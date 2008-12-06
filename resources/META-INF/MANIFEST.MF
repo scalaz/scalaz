@@ -1,0 +1,5 @@
+Main-Class: scalaz.Version
+Implementation-Title: Scalaz
+Implementation-URL: http://wiki.workingmouse.com/index.php/Scalaz
+Implementation-Vendor: Workingmouse Pty. Ltd. 
+Sealed: true
