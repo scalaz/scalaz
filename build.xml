@@ -6,8 +6,8 @@
 -->
     
 <project name="Scalaz" default="target" basedir=".">
-  <property name="projects.repository.uri" value="http://projects.workingmouse.com/public"/>
-  <property name="build-java.version" value="1.51"/>
+  <property name="projects.repository.uri" value="http://projects.tmorris.net/public"/>
+  <property name="build-java.version" value="1.52"/>
   <property name="scala.lib.path" value="lib"/>
   <property name="scaladoc.doctitle" value="Scalaz ${build.number} API Specification"/>
   <property name="scaladoc.top" value="&lt;div&gt;&lt;div align=&quot;right&quot;&gt;&lt;img src=&quot;http://projects.workingmouse.com/public/resources/images/logo_full_transparent.png&quot; alt=&quot;Workingmouse&quot;/&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Copyright Workingmouse Pty. Ltd. 2007, 2008&lt;/em&gt;&lt;/p&gt;This software is released under an open source BSD licence.&lt;/div&gt;"/>
