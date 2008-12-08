@@ -1,5 +1,6 @@
 package scalaz.database
 
+import sql.Relation
 import control.Semigroup
 import control.Semigroup.semigroup
 import control.SemigroupW._
@@ -144,4 +145,6 @@ object Database {
   def executeIndices(sql: String, columnIndices: Int*) = Function1Database(_.createStatement.execute(sql, columnIndices.toArray))
 
   def execute(sql: String, columnNames: String*) = Function1Database(_.createStatement.execute(sql, columnNames.toArray))
+
+  def from(relation: Relation, relations: Relation*) = sql.From.from(relation :: relations.toList)
 }
