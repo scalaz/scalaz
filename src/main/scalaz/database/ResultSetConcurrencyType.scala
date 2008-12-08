@@ -1,5 +1,7 @@
 package scalaz.database
 
+import java.sql.ResultSet.{ CONCUR_READ_ONLY, CONCUR_UPDATABLE }
+
 sealed trait ResultSetConcurrencyType {
   def asInt: Int
 }

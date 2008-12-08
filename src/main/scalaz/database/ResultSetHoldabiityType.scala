@@ -1,5 +1,7 @@
 package scalaz.database
 
+import java.sql.ResultSet.{ HOLD_CURSORS_OVER_COMMIT, CLOSE_CURSORS_AT_COMMIT }
+
 sealed trait ResultSetHoldabilityType {
   def asInt: Int
 }

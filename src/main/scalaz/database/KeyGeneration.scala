@@ -1,5 +1,7 @@
 package scalaz.database
 
+import java.sql.Statement.{ RETURN_GENERATED_KEYS, NO_GENERATED_KEYS }
+
 sealed trait KeyGeneration {
   def asInt: Int
 }

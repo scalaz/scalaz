@@ -1,5 +1,7 @@
 package scalaz.database
 
+import java.sql.Connection. { TRANSACTION_READ_UNCOMMITTED, TRANSACTION_READ_COMMITTED, TRANSACTION_REPEATABLE_READ, TRANSACTION_SERIALIZABLE }
+
 sealed trait TransactionIsolation {
   def asInt: Int
 }
