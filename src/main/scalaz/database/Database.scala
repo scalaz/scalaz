@@ -41,7 +41,7 @@ object Database {
 
   def commit = Function1Database(_.commit)
 
-  def arrayOf(name: String, elements: List[AnyRef]) = Function1Database(_.createArrayOf(name, elements.toArray))
+  def arrayOf(name: String, elements: AnyRef*) = Function1Database(_.createArrayOf(name, elements.toArray))
 
   def blob = Function1Database(_.createBlob)
 
@@ -57,7 +57,7 @@ object Database {
 
   def statement(t: ResultSetType, c: ResultSetConcurrencyType, h: ResultSetHoldabilityType) = Function1Database(_.createStatement(t.asInt, c.asInt, h.asInt))
 
-  def struct(name: String, attributes: List[AnyRef]) = Function1Database(_.createStruct(name, attributes.toArray))
+  def struct(name: String, attributes: AnyRef*) = Function1Database(_.createStruct(name, attributes.toArray))
 
   def autoCommit = Function1Database(_.getAutoCommit)
 
@@ -95,13 +95,13 @@ object Database {
 
   def prepareStatement(sql: String, g: KeyGeneration) = Function1Database(_.prepareStatement(sql, g.asInt))
 
-  def prepareStatementIndices(sql: String, columnIndices: List[Int]) = Function1Database(_.prepareStatement(sql, columnIndices.toArray))
+  def prepareStatementIndices(sql: String, columnIndices: Int*) = Function1Database(_.prepareStatement(sql, columnIndices.toArray))
 
   def prepareStatement(sql: String, t: ResultSetType, c: ResultSetConcurrencyType) = Function1Database(_.prepareStatement(sql, t.asInt, c.asInt))
 
   def prepareStatement(sql: String, t: ResultSetType, c: ResultSetConcurrencyType, h: ResultSetHoldabilityType) = Function1Database(_.prepareStatement(sql, t.asInt, c.asInt, h.asInt))
 
-  def prepareStatement(sql: String, columnNames: List[String]) = Function1Database(_.prepareStatement(sql, columnNames.toArray))
+  def prepareStatement(sql: String, columnNames: String*) = Function1Database(_.prepareStatement(sql, columnNames.toArray))
 
   def releaseSavepoint(s: Savepoint) = Function1Database(_.releaseSavepoint(s))
 
@@ -133,15 +133,15 @@ object Database {
 
   def update(sql: String, g: KeyGeneration) = Function1Database(_.createStatement.executeUpdate(sql, g.asInt))
 
-  def updateIndices(sql: String, columnIndices: List[Int]) = Function1Database(_.createStatement.executeUpdate(sql, columnIndices.toArray))
+  def updateIndices(sql: String, columnIndices: Int*) = Function1Database(_.createStatement.executeUpdate(sql, columnIndices.toArray))
 
-  def update(sql: String, columnNames: List[String]) = Function1Database(_.createStatement.executeUpdate(sql, columnNames.toArray))
+  def update(sql: String, columnNames: String*) = Function1Database(_.createStatement.executeUpdate(sql, columnNames.toArray))
 
   def execute(sql: String) = Function1Database(_.createStatement.execute(sql))
 
   def execute(sql: String, g: KeyGeneration) = Function1Database(_.createStatement.execute(sql, g.asInt))
 
-  def executeIndices(sql: String, columnIndices: List[Int]) = Function1Database(_.createStatement.execute(sql, columnIndices.toArray))
+  def executeIndices(sql: String, columnIndices: Int*) = Function1Database(_.createStatement.execute(sql, columnIndices.toArray))
 
-  def execute(sql: String, columnNames: List[String]) = Function1Database(_.createStatement.execute(sql, columnNames.toArray))
+  def execute(sql: String, columnNames: String*) = Function1Database(_.createStatement.execute(sql, columnNames.toArray))
 }
