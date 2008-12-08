@@ -13,6 +13,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/src/deps-main" />
+      <excludeFolder url="file://$MODULE_DIR$/src/deps-test" />
     </content>
     <orderEntry type="library" name="scala-2.7.2.final" level="project" />
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
