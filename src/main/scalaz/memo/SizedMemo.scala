@@ -1,4 +1,4 @@
-// Copyright Workingmouse Pty. Ltd. 2007, 2008
+// Copyright Tony Morris 2008
 // This software is released under an open source BSD licence.
 
 // $LastChangedRevision$
