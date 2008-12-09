@@ -1,4 +1,4 @@
-package scalaz.database
+package scalaz.database, but 
 
 import java.sql.ResultSet
 
