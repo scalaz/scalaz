@@ -10,7 +10,7 @@ package scalaz
 /**
  * Applies one type argument of two where one of the type arguments has a kind * -> *.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

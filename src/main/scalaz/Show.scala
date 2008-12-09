@@ -11,7 +11,7 @@ package scalaz
  * A strategy for displaying a value that serves as a suitable replacement for (the defective)
  * <code>java.lang.Object.toString</code>.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -32,7 +32,7 @@ import validation.Validation
 /**
  * Functions over show.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

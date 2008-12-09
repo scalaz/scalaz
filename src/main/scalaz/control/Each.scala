@@ -3,7 +3,7 @@ package scalaz.control
 /**
  * Executes a side-effect through an environment.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -18,7 +18,7 @@ trait Each[E[_]] {
 /**
  * Functions over each values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -101,7 +101,7 @@ object Each {
  * Wraps <code>Each</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Each
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -116,7 +116,7 @@ trait EachW[E[_], A] {
 /**
  * Functions over each values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

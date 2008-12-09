@@ -9,7 +9,7 @@ package scalaz.lazytuple
 
 /**
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -44,7 +44,7 @@ sealed trait LT5[+A, +B, +C, +D, +E] {
 /**
  * Functions over lazy tuple-5 values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

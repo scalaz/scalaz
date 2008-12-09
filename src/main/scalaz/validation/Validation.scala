@@ -11,7 +11,7 @@ import list.NonEmptyList
  *
  * @see scala.Either
  * @see scalaz.control.Applicative
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -176,7 +176,7 @@ sealed trait Validation[+E, +A] {
 /**
  * Functions over validation values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -238,7 +238,7 @@ object Validation {
   /**
    * An extractor that matches a failed validation.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$
@@ -256,7 +256,7 @@ object Validation {
   /**
    * An extractor that matches a succeeded validation.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$

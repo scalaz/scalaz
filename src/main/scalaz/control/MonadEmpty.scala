@@ -10,7 +10,7 @@ package scalaz.control
  * <li><strong>right identity (empty)</strong><br/><code>forall a. empty == bind(x => a, empty)</code></li>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -20,7 +20,7 @@ trait MonadEmpty[M[_]] extends Monad[M] with Empty[M]
 /**
  * Functions over monad-empty values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

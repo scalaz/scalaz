@@ -32,7 +32,7 @@ import scalaz.memo.SizedMemo._
  * The edit distance problem is a well known Dynamic Programming Algorithm (DPA) for which memoisation is very suitable.
  * This is evident by attempting to write the same algorithm some other way and observing the result. 
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

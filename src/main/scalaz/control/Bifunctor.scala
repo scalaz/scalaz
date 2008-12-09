@@ -11,7 +11,7 @@ package scalaz.control
  * </ol>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -26,7 +26,7 @@ trait Bifunctor[F[_, _]] {
 /**
  * Functions over binary functors.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -67,7 +67,7 @@ object Bifunctor {
  * Wraps <code>Bifunctor</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Bifunctor
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -102,7 +102,7 @@ trait BifunctorW[F[_, _], A, B] {
 /**
  * Functions over bifunctor values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -111,7 +111,7 @@ object BifunctorW {
   /**
    * Used to partially apply a higher-kinded argument when wrapping bifunctor.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$

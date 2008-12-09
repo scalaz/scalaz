@@ -14,7 +14,7 @@ package scalaz.control
  * </ol>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -29,7 +29,7 @@ trait Applicative[AP[_]] extends Functor[AP] with Pure[AP] with Apply[AP] {
 /**
  * Functions over applicatives.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -113,7 +113,7 @@ object Applicative {
  * Wraps <code>Applicative</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Applicative
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -193,7 +193,7 @@ trait ApplicativeW[AP[_], A] extends FunctorW[AP, A] with ApplyW[AP, A] {
  * Defines an applicative functor as described by McBride and Paterson in
  * <a href="http://www.soi.city.ac.uk/~ross/papers/Applicative.html">Applicative Programming with Effects</a>.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

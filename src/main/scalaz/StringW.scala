@@ -13,7 +13,7 @@ import validation.Validation
  * Wraps <code>scala.Predef.String</code> and provides additional methods.
  *
  * @see scala.Predef.String
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -63,7 +63,7 @@ sealed trait StringW {
 /**
  * Functions over strings.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

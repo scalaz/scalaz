@@ -10,7 +10,7 @@ package scalaz.lazytuple
 /**
  * A lazy tuple-7.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -55,7 +55,7 @@ sealed trait LT7[+A, +B, +C, +D, +E, +F, +G] {
 /**
  * Functions over lazy tuple-7 values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

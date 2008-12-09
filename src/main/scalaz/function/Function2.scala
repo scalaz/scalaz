@@ -11,7 +11,7 @@ package scalaz.function
  * Wraps <code>scala.Function2</code> and provides additional methods.
  *
  * @see scala.Function2
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -41,7 +41,7 @@ sealed trait Function2[-T1, -T2, +R] {
 /**
  * Functions over function-2.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

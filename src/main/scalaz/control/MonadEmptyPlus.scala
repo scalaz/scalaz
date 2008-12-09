@@ -7,7 +7,7 @@ package scalaz.control
  * All monad-empty-plus instances must satisfy the monad laws, the monad-empty laws and the monad-plus law.
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -17,7 +17,7 @@ trait MonadEmptyPlus[M[_]] extends MonadPlus[M] with MonadEmpty[M]
 /**
  * Functions over monad-empty-plus values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

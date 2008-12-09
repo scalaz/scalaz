@@ -3,7 +3,7 @@ package scalaz.control
 /**
  * A paramorphism of an iterable that can be deconstructed into next element and remaining elements.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -25,7 +25,7 @@ import list.NonEmptyList.nel
 /**
  * Functions over paramorphisms.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -80,7 +80,7 @@ object Paramorphism {
  * Wraps <code>Paramorphism</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Paramorphism
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -142,7 +142,7 @@ trait ParamorphismW[P[_], A] {
 /**
  * Functions over paramorphism values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -151,7 +151,7 @@ object ParamorphismW {
   /**
    * Used to partially apply a higher-kinded argument when wrapping paramorphism.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$

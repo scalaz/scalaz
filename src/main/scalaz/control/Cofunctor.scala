@@ -10,7 +10,7 @@ package scalaz.control
  * <li><strong>composition</strong><br/><code>forall a f g. comap(f compose g, a) == comap(g, comap(f, a))</code></li>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -25,7 +25,7 @@ trait Cofunctor[F[_]] {
 /**
  * Functions over contra-variant functors.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -43,7 +43,7 @@ object Cofunctor {
  * Wraps <code>Cofunctor</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Cofunctor
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -73,7 +73,7 @@ trait CofunctorW[F[_], A] {
 /**
  * Functions over contra-variant values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

@@ -27,7 +27,7 @@ fib n = fib (n - 1) + fib (n - 2)
  * again later (and so on). This algorithm has an excessive time complexity that is solved by memoising during
  * computation.</i>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

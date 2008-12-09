@@ -13,7 +13,7 @@ package scalaz
  * and the <code>Flip</code> type applies the second argument. See also
  * <a href="https://lampsvn.epfl.ch/trac/scala/ticket/339">Ticket #339</a>.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

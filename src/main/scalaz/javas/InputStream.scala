@@ -11,7 +11,7 @@ package scalaz.javas
  * Functions over a <code>java.io.InputStream</code>.
  *
  * @see java.io.InputStream
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

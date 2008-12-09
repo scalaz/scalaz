@@ -9,7 +9,7 @@ package scalaz.control
  * <li><strong>associativity</strong><br/><code>forall a b c. append(a, append(b, c)) == append(append(a, b), c)</code></li>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -24,7 +24,7 @@ trait Semigroup[S] {
 /**
  * Functions over pure values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

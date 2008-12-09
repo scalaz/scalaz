@@ -3,7 +3,7 @@ package scalaz.control
 /**
  * Folding a function across an iterable environment from left to right.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -22,7 +22,7 @@ trait FoldLeft[F[_]] {
 /**
  * Functions over fold-left values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -120,7 +120,7 @@ object FoldLeft {
  * Wraps <code>FoldLeft</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see FoldLeft
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -200,7 +200,7 @@ trait FoldLeftW[F[_], A] {
 /**
  * Functions over fold-left values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

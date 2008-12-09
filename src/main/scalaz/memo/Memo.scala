@@ -23,7 +23,7 @@ import TMemo.immutableAssociationTMemo
  * Further abstractions, such as purging the memoisation table, are achieved by abstracting over the type that maintains
  * the assocation (and so, may define means of purging themselves).
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -58,7 +58,7 @@ trait Memo[K, V] {
 /**
  * Functions creating memoisation types.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

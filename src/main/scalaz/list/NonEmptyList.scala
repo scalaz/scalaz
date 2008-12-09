@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
  * A List that has at least one element and therefore, a total <code>head</code> and <code>tail</code>. The structure is
  * backed by a <code>scala.List</code> and so is fully evaluated.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -89,7 +89,7 @@ sealed trait NonEmptyList[+A] {
 /**
  * Functions over non-empty lists.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

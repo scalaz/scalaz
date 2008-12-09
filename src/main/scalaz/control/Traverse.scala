@@ -6,7 +6,7 @@ package scalaz.control
  * <a href="http://citeseer.ist.psu.edu/536643.html">The Essence of the Iterator Pattern</a> by Saad Alfoudari and
  * L.J. Steggles for further work.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -24,7 +24,7 @@ trait Traverse[T[_]] {
 /**
  * Functions over traversable values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -136,7 +136,7 @@ object Traverse {
  * Wraps <code>Traversable</code> and a value for which there exists an instance and provides additional methods.
  *
  * @see Traversable
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -187,7 +187,7 @@ trait TraverseW[T[_], A] extends FunctorW[T, A] {
 /**
  * Functions over traversable values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

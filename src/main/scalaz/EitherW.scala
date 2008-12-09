@@ -11,7 +11,7 @@ package scalaz
  * Wraps <code>scala.Either</code> and provides additional methods.
  *
  * @see scala.Either
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -42,7 +42,7 @@ sealed trait EitherW[+A, +B] {
 /**
  * Functions over either values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -65,7 +65,7 @@ object EitherW {
   /**
    * Wraps a <code>scala.Either.LeftProjection</code>.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$
@@ -112,7 +112,7 @@ object EitherW {
   /**
    * Functions over left projections.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$
@@ -134,7 +134,7 @@ object EitherW {
   /**
    * Wraps a <code>scala.Either.RightProjection</code>.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$
@@ -181,7 +181,7 @@ object EitherW {
   /**
    * Functions over right projections.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$

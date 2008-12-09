@@ -11,7 +11,7 @@ package scalaz
  * A wrapper around a side-effect (<code>scala.Unit</code>)
  *
  * @see scala.Unit
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -36,7 +36,7 @@ sealed trait Effect {
 /**
  * Functions over side-effects.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

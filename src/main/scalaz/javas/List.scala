@@ -11,7 +11,7 @@ package scalaz.javas
  * Functions over <code>java.util.List</code>.
  *
  * @see java.util.List
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -37,7 +37,7 @@ object List {
   /**
    * Provides a non-empty extractor for <code>java.util.List</code>.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$
@@ -55,7 +55,7 @@ object List {
   /**
    * Provides an empty extractor for <code>java.util.List</code>.
    *
-   * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+   * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
    * @version $LastChangedRevision$<br>
    *          $LastChangedDate$<br>
    *          $LastChangedBy$

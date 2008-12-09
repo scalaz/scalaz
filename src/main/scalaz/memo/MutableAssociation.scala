@@ -13,7 +13,7 @@ import scala.collection.mutable.Map
  * Represents any association from a <code>K</code> (key) to <code>V</code> (value) over the mutable type
  * <code>T</code>, which represents the association.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -53,7 +53,7 @@ trait MutableAssociation[K, V, T] {
 /**
  * Functions creating mutable associative types.
  * 
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

@@ -10,7 +10,7 @@ package scalaz.control
  * <li><strong>right identity</strong><br/><code>forall a. append(a, zero) == a</code></li>
  * </p>
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -20,7 +20,7 @@ trait Monoid[M] extends Zero[M] with Semigroup[M]
 /**
  * Functions over monoids.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$

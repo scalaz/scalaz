@@ -11,7 +11,7 @@ package scalaz
  * Wraps <code>scala.Boolean</code> and provides additional methods.
  *
  * @see scala.Boolean
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
@@ -142,7 +142,7 @@ sealed trait BooleanW {
 /**
  * Functions over boolean values.
  *
- * @author <a href="mailto:research@workingmouse.com">Tony Morris</a>
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
