@@ -1,3 +1,10 @@
+// Copyright Tony Morris 2008
+// This software is released under an open source BSD licence.
+
+// $LastChangedRevision$
+// $LastChangedDate$
+
+
 package scalaz.database
 
 import java.sql.Connection. { TRANSACTION_READ_UNCOMMITTED, TRANSACTION_READ_COMMITTED, TRANSACTION_REPEATABLE_READ, TRANSACTION_SERIALIZABLE }

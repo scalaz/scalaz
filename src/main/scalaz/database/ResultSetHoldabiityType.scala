@@ -1,3 +1,10 @@
+// Copyright Tony Morris 2008
+// This software is released under an open source BSD licence.
+
+// $LastChangedRevision$
+// $LastChangedDate$
+
+
 package scalaz.database
 
 import java.sql.ResultSet.{ HOLD_CURSORS_OVER_COMMIT, CLOSE_CURSORS_AT_COMMIT }

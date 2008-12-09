@@ -1,3 +1,10 @@
+// Copyright Tony Morris 2008
+// This software is released under an open source BSD licence.
+
+// $LastChangedRevision$
+// $LastChangedDate$
+
+
 package scalaz.database
 
 import java.sql.ResultSet.{FETCH_FORWARD, FETCH_REVERSE, FETCH_UNKNOWN}

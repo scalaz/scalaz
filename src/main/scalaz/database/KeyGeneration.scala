@@ -1,3 +1,10 @@
+// Copyright Tony Morris 2008
+// This software is released under an open source BSD licence.
+
+// $LastChangedRevision$
+// $LastChangedDate$
+
+
 package scalaz.database
 
 import java.sql.Statement.{ RETURN_GENERATED_KEYS, NO_GENERATED_KEYS }
