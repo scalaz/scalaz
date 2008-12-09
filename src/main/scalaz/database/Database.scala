@@ -16,6 +16,7 @@ import java.sql.{Connection, Savepoint}
 import java.util.{Map, Properties}
 
 /**
+ * A functor over a database connection.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -23,14 +24,26 @@ import java.util.{Map, Properties}
  *          $LastChangedBy$
  */
 sealed trait Database[+A] {
+  /**
+   * Returns a value for the given database connection.
+   */
   def apply(c: Connection): A
 
   import Database._
 
+  /**
+   * Maps the given function across this database connection functor.
+   */
   def map[B](f: A => B): Database[B] = Function1Database(f compose (apply(_)))
 
+  /**
+   * Binds the given function across this database connection functor.
+   */
   def flatMap[B](f: A => Database[B]): Database[B] = Function1Database(c => f(apply(c))(c))
 
+  /**
+   * Returns a database connection functor that executes this database connection functor but ignores the result.
+   */
   def unary_~ = Function1Database(c => {
     apply(c)
     ()
@@ -38,6 +51,7 @@ sealed trait Database[+A] {
 }
 
 /**
+ * Functions over database connection functors.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -45,16 +59,31 @@ sealed trait Database[+A] {
  *          $LastChangedBy$
  */
 object Database {
+  /**
+   * Converts the given function into a database connection functor.
+   */
   implicit def Function1Database[A](f: Connection => A) = new Database[A] {
     def apply(c: Connection) = f(c)
   }
 
+  /**
+   * Returns a function for the given database connection functor.
+   */
   implicit def DatabaseFunction1[A](d: Database[A]) = d(_: Connection)
 
+  /**
+   * An associative operation for a database connection functor.
+   */
   implicit def DatabaseSemigroup[A](implicit s: Semigroup[A]) = semigroup[Database[A]](d1 => d2 => Function1Database(c => d1.apply(c) |+| d2.apply(c)))
 
+  /**
+   * Constructs a database functor that always produces the given value (the unital operation for the database connection monad).
+   */
   def constant[A](a: A) = Function1Database(c => a)
 
+  /**
+   * Returns an indentity database connection functor.
+   */
   def id = Function1Database(c => c)
 
   def clearWarnings = Function1Database(_.clearWarnings)

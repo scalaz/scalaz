@@ -10,6 +10,7 @@ package scalaz.database
 import java.sql.ResultSet.{ CONCUR_READ_ONLY, CONCUR_UPDATABLE }
 
 /**
+ * ResultSet concurrency.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -20,6 +21,7 @@ sealed trait ResultSetConcurrencyType {
   def asInt: Int
 }
 /**
+ * <code>ResultSet.CONCUR_READ_ONLY</code>
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -30,6 +32,7 @@ final case object ReadOnly extends ResultSetConcurrencyType {
   def asInt = CONCUR_READ_ONLY
 }
 /**
+ * <code>ResultSet.CONCUR_UPDATABLE</code>
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -41,6 +44,7 @@ final case object Updatable extends ResultSetConcurrencyType {
 }
 
 /**
+ * Functions over ResultSet concurrency.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
@@ -48,7 +52,13 @@ final case object Updatable extends ResultSetConcurrencyType {
  *          $LastChangedBy$
  */
 object ResultSetConcurrencyType {
+  /**
+   * All ResultSet concurrency values.
+   */
   def resultSetConcurrencyTypes = List(ReadOnly, Updatable)
 
+  /**
+   * Returns a ResultSet concurrency for the given value if one exists.
+   */
   def fromInt(n: Int) = resultSetConcurrencyTypes find (_.asInt == n)
 }
