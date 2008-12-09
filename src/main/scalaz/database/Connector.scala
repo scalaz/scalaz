@@ -9,10 +9,24 @@ package scalaz.database
 
 import java.sql.{Connection, SQLException, DriverManager => DM}
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait Connector {
   def connect: Either[SQLException, Connection]
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 object Connector {
   def connector(f: => Either[SQLException, Connection]) = new Connector {
     def connect = f

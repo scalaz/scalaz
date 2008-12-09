@@ -7,6 +7,13 @@
 
 package scalaz.database.sql
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait From {
   def relations: List[Relation]
 
@@ -17,6 +24,13 @@ sealed trait From {
   def sql = relations.map(_.toSQL).mkString(",")
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */  
 object From {
   def from(rs: List[Relation]) = new From {
     def relations = rs

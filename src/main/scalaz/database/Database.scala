@@ -15,6 +15,13 @@ import java.sql.{Connection, Savepoint}
 
 import java.util.{Map, Properties}
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait Database[+A] {
   def apply(c: Connection): A
 
@@ -30,6 +37,13 @@ sealed trait Database[+A] {
   })
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 object Database {
   implicit def Function1Database[A](f: Connection => A) = new Database[A] {
     def apply(c: Connection) = f(c)

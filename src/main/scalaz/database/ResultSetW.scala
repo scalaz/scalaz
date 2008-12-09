@@ -9,6 +9,13 @@ package scalaz.database
 
 import java.sql.ResultSet
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait ResultSetW {
   val resultset: ResultSet
 
@@ -23,6 +30,13 @@ sealed trait ResultSetW {
   }
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */  
 object ResultSetW {
   implicit def resultset(r: ResultSet) = new ResultSetW {
     val resultset = r

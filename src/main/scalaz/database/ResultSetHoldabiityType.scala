@@ -9,16 +9,44 @@ package scalaz.database
 
 import java.sql.ResultSet.{ HOLD_CURSORS_OVER_COMMIT, CLOSE_CURSORS_AT_COMMIT }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait ResultSetHoldabilityType {
   def asInt: Int
 }
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 final case object CursorsOverCommit extends ResultSetHoldabilityType {
   def asInt = HOLD_CURSORS_OVER_COMMIT
 }
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 final case object CloseCursorsAtCommit extends ResultSetHoldabilityType {
   def asInt = CLOSE_CURSORS_AT_COMMIT
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 object ResultSetHoldabilityType {
   def resultSetHoldabilityTypes = List(CursorsOverCommit, CloseCursorsAtCommit)
 

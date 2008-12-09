@@ -9,6 +9,13 @@ package scalaz.database
 
 import java.sql.SQLException
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait DatabaseState {
   val con: Connector
   val terminal: Database[Unit]
@@ -30,6 +37,13 @@ sealed trait DatabaseState {
       })
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 object DatabaseState {
   def databaseState(c: Connector, t: Database[Unit]) = new DatabaseState {
     val con = c

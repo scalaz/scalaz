@@ -14,6 +14,13 @@ import java.util.{Calendar, Map}
 import java.math.BigDecimal
 import java.net.URL
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 trait ImmutableResultSet {
   def findColumn(column: String): Int
   def array(column: String): Array
@@ -98,6 +105,13 @@ trait ImmutableResultSet {
   def wasNull: Boolean
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 object ImmutableResultSet {
   implicit def resultset(r: ResultSet) = new ImmutableResultSet {
     import java.util.Calendar

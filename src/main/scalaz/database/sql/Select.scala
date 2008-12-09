@@ -7,6 +7,13 @@
 
 package scalaz.database.sql
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait Select {
   def from: From
   def selectors: List[Selector]
@@ -18,6 +25,13 @@ sealed trait Select {
   def where(p: Predicate) = Database.query("SELECT " + sql + " FROM " + from.sql + " WHERE " + p.toSQL)
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */  
 object Select {
   def select(f: From, s: List[Selector]) = new Select {
     def from = f

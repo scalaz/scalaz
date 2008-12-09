@@ -7,6 +7,13 @@
 
 package scalaz.database.sql
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */
 sealed trait Predicate {
   def toSQL: String
 
@@ -17,6 +24,13 @@ sealed trait Predicate {
   def &&&(p: Predicate) = predicate("(" + toSQL + " AND " + p.toSQL + ")") 
 }
 
+/**
+ *
+ * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
+ * @version $LastChangedRevision$<br>
+ *          $LastChangedDate$<br>
+ *          $LastChangedBy$
+ */  
 object Predicate {
   implicit def predicate(s: String) = new Predicate {
     def toSQL = s
