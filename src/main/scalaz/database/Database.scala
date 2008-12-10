@@ -8,9 +8,6 @@
 package scalaz.database
 
 import sql.Relation
-import control.Semigroup
-import control.Semigroup.semigroup
-import control.SemigroupW._
 import java.sql.{Connection, Savepoint}
 
 import java.util.{Map, Properties}
@@ -50,6 +47,14 @@ sealed trait Database[+A] {
   })
 }
 
+import control.Semigroup
+import control.Semigroup.semigroup
+import control.SemigroupW._
+import control.Zero
+import control.Zero.z
+import control.Monoid
+import control.Monoid.monoid
+
 /**
  * Functions over database connection functors.
  *
@@ -76,6 +81,19 @@ object Database {
    */
   implicit def DatabaseSemigroup[A](implicit s: Semigroup[A]) = semigroup[Database[A]](d1 => d2 => Function1Database(c => d1.apply(c) |+| d2.apply(c)))
 
+  /**
+   * A zero for a database connection functor.
+   */
+  implicit def DatabaseZero[A](implicit az: Zero[A]): control.Zero[Database[A]] = z(Function1Database(c => az.zero))
+
+  /**
+   * A monoid for a database connection functor.
+   */
+  implicit def DatabaseMonoid[A](implicit az: Monoid[A]) = monoid[Database[A]]
+
+  // todo  Functor, Applicative, Monad
+
+  
   /**
    * Constructs a database functor that always produces the given value (the unital operation for the database connection monad).
    */
