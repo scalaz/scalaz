@@ -22,6 +22,16 @@ sealed trait Digit {
   val toLong: Long
 
   /**
+   * Compare two digits for equality.
+   */
+  override def equals(o: Any) = o != null && o.isInstanceOf[Digit] && toLong == o.asInstanceOf[Digit].toLong
+
+  /**
+   * A hash code for this digit.
+   */
+  override def hashCode = toLong.hashCode
+
+  /**
    * A String representation of this digit.
    */
   override def toString = toLong.toString
