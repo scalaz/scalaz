@@ -20,6 +20,11 @@ sealed trait Digit {
    * A long value for this digit.
    */
   val toLong: Long
+
+  /**
+   * A String representation of this digit.
+   */
+  override def toString = toLong.toString
 }
 /**
  * Zero.
