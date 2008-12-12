@@ -22,6 +22,11 @@ sealed trait Digit {
   val toLong: Long
 
   /**
+   * A character value for this digit.
+   */
+  def toChar = (toLong - 48).toChar
+
+  /**
    * Compare two digits for equality.
    */
   override def equals(o: Any) = o != null && o.isInstanceOf[Digit] && toLong == o.asInstanceOf[Digit].toLong
