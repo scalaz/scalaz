@@ -163,7 +163,7 @@ object Semigroup {
   /**
    * A semigroup for <code>forall M. scalaz.control.Pure[M]</code>.
    */
-  implicit def PureSemigroup[M[_]](implicit m: Monad[M]) = new Semigroup[Pure[M]] {
+  def PureSemigroup[M[_]](implicit m: Monad[M]) = new Semigroup[Pure[M]] {
     def append(s1: => Pure[M], s2: => Pure[M]) = new Pure[M] {
       def pure[A](a: A) = m.bind(s1.pure(_: A), s2.pure(a))
     }

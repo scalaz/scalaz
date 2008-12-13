@@ -102,4 +102,9 @@ object Monoid {
    * A monoid for <code>forall T U. scala.Either.RightProjection[T, U]</code>.
    */
   implicit def EitherRightMonoid[A, B](implicit s: Monoid[A]) = monoid[Either.RightProjection[B, A]]
+
+  /**
+   * A monoid for <code>forall M. scalaz.control.Pure[M]</code>.
+   */
+  def PureMonoid[M[_]](implicit m: Monad[M]) = monoid[Pure[M]](Zero.PureZero[M], Semigroup.PureSemigroup[M])
 }

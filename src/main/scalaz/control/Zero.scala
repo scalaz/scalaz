@@ -100,7 +100,12 @@ object Zero {
    * A zero for <code>forall T U. scala.Either.RightProjection[T, U]</code>.
    */
   implicit def EitherRightZero[A, B](implicit zz: Zero[A]) = z[Either.RightProjection[B, A]](Right(zz.zero).right)
-  
+
+  /**
+   * A zero for <code>forall M. scalaz.control.Pure[M]</code>.
+   */
+  def PureZero[M[_]](implicit m: Monad[M]) = z[Pure[M]](m)
+
   /**
    * Return the zero value for the given implementation.
    */
