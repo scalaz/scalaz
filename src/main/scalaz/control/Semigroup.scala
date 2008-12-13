@@ -159,6 +159,15 @@ object Semigroup {
         case (Left(e1), Left(e2)) => fail[B](sa append (e1, e2))
       }
   }
+
+  /**
+   * A semigroup for <code>forall M. scalaz.control.Pure[M]</code>.
+   */
+  implicit def PureSemigroup[M[_]](implicit m: Monad[M]) = new Semigroup[Pure[M]] {
+    def append(s1: => Pure[M], s2: => Pure[M]) = new Pure[M] {
+      def pure[A](a: A) = m.bind(s1.pure(_: A), s2.pure(a))
+    }
+  }
 }
 
 trait SemigroupW[S] {
