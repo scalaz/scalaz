@@ -112,9 +112,24 @@ object Monad {
   /**
    * Sequences the given iterable of monad values to produce a monad value of a container.
    */
-  def sequence[M[_], F[_], N[_]] = new {
-    def apply[A](ms: F[M[A]])(implicit m: Monad[M], fr: FoldRight[F], p: Pure[N], mo: Monoid[N[A]]) =
+  def sequence[M[_], F[_], N[_]] = new SequenceApply[M, F, N] {
+    def apply[A](ms: F[M[A]])(implicit m: Monad[M], fr: FoldRight[F], p: Pure[N], mo: Monoid[N[A]]): M[N[A]] =
       fr.foldRight[M[A], M[N[A]]](ms, m.pure(mo.zero), (a, b) => m.bind((x: A) => m.fmap((xs: N[A]) => p.pure(x) |+| xs, b), a))
+  }
+
+  /**
+   * Provides partial application of type arguments to <code>sequence</code>.
+   */
+  trait SequenceApply[M[_], F[_], N[_]] {
+    def apply[A](ms: F[M[A]])(implicit m: Monad[M], fr: FoldRight[F], p: Pure[N], mo: Monoid[N[A]]): M[N[A]]
+  }
+}
+
+object T {
+  def main(args: Array[String]) {
+    import Monad._
+    val x = sequence[List, List, List](List(List(1, 2, 3), List(4, 5, 6)))
+    println(x)    
   }
 }
 
