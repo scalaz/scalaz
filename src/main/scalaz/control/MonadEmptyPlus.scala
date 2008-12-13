@@ -57,7 +57,7 @@ object MonadEmptyPlus {
    * @param f The function to unfold to construct the container.
    * @param b The beginning value to start unfolding with.
    */
-  def unfold[M[_]]: { def apply[A, B](f: B => Option[(A, B)], b: B)(implicit m: MonadEmptyPlus[M]): M[A] } = new {
+  def unfold[M[_]]: UnfoldApply[M] = new UnfoldApply[M] {
     def apply[A, B](f: B => Option[(A, B)], b: B)(implicit m: MonadEmptyPlus[M]): M[A] =
       f(b) match {
         case None => m.empty
@@ -66,22 +66,43 @@ object MonadEmptyPlus {
   }
 
   /**
+   * Provides partial application of type arguments to <code>unfold</code>.
+   */
+  trait UnfoldApply[M[_]] {
+    def apply[A, B](f: B => Option[(A, B)], b: B)(implicit m: MonadEmptyPlus[M]): M[A]
+  }
+
+  /**
    * Replicates the given value the given number of times.
    *
    * @param n The number of times to replicate the given value.
    * @param a The value to replicate.
    */
-  def replicate[M[_]]: { def apply[A](n: Int, a: A)(implicit m: MonadEmptyPlus[M]): M[A] } = new {
+  def replicate[M[_]]: ReplicateApply[M] = new ReplicateApply[M] {
     def apply[A](n: Int, a: A)(implicit m: MonadEmptyPlus[M]): M[A] =
       if(n <= 0) m.empty
       else m.plus(m.pure(a), replicate[M](n - 1, a))
   }
 
   /**
+   * Provides partial application of type arguments to <code>replicate</code>.
+   */
+  trait ReplicateApply[M[_]] {
+    def apply[A](n: Int, a: A)(implicit m: MonadEmptyPlus[M]): M[A]
+  }
+
+  /**
    * Sums the given iterable by sequencing.
    */
-  def sum[F[_], M[_]] = new {
+  def sum[F[_], M[_]] = new SumApply[F, M] {
     def apply[A](as: F[M[A]])(implicit f: FoldRight[F], m: MonadEmptyPlus[M]) =
       f.foldRight[M[A], M[A]](as, m.empty, m.plus(_, _))
+  }
+
+  /**
+   * Provides partial application of type arguments to <code>replicate</code>.
+   */
+  trait SumApply[F[_], M[_]] {
+    def apply[A](as: F[M[A]])(implicit f: FoldRight[F], m: MonadEmptyPlus[M]): M[A]
   }
 }

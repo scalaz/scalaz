@@ -125,14 +125,6 @@ object Monad {
   }
 }
 
-object T {
-  def main(args: Array[String]) {
-    import Monad._
-    val x = sequence[List, List, List](List(List(1, 2, 3), List(4, 5, 6)))
-    println(x)    
-  }
-}
-
 /**
  * Wraps <code>Monad</code> and a value for which there exists an instance and provides additional methods.
  *
