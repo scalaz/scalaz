@@ -176,7 +176,7 @@ object Digit {
    * Converts the given long value to a sequence of digits.
    */
   def longDigits[T[_]](n: Long)(implicit f: FoldLeft[T], m: MonadEmptyPlus[T]): T[Digit] =
-    foldleft[T](unfold[T]((b: Long) => if(b == 0) None else Some (b % 10L: Digit, b / 10L), n)).rev[T]
+    if(n == 0) m.empty else foldleft[T](unfold[T]((b: Long) => if(b == 0) None else Some (b % 10L: Digit, b / 10L), n)).rev[T]
 
   /**
    * Converts the given sequence of digits to a long value.
@@ -187,5 +187,5 @@ object Digit {
   /**
    * Converts the given character to a digit.
    */
-  def charDigit(c: Char): Option[Digit] = if(c < '0' || c > '9') None else longDigits(c.toLong - '0').firstOption
+  def charDigit(c: Char): Option[Digit] = if(c < '0' || c > '9') None else longDigits[List](c.toLong - '0').firstOption
 }
