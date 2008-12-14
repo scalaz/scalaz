@@ -187,5 +187,5 @@ object Digit {
   /**
    * Converts the given character to a digit.
    */
-  def charDigit(c: Char) = if(c < '0' || c > '9') None else Some(longDigits(c.toLong - '0'))
+  def charDigit(c: Char): Option[Digit] = if(c < '0' || c > '9') None else longDigits(c.toLong - '0').firstOption
 }
