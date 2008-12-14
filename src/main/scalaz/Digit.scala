@@ -183,4 +183,9 @@ object Digit {
    */
   def digitsLong[T[_]](ds: T[Digit])(implicit f: FoldLeft[T]) =
     f.foldLeft[Long, Digit](ds, 0L, (a, b) => a * 10L + b)
+
+  /**
+   * Converts the given character to a digit.
+   */
+  def charDigit(c: Char) = if(c < '0' || c > '9') None else Some(longDigits(c.toLong - '0'))
 }
