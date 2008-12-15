@@ -17,12 +17,17 @@ package scalaz
  */
 sealed trait Digit {
   /**
-   * A long value for this digit.
+   * An integer value for this digit.
    */
-  val toLong: Long
+  val toInt: Int
 
   /**
-   * A character value for this digit.
+   * A long value for this digit.
+   */
+  val toLong = toInt.toLong
+
+  /**
+   *   A character value for this digit.
    */
   def toChar = (toLong - 48).toChar
 
@@ -48,7 +53,7 @@ final case object _0 extends Digit {
   /**
    * <code>0</code>.
    */
-  override val toLong = 0L
+  override val toInt = 0
 }
 /**
  * One.
@@ -57,7 +62,7 @@ final case object _1 extends Digit {
   /**
    * <code>1</code>.
    */
-  override val toLong = 1L
+  override val toInt = 1
 }
 /**
  * Two.
@@ -66,7 +71,7 @@ final case object _2 extends Digit {
   /**
    * <code>2</code>.
    */
-  override val toLong = 2L
+  override val toInt = 2
 }
 /**
  * Three.
@@ -75,7 +80,7 @@ final case object _3 extends Digit {
   /**
    * <code>3</code>.
    */
-  override val toLong = 3L
+  override val toInt = 3
 }
 /**
  * Four.
@@ -84,7 +89,7 @@ final case object _4 extends Digit {
   /**
    * <code>4</code>.
    */
-  override val toLong = 4L
+  override val toInt = 4
 }
 /**
  * Five.
@@ -93,7 +98,7 @@ final case object _5 extends Digit {
   /**
    * <code>5</code>.
    */
-  override val toLong = 5L
+  override val toInt = 5
 }
 /**
  * Six.
@@ -102,7 +107,7 @@ final case object _6 extends Digit {
   /**
    * <code>6</code>.
    */
-  override val toLong = 6L
+  override val toInt = 6
 }
 /**
  * Seven.
@@ -111,7 +116,7 @@ final case object _7 extends Digit {
   /**
    * <code>7</code>.
    */
-  override val toLong = 7L
+  override val toInt = 7
 }
 /**
  * Eight.
@@ -120,7 +125,7 @@ final case object _8 extends Digit {
   /**
    * <code>8</code>.
    */
-  override val toLong = 8L
+  override val toInt = 8
 }
 /**
  * Nine.
@@ -129,7 +134,7 @@ final case object _9 extends Digit {
   /**
    * <code>9</code>.
    */
-  override val toLong = 9L
+  override val toInt = 9
 }
 
 /**
