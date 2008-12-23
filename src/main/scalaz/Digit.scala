@@ -29,7 +29,7 @@ sealed trait Digit {
   /**
    *   A character value for this digit.
    */
-  def toChar = (toLong - 48).toChar
+  def toChar = (toLong + 48).toChar
 
   /**
    * Compare two digits for equality.
