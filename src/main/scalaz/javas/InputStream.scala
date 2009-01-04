@@ -22,18 +22,25 @@ object InputStream {
    */
   implicit def InputStreamByteIterator(in: java.io.InputStream) = 
     new Iterator[Byte] {
-      var i = in.read
+      var i: Int = _
+      var b = false
+      var h = true
       
-      def next =
-        if(i == -1)
-          error("Iterator.next (no more elements)")
-        else {
-          val r = i
-          i = in.read
-          r.toByte
-        }
+      def next = if(hasNext) {
+        b = false
+        i.toByte
+      } else error("Iterator.next (no more elements)")
      
-      def hasNext = i != -1
+      def hasNext = {
+        if(b) h
+        else if(h) {
+          i = in.read
+          b = true
+          if(i == -1)
+            h = false
+          h
+        } else false
+      }
   }
 
   /**
