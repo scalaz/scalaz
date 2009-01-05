@@ -48,7 +48,7 @@ object InputStream {
    */
   implicit def ByteIteratorInputStream(i: Iterator[Byte]) =
     new java.io.InputStream {
-      def read = if(i.hasNext) -1 else i.next.toInt
+      def read = if(i.hasNext) i.next.toInt else -1
     }
 
   /**
