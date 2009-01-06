@@ -54,6 +54,11 @@ import control.Monoid.monoid
 import control.{Monoid, Zero, Semigroup, Functor, Pure, Apply, Bind}
 import control.Applicative.applicative
 import control.Monad.monad
+import control.FunctorW._
+import control.ApplyW._
+import control.ApplicativeW
+import control.BindW._
+import control.MonadW
 
 /**
  * Functions over database connection functors.
@@ -91,26 +96,69 @@ object Database {
    */
   implicit def DatabaseMonoid[A](implicit az: Monoid[A]) = monoid[Database[A]]
 
+  /**
+   * A functor for a database connection functor.
+   */
   implicit val DatabaseFunctor = new Functor[Database] {
     def fmap[A, B](f: A => B, ft: Database[A]) = Function1Database(c => f(ft(c)))
   }
 
+  /**
+   * A functor wrapper for a database connection functor.
+   */
+  implicit val DatabaseFunctorW = functor[Database]
+
+  /**
+   * A pure for a database connection functor.
+   */
   implicit val DatabasePure = new Pure[Database] {
     def pure[A](a: A) = constant(a)
   }
 
+  /**
+   * An apply for a database connection functor.
+   */
   implicit val DatabaseApply = new Apply[Database] {
     def apply[A, B](f: Database[A => B], a: Database[A]) = f flatMap (f => a map (f(_)))
   }
 
+  /**
+   * An apply wrapper for a database connection functor.
+   */
+  implicit val DatabaseApplyW = apply[Database]
+
+  /**
+   * An applicative for a database connection functor.
+   */
   implicit val DatabaseApplicative = applicative[Database]
 
+  /**
+   * An applicative wrapper for a database connection functor.
+   */
+  implicit val DatabaseApplicativeW = ApplicativeW.applicative[Database]
+  
+  /**
+   * A bind for a database connection functor.
+   */
   implicit val DatabaseBind = new Bind[Database] {
     def bind[A, B](f: A => Database[B], a: Database[A]) = a flatMap f
   }
 
+  /**
+   * A bind wrapper for a database connection functor.
+   */
+  implicit val DatabaseBindW = bind[Database]
+
+  /**
+   * A monad for a database connection functor.
+   */
   implicit val DatabaseMonad = monad[Database]
-  
+
+  /**
+   * A monad wrapper for a database connection functor.
+   */
+  implicit val DatabaseMonadW = MonadW.monad[Database]
+
   /**
    * Constructs a database functor that always produces the given value (the unital operation for the database connection monad).
    */
