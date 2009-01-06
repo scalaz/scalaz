@@ -47,13 +47,13 @@ sealed trait Database[+A] {
   })
 }
 
-import control.Semigroup
 import control.Semigroup.semigroup
 import control.SemigroupW._
-import control.Zero
 import control.Zero.z
-import control.Monoid
 import control.Monoid.monoid
+import control.{Monoid, Zero, Semigroup, Functor, Pure, Apply, Bind}
+import control.Applicative.applicative
+import control.Monad.monad
 
 /**
  * Functions over database connection functors.
@@ -91,8 +91,25 @@ object Database {
    */
   implicit def DatabaseMonoid[A](implicit az: Monoid[A]) = monoid[Database[A]]
 
-  // todo  Functor, Applicative, Monad
+  implicit val DatabaseFunctor = new Functor[Database] {
+    def fmap[A, B](f: A => B, ft: Database[A]) = Function1Database(c => f(ft(c)))
+  }
 
+  implicit val DatabasePure = new Pure[Database] {
+    def pure[A](a: A) = constant(a)
+  }
+
+  implicit val DatabaseApply = new Apply[Database] {
+    def apply[A, B](f: Database[A => B], a: Database[A]) = f flatMap (f => a map (f(_)))
+  }
+
+  implicit val DatabaseApplicative = applicative[Database]
+
+  implicit val DatabaseBind = new Bind[Database] {
+    def bind[A, B](f: A => Database[B], a: Database[A]) = a flatMap f
+  }
+
+  implicit val DatabaseMonad = monad[Database]
   
   /**
    * Constructs a database functor that always produces the given value (the unital operation for the database connection monad).
