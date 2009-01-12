@@ -39,6 +39,11 @@ sealed trait Database[+A] {
   def flatMap[B](f: A => Database[B]): Database[B] = Function1Database(c => f(apply(c))(c))
 
   /**
+   * Returns a value for the given database connection.
+   */
+  def unary_!(implicit c: Connection) = apply(c)
+
+  /**
    * Returns a database connection functor that executes this database connection functor but ignores the result.
    */
   def unary_~ = Function1Database(c => {
