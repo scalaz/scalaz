@@ -34,7 +34,7 @@ sealed trait Digit {
   /**
    * Compare two digits for equality.
    */
-  override def equals(o: Any) = o == this
+  override def equals(o: Any) = o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
 
   /**
    * A hash code for this digit.
