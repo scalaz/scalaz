@@ -34,17 +34,17 @@ sealed trait Digit {
   /**
    * Compare two digits for equality.
    */
-  override def equals(o: Any) = o != null && o.isInstanceOf[Digit] && toLong == o.asInstanceOf[Digit].toLong
+  override def equals(o: Any) = o == this
 
   /**
    * A hash code for this digit.
    */
-  override def hashCode = toLong.hashCode
+  override def hashCode = toInt.hashCode
 
   /**
    * A String representation of this digit.
    */
-  override def toString = toLong.toString
+  override def toString = toInt.toString
 }
 /**
  * Zero.
