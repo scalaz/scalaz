@@ -31,6 +31,16 @@ sealed trait Digit {
    */
   def toChar = (toLong + 48).toChar
 
+   /**
+   * Compare two digits for equality.
+   */
+  override def equals(o: Any) = o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
+
+  /**
+   * A hash code for this digit.
+   */
+  override def hashCode = toInt
+
   /**
    * A String representation of this digit.
    */
