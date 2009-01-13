@@ -173,7 +173,7 @@ object Digit {
     case _ => Math.abs(n) % 10L
   }
 
-  import control.{FoldLeft, MonadEmptyPlus}
+  import control.{Functor, FoldLeft, MonadEmptyPlus}
   import control.FoldLeftW.foldleft
   import control.MonadEmptyPlus.unfold
 
@@ -193,4 +193,15 @@ object Digit {
    * Converts the given character to a digit.
    */
   def charDigit(c: Char): Option[Digit] = if(c < '0' || c > '9') None else longDigits[List](c.toLong - '0').firstOption
+
+  /**
+   * Converts the given characters to digits.
+   */
+  def charDigits[F[_]](c: F[Char])(implicit f: Functor[F]): F[Option[Digit]] = f.fmap(charDigit(_: Char), c)
+
+  /**
+   * Converts the given characters to digits sequencing through potential failure.
+   */
+  def charDigits(c: List[Char]) = 
+    charDigits[List](c).foldRight[Option[List[Digit]]](Some(Nil))((a, b) => for(j <- a; k <- b) yield j :: k)
 }
