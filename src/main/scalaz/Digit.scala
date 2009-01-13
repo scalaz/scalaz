@@ -174,6 +174,7 @@ object Digit {
   }
 
   import control.{Functor, FoldLeft, MonadEmptyPlus}
+  import control.CofunctorW._
   import control.FoldLeftW.foldleft
   import control.MonadEmptyPlus.unfold
 
@@ -204,4 +205,14 @@ object Digit {
    */
   def charDigits(c: List[Char]) = 
     charDigits[List](c).foldRight[Option[List[Digit]]](Some(Nil))((a, b) => for(j <- a; k <- b) yield j :: k)
+
+  /**
+   * Equality over digits.
+   */
+  implicit def EqualDigit: Equal[Digit] = Equal.equal(_.toInt == _.toInt)
+
+  /**
+   * Ordering over digits.
+   */
+  implicit def OrderDigit: Order[Digit] = Order.OrderInt < (_.toInt)
 }
