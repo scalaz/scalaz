@@ -115,7 +115,7 @@ object Equal {
     var x2 = a2
 
     while(!x1.isEmpty && !x2.isEmpty) {
-      if(!e.eq(x1.head, x2.head))
+      if(!e.equal(x1.head, x2.head))
         false
 
       x1 = x1.tail
@@ -133,7 +133,7 @@ object Equal {
     var x2 = a2
 
     while(!x1.isEmpty && !x2.isEmpty) {
-      if(!e.eq(x1.head, x2.head))
+      if(!e.equal(x1.head, x2.head))
         false
 
       x1 = x1.tail
