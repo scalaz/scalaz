@@ -65,9 +65,14 @@ sealed trait OptionW[A] {
   def toFail[B](success: => B): Validation[A, B] = option.toLeft(success)
 
   /**
-   * Returns a failure with the given value if this is <code>None</code>, otherwise returns this value in success. 
+   * Returns a failure with the given value if this is <code>None</code>, otherwise returns this value in success.
    */
   def toSuccess[B](fail: => B): Validation[B, A] = option.toRight(fail)
+
+  /**
+   * A synonym for <code>toSuccess</code>.
+   */
+  def ~[B](fail: => B): Validation[B, A] = toSuccess(fail)
 
   /**
    * Maps the given function then <code>getOrElse</code> the given value.
