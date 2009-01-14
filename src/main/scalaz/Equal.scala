@@ -113,7 +113,7 @@ object Equal {
   implicit def EqualStream[A](implicit e: Equal[A]): Equal[Stream[A]] = equal[Stream[A]]((a1, a2) => {
     var x1 = a1
     var x2 = a2
-    var b = true
+    var b = false
 
     while(!x1.isEmpty && !x2.isEmpty && !b) {
       if(!e.equal(x1.head, x2.head))
