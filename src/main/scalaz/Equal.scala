@@ -113,13 +113,15 @@ object Equal {
   implicit def EqualStream[A](implicit e: Equal[A]): Equal[Stream[A]] = equal[Stream[A]]((a1, a2) => {
     var x1 = a1
     var x2 = a2
+    var b = true
 
-    while(!x1.isEmpty && !x2.isEmpty) {
+    while(!x1.isEmpty && !x2.isEmpty && !b) {
       if(!e.equal(x1.head, x2.head))
-        false
-
-      x1 = x1.tail
-      x2 = x2.tail
+        b = true
+      else {
+        x1 = x1.tail
+        x2 = x2.tail
+      }
     }
 
     x1.isEmpty && x2.isEmpty        
@@ -131,13 +133,15 @@ object Equal {
   implicit def EqualList[A](implicit e: Equal[A]): Equal[List[A]] = equal[List[A]]((a1, a2) => {
     var x1 = a1
     var x2 = a2
+    var b = false
 
-    while(!x1.isEmpty && !x2.isEmpty) {
+    while(!x1.isEmpty && !x2.isEmpty && !b) {
       if(!e.equal(x1.head, x2.head))
-        false
-
-      x1 = x1.tail
-      x2 = x2.tail
+        b = true
+      else {
+        x1 = x1.tail
+        x2 = x2.tail
+      }
     }
 
     x1.isEmpty && x2.isEmpty    
