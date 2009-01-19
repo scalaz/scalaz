@@ -27,37 +27,63 @@ sealed trait StringW {
   /**
    * Parses this string as a boolean and returns it in <code>Right</code>.
    */
-  val parseBoolean: Validation[NumberFormatException, Boolean] = EitherW.throws(java.lang.Boolean.parseBoolean(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseBoolean: Validation[NumberFormatException, Boolean] = EitherW.throws(java.lang.Boolean.parseBoolean(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as a byte and returns it in <code>Right</code>.
    */
-  val parseByte: Validation[NumberFormatException, Byte] = EitherW.throws(java.lang.Byte.parseByte(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseByte: Validation[NumberFormatException, Byte] = EitherW.throws(java.lang.Byte.parseByte(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as a double and returns it in <code>Right</code>.
    */
-  val parseDouble: Validation[NumberFormatException, Double] = EitherW.throws(java.lang.Double.parseDouble(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseDouble: Validation[NumberFormatException, Double] = EitherW.throws(java.lang.Double.parseDouble(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as a float and returns it in <code>Right</code>.
    */
-  val parseFloat: Validation[NumberFormatException, Float] = EitherW.throws(java.lang.Float.parseFloat(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseFloat: Validation[NumberFormatException, Float] = EitherW.throws(java.lang.Float.parseFloat(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as an int and returns it in <code>Right</code>.
    */
-  val parseInt: Validation[NumberFormatException, Int] = EitherW.throws(java.lang.Integer.parseInt(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseInt: Validation[NumberFormatException, Int] = EitherW.throws(java.lang.Integer.parseInt(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as a long and returns it in <code>Right</code>.
    */
-  val parseLong: Validation[NumberFormatException, Long] = EitherW.throws(java.lang.Long.parseLong(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseLong: Validation[NumberFormatException, Long] = EitherW.throws(java.lang.Long.parseLong(s)).left.map(_.asInstanceOf[NumberFormatException])
 
   /**
    * Parses this string as a short and returns it in <code>Right</code>.
    */
-  val parseShort: Validation[NumberFormatException, Short] = EitherW.throws(java.lang.Short.parseShort(s)).left.map(_.asInstanceOf[NumberFormatException])
+  def parseShort: Validation[NumberFormatException, Short] = EitherW.throws(java.lang.Short.parseShort(s)).left.map(_.asInstanceOf[NumberFormatException])
+
+  import xml._
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  def |:|[A](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A])(implicit sh: Show[A]) =
+    a match {
+      case Some(t) => Elem(prefix, s, Null, TopScope, Text(Show.shows(t)))
+      case None => Text("")
+    }
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  def |:|[A](prefix: String, a: Option[A])(implicit sh: Show[A]): Node =
+    |:|(prefix, Null, TopScope, a)
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  def |:|[A](a: Option[A])(implicit sh: Show[A]): Node =
+    |:|(null, a)
 }
 
 /**
