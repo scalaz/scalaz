@@ -30,6 +30,13 @@ sealed trait ListW[A] {
     case Nil => e
     case h :: t => f(NonEmptyList.nel(h, t))
   }
+
+  import xml.{Node, Text}
+
+  /**
+   * Returns an empty text node if this list is empty otherwise runs the given function on the head and tail. 
+   */
+  def |#|(f: NonEmptyList[A] => Node) = |*|(Text(""), f)
 }
 
 /**
