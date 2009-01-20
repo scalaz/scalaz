@@ -19,7 +19,17 @@ sealed trait ListW[A] {
   /**
    * The value of this list.
    */
-  val list: List[A]  
+  val list: List[A]
+
+  import scalaz.list.NonEmptyList
+
+  /**
+   * Returns the first argument if this is an empty list or runs the given function on the head and tail.
+   */
+  def |*|[X](e: => X, f: NonEmptyList[A] => X) = list match {
+    case Nil => e
+    case h :: t => f(NonEmptyList.nel(h, t))
+  }
 }
 
 /**
