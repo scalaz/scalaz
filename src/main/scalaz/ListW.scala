@@ -26,9 +26,11 @@ sealed trait ListW[A] {
   /**
    * Returns the first argument if this is an empty list or runs the given function on the head and tail.
    */
-  def |*|[X](e: => X, f: NonEmptyList[A] => X) = list match {
-    case Nil => e
-    case h :: t => f(NonEmptyList.nel(h, t))
+  def |*|[X](e: => X) = new {
+    def |**|(f: NonEmptyList[A] => X) = list match {
+      case Nil => e
+      case h :: t => f(NonEmptyList.nel(h, t))
+    }
   }
 }
 
