@@ -36,7 +36,7 @@ sealed trait ListW[A] {
   /**
    * Returns an empty text node if this list is empty otherwise runs the given function on the head and tail. 
    */
-  def |#|(f: NonEmptyList[A] => Node) = |*|(Text(""), f)
+  def |#|(f: A => Node) = |*|(Text(""), x => (x map f).toList)
 }
 
 /**
