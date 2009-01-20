@@ -97,12 +97,12 @@ import control.{FoldRight, Empty, Plus, Pure}
  */
 object OptionW {
   /**
-   * Wraps a <code>scala.Option</code>.
+   * Unwraps a <code>scala.Option</code>.
    */
   implicit def OptionWOption[A](o: OptionW[A]): Option[A] = o.option
 
   /**
-   * Unwraps a <code>scala.Option</code>.
+   * Wraps a <code>scala.Option</code>.
    */
   implicit def OptionOptionW[A](o: Option[A]): OptionW[A] = new OptionW[A] {
     val option = o
