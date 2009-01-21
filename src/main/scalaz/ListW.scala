@@ -33,12 +33,12 @@ sealed trait ListW[A] {
     }
   }
 
-  import xml.{Node, Text}
+  import xml.{NodeSeq, Text}
 
   /**
    * Returns an empty XML text node if this is an empty list or runs the given function on the head and tail.
    */
-  def  |-|(f: NonEmptyList[A] => Node) = |*|(Text(""), f)
+  def  |-|(f: NonEmptyList[A] => NodeSeq) = |*|(Text(""), f)
 }
 
 /**
