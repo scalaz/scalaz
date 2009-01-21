@@ -32,6 +32,10 @@ sealed trait ListW[A] {
       case h :: t => f(NonEmptyList.nel(h, t))
     }
   }
+
+  import xml.{Node, Text}
+
+  def  |-|(f: NonEmptyList[A] => Node) = |*|(Text(""), f)
 }
 
 /**
