@@ -64,7 +64,7 @@ sealed trait StringW {
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
    * is appended.
    */
-  def plural(n: Int) = if(n == 1) s else
+  def plural(n: Long) = if(n == 1L) s else
                        if((s endsWith "y") && (List("ay", "ey","iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
                        else s + "s" 
 
