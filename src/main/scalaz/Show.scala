@@ -119,6 +119,11 @@ object Show {
    */
   implicit val ShowUnit = ShowA[Unit]
 
+  /**
+   * A show for XML elements.
+   */
+  implicit val ShowElem = ShowA[xml.Elem]
+
   import control.FoldRightW._
   import control.PlusW._
 
