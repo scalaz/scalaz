@@ -83,6 +83,11 @@ sealed trait OptionW[A] {
    * flatMaps the given function then <code>getOrElse</code> the given value.
    */
   def >>=|[B](f: A => Option[B], v: => B) = option flatMap f getOrElse v
+
+  /**
+   * Returns an xml text element with the show implementation or an empty string if there is no value in this option.
+   */
+  def <>(implicit s: Show[A]) = xml.Text(option map(Show.shows(_)) getOrElse "")
 }
 
 import control.{FoldRight, Empty, Plus, Pure}
