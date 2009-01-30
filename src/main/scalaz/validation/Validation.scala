@@ -103,6 +103,13 @@ sealed trait Validation[+E, +A] {
   def filter(f: A => Boolean): Option[Validation[E, A]] = either.right filter f map (x => x)
 
   /**
+   * Returns success if this is a success and if the value meets the given predicate or if the predicate is not met,
+   * then return the given value.
+   */
+  def filterOr[EE >: E](f: A => Boolean, e: => EE): Validation[EE, A] =
+    either.right flatMap (a => if(f(a)) Right(a) else Left(e))
+
+  /**
    * Function application through the success side of validation.
    */
   def apply[B, EE >: E](v: Validation[EE, A => B]) =
@@ -227,6 +234,13 @@ object Validation {
      * failing value, otherwise, returns a fail in <code>Some</code>.
      */
     def filter(f: E => Boolean): Option[Validation[E, A]] = v.either.left filter f map (x => x)
+
+    /**
+     * Returns failure if this is a failure and if the value meets the given predicate or if the predicate is not met,
+     * then return the given value.
+     */
+    def filterOr[AA >: A](f: E => Boolean, a: => AA): Validation[E, AA] =
+      v.either.left flatMap (e => if(f(e)) Left(e) else Right(a))    
 
     /**
      * Function application through the failing side of validation.
