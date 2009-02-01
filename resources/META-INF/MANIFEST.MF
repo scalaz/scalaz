@@ -1,5 +1,5 @@
 Main-Class: scalaz.Version
 Implementation-Title: Scalaz
-Implementation-URL: http://wiki.workingmouse.com/index.php/Scalaz
-Implementation-Vendor: Workingmouse Pty. Ltd. 
+Implementation-URL: http://code.google.com/p/scalaz
+Implementation-Vendor: Tony Morris
 Sealed: true
