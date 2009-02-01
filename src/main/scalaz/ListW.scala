@@ -21,6 +21,11 @@ sealed trait ListW[A] {
    */
   val list: List[A]
 
+  /**
+   * Converts this list to a string with each element corresponding to a character.
+   */
+  def string(f: A => Char) = list map f mkString
+
   import scalaz.list.NonEmptyList
 
   /**
