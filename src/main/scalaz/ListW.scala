@@ -26,6 +26,11 @@ sealed trait ListW[A] {
    */
   def string(f: A => Char) = list map f mkString
 
+  /**
+   * Converts this list to a string with each element corresponding to a list of characters.
+   */
+  def stringj(f: A => List[Char]) = list flatMap f mkString
+
   import scalaz.list.NonEmptyList
 
   /**
