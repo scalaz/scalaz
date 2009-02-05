@@ -102,6 +102,11 @@ object Zero {
   implicit def EitherRightZero[A, B](implicit zz: Zero[A]) = z[Either.RightProjection[B, A]](Right(zz.zero).right)
 
   /**
+   * A zero for <code>forall K V. scala.collection.immutable.Map[K, V]</code>.
+   */
+  implicit def MapZero[K, V] = z(Map.empty[K, V])
+
+  /**
    * A zero for <code>forall M. scalaz.control.Pure[M]</code>.
    */
   def PureZero[M[_]](implicit m: Monad[M]) = z[Pure[M]](m)

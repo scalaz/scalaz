@@ -104,7 +104,12 @@ object Monoid {
   implicit def EitherRightMonoid[A, B](implicit s: Monoid[A]) = monoid[Either.RightProjection[B, A]]
 
   /**
-   * A monoid for <code>forall M. scalaz.control.Pure[M]</code>.
+   * A monoid for <code>forall K V. scala.collection.immutable.Map[K, V]</code>.
+   */
+  implicit def MapMonoid[K, V] = monoid[Map[K, V]]
+
+  /**
+   *  A monoid for <code>forall M. scalaz.control.Pure[M]</code>.
    */
   def PureMonoid[M[_]](implicit m: Monad[M]) = monoid[Pure[M]](Zero.PureZero[M], Semigroup.PureSemigroup[M])
 }

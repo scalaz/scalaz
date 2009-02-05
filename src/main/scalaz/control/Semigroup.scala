@@ -144,6 +144,13 @@ object Semigroup {
     def append(s1: => Either.RightProjection[B, A], s2: => Either.RightProjection[B, A]) = if(s1.e.isLeft) s1 else s2
   }
 
+  /**
+   * A semigroup for <code>forall K V. scala.collection.immutable.Map[K, V]</code>.
+   */
+  implicit def MapSemigroup[K, V] = new Semigroup[Map[K, V]] {
+    def append(m1: => Map[K, V], m2: => Map[K, V]) = m1 ++ m2
+  }
+
   import validation.Validation
   import validation.Validation.{success, fail}
 
