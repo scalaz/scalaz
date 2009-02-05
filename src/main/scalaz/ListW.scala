@@ -43,6 +43,14 @@ sealed trait ListW[A] {
     }
   }
 
+  /**
+   * Sequences each element of this list through a monad - given by a function to map on each element.
+   */
+  def sequence[M[_]] = new {
+    def apply[B](f: A => M[B])(implicit m: control.Monad[M]) =
+      (list map f).foldRight[M[List[B]]](m.pure(Nil))((a, b) => m.bind((j: B) => m.fmap(j :: (_: List[B]), b), a))
+  }
+
   import xml.{NodeSeq, Text}
 
   /**
