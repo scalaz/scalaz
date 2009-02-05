@@ -88,6 +88,11 @@ sealed trait OptionW[A] {
    * Returns an xml text element with the show implementation or an empty string if there is no value in this option.
    */
   def unary_-(implicit s: Show[A]) = xml.Text(option map(Show.shows(_)) getOrElse "")
+
+  /**
+   * Returns the element value in this option or the zero for the element type.
+   */
+  def unary_~(implicit z: control.Zero[A]) = option getOrElse z.zero
 }
 
 import control.{FoldRight, Empty, Plus, Pure}
