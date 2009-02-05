@@ -207,6 +207,11 @@ object Digit {
     charDigits[List](c).foldRight[Option[List[Digit]]](Some(Nil))((a, b) => for(j <- a; k <- b) yield j :: k)
 
   /**
+   * Converts the given character to a potential long value.
+   */
+  def digitsValue(c: List[Char]) = charDigits(c) map (ds => digitsLong[List](ds))
+
+  /**
    * Equality over digits.
    */
   implicit def EqualDigit: Equal[Digit] = Equal.equal(_.toInt == _.toInt)
