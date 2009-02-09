@@ -62,6 +62,11 @@ sealed trait ListW[A] {
     case h :: t => h :: ListListW(t.filter(y => h /= y)).nub 
   }
 
+  /**
+   * Removes duplicate elements in O(n^2) time.
+   */
+  def nubBy(f: (A, A) => Boolean) = nub(Equal.equal(f))
+
   import xml.{NodeSeq, Text}
 
   /**
