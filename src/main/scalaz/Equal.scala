@@ -194,4 +194,79 @@ object Equal {
    * A contra-variant functor wrapper for <code>Equal</code>. 
    */
   implicit def EqualCofunctorW[A](e: Equal[A]): CofunctorW[Equal, A] = cofunctor[Equal](e)
+
+  /**
+   * Equality for tuple-1.
+   */
+  implicit def EqualP1[A](implicit ea: Equal[A]) = equal[Tuple1[A]] { case (a1, a2) => ea.equal(a1._1, a2._1) }
+
+  /**
+   * Equality for tuple-2.
+   */
+  implicit def EqualP2[A, B](implicit ea: Equal[A], eb: Equal[B]) = equal[Tuple2[A, B]] { case ((a1, b1), (a2, b2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) }
+
+  /**
+   * Equality for tuple-3.
+   */
+  implicit def EqualP3[A, B, C](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C]) = equal[Tuple3[A, B, C]] { case ((a1, b1, c1), (a2, b2, c2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal (c1, c2)}
+
+  /**
+   * Equality for tuple-4.
+   */
+  implicit def EqualP4[A, B, C, D](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D]) = equal[Tuple4[A, B, C, D]] { case ((a1, b1, c1, d1), (a2, b2, c2, d2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal(c1, c2) &&
+    ed.equal(d1, d2)}
+
+  /**
+   * Equality for tuple-5.
+   */
+  implicit def EqualP5[A, B, C, D, E](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E]) = equal[Tuple5[A, B, C, D, E]] { case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal(c1, c2) &&
+    ed.equal(d1, d2) &&
+    ee.equal(e1, e2)}
+
+  /**
+   * Equality for tuple-6.
+   */
+  implicit def EqualP6[A, B, C, D, E, F](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F]) = equal[Tuple6[A, B, C, D, E, F]] { case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal(c1, c2) &&
+    ed.equal(d1, d2) &&
+    ee.equal(e1, e2) &&
+    ef.equal(f1, f2)}
+
+  /**
+   * Equality for tuple-7.
+   */
+  implicit def EqualP7[A, B, C, D, E, F, G](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F], eg: Equal[G]) = equal[Tuple7[A, B, C, D, E, F, G]] { case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal(c1, c2) &&
+    ed.equal(d1, d2) &&
+    ee.equal(e1, e2) &&
+    ef.equal(f1, f2) &&
+    eg.equal(g1, g2)}
+
+  /**
+   * Equality for tuple-8.
+   */
+  implicit def EqualP8[A, B, C, D, E, F, G, H](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F], eg: Equal[G], eh: Equal[H]) = equal[Tuple8[A, B, C, D, E, F, G, H]] { case ((a1, b1, c1, d1, e1, f1, g1, h1), (a2, b2, c2, d2, e2, f2, g2, h2)) =>
+    ea.equal(a1, a2) &&
+    eb.equal(b1, b2) &&
+    ec.equal(c1, c2) &&
+    ed.equal(d1, d2) &&
+    ee.equal(e1, e2) &&
+    ef.equal(f1, f2) &&
+    eg.equal(g1, g2) &&
+    eh.equal(h1, h2)}
 }
