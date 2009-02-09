@@ -106,8 +106,15 @@ object Zero {
    */
   implicit def MapZero[K, V] = z(Map.empty[K, V])
 
+  import xml.{Text, NodeSeq}
+
   /**
-   * A zero for <code>forall M. scalaz.control.Pure[M]</code>.
+   * A zero for XML node sequences - an empty element.
+   */
+  implicit def NodeSeqZero = z[NodeSeq](Text(""))
+
+  /**
+   *  A zero for <code>forall M. scalaz.control.Pure[M]</code>.
    */
   def PureZero[M[_]](implicit m: Monad[M]) = z[Pure[M]](m)
 
