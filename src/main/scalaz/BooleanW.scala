@@ -137,6 +137,12 @@ sealed trait BooleanW {
    * @param b The argument to conditionally return in <code>Right</code>.  
    */
   def toEither[A, B](a: => A, b: => B) = if(isTrue) Right(b) else Left(a)
+
+  /**
+   * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
+   * argument. 
+   */
+  def **[A](a: => A)(implicit z: control.Zero[A]) = if(isTrue) a else z.zero
 }
 
 /**
