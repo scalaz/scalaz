@@ -51,6 +51,17 @@ sealed trait ListW[A] {
       (list map f).foldRight[M[List[B]]](m.pure(Nil))((a, b) => m.bind((j: B) => m.fmap(j :: (_: List[B]), b), a))
   }
 
+  import ListW._
+  import scalaz.EqualW._
+
+  /**
+   * Removes duplicate elements in O(n^2) time.
+   */
+  def nub(implicit e: Equal[A]): List[A] = list match {
+    case Nil => Nil
+    case h :: t => h :: ListListW(t.filter(y => h /= y)).nub 
+  }
+
   import xml.{NodeSeq, Text}
 
   /**
