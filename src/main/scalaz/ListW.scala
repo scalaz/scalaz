@@ -52,6 +52,25 @@ sealed trait ListW[A] {
   }
 
   import ListW._
+
+  /**
+   * Intersperses the given element between each element of the list.
+   */
+  def intersperse(a: A): List[A] = list match {
+    case Nil => Nil
+    case x :: Nil => x :: Nil
+    case h :: t => h :: a :: ListListW(t).intersperse(a)
+  }
+
+  /**
+   * Intercalates the given elements between each element of the list.
+   */
+  def intercalate(as: List[A]): List[A] = list match {
+    case Nil => Nil
+    case x :: Nil => x :: Nil
+    case h :: t => h :: as ::: ListListW(t).intercalate(as)
+  }
+
   import scalaz.EqualW._
 
   /**
