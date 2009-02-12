@@ -46,4 +46,20 @@ object Month {
   def months = List(January, February, March, April, May, June, July, August, September, October, November, December)
 
   def fromDigits(d1: Digit,  d2: Digit) = months find (_.toDigits == (d1, d2))
+
+  def fromInt(n: Int) = n match {
+    case 1 => Some(January)
+    case 2 => Some(February)
+    case 3 => Some(March)
+    case 4 => Some(April)
+    case 5 => Some(May)
+    case 6 => Some(June)
+    case 7 => Some(July)
+    case 8 => Some(August)
+    case 9 => Some(September)
+    case 10 => Some(October)
+    case 11 => Some(November)
+    case 12 => Some(December)
+    case _ => None
+  }
 }
