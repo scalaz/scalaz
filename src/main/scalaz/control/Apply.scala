@@ -154,15 +154,20 @@ trait ApplyW[AP[_], A] {
    * Applies the given applicative function to this applicative instance.
    */
   final def <*>:[B](f: AP[A => B]) = <*>(f)
+
+  /**
+   * Applies the given applicative function to this applicative instance with low precedence.
+   */
+  final def ^*^[B](f: AP[A => B]) = apply(f, v)
 }
 
 /**
- * Functions over apply values.
+ *   Functions over apply values.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision$<br>
- *          $LastChangedDate$<br>
- *          $LastChangedBy$
+ * @version $LastChangedRevision : 30 $<br>
+ *           $LastChangedDate$<br>
+ *           $LastChangedBy$
  */
 object ApplyW {
   /**
