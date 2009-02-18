@@ -71,6 +71,14 @@ sealed trait ListW[A] {
     case h :: t => h :: as ::: ListListW(t).intercalate(as)
   }
 
+  /**
+   * Returns the first argument if the list is empty, otherwise, executes the given function.
+   */
+  def empty[X](x: => X, f: NonEmptyList[A] => X) = list match {
+    case Nil => x
+    case h :: t => f(NonEmptyList.nel(h, t))
+  }
+
   import scalaz.EqualW._
 
   /**
