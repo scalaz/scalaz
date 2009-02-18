@@ -109,6 +109,11 @@ object NonEmptyList {
   def nel[A](a: A): NonEmptyList[A] = nel(a, Nil)
 
   /**
+   * Constructs a non-empty list with the given head and values.
+   */
+  def nels[A](a: A, as: A*): NonEmptyList[A] = nel(a, as.toList)
+
+  /**
    * Constructs a non-empty list with the given list if it is not empty, otherwise, returns the second argument.
    */
   def list[A](as: => List[A], e: => NonEmptyList[A]): NonEmptyList[A] = if(as.isEmpty) e else nel(as.head, as.tail)
