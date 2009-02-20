@@ -102,6 +102,13 @@ object Monad {
    */
   implicit def EitherRightMonad[X] = monad[PartialType[Either.RightProjection, X]#Apply]
 
+  import validation.Validation
+
+  /**
+   * A monad for <code>forall E. scala.validation.Validation[E, ?]</code>.
+   */
+  implicit def ValidationMonad[E] = monad[PartialType[Validation, E]#Apply]
+
   /**
    * A monad for <code>forall T. scalaz.State[T, ?]</code>.
    */
@@ -241,6 +248,13 @@ object MonadW {
    * A monad for <code>forall T. scala.Either.RightProjection[T, ?]</code>.
    */
   implicit def EitherRightMonad[A, B](as: Either.RightProjection[A, B]) = monad[PartialType[Either.RightProjection, A]#Apply](as)
+
+  import validation.Validation
+  
+  /**
+   * A monad for <code>forall E. scala.validation.Validation[E, ?]</code>.
+   */
+  implicit def ValidationMonad[E, A](as: Validation[E, A]) = monad[PartialType[Validation, E]#Apply](as)
 
   /**
    * A monad for <code>forall T. scalaz.State[T, ?]</code>.

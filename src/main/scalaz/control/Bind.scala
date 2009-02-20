@@ -103,6 +103,15 @@ object Bind {
     def bind[A, B](f: A => Either.RightProjection[X, B], a: Either.RightProjection[X, A]) = a.flatMap(f(_).e).right
   }
 
+  import validation.Validation
+
+  /**
+   * A bind for <code>forall E. scala.validation.Validation[E, ?]</code>.
+   */
+  implicit def ValidationBind[E] = new Bind[PartialType[Validation, E]#Apply] {
+    def bind[A, B](f: A => Validation[E, B], a: Validation[E, A]) = a.flatMap(f(_))
+  }
+
   /**
    * A bind for <code>forall T. scalaz.State[T, ?]</code>.
    */
