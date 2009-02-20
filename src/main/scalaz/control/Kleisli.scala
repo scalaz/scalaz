@@ -19,12 +19,19 @@ sealed trait Kleisli[M[_], -A, B] {
    */
   val monad: Monad[M]
 
+  private implicit val m = monad
+  
   import Kleisli._
 
   /**
    * Kleisli composition.
    */
-  def >=>[C](k: Kleisli[M, B, C]): Kleisli[M, A, C] = kleisli[M]((a: A) => monad.bind(k(_: B), this(a)))(monad)
+  def >=>[C](k: Kleisli[M, B, C]) = kleisli[M]((a: A) => monad.bind(k(_: B), this(a)))
+
+  /**
+   * Maps the given function across a kleisli structure.
+   */
+  def map[C](f: B => C) = kleisli[M]((a: A) => monad.fmap(f(_: B), this(a)))
 }
 
 /**
