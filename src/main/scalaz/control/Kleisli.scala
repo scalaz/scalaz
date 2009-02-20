@@ -14,24 +14,17 @@ sealed trait Kleisli[M[_], -A, B] {
    */
   def apply(a: A): M[B]
 
-  /**
-   * The monad instance for this kleisli structure.
-   */
-  val monad: Monad[M]
-
-  private implicit val m = monad
-  
   import Kleisli._
 
   /**
    * Kleisli composition.
    */
-  def >=>[C](k: Kleisli[M, B, C]) = kleisli[M]((a: A) => monad.bind(k(_: B), this(a)))
+  def >=>[C](k: Kleisli[M, B, C])(implicit m: Monad[M]) = kleisli[M]((a: A) => m.bind(k(_: B), this(a)))
 
   /**
    * Maps the given function across a kleisli structure.
    */
-  def map[C](f: B => C) = kleisli[M]((a: A) => monad.fmap(f(_: B), this(a)))
+  def map[C](f: B => C)(implicit ftr: Functor[M]) = kleisli[M]((a: A) => ftr.fmap(f(_: B), this(a)))
 
   /**
    * Contra-variant map for the given function across a kleisli structure.
@@ -60,16 +53,15 @@ object Kleisli {
     /**
      * Construct a kleisli structure using the given function and monad.
      */
-    def apply[A, B](f: A => M[B])(implicit m: Monad[M]): Kleisli[M, A, B]
+    def apply[A, B](f: A => M[B]): Kleisli[M, A, B]
   }
 
   /**
    * Constructs a kleisli structure.
    */
   def kleisli[M[_]] = new KleisliApply[M] {
-    def apply[A, B](f: A => M[B])(implicit m: Monad[M]) = new Kleisli[M, A, B] {
+    def apply[A, B](f: A => M[B]) = new Kleisli[M, A, B] {
       def apply(a: A) = f(a)
-      val monad = m       
     }
   }
 
@@ -77,13 +69,19 @@ object Kleisli {
    * For lifting a function into a kleisli structure.
    */
   sealed trait KleisliLift[M[_]] {
-    def apply[A, B](f: A => B)(implicit m: Monad[M]): Kleisli[M, A, B]
+    def apply[A, B](f: A => B)(implicit p: Pure[M]): Kleisli[M, A, B]
   }
 
   /**
    * Constructs a kleisli structure by lifting the given function.
    */
   def lift[M[_]] = new KleisliLift[M] {
-    def apply[A, B](f: A => B)(implicit m: Monad[M]) = kleisli[M]((a: A) => m.pure(f(a)))
+    def apply[A, B](f: A => B)(implicit p: Pure[M]) = kleisli[M]((a: A) => p.pure(f(a)))
   }
+
+  /**
+   * Creates a kleisli structure that returns the argument in <code>Some</code> if the given predicate satisfies on the
+   * argument.  
+   */
+  def filter[A](f: A => Boolean): Kleisli[Option, A, A] = kleisli[Option]((a: A) => if(f(a)) Some(a) else None)
 }
