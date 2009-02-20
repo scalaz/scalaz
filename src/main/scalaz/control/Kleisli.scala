@@ -8,7 +8,7 @@ package scalaz.control
  *          $LastChangedDate$<br>
  *          $LastChangedBy$
  */
-sealed trait Kleisli[M[+_], -A, +B] {
+sealed trait Kleisli[M[_], -A, B] {
   /**
    * Apply the given value to produce a monadic value.
    */
@@ -40,7 +40,7 @@ object Kleisli {
   /**
    * Permits partial application of type variables for constructing a kleisli structure.
    */
-  trait KleisliApply[M[+_]] {
+  sealed trait KleisliApply[M[_]] {
     /**
      * Construct a kleisli structure using the given function and monad.
      */
@@ -50,10 +50,24 @@ object Kleisli {
   /**
    * Constructs a kleisli structure.
    */
-  def kleisli[M[+_]] = new KleisliApply[M] {
+  def kleisli[M[_]] = new KleisliApply[M] {
     def apply[A, B](f: A => M[B])(implicit m: Monad[M]) = new Kleisli[M, A, B] {
       def apply(a: A) = f(a)
       val monad = m       
     }
+  }
+
+  /**
+   * For lifting a function into a kleisli structure.
+   */
+  sealed trait KleisliLift[M[_]] {
+    def apply[A, B](f: A => B)(implicit m: Monad[M]): Kleisli[M, A, B]
+  }
+
+  /**
+   * Constructs a kleisli structure by lifting the given function.
+   */
+  def lift[M[_]] = new KleisliLift[M] {
+    def apply[A, B](f: A => B)(implicit m: Monad[M]) = kleisli[M]((a: A) => m.pure(f(a)))
   }
 }
