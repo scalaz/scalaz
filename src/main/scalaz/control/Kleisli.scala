@@ -47,7 +47,6 @@ sealed trait Kleisli[M[_], -A, B] {
 /**
  * Kleisli construction functions.
  *
- * @see Cofunctor
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision$<br>
  *          $LastChangedDate$<br>
