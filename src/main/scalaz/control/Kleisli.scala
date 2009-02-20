@@ -22,7 +22,7 @@ sealed trait Kleisli[M[+_], -A, +B] {
   import Kleisli._
 
   /**
-   * The kleisli operator.
+   * Kleisli composition.
    */
   def >=>[C](k: Kleisli[M, B, C]): Kleisli[M, A, C] = kleisli[M]((a: A) => monad.bind(k(_: B), this(a)))(monad)
 }
