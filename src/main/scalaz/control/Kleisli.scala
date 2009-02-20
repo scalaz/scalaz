@@ -32,6 +32,11 @@ sealed trait Kleisli[M[_], -A, B] {
    * Maps the given function across a kleisli structure.
    */
   def map[C](f: B => C) = kleisli[M]((a: A) => monad.fmap(f(_: B), this(a)))
+
+  /**
+   * Contra-variant map for the given function across a kleisli structure.
+   */
+  def comap[C](f: C => A): Kleisli[M, C, B] = kleisli[M]((c: C) => this(f(c)))
 }
 
 /**
