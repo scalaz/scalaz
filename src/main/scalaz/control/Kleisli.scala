@@ -40,6 +40,11 @@ sealed trait Kleisli[M[_], -A, B] {
    * Traverse the kleisli structure using the given traversal.
    */
   def traverse[F[+_]](f: F[A])(implicit a: Applicative[M], t: Traverse[F]): M[F[B]] = t.traverse[M, A, B](Kleisli.this(_), f)
+
+  /**
+   * Traverse the kleisli structure as a list.
+   */
+  def traverses(as: List[A])(implicit a: Applicative[M]) = traverse[List](as)
 }
 
 /**

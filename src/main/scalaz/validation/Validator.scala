@@ -17,7 +17,8 @@ object Validator {
   type Validator[E, -A, B] = control.Kleisli[PartialType[Validation, E]#Apply, A, B]
 
   import Validation.{success, fail}
-
+  import scalaz.Digit.charDigit
+  
   /**
    * A validator for converting a String to an Int with the potential for a NumberFormatException.
    */
@@ -28,4 +29,14 @@ object Validator {
    * A validator for ensuring a list is not empty.
    */
   def notEmpty[A] = kleisli[Option]((cs: List[A]) => (cs: Option[NonEmptyList[A]]))
+
+  /**
+   * A validator for ensuring a character is a valid digit.
+   */
+  def isDigit = kleisli[Option]((c: Char) => charDigit(c))
+
+  /**
+   * A validator for ensuring a list of characters are all digits.
+   */
+  def isDigits = kleisli[Option]((ds: List[Char]) => isDigit.traverses(ds))
 }
