@@ -14,8 +14,6 @@ object Validator {
   import control.Kleisli._
   import list.NonEmptyList
 
-  type Validator[E, -A, B] = control.Kleisli[PartialType[Validation, E]#Apply, A, B]
-
   import Validation.{success, fail}
   import scalaz.Digit.charDigit
   
