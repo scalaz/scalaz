@@ -37,4 +37,9 @@ object Validator {
    * A validator for ensuring a list of characters are all digits.
    */
   def isDigits = kleisli[Option]((ds: List[Char]) => isDigit.traverses(ds))
+
+  /**
+   * A validator for a maximum length of a list.
+   */
+  def lengthMax[A](max: Int) = filter((as: List[A]) => as.length <= max) 
 }
