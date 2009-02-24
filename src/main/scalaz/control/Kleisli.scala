@@ -35,6 +35,11 @@ sealed trait Kleisli[M[_], -A, B] {
    * Composes the given function with the kleisli function to construct a new kleisli structure.
    */
   def compose[N[_]](f: M[B] => N[B])(implicit m: Monad[N]) = kleisli[N]((a: A) => f(this(a)))
+
+  /**
+   * Traverse the kleisli structure using the given traversal.
+   */
+  def traverse[F[+_]](f: F[A])(implicit a: Applicative[M], t: Traverse[F]): M[F[B]] = t.traverse[M, A, B](Kleisli.this(_), f)
 }
 
 /**
