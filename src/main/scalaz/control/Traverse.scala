@@ -131,11 +131,15 @@ object Traverse {
       applicative[F](EitherTraverse.traverse[F, A, B](f, as.either)) > ((t: Either[X, B]) => (t: Validation[X, B]))
   }
 
+  trait TraverseSequence[T[_], F[_]] {
+    def apply[A](x: T[F[A]])(implicit a: Applicative[F], t: Traverse[T]): F[T[A]]
+  }
+
   /**
    * Traverse on the identity function.
    */
-  def sequence[F[_], T[_]] = new {
-    def apply[A](x: T[F[A]])(implicit a: Applicative[F], t: Traverse[T]): F[T[A]] = t.traverse[F, F[A], A](identity, x)
+  def sequence[F[_], T[_]] = new TraverseSequence[T, F] {
+    def apply[A](x: T[F[A]])(implicit a: Applicative[F], t: Traverse[T]) = t.traverse[F, F[A], A](identity, x)
   }
 }
 
