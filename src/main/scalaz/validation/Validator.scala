@@ -56,7 +56,7 @@ object Validator {
   def intRange(min: Int, max: Int) = intMin(min) >=> intMax(max)
 
   /**
-   * A validator for a minimum length of a list.
+   * A validator for a minimum length of a folding structure.
    */
   def lengthMin[F[_]](min: Int)(implicit f: FoldLeft[F]) = intMin(min) comap ((x: F[_]) => {
     implicit val k = foldleft[F](x)
@@ -64,7 +64,7 @@ object Validator {
   })
 
   /**
-   * A validator for a maximum length of a list.
+   * A validator for a maximum length of a folding structure.
    */
   def lengthMax[F[_]](max: Int)(implicit f: FoldLeft[F]) = intMax(max) comap ((x: F[_]) => {
     implicit val k = foldleft[F](x)
@@ -72,7 +72,7 @@ object Validator {
   })
 
   /**
-   * A validator for a range of the length of a list.
+   * A validator for a range of the length of a folding structure.
    */
   def lengthRange[F[_]](min: Int, max: Int)(implicit f: FoldLeft[F]) = intRange(min, max) comap ((x: F[_]) => {
     implicit val k = foldleft[F](x)
