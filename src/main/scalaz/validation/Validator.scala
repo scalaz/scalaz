@@ -41,5 +41,10 @@ object Validator {
   /**
    * A validator for a maximum length of a list.
    */
-  def lengthMax[A](max: Int) = filter((as: List[A]) => as.length <= max) 
+  def lengthMax[A](max: Int) = filter((as: List[A]) => as.length <= max)
+
+  /**
+   * A validator for ensuring an int value is within a range.
+   */
+  def intRange(min: Int, max: Int) = filter((n: Int) => n >= min && n <= max)
 }
