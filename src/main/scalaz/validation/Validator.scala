@@ -78,4 +78,9 @@ object Validator {
     implicit val k = foldleft[F](x)
     k.items
   })
+
+  /**
+   * A validator for a specific length of a folding structure.
+   */
+  def lengthEqual[F[_]](n: Int)(implicit f: FoldLeft[F]) = lengthRange[F](n, n)
 }
