@@ -17,7 +17,7 @@ sealed trait Kleisli[M[_], -A, B] {
   /**
    * An alias for apply.
    */
-  def ~>(a: A) = apply(a)
+  def |=>(a: A) = apply(a)
 
   import Kleisli._
 
