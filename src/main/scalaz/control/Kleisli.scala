@@ -27,6 +27,11 @@ sealed trait Kleisli[M[_], -A, B] {
   def >=>[C](k: Kleisli[M, B, C])(implicit m: Monad[M]) = kleisli[M]((a: A) => m.bind(k(_: B), this(a)))
 
   /**
+   * Kleisli composition.
+   */
+  def >=>[C](k: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] = >=>(kleisli[M](k))
+
+  /**
    * Maps the given function across a kleisli structure.
    */
   def map[C](f: B => C)(implicit ftr: Functor[M]) = kleisli[M]((a: A) => ftr.fmap(f(_: B), this(a)))
