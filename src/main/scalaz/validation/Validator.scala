@@ -20,10 +20,10 @@ object Validator {
   import scalaz.Digit.charDigit
   
   /**
-   * A validator for converting a String to an Int with the potential for a NumberFormatException.
+   * A validator for converting a list of characters to an Int with the potential for a NumberFormatException.
    */
   val parseInt = kleisli[PartialType[Validation, NumberFormatException]#Apply](
-    (s: String) => try { success(s.toInt) } catch { case e: NumberFormatException => fail(e) })
+    (s: List[Char]) => try { success(s.mkString.toInt) } catch { case e: NumberFormatException => fail(e) })
 
   /**
    * A validator for ensuring a list is not empty.
