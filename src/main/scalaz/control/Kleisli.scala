@@ -14,6 +14,11 @@ sealed trait Kleisli[M[_], -A, B] {
    */
   def apply(a: A): M[B]
 
+  /**
+   * An alias for apply.
+   */
+  def ~>(a: A) = apply(a)
+
   import Kleisli._
 
   /**
