@@ -96,7 +96,17 @@ trait BifunctorW[F[_, _], A, B] {
   /**
    * Maps the given function across one side of this bifunctor.
    */
+  final def <=:[X](f: A => X) = <|(f)
+
+  /**
+   * Maps the given function across one side of this bifunctor.
+   */
   final def |>[Y](g: B => Y) = <|>(identity[A], g)
+
+  /**
+   * Maps the given function across one side of this bifunctor.
+   */
+  final def :=>[Y](g: B => Y) = <|>(identity[A], g)
 }
 
 /**
