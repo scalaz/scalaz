@@ -26,6 +26,11 @@ object Validator {
     (s: List[Char]) => try { success(s.mkString.toInt) } catch { case e: NumberFormatException => fail(e) })
 
   /**
+   * A validator for converting a list of characters to an Int.
+   */
+  val readInt = parseInt.compose[Option](_.right.toOption)                 
+
+  /**
    * A validator for ensuring a list is not empty.
    */
   def notEmpty[A] = kleisli[Option]((cs: List[A]) => (cs: Option[NonEmptyList[A]]))
@@ -33,12 +38,12 @@ object Validator {
   /**
    * A validator for ensuring a character is a valid digit.
    */
-  def isDigit = kleisli[Option]((c: Char) => charDigit(c))
+  val isDigit = kleisli[Option]((c: Char) => charDigit(c))
 
   /**
    * A validator for ensuring a list of characters are all digits.
    */
-  def isDigits = kleisli[Option]((ds: List[Char]) => isDigit.traverses(ds))
+  val isDigits = kleisli[Option]((ds: List[Char]) => isDigit.traverses(ds))
 
   /**
    * A validator for a minimum value of an integer.
