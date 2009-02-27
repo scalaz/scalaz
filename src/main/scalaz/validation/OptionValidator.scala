@@ -17,11 +17,19 @@ sealed trait OptionValidator[-A, B] {
 
   import control.Kleisli._
   import scalaz.OptionW._
+  import scalaz.list.NonEmptyList
+  import scalaz.list.NonEmptyList.nel
 
   /**
-   * Life the underlying kleisli structure from <code>Option</code> to <code>Validation</code> using the given error.
+   * Lift the underlying kleisli structure from <code>Option</code> to <code>Validation</code> using the given error.
    */
   def ^^[E](e: => E) = k.compose[PartialType[Validation, E]#Apply](_ toSuccess e)
+
+  /**
+   * Lift the underlying kleisli structure from <code>Option</code> to <code>Validation</code> using the given error in
+   * a non-empty list.
+   */
+  def ^^^[E](e: => E) = k.compose[PartialType[Validation, NonEmptyList[E]]#Apply](_ toSuccess nel(e))
 }
 
 /**
