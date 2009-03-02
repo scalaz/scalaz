@@ -264,4 +264,21 @@ object Validator {
     case List(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) => Some(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22)
     case Nil => None
   })
+
+  /**
+   * A validator for parsing a string into an integer value representing money. The input string may contain a decimal point.
+   */
+  val money = kleisli[PartialType[Validation, NumberFormatException]#Apply]((s: String) => {
+    val i = s indexOf '.'
+
+    try {
+      success({
+        val k = s.filter(_ != '.')
+        val z = k.mkString.toInt
+        if(i == -1) z * 100 else (z / Math.pow(10, k.length - i - 2)).toInt
+      })
+    } catch {
+      case e: NumberFormatException => fail(e)
+    }
+  })
 }
