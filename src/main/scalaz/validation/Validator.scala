@@ -281,4 +281,9 @@ object Validator {
       case e: NumberFormatException => fail(e)
     }
   })
+
+  /**
+   * A validator like <code>money</code> but uses the exceptions message.
+   */
+  val moneys = money.compose[scalaz.PartialType[Validation, String]#Apply](x => x.fail.map(z => z.getMessage))
 }
