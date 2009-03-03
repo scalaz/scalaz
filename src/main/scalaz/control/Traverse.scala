@@ -1,5 +1,7 @@
 package scalaz.control
 
+import scalaz.list.NonEmptyList
+
 /**
  * Defines a traversable type as described by McBride and Paterson in
  * <a href="http://www.soi.city.ac.uk/~ross/papers/Applicative.html">Applicative Programming with Effects</a>. Also see
@@ -60,6 +62,14 @@ object Traverse {
       as.foldRight[F[List[B]]](pure[F](Nil))((x, ys) => a(applicative[F](f(x)) > ((a: B) => (b: List[B]) => a :: b), ys))
   }
 
+  /**
+   * A traversable for <code>scalaz.list.NonEmptyList</code>.
+   */
+  implicit val NonEmptyListTraverse: Traverse[NonEmptyList] = new Traverse[NonEmptyList] {
+    def traverse[F[_], A, B](f: A => F[B], as: NonEmptyList[A])(implicit a: Applicative[F]) =
+      a.fmap((x: List[B]) => NonEmptyList.list(x), ListTraverse.traverse[F, A, B](f, as.toList))
+  }
+
   import FoldRightW._
 
   /**
@@ -91,7 +101,8 @@ object Traverse {
 
   /**
    * A traversable for <code>forall T. scala.Either[?, T]</code>.
-   */  implicit def FlipEitherTraverse[X]: Traverse[PartialType[Either, X]#Flip] = new Traverse[PartialType[Either, X]#Flip] {
+   */
+  implicit def FlipEitherTraverse[X]: Traverse[PartialType[Either, X]#Flip] = new Traverse[PartialType[Either, X]#Flip] {
     def traverse[F[_], A, B](f: A => F[B], as: Either[A, X])(implicit a: Applicative[F]): F[Either[B, X]] =
       as match {
         case Right(x) => pure[F](Right(x))
@@ -236,6 +247,11 @@ object TraverseW {
    * A traversable for <code>scala.List</code>.
    */
   implicit def ListTraverse[A](as: List[A]) = traverse[List](as)
+
+  /**
+   * A traversable for <code>scalaz.list.NonEmptyList</code>.
+   */
+  implicit def NonEmptyListTraverse[A](as: NonEmptyList[A]) = traverse[NonEmptyList](as)
 
   /**
    * A traversable for <code>scala.Stream</code>.
