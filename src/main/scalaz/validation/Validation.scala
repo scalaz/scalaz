@@ -116,6 +116,22 @@ sealed trait Validation[+E, +A] {
     for(f <- v; x <- this) yield f(x)
 
   /**
+   * Returns the failing value or runs the given function on the success value.
+   */
+  def ==>>[EE >: E](f: A => EE): EE = either match {
+    case Left(e) => e
+    case Right(a) => f(a)
+  }
+
+  /**
+   * Returns the succeeding value or runs the given function on the failing value.
+   */
+  def <<==[AA >: A](f: E => AA): AA = either match {
+    case Left(e) => f(e)
+    case Right(a) => a
+  }
+
+  /**
    * Function application on the successful side of this validation, or accumulating the errors on the failing side
    * using the given semigroup should one or more be encountered.
    */
