@@ -31,6 +31,17 @@ object Validator {
   val readInt = parseInt.compose[Option](_.right.toOption)                 
 
   /**
+   * A validator for converting a list of characters to a Long with the potential for a NumberFormatException.
+   */
+  val parseLong = kleisli[PartialType[Validation, NumberFormatException]#Apply](
+    (s: List[Char]) => try { success(s.mkString.toLong) } catch { case e: NumberFormatException => fail(e) })
+
+  /**
+   * A validator for converting a list of characters to a Long.
+   */
+  val readLong = parseLong.compose[Option](_.right.toOption)                 
+
+  /**
    * A validator for ensuring a list is not empty.
    */
   def notEmpty[A] = kleisli[Option]((cs: List[A]) => (cs: Option[NonEmptyList[A]]))
