@@ -297,4 +297,14 @@ object Validator {
    * A validator like <code>money</code> but uses the exceptions message.
    */
   val moneys = money.compose[scalaz.PartialType[Validation, String]#Apply](x => x.fail.map(z => z.getMessage))
+
+  /**
+   * A validator for parsing a string into an integer value representing money. The input string may contain a decimal point.
+   */
+  val readMoney = money.compose[Option](_.right.toOption)
+
+  /**
+   * A validator for parsing a list of characters into an integer value representing money. The input string may contain a decimal point.
+   */
+  val readMoneys = readMoney comap ((_: List[Char]).mkString)
 }
