@@ -1,5 +1,0 @@
-package scalaz
-
-object Implicit {
-
-}
