@@ -1,4 +1,4 @@
-// Copyright Tony Morris 2008
+// Copyright Tony Morris 2008-2009
 // This software is released under an open source BSD licence.
 
 // $LastChangedRevision$

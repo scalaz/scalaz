@@ -1,4 +1,4 @@
-// Copyright Tony Morris 2008
+// Copyright Tony Morris 2008-2009
 // This software is released under an open source BSD licence.
 
 // $LastChangedRevision$
@@ -18,6 +18,5 @@ package scalaz
 object Version extends Application {
   println("Scalaz version %build.number%")
   println("Compiled against Scala version %scala.version%")
-  println("Tested using Reductio version %reductio.version%")
-  println("Copyright 2008 Workingmouse Pty. Ltd.")
+  println("Copyright Tony Morris 2008-2009")
 }
