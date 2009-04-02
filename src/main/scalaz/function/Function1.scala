@@ -33,6 +33,11 @@ sealed trait Function1[-T, +R] {
    */
   def flatMap[B, TT <: T](g: R => Function1[TT, B]) =
     (t: TT) => g(Function1.this(t))(t)
+
+  /**
+   * Eecutes the given function on this function to produce a new function.
+   */
+  def on[X](g: (R, R) => X) = (t1: T, t2: T) => g(apply(t1), apply(t2))
 }
 
 /**
