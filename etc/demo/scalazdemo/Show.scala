@@ -6,10 +6,10 @@ import scalaz.Show._
 showv(empty: Stream[Int])
 <>
 
-showv(empty: Stream[Int])
+showv(cons(1, empty))
 <1>
 
-showv(empty: Stream[Int])
+showv(cons(1, cons(2, cons(3, empty))))
 <1,2,3>
 
 showv((1 to 10).toStream)
@@ -45,8 +45,8 @@ object Show {
   val demoes = List(
     // ShowStream
     ("showv(empty: Stream[Int])", showv(empty: Stream[Int])),
-    ("showv(empty: Stream[Int])", showv(cons(1, empty))),
-    ("showv(empty: Stream[Int])", showv(cons(1, cons(2, cons(3, empty))))),
+    ("showv(cons(1, empty))", showv(cons(1, empty))),
+    ("showv(cons(1, cons(2, cons(3, empty))))", showv(cons(1, cons(2, cons(3, empty))))),
     ("showv((1 to 10).toStream)", showv((1 to 10).toStream)),
 
     // ShowList
