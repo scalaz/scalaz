@@ -46,3 +46,4 @@ Identity
 Continuation
 NonEmptyList
 Validation
+State
