@@ -30,15 +30,14 @@ Scala
 Unit
 TupleN
 FunctionN
-PartialFunction
+List
+Stream
+Option
+Array
+Either
 scala.collection.*
 scala.collection.mutable.*
 scala.collection.immutable.*
-List
-Stream
-Either
-Option
-Array
 
 Other
 -----
