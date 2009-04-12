@@ -5,19 +5,6 @@ trait Bind[Z[_]] {
 }
 
 object Bind {
-  /*
-  implicit val IdentityBind: Bind[Identity] = new Bind[Identity] {
-    def bind[A, B](a: Identity[A], f: A => Identity[B]) = f(a.value)
-  }
-
-  implicit def ContinuationBind[R]: Bind[PartialApply1Of2[Continuation, R]#Apply] = new Bind[PartialApply1Of2[Continuation, R]#Apply] {
-    def bind[A, B](a: Continuation[R, A], f: A => Continuation[R, B]) = Continuation.continuation[R, B](c => a(p => f(p)(c)))
-  }
-
-  implicit def OptionBind: Bind[Option] = new Bind[Option] {
-    def bind[A, B](a: Option[A], f: A => Option[B]) = a flatMap f
-  }
-    */
   implicit val IdentityBind: Bind[Identity] = new Bind[Identity] {
     def bind[A, B](a: Identity[A], f: A => Identity[B]) = f(a.value)
   }
@@ -32,6 +19,10 @@ object Bind {
 
   implicit def StateBind[S] = new Bind[PartialApply1Of2[State, S]#Apply] {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
+  }
+
+  implicit val Tuple1Bind = new Bind[Tuple1] {
+    def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
   implicit val Function0Bind = new Bind[Function0] {
