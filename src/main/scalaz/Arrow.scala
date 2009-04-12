@@ -11,7 +11,7 @@ trait Arrow[A[_, _]] {
 }
 
 object Arrow {
-  val Function1Arrow = new Arrow[Function1] {
+  implicit val Function1Arrow = new Arrow[Function1] {
     def arrow[B, C](f: B => C) = f
 
     def compose[B, C, D](a1: B => C, a2: C => D) =
