@@ -6,7 +6,7 @@ sealed trait CharW {
   def digit = Digit.digits find (_.toChar == value)
 }
 
-object Char {
+object CharW {
   implicit def CharTo(c: Char) = new CharW {
     val value = c
   }

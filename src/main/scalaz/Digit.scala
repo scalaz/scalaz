@@ -61,14 +61,4 @@ object Digit {
     case 9L => _9
     case _ => Math.abs(n) % 10L
   }
-
-  /*
-  def digitsLong[T[_]](ds: T[Digit])(implicit f: FoldLeft[T]) =
-    f.foldLeft[Long, Digit](ds, 0L, (a, b) => a * 10L + b)
-
-  def charDigits(c: List[Char]) =
-    charDigits[List](c).foldRight[Option[List[Digit]]](Some(Nil))((a, b) => for(j <- a; k <- b) yield j :: k)
-
-  def digitsValue(c: List[Char]) = charDigits(c) map (ds => digitsLong[List](ds))
-  */
 }
