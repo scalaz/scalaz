@@ -92,26 +92,25 @@ sealed trait BooleanW {
   def unless(f: => Unit) = if(!isTrue) f
 
   trait Conditional[X] {
-    def apply(f: => X): X
+    def |(f: => X): X
   }
 
   /**
    * Conditional operator that returns the first argument if this is <code>true</code>, the second argument otherwise.
    */
   def ?[X](t: => X) = new Conditional[X] {
-    def apply(f: => X) = if(isTrue) t else f
+    def |(f: => X) = if(isTrue) t else f
   }
 
   /**
    * Returns the given argument in <code>Some</code> if this is <code>true</code>, <code>None</code> otherwise.
-   *
-   * @param a The argument to conditionally return in <code>Some</code>.
    */
   def option[A](a: => A) = if(isTrue) Some(a) else None
 
   trait ConditionalEither[A, B] {
-    def |||(b: => B): Either[A, B]
+    def |(b: => B): Either[A, B]
   }
+  
   /**
    * Returns the first argument in <code>Left</code> if this is <code>true</code>, otherwise the second argument in
    * <code>Right</code>.
