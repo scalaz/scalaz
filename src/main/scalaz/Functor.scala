@@ -39,6 +39,26 @@ object Functor {
     def fmap[A, B](r: R => A, f: A => B) = r andThen f
   }
 
+  implicit def Function2Functor[R, S] = new Functor[PartialApply2Of3[Function2, R, S]#Apply] {
+    def fmap[A, B](r: (R, S) => A, f: A => B) = (t1: R, t2: S) => f(r(t1, t2))
+  }
+
+  implicit def Function3Functor[R, S, T] = new Functor[PartialApply3Of4[Function3, R, S, T]#Apply] {
+    def fmap[A, B](r: (R, S, T) => A, f: A => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
+  }
+
+  implicit def Function4Functor[R, S, T, U] = new Functor[PartialApply4Of5[Function4, R, S, T, U]#Apply] {
+    def fmap[A, B](r: (R, S, T, U) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
+  }
+
+  implicit def Function5Functor[R, S, T, U, V] = new Functor[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] {
+    def fmap[A, B](r: (R, S, T, U, V) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
+  }
+
+  implicit def Function6Functor[R, S, T, U, V, W] = new Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+    def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6)) 
+  }
+
   implicit val ListFunctor = new Functor[List] {
     def fmap[A, B](r: List[A], f: A => B) = r map f
   }
