@@ -34,4 +34,18 @@ object MAB {
       val v = a
     }
   }
+
+  implicit def EitherMAB[A, B](a: Either[A, B]): MAB[Either, A, B] = mab[Either](a)
+
+  implicit def Function1MAB[A, B](a: A => B): MAB[Function1, A, B] = mab[Function1](a)
+
+  implicit def Tuple2MAB[A, B](a: (A, B)): MAB[Tuple2, A, B] = mab[Tuple2](a)
+
+  trait KleisliMABApply[M[_]] {
+    def apply[A, B](a: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B]
+  }
+
+  def KleisliMAB[M[_]] = new KleisliMABApply[M] {
+    def apply[A, B](a: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply](a)
+  }
 }
