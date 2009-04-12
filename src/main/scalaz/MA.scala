@@ -179,7 +179,53 @@ object MA {
     }
   }
 
-  implicit def IdentityMA[A](a: Identity[A]) = ma[Identity](a)
+  implicit def IdentityMA[A](a: Identity[A]): MA[Identity, A] = ma[Identity](a)
 
   implicit def ContinuationMA[R, A](a: Continuation[R, A]) = ma[PartialApply1Of2[Continuation, R]#Apply](a)
+
+  implicit def NonEmptyListMA[A](a: NonEmptyList[A]) = ma[NonEmptyList](a)
+
+  implicit def StateMA[S, A](a: State[S, A]) = ma[PartialApply1Of2[State, S]#Apply](a)
+
+  implicit def Tuple1MA[A](a: Tuple1[A]) = ma[Tuple1](a)
+
+  implicit def Tuple2MA[R, A](a: (R, A)) = ma[PartialApply1Of2[Tuple2, R]#Apply](a)
+
+  implicit def Tuple3MA[R, S, A](a: (R, S, A)) = ma[PartialApply2Of3[Tuple3, R, S]#Apply](a)
+
+  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)) = ma[PartialApply3Of4[Tuple4, R, S, T]#Apply](a)
+
+  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)) = ma[PartialApply4Of5[Tuple5, R, S, T, U]#Apply](a)
+
+  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)) = ma[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](a)
+
+  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)) = ma[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](a)
+
+  implicit def Function0MA[A](a: Function0[A]) = ma[Function0](a)
+
+  implicit def Function1MA[R, A](a: R => A) = ma[PartialApply1Of2[Function1, R]#Apply](a)
+
+  implicit def Function2MA[R, S, A](a: (R, S) => A) = ma[PartialApply2Of3[Function2, R, S]#Apply](a)
+
+  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A) = ma[PartialApply3Of4[Function3, R, S, T]#Apply](a)
+
+  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A) = ma[PartialApply4Of5[Function4, R, S, T, U]#Apply](a)
+
+  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A) = ma[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](a)
+
+  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A) = ma[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](a)
+
+  implicit def ListMA[A](a: List[A]) = ma[List](a)
+
+  implicit def StreamMA[A](a: Stream[A]) = ma[Stream](a)
+
+  implicit def OptionMA[A](a: Option[A]) = ma[Option](a)
+
+  implicit def ArrayMA[A](a: Array[A]) = ma[Array](a)
+
+  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip](a)
+
+  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
+
+  implicit def RandomAccessSeqMA[A](a: RandomAccessSeq[A]) = ma[RandomAccessSeq](a)
 }
