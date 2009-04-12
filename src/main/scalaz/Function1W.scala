@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Function1W[-T, +R] {
+sealed trait Function1W[T, R] {
   val k: T => R
 
   def on[X](f: (R, R) => X, t1: T, t2: T) = f(k(t1), k(t2))

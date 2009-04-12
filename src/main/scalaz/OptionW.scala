@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait OptionW[+A] {
+sealed trait OptionW[A] {
   val value: Option[A]
 
   sealed trait Fold[X] {
@@ -29,11 +29,11 @@ sealed trait OptionW[+A] {
 
   def err(message: => String) = value getOrElse (error(message))
 
-  def |[AA >: A](a: => AA) = value getOrElse a
+  def |(a: => A) = value getOrElse a
 
   def toNull = value getOrElse null.asInstanceOf[A]
 
-  def unary_~[AA >: A](implicit z: Zero[AA]) = value getOrElse z.zero
+  def unary_~(implicit z: Zero[A]) = value getOrElse z.zero
 }
 
 object OptionW {
