@@ -16,8 +16,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/deps-main" />
       <excludeFolder url="file://$MODULE_DIR$/src/deps-test" />
     </content>
-    <orderEntry type="library" name="scala-2.7.2.final" level="project" />
-    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
@@ -29,6 +28,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="functionaljava" />
+    <orderEntry type="library" name="Scala 2.7.3" level="project" />
   </component>
 </module>
 

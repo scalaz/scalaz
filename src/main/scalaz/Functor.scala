@@ -29,6 +29,26 @@ object Functor {
     def fmap[A, B](r: (R, A), f: A => B) = (r._1, f(r._2))
   }
 
+  implicit def Tuple3Functor[R, S] = new Functor[PartialApply2Of3[Tuple3, R, S]#Apply] {
+    def fmap[A, B](r: (R, S, A), f: A => B) = (r._1, r._2, f(r._3))
+  }
+
+  implicit def Tuple4Functor[R, S, T] = new Functor[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+    def fmap[A, B](r: (R, S, T, A), f: A => B) = (r._1, r._2, r._3, f(r._4))
+  }
+
+  implicit def Tuple5Functor[R, S, T, U] = new Functor[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+    def fmap[A, B](r: (R, S, T, U, A), f: A => B) = (r._1, r._2, r._3, r._4, f(r._5))
+  }
+
+  implicit def Tuple6Functor[R, S, T, U, V] = new Functor[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+    def fmap[A, B](r: (R, S, T, U, V, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, f(r._6))
+  }
+
+  implicit def Tuple7Functor[R, S, T, U, V, W] = new Functor[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+    def fmap[A, B](r: (R, S, T, U, V, W, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
+  }
+
   implicit val Function0Functor = new Functor[Function0] {
     def fmap[A, B](r: Function0[A], f: A => B) = new Function0[B] {
       def apply = f(r.apply)
