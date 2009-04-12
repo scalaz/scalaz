@@ -124,6 +124,8 @@ sealed trait MA[M[_], A] {
 
   def nil(implicit r: FoldRight[M]) = all(_ => false)
 
+  def empty(implicit r: FoldRight[M]) = foldr[Boolean](true, (_, _) => false)
+
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[(List[List[A]], Option[Boolean])]((Nil, None), (
 a, b) => {
       val pa = p(a)
