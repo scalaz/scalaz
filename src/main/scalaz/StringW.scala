@@ -41,6 +41,8 @@ sealed trait StringW {
    */
   def |:|[A](a: Option[A])(implicit sh: Show[A]): Node =
     node(null, a)
+
+  def encode(implicit c: CharSet) = s getBytes c.value
 }
 
 object StringW {
