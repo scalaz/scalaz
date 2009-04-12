@@ -110,7 +110,7 @@ sealed trait MA[M[_], A] {
     case Some(x) => f(a1, x)
   })) getOrElse (error("foldr1 on empty"))
 
-  def suml(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero.zero, m.semigroup append (_, _))
+  def sumr(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero.zero, m.semigroup append (_, _))
 
   def listr(implicit r: FoldRight[M]) = foldr[List[A]](Nil, _ :: _)
 
