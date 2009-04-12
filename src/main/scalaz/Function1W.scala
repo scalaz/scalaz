@@ -6,6 +6,8 @@ sealed trait Function1W[T, R] {
   def on[X](f: (R, R) => X, t1: T, t2: T) = f(k(t1), k(t2))
 
   def arrow[A[-_, +_]](implicit a: Arrow[A]) = a arrow k
+
+  def kleisli[Z[_]](implicit p: Pure[Z]) = Kleisli.kleisli[Z]((t: T) => p.pure(k(t)))
 }
 
 object Function1W {
