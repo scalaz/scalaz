@@ -25,6 +25,11 @@ sealed trait ListW[A] {
     case Nil => None
     case h :: t => Some(NonEmptyList.nel(h, t))
   }
+
+  def <^>[B](f: NonEmptyList[A] => B)(implicit z: Zero[B]) = value match {
+    case Nil => z.zero
+    case h :: t => f(NonEmptyList.nel(h, t))
+  }
 }
 
 object ListW {
