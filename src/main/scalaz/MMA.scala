@@ -13,5 +13,5 @@ object MMA {
     }
   }
 
-  implicit def IdentityZZ[A](a: Identity[Identity[A]]) = mma[Identity](a)
+  implicit def IdentityMMA[A](a: Identity[Identity[A]]) = mma[Identity](a)
 }
