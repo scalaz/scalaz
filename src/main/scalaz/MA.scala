@@ -90,6 +90,9 @@ sealed trait MA[M[_], A] {
   def min(implicit r: FoldLeft[M], ord: Order[A]) =
     foldl1((x: A, y: A) => if(ord.order(x, y) == LT) x else y)
 
+  def ->-(f: A => Digit)(implicit t: FoldLeft[M]) =
+    foldl[Long](0L, (n, a) => n * 10L + f(a))
+
   def foldr[B](b: B, f: (A, => B) => B)(implicit r: FoldRight[M]) = r.foldRight(v, b, f)
 
   def foldr1(f: (A, => A) => A)(implicit r: FoldRight[M]) = foldr[Option[A]](None, (a1, a2) => Some(a2 match {

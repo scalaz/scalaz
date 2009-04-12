@@ -63,9 +63,6 @@ object Digit {
   }
 
   /*
-  def longDigits[T[_]](n: Long)(implicit f: FoldLeft[T], m: MonadEmptyPlus[T]): T[Digit] =
-    if(n == 0) m.pure(_0) else foldleft[T](unfold[T]((b: Long) => if(b == 0) None else Some (b % 10L: Digit, b / 10L), n)).rev[T]
-
   def digitsLong[T[_]](ds: T[Digit])(implicit f: FoldLeft[T]) =
     f.foldLeft[Long, Digit](ds, 0L, (a, b) => a * 10L + b)
 
