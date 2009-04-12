@@ -21,6 +21,8 @@ sealed trait Identity[A] {
 
   def println(implicit s: Show[A]) = Console.println(shows)
 
+  def constantState[S, A](s: S) = State.constant(s, value)
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
