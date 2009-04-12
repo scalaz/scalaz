@@ -116,7 +116,7 @@ sealed trait BooleanW {
    * <code>Right</code>.
    */
   def either[A, B](a: => A) = new ConditionalEither[A, B] {
-    def |||(b: => B) = if(isTrue) Right(b) else Left(a)
+    def |(b: => B) = if(isTrue) Right(b) else Left(a)
   }
 
   /**
