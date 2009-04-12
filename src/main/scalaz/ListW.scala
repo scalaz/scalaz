@@ -20,6 +20,11 @@ sealed trait ListW[A] {
     case x :: Nil => x :: Nil
     case h :: t => h :: as ::: t.intercalate(as)
   }
+
+  def nel = value match {
+    case Nil => None
+    case h :: t => Some(NonEmptyList.nel(h, t))
+  }
 }
 
 object ListW {
