@@ -91,6 +91,11 @@ sealed trait BooleanW {
    */
   def unless(f: => Unit) = if(!isTrue) f
 
+  /**
+   * Executes the given side-effect if this boolean value is <code>true</code>.
+   */
+  def when(f: => Unit) = if(isTrue) f
+
   trait Conditional[X] {
     def |(f: => X): X
   }
