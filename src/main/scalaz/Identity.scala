@@ -23,6 +23,8 @@ sealed trait Identity[A] {
 
   def constantState[S, A](s: S) = State.constant(s, value)
 
+  def text(implicit s: Show[A]) = xml.Text(s shows value)
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode

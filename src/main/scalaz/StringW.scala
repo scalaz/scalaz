@@ -24,7 +24,7 @@ sealed trait StringW {
    */
   def node[A](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A])(implicit sh: Show[A]) =
     a match {
-      case Some(t) => Elem(prefix, s, Null, TopScope, Text(t.shows))
+      case Some(t) => Elem(prefix, s, Null, TopScope, t.text)
       case None => Text("")
     }
 
