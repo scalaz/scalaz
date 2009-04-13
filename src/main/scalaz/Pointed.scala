@@ -1,14 +1,11 @@
 package scalaz
 
-sealed trait Pointed[P[_]] {
-  val functor: Functor[P]
-  val pure: Pure[P]
-}
+trait Pointed[P[_]] extends Functor[P] with Pure[P]
 
 object Pointed {
-  def pointed[P[_]](implicit f: Functor[P], p: Pure[P]) = new Pointed[P] {
-    val functor = f
-    val pure = p
+  def pointed[P[_]](implicit t: Functor[P], p: Pure[P]) = new Pointed[P] {
+    def fmap[A, B](a: P[A], f: A => B) = t.fmap(a, f)
+    def pure[A](a: A): P[A] = p.pure(a)
   }
 
   implicit val IdentityPointed = pointed[Identity]

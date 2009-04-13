@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Semigroup[S] {
+trait Semigroup[S] {
   def append(s1: S, s2: => S): S
 }
 

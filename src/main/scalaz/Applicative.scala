@@ -1,20 +1,12 @@
 package scalaz
 
-sealed trait Applicative[Z[_]] {
-  implicit val pure: Pure[Z]
-  implicit val apply: Apply[Z]
-
-  implicit val functor: Functor[Z] = new Functor[Z] {
-    def fmap[A, B](fa: Z[A], f: A => B) = apply(pure.pure(f), fa)
-  }
-
-  implicit val pointed = Pointed.pointed[Z]
-}
+trait Applicative[Z[_]] extends Pointed[Z] with Apply[Z]
 
 object Applicative {
   def applicative[Z[_]](implicit p: Pure[Z], a: Apply[Z]) = new Applicative[Z] {
-    val pure = p
-    val apply = a
+    def fmap[A, B](fa: Z[A], f: A => B) = a(p.pure(f), fa)
+    def pure[A](a: A) = p.pure(a)
+    def apply[A, B](f: Z[A => B], x: Z[A]) = a(f, x)
   }
 
   implicit val IdentityApplicative = applicative[Identity]

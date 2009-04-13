@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Monoid[M] {
+trait Monoid[M] {
   implicit val semigroup: Semigroup[M]
   val zero: Zero[M]
 }

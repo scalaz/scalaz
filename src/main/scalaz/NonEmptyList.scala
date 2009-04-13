@@ -52,6 +52,5 @@ object NonEmptyList {
 
   def nel[A](a: A): NonEmptyList[A] = nel(a, Nil)
 
-  def nels[A](a: A, as: A*): NonEmptyList[A] = nel(a, as.toList)
-  
+  def nels[A](a: A, as: A*): NonEmptyList[A] = nel(a, as.toList)  
 }

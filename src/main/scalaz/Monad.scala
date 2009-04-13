@@ -1,24 +1,13 @@
 package scalaz
 
-sealed trait Monad[M[_]] {
-  implicit val pure: Pure[M]
-  implicit val bind: Bind[M]
-
-  implicit val functor = new Functor[M] {
-    def fmap[A, B](fa: M[A], f: A => B) = bind.bind(fa, (a: A) => pure.pure(f(a)))
-  }
-
-  implicit val pointed = Pointed.pointed[M]
-
-  implicit val apply = new Apply[M] {
-    def apply[A, B](f: M[A => B], a: M[A]): M[B] = bind.bind(f, (k: A => B) => functor.fmap(a, k(_: A)))
-  }
-}
+trait Monad[M[_]] extends Applicative[M] with Bind[M]
 
 object Monad {
   def monad[M[_]](implicit b: Bind[M], p: Pure[M]) = new Monad[M] {
-    val pure = p
-    val bind = b
+    def fmap[A, B](fa: M[A], f: A => B) = b.bind(fa, (a: A) => p.pure(f(a)))
+    def apply[A, B](f: M[A => B], a: M[A]): M[B] = b.bind(f, (k: A => B) => fmap(a, k(_: A)))
+    def pure[A](a: A) = p.pure(a)
+    def bind[A, B](a: M[A], f: A => M[B]) = b.bind(a, f)
   }
 
   implicit val IdentityMonad: Monad[Identity] = monad[Identity]

@@ -29,15 +29,15 @@ object Arrow {
     import Kleisli.kleisli
 
     def arrow[B, C](f: B => C) =
-      kleisli[M]((b: B) => m.pure.pure(f(b)))
+      kleisli[M]((b: B) => m.pure(f(b)))
 
     def compose[B, C, D](a1: Kleisli[M, B, C], a2: Kleisli[M, C, D]) =
-      kleisli[M]((b: B) => m.bind.bind(a1(b), (c: C) => a2(c)))
+      kleisli[M]((b: B) => m.bind(a1(b), (c: C) => a2(c)))
 
     def first[B, C, D](a: Kleisli[M, B, C]) =
-      kleisli[M].apply[(B, D), (C, D)] { case (b, d) => m.functor.fmap(a(b), (c: C) => (c, d)) }
+      kleisli[M].apply[(B, D), (C, D)] { case (b, d) => m.fmap(a(b), (c: C) => (c, d)) }
 
     def second[B, C, D](a: Kleisli[M, B, C]) =
-      kleisli[M].apply[(D, B), (D, C)]{ case (d, b) => m.functor.fmap(a(b), (c: C) => (d, c)) }
+      kleisli[M].apply[(D, B), (D, C)]{ case (d, b) => m.fmap(a(b), (c: C) => (d, c)) }
   }
 }
