@@ -29,8 +29,20 @@ object Each {
     def each[A](e: Function0[A], f: A => Unit) = f(e.apply)
   }
 
+  implicit def OptionEach[A] = new Each[Option] {
+    def each[A](e: Option[A], f: A => Unit) = e foreach f
+  }
+
   implicit def ArrayEach[A] = new Each[Array] {
-      def each[A](e: Array[A], f: A => Unit) = e foreach f
+    def each[A](e: Array[A], f: A => Unit) = e foreach f
+  }
+
+  implicit def EitherLeftEach[X] = new Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+    def each[A](e: Either.LeftProjection[A, X], f: A => Unit) = e foreach f
+  }
+
+  implicit def EitherRightEach[X] = new Each[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+    def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 
   implicit def IterableEach[A] = new Each[Iterable] {
