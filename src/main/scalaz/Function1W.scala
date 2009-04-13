@@ -11,9 +11,9 @@ sealed trait Function1W[T, R] {
 }
 
 object Function1W {
-  def Function1To[T, R](f: T => R) = new Function1W[T, R] {
+  implicit def Function1To[T, R](f: T => R) = new Function1W[T, R] {
     val k = f
   }
 
-  def Function1From[T, R](f: Function1W[T, R]) = f.k
+  implicit def Function1From[T, R](f: Function1W[T, R]) = f.k
 }
