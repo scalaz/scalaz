@@ -1,11 +1,9 @@
 package scalaz
 
-trait Traverse[T[_]] {
+trait Traverse[T[_]] extends Functor[T] {
   def traverse[F[_], A, B](f: A => F[B], t: T[A])(implicit a: Applicative[F]): F[T[B]]
 
-  implicit val functor: Functor[T] = new Functor[T] {
-    def fmap[A, B](k: T[A], f: A => B) = traverse[Identity, A, B](a => Identity.id(f(a)), k).value
-  }
+  def fmap[A, B](k: T[A], f: A => B) = traverse[Identity, A, B](a => Identity.id(f(a)), k).value
 }
 
 object Traverse {
