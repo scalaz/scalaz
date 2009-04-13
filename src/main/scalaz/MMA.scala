@@ -21,6 +21,12 @@ object MMA {
 
   implicit def StateMMA[S, A](a: State[S, State[S, A]]) = mma[PartialApply1Of2[State, S]#Apply](a)
 
+  implicit def EqualMMA[A](a: Equal[Equal[A]]) = mma[Equal](a)
+
+  implicit def OrderMMA[A](a: Order[Order[A]]) = mma[Order](a)
+
+  implicit def ShowMMA[A](a: Show[Show[A]]) = mma[Show](a)
+
   implicit def Tuple1MMA[A](a: Tuple1[Tuple1[A]]) = mma[Tuple1](a)
 
   implicit def Tuple2MMA[R, A](a: (R, (R, A))) = mma[PartialApply1Of2[Tuple2, R]#Apply](a)
