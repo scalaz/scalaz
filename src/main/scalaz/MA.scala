@@ -228,4 +228,37 @@ object MA {
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
 
   implicit def RandomAccessSeqMA[A](a: RandomAccessSeq[A]) = ma[RandomAccessSeq](a)
+  
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def ArrayListMA[A](a: ArrayList[A]) = ma[ArrayList](a)
+
+  implicit def HashSetMA[A](a: HashSet[A]) = ma[HashSet](a)
+
+  implicit def LinkedHashSetMA[A](a: LinkedHashSet[A]) = ma[LinkedHashSet](a)
+
+  implicit def LinkedListMA[A](a: LinkedList[A]) = ma[LinkedList](a)
+
+  implicit def PriorityQueueMA[A](a: PriorityQueue[A]) = ma[PriorityQueue](a)
+
+  implicit def StackMA[A](a: Stack[A]) = ma[Stack](a)
+
+  implicit def TreeSetMA[A](a: TreeSet[A]) = ma[TreeSet](a)
+
+  implicit def VectorMA[A](a: Vector[A]) = ma[Vector](a)
+
+  implicit def ArrayBlockingQueueMA[A](a: ArrayBlockingQueue[A]) = ma[ArrayBlockingQueue](a)
+
+  implicit def ConcurrentLinkedQueueMA[A](a: ConcurrentLinkedQueue[A]) = ma[ConcurrentLinkedQueue](a)
+
+  implicit def CopyOnWriteArrayListMA[A](a: CopyOnWriteArrayList[A]) = ma[CopyOnWriteArrayList](a)
+
+  implicit def CopyOnWriteArraySetMA[A](a: CopyOnWriteArraySet[A]) = ma[CopyOnWriteArraySet](a)
+
+  implicit def LinkedBlockingQueueMA[A](a: LinkedBlockingQueue[A]) = ma[LinkedBlockingQueue](a)
+
+  implicit def PriorityBlockingQueueMA[A](a: PriorityBlockingQueue[A]) = ma[PriorityBlockingQueue](a)
+
+  implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
 }
