@@ -48,17 +48,16 @@ object FoldRight {
     def foldRight[A, B](t: Iterable[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
   }
 
-  implicit def JavaListFoldRight[A] = new FoldRight[java.util.List] {
-    def foldRight[A, B](t: java.util.List[A], b: B, f: (A, => B) => B) = {
-      var x = b
-      val i = t.listIterator
-
-      while(i.hasPrevious) {
-        val n = i.previous
-        x = f(n, x)
+  implicit def JavaIterableFoldRight[A] = new FoldRight[java.lang.Iterable] {
+    def foldRight[A, B](t: java.lang.Iterable[A], b: B, f: (A, => B) => B) = {
+      val i = new Iterable[A] {
+        def elements = new Iterator[A] {
+          val k = t.iterator
+          def hasNext = k.hasNext
+          def next = k.next
+        }
       }
-
-      x
+      IterableFoldRight.foldRight(i, b, f)
     }
   }
 }
