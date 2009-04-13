@@ -47,3 +47,6 @@ NonEmptyList
 Validation
 State
 Digit
+Equal
+Order
+Show
