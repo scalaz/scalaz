@@ -1,6 +1,6 @@
 package scalaz
 
-trait Empty[E[_]] {
+trait Empty[+E[_]] {
   def empty[A]: E[A]
 }
 

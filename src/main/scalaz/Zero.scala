@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Zero[Z] {
+sealed trait Zero[+Z] {
   val zero: Z
 }
 

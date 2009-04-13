@@ -1,6 +1,6 @@
 package scalaz
 
-trait Each[E[_]] {
+trait Each[-E[_]] {
   def each[A](e: E[A], f: A => Unit): Unit
 }
 

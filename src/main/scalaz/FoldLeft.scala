@@ -1,6 +1,6 @@
 package scalaz
 
-trait FoldLeft[F[_]] {
+trait FoldLeft[-F[_]] {
   def foldLeft[B, A](t: F[A], b: B, f: (B, A) => B): B
 }
 

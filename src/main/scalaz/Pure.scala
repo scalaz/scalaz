@@ -1,6 +1,6 @@
 package scalaz
 
-trait Pure[P[_]] {
+trait Pure[+P[_]] {
   implicit def pure[A](a: A): P[A]
 }
 
