@@ -80,7 +80,7 @@ sealed trait MA[M[_], A] {
     b.toList
   }
 
-  def suml(implicit r: FoldLeft[M], m: Monoid[A]) = foldl[A](m.zero.zero, m.semigroup append (_, _))
+  def suml(implicit r: FoldLeft[M], m: Monoid[A]) = foldl[A](m.zero, m append (_, _))
 
   def items(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
 
@@ -100,7 +100,7 @@ sealed trait MA[M[_], A] {
 
   def =>=(f: A => Char)(implicit t: Traverse[M]): Option[M[Digit]] = {
     import CharW._
-    t.traverse[Option, Char, Digit](_.digit,  t.functor.fmap(v, f))
+    t.traverse[Option, Char, Digit](_.digit,  t.fmap(v, f))
   }
 
   def foldr[B](b: B, f: (A, => B) => B)(implicit r: FoldRight[M]) = r.foldRight(v, b, f)
@@ -110,7 +110,7 @@ sealed trait MA[M[_], A] {
     case Some(x) => f(a1, x)
   })) getOrElse (error("foldr1 on empty"))
 
-  def sumr(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero.zero, m.semigroup append (_, _))
+  def sumr(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero, m append (_, _))
 
   def listr(implicit r: FoldRight[M]) = foldr[List[A]](Nil, _ :: _)
 
@@ -157,11 +157,11 @@ a, b) => {
     case class Acc[B, A](acc: B)
 
     implicit val AccApply = new Apply[PartialApply1Of2[Acc, B]#Apply] {
-      def apply[A, X](f: Acc[B, A => X], fa: Acc[B, A]) = Acc[B, X](m.semigroup append (f.acc, fa.acc))
+      def apply[A, X](f: Acc[B, A => X], fa: Acc[B, A]) = Acc[B, X](m append (f.acc, fa.acc))
     }
 
     implicit val AccPure = new Pure[PartialApply1Of2[Acc, B]#Apply] {
-      def pure[A](a: A) = Acc[B, A](m.zero.zero)
+      def pure[A](a: A) = Acc[B, A](m.zero)
     }
 
     implicit val AccApplicative = Applicative.applicative[PartialApply1Of2[Acc, B]#Apply]
