@@ -5,6 +5,7 @@ sealed trait NonEmptyList[+A] {
   val tail: List[A]
 
   import NonEmptyList.nel
+  import ListW._
 
   def <::[B >: A](b: B) = nel(b, head :: tail)
 
@@ -40,6 +41,11 @@ sealed trait NonEmptyList[+A] {
   val list = head :: tail
 
   val stream = Stream.cons(head, tail.projection)
+
+  def tails : NonEmptyList[NonEmptyList[A]] = tail match {
+    case Nil => nel(this)
+    case h :: t => nel(this, tail.nel.get.tails.list)
+  }
 
   override def toString = "NonEmpty" + (head :: tail)
 }

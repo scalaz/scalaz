@@ -5,7 +5,23 @@ trait Cojoin[M[_]] {
 }
 
 object Cojoin {
-  implicit def IdentityCojoin = new Cojoin[Identity] {
+  implicit val IdentityCojoin = new Cojoin[Identity] {
     def cojoin[A](a: Identity[A]) = Identity.id(a)
+  }
+
+  implicit val NonEmptyListCojoin = new Cojoin[NonEmptyList] {
+    def cojoin[A](a: NonEmptyList[A]) = a.tails
+  }
+
+  implicit val Tuple1Comonad = new Cojoin[Tuple1] {
+    def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+  }
+
+  implicit def Tuple2Cojoin[R] = new Cojoin[PartialApply1Of2[Tuple2, R]#Apply] {
+    def cojoin[A](a: Tuple2[R, A]) = Tuple2(a._1, a)
+  }
+
+  implicit val Function0Cojoin = new Cojoin[Function0] {
+    def cojoin[A](a: Function0[A]) = () => a
   }
 }
