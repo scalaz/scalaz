@@ -171,7 +171,11 @@ a, b) => {
 
   def =>>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
 
-  def cojoin(implicit j: Cojoin[M]) = j.cojoin(a)
+  def cojoin(implicit j: Cojoin[M]) = j.cojoin(v)
+
+  def cobind[B](f: M[A] => B)(implicit w: Comonad[M]) = w.fmap(w.cojoin(v), f)
+
+  def copure[B](implicit p: Copure[M]) = p.copure(v)
 }
 
 object MA {
@@ -269,4 +273,5 @@ object MA {
   implicit def PriorityBlockingQueueMA[A](a: PriorityBlockingQueue[A]) = ma[PriorityBlockingQueue](a)
 
   implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
+
 }
