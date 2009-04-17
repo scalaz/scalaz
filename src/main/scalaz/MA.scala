@@ -170,6 +170,8 @@ a, b) => {
   }
 
   def =>>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
+
+  def cojoin(implicit j: Cojoin[M]) = j.cojoin(a)
 }
 
 object MA {
