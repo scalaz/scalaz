@@ -5,6 +5,8 @@ trait Pure[+P[_]] {
 }
 
 object Pure {
+  import S._
+  
   implicit val IdentityPure: Pure[Identity] = new Pure[Identity] {
     def pure[A](a: A) = Identity.id(a)
   }
@@ -18,7 +20,7 @@ object Pure {
   }
 
   implicit def StatePure[S] = new Pure[PartialApply1Of2[State, S]#Apply] {
-    def pure[A](a: A) = State.value[S](a)
+    def pure[A](a: A) = a.state[S]
   }
 
   implicit val Tuple1Pure = new Pure[Tuple1] {

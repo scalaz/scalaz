@@ -21,9 +21,11 @@ sealed trait Identity[A] {
 
   def println(implicit s: Show[A]) = Console.println(shows)
 
-  def constantState[S, A](s: S) = State.constant(s, value)
-
   def text(implicit s: Show[A]) = xml.Text(s shows value)
+
+  def constantState[S, A](s: S) = State.state((_: S) => (s, value))
+
+  def state[S] = State.state((_: S, value))
 
   override def toString = value.toString
 

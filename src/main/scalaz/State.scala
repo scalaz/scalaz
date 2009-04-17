@@ -23,17 +23,7 @@ object State {
     def apply(s: S) = f(s)
   }
 
-  trait StateValue[S] {
-    def apply[A](a: A): State[S, A]
-  }
-
-  def value[S] = new StateValue[S] {
-    def apply[A](a: A) = state((_: S, a))
-  }
-
   def init[S] = state[S, S](s => (s, s))
 
-  def constant[S, A](s: S, a: A) = state((x: S) => (s, a))
-
-  def modify[S](f: S => S) = init[S] flatMap (s => state(x => (f(s), ())))
+  def modify[S](f: S => S) = init[S] flatMap (s => state(_ => (f(s), ())))
 }
