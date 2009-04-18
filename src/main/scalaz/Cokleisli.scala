@@ -20,6 +20,4 @@ object Cokleisli {
       def apply(a: W[A]) = f(a)
     }
   }
-
-  implicit def CokleisliF[W[_], A, B](c: Cokleisli[W, A, B]): (W[A] => B) = c.apply(_:W[A])
 }
