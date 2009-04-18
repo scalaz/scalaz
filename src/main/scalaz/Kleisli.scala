@@ -20,6 +20,8 @@ trait Kleisli[M[_], -A, B] {
   def traverse[F[_]] = new TraverseK[F] {
     def apply[AA <: A](f: F[AA])(implicit a: Applicative[M], t: Traverse[F]): M[F[B]] = t.traverse[M, AA, B](Kleisli.this(_), f)
   }
+
+  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]) = m.bind(a, apply)
 }
 
 object Kleisli {
