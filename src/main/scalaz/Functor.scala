@@ -102,8 +102,4 @@ object Functor {
   implicit def EitherRightFunctor[X] = new Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
-
-  implicit val RandomAccessSeqFunctor = new Functor[RandomAccessSeq] {
-    def fmap[A, B](r: RandomAccessSeq[A], f: A => B) = r.projection map f projection
-  }
 }

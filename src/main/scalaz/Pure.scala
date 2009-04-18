@@ -80,8 +80,4 @@ object Pure {
   implicit def EitherRightPure[X] = new Pure[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def pure[A](a: A) = Right(a).right
   }
-
-  implicit val RandomAccessSeqPure = new Pure[RandomAccessSeq] {
-    def pure[A](a: A) = RandomAccessSeq(a)
-  }
 }

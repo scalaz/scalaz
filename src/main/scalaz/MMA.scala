@@ -67,8 +67,6 @@ object MMA {
 
   implicit def EitherRightMMA[X, A](a: Either.RightProjection[X, Either.RightProjection[X, A]]) = mma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
 
-  implicit def RandomAccessSeqMMA[A](a: RandomAccessSeq[RandomAccessSeq[A]]) = mma[RandomAccessSeq](a)
-
   import java.util._
   import java.util.concurrent._
 
