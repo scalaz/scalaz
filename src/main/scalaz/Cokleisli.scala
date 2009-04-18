@@ -5,10 +5,8 @@ trait Cokleisli[W[_], A, B] {
 
   def |>=(a: W[A]) = apply(a)
 
-  import MA._
-  
   def <<=(a: W[A])(implicit w: Comonad[W]) = {
-    ma[W](a) =>> apply
+    w.cobind(a, apply)
   }
 }
 
@@ -22,4 +20,6 @@ object Cokleisli {
       def apply(a: W[A]) = f(a)
     }
   }
+
+  implicit def CokleisliF[W[_], A, B](c: Cokleisli[W, A, B]): (W[A] => B) = c.apply(_:W[A])
 }

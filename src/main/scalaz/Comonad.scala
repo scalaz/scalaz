@@ -1,6 +1,8 @@
 package scalaz
 
-trait Comonad[W[_]] extends Copointed[W] with Cojoin[W]
+trait Comonad[W[_]] extends Copointed[W] with Cojoin[W] {
+  def cobind[A, B](a: W[A], f: W[A] => B) : W[B] = fmap(cojoin(a), f)
+}
 
 object Comonad {
   def comonad[W[_]](implicit j: Cojoin[W], p: Copointed[W]) = new Comonad[W] {

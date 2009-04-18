@@ -173,7 +173,7 @@ a, b) => {
 
   def cojoin(implicit j: Cojoin[M]) = j.cojoin(v)
 
-  def =>>[B](f: M[A] => B)(implicit w: Comonad[M]) = w.fmap(w.cojoin(v), f)
+  def =>>[B](f: M[A] => B)(implicit w: Comonad[M]) = w.cobind(v, f)
 
   def copure[B](implicit p: Copure[M]) = p.copure(v)
 }

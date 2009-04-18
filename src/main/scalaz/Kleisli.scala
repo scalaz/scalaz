@@ -34,4 +34,6 @@ object Kleisli {
       def apply(a: A) = f(a)
     }
   }
+
+  implicit def KleisliF[W[_], A, B](c: Cokleisli[W, A, B]): (A => W[B]) = c.apply(_:A)
 }
