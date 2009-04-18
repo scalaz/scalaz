@@ -169,11 +169,11 @@ a, b) => {
     traverse[PartialApply1Of2[Acc, B]#Apply](t)(a => Acc[B, B](f(a))).acc
   }
 
-  def =>>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
+  def -->>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
 
   def cojoin(implicit j: Cojoin[M]) = j.cojoin(v)
 
-  def cobind[B](f: M[A] => B)(implicit w: Comonad[M]) = w.fmap(w.cojoin(v), f)
+  def =>>[B](f: M[A] => B)(implicit w: Comonad[M]) = w.fmap(w.cojoin(v), f)
 
   def copure[B](implicit p: Copure[M]) = p.copure(v)
 }
