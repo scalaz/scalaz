@@ -18,7 +18,7 @@ object Cojoin {
   }
 
   implicit def Tuple2Cojoin[R] = new Cojoin[PartialApply1Of2[Tuple2, R]#Apply] {
-    def cojoin[A](a: Tuple2[R, A]) = Tuple2(a._1, a)
+    def cojoin[A](a: (R, A)) = (a._1, a)
   }
 
   implicit val Function0Cojoin = new Cojoin[Function0] {
