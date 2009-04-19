@@ -29,9 +29,25 @@ object Equal {
   
   implicit val DoubleEqual = equalA[Double]
 
+  import S._
+
+  implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {
+    case (Some(a1), Some(a2)) => a1 === a2
+    case (a1, a2) => a1.isDefined == a2.isDefined
+  }
+
+  implicit def EitherLeftEqual[A, X](implicit ea: Equal[A]) = equal[Either.LeftProjection[A, X]]((a1, a2) => (a1.toOption, a2.toOption) match {
+    case (Some(a1), Some(a2)) => a1 === a2
+    case (a1, a2) => a1.isDefined == a2.isDefined
+  })
+
+  implicit def EitherRightEqual[X, A](implicit ea: Equal[A]) = equal[Either.RightProjection[X, A]]((a1, a2) => (a1.toOption, a2.toOption) match {
+    case (Some(a1), Some(a2)) => a1 === a2
+    case (a1, a2) => a1.isDefined == a2.isDefined
+  })
+
   implicit def IterableEqual[A](implicit ea: Equal[A]) = equal[Iterable[A]]((a1, a2) => {
-    import S._
-    
+
     val i1 = a1.elements
     val i2 = a2.elements
     var b = false
