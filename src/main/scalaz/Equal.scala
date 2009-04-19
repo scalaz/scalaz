@@ -47,7 +47,6 @@ object Equal {
   })
 
   implicit def IterableEqual[A](implicit ea: Equal[A]) = equal[Iterable[A]]((a1, a2) => {
-
     val i1 = a1.elements
     val i2 = a2.elements
     var b = false
@@ -82,4 +81,8 @@ object Equal {
 
     !(b || i1.hasNext || i2.hasNext)
   })
+
+  implicit def JavaMapEntry[K, V](implicit ek: Equal[K], ev: Equal[V]) = equal[java.util.Map.Entry[K, V]]((a1, a2) => a1.getKey === a2.getKey)
+
+  implicit def JavaMapEqual[K, V](implicit ek: Equal[K], ev: Equal[V]) = equal[java.util.Map[K, V]](_.entrySet === _.entrySet)
 }
