@@ -25,6 +25,48 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
+  implicit def Tuple2Bind[R](implicit s: Semigroup[R]) = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
+    def bind[A, B](r: (R, A), f: A => (R, B)) = {
+      val (rr, b) = f(r._2)
+      (s append (r._1, rr), b)
+    }
+  }
+
+  implicit def Tuple3Bind[R, S](implicit sr: Semigroup[R], ss: Semigroup[S]) = new Bind[PartialApply2Of3[Tuple3, R, S]#Apply] {
+    def bind[A, B](r: (R, S, A), f: A => (R, S, B)) = {
+      val (rr, s, b) = f(r._3)
+      (sr append (r._1, rr), ss append(r._2, s), b)
+    }
+  }
+
+  implicit def Tuple4Bind[R, S, T](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T]) = new Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+    def bind[A, B](r: (R, S, T, A), f: A => (R, S, T, B)) = {
+      val (rr, s, t, b) = f(r._4)
+      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), b)
+    }
+  }
+
+  implicit def Tuple5Bind[R, S, T, U](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U]) = new Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+    def bind[A, B](r: (R, S, T, U, A), f: A => (R, S, T, U, B)) = {
+      val (rr, s, t, u, b) = f(r._5)
+      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), b)
+    }
+  }
+
+  implicit def Tuple6Bind[R, S, T, U, V](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V]) = new Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+    def bind[A, B](r: (R, S, T, U, V, A), f: A => (R, S, T, U, V, B)) = {
+      val (rr, s, t, u, v, b) = f(r._6)
+      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), sv append (r._5, v), b)
+    }
+  }
+
+  implicit def Tuple7Bind[R, S, T, U, V, W](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V], sw: Semigroup[W]) = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+    def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
+      val (rr, s, t, u, v, w, b) = f(r._7)
+      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), sv append (r._5, v), sw append (r._6, w), b)
+    }
+  }
+    
   implicit val Function0Bind = new Bind[Function0] {
     def bind[A, B](r: Function0[A], f: A => Function0[B]) = f(r.apply)
   }
