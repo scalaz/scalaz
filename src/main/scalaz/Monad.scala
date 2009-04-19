@@ -45,4 +45,27 @@ object Monad {
   implicit def EitherLeftMonad[X] = monad[PartialApply1Of2[Either.LeftProjection, X]#Flip]
 
   implicit def EitherRightMonad[X] = monad[PartialApply1Of2[Either.RightProjection, X]#Apply]
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListMonad = monad[ArrayList]
+
+  implicit val JavaLinkedListMonad = monad[LinkedList]
+
+  implicit val JavaPriorityQueueMonad = monad[PriorityQueue]
+
+  implicit val JavaStackMonad = monad[Stack]
+
+  implicit val JavaVectorMonad = monad[Vector]
+
+  implicit val JavaArrayBlockingQueueMonad = monad[ArrayBlockingQueue]
+
+  implicit val JavaConcurrentLinkedQueueMonad = monad[ConcurrentLinkedQueue]
+
+  implicit val JavaCopyOnWriteArrayListMonad = monad[CopyOnWriteArrayList]
+
+  implicit val JavaLinkedBlockingQueueMonad = monad[LinkedBlockingQueue]
+
+  implicit val JavaSynchronousQueueMonad = monad[SynchronousQueue]
 }
