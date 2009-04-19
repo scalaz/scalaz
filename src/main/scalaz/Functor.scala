@@ -166,6 +166,17 @@ object Functor {
     }
   }
 
+
+  implicit val JavaConcurrentLinkedQueueFunctor: Functor[ConcurrentLinkedQueue] = new Functor[ConcurrentLinkedQueue] {
+    def fmap[A, B](r: ConcurrentLinkedQueue[A], f: A => B) = {
+      val a = new ConcurrentLinkedQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
   implicit val JavaCopyOnWriteArrayListFunctor: Functor[CopyOnWriteArrayList] = new Functor[CopyOnWriteArrayList] {
     def fmap[A, B](r: CopyOnWriteArrayList[A], f: A => B) = {
       val a = new CopyOnWriteArrayList[B]
