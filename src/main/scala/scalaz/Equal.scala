@@ -36,6 +36,12 @@ object Equal {
     case (a1, a2) => a1.isDefined == a2.isDefined
   }
 
+  implicit def EitherEqual[A, B](implicit ea: Equal[A], eb: Equal[B]) = equal[Either[A, B]] {
+    case(Left(a1), Left(a2)) => a1 === a2
+    case (Right(b1), Right(b2)) => b1 === b2
+    case _ => false
+  }
+
   implicit def EitherLeftEqual[A, X](implicit ea: Equal[A]) = equal[Either.LeftProjection[A, X]]((a1, a2) => (a1.toOption, a2.toOption) match {
     case (Some(a1), Some(a2)) => a1 === a2
     case (a1, a2) => a1.isDefined == a2.isDefined
