@@ -13,7 +13,7 @@ object Cojoin {
     def cojoin[A](a: NonEmptyList[A]) = a.tails
   }
 
-  implicit val Tuple1Comonad = new Cojoin[Tuple1] {
+  implicit val Tuple1Cojoin = new Cojoin[Tuple1] {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
   }
 
