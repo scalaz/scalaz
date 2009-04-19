@@ -21,6 +21,18 @@ object Apply {
 
   implicit val Tuple1Apply = FunctorBindApply[Tuple1]
 
+  implicit def Tuple2Apply[R](implicit sr: Semigroup[R]) = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
+
+  implicit def Tuple3Apply[R, S](implicit sr: Semigroup[R], ss: Semigroup[S]) = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
+
+  implicit def Tuple4Apply[R, S, T](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T]) = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+
+  implicit def Tuple5Apply[R, S, T, U](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U]) = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+
+  implicit def Tuple6Apply[R, S, T, U, V](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V]) = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+
+  implicit def Tuple7Apply[R, S, T, U, V, W](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V], sw: Semigroup[W]) = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+
   implicit val Function0Apply = FunctorBindApply[Function0]
 
   implicit def Function1Apply[R] = FunctorBindApply[PartialApply1Of2[Function1, R]#Apply]

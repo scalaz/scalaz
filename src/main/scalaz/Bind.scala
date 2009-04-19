@@ -25,10 +25,10 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
-  implicit def Tuple2Bind[R](implicit s: Semigroup[R]) = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Bind[R](implicit sr: Semigroup[R]) = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
     def bind[A, B](r: (R, A), f: A => (R, B)) = {
       val (rr, b) = f(r._2)
-      (s append (r._1, rr), b)
+      (sr append (r._1, rr), b)
     }
   }
 
