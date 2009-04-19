@@ -20,6 +20,18 @@ object Monad {
 
   implicit val Tuple1Monad = monad[Tuple1]
 
+  implicit def Tuple2Monad[R](implicit sr: Monoid[R]) = monad[PartialApply1Of2[Tuple2, R]#Apply]
+
+  implicit def Tuple3Monad[R, S](implicit sr: Monoid[R], ss: Monoid[S]) = monad[PartialApply2Of3[Tuple3, R, S]#Apply]
+
+  implicit def Tuple4Monad[R, S, T](implicit sr: Monoid[R], ss: Monoid[S], st: Monoid[T]) = monad[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+
+  implicit def Tuple5Monad[R, S, T, U](implicit sr: Monoid[R], ss: Monoid[S], st: Monoid[T], su: Monoid[U]) = monad[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+
+  implicit def Tuple6Monad[R, S, T, U, V](implicit sr: Monoid[R], ss: Monoid[S], st: Monoid[T], su: Monoid[U], sv: Monoid[V]) = monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+
+  implicit def Tuple7Monad[R, S, T, U, V, W](implicit sr: Monoid[R], ss: Monoid[S], st: Monoid[T], su: Monoid[U], sv: Monoid[V], sw: Monoid[W]) = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+
   implicit val Function0Monad = monad[Function0]
 
   implicit def Function1Monad[R] = monad[PartialApply1Of2[Function1, R]#Apply]
