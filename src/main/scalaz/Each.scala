@@ -21,19 +21,43 @@ object Each {
     def each[A](e: State[Unit, A], f: A => Unit) = f(e(())._2)
   }
 
-  implicit def Tuple1Each[A] = new Each[Tuple1] {
-    def each[A](e: Tuple1[A], f: A => Unit) = f(e._1) 
+  implicit val Tuple1Each = new Each[Tuple1] {
+    def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
 
-  implicit def Function0Each[A] = new Each[Function0] {
+  implicit def Tuple2Each[R] = new Each[PartialApply1Of2[Tuple2, R]#Apply] {
+    def each[A](e: (R, A), f: A => Unit) = f(e._2)
+  }
+
+  implicit def Tuple3Each[R, S] = new Each[PartialApply2Of3[Tuple3, R, S]#Apply] {
+    def each[A](e: (R, S, A), f: A => Unit) = f(e._3)
+  }
+
+  implicit def Tuple4Each[R, S, T] = new Each[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+    def each[A](e: (R, S, T, A), f: A => Unit) = f(e._4)
+  }
+
+  implicit def Tuple5Each[R, S, T, U] = new Each[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+    def each[A](e: (R, S, T, U, A), f: A => Unit) = f(e._5)
+  }
+
+  implicit def Tuple6Each[R, S, T, U, V] = new Each[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+    def each[A](e: (R, S, T, U, V, A), f: A => Unit) = f(e._6)
+  }
+
+  implicit def Tuple7Each[R, S, T, U, V, W] = new Each[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+    def each[A](e: (R, S, T, U, V, W, A), f: A => Unit) = f(e._7)
+  }
+
+  implicit val Function0Each = new Each[Function0] {
     def each[A](e: Function0[A], f: A => Unit) = f(e.apply)
   }
 
-  implicit def OptionEach[A] = new Each[Option] {
+  implicit val OptionEach = new Each[Option] {
     def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
-  implicit def ArrayEach[A] = new Each[Array] {
+  implicit val ArrayEach = new Each[Array] {
     def each[A](e: Array[A], f: A => Unit) = e foreach f
   }
 
@@ -45,11 +69,11 @@ object Each {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 
-  implicit def IterableEach[A] = new Each[Iterable] {
+  implicit val IterableEach = new Each[Iterable] {
       def each[A](e: Iterable[A], f: A => Unit) = e foreach f
   }
 
-  implicit def JavaIterableEach[A] = new Each[java.lang.Iterable] {
+  implicit val JavaIterableEach = new Each[java.lang.Iterable] {
       def each[A](e: java.lang.Iterable[A], f: A => Unit) = {
         val i = e.iterator
 
