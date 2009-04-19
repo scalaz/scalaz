@@ -106,4 +106,97 @@ object Functor {
   implicit def EitherRightFunctor[X] = new Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListFunctor: Functor[ArrayList] = new Functor[ArrayList] {
+    def fmap[A, B](r: ArrayList[A], f: A => B) = {
+      val a = new ArrayList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaLinkedListFunctor: Functor[LinkedList] = new Functor[LinkedList] {
+    def fmap[A, B](r: LinkedList[A], f: A => B) = {
+      val a = new LinkedList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaPriorityQueueFunctor: Functor[PriorityQueue] = new Functor[PriorityQueue] {
+    def fmap[A, B](r: PriorityQueue[A], f: A => B) = {
+      val a = new PriorityQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaStackFunctor: Functor[Stack] = new Functor[Stack] {
+    def fmap[A, B](r: Stack[A], f: A => B) = {
+      val a = new Stack[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaVectorFunctor: Functor[Vector] = new Functor[Vector] {
+    def fmap[A, B](r: Vector[A], f: A => B) = {
+      val a = new Vector[B](r.capacity)
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaArrayBlockingQueueFunctor: Functor[ArrayBlockingQueue] = new Functor[ArrayBlockingQueue] {
+    def fmap[A, B](r: ArrayBlockingQueue[A], f: A => B) = {
+      val a = new ArrayBlockingQueue[B](r.remainingCapacity)
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaCopyOnWriteArrayListFunctor: Functor[CopyOnWriteArrayList] = new Functor[CopyOnWriteArrayList] {
+    def fmap[A, B](r: CopyOnWriteArrayList[A], f: A => B) = {
+      val a = new CopyOnWriteArrayList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaLinkedBlockingQueueFunctor: Functor[LinkedBlockingQueue] = new Functor[LinkedBlockingQueue] {
+    def fmap[A, B](r: LinkedBlockingQueue[A], f: A => B) = {
+      val a = new LinkedBlockingQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = new Functor[SynchronousQueue] {
+    def fmap[A, B](r: SynchronousQueue[A], f: A => B) = {
+      val a = new SynchronousQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
 }
