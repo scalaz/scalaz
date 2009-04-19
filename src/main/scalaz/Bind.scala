@@ -76,4 +76,107 @@ object Bind {
   implicit def EitherRightBind[X] = new Bind[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListBind: Bind[ArrayList] = new Bind[ArrayList] {
+    def bind[A, B](r: ArrayList[A], f: A => ArrayList[B]) = {
+      val a = new ArrayList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaLinkedListBind: Bind[LinkedList] = new Bind[LinkedList] {
+    def bind[A, B](r: LinkedList[A], f: A => LinkedList[B]) = {
+      val a = new LinkedList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaPriorityQueueBind: Bind[PriorityQueue] = new Bind[PriorityQueue] {
+    def bind[A, B](r: PriorityQueue[A], f: A => PriorityQueue[B]) = {
+      val a = new PriorityQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaStackBind: Bind[Stack] = new Bind[Stack] {
+    def bind[A, B](r: Stack[A], f: A => Stack[B]) = {
+      val a = new Stack[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaVectorBind: Bind[Vector] = new Bind[Vector] {
+    def bind[A, B](r: Vector[A], f: A => Vector[B]) = {
+      val a = new Vector[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaArrayBlockingQueueBind: Bind[ArrayBlockingQueue] = new Bind[ArrayBlockingQueue] {
+    def bind[A, B](r: ArrayBlockingQueue[A], f: A => ArrayBlockingQueue[B]) = {
+      val a = new ArrayBlockingQueue[B](r.remainingCapacity)
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaConcurrentLinkedQueueBind: Bind[ConcurrentLinkedQueue] = new Bind[ConcurrentLinkedQueue] {
+    def bind[A, B](r: ConcurrentLinkedQueue[A], f: A => ConcurrentLinkedQueue[B]) = {
+      val a = new ConcurrentLinkedQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaCopyOnWriteArrayListBind: Bind[CopyOnWriteArrayList] = new Bind[CopyOnWriteArrayList] {
+    def bind[A, B](r: CopyOnWriteArrayList[A], f: A => CopyOnWriteArrayList[B]) = {
+      val a = new CopyOnWriteArrayList[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaLinkedBlockingQueueBind: Bind[LinkedBlockingQueue] = new Bind[LinkedBlockingQueue] {
+    def bind[A, B](r: LinkedBlockingQueue[A], f: A => LinkedBlockingQueue[B]) = {
+      val a = new LinkedBlockingQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit val JavaSynchronousQueueBind: Bind[SynchronousQueue] = new Bind[SynchronousQueue] {
+    def bind[A, B](r: SynchronousQueue[A], f: A => SynchronousQueue[B]) = {
+      val a = new SynchronousQueue[B]
+      val i = r.iterator
+      while(i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
 }
