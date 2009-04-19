@@ -6,7 +6,7 @@ trait Pure[+P[_]] {
 
 object Pure {
   import S._
-  
+
   implicit val IdentityPure: Pure[Identity] = new Pure[Identity] {
     def pure[A](a: A) = Identity.id(a)
   }
@@ -79,5 +79,120 @@ object Pure {
 
   implicit def EitherRightPure[X] = new Pure[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def pure[A](a: A) = Right(a).right
+  }
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListPure: Pure[ArrayList] = new Pure[ArrayList] {
+    def pure[A](a: A) = {
+      val k = new ArrayList[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaHashSetPure: Pure[HashSet] = new Pure[HashSet] {
+    def pure[A](a: A) = {
+      val k = new HashSet[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaLinkedHashSetPure: Pure[LinkedHashSet] = new Pure[LinkedHashSet] {
+    def pure[A](a: A) = {
+      val k = new LinkedHashSet[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaLinkedListPure: Pure[LinkedList] = new Pure[LinkedList] {
+    def pure[A](a: A) = {
+      val k = new LinkedList[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaPriorityQueuePure: Pure[PriorityQueue] = new Pure[PriorityQueue] {
+    def pure[A](a: A) = {
+      val k = new PriorityQueue[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaStackPure: Pure[Stack] = new Pure[Stack] {
+    def pure[A](a: A) = {
+      val k = new Stack[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaTreeSetPure: Pure[TreeSet] = new Pure[TreeSet] {
+    def pure[A](a: A) = {
+      val k = new TreeSet[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaVectorPure: Pure[Vector] = new Pure[Vector] {
+    def pure[A](a: A) = {
+      val k = new Vector[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaArrayBlockingQueuePure: Pure[ArrayBlockingQueue] = new Pure[ArrayBlockingQueue] {
+    def pure[A](a: A) = {
+      val k = new ArrayBlockingQueue[A](0)
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaConcurrentLinkedQueuePure: Pure[ConcurrentLinkedQueue] = new Pure[ConcurrentLinkedQueue] {
+    def pure[A](a: A) = {
+      val k = new ConcurrentLinkedQueue[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaCopyOnWriteArrayListPure: Pure[CopyOnWriteArrayList] = new Pure[CopyOnWriteArrayList] {
+    def pure[A](a: A) = {
+      val k = new CopyOnWriteArrayList[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaCopyOnWriteArraySetPure: Pure[CopyOnWriteArraySet] = new Pure[CopyOnWriteArraySet] {
+    def pure[A](a: A) = {
+      val k = new CopyOnWriteArraySet[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaLinkedBlockingQueuePure: Pure[LinkedBlockingQueue] = new Pure[LinkedBlockingQueue] {
+    def pure[A](a: A) = {
+      val k = new LinkedBlockingQueue[A]
+      k add a
+      k
+    }
+  }
+
+  implicit val JavaSynchronousQueuePure: Pure[SynchronousQueue] = new Pure[SynchronousQueue] {
+    def pure[A](a: A) = {
+      val k = new SynchronousQueue[A]
+      k add a
+      k
+    }
   }
 }
