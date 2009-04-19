@@ -30,7 +30,7 @@ object Arrow {
       (db: (D, B)) => (db._1, a(db._2))
   }
 
-  def KleisliArrow[M[+ _]](implicit m: Monad[M]) =
+  def KleisliArrow[M[_]](implicit m: Monad[M]) =
     new Arrow[PartialApplyK[Kleisli, M]#Apply] {
       import Kleisli.kleisli
 

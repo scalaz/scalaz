@@ -21,6 +21,10 @@ object Functor {
     def fmap[A, B](r: State[S, A], f: A => B) = r map f
   }
 
+  def KleisliFunctor[M[_], R] = new Functor[PartialApplyKA[Kleisli, M, R]#Apply] {
+    def fmap[A, B](r: Kleisli[M, R, A], f: A => B): Kleisli[M, R, B] = error("")
+  } 
+
   implicit val Tuple1Functor = new Functor[Tuple1] {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
