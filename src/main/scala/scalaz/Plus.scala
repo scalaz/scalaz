@@ -78,11 +78,8 @@ object Plus {
 
   implicit val ArrayBlockingQueuePlus: Plus[ArrayBlockingQueue] = new Plus[ArrayBlockingQueue] {
     def plus[A](a1: ArrayBlockingQueue[A], a2: => ArrayBlockingQueue[A]) = {
-      val k = new ArrayBlockingQueue[A](a1.remainingCapacity)
-      val i = a1.iterator
-      while(i.hasNext)
-        k add i.next
-
+      val k = new ArrayBlockingQueue[A](a1.remainingCapacity + a2.remainingCapacity)
+      k addAll a1
       k addAll a2
       k
     }
@@ -115,10 +112,7 @@ object Plus {
   implicit val SynchronousQueuePlus: Plus[SynchronousQueue] = new Plus[SynchronousQueue] {
     def plus[A](a1: SynchronousQueue[A], a2: => SynchronousQueue[A]) = {
       val k = new SynchronousQueue[A]
-      val i = a1.iterator
-      while(i.hasNext)
-        k add i.next
-
+      k addAll a1
       k addAll a2
       k
     }
