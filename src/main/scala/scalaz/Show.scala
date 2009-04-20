@@ -38,15 +38,51 @@ object Show {
   implicit def IterableShow[A](implicit sa: Show[A]) = show[Iterable[A]](as => {
     val i = as.elements
     val k = new collection.mutable.ListBuffer[Char]
+    k += '['
     while(i.hasNext) {
       val n = i.next
       k ++= n.show
       if(i.hasNext)
         k += ','
     }
+    k += ']'
     k.toList
   })
 
   implicit def OptionShow[A](implicit sa: Show[A]) = shows[Option[A]](_ map (_.shows) toString)
 
+  import MAB._
+
+  implicit def EitherShow[A, B](implicit sa: Show[A], sb: Show[B]) = shows[Either[A, B]](e => (((_: A).shows) <-: e :-> (_.shows)).toString)
+
+  implicit def JavaIterableShow[A](implicit sa: Show[A]) = show[java.lang.Iterable[A]](as => {
+    val k = new collection.mutable.ListBuffer[Char]
+    val i = as.iterator
+    k += '['
+    while(i.hasNext) {
+      val n = i.next
+      k ++= n.show
+      if(i.hasNext)
+        k += ','
+    }
+    k += ']'
+    k.toList    
+  })
+
+  implicit def JavaMapShow[K, V](implicit sk: Show[K], sv: Show[V]) = show[java.util.Map[K, V]](m => {
+    val z = new collection.mutable.ListBuffer[Char]
+    z += '{'
+    val i = m.keySet.iterator
+    while(i.hasNext) {
+      val k = i.next
+      val v = m get k
+      z ++= k.show
+      z ++= " -> ".toList
+      z ++= v.show
+      if(i.hasNext)
+        z += ','
+    }
+    z += '}'
+    z.toList
+  })
 }
