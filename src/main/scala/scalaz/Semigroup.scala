@@ -17,21 +17,21 @@ object Semigroup {
 
   implicit val UnitSemigroup = semigroup[Unit]((_, _) => ())
 
-  implicit val IntSemigroup = semigroup[Int]((a, b) => (a + b).toInt)
+  implicit val IntSemigroup: Semigroup[Int] = semigroup[Int](_ + _)
 
   implicit val BooleanSemigroup = semigroup[Boolean](_ || _)
 
-  implicit val CharSemigroup = semigroup[Char]((a, b) => (a + b).toChar)
+  implicit val CharSemigroup: Semigroup[Char] = semigroup[Char]((a, b) => (a + b).toChar)
 
-  implicit val ByteSemigroup = semigroup[Byte]((a, b) => (a + b).toByte)
+  implicit val ByteSemigroup: Semigroup[Byte] = semigroup[Byte]((a, b) => (a + b).toByte)
 
-  implicit val LongSemigroup = semigroup[Long]((a, b) => (a + b).toLong)
+  implicit val LongSemigroup: Semigroup[Long] = semigroup[Long]((a, b) => (a + b).toLong)
 
-  implicit val ShortSemigroup = semigroup[Short]((a, b) => (a + b).toShort)
+  implicit val ShortSemigroup: Semigroup[Short] = semigroup[Short]((a, b) => (a + b).toShort)
 
-  implicit val FloatSemigroup = semigroup[Float]((a, b) => (a + b).toFloat)
+  implicit val FloatSemigroup: Semigroup[Float] = semigroup[Float]((a, b) => (a + b).toFloat)
 
-  implicit val DoubleSemigroup = semigroup[Double]((a, b) => (a + b).toDouble)
+  implicit val DoubleSemigroup: Semigroup[Double] = semigroup[Double]((a, b) => (a + b).toDouble)
 
   implicit val StringSemigroup = semigroup[String](_ + _)
 
