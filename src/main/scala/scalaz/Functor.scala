@@ -76,7 +76,7 @@ object Functor {
   }
 
   implicit def Function6Functor[R, S, T, U, V, W] = new Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
-    def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6)) 
+    def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
   implicit val ListFunctor = new Functor[List] {
@@ -103,6 +103,10 @@ object Functor {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
 
+  implicit val ZipperFunctor = new Functor[Zipper] {
+    def fmap[A, B](z: Zipper[A], f: A => B) = Zipper.zipper(z.lefts map f, f(z.focus), z.rights map f)
+  }
+
   import java.util._
   import java.util.concurrent._
 
@@ -110,7 +114,7 @@ object Functor {
     def fmap[A, B](r: ArrayList[A], f: A => B) = {
       val a = new ArrayList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -120,7 +124,7 @@ object Functor {
     def fmap[A, B](r: LinkedList[A], f: A => B) = {
       val a = new LinkedList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -130,7 +134,7 @@ object Functor {
     def fmap[A, B](r: PriorityQueue[A], f: A => B) = {
       val a = new PriorityQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -140,7 +144,7 @@ object Functor {
     def fmap[A, B](r: Stack[A], f: A => B) = {
       val a = new Stack[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -150,7 +154,7 @@ object Functor {
     def fmap[A, B](r: Vector[A], f: A => B) = {
       val a = new Vector[B](r.capacity)
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -160,7 +164,7 @@ object Functor {
     def fmap[A, B](r: ArrayBlockingQueue[A], f: A => B) = {
       val a = new ArrayBlockingQueue[B](r.remainingCapacity)
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -171,7 +175,7 @@ object Functor {
     def fmap[A, B](r: ConcurrentLinkedQueue[A], f: A => B) = {
       val a = new ConcurrentLinkedQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -181,7 +185,7 @@ object Functor {
     def fmap[A, B](r: CopyOnWriteArrayList[A], f: A => B) = {
       val a = new CopyOnWriteArrayList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -191,7 +195,7 @@ object Functor {
     def fmap[A, B](r: LinkedBlockingQueue[A], f: A => B) = {
       val a = new LinkedBlockingQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }
@@ -201,7 +205,7 @@ object Functor {
     def fmap[A, B](r: SynchronousQueue[A], f: A => B) = {
       val a = new SynchronousQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.add(f(i.next))
       a
     }

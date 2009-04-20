@@ -9,39 +9,29 @@ package scalaz
  */
 
 sealed trait Zipper[+A] extends Iterable[A] {
-  val a: A
-  val ls: Stream[A]
-  val rs: Stream[A]
+  val focus: A
+  val lefts: Stream[A]
+  val rights: Stream[A]
 
-  def elements = (ls.reverse ++ Stream.cons(a, rs)).elements
+  def elements = (lefts.reverse ++ Stream.cons(focus, rights)).elements
 }
 
 object Zipper {
-  def zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) = new Zipper[A] {
-    val a = focus;
-    val ls = lefts;
-    val rs = rights;
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = new Zipper[A] {
+    val focus = a;
+    val lefts = ls;
+    val rights = rs;
   }
 
-  def zipper[A](focus: A) = new Zipper[A] {
-    val a = focus;
-    val ls = Stream.empty
-    val rs = Stream.empty
+  def zipper[A](a: A) = new Zipper[A] {
+    val focus = a;
+    val lefts = Stream.empty
+    val rights = Stream.empty
   }
 
   def fromStream[A](s: Stream[A]) = new Zipper[A] {
-    val a = s.head
-    val ls = Stream.empty
-    val rs = s.tail 
-  }
-
-  import S._
-  import Show._
-  
-  implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
-    z.ls.reverse.show ++ " " ++ sa.show(z.a) ++ " " ++ z.rs.show)
-
-  implicit val ZipperFunctor = new Functor[Zipper] {
-    def fmap[A, B](z: Zipper[A], f: A => B) = zipper(z.ls.map(f), f(z.a), z.rs.map(f)) 
+    val focus = s.head
+    val lefts = Stream.empty
+    val rights = s.tail
   }
 }

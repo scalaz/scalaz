@@ -16,7 +16,7 @@ object Show {
   def showA[A] = shows[A](_.toString)
 
   implicit val OrderingShow = showA[Ordering]
-  
+
   implicit val UnitShow = showA[Unit]
 
   implicit val IntShow = showA[Int]
@@ -42,14 +42,17 @@ object Show {
 
   implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
 
+  implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
+      z.lefts.reverse.show ++ " " ++ sa.show(z.focus) ++ " " ++ z.rights.show)
+
   implicit def IterableShow[A](implicit sa: Show[A]) = show[Iterable[A]](as => {
     val i = as.elements
     val k = new collection.mutable.ListBuffer[Char]
     k += '['
-    while(i.hasNext) {
+    while (i.hasNext) {
       val n = i.next
       k ++= n.show
-      if(i.hasNext)
+      if (i.hasNext)
         k += ','
     }
     k += ']'
@@ -66,27 +69,27 @@ object Show {
     val k = new collection.mutable.ListBuffer[Char]
     val i = as.iterator
     k += '['
-    while(i.hasNext) {
+    while (i.hasNext) {
       val n = i.next
       k ++= n.show
-      if(i.hasNext)
+      if (i.hasNext)
         k += ','
     }
     k += ']'
-    k.toList    
+    k.toList
   })
 
   implicit def JavaMapShow[K, V](implicit sk: Show[K], sv: Show[V]) = show[java.util.Map[K, V]](m => {
     val z = new collection.mutable.ListBuffer[Char]
     z += '{'
     val i = m.keySet.iterator
-    while(i.hasNext) {
+    while (i.hasNext) {
       val k = i.next
       val v = m get k
       z ++= k.show
       z ++= " -> ".toList
       z ++= v.show
-      if(i.hasNext)
+      if (i.hasNext)
         z += ','
     }
     z += '}'
