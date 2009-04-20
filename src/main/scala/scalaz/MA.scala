@@ -238,7 +238,9 @@ object MA {
   implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip](a)
 
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
-  
+
+  implicit def ZipperMA[A](a: Zipper[A]) = ma[Zipper](a)
+
   import java.util._
   import java.util.concurrent._
 
