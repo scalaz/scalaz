@@ -42,6 +42,15 @@ object Traverse {
       }
   }
 
+  import Zipper.zipper
+  implicit val ZipperTraverse: Traverse[Zipper] = new Traverse[Zipper] {
+    def traverse[F[_], A, B](f: A => F[B], za: Zipper[A])(implicit a: Applicative[F]): F[Zipper[B]] = {
+      val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curry
+      a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_:Stream[B]).reverse),
+        z), f(za.focus)), StreamTraverse.traverse[F, A, B](f, za.rights))
+    }
+  }
+
   implicit val ArrayTraverse: Traverse[Array] = new Traverse[Array] {
     def traverse[F[_], A, B](f: A => F[B], as: Array[A])(implicit a: Applicative[F]): F[Array[B]] =
       a.fmap(ListTraverse.traverse[F, A, B](f, as.toList), ((_: List[B]).toArray))
