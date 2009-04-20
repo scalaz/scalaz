@@ -1,7 +1,5 @@
 package scalaz
 
-import MA._
-
 /**
  * Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
  * position in a stream. Focus can be moved forward and backwards through the stream, elements can be inserted
@@ -10,12 +8,15 @@ import MA._
  * Based on the pointedlist library by Jeff Wheeler.
  */
 
-sealed trait Zipper[+A] extends Iterable[A] {
+sealed trait Zipper[A] extends Iterable[A] {
   val focus: A
   val lefts: Stream[A]
   val rights: Stream[A]
 
   def elements = (lefts.reverse ++ Stream.cons(focus, rights)).elements
+
+  import Zipper._
+  import MA._  
 
   def next = rights match {
     case Stream.empty => None
@@ -37,7 +38,7 @@ sealed trait Zipper[+A] extends Iterable[A] {
     case Stream.cons(l, ls) => zipper(ls, l, Stream.cons(focus, rights))
   }
 
-  def insert = insertRight
+  def insert = insertRight(_)
 
   def insertLeft(y: A) = zipper(lefts, y, Stream.cons(focus, rights))
 
@@ -59,7 +60,7 @@ sealed trait Zipper[+A] extends Iterable[A] {
 
   def deleteOthers = zipper(Stream.empty, focus, Stream.empty)
 
-  def length = foldr(const(_ + 1)) 0
+  def length = this.foldr[Int](0, ((a: A, b: Int) => b + 1)(_, _))
 }
 
 object Zipper {
