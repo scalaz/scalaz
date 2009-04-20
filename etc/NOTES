@@ -1,3 +1,10 @@
+$LastChangedRevision: 104 $
+$LastChangedDate: 2009-03-24 17:53:13 +1000 (Tue, 24 Mar 2009) $
+$LastChangedBy: tonymorris $
+
+
+
+
 Some guidelines
 ===============
 1) Higher-kinds are never inferred, therefore they should not appear on implicit functions
