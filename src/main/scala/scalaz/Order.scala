@@ -11,6 +11,16 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
+  implicit val OrderingOrder: Order[Ordering] = order {
+    case (a, EQ) => a
+    case (EQ, LT) => GT
+    case (EQ, GT) => LT
+    case (LT, LT) => EQ
+    case (LT, _) => LT
+    case (GT, GT) => EQ
+    case (GT, _) => GT
+  }
+
   implicit val UnitOrder: Order[Unit] = order((_, _) => EQ)
 
   implicit val StringOrder: Order[String] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
@@ -28,18 +38,8 @@ object Order {
   implicit val ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   implicit val FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
-  
-  implicit val DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit val OrderingOrder: Order[Ordering] = order {
-    case (a, EQ) => a
-    case (EQ, LT) => GT
-    case (EQ, GT) => LT
-    case (LT, LT) => EQ
-    case (LT, _) => LT
-    case (GT, GT) => EQ
-    case (GT, _) => GT
-  }
+  implicit val DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   import Identity._
   

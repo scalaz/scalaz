@@ -11,5 +11,7 @@ object Zero {
     val zero = z
   }
 
+  implicit val UnitZero = zero(())
+
   implicit val StringZero = zero("")
 }
