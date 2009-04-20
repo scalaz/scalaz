@@ -18,23 +18,27 @@ sealed trait Zipper[+A] extends Iterable[A] {
 
 object Zipper {
   def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = new Zipper[A] {
-    val focus = a;
-    val lefts = ls;
-    val rights = rs;
+    val focus = a
+    val lefts = ls
+    val rights = rs
   }
 
   def zipper[A](a: A) = new Zipper[A] {
-    val focus = a;
+    val focus = a
     val lefts = Stream.empty
     val rights = Stream.empty
   }
 
   def fromStream[A](s: Stream[A]) = s match {
     case Stream.empty => None
-    case Stream.cons(h, t) => Some(new Zipper[A] {
-      val focus = h
-      val lefts = Stream.empty
-      val rights = t
-    })
+    case Stream.cons(h, t) => Some(zipper(Stream.empty, h, t))
+  }
+
+  def fromStreamEnd[A](s: Stream[A]) = s match {
+    case Stream.empty => None
+    case xs => {
+      val xsp = xs.reverse
+      Some(zipper(xsp.tail, xsp.head, Stream.empty))
+    }
   }
 }
