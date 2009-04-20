@@ -11,6 +11,8 @@ object Equal {
 
   def equalA[A] = equal[A](_ == _)
 
+  implicit val UnitEqual = equalA[Unit]
+
   implicit val StringEqual = equalA[String]
 
   implicit val IntEqual = equalA[Int]
@@ -28,6 +30,8 @@ object Equal {
   implicit val FloatEqual = equalA[Float]
   
   implicit val DoubleEqual = equalA[Double]
+
+  implicit val OrderingEqual = equalA[Ordering]
 
   import S._
 

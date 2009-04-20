@@ -20,7 +20,7 @@ object IterableW {
 
   implicit def IterableFrom[A](i: IterableW[A]) = i.value
 
-  implicit def JavaIterableTo[A](i: java.lang.Iterable[A]) = new IterableW[A] {
+  implicit def JavaIterableTo[A](i: java.lang.Iterable[A]): IterableW[A] = new IterableW[A] {
     val value = new Iterable[A] {
       val k = i.iterator
       def elements = new Iterator[A] {

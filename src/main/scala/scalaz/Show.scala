@@ -15,6 +15,8 @@ object Show {
 
   def showA[A] = shows[A](_.toString)
 
+  implicit val UnitShow = showA[Unit]
+
   implicit val IntShow = showA[Int]
 
   implicit val BooleanShow = showA[Boolean]

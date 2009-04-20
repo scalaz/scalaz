@@ -31,7 +31,7 @@ object S {
 
   implicit def IterableFrom[A](i: IterableW[A]) = IterableW.IterableFrom(i)
 
-  implicit def JavaIterableTo[A](i: java.lang.Iterable[A]) = IterableW.JavaIterableTo(i)
+  implicit def JavaIterableTo[A](i: java.lang.Iterable[A]): IterableW[A] = IterableW.JavaIterableTo(i)
 
   implicit def ListTo[A](as: List[A]): ListW[A] = ListW.ListTo(as)
 
