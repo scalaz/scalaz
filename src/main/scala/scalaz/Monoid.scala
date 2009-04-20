@@ -8,5 +8,60 @@ object Monoid {
     val zero = z.zero
   }
 
+  implicit val OrderingMonoid = monoid[Ordering]
+
+  implicit val UnitMonoid = monoid[Unit]
+
+  implicit val IntMonoid = monoid[Int]
+
+  implicit val BooleanMonoid = monoid[Boolean]
+
+  implicit val CharMonoid = monoid[Char]
+
+  implicit val ByteMonoid = monoid[Byte]
+
+  implicit val LongMonoid = monoid[Long]
+
+  implicit val ShortMonoid = monoid[Short]
+
+  implicit val FloatMonoid = monoid[Float]
+
+  implicit val DoubleMonoid = monoid[Double]
+
   implicit val StringMonoid = monoid[String]
+
+  implicit def ListMonoid[A] = monoid[List[A]]
+
+  implicit def StreamMonoid[A] = monoid[Stream[A]]
+
+  implicit def OptionMonoid[A] = monoid[Option[A]]
+
+  implicit def ArrayMonoid[A] = monoid[Array[A]]
+
+  implicit def EitherLeftMonoid[A, B](implicit za: Zero[A]) = monoid[Either.LeftProjection[A, B]]
+
+  implicit def EitherRightMonoid[A, B](implicit za: Zero[A]) = monoid[Either.RightProjection[B, A]]
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def JavaArrayListMonoid[A] = monoid[ArrayList[A]]
+
+  implicit def JavaLinkedListMonoid[A] = monoid[LinkedList[A]]
+
+  implicit def JavaPriorityQueueMonoid[A] = monoid[PriorityQueue[A]]
+
+  implicit def JavaStackMonoid[A] = monoid[Stack[A]]
+
+  implicit def JavaVectorMonoid[A] = monoid[Vector[A]]
+
+  implicit def JavaArrayBlockingQueueMonoid[A] = monoid[ArrayBlockingQueue[A]]
+
+  implicit def JavaConcurrentLinkedQueueMonoid[A] = monoid[ConcurrentLinkedQueue[A]]
+
+  implicit def JavaCopyOnWriteArrayListMonoid[A] = monoid[CopyOnWriteArrayList[A]]
+
+  implicit def JavaLinkedBlockingQueueMonoid[A] = monoid[LinkedBlockingQueue[A]]
+
+  implicit def JavaSynchronousQueueMonoid[A] = monoid[SynchronousQueue[A]]
 }
