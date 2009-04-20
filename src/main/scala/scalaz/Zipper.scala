@@ -29,9 +29,12 @@ object Zipper {
     val rights = Stream.empty
   }
 
-  def fromStream[A](s: Stream[A]) = some(new Zipper[A] {
-    val focus = s.head
-    val lefts = Stream.empty
-    val rights = s.tail
-  })
+  def fromStream[A](s: Stream[A]) = s match {
+    case Stream.empty => None
+    case Stream.cons(h, t) => Some(new Zipper[A] {
+      val focus = h
+      val lefts = Stream.empty
+      val rights = t
+    })
+  }
 }
