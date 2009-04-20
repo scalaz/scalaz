@@ -1,5 +1,38 @@
-Instancing
+Some guidelines
+===============
+1) Higher-kinds are never inferred, therefore they should not appear on implicit functions
+e.g. implicit def function[M[_]] can never be used implicitly. The compiler will not enforce this.
 
+2) Sometimes a function has 2 or more type variables, where one or more is always inferred while one or more is not.
+This is particularly the case for higher-kinded variables and first-order variables.
+e.g. def function[M[_], A](m: M[A]): T = ...
+In this example, M is never inferred while A is. This means a user must explicitly pass two type variables where only
+one is forced. Instead we may use structural types:
+
+def function[M[_]] = new {
+  def apply[A](m: M[A]): T = ...
+}
+
+However, this is fraught with problems. The first is performance -- this implementation will use reflection. The
+second is a compiler implementation issue:
+http://lampsvn.epfl.ch/trac/scala/ticket/1388
+
+Instead, define a local trait:
+
+sealed trait F[M[_]] {
+  def apply[A](m: M[A]): T
+}
+
+then:
+
+def function[M[_]] = new F[M] {
+  def apply[A](m: M[A]): T = ...
+}
+
+
+
+Instancing
+==========
 Java
 ----
 ArrayList
