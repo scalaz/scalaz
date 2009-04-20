@@ -27,6 +27,12 @@ object S {
 
   implicit def Function2From[T1, T2, R](f: Function2W[T1, T2, R]) = Function2W.Function2From(f)
 
+  implicit def IterableTo[A](i: Iterable[A]) = IterableW.IterableTo(i)
+
+  implicit def IterableFrom[A](i: IterableW[A]) = IterableW.IterableFrom(i)
+
+  implicit def JavaIterableTo[A](i: java.lang.Iterable[A]) = IterableW.JavaIterableTo(i)
+
   implicit def ListTo[A](as: List[A]): ListW[A] = ListW.ListTo(as)
 
   implicit def ListFrom[A](as: ListW[A]) = ListW.ListFrom(as)

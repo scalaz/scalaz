@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Equal[-A] {
+trait Equal[-A] {
   def equal(a1: A, a2: A): Boolean
 }
 
