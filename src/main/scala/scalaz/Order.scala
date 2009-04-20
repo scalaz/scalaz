@@ -42,7 +42,10 @@ object Order {
   implicit val DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   import Identity._
-  
+  import MA._
+
+  implicit def NonEmptyListOrder[A](implicit oa: Order[A]): Order[NonEmptyList[A]] = IterableOrder(oa) <| ((_: NonEmptyList[A]).list)
+
   implicit def IterableOrder[A](implicit oa: Order[A]): Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements

@@ -38,7 +38,10 @@ object Show {
   implicit val StringShow = showA[String]
 
   import S._
-  
+  import MA._
+
+  implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
+
   implicit def IterableShow[A](implicit sa: Show[A]) = show[Iterable[A]](as => {
     val i = as.elements
     val k = new collection.mutable.ListBuffer[Char]
