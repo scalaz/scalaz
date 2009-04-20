@@ -41,8 +41,7 @@ object Zipper {
   implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
     z.ls.reverse.show ++ " " ++ sa.show(z.a) ++ " " ++ z.rs.show)
 
-  import MA._
-  implicit def ZipperFunctor[A] = new Functor[Zipper[A]] = {
-    def fmap[A, B](z: Zipper[A], f: A => B) = zipper(ls.fmap(f), f(a), rs.fmap(f)) 
+  implicit val ZipperFunctor = new Functor[Zipper] {
+    def fmap[A, B](z: Zipper[A], f: A => B) = zipper(z.ls.map(f), f(z.a), z.rs.map(f)) 
   }
 }
