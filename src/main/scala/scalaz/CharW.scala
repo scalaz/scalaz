@@ -4,6 +4,8 @@ sealed trait CharW {
   val value: Char
 
   def digit = Digit.digits find (_.toChar == value)
+
+  def |*| = CharMultiplication.multiplication(value)  
 }
 
 object CharW {

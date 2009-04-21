@@ -10,8 +10,9 @@ sealed trait LongW {
     if(value == 0) List(0L)
     else if(value < 10) List(value)
     else value % 10L :: (value / 10L digits)
-
   }
+
+  def |*| = LongMultiplication.multiplication(value)  
 }
 
 object LongW {

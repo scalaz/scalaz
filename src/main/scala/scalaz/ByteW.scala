@@ -2,6 +2,8 @@ package scalaz
 
 sealed trait ByteW {
   val value: Byte
+
+  def |*| = ByteMultiplication.multiplication(value)  
 }
 
 object ByteW {

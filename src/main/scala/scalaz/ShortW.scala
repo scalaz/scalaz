@@ -2,6 +2,8 @@ package scalaz
 
 sealed trait ShortW {
   val value: Short
+
+  def |*| = ShortMultiplication.multiplication(value)  
 }
 
 object ShortW {

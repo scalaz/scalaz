@@ -2,6 +2,8 @@ package scalaz
 
 sealed trait IntW {
   val value: Int
+
+  def |*| = IntMultiplication.multiplication(value)
 }
 
 object IntW {
