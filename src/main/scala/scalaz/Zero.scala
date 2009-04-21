@@ -39,6 +39,8 @@ object Zero {
 
   implicit val DoubleZero = zero(0D)
 
+  implicit val NodeSeqZero = zero(xml.NodeSeq.Empty)
+
   implicit def ListZero[A] = zero[List[A]](Nil)
 
   implicit def StreamZero[A] = zero[Stream[A]](Stream.empty)

@@ -41,6 +41,8 @@ object Semigroup {
 
   implicit val StringSemigroup = semigroup[String](_ + _)
 
+  implicit val NodeSeqSemigroup: Semigroup[xml.NodeSeq] = semigroup[xml.NodeSeq](_ ++ _)
+
   implicit def NonEmptyListSemigroup[A] = semigroup[NonEmptyList[A]](_.list <::: _)
 
   implicit def ListSemigroup[A] = semigroup[List[A]](_ ::: _)

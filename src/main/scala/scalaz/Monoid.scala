@@ -34,6 +34,8 @@ object Monoid {
 
   implicit val StringMonoid = monoid[String]
 
+  implicit val NodeSeqMonoid = monoid[xml.NodeSeq]
+
   implicit def ListMonoid[A] = monoid[List[A]]
 
   implicit def StreamMonoid[A] = monoid[Stream[A]]
