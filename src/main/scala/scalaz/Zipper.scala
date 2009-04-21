@@ -31,7 +31,7 @@ sealed trait Zipper[A] extends Iterable[A] {
     case Stream.cons(l, ls) => Some(zipper(ls, l, Stream.cons(focus, rights)))
   }
 
-  def tryPrevious =  previous err "cannot move to previous element"
+  def tryPrevious = previous err "cannot move to previous element"
 
   def insert = insertRight(_)
 
@@ -56,6 +56,36 @@ sealed trait Zipper[A] extends Iterable[A] {
   def deleteOthers = zipper(Stream.empty, focus, Stream.empty)
 
   def length = this.foldr[Int](0, ((a: A, b: Int) => b + 1)(_, _))
+
+  def atStart = lefts.isEmpty
+
+  def atEnd = rights.isEmpty
+
+  def withFocus = zipper(lefts.zip(Stream.const(false)), (focus, true), rights.zip(Stream.const(false)))
+
+  def move(n: Int): Option[Zipper[A]] =
+    if (n < 0 || n >= length) None
+    else {
+      val l = lefts.length
+      if (l == n) Some(this)
+      else if (l >= n) tryPrevious.move(n)
+      else tryNext.move(n)
+    }
+
+  def findZ(p: A => Boolean): Option[Zipper[A]] =
+    if (p(focus)) Some(this)
+    else findPrevious(p) orElse findNext(p)
+
+  def findBy(p: A => Boolean, f: (Zipper[A], (A => Boolean)) => Option[Zipper[A]]): Option[Zipper[A]] = {
+    val x = f(this, p)
+    if (x.isEmpty) None
+    else if (p(x.get.focus)) x
+    else x.get.findBy(p, f)
+  }
+
+  def findNext(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.next)
+
+  def findPrevious(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.previous)
 }
 
 object Zipper {
