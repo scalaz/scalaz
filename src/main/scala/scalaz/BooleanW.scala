@@ -130,6 +130,8 @@ sealed trait BooleanW {
    */
   def ??[A](a: => A)(implicit z: Zero[A]) = if(isTrue) a else z.zero
 
+  def !?[A](a: => A)(implicit z: Zero[A]) = if(!isTrue) a else z.zero
+
   def |&&| = BooleanConjunction.booleanConjunction(isTrue)
 }
 
