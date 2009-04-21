@@ -58,6 +58,8 @@ object Equal {
 
   implicit val BigIntMultiplicationEqual = BigIntEqual <| ((_: BigIntMultiplication).value)
 
+  implicit val NodeSeqEqual = equalA[xml.NodeSeq]
+
   implicit def NonEmptyListEqual[A](implicit ea: Equal[A]): Equal[NonEmptyList[A]] = IterableEqual(ea) <| ((_: NonEmptyList[A]).list)
 
   implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {

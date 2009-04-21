@@ -62,6 +62,8 @@ object Show {
 
   implicit val BigIntMultiplicationShow = BigIntShow <| ((_: BigIntMultiplication).value)
 
+  implicit val NodeSeqShow = showA[xml.NodeSeq]
+
   implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
 
   implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
