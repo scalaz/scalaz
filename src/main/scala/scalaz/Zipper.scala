@@ -16,27 +16,22 @@ sealed trait Zipper[A] extends Iterable[A] {
   def elements = (lefts.reverse ++ Stream.cons(focus, rights)).elements
 
   import Zipper._
-  import MA._  
+  import MA._
+  import S._
 
   def next = rights match {
     case Stream.empty => None
-    case rs => Some(tryNext)
+    case Stream.cons(r, rs) => Some(zipper(Stream.cons(focus, lefts), r, rs))
   }
 
-  def tryNext = rights match {
-    case Stream.empty => error("cannot move to next element")
-    case Stream.cons(r, rs) => zipper(Stream.cons(focus, lefts), r, rs)
-  }
+  def tryNext = next err "cannot move to next element"
 
   def previous = lefts match {
     case Stream.empty => None
-    case ls => Some(tryPrevious)
+    case Stream.cons(l, ls) => Some(zipper(ls, l, Stream.cons(focus, rights)))
   }
 
-  def tryPrevious = lefts match {
-    case Stream.empty => error("cannot move to previous element")
-    case Stream.cons(l, ls) => zipper(ls, l, Stream.cons(focus, rights))
-  }
+  def tryPrevious =  previous err "cannot move to previous element"
 
   def insert = insertRight(_)
 
