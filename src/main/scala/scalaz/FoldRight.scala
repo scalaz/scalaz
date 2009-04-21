@@ -52,6 +52,10 @@ object FoldRight {
     def foldRight[A, B](e: Either.RightProjection[X, A], b: B, f: (A, => B) => B) = OptionFoldRight.foldRight(e.toOption, b, f)
   }
 
+  implicit val StreamFoldRight = new FoldRight[Stream] {
+    def foldRight[A, B](t: Stream[A], b: B, f: (A, => B) => B): B = if(t.isEmpty) b else f(t.head, foldRight(t.tail, b, f))
+  }
+
   implicit val IterableFoldRight = new FoldRight[Iterable] {
     def foldRight[A, B](t: Iterable[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
   }
