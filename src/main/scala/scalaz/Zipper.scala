@@ -16,6 +16,7 @@ sealed trait Zipper[A] extends Iterable[A] {
   def elements = (lefts.reverse ++ Stream.cons(focus, rights)).elements
 
   import Zipper._
+  import Cojoin._
   import MA._
   import S._
 
@@ -72,9 +73,13 @@ sealed trait Zipper[A] extends Iterable[A] {
       else tryNext.move(n)
     }
 
+  import StreamW._
   def findZ(p: A => Boolean): Option[Zipper[A]] =
     if (p(focus)) Some(this)
-    else findPrevious(p) orElse findNext(p)
+    else {
+      val c = this.positions
+      c.lefts.merge(c.rights).find((x => p(x.focus)))
+    }
 
   def findBy(p: A => Boolean, f: (Zipper[A], (A => Boolean)) => Option[Zipper[A]]): Option[Zipper[A]] = {
     f(this, p) >>= (x => if (p(x.focus)) Some(x) else x.findBy(p, f))
@@ -83,6 +88,12 @@ sealed trait Zipper[A] extends Iterable[A] {
   def findNext(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.next)
 
   def findPrevious(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.previous)
+
+  def positions = {
+    val left = unfoldr(((p: Zipper[A]) => p.previous.map(x => (x, x))), this)
+    val right = unfoldr(((p: Zipper[A]) => p.next.map(x => (x, x))), this)
+    zipper(left, this, right)
+  }
 }
 
 object Zipper {

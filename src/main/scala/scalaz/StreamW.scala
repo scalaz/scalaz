@@ -20,4 +20,9 @@ object StreamW {
   }
 
   implicit def StreamFrom[A](as: StreamW[A]): Stream[A] = as.value
+
+  def unfoldr[A, B](f: B => Option[(A, B)], b: B): Stream[A] = f(b) match {
+    case Some((a, new_b)) => unfoldr(f, new_b)
+    case None => Stream.empty
+  }
 }
