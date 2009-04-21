@@ -16,6 +16,8 @@ object Monoid {
 
   implicit val IntMonoid = monoid[Int]
 
+  implicit val BooleanConjunctionMonoid = monoid[BooleanConjunction]
+
   implicit val BooleanMonoid = monoid[Boolean]
 
   implicit val CharMonoid = monoid[Char]

@@ -17,9 +17,13 @@ object Semigroup {
     case (GT, _) => GT
   }
 
+  import S._
+  
   implicit val UnitSemigroup = semigroup[Unit]((_, _) => ())
 
   implicit val IntSemigroup: Semigroup[Int] = semigroup[Int](_ + _)
+
+  implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = semigroup[BooleanConjunction](_ && _ |*|)
 
   implicit val BooleanSemigroup = semigroup[Boolean](_ || _)
 

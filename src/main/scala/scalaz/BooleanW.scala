@@ -129,6 +129,8 @@ sealed trait BooleanW {
    * argument.
    */
   def **[A](a: => A)(implicit z: Zero[A]) = if(isTrue) a else z.zero
+
+  def |*| = BooleanConjunction.booleanConjunction(isTrue)
 }
 
 object BooleanW {

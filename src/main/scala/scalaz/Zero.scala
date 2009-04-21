@@ -11,6 +11,8 @@ object Zero {
     val zero = z
   }
 
+  import S._
+
   implicit val DigitZero = zero(_0)
 
   implicit val OrderingZero = zero(EQ)
@@ -20,6 +22,8 @@ object Zero {
   implicit val StringZero = zero("")
 
   implicit val IntZero = zero(0)
+
+  implicit val BooleanConjunctionZero = zero(true |*|)
 
   implicit val BooleanZero = zero(false)
 
