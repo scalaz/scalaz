@@ -51,7 +51,11 @@ object Zero {
 
   implicit val BigIntegerZero = zero(java.math.BigInteger.valueOf(0))
 
+  implicit val BigIntegerMultiplicationZero = zero(java.math.BigInteger.valueOf(1) |*|)
+
   implicit val BigIntZero = zero(BigInt(0))
+
+  implicit val BigIntMutliplicationZero = zero(BigInt(1) |*|)
 
   implicit val NodeSeqZero = zero(xml.NodeSeq.Empty)
 

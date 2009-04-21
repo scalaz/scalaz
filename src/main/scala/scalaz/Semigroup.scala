@@ -53,7 +53,11 @@ object Semigroup {
 
   implicit val BigIntegerSemigroup: Semigroup[java.math.BigInteger] = semigroup[java.math.BigInteger](_ add _)
 
+  implicit val BigIntegerMutliplicationSemigroup: Semigroup[BigIntegerMultiplication] = semigroup[BigIntegerMultiplication](_.value multiply _.value |*|)
+
   implicit val BigIntSemigroup: Semigroup[BigInt] = semigroup[BigInt](_ + _)
+
+  implicit val BigIntMultiplicationSemigroup: Semigroup[BigIntMultiplication] = semigroup[BigIntMultiplication](_.value * _.value |*|)
 
   implicit val NodeSeqSemigroup: Semigroup[xml.NodeSeq] = semigroup[xml.NodeSeq](_ ++ _)
 

@@ -1,11 +1,21 @@
 package scalaz
 
 object S {
+  import java.math.BigInteger
+
   implicit def id[A](x: A) = Identity.id(x)
   
   implicit def ArrayByteTo(bs: Array[Byte]) = ArrayByte.ArrayByteTo(bs)
 
   implicit def ArrayByteFrom(bs: ArrayByte) = ArrayByte.ArrayByteFrom(bs)
+
+  implicit def BigIntTo(n: BigInt) = BigIntW.BigIntTo(n)
+
+  implicit def BigIntFrom(n: BigIntW) = BigIntW.BigIntFrom(n)
+
+  implicit def BigIntegerTo(n: BigInteger) = BigIntegerW.BigIntegerTo(n)
+
+  implicit def BigIntegerFrom(n: BigIntegerW) = BigIntegerW.BigIntegerFrom(n)
 
   implicit def BooleanTo(b: Boolean) = BooleanW.BooleanTo(b)
 
