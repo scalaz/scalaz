@@ -5,7 +5,7 @@ sealed trait BooleanConjunction {
 }
 
 object BooleanConjunction {
-  def booleanConjunction(b: Boolean) = new BooleanConjunction {
+  def conjunction(b: Boolean) = new BooleanConjunction {
     val value = b
   }
 

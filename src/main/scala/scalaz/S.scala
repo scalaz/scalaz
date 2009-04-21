@@ -11,6 +11,8 @@ object S {
 
   implicit def BooleanFrom(b: BooleanW) = BooleanW.BooleanFrom(b)
 
+  def conjunction(b: Boolean) = BooleanConjunction.conjunction(b)
+
   implicit def BooleanConjunctionFrom(b: BooleanConjunction) = BooleanConjunction.BooleanConjunctionFrom(b)
 
   implicit def CharTo(c: Char) = CharW.CharTo(c)
