@@ -128,7 +128,7 @@ sealed trait BooleanW {
    * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
    * argument.
    */
-  def **[A](a: => A)(implicit z: Zero[A]) = if(isTrue) a else z.zero
+  def ??[A](a: => A)(implicit z: Zero[A]) = if(isTrue) a else z.zero
 
   def |&&| = BooleanConjunction.booleanConjunction(isTrue)
 }
