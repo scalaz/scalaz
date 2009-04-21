@@ -81,13 +81,13 @@ sealed trait Zipper[A] extends Iterable[A] {
       c.lefts.merge(c.rights).find((x => p(x.focus)))
     }
 
-  def findBy(p: A => Boolean, f: (Zipper[A], (A => Boolean)) => Option[Zipper[A]]): Option[Zipper[A]] = {
-    f(this, p) >>= (x => if (p(x.focus)) Some(x) else x.findBy(p, f))
+  def findBy(f: (Zipper[A], (A => Boolean)) => Option[Zipper[A]])(p: A => Boolean): Option[Zipper[A]] = {
+    f(this, p) >>= (x => if (p(x.focus)) Some(x) else x.findBy(f)(p))
   }
 
-  def findNext(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.next)
+  def findNext = findBy((z: Zipper[A], f: A => Boolean) => z.next)(_)
 
-  def findPrevious(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.previous)
+  def findPrevious = findBy((z: Zipper[A], f: A => Boolean) => z.previous)(_)
 
   def positions = {
     val left = unfoldr(((p: Zipper[A]) => p.previous.map(x => (x, x))), this)
