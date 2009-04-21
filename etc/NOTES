@@ -3,6 +3,32 @@ $LastChangedDate: 2009-03-24 17:53:13 +1000 (Tue, 24 Mar 2009) $
 $LastChangedBy: tonymorris $
 
 
+Mission
+=======
+To provide a library to Scala users for accessing JDBC succintly, creating web applications and having access to
+fundamental data structures that are possible in a language and type system as advanced as Scala.
+
+
+Packages
+========
+
+* scalaz
+Basic data structures, type-classes that not specific to any domain
+
+* scalaz.http
+Data structures for writing web applications
+
+* scalaz.database
+Data structures for JDBC
+
+* scalaz.test
+Automated specification-based testing
+
+* scalaz.parser
+Data structures for parsing
+
+* scalaz.concurrent
+Actors library for concurrency
 
 
 Some guidelines
