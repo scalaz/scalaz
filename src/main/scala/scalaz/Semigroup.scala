@@ -23,7 +23,7 @@ object Semigroup {
 
   implicit val IntSemigroup: Semigroup[Int] = semigroup[Int](_ + _)
 
-  implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = semigroup[BooleanConjunction](_ && _ |*|)
+  implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = semigroup[BooleanConjunction](_ && _ |&&|)
 
   implicit val BooleanSemigroup = semigroup[Boolean](_ || _)
 

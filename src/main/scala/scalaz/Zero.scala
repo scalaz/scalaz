@@ -23,7 +23,7 @@ object Zero {
 
   implicit val IntZero = zero(0)
 
-  implicit val BooleanConjunctionZero = zero(true |*|)
+  implicit val BooleanConjunctionZero = zero(true |&&|)
 
   implicit val BooleanZero = zero(false)
 
