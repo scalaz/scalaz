@@ -56,6 +56,8 @@ object Pointed {
 
   implicit def EitherRightPointed[X] = pointed[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ZipperPointed = pointed[Zipper]
+
   import java.util._
   import java.util.concurrent._
 

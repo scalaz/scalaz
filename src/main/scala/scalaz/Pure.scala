@@ -105,6 +105,10 @@ object Pure {
     def pure[A](a: A) = Right(a).right
   }
 
+  implicit def ZipperPure = new Pure[Zipper] {
+    def pure[A](a: A) = Zipper.zipper(a)
+  }
+
   import java.util._
   import java.util.concurrent._
 

@@ -57,6 +57,8 @@ object Applicative {
 
   implicit def EitherRightApplicative[X] = applicative[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit val ZipperApplicative = applicative[Zipper]
+
   import java.util._
   import java.util.concurrent._
 

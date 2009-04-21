@@ -24,4 +24,8 @@ object Cojoin {
   implicit val Function0Cojoin = new Cojoin[Function0] {
     def cojoin[A](a: Function0[A]) = () => a
   }
+
+  implicit val ZipperCojoin = new Cojoin[Zipper] {
+    def cojoin[A](a: Zipper[A]) = a.positions
+  }
 }

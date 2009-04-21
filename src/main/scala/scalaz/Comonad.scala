@@ -21,4 +21,6 @@ object Comonad {
   implicit def Tuple2Comonad[R] = comonad[PartialApply1Of2[Tuple2, R]#Apply]
 
   implicit val Function0Comonad = comonad[Function0]
+
+  implicit val ZipperComonad = comonad[Zipper]
 }

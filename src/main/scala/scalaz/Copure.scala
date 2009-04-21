@@ -29,4 +29,8 @@ object Copure {
     def copure[A](a: Function0[A]) = a.apply
   }
 
+  implicit val ZipperCopure = new Copure[Zipper] {
+    def copure[A](a: Zipper[A]) = a.focus
+  }
+
 }

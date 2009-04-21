@@ -59,6 +59,20 @@ object Apply {
 
   implicit def EitherRightApply[X] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit val ZipperApply = new Apply[Zipper] {
+    def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] = {
+      Zipper.zipper(StreamZapply.apply(f.lefts, a.lefts),
+        (f.focus)(a.focus),
+        StreamZapply.apply(f.rights, a.rights))
+    }
+  }
+
+  val StreamZapply = new Apply[Stream] {
+    def apply[A, B](f: Stream[A => B], a: Stream[A]): Stream[B] = {
+      Stream.cons((f.head)(a.head), apply(f.tail, a.tail))
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
 

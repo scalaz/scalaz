@@ -93,7 +93,7 @@ sealed trait Zipper[A] extends Iterable[A] {
     val left = unfoldr(((p: Zipper[A]) => p.previous.map(x => (x, x))), this)
     val right = unfoldr(((p: Zipper[A]) => p.next.map(x => (x, x))), this)
     zipper(left, this, right)
-  }
+  }  
 }
 
 object Zipper {
