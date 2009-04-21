@@ -152,13 +152,62 @@ sealed trait Zipper[A] extends Iterable[A] {
   def findPrevious = findBy((z: Zipper[A]) => z.previous)(_)
 
   /**
-   * Provides a zipper of all positions of the zipper, with focus on the current position.
+   * A zipper of all positions of the zipper, with focus on the current position.
    */
   def positions = {
     val left = unfoldr(((p: Zipper[A]) => p.previous.map(x => (x, x))), this)
     val right = unfoldr(((p: Zipper[A]) => p.next.map(x => (x, x))), this)
     zipper(left, this, right)
   }
+
+  /**
+   * The index of the focus.
+   */
+  def index = lefts.length
+
+  /**
+   * Moves focus to the next element. If the last element is currently focused, loop to the first element.
+   */
+  def nextC = (lefts, rights) match {
+    case (Stream.empty, Stream.empty) => this
+    case (_, Stream.empty) => {
+      val xs = lefts.reverse
+      zipper(rights, xs.head, xs.tail.append(Stream(focus)))
+    }
+    case (_, _) => tryNext
+  }
+
+  /**
+   * Moves focus to the previous element. If the first element is currently focused, loop to the last element.
+   */
+  def previousC = (lefts, rights) match {
+    case (Stream.empty, Stream.empty) => this
+    case (Stream.empty, _) => {
+      val xs = rights.reverse
+      zipper(xs.tail.append(Stream(focus)), xs.head, lefts)
+    }
+    case (_, _) => tryPrevious
+  }
+
+  def deleteLeftC = (lefts, rights) match {
+    case (Stream.empty, Stream.empty) => None
+    case (Stream.cons(l, ls), rs) => Some(zipper(ls, l, rs))
+    case (Stream.empty, rs) => {
+      val xs = rs.reverse
+      Some(zipper(xs.tail, xs.head, Stream.empty))
+    }
+  }
+
+  def deleteRightC = (lefts, rights) match {
+    case (Stream.empty, Stream.empty) => None
+    case (ls, Stream.cons(r, rs)) => Some(zipper(ls, r, rs))
+    case (ls, Stream.empty) => {
+      val xs = ls.reverse
+      Some(zipper(Stream.empty, xs.head, xs.tail))
+    }
+  }
+
+  def deleteC = deleteRightC
 }
 
 object Zipper {
