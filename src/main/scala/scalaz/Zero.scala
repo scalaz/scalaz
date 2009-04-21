@@ -23,7 +23,7 @@ object Zero {
 
   implicit val IntZero = zero(0)
 
-  implicit val IntMultiplicationZero = zero(0 |*|)
+  implicit val IntMultiplicationZero = zero(1 |*|)
 
   implicit val BooleanConjunctionZero = zero(true |&&|)
 
@@ -31,19 +31,19 @@ object Zero {
 
   implicit val CharZero = zero(0.toChar)
 
-  implicit val CharMultiplicationZero = zero(0.toChar |*|)
+  implicit val CharMultiplicationZero = zero(1.toChar |*|)
 
   implicit val ByteZero = zero(0.toByte)
 
-  implicit val ByteMultiplicationZero = zero(0.toByte |*|)
+  implicit val ByteMultiplicationZero = zero(1.toByte |*|)
 
   implicit val LongZero = zero(0L)
 
-  implicit val LongMultiplicationZero = zero(0L |*|)
+  implicit val LongMultiplicationZero = zero(1L |*|)
 
   implicit val ShortZero = zero(0.toShort)
 
-  implicit val ShortMultiplicationZero = zero(0.toShort |*|)
+  implicit val ShortMultiplicationZero = zero(1.toShort |*|)
 
   implicit val FloatZero = zero(0F)
 

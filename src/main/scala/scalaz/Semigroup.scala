@@ -23,7 +23,7 @@ object Semigroup {
 
   implicit val IntSemigroup: Semigroup[Int] = semigroup[Int](_ + _)
 
-  implicit val IntMultiplicationSemigroup: Semigroup[IntMultiplication] = semigroup[IntMultiplication](_ + _ |*|)
+  implicit val IntMultiplicationSemigroup: Semigroup[IntMultiplication] = semigroup[IntMultiplication](_ * _ |*|)
 
   implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = semigroup[BooleanConjunction](_ && _ |&&|)
 
@@ -31,19 +31,19 @@ object Semigroup {
 
   implicit val CharSemigroup: Semigroup[Char] = semigroup[Char]((a, b) => (a + b).toChar)
 
-  implicit val CharMultiplicationSemigroup: Semigroup[CharMultiplication] = semigroup[CharMultiplication]((a, b) => (a + b).toChar |*|)
+  implicit val CharMultiplicationSemigroup: Semigroup[CharMultiplication] = semigroup[CharMultiplication]((a, b) => (a * b).toChar |*|)
 
   implicit val ByteSemigroup: Semigroup[Byte] = semigroup[Byte]((a, b) => (a + b).toByte)
 
-  implicit val ByteMultiplicationSemigroup: Semigroup[ByteMultiplication] = semigroup[ByteMultiplication]((a, b) => (a + b).toByte |*|)
+  implicit val ByteMultiplicationSemigroup: Semigroup[ByteMultiplication] = semigroup[ByteMultiplication]((a, b) => (a * b).toByte |*|)
 
   implicit val LongSemigroup: Semigroup[Long] = semigroup[Long]((a, b) => (a + b).toLong)
 
-  implicit val LongMultiplicationSemigroup: Semigroup[LongMultiplication] = semigroup[LongMultiplication]((a, b) => (a + b).toLong |*|)
+  implicit val LongMultiplicationSemigroup: Semigroup[LongMultiplication] = semigroup[LongMultiplication]((a, b) => (a * b).toLong |*|)
 
   implicit val ShortSemigroup: Semigroup[Short] = semigroup[Short]((a, b) => (a + b).toShort)
 
-  implicit val ShortMultiplicationSemigroup: Semigroup[ShortMultiplication] = semigroup[ShortMultiplication]((a, b) => (a + b).toShort |*|)
+  implicit val ShortMultiplicationSemigroup: Semigroup[ShortMultiplication] = semigroup[ShortMultiplication]((a, b) => (a * b).toShort |*|)
 
   implicit val FloatSemigroup: Semigroup[Float] = semigroup[Float]((a, b) => (a + b).toFloat)
 
