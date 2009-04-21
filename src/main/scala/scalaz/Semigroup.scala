@@ -21,6 +21,8 @@ object Semigroup {
   
   implicit val UnitSemigroup = semigroup[Unit]((_, _) => ())
 
+  implicit val StringSemigroup = semigroup[String](_ + _)
+
   implicit val IntSemigroup: Semigroup[Int] = semigroup[Int](_ + _)
 
   implicit val IntMultiplicationSemigroup: Semigroup[IntMultiplication] = semigroup[IntMultiplication](_ * _ |*|)
@@ -49,7 +51,9 @@ object Semigroup {
 
   implicit val DoubleSemigroup: Semigroup[Double] = semigroup[Double]((a, b) => (a + b).toDouble)
 
-  implicit val StringSemigroup = semigroup[String](_ + _)
+  implicit val BigIntegerSemigroup: Semigroup[java.math.BigInteger] = semigroup[java.math.BigInteger](_ add _)
+
+  implicit val BigIntSemigroup: Semigroup[BigInt] = semigroup[BigInt](_ + _)
 
   implicit val NodeSeqSemigroup: Semigroup[xml.NodeSeq] = semigroup[xml.NodeSeq](_ ++ _)
 

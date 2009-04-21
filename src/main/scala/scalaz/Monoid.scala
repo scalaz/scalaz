@@ -14,6 +14,8 @@ object Monoid {
 
   implicit val UnitMonoid = monoid[Unit]
 
+  implicit val StringMonoid = monoid[String]
+
   implicit val IntMonoid = monoid[Int]
 
   implicit val IntMultiplicationMonoid = monoid[IntMultiplication]
@@ -42,7 +44,9 @@ object Monoid {
 
   implicit val DoubleMonoid = monoid[Double]
 
-  implicit val StringMonoid = monoid[String]
+  implicit val BigIntegerMonoid = monoid[java.math.BigInteger]
+
+  implicit val BigIntMonoid = monoid[BigInt]
 
   implicit val NodeSeqMonoid = monoid[xml.NodeSeq]
 

@@ -11,7 +11,7 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
-  import Identity._
+  import S._
   import MA._
 
   implicit val DigitOrder: Order[Digit] = IntOrder <| ((_: Digit).toInt)
@@ -57,6 +57,10 @@ object Order {
   implicit val FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   implicit val DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+
+  implicit val BigIntegerOrder: Order[java.math.BigInteger] = order(_ compareTo _ ordering)
+
+  implicit val BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   implicit def NonEmptyListOrder[A](implicit oa: Order[A]): Order[NonEmptyList[A]] = IterableOrder(oa) <| ((_: NonEmptyList[A]).list)
 

@@ -4,6 +4,8 @@ sealed trait IntW {
   val value: Int
 
   def |*| = IntMultiplication.multiplication(value)
+
+  def ordering = if(value < 0) LT else if(value > 0) GT else EQ
 }
 
 object IntW {

@@ -49,6 +49,10 @@ object Zero {
 
   implicit val DoubleZero = zero(0D)
 
+  implicit val BigIntegerZero = zero(java.math.BigInteger.valueOf(0))
+
+  implicit val BigIntZero = zero(BigInt(0))
+
   implicit val NodeSeqZero = zero(xml.NodeSeq.Empty)
 
   implicit def ListZero[A] = zero[List[A]](Nil)

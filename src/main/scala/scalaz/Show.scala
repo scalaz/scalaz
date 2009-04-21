@@ -23,6 +23,8 @@ object Show {
 
   implicit val UnitShow = showA[Unit]
 
+  implicit val StringShow = showA[String]
+
   implicit val IntShow = showA[Int]
 
   implicit val IntMultiplicationShow = IntShow <| ((_: IntMultiplication).value)
@@ -51,7 +53,9 @@ object Show {
 
   implicit val DoubleShow = showA[Double]
 
-  implicit val StringShow = showA[String]
+  implicit val BigIntegerShow = showA[java.math.BigInteger]
+
+  implicit val BigIntShow = showA[BigInt]
 
   import S._
   import MA._

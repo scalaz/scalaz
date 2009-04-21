@@ -50,6 +50,10 @@ object Equal {
 
   implicit val DoubleEqual = equalA[Double]
 
+  implicit val BigIntegerEqual = equalA[java.math.BigInteger]
+
+  implicit val BigIntEqual = equalA[BigInt]
+
   implicit def NonEmptyListEqual[A](implicit ea: Equal[A]): Equal[NonEmptyList[A]] = IterableEqual(ea) <| ((_: NonEmptyList[A]).list)
 
   implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {
