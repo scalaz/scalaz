@@ -32,15 +32,27 @@ object Order {
 
   implicit val IntOrder: Order[Int] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
+  implicit val IntMultiplicationOrder: Order[IntMultiplication] = IntOrder <| ((_: IntMultiplication).value)
+
   implicit val BooleanOrder: Order[Boolean] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+
+  implicit val BooleanConjunctionOrder: Order[BooleanConjunction] = BooleanOrder <| ((_: BooleanConjunction).value)
 
   implicit val CharOrder: Order[Char] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
+  implicit val CharMultiplicationOrder: Order[CharMultiplication] = CharOrder <| ((_: CharMultiplication).value)
+
   implicit val ByteOrder: Order[Byte] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+
+  implicit val ByteMultiplicationOrder: Order[ByteMultiplication] = ByteOrder <| ((_: ByteMultiplication).value)
 
   implicit val LongOrder: Order[Long] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
+  implicit val LongMultiplicationOrder: Order[LongMultiplication] = LongOrder <| ((_: LongMultiplication).value)
+
   implicit val ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+
+  implicit val ShortMultiplicationOrder: Order[ShortMultiplication] = ShortOrder <| ((_: ShortMultiplication).value)
 
   implicit val FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 

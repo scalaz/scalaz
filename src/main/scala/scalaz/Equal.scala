@@ -11,6 +11,9 @@ object Equal {
 
   def equalA[A] = equal[A](_ == _)
 
+  import S._
+  import MA._
+
   implicit val DigitEqual = equalA[Digit]
 
   implicit val OrderingEqual = equalA[Ordering]
@@ -21,22 +24,31 @@ object Equal {
 
   implicit val IntEqual = equalA[Int]
 
+  implicit val IntMultiplicationEqual = IntEqual <| ((_: IntMultiplication).value) 
+
   implicit val BooleanEqual = equalA[Boolean]
+
+  implicit val BooleanConjunctionEqual = BooleanEqual <| ((_: BooleanConjunction).value)
 
   implicit val CharEqual = equalA[Char]
 
+  implicit val CharMultiplicationEqual = CharEqual <| ((_: CharMultiplication).value)
+
   implicit val ByteEqual = equalA[Byte]
+
+  implicit val ByteMultiplicationEqual = ByteEqual <| ((_: ByteMultiplication).value)
 
   implicit val LongEqual = equalA[Long]
 
+  implicit val LongMultiplicationEqual = LongEqual <| ((_: LongMultiplication).value)
+
   implicit val ShortEqual = equalA[Short]
+
+  implicit val ShortMultiplicationEqual = ShortEqual <| ((_: ShortMultiplication).value) 
 
   implicit val FloatEqual = equalA[Float]
 
   implicit val DoubleEqual = equalA[Double]
-
-  import S._
-  import MA._
 
   implicit def NonEmptyListEqual[A](implicit ea: Equal[A]): Equal[NonEmptyList[A]] = IterableEqual(ea) <| ((_: NonEmptyList[A]).list)
 

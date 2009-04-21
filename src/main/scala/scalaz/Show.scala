@@ -25,15 +25,27 @@ object Show {
 
   implicit val IntShow = showA[Int]
 
+  implicit val IntMultiplicationShow = IntShow <| ((_: IntMultiplication).value)
+
   implicit val BooleanShow = showA[Boolean]
+
+  implicit val BooleanConjunctionShow = BooleanShow <| ((_: BooleanConjunction).value)
 
   implicit val CharShow = showA[Char]
 
+  implicit val CharMultiplicationShow = CharShow <| ((_: CharMultiplication).value)
+
   implicit val ByteShow = showA[Byte]
+
+  implicit val ByteMultiplicationShow = ByteShow <| ((_: ByteMultiplication).value)
 
   implicit val LongShow = showA[Long]
 
+  implicit val LongMultiplicationShow = LongShow <| ((_: LongMultiplication).value)
+
   implicit val ShortShow = showA[Short]
+
+  implicit val ShortMultiplicationShow = ShortShow <| ((_: ShortMultiplication).value)
 
   implicit val FloatShow = showA[Float]
 
