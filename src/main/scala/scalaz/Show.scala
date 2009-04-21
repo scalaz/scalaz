@@ -15,6 +15,7 @@ object Show {
 
   def showA[A] = shows[A](_.toString)
 
+  import S._
   import MA._
 
   implicit val DigitShow = IntShow <| ((_: Digit).toInt)
@@ -55,10 +56,11 @@ object Show {
 
   implicit val BigIntegerShow = showA[java.math.BigInteger]
 
+  implicit val BigIntegerMultiplicationShow = BigIntegerShow <| ((_: BigIntegerMultiplication).value)
+
   implicit val BigIntShow = showA[BigInt]
 
-  import S._
-  import MA._
+  implicit val BigIntMultiplicationShow = BigIntShow <| ((_: BigIntMultiplication).value)
 
   implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
 

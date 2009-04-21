@@ -60,7 +60,11 @@ object Order {
 
   implicit val BigIntegerOrder: Order[java.math.BigInteger] = order(_ compareTo _ ordering)
 
+  implicit val BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = BigIntegerOrder <| ((_: BigIntegerMultiplication).value)
+
   implicit val BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+
+  implicit val BigIntMultplicationOrder: Order[BigIntMultiplication] = BigIntOrder <| ((_: BigIntMultiplication).value)
 
   implicit def NonEmptyListOrder[A](implicit oa: Order[A]): Order[NonEmptyList[A]] = IterableOrder(oa) <| ((_: NonEmptyList[A]).list)
 

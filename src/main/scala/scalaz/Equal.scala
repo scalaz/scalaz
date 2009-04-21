@@ -52,7 +52,11 @@ object Equal {
 
   implicit val BigIntegerEqual = equalA[java.math.BigInteger]
 
+  implicit val BigIntegerMultiplicationEqual = BigIntegerEqual <| ((_: BigIntegerMultiplication).value)
+
   implicit val BigIntEqual = equalA[BigInt]
+
+  implicit val BigIntMultiplicationEqual = BigIntEqual <| ((_: BigIntMultiplication).value)
 
   implicit def NonEmptyListEqual[A](implicit ea: Equal[A]): Equal[NonEmptyList[A]] = IterableEqual(ea) <| ((_: NonEmptyList[A]).list)
 
