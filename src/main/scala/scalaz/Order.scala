@@ -11,6 +11,11 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
+  import Identity._
+  import MA._
+
+  implicit val DigitOrder: Order[Digit] = IntOrder <| ((_: Digit).toInt)
+
   implicit val OrderingOrder: Order[Ordering] = order {
     case (a, EQ) => a
     case (EQ, LT) => GT
@@ -40,9 +45,6 @@ object Order {
   implicit val FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
   implicit val DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
-
-  import Identity._
-  import MA._
 
   implicit def NonEmptyListOrder[A](implicit oa: Order[A]): Order[NonEmptyList[A]] = IterableOrder(oa) <| ((_: NonEmptyList[A]).list)
 

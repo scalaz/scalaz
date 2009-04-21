@@ -11,6 +11,8 @@ object Zero {
     val zero = z
   }
 
+  implicit val DigitZero = zero(_0)
+
   implicit val OrderingZero = zero(EQ)
 
   implicit val UnitZero = zero(())

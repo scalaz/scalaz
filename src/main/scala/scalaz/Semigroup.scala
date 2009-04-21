@@ -9,6 +9,8 @@ object Semigroup {
     def append(s1: S, s2: => S) = f(s1, s2)
   }
 
+  implicit val DigitSemigroup: Semigroup[Digit] = semigroup[Digit]((a, b) => a.toInt + b.toInt)
+
   implicit val OrderingSemigroup = semigroup[Ordering] {
     case (EQ, a) => a
     case (LT, _) => LT

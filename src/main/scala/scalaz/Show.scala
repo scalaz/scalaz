@@ -15,6 +15,10 @@ object Show {
 
   def showA[A] = shows[A](_.toString)
 
+  import MA._
+
+  implicit val DigitShow = IntShow <| ((_: Digit).toInt)
+
   implicit val OrderingShow = showA[Ordering]
 
   implicit val UnitShow = showA[Unit]

@@ -8,6 +8,8 @@ object Monoid {
     val zero = z.zero
   }
 
+  implicit val DigitMonoid = monoid[Digit]
+  
   implicit val OrderingMonoid = monoid[Ordering]
 
   implicit val UnitMonoid = monoid[Unit]
