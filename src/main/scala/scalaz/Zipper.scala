@@ -77,10 +77,7 @@ sealed trait Zipper[A] extends Iterable[A] {
     else findPrevious(p) orElse findNext(p)
 
   def findBy(p: A => Boolean, f: (Zipper[A], (A => Boolean)) => Option[Zipper[A]]): Option[Zipper[A]] = {
-    val x = f(this, p)
-    if (x.isEmpty) None
-    else if (p(x.get.focus)) x
-    else x.get.findBy(p, f)
+    f(this, p) >>= (x => if (p(x.focus)) Some(x) else x.findBy(p, f))
   }
 
   def findNext(p: A => Boolean) = findBy(p, (z: Zipper[A], f: A => Boolean) => z.next)
