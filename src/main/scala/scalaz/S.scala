@@ -19,6 +19,10 @@ object S {
 
   implicit def ByteMultiplicationFrom(n: ByteMultiplication) = ByteMultiplication.ByteMultiplicationFrom(n)
 
+  implicit def ByteTo(n: Byte) = ByteW.ByteTo(n)
+
+  implicit def ByteFrom(n: ByteW) = ByteW.ByteFrom(n)
+
   def multiplication(n: Char) = CharMultiplication.multiplication(n)
 
   implicit def CharMultiplicationFrom(n: CharMultiplication) = CharMultiplication.CharMultiplicationFrom(n)
@@ -47,6 +51,10 @@ object S {
 
   implicit def IntMultiplicationFrom(n: IntMultiplication) = IntMultiplication.IntMultiplicationFrom(n)
 
+  implicit def IntTo(n: Int) = IntW.IntTo(n)
+
+  implicit def IntFrom(n: IntW) = IntW.IntFrom(n)
+
   implicit def IterableTo[A](i: Iterable[A]) = IterableW.IterableTo(i)
 
   implicit def IterableFrom[A](i: IterableW[A]) = IterableW.IterableFrom(i)
@@ -68,6 +76,10 @@ object S {
   def multiplication(n: Short) = ShortMultiplication.multiplication(n)
 
   implicit def ShortMultiplicationFrom(n: ShortMultiplication) = ShortMultiplication.ShortMultiplicationFrom(n)
+
+  implicit def ShortTo(n: Short) = ShortW.ShortTo(n)
+
+  implicit def ShortFrom(n: ShortW) = ShortW.ShortFrom(n)
 
   implicit def StringTo(ss: String) = StringW.StringTo(ss)
 
