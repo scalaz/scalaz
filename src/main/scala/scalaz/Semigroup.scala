@@ -5,7 +5,7 @@ trait Semigroup[S] {
 }
 
 object Semigroup {
-  def semigroup[S](f: (S, S) => S) = new Semigroup[S] {
+  def semigroup[S](f: (S, => S) => S) = new Semigroup[S] {
     def append(s1: S, s2: => S) = f(s1, s2)
   }
 
@@ -27,7 +27,7 @@ object Semigroup {
 
   implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = semigroup[BooleanConjunction](_ && _ |&&|)
 
-  implicit val BooleanSemigroup = semigroup[Boolean](_ || _)
+  implicit val BooleanSemigroup = semigroup[Boolean]((a, b) => (a || b))
 
   implicit val CharSemigroup: Semigroup[Char] = semigroup[Char]((a, b) => (a + b).toChar)
 
