@@ -13,7 +13,7 @@ Packages
 ========
 
 * scalaz
-Basic data structures, type-classes that not specific to any domain
+Basic data structures, type-classes that are not specific to any domain
 
 * scalaz.http
 Data structures for writing web applications
