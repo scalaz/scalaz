@@ -15,6 +15,14 @@ object S {
 
   implicit def BooleanConjunctionFrom(b: BooleanConjunction) = BooleanConjunction.BooleanConjunctionFrom(b)
 
+  def multiplication(n: Byte) = ByteMultiplication.multiplication(n)
+
+  implicit def ByteMultiplicationFrom(n: ByteMultiplication) = ByteMultiplication.ByteMultiplicationFrom(n)
+
+  def multiplication(n: Char) = CharMultiplication.multiplication(n)
+
+  implicit def CharMultiplicationFrom(n: CharMultiplication) = CharMultiplication.CharMultiplicationFrom(n)
+
   implicit def CharTo(c: Char) = CharW.CharTo(c)
 
   implicit def CharFrom(c: CharW) = CharW.CharFrom(c)
@@ -23,6 +31,10 @@ object S {
 
   implicit def LongDigit(n: Long) = Digit.LongDigit(n)
 
+  def multiplication(n: Long) = LongMultiplication.multiplication(n)
+
+  implicit def LongMultiplicationFrom(n: LongMultiplication) = LongMultiplication.LongMultiplicationFrom(n)
+
   implicit def Function1To[T, R](f: T => R) = Function1W.Function1To(f)
 
   implicit def Function1From[T, R](f: Function1W[T, R]) = Function1W.Function1From(f)
@@ -30,6 +42,10 @@ object S {
   implicit def Function2To[T1, T2, R](f: (T1, T2) => R) = Function2W.Function2To(f)
 
   implicit def Function2From[T1, T2, R](f: Function2W[T1, T2, R]) = Function2W.Function2From(f)
+
+  def multiplication(n: Int) = IntMultiplication.multiplication(n)
+
+  implicit def IntMultiplicationFrom(n: IntMultiplication) = IntMultiplication.IntMultiplicationFrom(n)
 
   implicit def IterableTo[A](i: Iterable[A]) = IterableW.IterableTo(i)
 
@@ -48,6 +64,10 @@ object S {
   implicit def OptionTo[A](o: Option[A]) = OptionW.OptionTo(o)
 
   implicit def OptionFrom[A](o: OptionW[A]) = OptionW.OptionFrom(o)
+
+  def multiplication(n: Short) = ShortMultiplication.multiplication(n)
+
+  implicit def ShortMultiplicationFrom(n: ShortMultiplication) = ShortMultiplication.ShortMultiplicationFrom(n)
 
   implicit def StringTo(ss: String) = StringW.StringTo(ss)
 
