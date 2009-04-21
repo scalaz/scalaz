@@ -16,17 +16,27 @@ object Monoid {
 
   implicit val IntMonoid = monoid[Int]
 
+  implicit val IntMultiplicationMonoid = monoid[IntMultiplication]
+
   implicit val BooleanConjunctionMonoid = monoid[BooleanConjunction]
 
   implicit val BooleanMonoid = monoid[Boolean]
 
   implicit val CharMonoid = monoid[Char]
 
+  implicit val CharMultiplicationMonoid = monoid[CharMultiplication]
+
   implicit val ByteMonoid = monoid[Byte]
+
+  implicit val ByteMultiplicationMonoid = monoid[ByteMultiplication]
 
   implicit val LongMonoid = monoid[Long]
 
+  implicit val LongMultiplicationMonoid = monoid[LongMultiplication]
+
   implicit val ShortMonoid = monoid[Short]
+
+  implicit val ShortMultiplicationMonoid = monoid[ShortMultiplication]
 
   implicit val FloatMonoid = monoid[Float]
 
