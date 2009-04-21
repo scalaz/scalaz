@@ -16,7 +16,7 @@ Packages
 Basic data structures, type-classes that are not specific to any domain
 
 * scalaz.http
-Data structures for writing web applications
+Data structures for writing web applications (based on the slinky prototype http://code.google.com/p/slinky2)
 
 * scalaz.database
 Data structures for JDBC
