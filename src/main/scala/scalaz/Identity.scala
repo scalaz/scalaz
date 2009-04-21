@@ -3,6 +3,8 @@ package scalaz
 sealed trait Identity[A] {
   val value: A
 
+  import S._
+
   def pure[P[_]](implicit p: Pure[P]) = p pure value
 
   def |+|(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
@@ -26,6 +28,17 @@ sealed trait Identity[A] {
   def constantState[S, A](s: S) = State.state((_: S) => (s, value))
 
   def state[S] = State.state((_: S, value))
+
+  sealed trait Unfold[M[_]] {
+    def apply[B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B]
+  }
+
+  def unfold[M[_]]: Unfold[M] = new Unfold[M] {
+    def apply[B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]) = f(value) match {
+      case None => m.zero
+      case Some((b, a)) => b.pure[M] |+| a.unfold[M](f)
+    }
+  }
 
   override def toString = value.toString
 
