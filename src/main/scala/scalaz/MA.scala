@@ -199,6 +199,8 @@ object MA {
 
   implicit def ShowMA[A](a: Show[A]) = ma[Show](a)
 
+  implicit def ZipStreamMA[A](a: ZipStream[A]) = ma[ZipStream](a)
+
   implicit def Tuple1MA[A](a: Tuple1[A]) = ma[Tuple1](a)
 
   implicit def Tuple2MA[R, A](a: (R, A)) = ma[PartialApply1Of2[Tuple2, R]#Apply](a)

@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait ZipStream[+A] {
+trait ZipStream[+A] {
   val value: Stream[A]
 }
 
