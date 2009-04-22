@@ -50,6 +50,8 @@ object Monoid {
 
   implicit val NodeSeqMonoid = monoid[xml.NodeSeq]
 
+  implicit def ZipStreamMonoid[A] = monoid[ZipStream[A]]
+  
   implicit def ListMonoid[A] = monoid[List[A]]
 
   implicit def StreamMonoid[A] = monoid[Stream[A]]
