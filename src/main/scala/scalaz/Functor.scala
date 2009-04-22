@@ -113,6 +113,10 @@ object Functor {
     def fmap[A, B](z: Zipper[A], f: A => B) = Zipper.zipper(z.lefts map f, f(z.focus), z.rights map f)
   }
 
+  implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
+    def fmap[A, B](t: Tree[A], f: A => B): Tree[B] = Tree.node(f(t.rootLabel), t.subForest.map(fmap(_:Tree[A], f)))
+  }
+
   import java.util._
   import java.util.concurrent._
 

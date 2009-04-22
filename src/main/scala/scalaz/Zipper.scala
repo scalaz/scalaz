@@ -8,12 +8,10 @@ package scalaz
  * Based on the pointedlist library by Jeff Wheeler.
  */
 
-sealed trait Zipper[A] extends Iterable[A] {
+sealed trait Zipper[A] {
   val focus: A
   val lefts: Stream[A]
   val rights: Stream[A]
-
-  def elements = (lefts.reverse ++ Stream.cons(focus, rights)).elements
 
   import Zipper._
   import Cojoin._
@@ -190,6 +188,10 @@ sealed trait Zipper[A] extends Iterable[A] {
     case (_, _) => tryPrevious
   }
 
+  /**
+   * Deletes the focused element and moves focus to the left. If the focus was on the first element,
+   * focus is moved to the last element.
+   */
   def deleteLeftC = (lefts, rights) match {
     case (Stream.empty, Stream.empty) => None
     case (Stream.cons(l, ls), rs) => Some(zipper(ls, l, rs))
@@ -199,6 +201,10 @@ sealed trait Zipper[A] extends Iterable[A] {
     }
   }
 
+  /**
+   * Deletes the focused element and moves focus to the right. If the focus was on the last element,
+   * focus is moved to the first element.
+   */
   def deleteRightC = (lefts, rights) match {
     case (Stream.empty, Stream.empty) => None
     case (ls, Stream.cons(r, rs)) => Some(zipper(ls, r, rs))
@@ -208,6 +214,9 @@ sealed trait Zipper[A] extends Iterable[A] {
     }
   }
 
+  /**
+   * An alias for deleteRightC
+   */
   def deleteC = deleteRightC
 }
 

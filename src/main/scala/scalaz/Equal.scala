@@ -24,7 +24,7 @@ object Equal {
 
   implicit val IntEqual = equalA[Int]
 
-  implicit val IntMultiplicationEqual = IntEqual <| ((_: IntMultiplication).value) 
+  implicit val IntMultiplicationEqual = IntEqual <| ((_: IntMultiplication).value)
 
   implicit val BooleanEqual = equalA[Boolean]
 
@@ -44,7 +44,7 @@ object Equal {
 
   implicit val ShortEqual = equalA[Short]
 
-  implicit val ShortMultiplicationEqual = ShortEqual <| ((_: ShortMultiplication).value) 
+  implicit val ShortMultiplicationEqual = ShortEqual <| ((_: ShortMultiplication).value)
 
   implicit val FloatEqual = equalA[Float]
 
@@ -71,15 +71,15 @@ object Equal {
   }
 
   implicit def Tuple3Equal[A, B, C](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C]) = equal[(A, B, C)] {
-    case ((a1, b1, c1), (a2, b2, c2)) => a1 === a2 && b1 === b2 && c1 === c2  
+    case ((a1, b1, c1), (a2, b2, c2)) => a1 === a2 && b1 === b2 && c1 === c2
   }
 
   implicit def Tuple4Equal[A, B, C, D](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D]) = equal[(A, B, C, D)] {
-    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2  
+    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2
   }
 
   implicit def Tuple5Equal[A, B, C, D, E](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E]) = equal[(A, B, C, D, E)] {
-    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2  
+    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2
   }
 
   implicit def Tuple6Equal[A, B, C, D, E, F](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F]) = equal[(A, B, C, D, E, F)] {
@@ -87,7 +87,7 @@ object Equal {
   }
 
   implicit def Tuple7Equal[A, B, C, D, E, F, G](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F], eg: Equal[G]) = equal[(A, B, C, D, E, F, G)] {
-    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2 && f1 === f2 && g1 === g2  
+    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2 && f1 === f2 && g1 === g2
   }
 
   implicit def Function0Equal[A](implicit ea: Equal[A]) = equal[Function0[A]](_.apply === _.apply)
@@ -98,7 +98,7 @@ object Equal {
   }
 
   implicit def EitherEqual[A, B](implicit ea: Equal[A], eb: Equal[B]) = equal[Either[A, B]] {
-    case(Left(a1), Left(a2)) => a1 === a2
+    case (Left(a1), Left(a2)) => a1 === a2
     case (Right(b1), Right(b2)) => b1 === b2
     case _ => false
   }
@@ -113,21 +113,25 @@ object Equal {
     case (a1, a2) => a1.isDefined == a2.isDefined
   })
 
+  implicit def TreeEqual[A](implicit ea: Equal[A]): Equal[Tree[A]] =
+    equal[Tree[A]]((a1, a2) => a1.rootLabel === a2.rootLabel
+        && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
+
   implicit def IterableEqual[A](implicit ea: Equal[A]) = equal[Iterable[A]]((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
     var b = false
 
-    while(i1.hasNext && i2.hasNext && !b) {
+    while (i1.hasNext && i2.hasNext && !b) {
       val x1 = i1.next
       val x2 = i2.next
 
-      if(x1 /= x2) {
+      if (x1 /= x2) {
         b = true
       }
     }
 
-    !(b || i1.hasNext || i2.hasNext) 
+    !(b || i1.hasNext || i2.hasNext)
   })
 
   implicit def JavaIterableEqual[A](implicit ea: Equal[A]) = equal[java.lang.Iterable[A]]((a1, a2) => {
@@ -137,11 +141,11 @@ object Equal {
     val i2 = a2.iterator
     var b = false
 
-    while(i1.hasNext && i2.hasNext && !b) {
+    while (i1.hasNext && i2.hasNext && !b) {
       val x1 = i1.next
       val x2 = i2.next
 
-      if(x1 /= x2) {
+      if (x1 /= x2) {
         b = true
       }
     }
