@@ -17,6 +17,7 @@ object Show {
 
   import S._
   import MA._
+  import MAB._
 
   implicit val DigitShow = IntShow <| ((_: Digit).toInt)
 
@@ -186,8 +187,6 @@ object Show {
   implicit def Function0Show[A](implicit sa: Show[A]) = show[Function0[A]](_.apply.show)  
 
   implicit def OptionShow[A](implicit sa: Show[A]) = shows[Option[A]](_ map (_.shows) toString)
-
-  import MAB._
 
   implicit def EitherShow[A, B](implicit sa: Show[A], sb: Show[B]) = shows[Either[A, B]](e => (((_: A).shows) <-: e :-> (_.shows)).toString)
 
