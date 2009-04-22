@@ -90,7 +90,7 @@ object Equal {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2 && f1 === f2 && g1 === g2  
   }
 
-  // todo TupleN
+  implicit def Function0Equal[A](implicit ea: Equal[A]) = equal[Function0[A]](_.apply === _.apply)
 
   implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {
     case (Some(a1), Some(a2)) => a1 === a2

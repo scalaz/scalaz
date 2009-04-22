@@ -183,6 +183,8 @@ object Show {
     k.toList
   }}
 
+  implicit def Function0Show[A](implicit sa: Show[A]) = show[Function0[A]](_.apply.show)  
+
   implicit def OptionShow[A](implicit sa: Show[A]) = shows[Option[A]](_ map (_.shows) toString)
 
   import MAB._

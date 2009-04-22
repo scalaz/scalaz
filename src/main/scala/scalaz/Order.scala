@@ -96,6 +96,8 @@ object Order {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2, e1 ?:? e2, f1 ?:? f2, g1 ?:? g2) suml
   }
 
+  implicit def Function0Order[A](implicit oa: Order[A]) = order[Function0[A]](_.apply ?:? _.apply)
+
   implicit def IterableOrder[A](implicit oa: Order[A]): Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
