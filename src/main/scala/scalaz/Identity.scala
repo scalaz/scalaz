@@ -40,6 +40,11 @@ sealed trait Identity[A] {
     }
   }
 
+  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+    if(n <= 0) m.zero
+    else value.pure[M] |+| replicate[M](n - 1)
+  }
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
