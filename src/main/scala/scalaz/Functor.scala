@@ -5,6 +5,8 @@ trait Functor[F[_]] {
 }
 
 object Functor {
+  import S._
+
   implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
     def fmap[A, B](r: Identity[A], f: A => B) = Identity.id(f(r.value))
   }
@@ -19,6 +21,10 @@ object Functor {
 
   implicit def StateFunctor[S] = new Functor[PartialApply1Of2[State, S]#Apply] {
     def fmap[A, B](r: State[S, A], f: A => B) = r map f
+  }
+
+  implicit val ZipStreamFunctor: Functor[ZipStream] = new Functor[ZipStream] {
+    def fmap[A, B](r: ZipStream[A], f: A => B) = r.value map f |!|
   }
 
   implicit val Tuple1Functor = new Functor[Tuple1] {
