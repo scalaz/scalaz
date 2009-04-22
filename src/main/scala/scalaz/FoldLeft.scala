@@ -35,9 +35,14 @@ object FoldLeft {
   import S._
   import Function2W._
   import FoldRight._
+
   implicit val ZipperFoldLeft: FoldLeft[Zipper] = new FoldLeft[Zipper] {
     def foldLeft[B, A](t: Zipper[A], b: B, f: (B, A) => B): B =
       t.lefts.foldRight(Stream.cons(t.focus, t.rights).foldLeft(b)(f))(f.flip)
+  }
+
+  implicit val ZipStreamFoldLeft: FoldLeft[ZipStream] = new FoldLeft[ZipStream] {
+    def foldLeft[B, A](t: ZipStream[A], b: B, f: (B, A) => B): B = IterableFoldLeft.foldLeft(t.value, b, f)
   }
 
   implicit val ArrayFoldLeft = new FoldLeft[Array] {

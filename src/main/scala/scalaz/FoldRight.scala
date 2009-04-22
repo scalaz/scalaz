@@ -41,7 +41,7 @@ object FoldRight {
       t.lefts.foldLeft(Stream.cons(t.focus, t.rights).foldRight(b)(f(_, _)))((f.flip)(_, _))
   }
 
-  implicit val ZipStream: FoldRight[ZipStream] = new FoldRight[ZipStream] {
+  implicit val ZipStreamFoldRight: FoldRight[ZipStream] = new FoldRight[ZipStream] {
     def foldRight[A, B](t: ZipStream[A], b: B, f: (A, => B) => B): B = StreamFoldRight.foldRight(t.value, b, f)     
   }
 
