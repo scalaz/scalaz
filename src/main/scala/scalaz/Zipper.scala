@@ -156,7 +156,7 @@ sealed trait Zipper[A] extends Iterable[A] {
    */
   def positions: Zipper[Zipper[A]] = {
     val left = this.unfold[Stream]((p: Zipper[A]) => p.previous.map(x => (x, x)))
-    val right = this.unfold[Stream]((p: Zipper[A]) => p.previous.map(x => (x, x)))
+    val right = this.unfold[Stream]((p: Zipper[A]) => p.next.map(x => (x, x)))
     
     zipper(left, this, right)
   }
