@@ -60,6 +60,8 @@ object Applicative {
 
   implicit val ZipperApplicative = applicative[Zipper]
 
+  implicit val ZipStreamApplicative = applicative[ZipStream]
+
   import java.util._
   import java.util.concurrent._
 

@@ -109,6 +109,10 @@ object Pure {
     def pure[A](a: => A) = Zipper.zipper(a)
   }
 
+  implicit def ZipStreamPure = new Pure[ZipStream] {
+    def pure[A](a: => A) = ZipStream.zip(Stream(a))
+  }
+
   import java.util._
   import java.util.concurrent._
 
