@@ -40,10 +40,11 @@ sealed trait Identity[A] {
     }
   }
 
-  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
     if(n <= 0) m.zero
     else value.pure[M] |+| replicate[M](n - 1)
-  }
+
+  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.pure[M] |+| repeat[M]   
 
   override def toString = value.toString
 
