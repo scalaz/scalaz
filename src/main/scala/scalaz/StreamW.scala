@@ -7,6 +7,8 @@ sealed trait StreamW[A] {
 
   def stringj(f: A => Stream[Char]) = value flatMap f mkString
 
+  def |!| = ZipStream.zip(value)
+
   import StreamW._
 
   def merge(s: Stream[A]): Stream[A] =
