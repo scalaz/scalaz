@@ -62,6 +62,8 @@ object Equal {
 
   implicit def NonEmptyListEqual[A](implicit ea: Equal[A]): Equal[NonEmptyList[A]] = IterableEqual(ea) <| ((_: NonEmptyList[A]).list)
 
+  implicit def ZipStreamEqual[A](implicit ea: Equal[A]): Equal[ZipStream[A]] = IterableEqual(ea) <| ((_: ZipStream[A]).value)
+
   implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {
     case (Some(a1), Some(a2)) => a1 === a2
     case (a1, a2) => a1.isDefined == a2.isDefined
