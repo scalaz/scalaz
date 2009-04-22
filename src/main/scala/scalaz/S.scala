@@ -95,4 +95,8 @@ object S {
 
   implicit def StringFrom(s: StringW) = StringW.StringFrom(s)
 
+  def zip[A](s: Stream[A]) = ZipStream.zip(s)
+
+  implicit def ZipStreamFrom[A](z: ZipStream[A]) = ZipStream.ZipStreamFrom(z)
+
 }
