@@ -91,6 +91,10 @@ object S {
 
   implicit def ShortFrom(n: ShortW) = ShortW.ShortFrom(n)
 
+  implicit def StreamTo[A](as: Stream[A]) = StreamW.StreamTo(as)
+
+  implicit def StreamFrom[A](as: StreamW[A]) = StreamW.StreamFrom(as)
+
   implicit def StringTo(ss: String) = StringW.StringTo(ss)
 
   implicit def StringFrom(s: StringW) = StringW.StringFrom(s)
