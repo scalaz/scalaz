@@ -161,7 +161,7 @@ a, b) => {
     }
 
     implicit val AccPure = new Pure[PartialApply1Of2[Acc, B]#Apply] {
-      def pure[A](a: A) = Acc[B, A](m.zero)
+      def pure[A](a: => A) = Acc[B, A](m.zero)
     }
 
     implicit val AccApplicative = Applicative.applicative[PartialApply1Of2[Acc, B]#Apply]
