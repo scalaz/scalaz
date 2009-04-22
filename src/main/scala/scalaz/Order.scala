@@ -68,6 +68,8 @@ object Order {
 
   implicit def NonEmptyListOrder[A](implicit oa: Order[A]): Order[NonEmptyList[A]] = IterableOrder(oa) <| ((_: NonEmptyList[A]).list)
 
+  implicit def ZipStreamOrder[A](implicit oa: Order[A]): Order[ZipStream[A]] = IterableOrder(oa) <| ((_: ZipStream[A]).value)
+
   implicit def IterableOrder[A](implicit oa: Order[A]): Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
