@@ -16,6 +16,8 @@ object Pointed {
 
   implicit def StatePointed[S] = pointed[PartialApply1Of2[State, S]#Apply]
 
+  implicit val ZipStreamPointed = pointed[ZipStream]
+
   implicit val Tuple1Pointed = pointed[Tuple1]
 
   implicit def Tuple2Pointed[R](implicit sr: Monoid[R]) = pointed[PartialApply1Of2[Tuple2, R]#Apply]
