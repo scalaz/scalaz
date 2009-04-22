@@ -4,10 +4,10 @@ sealed trait OptionW[A] {
   val value: Option[A]
 
   sealed trait Fold[X] {
-    def none(s: A => X): X
+    def none(s: => X): X
   }
 
-  def some[X](s: A => X) = new {
+  def some[X](s: A => X) = new Fold[X] {
     def none(n: => X) = value match {
       case None => n
       case Some(a) => s(a)
