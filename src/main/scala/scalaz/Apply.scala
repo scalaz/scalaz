@@ -63,11 +63,10 @@ object Apply {
   implicit def EitherRightApply[X] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
   implicit val ZipperApply: Apply[Zipper] = new Apply[Zipper] {
-    def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] = {
+    def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] =
       Zipper.zipper((a.lefts |!|) <*> (f.lefts |!|),
         (f.focus)(a.focus),
         (a.rights |!|) <*> (f.rights |!|))
-    }
   }
 
   implicit val ZipStreamApply: Apply[ZipStream] = new Apply[ZipStream] {
