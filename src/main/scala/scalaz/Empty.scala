@@ -5,6 +5,10 @@ trait Empty[+E[_]] {
 }
 
 object Empty {
+  implicit val ZipStreamEmpty = new Empty[ZipStream] {
+    def empty[A] = ZipStream.zip(Stream.empty)
+  }
+
   implicit val ListEmpty = new Empty[List] {
     def empty[A] = Nil
   }
