@@ -66,6 +66,8 @@ object Show {
 
   implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
 
+  implicit def ZipStreamShow[A](implicit sa: Show[A]): Show[ZipStream[A]] = IterableShow(sa) <| ((_: ZipStream[A]).value)
+
   implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
       z.lefts.reverse.show ++ " " ++ sa.show(z.focus) ++ " " ++ z.rights.show)
 
