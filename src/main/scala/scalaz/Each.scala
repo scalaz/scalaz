@@ -21,6 +21,10 @@ object Each {
     def each[A](e: State[Unit, A], f: A => Unit) = f(e(())._2)
   }
 
+  implicit val ZipStreamEach = new Each[ZipStream] {
+    def each[A](e: ZipStream[A], f: A => Unit) = e.value foreach f
+  }
+
   implicit val Tuple1Each = new Each[Tuple1] {
     def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
