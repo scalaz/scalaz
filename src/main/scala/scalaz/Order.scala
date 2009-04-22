@@ -96,8 +96,6 @@ object Order {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2, e1 ?:? e2, f1 ?:? f2, g1 ?:? g2) suml
   }
 
-  // todo TupleN
-
   implicit def IterableOrder[A](implicit oa: Order[A]): Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
@@ -151,9 +149,6 @@ object Order {
     case (None, Some(_)) => LT
     case (None, None) => EQ
   })
-
-  import S._
-  import MA._
 
   implicit def JavaIterableOrder[A](implicit oa: Order[A]): Order[java.lang.Iterable[A]] = IterableOrder(oa) <| (x => JavaIterableTo(x))
 }
