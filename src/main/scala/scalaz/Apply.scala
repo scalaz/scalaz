@@ -11,6 +11,8 @@ object Apply {
     }
   }
 
+  import S._
+
   implicit val IdentityApply: Apply[Identity] = FunctorBindApply[Identity]
 
   implicit def ContinuationApply[R] = FunctorBindApply[PartialApply1Of2[Continuation, R]#Apply]
@@ -59,7 +61,7 @@ object Apply {
 
   implicit def EitherRightApply[X] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
-  implicit val ZipperApply = new Apply[Zipper] {
+  implicit val ZipperApply: Apply[Zipper] = new Apply[Zipper] {
     def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] = {
       Zipper.zipper(StreamZapply.apply(f.lefts, a.lefts),
         (f.focus)(a.focus),
@@ -67,9 +69,19 @@ object Apply {
     }
   }
 
+  // todo delete
   val StreamZapply = new Apply[Stream] {
     def apply[A, B](f: Stream[A => B], a: Stream[A]): Stream[B] = {
       Stream.cons((f.head)(a.head), apply(f.tail, a.tail))
+    }
+  }
+
+  implicit val ZipStreamApply: Apply[ZipStream] = new Apply[ZipStream] {
+    def apply[A, B](f: ZipStream[A => B], a: ZipStream[A]): ZipStream[B] = {
+      val ff = f.value
+      val aa = a.value
+      (if(ff.isEmpty || aa.isEmpty) Stream.empty
+      else Stream.cons((ff.head)(aa.head), apply(ff.tail |!|, aa.tail |!|))) |!|
     }
   }
 
