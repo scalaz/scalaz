@@ -7,6 +7,9 @@ trait Traverse[T[_]] extends Functor[T] {
 }
 
 object Traverse {
+  import S._
+  import MA._
+
   implicit val IdentityTraverse: Traverse[Identity] = new Traverse[Identity] {
     def traverse[F[_], A, B](f: A => F[B], t: Identity[A])(implicit a: Applicative[F]) = a.fmap(f(t.value), Identity.id(_: B))
   }
@@ -28,8 +31,6 @@ object Traverse {
       as.foldRight[F[List[B]]](a.pure(Nil))((x, ys) => a(a.fmap(f(x), (a: B) => (b: List[B]) => a :: b), ys))
   }
 
-  import MA._
-
   implicit val StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
     def traverse[F[_], A, B](f: A => F[B], as: Stream[A])(implicit a: Applicative[F]): F[Stream[B]] = as.foldr[F[Stream[B]]](a.pure(Stream.empty), (x, ys) => a(a.fmap(f(x), (a: B) => (b: Stream[B]) => Stream.cons(a, b)), ys))
   }
@@ -43,12 +44,18 @@ object Traverse {
   }
 
   import Zipper.zipper
+
   implicit val ZipperTraverse: Traverse[Zipper] = new Traverse[Zipper] {
     def traverse[F[_], A, B](f: A => F[B], za: Zipper[A])(implicit a: Applicative[F]): F[Zipper[B]] = {
       val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curry
       a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_:Stream[B]).reverse),
         z), f(za.focus)), StreamTraverse.traverse[F, A, B](f, za.rights))
     }
+  }
+
+  implicit val ZipStreamTraverse: Traverse[ZipStream] = new Traverse[ZipStream] {
+    def traverse[F[_], A, B](f: A => F[B], za: ZipStream[A])(implicit a: Applicative[F]): F[ZipStream[B]] =
+      a.fmap(StreamTraverse.traverse[F, A, B](f, za.value), (_: Stream[B]) |!|)
   }
 
   implicit val ArrayTraverse: Traverse[Array] = new Traverse[Array] {
