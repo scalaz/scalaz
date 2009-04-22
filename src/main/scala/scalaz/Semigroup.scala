@@ -9,6 +9,8 @@ object Semigroup {
     def append(s1: S, s2: => S) = f(s1, s2)
   }
 
+  import S._
+
   implicit val DigitSemigroup: Semigroup[Digit] = semigroup[Digit]((a, b) => a.toInt + b.toInt)
 
   implicit val OrderingSemigroup = semigroup[Ordering] {
@@ -17,8 +19,6 @@ object Semigroup {
     case (GT, _) => GT
   }
 
-  import S._
-  
   implicit val UnitSemigroup = semigroup[Unit]((_, _) => ())
 
   implicit val StringSemigroup = semigroup[String](_ + _)
@@ -62,6 +62,8 @@ object Semigroup {
   implicit val NodeSeqSemigroup: Semigroup[xml.NodeSeq] = semigroup[xml.NodeSeq](_ ++ _)
 
   implicit def NonEmptyListSemigroup[A] = semigroup[NonEmptyList[A]](_.list <::: _)
+
+  implicit def ZipStreamSemigroup[A] = semigroup[ZipStream[A]](_.value append _.value |!|)
 
   implicit def ListSemigroup[A] = semigroup[List[A]](_ ::: _)
 

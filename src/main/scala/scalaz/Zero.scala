@@ -59,6 +59,8 @@ object Zero {
 
   implicit val NodeSeqZero = zero(xml.NodeSeq.Empty)
 
+  implicit def ZipStreamZero[A] = zero[ZipStream[A]](ZipStream.zip(Stream.empty))
+
   implicit def ListZero[A] = zero[List[A]](Nil)
 
   implicit def StreamZero[A] = zero[Stream[A]](Stream.empty)
