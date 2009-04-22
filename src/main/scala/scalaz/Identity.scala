@@ -46,6 +46,9 @@ sealed trait Identity[A] {
 
   def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.pure[M] |+| repeat[M]   
 
+  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = 
+    value.pure[M] |+| f(value).iterate[M](f)
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
