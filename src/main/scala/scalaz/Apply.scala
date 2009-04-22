@@ -12,6 +12,7 @@ object Apply {
   }
 
   import S._
+  import MA._
 
   implicit val IdentityApply: Apply[Identity] = FunctorBindApply[Identity]
 
@@ -63,16 +64,9 @@ object Apply {
 
   implicit val ZipperApply: Apply[Zipper] = new Apply[Zipper] {
     def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] = {
-      Zipper.zipper(StreamZapply.apply(f.lefts, a.lefts),
+      Zipper.zipper((a.lefts |!|) <*> (f.lefts |!|),
         (f.focus)(a.focus),
-        StreamZapply.apply(f.rights, a.rights))
-    }
-  }
-
-  // todo delete
-  val StreamZapply = new Apply[Stream] {
-    def apply[A, B](f: Stream[A => B], a: Stream[A]): Stream[B] = {
-      Stream.cons((f.head)(a.head), apply(f.tail, a.tail))
+        (a.rights |!|) <*> (f.rights |!|))
     }
   }
 
