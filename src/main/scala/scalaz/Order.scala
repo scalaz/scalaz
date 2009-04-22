@@ -70,6 +70,34 @@ object Order {
 
   implicit def ZipStreamOrder[A](implicit oa: Order[A]): Order[ZipStream[A]] = IterableOrder(oa) <| ((_: ZipStream[A]).value)
 
+  implicit def Tuple1Order[A](implicit oa: Order[A]) = order[Tuple1[A]](_._1 ?:? _._1)
+
+  implicit def Tuple2Order[A, B](implicit oa: Order[A], ob: Order[B]) = order[(A, B)] {
+    case ((a1, b1), (a2, b2)) => List(a1 ?:? a2, b1 ?:? b2) suml
+  }
+
+  implicit def Tuple3Order[A, B, C](implicit oa: Order[A], ob: Order[B], oc: Order[C]) = order[(A, B, C)] {
+    case ((a1, b1, c1), (a2, b2, c2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2) suml
+  }
+
+  implicit def Tuple4Order[A, B, C, D](implicit oa: Order[A], ob: Order[B], oc: Order[C], od: Order[D]) = order[(A, B, C, D)] {
+    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2) suml
+  }
+
+  implicit def Tuple5Order[A, B, C, D, E](implicit oa: Order[A], ob: Order[B], oc: Order[C], od: Order[D], oe: Order[E]) = order[(A, B, C, D, E)] {
+    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2, e1 ?:? e2) suml
+  }
+
+  implicit def Tuple6Order[A, B, C, D, E, F](implicit oa: Order[A], ob: Order[B], oc: Order[C], od: Order[D], oe: Order[E], of: Order[F]) = order[(A, B, C, D, E, F)] {
+    case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2, e1 ?:? e2, f1 ?:? f2) suml
+  }
+
+  implicit def Tuple7Order[A, B, C, D, E, F, G](implicit oa: Order[A], ob: Order[B], oc: Order[C], od: Order[D], oe: Order[E], of: Order[F], og: Order[G]) = order[(A, B, C, D, E, F, G)] {
+    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => List(a1 ?:? a2, b1 ?:? b2, c1 ?:? c2, d1 ?:? d2, e1 ?:? e2, f1 ?:? f2, g1 ?:? g2) suml
+  }
+
+  // todo TupleN
+
   implicit def IterableOrder[A](implicit oa: Order[A]): Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
@@ -80,7 +108,7 @@ object Order {
       val a1 = i1.next
       val a2 = i2.next
 
-      val o = a1 compare a2
+      val o = a1 ?:? a2
       if(o != EQ) {
         r = o
         b = false
@@ -97,28 +125,28 @@ object Order {
   })
 
   implicit def OptionOrder[A](implicit o: Order[A]): Order[Option[A]] = order[Option[A]] {
-    case (Some(x), Some(y)) => x compare y
+    case (Some(x), Some(y)) => x ?:? y
     case (Some(_), None) => GT
     case (None, Some(_)) => LT
     case (None, None) => EQ
   }
 
   implicit def EitherOrder[A, B](implicit oa: Order[A], ob: Order[B]) = order[Either[A, B]] {
-    case (Left(x), Left(y)) => x compare y
-    case (Right(x), Right(y)) => x compare y
+    case (Left(x), Left(y)) => x ?:? y
+    case (Right(x), Right(y)) => x ?:? y
     case (Left(_), Right(_)) => LT
     case (Right(_), Left(_)) => GT
   }
 
   implicit def EitherLeftOrder[A, B](implicit oa: Order[A], ob: Order[B]) = order[Either.LeftProjection[A, B]]((a1, a2) => (a1.toOption, a2.toOption) match {
-    case (Some(a1), Some(a2)) => a1 compare a2
+    case (Some(a1), Some(a2)) => a1 ?:? a2
     case (Some(_), None) => GT
     case (None, Some(_)) => LT
     case (None, None) => EQ
   })
 
   implicit def EitherRightOrder[A, B](implicit oa: Order[A], ob: Order[B]) = order[Either.RightProjection[A, B]]((a1, a2) => (a1.toOption, a2.toOption) match {
-    case (Some(a1), Some(a2)) => a1 compare a2
+    case (Some(a1), Some(a2)) => a1 ?:? a2
     case (Some(_), None) => GT
     case (None, Some(_)) => LT
     case (None, None) => EQ

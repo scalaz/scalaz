@@ -13,7 +13,7 @@ sealed trait Identity[A] {
 
   def /=(a: A)(implicit e: Equal[A]) = !(===(a))
 
-  def compare(a: A)(implicit o: Order[A]) = o order (value, a)
+  def ?:?(a: A)(implicit o: Order[A]) = o order (value, a)
 
   def show(implicit s: Show[A]) = s.show(value)
 

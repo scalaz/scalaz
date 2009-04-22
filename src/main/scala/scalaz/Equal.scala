@@ -64,6 +64,32 @@ object Equal {
 
   implicit def ZipStreamEqual[A](implicit ea: Equal[A]): Equal[ZipStream[A]] = IterableEqual(ea) <| ((_: ZipStream[A]).value)
 
+  implicit def Tuple1Equal[A](implicit ea: Equal[A]) = equal[Tuple1[A]](_._1 === _._1)
+
+  implicit def Tuple2Equal[A, B](implicit ea: Equal[A], eb: Equal[B]) = equal[(A, B)] {
+    case ((a1, b1), (a2, b2)) => a1 === a2 && b1 === b2
+  }
+
+  implicit def Tuple3Equal[A, B, C](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C]) = equal[(A, B, C)] {
+    case ((a1, b1, c1), (a2, b2, c2)) => a1 === a2 && b1 === b2 && c1 === c2  
+  }
+
+  implicit def Tuple4Equal[A, B, C, D](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D]) = equal[(A, B, C, D)] {
+    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2  
+  }
+
+  implicit def Tuple5Equal[A, B, C, D, E](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E]) = equal[(A, B, C, D, E)] {
+    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2  
+  }
+
+  implicit def Tuple6Equal[A, B, C, D, E, F](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F]) = equal[(A, B, C, D, E, F)] {
+    case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2 && f1 === f2
+  }
+
+  implicit def Tuple7Equal[A, B, C, D, E, F, G](implicit ea: Equal[A], eb: Equal[B], ec: Equal[C], ed: Equal[D], ee: Equal[E], ef: Equal[F], eg: Equal[G]) = equal[(A, B, C, D, E, F, G)] {
+    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2 && e1 === e2 && f1 === f2 && g1 === g2  
+  }
+
   // todo TupleN
 
   implicit def OptionEqual[A](implicit ea: Equal[A]) = equal[Option[A]] {
