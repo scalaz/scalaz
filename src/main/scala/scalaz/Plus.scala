@@ -5,8 +5,14 @@ trait Plus[P[_]] {
 }
 
 object Plus {
+  import S._
+
   implicit val NonEmptyListPlus: Plus[NonEmptyList] = new Plus[NonEmptyList] {
     def plus[A](a1: NonEmptyList[A], a2: => NonEmptyList[A]) = a1.list <::: a2
+  }
+
+  implicit val ZipStreamPlus: Plus[ZipStream] = new Plus[ZipStream] {
+    def plus[A](a1: ZipStream[A], a2: => ZipStream[A]) = a1.value append a2.value |!|
   }
 
   implicit val ListPlus = new Plus[List] {
