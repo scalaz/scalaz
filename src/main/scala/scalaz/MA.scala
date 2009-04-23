@@ -32,7 +32,7 @@ sealed trait MA[M[_], A] {
     a(a(a(f.fmap(v, z), b), c), d)
 
   def liftA[B, C, D, E, F](b: M[B], c: M[C], d: M[D], e: M[E], z: A => B => C => D =>
- E => F)(implicit f: Functor[M], a: Apply[M]) =
+      E => F)(implicit f: Functor[M], a: Apply[M]) =
     a(a(a(a(f.fmap(v, z), b), c), d), e)
 
   def <<*>>[B](b: M[B])(implicit f: Functor[M], a: Apply[M]) = liftA(b, a => (b: B) => (a, b))
@@ -40,10 +40,10 @@ sealed trait MA[M[_], A] {
   def <<*>>[B, C](b: M[B], c: M[C])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, a => (b: B) => (c: C) => (a, b, c))
 
   def <<*>>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, d, a => (b: B) => (c: C)
- => (d: D) => (a, b, c, d))
+      => (d: D) => (a, b, c, d))
 
   def <<*>>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, d, e, a =>
-(b: B) => (c: C) => (d: D) => (e: E) => (a, b, c, d, e))
+      (b: B) => (c: C) => (d: D) => (e: E) => (a, b, c, d, e))
 
   def >>=[B](f: A => M[B])(implicit b: Bind[M]) = b.bind(v, f)
 
@@ -85,22 +85,22 @@ sealed trait MA[M[_], A] {
   def items(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
 
   def max(implicit r: FoldLeft[M], ord: Order[A]) =
-    foldl1((x: A, y: A) => if(ord.order(x, y) == GT) x else y)
+    foldl1((x: A, y: A) => if (ord.order(x, y) == GT) x else y)
 
   def min(implicit r: FoldLeft[M], ord: Order[A]) =
-    foldl1((x: A, y: A) => if(ord.order(x, y) == LT) x else y)
+    foldl1((x: A, y: A) => if (ord.order(x, y) == LT) x else y)
 
   def ->-(f: A => Digit)(implicit t: FoldLeft[M]) =
     foldl[Long](0L, (n, a) => n * 10L + f(a))
 
   def ->=(f: A => Char)(implicit t: Functor[M]): M[Option[Digit]] = {
     import CharW._
-    t.fmap(v, f andThen (_.digit))    
+    t.fmap(v, f andThen (_.digit))
   }
 
   def =>=(f: A => Char)(implicit t: Traverse[M]): Option[M[Digit]] = {
     import CharW._
-    t.traverse[Option, Char, Digit](_.digit,  t.fmap(v, f))
+    t.traverse[Option, Char, Digit](_.digit, t.fmap(v, f))
   }
 
   def foldr[B](b: B, f: (A, => B) => B)(implicit r: FoldRight[M]) = r.foldRight(v, b, f)
@@ -111,6 +111,8 @@ sealed trait MA[M[_], A] {
   })) getOrElse (error("foldr1 on empty"))
 
   def sumr(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero, m append (_, _))
+
+  def foldMap[B](f: A => B)(implicit r: FoldRight[M], m: Monoid[B]): B = foldr[B](m.zero, (a, b) => m.append(f(a), b))
 
   def listr(implicit r: FoldRight[M]) = foldr[List[A]](Nil, _ :: _)
 
@@ -124,24 +126,24 @@ sealed trait MA[M[_], A] {
 
   def nil(implicit r: FoldRight[M]) = all(_ => false)
 
-  def empty(implicit r: FoldRight[M]) = foldr[Boolean](true, (_, _) => false)   
+  def empty(implicit r: FoldRight[M]) = foldr[Boolean](true, (_, _) => false)
 
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[(List[List[A]], Option[Boolean])]((Nil, None), (
-a, b) => {
-      val pa = p(a)
-      (b match {
-        case (_, None) => List(List(a))
-        case (x, Some(q)) => if(pa == q) (a :: x.head) :: x.tail else List(a) :: x
-      }, Some(pa))
-    })._1
+      a, b) => {
+    val pa = p(a)
+    (b match {
+      case (_, None) => List(List(a))
+      case (x, Some(q)) => if (pa == q) (a :: x.head) :: x.tail else List(a) :: x
+    }, Some(pa))
+  })._1
 
   def selectSplit(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[(List[List[A]], Boolean)]((Nil, false), (a, xb
-) => xb match {
-      case (x, b) => {
-        val pa = p(a)
-        (if(pa) if(b) (a :: x.head) :: x.tail else List(a) :: x else x, pa)
-      }
-    })._1
+      ) => xb match {
+    case (x, b) => {
+      val pa = p(a)
+      (if (pa) if (b) (a :: x.head) :: x.tail else List(a) :: x else x, pa)
+    }
+  })._1
 
   def para[B](b: B, f: (=> A, => M[A], B) => B)(implicit p: Paramorphism[M]) = p.para(v, b, f)
 
@@ -242,6 +244,8 @@ object MA {
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
 
   implicit def ZipperMA[A](a: Zipper[A]) = ma[Zipper](a)
+
+  implicit def EndoMA[A](a: Endo[A]) = ma[Endo](a)
 
   import java.util._
   import java.util.concurrent._

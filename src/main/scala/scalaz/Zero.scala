@@ -73,6 +73,11 @@ object Zero {
 
   implicit def EitherRightZero[A, B](implicit za: Zero[A]) = zero[Either.RightProjection[B, A]](Right(za.zero).right)
 
+  import Endo._
+  implicit def EndoZero[A] = zero[Endo[A]](identity(_: A))
+
+  implicit def DualZero[A](implicit za: Zero[A]) = zero[Dual[A]](za.zero.dual)
+
   import java.util._
   import java.util.concurrent._
 

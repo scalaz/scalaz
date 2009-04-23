@@ -29,6 +29,8 @@ sealed trait Identity[A] {
 
   def state[S] = State.state((_: S, value))
 
+  def dual = Dual.dual(value)
+
   sealed trait Unfold[M[_]] {
     def apply[B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B]
   }

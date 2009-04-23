@@ -69,13 +69,19 @@ object Semigroup {
 
   implicit def StreamSemigroup[A] = semigroup[Stream[A]](_ append _)
 
-  implicit def OptionSemigroup[A] = semigroup[Option[A]]((a, b) => if(a.isDefined) a else b)
+  implicit def OptionSemigroup[A] = semigroup[Option[A]]((a, b) => if (a.isDefined) a else b)
 
   implicit def ArraySemigroup[A] = semigroup[Array[A]](_ ++ _)
 
-  implicit def EitherLeftSemigroup[A, B] = semigroup[Either.LeftProjection[A, B]]((a, b) => if(a.e.isRight) a else b)
+  implicit def EitherLeftSemigroup[A, B] = semigroup[Either.LeftProjection[A, B]]((a, b) => if (a.e.isRight) a else b)
 
-  implicit def EitherRightSemigroup[A, B] = semigroup[Either.RightProjection[B, A]]((a, b) => if(a.e.isLeft) a else b)
+  implicit def EitherRightSemigroup[A, B] = semigroup[Either.RightProjection[B, A]]((a, b) => if (a.e.isLeft) a else b)
+
+  import Endo._
+  implicit def EndoSemigroup[A] = semigroup[Endo[A]]((x, y) => ((a: A) => x.apply(y.apply(a))))
+
+  implicit def DualSemigroup[A](implicit sa: Semigroup[A]) =
+    semigroup[Dual[A]]((x, y) => Dual.dual(sa.append(y.value, x.value)))
 
   import java.util._
   import java.util.concurrent._

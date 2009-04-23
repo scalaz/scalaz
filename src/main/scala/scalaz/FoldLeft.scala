@@ -35,6 +35,14 @@ object FoldLeft {
   import S._
   import Function2W._
   import FoldRight._
+  import Zero._
+  import Semigroup._
+  import Monoid._
+
+  implicit val TreeFoldLeft: FoldLeft[Tree] = new FoldLeft[Tree] {
+    def foldLeft[B, A](t: Tree[A], b: B, f: (B, A) => B): B =
+      t.foldMap((a: A) => ((f.flip.curry)(a)).dual).value.apply(b)
+  }
 
   implicit val ZipperFoldLeft: FoldLeft[Zipper] = new FoldLeft[Zipper] {
     def foldLeft[B, A](t: Zipper[A], b: B, f: (B, A) => B): B =
@@ -50,11 +58,11 @@ object FoldLeft {
   }
 
   implicit def EitherLeftFoldLeft[X] = new FoldLeft[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
-    def foldLeft[B, A](e: Either.LeftProjection[A, X], b: B, f: (B, A) => B) = OptionFoldLeft.foldLeft(e.toOption, b ,f)
+    def foldLeft[B, A](e: Either.LeftProjection[A, X], b: B, f: (B, A) => B) = OptionFoldLeft.foldLeft(e.toOption, b, f)
   }
 
   implicit def EitherRightFoldLeft[X] = new FoldLeft[PartialApply1Of2[Either.RightProjection, X]#Apply] {
-    def foldLeft[B, A](e: Either.RightProjection[X, A], b: B, f: (B, A) => B) = OptionFoldLeft.foldLeft(e.toOption, b ,f)
+    def foldLeft[B, A](e: Either.RightProjection[X, A], b: B, f: (B, A) => B) = OptionFoldLeft.foldLeft(e.toOption, b, f)
   }
 
   implicit val IterableFoldLeft = new FoldLeft[Iterable] {
@@ -66,7 +74,7 @@ object FoldLeft {
       var x = b
       val i = t.iterator
 
-      while(i.hasNext) {
+      while (i.hasNext) {
         val n = i.next
         x = f(x, n)
       }
