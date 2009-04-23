@@ -47,6 +47,10 @@ object S {
 
   def multiplication(n: Long) = LongMultiplication.multiplication(n)
 
+  implicit def EndoTo[A](f: A => A) = Endo.EndoTo(f)
+
+  implicit def EndoFrom[A](e: Endo[A]) = Endo.EndoFrom(e)
+
   implicit def LongMultiplicationFrom(n: LongMultiplication) = LongMultiplication.LongMultiplicationFrom(n)
 
   implicit def Function1To[T, R](f: T => R) = Function1W.Function1To(f)
