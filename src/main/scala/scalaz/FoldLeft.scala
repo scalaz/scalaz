@@ -39,10 +39,12 @@ object FoldLeft {
   import Semigroup._
   import Monoid._
 
+  /*
   implicit val TreeFoldLeft: FoldLeft[Tree] = new FoldLeft[Tree] {
     def foldLeft[B, A](t: Tree[A], b: B, f: (B, A) => B): B =
       t.foldMap((a: A) => ((f.flip.curry)(a)).dual).value.apply(b)
   }
+  */
 
   implicit val ZipperFoldLeft: FoldLeft[Zipper] = new FoldLeft[Zipper] {
     def foldLeft[B, A](t: Zipper[A], b: B, f: (B, A) => B): B =
