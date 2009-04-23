@@ -10,4 +10,8 @@ object Endo {
   }
 
   implicit def EndoFrom[A](e: Endo[A]) = e.apply(_)
+
+  def constant[A](a: => A) = EndoTo[A](_ => a)
+
+  def identity[A] = EndoTo[A](a => a)
 }
