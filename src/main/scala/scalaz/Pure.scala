@@ -113,6 +113,10 @@ object Pure {
     def pure[A](a: => A) = ZipStream.zip(Stream(a))
   }
 
+  implicit def EndoPure = new Pure[Endo] {
+    def pure[A](a: => A) = Endo.constant(a) 
+  }
+
   import java.util._
   import java.util.concurrent._
 

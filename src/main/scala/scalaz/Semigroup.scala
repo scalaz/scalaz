@@ -78,7 +78,7 @@ object Semigroup {
   implicit def EitherRightSemigroup[A, B] = semigroup[Either.RightProjection[B, A]]((a, b) => if (a.e.isLeft) a else b)
 
   import Endo._
-  implicit def EndoSemigroup[A] = semigroup[Endo[A]]((x, y) => ((a: A) => x.apply(y.apply(a))))
+  implicit def EndoSemigroup[A] = semigroup[Endo[A]]((x, y) => ((a: A) => x(y.apply(a))))
 
   implicit def DualSemigroup[A](implicit sa: Semigroup[A]) =
     semigroup[Dual[A]]((x, y) => Dual.dual(sa.append(y.value, x.value)))
