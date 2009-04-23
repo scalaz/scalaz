@@ -40,14 +40,12 @@ object FoldLeft {
   import Monoid._
   import Endo._
 
-  /*
   implicit val TreeFoldLeft: FoldLeft[Tree] = new FoldLeft[Tree] {
     def foldLeft[B, A](t: Tree[A], b: B, f: (B, A) => B): B = {
       val m: Monoid[Dual[Endo[B]]] = monoid(DualSemigroup(EndoSemigroup[B]), DualZero(EndoZero[B]))
       (t.foldMap((a: A) => EndoTo((f.flip.curry)(a)).dual)(m)).value.apply(b)
     }
   }
-  */
 
   implicit val ZipperFoldLeft: FoldLeft[Zipper] = new FoldLeft[Zipper] {
     def foldLeft[B, A](t: Zipper[A], b: B, f: (B, A) => B): B =
