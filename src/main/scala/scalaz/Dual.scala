@@ -5,7 +5,7 @@ trait Dual[A] {
 }
 
 object Dual {
-  def dual[A](a: A) = new Dual[A] {
+  implicit def dual[A](a: A) = new Dual[A] {
     val value = a
   }
 }

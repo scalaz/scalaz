@@ -39,8 +39,10 @@ object FoldRight {
 
   /*
   implicit val TreeFoldRight: FoldRight[Tree] = new FoldRight[Tree] {
-    def foldRight[A, B](t: Tree[A], b: B, f: (A, => B) => B)(implicit m: Monoid[Endo[B]]): B =
-      (t.foldMap((a) => (f.curry)(a)(_: B))).apply(b)
+    def foldRight[A, B](t: Tree[A], b: B, f: (A, => B) => B): B = {
+      val m: Monoid[Endo[B]] = monoid(EndoSemigroup[B], EndoZero[B])
+      (t.foldMap((a) => EndoTo((f.curry)(a)(_: B)))(m)).apply(b)
+    }
   }
   */
 
