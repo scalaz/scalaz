@@ -4,6 +4,7 @@ sealed trait StreamW[A] {
   val value: Stream[A]
 
   import S._
+  import MA._
 
   def string(f: A => Char) = value map f mkString
 
@@ -29,6 +30,11 @@ sealed trait StreamW[A] {
       Some(S.zipper(x.tail, x.head, Stream.empty))  
     }
   }
+
+  def zapp[B, C](fs: ZipStream[A => B => C]) = S.zip(value) <*> fs
+
+  def zipWith[B, C](f: A => B => C, bs: ZipStream[B]) = bs <*> zapp(f.repeat[ZipStream])
+
 }
 
 object StreamW {

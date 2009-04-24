@@ -179,6 +179,8 @@ object S {
 
   implicit def EndoMA[A](a: Endo[A]) = ma[Endo](a)
 
+  implicit def TreeMA[A](a: Tree[A]) = ma[Tree](a)
+
   import java.util._
   import java.util.concurrent._
 
