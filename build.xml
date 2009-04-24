@@ -9,7 +9,7 @@
   <property name="projects.repository.uri" value="http://projects.tmorris.net/public"/>
   <property name="build-java.version" value="1.57"/>
   <property name="scala.lib.path" value="lib"/>
-  <property name="scala.version" value="2.7.4-RC1"/>
+  <property name="scala.version" value="2.7.4"/>
   <property name="scaladoc.doctitle" value="Scalaz ${build.number} API Specification"/>
   <property name="scaladoc.windowtitle" value="Scalaz ${build.number}"/>
   <import file="buildj.xml" optional="true"/>
