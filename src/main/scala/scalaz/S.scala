@@ -41,6 +41,8 @@ object S {
 
   implicit def CharFrom(c: CharW) = CharW.CharFrom(c)
 
+  def cokleisli[W[_]] = Cokleisli.cokleisli[W]
+
   def continuation[R, A](f: (A => R) => R) = Continuation.continuation(f)
 
   implicit def DigitLong(d: Digit) = Digit.DigitLong(d)
@@ -77,6 +79,8 @@ object S {
 
   implicit def JavaIterableTo[A](i: java.lang.Iterable[A]): IterableW[A] = IterableW.JavaIterableTo(i)
 
+  def kleisli[M[_]] = Kleisli.kleisli[M]
+  
   implicit def ListTo[A](as: List[A]): ListW[A] = ListW.ListTo(as)
 
   implicit def ListFrom[A](as: ListW[A]) = ListW.ListFrom(as)
