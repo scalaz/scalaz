@@ -41,6 +41,8 @@ object S {
 
   implicit def CharFrom(c: CharW) = CharW.CharFrom(c)
 
+  def continuation[R, A](f: (A => R) => R) = Continuation.continuation(f)
+
   implicit def DigitLong(d: Digit) = Digit.DigitLong(d)
 
   implicit def LongDigit(n: Long) = Digit.LongDigit(n)
