@@ -73,7 +73,8 @@ object Zero {
 
   implicit def EitherRightZero[A, B](implicit za: Zero[A]) = zero[Either.RightProjection[B, A]](Right(za.zero).right)
 
-  import Endo._
+  implicit def Function1ABZero[A, B](implicit zb: Zero[B]) = zero((_: A) => zb.zero)
+
   implicit def EndoZero[A] = zero[Endo[A]](identity(_: A))
 
   implicit def DualZero[A](implicit za: Zero[A]) = zero[Dual[A]](za.zero.dual)
