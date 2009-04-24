@@ -224,17 +224,4 @@ object Zipper {
     val lefts = ls
     val rights = rs
   }
-
-  def fromStream[A](s: Stream[A]) = s match {
-    case Stream.empty => None
-    case Stream.cons(h, t) => Some(zipper(Stream.empty, h, t))
-  }
-
-  def fromStreamEnd[A](s: Stream[A]) = s match {
-    case Stream.empty => None
-    case xs => {
-      val xsp = xs.reverse
-      Some(zipper(xsp.tail, xsp.head, Stream.empty))
-    }
-  }
 }
