@@ -16,7 +16,6 @@ object Show {
   def showA[A] = shows[A](_.toString)
 
   import S._
-  import MAB._
 
   implicit val DigitShow = IntShow <| ((_: Digit).toInt)
 
