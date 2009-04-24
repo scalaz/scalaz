@@ -12,7 +12,6 @@ object Equal {
   def equalA[A] = equal[A](_ == _)
 
   import S._
-  import MA._
 
   implicit val DigitEqual = equalA[Digit]
 

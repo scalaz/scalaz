@@ -12,7 +12,6 @@ object Order {
   }
 
   import S._
-  import MA._
 
   implicit val DigitOrder: Order[Digit] = IntOrder <| ((_: Digit).toInt)
 

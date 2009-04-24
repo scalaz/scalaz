@@ -8,7 +8,6 @@ sealed trait Tree[+A] {
   val subForest: Stream[Tree[A]]
 
   import S._
-  import MA._
 
   def foldMap[B](f: A => B)(implicit m: Monoid[B]):B =
     f(rootLabel) |+| subForest.foldMap((_:Tree[A]).foldMap(f))

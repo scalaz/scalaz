@@ -5,6 +5,8 @@ trait FoldRight[-F[_]] {
 }
 
 object FoldRight {
+  import S._
+
   implicit val IdentityFoldRight = new FoldRight[Identity] {
     def foldRight[A, B](t: Identity[A], b: B, f: (A, => B) => B) = f(t.value, b)
   }
@@ -32,21 +34,17 @@ object FoldRight {
     }
   }
 
-  import Zero._
-  import Semigroup._
-  import Monoid._
-  import Endo._
 
   implicit val TreeFoldRight: FoldRight[Tree] = new FoldRight[Tree] {
     def foldRight[A, B](t: Tree[A], b: B, f: (A, => B) => B): B = {
+      import Zero._
+      import Semigroup._
+      import Monoid._
+      import Endo._
       val m: Monoid[Endo[B]] = monoid(EndoSemigroup[B], EndoZero[B])
       t.foldMap((a) => EndoTo(f.curry(a)(_: B)))(m)(b)
     }
   }
-
-  import S._
-  import Function2W._
-  import FoldLeft._
 
   implicit val ZipperFoldRight: FoldRight[Zipper] = new FoldRight[Zipper] {
     def foldRight[A, B](t: Zipper[A], b: B, f: (A, => B) => B): B =

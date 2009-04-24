@@ -12,7 +12,6 @@ object Apply {
   }
 
   import S._
-  import MA._
 
   implicit val IdentityApply: Apply[Identity] = FunctorBindApply[Identity]
 

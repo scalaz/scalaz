@@ -15,7 +15,6 @@ sealed trait Zipper[A] {
 
   import Zipper._
   import Cojoin._
-  import MA._
   import S._
 
   /**

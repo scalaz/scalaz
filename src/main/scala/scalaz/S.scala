@@ -107,4 +107,102 @@ object S {
 
   implicit def ZipStreamFrom[A](z: ZipStream[A]) = ZipStream.ZipStreamFrom(z)
 
+  // MA
+
+  import MA.ma
+
+  implicit def IdentityMA[A](a: Identity[A]): MA[Identity, A] = ma[Identity](a)
+
+  implicit def ContinuationMA[R, A](a: Continuation[R, A]) = ma[PartialApply1Of2[Continuation, R]#Apply](a)
+
+  implicit def NonEmptyListMA[A](a: NonEmptyList[A]) = ma[NonEmptyList](a)
+
+  implicit def StateMA[S, A](a: State[S, A]) = ma[PartialApply1Of2[State, S]#Apply](a)
+
+  implicit def EqualMA[A](a: Equal[A]) = ma[Equal](a)
+
+  implicit def OrderMA[A](a: Order[A]) = ma[Order](a)
+
+  implicit def ShowMA[A](a: Show[A]) = ma[Show](a)
+
+  implicit def ZipStreamMA[A](a: ZipStream[A]) = ma[ZipStream](a)
+
+  implicit def Tuple1MA[A](a: Tuple1[A]) = ma[Tuple1](a)
+
+  implicit def Tuple2MA[R, A](a: (R, A)) = ma[PartialApply1Of2[Tuple2, R]#Apply](a)
+
+  implicit def Tuple3MA[R, S, A](a: (R, S, A)) = ma[PartialApply2Of3[Tuple3, R, S]#Apply](a)
+
+  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)) = ma[PartialApply3Of4[Tuple4, R, S, T]#Apply](a)
+
+  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)) = ma[PartialApply4Of5[Tuple5, R, S, T, U]#Apply](a)
+
+  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)) = ma[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](a)
+
+  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)) = ma[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](a)
+
+  implicit def Function0MA[A](a: Function0[A]) = ma[Function0](a)
+
+  implicit def Function1MA[R, A](a: R => A) = ma[PartialApply1Of2[Function1, R]#Apply](a)
+
+  implicit def Function2MA[R, S, A](a: (R, S) => A) = ma[PartialApply2Of3[Function2, R, S]#Apply](a)
+
+  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A) = ma[PartialApply3Of4[Function3, R, S, T]#Apply](a)
+
+  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A) = ma[PartialApply4Of5[Function4, R, S, T, U]#Apply](a)
+
+  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A) = ma[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](a)
+
+  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A) = ma[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](a)
+
+  implicit def ListMA[A](a: List[A]) = ma[List](a)
+
+  implicit def StreamMA[A](a: Stream[A]) = ma[Stream](a)
+
+  implicit def OptionMA[A](a: Option[A]) = ma[Option](a)
+
+  implicit def ArrayMA[A](a: Array[A]) = ma[Array](a)
+
+  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip](a)
+
+  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
+
+  implicit def ZipperMA[A](a: Zipper[A]) = ma[Zipper](a)
+
+  implicit def EndoMA[A](a: Endo[A]) = ma[Endo](a)
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def ArrayListMA[A](a: ArrayList[A]) = ma[ArrayList](a)
+
+  implicit def HashSetMA[A](a: HashSet[A]) = ma[HashSet](a)
+
+  implicit def LinkedHashSetMA[A](a: LinkedHashSet[A]) = ma[LinkedHashSet](a)
+
+  implicit def LinkedListMA[A](a: LinkedList[A]) = ma[LinkedList](a)
+
+  implicit def PriorityQueueMA[A](a: PriorityQueue[A]) = ma[PriorityQueue](a)
+
+  implicit def StackMA[A](a: Stack[A]) = ma[Stack](a)
+
+  implicit def TreeSetMA[A](a: TreeSet[A]) = ma[TreeSet](a)
+
+  implicit def VectorMA[A](a: Vector[A]) = ma[Vector](a)
+
+  implicit def ArrayBlockingQueueMA[A](a: ArrayBlockingQueue[A]) = ma[ArrayBlockingQueue](a)
+
+  implicit def ConcurrentLinkedQueueMA[A](a: ConcurrentLinkedQueue[A]) = ma[ConcurrentLinkedQueue](a)
+
+  implicit def CopyOnWriteArrayListMA[A](a: CopyOnWriteArrayList[A]) = ma[CopyOnWriteArrayList](a)
+
+  implicit def CopyOnWriteArraySetMA[A](a: CopyOnWriteArraySet[A]) = ma[CopyOnWriteArraySet](a)
+
+  implicit def LinkedBlockingQueueMA[A](a: LinkedBlockingQueue[A]) = ma[LinkedBlockingQueue](a)
+
+  implicit def PriorityBlockingQueueMA[A](a: PriorityBlockingQueue[A]) = ma[PriorityBlockingQueue](a)
+
+  implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
+
+
 }
