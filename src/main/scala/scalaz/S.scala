@@ -107,6 +107,8 @@ object S {
 
   implicit def ZipStreamFrom[A](z: ZipStream[A]) = ZipStream.ZipStreamFrom(z)
 
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = Zipper.zipper(ls, a, rs)
+
   // MA
 
   import MA.ma

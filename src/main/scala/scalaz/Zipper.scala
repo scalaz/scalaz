@@ -13,7 +13,6 @@ sealed trait Zipper[A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
-  import Zipper._
   import Cojoin._
   import S._
 
@@ -224,12 +223,6 @@ object Zipper {
     val focus = a
     val lefts = ls
     val rights = rs
-  }
-
-  def zipper[A](a: A) = new Zipper[A] {
-    val focus = a
-    val lefts = Stream.empty
-    val rights = Stream.empty
   }
 
   def fromStream[A](s: Stream[A]) = s match {

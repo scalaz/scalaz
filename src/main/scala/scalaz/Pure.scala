@@ -106,7 +106,7 @@ object Pure {
   }
 
   implicit def ZipperPure = new Pure[Zipper] {
-    def pure[A](a: => A) = Zipper.zipper(a)
+    def pure[A](a: => A) = a.zipper
   }
 
   implicit def ZipStreamPure = new Pure[ZipStream] {
