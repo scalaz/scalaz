@@ -123,5 +123,4 @@ object Zero {
   implicit def JavaLinkedBlockingQueueZero[A] = zero(new LinkedBlockingQueue[A])
 
   implicit def JavaSynchronousQueueZero[A] = zero(new SynchronousQueue[A])
-
 }
