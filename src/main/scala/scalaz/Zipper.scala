@@ -13,7 +13,6 @@ sealed trait Zipper[A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
-  import Cojoin._
   import S._
 
   /**
