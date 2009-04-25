@@ -53,6 +53,8 @@ sealed trait Identity[A] {
 
   def zipper = S.zipper(Stream.empty, value, Stream.empty)
 
+  def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
