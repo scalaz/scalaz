@@ -214,6 +214,8 @@ object S {
 
   implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
 
+  implicit def ComemoMA[T, K, V](a: memo.Comemo[T, K, V]) = ma[PartialApply2Of3[memo.Comemo, K, V]#ApplyA].apply[T](a)
+
   // MAB
 
   import MAB.mab

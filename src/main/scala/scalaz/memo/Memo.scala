@@ -22,8 +22,6 @@ object Memo {
   import MutableAssociation._
   import ImmutableAssociation._
 
-  def arrayMemo[V](sz: Int) = ArrayMutableAssociation.comemo(new Array[V](sz))
-
   def mutableHashMapMemo[K, V] = MapMutableAssociation.comemo(new HashMap[K, V])
 
   def immutableEmptyMapMemo[K, V] = ImmutableMapAssociation.comemo(new EmptyMap[K, V])

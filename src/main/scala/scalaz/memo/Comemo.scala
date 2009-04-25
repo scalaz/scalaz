@@ -9,7 +9,11 @@ object Comemo {
     def apply(t: T) = f(t)
   }
 
+  import S._
+
   implicit def ComemoCofunctor[K, V] = new Cofunctor[PartialApply2Of3[Comemo, K, V]#ApplyA] {
-    def comap[A, B](r: Comemo[A, K, V], f: B => A) = comemo[B, K, V](b => r(f(b)))   
+    def comap[A, B](r: Comemo[A, K, V], f: B => A) = comemo[B, K, V](b => r(f(b)))
   }
+
+  def arraySizeComemo[V] = MutableAssociation.ArrayMutableAssociation.comemo <| ((sz: Int) => new Array[V](sz))
 }
