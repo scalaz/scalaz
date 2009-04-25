@@ -126,7 +126,7 @@ sealed trait MA[M[_], A] {
 
   def !(n: Int)(implicit i: Index[M]) = i.index(v, n)
 
-  def -!-(n: Int)(implicit i: Index[M], s: Show[M[A]]) = i.index(v, n) getOrElse (error("Index " + n + " out of bounds for " + v.shows))
+  def -!-(n: Int)(implicit i: Index[M]) = i.index(v, n) getOrElse (error("Index " + n + " out of bounds"))
 
   def any(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](false, p(_) || _)
 
@@ -186,6 +186,25 @@ sealed trait MA[M[_], A] {
   def =>>[B](f: M[A] => B)(implicit w: Comonad[M]) = w.cobind(v, f)
 
   def copure[B](implicit p: Copure[M]) = p.copure(v)
+
+  def levenshteinMatrix(w: M[A])(implicit com: memo.Comemo[Int, Int, memo.Comemo[Int, Int, Int]], l: Length[M], ind: Index[M], equ: Equal[A]): Int => Int => Int = {
+    implicit def WMA[A](a: M[A]) = MA.ma[M](a)
+    val m = com(len + 1)
+
+    def get(i: Int)(j: Int): Int = if(i == 0) j else if(j == 0) i else {
+      lazy val t = this -!- (i - 1)
+      lazy val u = w -!- (j - 1)
+      lazy val e = t === u
+
+      // todo memo
+      def a = get(i - 1)(j) + 1
+      def b = get(i - 1)(j - 1) + (if(e) 0 else 1)
+      def c = get(i)(j - 1) + 1
+      if(a < b) a else if(b <= c) b else c
+    }
+    get
+
+  }
 }
 
 object MA {
