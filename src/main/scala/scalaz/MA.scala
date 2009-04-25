@@ -187,7 +187,7 @@ sealed trait MA[M[_], A] {
 
   def copure[B](implicit p: Copure[M]) = p.copure(v)
 
-  def distance(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]) = {
+  def <--->(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]) = {
     val k = levenshteinMatrix(w)
     k(l.len(v), l.len(w))
   }
