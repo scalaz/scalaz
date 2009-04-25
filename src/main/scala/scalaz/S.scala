@@ -135,6 +135,10 @@ object S {
 
   implicit def ZipStreamMA[A](a: ZipStream[A]) = ma[ZipStream](a)
 
+  implicit def ComemoMA[T, K, V](a: memo.Comemo[T, K, V]) = ma[PartialApply2Of3[memo.Comemo, K, V]#ApplyA].apply[T](a)
+
+  implicit def MetricSpaceStreamMA[A](a: MetricSpace[A]) = ma[MetricSpace](a)
+
   implicit def Tuple1MA[A](a: Tuple1[A]) = ma[Tuple1](a)
 
   implicit def Tuple2MA[R, A](a: (R, A)) = ma[PartialApply1Of2[Tuple2, R]#Apply](a)
@@ -213,8 +217,6 @@ object S {
   implicit def PriorityBlockingQueueMA[A](a: PriorityBlockingQueue[A]) = ma[PriorityBlockingQueue](a)
 
   implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
-
-  implicit def ComemoMA[T, K, V](a: memo.Comemo[T, K, V]) = ma[PartialApply2Of3[memo.Comemo, K, V]#ApplyA].apply[T](a)
 
   // MAB
 
