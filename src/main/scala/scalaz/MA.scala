@@ -3,6 +3,8 @@ package scalaz
 sealed trait MA[M[_], A] {
   val v: M[A]
 
+  import S._
+
   def map[B](f: A => B)(implicit t: Functor[M]) = t.fmap(v, f)
 
   def |>[B](f: A => B)(implicit t: Functor[M]) = map(f)
@@ -120,7 +122,11 @@ sealed trait MA[M[_], A] {
 
   def stream(implicit r: FoldRight[M]) = foldr[Stream[A]](Stream.empty, Stream.cons(_, _))
 
-  def !!!(n: Int)(implicit r: FoldRight[M]) = stream(r)(n)
+  def !!(n: Int)(implicit r: FoldRight[M]) = stream(r)(n)
+
+  def !(n: Int)(implicit i: Index[M]) = i.index(v, n)
+
+  def -!-(n: Int)(implicit i: Index[M], s: Show[M[A]]) = i.index(v, n) getOrElse (error("Index " + n + " out of bounds for " + v.shows))
 
   def any(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](false, p(_) || _)
 
