@@ -187,9 +187,14 @@ sealed trait MA[M[_], A] {
 
   def copure[B](implicit p: Copure[M]) = p.copure(v)
 
-  def levenshteinMatrix(w: M[A])(implicit com: memo.Comemo[(Int, Int), (Int, Int), Int], l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
+  def distance(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]) = {
+    val k = levenshteinMatrix(w)
+    k(l.len(v), l.len(w))
+  }
+
+  private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
     implicit def WMA[A](a: M[A]) = MA.ma[M](a)
-    val m = com(len + 1, w.len + 1)
+    val m = memo.Memo.mutableHashMapMemo[(Int, Int), Int]
 
     def get(i: Int, j: Int): Int = if(i == 0) j else if(j == 0) i else {
       lazy val t = this -!- (i - 1)
