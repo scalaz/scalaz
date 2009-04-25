@@ -84,6 +84,8 @@ sealed trait MA[M[_], A] {
 
   def items(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
 
+  def len(implicit l: Length[M]) = l len v
+  
   def max(implicit r: FoldLeft[M], ord: Order[A]) =
     foldl1((x: A, y: A) => if (ord.order(x, y) == GT) x else y)
 
