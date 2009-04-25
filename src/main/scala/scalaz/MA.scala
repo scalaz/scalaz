@@ -118,7 +118,7 @@ sealed trait MA[M[_], A] {
 
   def stream(implicit r: FoldRight[M]) = foldr[Stream[A]](Stream.empty, Stream.cons(_, _))
 
-  def !(n: Int)(implicit r: FoldRight[M]) = stream(r)(n)
+  def !!!(n: Int)(implicit r: FoldRight[M]) = stream(r)(n)
 
   def any(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](false, p(_) || _)
 
