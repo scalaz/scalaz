@@ -12,8 +12,6 @@ sealed trait StreamW[A] {
 
   def |!| = ZipStream.zip(value)
 
-  import StreamW._
-
   def merge(s: Stream[A]): Stream[A] =
     if (value.isEmpty) Stream.empty
     else Stream.cons(value.head, s.merge(value.tail))
