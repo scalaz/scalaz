@@ -2,6 +2,8 @@ package scalaz
 
 sealed trait Endo[A] {
   def apply(a: A): A
+
+  def fix: A = apply(fix)
 }
 
 object Endo {
