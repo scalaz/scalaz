@@ -54,6 +54,8 @@ sealed trait Identity[A] {
   def zipper = S.zipper(Stream.empty, value, Stream.empty)
 
   def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
+
+  def bktree(implicit m: MetricSpace[A]) = BKTree.empty[A] + value
   
   override def toString = value.toString
 
