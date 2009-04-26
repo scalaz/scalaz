@@ -192,6 +192,15 @@ sealed trait MA[M[_], A] {
     k(l.len(v), l.len(w))
   }
 
+  trait FoldM[N[_]] {
+    def apply[B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]): N[B]
+  }
+
+  def foldM[N[_]] = new FoldM[N] {
+    def apply[B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]) =
+      foldr[N[B]](b.pure[N], (a, b) => m.bind(b, (z: B) => f(z, a)))
+  }
+
   private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
     implicit def WMA[A](a: M[A]) = MA.ma[M](a)
     val m = memo.Memo.mutableHashMapMemo[(Int, Int), Int]
