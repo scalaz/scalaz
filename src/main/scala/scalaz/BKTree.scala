@@ -35,6 +35,23 @@ sealed trait BKTree[+A] {
       })
     }
   }
+
+  private def splitChildren[AA >: A](k: Int): (Map[Int, BKTree[AA]], Map[Int, BKTree[AA]]) = this match {
+    case BKTreeEmpty => (IntMap.empty, IntMap.empty)
+    case BKTreeNode(_, _, c) => splitMap(c, k)
+  }
+
+  private def splitMap[AA >: A](m: Map[Int, BKTree[AA]], k: Int): (Map[Int, BKTree[AA]], Map[Int, BKTree[AA]]) = {
+    var m1: Map[Int, BKTree[AA]] = IntMap.empty
+    var m2: Map[Int, BKTree[AA]] = IntMap.empty
+    for((i, v) <- m.elements) {
+      if(i < k)
+        m1 = m1 + ((i, v))
+      else if(i > k)
+        m2 = m2 + ((i, v))
+    }
+    (m1, m2)
+  }
 }
 private final case class BKTreeNode[+A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
 private final case object BKTreeEmpty extends BKTree[Nothing]
