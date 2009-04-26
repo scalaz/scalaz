@@ -2,6 +2,8 @@ package scalaz
 
 import collection.immutable.IntMap
 
+// http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html
+
 sealed trait BKTree[+A] {
   import S._
   
