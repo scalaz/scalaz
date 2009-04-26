@@ -38,8 +38,6 @@ sealed trait BKTree[+A] {
     else
       c
   }
-
-  override def toString = value + " : " + children
 }
 
 object BKTree {
