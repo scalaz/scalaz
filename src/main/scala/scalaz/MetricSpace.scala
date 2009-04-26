@@ -19,10 +19,12 @@ object MetricSpace {
     def distance(a1: A, a2: A) = f(a1, a2)
   }
 
-  import MA._
+  import S._
 
   def levenshtein[M[_], A](implicit l: Length[M], i: Index[M], e: Equal[A]) = metricSpace[M[A]]((a1, a2) => {
     implicit def XMA[A](a: M[A]) = MA.ma[M](a)
     a1 <---> a2
   })
+
+  def levenshteins: MetricSpace[String] = levenshtein[List, Char] <| ((s: String) => s.toList)
 }
