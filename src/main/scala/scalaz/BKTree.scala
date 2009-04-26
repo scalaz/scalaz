@@ -2,6 +2,8 @@ package scalaz
 
 import collection.immutable.IntMap
 
+// todo broken
+
 sealed trait BKTree[+A] {
   val value: A
   val children: Map[Int, BKTree[A]]
@@ -18,6 +20,26 @@ sealed trait BKTree[+A] {
 
     BKTree.bktree(a, j)
   }
+
+  import Stream.cons
+
+  def select(keys: List[Int]): List[BKTree[A]] = keys.foldRight(Nil: List[BKTree[A]])((k, x) => children get k match {
+    case None => x
+    case Some(a) => a :: x
+  })
+
+  def query[AA >: A](a: AA, n: Int)(implicit m: MetricSpace[AA]): List[(Int, AA)] = {
+    val d = (value: AA) <===> a
+
+    val c = select((d - n) to (d + n + 1) toList) flatMap(_.query(a, n))
+
+    if(d <= n)
+      (d, value) :: c
+    else
+      c
+  }
+
+  override def toString = value + " : " + children
 }
 
 object BKTree {

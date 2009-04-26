@@ -26,5 +26,5 @@ object MetricSpace {
     a1 <---> a2
   })
 
-  def levenshteins: MetricSpace[String] = levenshtein[List, Char] <| ((s: String) => s.toList)
+  implicit def levenshteins: MetricSpace[String] = levenshtein[List, Char] <| ((s: String) => s.toList)
 }
