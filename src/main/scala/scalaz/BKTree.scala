@@ -25,6 +25,18 @@ sealed trait BKTree[+A] {
     }
   }
 
+  def ++[AA >: A](t: BKTree[AA])(implicit m: MetricSpace[AA]): BKTree[AA] = {
+    var k: BKTree[AA] = this
+    for(v <- t.values)
+      k = k + v
+    k
+  }
+
+  def values: List[A] = this match {
+    case BKTreeEmpty => Nil
+    case BKTreeNode(v, _, c) => v :: c.values.toList.flatMap(_.values)
+  }
+
   def -?-[AA >: A](a: AA)(implicit m: MetricSpace[AA]): Boolean = this match {
     case BKTreeEmpty => false
     case BKTreeNode(v, _, c) => {
@@ -68,7 +80,6 @@ object BKTree {
   def empty[A]: BKTree[A] = BKTreeEmpty 
 }
 
-/*
 object T {
   def main(args: Array[String]) {
     import BKTree._
@@ -76,7 +87,8 @@ object T {
     println(k)
     println(args.length == k.size)
     println(k -?- "abc")
+    println(k =?= ("abc", 1))
   }
 }
-*/
+
 
