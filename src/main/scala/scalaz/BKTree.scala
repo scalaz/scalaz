@@ -36,6 +36,14 @@ sealed trait BKTree[+A] {
     }
   }
 
+  def =?=[AA >: A](a: AA, n: Int)(implicit m: MetricSpace[AA]): Boolean = this match {
+    case BKTreeEmpty => false
+    case BKTreeNode(v, _, c) => {
+      val d = (v: AA) <===> a
+      d <= n || (splitMap(splitMap(c, d - n - 1)._2, d + n + 1)._1 exists (_._2 =?= (a, n)))
+    }
+  }
+
   private def splitChildren[AA >: A](k: Int): (Map[Int, BKTree[AA]], Map[Int, BKTree[AA]]) = this match {
     case BKTreeEmpty => (IntMap.empty, IntMap.empty)
     case BKTreeNode(_, _, c) => splitMap(c, k)
