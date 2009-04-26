@@ -55,6 +55,8 @@ sealed trait Identity[A] {
 
   def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
 
+  def bktree = BKTree.bktree(value)
+  
   override def toString = value.toString
 
   override def hashCode = value.hashCode
