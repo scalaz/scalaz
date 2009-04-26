@@ -22,6 +22,17 @@ sealed trait BKTree[+A] {
       })))
     }
   }
+
+  def -?-[AA >: A](a: AA)(implicit m: MetricSpace[AA]): Boolean = this match {
+    case BKTreeEmpty => false
+    case BKTreeNode(v, _, c) => {
+      val d = (v: AA) <===> a
+      d == 0 || (c get d match {
+        case None => false
+        case Some(w) => w -?- a
+      })
+    }
+  }
 }
 private final case class BKTreeNode[+A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
 private final case object BKTreeEmpty extends BKTree[Nothing]
@@ -37,7 +48,8 @@ object T {
     val k = (empty[String] /: args)((a, b) => a + b)
     println(k)
     println(args.length == k.size)
+    println(k -?- "abc")
   }
 }
-
 */
+
