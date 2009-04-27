@@ -52,9 +52,28 @@ sealed trait BKTree[+A] {
     case BKTreeEmpty => false
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a
-      d <= n || (splitMap(splitMap(c, d - n - 1)._2, d + n + 1)._1 exists (_._2 =?= (a, n)))
+      d <= n || (subChildren(d, n) exists (_._2 =?= (a, n)))
     }
   }
+
+  def |=|[AA >: A](a: AA, n: Int)(implicit m: MetricSpace[AA]): List[AA] = this match {
+    case BKTreeEmpty => Nil
+    case BKTreeNode(v, _, c) => {
+      val d = (v: AA) <===> a
+      val k = subChildren(d, n).values.toList flatMap (_ |=| (a, n))
+      if(d <= n)
+        v :: k
+      else
+        k
+    }
+  }
+
+  private def subChildren[AA >: A](d: Int, n: Int) = this match {
+    case BKTreeEmpty => IntMap.empty
+    case BKTreeNode(_, _, c) => subMap(c, d, n)
+  }
+
+  private def subMap[AA >: A](m: Map[Int, BKTree[AA]], d: Int, n: Int) = splitMap(splitMap(m, d - n - 1)._2, d + n + 1)._1
 
   private def splitChildren[AA >: A](k: Int): (Map[Int, BKTree[AA]], Map[Int, BKTree[AA]]) = this match {
     case BKTreeEmpty => (IntMap.empty, IntMap.empty)
@@ -88,6 +107,7 @@ object T {
     println(args.length == k.size)
     println(k -?- "abc")
     println(k =?= ("abc", 1))
+    println(k |=| ("abc", 1))
   }
 }
 
