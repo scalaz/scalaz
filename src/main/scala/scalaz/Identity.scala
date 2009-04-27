@@ -63,9 +63,9 @@ sealed trait Identity[A] {
 }
 
 object Identity {
-  implicit def id[A](x: A) = new Identity[A] {
+  implicit def IdentityTo[A](x: A) = new Identity[A] {
     val value = x
   }
 
-  val u = id(())
+  val u = IdentityTo(())
 }
