@@ -7,7 +7,7 @@ sealed trait LazyIdentity[A] {
 }
 
 object LazyIdentity {
-  implicit def LazyIdentityTo[A](a: A) = new LazyIdentity[A] {
+  implicit def LazyIdentityTo[A](a: => A) = new LazyIdentity[A] {
     def value = a
   }
 
