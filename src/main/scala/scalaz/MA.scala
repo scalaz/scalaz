@@ -202,7 +202,7 @@ sealed trait MA[M[_], A] {
   }
 
   def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
-    foldl[BKTree[A]](BKTree.empty, (b, a) => b + a)
+    foldl[BKTree[A]](BKTree.empty, _ + _)
 
   private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
     implicit def WMA[A](a: M[A]) = MA.ma[M](a)
@@ -212,7 +212,7 @@ sealed trait MA[M[_], A] {
       lazy val t = this -!- (i - 1)
       lazy val u = w -!- (j - 1)
       lazy val e = t === u
-
+                                                                                                            
       val g = m { case (a, b) => get(a, b) }
       val a = g(i - 1, j) + 1
       val b = g(i - 1, j - 1) + (if(e) 0 else 1)
