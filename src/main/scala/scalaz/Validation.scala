@@ -25,6 +25,13 @@ sealed trait Validation[+E, +A] {
     case Failure(e) => Some(e)
   }
 
+  def >>*<<[EE >: E, AA >: A](x: Validation[EE, AA])(implicit m: Semigroup[AA], s: Semigroup[EE]): Validation[EE, AA] = (this, x) match {
+    case (Success(a1), Success(a2)) => Success((a1: AA) |+| a2)
+    case (Success(a1), Failure(_)) => Success(a1)
+    case (Failure(_), Success(a2)) => Success(a2)
+    case (Failure(e1), Failure(e2)) => Failure((e1: EE) |+| e2)
+  }
+
   def fail = new FailProjection
 
   ////
