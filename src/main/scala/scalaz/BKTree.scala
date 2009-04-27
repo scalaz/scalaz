@@ -99,16 +99,3 @@ object BKTree {
   def empty[A]: BKTree[A] = BKTreeEmpty 
 }
 
-object T {
-  def main(args: Array[String]) {
-    import BKTree._
-    val k = (empty[String] /: args)((a, b) => a + b)
-    println(k)
-    println(args.length == k.size)
-    println(k -?- "abc")
-    println(k =?= ("abc", 1))
-    println(k |=| ("abc", 1))
-  }
-}
-
-
