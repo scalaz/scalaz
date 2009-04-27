@@ -3,6 +3,8 @@ package scalaz
 object S {
   import java.math.BigInteger
 
+  def id[A](f:() => A) = LazyIdentity.id(f)
+  
   implicit def IdentityTo[A](x: A) = Identity.IdentityTo(x)
   
   implicit def ArrayByteTo(bs: Array[Byte]) = ArrayByte.ArrayByteTo(bs)

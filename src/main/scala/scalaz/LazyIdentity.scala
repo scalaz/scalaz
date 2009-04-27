@@ -11,5 +11,7 @@ object LazyIdentity {
     def value = a
   }
 
+  def id[A](f: () => A) = LazyIdentityTo(f())
+
   implicit def LazyIdentityFrom[A](i: LazyIdentity[A]) = i.value
 }
