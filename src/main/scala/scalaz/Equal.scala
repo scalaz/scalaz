@@ -112,6 +112,8 @@ object Equal {
     case (a1, a2) => a1.isDefined == a2.isDefined
   })
 
+  implicit def ValidationEqual[E, A](implicit ee: Equal[E], ea: Equal[A]) = EitherEqual(ee, ea) <| ((_: Validation[E, A]).either)
+
   implicit def TreeEqual[A](implicit ea: Equal[A]): Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) => a1.rootLabel === a2.rootLabel
         && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))

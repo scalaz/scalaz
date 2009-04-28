@@ -151,5 +151,7 @@ object Order {
     case (None, None) => EQ
   })
 
+  implicit def ValidationOrder[E, A](implicit ee: Order[E], ea: Order[A]) = EitherOrder(ee, ea) <| ((_: Validation[E, A]).either)  
+
   implicit def JavaIterableOrder[A](implicit oa: Order[A]): Order[java.lang.Iterable[A]] = IterableOrder(oa) <| (x => JavaIterableTo(x))
 }

@@ -203,6 +203,11 @@ object Show {
 
   implicit def EitherShow[A, B](implicit sa: Show[A], sb: Show[B]) = shows[Either[A, B]](e => (((_: A).shows) <-: e :-> (_.shows)).toString)
 
+  implicit def ValidationShow[E, A](implicit se: Show[E], sa: Show[A]) = shows[Validation[E, A]] {
+    case Success(a) => "Success(" + a.shows + ")"
+    case Failure(e) => "Failure(" + e.shows + ")"
+  }
+
   implicit def JavaIterableShow[A](implicit sa: Show[A]) = show[java.lang.Iterable[A]](as => {
     val k = new collection.mutable.ListBuffer[Char]
     val i = as.iterator
