@@ -58,6 +58,8 @@ sealed trait Identity[A] {
   def success[X]: Validation[X, A] = Success(value)
 
   def fail[X]: Validation[A, X] = Failure(value)
+
+  def gen: test.Gen[A] = test.Gen.gen((_, _) => Some(value))
   
   override def toString = value.toString
 
