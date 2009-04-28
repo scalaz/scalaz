@@ -85,4 +85,19 @@ object Traverse {
         case Right(x) => a.fmap(f(x), (Right(_: B).right))
       }
   }
+
+  implicit def ValidationTraverse[X]: Traverse[PartialApply1Of2[Validation, X]#Apply] = new Traverse[PartialApply1Of2[Validation, X]#Apply] {
+    def traverse[F[_], A, B](f: A => F[B], as: Validation[X, A])(implicit a: Applicative[F]): F[Validation[X, B]] = as match {
+      case Success(x) => a.fmap(f(x), (Success(_: B)))
+      case Failure(x) => a.pure(Failure(x))
+    }
+  }
+
+  implicit def ValidationFailureTraverse[X]: Traverse[PartialApply1Of2[Validation.FailureProjection, X]#Flip] = new Traverse[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def traverse[F[_], A, B](f: A => F[B], as: Validation.FailureProjection[A, X])(implicit a: Applicative[F]): F[Validation.FailureProjection[B, X]] =
+      as.validation match {
+        case Success(x) => a.pure(Success(x).fail)
+        case Failure(x) => a.fmap(f(x), (Failure(_: B).fail))
+      }
+  }
 }
