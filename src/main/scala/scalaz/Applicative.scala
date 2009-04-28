@@ -58,6 +58,10 @@ object Applicative {
 
   implicit def EitherRightApplicative[X] = applicative[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ValidationApplicative[X](implicit s: Semigroup[X]) = applicative[PartialApply1Of2[Validation, X]#Apply]
+
+  implicit def ValidationFailureApplicative[X] = applicative[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
+
   implicit val ZipperApplicative = applicative[Zipper]
 
   implicit val ZipStreamApplicative = applicative[ZipStream]

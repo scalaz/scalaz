@@ -58,6 +58,10 @@ object Pointed {
 
   implicit def EitherRightPointed[X] = pointed[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ValidationPointed[X] = pointed[PartialApply1Of2[Validation, X]#Apply]
+
+  implicit def ValidationFailurePointed[X] = pointed[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
+
   implicit def ZipperPointed = pointed[Zipper]
 
   import java.util._

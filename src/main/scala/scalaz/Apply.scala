@@ -70,6 +70,15 @@ object Apply {
       }
   }
 
+  implicit def ValidationFailureApply[X] = new Apply[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def apply[A, B](f: Validation.FailureProjection[A => B, X], a: Validation.FailureProjection[A, X]) = ((f.validation, a.validation) match {
+      case (Success(x1), Success(_)) => Success(x1)
+      case (Success(x1), Failure(_)) => Success(x1)
+      case (Failure(_), Success(x2)) => Success(x2)
+      case (Failure(f), Failure(e)) => Failure(f(e))
+    }).fail
+  }
+
   implicit val ZipperApply: Apply[Zipper] = new Apply[Zipper] {
     def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] =
       Zipper.zipper((a.lefts |!|) <*> (f.lefts |!|),
