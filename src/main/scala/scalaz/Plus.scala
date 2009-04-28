@@ -32,11 +32,23 @@ object Plus {
   }
 
   implicit def EitherLeftPlus[X] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
-    def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = error("")
+    def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {
+      case Left(_) => a1
+      case Right(_) => a2.e match {
+        case Left(_) => a2
+        case Right(_) => a1
+      }
+    }
   }
 
   implicit def EitherRightPlus[X] = new Plus[PartialApply1Of2[Either.RightProjection, X]#Apply] {
-    def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = error("")
+    def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = a2.e match {
+      case Right(_) => a1
+      case Left(_) => a2.e match {
+        case Right(_) => a2
+        case Left(_) => a1
+      }
+    }
   }
 
   import java.util._
