@@ -33,6 +33,22 @@ object Index {
     def index[A](a: Array[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
   }
 
+  implicit def EitherLeftIndex[X] = new Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+    def index[A](a: Either.LeftProjection[A, X], i: Int) = a.toOption filter (_ => i == 0)
+  }
+
+  implicit def EitherRightIndex[X] = new Index[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+    def index[A](a: Either.RightProjection[X, A], i: Int) = a.toOption filter (_ => i == 0)
+  }
+
+  implicit def ValidationIndex[X] = new Index[PartialApply1Of2[Validation, X]#Apply] {
+    def index[A](a: Validation[X, A], i: Int) = a.either.right.toOption filter (_ => i == 0)
+  }
+
+  implicit def ValidationFailureIndex[X] = new Index[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def index[A](a: Validation.FailureProjection[A, X], i: Int) = a.validation.either.left.toOption filter (_ => i == 0)
+  }
+  
   implicit val IterableIndex: Index[Iterable] = new Index[Iterable] {
     def index[A](a: Iterable[A], i: Int) = if(i < 0) None else {
       var n = 0
