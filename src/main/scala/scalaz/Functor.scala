@@ -116,6 +116,13 @@ object Functor {
     }
   }
 
+  implicit def ValidationFailureFunctor[X] = new Functor[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def fmap[A, B](r: Validation.FailureProjection[A, X], f: A => B) = (r.validation match {
+      case Success(a) => Success(a)
+      case Failure(e) => Failure(f(e))
+    }).fail
+  }
+
   implicit val ZipperFunctor = new Functor[Zipper] {
     def fmap[A, B](z: Zipper[A], f: A => B) = Zipper.zipper(z.lefts map f, f(z.focus), z.rights map f)
   }

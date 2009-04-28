@@ -65,25 +65,25 @@ final case class Failure[E, A](e: E) extends Validation[E, A]
 object Validation {
   import S._
 
-  final class FailureProjection[+E, +A](v: Validation[E, A]) {
-    def lift[M[+_]](implicit p: Pure[M]): Validation[M[E], A] = v match {
+  final case class FailureProjection[+E, +A](validation: Validation[E, A]) {
+    def lift[M[+_]](implicit p: Pure[M]): Validation[M[E], A] = validation match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(e.pure[M])
     }
 
-    def |||[EE >: E](f: A => EE): EE = v match {
+    def |||[EE >: E](f: A => EE): EE = validation match {
       case Success(a) => f(a)
       case Failure(e) => e
     }
 
     def |[EE >: E](f: => EE) = |||[EE](_ => f)
 
-    def exists(f: E => Boolean) = v match {
+    def exists(f: E => Boolean) = validation match {
       case Success(_) => false
       case Failure(e) => f(e)
     }
 
-    def forall(f: E => Boolean) = v match {
+    def forall(f: E => Boolean) = validation match {
       case Success(_) => true
       case Failure(e) => f(e)
     }
