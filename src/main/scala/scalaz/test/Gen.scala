@@ -12,6 +12,8 @@ object Gen {
     def apply(sz: Int)(implicit r: Rand) = f(sz, r)
   }
 
+  def fail[T]: Gen[T] = gen((_, _) => None)
+
   implicit val GenFunctor: Functor[Gen] = new Functor[Gen] {
     def fmap[A, B](r: Gen[A], f: A => B) = gen((sz, rd) => r(sz)(rd) map f)    
   }
