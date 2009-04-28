@@ -2,6 +2,9 @@ package scalaz.test
 
 sealed trait Gen[+A] {
   def apply(sz: Int)(implicit r: Rand): Option[A]
+
+  def filter(f: A => Boolean): Gen[A] = Gen.gen((sz, rd) => for(p <- this(sz)(rd);
+                                                                q <- if(f(p)) Some(p) else None) yield q)
 }
 
 object Gen {
