@@ -185,6 +185,10 @@ object S {
 
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[PartialApply1Of2[Either.RightProjection, X]#Apply](a)
 
+  implicit def ValidationMA[E, A](a: Validation[E, A]) = ma[PartialApply1Of2[Validation, E]#Apply](a)
+
+  implicit def ValidationFailureMA[A, E](a: Validation.FailureProjection[E, A]) = ma[PartialApply1Of2[Validation.FailureProjection, A]#Flip](a)
+
   implicit def ZipperMA[A](a: Zipper[A]) = ma[Zipper](a)
 
   implicit def EndoMA[A](a: Endo[A]) = ma[Endo](a)
