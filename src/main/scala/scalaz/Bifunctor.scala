@@ -17,4 +17,12 @@ object Bifunctor {
         case Right(b) => Right(g(b))
       }
   }
+
+  implicit def ValidationBifunctor = new Bifunctor[Validation] {
+    def bimap[A, B, C, D](k: Validation[A, B], f: A => C, g: B => D) =
+      k match {
+        case Failure(a) => Failure(f(a))
+        case Success(b) => Success(g(b))
+      }
+  }
 }

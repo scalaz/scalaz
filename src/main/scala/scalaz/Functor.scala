@@ -8,7 +8,7 @@ object Functor {
   import S._
 
   implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
-    def fmap[A, B](r: Identity[A], f: A => B) = Identity.id(f(r.value))
+    def fmap[A, B](r: Identity[A], f: A => B) = Identity.IdentityTo(f(r.value))
   }
 
   implicit def ContinuationFunctor[R] = new Functor[PartialApply1Of2[Continuation, R]#Apply] {
@@ -107,6 +107,13 @@ object Functor {
 
   implicit def EitherRightFunctor[X] = new Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
+  }
+
+  implicit def ValidationFunctor[X] = new Functor[PartialApply1Of2[Validation, X]#Apply] {
+    def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
+      case Success(a) => Success(f(a))
+      case Failure(e) => Failure(e)
+    }
   }
 
   implicit val ZipperFunctor = new Functor[Zipper] {

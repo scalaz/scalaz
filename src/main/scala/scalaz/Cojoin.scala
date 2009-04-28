@@ -6,7 +6,7 @@ trait Cojoin[M[_]] {
 
 object Cojoin {
   implicit val IdentityCojoin = new Cojoin[Identity] {
-    def cojoin[A](a: Identity[A]) = Identity.id(a)
+    def cojoin[A](a: Identity[A]) = Identity.IdentityTo(a)
   }
 
   implicit val NonEmptyListCojoin = new Cojoin[NonEmptyList] {

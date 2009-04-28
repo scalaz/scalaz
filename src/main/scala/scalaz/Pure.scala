@@ -8,7 +8,7 @@ object Pure {
   import S._
 
   implicit val IdentityPure: Pure[Identity] = new Pure[Identity] {
-    def pure[A](a: => A) = Identity.id(a)
+    def pure[A](a: => A) = Identity.IdentityTo(a)
   }
 
   implicit def ContinuationPure[R] = new Pure[PartialApply1Of2[Continuation, R]#Apply] {

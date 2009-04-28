@@ -61,6 +61,15 @@ object Apply {
 
   implicit def EitherRightApply[X] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ValidationApply[X](implicit s: Semigroup[X]) = new Apply[PartialApply1Of2[Validation, X]#Apply] {
+     def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
+        case (Success(f), Success(a)) => Success(f(a))
+        case (Success(_), Failure(e)) => Failure(e)
+        case (Failure(e), Success(_)) => Failure(e)
+        case (Failure(e1), Failure(e2)) => Failure(e1 |+| e2)
+      }
+  }
+
   implicit val ZipperApply: Apply[Zipper] = new Apply[Zipper] {
     def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] =
       Zipper.zipper((a.lefts |!|) <*> (f.lefts |!|),

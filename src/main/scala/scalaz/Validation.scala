@@ -32,7 +32,7 @@ sealed trait Validation[+E, +A] {
     case (Failure(e1), Failure(e2)) => Failure((e1: EE) |+| e2)
   }
 
-  def fail = new FailProjection
+  def fail = new Validation.FailureProjection[E, A](this)
 
   ////
 
@@ -57,31 +57,35 @@ sealed trait Validation[+E, +A] {
     case Success(a) => f(a)
     case Failure(_) => true
   }
+}
 
-  final class FailProjection {
-    def lift[M[+_]](implicit p: Pure[M]): Validation[M[E], A] = Validation.this match {
+final case class Success[E, A](a: A) extends Validation[E, A]
+final case class Failure[E, A](e: E) extends Validation[E, A]
+
+object Validation {
+  import S._
+
+  final class FailureProjection[+E, +A](v: Validation[E, A]) {
+    def lift[M[+_]](implicit p: Pure[M]): Validation[M[E], A] = v match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(e.pure[M])
     }
 
-    def |||[EE >: E](f: A => EE): EE = Validation.this match {
+    def |||[EE >: E](f: A => EE): EE = v match {
       case Success(a) => f(a)
       case Failure(e) => e
     }
 
     def |[EE >: E](f: => EE) = |||[EE](_ => f)
 
-    def exists(f: E => Boolean) = Validation.this match {
+    def exists(f: E => Boolean) = v match {
       case Success(_) => false
       case Failure(e) => f(e)
     }
 
-    def forall(f: E => Boolean) = Validation.this match {
+    def forall(f: E => Boolean) = v match {
       case Success(_) => true
       case Failure(e) => f(e)
     }
   }
 }
-
-final case class Success[E, A](a: A) extends Validation[E, A]
-final case class Failure[E, A](e: E) extends Validation[E, A]
