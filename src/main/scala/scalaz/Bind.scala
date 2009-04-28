@@ -119,6 +119,20 @@ object Bind {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
 
+  implicit def ValidationBind[X] = new Bind[PartialApply1Of2[Validation, X]#Apply] {
+    def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
+      case Success(a) => f(a)
+      case Failure(e) => Failure(e)
+    }
+  }
+
+  implicit def ValidationFailureBind[X] = new Bind[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def bind[A, B](r: Validation.FailureProjection[A, X], f: A => Validation.FailureProjection[B, X]) = r.validation match {
+      case Success(a) => Success(a).fail
+      case Failure(e) => f(e)
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
 
