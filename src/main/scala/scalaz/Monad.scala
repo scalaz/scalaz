@@ -59,6 +59,10 @@ object Monad {
 
   implicit def EitherRightMonad[X] = monad[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ValidationMonad[X] = monad[PartialApply1Of2[Validation, X]#Apply]
+
+  implicit def ValidationFailureMonad[X] = monad[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
+
   import java.util._
   import java.util.concurrent._
 
