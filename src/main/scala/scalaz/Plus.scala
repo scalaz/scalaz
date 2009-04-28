@@ -51,6 +51,26 @@ object Plus {
     }
   }
 
+  implicit def ValidationPlus[X] = new Plus[PartialApply1Of2[Validation, X]#Apply] {
+    def plus[A](a1: Validation[X, A], a2: => Validation[X, A]) = a1 match {
+      case Success(_) => a1
+      case Failure(_) => a2 match {
+        case Success() => a2
+        case Failure(_) => a1
+      }
+    }
+  }
+
+  implicit def ValidationFailurePlus[X] = new Plus[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def plus[A](a1: Validation.FailureProjection[A, X], a2: => Validation.FailureProjection[A, X]) = a1.validation match {
+      case Success(_) => a2.validation match {
+        case Failure(_) => a2
+        case Success(_) => a1
+      }
+      case Failure(_) => a1
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
 
