@@ -105,6 +105,14 @@ object Pure {
     def pure[A](a: => A) = Right(a).right
   }
 
+  implicit def ValidationPure[X] = new Pure[PartialApply1Of2[Validation, X]#Apply] {
+    def pure[A](a: => A) = Success(a)
+  }
+
+  implicit def ValidationFailurePure[X] = new Pure[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def pure[A](a: => A) = Failure(a).fail
+  }
+
   implicit def ZipperPure = new Pure[Zipper] {
     def pure[A](a: => A) = a.zipper
   }
