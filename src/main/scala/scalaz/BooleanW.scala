@@ -112,16 +112,16 @@ sealed trait BooleanW {
    */
   def option[A](a: => A) = if(isTrue) Some(a) else None
 
-  trait ConditionalEither[A, B] {
-    def |(b: => B): Either[A, B]
+  trait ConditionalEither[A] {
+    def |[B](b: => B): Either[A, B]
   }
   
   /**
    * Returns the first argument in <code>Left</code> if this is <code>true</code>, otherwise the second argument in
    * <code>Right</code>.
    */
-  def either[A, B](a: => A) = new ConditionalEither[A, B] {
-    def |(b: => B) = if(isTrue) Right(b) else Left(a)
+  def either[A, B](a: => A) = new ConditionalEither[A] {
+    def |[B](b: => B) = if(isTrue) Right(b) else Left(a)
   }
 
   /**
