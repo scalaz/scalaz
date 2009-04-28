@@ -29,6 +29,34 @@ object Length {
     def len[A](a: Option[A]) = a map (_ => 1) getOrElse 0
   }
 
+  implicit def EitherLeftLength[X] = new Length[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+    def len[A](a: Either.LeftProjection[A, X]) = a.e match {
+      case Right(_) => 0
+      case Left(_) => 1
+    }
+  }
+
+  implicit def EitherRightLength[X] = new Length[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+    def len[A](a: Either.RightProjection[X, A]) = a.e match {
+      case Right(_) => 1
+      case Left(_) => 0
+    }
+  }
+
+  implicit def ValidationLength[X] = new Length[PartialApply1Of2[Validation, X]#Apply] {
+    def len[A](a: Validation[X, A]) = a match {
+      case Success(_) => 1
+      case Failure(_) => 0
+    }
+  }
+
+  implicit def ValidationFailureLength[X] = new Length[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def len[A](a: Validation.FailureProjection[A, X]) = a.validation match {
+      case Success(_) => 0
+      case Failure(_) => 1
+    }
+  }
+
   implicit val ArrayLength = new Length[Array] {
     def len[A](a: Array[A]) = a.length
   }
