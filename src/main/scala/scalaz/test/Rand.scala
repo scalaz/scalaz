@@ -26,16 +26,16 @@ object Rand {
       case Some(v) => new Random(v)
       case None => new Random
     }
-    val f = Math.min(from, to);
-    val t = Math.max(from, to);
+    val f = Math.min(from, to)
+    val t = Math.max(from, to)
     k.nextInt(t - f + 1)
   }, (seed, from, to) => {
     val k = seed match {
       case Some(v) => new Random(v)
       case None => new Random
     }
-    val f = Math.min(from, to);
-    val t = Math.max(from, to);
+    val f = Math.min(from, to)
+    val t = Math.max(from, to)
     k.nextDouble * (t - f) + f
   })
 }
