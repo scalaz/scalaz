@@ -67,6 +67,20 @@ object FoldRight {
     def foldRight[A, B](e: Either.RightProjection[X, A], b: B, f: (A, => B) => B) = OptionFoldRight.foldRight(e.toOption, b, f)
   }
 
+  implicit def ValidationFoldRight[X] = new FoldRight[PartialApply1Of2[Validation, X]#Apply] {
+    def foldRight[A, B](e: Validation[X, A], b: B, f: (A, => B) => B) = e match {
+      case Success(a) => f(a, b)
+      case Failure(_) => b
+    }
+  }
+
+  implicit def ValidationFailureFoldRight[X] = new FoldRight[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def foldRight[A, B](e: Validation.FailureProjection[A, X], b: B, f: (A, => B) => B) = e.validation match {
+      case Success(_) => b
+      case Failure(e) => f(e, b)
+    }
+  }
+
   implicit val StreamFoldRight = new FoldRight[Stream] {
     def foldRight[A, B](t: Stream[A], b: B, f: (A, => B) => B): B = if(t.isEmpty) b else f(t.head, foldRight(t.tail, b, f))
   }

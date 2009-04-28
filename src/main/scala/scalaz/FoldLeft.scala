@@ -65,6 +65,20 @@ object FoldLeft {
     def foldLeft[B, A](e: Either.RightProjection[X, A], b: B, f: (B, A) => B) = OptionFoldLeft.foldLeft(e.toOption, b, f)
   }
 
+  implicit def ValidationFoldLeft[X] = new FoldLeft[PartialApply1Of2[Validation, X]#Apply] {
+    def foldLeft[B, A](e: Validation[X, A], b: B, f: (B, A) => B) = e match {
+      case Success(a) => f(b, a)
+      case Failure(_) => b
+    }
+  }
+
+  implicit def ValidationFailureFoldLeft[X] = new FoldLeft[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
+    def foldLeft[B, A](e: Validation.FailureProjection[A, X], b: B, f: (B, A) => B) = e.validation match {
+      case Success(_) => b
+      case Failure(e) => f(b, e)
+    }
+  }
+
   implicit val IterableFoldLeft = new FoldLeft[Iterable] {
     def foldLeft[B, A](t: Iterable[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
   }
