@@ -195,6 +195,8 @@ object S {
 
   implicit def TreeMA[A](a: Tree[A]) = ma[Tree](a)
 
+  implicit def GenMA[A](a: test.Gen[A]) = ma[test.Gen](a)
+
   import java.util._
   import java.util.concurrent._
 
