@@ -20,7 +20,7 @@ sealed trait IntW {
     else Gen.gen((sz, r) => {
       val k = new collection.mutable.ListBuffer[A]
       k ++= a
-      while(k.length > value) k.remove((0 >--> k.length-1)(sz)(r).get)     
+      while(k.length > value) k.remove((0 >--> k.length - 1)(sz)(r).get)     
       Some(k.toList)
     })
   }
