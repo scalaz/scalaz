@@ -3,12 +3,17 @@ package scalaz.test
 sealed trait Gen[+A] {
   def apply(sz: Int)(implicit r: Rand): Option[A]
 
+  import S._
+
   val f = (sz: Int, r: Rand) => apply(sz)(r)
 
   def filter(f: A => Boolean): Gen[A] = Gen.gen((sz, rd) => for(p <- this(sz)(rd);
                                                                 q <- if(f(p)) Some(p) else None) yield q)
 
   def resize(sz: Int) = Gen.gen((_, r) => apply(sz)(r))
+
+  def |||[AA >: A](g: => Gen[AA]): Gen[AA] =
+    (0 >--> 1) >>= (n => (n == 0) ? g | this)
 }
 
 object Gen {
