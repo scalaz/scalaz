@@ -3,8 +3,12 @@ package scalaz.test
 sealed trait Gen[+A] {
   def apply(sz: Int)(implicit r: Rand): Option[A]
 
+  val f = (sz: Int, r: Rand) => apply(sz)(r)
+
   def filter(f: A => Boolean): Gen[A] = Gen.gen((sz, rd) => for(p <- this(sz)(rd);
                                                                 q <- if(f(p)) Some(p) else None) yield q)
+
+  def resize(sz: Int) = Gen.gen((_, r) => apply(sz)(r))
 }
 
 object Gen {
@@ -12,7 +16,13 @@ object Gen {
     def apply(sz: Int)(implicit r: Rand) = f(sz, r)
   }
 
+  import S._
+
   def fail[T]: Gen[T] = gen((_, _) => None)
+
+  def parameterised[A](f: (Int, Rand) => Gen[A]) = gen(f >>= (_.f))
+
+  def sized[A](f: Int => Gen[A]): Gen[A] = parameterised((sz, _) => f(sz))
 
   implicit val GenFunctor: Functor[Gen] = new Functor[Gen] {
     def fmap[A, B](r: Gen[A], f: A => B) = gen((sz, rd) => r(sz)(rd) map f)    
