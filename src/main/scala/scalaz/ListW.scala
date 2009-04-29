@@ -7,7 +7,7 @@ sealed trait ListW[A] {
 
   def stringj(f: A => List[Char]) = value flatMap f mkString
 
-  import ListW._
+  import S._
 
   def intersperse(a: A): List[A] = value match {
     case Nil => Nil
@@ -30,6 +30,8 @@ sealed trait ListW[A] {
     case Nil => z.zero
     case h :: t => f(NonEmptyList.nel(h, t))
   }
+
+  def choose = (0 >--> value.length) >>= (_ <=- (value: _*))
 }
 
 object ListW {
