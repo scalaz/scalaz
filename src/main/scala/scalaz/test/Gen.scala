@@ -16,6 +16,10 @@ object Gen {
     def apply(sz: Int)(implicit r: Rand) = f(sz, r)
   }
 
+  def gens[A](f: Int => Option[A]) = gen((sz, _) => f(sz))
+
+  def genr[A](f: Rand => Option[A]) = gen((_, r) => f(r))
+
   import S._
 
   def fail[T]: Gen[T] = gen((_, _) => None)
