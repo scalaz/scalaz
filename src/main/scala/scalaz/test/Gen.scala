@@ -15,8 +15,12 @@ sealed trait Gen[+A] {
   def |||[AA >: A](g: => Gen[AA]): Gen[AA] =
     (0 >--> 1) >>= (n => (n == 0) ? g | this)
 
-  def many[M[_], AA >: A](n: Int)(implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] =
-    for(k <- this) yield (k: AA).replicate[M](n)  
+  def replicate[M[_], AA >: A](n: Int)(implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] =
+    for(k <- this) yield (k: AA).replicate[M](n)
+
+  def many[M[_], AA >: A](implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] = Gen.sized(sz => for(n <- 0 >--> sz; c <- replicate[M, AA](n)) yield c)
+
+  def many1[M[_], AA >: A](implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] = Gen.sized(sz => for(n <- 1 >--> sz; c <- replicate[M, AA](n)) yield c)
 }
 
 object Gen {
