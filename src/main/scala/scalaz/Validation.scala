@@ -36,8 +36,8 @@ sealed trait Validation[+E, +A] {
 
   ////
 
-  def lift[M[+_]](implicit p: Pure[M]): Validation[E, M[A]] = this match {
-    case Success(a) => Success(a.pure[M])
+  def lift[M[_], AA >: A](implicit p: Pure[M]): Validation[E, M[AA]] = this match {
+    case Success(a) => Success((a: AA).pure[M])
     case Failure(e) => Failure(e)
   }
 
@@ -66,9 +66,9 @@ object Validation {
   import S._
 
   final case class FailureProjection[+E, +A](validation: Validation[E, A]) {
-    def lift[M[+_]](implicit p: Pure[M]): Validation[M[E], A] = validation match {
+    def lift[M[_], EE >: E](implicit p: Pure[M]): Validation[M[EE], A] = validation match {
       case Success(a) => Success(a)
-      case Failure(e) => Failure(e.pure[M])
+      case Failure(e) => Failure((e: EE).pure[M])
     }
 
     def |||[EE >: E](f: A => EE): EE = validation match {
