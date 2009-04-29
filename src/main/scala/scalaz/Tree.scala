@@ -8,21 +8,33 @@ sealed trait Tree[+A] {
   val subForest: Stream[Tree[A]]
 
   import S._
+  import MA._
 
-  def foldMap[B](f: A => B)(implicit m: Monoid[B]):B =
-    f(rootLabel) |+| subForest.foldMap((_:Tree[A]).foldMap(f))
+  def foldMap[B](f: A => B)(implicit m: Monoid[B]): B =
+    f(rootLabel) |+| subForest.foldMap((_: Tree[A]).foldMap(f))
 
   def drawTree(implicit sh: Show[A]) = draw.foldMap(_ + "\n")
 
   def draw(implicit sh: Show[A]): Stream[String] = {
-    def drawSubTrees(s: Stream[Tree[A]]):Stream[String] = s match {
+    def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
       case Stream.empty => Stream.empty
       case Stream(t) => Stream.cons("|", shift("`- ", "   ", t.draw))
       case Stream.cons(t, ts) => Stream.cons("|", shift("+- ", "|  ", t.draw)) append drawSubTrees(ts)
     }
     def shift(first: String, other: String, s: Stream[String]) =
-      Stream.cons(first, other.repeat[Stream]).zipWith(((_:String) + (_:String)).curry, S.zip(s))
+      Stream.cons(first, other.repeat[Stream]).zipWith(((_: String) + (_: String)).curry, S.zip(s))
     Stream.cons(rootLabel.shows, drawSubTrees(subForest))
+  }
+
+  def flatten = squish[A](Stream.empty)
+
+  private def squish[AA >: A](xs: Stream[AA]): Stream[AA] =
+    Stream.cons(rootLabel, subForest.foldr[Stream[AA]](xs, _.squish(_)))
+
+  def levels: Stream[Stream[A]] = {
+    val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest)
+    val rl = (s: Stream[Tree[A]]) => s.map(_.rootLabel)
+    Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty).map(rl)
   }
 }
 
