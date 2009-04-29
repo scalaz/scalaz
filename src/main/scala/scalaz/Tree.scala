@@ -36,6 +36,7 @@ sealed trait Tree[+A] {
     val rl = (s: Stream[Tree[A]]) => s.map(_.rootLabel)
     Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty).map(rl)
   }
+
 }
 
 object Tree {

@@ -60,6 +60,11 @@ sealed trait Identity[A] {
   def fail[X]: Validation[A, X] = Failure(value)
 
   def gen: test.Gen[A] = test.Gen.gen((_, _) => Some(value))
+
+  import StreamW._
+  def unfoldTree[B](f: A => (B, Stream[A])): Tree[B] = f(value) match {
+    case (a, bs) => Tree.node(a, bs.unfoldForest(f))
+  }
   
   override def toString = value.toString
 
