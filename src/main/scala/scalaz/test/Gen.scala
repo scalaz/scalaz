@@ -42,6 +42,21 @@ object Gen {
 
   def randomised[A](f: Rand => Gen[A]): Gen[A] = parameterised((_, r) => f(r))
 
+  def frequency[A](k: (Int, Gen[A])*): Gen[A] = {
+    def pick(n: Int, l: List[(Int, Gen[A])]): Gen[A] = l match {
+      case Nil => fail
+      case (a, b) :: k => if(n <= a) b else pick(n - a, k)
+    }
+
+    for(n <- 1 >--> (k.map(_._1) :\ 0)(_ + _);
+        z <- pick(n, k.toList)) yield z
+  }
+
+  def freq[A](k: (Int, A)*): Gen[A] = frequency(k map (_ :-> (_.gen)): _*)
+  
+  def oneOf[A](k: Gen[A]*) = if(k.isEmpty) fail else for(i <- 0 >--> k.length - 1;
+                                                         x <- k(i)) yield x
+
   implicit val GenFunctor: Functor[Gen] = new Functor[Gen] {
     def fmap[A, B](r: Gen[A], f: A => B) = gen((sz, rd) => r(sz)(rd) map f)    
   }
