@@ -28,6 +28,8 @@ object Gen {
 
   def sized[A](f: Int => Gen[A]): Gen[A] = parameterised((sz, _) => f(sz))
 
+  def randomised[A](f: Rand => Gen[A]): Gen[A] = parameterised((_, r) => f(r))
+
   implicit val GenFunctor: Functor[Gen] = new Functor[Gen] {
     def fmap[A, B](r: Gen[A], f: A => B) = gen((sz, rd) => r(sz)(rd) map f)    
   }
