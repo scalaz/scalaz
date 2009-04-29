@@ -51,6 +51,10 @@ object S {
 
   implicit def LongDigit(n: Long) = Digit.LongDigit(n)
 
+  implicit def DoubleTo(n: Double) = DoubleW.DoubleTo(n)
+
+  implicit def DoubleFrom(n: DoubleW) = DoubleW.DoubleFrom(n)
+
   def multiplication(n: Long) = LongMultiplication.multiplication(n)
 
   implicit def EndoTo[A](f: A => A) = Endo.EndoTo(f)
