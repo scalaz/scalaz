@@ -65,7 +65,11 @@ sealed trait Identity[A] {
   def unfoldTree[B](f: A => (B, Stream[A])): Tree[B] = f(value) match {
     case (a, bs) => Tree.node(a, bs.unfoldForest(f))
   }
-  
+
+  def unfoldTreeM[B,M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[A]] = f(value) match {
+    case (a, bs) => bs.unfoldForestM(f) >>= ((ts: Stream[Tree[A]]) => Tree.node(a, ts).pure) 
+  }
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
