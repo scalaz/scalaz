@@ -43,12 +43,12 @@ sealed trait Identity[A] {
   }
 
   def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    if(n <= 0) m.zero
+    if (n <= 0) m.zero
     else value.pure[M] |+| replicate[M](n - 1)
 
-  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.pure[M] |+| repeat[M]   
+  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.pure[M] |+| repeat[M]
 
-  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = 
+  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
     value.pure[M] |+| f(value).iterate[M](f)
 
   def zipper = S.zipper(Stream.empty, value, Stream.empty)
@@ -66,8 +66,10 @@ sealed trait Identity[A] {
     case (a, bs) => Tree.node(a, bs.unfoldForest(f))
   }
 
-  def unfoldTreeM[B,M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[A]] = f(value) match {
-    case (a, bs) => bs.unfoldForestM(f) >>= ((ts: Stream[Tree[A]]) => Tree.node(a, ts).pure) 
+  def unfoldTreeM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[B]] = {
+    m.bind(f(value), (abs: (B, Stream[A])) =>
+        m.bind(abs._2.unfoldForestM[B, M](f), (ts: Stream[Tree[B]]) =>
+            m.pure(Tree.node(abs._1, ts))))
   }
 
   override def toString = value.toString
