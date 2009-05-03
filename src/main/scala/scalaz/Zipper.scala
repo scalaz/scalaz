@@ -8,7 +8,7 @@ package scalaz
  * Based on the pointedlist library by Jeff Wheeler.
  */
 
-sealed trait Zipper[A] {
+sealed trait Zipper[+A] {
   val focus: A
   val lefts: Stream[A]
   val rights: Stream[A]
@@ -44,17 +44,17 @@ sealed trait Zipper[A] {
   /**
    * An alias for insertRight
    */
-  def insert = insertRight(_)
+  def insert[AA >: A] = insertRight(_: AA)
 
   /**
    * Inserts an element to the left of focus and focuses on the new element.
    */
-  def insertLeft(y: A) = zipper(lefts, y, Stream.cons(focus, rights))
+  def insertLeft[AA >: A](y: AA) = zipper(lefts, y, Stream.cons(focus, rights))
 
   /**
    * Inserts an element to the right of focus and focuses on the new element.
    */
-  def insertRight(y: A) = zipper(Stream.cons(focus, lefts), y, rights)
+  def insertRight[AA >: A](y: AA) = zipper(Stream.cons(focus, lefts), y, rights)
 
   /**
    * An alias for deleteRigth
@@ -130,7 +130,7 @@ sealed trait Zipper[A] {
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate. 
    */
-  def findBy(f: Zipper[A] => Option[Zipper[A]])(p: A => Boolean): Option[Zipper[A]] = {
+  def findBy[AA >: A](f: Zipper[AA] => Option[Zipper[AA]])(p: AA => Boolean): Option[Zipper[AA]] = {
     f(this) >>= (x => if (p(x.focus)) Some(x) else x.findBy(f)(p))
   }
 

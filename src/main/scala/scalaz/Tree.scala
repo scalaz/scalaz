@@ -38,6 +38,8 @@ sealed trait Tree[+A] {
   }
 
   def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), t.subForest))
+
+  def loc = TreeLoc.loc(this, Stream.empty, Stream.empty, Stream.empty)
 }
 
 object Tree {
