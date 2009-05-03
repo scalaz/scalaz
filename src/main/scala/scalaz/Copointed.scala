@@ -19,4 +19,6 @@ object Copointed {
   implicit val Function0Copointed = copointed[Function0]
 
   implicit val ZipperCopointed = copointed[Zipper]
+
+  implicit val TreeCopointed = copointed[Tree]
 }
