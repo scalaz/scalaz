@@ -28,4 +28,8 @@ object Cojoin {
   implicit val ZipperCojoin = new Cojoin[Zipper] {
     def cojoin[A](a: Zipper[A]) = a.positions
   }
+
+  implicit val TreeCojoin:Cojoin[Tree] = new Cojoin[Tree] {
+    def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
+  }
 }

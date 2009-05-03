@@ -37,6 +37,7 @@ sealed trait Tree[+A] {
     Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty).map(rl)
   }
 
+  def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), t.subForest))
 }
 
 object Tree {

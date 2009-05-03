@@ -33,4 +33,8 @@ object Copure {
     def copure[A](a: Zipper[A]) = a.focus
   }
 
+  implicit val TreeCopure = new Copure[Tree] {
+    def copure[A](a: Tree[A]) = a.rootLabel
+  }
+
 }
