@@ -63,6 +63,8 @@ object Monad {
 
   implicit def ValidationFailureMonad[X] = monad[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
 
+  implicit def TreeMonad = monad[Tree]
+
   import java.util._
   import java.util.concurrent._
 
