@@ -128,7 +128,16 @@ object Functor {
   }
 
   implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
-    def fmap[A, B](t: Tree[A], f: A => B): Tree[B] = Tree.node(f(t.rootLabel), t.subForest.map(fmap(_:Tree[A], f)))
+    def fmap[A, B](t: Tree[A], f: A => B): Tree[B] = Tree.node(f(t.rootLabel), t.subForest.map(fmap(_: Tree[A], f)))
+  }
+
+  implicit val TreeLocFunctor: Functor[TreeLoc] = new Functor[TreeLoc] {
+    def fmap[A, B](t: TreeLoc[A], f: A => B): TreeLoc[B] = {
+      val ff = (_: Tree[A]).map(f)
+      TreeLoc.loc(t.tree map f, t.lefts map ff, t.rights map ff,
+        t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
+    }
+
   }
 
   import java.util._

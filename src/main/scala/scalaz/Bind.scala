@@ -133,6 +133,13 @@ object Bind {
     }
   }
 
+  implicit def TreeBind:Bind[Tree] = new Bind[Tree] {
+    def bind[A, B](t: Tree[A], f: A => Tree[B]): Tree[B] = {
+      val r = f(t.rootLabel)
+      Tree.node(r.rootLabel, r.subForest.append(t.subForest.map(bind(_, f))))
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
 

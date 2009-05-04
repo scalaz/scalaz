@@ -66,6 +66,8 @@ object Applicative {
 
   implicit val ZipStreamApplicative = applicative[ZipStream]
 
+  implicit val TreeApplicative = applicative[Tree]
+
   import java.util._
   import java.util.concurrent._
 

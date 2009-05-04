@@ -125,6 +125,10 @@ object Pure {
     def pure[A](a: => A) = Endo.constant(a) 
   }
 
+  implicit def TreePure = new Pure[Tree] {
+    def pure[A](a: => A) = Tree.node(a, Stream.empty)
+  }
+
   import java.util._
   import java.util.concurrent._
 

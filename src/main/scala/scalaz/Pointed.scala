@@ -64,6 +64,8 @@ object Pointed {
 
   implicit def ZipperPointed = pointed[Zipper]
 
+  implicit def TreePointed = pointed[Tree]
+
   import java.util._
   import java.util.concurrent._
 

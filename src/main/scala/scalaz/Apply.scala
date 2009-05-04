@@ -95,6 +95,14 @@ object Apply {
     }
   }
 
+  val ZipTreeApply: Apply[Tree] = new Apply[Tree] {
+    def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] = {
+      Tree.node((f.rootLabel)(a.rootLabel), (a.subForest |!|) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curry) |!|))
+    }
+  }
+
+  implicit val TreeApply = FunctorBindApply[Tree]
+
   import java.util._
   import java.util.concurrent._
 
