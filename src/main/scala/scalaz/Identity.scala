@@ -5,8 +5,6 @@ sealed trait Identity[A] {
 
   import S._
 
-  def pure[P[_]](implicit p: Pure[P]) = p pure value
-
   def |+|(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
 
   def ===(a: A)(implicit e: Equal[A]) = e equal (value, a)
