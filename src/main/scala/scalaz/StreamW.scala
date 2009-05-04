@@ -33,7 +33,7 @@ sealed trait StreamW[A] {
 
   def zipWith[B, C](f: A => B => C, bs: ZipStream[B]) = bs <*> zapp(f.repeat[ZipStream])
 
-  def unfoldForest[B](f: A => (B, Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
+  def unfoldForest[B](f: A => (B, () => Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
 
   import Traverse._
   def unfoldForestM[B,M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Stream[Tree[B]]] = 

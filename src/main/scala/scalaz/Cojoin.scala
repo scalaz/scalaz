@@ -49,8 +49,8 @@ object Cojoin {
       f(a).unfold[Stream]((o: Option[TreeLoc[A]]) =>
           for (c <- o) yield (c.unfoldTree(dwn[A](_: TreeLoc[A])), f(c)))
 
-    private def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], Stream[TreeLoc[A]]) = {
-      (tz, tz.firstChild.unfold[Stream]((o: Option[TreeLoc[A]]) =>
+    private def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => Stream[TreeLoc[A]]) = {
+      (tz, () => tz.firstChild.unfold[Stream]((o: Option[TreeLoc[A]]) =>
           for (c <- o) yield (c, c.right)))
     }
   }

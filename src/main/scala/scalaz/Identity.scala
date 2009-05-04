@@ -60,8 +60,8 @@ sealed trait Identity[A] {
   def gen: test.Gen[A] = test.Gen.gen((_, _) => Some(value))
 
   import StreamW._
-  def unfoldTree[B](f: A => (B, Stream[A])): Tree[B] = f(value) match {
-    case (a, bs) => Tree.node(a, bs.unfoldForest(f))
+  def unfoldTree[B](f: A => (B, () => Stream[A])): Tree[B] = f(value) match {
+    case (a, bs) => Tree.node(a, bs.apply.unfoldForest(f))
   }
 
   def unfoldTreeM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[B]] = {
