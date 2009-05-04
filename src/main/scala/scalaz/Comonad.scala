@@ -25,4 +25,6 @@ object Comonad {
   implicit val ZipperComonad = comonad[Zipper]
 
   implicit val TreeComonad = comonad[Tree]
+
+  implicit val TreeLocComonad = comonad[TreeLoc]
 }

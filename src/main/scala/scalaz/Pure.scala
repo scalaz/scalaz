@@ -129,6 +129,10 @@ object Pure {
     def pure[A](a: => A) = Tree.node(a, Stream.empty)
   }
 
+  implicit def TreeLocPure = new Pure[TreeLoc] {
+    def pure[A](a: => A) = TreePure.pure(a).loc
+  }
+
   import java.util._
   import java.util.concurrent._
 

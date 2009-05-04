@@ -37,4 +37,8 @@ object Copure {
     def copure[A](a: Tree[A]) = a.rootLabel
   }
 
+  implicit val TreeLocCopure = new Copure[TreeLoc] {
+    def copure[A](a: TreeLoc[A]) = a.tree.rootLabel
+  }
+
 }

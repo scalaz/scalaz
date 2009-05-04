@@ -66,6 +66,8 @@ object Pointed {
 
   implicit def TreePointed = pointed[Tree]
 
+  implicit def TreeLocPointed = pointed[TreeLoc]
+
   import java.util._
   import java.util.concurrent._
 

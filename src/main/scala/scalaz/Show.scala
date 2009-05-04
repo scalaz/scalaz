@@ -73,6 +73,9 @@ object Show {
   implicit def TreeShow[A](implicit sa: Show[A]): Show[Tree[A]] = show((t: Tree[A]) =>
       '{' :: sa.show(t.rootLabel) ++ " " ++ t.subForest.show ++ "}")
 
+  implicit def TreeLocShow[A](implicit sa: Show[A]): Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
+      t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
+
   implicit def IterableShow[A](implicit sa: Show[A]) = show[Iterable[A]](as => {
     val i = as.elements
     val k = new collection.mutable.ListBuffer[Char]

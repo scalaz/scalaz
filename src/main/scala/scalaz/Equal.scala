@@ -118,6 +118,11 @@ object Equal {
     equal[Tree[A]]((a1, a2) => a1.rootLabel === a2.rootLabel
         && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
 
+  implicit def TreeLocEqual[A](implicit ea: Equal[A]): Equal[TreeLoc[A]] = {
+    equal[TreeLoc[A]]((a1, a2) => a1.tree === a2.tree
+      && a1.lefts === a2.lefts && a1.rights === a2.rights && a1.parents === a2.parents)
+  }
+
   implicit def IterableEqual[A](implicit ea: Equal[A]) = equal[Iterable[A]]((a1, a2) => {
     val i1 = a1.elements
     val i2 = a2.elements
