@@ -7,6 +7,8 @@ sealed trait Gen[+A] {
 
   val f = (sz: Int, r: Rand) => apply(sz)(r)
 
+  def arbitrary = Arbitrary.arbitrary(this)
+  
   def filter(f: A => Boolean): Gen[A] = Gen.gen((sz, rd) => for(p <- this(sz)(rd);
                                                                 q <- if(f(p)) Some(p) else None) yield q)
 
