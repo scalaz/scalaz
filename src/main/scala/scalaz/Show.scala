@@ -71,7 +71,7 @@ object Show {
       z.lefts.reverse.show ++ " " ++ sa.show(z.focus) ++ " " ++ z.rights.show)
 
   implicit def TreeShow[A](implicit sa: Show[A]): Show[Tree[A]] = show((t: Tree[A]) =>
-      '{' :: sa.show(t.rootLabel) ++ " " ++ t.subForest.show ++ "}")
+      '{' :: sa.show(t.rootLabel) ++ " " ++ t.subForest.apply.show ++ "}")
 
   implicit def TreeLocShow[A](implicit sa: Show[A]): Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
       t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)

@@ -60,8 +60,8 @@ object Traverse {
   implicit val TreeTraverse: Traverse[Tree] = new Traverse[Tree] {
     def traverse[F[_], A, B](f: A => F[B], ta: Tree[A])(implicit a: Applicative[F]): F[Tree[B]] = {
       val trav = (t: Tree[A]) => traverse[F, A, B](f, t)
-      val cons = (x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, xs)
-      a.apply(a.fmap(f(ta.rootLabel), cons), StreamTraverse.traverse[F, Tree[A], Tree[B]](trav, ta.subForest))
+      val cons = (x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, () => xs)
+      a.apply(a.fmap(f(ta.rootLabel), cons), StreamTraverse.traverse[F, Tree[A], Tree[B]](trav, ta.subForest.apply))
     }
   }
 
