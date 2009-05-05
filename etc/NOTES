@@ -30,6 +30,9 @@ Data structures for parsing
 * scalaz.concurrent
 Actors library for concurrency
 
+* scalaz.geo
+Data structures and algorithms for cartography
+
 
 Some guidelines
 ===============
