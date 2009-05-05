@@ -1,5 +1,8 @@
 package scalaz
 
+
+import concurrent.Strategy
+
 object S {
   import java.math.BigInteger
 
@@ -124,6 +127,10 @@ object S {
   implicit def ZipStreamFrom[A](z: ZipStream[A]) = ZipStream.ZipStreamFrom(z)
 
   def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = Zipper.zipper(ls, a, rs)
+
+  implicit def StrategyTo[A](s: Strategy[A]) = Strategy.strategyTo(s)
+
+  implicit def StrategyFrom[A](s: (() => A) => () => A) = Strategy.strategyFrom(s)
 
   // MA
 

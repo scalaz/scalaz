@@ -7,7 +7,7 @@ sealed trait MMA[M[_], A] {
 }
 
 object MMA {
-  def mma[M[_]] = new PartialWrapMMA[M, MMA] {
+  implicit def mma[M[_]] = new PartialWrapMMA[M, MMA] {
     def apply[A](m: M[M[A]]) = new MMA[M, A] {
       val v = m
     }

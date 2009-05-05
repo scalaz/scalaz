@@ -226,6 +226,13 @@ sealed trait MA[M[_], A] {
 
     get
   }
+
+  import concurrent.Strategy
+  def parMap[B](f: A => B)(implicit m: Traverse[M], s: Strategy[B]) = m.traverse[Function0, A, B](f.concurry, v)
+
+  import MMA._
+  def parBind[B](f: A => M[B])(implicit m: Bind[M], t: Traverse[M], s: Strategy[M[B]]) =
+    parMap(f).map(((_: MMA[M, B]).join) compose (mma[M](_)))
 }
 
 object MA {

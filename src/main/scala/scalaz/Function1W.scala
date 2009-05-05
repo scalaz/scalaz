@@ -1,5 +1,6 @@
 package scalaz
 
+
 sealed trait Function1W[T, R] {
   val k: T => R
 
@@ -8,6 +9,9 @@ sealed trait Function1W[T, R] {
   def arrow[A[_, _]](implicit a: Arrow[A]) = a arrow k
 
   def kleisli[Z[_]](implicit p: Pure[Z]) = Kleisli.kleisli[Z]((t: T) => p.pure(k(t)))
+
+  import scalaz.concurrent.Strategy
+  def concurry(implicit s: Strategy[R]): T => () => R = (t: T) => s(() => k(t))
 }
 
 object Function1W {
