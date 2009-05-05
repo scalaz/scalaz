@@ -208,6 +208,8 @@ object S {
 
   implicit def GenMA[A](a: test.Gen[A]) = ma[test.Gen](a)
 
+  implicit def TestableMA[A](a: test.Testable[A]) = ma[test.Testable](a)
+
   implicit def TreeLocMA[A](a: TreeLoc[A]) = ma[TreeLoc](a)
 
   import java.util._
@@ -315,7 +317,11 @@ object S {
 
   implicit def TreeMMA[A](a: Tree[Tree[A]]) = mma[Tree](a)
 
-  implicit def TreeMMA[A](a: test.Gen[test.Gen[A]]) = mma[test.Gen](a)
+  implicit def GenMMA[A](a: test.Gen[test.Gen[A]]) = mma[test.Gen](a)
+
+  implicit def TestableMMA[A](a: test.Testable[test.Testable[A]]) = mma[test.Testable](a)
+
+  implicit def TreeLocMMA[A](a: TreeLoc[TreeLoc[A]]) = mma[TreeLoc](a)
 
   import java.util._
   import java.util.concurrent._
