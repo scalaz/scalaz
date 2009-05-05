@@ -30,4 +30,10 @@ object Result {
     val status = st
     val exception = None
   }
+
+  val proven: Result = result(Status.proven)
+  val unfalsified: Result = result(Status.unfalsified)
+  val falsified: Result = result(Status.falsified)
+  val undecided: Result = result(Status.undecided)
+  def exception(e: Throwable): Result = result(Status.exception(e))
 }
