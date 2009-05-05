@@ -1,6 +1,8 @@
 package scalaz.test
 
 sealed trait Status {
+  import Status._
+  
   def status[X](p: => X, t: => X, f: => X, u: => X, e: Throwable => X): X = this match {
     case Proven => p
     case Unfalsified => t
@@ -59,13 +61,14 @@ sealed trait Status {
 
   def property = result.property
 }
-private case object Proven extends Status
-private case object Unfalsified extends Status
-private case object Falsified extends Status
-private case object Undecided extends Status
-private final case class Exception(e: Throwable) extends Status
 
 object Status {
+  private case object Proven extends Status
+  private case object Unfalsified extends Status
+  private case object Falsified extends Status
+  private case object Undecided extends Status
+  private final case class Exception(e: Throwable) extends Status
+
   val proven: Status = Proven
   val unfalsified: Status = Unfalsified
   val falsified: Status = Falsified
