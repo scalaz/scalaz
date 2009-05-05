@@ -4,6 +4,8 @@ sealed trait Result {
   val arguments: Option[List[Argument[_]]]
   val status: Status
   val exception: Option[Throwable]
+
+  def property = Property.property((_, _) => this)
 }
 
 object Result {

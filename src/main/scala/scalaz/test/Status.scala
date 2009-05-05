@@ -54,6 +54,10 @@ sealed trait Status {
     case Undecided => s
     case Exception(_) => this
   }
+
+  def result = Result.result(this)
+
+  def property = result.property
 }
 private case object Proven extends Status
 private case object Unfalsified extends Status
