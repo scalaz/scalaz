@@ -25,5 +25,5 @@ object Testable {
 
   implicit val PropertyTestable: Testable[Property] = testable(p => p)
 
-  implicit def GenTestable[A](implicit t: Testable[A]): Testable[Gen[A]] = testable(g => Property.property((sz, r) => g(sz)(r) map (a => t.test(a)(sz, r)) getOrElse Result.undecided))
+  implicit def GenTestable[A](implicit t: Testable[A]): Testable[Gen[A]] = testable(g => Property.property((sz, r) => g(sz)(r) map (a => t.test(a)(sz)(r)) getOrElse Result.undecided))
 }
