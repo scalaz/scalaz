@@ -56,4 +56,5 @@ object StreamW {
   }
 
   implicit def StreamFrom[A](as: StreamW[A]): Stream[A] = as.value
+
 }

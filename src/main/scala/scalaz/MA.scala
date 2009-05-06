@@ -87,7 +87,7 @@ sealed trait MA[M[_], A] {
   def items(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
 
   def len(implicit l: Length[M]) = l len v
-  
+
   def max(implicit r: FoldLeft[M], ord: Order[A]) =
     foldl1((x: A, y: A) => if (ord.order(x, y) == GT) x else y)
 
@@ -192,6 +192,12 @@ sealed trait MA[M[_], A] {
     k(l.len(v), l.len(w))
   }
 
+  def zip[B](bs: M[B])(implicit z: Zip[M]): M[(A, B)] = z.zip(v, bs)
+
+  def zipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Zip[M], m: Functor[M]): M[C] = z.zipWith(f, v, bs)
+
+  def zipWith[B, C, D](f: (A, B, C) => D, bs: M[B], cs: M[C])(implicit z: Zip[M], m: Functor[M]): M[D] = z.zipWith(f, v, bs, cs)
+
   trait FoldM[N[_]] {
     def apply[B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]): N[B]
   }
@@ -205,23 +211,23 @@ sealed trait MA[M[_], A] {
     foldl[BKTree[A]](BKTree.empty, _ + _)
 
   def elements(implicit l: Length[M], f: FoldRight[M]): test.Gen[A] =
-    if(nil) test.Gen.fail else
+    if (nil) test.Gen.fail else
       0 >--> len map (!!(_))
 
   private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
     implicit def WMA[A](a: M[A]) = MA.ma[M](a)
     val m = memo.Memo.mutableHashMapMemo[(Int, Int), Int]
 
-    def get(i: Int, j: Int): Int = if(i == 0) j else if(j == 0) i else {
+    def get(i: Int, j: Int): Int = if (i == 0) j else if (j == 0) i else {
       lazy val t = this -!- (i - 1)
       lazy val u = w -!- (j - 1)
       lazy val e = t === u
-                                                                                                            
-      val g = m { case (a, b) => get(a, b) }
+
+      val g = m {case (a, b) => get(a, b)}
       val a = g(i - 1, j) + 1
-      val b = g(i - 1, j - 1) + (if(e) 0 else 1)
+      val b = g(i - 1, j - 1) + (if (e) 0 else 1)
       def c = g(i, j - 1) + 1
-      if(a < b) a else if(b <= c) b else c
+      if (a < b) a else if (b <= c) b else c
     }
 
     get

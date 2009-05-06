@@ -10,6 +10,8 @@ sealed trait Function1W[T, R] {
 
   def kleisli[Z[_]](implicit p: Pure[Z]) = Kleisli.kleisli[Z]((t: T) => p.pure(k(t)))
 
+  def liftM[Z[_]](implicit f: Functor[Z]) = f.fmap(_: Z[T], k)
+
   import scalaz.concurrent.Strategy
   def concurry(implicit s: Strategy[R]): T => () => R = (t: T) => s(() => k(t))
 }
