@@ -32,6 +32,7 @@
     </orderEntry>
     <orderEntry type="module" module-name="functionaljava" />
     <orderEntry type="library" name="Scala 2.7.3" level="project" />
+    <orderEntry type="library" exported="" name="scala" level="application" />
   </component>
 </module>
 

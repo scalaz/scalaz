@@ -5,13 +5,14 @@ package scalaz
  */
 sealed trait Tree[+A] {
   val rootLabel: A
-  val subForest: () => Stream[Tree[A]]
+
+  def subForest: Stream[Tree[A]]
 
   import S._
   import MA._
 
   def foldMap[B](f: A => B)(implicit m: Monoid[B]): B =
-    f(rootLabel) |+| subForest.apply.foldMap((_: Tree[A]).foldMap(f))
+    f(rootLabel) |+| subForest.foldMap((_: Tree[A]).foldMap(f))
 
   def drawTree(implicit sh: Show[A]) = draw.foldMap(_ + "\n")
 
@@ -23,28 +24,28 @@ sealed trait Tree[+A] {
     }
     def shift(first: String, other: String, s: Stream[String]) =
       Stream.cons(first, other.repeat[Stream]).zipWith(((_: String) + (_: String)).curry, S.zip(s))
-    Stream.cons(rootLabel.shows, drawSubTrees(subForest.apply))
+    Stream.cons(rootLabel.shows, drawSubTrees(subForest))
   }
 
   def flatten = squish[A](Stream.empty)
 
   private def squish[AA >: A](xs: Stream[AA]): Stream[AA] =
-    Stream.cons(rootLabel, subForest.apply.foldr[Stream[AA]](xs, _.squish(_)))
+    Stream.cons(rootLabel, subForest.foldr[Stream[AA]](xs, _.squish(_)))
 
   def levels: Stream[Stream[A]] = {
-    val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest.apply)
+    val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest)
     val rl = (s: Stream[Tree[A]]) => s.map(_.rootLabel)
     Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty).map(rl)
   }
 
-  def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), t.subForest))
+  def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), () => t.subForest))
 
   def loc = TreeLoc.loc(this, Stream.empty, Stream.empty, Stream.empty)
 }
 
 object Tree {
-  def node[A](root: A, forest: () => Stream[Tree[A]]) = new Tree[A] {
+  def node[A](root: A, forest: Stream[Tree[A]]) = new Tree[A] {
     val rootLabel = root
-    val subForest = forest
+    def subForest = forest
   }
 }

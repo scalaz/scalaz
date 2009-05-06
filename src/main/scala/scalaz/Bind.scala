@@ -35,38 +35,38 @@ object Bind {
   implicit def Tuple3Bind[R, S](implicit sr: Semigroup[R], ss: Semigroup[S]) = new Bind[PartialApply2Of3[Tuple3, R, S]#Apply] {
     def bind[A, B](r: (R, S, A), f: A => (R, S, B)) = {
       val (rr, s, b) = f(r._3)
-      (sr append (r._1, rr), ss append(r._2, s), b)
+      (sr append (r._1, rr), ss append (r._2, s), b)
     }
   }
 
   implicit def Tuple4Bind[R, S, T](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T]) = new Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
     def bind[A, B](r: (R, S, T, A), f: A => (R, S, T, B)) = {
       val (rr, s, t, b) = f(r._4)
-      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), b)
+      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), b)
     }
   }
 
   implicit def Tuple5Bind[R, S, T, U](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U]) = new Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
     def bind[A, B](r: (R, S, T, U, A), f: A => (R, S, T, U, B)) = {
       val (rr, s, t, u, b) = f(r._5)
-      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), b)
+      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), b)
     }
   }
 
   implicit def Tuple6Bind[R, S, T, U, V](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V]) = new Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
     def bind[A, B](r: (R, S, T, U, V, A), f: A => (R, S, T, U, V, B)) = {
       val (rr, s, t, u, v, b) = f(r._6)
-      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), sv append (r._5, v), b)
+      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), sv append (r._5, v), b)
     }
   }
 
   implicit def Tuple7Bind[R, S, T, U, V, W](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V], sw: Semigroup[W]) = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
     def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
       val (rr, s, t, u, v, w, b) = f(r._7)
-      (sr append (r._1, rr), ss append(r._2, s), st append(r._3, t), su append (r._4, u), sv append (r._5, v), sw append (r._6, w), b)
+      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), sv append (r._5, v), sw append (r._6, w), b)
     }
   }
-    
+
   implicit val Function0Bind = new Bind[Function0] {
     def bind[A, B](r: Function0[A], f: A => Function0[B]) = f(r.apply)
   }
@@ -133,10 +133,10 @@ object Bind {
     }
   }
 
-  implicit def TreeBind:Bind[Tree] = new Bind[Tree] {
+  implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
     def bind[A, B](t: Tree[A], f: A => Tree[B]): Tree[B] = {
       val r = f(t.rootLabel)
-      Tree.node(r.rootLabel, () => r.subForest.apply.append(t.subForest.apply.map(bind(_, f))))
+      Tree.node(r.rootLabel, r.subForest.append(t.subForest.map(bind(_, f))))
     }
   }
 
@@ -147,7 +147,7 @@ object Bind {
     def bind[A, B](r: ArrayList[A], f: A => ArrayList[B]) = {
       val a = new ArrayList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -157,7 +157,7 @@ object Bind {
     def bind[A, B](r: LinkedList[A], f: A => LinkedList[B]) = {
       val a = new LinkedList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -167,7 +167,7 @@ object Bind {
     def bind[A, B](r: PriorityQueue[A], f: A => PriorityQueue[B]) = {
       val a = new PriorityQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -177,7 +177,7 @@ object Bind {
     def bind[A, B](r: Stack[A], f: A => Stack[B]) = {
       val a = new Stack[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -187,7 +187,7 @@ object Bind {
     def bind[A, B](r: Vector[A], f: A => Vector[B]) = {
       val a = new Vector[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -197,7 +197,7 @@ object Bind {
     def bind[A, B](r: ArrayBlockingQueue[A], f: A => ArrayBlockingQueue[B]) = {
       val a = new ArrayBlockingQueue[B](r.remainingCapacity)
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -207,7 +207,7 @@ object Bind {
     def bind[A, B](r: ConcurrentLinkedQueue[A], f: A => ConcurrentLinkedQueue[B]) = {
       val a = new ConcurrentLinkedQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -217,7 +217,7 @@ object Bind {
     def bind[A, B](r: CopyOnWriteArrayList[A], f: A => CopyOnWriteArrayList[B]) = {
       val a = new CopyOnWriteArrayList[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -227,7 +227,7 @@ object Bind {
     def bind[A, B](r: LinkedBlockingQueue[A], f: A => LinkedBlockingQueue[B]) = {
       val a = new LinkedBlockingQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }
@@ -237,7 +237,7 @@ object Bind {
     def bind[A, B](r: SynchronousQueue[A], f: A => SynchronousQueue[B]) = {
       val a = new SynchronousQueue[B]
       val i = r.iterator
-      while(i.hasNext)
+      while (i.hasNext)
         a.addAll(f(i.next))
       a
     }

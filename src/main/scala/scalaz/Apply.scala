@@ -62,12 +62,12 @@ object Apply {
   implicit def EitherRightApply[X] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
   implicit def ValidationApply[X](implicit s: Semigroup[X]) = new Apply[PartialApply1Of2[Validation, X]#Apply] {
-     def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
-        case (Success(f), Success(a)) => Success(f(a))
-        case (Success(_), Failure(e)) => Failure(e)
-        case (Failure(e), Success(_)) => Failure(e)
-        case (Failure(e1), Failure(e2)) => Failure(e1 |+| e2)
-      }
+    def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
+      case (Success(f), Success(a)) => Success(f(a))
+      case (Success(_), Failure(e)) => Failure(e)
+      case (Failure(e), Success(_)) => Failure(e)
+      case (Failure(e1), Failure(e2)) => Failure(e1 |+| e2)
+    }
   }
 
   implicit def ValidationFailureApply[X] = new Apply[PartialApply1Of2[Validation.FailureProjection, X]#Flip] {
@@ -90,14 +90,14 @@ object Apply {
     def apply[A, B](f: ZipStream[A => B], a: ZipStream[A]): ZipStream[B] = {
       val ff = f.value
       val aa = a.value
-      (if(ff.isEmpty || aa.isEmpty) Stream.empty
+      (if (ff.isEmpty || aa.isEmpty) Stream.empty
       else Stream.cons((ff.head)(aa.head), apply(ff.tail |!|, aa.tail |!|))) |!|
     }
   }
 
   val ZipTreeApply: Apply[Tree] = new Apply[Tree] {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] = {
-      Tree.node((f.rootLabel)(a.rootLabel), () => (a.subForest.apply |!|) <*> (f.subForest.apply.map((apply(_: Tree[A => B], _: Tree[A])).curry) |!|))
+      Tree.node((f.rootLabel)(a.rootLabel), (a.subForest |!|) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curry) |!|))
     }
   }
 

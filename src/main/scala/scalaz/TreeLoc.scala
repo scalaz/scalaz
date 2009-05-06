@@ -13,7 +13,7 @@ sealed trait TreeLoc[+A] {
   import Tree._
   import TreeLoc._
   def parent = parents match {
-    case Stream.cons((pls, v, prs), ps) => Some(loc(node(v, () => combChildren(lefts, tree, rights)), pls, prs, ps))
+    case Stream.cons((pls, v, prs), ps) => Some(loc(node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
     case Stream.empty => None
   }
 
@@ -29,22 +29,21 @@ sealed trait TreeLoc[+A] {
     case Stream.empty => None
   }
 
-  def firstChild = tree.subForest.apply match {
+  def firstChild = tree.subForest match {
     case Stream.cons(t, ts) => Some(loc(t, Stream.empty, ts, downParents))
     case Stream.empty => None
   }
 
-  def lastChild = tree.subForest.apply.reverse match {
+  def lastChild = tree.subForest.reverse match {
     case Stream.cons(t, ts) => Some(loc(t, ts, Stream.empty, downParents))
     case Stream.empty => None
   }
 
   def getChild(n: Int) =
-    for (val lr <- splitChildren(Stream.empty, tree.subForest.apply, n)) {
+    for (val lr <- splitChildren(Stream.empty, tree.subForest, n)) {
       val ls = lr._1
       loc(ls.head, ls.tail, lr._2, downParents)
     }
-
 
   def findChild(p: Tree[A] => Boolean) = {
     def split(acc: Stream[Tree[A]], xs: Stream[Tree[A]]): Option[(Stream[Tree[A]], Tree[A], Stream[Tree[A]])] =
@@ -52,7 +51,7 @@ sealed trait TreeLoc[+A] {
         case (acc, Stream.cons(x, xs)) => if (p(x)) Some((acc, x, xs)) else split(Stream.cons(x, acc), xs)
         case _ => None
       }
-    for (val ltr <- split(Stream.empty, tree.subForest.apply)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
+    for (val ltr <- split(Stream.empty, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
   }
 
   def toTree = root.tree
@@ -65,7 +64,7 @@ sealed trait TreeLoc[+A] {
 
   def isLast = rights.isEmpty
 
-  def isLeaf = tree.subForest.apply.isEmpty
+  def isLeaf = tree.subForest.isEmpty
 
   def isChild = !isRoot
 
@@ -85,18 +84,18 @@ sealed trait TreeLoc[+A] {
 
   def insertRight[AA >: A](t: Tree[AA]) = loc(t, Stream.cons(tree, lefts), rights, parents)
 
-  def insertDownFirst[AA >: A](t: Tree[AA]) = loc(t, Stream.empty, tree.subForest.apply, downParents)
+  def insertDownFirst[AA >: A](t: Tree[AA]) = loc(t, Stream.empty, tree.subForest, downParents)
 
-  def insertDownLast[AA >: A](t: Tree[AA]) = loc(t, tree.subForest.apply.reverse, Stream.empty, downParents)
+  def insertDownLast[AA >: A](t: Tree[AA]) = loc(t, tree.subForest.reverse, Stream.empty, downParents)
 
   def insertDownAt[AA >: A](n: Int, t: Tree[AA]) =
-    for (lr <- splitChildren(Stream.empty, tree.subForest.apply, n)) yield loc(t, lr._1, lr._2, downParents)
+    for (lr <- splitChildren(Stream.empty, tree.subForest, n)) yield loc(t, lr._1, lr._2, downParents)
 
   def delete = rights match {
     case Stream.cons(t, ts) => Some(loc(t, lefts, ts, parents))
     case _ => lefts match {
       case Stream.cons(t, ts) => Some(loc(t, ts, rights, parents))
-      case _ => for (val loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => node(t.rootLabel, () => Stream.empty))
+      case _ => for (val loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => node(t.rootLabel, Stream.empty))
     }
   }
 

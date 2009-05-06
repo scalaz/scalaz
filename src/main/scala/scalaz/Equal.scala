@@ -116,7 +116,7 @@ object Equal {
 
   implicit def TreeEqual[A](implicit ea: Equal[A]): Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) => a1.rootLabel === a2.rootLabel
-        && IterableEqual[Tree[A]].equal(a1.subForest.apply, a2.subForest.apply))
+        && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
 
   implicit def TreeLocEqual[A](implicit ea: Equal[A]): Equal[TreeLoc[A]] = {
     equal[TreeLoc[A]]((a1, a2) => a1.tree === a2.tree
