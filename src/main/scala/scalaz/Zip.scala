@@ -19,7 +19,9 @@ trait Zip[F[_]] {
 
 object Zip {
   import S._
-  import MA.ma
+  import MA._
+  import Copure._
+  import Traverse._
   def applicativeZip[F[_]](implicit f: Applicative[F]) = new Zip[F] {
     def zip[A, B](a: F[A], b: F[B]) = ma[F](a).liftA(b, (Tuple2(_: A, _: B)).curry)
   }
@@ -28,13 +30,19 @@ object Zip {
     def apply[A, B](fs: Z[A => B], a: Z[A]): Z[B] = z.zipWith((_: (A => B)).apply(_: A), fs, a)
   }
 
-  implicit val IdentityZip: Zip[Identity] = new Zip[Identity] {
-    def zip[A, B](a: Identity[A], b: Identity[B]): Identity[(A, B)] = (a.value, b.value)
+  def copureTraverseZip[F[_]](implicit c: Copure[F], t: Traverse[F]) = new Zip[F] {
+    def cp[A, B, C](x: B => A => C) = (y: B, z: F[A]) => x(y)(c.copure(z)) 
+    def zip[A, B](a: F[A], b: F[B]): F[(A, B)] =
+      cp(kleisli[PartialApply1Of2[Function1, B]#Apply]((Tuple2(_: A, _: B)).curry).traverse[F](_: F[A]))(a, b)
   }
+
+  implicit val ZipStreamZip: Zip[ZipStream] = applicativeZip[ZipStream] 
+
+  implicit val IdentityZip: Zip[Identity] = applicativeZip[Identity]
 
   implicit def ContinuationZip[R] = applicativeZip[PartialApply1Of2[Continuation, R]#Apply]
 
-  implicit val NonEmptyListZip = applicativeZip[NonEmptyList]
+  implicit val NonEmptyListZip = copureTraverseZip[NonEmptyList]
 
   implicit def StateZip[S] = applicativeZip[PartialApply1Of2[State, S]#Apply]
 
@@ -66,9 +74,18 @@ object Zip {
 
   implicit def Function6Zip[R, S, T, U, V, W] = applicativeZip[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]
 
-  implicit val ListZip = applicativeZip[List]
+  implicit val ListZip: Zip[List] = new Zip[List] {
+    def zip[A, B](a: List[A], b: List[B]): List[(A, B)] = (a, b) match {
+      case (Nil, _) => Nil
+      case (_, Nil) => Nil
+      case (a::as, b::bs) => (a, b) :: zip(as, bs)
+    }
+  }
 
-  implicit val StreamZip = applicativeZip[Stream]
+  implicit val StreamZip: Zip[Stream] = new Zip[Stream] {
+    import StreamW._
+    def zip[A, B](a: Stream[A], b: Stream[B]): Stream[(A, B)] = ZipStreamZip.zip(a |!|, b |!|)
+  }
 
   implicit val OptionZip = applicativeZip[Option]
 
@@ -82,9 +99,9 @@ object Zip {
 
   implicit def ValidationFailureZip[X] = applicativeZip[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
 
-  implicit val ZipperZip = applicativeZip[Zipper]
+  implicit val ZipperZip = copureTraverseZip[Zipper]
 
-  implicit val TreeZip = applicativeZip[Tree]
+  implicit val TreeZip = copureTraverseZip[Tree]
 
   import java.util._
   import java.util.concurrent._
