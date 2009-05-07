@@ -23,7 +23,7 @@ sealed trait Tree[+A] {
       case Stream.cons(t, ts) => Stream.cons("|", shift("+- ", "|  ", t.draw)) append drawSubTrees(ts)
     }
     def shift(first: String, other: String, s: Stream[String]) =
-      Stream.cons(first, other.repeat[Stream]).zipWith(((_: String) + (_: String)).curry, S.zip(s))
+      Stream.cons(first, other.repeat[Stream]).zipWith(((_: String) + (_: String)), s |!|)
     Stream.cons(rootLabel.shows, drawSubTrees(subForest))
   }
 

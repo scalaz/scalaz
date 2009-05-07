@@ -39,9 +39,7 @@ sealed trait StreamW[A] {
     case _ => Stream.empty
   }
 
-  def zapp[B, C](fs: ZipStream[A => B => C]) = S.zip(value) <*> fs
-
-  def zipWith[B, C](f: A => B => C, bs: ZipStream[B]) = bs <*> zapp(f.repeat[ZipStream])
+  def zapp[B, C](fs: ZipStream[A => B => C]) = (value |!|) <*> fs
 
   def unfoldForest[B](f: A => (B, () => Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
 

@@ -13,7 +13,7 @@ object Zero {
 
   import S._
 
-  implicit val DigitZero = zero(_0)
+  implicit val DigitZero: Zero[Digit] = zero(_0)
 
   implicit val OrderingZero = zero(EQ)
 

@@ -126,7 +126,7 @@ object Pure {
   }
 
   implicit def TreePure = new Pure[Tree] {
-    def pure[A](a: => A) = Tree.node(a, () => Stream.empty)
+    def pure[A](a: => A) = Tree.node(a, Stream.empty)
   }
 
   implicit def TreeLocPure = new Pure[TreeLoc] {

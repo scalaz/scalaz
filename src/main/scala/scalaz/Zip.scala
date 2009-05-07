@@ -30,19 +30,16 @@ object Zip {
     def apply[A, B](fs: Z[A => B], a: Z[A]): Z[B] = z.zipWith((_: (A => B)).apply(_: A), fs, a)
   }
 
-  def copureTraverseZip[F[_]](implicit c: Copure[F], t: Traverse[F]) = new Zip[F] {
-    def cp[A, B, C](x: B => A => C) = (y: B, z: F[A]) => x(y)(c.copure(z)) 
-    def zip[A, B](a: F[A], b: F[B]): F[(A, B)] =
-      cp(kleisli[PartialApply1Of2[Function1, B]#Apply]((Tuple2(_: A, _: B)).curry).traverse[F](_: F[A]))(a, b)
-  }
-
-  implicit val ZipStreamZip: Zip[ZipStream] = applicativeZip[ZipStream] 
+  implicit val ZipStreamZip: Zip[ZipStream] = applicativeZip[ZipStream]
 
   implicit val IdentityZip: Zip[Identity] = applicativeZip[Identity]
 
   implicit def ContinuationZip[R] = applicativeZip[PartialApply1Of2[Continuation, R]#Apply]
 
-  implicit val NonEmptyListZip = copureTraverseZip[NonEmptyList]
+  implicit val NonEmptyListZip: Zip[NonEmptyList] = new Zip[NonEmptyList] {
+    def zip[A, B](a: NonEmptyList[A], b: NonEmptyList[B]) =
+      NonEmptyList.nel((a.head, b.head), ListZip.zip(a.tail, b.tail))
+  }
 
   implicit def StateZip[S] = applicativeZip[PartialApply1Of2[State, S]#Apply]
 
@@ -75,21 +72,18 @@ object Zip {
   implicit def Function6Zip[R, S, T, U, V, W] = applicativeZip[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]
 
   implicit val ListZip: Zip[List] = new Zip[List] {
-    def zip[A, B](a: List[A], b: List[B]): List[(A, B)] = (a, b) match {
-      case (Nil, _) => Nil
-      case (_, Nil) => Nil
-      case (a::as, b::bs) => (a, b) :: zip(as, bs)
-    }
+    def zip[A, B](a: List[A], b: List[B]): List[(A, B)] = a.zip(b)
   }
 
   implicit val StreamZip: Zip[Stream] = new Zip[Stream] {
-    import StreamW._
-    def zip[A, B](a: Stream[A], b: Stream[B]): Stream[(A, B)] = ZipStreamZip.zip(a |!|, b |!|)
+    def zip[A, B](a: Stream[A], b: Stream[B]): Stream[(A, B)] = a.zip(b)
   }
 
   implicit val OptionZip = applicativeZip[Option]
 
-  implicit val ArrayZip = applicativeZip[Array]
+  implicit val ArrayZip = new Zip[Array] {
+    def zip[A, B](a: Array[A], b: Array[B]): Array[(A, B)] = a.zip(b)
+  }
 
   implicit def EitherLeftZip[X] = applicativeZip[PartialApply1Of2[Either.LeftProjection, X]#Flip]
 
@@ -99,9 +93,16 @@ object Zip {
 
   implicit def ValidationFailureZip[X] = applicativeZip[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
 
-  implicit val ZipperZip = copureTraverseZip[Zipper]
+  implicit val ZipperZip: Zip[Zipper] = new Zip[Zipper] {
+    def zip[A, B](a: Zipper[A], b: Zipper[B]): Zipper[(A, B)] =
+      Zipper.zipper(StreamZip.zip(a.lefts, b.lefts), (a.focus, b.focus), StreamZip.zip(a.lefts, b.lefts))
+  }
 
-  implicit val TreeZip = copureTraverseZip[Tree]
+  implicit val TreeZip: Zip[Tree] = new Zip[Tree] {
+    def zip[A, B](a: Tree[A], b: Tree[B]): Tree[(A, B)] =
+      Tree.node((a.rootLabel, b.rootLabel),
+        StreamZip.zip(a.subForest, b.subForest).map((TreeZip.zip(_: Tree[A], _: Tree[B])).tupled))
+  }
 
   import java.util._
   import java.util.concurrent._
