@@ -31,8 +31,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="functionaljava" />
-    <orderEntry type="library" name="Scala 2.7.3" level="project" />
-    <orderEntry type="library" name="scala" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/build/lib/scala-library.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

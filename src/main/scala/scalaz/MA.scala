@@ -210,12 +210,10 @@ sealed trait MA[M[_], A] {
   def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
     foldl[BKTree[A]](BKTree.empty, _ + _)
 
-  /*
-  // todo
   def elements(implicit l: Length[M], f: FoldRight[M]): test.Gen[A] =
     if (nil) test.Gen.fail else
       0 >--> len map (!!(_))
-    */
+    
   private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
     implicit def WMA[A](a: M[A]) = MA.ma[M](a)
     val m = memo.Memo.mutableHashMapMemo[(Int, Int), Int]

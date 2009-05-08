@@ -8,8 +8,7 @@ sealed trait IntW {
   def |*| = IntMultiplication.multiplication(value)
 
   def ordering = if(value < 0) LT else if(value > 0) GT else EQ
-            /*
-            // todo
+
   import test._
 
   def >-->(high: Int): Gen[Int] = if(value < high) Gen.fail else Gen.randomised(_.chooseInt(value, high).gen)
@@ -21,11 +20,10 @@ sealed trait IntW {
     else Gen.gen((sz, r) => {
       val k = new collection.mutable.ListBuffer[A]
       k ++= a
-      while(k.length > value) k.remove((0 >--> k.length - 1)(sz)(r).get)     
-      Some(k.toList)
+      while(k.length > value) k.remove((0 >--> k.length - 1)(sz)(r))     
+      k.toList
     })
   }
-  */
 }
 
 object IntW {
