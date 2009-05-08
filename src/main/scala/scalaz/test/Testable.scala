@@ -13,7 +13,6 @@ object Testable {
 
   import S._
 
-
   implicit val TestableCofunctor: Cofunctor[Testable] = new Cofunctor[Testable] {
     def comap[A, B](r: Testable[A], f: B => A) = testable[B](b => r.test(f(b)))
   }
