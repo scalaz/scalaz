@@ -31,7 +31,7 @@ sealed trait ListW[A] {
     case h :: t => f(NonEmptyList.nel(h, t))
   }
 
-  def choose = (0 >--> value.length) >>= (_ <=- (value: _*))
+// todo  def choose = (0 >--> value.length) >>= (_ <=- (value: _*))
 }
 
 object ListW {

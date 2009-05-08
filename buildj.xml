@@ -212,12 +212,12 @@
      </sequential>
   </macrodef>
 
-  <target name="javadoc" description="javadoc the project">
+  <target name="javadoc" depends="init" description="javadoc the project">
     <mkdir dir="${build.dir}/javadoc"/>
     <javadoc-links/>
   </target>
 
-  <target name="scaladoc" depends=" javac, scalac" description="scaladoc the project">
+  <target name="scaladoc" depends="init, javac, scalac" description="scaladoc the project">
     <mkdir dir="${build.dir}/scaladoc"/>
     <scaladoc-links/>
   </target>
@@ -276,11 +276,11 @@
     </sequential>
   </macrodef>
 
-  <target name="javac-deps" description="compile the dependent Java source">
+  <target name="javac-deps" depends="init" description="compile the dependent Java source">
     <compile-java src="${deps-src.java.dir}" classes="${build.dir}/classes/deps-src" classpath="libs.path"/>
   </target>
 
-  <target name="javac" depends=" javac-deps" description="compile the Java source">
+  <target name="javac" depends="init, javac-deps" description="compile the Java source">
     <compile-java src="${src.java.dir}" classes="${build.dir}/classes/src" classpath="libs.path"/>
   </target>
 
