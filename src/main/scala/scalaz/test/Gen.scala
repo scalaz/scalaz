@@ -7,7 +7,7 @@ sealed trait Gen[+A] {
 
   import S._
   
-  // todo arbitrary
+  def arbitrary = Arbitrary.arbitrary(this)
 
   def filter(f: A => Boolean): Gen[A] = Gen.gen((sz, rd) => {
     var a: A = this(sz)(rd)
