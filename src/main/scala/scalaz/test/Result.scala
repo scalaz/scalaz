@@ -2,7 +2,8 @@ package scalaz.test
 
 sealed trait Result {
   import Result._
-  
+  import S._
+
   def fold[X](proven: List[Argument[_]] => X,
               unfalsified: => X,
               falsified: List[Argument[_]] => X,
@@ -16,6 +17,8 @@ sealed trait Result {
     case PropertyException(args, ex) => propertyException(args, ex)
     case GenException(ex) => genException(ex)
   }
+
+  def property = Property.property(this.gen)
 }
 
 object Result {
