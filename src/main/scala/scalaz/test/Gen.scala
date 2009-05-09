@@ -30,6 +30,42 @@ sealed trait Gen[+A] {
   def many[M[_], AA >: A](implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] = Gen.sized(sz => for(n <- 0 >--> sz; c <- replicate[M, AA](n)) yield c)
 
   def many1[M[_], AA >: A](implicit p: Pure[M], m: Monoid[M[AA]]): Gen[M[AA]] = Gen.sized(sz => for(n <- 1 >--> sz; c <- replicate[M, AA](n)) yield c)
+
+  def forall[AA >:A](implicit s: Shrink[AA], t: Testable[AA]) = Property.property(Gen.gen((sz, r) => {
+    def failed(o: Option[(AA, Status)]) = o exists (_._2.failed)
+
+    def first(as: Stream[AA], shrinks: Int): Option[(AA, Status)] = {
+      val rs = as map (a => {
+        val k = (try {
+          t test a
+        } catch {
+          case t => Property.property(Status.exception(Nil, t).gen)
+        }).gen(sz)(r)
+
+        if(k.isUndecided) None
+        else Some((a, k))
+      })
+
+      if(rs.isEmpty) None
+      else rs.find(failed(_))| rs.head
+    }
+
+    var x = first(Stream(this(sz)(r)), 0)
+
+    (if(failed(x)) {
+      var or: Option[Status] = null
+      var shrinks = 0
+
+      do {
+        shrinks = shrinks + 1
+        or = x map (_._2)
+        x = first(s shrink x.get._1, shrinks)
+      } while(failed(x))
+      
+      or
+    } else
+      x.map(_._2)) | Status.undecided
+  }))
 }
 
 object Gen {
