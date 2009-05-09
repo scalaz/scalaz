@@ -9,7 +9,7 @@ object Testable {
     def test(a: A) = f(a)
   }
 
-  def testableResult[A](f: A => Result) = testable[A](a => f(a).property)
+  def testableStatus[A](f: A => Status) = testable[A](a => f(a).property)
 
   import S._
 
@@ -17,11 +17,11 @@ object Testable {
     def comap[A, B](r: Testable[A], f: B => A) = testable[B](b => r.test(f(b)))
   }
 
-  implicit val UnitTestable: Testable[Unit] = testableResult(_ => Result.undecided)
+  implicit val UnitTestable: Testable[Unit] = testableStatus(_ => Status.undecided)
 
-  implicit val BooleanTestable: Testable[Boolean] = testableResult(b => if(b) Result.proven(Nil) else Result.falsified(Nil))
+  implicit val BooleanTestable: Testable[Boolean] = testableStatus(b => if(b) Status.proven(Nil) else Status.falsified(Nil))
 
-  implicit val ResultTestable: Testable[Result] = testableResult(r => r)
+  implicit val StatusTestable: Testable[Status] = testableStatus(s => s)
 
   implicit val PropertyTestable: Testable[Property] = testable(p => p)
 
