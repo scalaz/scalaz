@@ -12,6 +12,9 @@ object Strategy {
   }
 
   implicit def strategyTo[A](s: Strategy[A]) = (a: () => A) => s(a)
-  
-  def parM[M[_], A](as: M[() => A])(implicit m: Functor[M], s: Strategy[A]) = m.fmap(as, s)
+
+  def parM[M[_], A](as: M[() => A])(implicit m: Functor[M], s: Strategy[A]) = {
+    val v = m.fmap(as, s)
+    () => m.fmap(v, (_: (() => A)).apply)
+  }
 }

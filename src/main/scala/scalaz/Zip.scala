@@ -104,26 +104,127 @@ object Zip {
         StreamZip.zip(a.subForest, b.subForest).map((TreeZip.zip(_: Tree[A], _: Tree[B])).tupled))
   }
 
+  implicit val TreeLocZip: Zip[TreeLoc] = new Zip[TreeLoc] {
+    def zip[A, B](a: TreeLoc[A], b: TreeLoc[B]): TreeLoc[(A, B)] = {
+      val tzip = (TreeZip.zip(_: Tree[A], _: Tree[B])).tupled;
+      TreeLoc.loc(TreeZip.zip(a.tree, b.tree),
+        a.lefts.zip(b.lefts).map(tzip),
+        a.rights.zip(b.rights).map(tzip),
+        a.parents.zip(b.parents)
+            .map((p: ((Stream[Tree[A]], A, Stream[Tree[A]]), (Stream[Tree[B]], B, Stream[Tree[B]]))) => p match {
+          case ((la, a, ra), (lb, b, rb)) => (la.zip(lb).map(tzip), (a, b), ra.zip(rb).map(tzip))
+        }))
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
+  import scala.Math._
 
-  implicit val JavaArrayListZip = applicativeZip[ArrayList]
+  implicit val JavaArrayListZip: Zip[ArrayList] = new Zip[ArrayList] {
+    def zip[A, B](a: ArrayList[A], b: ArrayList[B]): ArrayList[(A, B)] = {
+      val s = min(a.size, b.size)
+      val z: ArrayList[(A, B)] = new ArrayList[(A, B)](s)
+      for (n <- 0 until s)
+        z.add((a.get(n), b.get(n)))
+      z
+    }
+  }
 
-  implicit val JavaLinkedListZip = applicativeZip[LinkedList]
+  implicit val JavaLinkedListZip: Zip[LinkedList] = new Zip[LinkedList] {
+    def zip[A, B](a: LinkedList[A], b: LinkedList[B]): LinkedList[(A, B)] = {
+      val z: LinkedList[(A, B)] = new LinkedList[(A, B)]
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
 
-  implicit val JavaPriorityQueueZip = applicativeZip[PriorityQueue]
+  implicit val JavaPriorityQueueZip: Zip[PriorityQueue] = new Zip[PriorityQueue] {
+    def zip[A, B](a: PriorityQueue[A], b: PriorityQueue[B]): PriorityQueue[(A, B)] = {
+      val z: PriorityQueue[(A, B)] = new PriorityQueue[(A, B)]
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
 
-  implicit val JavaStackZip = applicativeZip[Stack]
+  implicit val JavaStackZip: Zip[Stack] = new Zip[Stack] {
+    def zip[A, B](a: Stack[A], b: Stack[B]): Stack[(A, B)] = {
+      val z: Stack[(A, B)] = new Stack[(A, B)]
+      val s = min(a.size, b.size)
+      for (n <- 0 until s)
+        z.add((a.get(n), b.get(n)))
+      z
+    }
+  }
 
-  implicit val JavaVectorZip = applicativeZip[Vector]
+  implicit val JavaVectorZip: Zip[Vector] = new Zip[Vector] {
+    def zip[A, B](a: Vector[A], b: Vector[B]): Vector[(A, B)] = {
+      val z: Vector[(A, B)] = new Vector[(A, B)](min(a.size, b.size))
+      val s = min(a.size, b.size)
+      for (n <- 0 until s)
+        z.add((a.get(n), b.get(n)))
+      z
+    }
+  }
 
-  implicit val JavaArrayBlockingQueueZip = applicativeZip[ArrayBlockingQueue]
+  implicit val JavaArrayBlockingQueueZip: Zip[ArrayBlockingQueue] = new Zip[ArrayBlockingQueue] {
+    def zip[A, B](a: ArrayBlockingQueue[A], b: ArrayBlockingQueue[B]): ArrayBlockingQueue[(A, B)] = {
+      val z: ArrayBlockingQueue[(A, B)] = new ArrayBlockingQueue[(A, B)](min(a.size, b.size))
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
 
-  implicit val JavaConcurrentLinkedQueueZip = applicativeZip[ConcurrentLinkedQueue]
+  implicit val JavaConcurrentLinkedQueueZip: Zip[ConcurrentLinkedQueue] = new Zip[ConcurrentLinkedQueue] {
+    def zip[A, B](a: ConcurrentLinkedQueue[A], b: ConcurrentLinkedQueue[B]): ConcurrentLinkedQueue[(A, B)] = {
+      val z: ConcurrentLinkedQueue[(A, B)] = new ConcurrentLinkedQueue[(A, B)]
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
 
-  implicit val JavaCopyOnWriteArrayListZip = applicativeZip[CopyOnWriteArrayList]
+  implicit val JavaCopyOnWriteArrayListZip: Zip[CopyOnWriteArrayList] = new Zip[CopyOnWriteArrayList] {
+    def zip[A, B](a: CopyOnWriteArrayList[A], b: CopyOnWriteArrayList[B]): CopyOnWriteArrayList[(A, B)] = {
+      val s = min(a.size, b.size)
+      val z: CopyOnWriteArrayList[(A, B)] = new CopyOnWriteArrayList[(A, B)]
+      for (n <- 0 until s)
+        z.add((a.get(n), b.get(n)))
+      z
+    }
+  }
 
-  implicit val JavaLinkedBlockingQueueZip = applicativeZip[LinkedBlockingQueue]
+  implicit val JavaLinkedBlockingQueueZip: Zip[LinkedBlockingQueue] = new Zip[LinkedBlockingQueue] {
+    def zip[A, B](a: LinkedBlockingQueue[A], b: LinkedBlockingQueue[B]): LinkedBlockingQueue[(A, B)] = {
+      val z: LinkedBlockingQueue[(A, B)] = new LinkedBlockingQueue[(A, B)]
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
 
-  implicit val JavaSynchronousQueueZip = applicativeZip[SynchronousQueue]
+  implicit val JavaSynchronousQueueZip: Zip[SynchronousQueue] = new Zip[SynchronousQueue] {
+    def zip[A, B](a: SynchronousQueue[A], b: SynchronousQueue[B]): SynchronousQueue[(A, B)] = {
+      val z: SynchronousQueue[(A, B)] = new SynchronousQueue[(A, B)]
+      val as = a.iterator
+      val bs = b.iterator
+      while (as.hasNext && bs.hasNext)
+        z.add((as.next, bs.next))
+      z
+    }
+  }
+
 }

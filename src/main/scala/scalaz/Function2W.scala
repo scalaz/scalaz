@@ -8,6 +8,9 @@ sealed trait Function2W[T1, T2, R] {
   def on[X](f: (R, R) => X, t1: (T1, T1), t2: (T2, T2)) = f(k(t1._1, t2._1), k(t1._2, t2._2))
 
   def tupled = Function.tupled(k)
+
+  import scalaz.concurrent.Strategy
+  def concurry(implicit s: Strategy[R]): (T1, T2) => () => R = (t1: T1, t2: T2) => s(() => k(t1, t2))
 }
 
 object Function2W {
