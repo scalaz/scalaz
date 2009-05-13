@@ -89,7 +89,7 @@ sealed trait Identity[A] {
                  if(d + 1 >= maxDiscarded) { res = Result.result(Status.undecided, s, d + 1); l = false } else { sz = size; d = d + 1 },
                  (as, t) => { Result.result(Status.exception(as, t), s, d); l = false })
       } catch {
-        case e =>
+        case e => Result.result(e, s, d)
       }
 
     }
