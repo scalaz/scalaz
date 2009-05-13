@@ -8,8 +8,7 @@ sealed trait Status {
               unfalsified: => X,
               falsified: List[Argument[_]] => X,
               undecided: => X,
-              propertyException: (List[Argument[_]], Throwable) => X,
-              genException: Throwable => X): X = this match {
+              propertyException: (List[Argument[_]], Throwable) => X): X = this match {
     case Proven(args) => proven(args)
     case Unfalsified => unfalsified
     case Falsified(args) => falsified(args)

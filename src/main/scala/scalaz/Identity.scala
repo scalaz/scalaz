@@ -68,6 +68,35 @@ sealed trait Identity[A] {
             m.pure(Tree.node(abs._1, ts))))
   }
 
+  import test._
+
+  def check(minSuccessful: Int, maxDiscarded: Int, minSize: Int, maxSize: Int)(implicit t: Testable[A], r: Rand): Result = {
+    var s = 0
+    var d = 0
+    var sz = minSize.toFloat
+    var res: Result = null
+    var l = true
+    val p = t test value
+
+    while(l) {
+      val size = if(s == 0 && d == 0) minSize.toFloat else sz + (maxSize - sz) / (minSuccessful - s)
+
+      try {
+        p.gen(size.round) fold
+                (as => { res = Result.result(Status.proven(as), s + 1, d); l = false },
+                 if(s + 1 >= minSuccessful) { Result.result(Status.unfalsified, s + 1, d); l = false } else { sz = size; s = s + 1 },
+                 as => { res = Result.result(Status.falsified(as), s, d); l = false },
+                 if(d + 1 >= maxDiscarded) { res = Result.result(Status.undecided, s, d + 1); l = false } else { sz = size; d = d + 1 },
+                 (as, t) => { Result.result(Status.exception(as, t), s, d); l = false })
+      } catch {
+        case e =>
+      }
+
+    }
+
+    res
+  }
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode

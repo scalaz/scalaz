@@ -7,7 +7,7 @@ sealed trait Result {
 }
 
 object Result {
-  def genExceptionResult(t: Throwable, s: Int, d: Int) = new Result {
+  def result(t: Throwable, s: Int, d: Int) = new Result {
     val status = Left(t)
     val succeeded = s
     val discarded = d
