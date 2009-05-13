@@ -11,6 +11,10 @@ object Arbitrary {
 
   import S._
 
+  implicit val IntArbitrary: Arbitrary[Int] = Gen.sized(i => -i >--> i).arbitrary 
+
+  // todo lots of Arbitrary
+  
   implicit val ArbitraryFunctor: Functor[Arbitrary] = new Functor[Arbitrary] {
     def fmap[A, B](r: Arbitrary[A], f: A => B) = r.gen |> f arbitrary
   }
