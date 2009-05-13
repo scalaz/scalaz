@@ -8,12 +8,12 @@ sealed trait Status {
               unfalsified: => X,
               falsified: List[Argument[_]] => X,
               undecided: => X,
-              propertyException: (List[Argument[_]], Throwable) => X): X = this match {
+              exception: (List[Argument[_]], Throwable) => X): X = this match {
     case Proven(args) => proven(args)
     case Unfalsified => unfalsified
     case Falsified(args) => falsified(args)
     case Undecided => undecided
-    case Exception(args, ex) => propertyException(args, ex)
+    case Exception(args, ex) => exception(args, ex)
   }
 
   def isProven = this match {
