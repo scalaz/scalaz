@@ -86,15 +86,15 @@ sealed trait Identity[A] {
                 // proven
                 (as => { res = Result.result(Status.proven(as), s + 1, d); l = false },
                 // unfalsified
-                if(s + 1 >= minSuccessful) { Result.result(Status.unfalsified, s + 1, d); l = false } else { sz = size; s = s + 1 },
+                if(s + 1 >= minSuccessful) { res = Result.result(Status.unfalsified, s + 1, d); l = false } else { sz = size; s = s + 1 },
                 // falsified
                 as => { res = Result.result(Status.falsified(as), s, d); l = false },
                 // undecided
                 if(d + 1 >= maxDiscarded) { res = Result.result(Status.undecided, s, d + 1); l = false } else { sz = size; d = d + 1 },
                 // exception
-                (as, t) => { Result.result(Status.exception(as, t), s, d); l = false })
+                (as, t) => { res = Result.result(Status.exception(as, t), s, d); l = false })
       } catch {
-        case e => { Result.result(e, s, d); l = false }
+        case e => { res = Result.result(e, s, d); l = false }
       }
 
     }
