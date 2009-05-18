@@ -79,7 +79,6 @@ sealed trait Identity[A] {
     val p = t test value
 
     while(l) {
-      Predef.println("boo")
       val size = if(s == 0 && d == 0) minSize.toFloat else sz + (maxSize - sz) / (minSuccessful - s)
 
       try {
@@ -95,7 +94,7 @@ sealed trait Identity[A] {
                 // exception
                 (as, t) => { Result.result(Status.exception(as, t), s, d); l = false })
       } catch {
-        case e => Result.result(e, s, d)
+        case e => { Result.result(e, s, d); l = false }
       }
 
     }

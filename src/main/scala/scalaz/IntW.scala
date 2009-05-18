@@ -11,7 +11,7 @@ sealed trait IntW {
 
   import test._
 
-  def >-->(high: Int): Gen[Int] = if(value < high) Gen.fail else Gen.randomised(_.chooseInt(value, high).gen)
+  def >-->(high: Int): Gen[Int] = if(value > high) Gen.fail else Gen.randomised(_.chooseInt(value, high).gen)
 
   def <=-[A](a: A*): Gen[List[A]] = {
     val l = a.length

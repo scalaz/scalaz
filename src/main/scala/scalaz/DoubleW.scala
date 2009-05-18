@@ -9,7 +9,7 @@ sealed trait DoubleW {
 
   import test._
 
-  def >-->(high: Double): Gen[Double] = if(value < high) Gen.fail else Gen.randomised(_.chooseDouble(value, high).gen)
+  def >-->(high: Double): Gen[Double] = if(value > high) Gen.fail else Gen.randomised(_.chooseDouble(value, high).gen)
 }
 
 object DoubleW {
