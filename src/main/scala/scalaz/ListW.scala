@@ -7,7 +7,7 @@ sealed trait ListW[A] {
 
   def stringj(f: A => List[Char]) = value flatMap f mkString
 
-  import S._
+  import Scalaz._
 
   def intersperse(a: A): List[A] = value match {
     case Nil => Nil

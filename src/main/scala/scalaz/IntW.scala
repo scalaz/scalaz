@@ -3,7 +3,7 @@ package scalaz
 sealed trait IntW {
   val value: Int
 
-  import S._
+  import Scalaz._
   
   def |*| = IntMultiplication.multiplication(value)
 

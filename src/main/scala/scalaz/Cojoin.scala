@@ -33,7 +33,7 @@ object Cojoin {
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
   }
 
-  import S._
+  import Scalaz._
   import MA._
 
   implicit val TreeLocCojoin: Cojoin[TreeLoc] = new Cojoin[TreeLoc] {

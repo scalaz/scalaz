@@ -9,7 +9,7 @@ object Semigroup {
     def append(s1: S, s2: => S) = f(s1, s2)
   }
 
-  import S._
+  import Scalaz._
 
   implicit val DigitSemigroup: Semigroup[Digit] = semigroup[Digit]((a, b) => a.toInt + b.toInt)
 

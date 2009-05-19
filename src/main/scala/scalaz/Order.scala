@@ -11,7 +11,7 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
-  import S._
+  import Scalaz._
 
   implicit val DigitOrder: Order[Digit] = IntOrder <| ((_: Digit).toInt)
 

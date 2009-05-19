@@ -5,7 +5,7 @@ trait Pure[+P[_]] {
 }
 
 object Pure {
-  import S._
+  import Scalaz._
 
   implicit val IdentityPure: Pure[Identity] = new Pure[Identity] {
     def pure[A](a: => A) = Identity.IdentityTo(a)

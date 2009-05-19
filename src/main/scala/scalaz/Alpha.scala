@@ -94,6 +94,4 @@ object Alpha {
   val alphas = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
 
   implicit def AlphaChar(a: Alpha) = a.toChar
-
-  implicit def CharAlpha(c: Char) = alphas find (_.toChar == c)
 }

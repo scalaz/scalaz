@@ -7,7 +7,7 @@ trait Traverse[T[_]] extends Functor[T] {
 }
 
 object Traverse {
-  import S._
+  import Scalaz._
 
   implicit val IdentityTraverse: Traverse[Identity] = new Traverse[Identity] {
     def traverse[F[_], A, B](f: A => F[B], t: Identity[A])(implicit a: Applicative[F]) = a.fmap(f(t.value), Identity.IdentityTo(_: B))

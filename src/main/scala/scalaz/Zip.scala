@@ -3,7 +3,7 @@ package scalaz
 trait Zip[F[_]] {
   def zip[A, B](a: F[A], b: F[B]): F[(A, B)]
 
-  import S._
+  import Scalaz._
   import MA._
   def zipWith[A, B, C](h: (A, B) => C, a: F[A], b: F[B])(implicit f: Functor[F]): F[C] = {
     def map[M[_], X, Y](implicit t: Functor[M]) = (g: X => Y) => (m: M[X]) => ma[M](m).map(g)
@@ -18,7 +18,7 @@ trait Zip[F[_]] {
 }
 
 object Zip {
-  import S._
+  import Scalaz._
   import MA._
   import Copure._
   import Traverse._

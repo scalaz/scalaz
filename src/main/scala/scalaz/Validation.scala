@@ -1,7 +1,7 @@
 package scalaz
 
 sealed trait Validation[+E, +A] {
-  import S._
+  import Scalaz._
   
   def either = this match {
     case Success(a) => Right(a)
@@ -63,7 +63,7 @@ final case class Success[E, A](a: A) extends Validation[E, A]
 final case class Failure[E, A](e: E) extends Validation[E, A]
 
 object Validation {
-  import S._
+  import Scalaz._
 
   final case class FailureProjection[+E, +A](validation: Validation[E, A]) {
     def lift[M[_], EE >: E](implicit p: Pure[M]): Validation[M[EE], A] = validation match {

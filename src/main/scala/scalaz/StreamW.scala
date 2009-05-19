@@ -3,7 +3,7 @@ package scalaz
 sealed trait StreamW[A] {
   val value: Stream[A]
 
-  import S._
+  import Scalaz._
   import MA._
 
   def string(f: A => Char) = value map f mkString
@@ -18,14 +18,14 @@ sealed trait StreamW[A] {
 
   def zipper = value match {
     case Stream.empty => None
-    case Stream.cons(h, t) => Some(S.zipper(Stream.empty, h, t))
+    case Stream.cons(h, t) => Some(Scalaz.zipper(Stream.empty, h, t))
   }
 
   def zipperEnd = value match {
     case Stream.empty => None
     case _ => {
       val x = value.reverse
-      Some(S.zipper(x.tail, x.head, Stream.empty))
+      Some(Scalaz.zipper(x.tail, x.head, Stream.empty))
     }
   }
 

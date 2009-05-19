@@ -15,7 +15,7 @@ object Show {
 
   def showA[A] = shows[A](_.toString)
 
-  import S._
+  import Scalaz._
 
   implicit val DigitShow = IntShow <| ((_: Digit).toInt)
 

@@ -11,7 +11,7 @@ object Zero {
     val zero = z
   }
 
-  import S._
+  import Scalaz._
 
   implicit val DigitZero: Zero[Digit] = zero(_0)
 

@@ -1,6 +1,6 @@
 package scalaz
 
-import S._
+import Scalaz._
 
 /**
  * A continuation monad with two answer types.

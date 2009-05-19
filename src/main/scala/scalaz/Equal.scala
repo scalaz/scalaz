@@ -11,7 +11,7 @@ object Equal {
 
   def equalA[A] = equal[A](_ == _)
 
-  import S._
+  import Scalaz._
 
   implicit val DigitEqual = equalA[Digit]
 
@@ -141,7 +141,7 @@ object Equal {
   })
 
   implicit def JavaIterableEqual[A](implicit ea: Equal[A]) = equal[java.lang.Iterable[A]]((a1, a2) => {
-    import S._
+    import Scalaz._
 
     val i1 = a1.iterator
     val i2 = a2.iterator

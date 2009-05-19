@@ -3,7 +3,7 @@ package scalaz
 sealed trait MA[M[_], A] {
   val v: M[A]
 
-  import S._
+  import Scalaz._
 
   def map[B](f: A => B)(implicit t: Functor[M]) = t.fmap(v, f)
 

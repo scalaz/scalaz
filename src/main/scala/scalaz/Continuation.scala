@@ -3,7 +3,7 @@ package scalaz
 sealed trait Continuation[R, +A] {
   def apply(f: A => R): R
 
-  import S._
+  import Scalaz._
 
   def using[AA >: A, B](f: (B => R) => AA => R) = {
     continuation[R, B](f andThen apply)

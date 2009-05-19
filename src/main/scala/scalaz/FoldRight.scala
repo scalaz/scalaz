@@ -5,7 +5,7 @@ trait FoldRight[-F[_]] {
 }
 
 object FoldRight {
-  import S._
+  import Scalaz._
 
   implicit val IdentityFoldRight = new FoldRight[Identity] {
     def foldRight[A, B](t: Identity[A], b: B, f: (A, => B) => B) = f(t.value, b)

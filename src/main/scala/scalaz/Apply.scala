@@ -11,7 +11,7 @@ object Apply {
     }
   }
 
-  import S._
+  import Scalaz._
 
   implicit val IdentityApply: Apply[Identity] = FunctorBindApply[Identity]
 

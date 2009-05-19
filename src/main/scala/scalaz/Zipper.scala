@@ -13,7 +13,7 @@ sealed trait Zipper[+A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
-  import S._
+  import Scalaz._
 
   /**
    * Possibly moves to next element to the right of focus.

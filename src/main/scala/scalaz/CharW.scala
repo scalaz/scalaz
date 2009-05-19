@@ -5,6 +5,8 @@ sealed trait CharW {
 
   def digit = Digit.digits find (_.toChar == value)
 
+  def alpha = Alpha.alphas find(_.toChar == value)
+
   def |*| = CharMultiplication.multiplication(value)  
 }
 

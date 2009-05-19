@@ -5,7 +5,7 @@ trait Plus[P[_]] {
 }
 
 object Plus {
-  import S._
+  import Scalaz._
 
   implicit val NonEmptyListPlus: Plus[NonEmptyList] = new Plus[NonEmptyList] {
     def plus[A](a1: NonEmptyList[A], a2: => NonEmptyList[A]) = a1.list <::: a2

@@ -1,6 +1,6 @@
 package scalaz
 
-import S._
+import Scalaz._
 import OptionW._
 import MA._
 

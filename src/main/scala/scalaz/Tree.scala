@@ -8,7 +8,7 @@ sealed trait Tree[+A] {
 
   def subForest: Stream[Tree[A]]
 
-  import S._
+  import Scalaz._
   import MA._
 
   def foldMap[B](f: A => B)(implicit m: Monoid[B]): B =

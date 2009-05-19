@@ -5,7 +5,7 @@ trait Functor[F[_]] {
 }
 
 object Functor {
-  import S._
+  import Scalaz._
 
   implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
     def fmap[A, B](r: Identity[A], f: A => B) = Identity.IdentityTo(f(r.value))

@@ -3,16 +3,14 @@ package scalaz
 
 import concurrent.Strategy
 
-object S {
+object Scalaz {
   import java.math.BigInteger
 
   def id[A](f:() => A) = LazyIdentity.id(f)
-  
+
   implicit def IdentityTo[A](x: A) = Identity.IdentityTo(x)
 
   implicit def AlphaChar(a: Alpha) = Alpha.AlphaChar(a)
-
-  implicit def CharAlpha(c: Char) = Alpha.CharAlpha(c)
 
   implicit def ArrayByteTo(bs: Array[Byte]) = ArrayByte.ArrayByteTo(bs)
 

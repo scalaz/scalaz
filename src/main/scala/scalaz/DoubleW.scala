@@ -3,7 +3,7 @@ package scalaz
 sealed trait DoubleW {
   val value: Double
 
-  import S._
+  import Scalaz._
 
   def ordering = if(value < 0D) LT else if(value > 0D) GT else EQ
 }

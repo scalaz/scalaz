@@ -9,7 +9,7 @@ object Comemo {
     def apply(t: T) = f(t)
   }
 
-  import S._
+  import Scalaz._
 
   implicit def ComemoCofunctor[K, V] = new Cofunctor[PartialApply2Of3[Comemo, K, V]#ApplyA] {
     def comap[A, B](r: Comemo[A, K, V], f: B => A) = comemo[B, K, V](b => r(f(b)))

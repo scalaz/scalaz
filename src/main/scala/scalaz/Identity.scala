@@ -3,7 +3,7 @@ package scalaz
 sealed trait Identity[A] {
   val value: A
 
-  import S._
+  import Scalaz._
 
   def |+|(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
 
@@ -49,7 +49,7 @@ sealed trait Identity[A] {
   def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
     value.pure[M] |+| f(value).iterate[M](f)
 
-  def zipper = S.zipper(Stream.empty, value, Stream.empty)
+  def zipper = Scalaz.zipper(Stream.empty, value, Stream.empty)
 
   def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
 
