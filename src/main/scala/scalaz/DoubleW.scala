@@ -6,10 +6,6 @@ sealed trait DoubleW {
   import S._
 
   def ordering = if(value < 0D) LT else if(value > 0D) GT else EQ
-
-  import test._
-
-  def >-->(high: Double): Gen[Double] = if(value > high) Gen.fail else Gen.randomised(_.chooseDouble(value, high).gen)
 }
 
 object DoubleW {

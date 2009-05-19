@@ -6,8 +6,6 @@ sealed trait LazyIdentity[A] {
   def throws = try { Right(value) } catch { case e => Left(e) }
 
   def pure[P[_]](implicit p: Pure[P]) = p pure value
-
-  def gen = test.Gen.gen((_, _) => value)
 }
 
 object LazyIdentity {
