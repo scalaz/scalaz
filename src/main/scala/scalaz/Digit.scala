@@ -8,7 +8,7 @@ sealed trait Digit {
 
   override def equals(o: Any) = o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
 
-  override def hashCode = toInt
+  override def hashCode = toInt.hashCode
 
   override def toString = toInt.toString
 }
