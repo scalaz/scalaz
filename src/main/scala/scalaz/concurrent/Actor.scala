@@ -6,7 +6,6 @@ import java.util.ArrayDeque
 
 sealed trait Act[-A] {
   protected val effect: A => () => Unit
-
   protected val strategy: Strategy[Unit]
 
   def act(a: A) = strategy(effect(a))
@@ -16,11 +15,11 @@ sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ArrayDeque[A]
 
-  def effect: Act[Unit]
-
   protected def selfish: Act[A]
 
   protected def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
+
+  def effect: Act[Unit]
 
   def !(a: A) = if (mbox offerLast a) work else selfish act a
 }
