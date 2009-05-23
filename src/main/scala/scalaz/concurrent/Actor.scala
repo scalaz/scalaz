@@ -19,9 +19,9 @@ sealed trait Actor[A] {
 
   protected def selfish: Act[A]
 
-  protected def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect.act(()) else () => ()
+  protected def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
 
-  def !(a: A) = if (mbox.offer(a)) work else selfish.act(a)
+  def !(a: A) = if (mbox offer a) work else selfish act a
 }
 
 object Actor {
