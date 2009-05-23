@@ -1,9 +1,9 @@
 package scalaz.concurrent
 
-import collection.mutable.Queue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.{ArrayDeque, Deque}
+import java.util.ArrayDeque
+
 sealed trait Act[-A] {
   protected val effect: A => () => Unit
 
@@ -13,8 +13,8 @@ sealed trait Act[-A] {
 }
 
 sealed trait Actor[A] {
-  private val suspended: AtomicBoolean = new AtomicBoolean(true)
-  private val mbox: Deque[A] = new ArrayDeque[A]
+  private val suspended = new AtomicBoolean(true)
+  private val mbox = new ArrayDeque[A]
 
   def effect: Act[Unit]
 
