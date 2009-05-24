@@ -1,11 +1,10 @@
 package scalaz.concurrent
 
-import java.util.ArrayDeque
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
 
 sealed trait Promise[A] {
   private val latch = new CountDownLatch(1)
-  private val waiting = new ArrayDeque[Actor[A]]
+  private val waiting = new ConcurrentLinkedQueue[Actor[A]]
   @volatile private var v: Option[A] = None
   protected val actor: Actor[(Either[() => A, Actor[A]], Promise[A])]
   val strategy: Strategy[Unit]
@@ -14,6 +13,8 @@ sealed trait Promise[A] {
     latch.await
     v.get
   }
+
+  def to(a: Actor[A]) = actor ! (Right(a), this)
 }
 
 object Promise {
@@ -27,10 +28,10 @@ object Promise {
           val a = l()
           promise.v = Some(a)
           promise.latch.countDown
-          while (!as.isEmpty) as.removeFirst ! a
+          while (!as.isEmpty) as.remove() ! a
         }
         case Right(r) => {
-          if (promise.v.isEmpty) as.offerLast(r)
+          if (promise.v.isEmpty) as.offer(r)
           else r ! promise.v.get
         }
       }

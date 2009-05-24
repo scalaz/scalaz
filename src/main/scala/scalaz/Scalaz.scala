@@ -1,12 +1,9 @@
 package scalaz
 
-
-import concurrent.Strategy
-
 object Scalaz {
   import java.math.BigInteger
 
-  def id[A](f:() => A) = LazyIdentity.id(f)
+  def id[A](f: () => A) = LazyIdentity.id(f)
 
   implicit def IdentityTo[A](x: A) = Identity.IdentityTo(x)
 
@@ -130,6 +127,7 @@ object Scalaz {
 
   def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = Zipper.zipper(ls, a, rs)
 
+  import concurrent.Strategy
   implicit def StrategyTo[A](s: Strategy[A]) = Strategy.strategyTo(s)
 
   implicit def StrategyFrom[A](s: (() => A) => () => A) = Strategy.strategyFrom(s)
@@ -209,6 +207,13 @@ object Scalaz {
   implicit def TreeMA[A](a: Tree[A]) = ma[Tree](a)
 
   implicit def TreeLocMA[A](a: TreeLoc[A]) = ma[TreeLoc](a)
+
+  import concurrent._
+  implicit def StrategyMA[A](a: Strategy[A]) = ma[Strategy](a)
+
+  implicit def ActorMA[A](a: Actor[A]) = ma[Actor](a)
+
+  implicit def PromiseMA[A](a: Promise[A]) = ma[Promise](a)
 
   import java.util._
   import java.util.concurrent._
