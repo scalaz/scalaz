@@ -2,7 +2,6 @@ package scalaz.concurrent
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.ArrayDeque
 
 sealed trait Effect[-A] {
   val effect: A => () => Unit
@@ -13,7 +12,7 @@ sealed trait Effect[-A] {
 
 sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
-  private val mbox = new ArrayDeque[A]
+  private val mbox = new ConcurrentLinkedQueue[A]
 
   private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
 
@@ -21,7 +20,7 @@ sealed trait Actor[A] {
 
   def effect: Effect[Unit]
 
-  def !(a: A) = if (mbox offerLast a) work else selfish act a
+  def !(a: A) = if (mbox offer a) work else selfish act a
 }
 
 object Actor {
@@ -34,7 +33,7 @@ object Actor {
 
   def actor[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Actor[A] {
     def effect = act((u) => {
-      e(mbox.removeFirst)
+      e(mbox.remove)
       if (mbox.isEmpty) {
         suspended.set(true)
         work
