@@ -16,27 +16,25 @@ sealed trait Promise[A] {
   }
 }
 
-import Actor._
-
 object Promise {
-  private def mkPromise[A](implicit s: Strategy[Unit]) = {
-    val q = actor[(Either[() => A, Actor[A]], Promise[A])]((p) => {
-      val fst = p._1
-      val snd = p._2
-      val as = snd.waiting
-      if (fst.isLeft) {
-        val a = fst.left.get()
-        snd.v = Some(a)
-        snd.latch.countDown
-        while (!as.isEmpty) as.removeFirst ! a
+  private def mkPromise[A](implicit s: Strategy[Unit]) = new Promise[A] {
+    val strategy = s
+    val actor = Actor.actor[(Either[() => A, Actor[A]], Promise[A])]((p) => {
+      val promise = p._2
+      val as = promise.waiting
+      p._1 match {
+        case Left(l) => {
+          val a = l()
+          promise.v = Some(a)
+          promise.latch.countDown
+          while (!as.isEmpty) as.removeFirst ! a
+        }
+        case Right(r) => {
+          if (promise.v.isEmpty) as.offerLast(r)
+          else r ! promise.v.get
+        }
       }
-      else if (snd.v.isEmpty) as.offerLast(fst.right.get)
-      else fst.right.get ! snd.v.get
     })
-    new Promise[A] {
-      val strategy = s
-      val actor = q
-    }
   }
 
   def promise[A](a: => A)(implicit s: Strategy[Unit]) = {
