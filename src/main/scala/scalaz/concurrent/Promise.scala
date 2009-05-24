@@ -6,7 +6,7 @@ import java.util.concurrent.CountDownLatch
 sealed trait Promise[A] {
   private val latch = new CountDownLatch(1)
   private val waiting = new ArrayDeque[Actor[A]]
-  private var v: Option[A] = None
+  @volatile private var v: Option[A] = None
   protected val actor: Actor[(Either[() => A, Actor[A]], Promise[A])]
   val strategy: Strategy[Unit]
 
@@ -30,8 +30,8 @@ object Promise {
         snd.latch.countDown
         while (!as.isEmpty) as.removeFirst ! a
       }
-      else if (snd.v.isEmpty) as.offerLast(p._1.right.get)
-      else p._1.right.get ! snd.v.get
+      else if (snd.v.isEmpty) as.offerLast(fst.right.get)
+      else fst.right.get ! snd.v.get
     })
     new Promise[A] {
       val strategy = s
