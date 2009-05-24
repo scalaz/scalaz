@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.ArrayDeque
 
-sealed trait Act[-A] {
+sealed trait Effect[-A] {
   val effect: A => () => Unit
   val strategy: Strategy[Unit]
 
@@ -17,20 +17,20 @@ sealed trait Actor[A] {
 
   private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
 
-  protected def selfish: Act[A]
+  protected def selfish: Effect[A]
 
-  def effect: Act[Unit]
+  def effect: Effect[Unit]
 
   def !(a: A) = if (mbox offerLast a) work else selfish act a
 }
 
 object Actor {
-  def act[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Act[A] {
+  def act[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Effect[A] {
     val effect = (a: A) => () => e(a)
     val strategy = s
   }
 
-  implicit def actFrom[A](implicit a: Act[A], s: Strategy[Unit]) = (a.act(_))
+  implicit def actFrom[A](implicit a: Effect[A], s: Strategy[Unit]) = (a.act(_))
 
   def actor[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Actor[A] {
     def effect = act((u) => {
