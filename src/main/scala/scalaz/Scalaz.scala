@@ -132,6 +132,12 @@ object Scalaz {
 
   implicit def StrategyFrom[A](s: (() => A) => () => A) = Strategy.strategyFrom(s)
 
+  import concurrent.Actor
+  implicit def ActorFrom[A](a: Actor[A]) = Actor.actorFrom(a)
+
+  import concurrent.Effect
+  implicit def EffectFrom[A](e: Effect[A]) = Effect.effectFrom(e)
+
   // MA
 
   import MA.ma
@@ -214,6 +220,8 @@ object Scalaz {
   implicit def ActorMA[A](a: Actor[A]) = ma[Actor](a)
 
   implicit def PromiseMA[A](a: Promise[A]) = ma[Promise](a)
+
+  implicit def EffectMA[A](a: Effect[A]) = ma[Effect](a)
 
   import java.util._
   import java.util.concurrent._

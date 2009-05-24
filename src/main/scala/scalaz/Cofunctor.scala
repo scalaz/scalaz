@@ -1,6 +1,6 @@
 package scalaz
 
-import concurrent.Actor
+import concurrent.{Effect, Actor}
 
 trait Cofunctor[F[_]] {
   def comap[A, B](r: F[A], f: B => A): F[B]
@@ -27,7 +27,9 @@ object Cofunctor {
     def comap[A, B](r: MetricSpace[A], f: B => A) = MetricSpace.metricSpace[B]((b1, b2) => r distance (f(b1), f(b2)))
   }
 
-  implicit val ActorCofunctor = new Cofunctor[Actor] {
-    def comap[A, B](r: Actor[A], f: B => A) = Actor.actor[B]((b) => r.effect.act(f(b)))(r.effect.strategy)
+  implicit val ActorCofunctor = Actor.ActorCofunctor
+
+  implicit val EffectCofunctor = new Cofunctor[Effect] {
+    def comap[A, B](r: Effect[A], f: B => A) = Effect.effect[B]((b) => r ! f(b))(r.strategy)
   }
 }

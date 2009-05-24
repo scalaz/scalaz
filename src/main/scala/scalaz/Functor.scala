@@ -137,7 +137,6 @@ object Functor {
       TreeLoc.loc(t.tree map f, t.lefts map ff, t.rights map ff,
         t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
     }
-
   }
 
   import java.util._

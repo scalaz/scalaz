@@ -66,19 +66,19 @@ object Pure {
   }
 
   implicit def Function3Pure[R, S, T] = new Pure[PartialApply3Of4[Function3, R, S, T]#Apply] {
-    def pure[A](a: => A) = (_: R, _: S , _: T ) => a
+    def pure[A](a: => A) = (_: R, _: S, _: T) => a
   }
 
   implicit def Function4Pure[R, S, T, U] = new Pure[PartialApply4Of5[Function4, R, S, T, U]#Apply] {
-    def pure[A](a: => A) = (_: R, _: S , _: T , _: U) => a
+    def pure[A](a: => A) = (_: R, _: S, _: T, _: U) => a
   }
 
   implicit def Function5Pure[R, S, T, U, V] = new Pure[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] {
-    def pure[A](a: => A) = (_: R, _: S , _: T , _: U, _: V) => a
+    def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
   }
 
   implicit def Function6Pure[R, S, T, U, V, W] = new Pure[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
-    def pure[A](a: => A) = (_: R, _: S , _: T , _: U, _: V, _: W) => a
+    def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
 
   implicit val ListPure = new Pure[List] {
@@ -122,7 +122,7 @@ object Pure {
   }
 
   implicit def EndoPure = new Pure[Endo] {
-    def pure[A](a: => A) = Endo.constant(a) 
+    def pure[A](a: => A) = Endo.constant(a)
   }
 
   implicit def TreePure = new Pure[Tree] {
@@ -131,6 +131,11 @@ object Pure {
 
   implicit def TreeLocPure = new Pure[TreeLoc] {
     def pure[A](a: => A) = TreePure.pure(a).loc
+  }
+
+  import concurrent._
+  implicit def PromisePure(implicit s: Strategy[Unit]) = new Pure[Promise] {
+    def pure[A](a: => A) = Promise.promise(a)
   }
 
   import java.util._

@@ -3,46 +3,42 @@ package scalaz.concurrent
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
 
-sealed trait Effect[-A] {
-  val effect: A => () => Unit
-  val strategy: Strategy[Unit]
-
-  def act(a: A) = strategy(effect(a))
-}
-
 sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
-  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
+  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (()) else ()
 
-  protected def selfish: Effect[A]
+  protected val selfish: Effect[A]
 
-  def effect: Effect[Unit]
+  protected val act: Effect[Unit]
 
-  def !(a: A) = if (mbox offer a) work else selfish act a
+  val e: A => Unit
+
+  def !(a: A) = if (mbox offer a) work else selfish ! a
 }
 
+import Effect._
+
 object Actor {
-  def act[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Effect[A] {
-    val effect = (a: A) => () => e(a)
-    val strategy = s
-  }
-
-  implicit def actFrom[A](implicit a: Effect[A], s: Strategy[Unit]) = (a.act(_))
-
-  def actor[A](e: A => Unit)(implicit s: Strategy[Unit]) = new Actor[A] {
-    def effect = act((u) => {
-      e(mbox.remove)
+  def actor[A](c: A => Unit)(implicit s: Strategy[Unit]) = new Actor[A] {
+    val act: Effect[Unit] = effect((u) => {
+      c(mbox.remove)
       if (mbox.isEmpty) {
         suspended.set(true)
         work
       }
-      else effect.act(u)
+      else act ! u
     })
 
-    def selfish = act((a) => this ! a)
+    val selfish = effect[A]((a) => this ! a)
+
+    val e = c
   }
 
+  implicit val ActorCofunctor = new Cofunctor[Actor] {
+    def comap[A, B](r: Actor[A], f: B => A) = actor[B]((b) => r.act ! f(b))(r.act.strategy)
+  }
 
+  implicit def actorFrom[A](implicit a: Actor[A]): A => Unit = ((m) => a ! m)
 }
