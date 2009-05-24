@@ -85,6 +85,9 @@ object Semigroup {
   implicit def DualSemigroup[A](implicit sa: Semigroup[A]) =
     semigroup[Dual[A]]((x, y) => Dual.dual(sa.append(y.value, x.value)))
 
+  import concurrent.Strategy
+  implicit def StrategySemigroup[A] = semigroup[Strategy[A]]((x, y) => ((a: () => A) => x(y.apply(a))))
+
   import java.util._
   import java.util.concurrent._
 

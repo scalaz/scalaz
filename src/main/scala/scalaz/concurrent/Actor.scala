@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.ArrayDeque
 
 sealed trait Act[-A] {
-  protected val effect: A => () => Unit
-  protected val strategy: Strategy[Unit]
+  val effect: A => () => Unit
+  val strategy: Strategy[Unit]
 
   def act(a: A) = strategy(effect(a))
 }
@@ -15,9 +15,9 @@ sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ArrayDeque[A]
 
-  protected def selfish: Act[A]
+  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
 
-  protected def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) effect act () else ()
+  protected def selfish: Act[A]
 
   def effect: Act[Unit]
 
@@ -44,4 +44,6 @@ object Actor {
 
     def selfish = act((a) => this ! a)
   }
+
+
 }

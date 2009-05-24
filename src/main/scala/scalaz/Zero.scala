@@ -1,5 +1,7 @@
 package scalaz
 
+import concurrent.Strategy
+
 trait Zero[+Z] {
   val zero: Z
 }
@@ -78,6 +80,8 @@ object Zero {
   implicit def EndoZero[A] = zero[Endo[A]](identity(_: A))
 
   implicit def DualZero[A](implicit za: Zero[A]) = zero[Dual[A]](za.zero.dual)
+
+  implicit def StrategyZero[A] = zero[Strategy[A]](concurrent.strategies.Id.strategy[A])
 
   import java.util._
   import java.util.concurrent._
