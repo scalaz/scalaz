@@ -7,23 +7,32 @@ sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
-  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (()) else ()
+  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (()) else () => ()
 
-  protected val selfish: Effect[A]
+  val toEffect: Effect[A]
 
   protected val act: Effect[Unit]
 
   val e: A => Unit
 
-  def !(a: A) = if (mbox offer a) work else selfish ! a
+  def !(a: A) = if (mbox offer a) work else toEffect ! a
+
+  val strategy: Strategy[Unit]
+
+  val onError: Throwable => Unit
 }
 
 import Effect._
 
 object Actor {
-  def actor[A](c: A => Unit)(implicit s: Strategy[Unit]) = new Actor[A] {
+  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new Actor[A] {
     val act: Effect[Unit] = effect((u) => {
-      c(mbox.remove)
+      try {c(mbox.remove())} catch {
+        case e => {
+          err(e)
+          act ! (())
+        }
+      }
       if (mbox.isEmpty) {
         suspended.set(true)
         work
@@ -31,14 +40,16 @@ object Actor {
       else act ! u
     })
 
-    val selfish = effect[A]((a) => this ! a)
+    val toEffect = effect[A]((a) => this ! a)
 
     val e = c
+
+    val strategy = s
+
+    val onError = err
   }
 
-  implicit val ActorCofunctor = new Cofunctor[Actor] {
-    def comap[A, B](r: Actor[A], f: B => A) = actor[B]((b) => r.act ! f(b))(r.act.strategy)
-  }
+  def actor[A](c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = actor[A]((e: Throwable) => throw e, c)
 
   implicit def actorFrom[A](implicit a: Actor[A]): A => Unit = ((m) => a ! m)
 }
