@@ -1,10 +1,12 @@
 package scalaz.concurrent
 
-sealed trait Effect[-A] {
+sealed trait Effect[-A] extends (A => Unit) {
   val e: A => () => Unit
   val strategy: Strategy[Unit]
 
   def !(a: A) = strategy(e(a))
+
+  def apply(a: A) = this ! a
 }
 
 object Effect {
@@ -12,6 +14,4 @@ object Effect {
     val e = (a: A) => () => c(a)
     val strategy = s
   }
-
-  implicit def effectFrom[A](implicit a: Effect[A]): A => Unit = (a ! _)
 }

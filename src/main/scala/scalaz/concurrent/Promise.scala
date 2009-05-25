@@ -6,7 +6,7 @@ import scalaz.MA._
 import scalaz.Cofunctor._
 import Effect._
 
-sealed trait Promise[A] {
+sealed trait Promise[A] extends (() => A) {
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Option[A] = None
@@ -26,6 +26,8 @@ sealed trait Promise[A] {
     to((a) => f(a).to(ab))
     r
   }
+
+  def apply = get
 }
 
 object Promise {
@@ -54,6 +56,4 @@ object Promise {
     p.e ! ((Left(() => a), p))
     p
   }
-
-  implicit def promiseFrom[A](implicit a: Promise[A]) = () => a.get
 }
