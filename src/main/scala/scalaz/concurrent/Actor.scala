@@ -29,10 +29,10 @@ import Effect._
 object Actor {
   def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new Actor[A] {
     val act: Effect[Unit] = effect((u) => {
-      try {c(mbox.remove())} catch {
+      val m = mbox.remove()
+      try {c(m)} catch {
         case e => {
           err(e)
-          act ! (())
         }
       }
       if (mbox.isEmpty) {
