@@ -1,16 +1,14 @@
 package scalaz.concurrent
 
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
-import scalaz.Scalaz._
-import scalaz.MA._
-import scalaz.Cofunctor._
 import Effect._
+import Actor._
 
 sealed trait Promise[A] extends (() => A) {
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Option[A] = None
-  protected val e: Effect[(Either[() => A, A => Unit], Promise[A])]
+  protected val e: Actor[(Either[() => A, A => Unit], Promise[A])]
   val strategy: Strategy[Unit]
 
   def get = {
@@ -33,7 +31,7 @@ sealed trait Promise[A] extends (() => A) {
 object Promise {
   private def mkPromise[A](implicit s: Strategy[Unit]) = new Promise[A] {
     val strategy = s
-    val e = effect[(Either[() => A, A => Unit], Promise[A])]((p) => {
+    val e = actor((p: (Either[() => A, A => Unit], Promise[A])) => {
       val promise = p._2
       val as = promise.waiting
       p._1 match {

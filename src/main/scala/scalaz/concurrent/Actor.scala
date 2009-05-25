@@ -31,9 +31,7 @@ object Actor {
     val act: Effect[Unit] = effect((u) => {
       val m = mbox.remove()
       try {c(m)} catch {
-        case e => {
-          err(e)
-        }
+        case e => err(e)
       }
       if (mbox.isEmpty) {
         suspended.set(true)
