@@ -55,4 +55,9 @@ object Cojoin {
     }
   }
 
+  import concurrent.Promise
+  implicit val PromiseCojoin: Cojoin[Promise] = new Cojoin[Promise] {
+    def cojoin[A](a: Promise[A]) = Promise.promise(a)(a.strategy)
+  }
+
 }

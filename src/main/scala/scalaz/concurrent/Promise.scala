@@ -21,7 +21,7 @@ sealed trait Promise[A] extends (() => A) {
   def bind[B](f: A => Promise[B]) = {
     val r = Promise.mkPromise[B](strategy)
     val ab = effect[B]((b: B) => r.e ! ((Left(() => b), r)))(strategy)
-    to((a) => f(a).to(ab))
+    to(a => f(a).to(ab))
     r
   }
 
@@ -54,4 +54,6 @@ object Promise {
     p.e ! ((Left(() => a), p))
     p
   }
+
+  implicit def promiseFrom[A](implicit a: Promise[A]) = () => a.get
 }

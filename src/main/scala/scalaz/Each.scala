@@ -14,7 +14,7 @@ object Each {
   }
 
   implicit def NonEmptyListEach[A] = new Each[NonEmptyList] {
-    def each[A](e: NonEmptyList[A], f: A => Unit) = e.list foreach f 
+    def each[A](e: NonEmptyList[A], f: A => Unit) = e.list foreach f
   }
 
   implicit val StateEach = new Each[PartialApply1Of2[State, Unit]#Apply] {
@@ -74,16 +74,21 @@ object Each {
   }
 
   implicit val IterableEach = new Each[Iterable] {
-      def each[A](e: Iterable[A], f: A => Unit) = e foreach f
+    def each[A](e: Iterable[A], f: A => Unit) = e foreach f
+  }
+
+  import concurrent.Promise
+  implicit val PromiseEach = new Each[Promise] {
+    def each[A](e: Promise[A], f: A => Unit) = f(e.get)
   }
 
   implicit val JavaIterableEach = new Each[java.lang.Iterable] {
-      def each[A](e: java.lang.Iterable[A], f: A => Unit) = {
-        val i = e.iterator
+    def each[A](e: java.lang.Iterable[A], f: A => Unit) = {
+      val i = e.iterator
 
-        while(i.hasNext) {
-          f(i.next)
-        }
+      while (i.hasNext) {
+        f(i.next)
       }
+    }
   }
 }

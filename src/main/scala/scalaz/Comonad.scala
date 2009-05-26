@@ -27,4 +27,8 @@ object Comonad {
   implicit val TreeComonad = comonad[Tree]
 
   implicit val TreeLocComonad = comonad[TreeLoc]
+
+  import concurrent.Promise
+  implicit val PromiseComonad = comonad[Promise]
+  
 }

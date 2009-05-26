@@ -63,11 +63,14 @@ object Pointed {
 
   implicit def ValidationFailurePointed[X] = pointed[PartialApply1Of2[Validation.FailureProjection, X]#Flip]
 
-  implicit def ZipperPointed = pointed[Zipper]
+  implicit val ZipperPointed = pointed[Zipper]
 
-  implicit def TreePointed = pointed[Tree]
+  implicit val TreePointed = pointed[Tree]
 
-  implicit def TreeLocPointed = pointed[TreeLoc]
+  implicit val TreeLocPointed = pointed[TreeLoc]
+
+  import concurrent._
+  implicit def PromisePointed(implicit s: Strategy[Unit]) = pointed[Promise]
 
   import java.util._
   import java.util.concurrent._

@@ -13,7 +13,7 @@ object Copointed {
   implicit val NonEmptyListCopointed = copointed[NonEmptyList]
 
   implicit val Tuple1Copointed = copointed[Tuple1]
-  
+
   implicit def Tuple2Copointed[R] = copointed[PartialApply1Of2[Tuple2, R]#Apply]
 
   implicit val Function0Copointed = copointed[Function0]
@@ -23,4 +23,7 @@ object Copointed {
   implicit val TreeCopointed = copointed[Tree]
 
   implicit val TreeLocCopointed = copointed[TreeLoc]
+
+  import concurrent.Promise
+  implicit val PromiseCopointed = copointed[Promise]
 }

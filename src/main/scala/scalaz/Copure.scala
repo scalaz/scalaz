@@ -41,4 +41,9 @@ object Copure {
     def copure[A](a: TreeLoc[A]) = a.tree.rootLabel
   }
 
+  import concurrent.Promise
+  implicit val PromiseCopure = new Copure[Promise] {
+    def copure[A](a: Promise[A]) = a.get
+  }
+
 }

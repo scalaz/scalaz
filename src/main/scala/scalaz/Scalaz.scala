@@ -127,16 +127,10 @@ object Scalaz {
 
   def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = Zipper.zipper(ls, a, rs)
 
-  import concurrent.Strategy
+  import concurrent._
   implicit def StrategyTo[A](s: Strategy[A]) = Strategy.strategyTo(s)
 
   implicit def StrategyFrom[A](s: (() => A) => () => A) = Strategy.strategyFrom(s)
-
-  import concurrent.Actor
-  implicit def ActorFrom[A](a: Actor[A]) = Actor.actorFrom(a)
-
-  import concurrent.Effect
-  implicit def EffectFrom[A](e: Effect[A]) = Effect.effectFrom(e)
 
   // MA
 

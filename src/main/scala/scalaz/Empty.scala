@@ -20,7 +20,7 @@ object Empty {
   implicit val OptionEmpty = new Empty[Option] {
     def empty[A] = None
   }
-  
+
   implicit val ArrayEmpty = new Empty[Array] {
     def empty[A] = new Array(0)
   }

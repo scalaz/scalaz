@@ -103,6 +103,9 @@ object Apply {
 
   implicit val TreeApply = FunctorBindApply[Tree]
 
+  import concurrent.Promise
+  implicit val PromiseApply = FunctorBindApply[Promise]
+
   import java.util._
   import java.util.concurrent._
 
