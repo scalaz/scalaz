@@ -42,12 +42,19 @@ object Traverse {
       }
   }
 
+  import concurrent.Promise
+  import concurrent.Promise._
+  implicit val PromiseTraverse: Traverse[Promise] = new Traverse[Promise] {
+    def traverse[F[_], A, B](f: A => F[B], ta: Promise[A])(implicit a: Applicative[F]): F[Promise[B]] =
+      a.fmap(f(ta.get), promise(_: B)(ta.strategy))
+  }
+
   import Zipper.zipper
 
   implicit val ZipperTraverse: Traverse[Zipper] = new Traverse[Zipper] {
     def traverse[F[_], A, B](f: A => F[B], za: Zipper[A])(implicit a: Applicative[F]): F[Zipper[B]] = {
       val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curry
-      a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_:Stream[B]).reverse),
+      a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_: Stream[B]).reverse),
         z), f(za.focus)), StreamTraverse.traverse[F, A, B](f, za.rights))
     }
   }
