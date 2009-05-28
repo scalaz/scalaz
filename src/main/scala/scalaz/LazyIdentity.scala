@@ -7,7 +7,10 @@ sealed trait LazyIdentity[A] {
 
   def pure[P[_]](implicit p: Pure[P]) = p pure value
   
-  def onull : Option[A] = if(value == null) None else Some(value) 
+  def onull = {
+    val v = value
+    if(v == null) None else Some(v) 
+  }
 }
 
 object LazyIdentity {
