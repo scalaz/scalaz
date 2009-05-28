@@ -6,6 +6,8 @@ sealed trait LazyIdentity[A] {
   def throws = try { Right(value) } catch { case e => Left(e) }
 
   def pure[P[_]](implicit p: Pure[P]) = p pure value
+  
+  def onull : Option[A] = if(value == null) None else Some(value) 
 }
 
 object LazyIdentity {
