@@ -57,6 +57,10 @@ sealed trait StringW {
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
    */
   def nel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = nel getOrElse e
+  
+  def nelErr(message: => String) = nel(error(message))
+  
+  def unsafeNel = nelErr("cannot turn empty string into NonEmptyList")
 }
 
 object StringW {
