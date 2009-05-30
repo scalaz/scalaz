@@ -43,6 +43,20 @@ sealed trait StringW {
     node(null, a)
 
   def encode(implicit c: CharSet) = s getBytes c.value
+  
+
+  /**
+   * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
+   */
+  def nel : Option[NonEmptyList[Char]] = if (s.length == 0) None else {
+    val l = s.toList
+    Some(NonEmptyList.nel(l.head, l.tail))
+  }
+  
+  /**
+   * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
+   */
+  def nel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = nel getOrElse e
 }
 
 object StringW {
