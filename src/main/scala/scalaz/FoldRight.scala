@@ -10,6 +10,10 @@ object FoldRight {
   implicit val IdentityFoldRight = new FoldRight[Identity] {
     def foldRight[A, B](t: Identity[A], b: B, f: (A, => B) => B) = f(t.value, b)
   }
+  
+  implicit val ListFoldRight = new FoldRight[List] {
+    def foldRight[A, B](t: List[A], b: B, f: (A, => B) => B) = IterableFoldRight.foldRight(t, b, f)
+  }
 
   implicit val NonEmptyListFoldRight = new FoldRight[NonEmptyList] {
     def foldRight[A, B](t: NonEmptyList[A], b: B, f: (A, => B) => B) = IterableFoldRight.foldRight(t.list, b, f)
