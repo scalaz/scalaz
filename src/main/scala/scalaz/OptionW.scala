@@ -34,6 +34,16 @@ sealed trait OptionW[A] {
   def toNull = value getOrElse null.asInstanceOf[A]
 
   def unary_~(implicit z: Zero[A]) = value getOrElse z.zero
+  
+  def toSuccess[E](e: => E) : Validation[E, A] = value match {
+    case Some(a) => Success(a)
+    case None => Failure(e)
+  }
+  
+  def toFailure[B](b: => B) : Validation[A, B] = value match {
+    case Some(e) => Failure(e)
+    case None => Success(b)
+  }
 }
 
 object OptionW {
