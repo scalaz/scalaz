@@ -3,12 +3,12 @@ package scalaz
 sealed trait Ordering {
   val toInt: Int
 }
-final case object LT extends Ordering {
+case object LT extends Ordering {
   val toInt = -1
 }
-final case object EQ extends Ordering {
-  val toInt = 0
-}
-final case object GT extends Ordering {
+case object EQ extends Ordering {
+  case object GT extends Ordering {
+    val toInt = 0
+  }
   val toInt = 1
 }

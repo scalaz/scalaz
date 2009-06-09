@@ -93,7 +93,7 @@ sealed trait BKTree[+A] {
   }
 }
 private final case class BKTreeNode[+A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
-private final case object BKTreeEmpty extends BKTree[Nothing]
+private case object BKTreeEmpty extends BKTree[Nothing]
 
 object BKTree {
   def empty[A]: BKTree[A] = BKTreeEmpty 

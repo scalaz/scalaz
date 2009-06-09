@@ -12,34 +12,34 @@ sealed trait Digit {
 
   override def toString = toInt.toString
 }
-final case object _0 extends Digit {
+case object _0 extends Digit {
   override val toInt = 0
 }
-final case object _1 extends Digit {
+case object _1 extends Digit {
   override val toInt = 1
 }
-final case object _2 extends Digit {
+case object _2 extends Digit {
   override val toInt = 2
 }
-final case object _3 extends Digit {
+case object _3 extends Digit {
   override val toInt = 3
 }
-final case object _4 extends Digit {
+case object _4 extends Digit {
   override val toInt = 4
 }
-final case object _5 extends Digit {
+case object _5 extends Digit {
   override val toInt = 5
 }
-final case object _6 extends Digit {
+case object _6 extends Digit {
   override val toInt = 6
 }
-final case object _7 extends Digit {
+case object _7 extends Digit {
   override val toInt = 7
 }
-final case object _8 extends Digit {
+case object _8 extends Digit {
   override val toInt = 8
 }
-final case object _9 extends Digit {
+case object _9 extends Digit {
   override val toInt = 9
 }
 
