@@ -1,3 +1,7 @@
+{-
+This belongs in its own library
+-}
+
 module Compile where
 
 import System.Exit
