@@ -5,7 +5,7 @@ This belongs in its own library
 module Compile(recurse, Compile, (!!!)) where
 
 import System.Exit
-import System.FilePath.Find -- -- http://hackage.haskell.org/packages/archive/FileManip/latest/doc/html/
+import System.FilePath.Find hiding (directory) -- http://hackage.haskell.org/packages/archive/FileManip/latest/doc/html/
 
 class Compile c where
   (!!!) :: c -> [FilePath] -> IO ExitCode
