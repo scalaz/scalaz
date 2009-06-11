@@ -43,7 +43,7 @@ module Scalac(none,
               shutdown,
               server,
               flags,
-              scalacfsc,
+              fast,
               fsc,
               Fsc,
               Fsc',
@@ -243,11 +243,11 @@ data Fsc = Fsc {
   flags :: [String]
 }
 
-scalacfsc :: Scalac -> Fsc
-scalacfsc s = Fsc s False False Nothing []
+fast :: Scalac -> Fsc
+fast s = Fsc s False False Nothing []
 
 fsc :: Fsc
-fsc = scalacfsc scalac
+fsc = fast scalac
 
 -- not exported
 dofsc :: Fsc -> (String -> IO a) -> [String] -> IO ExitCode
