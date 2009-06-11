@@ -31,12 +31,9 @@ module Scalac(none,
               (#),
               scalac,
               scalacd,
-              scalac',
-              scalacd',
               ScalacDebug,
               ScalacTarget,
               Scalac,
-              Scalac',
               (!*!),
               fscalac,
               reset,
@@ -45,9 +42,7 @@ module Scalac(none,
               flags,
               fast,
               fsc,
-              Fsc,
-              Fsc',
-              fsc') where
+              Fsc) where
 
 import Compile
 import System.Cmd
@@ -211,29 +206,18 @@ surround :: String -> String
 surround s = '"' : s ++ ['"']
 
 -- not exported
-docompile :: String -> (String -> IO a) -> [String] -> IO ExitCode
-docompile z k ps = let v = z ++ ' ' : intercalate " " (fmap surround ps) in do k v >> system v
+docompile :: String -> [String] -> IO ExitCode
+docompile z ps = let v = z ++ ' ' : intercalate " " (fmap surround ps) in system v
 
 -- not exported
-doscalac :: Scalac -> (String -> IO a) -> [String] -> IO ExitCode
+doscalac :: Scalac -> [String] -> IO ExitCode
 doscalac s = docompile (dscalac "scalac" [] s)
 
 instance Compile Scalac where
-  s !!! ps = doscalac s (const $ return ()) ps
-
-newtype Scalac' = Scalac' Scalac
-
-instance Compile Scalac' where
-  Scalac' s !!! ps = doscalac s (Prelude.print) ps
-
-scalac' :: Scalac -> Scalac'
-scalac' = Scalac'
+  s !!! ps = doscalac s ps
 
 (!*!) :: (Compile c) => c -> [FilePath] -> IO ExitCode
 (!*!) = recurse ".scala"
-
-scalacd' :: Scalac'
-scalacd' = scalac' scalacd
 
 data Fsc = Fsc {
   fscalac :: Scalac,
@@ -250,16 +234,8 @@ fsc :: Fsc
 fsc = fast scalac
 
 -- not exported
-dofsc :: Fsc -> (String -> IO a) -> [String] -> IO ExitCode
+dofsc :: Fsc -> [String] -> IO ExitCode
 dofsc (Fsc fscalac reset shutdown server flags) = docompile (dscalac "fsc" [b "reset" reset, b "shutdown" shutdown, m (uncurry (++)) server, intercalate " " (fmap ("-J" ++) flags)] fscalac)
 
 instance Compile Fsc where
-  s !!! ps = dofsc s (const $ return ()) ps
-
-newtype Fsc' = Fsc' Fsc
-
-instance Compile Fsc' where
-  Fsc' s !!! ps = dofsc s (Prelude.print) ps
-
-fsc' :: Fsc -> Fsc'
-fsc' = Fsc'
+  s !!! ps = dofsc s ps
