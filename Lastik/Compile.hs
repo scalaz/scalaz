@@ -2,7 +2,7 @@
 This belongs in its own library
 -}
 
-module Compile(recurse, Compile, (!!!), filterRecent, foldIf, systems) where
+module Lastik.Compile(recurse, Compile, (!!!), filterRecent, foldIf, systems) where
 
 import Control.Monad
 import System.Cmd

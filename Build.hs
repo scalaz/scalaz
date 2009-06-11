@@ -1,4 +1,4 @@
 module Build where
 
-import Scalac
-import Compile
+import Lastik.Scalac
+import Lastik.Compile

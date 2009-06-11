@@ -2,7 +2,7 @@
 This belongs in its own library
 -}
 
-module Scalac(none,
+module Lastik.Scalac(none,
               source,
               line,
               vars,
@@ -19,10 +19,10 @@ module Scalac(none,
               sourcepath,
               bootclasspath,
               extdirs,
-              Scalac.directory,
+              Lastik.Scalac.directory,
               encoding,
               target,
-              Scalac.print,
+              Lastik.Scalac.print,
               optimise,
               explaintypes,
               uniqid,
@@ -48,7 +48,7 @@ module Scalac(none,
               incscalac') where
 
 
-import Compile
+import Lastik.Compile
 import System.Cmd
 import System.Directory
 import System.Exit
