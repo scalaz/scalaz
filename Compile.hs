@@ -2,7 +2,7 @@
 This belongs in its own library
 -}
 
-module Compile(recurse) where
+module Compile(recurse, Compile, (!!!)) where
 
 import System.Exit
 import System.FilePath.Find -- -- http://hackage.haskell.org/packages/archive/FileManip/latest/doc/html/
