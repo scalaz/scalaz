@@ -42,7 +42,11 @@ module Scalac(none,
               flags,
               fast,
               fsc,
-              Fsc) where
+              Fsc,
+              IncrementalScalac,
+              incscalac,
+              incscalac') where
+
 
 import Compile
 import System.Cmd
@@ -50,6 +54,7 @@ import System.Exit
 import System.FilePath
 import Data.Char
 import Data.List
+import Data.Maybe
 
 data ScalacDebug = None | Source | Line | Vars | NoTailCalls
   deriving Eq
@@ -211,13 +216,28 @@ docompile z ps = let v = z ++ ' ' : intercalate " " (fmap surround ps) in system
 
 -- not exported
 doscalac :: Scalac -> [String] -> IO ExitCode
-doscalac s = docompile (dscalac "scalac" [] s)
+doscalac = docompile . dscalac "scalac" []
+
+(!*!) :: (Compile c) => c -> [FilePath] -> IO ExitCode
+(!*!) = recurse ".scala"
 
 instance Compile Scalac where
   s !!! ps = doscalac s ps
 
-(!*!) :: (Compile c) => c -> [FilePath] -> IO ExitCode
-(!*!) = recurse ".scala"
+data IncrementalScalac = IncrementalScalac FilePath Scalac
+
+incscalac :: FilePath -> Scalac -> IncrementalScalac
+incscalac = IncrementalScalac
+
+-- unsafe
+incscalac' :: Scalac -> IncrementalScalac
+incscalac' s = incscalac (fromJust $ directory s) s
+
+instance Compile IncrementalScalac where
+  IncrementalScalac p s !!! ps = do ps' <- p `filterRecent` ps
+                                    if null ps'
+                                      then Prelude.print "All up to date"  >> return ExitSuccess
+                                      else doscalac s { directory = Just p } ps'
 
 data Fsc = Fsc {
   fscalac :: Scalac,
