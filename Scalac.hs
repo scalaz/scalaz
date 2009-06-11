@@ -30,7 +30,9 @@ module Scalac(none,
               help,
               (#),
               scalac,
+              scalacd,
               scalac',
+              scalacd',
               ScalacDebug,
               ScalacTarget,
               Scalac,
@@ -112,6 +114,15 @@ data Scalac = Scalac {
 scalac :: Scalac
 scalac = Scalac Nothing False False False False Nothing Nothing Nothing Nothing Nothing Nothing Nothing False False False False False False Nothing
 
+scalacd :: Scalac
+scalacd = scalac {
+                   debug = Just vars,
+                   verbose = True,
+                   deprecation = True,
+                   unchecked = True,
+                   explaintypes = True
+                 }
+
 -- not exported
 dscalac (Scalac debug
                 nowarn
@@ -186,3 +197,5 @@ scalac' = Scalac'
 
 (!*!) :: (Compile c) => c -> [FilePath] -> IO ExitCode
 (!*!) = recurse ".scala"
+
+scalacd' = scalac' scalacd
