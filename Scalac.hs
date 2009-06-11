@@ -52,8 +52,9 @@ import Compile
 import System.Cmd
 import System.Exit
 import System.FilePath
+import System.FilePath.Find hiding (directory)
 import Data.Char
-import Data.List
+import Data.List hiding (find)
 import Data.Maybe
 
 data ScalacDebug = None | Source | Line | Vars | NoTailCalls
@@ -234,7 +235,8 @@ incscalac' :: Scalac -> IncrementalScalac
 incscalac' s = incscalac (fromJust $ directory s) s
 
 instance Compile IncrementalScalac where
-  IncrementalScalac p s !!! ps = do ps' <- p `filterRecent` ps
+  IncrementalScalac p s !!! ps = do p' <- find always always p
+                                    ps' <- p' `filterRecent` ps
                                     if null ps'
                                       then Prelude.print "All up to date"  >> return ExitSuccess
                                       else doscalac s { directory = Just p } ps'

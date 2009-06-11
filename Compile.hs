@@ -16,11 +16,7 @@ recurse :: (Compile c) => String -> c -> [FilePath] -> IO ExitCode
 recurse e c p = do k <- find always (extension ==? e) `mapM` p
                    c !!! concat k
 
-filterRecent :: FilePath -> [FilePath] -> IO [FilePath]
+filterRecent :: [FilePath] -> [FilePath] -> IO [FilePath]
 filterRecent d s = if null d
                      then return s
-                     else do e <- doesDirectoryExist d
-                             if e
-                               then let r = getModificationTime d in filterM (\z -> liftM2 (>) (getModificationTime z) (getModificationTime d)) s
-                               else do createDirectoryIfMissing True d
-                                       return s
+                     else let r = fmap maximum $ mapM getModificationTime d in filterM (\z -> liftM2 (>) (getModificationTime z) r) s
