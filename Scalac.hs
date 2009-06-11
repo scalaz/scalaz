@@ -50,6 +50,7 @@ module Scalac(none,
 
 import Compile
 import System.Cmd
+import System.Directory
 import System.Exit
 import System.FilePath
 import System.FilePath.Find hiding (directory)
@@ -219,11 +220,15 @@ docompile z ps = let v = z ++ ' ' : intercalate " " (fmap surround ps) in system
 doscalac :: Scalac -> [String] -> IO ExitCode
 doscalac = docompile . dscalac "scalac" []
 
+mkdirectory :: Scalac -> IO ()
+mkdirectory s = createDirectoryIfMissing True `mapM_` maybeToList (directory s)
+
 (!*!) :: (Compile c) => c -> [FilePath] -> IO ExitCode
 (!*!) = recurse ".scala"
 
 instance Compile Scalac where
-  s !!! ps = doscalac s ps
+  s !!! ps = do mkdirectory s
+                doscalac s ps
 
 data IncrementalScalac = IncrementalScalac FilePath Scalac
 
@@ -260,4 +265,5 @@ dofsc :: Fsc -> [String] -> IO ExitCode
 dofsc (Fsc fscalac reset shutdown server flags) = docompile (dscalac "fsc" [b "reset" reset, b "shutdown" shutdown, m (uncurry (++)) server, intercalate " " (fmap ("-J" ++) flags)] fscalac)
 
 instance Compile Fsc where
-  s !!! ps = dofsc s ps
+  s !!! ps = do mkdirectory (fscalac s)
+                dofsc s ps
