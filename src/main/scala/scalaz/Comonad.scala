@@ -30,5 +30,8 @@ object Comonad {
 
   import concurrent.Promise
   implicit val PromiseComonad = comonad[Promise]
-  
+
+  import org.scalacheck.Constraint
+
+  implicit val ConstraintComonad = comonad[Constraint]
 }

@@ -26,4 +26,8 @@ object Copointed {
 
   import concurrent.Promise
   implicit val PromiseCopointed = copointed[Promise]
+
+  import org.scalacheck.Constraint
+
+  implicit val ConstraintCopointed = copointed[Constraint]
 }
