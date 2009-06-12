@@ -156,15 +156,16 @@ sealed trait MA[M[_], A] {
   def para[B](b: B, f: (=> A, => M[A], B) => B)(implicit p: Paramorphism[M]) = p.para(v, b, f)
 
   trait TraverseM[F[_]] {
-    def apply[B](f: A => F[B])(implicit a: Applicative[F]): F[M[B]]
+    def apply[B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]]
   }
 
-  def traverse[F[_]](implicit t: Traverse[M]) = new TraverseM[F] {
-    def apply[B](f: A => F[B])(implicit a: Applicative[F]) = t.traverse[F, A, B](f, v)
+  def traverse[F[_]] = new TraverseM[F] {
+    def apply[B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]) = t.traverse[F, A, B](f, v)
   }
 
   def ==>>[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
     case class Acc[B, A](acc: B)
+
 
     implicit val AccApply = new Apply[PartialApply1Of2[Acc, B]#Apply] {
       def apply[A, X](f: Acc[B, A => X], fa: Acc[B, A]) = Acc[B, X](m append (f.acc, fa.acc))
@@ -176,7 +177,7 @@ sealed trait MA[M[_], A] {
 
     implicit val AccApplicative = Applicative.applicative[PartialApply1Of2[Acc, B]#Apply]
 
-    traverse[PartialApply1Of2[Acc, B]#Apply](t)(a => Acc[B, B](f(a))).acc
+    traverse[PartialApply1Of2[Acc, B]#Apply](a => Acc[B, B](f(a))).acc
   }
 
   def -->>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
