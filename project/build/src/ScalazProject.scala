@@ -2,6 +2,8 @@ import sbt._
 import java.util.jar.Attributes.Name._
 
 final class ScalazProject(info: ProjectInfo) extends DefaultProject(info) {
+  val servlet = "javax.servlet" % "servlet-api" % "2.5"
+
   override def compileOrder = CompileOrder.JavaThenScala
 
   override def compileOptions = target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
