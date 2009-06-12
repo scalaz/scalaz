@@ -75,6 +75,10 @@ object Scalaz {
 
   def multiplication(n: Int) = IntMultiplication.multiplication(n)
 
+  implicit def InputStreamTo(v: java.io.InputStream) = InputStreamW.InputStreamTo(v)
+
+  implicit def InputStreamFrom(v: InputStreamW) = InputStreamW.InputStreamFrom(v)
+
   implicit def IntMultiplicationFrom(n: IntMultiplication) = IntMultiplication.IntMultiplicationFrom(n)
 
   implicit def IntTo(n: Int) = IntW.IntTo(n)
