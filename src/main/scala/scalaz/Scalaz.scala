@@ -63,6 +63,10 @@ object Scalaz {
 
   implicit def EndoFrom[A](e: Endo[A]) = Endo.EndoFrom(e)
 
+  implicit def EnumerationTo[A](v: java.util.Enumeration[A]) = EnumerationW.EnumerationTo(v)
+
+  implicit def EnumerationFrom[A](v: EnumerationW[A]) = EnumerationW.EnumerationFrom(v)
+
   implicit def LongMultiplicationFrom(n: LongMultiplication) = LongMultiplication.LongMultiplicationFrom(n)
 
   implicit def Function1To[T, R](f: T => R) = Function1W.Function1To(f)
