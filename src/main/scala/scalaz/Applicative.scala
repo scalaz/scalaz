@@ -94,4 +94,10 @@ object Applicative {
   implicit val JavaLinkedBlockingQueueApplicative = applicative[LinkedBlockingQueue]
 
   implicit val JavaSynchronousQueueApplicative = applicative[SynchronousQueue]
+
+  import org.scalacheck.{Gen, Arbitrary}
+
+  implicit val GenApplicative = applicative[Gen]
+
+  implicit val ArbitraryApplicative = applicative[Arbitrary]
 }

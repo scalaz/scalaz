@@ -92,4 +92,10 @@ object Monad {
   implicit val JavaLinkedBlockingQueueMonad = monad[LinkedBlockingQueue]
 
   implicit val JavaSynchronousQueueMonad = monad[SynchronousQueue]
+
+  import org.scalacheck.{Gen, Arbitrary}
+
+  implicit val GenMonad = monad[Gen]
+  
+  implicit val ArbitraryMonad = monad[Arbitrary]
 }
