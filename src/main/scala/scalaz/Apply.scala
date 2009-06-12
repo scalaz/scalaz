@@ -128,4 +128,10 @@ object Apply {
   implicit val JavaLinkedBlockingQueueApply = FunctorBindApply[LinkedBlockingQueue]
 
   implicit val JavaSynchronousQueueApply = FunctorBindApply[SynchronousQueue]
+
+  import org.scalacheck.{Gen, Arbitrary}
+
+  implicit val GenApply = FunctorBindApply[Gen]
+
+  implicit val ArbitraryApply = FunctorBindApply[Arbitrary]
 }
