@@ -27,7 +27,7 @@ object Traverse {
 
   implicit val ListTraverse: Traverse[List] = new Traverse[List] {
     def traverse[F[_], A, B](f: A => F[B], as: List[A])(implicit a: Applicative[F]): F[List[B]] =
-      as.foldLeft[F[List[B]]](a.pure(Nil))((ys, x) => a(a.fmap(f(x), (a: B) => (b: List[B]) => a :: b), ys))
+      as.foldRight[F[List[B]]](a.pure(Nil))((x, ys) => a(a.fmap(f(x), (a: B) => (b: List[B]) => a :: b), ys))
   }
 
   implicit val StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
