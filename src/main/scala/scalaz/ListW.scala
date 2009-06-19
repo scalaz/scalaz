@@ -30,6 +30,10 @@ sealed trait ListW[A] {
     case Nil => z.zero
     case h :: t => f(NonEmptyList.nel(h, t))
   }
+
+  // def dlist[A](as: List[A]): DList[A] = dlist(as ::: _)
+
+  def dlist = DList.dlist(value ::: (_: List[A])) 
 }
 
 object ListW {

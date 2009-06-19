@@ -68,6 +68,8 @@ sealed trait Identity[A] {
             m.pure(Tree.node(abs._1, ts))))
   }
 
+  def dlist = DList.dlist(value :: (_: List[A]))
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
