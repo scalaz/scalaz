@@ -150,6 +150,8 @@ object Scalaz {
 
   implicit def NonEmptyListMA[A](a: NonEmptyList[A]) = ma[NonEmptyList](a)
 
+  implicit def DListMA[A](a: DList[A]) = ma[DList](a)
+
   implicit def StateMA[S, A](a: State[S, A]) = ma[PartialApply1Of2[State, S]#Apply](a)
 
   implicit def EqualMA[A](a: Equal[A]) = ma[Equal](a)
@@ -275,6 +277,8 @@ object Scalaz {
   implicit def ContinuationMMA[R, A](a: Continuation[R, Continuation[R, A]]) = mma[PartialApply1Of2[Continuation, R]#Apply](a)
 
   implicit def NonEmptyListMMA[A](a: NonEmptyList[NonEmptyList[A]]) = mma[NonEmptyList](a)
+
+  implicit def DListMMA[A](a: DList[DList[A]]) = mma[DList](a)
 
   implicit def StateMMA[S, A](a: State[S, State[S, A]]) = mma[PartialApply1Of2[State, S]#Apply](a)
 
