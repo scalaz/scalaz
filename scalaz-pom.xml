@@ -57,6 +57,12 @@
             <version>1.5</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>1.5</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
     <build>
         <!-- Should be src/main/scala, but need to hide the svn:externals from this build. -->
