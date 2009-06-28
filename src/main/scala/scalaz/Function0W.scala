@@ -4,8 +4,6 @@ sealed trait Function0W[T] {
   val k: () => T
 
   def throws = try { Right(k()) } catch { case e => Left(e) }
-
-  def pure[P[_]](implicit p: Pure[P]) = p pure k()
 }
 
 object Function0W {

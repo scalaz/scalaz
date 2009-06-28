@@ -3,8 +3,6 @@ package scalaz
 object Scalaz {
   import java.math.BigInteger
 
-  def id[A](f: () => A) = LazyIdentity.id(f)
-
   implicit def IdentityTo[A](x: A) = Identity.IdentityTo(x)
 
   implicit def AlphaChar(a: Alpha) = Alpha.AlphaChar(a)
@@ -100,10 +98,6 @@ object Scalaz {
   implicit def JavaIterableTo[A](i: java.lang.Iterable[A]): IterableW[A] = IterableW.JavaIterableTo(i)
 
   def kleisli[M[_]] = Kleisli.kleisli[M]
-
-  implicit def LazyIdentityTo[A](a: A) = LazyIdentity.LazyIdentityTo(a)
-
-  implicit def LazyIdentityFrom[A](i: LazyIdentity[A]) = LazyIdentity.LazyIdentityFrom(i)
 
   implicit def ListTo[A](as: List[A]): ListW[A] = ListW.ListTo(as)
 

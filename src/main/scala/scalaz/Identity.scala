@@ -75,6 +75,13 @@ sealed trait Identity[A] {
   override def hashCode = value.hashCode
 
   override def equals(o: Any) = o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+
+  def onull = {
+    val v = value
+    if(v == null) None else Some(v)
+  }
+
+  def pure[P[_]](implicit p: Pure[P]) = p pure value
 }
 
 object Identity {
