@@ -69,6 +69,10 @@ object Scalaz {
 
   implicit def LongMultiplicationFrom(n: LongMultiplication) = LongMultiplication.LongMultiplicationFrom(n)
 
+  implicit def Function0To[T](f: () => T) = Function0W.Function0To(f)
+
+  implicit def Function0From[T](f: Function0W[T]) = Function0W.Function0From(f) 
+
   implicit def Function1To[T, R](f: T => R) = Function1W.Function1To(f)
 
   implicit def Function1From[T, R](f: Function1W[T, R]) = Function1W.Function1From(f)
