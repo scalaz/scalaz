@@ -1,13 +1,6 @@
 package scalaz.http.scapps
 
-import scalaz.Zero
 import xml.{NodeSeq, Elem, Node}
-
-object Zeros {
-  implicit def NodeSeqZero: Zero[NodeSeq] = new Zero[NodeSeq] {val zero = xml.NodeSeq.Empty}
-
-  implicit def ElemZero: Zero[Elem] = new Zero[Elem] {val zero = <span> </span>}
-}
 
 object ViewHelpers {
   import scalaz.http.request.Request
