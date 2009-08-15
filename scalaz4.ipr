@@ -121,6 +121,7 @@
   </component>
   <component name="InspectionProjectProfileManager">
     <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
     <profiles>
       <profile version="1.0" is_locked="false">

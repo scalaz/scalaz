@@ -14,7 +14,7 @@ object Scapps {
 
   implicit def ListKleisliKleisli[A, B](fs: List[Kleisli[Option, A, B]]): Kleisli[Option, A, B] = Kleisli.kleisli[Option](firstSome(fs) _)
 
-  implicit def PathKliesli(s: String) = Kleisli.kleisli[Option](exactdir(s))
+  implicit def PathKliesli(s: String) = Kleisli.kleisli[Option](exactPath(s))
 
   implicit def MethodKliesli(m: Method) = Kleisli.kleisli[Option](methodM(m))
 
