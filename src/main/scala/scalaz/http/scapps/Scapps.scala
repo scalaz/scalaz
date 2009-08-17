@@ -1,12 +1,13 @@
 package scalaz.http.scapps
 
 import Route._
+import scala.xml.{Elem, Node, NodeSeq, Null}
 import scalaz.Scalaz._
 import scalaz.{Kleisli, OptionW, StringW, Zero}
 import scalaz.http.request._
-import xml.{NodeSeq, Elem, Node}
 
 object Scapps {
+  import _root_.scala.xml.NodeSeq
 
   def firstSome[A, B](fs: List[Kleisli[Option, A, B]])(a: A): Option[B] = (fs.elements.map(_(a)).find(_.isDefined)).join
 
@@ -22,6 +23,16 @@ object Scapps {
 
   implicit def NodeSeqZero: Zero[NodeSeq] = new Zero[NodeSeq] {val zero = xml.NodeSeq.Empty}
 
-  implicit def ElemZero: Zero[Elem] = new Zero[Elem] {val zero = <span> </span>}
+  implicit def NodeZero: Zero[Node] = new Zero[Node] {
+    val zero = new Node {
+      override def text = null
+      override def label = null
+      override def child = Nil
+    }
+  }
+
+  implicit def ElemZero: Zero[Elem] = new Zero[Elem] {
+    val zero = new Elem(null, null, Null, xml.TopScope, Nil: _*)
+  }
 }
 
