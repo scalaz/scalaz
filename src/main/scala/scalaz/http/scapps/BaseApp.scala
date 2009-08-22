@@ -1,35 +1,30 @@
 package scalaz.http.scapps
 
-// TODO clean up these imports if possible
-
-import javax.servlet.ServletContext
+import java.util.Date
 import scalaz.Scalaz._
 import scalaz.http.request.{Method, Request}
-import scalaz.http.servlet.{HttpServlet, HttpServletRequest, ServletApplication, StreamStreamServletApplication}
-import scalaz.http.servlet.HttpServlet._
+import scalaz.http.servlet.{HttpServlet, HttpServletRequest, ServletApplication, StreamStreamServletApplication}, HttpServlet._, HttpServletRequest._
 import scalaz.http.StreamStreamApplication._
 import scalaz.http.{Application}
 import scalaz.http.response._
 import scalaz.http.response.Body._
 
-/*
-Slinky base application that provides Optional handling of request.
-Looks up resources if None.
+/**
+ * Base application that provides Optional handling of request. Looks up resources if no routes match, then 404.
 */
 abstract class BaseApp extends StreamStreamServletApplication {
   def route(implicit request : Request[Stream], servletRequest: HttpServletRequest) : Option[Response[Stream]]
 
-  def log(request: Request[Stream], response: Response[Stream]) {
-    println("0.0.0.0 - localhost [%s] \"%s %s HTTP/1.0\" %s 0000" format ("", request.method.asString, request.path.list.mkString, response.status.toInt.toString))
-    println("Request body: " + request.body.map(_.toChar).mkString)
-    // TODO use apache log format
-    // 127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
+  def log(time: Date, servletRequest: HttpServletRequest, request: Request[Stream], response: Response[Stream]) {
+    println("""%s - - [%s] "%s %s %s" %s 0""".format(servletRequest.getRemoteAddr, new Date(), request.method.asString, request.path.list.mkString, request.version.asString, response.status.toInt.toString))
+    println(request.body.map(_.toChar).mkString)
   }
 
   val application = new ServletApplication[Stream, Stream] {
     def application(implicit servlet: HttpServlet, servletRequest: HttpServletRequest, request: Request[Stream]) = {
+      val time = new Date()
       val response = route getOrElse resource(x => OK << Stream.fromIterator(x), NotFound.xhtml)
-      log(request, response)
+      log(time, servletRequest, request, response)
       response
     }
   }
