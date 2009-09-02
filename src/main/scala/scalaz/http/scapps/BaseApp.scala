@@ -20,6 +20,7 @@ abstract class BaseApp extends StreamStreamServletApplication {
     println(request.body.map(_.toChar).mkString)
   }
 
+  // TODO Handle exceptions.
   val application = new ServletApplication[Stream, Stream] {
     def application(implicit servlet: HttpServlet, servletRequest: HttpServletRequest, request: Request[Stream]) = {
       val time = new Date()

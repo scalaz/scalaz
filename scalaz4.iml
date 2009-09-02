@@ -32,8 +32,15 @@
         <CLASSES>
           <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/lib" />
         </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/etc/lib-docs/scala-2.7.5.final-devel-docs.zip!/scala-2.7.5.final-devel-docs/api" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/etc/lib-src/scala/scala-compiler-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/etc/lib-src/scala/scala-dbc-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/etc/lib-src/scala/scala-library-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/etc/lib-src/scala/scala-swing-src.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/lib" recursive="false" />
       </library>
     </orderEntry>

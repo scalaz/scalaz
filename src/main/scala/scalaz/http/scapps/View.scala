@@ -37,12 +37,12 @@ object View {
   import scalaz.http.response.OK
   import scalaz.http.request.Request
   import scalaz.http.StreamStreamApplication._
-  //import _root_.scapps.{JSON, Id}, JSON._, Id._
+  //import _root_.scapps.{JsonValuer, Id}, JsonValuer._, Id._
 
   implicit val charSet = scalaz.CharSet.UTF8
 
-//  def jsonResponse[T](t: T)(implicit request: Request[Stream], jsoner: JSON[T]) = OK(ContentType, "application/json") << t.jsonString << "\n"
-  //def jsonResponse[T](t: T)(implicit request: Request[Stream], jsoner: JSON[T]) = OK(ContentType, "text/plain") << t.jsonString << "\n"
+//  def jsonResponse[T](t: T)(implicit request: Request[Stream], jsoner: JsonValuer[T]) = OK(ContentType, "application/json") << t.jsonString << "\n"
+  //def jsonResponse[T](t: T)(implicit request: Request[Stream], jsoner: JsonValuer[T]) = OK(ContentType, "text/plain") << t.jsonString << "\n"
 
   def doc[A](title: String, content: A, request : Request[Stream]) =
     <html xmlns="http://www.w3.org/1999/xhtml">
