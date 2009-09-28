@@ -258,13 +258,11 @@ object Scalaz {
 
   implicit def SynchronousQueueMA[A](a: SynchronousQueue[A]) = ma[SynchronousQueue](a)
 
-  import org.scalacheck.{Gen, Arbitrary, Constraint}
+  import org.scalacheck.{Gen, Arbitrary}
 
   implicit def GenMA[A](a: Gen[A]) = ma[Gen](a)
 
   implicit def ArbitraryMA[A](a: Arbitrary[A]) = ma[Arbitrary](a)
-
-  implicit def ConstraintMA[A](a: Constraint[A]) = ma[Constraint](a)
 
   // MMA
 
@@ -375,13 +373,11 @@ object Scalaz {
 
   implicit def SynchronousQueueMMMA[A](a: SynchronousQueue[SynchronousQueue[A]]) = mma[SynchronousQueue](a)
 
-  import org.scalacheck.{Gen, Arbitrary, Constraint}
+  import org.scalacheck.{Gen, Arbitrary}
 
   implicit def GenMMA[A](a: Gen[Gen[A]]) = mma[Gen](a)
 
   implicit def ArbitraryMMA[A](a: Arbitrary[Arbitrary[A]]) = mma[Arbitrary](a)
-
-  implicit def ConstraintMMA[A](a: Constraint[Constraint[A]]) = mma[Constraint](a)
 
   // MAB
 
