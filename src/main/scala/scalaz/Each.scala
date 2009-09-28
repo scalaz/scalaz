@@ -91,10 +91,4 @@ object Each {
       }
     }
   }
-
-  import org.scalacheck.Constraint
-
-  implicit val ConstraintEach = new Each[Constraint] {
-    def each[A](e: Constraint[A], f: A => Unit) = f(e.unbox)
-  }
 }
