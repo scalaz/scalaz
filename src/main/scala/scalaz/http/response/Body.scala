@@ -16,7 +16,7 @@ sealed trait Body[OUT[_], A] {
 }
 
 import Scalaz._
-import xml.Elem
+import xml.{Elem, NodeSeq}
 
 /**
  * Type constructors that can be used in request and response bodies.
@@ -70,6 +70,12 @@ object Body {
    * The body implementation for an XML element to a stream.
    */
   implicit def ElemStreamBody(implicit c: CharSet): Body[Stream, Elem] = body[Stream](_.toString.getBytes(c.value).toStream)
+  
+  /**
+   * The body implementation for an XML element to a stream.
+   */
+  implicit def NodeSeqStreamBody(implicit c: CharSet): Body[Stream, NodeSeq] = body[Stream](_.toString.getBytes(c.value).toStream)
+  
 
   /**
    * The body implementation for an XHTML doctype to a stream.
