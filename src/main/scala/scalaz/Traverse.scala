@@ -20,6 +20,11 @@ object Traverse {
   implicit val Tuple1Traverse: Traverse[Tuple1] = new Traverse[Tuple1] {
     def traverse[F[_], A, B](f: A => F[B], t: Tuple1[A])(implicit a: Applicative[F]) = a.fmap(f(t._1), Tuple1(_: B))
   }
+  
+  implicit def Tuple2Traverse[X]: Traverse[PartialApply1Of2[Tuple2, X]#Apply] = new Traverse[PartialApply1Of2[Tuple2, X]#Apply] {
+    def traverse[F[_], A, B](f: A => F[B], as: Tuple2[X, A])(implicit a: Applicative[F]): F[Tuple2[X, B]] =
+      a.fmap(f(as._2), ((b: B) => (as._1, b)))
+  }
 
   implicit val Function0Traverse: Traverse[Function0] = new Traverse[Function0] {
     def traverse[F[_], A, B](f: A => F[B], t: Function0[A])(implicit a: Applicative[F]) = a.fmap(f(t.apply), (b: B) => () => b)
