@@ -7,6 +7,12 @@ import scalaz.Scalaz._
 
 // Methods to get route parsing functions
 object Routing {
+  def traceRequest(f : Request[Stream] => Unit) = (r : Request[Stream]) => {
+    f(r); Some(r)
+  }
+  
+  val tracePath = traceRequest(_.path.list.mkString.println)
+  
   // returns a new request with the prefix stripped if it matches, else none
   def startsWith(prefix: String): (Request[Stream] => Option[Request[Stream]])= {
     def f(prefix: String)(r: Request[Stream]): Option[Request[Stream]] = {
@@ -35,7 +41,7 @@ object Routing {
   }
 
   // interprets the value of _method in a post as an HTTP method
-  def methodHax = (r: Request[Stream]) => {
+  val methodHax = (r: Request[Stream]) => {
     import scalaz.http.request.Method._
     val mbMeth: Option[Method] = (r | "_method") >>= (_.mkString : Option[Method])
     Some((mbMeth |> (r(_))) getOrElse (r))
