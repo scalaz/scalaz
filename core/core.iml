@@ -8,22 +8,11 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/project/boot" />
-      <excludeFolder url="file://$MODULE_DIR$/project/build/target" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="sbt">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" recursive="false" />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="Scala" level="project" />
   </component>
 </module>

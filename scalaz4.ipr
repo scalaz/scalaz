@@ -177,13 +177,16 @@
   <component name="ProjectDetails">
     <option name="projectName" value="scalaz" />
   </component>
-  <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
     <option name="state" value="https://scalaz.googlecode.com/svn/trunk/scalaz4.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/http/http.iml" filepath="$PROJECT_DIR$/http/http.iml" />
       <module fileurl="file://$PROJECT_DIR$/scalaz4.iml" filepath="$PROJECT_DIR$/scalaz4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scapps/scapps.iml" filepath="$PROJECT_DIR$/scapps/scapps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/test.iml" filepath="$PROJECT_DIR$/test/test.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
@@ -207,6 +210,16 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="" />
     <mapping directory="$PROJECT_DIR$" vcs="svn" />
+  </component>
+  <component name="libraryTable">
+    <library name="Scala">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/project/boot/scala-2.7.5/lib" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/project/boot/scala-2.7.5/lib" recursive="false" />
+    </library>
   </component>
 </project>
 
