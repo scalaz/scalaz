@@ -21,14 +21,14 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
   
   
-  override def fork = Some(new ForkScalaCompiler { 
-      override def javaHome: Option[File] = None
-      override def scalaJars: Iterable[File] = List(
-        new File("/Users/nkpart/p/x/am-scala/lib/scala-compiler.jar"),
-        new File("/Users/nkpart/p/x/am-scala/lib/scala-library.jar")
-        )
-    }
-    )
+  // override def fork = Some(new ForkScalaCompiler { 
+  //     override def javaHome: Option[File] = None
+  //     override def scalaJars: Iterable[File] = List(
+  //       new File("/Users/nkpart/p/x/am-scala/lib/scala-compiler.jar"),
+  //       new File("/Users/nkpart/p/x/am-scala/lib/scala-library.jar")
+  //       )
+  //   }
+  //   )
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
