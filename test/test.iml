@@ -20,7 +20,10 @@
           <root url="file://$MODULE_DIR$/lib_managed/compile" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib_managed/compile/fj-2.19-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/compile/scalacheck-1.5-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib_managed/compile" recursive="false" />
       </library>
     </orderEntry>

@@ -15,6 +15,18 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Scala" level="project" />
     <orderEntry type="module" module-name="core" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib_managed/compile" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib_managed/compile/servlet-api-2.5-sources.jar!/" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib_managed/compile" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

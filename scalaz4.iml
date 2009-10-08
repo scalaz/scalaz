@@ -18,10 +18,12 @@
       <library name="sbt">
         <CLASSES>
           <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" />
+          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
         <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="library" name="Scala" level="project" />
