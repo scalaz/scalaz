@@ -1,6 +1,7 @@
 import sbt._
 import sbt.CompileOrder._
 import java.util.jar.Attributes.Name._
+import java.io.File
 
 abstract class ScalazDefaults(info: ProjectInfo, component: String) extends DefaultProject(info) {
   override def compileOptions = target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
@@ -18,6 +19,16 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
   val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
+  
+  
+  override def fork = Some(new ForkScalaCompiler { 
+      override def javaHome: Option[File] = None
+      override def scalaJars: Iterable[File] = List(
+        new File("/Users/nkpart/p/x/am-scala/lib/scala-compiler.jar"),
+        new File("/Users/nkpart/p/x/am-scala/lib/scala-library.jar")
+        )
+    }
+    )
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
@@ -35,6 +46,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
   // One-shot build for users building from trunk
   //  lazy val fullBuild = task {None} dependsOn (boot.proguard, main.crossPublishLocal) describedAs
   //      "Builds the loader and builds main sbt against all supported versions of Scala and installs to the local repository."
+
 
 }
 
