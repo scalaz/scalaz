@@ -2,6 +2,18 @@ package scalaz
 
 trait Paramorphism[P[_]] {
   def para[A, B](fa: P[A], b: B, f: (=> A, => P[A], B) => B): B
+
+	// Apply a function to consecutives pairs of an environment and accumulates the result of each application in a new environement
+  def pairMap[A](fa: P[A], f: (A, A) => A)(implicit e: Empty[P], p: Pure[P], m: Monoid[P[A]], s: Semigroup[P[A]], first: First[P]) : P[A] = {
+
+    def combine(a: => A, as: => P[A], b: P[A]) : P[A] = first.first(as) match
+    {
+      case None => b
+      case Some(value) => s.append(p.pure(f(a, value)), b)
+    }
+
+    para[A, P[A]](fa, e.empty, combine);
+  }
 }
 
 object Paramorphism {
