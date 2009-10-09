@@ -9,17 +9,14 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   override def documentOptions = documentTitle("Scalaz " + component + projectVersion + " API Specification") :: windowTitle("Scalaz " + projectVersion) :: super.documentOptions.toList
   //  override def defaultJarBaseName = "scalaz-" + component.toLowerCase + "-" + version.toString
 
-  // TODO configure direct publishing once credentials for scala-tools are obtained.
   override def managedStyle = ManagedStyle.Maven
-  val localFileRepo = Resolver.file("local-file-repo", new java.io.File("/Users/jason/code/scalaz-maven/snapshots"))
-  val publishTo = localFileRepo
 
   override def packageDocsJar = defaultJarPath("-javadoc.jar")
   override def packageSrcJar = defaultJarPath("-sources.jar")
   val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
   val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
-  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
 
+  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
 
   // override def fork = Some(new ForkScalaCompiler {
   //     override def javaHome: Option[File] = None
@@ -38,6 +35,10 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
   lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
   lazy val scapps = project("scapps", "Scalaz Scapps", new ScalazScappsProject(_), core, http)
 
+  // TODO configure direct publishing once credentials to scala-tools.org
+  val publishTo = Resolver.file("local-file-repo", new java.io.File("/Users/jason/code/scalaz-maven/snapshots"))
+  
+  override def publishAction = task { None }
   // TODO Package the project up
   //packageProjectZip
   //  def extraResources = descendents(info.projectPath / "licenses", "*") +++ "LICENSE" +++ "NOTICE"
