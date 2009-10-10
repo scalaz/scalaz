@@ -15,4 +15,19 @@ object First {
       case a :: _ => Some(a)
     }
   }
+
+  implicit val NonEmptyListFirst = new First[NonEmptyList] {
+    override def first[A](as: NonEmptyList[A]): Option[A] = Some(as.head)
+  }
+
+  implicit val StreamFirst = new First[Stream] {
+    override def first[A](as: Stream[A]): Option[A] = {
+      if (as.isEmpty) None else Some(as.head)
+    }
+  }
+
+  implicit val OptionFirst = new First[Option] {
+    override def first[A](as: Option[A]): Option[A] = as
+  }
+
 }
