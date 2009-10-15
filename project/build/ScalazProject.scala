@@ -35,10 +35,14 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
   lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
   lazy val scapps = project("scapps", "Scalaz Scapps", new ScalazScappsProject(_), core, http)
 
-  // TODO configure direct publishing once credentials to scala-tools.org
-  val publishTo = Resolver.file("local-file-repo", new java.io.File("/Users/jason/code/scalaz-maven/snapshots"))
-  
+  // Use this as a test run of pom generation and jar publishing
+  // val publishTo = Resolver.file("local-file-repo", new java.io.File("/Users/jason/code/scalaz-maven/snapshots"))
+
+  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+
   override def publishAction = task { None }
+
   // TODO Package the project up
   //packageProjectZip
   //  def extraResources = descendents(info.projectPath / "licenses", "*") +++ "LICENSE" +++ "NOTICE"
@@ -47,8 +51,6 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
   // One-shot build for users building from trunk
   //  lazy val fullBuild = task {None} dependsOn (boot.proguard, main.crossPublishLocal) describedAs
   //      "Builds the loader and builds main sbt against all supported versions of Scala and installs to the local repository."
-
-
 }
 
 protected final class ScalazCoreProject(info: ProjectInfo) extends ScalazDefaults(info, "Core")
