@@ -1,9 +1,11 @@
 package scalaz.http.request
 
 import scalaz.memo.Memo._
-import Scalaz._
-import Util.{asHashMap, mapHeads, parameters}
-import Util.Nel._
+import scalaz.Scalaz._
+import scalaz.http.Util.{asHashMap, mapHeads, parameters}
+import scalaz.http.Util.Nel._
+import scalaz.http._
+import scalaz._
 
 /**
  * HTTP request.

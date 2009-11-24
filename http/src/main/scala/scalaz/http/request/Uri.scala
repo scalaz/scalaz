@@ -1,8 +1,10 @@
 package scalaz.http.request
 
 import scalaz.NonEmptyList.nel
-import Util.Nel._
-import Scalaz._
+import scalaz._
+import scalaz.http.Util.Nel._
+import scalaz.http.Util
+import scalaz.Scalaz._
 
 /**
  * HTTP request URI.
@@ -51,7 +53,7 @@ sealed trait Uri {
    */
   lazy val pathExtension = path.dropWhile(_ != '.').reverse.takeWhile(_ != '.').reverse.mkString
   
-  import Util.{asHashMap, mapHeads}
+  import scalaz.http.Util.{asHashMap, mapHeads}
 
   /**
    * Returns the query string split into values by <code>'='</code>.
