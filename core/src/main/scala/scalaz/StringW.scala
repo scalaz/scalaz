@@ -108,6 +108,50 @@ sealed trait StringW {
       in.close
     }
   }
+
+  // Parsing functions.
+
+  def parseBoolean: Validation[NumberFormatException, Boolean] = try {
+    Success(s.toBoolean)
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseByte: Validation[NumberFormatException, Byte] = try {
+    Success(java.lang.Byte.parseByte(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseShort: Validation[NumberFormatException, Short] = try {
+    Success(java.lang.Short.parseShort(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseInt: Validation[NumberFormatException, Int] = try {
+    Success(java.lang.Integer.parseInt(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseLong: Validation[NumberFormatException, Long] = try {
+    Success(java.lang.Long.parseLong(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseFloat: Validation[NumberFormatException, Float] = try {
+    Success(java.lang.Float.parseFloat(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseDouble: Validation[NumberFormatException, Double] = try {
+    Success(java.lang.Double.parseDouble(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
 }
 
 object StringW {

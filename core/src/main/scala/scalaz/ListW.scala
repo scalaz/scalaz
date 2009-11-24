@@ -31,6 +31,11 @@ sealed trait ListW[A] {
     case h :: t => f(NonEmptyList.nel(h, t))
   }
 
+  def stripPrefix(prefix : List[A]) : Option[List[A]] = {
+    val (before, after) = value splitAt prefix.length
+    (before == prefix) option after
+  }
+
   // def dlist[A](as: List[A]): DList[A] = dlist(as ::: _)
 
   def dlist = DList.dlist(value ::: (_: List[A])) 
