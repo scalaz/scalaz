@@ -33,7 +33,6 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) {
   lazy val core = project("core", "Scalaz Core", new ScalazCoreProject(_))
   lazy val test = project("test", "Scalaz Test", new ScalazTestProject(_), core)
   lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
-  lazy val scapps = project("scapps", "Scalaz Scapps", new ScalazScappsProject(_), core, http)
 
   // Use this as a test run of pom generation and jar publishing
   // val publishTo = Resolver.file("local-file-repo", new java.io.File("/Users/jason/code/scalaz-maven/snapshots"))
@@ -65,5 +64,3 @@ protected final class ScalazHttpProject(info: ProjectInfo) extends ScalazDefault
   val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
 }
 
-protected final class ScalazScappsProject(info: ProjectInfo) extends ScalazDefaults(info, "Scapps") {
-}
