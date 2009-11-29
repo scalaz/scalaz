@@ -55,7 +55,7 @@ object Plus {
     def plus[A](a1: Validation[X, A], a2: => Validation[X, A]) = a1 match {
       case Success(_) => a1
       case Failure(_) => a2 match {
-        case Success() => a2
+        case Success(_) => a2
         case Failure(_) => a1
       }
     }
