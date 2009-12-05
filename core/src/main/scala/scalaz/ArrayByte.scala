@@ -6,10 +6,10 @@ sealed trait ArrayByte {
   def decode(implicit c: CharSet) = new String(value, c.value)
 }
 
-object ArrayByte {
-  implicit def ArrayByteTo(bs: Array[Byte]) = new ArrayByte {
+trait ArrayBytes {
+  implicit def ArrayByteTo(bs: Array[Byte]): ArrayByte = new ArrayByte {
     val value = bs
   }
 
-  implicit def ArrayByteFrom(bs: ArrayByte) = bs.value
+  implicit def ArrayByteFrom(bs: ArrayByte): Array[Byte] = bs.value
 }

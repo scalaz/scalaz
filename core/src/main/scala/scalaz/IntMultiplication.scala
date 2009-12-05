@@ -4,10 +4,10 @@ sealed trait IntMultiplication {
   val value: Int
 }
 
-object IntMultiplication {
+trait IntMultiplications {
   def multiplication(n: Int) = new IntMultiplication {
     val value = n
   }
 
-  implicit def IntMultiplicationFrom(n: IntMultiplication) = n.value
+  implicit def IntMultiplicationFrom(n: IntMultiplication): Int = n.value
 }

@@ -6,14 +6,14 @@ sealed trait Endo[A] {
   def fix: A = apply(fix)
 }
 
-object Endo {
-  implicit def EndoTo[A](f: A => A) = new Endo[A] {
+trait Endos {
+  implicit def EndoTo[A](f: A => A): Endo[A] = new Endo[A] {
     def apply(a: A) = f(a)
   }
 
-  implicit def EndoFrom[A](e: Endo[A]) = e.apply(_)
+  implicit def EndoFrom[A](e: Endo[A]): A => A = e.apply(_)
 
-  def constant[A](a: => A) = EndoTo[A](_ => a)
+  def constantEndo[A](a: => A) = EndoTo[A](_ => a)
 
-  def identity[A] = EndoTo[A](a => a)
+  def idEndo[A] = EndoTo[A](a => a)
 }

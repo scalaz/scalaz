@@ -1,10 +1,9 @@
 package scalaz.concurrent
 
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
-import Effect._
-import Actor._
+import scalaz.Scalaz._
 
-sealed trait Promise[A] extends (() => A) {
+sealed trait Promise[A] {
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Option[A] = None
@@ -26,6 +25,10 @@ sealed trait Promise[A] extends (() => A) {
   }
 
   def apply = get
+}
+
+trait Promises {
+  def promise[A](a: => A)(implicit s: Strategy[Unit]): Promise[A] = Promise.promise(a) 
 }
 
 object Promise {
@@ -55,5 +58,5 @@ object Promise {
     p
   }
 
-  implicit def promiseFrom[A](implicit a: Promise[A]) = () => a.get
+  implicit def PromiseFrom[A](implicit a: Promise[A]) = () => a.get  
 }

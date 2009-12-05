@@ -5,106 +5,96 @@ sealed trait MA[M[_], A] {
 
   import Scalaz._
 
-  def map[B](f: A => B)(implicit t: Functor[M]) = t.fmap(v, f)
+  def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = t.fmap(v, f)
 
-  def |>[B](f: A => B)(implicit t: Functor[M]) = map(f)
+  def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
 
-  def <|:[B](f: A => B)(implicit t: Functor[M]) = map(f)
+  def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
-  def |>-[B](f: => B)(implicit t: Functor[M]) = map(_ => f)
+  def ⊛[B](f: M[A => B])(implicit a: Apply[M]) = a(f, v)
 
-  def -<|:[B](f: => B)(implicit t: Functor[M]) = |>-(f)
+  def <⊛>[B, C](b: M[B], z: (A, B) => C)(implicit t: Functor[M], a: Apply[M]) = a(t.fmap(v, z.curry), b)
 
-  def <*>[B](f: M[A => B])(implicit a: Apply[M]) = a(f, v)
+  def <⊛⊛>[B, C, D](b: M[B], c: M[C], z: (A, B, C) => D)(implicit t: Functor[M], a: Apply[M]) = a(a(t.fmap(v, z.curry), b), c)
 
-  def <*>:[B](f: M[A => B])(implicit a: Apply[M]) = <*>(f)
+  def <⊛⊛⊛>[B, C, D, E](b: M[B], c: M[C], d: M[D], z: (A, B, C, D) => E)(implicit t: Functor[M], a: Apply[M]) = a(a(a(t.fmap(v, z.curry), b), c), d)
 
-  def *>[B](k: M[B])(implicit f: Functor[M], a: Apply[M]) = a(f.fmap(v, (_: A) => (b: B) => b), k)
+  def <⊛⊛⊛⊛>[B, C, D, E, F](b: M[B], c: M[C], d: M[D], e: M[E], z: (A, B, C, D, E) => F)(implicit t: Functor[M], a: Apply[M]) = a(a(a(a(t.fmap(v, z.curry), b), c), d), e)
 
-  def <*[B](k: M[B])(implicit f: Functor[M], a: Apply[M]) = a(f.fmap(v, (a: A) => (_: B) => a), k)
+  def ⊛>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]) = <⊛>(b, (_, b: B) => b)
 
-  def <**>[B](k: M[B])(implicit f: Functor[M], a: Apply[M]) = a(f.fmap(v, (a: A) => (b: B) => (a, b)), k)
+  def <⊛[B](b: M[B])(implicit t: Functor[M], a: Apply[M]) = <⊛>(b, (a, _: B) => a)
 
-  def liftA[B, C](b: M[B], z: A => B => C)(implicit f: Functor[M], a: Apply[M]) = a(f.fmap(v, z), b)
+  def <×>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]) = <⊛>(b, (_: A, _: B))
 
-  def liftA[B, C, D](b: M[B], c: M[C], z: A => B => C => D)(implicit f: Functor[M], a: Apply[M]) =
-    a(a(f.fmap(v, z), b), c)
+  def <××>[B, C](b: M[B], c: M[C])(implicit t: Functor[M], a: Apply[M]) = <⊛⊛>(b, c, (_: A, _: B, _: C))
 
-  def liftA[B, C, D, E](b: M[B], c: M[C], d: M[D], z: A => B => C => D => E)(implicit f: Functor[M], a: Apply[M]) =
-    a(a(a(f.fmap(v, z), b), c), d)
+  def <×××>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit t: Functor[M], a: Apply[M]) = <⊛⊛⊛>(b, c, d, (_: A, _: B, _: C, _: D))
 
-  def liftA[B, C, D, E, F](b: M[B], c: M[C], d: M[D], e: M[E], z: A => B => C => D =>
-      E => F)(implicit f: Functor[M], a: Apply[M]) =
-    a(a(a(a(f.fmap(v, z), b), c), d), e)
+  def <××××>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]) = <⊛⊛⊛⊛>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
 
-  def <<*>>[B](b: M[B])(implicit f: Functor[M], a: Apply[M]) = liftA(b, a => (b: B) => (a, b))
+  def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
+    t.traverse(f, v)
 
-  def <<*>>[B, C](b: M[B], c: M[C])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, a => (b: B) => (c: C) => (a, b, c))
+  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(v, f)
 
-  def <<*>>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, d, a => (b: B) => (c: C)
-      => (d: D) => (a, b, c, d))
+  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = ∗(_ => f)
 
-  def <<*>>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit f: Functor[M], a: Apply[M]) = liftA(b, c, d, e, a =>
-      (b: B) => (c: C) => (d: D) => (e: E) => (a, b, c, d, e))
+  def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = ∗(f)
 
-  def >>=[B](f: A => M[B])(implicit b: Bind[M]) = b.bind(v, f)
+  def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = ∗(z => z)
 
-  def flatMap[B](f: A => M[B])(implicit b: Bind[M]) = >>=(f)
+  def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join
 
-  def >->[B](f: => M[B])(implicit b: Bind[M]) = >>=(_ => f)
+  def ∞[B](implicit b: Bind[M]): M[B] = v ∗| v.∞
 
-  def <+>(z: => M[A])(implicit p: Plus[M]) = p.plus(v, z)
+  def ⟴(z: => M[A])(implicit p: Plus[M]) = p.plus(v, z)
 
-  def ::+::(a: A)(implicit p: Plus[M], q: Pure[M]) = p.plus(q.pure(a), v)
+  def ➜:(a: A)(implicit s: Semigroup[M[A]], q: Pure[M]): M[A] = s append (q.pure(a), v)
 
-  def <|[B](f: B => A)(implicit t: Cofunctor[M]) = t.comap(v, f)
+  def ➝:(a: A)(implicit p: Plus[M], q: Pure[M]) = p.plus(q.pure(a), v)
 
-  def <|:[B](f: B => A)(implicit t: Cofunctor[M]) = <|(f)
+  def ➡(f: A => Unit)(implicit e: Each[M]) = e.each(v, f)
 
-  def -<|[B](f: => A)(implicit t: Cofunctor[M]) = <|((_: B) => f)
-
-  def |>-:[B](f: => A)(implicit t: Cofunctor[M]) = -<|[B](f)
-
-  def foreach(f: A => Unit)(implicit e: Each[M]) = e.each(v, f)
-
-  def ->>(f: A => Unit)(implicit e: Each[M]) = foreach(f)
+  def foreach(f: A => Unit)(implicit e: Each[M]) = ➡ (f)
 
   def foldl[B](b: B, f: (B, A) => B)(implicit r: FoldLeft[M]) = r.foldLeft[B, A](v, b, f)
 
   def foldl1(f: (A, A) => A)(implicit r: FoldLeft[M]) = foldl[Option[A]](None, (a1, a2) => Some(a1 match {
     case None => a2
     case Some(x) => f(a2, x)
-  })) getOrElse (error("foldl1 on empty"))
+  }))
 
   def listl(implicit r: FoldLeft[M]) = {
     val b = new scala.collection.mutable.ListBuffer[A]
-    foldl[scala.Unit]((), (x, a) => b += a)
+    foldl[scala.Unit]((), (_, a) => b += a)
     b.toList
   }
 
-  def suml(implicit r: FoldLeft[M], m: Monoid[A]) = foldl[A](m.zero, m append (_, _))
+  def ∑(implicit r: FoldLeft[M], m: Monoid[A]) = foldl[A](m.zero, m append (_, _))
 
-  def items(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
+  def ♯(implicit r: FoldLeft[M]) = foldl[Int](0, (b, _) => b + 1)
 
   def len(implicit l: Length[M]) = l len v
 
   def max(implicit r: FoldLeft[M], ord: Order[A]) =
-    foldl1((x: A, y: A) => if (ord.order(x, y) == GT) x else y)
+    foldl1((x: A, y: A) => if (x ≩ y) x else y)
 
   def min(implicit r: FoldLeft[M], ord: Order[A]) =
-    foldl1((x: A, y: A) => if (ord.order(x, y) == LT) x else y)
+    foldl1((x: A, y: A) => if (x ≨ y) x else y)
 
-  def ->-(f: A => Digit)(implicit t: FoldLeft[M]) =
-    foldl[Long](0L, (n, a) => n * 10L + f(a))
+  def longDigits(implicit d: A <:< Digit, t: FoldLeft[M]) =
+    foldl[Long](0L, (n, a) => n * 10L + (a: Digit))
 
-  def ->=(f: A => Char)(implicit t: Functor[M]): M[Option[Digit]] = {
-    import CharW._
-    t.fmap(v, f andThen (_.digit))
-  }
+  def digits(implicit c: A <:< Char, t: Functor[M]): M[Option[Digit]] =
+    ∘((a: A) => (a: Char).digit)
 
-  def =>=(f: A => Char)(implicit t: Traverse[M]): Option[M[Digit]] = {
-    import CharW._
-    t.traverse[Option, Char, Digit](_.digit, t.fmap(v, f))
+  def sequence[N[_], B](implicit a: A <:< N[B], t: Traverse[M], n: Applicative[N]): N[M[B]] =
+    ↦((z: A) => (z: N[B]))
+
+  def traverseDigits(implicit c: A <:< Char, t: Traverse[M]): Option[M[Digit]] = {
+    val k = ∘((f: A) => (f: Char)).digits.sequence
+    k
   }
 
   def foldr[B](b: B, f: (A, => B) => B)(implicit r: FoldRight[M]) = r.foldRight(v, b, f)
@@ -112,9 +102,9 @@ sealed trait MA[M[_], A] {
   def foldr1(f: (A, => A) => A)(implicit r: FoldRight[M]) = foldr[Option[A]](None, (a1, a2) => Some(a2 match {
     case None => a1
     case Some(x) => f(a1, x)
-  })) getOrElse (error("foldr1 on empty"))
+  }))
 
-  def sumr(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero, m append (_, _))
+  def ∑∑(implicit r: FoldRight[M], m: Monoid[A]) = foldr[A](m.zero, m append (_, _))
 
   def foldMap[B](f: A => B)(implicit r: FoldRight[M], m: Monoid[B]): B = foldr[B](m.zero, (a, b) => m.append(f(a), b))
 
@@ -126,18 +116,16 @@ sealed trait MA[M[_], A] {
 
   def !(n: Int)(implicit i: Index[M]) = i.index(v, n)
 
-  def -!-(n: Int)(implicit i: Index[M]) = i.index(v, n) getOrElse (error("Index " + n + " out of bounds"))
+  def -!-(n: Int)(implicit i: Index[M]) = this.!(n) getOrElse (error("Index " + n + " out of bounds"))
 
-  def any(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](false, p(_) || _)
+  def ∃(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](false, p(_) || _)
 
-  def all(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](true, p(_) && _)
+  def ∀(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[Boolean](true, p(_) && _)
 
-  def nil(implicit r: FoldRight[M]) = all(_ => false)
-
-  def empty(implicit r: FoldRight[M]) = foldr[Boolean](true, (_, _) => false)
+  def empty(implicit r: FoldRight[M]) = ∀(_ => false)
 
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[(List[List[A]], Option[Boolean])]((Nil, None), (
-      a, b) => {
+          a, b) => {
     val pa = p(a)
     (b match {
       case (_, None) => List(List(a))
@@ -146,26 +134,21 @@ sealed trait MA[M[_], A] {
   })._1
 
   def selectSplit(p: A => Boolean)(implicit r: FoldRight[M]) = foldr[(List[List[A]], Boolean)]((Nil, false), (a, xb
-      ) => xb match {
+          ) => xb match {
     case (x, b) => {
       val pa = p(a)
-      (if (pa) if (b) (a :: x.head) :: x.tail else List(a) :: x else x, pa)
+      (if (pa)
+        if (b)
+          (a :: x.head) :: x.tail else
+          List(a) :: x
+      else x, pa)
     }
   })._1
 
   def para[B](b: B, f: (=> A, => M[A], B) => B)(implicit p: Paramorphism[M]) = p.para(v, b, f)
 
-  trait TraverseM[F[_]] {
-    def apply[B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]]
-  }
-
-  def traverse[F[_]] = new TraverseM[F] {
-    def apply[B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]) = t.traverse[F, A, B](f, v)
-  }
-
-  def ==>>[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
+  def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
     case class Acc[B, A](acc: B)
-
 
     implicit val AccApply = new Apply[PartialApply1Of2[Acc, B]#Apply] {
       def apply[A, X](f: Acc[B, A => X], fa: Acc[B, A]) = Acc[B, X](m append (f.acc, fa.acc))
@@ -175,80 +158,106 @@ sealed trait MA[M[_], A] {
       def pure[A](a: => A) = Acc[B, A](m.zero)
     }
 
-    implicit val AccApplicative = Applicative.applicative[PartialApply1Of2[Acc, B]#Apply]
+    implicit val AccApplicative = Applicative.applicative[PartialApply1Of2[Acc, B]#Apply](AccPure, AccApply)
 
-    traverse[PartialApply1Of2[Acc, B]#Apply](a => Acc[B, B](f(a))).acc
+    t.traverse[PartialApply1Of2[Acc, B]#Apply, A, B](a => Acc[B, B](f(a)), v).acc
   }
 
-  def -->>(implicit t: Traverse[M], m: Monoid[A]) = ==>>(identity[A])
+  def collapse(implicit t: Traverse[M], m: Monoid[A]) = ↣(identity[A])
 
-  def cojoin(implicit j: Cojoin[M]) = j.cojoin(v)
+  def =>>[B](f: M[A] => B)(implicit w: Comonad[M]): M[B] = w.fmap(w.cojoin(v), f)
 
-  def =>>[B](f: M[A] => B)(implicit w: Comonad[M]) = w.cobind(v, f)
+  def copure[B](implicit p: Copure[M]) = p copure v
 
-  def copure[B](implicit p: Copure[M]) = p.copure(v)
+  def ε[B](implicit p: Copure[M]): A = copure
+
+  def cojoin(implicit j: Cojoin[M]) = j cojoin v
+
+  def υ(implicit j: Cojoin[M]): M[M[A]] = cojoin
 
   def <--->(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]) = {
+    def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
+      val m = mutableHashMapMemo[(Int, Int), Int]
+
+      def get(i: Int, j: Int): Int = if (i == 0) j else if (j == 0) i else {
+        lazy val t = this -!- (i - 1)
+        lazy val u = w -!- (j - 1)
+        lazy val e = t ≟ u
+
+        val g = m {case (a, b) => get(a, b)}
+        val a = g(i - 1, j) + 1
+        val b = g(i - 1, j - 1) + (if (e) 0 else 1)
+        def c = g(i, j - 1) + 1
+        if (a < b) a else if (b <= c) b else c
+      }
+
+      get
+    }
+
     val k = levenshteinMatrix(w)
     k(l.len(v), l.len(w))
   }
 
-  def zip[B](bs: M[B])(implicit z: Zip[M]): M[(A, B)] = z.zip(v, bs)
+  def foldLeftM[N[_], B](f: (B, A) => N[B], b: B)(implicit fr: FoldLeft[M], m: Monad[N]): N[B] =
+    foldl[N[B]](b η, (b, a) => b ∗ ((z: B) => f(z, a)))
 
-  def zipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Zip[M], m: Functor[M]): M[C] = z.zipWith(f, v, bs)
+  def foldRightM[N[_], B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]): N[B] =
+    foldr[N[B]](b η, (a, b) => b ∗ ((z: B) => f(z, a)))
 
-  def zipWith[B, C, D](f: (A, B, C) => D, bs: M[B], cs: M[C])(implicit z: Zip[M], m: Functor[M]): M[D] = z.zipWith(f, v, bs, cs)
+  def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
+    if (n <= 0) ∅ η
+    else v ∗ (a => replicateM[N](n - 1) ∘ (a ➜: _) )
 
-  trait FoldM[N[_]] {
-    def apply[B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]): N[B]
-  }
-
-  def foldM[N[_]] = new FoldM[N] {
-    def apply[B](f: (B, A) => N[B], b: B)(implicit fr: FoldRight[M], m: Monad[N]) =
-      foldr[N[B]](b.pure[N], (a, b) => m.bind(b, (z: B) => f(z, a)))
-  }
+  def zipWithA[F[_], B, C](b: M[B], f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
+    (b ⊛ (a.fmap(v, f.curry))).sequence[F, C]
 
   def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
-    foldl[BKTree[A]](BKTree.empty, _ + _)
+    foldl[BKTree[A]](emptyBKTree, _ + _)
 
-  private def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
-    implicit def WMA[A](a: M[A]) = MA.ma[M](a)
-    val m = memo.Memo.mutableHashMapMemo[(Int, Int), Int]
+  import concurrent.Strategy
 
-    def get(i: Int, j: Int): Int = if (i == 0) j else if (j == 0) i else {
-      lazy val t = this -!- (i - 1)
-      lazy val u = w -!- (j - 1)
-      lazy val e = t === u
-
-      val g = m {case (a, b) => get(a, b)}
-      val a = g(i - 1, j) + 1
-      val b = g(i - 1, j - 1) + (if (e) 0 else 1)
-      def c = g(i, j - 1) + 1
-      if (a < b) a else if (b <= c) b else c
-    }
-
-    get
-  }
-
-  import concurrent._
-  import concurrent.ParM._
-  import concurrent.Strategy._
   def parMap[B](f: A => B)(implicit m: Functor[M], s: Strategy[B]): () => M[B] =
-    parM[M](m.fmap(v, f.concurry))
+    ∘(f.concurry).parM
 
-  import MMA._
   def parBind[B](f: A => M[B])(implicit m: Bind[M], t: Functor[M], s: Strategy[M[B]]): () => M[B] =
-    parMap(f).map(((_: MMA[M, B]).join) compose (mma[M](_)))
+    parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
 
-  def parZipWith[B, C](f: (A, B) => C, bs: M[B])
-                      (implicit z: Zip[M], m: Functor[M], s: Strategy[C]): () => M[C] =
-    parM[M](zipWith(f.concurry, bs))
+  def parZipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Applicative[M], s: Strategy[C]): () => M[C] =
+    (bs ⊛ (v ∘ f.concurry.curry)).parM
+
+  import scalaz.concurrent.Strategy
+
+  def parM[B](implicit b: A <:< (() => B), m: Functor[M], s: Strategy[B]): () => M[B] =
+    () => v ∘ (z => s(z).apply)
 }
 
-object MA {
-  def ma[M[_]] = new PartialWrapMA[M, MA] {
-    def apply[A](a: M[A]) = new MA[M, A] {
-      val v = a
-    }
+// Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
+// This is a hack to fix the pressing problem that this caused.
+trait MACofunctor[M[_], A] {
+  val v: M[A]
+
+  def ∙[B](f: B => A)(implicit t: Cofunctor[M]) = t.comap(v, f)
+
+  def |<[B](f: => A)(implicit t: Cofunctor[M]) = ∙((_: B) => f)
+}
+
+
+trait MAsLow {
+  implicit def maImplicit[M[_], A](a: M[A]): MA[M, A] = new MA[M, A] {
+    val v = a
+  }
+
+  implicit def maCofunctorImplicit[M[_], A](a: M[A]): MACofunctor[M, A] = new MACofunctor[M, A] {
+    val v = a
+  }
+}
+
+trait MAs {
+  def ma[M[_], A](a: M[A]): MA[M, A] = new MA[M, A] {
+    val v = a
+  }
+
+  def maCofunctor[M[_], A](a: M[A])(implicit cf: Cofunctor[M]): MACofunctor[M, A] = new MACofunctor[M, A] {
+    val v = a
   }
 }

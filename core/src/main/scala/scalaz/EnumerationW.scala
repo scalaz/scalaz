@@ -7,14 +7,14 @@ sealed trait EnumerationW[A] {
 
   def elements = new Iterator[A] {
     def hasNext = value.hasMoreElements
-    def next = value.nextElement    
+    def next = value.nextElement
   }
 }
 
-object EnumerationW {
-  implicit def EnumerationTo[A](v: Enumeration[A]) = new EnumerationW[A] {
+trait Enumerations {
+  implicit def EnumerationTo[A](v: Enumeration[A]): EnumerationW[A] = new EnumerationW[A] {
     val value = v
   }
 
-  implicit def EnumerationFrom[A](v: EnumerationW[A]) = v.value  
+  implicit def EnumerationFrom[A](v: EnumerationW[A]): Enumeration[A] = v.value
 }

@@ -2,70 +2,72 @@ package scalaz
 
 trait Show[-A] {
   def show(a: A): List[Char]
-
-  def shows(a: A) = show(a).mkString
 }
 
-object Show {
+trait Shows {
   def show[A](f: A => List[Char]) = new Show[A] {
     def show(a: A) = f(a)
   }
 
-  def shows[A](f: A => String) = show[A](f(_).toList)
+  def shows[A](f: A => String): Show[A] = show[A](f(_).toList)
 
   def showA[A] = shows[A](_.toString)
+}
 
+object Show {
   import Scalaz._
 
-  implicit val DigitShow = IntShow <| ((_: Digit).toInt)
+  implicit def DigitShow: Show[Digit] = IntShow ∙ ((_: Digit).toInt)
 
-  implicit val OrderingShow = showA[Ordering]
+  implicit def OrderingShow: Show[Ordering] = showA
 
-  implicit val UnitShow = showA[Unit]
+  implicit def UnitShow: Show[Unit] = showA
 
-  implicit val StringShow = showA[String]
+  implicit def ThrowableShow: Show[Throwable] = showA
 
-  implicit val IntShow = showA[Int]
+  implicit def StringShow: Show[String] = showA
 
-  implicit val IntMultiplicationShow = IntShow <| ((_: IntMultiplication).value)
+  implicit def IntShow: Show[Int] = showA
 
-  implicit val BooleanShow = showA[Boolean]
+  implicit def IntMultiplicationShow: Show[IntMultiplication] = IntShow ∙ ((_: IntMultiplication).value)
 
-  implicit val BooleanConjunctionShow = BooleanShow <| ((_: BooleanConjunction).value)
+  implicit def BooleanShow: Show[Boolean] = showA
 
-  implicit val CharShow = showA[Char]
+  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = BooleanShow ∙ ((_: BooleanConjunction).value)
 
-  implicit val CharMultiplicationShow = CharShow <| ((_: CharMultiplication).value)
+  implicit def CharShow: Show[Char] = showA
 
-  implicit val ByteShow = showA[Byte]
+  implicit def CharMultiplicationShow: Show[CharMultiplication] = CharShow ∙ ((_: CharMultiplication).value)
 
-  implicit val ByteMultiplicationShow = ByteShow <| ((_: ByteMultiplication).value)
+  implicit def ByteShow: Show[Byte] = showA
 
-  implicit val LongShow = showA[Long]
+  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = ByteShow ∙ ((_: ByteMultiplication).value)
 
-  implicit val LongMultiplicationShow = LongShow <| ((_: LongMultiplication).value)
+  implicit def LongShow: Show[Long] = showA
 
-  implicit val ShortShow = showA[Short]
+  implicit def LongMultiplicationShow: Show[LongMultiplication] = LongShow ∙ ((_: LongMultiplication).value)
 
-  implicit val ShortMultiplicationShow = ShortShow <| ((_: ShortMultiplication).value)
+  implicit def ShortShow: Show[Short] = showA
 
-  implicit val FloatShow = showA[Float]
+  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = ShortShow ∙ ((_: ShortMultiplication).value)
 
-  implicit val DoubleShow = showA[Double]
+  implicit def FloatShow: Show[Float] = showA
 
-  implicit val BigIntegerShow = showA[java.math.BigInteger]
+  implicit def DoubleShow: Show[Double] = showA
 
-  implicit val BigIntegerMultiplicationShow = BigIntegerShow <| ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerShow: Show[java.math.BigInteger] = showA[java.math.BigInteger]
 
-  implicit val BigIntShow = showA[BigInt]
+  implicit def BigIntegerMultiplicationShow: Show[BigIntegerMultiplication] = BigIntegerShow ∙ ((_: BigIntegerMultiplication).value)
 
-  implicit val BigIntMultiplicationShow = BigIntShow <| ((_: BigIntMultiplication).value)
+  implicit def BigIntShow: Show[BigInt] = showA
 
-  implicit val NodeSeqShow = showA[xml.NodeSeq]
+  implicit def BigIntMultiplicationShow: Show[BigIntMultiplication] = BigIntShow ∙ ((_: BigIntMultiplication).value)
 
-  implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) <| ((_: NonEmptyList[A]).list)
+  implicit def NodeSeqShow: Show[xml.NodeSeq] = showA
 
-  implicit def ZipStreamShow[A](implicit sa: Show[A]): Show[ZipStream[A]] = IterableShow(sa) <| ((_: ZipStream[A]).value)
+  implicit def NonEmptyListShow[A](implicit sa: Show[A]): Show[NonEmptyList[A]] = IterableShow(sa) ∙ ((_: NonEmptyList[A]).list)
+
+  implicit def ZipStreamShow[A](implicit sa: Show[A]): Show[ZipStream[A]] = IterableShow(sa) ∙ ((_: ZipStream[A]).value)
 
   implicit def ZipperShow[A](implicit sa: Show[A]): Show[Zipper[A]] = show((z: Zipper[A]) =>
       z.lefts.reverse.show ++ " " ++ sa.show(z.focus) ++ " " ++ z.rights.show)
@@ -76,8 +78,8 @@ object Show {
   implicit def TreeLocShow[A](implicit sa: Show[A]): Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
       t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
-  implicit def IterableShow[A](implicit sa: Show[A]) = show[Iterable[A]](as => {
-    val i = as.elements
+  implicit def IterableShow[A](implicit sa: Show[A]): Show[Iterable[A]] = show(as => {
+    val i = as.iterator
     val k = new collection.mutable.ListBuffer[Char]
     k += '['
     while (i.hasNext) {
@@ -90,7 +92,7 @@ object Show {
     k.toList
   })
 
-  implicit def Tuple1Show[A](implicit sa: Show[A]) = show[Tuple1[A]](a => {
+  implicit def Tuple1Show[A](implicit sa: Show[A]): Show[Tuple1[A]] = show(a => {
     val k = new collection.mutable.ListBuffer[Char]
     k += '('
     k ++= a._1.show
@@ -98,7 +100,7 @@ object Show {
     k.toList
   })
 
-  implicit def Tuple2Show[A, B](implicit sa: Show[A], sb: Show[B]) = show[Tuple2[A, B]] {
+  implicit def Tuple2Show[A, B](implicit sa: Show[A], sb: Show[B]): Show[(A, B)] = show {
     case (a, b) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -110,7 +112,7 @@ object Show {
     }
   }
 
-  implicit def Tuple3Show[A, B, C](implicit sa: Show[A], sb: Show[B], sc: Show[C]) = show[Tuple3[A, B, C]] {
+  implicit def Tuple3Show[A, B, C](implicit sa: Show[A], sb: Show[B], sc: Show[C]): Show[(A, B, C)] = show {
     case (a, b, c) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -124,7 +126,7 @@ object Show {
     }
   }
 
-  implicit def Tuple4Show[A, B, C, D](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D]) = show[Tuple4[A, B, C, D]] {
+  implicit def Tuple4Show[A, B, C, D](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D]): Show[(A, B, C, D)] = show {
     case (a, b, c, d) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -140,7 +142,7 @@ object Show {
     }
   }
 
-  implicit def Tuple5Show[A, B, C, D, E](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E]) = show[Tuple5[A, B, C, D, E]] {
+  implicit def Tuple5Show[A, B, C, D, E](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E]): Show[(A, B, C, D, E)] = show {
     case (a, b, c, d, e) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -158,7 +160,7 @@ object Show {
     }
   }
 
-  implicit def Tuple6Show[A, B, C, D, E, F](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E], sf: Show[F]) = show[Tuple6[A, B, C, D, E, F]] {
+  implicit def Tuple6Show[A, B, C, D, E, F](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E], sf: Show[F]): Show[(A, B, C, D, E, F)] = show {
     case (a, b, c, d, e, f) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -178,7 +180,7 @@ object Show {
     }
   }
 
-  implicit def Tuple7Show[A, B, C, D, E, F, G](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E], sf: Show[F], sg: Show[G]) = show[Tuple7[A, B, C, D, E, F, G]] {
+  implicit def Tuple7Show[A, B, C, D, E, F, G](implicit sa: Show[A], sb: Show[B], sc: Show[C], sd: Show[D], se: Show[E], sf: Show[F], sg: Show[G]): Show[(A, B, C, D, E, F, G)] = show {
     case (a, b, c, d, e, f, g) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
@@ -200,18 +202,18 @@ object Show {
     }
   }
 
-  implicit def Function0Show[A](implicit sa: Show[A]) = show[Function0[A]](_.apply.show)
+  implicit def Function0Show[A](implicit sa: Show[A]): Show[Function0[A]] = show(_.apply.show)
 
-  implicit def OptionShow[A](implicit sa: Show[A]) = shows[Option[A]](_ map (_.shows) toString)
+  implicit def OptionShow[A](implicit sa: Show[A]): Show[Option[A]] = shows(_ map (_.shows) toString)
 
-  implicit def EitherShow[A, B](implicit sa: Show[A], sb: Show[B]) = shows[Either[A, B]](e => (((_: A).shows) <-: e :-> (_.shows)).toString)
+  implicit def EitherShow[A, B](implicit sa: Show[A], sb: Show[B]): Show[Either[A, B]] = shows(e => (((_: A).shows) <-: e :-> (_.shows)).toString)
 
-  implicit def ValidationShow[E, A](implicit se: Show[E], sa: Show[A]) = shows[Validation[E, A]] {
+  implicit def ValidationShow[E, A](implicit se: Show[E], sa: Show[A]): Show[Validation[E, A]] = shows {
     case Success(a) => "Success(" + a.shows + ")"
     case Failure(e) => "Failure(" + e.shows + ")"
   }
 
-  implicit def JavaIterableShow[A](implicit sa: Show[A]) = show[java.lang.Iterable[A]](as => {
+  implicit def JavaIterableShow[A](implicit sa: Show[A]): Show[java.lang.Iterable[A]] = show(as => {
     val k = new collection.mutable.ListBuffer[Char]
     val i = as.iterator
     k += '['
@@ -225,7 +227,7 @@ object Show {
     k.toList
   })
 
-  implicit def JavaMapShow[K, V](implicit sk: Show[K], sv: Show[V]) = show[java.util.Map[K, V]](m => {
+  implicit def JavaMapShow[K, V](implicit sk: Show[K], sv: Show[V]): Show[java.util.Map[K, V]] = show(m => {
     val z = new collection.mutable.ListBuffer[Char]
     z += '{'
     val i = m.keySet.iterator

@@ -3,17 +3,19 @@ package scalaz
 sealed trait CharW {
   val value: Char
 
-  def digit = Digit.digits find (_.toChar == value)
+  import Scalaz._
+  
+  def ∏ = multiplication(value)
 
-  def alpha = Alpha.alphas find(_.toChar == value)
+  def digit = digits find (_.toChar == value)
 
-  def |*| = CharMultiplication.multiplication(value)  
+  def alpha = alphas find(_.toChar == value) 
 }
 
-object CharW {
-  implicit def CharTo(c: Char) = new CharW {
+trait Chars {
+  implicit def CharTo(c: Char): CharW = new CharW {
     val value = c
   }
 
-  implicit def CharFrom(c: CharW) = c.value
+  implicit def CharFrom(c: CharW): Char = c.value
 }

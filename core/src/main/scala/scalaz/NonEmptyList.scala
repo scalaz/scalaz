@@ -4,12 +4,11 @@ sealed trait NonEmptyList[+A] {
   val head: A
   val tail: List[A]
 
-  import NonEmptyList.nel
-  import ListW._
+  import Scalaz._
 
   def <::[B >: A](b: B) = nel(b, head :: tail)
 
-  import scala.collection.mutable.ListBuffer
+  import collection.mutable.ListBuffer
 
   def <:::[B >: A](bs: List[B]) = {
     val b = new ListBuffer[B]
@@ -37,26 +36,22 @@ sealed trait NonEmptyList[+A] {
     val bb = b.toList
     nel(bb.head, bb.tail)
   }
-  
+
   val list = head :: tail
 
-  val stream = Stream.cons(head, tail.projection)
+  val stream = head #:: tail.toStream
 
-  def tails : NonEmptyList[NonEmptyList[A]] = tail match {
-    case Nil => nel(this)
-    case h :: t => nel(this, tail.nel.get.tails.list)
-  }
+  def tails : NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
+    case Nil => Nil
+    case _ :: _ => tail.nel.get.tails.list    
+  })
 
   override def toString = "NonEmpty" + (head :: tail)
 }
 
-object NonEmptyList {
-  def nel[A](h: A, t: List[A]) = new NonEmptyList[A] {
+trait NonEmptyLists {
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
     val head = h
     val tail = t
   }
-
-  def nel[A](a: A): NonEmptyList[A] = nel(a, Nil)
-
-  def nels[A](a: A, as: A*): NonEmptyList[A] = nel(a, as.toList)  
 }

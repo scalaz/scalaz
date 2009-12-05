@@ -5,89 +5,101 @@ sealed trait Identity[A] {
 
   import Scalaz._
 
-  def |+|(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
+  def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
-  def ===(a: A)(implicit e: Equal[A]) = e equal (value, a)
+  def σ: Dual[A] = value
+  
+  def ⊹(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
 
-  def /=(a: A)(implicit e: Equal[A]) = !(===(a))
+  def ≟(a: A)(implicit e: Equal[A]) = e equal (value, a)
 
-  def ?:?(a: A)(implicit o: Order[A]) = o order (value, a)
+  def ≠(a: A)(implicit e: Equal[A]) = !(≟(a))
+
+  // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
+  // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
+  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if(≠(b)) error(shows + " ≠ " + ev(b).shows)
+
+  def ?|?(a: A)(implicit o: Order[A]) = o order (value, a)
+
+  def ≤(a: A)(implicit o: Order[A]) = o.order(value, a) != GT
+
+  def ≥(a: A)(implicit o: Order[A]) = o.order(value, a) != LT
+
+  def ≨(a: A)(implicit o: Order[A]) = o.order(value, a) == LT
+
+  def ≩(a: A)(implicit o: Order[A]) = o.order(value, a) == GT
+
+  def ≮(a: A)(implicit o: Order[A]) = o.order(value, a) != LT
+
+  def ≯(a: A)(implicit o: Order[A]) = o.order(value, a) != GT
+
+  def ≰(a: A)(implicit o: Order[A]) = o.order(value, a) == GT
+
+  def ≱(a: A)(implicit o: Order[A]) = o.order(value, a) == LT
 
   def show(implicit s: Show[A]) = s.show(value)
 
-  def shows(implicit s: Show[A]) = s.shows(value)
+  def shows(implicit s: Show[A]) = s.show(value).mkString
 
   def print(implicit s: Show[A]) = Console.print(shows)
 
   def println(implicit s: Show[A]) = Console.println(shows)
 
-  def text(implicit s: Show[A]) = xml.Text(s shows value)
-
-  def constantState[S, A](s: S) = State.state((_: S) => (s, value))
-
-  def state[S] = State.state((_: S, value))
-
-  def dual = Dual.dual(value)
-
-  sealed trait Unfold[M[_]] {
-    def apply[B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B]
-  }
-
-  def unfold[M[_]]: Unfold[M] = new Unfold[M] {
-    def apply[B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]) = f(value) match {
-      case None => m.zero
-      case Some((b, a)) => b.pure[M] |+| a.unfold[M](f)
-    }
-  }
-
-  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    if (n <= 0) m.zero
-    else value.pure[M] |+| replicate[M](n - 1)
-
-  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.pure[M] |+| repeat[M]
-
-  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    value.pure[M] |+| f(value).iterate[M](f)
-
-  def zipper = Scalaz.zipper(Stream.empty, value, Stream.empty)
+  def text(implicit s: Show[A]) = xml.Text(value.shows)
 
   def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
 
-  def success[X]: Validation[X, A] = Success(value)
+  def constantState[S, A](s: => S) = state((_: S) => (s, value))
 
-  def fail[X]: Validation[A, X] = Failure(value)
+  def state[S] = Scalaz.state((_: S, value))
 
-  import StreamW._
+  def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = f(value) match {
+    case None => m.zero
+    case Some((b, a)) => b.η ⊹ a.unfold(f)
+  }
+
+  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
+    if (n <= 0) ∅
+    else value.η ⊹ replicate(n - 1)
+
+  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.η ⊹ repeat
+
+  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
+    value.η ⊹ f(value).iterate(f)
+
+  def zipper = Scalaz.zipper(Stream.empty, value, Stream.empty)
+
   def unfoldTree[B](f: A => (B, () => Stream[A])): Tree[B] = f(value) match {
-    case (a, bs) => Tree.node(a, bs.apply.unfoldForest(f))
+    case (a, bs) => node(a, bs.apply.unfoldForest(f))
   }
 
   def unfoldTreeM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[B]] = {
     m.bind(f(value), (abs: (B, Stream[A])) =>
         m.bind(abs._2.unfoldForestM[B, M](f), (ts: Stream[Tree[B]]) =>
-            m.pure(Tree.node(abs._1, ts))))
+            m.pure(node(abs._1, ts))))
   }
 
-  def dlist = DList.dlist(value :: (_: List[A]))
+  def success[X]: Validation[X, A] = Scalaz.success(value)
+
+  def fail[X]: Validation[A, X] = Scalaz.failure(value)
+
+  def dlist = Scalaz.dlist(value :: (_: List[A]))
+
+  def nel: NonEmptyList[A] = Scalaz.nel(value, Nil)
 
   override def toString = value.toString
 
   override def hashCode = value.hashCode
 
   override def equals(o: Any) = o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
-
-  def onull = {
-    val v = value
-    if(v == null) None else Some(v)
-  }
-
-  def pure[P[_]](implicit p: Pure[P]) = p pure value
 }
 
-object Identity {
-  implicit def IdentityTo[A](x: A) = new Identity[A] {
+trait Identitys {
+  implicit def IdentityTo[A](x: A): Identity[A] = new Identity[A] {
     val value = x
   }
 
-  val u = IdentityTo(())
+  implicit def IdentityFrom[A](x: Identity[A]): A = x.value
+
+  val unital = IdentityTo(())
 }

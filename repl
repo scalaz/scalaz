@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ghc -e "repl" Scalaz.hs
+

@@ -4,8 +4,10 @@ trait Dual[A] {
   val value : A
 }
 
-object Dual {
-  implicit def dual[A](a: A) = new Dual[A] {
+trait Duals {
+  implicit def DualTo[A](a: A): Dual[A] = new Dual[A] {
     val value = a
   }
+
+  implicit def DualFrom[A](d: Dual[A]): A = d.value
 }

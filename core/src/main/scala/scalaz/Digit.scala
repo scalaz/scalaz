@@ -1,8 +1,9 @@
 package scalaz
 
+
 sealed trait Digit {
   val toInt: Int
-  val toLong = toInt.toLong
+  def toLong = toInt.toLong
 
   def toChar = (toLong + 48).toChar
 
@@ -43,10 +44,10 @@ case object _9 extends Digit {
   override val toInt = 9
 }
 
-object Digit {
+trait Digits {
   val digits = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
-  implicit def DigitLong(d: Digit) = d.toLong
+  implicit def DigitLong(d: Digit): Long = d.toLong
 
   implicit def LongDigit(n: Long): Digit = n match {
     case 0L => _0

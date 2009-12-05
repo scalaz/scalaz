@@ -5,13 +5,15 @@ import java.math.BigInteger
 sealed trait BigIntegerW {
   val value: BigInteger
 
-  def |*| = BigIntegerMultiplication.multiplication(value)
+  import Scalaz._
+
+  def ∏ = multiplication(value)
 }
 
-object BigIntegerW {
-  implicit def BigIntegerTo(n: BigInteger) = new BigIntegerW {
+trait BigIntegers {
+  implicit def BigIntegerTo(n: BigInteger): BigIntegerW = new BigIntegerW {
     val value = n
   }
 
-  implicit def BigIntegerFrom(n: BigIntegerW) = n.value
+  implicit def BigIntegerFrom(n: BigIntegerW): BigInteger = n.value
 }

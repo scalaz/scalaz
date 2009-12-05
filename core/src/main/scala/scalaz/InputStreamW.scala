@@ -34,13 +34,13 @@ sealed trait InputStreamW {
       val c = value.read
       if(c == -1) Stream.empty
       else Stream.cons(c.toByte, value.stream)
-    }    
+    }
 }
 
-object InputStreamW {
-  implicit def InputStreamTo(v: InputStream) = new InputStreamW {
+trait InputStreams {
+  implicit def InputStreamTo(v: InputStream): InputStreamW = new InputStreamW {
     val value = v
   }
 
-  implicit def InputStreamFrom(v: InputStreamW) = v.value
+  implicit def InputStreamFrom(v: InputStreamW): InputStream = v.value
 }

@@ -3,6 +3,8 @@ package scalaz
 sealed trait OptionW[A] {
   val value: Option[A]
 
+  import Scalaz._
+  
   sealed trait Fold[X] {
     def none(s: => X): X
   }
@@ -31,25 +33,39 @@ sealed trait OptionW[A] {
 
   def |(a: => A) = value getOrElse a
 
-  def toNull = value getOrElse null.asInstanceOf[A]
+  @deprecated("use Option.orNull")
+  def toNull[A1 >: A](implicit ev: Null <:< A1): A1 = value orNull
 
   def unary_~(implicit z: Zero[A]) = value getOrElse z.zero
-  
+
   def toSuccess[E](e: => E) : Validation[E, A] = value match {
     case Some(a) => Success(a)
     case None => Failure(e)
   }
-  
+
   def toFailure[B](b: => B) : Validation[A, B] = value match {
     case Some(e) => Failure(e)
     case None => Success(b)
   }
+
+  def fst: FirstOption[A] = value
+
+  def lst: LastOption[A] = value
+
+  def zeroOr[M[_]](implicit p: Pure[M], e: Empty[M]): M[A] = value match {
+    case Some(a) => a η
+    case None => <∅>
+  }
 }
 
-object OptionW {
-  implicit def OptionTo[A](o: Option[A]) = new OptionW[A] {
+trait Options {
+  implicit def OptionTo[A](o: Option[A]): OptionW[A] = new OptionW[A] {
     val value = o
   }
 
-  implicit def OptionFrom[A](o: OptionW[A]) = o.value
+  implicit def OptionFrom[A](o: OptionW[A]): Option[A] = o.value
+
+  def some[A](a: A): Option[A] = Some(a)
+
+  def none[A]: Option[A] = None
 }

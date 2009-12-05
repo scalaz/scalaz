@@ -6,10 +6,10 @@ sealed trait BigIntegerMultiplication {
   val value: BigInteger
 }
 
-object BigIntegerMultiplication {
+trait BigIntegerMultiplications {
   def multiplication(n: BigInteger) = new BigIntegerMultiplication {
     val value = n
   }
 
-  implicit def BigIntegerMultiplicationFrom(n: BigIntegerMultiplication) = n.value
+  implicit def BigIntegerMultiplicationFrom(n: BigIntegerMultiplication): BigInteger = n.value
 }

@@ -9,14 +9,15 @@ sealed trait Function2W[T1, T2, R] {
 
   def tupled = Function.tupled(k)
 
-  import scalaz.concurrent.Strategy
+  import concurrent.Strategy
+
   def concurry(implicit s: Strategy[R]): (T1, T2) => () => R = (t1: T1, t2: T2) => s(() => k(t1, t2))
 }
 
-object Function2W {
+trait Function2s {
   implicit def Function2To[T1, T2, R](f: (T1, T2) => R): Function2W[T1, T2, R] = new Function2W[T1, T2, R] {
     val k = f
   }
 
-  implicit def Function2From[T1, T2, R](f: Function2W[T1, T2, R]) = f.k
+  implicit def Function2From[T1, T2, R](f: Function2W[T1, T2, R]): Function2[T1, T2, R] = f.k
 }

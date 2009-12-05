@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module relativePaths="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Scala" name="Scala">
+      <configuration />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="sbt">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" />
+          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar:///opt/scala-2.8.0.r19920-b20091128020206/lib/scala-library.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Scala Latest" level="application" />
+    <orderEntry type="library" name="sbt-0.6.x" level="application" />
+  </component>
+</module>
+

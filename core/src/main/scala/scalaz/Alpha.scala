@@ -3,7 +3,7 @@ package scalaz
 sealed trait Alpha {
   val toChar: Char
 
-  def toUpperChar = toChar.toUpperCase
+  def toUpperChar = toChar.toUpper
 
   override def equals(o: Any) = o.isInstanceOf[Alpha] && o.asInstanceOf[Alpha].toChar == toChar
 
@@ -88,10 +88,10 @@ private case object Y extends Alpha {
   val toChar = 'y'
 }
 private case object Z extends Alpha {
-  val toChar = 'z'  
+  val toChar = 'z'
 }
 
-object Alpha {
+trait Alphas {
   val alphas = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
 
   implicit def AlphaChar(a: Alpha) = a.toChar

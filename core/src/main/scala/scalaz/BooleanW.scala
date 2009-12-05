@@ -3,83 +3,87 @@ package scalaz
 sealed trait BooleanW {
   val isTrue: Boolean
 
+  import Scalaz._
+  
+  def |∧| = conjunction(isTrue)
+
   /**
    * Negation of Conjunction.
    *
    * <pre>
-   * p q  p ~&& q
+   * p q  p ¬∧ q
    * 0 0  1
    * 0 1  1
    * 1 0  1
    * 1 1  0
    * </pre>
    */
-  def ~&&(q: => BooleanW) = !isTrue || !q.isTrue
+  def ¬∧(q: => BooleanW) = !isTrue || !q.isTrue
 
   /**
    * Negation of Disjunction.
    *
    * <pre>
-   * p q  p ~|| q
+   * p q  p ¬∨ q
    * 0 0  1
    * 0 1  0
    * 1 0  0
    * 1 1  0
    * </pre>
    */
-  def ~||(q: => BooleanW) = !isTrue && !q.isTrue
+  def ¬∨(q: => BooleanW) = !isTrue && !q.isTrue
 
   /**
    * Conditional.
    *
    * <pre>
-   * p q  p ==> q
+   * p q  p → q
    * 0 0  1
    * 0 1  1
    * 1 0  0
    * 1 1  1
    * </pre>
    */
-  def ==>(q: => BooleanW) = !isTrue || q.isTrue
+  def →(q: => BooleanW) = !isTrue || q.isTrue
 
   /**
    * Inverse Conditional.
    *
    * <pre>
-   * p q  p <== q
+   * p q  p ⇐ q
    * 0 0  1
    * 0 1  0
    * 1 0  1
    * 1 1  1
    * </pre>
    */
-  def <==(q: => BooleanW) = isTrue || !q.isTrue
+  def ⇐(q: => BooleanW) = isTrue || !q.isTrue
 
   /**
    * Negational of Conditional.
    *
    * <pre>
-   * p q  p ~==> q
+   * p q  p ⇏ q
    * 0 0  0
    * 0 1  0
    * 1 0  1
    * 1 1  0
    * </pre>
    */
-  def ~==>(q: => BooleanW) = isTrue && !q.isTrue
+  def ⇏(q: => BooleanW) = isTrue && !q.isTrue
 
   /**
    * Negation of Inverse Conditional.
    *
    * <pre>
-   * p q  p ~<== q
+   * p q  p ⇍ q
    * 0 0  0
    * 0 1  1
    * 1 0  0
    * 1 1  0
    * </pre>
    */
-  def ~<==(q: => BooleanW) = !isTrue && q.isTrue
+  def ⇍(q: => BooleanW) = !isTrue && q.isTrue
 
   /**
    * Executes the given side-effect if this boolean value is <code>true</code>.
@@ -115,7 +119,7 @@ sealed trait BooleanW {
   trait ConditionalEither[A] {
     def |[B](b: => B): Either[A, B]
   }
-  
+
   /**
    * Returns the first argument in <code>Left</code> if this is <code>true</code>, otherwise the second argument in
    * <code>Right</code>.
@@ -137,20 +141,18 @@ sealed trait BooleanW {
   }
 
   def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) p pure a else e.empty[A]  
+    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) a η else <∅>
   }
 
   def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) e.empty[A] else p pure a   
+    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) <∅> else a η
   }
-
-  def |&&| = BooleanConjunction.conjunction(isTrue)
 }
 
-object BooleanW {
+trait Booleans {
   implicit def BooleanTo(b: Boolean): BooleanW = new BooleanW {
     val isTrue = b
   }
 
-  implicit def BooleanFrom(b: BooleanW) = b.isTrue
+  implicit def BooleanFrom(b: BooleanW): Boolean = b.isTrue
 }

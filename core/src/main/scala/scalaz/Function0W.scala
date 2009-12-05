@@ -3,13 +3,15 @@ package scalaz
 sealed trait Function0W[T] {
   val k: () => T
 
-  def throws = try { Right(k()) } catch { case e => Left(e) }
+  import Scalaz._
+  
+  def throws = try { success(k()) } catch { case e => failure(e) }
 }
 
-object Function0W {
-  implicit def Function0To[T](f: () => T) = new Function0W[T] {
+trait Function0s {
+  implicit def Function0To[T](f: () => T): Function0W[T] = new Function0W[T] {
     val k = f
   }
 
-  implicit def Function0From[T](f: Function0W[T]) = f.k
+  implicit def Function0From[T](f: Function0W[T]): Function0[T] = f.k
 }

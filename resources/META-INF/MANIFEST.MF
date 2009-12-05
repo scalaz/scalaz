@@ -1,0 +1,5 @@
+Main-Class: scalaz.Main
+Implementation-Title: Scalaz
+Implementation-URL: http://code.google.com/p/scalaz
+Implementation-Vendor: Tony Morris
+Sealed: true

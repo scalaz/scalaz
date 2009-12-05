@@ -4,10 +4,10 @@ sealed trait LongMultiplication {
   val value: Long
 }
 
-object LongMultiplication {
+trait LongMultiplications {
   def multiplication(n: Long) = new LongMultiplication {
     val value = n
   }
 
-  implicit def LongMultiplicationFrom(n: LongMultiplication) = n.value
+  implicit def LongMultiplicationFrom(n: LongMultiplication): Long = n.value
 }

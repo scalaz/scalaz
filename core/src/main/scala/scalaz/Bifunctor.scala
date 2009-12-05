@@ -5,12 +5,14 @@ trait Bifunctor[F[_, _]] {
 }
 
 object Bifunctor {
-  implicit def Tuple2Bifunctor = new Bifunctor[Tuple2] {
+  import Scalaz._
+  
+  implicit def Tuple2Bifunctor: Bifunctor[Tuple2] = new Bifunctor[Tuple2] {
     def bimap[A, B, C, D](k: (A, B), f: A => C, g: B => D) =
       (f(k._1), g(k._2))
   }
 
-  implicit def EitherBifunctor = new Bifunctor[Either] {
+  implicit def EitherBifunctor: Bifunctor[Either] = new Bifunctor[Either] {
     def bimap[A, B, C, D](k: Either[A, B], f: A => C, g: B => D) =
       k match {
         case Left(a) => Left(f(a))
@@ -18,11 +20,11 @@ object Bifunctor {
       }
   }
 
-  implicit def ValidationBifunctor = new Bifunctor[Validation] {
+  implicit def ValidationBifunctor: Bifunctor[Validation] = new Bifunctor[Validation] {
     def bimap[A, B, C, D](k: Validation[A, B], f: A => C, g: B => D) =
       k match {
-        case Failure(a) => Failure(f(a))
-        case Success(b) => Success(g(b))
+        case Failure(a) => failure(f(a))
+        case Success(b) => success(g(b))
       }
   }
 }

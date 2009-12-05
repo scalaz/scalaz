@@ -6,7 +6,7 @@ import collection.immutable.IntMap
 
 sealed trait BKTree[+A] {
   import Scalaz._
-  
+
   def isEmpty = this == BKTreeEmpty
 
   def size = this match {
@@ -34,7 +34,7 @@ sealed trait BKTree[+A] {
 
   def values: List[A] = this match {
     case BKTreeEmpty => Nil
-    case BKTreeNode(v, _, c) => v :: c.values.toList.flatMap(_.values)
+    case BKTreeNode(v, _, c) => v :: c.valuesIterator.toList.flatMap(_.values)
   }
 
   def -?-[AA >: A](a: AA)(implicit m: MetricSpace[AA]): Boolean = this match {
@@ -60,7 +60,7 @@ sealed trait BKTree[+A] {
     case BKTreeEmpty => Nil
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a
-      val k = subChildren(d, n).values.toList flatMap (_ |=| (a, n))
+      val k = subChildren(d, n).valuesIterator.toList flatMap (_ |=| (a, n))
       if(d <= n)
         v :: k
       else
@@ -95,7 +95,6 @@ sealed trait BKTree[+A] {
 private final case class BKTreeNode[+A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
 private case object BKTreeEmpty extends BKTree[Nothing]
 
-object BKTree {
-  def empty[A]: BKTree[A] = BKTreeEmpty 
+trait BKTrees {
+  def emptyBKTree[A]: BKTree[A] = BKTreeEmpty
 }
-

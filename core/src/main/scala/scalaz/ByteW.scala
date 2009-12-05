@@ -3,13 +3,15 @@ package scalaz
 sealed trait ByteW {
   val value: Byte
 
-  def |*| = ByteMultiplication.multiplication(value)  
+  import Scalaz._
+  
+  def ∏ = multiplication(value)
 }
 
-object ByteW {
+trait Bytes {
   implicit def ByteTo(n: Byte): ByteW = new ByteW {
     val value = n
   }
 
-  implicit def ByteFrom(n: ByteW) = n.value
+  implicit def ByteFrom(n: ByteW): Byte = n.value
 }

@@ -43,23 +43,19 @@ sealed trait StringW {
     node(null, a)
 
   def encode(implicit c: CharSet) = s getBytes c.value
-  
 
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def nel : Option[NonEmptyList[Char]] = if (s.length == 0) None else {
-    val l = s.toList
-    Some(NonEmptyList.nel(l.head, l.tail))
-  }
-  
+  def nel : Option[NonEmptyList[Char]] = s.toList.nel
+
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
    */
-  def nel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = nel getOrElse e
-  
+  def nel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.nel getOrElse e
+
   def nelErr(message: => String) = nel(error(message))
-  
+
   def unsafeNel = nelErr("cannot turn empty string into NonEmptyList")
 
   import java.io.FileInputStream
@@ -112,52 +108,52 @@ sealed trait StringW {
   // Parsing functions.
 
   def parseBoolean: Validation[NumberFormatException, Boolean] = try {
-    Success(s.toBoolean)
+    success(s.toBoolean)
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseByte: Validation[NumberFormatException, Byte] = try {
-    Success(java.lang.Byte.parseByte(s))
+    success(java.lang.Byte.parseByte(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseShort: Validation[NumberFormatException, Short] = try {
-    Success(java.lang.Short.parseShort(s))
+    success(java.lang.Short.parseShort(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseInt: Validation[NumberFormatException, Int] = try {
-    Success(java.lang.Integer.parseInt(s))
+    success(java.lang.Integer.parseInt(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseLong: Validation[NumberFormatException, Long] = try {
-    Success(java.lang.Long.parseLong(s))
+    success(java.lang.Long.parseLong(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseFloat: Validation[NumberFormatException, Float] = try {
-    Success(java.lang.Float.parseFloat(s))
+    success(java.lang.Float.parseFloat(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 
   def parseDouble: Validation[NumberFormatException, Double] = try {
-    Success(java.lang.Double.parseDouble(s))
+    success(java.lang.Double.parseDouble(s))
   } catch {
-    case e: NumberFormatException => Failure(e)
+    case e: NumberFormatException => failure(e)
   }
 }
 
-object StringW {
+trait Strings {
   implicit def StringTo(ss: String): StringW = new StringW {
     val s = ss
   }
 
-  implicit def StringFrom(s: StringW) = s.s
+  implicit def StringFrom(s: StringW): String = s.s
 }

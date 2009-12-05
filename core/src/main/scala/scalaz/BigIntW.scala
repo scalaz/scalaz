@@ -3,13 +3,15 @@ package scalaz
 sealed trait BigIntW {
   val value: BigInt
 
-  def |*| = BigIntMultiplication.multiplication(value)
+  import Scalaz._
+  
+  def ∏ = multiplication(value)
 }
 
-object BigIntW {
-  implicit def BigIntTo(n: BigInt) = new BigIntW {
+trait BigInts {
+  implicit def BigIntTo(n: BigInt): BigIntW = new BigIntW {
     val value = n
   }
 
-  implicit def BigIntFrom(n: BigIntW) = n.value
+  implicit def BigIntFrom(n: BigIntW): BigInt = n.value
 }
