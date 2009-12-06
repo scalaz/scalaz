@@ -105,6 +105,25 @@ object Functor {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
 
+  implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
+    def fmap[A, B](r: Responder[A], f: A => B) = r map f
+  }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableFunctor: Functor[Callable] = new Functor[Callable] {
+    def fmap[A, B](r: Callable[A], f: A => B) = new Callable[B] {
+      def call = f(r.call)
+    }
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryFunctor[X]: Functor[PartialApply1Of2[Entry, X]#Apply] = new Functor[PartialApply1Of2[Entry, X]#Apply] {
+    def fmap[A, B](r: Entry[X, A], f: A => B) = new SimpleImmutableEntry(r.getKey, f(r.getValue))
+  }
+
   implicit def ValidationFunctor[X]: Functor[PartialApply1Of2[Validation, X]#Apply] = new Functor[PartialApply1Of2[Validation, X]#Apply] {
     def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
       case Success(a) => Success(f(a))
