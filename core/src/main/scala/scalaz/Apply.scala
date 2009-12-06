@@ -61,6 +61,16 @@ object Apply {
 
   implicit def EitherRightApply[X]: Apply[PartialApply1Of2[Either.RightProjection, X]#Apply] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
 
+  implicit def ResponderApply: Apply[Responder] = FunctorBindApply[Responder]
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableApply: Apply[Callable] = FunctorBindApply[Callable]
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryApply[X](implicit sr: Semigroup[X]): Apply[PartialApply1Of2[Entry, X]#Apply] = FunctorBindApply[PartialApply1Of2[Entry, X]#Apply]
+
   implicit def ValidationApply[X](implicit s: Semigroup[X]): Apply[PartialApply1Of2[Validation, X]#Apply] = new Apply[PartialApply1Of2[Validation, X]#Apply] {
     def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
       case (Success(f), Success(a)) => success(f(a))

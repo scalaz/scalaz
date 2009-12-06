@@ -117,6 +117,26 @@ object Bind {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
 
+  implicit def ResponderBind: Bind[Responder] = new Bind[Responder] {
+    def bind[A, B](r: Responder[A], f: A => Responder[B]) = r flatMap f
+  }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableBind: Bind[Callable] = new Bind[Callable] {
+    def bind[A, B](r: Callable[A], f: A => Callable[B]) = f(r.call)
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryBind[X](implicit sr: Semigroup[X]): Bind[PartialApply1Of2[Entry, X]#Apply] = new Bind[PartialApply1Of2[Entry, X]#Apply] {
+    def bind[A, B](r: Entry[X, A], f: A => Entry[X, B]) = {
+      val e = f(r.getValue)
+      new SimpleImmutableEntry(sr append(r.getKey, e.getKey), e.getValue)
+    }
+  }
+  
   implicit def ValidationBind[X]: Bind[PartialApply1Of2[Validation, X]#Apply] = new Bind[PartialApply1Of2[Validation, X]#Apply] {
     def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
       case Success(a) => f(a)
