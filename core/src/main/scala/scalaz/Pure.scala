@@ -105,6 +105,27 @@ object Pure {
     def pure[A](a: => A) = Right(a).right
   }
 
+  implicit def ResponderPure: Pure[Responder] = new Pure[Responder] {
+    def pure[A](a: => A) = new Responder[A] {
+      def respond(k: A => Unit) = k(a)
+    }
+  }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallablePure: Pure[Callable] = new Pure[Callable] {
+    def pure[A](a: => A) = new Callable[A] {
+      def call = a
+    }
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryPure[X](implicit zr: Zero[X]): Pure[PartialApply1Of2[Entry, X]#Apply] = new Pure[PartialApply1Of2[Entry, X]#Apply] {
+    def pure[A](a: => A) = new SimpleImmutableEntry(zr.zero, a)
+  }
+
   implicit def ValidationPure[X]: Pure[PartialApply1Of2[Validation, X]#Apply] = new Pure[PartialApply1Of2[Validation, X]#Apply] {
     def pure[A](a: => A) = a.success
   }

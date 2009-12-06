@@ -27,4 +27,12 @@ object Bifunctor {
         case Success(b) => success(g(b))
       }
   }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryBifunctor: Bifunctor[Entry] = new Bifunctor[Entry] {
+    def bimap[A, B, C, D](k: Entry[A, B], f: A => C, g: B => D) = new SimpleImmutableEntry(f(k.getKey), g(k.getValue))
+  }
+
 }
