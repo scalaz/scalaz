@@ -27,6 +27,21 @@ object Cojoin {
     def cojoin[A](a: Function0[A]) = () => a
   }
 
+  import java.util.concurrent.Callable
+
+  implicit def CallableCojoin: Cojoin[Callable] = new Cojoin[Callable] {
+    def cojoin[A](a: Callable[A]) = new Callable[Callable[A]] {
+      def call = a
+    }
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryCojoin[X]: Cojoin[PartialApply1Of2[Entry, X]#Apply] = new Cojoin[PartialApply1Of2[Entry, X]#Apply] {
+    def cojoin[A](a: Entry[X, A]) = new SimpleImmutableEntry(a.getKey, a)
+  }
+
   implicit def ZipperCojoin: Cojoin[Zipper] = new Cojoin[Zipper] {
     def cojoin[A](a: Zipper[A]) = a.positions
   }
