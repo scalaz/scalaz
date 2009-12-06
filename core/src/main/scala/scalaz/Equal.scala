@@ -149,8 +149,6 @@ object Equal {
   })
 
   implicit def JavaIterableEqual[A](implicit ea: Equal[A]): Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
-    import Scalaz._
-
     val i1 = a1.iterator
     val i2 = a2.iterator
     var b = false

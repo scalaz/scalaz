@@ -6,7 +6,7 @@ trait Cofunctor[F[_]] {
 
 object Cofunctor {
   import Scalaz._
-  
+
   implicit def Function1Cofunctor[X]: Cofunctor[PartialApply1Of2[Function1, X]#Flip] = new Cofunctor[PartialApply1Of2[Function1, X]#Flip] {
     def comap[A, B](r: A => X, f: B => A) = r compose f
   }
@@ -38,5 +38,19 @@ object Cofunctor {
 
   implicit def EffectCofunctor: Cofunctor[Effect] = new Cofunctor[Effect] {
     def comap[A, B](r: Effect[A], f: B => A) = effect[B]((b) => r ! f(b))(r.strategy)
+  }
+
+  import java.util.Comparator
+
+  implicit def ComparatorCofunctor: Cofunctor[Comparator] = new Cofunctor[Comparator] {
+    def comap[A, B](r: Comparator[A], f: B => A) = new Comparator[B] {
+      def compare(b1: B, b2: B) = r.compare(f(b1), f(b2))
+    }
+  }
+
+  implicit def ComparableCofunctor: Cofunctor[Comparable] = new Cofunctor[Comparable] {
+    def comap[A, B](r: Comparable[A], f: B => A) = new Comparable[B] {
+      def compareTo(b: B) = r.compareTo(f(b))
+    }
   }
 }
