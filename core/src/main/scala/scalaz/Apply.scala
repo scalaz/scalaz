@@ -101,10 +101,10 @@ object Apply {
   }
 
   implicit def TreeApply = FunctorBindApply[Tree]
-     /*
+
   import concurrent.Promise
   implicit def PromiseApply = FunctorBindApply[Promise]
-  */
+
   import java.util._
   import java.util.concurrent._
 
