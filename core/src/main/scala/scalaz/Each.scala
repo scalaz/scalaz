@@ -71,6 +71,22 @@ object Each {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 
+  implicit def ResponderEach: Each[Responder] = new Each[Responder] {
+    def each[A](e: Responder[A], f: A => Unit) = e respond f
+  }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableEach: Each[Callable] = new Each[Callable] {
+    def each[A](e: Callable[A], f: A => Unit) = f(e.call)
+  }
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryEach[X]: Each[PartialApply1Of2[Entry, X]#Apply] = new Each[PartialApply1Of2[Entry, X]#Apply] {
+    def each[A](e: Entry[X, A], f: A => Unit) = f(e.getValue)
+  }
+
   implicit def IterableEach: Each[Iterable] = new Each[Iterable] {
     def each[A](e: Iterable[A], f: A => Unit) = e foreach f
   }
