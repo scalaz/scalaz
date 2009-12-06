@@ -31,6 +31,18 @@ object Copure {
     def copure[A](a: Function0[A]) = a.apply
   }
 
+  import java.util.concurrent.Callable
+
+  implicit def CallableCopure: Copure[Callable] = new Copure[Callable] {
+    def copure[A](a: Callable[A]) = a.call
+  }
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryCopure[X]: Copure[PartialApply1Of2[Entry, X]#Apply] = new Copure[PartialApply1Of2[Entry, X]#Apply] {
+    def copure[A](a: Entry[X, A]) = a.getValue
+  }
+
   implicit def ZipperCopure: Copure[Zipper] = new Copure[Zipper] {
     def copure[A](a: Zipper[A]) = a.focus
   }
