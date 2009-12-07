@@ -23,45 +23,45 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
-  implicit def Tuple2Bind[R](implicit sr: Semigroup[R]): Bind[PartialApply1Of2[Tuple2, R]#Apply] = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Bind[R: Semigroup]: Bind[PartialApply1Of2[Tuple2, R]#Apply] = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
     def bind[A, B](r: (R, A), f: A => (R, B)) = {
       val (rr, b) = f(r._2)
-      (sr append (r._1, rr), b)
+      (r._1 ⊹ rr, b)
     }
   }
 
-  implicit def Tuple3Bind[R, S](implicit sr: Semigroup[R], ss: Semigroup[S]): Bind[PartialApply2Of3[Tuple3, R, S]#Apply] = new Bind[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Bind[R: Semigroup, S: Semigroup]: Bind[PartialApply2Of3[Tuple3, R, S]#Apply] = new Bind[PartialApply2Of3[Tuple3, R, S]#Apply] {
     def bind[A, B](r: (R, S, A), f: A => (R, S, B)) = {
       val (rr, s, b) = f(r._3)
-      (sr append (r._1, rr), ss append (r._2, s), b)
+      (r._1 ⊹ rr, r._2 ⊹ s, b)
     }
   }
 
-  implicit def Tuple4Bind[R, S, T](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T]): Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Bind[R: Semigroup, S: Semigroup, T: Semigroup]: Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
     def bind[A, B](r: (R, S, T, A), f: A => (R, S, T, B)) = {
       val (rr, s, t, b) = f(r._4)
-      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), b)
+      (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, b)
     }
   }
 
-  implicit def Tuple5Bind[R, S, T, U](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U]): Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
     def bind[A, B](r: (R, S, T, U, A), f: A => (R, S, T, U, B)) = {
       val (rr, s, t, u, b) = f(r._5)
-      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), b)
+      (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, b)
     }
   }
 
-  implicit def Tuple6Bind[R, S, T, U, V](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V]): Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
     def bind[A, B](r: (R, S, T, U, V, A), f: A => (R, S, T, U, V, B)) = {
       val (rr, s, t, u, v, b) = f(r._6)
-      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), sv append (r._5, v), b)
+      (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, b)
     }
   }
 
-  implicit def Tuple7Bind[R, S, T, U, V, W](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V], sw: Semigroup[W]): Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
     def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
       val (rr, s, t, u, v, w, b) = f(r._7)
-      (sr append (r._1, rr), ss append (r._2, s), st append (r._3, t), su append (r._4, u), sv append (r._5, v), sw append (r._6, w), b)
+      (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, r._6 ⊹ w, b)
     }
   }
 
@@ -130,10 +130,10 @@ object Bind {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryBind[X](implicit sr: Semigroup[X]): Bind[PartialApply1Of2[Entry, X]#Apply] = new Bind[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryBind[X: Semigroup]: Bind[PartialApply1Of2[Entry, X]#Apply] = new Bind[PartialApply1Of2[Entry, X]#Apply] {
     def bind[A, B](r: Entry[X, A], f: A => Entry[X, B]) = {
       val e = f(r.getValue)
-      new SimpleImmutableEntry(sr append(r.getKey, e.getKey), e.getValue)
+      new SimpleImmutableEntry(r.getKey ⊹ e.getKey, e.getValue)
     }
   }
   

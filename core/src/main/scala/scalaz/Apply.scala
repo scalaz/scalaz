@@ -23,17 +23,17 @@ object Apply {
 
   implicit def Tuple1Apply: Apply[Tuple1] = FunctorBindApply[Tuple1]
 
-  implicit def Tuple2Apply[R](implicit sr: Semigroup[R]): Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
+  implicit def Tuple2Apply[R: Semigroup]: Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
 
-  implicit def Tuple3Apply[R, S](implicit sr: Semigroup[R], ss: Semigroup[S]): Apply[PartialApply2Of3[Tuple3, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
+  implicit def Tuple3Apply[R: Semigroup, S: Semigroup]: Apply[PartialApply2Of3[Tuple3, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
 
-  implicit def Tuple4Apply[R, S, T](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T]): Apply[PartialApply3Of4[Tuple4, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+  implicit def Tuple4Apply[R: Semigroup, S: Semigroup, T: Semigroup]: Apply[PartialApply3Of4[Tuple4, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
 
-  implicit def Tuple5Apply[R, S, T, U](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U]): Apply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+  implicit def Tuple5Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Apply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
 
-  implicit def Tuple6Apply[R, S, T, U, V](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V]): Apply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+  implicit def Tuple6Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Apply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
 
-  implicit def Tuple7Apply[R, S, T, U, V, W](implicit sr: Semigroup[R], ss: Semigroup[S], st: Semigroup[T], su: Semigroup[U], sv: Semigroup[V], sw: Semigroup[W]): Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+  implicit def Tuple7Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
 
   implicit def Function0Apply: Apply[Function0] = FunctorBindApply[Function0]
 
@@ -69,9 +69,9 @@ object Apply {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryApply[X](implicit sr: Semigroup[X]): Apply[PartialApply1Of2[Entry, X]#Apply] = FunctorBindApply[PartialApply1Of2[Entry, X]#Apply]
+  implicit def MapEntryApply[X: Semigroup]: Apply[PartialApply1Of2[Entry, X]#Apply] = FunctorBindApply[PartialApply1Of2[Entry, X]#Apply]
 
-  implicit def ValidationApply[X](implicit s: Semigroup[X]): Apply[PartialApply1Of2[Validation, X]#Apply] = new Apply[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationApply[X: Semigroup]: Apply[PartialApply1Of2[Validation, X]#Apply] = new Apply[PartialApply1Of2[Validation, X]#Apply] {
     def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
       case (Success(f), Success(a)) => success(f(a))
       case (Success(_), Failure(e)) => failure(e)
