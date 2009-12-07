@@ -9,49 +9,49 @@ sealed trait Identity[A] {
 
   def σ: Dual[A] = value
   
-  def ⊹(a: => A)(implicit s: Semigroup[A]) = s append (value, a)
+  def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
-  def ≟(a: A)(implicit e: Equal[A]) = e equal (value, a)
+  def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
-  def ≠(a: A)(implicit e: Equal[A]) = !(≟(a))
+  def ≠(a: A)(implicit e: Equal[A]): Boolean = !(≟(a))
 
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
   // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
   def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if(≠(b)) error(shows + " ≠ " + ev(b).shows)
 
-  def ?|?(a: A)(implicit o: Order[A]) = o order (value, a)
+  def ?|?(a: A)(implicit o: Order[A]): Ordering = o order (value, a)
 
-  def ≤(a: A)(implicit o: Order[A]) = o.order(value, a) != GT
+  def ≤(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
 
-  def ≥(a: A)(implicit o: Order[A]) = o.order(value, a) != LT
+  def ≥(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
 
-  def ≨(a: A)(implicit o: Order[A]) = o.order(value, a) == LT
+  def ≨(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
-  def ≩(a: A)(implicit o: Order[A]) = o.order(value, a) == GT
+  def ≩(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
 
-  def ≮(a: A)(implicit o: Order[A]) = o.order(value, a) != LT
+  def ≮(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
 
-  def ≯(a: A)(implicit o: Order[A]) = o.order(value, a) != GT
+  def ≯(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
 
-  def ≰(a: A)(implicit o: Order[A]) = o.order(value, a) == GT
+  def ≰(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
 
-  def ≱(a: A)(implicit o: Order[A]) = o.order(value, a) == LT
+  def ≱(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
-  def show(implicit s: Show[A]) = s.show(value)
+  def show(implicit s: Show[A]): List[Char] = s.show(value)
 
-  def shows(implicit s: Show[A]) = s.show(value).mkString
+  def shows(implicit s: Show[A]): String = s.show(value).mkString
 
-  def print(implicit s: Show[A]) = Console.print(shows)
+  def print(implicit s: Show[A]): Unit = Console.print(shows)
 
-  def println(implicit s: Show[A]) = Console.println(shows)
+  def println(implicit s: Show[A]): Unit = Console.println(shows)
 
-  def text(implicit s: Show[A]) = xml.Text(value.shows)
+  def text(implicit s: Show[A]): xml.Text = xml.Text(value.shows)
 
-  def <===>(a: A)(implicit m: MetricSpace[A]) = m distance (value, a)
+  def <===>(a: A)(implicit m: MetricSpace[A]): Int = m distance (value, a)
 
-  def constantState[S, A](s: => S) = state((_: S) => (s, value))
+  def constantState[S](s: => S): State[S, A] = Scalaz.state((_: S) => (s, value))
 
-  def state[S] = Scalaz.state((_: S, value))
+  def state[S]: State[S, A] = Scalaz.state((_: S, value))
 
   def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = f(value) match {
     case None => m.zero
@@ -67,7 +67,7 @@ sealed trait Identity[A] {
   def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
     value.η ⊹ f(value).iterate(f)
 
-  def zipper = Scalaz.zipper(Stream.empty, value, Stream.empty)
+  def zipper: Zipper[A] = Scalaz.zipper(Stream.empty, value, Stream.empty)
 
   def unfoldTree[B](f: A => (B, () => Stream[A])): Tree[B] = f(value) match {
     case (a, bs) => node(a, bs.apply.unfoldForest(f))
@@ -83,7 +83,7 @@ sealed trait Identity[A] {
 
   def fail[X]: Validation[A, X] = Scalaz.failure(value)
 
-  def dlist = Scalaz.dlist(value :: (_: List[A]))
+  def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def nel: NonEmptyList[A] = Scalaz.nel(value, Nil)
 
