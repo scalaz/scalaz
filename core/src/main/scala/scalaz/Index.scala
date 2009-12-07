@@ -80,4 +80,10 @@ object Index {
       k
     }
   }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableIndex: Index[Callable] = new Index[Callable] {
+    def index[A](a: Callable[A], i: Int) = if(i == 0) Some(a.call) else None
+  }
 }

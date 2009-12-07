@@ -12,7 +12,7 @@ trait Semigroups {
 
 object Semigroup {
   import Scalaz._
-  import xml.{Elem, Node, NodeSeq}
+  import xml.NodeSeq
 
   implicit def DigitSemigroup: Semigroup[Digit] = semigroup((a, b) => a.toInt + b.toInt)
 

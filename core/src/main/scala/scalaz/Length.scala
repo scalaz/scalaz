@@ -88,4 +88,10 @@ object Length {
       n
     }
   }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableLength: Length[Callable] = new Length[Callable] {
+    def len[A](a: Callable[A]) = 1
+  }
 }

@@ -99,4 +99,10 @@ object FoldRight {
       IterableFoldRight.foldRight(i, b, f)
     }
   }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableFoldRight = new FoldRight[Callable] {
+    def foldRight[A, B](t: Callable[A], b: B, f: (A, => B) => B) = f(t.call, b)
+  }
 }

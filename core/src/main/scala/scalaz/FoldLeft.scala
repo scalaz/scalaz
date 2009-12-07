@@ -91,4 +91,10 @@ object FoldLeft {
       x
     }
   }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableFoldLeft: FoldLeft[Callable] = new FoldLeft[Callable] {
+    def foldLeft[B, A](t: Callable[A], b: B, f: (B, A) => B) = f(b, t.call)
+  }
 }
