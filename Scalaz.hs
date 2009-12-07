@@ -114,14 +114,17 @@ scala k = system ("scala " ++ k)
 jar :: String -> IO ExitCode
 jar k = system ("jar " ++ k)
 
-runExample' :: String -> IO ExitCode
-runExample' e = example >>>> scala (intercalate " " [cp, e])
+qrunExample :: String -> IO ExitCode
+qrunExample e = scala (intercalate " " [cp, "scalaz." ++ e])
 
 runExample :: String -> IO ExitCode
-runExample = runExample' . ("scalaz." ++)
+runExample e = example >>>> qrunExample e
 
 allExample :: IO ExitCode
 allExample = runExample "Example"
+
+qallExample :: IO ExitCode
+qallExample = qrunExample "Example"
 
 repl :: IO ExitCode
 repl = example >>>> test >>>> qrepl
