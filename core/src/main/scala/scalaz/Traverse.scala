@@ -112,4 +112,17 @@ object Traverse {
         case Failure(x) => f(x) ∘ (Failure(_: B).fail)
       }
   }
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableTraverse: Traverse[Callable] = new Traverse[Callable] {
+    def traverse[F[_], A, B](f: A => F[B], as: Callable[A])(implicit a: Applicative[F]): F[Callable[B]] =  f(as.call) ∘ (b => new Callable[B] { def call = b })
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryTraverse[X]: Traverse[PartialApply1Of2[Entry, X]#Apply] = new Traverse[PartialApply1Of2[Entry, X]#Apply] {
+    def traverse[F[_], A, B](f: A => F[B], as: Entry[X, A])(implicit a: Applicative[F]): F[Entry[X, B]] = f(as.getValue) ∘ ((b: B) => new SimpleImmutableEntry(as.getKey, b))
+  }
 }
