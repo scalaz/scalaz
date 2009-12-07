@@ -9,4 +9,9 @@ trait Curry[T[_, _]] extends Applicable {
   type Apply[X] = C[X]
 }
 
-trait Flip[T[_, _]] extends Applicable { type Apply[X] = Curry[T]#Apply[X] }
+trait Flip[T[_, _]] extends Applicable {
+  trait F[Z] extends Applicable {
+    type Apply[Y] = T[Y, Z]
+  }
+  type Apply[X] = F[X]
+}
