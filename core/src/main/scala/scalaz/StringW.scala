@@ -22,7 +22,7 @@ sealed trait StringW {
    * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
    * otherwise, the string representation (using show) of the value is returned in an element with the given label.
    */
-  def node[A](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A])(implicit sh: Show[A]) =
+  def node[A: Show](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]) =
     a match {
       case Some(t) => Elem(prefix, s, Null, TopScope, t.text)
       case None => Text("")
@@ -32,14 +32,14 @@ sealed trait StringW {
    * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
    * otherwise, the string representation (using show) of the value is returned in an element with the given label.
    */
-  def node[A](prefix: String, a: Option[A])(implicit sh: Show[A]): Node =
+  def node[A: Show](prefix: String, a: Option[A]): Node =
     node(prefix, Null, TopScope, a)
 
   /**
    * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
    * otherwise, the string representation (using show) of the value is returned in an element with the given label.
    */
-  def |:|[A](a: Option[A])(implicit sh: Show[A]): Node =
+  def |:|[A: Show](a: Option[A]): Node =
     node(null, a)
 
   def encode(implicit c: CharSet) = s getBytes c.value

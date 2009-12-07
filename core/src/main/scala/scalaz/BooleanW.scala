@@ -132,9 +132,9 @@ sealed trait BooleanW {
    * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
    * argument.
    */
-  def ??[A](a: => A)(implicit z: Zero[A]) = if(isTrue) a else z.zero
+  def ??[A: Zero](a: => A) = if(isTrue) a else ∅
 
-  def !?[A](a: => A)(implicit z: Zero[A]) = if(!isTrue) a else z.zero
+  def !?[A: Zero](a: => A) = if(!isTrue) a else ∅
 
   trait GuardPrevent[M[_]] {
     def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]): M[A]

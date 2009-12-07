@@ -86,12 +86,12 @@ object Semigroup {
 
   implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isLeft) a else b)
 
-  implicit def Function1ABSemigroup[A, B](implicit s: Semigroup[B]): Semigroup[A => B] = semigroup((a1, a2) => a => s append (a1(a), a2.apply(a)))
+  implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
 
   implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => ((a: A) => x(y.apply(a))))
 
-  implicit def DualSemigroup[A](implicit sa: Semigroup[A]): Semigroup[Dual[A]] =
-    semigroup((x, y) => sa.append(y.value, x.value))
+  implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
+    semigroup((x, y) => y.value ⊹ x.value)
 
   import concurrent.Strategy
   

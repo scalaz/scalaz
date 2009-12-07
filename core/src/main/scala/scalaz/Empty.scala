@@ -31,12 +31,12 @@ object Empty {
     def empty[A] = new GArray(0)
   }
 
-  implicit def EitherLeftEmpty[X](implicit z: Zero[X]): Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
-    def empty[A] = Right(z.zero).left
+  implicit def EitherLeftEmpty[X: Zero]: Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+    def empty[A] = Right(∅).left
   }
 
-  implicit def EitherRightEmpty[X](implicit z: Zero[X]): Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] {
-    def empty[A] = Left(z.zero).right
+  implicit def EitherRightEmpty[X: Zero]: Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+    def empty[A] = Left(∅).right
   }
 
   import java.util._

@@ -22,8 +22,8 @@ sealed trait ListW[A] {
     case h :: t => Some(Scalaz.nel(h, t))
   }
 
-  def <^>[B](f: NonEmptyList[A] => B)(implicit z: Zero[B]) = value match {
-    case Nil => z.zero
+  def <^>[B: Zero](f: NonEmptyList[A] => B) = value match {
+    case Nil => ∅
     case h :: t => f(Scalaz.nel(h, t))
   }
 

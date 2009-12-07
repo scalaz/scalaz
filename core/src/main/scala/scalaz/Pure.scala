@@ -23,28 +23,28 @@ object Pure {
     def pure[A](a: => A) = Tuple1(a)
   }
 
-  implicit def Tuple2Pure[R](implicit zr: Zero[R]): Pure[PartialApply1Of2[Tuple2, R]#Apply] = new Pure[PartialApply1Of2[Tuple2, R]#Apply] {
-    def pure[A](a: => A) = (zr.zero, a)
+  implicit def Tuple2Pure[R: Zero]: Pure[PartialApply1Of2[Tuple2, R]#Apply] = new Pure[PartialApply1Of2[Tuple2, R]#Apply] {
+    def pure[A](a: => A) = (∅, a)
   }
 
-  implicit def Tuple3Pure[R, S](implicit zr: Zero[R], zs: Zero[S]): Pure[PartialApply2Of3[Tuple3, R, S]#Apply] = new Pure[PartialApply2Of3[Tuple3, R, S]#Apply] {
-    def pure[A](a: => A) = (zr.zero, zs.zero, a)
+  implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[PartialApply2Of3[Tuple3, R, S]#Apply] = new Pure[PartialApply2Of3[Tuple3, R, S]#Apply] {
+    def pure[A](a: => A) = (∅, ∅, a)
   }
 
-  implicit def Tuple4Pure[R, S, T](implicit zr: Zero[R], zs: Zero[S], zt: Zero[T]): Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
-    def pure[A](a: => A) = (zr.zero, zs.zero, zt.zero, a)
+  implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+    def pure[A](a: => A) = (∅, ∅, ∅, a)
   }
 
-  implicit def Tuple5Pure[R, S, T, U](implicit zr: Zero[R], zs: Zero[S], zt: Zero[T], zu: Zero[U]): Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
-    def pure[A](a: => A) = (zr.zero, zs.zero, zt.zero, zu.zero, a)
+  implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+    def pure[A](a: => A) = (∅, ∅, ∅, ∅, a)
   }
 
-  implicit def Tuple6Pure[R, S, T, U, V](implicit zr: Zero[R], zs: Zero[S], zt: Zero[T], zu: Zero[U], zv: Zero[V]): Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
-    def pure[A](a: => A) = (zr.zero, zs.zero, zt.zero, zu.zero, zv.zero, a)
+  implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+    def pure[A](a: => A) = (∅, ∅, ∅, ∅, ∅, a)
   }
 
-  implicit def Tuple7Pure[R, S, T, U, V, W](implicit zr: Zero[R], zs: Zero[S], zt: Zero[T], zu: Zero[U], zv: Zero[V], zw: Zero[W]): Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
-    def pure[A](a: => A) = (zr.zero, zs.zero, zt.zero, zu.zero, zv.zero, zw.zero, a)
+  implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+    def pure[A](a: => A) = (∅, ∅, ∅, ∅, ∅, ∅, a)
   }
 
   implicit def Function0Pure: Pure[Function0] = new Pure[Function0] {
@@ -122,8 +122,8 @@ object Pure {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryPure[X](implicit zr: Zero[X]): Pure[PartialApply1Of2[Entry, X]#Apply] = new Pure[PartialApply1Of2[Entry, X]#Apply] {
-    def pure[A](a: => A) = new SimpleImmutableEntry(zr.zero, a)
+  implicit def MapEntryPure[X: Zero]: Pure[PartialApply1Of2[Entry, X]#Apply] = new Pure[PartialApply1Of2[Entry, X]#Apply] {
+    def pure[A](a: => A) = new SimpleImmutableEntry(∅, a)
   }
 
   implicit def ValidationPure[X]: Pure[PartialApply1Of2[Validation, X]#Apply] = new Pure[PartialApply1Of2[Validation, X]#Apply] {

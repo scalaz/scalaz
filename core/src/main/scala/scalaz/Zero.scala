@@ -90,15 +90,15 @@ object Zero {
 
   implicit def GenericArrayZero[A]: Zero[GArray[A]] = zero(new GArray[A](0))
 
-  implicit def EitherLeftZero[A, B](implicit za: Zero[A]): Zero[Either.LeftProjection[A, B]] = zero(Left(za.zero).left)
+  implicit def EitherLeftZero[A: Zero, B]: Zero[Either.LeftProjection[A, B]] = zero(Left(∅[A]).left)
 
-  implicit def EitherRightZero[A, B](implicit za: Zero[A]): Zero[Either.RightProjection[B, A]] = zero(Right(za.zero).right)
+  implicit def EitherRightZero[A, B: Zero]: Zero[Either.RightProjection[A, B]] = zero(Right(∅[B]).right)
 
-  implicit def Function1ABZero[A, B](implicit zb: Zero[B]): Zero[A => B] = zero((_: A) => zb.zero)
+  implicit def Function1ABZero[A, B: Zero]: Zero[A => B] = zero((_: A) => ∅[B])
 
   implicit def EndoZero[A]: Zero[Endo[A]] = zero(identity(_: A))
 
-  implicit def DualZero[A](implicit za: Zero[A]): Zero[Dual[A]] = zero(za.zero σ)
+  implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
   import concurrent.Strategy
   import concurrent.strategy.Id

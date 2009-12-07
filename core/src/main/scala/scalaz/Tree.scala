@@ -10,7 +10,7 @@ sealed trait Tree[+A] {
 
   import Scalaz._
 
-  def foldMap[B](f: A => B)(implicit m: Monoid[B]): B =
+  def foldMap[B: Monoid](f: A => B): B =
     f(rootLabel) ⊹ subForest.foldMap((_: Tree[A]).foldMap(f))
 
   def drawTree(implicit sh: Show[A]) = draw.foldMap(_ + "\n")
