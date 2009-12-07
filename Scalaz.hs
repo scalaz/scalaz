@@ -3,6 +3,7 @@
 Depends
 * The Haskell Platform http://hackage.haskell.org/platform/
 * Lastik http://hackage.haskell.org/package/Lastik
+* time http://hackage.haskell.org/package/time
 
 
 $LastChangedRevision$
