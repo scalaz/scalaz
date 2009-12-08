@@ -8,7 +8,7 @@ import scalaz.NonEmptyList
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14">RFC 2616 Section 14 Header Field Definitions</a>.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
+ * @version $LastChangedRevision < br >
  *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
  *          $LastChangedBy: tonymorris $
  */
@@ -54,114 +54,133 @@ sealed trait RequestHeader {
     case _ => x
   }
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1">§</a>
  */
 final case object Accept extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.2">§</a>
  */
 final case object AcceptCharset extends RequestHeader {
   override val asString = "Accept-Charset"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3">§</a>
  */
 final case object AcceptEncoding extends RequestHeader {
   override val asString = "Accept-Encoding"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4">§</a>
  */
 final case object AcceptLanguage extends RequestHeader {
   override val asString = "Accept-Language"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.8">§</a>
  */
 final case object Authorization extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.20">§</a>
  */
 final case object Expect extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.22">§</a>
  */
 final case object From extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23">§</a>
  */
 final case object Host extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24">§</a>
  */
 final case object IfMatch extends RequestHeader {
   override val asString = "If-Match"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25">§</a>
  */
 final case object IfModifiedSince extends RequestHeader {
   override val asString = "If-Modified-Since"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26">§</a>
  */
 final case object IfNoneMatch extends RequestHeader {
   override val asString = "If-None-Match"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.27">§</a>
  */
 final case object IfRange extends RequestHeader {
   override val asString = "If-Range"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.28">§</a>
  */
 final case object IfUnmodifiedSince extends RequestHeader {
   override val asString = "If-Unmodified-Since"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.31">§</a>
  */
 final case object MaxForwards extends RequestHeader {
   override val asString = "Max-Forwards"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.34">§</a>
  */
 final case object ProxyAuthorization extends RequestHeader {
   override val asString = "Proxy-Authorization"
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35">§</a>
  */
 final case object Range extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36">§</a>
  */
 final case object Referer extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.39">§</a>
  */
 final case object TE extends RequestHeader {
   override val asString = toString
 }
+
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43">§</a>
  */
@@ -178,11 +197,39 @@ private final case class General(gh: GeneralHeader) extends RequestHeader {
 import Character.isSpace
 import scalaz.Scalaz._
 import scalaz.http.Util.Nel._
+
+trait RequestHeaders {
+  /**
+   * Converts the given entity header into a request header.
+   */
+  implicit def entityToRequest(eh: EntityHeader): RequestHeader = scalaz.http.request.Entity(eh)
+
+  /**
+   * Converts the given general header into a request header.
+   */
+  implicit def generalToRequest(gh: GeneralHeader): RequestHeader = scalaz.http.request.General(gh)
+
+  /**
+   * Converts the given string to a request header. If the string is a known request header, then it is used. If not,
+   * then it if it is a known general header, then it is used. If not then it is an entity header.
+   */
+  implicit def StringRequestHeader(s: String): Option[RequestHeader] =
+    RequestHeader.headers find {case (n, h) => n == s} map (_._2) orElse
+            (s: Option[GeneralHeader]) ∘ (scalaz.http.request.General(_)) orElse
+            (s: Option[EntityHeader]) ∘ (scalaz.http.request.Entity(_))
+
+  /**
+   * Converts the given list of characters to a request header. If the string is a known request header, then it is
+   * used. If not, then it if it is a known general header, then it is used. If not then it is an entity header.
+   */
+  implicit def ListRequestHeader: (List[Char] => Option[RequestHeader]) = StringRequestHeader _ compose (_.mkString)
+}
+
 /**
  * HTTP request headers.
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14">RFC 2616 Section 14 Header Field Definitions</a>.
  */
-object RequestHeader {
+object RequestHeader extends RequestHeaders {
   /**
    * For deconstructing request headers into entity headers.
    */
@@ -209,16 +256,6 @@ object RequestHeader {
     }
   }
 
-  /**
-   * Converts the given entity header into a request header.
-   */
-  implicit def entity(eh: EntityHeader): RequestHeader = scalaz.http.request.Entity(eh)
-  
-  /**
-   * Converts the given general header into a request header.
-   */
-  implicit def general(gh: GeneralHeader): RequestHeader = scalaz.http.request.General(gh)
-
   import GeneralHeader.StringGeneralHeader
   import EntityHeader.StringEntityHeader
 
@@ -226,38 +263,23 @@ object RequestHeader {
    * A list of known headers.
    */
   val headers = List(("accept", Accept),
-                     ("accept-charset", AcceptCharset),
-                     ("accept-encoding", AcceptEncoding),
-                     ("accept-language", AcceptLanguage),
-                     ("authorization", Authorization),
-                     ("from", From),
-                     ("host", Host),
-                     ("if-match", IfMatch),
-                     ("if-modified-since", IfModifiedSince),
-                     ("if-none-match", IfNoneMatch),
-                     ("if-range", IfRange),
-                     ("if-unmodified-since", IfUnmodifiedSince),
-                     ("max-forwards", MaxForwards),
-                     ("proxy-authorization", ProxyAuthorization),
-                     ("range", Range),
-                     ("referer", Referer),
-                     ("te", TE),
-                     ("user-agent", UserAgent))
-
-  /**
-   * Converts the given string to a request header. If the string is a known request header, then it is used. If not,
-   * then it if it is a known general header, then it is used. If not then it is an entity header.
-   */
-  implicit def StringRequestHeader(s: String): Option[RequestHeader] =
-    headers find { case (n, h) => n == s } map (_._2) orElse
-    (s: Option[GeneralHeader]) ∘ (scalaz.http.request.General(_)) orElse
-    (s: Option[EntityHeader]) ∘ (scalaz.http.request.Entity(_))
-
-  /**
-   * Converts the given list of characters to a request header. If the string is a known request header, then it is
-   * used. If not, then it if it is a known general header, then it is used. If not then it is an entity header.
-   */
-  implicit def ListRequestHeader : (List[Char] => Option[RequestHeader]) = StringRequestHeader _ compose (_.mkString)
+    ("accept-charset", AcceptCharset),
+    ("accept-encoding", AcceptEncoding),
+    ("accept-language", AcceptLanguage),
+    ("authorization", Authorization),
+    ("from", From),
+    ("host", Host),
+    ("if-match", IfMatch),
+    ("if-modified-since", IfModifiedSince),
+    ("if-none-match", IfNoneMatch),
+    ("if-range", IfRange),
+    ("if-unmodified-since", IfUnmodifiedSince),
+    ("max-forwards", MaxForwards),
+    ("proxy-authorization", ProxyAuthorization),
+    ("range", Range),
+    ("referer", Referer),
+    ("te", TE),
+    ("user-agent", UserAgent))
 
   /**
    * Converts a list of characters of the form "abc:def" into a potential request header and non-empty value split at
@@ -267,7 +289,7 @@ object RequestHeader {
     cs span (_ != ':') match {
       case (n, v) => {
         (n: Option[RequestHeader]) ∗ (h =>
-          (v.dropWhile(x => x == ':' || isSpace(x)): Option[NonEmptyList[Char]]) map (v => (h, v)))
+          (v.dropWhile(x => x == ':' || isSpace(x))).nel map (v => (h, v)))
       }
     }
 }

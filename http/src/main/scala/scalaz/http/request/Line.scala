@@ -65,7 +65,7 @@ sealed trait Line {
   /**
    * Returns all occurrences of the given request parameter in the request URI or the given error value.
    */
-  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = NonEmptyListOptionList(this !! p) toSuccess e
+  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = (this !! p).nel toSuccess e
 
   /**
    * Returns <code>true</code> if the given request parameter occurs in the request URI.
@@ -78,26 +78,7 @@ sealed trait Line {
   def ~!?(p: String) = this ! p isEmpty
 }
 
-/**
- * A request line.
- * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1">RFC 2616 Section 5.1 Request-Line</a>.
- */
-object Line {
-  /**
-   * An extractor that always matches with the method, URI and version of the given request line.
-   */
-  def unapply(line: Line): Option[(Method, Uri, Version)] =
-    Some(line.method, line.uri, line.version)
-
-  /**
-   * Construct a request line with the given method, URI and version
-   */
-  def line(m: Method, u: Uri, v: Version): Line = new Line {
-    val method = m
-    val uri = u
-    val version = v
-  }
-
+trait Lines {
   import Character.isSpace
   import scalaz.Scalaz._
 
@@ -111,6 +92,26 @@ object Line {
     val y = x._2.reverse span (!isSpace(_))
     val u: Option[Uri] = reverseTrim(y._2)
     val v: Option[Version] = reverseTrim(y._1)
-    v ⊛ (u ⊛ (m map (m => u => v => line(m, u, v))))
+    v ⊛ (u ⊛ (m map (m => u => v => Line.line(m, u, v))))
+  }
+}
+/**
+ * A request line.
+ * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1">RFC 2616 Section 5.1 Request-Line</a>.
+ */
+object Line extends Lines {
+  /**
+   * An extractor that always matches with the method, URI and version of the given request line.
+   */
+  def unapply(line: Line): Option[(Method, Uri, Version)] =
+    Some(line.method, line.uri, line.version)
+
+  /**
+   * Construct a request line with the given method, URI and version
+   */
+  def line(m: Method, u: Uri, v: Version): Line = new Line {
+    val method = m
+    val uri = u
+    val version = v
   }
 }

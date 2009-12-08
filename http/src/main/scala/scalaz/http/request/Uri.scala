@@ -10,7 +10,7 @@ import scalaz.Scalaz._
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2">RFC 2616 Section 5.1.2 Request-URI</a>.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
+ * @version $LastChangedRevision < br >
  *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
  *          $LastChangedBy: tonymorris $
  */
@@ -51,7 +51,7 @@ sealed trait Uri {
    * Returns the path extension - characters after the last dot (.) in the path.
    */
   lazy val pathExtension = path.dropWhile(_ != '.').reverse.takeWhile(_ != '.').reverse.mkString
-  
+
   import scalaz.http.Util.{asHashMap, mapHeads}
 
   /**
@@ -71,11 +71,29 @@ sealed trait Uri {
   lazy val parametersMapHeads = parametersMap ∘ (mapHeads(_))
 }
 
+trait Uris {
+  /**
+   * Takes the given string and splits it into a URI and query string by <code>'?'</code> character.
+   */
+  implicit def ListUri(cs: List[Char]): Option[Uri] = cs match {
+    case Nil => None
+    case x :: _ if x == '?' => None
+    case h :: t => {
+      val z = t.span(_ != '?')
+      Some(Uri.uri(nel(h, z._1), z._2 match {
+        case Nil => None
+        case _ :: Nil => None
+        case _ :: k => Some(k)
+      }))
+    }
+  }
+}
+
 /*
  * HTTP request URI.
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2">RFC 2616 Section 5.1.2 Request-URI</a>.
  */
-object Uri {
+object Uri extends Uris {
   /**
    * An extractor that always matches with the URI path and query string.
    */
@@ -88,21 +106,5 @@ object Uri {
   def uri(p: NonEmptyList[Char], s: Option[List[Char]]) = new Uri {
     val path = p
     val queryString = s
-  }
-
-  /**
-   * Takes the given string and splits it into a URI and query string by <code>'?'</code> character.
-   */
-  implicit def ListUri(cs: List[Char]): Option[Uri] = cs match {
-    case Nil => None
-    case x :: _ if x == '?' => None
-    case h :: t => {
-      val z = t.span(_ != '?')
-      Some(uri(nel(h, z._1), z._2 match {
-        case Nil => None
-        case _ :: Nil => None
-        case _ :: k => Some(k)
-      }))
-    }
   }
 }

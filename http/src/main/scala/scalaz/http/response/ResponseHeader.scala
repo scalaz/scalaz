@@ -116,11 +116,36 @@ private final case class General(gh: GeneralHeader) extends ResponseHeader {
 
 import scalaz.Scalaz._
 
+trait ResponseHeaders {
+    /**
+   * Converts the given entity header into a response header.
+   */
+  implicit def entityToResponse(eh: EntityHeader): ResponseHeader = scalaz.http.response.Entity(eh)
+
+  /**
+   * Converts the given general header into a response header.
+   */
+  implicit def generalToResponse(gh: GeneralHeader): ResponseHeader = scalaz.http.response.General(gh)
+
+  /**
+   * Converts the given response header into a string.
+   */
+  implicit def ResponseHeaderString(rh: ResponseHeader) = rh.asString
+
+  /**
+   * Converts the given string into a response header.
+   */
+  implicit def StringResponseHeader(s: String): Option[ResponseHeader] =
+    ResponseHeader.headers find { case (n, h) => n == s } map (_._2) orElse
+    (s: Option[GeneralHeader]) ∘ (scalaz.http.response.General(_)) orElse
+    (s: Option[EntityHeader]) ∘ (scalaz.http.response.Entity(_))
+}
+
 /**
  * HTTP response headers.
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14">RFC 2616 Section 14 Header Field Definitions</a>.
  */
-object ResponseHeader {
+object ResponseHeader extends ResponseHeaders {
   /**
    * For deconstructing response headers into entity headers.
    */
@@ -160,26 +185,4 @@ object ResponseHeader {
                      ("vary", Vary),
                      ("www-authenticate", WWWAuthenticate))
 
-  /**
-   * Converts the given entity header into a response header.
-   */
-  implicit def entity(eh: EntityHeader): ResponseHeader = scalaz.http.response.Entity(eh)
-
-  /**
-   * Converts the given general header into a response header.
-   */
-  implicit def general(gh: GeneralHeader): ResponseHeader = scalaz.http.response.General(gh)
-
-  /**
-   * Converts the given response header into a string.
-   */
-  implicit def ResponseHeaderString(rh: ResponseHeader) = rh.asString
-
-  /**
-   * Converts the given string into a response header.
-   */
-  implicit def StringResponseHeader(s: String): Option[ResponseHeader] =
-    headers find { case (n, h) => n == s } map (_._2) orElse
-    (s: Option[GeneralHeader]) ∘ (scalaz.http.response.General(_)) orElse
-    (s: Option[EntityHeader]) ∘ (scalaz.http.response.Entity(_))
 }

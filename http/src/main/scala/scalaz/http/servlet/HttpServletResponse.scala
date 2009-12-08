@@ -61,7 +61,7 @@ sealed trait HttpServletResponse {
 /**
  * A wrapper around Java Servlet <code>HttpServletResponse</code>.
  */
-object HttpServletResponse {
+trait HttpServletResponses {
   /**
    * Wraps the given Java Servlet HTTP response.
    */
@@ -74,3 +74,5 @@ object HttpServletResponse {
    */
   implicit def ResponseHttpServletResponse(response: HttpServletResponse) = response.response
 }
+
+object HttpServletResponse extends HttpServletResponses

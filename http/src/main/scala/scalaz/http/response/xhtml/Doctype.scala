@@ -27,7 +27,7 @@ private final case object Frameset extends Doctype {
 /**
  * XHTML doctypes.
  */
-object Doctype {
+trait Doctypes {
   /**
    * All XHTML doctypes.
    */
@@ -48,3 +48,5 @@ object Doctype {
    */
   val frameset: Doctype = Frameset
 }
+
+object Doctype extends Doctypes

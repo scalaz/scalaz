@@ -26,10 +26,7 @@ sealed trait HttpServlet {
 
 import scalaz.http.request.Request
 
-/**
- * A wrapper around Java Servlet <code>HttpServlet</code>.
- */
-object HttpServlet {
+trait HttpServlets {
   /**
    * Wraps the given Java Servlet.
    */
@@ -42,6 +39,20 @@ object HttpServlet {
    */
   implicit def ServletHttpServlet(s: HttpServlet) = s.servlet
 
+
+  /**
+   * Loads a resource at the given path. If that resource is found, return the result of applying the given function,
+   * otherwise return the given value.
+   */
+  implicit def Resource(path: NonEmptyList[Char]): { def ?[A](found: Iterator[Byte] => A, notFound: => A)(implicit s: HttpServlet): A } = new {
+    def ?[A](found: Iterator[Byte] => A, notFound: => A)(implicit s: HttpServlet) =
+      s.resource(path) map (z => found(z.elements)) getOrElse notFound
+  }
+}
+/**
+ * A wrapper around Java Servlet <code>HttpServlet</code>.
+ */
+object HttpServlet extends HttpServlets {
   /**
    * Loads a resource at the given path. If that resource is found, return the result of applying the given function,
    * otherwise return the given value.
@@ -56,12 +67,4 @@ object HttpServlet {
   def resource[IN[_], A](found: Iterator[Byte] => A, notFound: => A)(implicit s: HttpServlet, request: Request[IN]): A =
     resource(request.path.mkString, found, notFound)
 
-  /**
-   * Loads a resource at the given path. If that resource is found, return the result of applying the given function,
-   * otherwise return the given value.
-   */
-  implicit def Resource(path: NonEmptyList[Char]): { def ?[A](found: Iterator[Byte] => A, notFound: => A)(implicit s: HttpServlet): A } = new {
-    def ?[A](found: Iterator[Byte] => A, notFound: => A)(implicit s: HttpServlet) =
-      s.resource(path) map (z => found(z.elements)) getOrElse notFound
-  }
 }

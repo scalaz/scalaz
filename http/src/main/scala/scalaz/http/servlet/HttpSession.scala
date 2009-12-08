@@ -50,7 +50,7 @@ sealed trait HttpSession {
 /**
  * A wrapper around Java Servlet <code>HttpSession</code>.
  */
-object HttpSession {
+trait HttpSessions {
   /**
    * Wraps the given HTTP session.
    */
@@ -63,3 +63,5 @@ object HttpSession {
    */
   implicit def SessionHttpSession(session: HttpSession) = session.session
 }
+
+object HttpSession extends HttpSessions

@@ -91,14 +91,6 @@ object Util {
     implicit def NonEmptyListList[A](xs: NonEmptyList[A]): List[A] = xs.list
 
     /**
-     * Creates a potential non-empty list. If the given list is empty, then <code>None</code>.
-     */
-    implicit def NonEmptyListOptionList[A](as: List[A]): Option[NonEmptyList[A]] = as match {
-      case Nil => None
-      case a :: as => Some(nel(a, as))
-    }
-
-    /**
      * Creates a string from the given non-empty list.
      */
     implicit def NonEmptyListString[A](xs: NonEmptyList[Char]): String = xs.toList.mkString

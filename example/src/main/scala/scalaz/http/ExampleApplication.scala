@@ -1,14 +1,11 @@
 package scalaz.http
 
-import request.{GET, Request}
 import scalaz.Scalaz._
-import response.xhtml.Doctype.transitional
-import response.{Response, NotFound, OK}
-import servlet.{HttpServletRequest, ServletApplication, HttpServlet, StreamStreamServletApplication}
+import scalaz.http.Slinky._
+import request._
+import response._
+import servlet._
 import servlet.HttpServlet._
-import response.Response._
-import response.Body._
-import StreamStreamApplication._
 
 final class ExampleApplication extends StreamStreamServletApplication {
   implicit val charset = UTF8

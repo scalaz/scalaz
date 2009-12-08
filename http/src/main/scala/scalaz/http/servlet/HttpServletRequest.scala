@@ -12,7 +12,7 @@ import scalaz.http._
 
 /**
  * A wrapper around Java Servlet <code>HttpServletRequest</code>.
- * 
+ *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  * @version $LastChangedRevision<br>
  *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
@@ -44,7 +44,7 @@ sealed trait HttpServletRequest {
    * Sets the given request attribute with the given value.
    */
   def update[A](attr: String, value: A) = request.setAttribute(attr, value)
-  
+
   /**
    * Gets the given request attribute value.
    */
@@ -66,10 +66,10 @@ sealed trait HttpServletRequest {
   def asRequest[I[_]](implicit in: InputStreamer[I]) = {
       val headers: List[(RequestHeader, NonEmptyList[Char])] = request.getHeaderNames.elements.map(_.asInstanceOf[String]).toList ∗
               (h => request.getHeaders(h).elements.map(_.asInstanceOf[String]).filter(_.length > 0).map
-                        (v => ((h: Option[RequestHeader]).get, (v.toList: Option[NonEmptyList[Char]]).get)).toList)
+                        (v => ((h: Option[RequestHeader]).get, v.toList.nel.get)).toList)
 
       val rline = (request.getMethod.toList: Option[Method]) >>= (m =>
-        (request.getRequestURI.toList: Option[NonEmptyList[Char]]) map
+        request.getRequestURI.toList.nel map
                 (p => uri(p, Option(request.getQueryString) map (_.toList))) >>=
                 (u => (request.getProtocol: Option[Version]) map
                         (v => line(m, u, v))))
@@ -78,10 +78,7 @@ sealed trait HttpServletRequest {
     }
 }
 
-/**
- * A wrapper around Java Servlet <code>HttpServletRequest</code>.
- */
-object HttpServletRequest {
+trait HttpServletRequests {
   /**
    * Wraps the given Java Servlet HTTP request.
    */
@@ -93,7 +90,12 @@ object HttpServletRequest {
    * Unwraps the given HTTP request into a servlet HTTP request.
    */
   implicit def RequestHttpServletRequest(request: HttpServletRequest) = request.request
+}
 
+/**
+ * A wrapper around Java Servlet <code>HttpServletRequest</code>.
+ */
+object HttpServletRequest extends HttpServletRequests {
   /**
    * Prepends the context path of the given HTTP servlet request to the given argument. This is useful for creating
    * anchor tags in HTML documents.
@@ -102,10 +104,10 @@ object HttpServletRequest {
     request.getContextPath + '/' + s
 
   /**
-   * Removes the length of the context path of the given servlet request unless it is empty. 
+   * Removes the length of the context path of the given servlet request unless it is empty.
    */
   def c[IN[_]](r: Request[IN])(implicit request: HttpServletRequest) = {
-    val k: Option[NonEmptyList[Char]] = r.path drop request.getContextPath.length
+    val k: Option[NonEmptyList[Char]] = (r.path drop request.getContextPath.length).nel
     k ∘ (p => r(r.uri(p))) | r
   }
 

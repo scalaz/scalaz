@@ -22,7 +22,7 @@ sealed trait Method {
   /**
    * A non-empty string representation of this request method.
    */
-  val asNonEmptyList: NonEmptyList[Char] = toString.toList.get
+  val asNonEmptyList: NonEmptyList[Char] = toString.toList.nel.get
 
   /**
    * Returns <code>true</code> if this method is an extension method, <code>false</code> otherwise.
@@ -93,21 +93,7 @@ private final case class ExtensionMethod(m: NonEmptyList[Char]) extends Method {
   override val asString = m.mkString
 }
 
-/**
- * HTTP request method.
- * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9">RFC 2616 Section 9 Method Definitions</a>.
- */
-object Method {
-  /**
-   * A list of known methods.
-   */
-  val methods = List(OPTIONS,GET,HEAD,POST,PUT,DELETE,TRACE,CONNECT)
-
-  /**
-   * An extractor that always matches with a non-empty string representation of this request method.
-   */
-  def unapply(m: Method) = Some(m.asNonEmptyList)
-
+trait Methods {
   /**
    * Converts the given non-empty string representation into a request method. If it is a known request method then that
    * is used, otherwise an extension method is returned.
@@ -124,7 +110,7 @@ object Method {
    * Returns a string representation of the given request method.
    */
   implicit def MethodString(m: Method) = m.asString
- 
+
   /**
    * Converts the given non-empty string representation into a request method. If it is a known request method then that
    * is used, otherwise an extension method is returned.
@@ -143,4 +129,20 @@ object Method {
       ExtensionMethod(nel(t.head, t.tail))
     }
   })
+}
+
+/**
+ * HTTP request method.
+ * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9">RFC 2616 Section 9 Method Definitions</a>.
+ */
+object Method extends Methods {
+  /**
+   * A list of known methods.
+   */
+  val methods = List(OPTIONS,GET,HEAD,POST,PUT,DELETE,TRACE,CONNECT)
+
+  /**
+   * An extractor that always matches with a non-empty string representation of this request method.
+   */
+  def unapply(m: Method) = Some(m.asNonEmptyList)
 }

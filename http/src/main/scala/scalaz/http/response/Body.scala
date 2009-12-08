@@ -22,29 +22,8 @@ import scalaz.Cofunctor
 import scalaz.PartialApply1Of2
 import scalaz.PartialType2
 
-/**
- * Type constructors that can be used in request and response bodies.
- */
-object Body {
-  /**
-   * Construct a body implementation from the given function.
-   */
-  def body[OUT[_]] = new {
-    def apply[A](f: A => OUT[Byte]) = new Body[OUT, A] {
-      def apply(a: A) = f(a)
-    }
-  }
-
-  /**
-   * The body implementation for identity.
-   */
-  def identityBody[OUT[_]] = body[OUT](identity[OUT[Byte]])
-
-  /**
-   * The body implementation for stream.
-   */
-  def streamBody[A](f: A => Stream[Byte]) = body[Stream](f)
-
+trait Bodys {
+  import Body._
   /**
    * The body implementation for stream identity.
    */
@@ -74,26 +53,27 @@ object Body {
    * The body implementation for an XML element to a stream.
    */
   implicit def ElemStreamBody(implicit c: CharSet): Body[Stream, Elem] = body[Stream](_.toString.getBytes(c.value).toStream)
-  
+
   /**
    * The body implementation for an XML element to a stream.
    */
   implicit def NodeSeqStreamBody(implicit c: CharSet): Body[Stream, NodeSeq] = body[Stream](_.toString.getBytes(c.value).toStream)
-  
+
 
   /**
    * The body implementation for an XHTML doctype to a stream.
    */
   implicit def XhtmlDoctypeStreamBody(implicit c: CharSet): Body[Stream, xhtml.Doctype] = body[Stream](_.asString.getBytes(c.value).toStream)
 
-  /**
-   * The cofunctor implementation for a body.
-   */
-  def bodyCofunctor[OUT[_]]: Cofunctor[PartialType2[Body, OUT]#Apply] = new Cofunctor[PartialType2[Body, OUT]#Apply] {
-    def comap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
-      def apply(b: B) = body(f(b))
-    }
-  }
+  
+//  /**
+//   * The cofunctor implementation for a body.
+//   */
+//  def bodyCofunctor[OUT[_]]: Cofunctor[PartialType2[Body, OUT]#Apply] = new Cofunctor[PartialType2[Body, OUT]#Apply] {
+//    def comap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
+//      def apply(b: B) = body(f(b))
+//    }
+//  }
 
   /**
    * The cofunctor wrapper implementation for a body.
@@ -103,10 +83,33 @@ object Body {
   /**
    * The cofunctor implementation for a stream body.
    */
-  implicit val StreamBodyCofunctor = bodyCofunctor[Stream]
+//  implicit val StreamBodyCofunctor = bodyCofunctor[Stream]
 
   /**
    * The cofunctor wrapper implementation for a stream body.
    */
   //implicit def StreamBodyCofunctorW[A](c: PartialType2[Body, Stream]#Apply[A]) = bodyCofunctorW[Stream, A](c)
+}
+/**
+ * Type constructors that can be used in request and response bodies.
+ */
+object Body extends Bodys {
+  /**
+   * Construct a body implementation from the given function.
+   */
+  def body[OUT[_]] = new {
+    def apply[A](f: A => OUT[Byte]) = new Body[OUT, A] {
+      def apply(a: A) = f(a)
+    }
+  }
+
+  /**
+   * The body implementation for identity.
+   */
+  def identityBody[OUT[_]] = body[OUT](identity[OUT[Byte]])
+
+  /**
+   * The body implementation for stream.
+   */
+  def streamBody[A](f: A => Stream[Byte]) = body[Stream](f)
 }

@@ -97,17 +97,7 @@ final case object Warning extends GeneralHeader {
   override val asString = toString
 }
 
-/**
- * HTTP general header fields.
- * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5">RFC 2616 Section 4.5 General Header Fields</a>.
- */
-object GeneralHeader {
-  /**
-   * A list of all general entity headers.
-   */
-  val generalHeaders = List(CacheControl, Connection, Date, Pragma, Trailer, TransferEncoding,
-      Upgrade, Via, Warning)
-
+trait GeneralHeaders {
   /**
    * Returns a general header for the given list of characters.
    */
@@ -133,4 +123,16 @@ object GeneralHeader {
     case "warning" => Some(Warning)
     case _ => None
   }
+}
+
+/**
+ * HTTP general header fields.
+ * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5">RFC 2616 Section 4.5 General Header Fields</a>.
+ */
+object GeneralHeader extends GeneralHeaders {
+  /**
+   * A list of all general entity headers.
+   */
+  val generalHeaders = List(CacheControl, Connection, Date, Pragma, Trailer, TransferEncoding,
+      Upgrade, Via, Warning)
 }

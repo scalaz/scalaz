@@ -5,6 +5,14 @@ import scalaz.http.request.Request
 import scalaz.http.response.Response
 import scalaz.http.response.{ResponseHeader, Status}
 
+trait StreamStreamApplications {
+  /**
+   * Construct a response from the given status with a version determined by the given request.
+   */
+  implicit def response(s: Status)(implicit req: Request[Stream]): Response[Stream] =
+    Response.emptyHeadersBodyStatusResponse[Stream, Stream](s)
+  
+}
 /**
  * Functions for web applications whose request and response body and transformed using <code>scala.Stream</code>.
  *
@@ -13,7 +21,7 @@ import scalaz.http.response.{ResponseHeader, Status}
  *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
  *          $LastChangedBy: tonymorris $
  */
-object StreamStreamApplication {
+object StreamStreamApplication extends StreamStreamApplications {
   /**
    * Construct a response from the given status, headers and body.
    */
@@ -31,12 +39,6 @@ object StreamStreamApplication {
    */
   def response(s: Status, h: List[(ResponseHeader, NonEmptyList[Char])])(implicit req: Request[Stream]) =
     Response.emptyStatusResponse[Stream, Stream](s, h)
-
-  /**
-   * Construct a response from the given status with a version determined by the given request.
-   */
-  implicit def response(s: Status)(implicit req: Request[Stream]): Response[Stream] =
-    Response.emptyHeadersBodyStatusResponse[Stream, Stream](s)
 
   /**
    * Create a response with a version derived from the given request that redirects (301 Moved Permanently) to the given location.
