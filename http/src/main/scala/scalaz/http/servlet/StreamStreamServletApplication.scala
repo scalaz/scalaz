@@ -42,7 +42,7 @@ object StreamStreamServletApplication {
     def or(otherwise: Request[Stream] => Response[Stream]): ServletApplication[Stream, Stream] =
       new ServletApplication[Stream, Stream] {
       def application(implicit servlet: HttpServlet, servletRequest: HttpServletRequest, request: Request[Stream]) =
-        f(request) | (request.path ? (in => response(statusLine(OK), Stream.fromIterator(in)), otherwise(request)))
+        f(request) | (request.path ? (in => response(statusLine(OK), in.toStream), otherwise(request)))
     }
   }
 }

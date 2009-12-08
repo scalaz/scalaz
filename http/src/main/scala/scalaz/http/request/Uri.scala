@@ -97,7 +97,7 @@ object Uri {
     case Nil => None
     case x :: _ if x == '?' => None
     case h :: t => {
-      val z = t.break(_ == '?')
+      val z = t.span(_ != '?')
       Some(uri(nel(h, z._1), z._2 match {
         case Nil => None
         case _ :: Nil => None

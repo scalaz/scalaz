@@ -264,7 +264,7 @@ object RequestHeader {
    * the colon (:).
    */
   def requestHeaderValue(cs: List[Char]): Option[(RequestHeader, NonEmptyList[Char])] =
-    cs break (_ == ':') match {
+    cs span (_ != ':') match {
       case (n, v) => {
         (n: Option[RequestHeader]) ∗ (h =>
           (v.dropWhile(x => x == ':' || isSpace(x)): Option[NonEmptyList[Char]]) map (v => (h, v)))

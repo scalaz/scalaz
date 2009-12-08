@@ -106,9 +106,9 @@ object Line {
    */
   implicit def ListLine(cs: List[Char]): Option[Line] = {
     def reverseTrim(c: List[Char]) = c.dropWhile(isSpace(_)).reverse.dropWhile(isSpace(_))
-    val x = cs break (isSpace(_))
+    val x = cs span (!isSpace(_))
     val m: Option[Method] = x._1
-    val y = x._2.reverse break (isSpace(_))
+    val y = x._2.reverse span (!isSpace(_))
     val u: Option[Uri] = reverseTrim(y._2)
     val v: Option[Version] = reverseTrim(y._1)
     v ⊛ (u ⊛ (m map (m => u => v => line(m, u, v))))
