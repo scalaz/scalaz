@@ -86,8 +86,9 @@ object Version {
       // required: scalaz.this.Applicative[scala.this.Option]
       //[error] E:\code\scalaz\http\src\main\scala\scalaz\http\Version.scala:85: could not find implicit value for parameter a: scalaz.Applicative[Option]
       //[error]       List(major, minor) ? ((c: Char) => isDigit(c).option(c.toLong - 48L)) map { case List(maj, min) => version(maj, min) }
-      // figure this out
-//      implicit val a = Applicative.applicative[Option]
+      //
+      // TODO boil the problem down and update https://lampsvn.epfl.ch/trac/scala/ticket/2778
+      implicit val a = Applicative.applicative[Option]
 
       List(major, minor) ↦ ((c: Char) => isDigit(c).option(c.toLong - 48L)) map { case List(maj, min) => version(maj, min) }
     }
