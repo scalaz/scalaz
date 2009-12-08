@@ -38,7 +38,11 @@ sealed trait MA[M[_], A] {
 
   def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(v, f)
 
+  def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = ∗(f)
+
   def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = ∗(_ => f)
+
+  def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = ∗|(f)
 
   def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = ∗(f)
 
