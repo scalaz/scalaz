@@ -32,8 +32,8 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with FileTasks {
   // Sub-projects
   lazy val core = project("core", "Scalaz Core", new ScalazCoreProject(_))
-  lazy val example = project("example", "Scalaz Example", new ScalazExampleProject(_), core)
   lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
+  lazy val example = project("example", "Scalaz Example", new ScalazExampleProject(_), core, http)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
