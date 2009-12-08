@@ -57,5 +57,6 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class ScalazHttpProject(info: ProjectInfo) extends ScalazDefaults(info, "HTTP") {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
+    override def compileOptions = CompileOption("-Xlog-implicits") :: CompileOption("-Ydebug") :: super.compileOptions.toList
   }
 }

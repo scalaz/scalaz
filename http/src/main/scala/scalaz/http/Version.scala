@@ -2,7 +2,7 @@ package scalaz.http
 
 import scalaz.Scalaz._
 import java.lang.Character.isDigit
-import scalaz.{_1, _0, Digit}
+import scalaz.{Applicative, _1, _0, Digit}
 
 /**
  * HTTP version.
@@ -78,6 +78,16 @@ object Version {
     else {
       val major = s charAt 5
       val minor = s charAt 7
+
+      // Without the following line, we get this error when compiling using SBT (with CompileOption("-Xlog-implicits") :: CompileOption("-Ydebug")):
+      //      scalaz.this.Applicative.applicative is not a valid implicit value for scalaz.this.Applicative[scala.this.Option] because:
+      //polymorphic expression cannot be instantiated to expected type;
+      // found   : [<deferred> <param> Z[<deferred> <param> _]]scalaz.this.Applicative[Z]
+      // required: scalaz.this.Applicative[scala.this.Option]
+      //[error] E:\code\scalaz\http\src\main\scala\scalaz\http\Version.scala:85: could not find implicit value for parameter a: scalaz.Applicative[Option]
+      //[error]       List(major, minor) ? ((c: Char) => isDigit(c).option(c.toLong - 48L)) map { case List(maj, min) => version(maj, min) }
+      // figure this out
+      implicit val a = Applicative.applicative[Option]
 
       List(major, minor) ↦ ((c: Char) => isDigit(c).option(c.toLong - 48L)) map { case List(maj, min) => version(maj, min) }
     }

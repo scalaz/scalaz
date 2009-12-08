@@ -5,7 +5,7 @@ trait Applicative[Z[_]] extends Pointed[Z] with Apply[Z] {
 }
 
 object Applicative {
-  implicit def applicative[Z[_]](implicit p: Pure[Z], a: Apply[Z]) = new Applicative[Z] {
+  implicit def applicative[Z[_]](implicit p: Pure[Z], a: Apply[Z]): Applicative[Z] = new Applicative[Z] {
     def pure[A](a: => A) = p.pure(a)
     def apply[A, B](f: Z[A => B], x: Z[A]) = a(f, x)
   }
