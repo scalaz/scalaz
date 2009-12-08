@@ -33,6 +33,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   // Sub-projects
   lazy val core = project("core", "Scalaz Core", new ScalazCoreProject(_))
   lazy val example = project("example", "Scalaz Example", new ScalazExampleProject(_), core)
+  lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
@@ -40,7 +41,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   override def publishAction = task {None}
 
   lazy val releaseZipAction = {
-    val allJars = Path.lazyPathFinder(Seq(core, example).map(_.outputPath)).## ** GlobFilter("*jar")
+    val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
     val extra = path("README")
     zipTask(allJars +++ extra, outputPath / "scalaz-full.zip")
   }
@@ -53,4 +54,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   class ScalazCoreProject(info: ProjectInfo) extends ScalazDefaults(info, "Core")
 
   class ScalazExampleProject(info: ProjectInfo) extends ScalazDefaults(info, "Example")
+
+  class ScalazHttpProject(info: ProjectInfo) extends ScalazDefaults(info, "HTTP") {
+    val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
+  }
 }
