@@ -8,15 +8,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Scala Latest" level="application" />
-    <orderEntry type="module-library">
-      <library name="Servlet API">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../servlet-api-2.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="Servlet API" level="application" />
+    <orderEntry type="module" module-name="core" />
   </component>
 </module>
 
