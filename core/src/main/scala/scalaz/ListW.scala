@@ -34,15 +34,15 @@ sealed trait ListW[A] {
 
   def dlist: DList[A] = Scalaz.dlist(value ::: (_: List[A]))
 
-  def takeWhileM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[List[A]] = value match {
+  def takeWhileM[M[_]: Monad](p: A => M[Boolean]): M[List[A]] = value match {
     case Nil => nil[A] η
     case h :: t => p(h) ∗ (if(_) (t takeWhileM p) ∘ (h :: _) else nil[A] η)
   }
 
-  def takeUntilM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[List[A]] =
+  def takeUntilM[M[_]: Monad](p: A => M[Boolean]): M[List[A]] =
     takeWhileM(p(_) ∘ (! _))
 
-  def filterM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[List[A]] = value match {
+  def filterM[M[_]: Monad](p: A => M[Boolean]): M[List[A]] = value match {
     case Nil => nil[A] η
     case h :: t => {
       def g = t filterM p
@@ -52,20 +52,20 @@ sealed trait ListW[A] {
 
   def powerset = filterM(_ => List(true, false))
 
-  def partitionM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[(List[A], List[A])] = value match {
+  def partitionM[M[_]: Monad](p: A => M[Boolean]): M[(List[A], List[A])] = value match {
     case Nil => (nil[A], nil[A]) η
     case h :: t => p(h) ∗ (b => (t partitionM p) ∘ { case (x, y) => if(b) (h :: x, y) else (x, h :: y) })
   }
 
-  def spanM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[(List[A], List[A])] = value match {
+  def spanM[M[_]: Monad](p: A => M[Boolean]): M[(List[A], List[A])] = value match {
     case Nil => (nil[A], nil[A]) η
     case h :: t => p(h) ∗ (if(_) (t spanM p) ∘ ((h :: (_: List[A])) <-: _) else (nil[A], value) η) 
   }
 
-  def breakM[M[_]](p: A => M[Boolean])(implicit m: Monad[M]): M[(List[A], List[A])] =
+  def breakM[M[_]: Monad](p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(p(_) ∘ (! _))
 
-  def groupByM[M[_]](p: (A, A) => M[Boolean])(implicit m: Monad[M]): M[List[List[A]]] = value match {
+  def groupByM[M[_]: Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = value match {
     case Nil => nil[List[A]] η
     case h :: t => spanM(p(h, _)) ∗ { case (x, y) => (y groupByM p) ∘ ((h :: x) :: _) }
   }

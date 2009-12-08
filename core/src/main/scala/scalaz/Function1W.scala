@@ -9,7 +9,7 @@ sealed trait Function1W[T, R] {
 
   def arrow[A[_, _]](implicit a: Arrow[A]) = a arrow k
 
-  def kleisli[Z[_]](implicit p: Pure[Z]): Kleisli[Z, T, R] = ☆(k(_) η)
+  def kleisli[Z[_]: Pure]: Kleisli[Z, T, R] = ☆(k(_) η)
 
   def unary_!(implicit m: Memo[T, R]) = m(k)
 

@@ -14,7 +14,7 @@ sealed trait BKTree[+A] {
     case BKTreeNode(_, s, _) => s
   }
 
-  def +[AA >: A](a: AA)(implicit m: MetricSpace[AA]): BKTree[AA] = this match {
+  def +[AA >: A : MetricSpace](a: AA): BKTree[AA] = this match {
     case BKTreeEmpty => BKTreeNode(a, 1, IntMap.empty)
     case BKTreeNode(v, s, c) => {
       val d = (v: AA) <===> a
@@ -25,7 +25,7 @@ sealed trait BKTree[+A] {
     }
   }
 
-  def ++[AA >: A](t: BKTree[AA])(implicit m: MetricSpace[AA]): BKTree[AA] = {
+  def ++[AA >: A: MetricSpace](t: BKTree[AA]): BKTree[AA] = {
     var k: BKTree[AA] = this
     for(v <- t.values)
       k = k + v
@@ -37,7 +37,7 @@ sealed trait BKTree[+A] {
     case BKTreeNode(v, _, c) => v :: c.valuesIterator.toList.flatMap(_.values)
   }
 
-  def -?-[AA >: A](a: AA)(implicit m: MetricSpace[AA]): Boolean = this match {
+  def -?-[AA >: A: MetricSpace](a: AA): Boolean = this match {
     case BKTreeEmpty => false
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a
@@ -48,7 +48,7 @@ sealed trait BKTree[+A] {
     }
   }
 
-  def =?=[AA >: A](a: AA, n: Int)(implicit m: MetricSpace[AA]): Boolean = this match {
+  def =?=[AA >: A: MetricSpace](a: AA, n: Int): Boolean = this match {
     case BKTreeEmpty => false
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a
@@ -56,7 +56,7 @@ sealed trait BKTree[+A] {
     }
   }
 
-  def |=|[AA >: A](a: AA, n: Int)(implicit m: MetricSpace[AA]): List[AA] = this match {
+  def |=|[AA >: A: MetricSpace](a: AA, n: Int): List[AA] = this match {
     case BKTreeEmpty => Nil
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a

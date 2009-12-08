@@ -13,12 +13,12 @@ object Category {
     def compose[X, Y, Z](f: Y => Z, g: X => Y) = f compose g   
   }
 
-  implicit def KleisliCategory[M[_]](implicit m: Monad[M]): Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
+  implicit def KleisliCategory[M[_]: Monad]: Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
     def id[A] = ☆(_ η)
     def compose[X, Y, Z](f: Kleisli[M, Y, Z], g: Kleisli[M, X, Y]) = f <=< g
   }
 
-  implicit def CokleisliCategory[M[_]](implicit m: Comonad[M]): Category[PartialApplyK[Cokleisli, M]#Apply] = new Category[PartialApplyK[Cokleisli, M]#Apply] {
+  implicit def CokleisliCategory[M[_]: Comonad]: Category[PartialApplyK[Cokleisli, M]#Apply] = new Category[PartialApplyK[Cokleisli, M]#Apply] {
     def id[A] = ★(_ ε)
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }

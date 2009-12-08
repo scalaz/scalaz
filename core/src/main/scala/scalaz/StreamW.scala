@@ -38,7 +38,7 @@ sealed trait StreamW[A] {
 
   def unfoldForest[B](f: A => (B, () => Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
 
-  def unfoldForestM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Stream[Tree[B]]] =
+  def unfoldForestM[B, M[_]: Monad](f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] =
     value ↦ ((_: A).unfoldTreeM(f))
 }
 

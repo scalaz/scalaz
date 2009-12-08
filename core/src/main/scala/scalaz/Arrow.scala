@@ -25,7 +25,7 @@ object Arrow {
       (db: (D, B)) => (db._1, a(db._2))
   }
 
-  implicit def KleisliArrow[M[_]](implicit m: Monad[M]): Arrow[PartialApplyK[Kleisli, M]#Apply] = new Arrow[PartialApplyK[Kleisli, M]#Apply] {
+  implicit def KleisliArrow[M[_]: Monad]: Arrow[PartialApplyK[Kleisli, M]#Apply] = new Arrow[PartialApplyK[Kleisli, M]#Apply] {
     val category = Category.KleisliCategory
 
     def arrow[B, C](f: B => C) = ☆(f(_) η)
@@ -39,7 +39,7 @@ object Arrow {
     }
   }
 
-  implicit def CokleisliArrow[M[_]](implicit m: Comonad[M]): Arrow[PartialApplyK[Cokleisli, M]#Apply] = new Arrow[PartialApplyK[Cokleisli, M]#Apply] {
+  implicit def CokleisliArrow[M[_]: Comonad]: Arrow[PartialApplyK[Cokleisli, M]#Apply] = new Arrow[PartialApplyK[Cokleisli, M]#Apply] {
     val category = Category.CokleisliCategory
 
     def arrow[B, C](f: B => C) = ★(r => f(r ε))

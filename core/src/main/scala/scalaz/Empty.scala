@@ -5,7 +5,7 @@ trait Empty[+E[_]] {
 }
 
 trait Emptys {
-  def <∅>[E[_], A](implicit e: Empty[E]): E[A] = e.empty  
+  def <∅>[E[_], A](implicit e: Empty[E]): E[A] = e.empty
 }
 
 object Empty {
