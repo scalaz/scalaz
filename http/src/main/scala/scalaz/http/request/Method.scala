@@ -112,13 +112,13 @@ object Method {
    * Converts the given non-empty string representation into a request method. If it is a known request method then that
    * is used, otherwise an extension method is returned.
    */
-  implicit def NonEmptyListMethod(s: NonEmptyList[Char]): Method = StringMethod(List.toString(s)).get
+  implicit def NonEmptyListMethod(s: NonEmptyList[Char]): Method = StringMethod(s.mkString).get
 
   /**
    * Converts the given string representation into a request method. If it is a known request method then that
    * is used, otherwise an extension method is returned.
    */
-  implicit def ListMethod = StringMethod _ compose List.toString
+  implicit def ListMethod : (List[Char] => Option[Method]) = StringMethod _ compose (_.mkString)
 
   /**
    * Returns a string representation of the given request method.

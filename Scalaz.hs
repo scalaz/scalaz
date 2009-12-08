@@ -52,6 +52,7 @@ artifacts = repo' "artifacts"
 exampleDir = "example"  </> "src" </> "main" </> "scala"
 mainDir = "core"  </> "src" </> "main" </> "scala"
 httpDir = "http"  </> "src" </> "main" </> "scala"
+scappsDir = "scapps"  </> "src" </> "main" </> "scala"
 testDir = "core"  </> "src" </> "test" </> "scala"
 resourcesDir = "resources"
 etcDir = "etc"
@@ -84,7 +85,7 @@ main' :: S.Scalac
 main' = s buildClasses
 
 main :: IO ExitCode
-main = main' +->- [mainDir, httpDir]
+main = main' +->- [mainDir, httpDir, scappsDir]
 
 example' :: S.Scalac
 example' = main' >=>=> s buildClasses

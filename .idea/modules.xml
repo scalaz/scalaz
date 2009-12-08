@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
       <module fileurl="file://$PROJECT_DIR$/http/http.iml" filepath="$PROJECT_DIR$/http/http.iml" />
       <module fileurl="file://$PROJECT_DIR$/scalaz5.iml" filepath="$PROJECT_DIR$/scalaz5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scapps/scapps.iml" filepath="$PROJECT_DIR$/scapps/scapps.iml" />
     </modules>
   </component>
 </project>

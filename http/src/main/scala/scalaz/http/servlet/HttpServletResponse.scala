@@ -51,7 +51,7 @@ sealed trait HttpServletResponse {
   def respond[OUT[_]](res: Response[OUT])(implicit e: Each[OUT]) {
     response.setStatus(res.line.status)
 
-    res.headers.foreach { case (h, v) => response.setHeader(h, List.toString(v)) }
+    res.headers.foreach { case (h, v) => response.setHeader(h, v.mkString) }
 
     val out = response.getOutputStream
     e.each[Byte](res.body, out.write(_))

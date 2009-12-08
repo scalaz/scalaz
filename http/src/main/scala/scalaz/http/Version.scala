@@ -67,7 +67,7 @@ object Version {
   /**
    * Returns a string representation for the given version.
    */
-  implicit def ListVersion = StringVersion _ compose List.toString
+  implicit def ListVersion : (List[Char] => Option[Version]) = StringVersion _ compose (_.mkString)
 
   /**
    * Returns a potential version for the given string of the form <code>HTTP/major/minor</code>.

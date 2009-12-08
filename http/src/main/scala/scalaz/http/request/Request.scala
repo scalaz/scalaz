@@ -420,7 +420,7 @@ object Request {
 
   object MethodPath {
     def unapply[IN[_]](r: Request[IN]): Option[(Method, String)] =
-      Some(r.line.method, List.toString(r.line.uri.path.toList))
+      Some(r.line.method, r.line.uri.path.toList.mkString)
   }
 
   object MethodUri {
@@ -430,7 +430,7 @@ object Request {
 
   object Path {
     def unapply[IN[_]](r: Request[IN]): Option[(String)] =
-      Some(List.toString(r.line.uri.path.toList))
+      Some(r.line.uri.path.toList.mkString)
   }
 
   object Uri {
@@ -459,7 +459,7 @@ object Request {
      */
     object MethodPath {
       def unapply(r: Request[Stream]): Option[(Method, String)] =
-        Some(r.line.method, List.toString(r.line.uri.path.toList))
+        Some(r.line.method, r.line.uri.path.toList.mkString)
     }
 
     /**
@@ -475,7 +475,7 @@ object Request {
      */
     object Path {
       def unapply(r: Request[Stream]): Option[(String)] =
-        Some(List.toString(r.line.uri.path.toList))
+        Some(r.line.uri.path.toList.mkString)
     }
 
     /**

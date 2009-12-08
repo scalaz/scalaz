@@ -257,7 +257,7 @@ object RequestHeader {
    * Converts the given list of characters to a request header. If the string is a known request header, then it is
    * used. If not, then it if it is a known general header, then it is used. If not then it is an entity header.
    */
-  implicit def ListRequestHeader = StringRequestHeader _ compose List.toString
+  implicit def ListRequestHeader : (List[Char] => Option[RequestHeader]) = StringRequestHeader _ compose (_.mkString)
 
   /**
    * Converts a list of characters of the form "abc:def" into a potential request header and non-empty value split at

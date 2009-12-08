@@ -154,7 +154,7 @@ object EntityHeader {
   /**
    * Returns a potential entity header for the given list of characters; <code>None</code> iff the given list is empty.
    */
-  implicit def ListEntityHeader = StringEntityHeader _ compose List.toString
+  implicit def ListEntityHeader : (List[Char] => Option[EntityHeader]) = StringEntityHeader _ compose (_.mkString)
 
   /**
    * Returns a potential entity header for the given string; <code>None</code> iff the given string is empty.

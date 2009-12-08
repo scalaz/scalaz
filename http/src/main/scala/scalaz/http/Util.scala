@@ -101,7 +101,7 @@ object Util {
     /**
      * Creates a string from the given non-empty list.
      */
-    implicit def NonEmptyListString[A](xs: NonEmptyList[Char]): String = scala.List.toString(xs.toList)
+    implicit def NonEmptyListString[A](xs: NonEmptyList[Char]): String = xs.toList.mkString
   }
 
   object Digits {
