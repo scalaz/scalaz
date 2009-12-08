@@ -51,6 +51,7 @@ artifacts = repo' "artifacts"
 
 exampleDir = "example"  </> "src" </> "main" </> "scala"
 mainDir = "core"  </> "src" </> "main" </> "scala"
+httpDir = "http"  </> "src" </> "main" </> "scala"
 testDir = "core"  </> "src" </> "test" </> "scala"
 resourcesDir = "resources"
 etcDir = "etc"
@@ -75,14 +76,15 @@ cp = "classpath" ~?? [buildClasses]
 s :: FilePath -> S.Scalac
 s d = S.scalac {
   S.directory = Just d,
-  S.deprecation = True
+  S.deprecation = True,
+  S.classpath = ["servlet-api-2.5.jar"]
 }
 
 main' :: S.Scalac
 main' = s buildClasses
 
 main :: IO ExitCode
-main = main' +->- [mainDir]
+main = main' +->- [mainDir, httpDir]
 
 example' :: S.Scalac
 example' = main' >=>=> s buildClasses
