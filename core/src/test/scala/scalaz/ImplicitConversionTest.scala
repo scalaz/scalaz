@@ -30,6 +30,9 @@ object ImplicitConversionTest {
     implicitly[Monad[Stream]]
   }
 
+  def functor {
+    implicitly[Functor[java.util.PriorityQueue]]
+  }
 
   def partialApply {
     trait A

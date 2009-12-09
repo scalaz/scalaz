@@ -161,107 +161,39 @@ object Functor {
     }
   }
 
+  // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
+  // http://lampsvn.epfl.ch/trac/scala/ticket/2782
+  /*implicit*/
+  def JavaCollectionFunctor[S[X] <: java.util.Collection[X]: Empty]: Functor[S] = new Functor[S] {
+    def fmap[A, B](r: S[A], f: A => B) = {
+      val a: S[B] = <∅>
+      val i = r.iterator
+      while (i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
   import java.util._
   import java.util.concurrent._
 
-  implicit def JavaArrayListFunctor: Functor[ArrayList] = new Functor[ArrayList] {
-    def fmap[A, B](r: ArrayList[A], f: A => B) = {
-      val a = new ArrayList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaArrayListFunctor: Functor[ArrayList] = JavaCollectionFunctor
 
-  implicit def JavaLinkedListFunctor: Functor[LinkedList] = new Functor[LinkedList] {
-    def fmap[A, B](r: LinkedList[A], f: A => B) = {
-      val a = new LinkedList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaLinkedListFunctor: Functor[LinkedList] = JavaCollectionFunctor
 
-  implicit def JavaPriorityQueueFunctor: Functor[PriorityQueue] = new Functor[PriorityQueue] {
-    def fmap[A, B](r: PriorityQueue[A], f: A => B) = {
-      val a = new PriorityQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaPriorityQueueFunctor: Functor[PriorityQueue] = JavaCollectionFunctor
 
-  implicit def JavaStackFunctor: Functor[Stack] = new Functor[Stack] {
-    def fmap[A, B](r: Stack[A], f: A => B) = {
-      val a = new Stack[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaStackFunctor: Functor[Stack] = JavaCollectionFunctor
 
-  implicit def JavaVectorFunctor: Functor[Vector] = new Functor[Vector] {
-    def fmap[A, B](r: Vector[A], f: A => B) = {
-      val a = new Vector[B](r.capacity)
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaVectorFunctor: Functor[Vector] = JavaCollectionFunctor
 
-  implicit def JavaArrayBlockingQueueFunctor: Functor[ArrayBlockingQueue] = new Functor[ArrayBlockingQueue] {
-    def fmap[A, B](r: ArrayBlockingQueue[A], f: A => B) = {
-      val a = new ArrayBlockingQueue[B](r.remainingCapacity)
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaArrayBlockingQueueFunctor: Functor[ArrayBlockingQueue] = JavaCollectionFunctor
 
+  implicit def JavaConcurrentLinkedQueueFunctor: Functor[ConcurrentLinkedQueue] = JavaCollectionFunctor
 
-  implicit def JavaConcurrentLinkedQueueFunctor: Functor[ConcurrentLinkedQueue] = new Functor[ConcurrentLinkedQueue] {
-    def fmap[A, B](r: ConcurrentLinkedQueue[A], f: A => B) = {
-      val a = new ConcurrentLinkedQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaCopyOnWriteArrayListFunctor: Functor[CopyOnWriteArrayList] = JavaCollectionFunctor
 
-  implicit def JavaCopyOnWriteArrayListFunctor: Functor[CopyOnWriteArrayList] = new Functor[CopyOnWriteArrayList] {
-    def fmap[A, B](r: CopyOnWriteArrayList[A], f: A => B) = {
-      val a = new CopyOnWriteArrayList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaLinkedBlockingQueueFunctor: Functor[LinkedBlockingQueue] = JavaCollectionFunctor
 
-  implicit def JavaLinkedBlockingQueueFunctor: Functor[LinkedBlockingQueue] = new Functor[LinkedBlockingQueue] {
-    def fmap[A, B](r: LinkedBlockingQueue[A], f: A => B) = {
-      val a = new LinkedBlockingQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
-
-  implicit def JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = new Functor[SynchronousQueue] {
-    def fmap[A, B](r: SynchronousQueue[A], f: A => B) = {
-      val a = new SynchronousQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
-  }
+  implicit def JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = JavaCollectionFunctor
 }
