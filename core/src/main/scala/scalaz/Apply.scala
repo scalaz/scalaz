@@ -11,30 +11,14 @@ trait Applys {
   }
 }
 
-object Apply {
+abstract class ApplyLow {
+  implicit def FunctorBindApply[Z[_]](implicit t: Functor[Z], b: Bind[Z]): Apply[Z] = Scalaz.FunctorBindApply(t, b)
+}
+
+object Apply extends ApplyLow {
   import Scalaz._
-
-  implicit def IdentityApply: Apply[Identity] = FunctorBindApply[Identity]
-
-  implicit def NonEmptyListApply: Apply[NonEmptyList] = FunctorBindApply[NonEmptyList]
-
+ 
   implicit def StateApply[S]: Apply[PartialApply1Of2[State, S]#Apply] = FunctorBindApply[PartialApply1Of2[State, S]#Apply]
-
-  implicit def Tuple1Apply: Apply[Tuple1] = FunctorBindApply[Tuple1]
-
-  implicit def Tuple2Apply[R: Semigroup]: Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
-
-  implicit def Tuple3Apply[R: Semigroup, S: Semigroup]: Apply[PartialApply2Of3[Tuple3, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
-
-  implicit def Tuple4Apply[R: Semigroup, S: Semigroup, T: Semigroup]: Apply[PartialApply3Of4[Tuple4, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
-
-  implicit def Tuple5Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Apply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
-
-  implicit def Tuple6Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Apply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
-
-  implicit def Tuple7Apply[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
-
-  implicit def Function0Apply: Apply[Function0] = FunctorBindApply[Function0]
 
   implicit def Function1Apply[R]: Apply[PartialApply1Of2[Function1, R]#Apply] = FunctorBindApply[PartialApply1Of2[Function1, R]#Apply]
 
@@ -48,23 +32,9 @@ object Apply {
 
   implicit def Function6Apply[R, S, T, U, V, W]: Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]
 
-  implicit def ListApply: Apply[List] = FunctorBindApply[List]
-
-  implicit def StreamApply: Apply[Stream] = FunctorBindApply[Stream]
-
-  implicit def OptionApply: Apply[Option] = FunctorBindApply[Option]
-
-  implicit def GenericArrayApply: Apply[GArray] = FunctorBindApply[GArray]
-
   implicit def EitherLeftApply[X]: Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip] = FunctorBindApply[PartialApply1Of2[Either.LeftProjection, X]#Flip]
 
   implicit def EitherRightApply[X]: Apply[PartialApply1Of2[Either.RightProjection, X]#Apply] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
-
-  implicit def ResponderApply: Apply[Responder] = FunctorBindApply[Responder]
-
-  import java.util.concurrent.Callable
-
-  implicit def CallableApply: Apply[Callable] = FunctorBindApply[Callable]
 
   import java.util.Map.Entry
 
@@ -108,32 +78,4 @@ object Apply {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
       node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) ⊛ (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curry) ʐ))
   }
-
-  implicit def TreeApply = FunctorBindApply[Tree]
-
-  import concurrent.Promise
-  implicit def PromiseApply = FunctorBindApply[Promise]
-
-  import java.util._
-  import java.util.concurrent._
-
-  implicit def JavaArrayListApply: Apply[ArrayList] = FunctorBindApply[ArrayList]
-
-  implicit def JavaLinkedListApply: Apply[LinkedList] = FunctorBindApply[LinkedList]
-
-  implicit def JavaPriorityQueueApply: Apply[PriorityQueue] = FunctorBindApply[PriorityQueue]
-
-  implicit def JavaStackApply: Apply[Stack] = FunctorBindApply[Stack]
-
-  implicit def JavaVectorApply: Apply[Vector] = FunctorBindApply[Vector]
-
-  implicit def JavaArrayBlockingQueueApply: Apply[ArrayBlockingQueue] = FunctorBindApply[ArrayBlockingQueue]
-
-  implicit def JavaConcurrentLinkedQueueApply: Apply[ConcurrentLinkedQueue] = FunctorBindApply[ConcurrentLinkedQueue]
-
-  implicit def JavaCopyOnWriteArrayListApply: Apply[CopyOnWriteArrayList] = FunctorBindApply[CopyOnWriteArrayList]
-
-  implicit def JavaLinkedBlockingQueueApply: Apply[LinkedBlockingQueue] = FunctorBindApply[LinkedBlockingQueue]
-
-  implicit def JavaSynchronousQueueApply: Apply[SynchronousQueue] = FunctorBindApply[SynchronousQueue]
 }

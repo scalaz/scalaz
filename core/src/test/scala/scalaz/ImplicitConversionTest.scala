@@ -22,6 +22,7 @@ object ImplicitConversionTest {
     implicitly[Apply[List]]
     implicitly[Apply[Function0]]
     implicitly[Apply[Option]]
+    implicitly[Apply[PartialApply1Of2[Function1, Int]#Apply]]
   }
 
   def monad {

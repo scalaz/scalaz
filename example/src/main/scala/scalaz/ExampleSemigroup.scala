@@ -26,7 +26,7 @@ object ExampleSemigroup {
     {
       val f = (n: Int) => "AAA" + n.toString + "ZZZ"
       val g = (n: Int) => n.toString.reverse.mkString
-      println((f ⊹ g) apply 123)
+      (f ⊹ g).apply(123) assert_≟ "AAA123ZZZ321"
     }
 
     List(1, 2, 3) ⊹ List(4, 5, 6) assert_≟ List(1, 2, 3, 4, 5, 6)
