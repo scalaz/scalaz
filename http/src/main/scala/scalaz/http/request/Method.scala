@@ -19,7 +19,6 @@ sealed trait Method {
    */
   val asString: String
 
-  // FIX: lazy val's here are a workaround for http://lampsvn.epfl.ch/trac/scala/ticket/2786
   /**
    * A non-empty string representation of this request method.
    */
