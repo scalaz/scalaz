@@ -86,12 +86,12 @@ sealed trait Request[IN[_]] {
   /**
    * A map of request header values offering optimal seek time.
    */
-  lazy val headersMap = asHashMap[List, NonEmptyList](headers)
+  val headersMap = asHashMap[List, NonEmptyList](headers)
   
   /**
    * A map of the first request header values offering optimal seek time.
    */
-  lazy val headersMapHeads = mapHeads(headersMap)
+  val headersMapHeads = mapHeads(headersMap)
 
   private val m = immutableHashMapMemo[FoldLeft[IN], List[(List[Char], List[Char])]]
 
@@ -412,11 +412,11 @@ object Request {
   /**
    * Construct a request with the given status line, headers and body.
    */
-  def request[IN[_]](l: Line, h: List[(RequestHeader, NonEmptyList[Char])], b: IN[Byte]) = new Request[IN] {
+  def request[IN[_]](l: Line, h: List[(RequestHeader, NonEmptyList[Char])], b: IN[Byte]) = new {
     val line = l
     val headers = h
     val body = b
-  }
+  } with Request[IN]
 
   object MethodPath {
     def unapply[IN[_]](r: Request[IN]): Option[(Method, String)] =
