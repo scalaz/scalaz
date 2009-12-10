@@ -22,12 +22,12 @@ sealed trait Method {
   /**
    * A non-empty string representation of this request method.
    */
-  val asNonEmptyList: NonEmptyList[Char] = asString.toList.nel.get
+  lazy val asNonEmptyList: NonEmptyList[Char] = asString.toList.nel.get
 
   /**
    * Returns <code>true</code> if this method is an extension method, <code>false</code> otherwise.
    */
-  val isExtension = this match {
+  lazy val isExtension = this match {
     case ExtensionMethod(_) => true
     case _ => false
   }
@@ -42,15 +42,12 @@ sealed trait Method {
   }
 }
 
-trait CaseMethod0 {
-  self: Any =>
-  val asString = this.toString
-}
-
 /**
- * A method whose name comes from toString().
+ * A HTTP method whose name comes from toString().
  */
-trait CaseMethod extends CaseMethod0 with Method // avoids NPEs by ensuring that asString is initialised early.
+trait CaseMethod extends Method {
+  override val asString = this.toString
+}
 
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2">§</a>
@@ -86,9 +83,9 @@ case object TRACE extends CaseMethod
  */
 case object CONNECT extends CaseMethod
 
-private final case class ExtensionMethod(m: NonEmptyList[Char]) extends {
+private final case class ExtensionMethod(m: NonEmptyList[Char]) extends Method {
   val asString = m.mkString
-} with Method
+}
 
 trait Methods {
   /**
@@ -136,7 +133,7 @@ object Method extends Methods {
   /**
    * A list of known methods.
    */
-  val methods = List(OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT)
+  val methods = List(OPTIONS,GET,HEAD,POST,PUT,DELETE,TRACE,CONNECT)
 
   /**
    * An extractor that always matches with a non-empty string representation of this request method.
