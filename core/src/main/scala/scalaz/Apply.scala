@@ -78,4 +78,30 @@ object Apply extends ApplyLow {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
       node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) ⊛ (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curry) ʐ))
   }
+
+  import concurrent.Promise
+  implicit val PromiseApply = FunctorBindApply[Promise]
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListApply = FunctorBindApply[ArrayList]
+
+  implicit val JavaLinkedListApply = FunctorBindApply[LinkedList]
+
+  implicit val JavaPriorityQueueApply = FunctorBindApply[PriorityQueue]
+
+  implicit val JavaStackApply = FunctorBindApply[Stack]
+
+  implicit val JavaVectorApply = FunctorBindApply[Vector]
+
+  implicit val JavaArrayBlockingQueueApply = FunctorBindApply[ArrayBlockingQueue]
+
+  implicit val JavaConcurrentLinkedQueueApply = FunctorBindApply[ConcurrentLinkedQueue]
+
+  implicit val JavaCopyOnWriteArrayListApply = FunctorBindApply[CopyOnWriteArrayList]
+
+  implicit val JavaLinkedBlockingQueueApply = FunctorBindApply[LinkedBlockingQueue]
+
+  implicit val JavaSynchronousQueueApply = FunctorBindApply[SynchronousQueue]
 }
