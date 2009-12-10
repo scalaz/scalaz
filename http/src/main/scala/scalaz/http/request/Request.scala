@@ -264,6 +264,11 @@ sealed trait Request[IN[_]] {
    * Returns the path extension - characters after the last dot (.) in the path.
    */
   def pathExtension = line.uri.pathExtension
+  
+  /**
+   * Returns the components of the path split by '/', stripped of empty components
+   */
+  def parts = line.uri.parts
 
   /**
    * The query string of the request URI of the status line.
@@ -446,5 +451,17 @@ object Request {
   object Version {
     def unapply[IN[_]](r: Request[IN]): Option[Version] =
       Some(r.line.version)
+  }
+
+  object Parts {
+    def unapply[IN[_]](r : Request[IN]) : Option[List[String]] = {
+      Some(r.parts)
+    }
+  }
+
+  object MethodParts {
+    def unapply[IN[_]](r : Request[IN]) : Option[(Method, List[String])] = {
+      Some(r.method, r.parts)
+    }
   }
 }
