@@ -5,7 +5,7 @@ import scalaz.http.Slinky._
 import request._
 import response._
 import servlet._
-import servlet.HttpServlet._
+import servlet.HttpServlet.resource
 
 final class ExampleApplication extends StreamStreamServletApplication {
   implicit val charset = UTF8
