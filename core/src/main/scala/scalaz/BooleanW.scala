@@ -8,6 +8,32 @@ sealed trait BooleanW {
   def |∧| = conjunction(isTrue)
 
   /**
+   * Conjunction.
+   *
+   * <pre>
+   * p q  p ∧ q
+   * 0 0  0
+   * 0 1  0
+   * 1 0  0
+   * 1 1  1
+   * </pre>
+   */
+  def ∧(q: => BooleanW) = isTrue && q.isTrue
+
+  /**
+   * Disjunction.
+   *
+   * <pre>
+   * p q  p ∨ q
+   * 0 0  0
+   * 0 1  1
+   * 1 0  1
+   * 1 1  1
+   * </pre>
+   */
+  def ∨(q: => BooleanW) = isTrue || q.isTrue
+
+  /**
    * Negation of Conjunction.
    *
    * <pre>
