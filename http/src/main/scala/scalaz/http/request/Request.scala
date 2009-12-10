@@ -420,7 +420,7 @@ object Request {
 
   object MethodPath {
     def unapply[IN[_]](r: Request[IN]): Option[(Method, String)] =
-      Some(r.line.method, r.line.uri.path.toList.mkString)
+      Some(r.line.method, r.line.uri.path.list.mkString)
   }
 
   object MethodUri {
@@ -430,7 +430,7 @@ object Request {
 
   object Path {
     def unapply[IN[_]](r: Request[IN]): Option[(String)] =
-      Some(r.line.uri.path.toList.mkString)
+      Some(r.line.uri.path.list.mkString)
   }
 
   object Uri {
@@ -446,60 +446,5 @@ object Request {
   object Version {
     def unapply[IN[_]](r: Request[IN]): Option[Version] =
       Some(r.line.version)
-  }
-
-  /**
-   * Workarounds to <a href="http://lampsvn.epfl.ch/trac/scala/ticket/1227">Ticket 1227</a> stream-body requests.
-   */
-  object Stream {
-    import scala.Stream
-
-    /**
-     * Extracts the given request into request method and request path.
-     */
-    object MethodPath {
-      def unapply(r: Request[Stream]): Option[(Method, String)] =
-        Some(r.line.method, r.line.uri.path.toList.mkString)
-    }
-
-    /**
-     * Extracts the given request into request method and request URI.
-     */
-    object MethodUri {
-      def unapply(r: Request[Stream]): Option[(Method, Uri)] =
-        Some(r.line.method, r.line.uri)
-    }
-
-    /**
-     * Extracts the given request into request path.
-     */
-    object Path {
-      def unapply(r: Request[Stream]): Option[(String)] =
-        Some(r.line.uri.path.toList.mkString)
-    }
-
-    /**
-     * Extracts the given request into request URI.
-     */
-    object Uri {
-      def unapply(r: Request[Stream]): Option[Uri] =
-        Some(r.line.uri)
-    }
-
-    /**
-     * Extracts the given request into request method.
-     */
-    object Method {
-      def unapply(r: Request[Stream]): Option[Method] =
-        Some(r.line.method)
-    }
-
-    /**
-     * Extracts the given request into request version.
-     */
-    object Version {
-      def unapply(r: Request[Stream]): Option[Version] =
-        Some(r.line.version)
-    }
   }
 }

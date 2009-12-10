@@ -9,7 +9,7 @@ import scalaz.{Applicative, _1, _0, Digit}
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.1">RFC 2616 Section 3.1 HTTP Version</a>.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
+ * @version $LastChangedRevision < br >
  *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
  *          $LastChangedBy: tonymorris $
  */
@@ -39,13 +39,13 @@ trait Versions {
   /**
    * Returns a string representation for the given version.
    */
-  implicit def ListVersion : (List[Char] => Option[Version]) = StringVersion _ compose (_.mkString)
+  implicit def ListVersion: (List[Char] => Option[Version]) = StringVersion _ compose (_.mkString)
 
   /**
    * Returns a potential version for the given string of the form <code>HTTP/major/minor</code>.
    */
   implicit def StringVersion(s: String): Option[Version] =
-    if(s.length < 8)
+    if (s.length < 8)
       None
     else {
       val major = s charAt 5
@@ -61,8 +61,8 @@ trait Versions {
       //
       // TODO boil the problem down and update https://lampsvn.epfl.ch/trac/scala/ticket/2778
       implicit val a = Applicative.applicative[Option]
-      
-      List(major, minor) ↦ ((c: Char) => isDigit(c).option(c.toLong - 48L)) map { case List(maj, min) => Version.version(maj, min) }
+
+      List(major, minor) ↦ ((c: Char) => isDigit(c).option(c.toLong - 48L)) map {case List(maj, min) => Version.version(maj, min)}
     }
 }
 
@@ -89,7 +89,7 @@ object Version extends Versions {
    * A version for HTTP/1.0.
    */
   val version10 = version(_1, _0)
-  
+
   /**
    * A version for HTTP/1.1.
    */

@@ -22,7 +22,7 @@ sealed trait RequestHeader {
    * Returns <code>true</code> if this header is an <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1">entity header</a>,
    * <code>false</code> otherwise.
    */
-  val isEntity = this match {
+  lazy val isEntity = this match {
     case Entity(_) => true
     case _ => false
   }
@@ -31,7 +31,7 @@ sealed trait RequestHeader {
    * Returns <code>true</code> if this header is a <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5">general header</a>,
    * <code>false</code> otherwise.
    */
-  val isGeneral = this match {
+  lazy val isGeneral = this match {
     case General(_) => true
     case _ => false
   }

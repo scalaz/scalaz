@@ -93,7 +93,7 @@ object Util {
     /**
      * Creates a string from the given non-empty list.
      */
-    implicit def NonEmptyListString[A](xs: NonEmptyList[Char]): String = xs.toList.mkString
+    implicit def NonEmptyListString[A](xs: NonEmptyList[Char]): String = xs.list.mkString
   }
 
   object Digits {

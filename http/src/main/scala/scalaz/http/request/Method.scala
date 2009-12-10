@@ -19,15 +19,16 @@ sealed trait Method {
    */
   val asString: String
 
+  // FIX: lazy val's here are a workaround for http://lampsvn.epfl.ch/trac/scala/ticket/2786
   /**
    * A non-empty string representation of this request method.
    */
-  val asNonEmptyList: NonEmptyList[Char] = toString.toList.nel.get
+  lazy val asNonEmptyList: NonEmptyList[Char] = asString.toList.nel.get
 
   /**
    * Returns <code>true</code> if this method is an extension method, <code>false</code> otherwise.
    */
-  val isExtension = this match {
+  lazy val isExtension = this match {
     case ExtensionMethod(_) => true
     case _ => false
   }
@@ -44,51 +45,52 @@ sealed trait Method {
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2">§</a>
  */
-final case object OPTIONS extends Method {
+case object OPTIONS extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3">§</a>
  */
-final case object GET extends Method {
+case object GET extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4">§</a>
  */
-final case object HEAD extends Method {
+case object HEAD extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">§</a>
  */
-final case object POST extends Method {
+case object POST extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.6">§</a>
  */
-final case object PUT extends Method {
+case object PUT extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.7">§</a>
  */
-final case object DELETE extends Method {
+case object DELETE extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.8">§</a>
  */
-final case object TRACE extends Method {
+case object TRACE extends Method {
   override val asString = toString
 }
 /**
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.9">§</a>
  */
-final case object CONNECT extends Method {
+case object CONNECT extends Method {
   override val asString = toString
 }
+
 private final case class ExtensionMethod(m: NonEmptyList[Char]) extends Method {
   override val asString = m.mkString
 }
