@@ -96,13 +96,13 @@ example' :: S.Fsc
 example' = main' >=>=> f
 
 example :: IO ExitCode
-example = main >>>> (example' +->- [exampleDir])
+example = main >>>> (example' ->- [exampleDir])
 
 test' :: S.Fsc
 test' = main' >=>=> f
 
 test :: IO ExitCode
-test = main >>>> (test' +->- [testDir])
+test = main >>>> (test' ->- [testDir])
 
 -- todo Update Lastik Scaladoc for Scala 2.8.0
 scaladoc' :: Version -> SD.Scaladoc
