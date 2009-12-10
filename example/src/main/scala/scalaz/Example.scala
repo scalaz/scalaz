@@ -9,6 +9,7 @@ object Example {
     ExampleFunctor.run
     ExampleKleisli.run
     ExampleMonad.run
+    ExampleMonoid.run
     ExamplePlus.run
     ExampleTraverse.run
   }
