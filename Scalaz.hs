@@ -74,11 +74,14 @@ version' = readFile "version"
 cp :: String
 cp = "classpath" ~?? [buildClasses]
 
+depends :: [String]
+depends = ["servlet-api-2.5.jar"]
+
 s :: FilePath -> S.Scalac
 s d = S.scalac {
   S.directory = Just d,
   S.deprecation = True,
-  S.classpath = ["servlet-api-2.5.jar"]
+  S.classpath = depends
 }
 
 f :: S.Fsc
@@ -92,28 +95,26 @@ main' = f
 main :: IO ExitCode
 main = main' +->- [mainDir, httpDir]
 
-example' :: S.Fsc
-example' = main' >=>=> f
+main'' :: S.Fsc
+main'' = main' >=>=> f
 
 example :: IO ExitCode
-example = main >>>> (example' ->- [exampleDir])
-
-test' :: S.Fsc
-test' = main' >=>=> f
+example = main >>>> (main'' ->- [exampleDir])
 
 test :: IO ExitCode
-test = main >>>> (test' ->- [testDir])
+test = main >>>> (main'' ->- [testDir])
 
 -- todo Update Lastik Scaladoc for Scala 2.8.0
 scaladoc' :: Version -> SD.Scaladoc
 scaladoc' v = SD.scaladoc {
   SD.directory = Just buildScaladoc,
-  SD.etc = Just ("-doc-title \"Scalaz " ++ v ++ " API Specification <div><p><em>Copyright 2008 - 2009 Tony Morris, Runar Bjarnason, Tom Adams, Kristian Domagala, Brad Clow, Ricky Clarkson, Paul Chiusano, Trygve Laugstøl, Nick Partridge, Jason Zaugg</em></p>This software is released under an open source BSD licence.</div>\"")
+  SD.etc = Just ("-doc-title \"Scalaz " ++ v ++ " API Specification <div><p><em>Copyright 2008 - 2009 Tony Morris, Runar Bjarnason, Tom Adams, Kristian Domagala, Brad Clow, Ricky Clarkson, Paul Chiusano, Trygve Laugstøl, Nick Partridge, Jason Zaugg</em></p>This software is released under an open source BSD licence.</div>\""),
+  SD.classpath = depends
 }
 
 scaladoc :: IO ExitCode
 scaladoc = do v <- version'
-              scaladoc' v ->- [mainDir]
+              scaladoc' v ->- [mainDir, httpDir]
 
 -- todo scala function in Lastik
 scala :: String -> IO ExitCode
