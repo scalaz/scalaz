@@ -37,9 +37,9 @@ sealed trait NonEmptyList[+A] {
     nel(bb.head, bb.tail)
   }
 
-  val list = head :: tail
+  lazy val list = head :: tail
 
-  val stream = head #:: tail.toStream
+  lazy val stream = head #:: tail.toStream
 
   def tails : NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
     case Nil => Nil
