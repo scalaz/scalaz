@@ -81,23 +81,28 @@ s d = S.scalac {
   S.classpath = ["servlet-api-2.5.jar"]
 }
 
-main' :: S.Scalac
-main' = s buildClasses
+f :: S.Fsc
+f = S.fsc {
+  S.fscalac = s buildClasses
+}
+
+main' :: S.Fsc
+main' = f
 
 main :: IO ExitCode
-main = main' +->- [mainDir, httpDir] --scappsDir]
+main = main' +->- [mainDir, httpDir]
 
-example' :: S.Scalac
-example' = main' >=>=> s buildClasses
+example' :: S.Fsc
+example' = main' >=>=> f
 
 example :: IO ExitCode
-example = main >>>> (example' ->- [exampleDir])
+example = main >>>> (example' +->- [exampleDir])
 
-test' :: S.Scalac
-test' = main' >=>=> s buildClasses
+test' :: S.Fsc
+test' = main' >=>=> f
 
 test :: IO ExitCode
-test = main >>>> (test' ->- [testDir])
+test = main >>>> (test' +->- [testDir])
 
 -- todo Update Lastik Scaladoc for Scala 2.8.0
 scaladoc' :: Version -> SD.Scaladoc
@@ -174,7 +179,6 @@ releasetype t = let r' Release = ("*", " ", " ")
 meta :: IO [ExitCode]
 meta = mkdir buildScalaz >> time >> scalazversion >> sequence [scalaversion, scalacversion, scaladocversion]
 
--- Codec.Archive.Zip is too buggy, using jar instead
 archive :: IO ExitCode
 archive = mkdir buildJar >>
           meta >>
