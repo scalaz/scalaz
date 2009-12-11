@@ -80,6 +80,8 @@ object Scalaz extends ScalazLow
 
   type ℤ = BigInt
 
+  val π = java.lang.Math.PI  
+
   type GArray[A] = collection.mutable.GenericArray[A]
 
   type ![A <: Applicable, B] = A#Apply[B]
