@@ -10,11 +10,11 @@ object Radians {
 
   implicit val DoubleRadians: Radians[Double] = radians(x => x, x => x)
 
-  implicit val LatitudeRadians: Radians[Latitude] = radians(_.latitude, latitude(_))
+  implicit val LatitudeRadians: Radians[Latitude] = radians(_.value, latitude(_))
 
-  implicit val LongitudeRadians: Radians[Longitude] = radians(_.longitude, longitude(_))
+  implicit val LongitudeRadians: Radians[Longitude] = radians(_.value, longitude(_))
 
-  implicit val BearingRadians: Radians[Bearing] = radians(_.bearing, bearing(_)) 
+  implicit val BearingRadians: Radians[Bearing] = radians(_.value, bearing(_)) 
 }
 
 trait Radianss {

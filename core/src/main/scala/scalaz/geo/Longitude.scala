@@ -1,11 +1,11 @@
 package scalaz.geo
 
 sealed trait Longitude {
-  val longitude: Double
+  val value: Double
 }
 
 trait Longitudes {
   def longitude(d: Double) = new Longitude {
-    val longitude = (d + 180) % 360 - 180
+    val value = (d + 180) % 360 - 180
   }
 }

@@ -1,7 +1,7 @@
 package scalaz.geo
 
 sealed trait Latitude {
-  val latitude: Double
+  val value: Double
 
   import scalaz.Scalaz._
   
@@ -10,6 +10,6 @@ sealed trait Latitude {
 
 trait Latitudes {
   def latitude(d: Double) = new Latitude {
-    val latitude = (d + 90) % 180 - 90
+    val value = (d + 90) % 180 - 90
   }
 }

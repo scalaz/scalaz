@@ -1,11 +1,11 @@
 package scalaz.geo
 
 sealed trait Bearing {
-  val bearing: Double
+  val value: Double
 }
 
 trait Bearings {
   def bearing(d: Double) = new Bearing {
-    val bearing = d % 360
+    val value = d % 360
   }
 }

@@ -88,7 +88,7 @@ sealed trait Identity[A] {
 
   def nel: NonEmptyList[A] = Scalaz.nel(value, Nil)
 
-  def toRadians(implicit r: Radians[A]) = r.toRadians(value)
+  def toRadians(implicit r: Radians[A]): Double = r.toRadians(value)
 
   def doWhile(f: A => A, p: A => Boolean): A = {
     val x = f(value)

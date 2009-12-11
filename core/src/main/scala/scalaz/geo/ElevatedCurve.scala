@@ -6,7 +6,7 @@ sealed trait ElevatedCurve {
 
   lazy val length = {
     val d = curve.ellipsoidalDistance
-    val e = elevation.elevation
+    val e = elevation.value
     Math.sqrt(d * d + e * e) 
   }
 }

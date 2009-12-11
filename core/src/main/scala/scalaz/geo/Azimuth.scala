@@ -1,11 +1,11 @@
 package scalaz.geo
 
 sealed trait Azimuth {
-  val azimuth: Double
+  val value: Double
 }
 
 trait Azimuths {
   def azimuth(d: Double) = new Azimuth {
-    val azimuth = d % 360
+    val value = d % 360
   }
 }

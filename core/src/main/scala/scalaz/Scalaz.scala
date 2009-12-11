@@ -71,6 +71,7 @@ object Scalaz extends ScalazLow
     with    Trees
     with    TreeLocs
     with    Validations
+    with    Vectors
     with    Zeros
     with    Zippers
     with    ZipStreams {

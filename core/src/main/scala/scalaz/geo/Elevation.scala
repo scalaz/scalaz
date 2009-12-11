@@ -1,11 +1,11 @@
 package scalaz.geo
 
 sealed trait Elevation {
-  val elevation: Double
+  val value: Double
 }
 
 trait Elevations {
   def elevation(d: Double) = new Elevation {
-    val elevation = d.abs
+    val value = d.abs
   }
 }
