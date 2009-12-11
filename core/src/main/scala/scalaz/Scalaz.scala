@@ -81,7 +81,7 @@ object Scalaz extends ScalazLow
 
   type ⊤ = Any
 
-  type ℤ = BigInt
+  type ℤ = math.BigInt
 
   lazy val π = java.lang.Math.PI
 
@@ -97,6 +97,15 @@ object Scalaz extends ScalazLow
   implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[PartialApply1Of2[Function1, A]#Flip, R] = maCofunctor[PartialApply1Of2[Function1, A]#Flip, R](f)
 
   implicit def Function1ApplyMA[A, R](f: A => R): MA[PartialApply1Of2[Function1, A]#Apply, R] = ma[PartialApply1Of2[Function1, A]#Apply, R](f)
+
+  implicit def StateMA[S, A](s: State[S, A]): MA[PartialApply1Of2[State, S]#Apply, A] = ma[PartialApply1Of2[State, S]#Apply, A](s)
+
+  implicit def ValidationMA[A, E](v: Validation[E, A]): MA[PartialApply1Of2[Validation, E]#Apply, A] = ma[PartialApply1Of2[Validation, E]#Apply, A](v)
+
+  // todo not working, see ImplicitConversionsTest
+  // implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[PartialApply1Of2[FailProjection, A]#Flip, E] = ma[PartialApply1Of2[FailProjection, A]#Flip, E](f)
+
+  // todo Add TupleN, FunctionN, Left, Right, Map.Entry, and tests in ImplicitConversionsTest.
 
   // Seq[A] implements Function1[Int, A]. Without this, Function1FlipMA would be used.
   implicit def SeqMA[M[_] <: Seq[_], A](l: M[A]): MA[M, A] = ma[M, A](l)

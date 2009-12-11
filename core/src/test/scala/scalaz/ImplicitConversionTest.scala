@@ -11,6 +11,11 @@ object ImplicitConversionTest {
     implicitly[(A => B) <%%< MACofunctor[PartialApply1Of2[Function1, B]#Flip, A]]
     implicitly[(A => B) <%%< MA[PartialApply1Of2[Function1, A]#Apply, B]]
 
+    implicitly[(Validation[A, B]) <%%< MA[PartialApply1Of2[Validation, A]#Apply, B]]
+
+    // todo
+    //implicitly[(FailProjection[A, B]) <%%< MA[PartialApply1Of2[Validation, B]#Flip, A]]
+
     // via higher kind inference
     trait T[A]
     implicitly[T[A] <%%< MACofunctor[T, A]]
@@ -23,6 +28,12 @@ object ImplicitConversionTest {
     implicitly[Apply[Function0]]
     implicitly[Apply[Option]]
     implicitly[Apply[PartialApply1Of2[Function1, Int]#Apply]]
+  }
+
+  def bind {
+    implicitly[Bind[List]]
+    implicitly[Bind[GArray]]
+    implicitly[Bind[java.util.ArrayList]]
   }
 
   def monad {
