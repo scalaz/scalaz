@@ -1,12 +1,15 @@
 package scalaz
 
 import concurrent._
+import geo._
 
 object Scalaz extends ScalazLow
     with    Actors
     with    Alphas
     with    Applys
     with    ArrayBytes
+    with    Azimuths
+    with    Bearings
     with    BigIntegerMultiplications
     with    BigIntegers
     with    BigIntMultiplications
@@ -20,10 +23,13 @@ object Scalaz extends ScalazLow
     with    Chars
     with    CharSets
     with    Cokleislis
+    with    Coords
     with    Digits
     with    DLists
     with    Duals
     with    Effects
+    with    Elevations
+    with    Ellipsoids
     with    Emptys
     with    Endos
     with    Enumerations
@@ -39,7 +45,9 @@ object Scalaz extends ScalazLow
     with    Ints
     with    Iterables
     with    LastOptions
+    with    Latitudes
     with    Lists
+    with    Longitudes
     with    LongMultiplications
     with    Longs
     with    MAs
@@ -49,6 +57,7 @@ object Scalaz extends ScalazLow
     with    Options
     with    Orders
     with    Promises
+    with    Radianss
     with    Semigroups
     with    ShortMultiplications
     with    Shorts
