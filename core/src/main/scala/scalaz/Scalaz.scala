@@ -39,6 +39,7 @@ object Scalaz extends ScalazLow
     with    Function0s
     with    Function1s
     with    Function2s
+    with    GeodeticCurves
     with    Kleislis
     with    Identitys
     with    InputStreams
@@ -57,6 +58,7 @@ object Scalaz extends ScalazLow
     with    NonEmptyLists
     with    Options
     with    Orders
+    with    Positions
     with    Promises
     with    Radianss
     with    Semigroups
@@ -80,7 +82,9 @@ object Scalaz extends ScalazLow
 
   type ℤ = BigInt
 
-  val π = java.lang.Math.PI  
+  lazy val π = java.lang.Math.PI
+
+  lazy val π2 = π * 2  
 
   type GArray[A] = collection.mutable.GenericArray[A]
 
