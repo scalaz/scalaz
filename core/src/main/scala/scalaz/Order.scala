@@ -34,27 +34,27 @@ object Order {
 
   implicit def IntOrder: Order[Int] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def IntMultiplicationOrder: Order[IntMultiplication] = IntOrder ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationOrder: Order[IntMultiplication] = i[Order, Int] ∙ ((_: IntMultiplication).value)
 
   implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = BooleanOrder ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = i[Order, Boolean] ∙ ((_: BooleanConjunction).value)
 
   implicit def CharOrder: Order[Char] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def CharMultiplicationOrder: Order[CharMultiplication] = CharOrder ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationOrder: Order[CharMultiplication] = i[Order, Char] ∙ ((_: CharMultiplication).value)
 
   implicit def ByteOrder: Order[Byte] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = ByteOrder ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = i[Order, Byte] ∙ ((_: ByteMultiplication).value)
 
   implicit def LongOrder: Order[Long] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def LongMultiplicationOrder: Order[LongMultiplication] = LongOrder ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationOrder: Order[LongMultiplication] = i[Order, Long] ∙ ((_: LongMultiplication).value)
 
   implicit def ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = ShortOrder ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = i[Order, Short] ∙ ((_: ShortMultiplication).value)
 
   implicit def FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
@@ -62,11 +62,11 @@ object Order {
 
   implicit def BigIntegerOrder: Order[BigInteger] = order(_ compareTo _ ordering)
 
-  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = BigIntegerOrder ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = i[Order, BigInteger] ∙ ((_: BigIntegerMultiplication).value)
 
   implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = BigIntOrder ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = i[Order, BigInt] ∙ ((_: BigIntMultiplication).value)
 
   implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] = IterableOrder[A] ∙ ((_: NonEmptyList[A]).list)
 

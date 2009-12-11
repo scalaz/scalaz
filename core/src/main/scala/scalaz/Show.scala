@@ -17,7 +17,7 @@ trait Shows {
 object Show {
   import Scalaz._
 
-  implicit def DigitShow: Show[Digit] = IntShow ∙ ((_: Digit).toInt)
+  implicit def DigitShow: Show[Digit] = i[Show, Int] ∙ ((_: Digit).toInt)
 
   implicit def OrderingShow: Show[Ordering] = showA
 
@@ -29,27 +29,27 @@ object Show {
 
   implicit def IntShow: Show[Int] = showA
 
-  implicit def IntMultiplicationShow: Show[IntMultiplication] = IntShow ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationShow: Show[IntMultiplication] = i[Show, Int] ∙ ((_: IntMultiplication).value)
 
   implicit def BooleanShow: Show[Boolean] = showA
 
-  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = BooleanShow ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = i[Show, Boolean] ∙ ((_: BooleanConjunction).value)
 
   implicit def CharShow: Show[Char] = showA
 
-  implicit def CharMultiplicationShow: Show[CharMultiplication] = CharShow ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationShow: Show[CharMultiplication] = i[Show, Char] ∙ ((_: CharMultiplication).value)
 
   implicit def ByteShow: Show[Byte] = showA
 
-  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = ByteShow ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = i[Show, Byte] ∙ ((_: ByteMultiplication).value)
 
   implicit def LongShow: Show[Long] = showA
 
-  implicit def LongMultiplicationShow: Show[LongMultiplication] = LongShow ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationShow: Show[LongMultiplication] = i[Show, Long] ∙ ((_: LongMultiplication).value)
 
   implicit def ShortShow: Show[Short] = showA
 
-  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = ShortShow ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = i[Show, Short] ∙ ((_: ShortMultiplication).value)
 
   implicit def FloatShow: Show[Float] = showA
 

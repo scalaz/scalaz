@@ -93,6 +93,8 @@ object Scalaz extends ScalazLow
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
+  def i[F[_], A](implicit i: F[A]): F[A] = i
+
   // todo move to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[PartialApply1Of2[Function1, A]#Flip, R] = maCofunctor[PartialApply1Of2[Function1, A]#Flip, R](f)
 
