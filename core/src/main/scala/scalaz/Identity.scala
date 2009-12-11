@@ -4,6 +4,7 @@ sealed trait Identity[A] {
   val value: A
 
   import Scalaz._
+  import geo._
 
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
@@ -86,6 +87,8 @@ sealed trait Identity[A] {
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def nel: NonEmptyList[A] = Scalaz.nel(value, Nil)
+
+  def toRadians(implicit r: Radians[A]) = r.toRadians(value)
 
   override def toString = value.toString
 

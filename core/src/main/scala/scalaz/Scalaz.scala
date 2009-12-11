@@ -26,6 +26,7 @@ object Scalaz extends ScalazLow
     with    Coords
     with    Digits
     with    DLists
+    with    DoubleWs
     with    Duals
     with    Effects
     with    Elevations
