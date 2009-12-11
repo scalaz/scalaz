@@ -3,6 +3,12 @@ package scalaz.geo
 sealed trait ElevatedCurve {
   val curve: GeodeticCurve
   val elevation: Elevation
+
+  lazy val length = {
+    val d = curve.ellipsoidalDistance
+    val e = elevation.elevation
+    Math.sqrt(d * d + e * e) 
+  }
 }
 
 trait ElevatedCurves {

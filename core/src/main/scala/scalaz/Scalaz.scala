@@ -84,7 +84,7 @@ object Scalaz extends ScalazLow
 
   lazy val π = java.lang.Math.PI
 
-  lazy val π2 = π * 2  
+  lazy val π2 = π * 2   
 
   type GArray[A] = collection.mutable.GenericArray[A]
 
