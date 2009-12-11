@@ -90,6 +90,14 @@ sealed trait Identity[A] {
 
   def toRadians(implicit r: Radians[A]) = r.toRadians(value)
 
+  def doWhile(f: A => A, p: A => Boolean): A = {
+    val x = f(value)
+    if(p(x)) x.doWhile(f, p) else x
+  }
+
+  def whileDo(f: A => A, p: A => Boolean): A =
+    if(p(value)) value.whileDo(f, p) else value
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
