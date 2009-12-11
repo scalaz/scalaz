@@ -12,6 +12,7 @@ object Example {
     ExampleMonoid.run
     ExamplePlus.run
     ExampleTraverse.run
+    geo.ExampleVincenty.run
   }
 
   def main(args: Array[String]) = run
