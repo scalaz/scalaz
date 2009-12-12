@@ -258,7 +258,7 @@ object Show {
 
   implicit def EllipsoidShow: Show[Ellipsoid] = i[Show, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 
-  implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance + " " + c.azi + " " + c.reverseAzi + "]")
+  implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance.shows + " " + c.azi.shows + " " + c.reverseAzi.shows + "]")
 
   implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
 
