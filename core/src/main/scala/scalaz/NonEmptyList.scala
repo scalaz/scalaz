@@ -43,15 +43,19 @@ sealed trait NonEmptyList[+A] {
 
   def tails : NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
     case Nil => Nil
-    case _ :: _ => tail.nel.get.tails.list    
+    case _ :: _ => tail.toNel.get.tails.list    
   })
 
   override def toString = "NonEmpty" + (head :: tail)
 }
 
 trait NonEmptyLists {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] = NonEmptyList(h, t: _*)
+}
+
+object NonEmptyList {
+  def apply[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
     val head = h
-    val tail = t
+    val tail = t.toList
   }
 }

@@ -17,7 +17,7 @@ sealed trait ListW[A] {
     case h :: t => h :: as ::: t.intercalate(as)
   }
 
-  def nel = value match {
+  def toNel = value match {
     case Nil => None
     case h :: t => Some(Scalaz.nel(h, t))
   }

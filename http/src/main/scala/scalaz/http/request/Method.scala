@@ -22,7 +22,7 @@ sealed trait Method {
   /**
    * A non-empty string representation of this request method.
    */
-  lazy val asNonEmptyList: NonEmptyList[Char] = asString.toList.nel.get
+  lazy val asNonEmptyList: NonEmptyList[Char] = asString.charsNel.get
 
   /**
    * Returns <code>true</code> if this method is an extension method, <code>false</code> otherwise.

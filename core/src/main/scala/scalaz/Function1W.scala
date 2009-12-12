@@ -17,7 +17,7 @@ sealed trait Function1W[T, R] {
   
   def concurry(implicit s: Strategy[R]): T => () => R = (t: T) => s(() => k(t))
 
-  def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.nel); 
+  def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 }
 
 trait Function1s {

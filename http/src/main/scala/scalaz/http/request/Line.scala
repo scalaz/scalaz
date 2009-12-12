@@ -65,7 +65,7 @@ sealed trait Line {
   /**
    * Returns all occurrences of the given request parameter in the request URI or the given error value.
    */
-  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = (this !! p).nel toSuccess e
+  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = (this !! p).toNel toSuccess e
 
   /**
    * Returns <code>true</code> if the given request parameter occurs in the request URI.

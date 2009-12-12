@@ -45,7 +45,7 @@ sealed trait Response[OUT[_]] {
    * Add the given header and value to this response.
    * <strong>This function fails if the given string value is empty</strong>.
    */
-  def apply(h: ResponseHeader, s: String): Response[OUT] = apply(h, s.nelErr("Header values must be non-empty"))
+  def apply(h: ResponseHeader, s: String): Response[OUT] = apply(h, s.charsNelErr("Header values must be non-empty"))
 
   /**
    * Replace the status line of this reponse with the given status line.
@@ -281,7 +281,7 @@ object Response {
    * <strong>This function fails if the given string value is empty</strong>.
    */
   def versionRedirects[OUT[_]](version: Version, location: String)(implicit e: Empty[OUT]) =
-    response[OUT](statusLine(version, MovedPermanently), List((Location, location.nelErr("location must be non-empty"))), e.empty)
+    response[OUT](statusLine(version, MovedPermanently), List((Location, location.charsNelErr("location must be non-empty"))), e.empty)
 
   /**
    * Create a response with a version derived from the given request that redirects (301 Moved Permanently) to the given location.
@@ -294,5 +294,5 @@ object Response {
    * <strong>This function fails if the given string value is empty</strong>.
    */
   def redirects[OUT[_], IN[_]](location: String, parameters: (String, String)*)(implicit e: Empty[OUT], req: Request[IN]) =
-    redirect[OUT, IN](location.nelErr("location must be non-empty"), parameters: _*)
+    redirect[OUT, IN](location.charsNelErr("location must be non-empty"), parameters: _*)
 }

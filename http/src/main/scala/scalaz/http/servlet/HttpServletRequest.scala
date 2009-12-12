@@ -66,10 +66,10 @@ sealed trait HttpServletRequest {
   def asRequest[I[_]](implicit in: InputStreamer[I]) = {
       val headers: List[(RequestHeader, NonEmptyList[Char])] = request.getHeaderNames.elements.map(_.asInstanceOf[String]).toList ∗
               (h => request.getHeaders(h).elements.map(_.asInstanceOf[String]).filter(_.length > 0).map
-                        (v => ((h: Option[RequestHeader]).get, v.toList.nel.get)).toList)
+                        (v => ((h: Option[RequestHeader]).get, v.toList.toNel.get)).toList)
 
       val rline = (request.getMethod.toList: Option[Method]) >>= (m =>
-        request.getRequestURI.toList.nel map
+        request.getRequestURI.toList.toNel map
                 (p => uri(p, Option(request.getQueryString) map (_.toList))) >>=
                 (u => (request.getProtocol: Option[Version]) map
                         (v => line(m, u, v))))
@@ -107,7 +107,7 @@ object HttpServletRequest extends HttpServletRequests {
    * Removes the length of the context path of the given servlet request unless it is empty.
    */
   def c[IN[_]](r: Request[IN])(implicit request: HttpServletRequest) = {
-    val k: Option[NonEmptyList[Char]] = (r.path drop request.getContextPath.length).nel
+    val k: Option[NonEmptyList[Char]] = (r.path drop request.getContextPath.length).toNel
     k ∘ (p => r(r.uri(p))) | r
   }
 

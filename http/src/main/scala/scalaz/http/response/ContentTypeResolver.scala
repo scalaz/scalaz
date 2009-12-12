@@ -235,5 +235,5 @@ object ContentTypeResolver {
     "xwd" -> "image/x-xwindowdump",
     "z" -> "application/x-compress",
     "zip" -> "application/zip"
-    ) transform { case (_, v) => v.unsafeNel })
+    ) transform { case (_, v) => v.unsafeCharsNel })
 }

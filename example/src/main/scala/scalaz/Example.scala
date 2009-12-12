@@ -8,6 +8,7 @@ object Example {
     ExampleCofunctor.run
     ExampleFunctor.run
     ExampleKleisli.run
+    ExampleIdentity.run
     ExampleMonad.run
     ExampleMonoid.run
     ExamplePlus.run

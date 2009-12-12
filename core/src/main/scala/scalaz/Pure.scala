@@ -12,7 +12,7 @@ object Pure {
   }
 
   implicit def NonEmptyListPure: Pure[NonEmptyList] = new Pure[NonEmptyList] {
-    def pure[A](a: => A) = a.nel
+    def pure[A](a: => A) = a.wrapNel
   }
 
   implicit def StatePure[S]: Pure[PartialApply1Of2[State, S]#Apply] = new Pure[PartialApply1Of2[State, S]#Apply] {

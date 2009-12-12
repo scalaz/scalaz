@@ -141,12 +141,12 @@ sealed trait Request[IN[_]] {
   /**
    * Returns all occurrences of a given request parameter in the request URI.
    */
-  def ^!!^ : Kleisli[Option, String, NonEmptyList[List[Char]]] = kleisli((p : String) => {(this !! p).nel })
+  def ^!!^ : Kleisli[Option, String, NonEmptyList[List[Char]]] = kleisli((p : String) => {(this !! p).toNel })
 
   /**
    * Returns all occurrences of the given request parameter in the request URI or the given error value.
    */
-  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = (this !! p).nel toSuccess e
+  def !![E](p: String, e: => E): Validation[E, NonEmptyList[List[Char]]] = (this !! p).toNel toSuccess e
 
   /**
    * Returns <code>true</code> if the given request parameter occurs in the request URI.
@@ -187,7 +187,7 @@ sealed trait Request[IN[_]] {
    *  Returns all occurrences of a given request parameter in the request body.
    */
   def ^||^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
-    kleisli((p : String) => {(this || p).nel })
+    kleisli((p : String) => {(this || p).toNel })
 
   /**
    * Returns the first occurrence of the given request parameter in the request URI if it exists or in the request body
@@ -225,7 +225,7 @@ sealed trait Request[IN[_]] {
    * otherwise.
    */
   def ^!!||^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
-    kleisli((p : String) => {(this !!|| p).nel })
+    kleisli((p : String) => {(this !!|| p).toNel })
 
   /**
    * Returns all occurrences of the given request parameter in the request body if it exists or in the request URI
@@ -238,7 +238,7 @@ sealed trait Request[IN[_]] {
    * otherwise.
    */
   def ^||!!^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
-    kleisli((p : String) => {(this ||!! p).nel })
+    kleisli((p : String) => {(this ||!! p).toNel })
 
   /**
    * The request method of the status line.

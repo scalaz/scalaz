@@ -86,7 +86,7 @@ sealed trait Identity[A] {
 
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
-  def nel: NonEmptyList[A] = Scalaz.nel(value, Nil)
+  def wrapNel: NonEmptyList[A] = Scalaz.nel(value, Nil)
 
   def toRadians(implicit r: Radians[A]): Double = r.toRadians(value)
 

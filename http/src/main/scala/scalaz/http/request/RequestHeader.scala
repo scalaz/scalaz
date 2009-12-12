@@ -289,7 +289,7 @@ object RequestHeader extends RequestHeaders {
     cs span (_ != ':') match {
       case (n, v) => {
         (n: Option[RequestHeader]) ∗ (h =>
-          (v.dropWhile(x => x == ':' || isSpace(x))).nel map (v => (h, v)))
+          (v.dropWhile(x => x == ':' || isSpace(x))).toNel map (v => (h, v)))
       }
     }
 }

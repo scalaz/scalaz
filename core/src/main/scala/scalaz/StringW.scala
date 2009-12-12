@@ -47,16 +47,16 @@ sealed trait StringW {
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def nel : Option[NonEmptyList[Char]] = s.toList.nel
+  def charsNel : Option[NonEmptyList[Char]] = s.toList.toNel
 
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
    */
-  def nel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.nel getOrElse e
+  def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.charsNel getOrElse e
 
-  def nelErr(message: => String) = nel(error(message))
+  def charsNelErr(message: => String) = charsNel(error(message))
 
-  def unsafeNel = nelErr("cannot turn empty string into NonEmptyList")
+  def unsafeCharsNel = charsNelErr("cannot turn empty string into NonEmptyList")
 
   import java.io.FileInputStream
 
