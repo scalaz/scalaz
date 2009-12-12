@@ -48,4 +48,6 @@ trait Trees {
     val rootLabel = root
     def subForest = forest
   }
+
+  def leaf[A](root: A): Tree[A] = node(root, Stream.empty)
 }
