@@ -6,8 +6,6 @@ object ExampleVincenty {
   import scalaz.Scalaz._
 
   def run {
-    implicit val ellipsoid = wgs84
-
     // Mount Barney, Queensland, Australia
     val mountBarney = -28.2807 |-| 152.698
 
