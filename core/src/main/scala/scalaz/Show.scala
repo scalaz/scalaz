@@ -243,4 +243,28 @@ object Show {
     z += '}'
     z.toList
   })
+
+  import geo._
+
+  implicit def AzimuthShow: Show[Azimuth] = shows(_.value.shows + "°")
+
+  implicit def BearingShow: Show[Bearing] = shows(_.value.shows + "°")
+
+  implicit def CoordShow: Show[Coord] = shows(c => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
+
+  implicit def ElevatedCurveShow: Show[ElevatedCurve] = i[Show, (GeodeticCurve, Elevation)] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+
+  implicit def ElevationShow: Show[Elevation] = shows(_.value.shows + "m")
+
+  implicit def EllipsoidShow: Show[Ellipsoid] = i[Show, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+
+  implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance + " " + c.azi + " " + c.reverseAzi + "]")
+
+  implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
+
+  implicit def LongitudeShow: Show[Longitude] = shows(_.value.shows + "°")
+
+  implicit def PositionShow: Show[Position] = i[Show, (Coord, Elevation)] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+
+  implicit def VectorShow: Show[Vector] = i[Show, (Coord, Bearing)] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
 }
