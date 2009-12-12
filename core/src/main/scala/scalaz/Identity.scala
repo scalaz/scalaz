@@ -60,8 +60,7 @@ sealed trait Identity[A] {
   }
 
   def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    if (n <= 0) ∅
-    else value.η ⊹ replicate(n - 1)
+    (n > 0) ?? (value.η ⊹ replicate(n - 1))
 
   def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.η ⊹ repeat
 

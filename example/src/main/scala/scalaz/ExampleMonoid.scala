@@ -30,13 +30,13 @@ object ExampleMonoid {
 
     List(1, 2, 3) ⊹ List(4, 5, 6) assert_≟ List(1, 2, 3, 4, 5, 6)
 
-    // Zero of the List Semigroup
+    // Zero of the List Monoid
     ∅[List[Int]] assert_≟ List.empty[Int]
 
-    // Zero of the Int Semigroup
+    // Zero of the Int Monoid
     ∅[Int] assert_≟ 0
 
-    // Zero of the IntMultiplication Semigroup
+    // Zero of the IntMultiplication Monoid
     ∅[IntMultiplication] assert_≟ (1 ∏)
 
     // Appending zero must leave t unchanged
@@ -44,5 +44,11 @@ object ExampleMonoid {
     assertIdentity(List(1))
     assertIdentity(1)
     assertIdentity(1 ∏)
+
+    // Replicate using the List Monoid and List Pure
+    1.replicate[List](3) assert_≟ List(1, 1, 1)
+
+    // Repeat using the Stream Monoid and Stream Pure
+    1.repeat[Stream].take(3).toList assert_≟ List(1, 1, 1)
   }
 }
