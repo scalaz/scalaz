@@ -157,4 +157,28 @@ object Order {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = EitherOrder[E, A] ∙ ((_: Validation[E, A]).either)
 
   implicit def JavaIterableOrder[A: Order]: Order[java.lang.Iterable[A]] = IterableOrder[A] ∙ (x => x)
+
+  import geo._
+
+  implicit def AzimuthOrder: Order[Azimuth] = i[Order, Double] ∙ (_.value)
+
+  implicit def BearingOrder: Order[Bearing] = i[Order, Double] ∙ (_.value)
+
+  implicit def CoordOrder: Order[Coord] = i[Order, (Latitude, Longitude)] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+
+  implicit def ElevatedCurveOrder: Order[ElevatedCurve] = i[Order, (GeodeticCurve, Elevation)] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+
+  implicit def ElevationOrder: Order[Elevation] = i[Order, Double] ∙ (_.value)
+
+  implicit def EllipsoidOrder: Order[Ellipsoid] = i[Order, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+
+  implicit def GeodeticCurveOrder: Order[GeodeticCurve] = i[Order, (Double, Azimuth, Azimuth)] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
+
+  implicit def LatitudeOrder: Order[Latitude] = i[Order, Double] ∙ (_.value)
+
+  implicit def LongitudeOrder: Order[Longitude] = i[Order, Double] ∙ (_.value)
+
+  implicit def PositionOrder: Order[Position] = i[Order, (Coord, Elevation)] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+
+  implicit def VectorOrder: Order[Vector] = i[Order, (Coord, Bearing)] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
 }
