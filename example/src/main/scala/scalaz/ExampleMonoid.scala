@@ -45,10 +45,13 @@ object ExampleMonoid {
     assertIdentity(1)
     assertIdentity(1 ∏)
 
-    // Replicate using the List Monoid and List Pure
+    // Repeat a value using the Stream Monoid and Stream Pure
+    1.repeat[Stream].take(3).toList assert_≟ List(1, 1, 1)
+
+    // Replicate a value using the List Monoid and List Pure
     1.replicate[List](3) assert_≟ List(1, 1, 1)
 
-    // Repeat using the Stream Monoid and Stream Pure
-    1.repeat[Stream].take(3).toList assert_≟ List(1, 1, 1)
+    // Unfold a value through the List Monoid with List Pure
+    1.unfold[List, String]((a: Int) => (a < 5).option((a.toString, a + 1))) assert_≟ List("1", "2", "3", "4")
   }
 }
