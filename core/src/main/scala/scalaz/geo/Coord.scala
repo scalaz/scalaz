@@ -9,6 +9,8 @@ sealed trait Coord {
 
   def |*|(e: Elevation) = position(this, e)
 
+  private def square(d: Double) = d * d
+
   private case class P(origSigma: Double, sigma: Double, prevSigma: Double) {
     def transition(d: Double) = P(origSigma, origSigma + d, sigma)
 
@@ -20,16 +22,13 @@ sealed trait Coord {
 
     def cosSigmaM2(d: Double) = cos(sigmaM2(d))
 
-    def cos2SigmaM2(d: Double) = {
-      val k = cosSigmaM2(d)
-      k * k
-    }
+    def cos2SigmaM2(d: Double) =
+      square(cosSigmaM2(d))
   }
 
   private def ps(d: Double) = P(d, d, d)
   
   def direct(bear: Bearing, dist: Double, convergence: Double = 0.0000000000001D)(implicit e: Ellipsoid): Vector = {
-    def square(d: Double) = d * d
     val sMnr = e.semiMinor
     val flat = e.flattening
     val alpha = bear.toRadians
@@ -57,7 +56,7 @@ sealed trait Coord {
         val cos2SigmaM2 = p.cos2SigmaM2(sigma1)
         p.transition(b * p.sinSigma * (cosSigmaM2 + b / 4D * (p.cosSigma * (-1 + 2 * cos2SigmaM2) - (b / 6D) * cosSigmaM2 * tf(p.sinSigma * p.sinSigma) * tf(square(cos2SigmaM2)))))
       }
-      def pred(p: P) = (p.sigma + p.prevSigma).abs >= convergence
+      def pred(p: P) = (p.sigma - p.prevSigma).abs >= convergence
       begin.doWhile(iter(_), pred(_))
     }
     val c = flat / 16 * cos2Alpha * (4 + flat * (4 - 3 * cos2Alpha))
