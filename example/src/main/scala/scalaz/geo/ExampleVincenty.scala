@@ -14,5 +14,9 @@ object ExampleVincenty {
 
     // Travelling at 11.5 degrees for a little over 150km from Mount Barney places you at the given vector.
     mountBarney.direct(bearing(11.5D), 150435D) assert_≟ vector(-26.950066610300084D |-| 153.0000106566432D, bearing(11.359998078380356D))
+
+    val k = mountBarney inverse ngaPeak
+
+    k.println
   }
 }

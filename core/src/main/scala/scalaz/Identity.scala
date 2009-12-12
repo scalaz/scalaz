@@ -96,7 +96,7 @@ sealed trait Identity[A] {
   }
 
   def whileDo(f: A => A, p: A => Boolean): A =
-    if(p(value)) value.whileDo(f, p) else value
+    if(p(value)) f(value).whileDo(f, p) else value
 
   override def toString = value.toString
 
