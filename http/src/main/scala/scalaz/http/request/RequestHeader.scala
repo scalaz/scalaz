@@ -1,7 +1,6 @@
-package scalaz.http.request
-
-import scalaz.http.{GeneralHeader, EntityHeader}
-import scalaz.NonEmptyList
+package scalaz
+package http
+package request
 
 /**
  * HTTP request headers.
@@ -195,8 +194,8 @@ private final case class General(gh: GeneralHeader) extends RequestHeader {
 }
 
 import Character.isSpace
-import scalaz.Scalaz._
-import scalaz.http.Util.Nel._
+import Scalaz._
+import Util.Nel._
 
 trait RequestHeaders {
   /**

@@ -1,7 +1,6 @@
-package scalaz.http.servlet
-
-import HttpServletRequest._
-import HttpServletResponse._
+package scalaz
+package http
+package servlet
 
 final class StreamStreamServlet extends
   ScalazServlet[Stream, Stream, StreamStreamServletApplication](classOf[StreamStreamServletApplication])

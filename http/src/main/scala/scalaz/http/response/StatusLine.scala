@@ -1,8 +1,9 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
-import scalaz.http._
-import scalaz.Scalaz._
-import scalaz._
+import Scalaz._
+
 /**
  * HTTP response status line.
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1">RFC 2616 Section 6.1 Status-Line</a>.
@@ -29,9 +30,9 @@ sealed trait StatusLine {
   val reasonPhrase: List[Char]
 }
 
-import scalaz.http.request.Request
-import scalaz.http.Version.version
-import scalaz.Scalaz._
+import request.Request
+import Version.version
+import Scalaz._
 
 /**
  * HTTP response status line.

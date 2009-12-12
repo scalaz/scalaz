@@ -1,11 +1,11 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
 import javax.servlet.{ServletException, ServletConfig}
 import Class.forName
 import HttpServletRequest._
 import HttpServletResponse._
-import scalaz.Each
-import scalaz.http.InputStreamer
 
 /**
  * A servlet that can run scalaz applications. It is intended that subclasses apply one or more type arguments until a

@@ -1,4 +1,6 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
 /**
  * Type constructors that can be used in request and response bodies.
@@ -15,12 +17,8 @@ sealed trait Body[OUT[_], A] {
   def apply(a: A): OUT[Byte]
 }
 
-import scalaz.Scalaz._
+import Scalaz._
 import scala.xml.{Elem, NodeSeq}
-import scalaz.CharSet
-import scalaz.Cofunctor
-import scalaz.PartialApply1Of2
-import scalaz.PartialType2
 
 trait Bodys {
   import Body._

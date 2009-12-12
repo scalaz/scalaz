@@ -1,10 +1,11 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
 import javax.servlet.http.Cookie
-import scalaz.http.response.Response
-import scalaz.http.Util.Nel._
-import scalaz.Scalaz._
-import scalaz._
+import response.Response
+import Util.Nel._
+import Scalaz._
 
 /**
  * A wrapper around Java Servlet <code>HttpServletResponse</code>.

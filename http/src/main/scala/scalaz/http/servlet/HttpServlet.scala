@@ -1,8 +1,9 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
-import scalaz.Scalaz._
-import scalaz.http.Util.Nel._
-import scalaz.NonEmptyList
+import Scalaz._
+import Util.Nel._
 
 /**
  * A wrapper around Java Servlet <code>HttpServlet</code>.
@@ -24,7 +25,7 @@ sealed trait HttpServlet {
   def resource(path: String) = Option(servlet.getServletContext.getResourceAsStream(path)) map (x => x)
 }
 
-import scalaz.http.request.Request
+import request.Request
 
 trait HttpServlets {
   /**

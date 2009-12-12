@@ -1,6 +1,7 @@
-package scalaz.concurrent.strategy
+package scalaz
+package concurrent
+package strategy
 
-import scalaz.concurrent.Strategy
 import java.util.concurrent.{ExecutorService, Callable}
 
 /**

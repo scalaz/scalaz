@@ -1,8 +1,8 @@
-package scalaz.http
+package scalaz
+package http
 
 import collection.immutable.{Map, HashMap}
-import scalaz.Scalaz._
-import scalaz._
+import Scalaz._
 import java.net.URLDecoder.decode
 
 /**

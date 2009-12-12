@@ -1,4 +1,5 @@
-package scalaz.geo
+package scalaz
+package geo
 
 object ExampleVincenty {
   def main(args: Array[String]) = run

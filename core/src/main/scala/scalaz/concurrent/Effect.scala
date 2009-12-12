@@ -1,4 +1,5 @@
-package scalaz.concurrent
+package scalaz
+package concurrent
 
 sealed trait Effect[-A] {
   val e: A => () => Unit

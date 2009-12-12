@@ -1,7 +1,8 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
-import scalaz.Scalaz._
-
+import Scalaz._
 
 /**
  * A wrapper around Java Servlet <code>HttpSession</code>.

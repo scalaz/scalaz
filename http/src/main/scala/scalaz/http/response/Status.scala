@@ -1,8 +1,9 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
-import scalaz.Scalaz._
-import scalaz.Digit
-import scalaz.http.Util.Digits.{digitsLong, longDigits}
+import Scalaz._
+import Util.Digits.{digitsLong, longDigits}
 
 /**
  * HTTP response status codes.

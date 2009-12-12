@@ -1,4 +1,5 @@
-package scalaz.geo
+package scalaz
+package geo
 
 sealed trait Longitude {
   val value: Double

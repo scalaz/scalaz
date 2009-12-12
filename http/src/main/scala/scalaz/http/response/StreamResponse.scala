@@ -1,8 +1,8 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
-import scalaz.http.request.Request
-import scalaz.http.Version
-import scalaz.NonEmptyList
+import request.Request
 
 /**
  * Functions to create responses that have a stream body.

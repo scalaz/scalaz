@@ -1,10 +1,11 @@
-package scalaz.geo
+package scalaz
+package geo
 
 sealed trait Coord {
   val latitude: Latitude
   val longitude: Longitude
 
-  import scalaz.Scalaz._
+  import Scalaz._
   import Math._
 
   def |*|(e: Elevation) = position(this, e)

@@ -2,7 +2,7 @@ package scalaz
 
 // compiles == green
 object ImplicitConversionTest {
-  import scalaz.Scalaz._
+  import Scalaz._
 
   def MAs[A, B, C, D, E, F, G, H] {
     implicitly[List[A] <%%< MA[List, A]]
@@ -48,6 +48,11 @@ object ImplicitConversionTest {
   def monad {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
+
+
+    implicitly[Pure[NonEmptyList]]
+    implicitly[Bind[NonEmptyList]]
+    implicitly[Monad[NonEmptyList]]
   }
 
   def functor {

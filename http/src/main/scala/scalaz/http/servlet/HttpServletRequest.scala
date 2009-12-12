@@ -1,14 +1,14 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
-import scalaz.http.request.Request
-import scalaz.Scalaz._
-import scalaz._
-import scalaz.http.request.{Method, RequestHeader}
-import scalaz.http.request.Line.line
-import scalaz.http.request.Uri.uri
-import scalaz.http.servlet.HttpSession.HttpSessionSession
-import scalaz.http.Util.Nel._
-import scalaz.http._
+import request.Request
+import Scalaz._
+import request.{Method, RequestHeader}
+import request.Line.line
+import request.Uri.uri
+import HttpSession.HttpSessionSession
+import Util.Nel._
 
 /**
  * A wrapper around Java Servlet <code>HttpServletRequest</code>.

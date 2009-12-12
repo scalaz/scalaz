@@ -1,9 +1,9 @@
-package scalaz.http
+package scalaz
+package http
 
-import scalaz._
-import scalaz.http.request.Request
-import scalaz.http.response.Response
-import scalaz.http.response.{ResponseHeader, Status}
+import request.Request
+import response.Response
+import response.{ResponseHeader, Status}
 
 trait StreamStreamApplications {
   /**

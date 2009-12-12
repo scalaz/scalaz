@@ -1,8 +1,9 @@
-package scalaz.http.request
+package scalaz
+package http
+package request
 
-import scalaz.http.Util.Nel._
-import scalaz.Scalaz._
-import scalaz.NonEmptyList
+import Util.Nel._
+import Scalaz._
 
 /**
  * HTTP request method.

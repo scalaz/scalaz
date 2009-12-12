@@ -1,8 +1,8 @@
-package scalaz.http
+package scalaz
+package http
 
-import scalaz.http.Util.Nel._
-import scalaz.NonEmptyList
-import scalaz.Scalaz._
+import http.Util.Nel._
+import Scalaz._
 
 /**
  * HTTP entity header fields.

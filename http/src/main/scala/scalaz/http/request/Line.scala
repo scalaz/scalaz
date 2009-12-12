@@ -1,9 +1,9 @@
-package scalaz.http.request
+package scalaz
+package http
+package request
 
-import scalaz.http.Util.Nel._
-import scalaz.Scalaz._
-import scalaz.{NonEmptyList, Validation}
-import scalaz.http.Version
+import Util.Nel._
+import Scalaz._
 
 /**
  * A request line.
@@ -80,7 +80,7 @@ sealed trait Line {
 
 trait Lines {
   import Character.isSpace
-  import scalaz.Scalaz._
+  import Scalaz._
 
   /**
    * Converts the given string into a potential request line.

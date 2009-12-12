@@ -1,8 +1,8 @@
-package scalaz.http
+package scalaz
+package http
 
-import scalaz.Scalaz._
+import Scalaz._
 import java.lang.Character.isDigit
-import scalaz.{Applicative, _1, _0, Digit}
 
 /**
  * HTTP version.

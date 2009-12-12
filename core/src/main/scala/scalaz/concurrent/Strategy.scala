@@ -1,4 +1,5 @@
-package scalaz.concurrent
+package scalaz
+package concurrent
 
 trait Strategy[A] {
   def apply(a: () => A): () => A

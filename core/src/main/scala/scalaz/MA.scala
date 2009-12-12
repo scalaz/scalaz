@@ -229,7 +229,7 @@ sealed trait MA[M[_], A] {
   def parZipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Applicative[M], s: Strategy[C]): () => M[C] =
     (bs ⊛ (v ∘ f.concurry.curry)).parM
 
-  import scalaz.concurrent.Strategy
+  import concurrent.Strategy
 
   def parM[B](implicit b: A <:< (() => B), m: Functor[M], s: Strategy[B]): () => M[B] =
     () => v ∘ (z => s(z).apply)

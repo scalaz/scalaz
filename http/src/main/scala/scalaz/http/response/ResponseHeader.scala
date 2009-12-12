@@ -1,6 +1,6 @@
-package scalaz.http.response
-
-import scalaz.http.{GeneralHeader, EntityHeader}
+package scalaz
+package http
+package response
 
 /**
  * HTTP response headers.
@@ -114,7 +114,7 @@ private final case class General(gh: GeneralHeader) extends ResponseHeader {
   override val asString = gh.asString
 }
 
-import scalaz.Scalaz._
+import Scalaz._
 
 trait ResponseHeaders {
     /**

@@ -1,13 +1,9 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
-import scalaz.http.response.Response
-import scala.collection.mutable.HashMap
-import scalaz.http.request.Request
-import scalaz._
-import scalaz.http.InputStreamer
-
-import scalaz.http.Application
-import scala.{Application => _}
+import response.Response
+import request.Request
 
 /**
  * A HTTP servlet application.

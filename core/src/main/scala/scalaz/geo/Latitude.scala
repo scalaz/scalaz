@@ -1,9 +1,10 @@
-package scalaz.geo
+package scalaz
+package geo
 
 sealed trait Latitude {
   val value: Double
 
-  import scalaz.Scalaz._
+  import Scalaz._
   
   def |:|(lon: Longitude) = coord(this, lon)
 }

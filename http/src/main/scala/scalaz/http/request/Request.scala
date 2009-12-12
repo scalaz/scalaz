@@ -1,10 +1,10 @@
-package scalaz.http.request
+package scalaz
+package http
+package request
 
-import scalaz.Scalaz._
-import scalaz.http.Util.{asHashMap, mapHeads, parameters}
-import scalaz.http.Util.Nel._
-import scalaz.http._
-import scalaz._
+import Scalaz._
+import Util.{asHashMap, mapHeads, parameters}
+import Util.Nel._
 
 /**
  * HTTP request.
@@ -95,7 +95,6 @@ sealed trait Request[IN[_]] {
 
   private val m = immutableHashMapMemo[FoldLeft[IN], List[(List[Char], List[Char])]]
 
-  import scalaz.MA
   /**
    * Provides look up for POST request parameters in the request body. Only the first invocation uses the given
    * fold-left and subsequent invocations look-up using a memoisation table (scoped to each request).
@@ -351,7 +350,7 @@ sealed trait Request[IN[_]] {
    */
   def isInternetExplorer = this(UserAgent).mkString.toLowerCase contains "msie" 
 
-  import scalaz.http.response._
+  import response._
 
   trait Debug[OUT[_]] {
     def apply[A](f: IN[Byte] => A)(implicit e: Empty[OUT], b: Body[OUT, xml.Elem], s: Semigroup[OUT[Byte]]): Response[OUT]

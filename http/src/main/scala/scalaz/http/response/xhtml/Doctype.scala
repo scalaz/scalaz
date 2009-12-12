@@ -1,4 +1,7 @@
-package scalaz.http.response.xhtml
+package scalaz
+package http
+package response
+package xhtml
 
 /**
  * XHTML doctypes.

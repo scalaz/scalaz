@@ -1,4 +1,5 @@
-package scalaz.http
+package scalaz
+package http
 
 /**
  * HTTP general header fields.

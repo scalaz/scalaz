@@ -12,7 +12,7 @@ object ExampleIdentity {
     1: Identity[Int]
 
     // Wrap a value in NonEmptyList
-    1.wrapNel assert_≟ NonEmptyList(1)
+//    1.wrapNel assert_≟ NonEmptyList(1)
 
     // Unfold a value into a Tree, by recursively applying a function to generate the child nodes
     // from their parent.

@@ -1,4 +1,5 @@
-package scalaz.http
+package scalaz
+package http
 
 import request.{RequestHeaders, Uris, Methods, Lines}
 import response.xhtml.Doctypes

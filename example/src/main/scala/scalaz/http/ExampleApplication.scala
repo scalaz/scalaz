@@ -1,4 +1,5 @@
-package scalaz.http
+package scalaz
+package http
 
 import scalaz.Scalaz._
 import scalaz.http.Slinky._

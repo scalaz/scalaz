@@ -1,7 +1,8 @@
-package scalaz.concurrent
+package scalaz
+package concurrent
 
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
-import scalaz.Scalaz._
+import Scalaz._
 
 sealed trait Promise[A] {
   private val latch = new CountDownLatch(1)

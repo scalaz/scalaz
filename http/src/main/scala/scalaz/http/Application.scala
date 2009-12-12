@@ -1,9 +1,9 @@
-package scalaz.http
+package scalaz
+package http
 
-import scalaz.http.response.{Body, Response, OK}
-import scalaz.http.request.Request
-import scalaz.Semigroup
-import scalaz.Scalaz._
+import response.{Body, Response, OK}
+import request.Request
+import Scalaz._
 
 /**
  * A web application that transforms a request to a response.

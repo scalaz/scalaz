@@ -1,4 +1,5 @@
-package scalaz.geo
+package scalaz
+package geo
 
 sealed trait Bearing {
   val value: Double

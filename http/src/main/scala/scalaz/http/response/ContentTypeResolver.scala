@@ -1,7 +1,8 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
-import scalaz.Scalaz._
-import scalaz.NonEmptyList
+import Scalaz._
 
 /**
  * A function to resolve a content-type given a file extension.

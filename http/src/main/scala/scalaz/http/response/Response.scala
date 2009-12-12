@@ -1,13 +1,13 @@
-package scalaz.http.response
+package scalaz
+package http
+package response
 
 
-import scalaz.http.request.Request
-import scalaz.http.request.UserAgent
-import scalaz.Scalaz._
-import scalaz.http.Util._
-import scalaz.http.Util.Nel._
-import scalaz.http.{Version, ContentType}
-import scalaz._
+import request.Request
+import request.UserAgent
+import Scalaz._
+import Util._
+import Util.Nel._
 
 /**
  * HTTP response.
@@ -184,7 +184,7 @@ sealed trait Response[OUT[_]] {
     if(hasContentType) this else this(ContentType, if(req.isInternetExplorer) "text/html" else "application/xhtml+xml")
 }
 
-import scalaz.http.request.Request
+import request.Request
 import StatusLine.statusLine
 
 /**

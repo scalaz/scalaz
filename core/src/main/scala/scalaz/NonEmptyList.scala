@@ -50,7 +50,10 @@ sealed trait NonEmptyList[+A] {
 }
 
 trait NonEmptyLists {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] = NonEmptyList(h, t: _*)
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
+    val head = h
+    val tail = t.toList
+  }
 }
 
 object NonEmptyList {

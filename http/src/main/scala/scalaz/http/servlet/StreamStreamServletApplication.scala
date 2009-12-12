@@ -1,6 +1,8 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
-import scalaz.http.request.Request
+import request.Request
 
 /**
  * A servlet web application with a request body and response body made up of a stream of bytes.
@@ -17,12 +19,11 @@ trait StreamStreamServletApplication {
   val application: ServletApplication[Stream, Stream]
 }
 
-import scalaz.Scalaz._
-import scalaz.http.response.Response
-import scalaz.http.servlet.HttpServlet._
-import scalaz.http.response.OK
-import scalaz.http.response.StreamResponse.{response, statusLine}
-
+import Scalaz._
+import response.Response
+import servlet.HttpServlet._
+import response.OK
+import response.StreamResponse.{response, statusLine}
 
 /**
  * A servlet web application with a request body and response body made up of a stream of bytes.

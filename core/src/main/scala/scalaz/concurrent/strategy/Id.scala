@@ -1,6 +1,6 @@
-package scalaz.concurrent.strategy
-
-import scalaz.concurrent.Strategy
+package scalaz
+package concurrent
+package strategy
 
 /**
  * A strategy that performs no evaluation of its argument.

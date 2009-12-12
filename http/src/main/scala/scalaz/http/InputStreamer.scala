@@ -1,7 +1,8 @@
-package scalaz.http
+package scalaz
+package http
 
 import java.io.InputStream
-import scalaz.Scalaz._
+import Scalaz._
 
 /**
  * Takes an input-stream to an environment for bytes.

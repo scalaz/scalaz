@@ -1,7 +1,9 @@
-package scalaz.http.servlet
+package scalaz
+package http
+package servlet
 
 import javax.servlet.{ServletRequest, ServletResponse, Filter, FilterChain, FilterConfig}
-import scalaz.http.servlet.HttpServletRequest._
+import HttpServletRequest._
 
 /**
  * A filter that will keep a session variable until the next request where its value is placed in a request attribute.

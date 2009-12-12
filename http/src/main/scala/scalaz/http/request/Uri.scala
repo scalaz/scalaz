@@ -1,9 +1,9 @@
-package scalaz.http.request
+package scalaz
+package http
+package request
 
-import scalaz._
-import scalaz.http.Util.Nel._
-import scalaz.http.Util
-import scalaz.Scalaz._
+import Util.Nel._
+import Scalaz._
 
 /**
  * HTTP request URI.
@@ -58,7 +58,7 @@ sealed trait Uri {
     }).filter(!_.isEmpty).map(_.mkString)
   }
 
-  import scalaz.http.Util.{asHashMap, mapHeads}
+  import Util.{asHashMap, mapHeads}
 
   /**
    * Returns the query string split into values by <code>'='</code>.

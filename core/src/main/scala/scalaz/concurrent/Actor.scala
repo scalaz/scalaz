@@ -1,8 +1,9 @@
-package scalaz.concurrent
+package scalaz
+package concurrent
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
-import scalaz.Scalaz._
+import Scalaz._
                   
 sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
