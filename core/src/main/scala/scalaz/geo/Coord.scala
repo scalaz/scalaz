@@ -53,7 +53,7 @@ sealed trait Coord {
         def tf(d: Double) = -3 + 4 * d
         val cosSigmaM2 = p.cosSigmaM2(sigma1)
         val cos2SigmaM2 = p.cos2SigmaM2(sigma1)
-        p.transition(b * p.sinSigma * (cosSigmaM2 + b / 4D * (p.cosSigma * (-1 + 2 * cos2SigmaM2) - (b / 6D) * cosSigmaM2 * tf(p.sinSigma * p.sinSigma) * tf(square(cos2SigmaM2)))))
+        p.transition(b * p.sinSigma * (cosSigmaM2 + b / 4D * (p.cosSigma * (-1 + 2 * cos2SigmaM2) - (b / 6D) * cosSigmaM2 * tf(square(p.sinSigma)) * tf(cos2SigmaM2))))
       }
       def pred(p: P) = (p.sigma - p.prevSigma).abs >= convergence
       begin.doWhile(iter(_), pred(_))
@@ -64,7 +64,7 @@ sealed trait Coord {
     val sss = sinu1 * end.sinSigma
     val lat = atan2(sinu1 * end.cosSigma + cosu1 * end.sinSigma * cosAlpha, (1D - flat) * sqrt(sin2Alpha + square(sss - ccca))).fromRadians[Latitude].value
     val lon = longitude.value + (atan2(end.sinSigma * sinAlpha, cc - sss * cosAlpha) - (1 - c) * flat * csa * (end.sigma + c * end.sinSigma * (end.cosSigmaM2(sigma1) + c * end.cosSigma * (-1 + 2 * end.cos2SigmaM2(sigma1))))).fromRadians[Longitude].value
-    vector(lat |-| lon, bearing(atan2(csa, ccca - sss)))
+    vector(lat |-| lon, (atan2(csa, ccca - sss)).fromRadians[Bearing])
   }
 }
 
