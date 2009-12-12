@@ -8,16 +8,13 @@ object ExampleVincenty {
   def run {
     implicit val ellipsoid = wgs84
 
+    // Mount Barney, Queensland, Australia
     val mountBarney = -28.2807 |-| 152.698
+
+    // N'ga Peak, Isle of Pines, New Caledonia
     val ngaPeak = -22.6528 |-| 167.4619
 
-    val d = mountBarney.direct(bearing(11.5D), 150435D)
-
-    // ((-26.950066610300084,153.00001065664318),Bearing {bearing = 11.359998078380356})
-    val e = vector(0.005187494614261823D |-| 152.67721319546956D, bearing(-1.0663583638067147D))
-    
-    d.println // todo
-
-    println(d ≟ e)
+    // Travelling at 11.5 degrees for a little over 150km from Mount Barney places you at the given vector.
+    mountBarney.direct(bearing(11.5D), 150435D) assert_≟ vector(-26.950066610300084D |-| 153.0000106566432D, bearing(11.359998078380356D))
   }
 }
