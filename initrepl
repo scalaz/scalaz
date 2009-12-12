@@ -1,1 +1,2 @@
+import scalaz._
 import scalaz.Scalaz._
