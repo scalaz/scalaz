@@ -53,5 +53,9 @@ object ExampleMonoid {
 
     // Unfold a value through the List Monoid with List Pure
     1.unfold[List, String]((a: Int) => (a < 5).option((a.toString, a + 1))) assert_≟ List("1", "2", "3", "4")
+
+    // Iterate over a function (Int, Int) => (Int, Int) through the Stream Monoid to generate the Fibonacci numbers
+    val fibs: Stream[Int] = (1, 1).iterate[Stream](p => (p._2, p._1 + p._2)).map(_._1)
+    fibs.take(6).toList assert_≟ List(1, 1, 2, 3, 5, 8)
   }
 }
