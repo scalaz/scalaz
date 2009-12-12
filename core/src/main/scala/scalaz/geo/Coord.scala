@@ -42,8 +42,7 @@ sealed trait Coord {
     val sin2Alpha = csa * csa
     val cos2Alpha = 1 - sin2Alpha
     def ab(d: Double, f: Double, g: Double, h: Double, i: Double) = {
-      val m = e.semiMajor / sMnr
-      val s = cos2Alpha * square(m) - 1
+      val s = cos2Alpha * (square(e.semiMajor / sMnr) - 1)
       (s / d) * ( f + s * (g + s * (h - i * s)))
     }
     val a = 1 + ab(16384, 4096, -768, 320, 175)
