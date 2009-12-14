@@ -9,7 +9,7 @@ sealed trait Identity[A] {
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   def σ: Dual[A] = value
-  
+
   def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
   def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
@@ -45,6 +45,8 @@ sealed trait Identity[A] {
   def print(implicit s: Show[A]): Unit = Console.print(shows)
 
   def println(implicit s: Show[A]): Unit = Console.println(shows)
+
+  def mapply[F[_], B](f: F[A => B])(implicit ftr: Functor[F]): F[B] = f ∘ (_(value)) 
 
   def text(implicit s: Show[A]): xml.Text = xml.Text(value.shows)
 
