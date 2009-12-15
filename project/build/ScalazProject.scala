@@ -10,7 +10,7 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
   // override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
 
-  override def compileOptions = target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
+  override def compileOptions = target(Target.Java1_5) :: Unchecked /*:: CompileOption("-Xlog-implicits") :: CompileOption("-Ydebug") :: CompileOption("-Ylog:typer") */:: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
