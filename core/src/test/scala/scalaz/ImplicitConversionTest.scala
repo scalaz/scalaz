@@ -48,11 +48,6 @@ object ImplicitConversionTest {
   def monad {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
-
-
-    implicitly[Pure[NonEmptyList]]
-    implicitly[Bind[NonEmptyList]]
-
     implicitly[Monad[NonEmptyList]]
   }
 
