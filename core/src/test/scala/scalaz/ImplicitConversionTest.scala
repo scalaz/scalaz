@@ -2,8 +2,6 @@ package scalaz
 
 // compiles == green
 object ImplicitConversionTest {
-  type X[_] = NonEmptyList[_] // todo remove this, it is a workaround for http://lampsvn.epfl.ch/trac/scala/ticket/2778
-
   import Scalaz._
 
   def MAs[A, B, C, D, E, F, G, H] {

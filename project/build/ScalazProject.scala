@@ -8,7 +8,7 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
-  // override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
+  override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
 
   override def compileOptions = target(Target.Java1_5) :: Unchecked /*:: CompileOption("-Xlog-implicits") :: CompileOption("-Ydebug") :: CompileOption("-Ylog:typer") */:: super.compileOptions.toList
 
