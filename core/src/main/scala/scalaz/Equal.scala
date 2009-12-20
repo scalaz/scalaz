@@ -16,6 +16,7 @@ object Equal {
   import Scalaz._
   import java.math.BigInteger
   import xml.NodeSeq
+  import Predef.{implicitly => i}
 
   implicit def DigitEqual: Equal[Digit] = equalA
 
@@ -27,27 +28,27 @@ object Equal {
 
   implicit def IntEqual: Equal[Int] = equalA
 
-  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = i[Equal, Int] ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = i[Equal[Int]] ∙ ((_: IntMultiplication).value)
 
   implicit def BooleanEqual: Equal[Boolean] = equalA
 
-  implicit def BooleanConjunctionEqual: Equal[BooleanConjunction] = i[Equal, Boolean] ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionEqual: Equal[BooleanConjunction] = i[Equal[Boolean]] ∙ ((_: BooleanConjunction).value)
 
   implicit def CharEqual: Equal[Char] = equalA
 
-  implicit def CharMultiplicationEqual: Equal[CharMultiplication] = i[Equal, Char] ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationEqual: Equal[CharMultiplication] = i[Equal[Char]] ∙ ((_: CharMultiplication).value)
 
   implicit def ByteEqual: Equal[Byte] = equalA
 
-  implicit def ByteMultiplicationEqual: Equal[ByteMultiplication] = i[Equal, Byte] ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationEqual: Equal[ByteMultiplication] = i[Equal[Byte]] ∙ ((_: ByteMultiplication).value)
 
   implicit def LongEqual: Equal[Long] = equalA
 
-  implicit def LongMultiplicationEqual: Equal[LongMultiplication] = i[Equal, Long] ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationEqual: Equal[LongMultiplication] = i[Equal[Long]] ∙ ((_: LongMultiplication).value)
 
   implicit def ShortEqual: Equal[Short] = equalA
 
-  implicit def ShortMultiplicationEqual: Equal[ShortMultiplication] = i[Equal, Short] ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationEqual: Equal[ShortMultiplication] = i[Equal[Short]] ∙ ((_: ShortMultiplication).value)
 
   implicit def FloatEqual: Equal[Float] = equalA
 
@@ -55,11 +56,11 @@ object Equal {
 
   implicit def BigIntegerEqual: Equal[BigInteger] = equalA[java.math.BigInteger]
 
-  implicit def BigIntegerMultiplicationEqual: Equal[BigIntegerMultiplication] = i[Equal, BigInteger] ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationEqual: Equal[BigIntegerMultiplication] = i[Equal[BigInteger]] ∙ ((_: BigIntegerMultiplication).value)
 
   implicit def BigIntEqual: Equal[BigInt] = equalA
 
-  implicit def BigIntMultiplicationEqual: Equal[BigIntMultiplication] = i[Equal, BigInt] ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultiplicationEqual: Equal[BigIntMultiplication] = i[Equal[BigInt]] ∙ ((_: BigIntMultiplication).value)
 
   implicit def NodeSeqEqual: Equal[NodeSeq] = equalA
 
@@ -150,27 +151,27 @@ object Equal {
 
   import geo._
 
-  implicit def AzimuthEqual: Equal[Azimuth] = i[Equal, Double] ∙ (_.value)
+  implicit def AzimuthEqual: Equal[Azimuth] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def BearingEqual: Equal[Bearing] = i[Equal, Double] ∙ (_.value)
+  implicit def BearingEqual: Equal[Bearing] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def CoordEqual: Equal[Coord] = i[Equal, (Latitude, Longitude)] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+  implicit def CoordEqual: Equal[Coord] = i[Equal[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
 
-  implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = i[Equal, (GeodeticCurve, Elevation)] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = i[Equal[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
-  implicit def ElevationEqual: Equal[Elevation] = i[Equal, Double] ∙ (_.value)
+  implicit def ElevationEqual: Equal[Elevation] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 
-  implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = i[Equal, (Double, Azimuth, Azimuth)] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
+  implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = i[Equal[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
 
-  implicit def LatitudeEqual: Equal[Latitude] = i[Equal, Double] ∙ (_.value)
+  implicit def LatitudeEqual: Equal[Latitude] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def LongitudeEqual: Equal[Longitude] = i[Equal, Double] ∙ (_.value)
+  implicit def LongitudeEqual: Equal[Longitude] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def PositionEqual: Equal[Position] = i[Equal, (Coord, Elevation)] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+  implicit def PositionEqual: Equal[Position] = i[Equal[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
 
-  implicit def VectorEqual: Equal[Vector] = i[Equal, (Coord, Bearing)] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorEqual: Equal[Vector] = i[Equal[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
 
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator

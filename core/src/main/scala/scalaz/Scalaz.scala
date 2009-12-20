@@ -85,15 +85,13 @@ object Scalaz extends ScalazLow
 
   lazy val π = java.lang.Math.PI
 
-  lazy val π2 = π * 2   
+  lazy val π2 = π * 2
 
   type GArray[A] = collection.mutable.GenericArray[A]
 
   type ![A <: Applicable, B] = A#Apply[B]
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
-
-  def i[F[_], A](implicit i: F[A]): F[A] = i
 
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip, A](a)

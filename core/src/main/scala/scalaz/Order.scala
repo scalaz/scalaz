@@ -15,6 +15,7 @@ trait Orders {
 object Order {
   import Scalaz._
   import java.math.BigInteger
+  import Predef.{implicitly => i}
 
   implicit def DigitOrder: Order[Digit] = IntOrder ∙ ((_: Digit).toInt)
 
@@ -34,27 +35,27 @@ object Order {
 
   implicit def IntOrder: Order[Int] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def IntMultiplicationOrder: Order[IntMultiplication] = i[Order, Int] ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationOrder: Order[IntMultiplication] = i[Order[Int]] ∙ ((_: IntMultiplication).value)
 
   implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = i[Order, Boolean] ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = i[Order[Boolean]] ∙ ((_: BooleanConjunction).value)
 
   implicit def CharOrder: Order[Char] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def CharMultiplicationOrder: Order[CharMultiplication] = i[Order, Char] ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationOrder: Order[CharMultiplication] = i[Order[Char]] ∙ ((_: CharMultiplication).value)
 
   implicit def ByteOrder: Order[Byte] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = i[Order, Byte] ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = i[Order[Byte]] ∙ ((_: ByteMultiplication).value)
 
   implicit def LongOrder: Order[Long] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def LongMultiplicationOrder: Order[LongMultiplication] = i[Order, Long] ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationOrder: Order[LongMultiplication] = i[Order[Long]] ∙ ((_: LongMultiplication).value)
 
   implicit def ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = i[Order, Short] ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = i[Order[Short]] ∙ ((_: ShortMultiplication).value)
 
   implicit def FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
@@ -62,11 +63,11 @@ object Order {
 
   implicit def BigIntegerOrder: Order[BigInteger] = order(_ compareTo _ ordering)
 
-  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = i[Order, BigInteger] ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = i[Order[BigInteger]] ∙ ((_: BigIntegerMultiplication).value)
 
   implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = i[Order, BigInt] ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = i[Order[BigInt]] ∙ ((_: BigIntMultiplication).value)
 
   implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] = IterableOrder[A] ∙ ((_: NonEmptyList[A]).list)
 
@@ -160,25 +161,25 @@ object Order {
 
   import geo._
 
-  implicit def AzimuthOrder: Order[Azimuth] = i[Order, Double] ∙ (_.value)
+  implicit def AzimuthOrder: Order[Azimuth] = i[Order[Double]] ∙ (_.value)
 
-  implicit def BearingOrder: Order[Bearing] = i[Order, Double] ∙ (_.value)
+  implicit def BearingOrder: Order[Bearing] = i[Order[Double]] ∙ (_.value)
 
-  implicit def CoordOrder: Order[Coord] = i[Order, (Latitude, Longitude)] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+  implicit def CoordOrder: Order[Coord] = i[Order[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
 
-  implicit def ElevatedCurveOrder: Order[ElevatedCurve] = i[Order, (GeodeticCurve, Elevation)] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveOrder: Order[ElevatedCurve] = i[Order[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
-  implicit def ElevationOrder: Order[Elevation] = i[Order, Double] ∙ (_.value)
+  implicit def ElevationOrder: Order[Elevation] = i[Order[Double]] ∙ (_.value)
 
-  implicit def EllipsoidOrder: Order[Ellipsoid] = i[Order, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+  implicit def EllipsoidOrder: Order[Ellipsoid] = i[Order[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 
-  implicit def GeodeticCurveOrder: Order[GeodeticCurve] = i[Order, (Double, Azimuth, Azimuth)] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
+  implicit def GeodeticCurveOrder: Order[GeodeticCurve] = i[Order[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
 
-  implicit def LatitudeOrder: Order[Latitude] = i[Order, Double] ∙ (_.value)
+  implicit def LatitudeOrder: Order[Latitude] = i[Order[Double]] ∙ (_.value)
 
-  implicit def LongitudeOrder: Order[Longitude] = i[Order, Double] ∙ (_.value)
+  implicit def LongitudeOrder: Order[Longitude] = i[Order[Double]] ∙ (_.value)
 
-  implicit def PositionOrder: Order[Position] = i[Order, (Coord, Elevation)] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+  implicit def PositionOrder: Order[Position] = i[Order[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
 
-  implicit def VectorOrder: Order[Vector] = i[Order, (Coord, Bearing)] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorOrder: Order[Vector] = i[Order[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
 }

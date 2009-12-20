@@ -16,8 +16,9 @@ trait Shows {
 
 object Show {
   import Scalaz._
+  import Predef.{implicitly => i}
 
-  implicit def DigitShow: Show[Digit] = i[Show, Int] ∙ ((_: Digit).toInt)
+  implicit def DigitShow: Show[Digit] = i[Show[Int]] ∙ ((_: Digit).toInt)
 
   implicit def OrderingShow: Show[Ordering] = showA
 
@@ -29,27 +30,27 @@ object Show {
 
   implicit def IntShow: Show[Int] = showA
 
-  implicit def IntMultiplicationShow: Show[IntMultiplication] = i[Show, Int] ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationShow: Show[IntMultiplication] = i[Show[Int]] ∙ ((_: IntMultiplication).value)
 
   implicit def BooleanShow: Show[Boolean] = showA
 
-  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = i[Show, Boolean] ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = i[Show[Boolean]] ∙ ((_: BooleanConjunction).value)
 
   implicit def CharShow: Show[Char] = showA
 
-  implicit def CharMultiplicationShow: Show[CharMultiplication] = i[Show, Char] ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationShow: Show[CharMultiplication] = i[Show[Char]] ∙ ((_: CharMultiplication).value)
 
   implicit def ByteShow: Show[Byte] = showA
 
-  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = i[Show, Byte] ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = i[Show[Byte]] ∙ ((_: ByteMultiplication).value)
 
   implicit def LongShow: Show[Long] = showA
 
-  implicit def LongMultiplicationShow: Show[LongMultiplication] = i[Show, Long] ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationShow: Show[LongMultiplication] = i[Show[Long]] ∙ ((_: LongMultiplication).value)
 
   implicit def ShortShow: Show[Short] = showA
 
-  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = i[Show, Short] ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = i[Show[Short]] ∙ ((_: ShortMultiplication).value)
 
   implicit def FloatShow: Show[Float] = showA
 
@@ -252,11 +253,11 @@ object Show {
 
   implicit def CoordShow: Show[Coord] = shows(c => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
 
-  implicit def ElevatedCurveShow: Show[ElevatedCurve] = i[Show, (GeodeticCurve, Elevation)] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveShow: Show[ElevatedCurve] = i[Show[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
   implicit def ElevationShow: Show[Elevation] = shows(_.value.shows + "m")
 
-  implicit def EllipsoidShow: Show[Ellipsoid] = i[Show, (Double, Double, Double, Double)] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+  implicit def EllipsoidShow: Show[Ellipsoid] = i[Show[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 
   implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance.shows + " " + c.azi.shows + " " + c.reverseAzi.shows + "]")
 
@@ -264,7 +265,7 @@ object Show {
 
   implicit def LongitudeShow: Show[Longitude] = shows(_.value.shows + "°")
 
-  implicit def PositionShow: Show[Position] = i[Show, (Coord, Elevation)] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+  implicit def PositionShow: Show[Position] = i[Show[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
 
-  implicit def VectorShow: Show[Vector] = i[Show, (Coord, Bearing)] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorShow: Show[Vector] = i[Show[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
 }

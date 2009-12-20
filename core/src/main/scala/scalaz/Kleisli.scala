@@ -5,13 +5,13 @@ sealed trait Kleisli[M[_], A, B] {
 
   import Scalaz._
 
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]) = ☆((a: A) => b.bind(this(a), k(_: B)))
+  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = ☆((a: A) => b.bind(this(a), k(_: B)))
 
   def >=>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(☆(k))
 
-  def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]) = k >=> this
+  def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
-  def <=<[C](k: C => M[A])(implicit b: Bind[M]) = ☆(k) >=> this
+  def <=<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = ☆(k) >=> this
 
   def compose[N[_]](f: M[B] => N[B]) = ☆((a: A) => f(this(a)))
 
