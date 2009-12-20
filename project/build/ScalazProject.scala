@@ -10,12 +10,14 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
   override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
 
-  override def compileOptions = target(Target.Java1_5) :: Unchecked /*:: CompileOption("-Xlog-implicits") :: CompileOption("-Ydebug") :: CompileOption("-Ylog:typer") */:: super.compileOptions.toList
+  override def compileOptions = target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
-  override def documentOptions = documentTitle("Scalaz " + component + projectVersion + " API Specification") :: windowTitle("Scalaz " + projectVersion) :: super.documentOptions.toList
+  val documentSkipPhases = List("tailcalls",  "explicitouter",  "erasure",  "lazyvals",  "lambdalift",  "constructors",  "flatten",  "mixin",  "cleanup",  "icode",  "inliner",  "closelim",  "dce",  "jvm")
 
+  override def documentOptions = SimpleDocOption("-verbose") :: Nil
+  
   override def managedStyle = ManagedStyle.Maven
 
   override def packageDocsJar = defaultJarPath("-javadoc.jar")
@@ -24,9 +26,9 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
 
   val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-//  val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
+  val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  override def packageToPublishActions = super.packageToPublishActions ++ Seq(/*packageDocs,*/ packageSrc)
+  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with FileTasks {
@@ -47,7 +49,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   }
 
   def zipTask(sources: PathFinder, zipPath: => Path): Task =
-		fileTask("zip", zipPath from sources) { FileUtilities.zip(sources.get, zipPath, false, log) }
+    fileTask("zip", zipPath from sources) {FileUtilities.zip(sources.get, zipPath, false, log)}
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(releaseZipAction)
 

@@ -19,19 +19,8 @@
     <orderEntry type="module-library">
       <library name="sbt">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" />
-          <root url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.2" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/project/boot/scala-2.7.5/sbt-0.5.5" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar:///opt/scala-2.8.0.r19920-b20091128020206/lib/scala-library.jar!/" />
+          <root url="jar://$MODULE_DIR$/project/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.6.7/sbt_2.7.7-0.6.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/project/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.6.7/ivy_2.7.7-0.6.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
