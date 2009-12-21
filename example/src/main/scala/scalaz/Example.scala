@@ -3,6 +3,7 @@ package scalaz
 object Example {
   def run {
     ExampleApplicative.run
+    ExampleArrow.run
     ExampleBifunctor.run
     ExampleBKTree.run
     ExampleCategory.run
