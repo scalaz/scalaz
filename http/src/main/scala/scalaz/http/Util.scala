@@ -30,6 +30,7 @@ object Util {
     x map (chars => {
       val pre = chars takeWhile (_ != '=')
       val post = chars dropWhile (_ != '=')
+      // TODO decode is deprecated
       (pre, decode(post.mkString).drop(1).toList)
     })
   }
