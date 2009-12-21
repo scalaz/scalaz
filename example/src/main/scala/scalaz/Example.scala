@@ -10,6 +10,7 @@ object Example {
     ExampleCofunctor.run
     ExampleDistance.run
     ExampleFunctor.run
+    ExampleFold.run
     ExampleKleisli.run
     ExampleIdentity.run
     ExampleMonad.run

@@ -55,6 +55,12 @@ object ImplicitConversionTest {
     implicitly[Functor[java.util.PriorityQueue]]
   }
 
+  def foldRight[A] {
+    implicitly[FoldRight[Stream]]
+    implicitly[FoldRight[List]]
+    implicitly[FoldRight[Set]]
+  }
+
   def partialApply {
     trait A
     trait B

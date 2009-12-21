@@ -1,6 +1,8 @@
 package scalaz
 
-trait FoldRight[-F[_]] {
+// We can't make this contra-variant and have a specific instance for Stream with
+// the current rules for implicit prioritization in Scala.
+trait FoldRight[F[_]] {
   def foldRight[A, B](t: F[A], b: B, f: (A, => B) => B): B
 }
 
@@ -11,9 +13,23 @@ object FoldRight {
     def foldRight[A, B](t: Identity[A], b: B, f: (A, => B) => B) = f(t.value, b)
   }
 
-  implicit def ListFoldRight = new FoldRight[List] {
-    def foldRight[A, B](t: List[A], b: B, f: (A, => B) => B) = IterableFoldRight.foldRight(t, b, f)
+  def IterableFoldRight[I[X] <: Iterable[X]]: FoldRight[I] = new FoldRight[I] {
+    def foldRight[A, B](t: I[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
   }
+
+  implicit val IterableFoldRight0: FoldRight[Iterable] = IterableFoldRight[Iterable]
+
+  implicit def ListFoldRight: FoldRight[List] = IterableFoldRight[List]
+
+  implicit def VectorFoldRight: FoldRight[Vector] = IterableFoldRight[Vector]
+
+  import collection.mutable.Buffer
+
+  implicit def BufferFoldRight: FoldRight[Buffer] = IterableFoldRight[Buffer]
+
+  implicit def SetFoldRight: FoldRight[Set] = IterableFoldRight[Set]
+
+  implicit def SeqFoldRight: FoldRight[Seq] = IterableFoldRight[Seq]
 
   implicit def NonEmptyListFoldRight = new FoldRight[NonEmptyList] {
     def foldRight[A, B](t: NonEmptyList[A], b: B, f: (A, => B) => B) = IterableFoldRight.foldRight(t.list, b, f)
@@ -52,10 +68,8 @@ object FoldRight {
   implicit def ZipStreamFoldRight: FoldRight[ZipStream] = new FoldRight[ZipStream] {
     def foldRight[A, B](t: ZipStream[A], b: B, f: (A, => B) => B): B = StreamFoldRight.foldRight(t.value, b, f)
   }
-  
-  implicit def GenericArrayFoldRight: FoldRight[GArray] = new FoldRight[GArray] {
-    def foldRight[A, B](t: GArray[A], b: B, f: (A, => B) => B) = t.foldRight(b)(f(_, _))
-  }
+
+  implicit def GenericArrayFoldRight: FoldRight[GArray] = IterableFoldRight[GArray]
 
   implicit def EitherLeftFoldRight[X] = new FoldRight[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def foldRight[A, B](e: Either.LeftProjection[A, X], b: B, f: (A, => B) => B) = OptionFoldRight.foldRight(e.toOption, b, f)
@@ -79,12 +93,12 @@ object FoldRight {
     }
   }
 
-  implicit def StreamFoldRight = new FoldRight[Stream] {
-    def foldRight[A, B](t: Stream[A], b: B, f: (A, => B) => B): B = if(t.isEmpty) b else f(t.head, foldRight(t.tail, b, f))
-  }
-
-  implicit def IterableFoldRight = new FoldRight[Iterable] {
-    def foldRight[A, B](t: Iterable[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
+  implicit def StreamFoldRight: FoldRight[Stream] = new FoldRight[Stream] {
+    def foldRight[A, B](t: Stream[A], b: B, f: (A, => B) => B): B =
+      if(t.isEmpty)
+        b
+      else
+        f(t.head, foldRight(t.tail, b, f))
   }
 
   implicit def JavaIterableFoldRight[A] = new FoldRight[java.lang.Iterable] {
@@ -96,7 +110,7 @@ object FoldRight {
           def next = k.next
         }
       }
-      IterableFoldRight.foldRight(i, b, f)
+      IterableFoldRight[Iterable].foldRight[A, B](i, b, f)
     }
   }
 
