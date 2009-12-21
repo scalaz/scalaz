@@ -35,6 +35,10 @@ object Index {
     def index[A](a: GArray[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
   }
 
+  implicit def ArrayIndex: Index[Array] = new Index[Array] {
+    def index[A](a: Array[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
+  }
+
   implicit def EitherLeftIndex[X]: Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def index[A](a: Either.LeftProjection[A, X], i: Int) = a.toOption filter (_ => i == 0)
   }

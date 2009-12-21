@@ -6,6 +6,7 @@ object Example {
     ExampleBifunctor.run
     ExampleCategory.run
     ExampleCofunctor.run
+    ExampleDistance.run
     ExampleFunctor.run
     ExampleKleisli.run
     ExampleIdentity.run

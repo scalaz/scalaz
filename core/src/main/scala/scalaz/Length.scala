@@ -63,6 +63,10 @@ object Length {
     def len[A](a: GArray[A]) = a.length
   }
 
+  implicit def ArrayLength: Length[Array] = new Length[Array] {
+    def len[A](a: Array[A]) = a.length
+  }
+
   implicit def IterableLength: Length[Iterable] = new Length[Iterable] {
     def len[A](a: Iterable[A]) = {
       var n = 0
