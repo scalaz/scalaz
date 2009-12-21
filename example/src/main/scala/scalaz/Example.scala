@@ -4,6 +4,7 @@ object Example {
   def run {
     ExampleApplicative.run
     ExampleBifunctor.run
+    ExampleBKTree.run
     ExampleCategory.run
     ExampleCofunctor.run
     ExampleDistance.run
