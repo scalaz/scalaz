@@ -16,7 +16,7 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
 
   val documentSkipPhases = List("tailcalls",  "explicitouter",  "erasure",  "lazyvals",  "lambdalift",  "constructors",  "flatten",  "mixin",  "cleanup",  "icode",  "inliner",  "closelim",  "dce",  "jvm")
 
-  override def documentOptions = SimpleDocOption("-verbose") :: Nil
+  override def documentOptions = Nil
   
   override def managedStyle = ManagedStyle.Maven
 
