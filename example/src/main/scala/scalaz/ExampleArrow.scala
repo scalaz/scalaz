@@ -29,9 +29,6 @@ object ExampleArrow {
     }
 
     // Kleisli arrow
-    {
-      // TODO Eschew the explicit call to mab
-      // mab[PartialApplyK[Kleisli, Option]#Apply, List[Int], String](☆((n: List[Int]) => if(n.isEmpty) None else Some(n.shows.reverse)))
-    }
+    ☆((n: List[Int]) => if(n.isEmpty) None else Some(n.shows.reverse))
   }
 }

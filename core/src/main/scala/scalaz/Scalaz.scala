@@ -136,4 +136,8 @@ object Scalaz extends ScalazLow
 
   // Seq[A] implements Function1[Int, A]. Without this, Function1FlipMA would be used.
   implicit def SeqMA[M[_] <: Seq[_], A](l: M[A]): MA[M, A] = ma[M, A](l)
+
+  // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
+  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
+
 }
