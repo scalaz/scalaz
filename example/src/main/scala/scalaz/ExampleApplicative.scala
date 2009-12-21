@@ -28,5 +28,28 @@ object ExampleApplicative {
       
       List(7, 8, 14, 15, 16, 20, 21) ∘ z assert_≟ List(false,false,false,false,true,true,false)
     }
+
+    def s[A](a: A) = a.success[List[String]]
+    def f[A](s: String) = ff(List(s))
+    def ff[A](s: List[String]) = s.fail[Int]
+    val add3 = (x: Int) => (y: Int) => (z: Int) => x + y + z
+
+    s(7) ⊛ (s(8) ⊛ (s(9) ∘ add3)) assert_≟ s(24)
+    f("bzzt") ⊛ (s(8) ⊛ (f("bang") ∘ add3)) assert_≟ ff(List("bang", "bzzt"))
+
+    s(7) ⊛> s(8) assert_≟ s(8)
+    s(7) ⊛> f("bzzt") assert_≟ f("bzzt")
+    f("bang") ⊛> s(8) assert_≟ f("bang")
+    f("bang") ⊛> f("bzzt") assert_≟ ff(List("bang", "bzzt"))
+
+    s(7) <⊛ s(8) assert_≟ s(7)
+    s(7) <⊛ f("bzzt") assert_≟ f("bzzt")
+    f("bang") <⊛ s(8) assert_≟ f("bang")
+    f("bang") <⊛ f("bzzt") assert_≟ ff(List("bang", "bzzt"))
+
+    s(7) <×> s(8) assert_≟ s(7, 8)
+    s(7) <×> f("bzzt") assert_≟ List("bzzt").fail
+    f("bang") <×> s(8) assert_≟ List("bang").fail
+    f("bang") <×> f("bzzt") assert_≟ List("bang", "bzzt").fail
   }
 }
