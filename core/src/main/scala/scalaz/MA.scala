@@ -7,6 +7,8 @@ sealed trait MA[M[_], A] {
 
   def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = t.fmap(v, f)
 
+  def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
+
   def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)

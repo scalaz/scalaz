@@ -15,5 +15,8 @@ object ExampleFunctor {
     // Map across the Function1 functor
     val len = (s: String) => s.length
     (len ∘ (1 + (_: Int))).apply("foo") assert_≟ 4
+
+    // Map across the Option functor within a map across the List functor 
+    (List(Some(7), None, Some(8)) ∘∘ (1 + (_: Int))) assert_≟ List(Some(8), None, Some(9))
   }
 }
