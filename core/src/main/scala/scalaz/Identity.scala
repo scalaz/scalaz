@@ -99,6 +99,8 @@ sealed trait Identity[A] {
   def whileDo(f: A => A, p: A => Boolean): A =
     if(p(value)) f(value).whileDo(f, p) else value
 
+  def ×× : (A, A) = ×[A, A].join apply value
+
   override def toString = value.toString
 
   override def hashCode = value.hashCode
