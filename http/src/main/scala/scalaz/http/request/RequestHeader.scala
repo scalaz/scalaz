@@ -193,7 +193,7 @@ private final case class General(gh: GeneralHeader) extends RequestHeader {
   override val asString = gh.asString
 }
 
-import Character.isSpace
+import Character.isWhitespace
 import Scalaz._
 import Util.Nel._
 
@@ -288,7 +288,7 @@ object RequestHeader extends RequestHeaders {
     cs span (_ != ':') match {
       case (n, v) => {
         (n: Option[RequestHeader]) ∗ (h =>
-          (v.dropWhile(x => x == ':' || isSpace(x))).toNel map (v => (h, v)))
+          (v.dropWhile(x => x == ':' || isWhitespace(x))).toNel map (v => (h, v)))
       }
     }
 }

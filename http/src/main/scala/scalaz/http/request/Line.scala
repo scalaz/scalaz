@@ -79,17 +79,17 @@ sealed trait Line {
 }
 
 trait Lines {
-  import Character.isSpace
+  import Character.isWhitespace
   import Scalaz._
 
   /**
    * Converts the given string into a potential request line.
    */
   implicit def ListLine(cs: List[Char]): Option[Line] = {
-    def reverseTrim(c: List[Char]) = c.dropWhile(isSpace(_)).reverse.dropWhile(isSpace(_))
-    val x = cs span (!isSpace(_))
+    def reverseTrim(c: List[Char]) = c.dropWhile(isWhitespace(_)).reverse.dropWhile(isWhitespace(_))
+    val x = cs span (!isWhitespace(_))
     val m: Option[Method] = x._1
-    val y = x._2.reverse span (!isSpace(_))
+    val y = x._2.reverse span (!isWhitespace(_))
     val u: Option[Uri] = reverseTrim(y._2)
     val v: Option[Version] = reverseTrim(y._1)
     v ⊛ (u ⊛ (m map (m => u => v => Line.line(m, u, v))))
