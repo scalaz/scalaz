@@ -3,8 +3,8 @@ $LastChangedRevision$
 $LastChangedBy$
 $URL$
 
-Build Instructions
-------------------
+Build Instructions (Using Haskell and Lastik)
+---------------------------------------------
 
 1a) Install The Haskell Platform http://hackage.haskell.org/platform/
 1b) If The Haskell Platform is not available to you:
@@ -15,3 +15,15 @@ Build Instructions
 3) Install Lastik with the command 'cabal install Lastik'
     http://hackage.haskell.org/package/Lastik
 
+Build Instructions (Using SBT)
+------------------------------
+
+The root directory of the project contains the SBT launcher, shell script, and Windows command script.
+Project configuration is found under ./project/build/ScalazProject.scala
+
+0. alias sbt=sh $PWD/sbt.sh (on Unix systems)
+1. sbt update (this step is required after a fresh checkout, after changing the version of 
+                     SBT, Scala, or other dependencies)
+2. sbt package
+
+For other options, read: http://code.google.com/p/simple-build-tool/wiki/DocumentationHome
