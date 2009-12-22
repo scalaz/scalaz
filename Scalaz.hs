@@ -81,7 +81,8 @@ s :: FilePath -> S.Scalac
 s d = S.scalac {
   S.directory = Just d,
   S.deprecation = True,
-  S.classpath = depends
+  S.classpath = depends,
+  S.etc = "-Xcheckinit -Xlog-implicits -Xstrict-warnings -Xwarninit"
 }
 
 f :: S.Fsc

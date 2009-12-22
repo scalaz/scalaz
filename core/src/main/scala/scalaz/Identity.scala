@@ -85,6 +85,8 @@ sealed trait Identity[A] {
 
   def fail[X]: Validation[A, X] = Scalaz.failure(value)
 
+  def some: Option[A] = Some(value)
+
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def wrapNel: NonEmptyList[A] = Scalaz.nel(value, Nil)
