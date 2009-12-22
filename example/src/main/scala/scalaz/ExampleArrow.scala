@@ -56,7 +56,12 @@ object ExampleArrow {
       q apply 91 assert_≟ None
       q apply 92 assert_≟ (368, 1196).some
       q apply 104 assert_≟ None
-      
+
+      // Perform k on a pair on the Kleisli arrow using the Option monad.
+      val j = k.product
+      j apply ((44 to 49).toList, (12 to 18).toList) assert_≟ (List("44","54","64","74","84","94"),List("21", "31", "41", "51", "61", "71", "81")).some
+      j apply (Nil, (12 to 18).toList) assert_≟ None
+      j apply ((44 to 49).toList,Nil) assert_≟ None
     }
   }
 }
