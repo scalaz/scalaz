@@ -4,19 +4,25 @@ import java.util.jar.Attributes.Name._
 import java.io.File
 import scala.Array
 
-abstract class ScalazDefaults(info: ProjectInfo, component: String) extends DefaultProject(info) {
+abstract class ScalazDefaults(info: ProjectInfo, component: String) extends DefaultProject(info)
+        with AutoCompilerPlugins{
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
   override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
 
-  override def compileOptions = target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
+  val sxr = compilerPlugin("org.scala-tools.sxr" %% "sxr" % "0.2.3")
+
+  private val encodingUtf8 = List("-encoding", "UTF-8")
+
+  override def compileOptions =
+          CompileOption("-P:sxr:base-directory:" + mainScalaSourcePath.asFile.getAbsolutePath) ::
+          encodingUtf8.map(CompileOption(_)) :::
+          target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
-  val documentSkipPhases = List("tailcalls",  "explicitouter",  "erasure",  "lazyvals",  "lambdalift",  "constructors",  "flatten",  "mixin",  "cleanup",  "icode",  "inliner",  "closelim",  "dce",  "jvm")
-
-  override def documentOptions = Nil
+  override def documentOptions = encodingUtf8.map(SimpleDocOption(_))
   
   override def managedStyle = ManagedStyle.Maven
 
