@@ -11,12 +11,9 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
   override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
 
-  val sxr = compilerPlugin("org.scala-tools.sxr" %% "sxr" % "0.2.3")
-
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
   override def compileOptions =
-          CompileOption("-P:sxr:base-directory:" + mainScalaSourcePath.asFile.getAbsolutePath) ::
           encodingUtf8.map(CompileOption(_)) :::
           target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
