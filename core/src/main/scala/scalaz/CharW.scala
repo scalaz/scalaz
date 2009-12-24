@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait CharW {
-  val value: Char
-
+sealed trait CharW extends PimpedType[Char] {
   import Scalaz._
   
   def ∏ = multiplication(value)
@@ -16,6 +14,4 @@ trait Chars {
   implicit def CharTo(c: Char): CharW = new CharW {
     val value = c
   }
-
-  implicit def CharFrom(c: CharW): Char = c.value
 }

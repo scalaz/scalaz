@@ -2,9 +2,7 @@ package scalaz
 
 import java.io.InputStream
 
-sealed trait InputStreamW {
-  val value: InputStream
-
+sealed trait InputStreamW extends PimpedType[InputStream] {
   import Scalaz._
 
   implicit def elements =
@@ -41,6 +39,4 @@ trait InputStreams {
   implicit def InputStreamTo(v: InputStream): InputStreamW = new InputStreamW {
     val value = v
   }
-
-  implicit def InputStreamFrom(v: InputStreamW): InputStream = v.value
 }

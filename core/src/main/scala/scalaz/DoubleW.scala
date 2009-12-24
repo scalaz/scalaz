@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait DoubleW {
-  val value: Double
-
+sealed trait DoubleW extends PimpedType[Double] {
   import Scalaz._
   import geo._
 
@@ -17,6 +15,4 @@ trait DoubleWs {
   implicit def DoubleTo(n: Double): DoubleW = new DoubleW {
     val value = n
   }
-
-  implicit def DoubleFrom(n: DoubleW): Double = n.value
 }

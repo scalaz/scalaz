@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait ListW[A] {
-  val value: List[A]
-
+sealed trait ListW[A] extends PimpedType[List[A]] {
   import Scalaz._
 
   def intersperse(a: A): List[A] = value match {
@@ -91,8 +89,6 @@ trait Lists {
   implicit def ListTo[A](as: List[A]): ListW[A] = new ListW[A] {
     val value = as
   }
-
-  implicit def ListFrom[A](as: ListW[A]): List[A] = as.value
 
   def nil[A]: List[A] = Nil
 }

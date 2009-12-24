@@ -13,5 +13,5 @@ trait NewType[X] {
 }
 
 object NewType {
-  implicit def NewTypeFrom[X](n: NewType[X]): X = n.value
+  implicit def UnwrapNewType[X](n: NewType[X]): X = n.value
 }

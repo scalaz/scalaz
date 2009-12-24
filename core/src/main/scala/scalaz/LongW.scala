@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait LongW {
-  val value: Long
-
+sealed trait LongW extends PimpedType[Long] {
   import Scalaz._
 
   def ∏ = multiplication(value)  
@@ -17,6 +15,4 @@ trait Longs {
   implicit def LongTo(n: Long): LongW = new LongW {
     val value = n
   }
-
-  implicit def LongFrom(n: LongW): Long = n.value
 }

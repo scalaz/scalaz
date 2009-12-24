@@ -1,5 +1,6 @@
 package scalaz
 
+// todo extends NewType?
 trait Dual[A] {
   val value : A
 }

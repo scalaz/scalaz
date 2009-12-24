@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait Identity[A] {
-  val value: A
-
+sealed trait Identity[A] extends PimpedType[A] {
   import Scalaz._
   import geo._
 
@@ -114,8 +112,6 @@ trait Identitys {
   implicit def IdentityTo[A](x: A): Identity[A] = new Identity[A] {
     val value = x
   }
-
-  implicit def IdentityFrom[A](x: Identity[A]): A = x.value
 
   val unital = IdentityTo(())
 }

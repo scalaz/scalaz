@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait StreamW[A] {
-  val value: Stream[A]
-
+sealed trait StreamW[A] extends PimpedType[Stream[A]] {
   import Scalaz._
 
   def ʐ: ZipStream[A] = zip(value)
@@ -46,6 +44,4 @@ trait Streams {
   implicit def StreamTo[A](as: Stream[A]): StreamW[A] = new StreamW[A] {
     val value = as
   }
-
-  implicit def StreamFrom[A](as: StreamW[A]): Stream[A] = as.value
 }

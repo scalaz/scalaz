@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait OptionW[A] {
-  val value: Option[A]
-
+sealed trait OptionW[A] extends PimpedType[Option[A]] {
   import Scalaz._
   
   sealed trait Fold[X] {
@@ -62,8 +60,6 @@ trait Options {
   implicit def OptionTo[A](o: Option[A]): OptionW[A] = new OptionW[A] {
     val value = o
   }
-
-  implicit def OptionFrom[A](o: OptionW[A]): Option[A] = o.value
 
   def some[A](a: A): Option[A] = Some(a)
 
