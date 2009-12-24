@@ -1,13 +1,9 @@
 package scalaz
 
-sealed trait BigIntMultiplication {
-  val value: BigInt
-}
+sealed trait BigIntMultiplication extends NewType[BigInt]
 
 trait BigIntMultiplications {
   def multiplication(n: BigInt) = new BigIntMultiplication {
     val value = n
   }
-
-  implicit def BigIntMultiplicationFrom(n: BigIntMultiplication): BigInt = n.value
 }
