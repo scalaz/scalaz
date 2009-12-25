@@ -7,6 +7,12 @@ object ExampleFold {
 
   def run {
     // Folding left over a List
+    (List(1, 2, 3).foldl[String]("0", (a, b) => "f(" + a.toString + ", " + b + ")")) assert_≟ "f(f(f(0, 1), 2), 3)"
+
+    // Folding right over a List    
+    (List(1, 2, 3).foldr[String]("0", (a, b) => "f(" + a.toString + ", " + b + ")")) assert_≟ "f(1, f(2, f(3, 0)))"
+
+    // Folding left over a List
     (List(1, 2, 3) foldl(0, ((_: Int) + (_: Int)))) assert_≟ 6
 
     // Folding left over a List, using the first value as the starting value.
