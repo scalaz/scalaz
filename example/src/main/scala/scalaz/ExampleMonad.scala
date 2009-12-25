@@ -36,6 +36,9 @@ object ExampleMonad {
     (some(7) ∗ (x => if (x % 2 == 0) some(x - 1) else none)) assert_≟ none[Int]
     (some(8) ∗ (x => if (x % 2 == 0) some(x - 1) else none)) assert_≟ some(7)
 
+    // anonymous bind ∗|
+    (List(1, 2, 3) ∗| (List(3, 4))) assert_≟ List(3, 4, 3, 4, 3, 4)
+
     // Folding left on a List through the List monad
     List(1, 2).foldLeftM((b: Int, a: Int) => List(10, 20, a, b), 0) assert_≟ List(10, 20, 2, 10, 10, 20, 2, 20, 10, 20, 2, 1, 10, 20, 2, 0)
 
@@ -58,7 +61,7 @@ object ExampleMonad {
     List(1, 2, 3).filterM(_ => List(true, false)) assert_≟ List(List(1, 2, 3), List(1, 2), List(1, 3), List(1), List(2, 3), List(2), List(3), List())
 
     // Filtering on a List through the Option monad
-    List(1, 2, 3).filterM(n => some(n < 3)) assert_≟ Some(List(1, 2))
+    List(1, 2, 3).filterM(n => some(n < 3)) assert_≟ some(List(1, 2))
 
     // Replicating a List through the List monad
     List(1, 2, 3).replicateM[List](2) assert_≟ List(List(1, 1), List(1, 2), List(1, 3), List(2, 1), List(2, 2), List(2, 3), List(3, 1), List(3, 2), List(3, 3))
