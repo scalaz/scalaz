@@ -16,7 +16,10 @@ object ExampleFold {
     (List(1, 2, 3) foldl(0, ((_: Int) + (_: Int)))) assert_≟ 6
 
     // Folding left over a List, using the first value as the starting value.
-    (List(1, 2, 3) foldl1 (_ + _)) assert_≟ Some(6)
+    (List(1, 2, 3) foldl1 (_ + _)) assert_≟ some(6)
+
+    // Folding left over an empty List, using the first value as the starting value.
+    (List.empty[Int] foldl1 (_ + _)) assert_≟ none
 
     // Summing over a List using FoldLeft, using the Int Monoid to combine the elements.
     (List(1, 2, 3) ∑) assert_≟ 6

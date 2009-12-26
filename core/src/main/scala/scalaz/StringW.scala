@@ -1,10 +1,10 @@
 package scalaz
 
-sealed trait StringW {
+sealed trait StringW extends PimpedType[String] {
   /**
    * The value of this string.
    */
-  val s: String
+  val s: String = value
 
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
@@ -152,8 +152,6 @@ sealed trait StringW {
 
 trait Strings {
   implicit def StringTo(ss: String): StringW = new StringW {
-    val s = ss
+    val value = ss
   }
-
-  implicit def StringFrom(s: StringW): String = s.s
 }

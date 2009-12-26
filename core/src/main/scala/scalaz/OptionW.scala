@@ -50,7 +50,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
 
   def lst: LastOption[A] = value
 
-  def zeroOr[M[_]](implicit p: Pure[M], e: Empty[M]): M[A] = value match {
+  def zeroOr[M[_]: Pure : Empty]: M[A] = value match {
     case Some(a) => a η
     case None => <∅>
   }
