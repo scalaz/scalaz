@@ -7,7 +7,7 @@ sealed trait Digit {
 
   def toChar = (toLong + 48).toChar
 
-  override def equals(o: Any) = o ne null && o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
+  override def equals(o: Any) = o != null && o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
 
   override def hashCode = toInt.hashCode
 
