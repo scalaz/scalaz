@@ -34,13 +34,12 @@ sealed trait Tree[+A] {
 
   def levels: Stream[Stream[A]] = {
     val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest)
-    val rl = (s: Stream[Tree[A]]) => s.map(_.rootLabel)
-    Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty).map(rl)
+    Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty) ∘∘ ((_: Tree[A]).rootLabel) 
   }
 
   def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), () => t.subForest))
 
-  def loc = Scalaz.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
+  def loc: TreeLoc[A] = Scalaz.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
 }
 
 trait Trees {
