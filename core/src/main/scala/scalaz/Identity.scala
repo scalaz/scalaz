@@ -105,7 +105,7 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   override def hashCode = value.hashCode
 
-  override def equals(o: Any) = o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+  override def equals(o: Any) = o ne null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
 }
 
 trait Identitys {

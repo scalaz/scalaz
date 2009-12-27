@@ -5,7 +5,7 @@ sealed trait Alpha {
 
   def toUpperChar = toChar.toUpper
 
-  override def equals(o: Any) = o.isInstanceOf[Alpha] && o.asInstanceOf[Alpha].toChar == toChar
+  override def equals(o: Any) = o ne null && o.isInstanceOf[Alpha] && o.asInstanceOf[Alpha].toChar == toChar
 
   override def hashCode = toChar.hashCode
 
