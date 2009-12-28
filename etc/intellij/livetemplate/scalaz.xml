@@ -188,6 +188,12 @@
             <option value="true" name="SCALA"></option>
         </context>
     </template>
+    <template value="&#9733;($F$)" description="★" toShortenFQNames="true" name="cokleisli" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
     <template value=".&#963;" description="σ" toShortenFQNames="true" name=".dual" toReformat="false">
         <context>
             <option value="true" name="SCALA"></option>
@@ -282,7 +288,7 @@
             <option value="true" name="SCALA"></option>
         </context>
     </template>
-    <template value="&#8869;" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
+    <template value="&#8869;()" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
         <context>
             <option value="true" name="SCALA"></option>
         </context>
@@ -353,5 +359,5 @@
         <context>
             <option value="true" name="SCALA"></option>
         </context>
-    </template>
+</template>
 </templateSet>

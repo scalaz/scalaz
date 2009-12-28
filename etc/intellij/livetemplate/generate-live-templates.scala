@@ -72,6 +72,7 @@ val templates = List(
   method("comap", "∙", Arg("f")),
   method("pure", "η"),
   function("kleisli", "☆", Arg("f")),
+  function("cokleisli", "★", Arg("f")),
   method("dual", "σ"),
   method("equal", "≟", Arg("a")),
   method("notequal", "≠", Arg("a")),
