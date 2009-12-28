@@ -80,7 +80,7 @@ val templates = List(
   method("<", "≨", Arg("a")),
   method(">>>", "⋙", Arg("a")),
   method("<<<", "⋘", Arg("a")),
-  function("undefined", "⊥", Arg("a")),
+  function("undefined", "⊥"),
   method("conjunction", "∧", Arg("a")),
   method("disjunction", "∨", Arg("a")),
   method("<==", "\u21D0", Arg("a")),
@@ -94,4 +94,3 @@ val templateSet = <templateSet group="scalaz">
 </templateSet>
 
 println(new xml.PrettyPrinter(120, 4).format(templateSet))
-

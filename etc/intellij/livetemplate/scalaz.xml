@@ -282,8 +282,7 @@
             <option value="true" name="SCALA"></option>
         </context>
     </template>
-    <template value="&#8869;($A$)" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+    <template value="&#8869;" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
         <context>
             <option value="true" name="SCALA"></option>
         </context>
