@@ -1,6 +1,7 @@
 import collection.immutable.List
 import collection.Seq
 import java.lang.String
+import xml.NodeSeq
 
 case class Variable(name: String) {
   def toXml = <variable name={name} expression=" " defaultValue=" " alwaysStopAt="true"/>
@@ -8,7 +9,7 @@ case class Variable(name: String) {
 
 case class Template(name: String, value: String, description: String, variables: List[Variable]) {
   def toXml =
-  <template name={name} value={value} description={description} toReformat="false" toShortenFQNames="true">
+  <template name={name} value={escape(value)} description={description} toReformat="false" toShortenFQNames="true">
     {for (v <- variables) yield v.toXml}
     <context>
       <option name="SCALA" value="true"/>
@@ -19,7 +20,7 @@ case class Template(name: String, value: String, description: String, variables:
 case class Arg(val name: String)
 
 def method(shortcut: String, name: String, args: Arg*): List[Template] = {
-  val varNames: Seq[String] = args.map("$" + _.name.toUpperCase + "$")
+  val varNames = args.map("$" + _.name.toUpperCase + "$")
   val dotValue = "." + name + (if (args.isEmpty) "" else varNames.mkString("(", ", ", ")"))
   val vars = args.map((a: Arg) => Variable(a.name.toUpperCase)).toList
   val dotTemplate = Template("." + shortcut, dotValue, name, vars)
@@ -27,28 +28,30 @@ def method(shortcut: String, name: String, args: Arg*): List[Template] = {
   
   if (name.endsWith(":"))
     List(template)
-  else if (args.size == 1)
+  else if (args.size <= 1)
     List(dotTemplate, template)
   else
     List(dotTemplate)
 }
 
 def function(shortcut: String, name: String, args: Arg*): List[Template] = {
-  val varNames: Seq[String] = args.map("$" + _.name.toUpperCase + "$")
+  val varNames = args.map("$" + _.name.toUpperCase + "$")
   val vars = args.map((a: Arg) => Variable(a.name.toUpperCase)).toList
-  val template = Template(shortcut, name + " " + varNames.mkString(" "), name, vars)
+  val template = Template(shortcut, name + varNames.mkString("(", ", ", ")"), name, vars)
   List(template)
 }
 
-def escapeUnicode(xmlText: String): String = {
-  def escapeChar(c: Char): String =
-    if (c > 0x7F)
-      "&#" + Integer.toString(c, 10) + ";"
+def escape(xmlText: String): NodeSeq = {
+  def escapeChar(c: Char): xml.Node =
+    if (c > 0x7F || Character.isISOControl(c))
+      xml.EntityRef("#" + Integer.toString(c, 10))
     else
-      c.toString
+      xml.Text(c.toString)
 
-  xmlText.map(escapeChar(_)).mkString
+  new xml.Group(xmlText.map(escapeChar(_)))
 }
+
+val imports = Template("isz", "import scalaz._\nimport Scalaz.\n", "imports for Scalaz", List())
 
 val templates = List(
   method("apply", "⊛", Arg("f")),
@@ -68,7 +71,7 @@ val templates = List(
   method("copure", "ε"),
   method("comap", "∙", Arg("f")),
   method("pure", "η"),
-  method("kleisli", "☆", Arg("f")),
+  function("kleisli", "☆", Arg("f")),
   method("dual", "σ"),
   method("equal", "≟", Arg("a")),
   method("notequal", "≠", Arg("a")),
@@ -84,13 +87,11 @@ val templates = List(
   method("zipstream", "\u0290"),
   method("mult", "\u220f"),
   function("zero", "∅")
-).flatten
+).flatten ++ List(imports)
 
 val templateSet = <templateSet group="scalaz">
   {templates.map(_.toXml)}
 </templateSet>
 
-println(escapeUnicode(new xml.PrettyPrinter(120, 4).format(templateSet)))
-
-
+println(new xml.PrettyPrinter(120, 4).format(templateSet))
 

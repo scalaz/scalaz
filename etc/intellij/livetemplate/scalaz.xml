@@ -1,1526 +1,358 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templateSet group="scalaz">
-    <template name="apply" value="⊛ " description="⊛" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="map" value="∘ " description="∘ Functor map" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="mapmap" value="∘∘ " description="∘∘" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="|-&gt;" value="↦  " description="Applicative Traverse" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="bind" value="∗ " description="∗ Monad Bind" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="join" value="μ" description="μ Monadic Join" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="plus" value="⟴ " description="⟴" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="appendpure" value="➜: " description="➜:" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="pluspure" value="➝:  " description="➝:" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="foreach" value="➡   " description="➡" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="suml" value="∑ " description="∑" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="sumr" value="∑∑ " description="∑∑" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="count" value="♯ " description="♯" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="exists" value="∃ " description="∃" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="forall" value="∀ " description="∀" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="traversemonoid" value="↣ " description="Traverse with Monoid" toReformat="false"
-              toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="cojoin" value="υ   " description="υ cojoin" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="copure" value="ε " description="ε copure" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="comap" value="∙ " description="∙ comap" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="pure" value="η" description="η pure" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="append" value="⊹ " description="⊹ append" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="dual" value="σ " description="σ dual" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="equal" value="≟ " description="≠ equal" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="notequal" value="≠ " description="≠ equal" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&lt;=" value="≤ " description="≤" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&gt;=" value="≥ " description="≥" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&lt;" value="≨ " description="≨ Less Than" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="≩" value="≩ " description="≩ Greater Than" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&gt;&gt;&gt;" value="⋙ " description="⋙" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&lt;&lt;&lt;" value="⋘ " description="⋘" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="undefined" value="⊥ " description="⊥" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="conjunction" value="∧" description="∧" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="disjunction" value="∨" description="∨" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="&lt;==" value="⇐ " description="⇐" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="zipstream" value="ʐ " description="ʐ" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="mult" value="∏ " description="∏" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="kliesli" value="☆($FUN$)" description="☆" toReformat="false" toShortenFQNames="true">
-        <variable name="FUN" expression="" defaultValue="" alwaysStopAt="true"/>
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name="zero" value="∅ " description="∅" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".apply" value=".⊛ " description="⊛" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".map" value=".∘ " description="∘ Functor map" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".mapmap" value=".∘∘ " description="∘∘" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".|-&gt;" value=".↦  " description="Applicative Traverse" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".bind" value=".∗ " description="∗ Monad Bind" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".join" value=".μ" description="μ Monadic Join" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".plus" value=".⟴ " description="⟴" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".appendpure" value=".➜: " description="➜:" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".pluspure" value=".➝:  " description="➝:" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".foreach" value=".➡   " description="➡" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".suml" value=".∑ " description="∑" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".sumr" value=".∑∑ " description="∑∑" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".count" value=".♯ " description="♯" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".exists" value=".∃ " description="∃" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".forall" value=".∀ " description="∀" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".traversemonoid" value=".↣ " description="Traverse with Monoid" toReformat="false"
-              toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".cojoin" value=".υ   " description="υ cojoin" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".copure" value=".ε " description="ε copure" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".comap" value=".∙ " description="∙ comap" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".pure" value=".η" description="η pure" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".append" value=".⊹ " description="⊹ append" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".dual" value=".σ " description="σ dual" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".equal" value=".≟ " description="≠ equal" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".notequal" value=".≠ " description="≠ equal" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&lt;=" value=".≤ " description="≤" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&gt;=" value=".≥ " description="≥" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&lt;" value=".≨ " description="≨ Less Than" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".≩" value=".≩ " description="≩ Greater Than" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&gt;&gt;&gt;" value=".⋙ " description="⋙" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&lt;&lt;&lt;" value=".⋘ " description="⋘" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".undefined" value=".⊥ " description="⊥" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".conjunction" value=".∧" description="∧" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".disjunction" value=".∨" description="∨" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".&lt;==" value=".⇐ " description="⇐" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".zipstream" value=".ʐ " description="ʐ" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".mult" value=".∏ " description="∏" toReformat="false" toShortenFQNames="true">
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".kliesli" value=".☆($FUN$)" description="☆" toReformat="false" toShortenFQNames="true">
-        <variable name="FUN" expression="" defaultValue="" alwaysStopAt="true"/>
-        <context>
-
-
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
-        </context>
-    </template>
-    <template name=".zero" value=".∅ " description="∅" toReformat="false" toShortenFQNames="true">
-        <context>
-            <option name="JAVA_CODE" value="false"/>
-            <option name="JAVA_COMMENT" value="false"/>
-            <option name="JAVA_STRING" value="false"/>
-            <option name="COMPLETION" value="false"/>
-            <option name="HTML" value="false"/>
-            <option name="XML" value="false"/>
-            <option name="JSP" value="false"/>
-            <option name="GROOVY" value="false"/>
-            <option name="SCALA" value="true"/>
-            <option name="SQL" value="false"/>
-            <option name="CSS" value="false"/>
-            <option name="PHP" value="false"/>
-            <option name="JAVA_SCRIPT" value="false"/>
-            <option name="GSP" value="false"/>
-            <option name="OTHER" value="false"/>
+    <template value=".&#8859;($F$)" description="⊛" toShortenFQNames="true" name=".apply" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8859; $F$" description="⊛" toShortenFQNames="true" name="apply" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8728;($F$)" description="∘" toShortenFQNames="true" name=".map" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8728; $F$" description="∘" toShortenFQNames="true" name="map" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8728;&#8728;($F$)" description="∘∘" toShortenFQNames="true" name=".mapmap" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8728;&#8728; $F$" description="∘∘" toShortenFQNames="true" name="mapmap" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8614;($F$)" description="↦" toShortenFQNames="true" name=".|-&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8614; $F$" description="↦" toShortenFQNames="true" name="|-&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8727;($F$)" description="∗" toShortenFQNames="true" name=".bind" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8727; $F$" description="∗" toShortenFQNames="true" name="bind" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8889;($A$)" description="⊹" toShortenFQNames="true" name=".plus" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8889; $A$" description="⊹" toShortenFQNames="true" name="plus" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#10140;: $A$" description="➜:" toShortenFQNames="true" name="appendpure" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#10141;: $A$" description="➝:" toShortenFQNames="true" name="pluspure" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8721;" description="∑" toShortenFQNames="true" name=".suml" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8721; " description="∑" toShortenFQNames="true" name="suml" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8707;($F$)" description="∃" toShortenFQNames="true" name=".exists" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8707; $F$" description="∃" toShortenFQNames="true" name="exists" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8704;($F$)" description="∀" toShortenFQNames="true" name=".forall" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8704; $F$" description="∀" toShortenFQNames="true" name="forall" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8611;($F$)" description="↣" toShortenFQNames="true" name=".traversemonoid" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8611; $F$" description="↣" toShortenFQNames="true" name="traversemonoid" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#956;" description="μ" toShortenFQNames="true" name=".join" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#956; " description="μ" toShortenFQNames="true" name="join" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#965;" description="υ" toShortenFQNames="true" name=".cojoin" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#965; " description="υ" toShortenFQNames="true" name="cojoin" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#949;" description="ε" toShortenFQNames="true" name=".copure" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#949; " description="ε" toShortenFQNames="true" name="copure" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8729;($F$)" description="∙" toShortenFQNames="true" name=".comap" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8729; $F$" description="∙" toShortenFQNames="true" name="comap" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#951;" description="η" toShortenFQNames="true" name=".pure" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#951; " description="η" toShortenFQNames="true" name="pure" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#9734;($F$)" description="☆" toShortenFQNames="true" name="kleisli" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#963;" description="σ" toShortenFQNames="true" name=".dual" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#963; " description="σ" toShortenFQNames="true" name="dual" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8799;($A$)" description="≟" toShortenFQNames="true" name=".equal" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8799; $A$" description="≟" toShortenFQNames="true" name="equal" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8800;($A$)" description="≠" toShortenFQNames="true" name=".notequal" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8800; $A$" description="≠" toShortenFQNames="true" name="notequal" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8804;($A$)" description="≤" toShortenFQNames="true" name=".&lt;=" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8804; $A$" description="≤" toShortenFQNames="true" name="&lt;=" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8805;($A$)" description="≥" toShortenFQNames="true" name=".&gt;=" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8805; $A$" description="≥" toShortenFQNames="true" name="&gt;=" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8808;($A$)" description="≨" toShortenFQNames="true" name=".&lt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8808; $A$" description="≨" toShortenFQNames="true" name="&lt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8921;($A$)" description="⋙" toShortenFQNames="true" name=".&gt;&gt;&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8921; $A$" description="⋙" toShortenFQNames="true" name="&gt;&gt;&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8920;($A$)" description="⋘" toShortenFQNames="true" name=".&lt;&lt;&lt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8920; $A$" description="⋘" toShortenFQNames="true" name="&lt;&lt;&lt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8869;($A$)" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8743;($A$)" description="∧" toShortenFQNames="true" name=".conjunction" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8743; $A$" description="∧" toShortenFQNames="true" name="conjunction" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8744;($A$)" description="∨" toShortenFQNames="true" name=".disjunction" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8744; $A$" description="∨" toShortenFQNames="true" name="disjunction" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8656;($A$)" description="⇐" toShortenFQNames="true" name=".&lt;==" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8656; $A$" description="⇐" toShortenFQNames="true" name="&lt;==" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#656;" description="ʐ" toShortenFQNames="true" name=".zipstream" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#656; " description="ʐ" toShortenFQNames="true" name="zipstream" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8719;" description="∏" toShortenFQNames="true" name=".mult" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8719; " description="∏" toShortenFQNames="true" name="mult" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8709;()" description="∅" toShortenFQNames="true" name="zero" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+    value="import scalaz._&#10;import Scalaz.&#10;" description="imports for Scalaz" toShortenFQNames="true" name="isz" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
         </context>
     </template>
 </templateSet>
-
