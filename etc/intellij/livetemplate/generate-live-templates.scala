@@ -52,7 +52,7 @@ def escape(xmlText: String): NodeSeq = {
   new xml.Group(xmlText.map(escapeChar(_)))
 }
 
-val imports = Template("isz", "import scalaz._\nimport Scalaz.\n", "imports for Scalaz", List())
+val imports = Template("isz", "import scalaz._\nimport Scalaz._\n", "imports for Scalaz", List())
 
 val templates = List(
   method("@", "⊛", Param("f")),
