@@ -44,10 +44,8 @@ object Arrow {
 
     def arrow[B, C](f: B => C) = ★(r => f(r ε))
 
-    // todo higher-order unification
-    def first[B, C, D](a: Cokleisli[M, B, C]) = ★(mab[PartialApplyK[Cokleisli, M]#Apply, B, C](a) *** arrow(identity(_: D)) apply (_: M[(B, D)]))
+    def first[B, C, D](a: Cokleisli[M, B, C]) = ★(a *** arrow(identity(_: D)) apply (_: M[(B, D)]))
 
-    // todo higher-order unification
-    def second[B, C, D](a: Cokleisli[M, B, C]) = ★(mab[PartialApplyK[Cokleisli, M]#Apply, D, D](arrow(identity(_: D))) *** a apply (_: M[(D, B)]))
+    def second[B, C, D](a: Cokleisli[M, B, C]) = ★(arrow(identity(_: D)) *** a apply (_: M[(D, B)]))
   }
 }

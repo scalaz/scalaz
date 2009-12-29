@@ -63,5 +63,15 @@ object ExampleArrow {
       j apply (Nil, (12 to 18).toList) assert_≟ None
       j apply ((44 to 49).toList,Nil) assert_≟ None
     }
+
+    // Cokleisli Arrow
+    {
+      val nums = nel1(1, 2, 3)
+      nums.υ assert_≟ nel1(nel1(1, 2, 3), nel1(2, 3), nel1(3))
+      val sum = ★((m: NonEmptyList[Int]) => m.∑)
+      val max = ★((m: NonEmptyList[Int]) => m.max)
+      // todo this causes StackOverflowError.
+//      ((sum &&& max) apply nums).println
+    }
   }
 }

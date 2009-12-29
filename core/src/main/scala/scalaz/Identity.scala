@@ -87,7 +87,7 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
-  def wrapNel: NonEmptyList[A] = Scalaz.nel(value, Nil)
+  def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
 
   def toRadians(implicit r: Radians[A]): Double = r.toRadians(value)
 
