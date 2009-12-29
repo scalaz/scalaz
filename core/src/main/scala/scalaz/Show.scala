@@ -79,7 +79,7 @@ object Show {
   implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
       t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
-  implicit def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
+  def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
     val i = as.iterator
     val k = new collection.mutable.ListBuffer[Char]
     k += '['
@@ -92,6 +92,12 @@ object Show {
     k += ']'
     k.toList
   })
+
+  implicit def StreamShow[A: Show]: Show[Stream[A]] = IterableShow
+
+  implicit def GArrayShow[A: Show]: Show[GArray[A]] = IterableShow
+
+  implicit def ListShow[A: Show]: Show[List[A]] = IterableShow
 
   implicit def Tuple1Show[A: Show]: Show[Tuple1[A]] = show(a => {
     val k = new collection.mutable.ListBuffer[Char]

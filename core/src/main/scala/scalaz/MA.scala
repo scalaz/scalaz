@@ -128,6 +128,10 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def empty(implicit r: FoldRight[M]): Boolean = ∀(_ => false)
 
+  def ∈:(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
+
+  def ∋(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
+
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
     foldr[(List[List[A]], Option[Boolean])]((Nil, None), (a, b) => {
       val pa = p(a)

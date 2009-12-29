@@ -21,7 +21,7 @@ trait MetricSpaces {
 
   import Scalaz._
 
-  def levenshtein[M[_], A](implicit l: Length[M], i: Index[M], e: Equal[A]) = metricSpace[M[A]](_ <---> _)
+  def levenshtein[M[_], A](implicit l: Length[M], i: Index[M], e: Equal[A]): MetricSpace[M[A]] = metricSpace[M[A]](_ <---> _)
 
   implicit def levenshteins: MetricSpace[String] = levenshtein[List, Char] ∙ ((s: String) => s.toList)
 }

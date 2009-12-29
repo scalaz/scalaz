@@ -43,5 +43,9 @@ object ExampleFold {
 
     // Counting the elements using Option FoldRight
     (Some(0) ♯) assert_≟ 1
+
+    (50 ∈: Stream.range(0, 100)) assert_≟ true
+
+    Stream.range(0, 100) ∋ 50 assert_≟ true
   }
 }

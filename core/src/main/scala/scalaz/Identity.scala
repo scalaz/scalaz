@@ -99,7 +99,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   def whileDo(f: A => A, p: A => Boolean): A =
     if(p(value)) f(value).whileDo(f, p) else value
 
-  def ×× : (A, A) = ×[A, A].join apply value
+  def ×× : (A, A) = ×[A, A].μ apply value
 
   override def toString = value.toString
 
