@@ -38,7 +38,7 @@ def method(shortcut: String, name: String, params: Param*): List[Template] = {
 def function(shortcut: String, name: String, args: Param*): List[Template] = {
   val varNames = args.map("$" + _.name.toUpperCase + "$")
   val vars = args.map((a: Param) => Variable(a.name.toUpperCase)).toList
-  val template = Template(shortcut, name + varNames.mkString("(", ", ", ")"), name, vars)
+  val template = Template(shortcut, name + (if (varNames.isEmpty) "" else varNames.mkString("(", ", ", ")")), name, vars)
   List(template)
 }
 
@@ -105,7 +105,10 @@ val templates = List(
   method("mult", "\u220f"),
   function("zero", "∅"),
   function("x", "×"),
-  function("=>", "\u21D2")
+  function("=>", "\u21D2"),
+  method("3", "∋", Param("a")),
+  method("contains", "∋", Param("a")),
+  method("memberof", "∈:", Param("a"))
 ).flatten ++ List(imports)
 
 val templateSet = <templateSet group="scalaz">
