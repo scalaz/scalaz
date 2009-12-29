@@ -17,26 +17,27 @@ case class Template(name: String, value: String, description: String, variables:
   </template>
 }
 
-case class Arg(val name: String)
+case class Param(val name: String)
 
-def method(shortcut: String, name: String, args: Arg*): List[Template] = {
-  val varNames = args.map("$" + _.name.toUpperCase + "$")
-  val dotValue = "." + name + (if (args.isEmpty) "" else varNames.mkString("(", ", ", ")"))
-  val vars = args.map((a: Arg) => Variable(a.name.toUpperCase)).toList
+def method(shortcut: String, name: String, params: Param*): List[Template] = {
+  val varNames = params.map(_.name.toUpperCase).toList
+  val varNamesDelimited = varNames.map("$" + _ + "$")
+  val dotValue = "." + name + (if (params.isEmpty) "" else varNamesDelimited.mkString("(", ", ", ")"))
+  val vars = varNames.map(Variable(_))
   val dotTemplate = Template("." + shortcut, dotValue, name, vars)
-  val template = Template(shortcut, name + " " + varNames.mkString(" "), name, vars)
+  val template = Template(shortcut, name + " " + varNamesDelimited.mkString(" "), name, vars)
   
   if (name.endsWith(":"))
     List(template)
-  else if (args.size <= 1)
+  else if (params.size <= 1)
     List(dotTemplate, template)
   else
     List(dotTemplate)
 }
 
-def function(shortcut: String, name: String, args: Arg*): List[Template] = {
+def function(shortcut: String, name: String, args: Param*): List[Template] = {
   val varNames = args.map("$" + _.name.toUpperCase + "$")
-  val vars = args.map((a: Arg) => Variable(a.name.toUpperCase)).toList
+  val vars = args.map((a: Param) => Variable(a.name.toUpperCase)).toList
   val template = Template(shortcut, name + varNames.mkString("(", ", ", ")"), name, vars)
   List(template)
 }
@@ -54,40 +55,57 @@ def escape(xmlText: String): NodeSeq = {
 val imports = Template("isz", "import scalaz._\nimport Scalaz.\n", "imports for Scalaz", List())
 
 val templates = List(
-  method("apply", "⊛", Arg("f")),
-  method("map", "∘", Arg("f")),
-  method("mapmap", "∘∘", Arg("f")),
-  method("|->", "↦", Arg("f")),
-  method("bind", "∗", Arg("f")),
-  method("plus", "⊹", Arg("a")),
-  method("appendpure", "\u279C:", Arg("a")),
-  method("pluspure", "\u279D:", Arg("a")),
+  method("@", "⊛", Param("f")),
+  method("<@>", "<⊛>", Param("b"), Param("z")),
+  method("<@@>", "<⊛⊛>", Param("b"), Param("c"), Param("z")),
+  method("<@@@>", "<⊛⊛⊛>", Param("b"), Param("c"), Param("d"), Param("z")),
+  method("<@@@@>", "<⊛⊛⊛⊛>", Param("b"), Param("c"), Param("d"), Param("d"), Param("z")),
+  method("@>", "⊛>", Param("b")),
+  method("<@", "<⊛", Param("b")),
+  method("<x>", "<×>", Param("b")),
+  method("<xx>", "<××>", Param("b"), Param("c")),
+  method("<xxx>", "<×××>", Param("b"), Param("c"), Param("d")),
+  method("<xxxx>", "<××××>", Param("b"), Param("c"), Param("d"), Param("d")),
+  method("map", "∘", Param("f")),
+  method("mapmap", "∘∘", Param("f")),
+  method("o", "∘", Param("f")),
+  method("oo", "∘∘", Param("f")),
+  method("|->", "↦", Param("f")),
+  method("bind", "∗", Param("f")),
+  method("plus", "⊹", Param("a")),
+  method("appendpure", "\u279C:", Param("a")),
+  method("pluspure", "\u279D:", Param("a")),
+  method("sum", "∑"),
   method("suml", "∑"),
-  method("exists", "∃", Arg("f")),
-  method("forall", "∀", Arg("f")),
-  method("traversemonoid", "↣", Arg("f")),
+  method("exists", "∃", Param("f")),
+  method("forall", "∀", Param("f")),
+  method("traversemonoid", "↣", Param("f")),
   method("join", "μ"),
   method("cojoin", "υ"),
   method("copure", "ε"),
-  method("comap", "∙", Arg("f")),
+  method("comap", "∙", Param("f")),
   method("pure", "η"),
-  function("kleisli", "☆", Arg("f")),
-  function("cokleisli", "★", Arg("f")),
+  function("kleisli", "☆", Param("f")),
+  function("cokleisli", "★", Param("f")),
   method("dual", "σ"),
-  method("equal", "≟", Arg("a")),
-  method("notequal", "≠", Arg("a")),
-  method("<=", "≤", Arg("a")),
-  method(">=", "≥", Arg("a")),
-  method("<", "≨", Arg("a")),
-  method(">>>", "⋙", Arg("a")),
-  method("<<<", "⋘", Arg("a")),
+  method("equal", "≟", Param("a")),
+  method("notequal", "≠", Param("a")),
+  method("<=", "≤", Param("a")),
+  method(">=", "≥", Param("a")),
+  method("<", "≨", Param("a")),
+  method(">>>", "⋙", Param("a")),
+  method("<<<", "⋘", Param("a")),
   function("undefined", "⊥"),
-  method("conjunction", "∧", Arg("a")),
-  method("disjunction", "∨", Arg("a")),
-  method("<==", "\u21D0", Arg("a")),
+  method("^", "∧", Param("a")),
+  method("conjunction", "∧", Param("a")),
+  method("disjunction", "∨", Param("a")),
+  method("v", "∨", Param("a")),
+  method("<==", "\u21D0", Param("a")),
   method("zipstream", "\u0290"),
   method("mult", "\u220f"),
-  function("zero", "∅")
+  function("zero", "∅"),
+  function("x", "×"),
+  function("=>", "\u21D2")
 ).flatten ++ List(imports)
 
 val templateSet = <templateSet group="scalaz">

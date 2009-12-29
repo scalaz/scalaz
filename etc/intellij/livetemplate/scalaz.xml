@@ -1,13 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
+        /System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/bin/java -Denv.classpath="%CLASSPATH%" -Denv.emacs="%EMACS%" -Dfile.encoding=UTF-8 -classpath /Users/jason/usr/scala-2.8.0.r20247-b20091220020228/lib/scala-library.jar:/Users/jason/usr/scala-2.8.0.r20247-b20091220020228/lib/scala-compiler.jar scala.tools.nsc.MainGenericRunner -nocompdaemon -classpath /System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/ext/apple_provider.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/laf.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/deploy.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/ext/sunpkcs11.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/dt.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/ext/localedata.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/jce.jar:/Users/jason/usr/scala-2.8.0.latest/lib/scalap.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/charsets.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/ui.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/ext/sunjce_provider.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/plugin.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/jsse.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/jconsole.jar:/Users/jason/code/scalaz/project/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.6.8/ivy_2.7.7-0.6.8.jar:/Users/jason/code/scalaz/project/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.6.8/ivy-2.1.0.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/dt.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/javaws.jar:/Users/jason/code/scalaz/out/test/scalaz5:/Users/jason/code/scalaz/project/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.6.8/sbt_2.7.7-0.6.8.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/ext/dnsns.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/management-agent.jar:/Users/jason/code/scalaz/out/production/scalaz5:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/sa-jdi.jar:/Users/jason/usr/scala-2.8.0.latest/lib/scala-library.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/../Classes/management-agent.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/lib/jce.jar:/Users/jason/usr/scala-2.8.0.latest/lib/scala-compiler.jar: /Users/jason/code/scalaz/etc/intellij/livetemplate/generate-live-templates.scala
 <templateSet group="scalaz">
-    <template value=".&#8859;($F$)" description="⊛" toShortenFQNames="true" name=".apply" toReformat="false">
+    <template value=".&#8859;($F$)" description="⊛" toShortenFQNames="true" name=".@" toReformat="false">
         <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
         <context>
             <option value="true" name="SCALA"></option>
         </context>
     </template>
-    <template value="&#8859; $F$" description="⊛" toShortenFQNames="true" name="apply" toReformat="false">
+    <template value="&#8859; $F$" description="⊛" toShortenFQNames="true" name="@" toReformat="false">
         <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#8859;&gt;($B$, $Z$)" description="&lt;⊛&gt;" toShortenFQNames="true" name=".&lt;@&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#8859;&#8859;&gt;($B$, $C$, $Z$)" description="&lt;⊛⊛&gt;" toShortenFQNames="true"
+            name=".&lt;@@&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#8859;&#8859;&#8859;&gt;($B$, $C$, $D$, $Z$)" description="&lt;⊛⊛⊛&gt;" toShortenFQNames="true"
+            name=".&lt;@@@&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#8859;&#8859;&#8859;&#8859;&gt;($B$, $C$, $D$, $D$, $Z$)" description="&lt;⊛⊛⊛⊛&gt;"
+            toShortenFQNames="true" name=".&lt;@@@@&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8859;&gt;($B$)" description="⊛&gt;" toShortenFQNames="true" name=".@&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8859;&gt; $B$" description="⊛&gt;" toShortenFQNames="true" name="@&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&lt;&#8859;($B$)" description="&lt;⊛" toShortenFQNames="true" name=".&lt;@" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&lt;&#8859; $B$" description="&lt;⊛" toShortenFQNames="true" name="&lt;@" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#215;&gt;($B$)" description="&lt;×&gt;" toShortenFQNames="true" name=".&lt;x&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value="&lt;&#215;&gt; $B$" description="&lt;×&gt;" toShortenFQNames="true" name="&lt;x&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#215;&#215;&gt;($B$, $C$)" description="&lt;××&gt;" toShortenFQNames="true" name=".&lt;xx&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#215;&#215;&#215;&gt;($B$, $C$, $D$)" description="&lt;×××&gt;" toShortenFQNames="true"
+            name=".&lt;xxx&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template
+            value=".&lt;&#215;&#215;&#215;&#215;&gt;($B$, $C$, $D$, $D$)" description="&lt;××××&gt;"
+            toShortenFQNames="true" name=".&lt;xxxx&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
         <context>
             <option value="true" name="SCALA"></option>
         </context>
@@ -31,6 +144,30 @@
         </context>
     </template>
     <template value="&#8728;&#8728; $F$" description="∘∘" toShortenFQNames="true" name="mapmap" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8728;($F$)" description="∘" toShortenFQNames="true" name=".o" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8728; $F$" description="∘" toShortenFQNames="true" name="o" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8728;&#8728;($F$)" description="∘∘" toShortenFQNames="true" name=".oo" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8728;&#8728; $F$" description="∘∘" toShortenFQNames="true" name="oo" toReformat="false">
         <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
         <context>
             <option value="true" name="SCALA"></option>
@@ -80,6 +217,16 @@
     </template>
     <template value="&#10141;: $A$" description="➝:" toShortenFQNames="true" name="pluspure" toReformat="false">
         <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value=".&#8721;" description="∑" toShortenFQNames="true" name=".sum" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
+    <template value="&#8721; " description="∑" toShortenFQNames="true" name="sum" toReformat="false">
         <context>
             <option value="true" name="SCALA"></option>
         </context>
@@ -354,10 +501,16 @@
             <option value="true" name="SCALA"></option>
         </context>
     </template>
-    <template
-    value="import scalaz._&#10;import Scalaz.&#10;" description="imports for Scalaz" toShortenFQNames="true" name="isz" toReformat="false">
+    <template value="&#215;()" description="×" toShortenFQNames="true" name="x" toReformat="false">
         <context>
             <option value="true" name="SCALA"></option>
         </context>
-</template>
+    </template>
+    <template
+            value="import scalaz._&#10;import Scalaz.&#10;" description="imports for Scalaz" toShortenFQNames="true"
+            name="isz" toReformat="false">
+        <context>
+            <option value="true" name="SCALA"></option>
+        </context>
+    </template>
 </templateSet>
