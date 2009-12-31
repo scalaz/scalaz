@@ -100,6 +100,8 @@ object Zero {
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
+  implicit def ZeroKleisliZero[M[_],A,B](implicit z: Zero[M[B]]): Zero[Kleisli[M,A,B]] = zero(☆((_ : A) => ∅))
+
   import concurrent.Strategy
   import concurrent.strategy.Id
 

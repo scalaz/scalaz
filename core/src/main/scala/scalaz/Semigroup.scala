@@ -72,11 +72,16 @@ object Semigroup {
 
   implicit def StreamSemigroup[A]: Semigroup[Stream[A]] = semigroup(_ append _)
 
-  implicit def OptionSemigroup[A]: Semigroup[Option[A]] = semigroup((a, b) => if (a.isDefined) a else b)
+  implicit def OptionSemigroup[A : Semigroup]: Semigroup[Option[A]] = semigroup((a, b) => { (a,b) match {
+    case (Some(va), Some(vb)) => Some(va ⊹ vb)
+    case (Some(va), None) => Some(va)
+    case (None, Some(vb)) => Some(vb)
+    case (None, None) => None
+  }})
 
-  implicit def FirstSemigroup[A]: Semigroup[FirstOption[A]] = semigroup((a, b) => if (a.isDefined) a else b)
+  implicit def FirstSemigroup[A]: Semigroup[FirstOption[A]] = semigroup((a, b) => a orElse b)
 
-  implicit def LastSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => if (a.isDefined) a else b)
+  implicit def LastSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => b orElse a)
 
   implicit def ArraySemigroup[A: Manifest]: Semigroup[Array[A]] = semigroup(Array.concat(_, _))
 
@@ -92,6 +97,8 @@ object Semigroup {
 
   implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
     semigroup((x, y) => y.value ⊹ x.value)
+
+  implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
 
   import concurrent.Strategy
   
