@@ -1,5 +1,11 @@
 package scalaz
 
+/**
+ * A Zero in type Z provides the identity element for the operation {@link scalaz.Semigroup#append}
+ * in the corresponding {@link scalaz.Semigroup} in type Z.
+ * <p/>
+ * ∀ a in S, append(a, zero) = a
+ */
 trait Zero[+Z] {
   val zero: Z
 }
@@ -9,6 +15,10 @@ trait Zeros {
     val zero = z
   }
 
+  /**
+   * @usage ∅[Z]
+   * @usage ∅: Z
+   */
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
 }
 
