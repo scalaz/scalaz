@@ -39,6 +39,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   lazy val core = project("core", "Scalaz Core", new ScalazCoreProject(_))
   lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
   lazy val example = project("example", "Scalaz Example", new ScalazExampleProject(_), core, http)
+  lazy val scalacheckBinding = project("scalacheck-binding", "Scalaz Scalacheck Binding", new ScalazScalacheckBindingProject(_), core)
+  lazy val tests = project("tests", "Scalaz Test Suite", new ScalazTestsProject(_), core, scalacheckBinding)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
@@ -62,5 +64,13 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class ScalazHttpProject(info: ProjectInfo) extends ScalazDefaults(info, "HTTP") {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
+  }
+
+  class ScalazScalacheckBindingProject(info: ProjectInfo) extends ScalazDefaults(info, "Scalacheck Binding") {
+    val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7-SNAPSHOT" withSources
+  }
+
+  class ScalazTestsProject(info: ProjectInfo) extends ScalazDefaults(info, "Tests") {
+    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
   }
 }

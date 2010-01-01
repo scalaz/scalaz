@@ -8,3 +8,9 @@ object Monoid {
     val zero = z.zero
   }
 }
+
+object MonoidLaw {
+  import Scalaz._
+
+  def identityLaw[A: Monoid : Equal]: A => Boolean = a => (a ⊹ ∅) ≟ a
+}

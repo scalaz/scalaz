@@ -5,7 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
       <module fileurl="file://$PROJECT_DIR$/http/http.iml" filepath="$PROJECT_DIR$/http/http.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scalacheck-binding/scalacheck-binding.iml" filepath="$PROJECT_DIR$/scalacheck-binding/scalacheck-binding.iml" />
       <module fileurl="file://$PROJECT_DIR$/scalaz5.iml" filepath="$PROJECT_DIR$/scalaz5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/tests.iml" filepath="$PROJECT_DIR$/tests/tests.iml" />
     </modules>
   </component>
 </project>

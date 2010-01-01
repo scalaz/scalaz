@@ -11,6 +11,7 @@ package scalaz
  * </li>
  * </ol>
  * @see scalaz.Identity#⊹
+ * @see SemigroupLaw#associativeLaw
  */
 trait Semigroup[S] {
   def append(s1: S, s2: => S): S
@@ -180,4 +181,12 @@ object Semigroup {
     k addAll b
     k
   })
+}
+
+object SemigroupLaw {
+  import Scalaz._
+
+  def associativeLaw[A: Semigroup : Equal]: Tuple3[A, A, A] => Boolean = {
+    case (a1, a2, a3) => ((a1 ⊹ a2) ⊹ a3) ≟ (a1 ⊹ (a2 ⊹ a3))
+  }
 }
