@@ -37,7 +37,7 @@ sealed trait BooleanW {
    * Negation of Conjunction. (NOR)
    *
    * <pre>
-   * p q  p ¬∧ q
+   * p q  p ⊽ q
    * 0 0  1
    * 0 1  1
    * 1 0  1
@@ -50,7 +50,7 @@ sealed trait BooleanW {
    * Negation of Disjunction. (NAND)
    *
    * <pre>
-   * p q  p ¬∨ q
+   * p q  p ⊼ q
    * 0 0  1
    * 0 1  0
    * 1 0  0
