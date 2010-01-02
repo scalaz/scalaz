@@ -22,45 +22,33 @@ object Equal {
 
   implicit def OrderingEqual: Equal[Ordering]= equalA
 
-  implicit def UnitEqual: Equal[Unit] = equalA
-
   implicit def StringEqual: Equal[String] = equalA
 
   implicit def IntEqual: Equal[Int] = equalA
+  
+  def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = implicitly[Equal[B]] ∙ ((_: NewType[B]).value)
+  
+  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = NewTypeEqual[Int, IntMultiplication]
 
-  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = i[Equal[Int]] ∙ ((_: IntMultiplication).value)
+  implicit def AnyValEqual[V <: AnyVal]: Equal[V] = equalA
 
-  implicit def BooleanEqual: Equal[Boolean] = equalA
+  implicit def BooleanConjunctionEqual: Equal[BooleanConjunction] = NewTypeEqual[Boolean, BooleanConjunction]
 
-  implicit def BooleanConjunctionEqual: Equal[BooleanConjunction] = i[Equal[Boolean]] ∙ ((_: BooleanConjunction).value)
+  implicit def CharMultiplicationEqual: Equal[CharMultiplication] = NewTypeEqual[Char, CharMultiplication]
 
-  implicit def CharEqual: Equal[Char] = equalA
+  implicit def ByteMultiplicationEqual: Equal[ByteMultiplication] = NewTypeEqual[Byte, ByteMultiplication]
 
-  implicit def CharMultiplicationEqual: Equal[CharMultiplication] = i[Equal[Char]] ∙ ((_: CharMultiplication).value)
+  implicit def LongMultiplicationEqual: Equal[LongMultiplication] = NewTypeEqual[Long, LongMultiplication]
 
-  implicit def ByteEqual: Equal[Byte] = equalA
-
-  implicit def ByteMultiplicationEqual: Equal[ByteMultiplication] = i[Equal[Byte]] ∙ ((_: ByteMultiplication).value)
-
-  implicit def LongEqual: Equal[Long] = equalA
-
-  implicit def LongMultiplicationEqual: Equal[LongMultiplication] = i[Equal[Long]] ∙ ((_: LongMultiplication).value)
-
-  implicit def ShortEqual: Equal[Short] = equalA
-
-  implicit def ShortMultiplicationEqual: Equal[ShortMultiplication] = i[Equal[Short]] ∙ ((_: ShortMultiplication).value)
-
-  implicit def FloatEqual: Equal[Float] = equalA
-
-  implicit def DoubleEqual: Equal[Double] = equalA
+  implicit def ShortMultiplicationEqual: Equal[ShortMultiplication] = NewTypeEqual[Short, ShortMultiplication]
 
   implicit def BigIntegerEqual: Equal[BigInteger] = equalA[java.math.BigInteger]
 
-  implicit def BigIntegerMultiplicationEqual: Equal[BigIntegerMultiplication] = i[Equal[BigInteger]] ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationEqual: Equal[BigIntegerMultiplication] = NewTypeEqual[BigInteger, BigIntegerMultiplication]
 
   implicit def BigIntEqual: Equal[BigInt] = equalA
 
-  implicit def BigIntMultiplicationEqual: Equal[BigIntMultiplication] = i[Equal[BigInt]] ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultiplicationEqual: Equal[BigIntMultiplication] = NewTypeEqual[BigInt, BigIntMultiplication]
 
   implicit def NodeSeqEqual: Equal[NodeSeq] = equalA
 

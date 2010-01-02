@@ -22,47 +22,33 @@ object Show {
 
   implicit def OrderingShow: Show[Ordering] = showA
 
-  implicit def UnitShow: Show[Unit] = showA
-
   implicit def ThrowableShow: Show[Throwable] = showA
 
   implicit def StringShow: Show[String] = showA
 
-  implicit def IntShow: Show[Int] = showA
+  implicit def AnyValShow[V <: AnyVal]: Show[V] = showA
 
-  implicit def IntMultiplicationShow: Show[IntMultiplication] = i[Show[Int]] ∙ ((_: IntMultiplication).value)
+  def NewTypeShow[B: Show, A <: NewType[B]]: Show[A] = i[Show[B]] ∙ ((_: NewType[B]).value)
 
-  implicit def BooleanShow: Show[Boolean] = showA
+  implicit def IntMultiplicationShow: Show[IntMultiplication] = NewTypeShow[Int, IntMultiplication]
 
-  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = i[Show[Boolean]] ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = NewTypeShow[Boolean, BooleanConjunction]
 
-  implicit def CharShow: Show[Char] = showA
+  implicit def CharMultiplicationShow: Show[CharMultiplication] = NewTypeShow[Char, CharMultiplication]
 
-  implicit def CharMultiplicationShow: Show[CharMultiplication] = i[Show[Char]] ∙ ((_: CharMultiplication).value)
+  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = NewTypeShow[Byte, ByteMultiplication]
 
-  implicit def ByteShow: Show[Byte] = showA
+  implicit def LongMultiplicationShow: Show[LongMultiplication] = NewTypeShow[Long, LongMultiplication]
 
-  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = i[Show[Byte]] ∙ ((_: ByteMultiplication).value)
-
-  implicit def LongShow: Show[Long] = showA
-
-  implicit def LongMultiplicationShow: Show[LongMultiplication] = i[Show[Long]] ∙ ((_: LongMultiplication).value)
-
-  implicit def ShortShow: Show[Short] = showA
-
-  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = i[Show[Short]] ∙ ((_: ShortMultiplication).value)
-
-  implicit def FloatShow: Show[Float] = showA
-
-  implicit def DoubleShow: Show[Double] = showA
+  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = NewTypeShow[Short, ShortMultiplication]
 
   implicit def BigIntegerShow: Show[java.math.BigInteger] = showA[java.math.BigInteger]
 
-  implicit def BigIntegerMultiplicationShow: Show[BigIntegerMultiplication] = BigIntegerShow ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationShow: Show[BigIntegerMultiplication] = NewTypeShow[java.math.BigInteger, BigIntegerMultiplication]
 
   implicit def BigIntShow: Show[BigInt] = showA
 
-  implicit def BigIntMultiplicationShow: Show[BigIntMultiplication] = BigIntShow ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultiplicationShow: Show[BigIntMultiplication] = NewTypeShow[BigInt, BigIntMultiplication]
 
   implicit def NodeSeqShow: Show[xml.NodeSeq] = showA
 
