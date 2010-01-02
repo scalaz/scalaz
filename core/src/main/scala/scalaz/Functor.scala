@@ -93,6 +93,14 @@ object Functor {
     def fmap[A, B](r: Option[A], f: A => B) = r map f
   }
 
+  implicit def FirstOptionFunctor: Functor[FirstOption] = new Functor[FirstOption] {
+    def fmap[A, B](r: FirstOption[A], f: A => B) = (r.value map f).fst
+  }
+
+  implicit def LastOptionFunctor: Functor[LastOption] = new Functor[LastOption] {
+    def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
+  }
+
   implicit def GenericArrayFunctor: Functor[GArray] = new Functor[GArray] {
     def fmap[A, B](r: GArray[A], f: A => B) = r map f
   }

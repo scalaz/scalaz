@@ -4,7 +4,7 @@ sealed trait StringW extends PimpedType[String] {
   /**
    * The value of this string.
    */
-  val s: String = value
+  lazy val s: String = value
 
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless

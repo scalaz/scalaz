@@ -89,6 +89,14 @@ object Pure {
     def pure[A](a: => A) = Some(a)
   }
 
+  implicit def FirstOptionPure: Pure[FirstOption] = new Pure[FirstOption] {
+    def pure[A](a: => A) = Some(a).fst
+  }
+  
+  implicit def LastOptionPure: Pure[LastOption] = new Pure[LastOption] {
+    def pure[A](a: => A) = Some(a).lst
+  }
+
   implicit def GenericArrayPure: Pure[GArray] = new Pure[GArray] {
     def pure[A](a: => A) = {
       val t = new GArray[A](1)

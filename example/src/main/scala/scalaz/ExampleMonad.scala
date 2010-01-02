@@ -66,13 +66,19 @@ object ExampleMonad {
     // Replicating a List through the List monad
     List(1, 2, 3).replicateM[List](2) assert_≟ List(List(1, 1), List(1, 2), List(1, 3), List(2, 1), List(2, 2), List(2, 3), List(3, 1), List(3, 2), List(3, 3))
 
-    // Replicating a List through the Option monad
-    List(1, 2, 3).replicateM[Option](2) assert_≟ List(some(1), some(1), some(1), some(2), some(2), some(2), some(3), some(3), some(3))
+    // Replicating a List through the FirstOption monoid
+    List(1, 2, 3).replicateM[FirstOption](2) assert_≟ List(some(1), some(1), some(1), some(2), some(2), some(2), some(3), some(3), some(3)).map(_.fst)
 
-    // Replicating an Option through the GenericArray monad
+    // Replicating a List through the Option monoid
+    List(1, 2, 3).replicateM[Option](2) assert_≟ List(some(2), some(3), some(4), some(3), some(4), some(5), some(4), some(5), some(6))
+
+    // Replicating an Option through the GenericArray monoid
     some(7).replicateM[GenericArray](3) assert_≟ some(GenericArray(7, 7, 7))
 
-    // Replicating an Option through the Option monad
-    some(7).replicateM[Option](3) assert_≟ some(some(7))
+    // Replicating an Option through the Option monoid
+    some(7).replicateM[Option](3) assert_≟ some(some(21))
+
+    // Replicating an Option through the FisrtOption monoid
+    some(7).replicateM[FirstOption](3) assert_≟ some(some(7).fst)
   }
 }

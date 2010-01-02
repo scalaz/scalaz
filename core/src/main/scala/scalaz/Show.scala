@@ -213,6 +213,10 @@ object Show {
 
   implicit def OptionShow[A: Show]: Show[Option[A]] = shows(_ map (_.shows) toString)
 
+  implicit def FirstOptionShow[A: Show]: Show[FirstOption[A]] = OptionShow[A] ∙ ((_: FirstOption[A]).value)
+
+  implicit def LastOptionShow[A: Show]: Show[LastOption[A]] = OptionShow[A] ∙ ((_: LastOption[A]).value)
+
   implicit def EitherShow[A: Show, B: Show]: Show[Either[A, B]] = shows(e => (((_: A).shows) <-: e :-> (_.shows)).toString)
 
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] = shows {

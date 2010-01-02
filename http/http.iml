@@ -15,16 +15,16 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Scala Latest" level="application" />
-    <orderEntry type="library" name="Servlet API" level="application" />
     <orderEntry type="module" module-name="core" />
     <orderEntry type="module-library" exported="">
-      <library>
+      <library name="lib_managed">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib_managed/scala_2.8.0-20091129.024453-+/compile" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC5/compile/servlet-api-2.5.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/lib_managed/scala_2.8.0-20091129.024453-+/compile" recursive="false" />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC5/compile/servlet-api-2.5-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

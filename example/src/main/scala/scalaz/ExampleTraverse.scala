@@ -14,19 +14,24 @@ object ExampleTraverse {
     Stream(Some(7), None, Some(9)).sequence assert_≟ none
 
     val f = (_: String).map(_ - 48).toList
-    def g(s: String): Option[Int] = s.parseInt.either.right.toOption
+    def g(s: String): FirstOption[Int] = {
+      val validation = s.parseInt
+      val option = validation.either.right.toOption
+      val fst = option.fst
+      fst
+    }
 
-    // Traverse the List with the Option applicative functor (domain of g)
-    (List("abc", "def") ↦ g) assert_≟ none
+    // Traverse the List with the FirstOption applicative functor (domain of g)
+    (List("abc", "def") ↦ g).value assert_≟ none
 
-    // Traverse the List with the Option applicative functor (domain of g)
-    (List("7", "8") ↦ g) assert_≟ some(List(7, 8))
+    // Traverse the List with the FirstOption applicative functor (domain of g)
+    (List("7", "8") ↦ g).value assert_≟ some(List(7, 8))
 
-    // Traverse the Option with the Option applicative functor (domain of g)
-    (some("abc") ↦ g) assert_≟ none
+    // Traverse the Option with the FirstOption applicative functor (domain of g)
+    (some("abc") ↦ g).value assert_≟ none
 
-    // Traverse the Option with the Option applicative functor (domain of g)
-    (some("9") ↦ g) assert_≟ some(some(9))
+    // Traverse the Option with the FirstOption applicative functor (domain of g)
+    (some("9") ↦ g).value assert_≟ some(some(9))
 
     // Traverse a List of characters to get a possible List of digits (scalaz.Digit) using the Option applicative functor
     List('1', '2', '3').traverseDigits assert_≟ some(List(_1, _2, _3))

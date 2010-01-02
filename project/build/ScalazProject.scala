@@ -60,7 +60,9 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class ScalazCoreProject(info: ProjectInfo) extends ScalazDefaults(info, "Core")
 
-  class ScalazExampleProject(info: ProjectInfo) extends ScalazDefaults(info, "Example")
+  class ScalazExampleProject(info: ProjectInfo) extends ScalazDefaults(info, "Example") {
+    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
+  }
 
   class ScalazHttpProject(info: ProjectInfo) extends ScalazDefaults(info, "HTTP") {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources

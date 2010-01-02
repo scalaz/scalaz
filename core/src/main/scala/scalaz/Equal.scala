@@ -101,6 +101,10 @@ object Equal {
     case (a1, a2) => a1.isDefined == a2.isDefined
   }
 
+  implicit def OptionFirstEqual[A: Equal]: Equal[FirstOption[A]] = OptionEqual[A] ∙ ((_: FirstOption[A]).value)
+
+  implicit def OptionLastEqual[A: Equal]: Equal[LastOption[A]] = OptionEqual[A] ∙ ((_: LastOption[A]).value)
+
   implicit def EitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] = equal {
     case (Left(a1), Left(a2)) => a1 ≟ a2
     case (Right(b1), Right(b2)) => b1 ≟ b2
