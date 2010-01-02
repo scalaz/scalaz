@@ -45,6 +45,12 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
+  private def noAction = task {None}
+
+  override def deliverLocalAction = noAction
+
+  override def publishLocalAction = noAction
+
   override def publishAction = task {None}
 
   lazy val releaseZipAction = {
