@@ -4,7 +4,7 @@ import java.util.jar.Attributes.Name._
 import java.io.File
 import scala.Array
 
-abstract class ScalazDefaults(info: ProjectInfo, component: String) extends DefaultProject(info)
+abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
         with AutoCompilerPlugins{
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
@@ -36,11 +36,11 @@ abstract class ScalazDefaults(info: ProjectInfo, component: String) extends Defa
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with FileTasks {
   // Sub-projects
-  lazy val core = project("core", "Scalaz Core", new ScalazCoreProject(_))
-  lazy val http = project("http", "Scalaz HTTP", new ScalazHttpProject(_), core)
-  lazy val example = project("example", "Scalaz Example", new ScalazExampleProject(_), core, http)
-  lazy val scalacheckBinding = project("scalacheck-binding", "Scalaz Scalacheck Binding", new ScalazScalacheckBindingProject(_), core)
-  lazy val tests = project("tests", "Scalaz Test Suite", new ScalazTestsProject(_), core, scalacheckBinding)
+  lazy val core = project("core", "scalaz-core", new Core(_))
+  lazy val http = project("http", "scalaz-http", new Http(_), core)
+  lazy val example = project("example", "scalaz-example", new Example(_), core, http)
+  lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core)
+  lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, scalacheckBinding)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
@@ -64,21 +64,21 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(releaseZipAction)
 
-  class ScalazCoreProject(info: ProjectInfo) extends ScalazDefaults(info, "Core")
+  class Core(info: ProjectInfo) extends ScalazDefaults(info)
 
-  class ScalazExampleProject(info: ProjectInfo) extends ScalazDefaults(info, "Example") {
-    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
-  }
-
-  class ScalazHttpProject(info: ProjectInfo) extends ScalazDefaults(info, "HTTP") {
+  class Http(info: ProjectInfo) extends ScalazDefaults(info) {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
   }
 
-  class ScalazScalacheckBindingProject(info: ProjectInfo) extends ScalazDefaults(info, "Scalacheck Binding") {
+  class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
     val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7-SNAPSHOT" withSources
   }
 
-  class ScalazTestsProject(info: ProjectInfo) extends ScalazDefaults(info, "Tests") {
+  class Example(info: ProjectInfo) extends ScalazDefaults(info) {
+    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
+  }
+
+  class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
   }
 }
