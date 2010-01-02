@@ -53,7 +53,7 @@ exampleDir = "example"  </> "src" </> "main" </> "scala"
 mainDir = "core"  </> "src" </> "main" </> "scala"
 httpDir = "http"  </> "src" </> "main" </> "scala"
 --scappsDir = "scapps"  </> "src" </> "main" </> "scala"
-testDir = "core"  </> "src" </> "test" </> "scala"
+-- testDir = "core"  </> "src" </> "test" </> "scala"
 resourcesDir = "resources"
 etcDir = "etc"
 
@@ -82,7 +82,7 @@ s d = S.scalac {
   S.directory = Just d,
   S.deprecation = True,
   S.classpath = depends,
-  S.etc = Just "-Xcheckinit -Xlog-implicits -Xstrict-warnings -Xwarninit"
+  S.etc = Nothing -- Just "-Xcheckinit -Xlog-implicits -Xstrict-warnings -Xwarninit"
 }
 
 f :: S.Fsc
@@ -102,8 +102,10 @@ main'' = main' >=>=> f
 example :: IO ExitCode
 example = main >>>> (main'' ->- [exampleDir])
 
+{-
 test :: IO ExitCode
 test = main >>>> (main'' ->- [testDir])
+-}
 
 -- todo Update Lastik Scaladoc for Scala 2.8.0
 scaladoc' :: Version -> SD.Scaladoc
@@ -138,7 +140,7 @@ qallExample :: IO ExitCode
 qallExample = qrunExample "Example"
 
 repl :: IO ExitCode
-repl = example >>>> test >>>> qrepl
+repl = example >>>> {- test >>>> -} qrepl
 
 qrepl :: IO ExitCode
 qrepl = scala (intercalate " " ["-i initrepl", cp])
@@ -186,7 +188,7 @@ archive = mkdir buildJar >>
           meta >>
           main >>>>
           example >>>>
-          test >>>>
+          -- test >>>>
           let z = intercalate " " (fmap (\(d, f) -> "-C " ++ d ++ " " ++ f) [(buildScalaz, "scalaversion"), (buildScalaz, "scalazversion"), (buildScalaz, "time"), (buildScalaz, "scalacversion")])
               r = "-cvfm " ++ buildJar' ++ " " ++ resourcesDir </> "META-INF" </> "MANIFEST.MF " ++ z ++ " -C " ++ buildClasses ++ " ."
           in jar r
@@ -200,7 +202,7 @@ release t = let c = copyFiles nosvn nosvnf
                   archive
                   releasetype t
                   c mainDir (buildScalaz </> "src")
-                  c testDir (buildScalaz </> "test")
+                  -- c testDir (buildScalaz </> "test")
                   c exampleDir (buildScalaz </> "example")
                   c etcDir buildScalaz
                   mkdir buildRelease
