@@ -27,9 +27,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
 
   override def packageSrcJar = defaultJarPath("-sources.jar")
 
-  val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
+  lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
+  lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc)
 }
