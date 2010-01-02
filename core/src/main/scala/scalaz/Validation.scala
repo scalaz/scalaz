@@ -99,4 +99,6 @@ trait Validations {
   def success[E, A](a: A): Validation[E, A] = Success(a)
 
   def failure[E, A](e: E): Validation[E, A] = Failure(e)
+
+  def validation[E, A](e: Either[E, A]): Validation[E, A] = e.fold(Failure(_), Success(_))
 }

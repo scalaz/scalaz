@@ -21,11 +21,11 @@ sealed trait State[S, +A] {
 }
 
 trait States {
-  def state[S, A](f: S => (S, A)) = new State[S, A] {
+  def state[S, A](f: S => (S, A)): State[S, A] = new State[S, A] {
     def apply(s: S) = f(s)
   }
 
-  def init[S] = state[S, S](s => (s, s))
+  def init[S]: State[S, S] = state[S, S](s => (s, s))
 
   def modify[S](f: S => S) = init[S] flatMap (s => state(_ => (f(s), ())))
 }

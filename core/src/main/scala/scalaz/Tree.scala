@@ -43,7 +43,7 @@ sealed trait Tree[+A] {
 }
 
 trait Trees {
-  def node[A](root: A, forest: Stream[Tree[A]]) = new Tree[A] {
+  def node[A](root: A, forest: Stream[Tree[A]]): Tree[A] = new Tree[A] {
     val rootLabel = root
     def subForest = forest
   }
