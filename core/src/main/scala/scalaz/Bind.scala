@@ -119,7 +119,7 @@ object Bind {
 
 
   // todo use something like this to reduce duplication between FirstOption and LastOption.
-     The same idea could help in Functor, Show, Equal et al.
+  //     The same idea could help in Functor, Show, Equal et al.
   /*trait Convert[X[_], Y[_]] {
     def XToY[A](x: X[A]): Y[A]
     def YToX[A](x: Y[A]): X[A]
