@@ -114,21 +114,4 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
       }
     }
   }
-
-  // todo report scala bug: forward reference extends over definition of value da
-/*
-  def checkEqualLaws[A: Equal : Manifest : Arbitrary] = {
-    val typeName = manifest[A].toString
-    import EqualLaw._
-    (typeName ⊹ ": commutativityLaw") verifies commutativityLaw[A]
-    (typeName ⊹ ": identityLaw") verifies identityLaw[A]
-    implicit val da: Arbitrary[(A, A)] = DuplicateArbitrary[A]
-    import Arbitrary.{arbTuple2 => _}
-    (typeName ⊹ ": identityLaw2") verifies {
-      (t: Tuple1[Tuple2[A, A]]) => {
-        t._1._1 ≟ t._1._2
-      }
-    }
-  }
-*/
 }
