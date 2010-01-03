@@ -3,11 +3,11 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
 import java.math.BigInteger
-
+import scalacheck.{ScalazArbitrary, ScalaCheckBinding}
 
 class MonoidTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
-  import ScalaCheckImplicits._
+  import ScalaCheckBinding._
   import ScalazArbitrary._
 
   "function monoid" in {

@@ -1,7 +1,36 @@
 package scalaz
 
+/**
+ * A type safe alternative to {@scala.Any.equals}.
+ * <o
+ * <p/>
+ * Instances of {@code Equal} must satisfy {@link scalaz.EqualLaw#commutativityLaw}
+ * <p/>
+ * For example:
+ * <pre>
+ *   (1 ≟ 0) ≟ false 
+ *   (List("1") ≟ List("1")) ≟ true
+ *   (1 ≟ "1") // compile error
+ *   (1 ≟ 0L) // compile error
+ * </pre>
+ * @see scalaz.Identity#≟
+ * @see scalaz.Identity#≠
+ */
 trait Equal[-A] {
   def equal(a1: A, a2: A): Boolean
+}
+
+object EqualLaw {
+  import Scalaz._
+  
+  def commutativityLaw[A: Equal]: Tuple2[A, A] => Boolean = {
+    case (a1, a2) => (a1 ≟ a2) ≟ (a2 ≟ a1)
+  }
+
+  // todo better name for this?
+  def identityLaw[A: Equal]: Tuple1[A] => Boolean = {
+    case (a1) => a1 ≟ a1
+  }
 }
 
 trait Equals {
@@ -20,12 +49,10 @@ object Equal {
 
   implicit def DigitEqual: Equal[Digit] = equalA
 
-  implicit def OrderingEqual: Equal[Ordering]= equalA
+  implicit def OrderingEqual: Equal[Ordering] = equalA
 
   implicit def StringEqual: Equal[String] = equalA
 
-  implicit def IntEqual: Equal[Int] = equalA
-  
   def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = implicitly[Equal[B]] ∙ ((_: NewType[B]).value)
   
   implicit def IntMultiplicationEqual: Equal[IntMultiplication] = NewTypeEqual[Int, IntMultiplication]
@@ -124,7 +151,7 @@ object Equal {
   implicit def PromiseEqual[A: Equal]: Equal[Promise[A]] =
     equal[Promise[A]]((a1, a2) => a1.get ≟ a2.get)
 
-  implicit def IterableEqual[A: Equal]: Equal[Iterable[A]] = equal((a1, a2) => {
+  def IterableEqual[A: Equal]: Equal[Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
     val i2 = a2.iterator
     var b = false
@@ -141,6 +168,12 @@ object Equal {
     !(b || i1.hasNext || i2.hasNext)
   })
 
+  implicit def ListEqual[A: Equal]: Equal[List[A]] = IterableEqual[A]
+
+  implicit def StreamEqual[A: Equal]: Equal[Stream[A]] = IterableEqual[A]
+
+  implicit def GArrayEqual[A: Equal]: Equal[GArray[A]] = IterableEqual[A]
+
   import geo._
 
   implicit def AzimuthEqual: Equal[Azimuth] = i[Equal[Double]] ∙ (_.value)
@@ -153,7 +186,8 @@ object Equal {
 
   implicit def ElevationEqual: Equal[Elevation] = i[Equal[Double]] ∙ (_.value)
 
-  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.
+          flattening, e.inverseFlattening))
 
   implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = i[Equal[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
 

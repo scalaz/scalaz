@@ -3,10 +3,11 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.{Gen, Arbitrary}
 import java.util.Random
+import scalacheck.{ScalazArbitrary, ScalaCheckBinding}
 
 class ScalazArbitraryTest extends Specification with ScalaCheck {
   import Scalaz._
-  import ScalaCheckImplicits._
+  import ScalaCheckBinding._
   import ScalazArbitrary._
   import Arbitrary._
 

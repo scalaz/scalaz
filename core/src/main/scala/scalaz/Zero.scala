@@ -18,8 +18,13 @@ trait Zeros {
   }
 
   /**
-   * @usage ∅[Z]
-   * @usage ∅: Z
+   * Returns the Zero element of type Z.
+   * <p/>
+   * For example:
+   * <pre>
+   *   (∅[Int], ∅: List[Int]) == (0, List.empty[Int])
+   * </pre>
+   * @usecase def ∅[Z]: Z
    */
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
 }

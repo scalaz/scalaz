@@ -6,9 +6,6 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
    * if it is defined, otherwise, the provided value `none`.
-   *
-   * @usage option.cata(_ * 2, 0)
-   * @usage option.cata(some = _ * 2, none = 0)
    */
   def cata[X](some: A => X, none: => X): X = value match {
     case None => none
@@ -22,10 +19,13 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Returns the provided function `s` applied to item contained in the Option if it is defined,
    * otherwise, the provided value `n`.
-   *
+   * <p/>
    * This is a syntactic alternative to {@link scalaz.OptionW#cata}
-   *
-   * @usage option.some(_ * 2).none(0)
+   * <p/>
+   * Example:
+   * <code>
+   * option.some(_ * 2).none(0)
+   * </code>
    */
   def some[X](s: A => X) = new Fold[X] {
     def none(n: => X): X = cata(s, n)
@@ -37,8 +37,11 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
 
   /**
    * Ternary operator. Note that the arguments s and n are call-by-name.
-   *
-   * @usage option ? "defined" | "undefined"
+   * <p/>
+   * Example
+   * <code>
+   * option ? "defined" | "undefined"
+   * </code>
    */
   def ?[X](s: => X) = new Conditional[X] {
     def |(n: => X): X = value match {
@@ -67,8 +70,12 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
-   *
-   * @usage ~option
+   * <p/>
+   * For example:
+   * <pre>
+   * val o: Option = None
+   * val a: List[String] = ~o
+   * </pre>
    */
   def unary_~(implicit z: Zero[A]): A = value getOrElse z.zero
 

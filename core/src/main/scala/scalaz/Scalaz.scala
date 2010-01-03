@@ -89,6 +89,8 @@ object Scalaz extends ScalazLow
 
   type GArray[A] = collection.mutable.GenericArray[A]
 
+  val GArray = collection.mutable.GenericArray
+
   type ![A <: Applicable, B] = A#Apply[B]
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)

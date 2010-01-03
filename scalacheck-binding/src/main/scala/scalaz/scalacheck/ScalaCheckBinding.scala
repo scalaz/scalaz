@@ -1,7 +1,10 @@
 package scalaz
+package scalacheck
 
-
-object ScalaCheckImplicits {
+/**
+ * Type class instances for types from <a href="http://code.google.com/p/scalacheck">Scalacheck</a>
+ */
+object ScalaCheckBinding {
   import Scalaz._
   import org.scalacheck.{Gen, Arbitrary}
   import Gen.{sized, value}
@@ -37,5 +40,4 @@ object ScalaCheckImplicits {
   implicit def GenZero[A](implicit z: Zero[A]) = Gen(_ => Some(z.zero))
 
   implicit def ArbitraryZero[A] = Arbitrary(Gen(_ => None))
-
 }
