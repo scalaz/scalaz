@@ -3,7 +3,6 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Pretty, Gen, Arbitrary}
-import scalacheck.ScalaCheckBinding
 import java.io._
 
 /**
