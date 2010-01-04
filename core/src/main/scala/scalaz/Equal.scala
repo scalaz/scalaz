@@ -20,19 +20,6 @@ trait Equal[-A] {
   def equal(a1: A, a2: A): Boolean
 }
 
-object EqualLaw {
-  import Scalaz._
-  
-  def commutativityLaw[A: Equal]: Tuple2[A, A] => Boolean = {
-    case (a1, a2) => (a1 ≟ a2) ≟ (a2 ≟ a1)
-  }
-
-  // todo better name for this?
-  def identityLaw[A: Equal]: Tuple1[A] => Boolean = {
-    case (a1) => a1 ≟ a1
-  }
-}
-
 trait Equals {
   def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
     def equal(a1: A, a2: A) = f(a1, a2)

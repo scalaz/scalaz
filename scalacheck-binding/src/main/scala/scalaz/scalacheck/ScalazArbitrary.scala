@@ -83,12 +83,16 @@ object ScalazArbitrary {
 
   implicit def GenericArrayArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[GArray[A]] = arb[List[A]] ∘ ((x: List[A]) => GArray(x: _*))
 
+  trait Duplicate[A] {
+    def pair: (A, A)
+  }
+
   /**
    * An Arbitrary that calls the underlying generator twice with each random value, returning
    * a pair of identically created values. This is useful to test that equality is not based on
    * object identity.
    */
-  def DuplicateArbitrary[A](implicit aa: Arbitrary[A]): Arbitrary[(A, A)] = Arbitrary {
+  implicit def DuplicateArbitrary[A](implicit aa: Arbitrary[A]): Arbitrary[Duplicate[A]] = Arbitrary {
     Gen {
       (params: Gen.Params) => {
         val Params(_, rng) = params
@@ -96,7 +100,9 @@ object ScalazArbitrary {
         // Furthermore, the only way to copy one is through serialization.
         def cloneParams = params.copy(rng = Serialization.clone(rng))
         def a: Option[A] = aa.arbitrary(cloneParams)
-        a <×> a
+        (a <×> a) ∘ (as => new Duplicate[A] {
+          def pair = as
+        })
       }
     }
   }

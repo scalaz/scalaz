@@ -1,10 +1,10 @@
 package scalaz
 
 import concurrent.Promise
-import org.scalacheck.Arbitrary
-import scalacheck.{ScalazArbitrary, ScalaCheckBinding}
+import org.scalacheck.{Arbitrary, Prop}
 import org.specs.{Specification, ScalaCheck, Sugar}
 import java.math.BigInteger
+import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
 
 class EqualTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
@@ -95,23 +95,19 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     //checkEqualLaws[java.util.Map[K, V]]
   }
 
-  def checkEqualLaws[A: Equal : Manifest : Arbitrary] = {
+  def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {
     val typeName = manifest[A].toString
-    import EqualLaw._
-    (typeName ⊹ ": commutativityLaw") verifies commutativityLaw[A]
-    (typeName ⊹ ": identityLaw") verifies identityLaw[A]
-    checkEqualsNotBasedOnObjectIdentity[A]
+    typeName in {
+      import ScalazProperties.Equal._
+      commutativity[A] must pass
+      identity[A] must pass
+      checkEqualsNotBasedOnObjectIdentity[A]
+    }
   }
 
-  def checkEqualsNotBasedOnObjectIdentity[A: Equal : Manifest : Arbitrary] = {
-    val typeName = manifest[A].toString
-    implicit val da: Arbitrary[(A, A)] = DuplicateArbitrary[A]
-    import Arbitrary.{arbTuple2 => _, _}
-    (typeName ⊹ ": checkEqualsNotBasedOnObjectIdentity") verifies {
-      (t: Tuple1[Tuple2[A, A]]) => {
-        val Tuple1((a1, a2)) = t
-        a1 ≟ a2
-      }
-    }
+  def checkEqualsNotBasedOnObjectIdentity[A: Equal : Manifest : Arbitrary]: Unit = {
+    Prop.forAll((as: Duplicate[A]) => as.pair match {
+      case (a1, a2) =>  a1 ≟ a2
+    }).label("checkEqualsNotBasedOnObjectIdentity") must pass
   }
 }

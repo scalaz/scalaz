@@ -5,8 +5,6 @@ package scalaz
  * in the corresponding {@link scalaz.Semigroup} in type Z.
  * <p/>
  * ∀ a in S, append(a, zero) = a
- *
- * @see Monoid@identityLaw
  */
 trait Zero[+Z] {
   val zero: Z

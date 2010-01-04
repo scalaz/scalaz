@@ -3,7 +3,7 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
 import java.math.BigInteger
-import scalacheck.{ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
 
 class MonoidTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
@@ -35,11 +35,13 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
     // todo more types
   }
 
-  def checkMonoidLaws[A: Monoid : Equal : Manifest : Arbitrary] = {
+  def checkMonoidLaws[A: Monoid : Equal : Manifest : Arbitrary]: Unit = {
     val typeName = manifest[A].toString
-    import SemigroupLaw.associativeLaw
-    (typeName + ": associativeLaw") verifies associativeLaw[A]
-    import MonoidLaw.identityLaw
-    (typeName + ": identityLaw") verifies identityLaw[A]
+    typeName in {
+      import ScalazProperties.Semigroup._
+      import ScalazProperties.Monoid._
+      associative[A] must pass
+      identity[A] must pass
+    }
   }
 }
