@@ -12,7 +12,7 @@ $LastChangedBy$
 
 -}
 
-module Build where
+module Scalaz where
 
 import qualified Lastik.Scala.Scalac as S
 import qualified Lastik.Scala.Scaladoc as SD
@@ -30,52 +30,7 @@ import Control.Monad
 import Data.List hiding (find)
 import Data.Time.Clock
 import Data.Time.Calendar
-
-commitMessage :: String
-commitMessage = "\"Automated build (Scalaz.hs)\""
-
-repo :: String
-repo = "https://scalaz.googlecode.com/svn"
-
-repo' :: String -> String
-repo' = (repo ++) . ('/' :)
-
-continuous :: String
-continuous = repo' "continuous"
-
-trunk :: String
-trunk = repo' "trunk"
-
-artifacts :: String
-artifacts = repo' "artifacts"
-
-exampleDir = "example"  </> "src" </> "main" </> "scala"
-mainDir = "core"  </> "src" </> "main" </> "scala"
-httpDir = "http"  </> "src" </> "main" </> "scala"
---scappsDir = "scapps"  </> "src" </> "main" </> "scala"
--- testDir = "core"  </> "src" </> "test" </> "scala"
-resourcesDir = "resources"
-etcDir = "etc"
-
-build = "build"
-buildClasses = build </> "classes"
-buildScalaz = build </> "scalaz"
-buildScaladoc = buildScalaz </> "scaladoc"
-buildJar = buildScalaz
-jarFile = "scalaz.jar"
-buildJar' = buildJar </> jarFile
-buildRelease = build </> "release"
-
-type Version = String
-
-version' :: IO Version
-version' = readFile "version"
-
-cp :: String
-cp = "classpath" ~?? [buildClasses]
-
-depends :: [String]
-depends = ["servlet-api-2.5.jar"]
+import Scalaz.Build
 
 s :: FilePath -> S.Scalac
 s d = S.scalac {
@@ -223,22 +178,3 @@ nosvn = fileName /=? ".svn"
 
 nosvnf :: FilterPredicate
 nosvnf = constant nosvn ?&&? isFile
-
--- todo belongs in Lastik
--- Copies from one directory to another
-copyFiles :: RecursePredicate -> FilterPredicate -> FilePath -> FilePath -> IO ()
-copyFiles r f from to = do isf <- doesFileExist from
-                           if isf
-                             then error ("Cannot copy from file " ++ from)
-                             else do isd <- doesDirectoryExist from
-                                     if isd
-                                       then do dis <- doesFileExist to
-                                               if dis
-                                                 then error ("Cannot copy to" ++ to ++ " (a file)")
-                                                 else do j <- find r f from
-                                                         k <- filterM doesFileExist j
-                                                         mkdir to
-                                                         mapM_ (\z -> let t = to </> dropWhile (pathSeparator ==) (drop (length from) z)
-                                                                      in do mkdir (dropFileName t)
-                                                                            copyFile z t) k
-                                       else error (from ++ " is not a directory")
