@@ -5,7 +5,7 @@ import java.io.File
 import scala.Array
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
-        with AutoCompilerPlugins{
+        with AutoCompilerPlugins {
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
@@ -32,6 +32,11 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
+
+  def specsDependency = {
+    val specsVersion = "1.6.1-" + buildScalaVersion
+    "org.scala-tools.testing" % "specs" % specsVersion % "test" withSources
+  }
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 }
@@ -77,10 +82,10 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
+    val specs = specsDependency
   }
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = "org.scala-tools.testing" % "specs" % "1.6.1-2.8.0.Beta1-RC5" % "test" withSources
+    val specs = specsDependency
   }
 }
