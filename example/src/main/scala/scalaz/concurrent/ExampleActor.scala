@@ -28,11 +28,12 @@ object ExampleActor {
         }
       }
       chatServer
-      chatServer ! Login("bob")
+      val user = "bob"
+      chatServer ! Login(user)
       for (i <- 1 to 10) {
-        chatServer ! ChatMessage("bob", "SPAM: " ⊹ i.toString)
+        chatServer ! ChatMessage(user, "SPAM: " ⊹ i.toString)
       }
-      chatServer ! Logout("bob")
+      chatServer ! Logout(user)
     }
   }
 }
