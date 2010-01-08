@@ -73,5 +73,7 @@ object ExampleArrow {
       // todo this causes StackOverflowError.
 //      ((sum &&& max) apply nums) assert_≟ nel1((some(6), some(1)), (some(5), some(2), (some(3), some(3))
     }
+
+    List(1, 2, 3, 4)
   }
 }
