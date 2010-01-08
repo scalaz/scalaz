@@ -94,8 +94,8 @@ object Real {
       dual(expA, x.ε * expA)
     }
 
-    def cos(x: Dual[T]) = dual(x.a.sin, -x.ε * x.a.cos)
-
     def sin(x: Dual[T]) = dual(x.a.sin, x.ε * x.a.cos)
+
+    def cos(x: Dual[T]) = dual(x.a.cos, -x.ε * x.a.sin)
   }
 }
