@@ -19,6 +19,9 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def IdentityArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Identity[A]] =
+    a ∘ ((x: A) => IdentityTo(x))
+
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
   implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas ∘ (value _): _*))
