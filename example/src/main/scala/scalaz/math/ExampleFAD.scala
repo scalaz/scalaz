@@ -10,13 +10,10 @@ object ExampleFAD {
 
   def run {
     import scalaz.math._
-    import Real._
-    import Dual._
     import FAD._
 
-    def f[T: Real](x: T) = {
-      val rt = implicitly[Real[T]]
-      import rt._
+    def f[T](x: T)(implicit r: Real[T]) = {
+      import r._
       
       x * 2. + x * x
     }
