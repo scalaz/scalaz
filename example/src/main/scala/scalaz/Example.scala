@@ -19,6 +19,7 @@ object Example {
     ExampleTraverse.run
     geo.ExampleVincenty.run
     math.ExampleFAD.run
+    concurrent.ExampleActor.run
   }
 
   def main(args: Array[String]) = run
