@@ -37,13 +37,13 @@ sealed trait Actor[A] {
 }
 
 trait Actors {
-  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new Actor[A] {
+  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new {
     val e = c
 
     val strategy = s
 
     val onError = err
-  }
+  } with Actor[A]
 
   def actor[A](c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = actor[A]((e: Throwable) => throw e, c)
 
