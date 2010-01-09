@@ -2,9 +2,6 @@ package scalaz
 
 /**
  * A type safe alternative to {@scala.Any.==}.
- * <o
- * <p/>
- * Instances of {@code Equal} must satisfy {@link scalaz.EqualLaw#commutativityLaw}
  * <p/>
  * For example:
  * <pre>
