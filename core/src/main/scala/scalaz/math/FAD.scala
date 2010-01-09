@@ -20,12 +20,12 @@ trait Real[T] extends Fractional[T] {
   def exp(x: T): T
   // todo more ops
 
-  class RealOps(lhs: T) {
+  class RealOps(lhs: T) extends FractionalOps(lhs) {
     def exp() = Real.this.exp(lhs)
     def sin() = Real.this.sin(lhs)
     def cos() = Real.this.cos(lhs)
   }
-  implicit def mkRealOps(lhs: T): RealOps = new RealOps(lhs)
+  override implicit def mkNumericOps(lhs: T): RealOps = new RealOps(lhs)
 }
 
 
