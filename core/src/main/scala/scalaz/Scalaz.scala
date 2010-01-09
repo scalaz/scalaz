@@ -81,7 +81,7 @@ object Scalaz extends ScalazLow
 
   type ⊤ = Any
 
-  type ℤ = math.BigInt
+  type ℤ = scala.math.BigInt
 
   lazy val π = java.lang.Math.PI
 
