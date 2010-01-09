@@ -64,6 +64,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     checkEqualLaws[Either.LeftProjection[A, X]]
     checkEqualLaws[Either.RightProjection[X, A]]
     checkEqualLaws[Validation[E, A]]
+    checkEqualLaws[FailProjection[E, A]]
     // todo Arbitrary for Tree producing large (infinite?) trees.
     //    checkEqualLaws[Tree[A]]
     //    checkEqualLaws[TreeLoc[A]]
@@ -93,6 +94,8 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     //checkEqualLaws[java.lang.Iterable[A]]
     //checkEqualLaws[java.util.Map.Entry[K, V]]
     //checkEqualLaws[java.util.Map[K, V]]
+    checkEqualLaws[java.util.concurrent.Callable[A]]
+    checkEqualLaws[Zipper[A]]
   }
 
   def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {

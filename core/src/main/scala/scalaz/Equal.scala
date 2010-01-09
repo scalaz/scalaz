@@ -125,6 +125,8 @@ object Equal {
 
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = EitherEqual[E, A] ∙ ((_: Validation[E, A]).either)
 
+  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] = ValidationEqual[E, A] ∙ ((_: FailProjection[E, A]).validation)
+
   implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) => a1.rootLabel ≟ a2.rootLabel
         && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
@@ -206,4 +208,8 @@ object Equal {
   implicit def JavaMapEntry[K: Equal, V: Equal]: Equal[java.util.Map.Entry[K, V]] = equal((a1, a2) => a1.getKey ≟ a2.getKey)
 
   implicit def JavaMapEqual[K: Equal, V: Equal]: Equal[java.util.Map[K, V]] = equal(_.entrySet ≟ _.entrySet)
+
+  implicit def CallableEqual[A: Equal]: Equal[java.util.concurrent.Callable[A]] = equal(_.call ≟ _.call)
+
+  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] = implicitly[Equal[Stream[A]]] ∙ ((z: Zipper[A]) => z.stream)
 }

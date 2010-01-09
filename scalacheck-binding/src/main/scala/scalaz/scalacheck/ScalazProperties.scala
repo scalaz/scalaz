@@ -29,11 +29,17 @@ object ScalazProperties {
 
   object Functor {
     // todo
-//    def identity[F[_] : Functor : Equal : Arbitrary, X: Equal : Arbitrary] =
-//      forAll((a: F[X]) => (a ∘ Predef.identity) ≟ a).label("identity")
-//
-//    def associative[A[_] : Functor : Equal : Arbitrary, XEqual: Arbitrary] =
-//      forAll((a1: A[X], a2: A[X], a3: A[X]) => ((a1 ∘ a2) ∘ a3) ≟ ((a1 ∘ a2) ∘ a3)).label("associative")
+    def identity[F[_], X](implicit f: Functor[F],
+                          afx: Arbitrary[F[X]],
+                          ef: Equal[F[X]]) =
+      forAll((a: F[X]) => (a ∘ Predef.identity) ≟ a).label("identity")
+
+    def associative[F[_], X, Y, Z](implicit f: Functor[F],
+                          af: Arbitrary[F[X]],
+                          axy: Arbitrary[(X => Y)],
+                          ayz: Arbitrary[(Y => Z)],
+                          ef: Equal[F[Z]]) =
+      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ ((a1 ∘ f1) ∘ f2)).label("associative")
   }
 
   object Monad {

@@ -69,6 +69,8 @@ object ScalazArbitrary {
 
   implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] = arb[Either[A, B]] ∘ (validation _)
 
+  implicit def FailProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[FailProjection[A, B]] = arb[Validation[A, B]] ∘ (_.fail)
+
   implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
   implicit def Tuple1Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tuple1[A]] = arb[A] ∘ ((x: A) => Tuple1(x))
@@ -85,6 +87,16 @@ object ScalazArbitrary {
 
   implicit def GenericArrayArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[GArray[A]] = arb[List[A]] ∘ ((x: List[A]) => GArray(x: _*))
 
+  import java.util.concurrent.Callable
+
+  implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = arb[A] ∘ ((x: A) => x.η[Callable])
+
+  import concurrent.Promise
+
+  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy[Unit]): Arbitrary[Promise[A]] = arb[A] ∘ ((x: A) => promise(x))
+
+  implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]] <⊛⊛> (arb[A], arb[Stream[A]], zipper[A]((_: Stream[A]), (_: A), (_: Stream[A])))
+
   trait Duplicate[A] {
     def pair: (A, A)
   }
@@ -98,7 +110,7 @@ object ScalazArbitrary {
     Gen {
       (params: Gen.Params) => {
         val Params(_, rng) = params
-        // As because java.util.Random is side-effectful, it cannot be shared.
+        // Because java.util.Random is side-effectful, it cannot be shared.
         // Furthermore, the only way to copy one is through serialization.
         def cloneParams = params.copy(rng = Serialization.clone(rng))
         def a: Option[A] = aa.arbitrary(cloneParams)
