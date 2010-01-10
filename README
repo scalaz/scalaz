@@ -34,6 +34,14 @@ This is the directory structure of the build.
 |-         +-boot                            Versions of Scala Compiler and Library.
 |
 |- <mod N> +
+
+           |-src   +
+           |       |-main +
+           |       |      |-scala            Source files
+           |       |
+           |       |-test +
+           |              |-scala            Test source files
+           |
            |-lib_managed                     Managed Dependencies for this module, e.g. Scalacheck.
            |
            |-target +
