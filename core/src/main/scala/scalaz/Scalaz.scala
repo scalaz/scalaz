@@ -30,6 +30,7 @@ object Scalaz extends ScalazLow
     with    Duals
     with    Effects
     with    Elevations
+    with    ElevatedCurves
     with    Ellipsoids
     with    Emptys
     with    Endos

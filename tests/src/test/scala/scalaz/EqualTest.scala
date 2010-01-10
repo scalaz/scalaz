@@ -75,19 +75,18 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     checkEqualLaws[Stream[A]]
     checkEqualLaws[GArray[A]]
 
-    // todo add Arbitrary instances
-    //    import geo._
-    //    checkEqualLaws[Azimuth]
-    //    checkEqualLaws[Bearing]
-    //    checkEqualLaws[Coord]
-    //    checkEqualLaws[ElevatedCurve]
-    //    checkEqualLaws[Elevation]
-    //    checkEqualLaws[Ellipsoid]
-    //    checkEqualLaws[GeodeticCurve]
-    //    checkEqualLaws[Latitude]
-    //    checkEqualLaws[Longitude]
-    //    checkEqualLaws[Position]
-    //    checkEqualLaws[Vector]
+    import geo._
+    checkEqualLaws[Azimuth]
+    checkEqualLaws[Bearing]
+    checkEqualLaws[Coord]
+    checkEqualLaws[ElevatedCurve]
+    checkEqualLaws[Elevation]
+    checkEqualLaws[Ellipsoid]
+    checkEqualLaws[GeodeticCurve]
+    checkEqualLaws[Latitude]
+    checkEqualLaws[Longitude]
+    checkEqualLaws[Position]
+    checkEqualLaws[Vector]
 
     // todo add Arbitrary instances
     // java collections

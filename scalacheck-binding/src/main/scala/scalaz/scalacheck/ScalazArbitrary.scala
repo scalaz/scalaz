@@ -97,6 +97,29 @@ object ScalazArbitrary {
 
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]] <⊛⊛> (arb[A], arb[Stream[A]], zipper[A]((_: Stream[A]), (_: A), (_: Stream[A])))
 
+  import geo._
+  implicit def AzimuthArbitrary: Arbitrary[Azimuth] = arb[Double] ∘ (azimuth _)
+
+  implicit def BearingArbitrary: Arbitrary[Bearing] = arb[Double] ∘ (bearing _)
+
+  implicit def CoordArbitrary: Arbitrary[Coord] = arb[Latitude] <⊛> (arb[Longitude], coord _)
+
+  implicit def ElevatedCurveArbitrary: Arbitrary[ElevatedCurve] = arb[GeodeticCurve] <⊛> (arb[Elevation], elevatedCurve _)
+
+  implicit def ElevationArbitrary: Arbitrary[Elevation] = arb[Double] ∘ (elevation _)
+
+  implicit def EllipsoidArbitrary: Arbitrary[Ellipsoid] = arb[Double] <⊛⊛⊛> (arb[Double], arb[Double], arb[Double], ellipsoid _)
+
+  implicit def GeodeticCurveArbitrary: Arbitrary[GeodeticCurve] = arb[Double] <⊛⊛> (arb[Azimuth], arb[Azimuth], curve _)
+
+  implicit def LatitudeArbitrary: Arbitrary[Latitude] = arb[Double] ∘ (latitude _)
+
+  implicit def LongitudeArbitrary: Arbitrary[Longitude] = arb[Double] ∘ (longitude _)
+
+  implicit def PositionArbitrary: Arbitrary[Position] = arb[Coord] <⊛> (arb[Elevation], position _)
+
+  implicit def VectorArbitrary: Arbitrary[Vector] = arb[Coord] <⊛> (arb[Bearing], vector _)
+
   trait Duplicate[A] {
     def pair: (A, A)
   }
