@@ -14,25 +14,25 @@ object ExampleActor {
     case class Logout(user: String) extends Event
     case class ChatMessage(from: String, message: String) extends Event
 
-    import strategy._
-    val executor = Executors.newFixedThreadPool(5)
-    implicit val strat = strategy.Executor.strategy[Unit](executor)
+    implicit val executor = Executors.newFixedThreadPool(5)
+    import strategy.Executor._
+    
     val chatServer = actor[Event] {
       (e: Event) => e match {
         case Login(user) => ("user: " + user + " logged in.").println
         case Logout(user) => ("user: " + user + " logged out.").println
-        case ChatMessage(from, message) => {
-          ("user: " + from + " sent message: " + message).println
-        }
+        case ChatMessage(from, message) => ("user: " + from + " sent message: " + message).println
         case _ =>
       }
     }
+
     val user = "bob"
     chatServer ! Login(user)
     for (i <- 1 to 10) {
       chatServer ! ChatMessage(user, "SPAM: " ⊹ i.toString)
     }
     chatServer ! Logout(user)
+
     Thread.sleep(1000)
     executor.shutdown()
     executor.awaitTermination(60L, TimeUnit.SECONDS)
