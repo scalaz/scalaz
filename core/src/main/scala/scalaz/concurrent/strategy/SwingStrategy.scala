@@ -3,8 +3,8 @@ package concurrent
 package strategy
 
 import javax.swing.{SwingUtilities, SwingWorker}
-import java.util.concurrent.atomic.AtomicReference
-import SwingUtilities.invokeAndWait
+import SwingUtilities.invokeLater
+import java.util.concurrent.{Callable, FutureTask}
 
 object SwingStrategy {
 
@@ -26,13 +26,11 @@ object SwingStrategy {
    */
   implicit def eventDispatchingThreadStrategy[A]: Strategy[A] = new Strategy[A] {
     def apply(a: () => A) = {
-      () => {
-        val ref = new AtomicReference[A]
-        invokeAndWait(new Runnable {
-          def run = ref.set(a())
-        })
-        ref.get
-      }
+      val task = new FutureTask[A](new Callable[A] {
+        def call = a()
+      })
+      invokeLater(task)
+      () => task.get
     }
   }
 }
