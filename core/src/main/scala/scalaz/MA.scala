@@ -71,7 +71,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def listl(implicit r: FoldLeft[M]): List[A] = {
     val b = new scala.collection.mutable.ListBuffer[A]
-    foldl[scala.Unit]((), (_, a) => b += a)
+    foldl[Unit]((), (_, a) => b += a)
     b.toList
   }
 
@@ -205,6 +205,8 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     val k = levenshteinMatrix(w)
     k(l.len(value), l.len(w))
   }
+
+  def ifM[B](t: => M[B], f: => M[B])(implicit a: Monad[M], b: A <:< Boolean): M[B] = ∗ ((x: A) => if (x) t else f)
 
   def foldLeftM[N[_], B](f: (B, A) => N[B], b: B)(implicit fr: FoldLeft[M], m: Monad[N]): N[B] =
     foldl[N[B]](b η, (b, a) => b ∗ ((z: B) => f(z, a)))

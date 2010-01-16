@@ -20,7 +20,7 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     case h :: t => Some(Scalaz.nel(h, t))
   }
 
-  def <^>[B: Zero](f: NonEmptyList[A] => B) = value match {
+  def <^>[B: Zero](f: NonEmptyList[A] => B): B = value match {
     case Nil => ∅
     case h :: t => f(Scalaz.nel(h, t))
   }
