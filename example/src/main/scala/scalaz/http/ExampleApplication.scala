@@ -15,7 +15,7 @@ final class ExampleApplication extends StreamStreamServletApplication {
 
   // todo added the explicit calls to Slinky.response when migrating the Scala 2.8.0 Beta1 RC8. It seems that
   // there is a name shadowing occurring otherwise between the package response and the method response.
-  // Boil it down and report a bug.
+  // Boil it down and report a bug. See https://lampsvn.epfl.ch/trac/scala/changeset/20486
   def ok(s: String)(implicit request: Request[Stream]) = Slinky.response(OK).apply(ContentType, "text/html") << transitional << say(s)
 
   def say(s: String) = {
