@@ -6,13 +6,33 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
+  /**
+   * Alias for {@link scalaz.Identity#η}
+   */
+  def pure[F[_]](implicit p: Pure[F]): F[A] = η
+
   def σ: Dual[A] = value
 
   def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
+  /**
+   * Alias for {@link scalaz.Identity#⊹}
+   */
+  def |+|(a: => A)(implicit s: Semigroup[A]): A = ⊹(a)
+
   def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
+  /**
+   * Alias for {@link scalaz.Identity#≟}
+   */
+  def ===(a: A)(implicit e: Equal[A]): Boolean = ≟(a)
+
   def ≠(a: A)(implicit e: Equal[A]): Boolean = !(≟(a))
+
+  /**
+   * Alias for {@link scalaz.Identity#≠}
+   */
+  def /==(a: A)(implicit e: Equal[A]): Boolean = ≠(a)
 
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
   // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
