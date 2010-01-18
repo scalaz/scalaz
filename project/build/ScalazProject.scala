@@ -9,7 +9,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
-  override def localScala = defineScala("2.8.0-latest", Path.userHome / "usr" / "scala-2.8.0.latest" asFile) :: Nil
+//  override def localScala = defineScala("2.8.0-custom", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
+
+  override def crossScalaVersions = Seq("2.8.0.Beta1-RC8")
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
@@ -33,10 +35,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = {
-    val specsVersion = "1.6.1-" + buildScalaVersion
-    "org.scala-tools.testing" % "specs" % specsVersion % "test" withSources
-  }
+  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0.Beta1-RC7" % "1.6.1" % "test" withSources
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 }
@@ -78,7 +77,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7-SNAPSHOT" withSources
+    val scalacheck = "org.scala-tools.testing" % "scalacheck_2.8.0.Beta1-RC5" % "1.7-SNAPSHOT" withSources
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {

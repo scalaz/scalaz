@@ -56,7 +56,7 @@ object FoldRight {
 
   implicit def TreeFoldRight: FoldRight[Tree] = new FoldRight[Tree] {
     def foldRight[A, B](t: Tree[A], b: B, f: (A, => B) => B): B = {
-      t.foldMap((a: A) => ((f.curry(a)(_: B)): Endo[B])) apply b
+      t.foldMap((a: A) => ((f.curried(a)(_: B)): Endo[B])) apply b
     }
   }
 

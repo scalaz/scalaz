@@ -76,7 +76,7 @@ object Apply extends ApplyLow {
 
   val ZipTreeApply: Apply[Tree] = new Apply[Tree] {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
-      node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) ⊛ (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curry) ʐ))
+      node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) ⊛ (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
   }
 
   import concurrent.Promise

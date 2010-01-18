@@ -7,7 +7,7 @@ object ExampleApplicative {
 
   def run {
     // Apply the List Applicative functor
-    ((List(40, 50, 60) ⊛ (List(1, 2, 3) ∘ ((_: Int) * (_: Int)).curry))) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
+    ((List(40, 50, 60) ⊛ (List(1, 2, 3) ∘ ((_: Int) * (_: Int)).curried))) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
 
     // Lift-2 the List Applicative functor
     List(1, 2, 3) <⊛> (List(40, 50, 60), (_: Int) * (_: Int)) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
@@ -24,7 +24,7 @@ object ExampleApplicative {
     {
       // Apply the Function Applicative functor to produce a function that lifts conjunction
       // i.e. x => if(x < 15 && x % 2 == 0) without repeating the application to x.
-      val z = ((_: Int) > 15) ⊛ (((_: Int) % 2 == 0) ∘ ((_: Boolean) ∧ (_: Boolean)).curry)
+      val z = ((_: Int) > 15) ⊛ (((_: Int) % 2 == 0) ∘ ((_: Boolean) ∧ (_: Boolean)).curried)
       
       List(7, 8, 14, 15, 16, 20, 21) ∘ z assert_≟ List(false,false,false,false,true,true,false)
     }

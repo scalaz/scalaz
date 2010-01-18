@@ -22,7 +22,7 @@ sealed trait Tree[+A] {
       case t #:: ts => "|" #:: shift("+- ", "|  ", t.draw) append drawSubTrees(ts)
     }
     def shift(first: String, other: String, s: Stream[String]): Stream[String] =
-      s.ʐ ⊛ ((first #:: other.repeat[Stream]).ʐ ∘ ((_: String) + (_: String)).curry)
+      s.ʐ ⊛ ((first #:: other.repeat[Stream]).ʐ ∘ ((_: String) + (_: String)).curried)
 
     rootLabel.shows #:: drawSubTrees(subForest)
   }

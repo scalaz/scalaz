@@ -115,7 +115,7 @@ object Real {
 
     def cos(x: Dual[T]) = dual(x.a.cos, -x.ε * x.a.sin)
 
-    override def abs(x: Dual[T]) = if (x.a equiv t.zero) ⊥ else dual(x.a.abs, x.ε * t.signum(x.a))
+    override def abs(x: Dual[T]) = if (x.a equiv t.zero) ⊥ else dual(x.a.abs, x.ε * t.fromInt(t.signum(x.a)))
 
     // TODO scala.math.Numeric#signum returns Int, not T. Perhaps we should redefine the Numeric
     // type class rather than use the one from Scala.
@@ -125,8 +125,8 @@ object Real {
       if (!(y.ε equiv t.zero) || (x.a equiv t.zero))
         ⊥
       else
-        dual(x.a ** y.a, y.a * (x.a ** (y.a - 1.0)) * x.ε)
+        dual(x.a ** y.a, y.a * (x.a ** (y.a - t.one)) * x.ε)
 
-    def log(x: Dual[T]) = if (x.a <= 0) ⊥ else dual(x.a.log, x.ε / x.a)
+    def log(x: Dual[T]) = if (x.a <= t.zero) ⊥ else dual(x.a.log, x.ε / x.a)
   }
 }

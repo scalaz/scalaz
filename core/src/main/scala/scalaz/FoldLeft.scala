@@ -36,7 +36,7 @@ object FoldLeft {
 
   implicit def TreeFoldLeft: FoldLeft[Tree] = new FoldLeft[Tree] {
     def foldLeft[B, A](t: Tree[A], b: B, f: (B, A) => B): B =
-      t.foldMap((a: A) => (f.flip.curry(a): Endo[B]) σ).value(b)
+      t.foldMap((a: A) => (f.flip.curried(a): Endo[B]) σ).value(b)
   }
 
   implicit def ZipperFoldLeft: FoldLeft[Zipper] = new FoldLeft[Zipper] {

@@ -60,7 +60,7 @@ object Traverse {
 
   implicit def ZipperTraverse: Traverse[Zipper] = new Traverse[Zipper] {
     def traverse[F[_]: Applicative, A, B](f: A => F[B], za: Zipper[A]): F[Zipper[B]] = {
-      val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curry
+      val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curried
       val a = implicitly[Applicative[F]]
       a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_: Stream[B]).reverse),
         z), f(za.focus)), StreamTraverse.traverse[F, A, B](f, za.rights))
