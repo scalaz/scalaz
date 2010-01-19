@@ -13,10 +13,7 @@ final class ExampleApplication extends StreamStreamServletApplication {
 
   import Request._
 
-  // todo added the explicit calls to Slinky.response when migrating the Scala 2.8.0 Beta1 RC8. It seems that
-  // there is a name shadowing occurring otherwise between the package response and the method response.
-  // Boil it down and report a bug. See https://lampsvn.epfl.ch/trac/scala/changeset/20486
-  def ok(s: String)(implicit request: Request[Stream]) = Slinky.response(OK).apply(ContentType, "text/html") << transitional << say(s)
+  def ok(s: String)(implicit request: Request[Stream]) = OK(ContentType, "text/html") << transitional << say(s)
 
   def say(s: String) = {
     <html>
@@ -36,10 +33,9 @@ final class ExampleApplication extends StreamStreamServletApplication {
     }
   }
 
-
   val application = new ServletApplication[Stream, Stream] {
     def application(implicit servlet: HttpServlet, servletRequest: HttpServletRequest, request: Request[Stream]) = {
-      handle getOrElse resource(x => Slinky.response(OK) << x.toStream, Slinky.response(NotFound).xhtml)
+      handle getOrElse resource(x => OK << x.toStream, Slinky.responseFromStatus(NotFound).xhtml)
     }
   }
 }

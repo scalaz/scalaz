@@ -9,9 +9,9 @@ trait StreamStreamApplications {
   /**
    * Construct a response from the given status with a version determined by the given request.
    */
-  implicit def response(s: Status)(implicit req: Request[Stream]): Response[Stream] =
+  implicit def responseFromStatus(s: Status)(implicit req: Request[Stream]): Response[Stream] =
     Response.emptyHeadersBodyStatusResponse[Stream, Stream](s)
-  
+
 }
 /**
  * Functions for web applications whose request and response body and transformed using <code>scala.Stream</code>.
