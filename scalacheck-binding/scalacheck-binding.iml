@@ -5,12 +5,12 @@
       <configuration>
         <option name="myScalaCompilerJarPaths">
           <array>
-            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-compiler.jar" />
+            <option value="E:/Library/Application Support/IntelliJIDEA90/Scala/lib/scala-compiler.jar" />
           </array>
         </option>
         <option name="myScalaSdkJarPaths">
           <array>
-            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-library.jar" />
+            <option value="E:/Library/Application Support/IntelliJIDEA90/Scala/lib/scala-library.jar" />
           </array>
         </option>
       </configuration>

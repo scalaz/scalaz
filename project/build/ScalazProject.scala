@@ -35,7 +35,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0.Beta1-RC7" % "1.6.1" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.2" % "test" withSources
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 }
@@ -86,5 +86,5 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
-  }
+  }  
 }

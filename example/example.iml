@@ -5,12 +5,12 @@
       <configuration>
         <option name="myScalaCompilerJarPaths">
           <array>
-            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-compiler.jar" />
+            <option value="E:/Library/Application Support/IntelliJIDEA90/Scala/lib/scala-compiler.jar" />
           </array>
         </option>
         <option name="myScalaSdkJarPaths">
           <array>
-            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-library.jar" />
+            <option value="E:/Library/Application Support/IntelliJIDEA90/Scala/lib/scala-library.jar" />
           </array>
         </option>
       </configuration>
@@ -31,11 +31,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library name="lib_managed_test">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC7-1.6.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC8-1.6.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC7-1.6.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC8-1.6.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

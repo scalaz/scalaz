@@ -14,7 +14,6 @@ object ScalazProperties {
     def commutativity[A: Equal : Arbitrary] =
       forAll((a1: A, a2: A) => (a1 ≟ a2) ≟ (a2 ≟ a1)).label("commutativity")
 
-    // todo better name for this?
     def identity[A: Equal : Arbitrary] = forAll((a: A) => a ≟ a).label("identity")
   }
 
