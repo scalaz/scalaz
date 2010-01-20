@@ -19,6 +19,8 @@ object ExampleEqual {
 
     def checkEqual[X: Equal](o1: X, o2: X): Boolean = o1 ≟ o2
 
+    // Case class equality is suitable, so expose it as a implicit instance of scalaz.Equal
+    // for Apple and Orange.
     implicit def dogEqual = equalA[Apple]
     implicit def catEqual = equalA[Orange]
 
