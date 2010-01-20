@@ -35,16 +35,16 @@ object ExampleEqual {
     //assert(new Fruit ≠ new Orange) // does not compile
     //checkEqual(new Fruit, new Orange) // does not compile
 
-    //assert(new Orange ≟ new Fruit) // does not compile
+    //assert(new Orange ≠ new Fruit) // does not compile
     //checkEqual(new Orange, new Fruit) // does not compile
 
-    //assert(new Apple ≟ new Orange) //does not compile
+    //assert(new Apple ≠ new Orange) //does not compile
     //checkEqual(new Apple, new Orange) //does not compile
 
-    //assert(new Apple ≟ new Vehicle) //does not compile
+    //assert(new Apple ≠ new Vehicle) //does not compile
     //checkEqual(new Apple, new Vehicle) //does not compile
 
-    //assert(new Fruit ≟ "") //does not compile
+    //assert(new Fruit ≠ "") //does not compile
     //checkEqual(new Fruit, "") //does not compile
 
     assert(List(new Orange) ≟ List(new Orange))
