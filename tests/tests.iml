@@ -2,7 +2,18 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Scala" name="Scala">
-      <configuration />
+      <configuration>
+        <option name="myScalaCompilerJarPaths">
+          <array>
+            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-compiler.jar" />
+          </array>
+        </option>
+        <option name="myScalaSdkJarPaths">
+          <array>
+            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIDEA90/Scala/lib/scala-library.jar" />
+          </array>
+        </option>
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -18,11 +29,11 @@
     <orderEntry type="module-library">
       <library name="lib_managed_test">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC5/test/specs-1.6.1-2.8.0.Beta1-RC5.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC7-1.6.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC5/test/specs-1.6.1-2.8.0.Beta1-RC5-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1-RC8/test/specs_2.8.0.Beta1-RC7-1.6.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
