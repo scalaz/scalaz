@@ -244,9 +244,19 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
 // This is a hack to fix the pressing problem that this caused.
 trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
-  def ∙[B](f: B => A)(implicit t: Cofunctor[M]) = t.comap(value, f)
+  def ∙[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = t.comap(value, f)
 
-  def |<[B](f: => A)(implicit t: Cofunctor[M]) = ∙((_: B) => f)
+  /**
+   * Alias for {@link scalaz.MACofunctor#∙}
+   */
+  def comap[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = ∙(f)
+
+  /**
+   * Comap the identity function
+   */
+  def covary[B <: A](implicit t: Cofunctor[M]): M[B] = ∙[B](identity)
+
+  def |<[B](f: => A)(implicit t: Cofunctor[M]): M[B] = ∙((_: B) => f)
 }
 
 
