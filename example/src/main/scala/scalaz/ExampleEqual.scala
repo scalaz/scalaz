@@ -29,7 +29,7 @@ object ExampleEqual {
 
     assert(new Orange ≟ new Orange)
     checkEqual(new Orange, new Orange)
-    
+
     //assert(new Fruit ≠ new Orange) // does not compile
     //checkEqual(new Fruit, new Orange) // does not compile
 
@@ -44,5 +44,9 @@ object ExampleEqual {
 
     //assert(new Fruit ≟ "") //does not compile
     //checkEqual(new Fruit, "") //does not compile
+
+    assert(List(new Orange) ≟ List(new Orange))
+
+    //assert(List(new Orange) ≟ List(new Apple)) //does not compile  
   }
 }
