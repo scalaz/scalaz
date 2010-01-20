@@ -11,6 +11,7 @@ object Example {
     ExampleDistance.run
     ExampleFunctor.run
     ExampleFold.run
+    ExampleEqual.run
     ExampleKleisli.run
     ExampleIdentity.run
     ExampleMonad.run
