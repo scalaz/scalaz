@@ -34,6 +34,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def <××××>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <⊛⊛⊛⊛>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
 
   def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
+    mapM(f)
+
+  def mapM[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     t.traverse(f, value)
 
   def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
@@ -175,9 +178,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def =>>[B](f: M[A] => B)(implicit w: Comonad[M]): M[B] = w.fmap(w.cojoin(value), f)
 
-  def copure[B](implicit p: Copure[M]): A = p copure value
+  def copure(implicit p: Copure[M]): A = p copure value
 
-  def ε[B](implicit p: Copure[M]): A = copure
+  def ε(implicit p: Copure[M]): A = copure
 
   def cojoin(implicit j: Cojoin[M]): M[M[A]] = j cojoin value
 
