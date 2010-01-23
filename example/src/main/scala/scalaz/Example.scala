@@ -17,6 +17,7 @@ object Example {
     ExampleMonad.run
     ExampleMonoid.run
     ExamplePlus.run
+    ExampleState.run
     ExampleTraverse.run
     geo.ExampleVincenty.run
     math.ExampleFAD.run
