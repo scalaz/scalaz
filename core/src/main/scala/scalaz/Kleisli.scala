@@ -27,4 +27,6 @@ trait Kleislis {
   }
 
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = ☆(f)
+
+  implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
 }

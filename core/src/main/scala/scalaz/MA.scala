@@ -11,27 +11,27 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
-  def ⊛[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
+  def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
 
-  def <⊛>[B, C](b: M[B], z: (A, B) => C)(implicit t: Functor[M], a: Apply[M]): M[C] = a(t.fmap(value, z.curried), b)
+  def <**>[B, C](b: M[B], z: (A, B) => C)(implicit t: Functor[M], a: Apply[M]): M[C] = a(t.fmap(value, z.curried), b)
 
-  def <⊛⊛>[B, C, D](b: M[B], c: M[C], z: (A, B, C) => D)(implicit t: Functor[M], a: Apply[M]): M[D] = a(a(t.fmap(value, z.curried), b), c)
+  def <***>[B, C, D](b: M[B], c: M[C], z: (A, B, C) => D)(implicit t: Functor[M], a: Apply[M]): M[D] = a(a(t.fmap(value, z.curried), b), c)
 
-  def <⊛⊛⊛>[B, C, D, E](b: M[B], c: M[C], d: M[D], z: (A, B, C, D) => E)(implicit t: Functor[M], a: Apply[M]): M[E] = a(a(a(t.fmap(value, z.curried), b), c), d)
+  def <****>[B, C, D, E](b: M[B], c: M[C], d: M[D], z: (A, B, C, D) => E)(implicit t: Functor[M], a: Apply[M]): M[E] = a(a(a(t.fmap(value, z.curried), b), c), d)
 
-  def <⊛⊛⊛⊛>[B, C, D, E, F](b: M[B], c: M[C], d: M[D], e: M[E], z: (A, B, C, D, E) => F)(implicit t: Functor[M], a: Apply[M]): M[F] = a(a(a(a(t.fmap(value, z.curried), b), c), d), e)
+  def <*****>[B, C, D, E, F](b: M[B], c: M[C], d: M[D], e: M[E], z: (A, B, C, D, E) => F)(implicit t: Functor[M], a: Apply[M]): M[F] = a(a(a(a(t.fmap(value, z.curried), b), c), d), e)
 
-  def ⊛>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[B] = <⊛>(b, (_, b: B) => b)
+  def *>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[B] = <**>(b, (_, b: B) => b)
 
-  def <⊛[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[A] = <⊛>(b, (a, _: B) => a)
+  def <*[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[A] = <**>(b, (a, _: B) => a)
 
-  def <×>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[(A, B)] = <⊛>(b, (_: A, _: B))
+  def <×>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[(A, B)] = <**>(b, (_: A, _: B))
 
-  def <××>[B, C](b: M[B], c: M[C])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C)] = <⊛⊛>(b, c, (_: A, _: B, _: C))
+  def <××>[B, C](b: M[B], c: M[C])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C)] = <***>(b, c, (_: A, _: B, _: C))
 
-  def <×××>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D)] = <⊛⊛⊛>(b, c, d, (_: A, _: B, _: C, _: D))
+  def <×××>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D)] = <****>(b, c, d, (_: A, _: B, _: C, _: D))
 
-  def <××××>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <⊛⊛⊛⊛>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
+  def <××××>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <*****>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
 
   def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     mapM(f)
@@ -222,21 +222,21 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     else value ∗ (a => replicateM[N](n - 1) ∘ (a ➜: _) )
 
   def zipWithA[F[_], B, C](b: M[B], f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
-    (b ⊛ (a.fmap(value, f.curried))).sequence[F, C]
+    (b <*> (a.fmap(value, f.curried))).sequence[F, C]
 
   def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
     foldl[BKTree[A]](emptyBKTree, _ + _)
 
-  import concurrent.Strategy
+  import concurrent._
 
-  def parMap[B](f: A => B)(implicit m: Functor[M], s: Strategy[B]): () => M[B] =
-    ∘(f.concurry).parM
+  def parMap[B](f: A => B)(implicit m: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
+    mapM(f.kleisli[Promise])
 
-  def parBind[B](f: A => M[B])(implicit m: Bind[M], t: Functor[M], s: Strategy[M[B]]): () => M[B] =
+  def parBind[B](f: A => M[B])(implicit m: Bind[M], g: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
 
-  def parZipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Applicative[M], s: Strategy[C]): () => M[C] =
-    (bs ⊛ (value ∘ f.concurry.curried)).parM
+  def parZipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Applicative[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[C]] =
+    zipWithA(bs, (x: A, y :B) => promise(f(x, y)))
 
   import concurrent.Strategy
 

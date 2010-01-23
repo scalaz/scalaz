@@ -92,7 +92,7 @@ trait Lines {
     val y = x._2.reverse span (!isWhitespace(_))
     val u: Option[Uri] = reverseTrim(y._2)
     val v: Option[Version] = reverseTrim(y._1)
-    v ⊛ (u ⊛ (m map (m => u => v => Line.line(m, u, v))))
+    v <*> (u <*> (m map (m => u => v => Line.line(m, u, v))))
   }
 }
 /**

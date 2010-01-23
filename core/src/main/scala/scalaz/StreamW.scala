@@ -32,7 +32,7 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
     case _ => Stream.Empty
   }
 
-  def zapp[B, C](fs: ZipStream[A => B => C]) = (value ʐ) ⊛ fs
+  def zapp[B, C](fs: ZipStream[A => B => C]) = (value ʐ) <*> fs
 
   def unfoldForest[B](f: A => (B, () => Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
 

@@ -60,9 +60,9 @@ object Apply extends ApplyLow {
 
   implicit def ZipperApply: Apply[Zipper] = new Apply[Zipper] {
     def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] =
-      zipper((a.lefts ʐ) ⊛ (f.lefts ʐ),
+      zipper((a.lefts ʐ) <*> (f.lefts ʐ),
         (f.focus)(a.focus),
-        (a.rights ʐ) ⊛ (f.rights ʐ))
+        (a.rights ʐ) <*> (f.rights ʐ))
   }
 
   implicit def ZipStreamApply: Apply[ZipStream] = new Apply[ZipStream] {
@@ -76,7 +76,7 @@ object Apply extends ApplyLow {
 
   val ZipTreeApply: Apply[Tree] = new Apply[Tree] {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
-      node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) ⊛ (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
+      node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
   }
 
   import concurrent.Promise
