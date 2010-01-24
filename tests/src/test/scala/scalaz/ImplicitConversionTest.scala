@@ -45,7 +45,7 @@ object ImplicitConversionTest {
     implicitly[Bind[java.util.ArrayList]]
   }
 
-  def monad[A, B, R, S, T, U, V, W] {
+  def monad[A, B, R, S, T, U, V, W, X] {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
     implicitly[Monad[NonEmptyList]]
@@ -58,6 +58,12 @@ object ImplicitConversionTest {
     implicitly[Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     implicitly[Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
     implicitly[Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    implicitly[Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
+    implicitly[Monad[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    import java.util.Map.Entry    
+    implicitly[Monad[PartialApply1Of2[Entry, Int]#Apply]]
+    implicitly[Monad[PartialApply1Of2[Validation, X]#Apply]]
+    implicitly[Monad[PartialApply1Of2[FailProjection, X]#Flip]]
   }
 
   def functor {
