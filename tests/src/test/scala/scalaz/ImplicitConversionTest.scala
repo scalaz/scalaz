@@ -31,12 +31,46 @@ object ImplicitConversionTest {
     implicitly[T[A] <%%< MA[T, A]]
   }
 
-  def apply {
+  def apply[A, B, R, S, T, U, V, W, X] {
     implicitly[Apply[Identity]]
     implicitly[Apply[List]]
     implicitly[Apply[Function0]]
     implicitly[Apply[Option]]
-    implicitly[Apply[PartialApply1Of2[Function1, Int]#Apply]]
+    implicitly[Apply[PartialApply1Of2[State, A]#Apply]]
+    implicitly[Apply[Function0]]
+    implicitly[Apply[PartialApply1Of2[Function1, R]#Apply]]
+    implicitly[Apply[PartialApply2Of3[Function2, R, S]#Apply]]
+    implicitly[Apply[PartialApply3Of4[Function3, R, S, T]#Apply]]
+    implicitly[Apply[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
+    implicitly[Apply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
+    implicitly[Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    implicitly[Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
+    implicitly[Apply[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    import java.util.Map.Entry
+    implicitly[Apply[PartialApply1Of2[Entry, Int]#Apply]]
+    implicitly[Apply[PartialApply1Of2[Validation, Int]#Apply]]
+    implicitly[Apply[PartialApply1Of2[FailProjection, X]#Flip]]
+  }
+
+  def applicative[A, B, R, S, T, U, V, W, X] {
+    implicitly[Applicative[Identity]]
+    implicitly[Applicative[List]]
+    implicitly[Applicative[Function0]]
+    implicitly[Applicative[Option]]
+    implicitly[Applicative[PartialApply1Of2[State, A]#Apply]]
+    implicitly[Applicative[Function0]]
+    implicitly[Applicative[PartialApply1Of2[Function1, R]#Apply]]
+    implicitly[Applicative[PartialApply2Of3[Function2, R, S]#Apply]]
+    implicitly[Applicative[PartialApply3Of4[Function3, R, S, T]#Apply]]
+    implicitly[Applicative[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
+    implicitly[Applicative[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
+    implicitly[Applicative[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    implicitly[Applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
+    implicitly[Applicative[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    import java.util.Map.Entry
+    implicitly[Applicative[PartialApply1Of2[Entry, Int]#Apply]]
+    implicitly[Applicative[PartialApply1Of2[Validation, Int]#Apply]]
+    implicitly[Applicative[PartialApply1Of2[FailProjection, X]#Flip]]
   }
 
   def bind {
@@ -50,7 +84,6 @@ object ImplicitConversionTest {
     implicitly[Monad[Stream]]
     implicitly[Monad[NonEmptyList]]
     implicitly[Monad[PartialApply1Of2[State, A]#Apply]]
-    implicitly[Monad[PartialApply1Of2[Function1, A]#Apply]]
     implicitly[Monad[Function0]]
     implicitly[Monad[PartialApply1Of2[Function1, R]#Apply]]
     implicitly[Monad[PartialApply2Of3[Function2, R, S]#Apply]]

@@ -20,6 +20,18 @@ object Apply extends ApplyLow {
  
   implicit def StateApply[S]: Apply[PartialApply1Of2[State, S]#Apply] = FunctorBindApply[PartialApply1Of2[State, S]#Apply]
 
+  implicit def Tuple2Apply[R: Monoid]: Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
+
+  implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[PartialApply2Of3[Tuple3, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
+
+  implicit def Tuple4Apply[R: Monoid, S: Monoid, T: Monoid]: Apply[PartialApply3Of4[Tuple4, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+
+  implicit def Tuple5Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Apply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+
+  implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+
+  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+    
   implicit def Function1Apply[R]: Apply[PartialApply1Of2[Function1, R]#Apply] = FunctorBindApply[PartialApply1Of2[Function1, R]#Apply]
 
   implicit def Function2Apply[R, S]: Apply[PartialApply2Of3[Function2, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Function2, R, S]#Apply]
