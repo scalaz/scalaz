@@ -99,9 +99,9 @@ object Semigroup {
 
   implicit def GenericArraySemigroup[A]: Semigroup[GArray[A]] = semigroup(_ ++ _)
 
-  implicit def EitherLeftSemigroup[A, B]: Semigroup[Either.LeftProjection[A, B]] = semigroup((a, b) => if (a.e.isRight) a else b)
+  implicit def EitherLeftSemigroup[A, B]: Semigroup[Either.LeftProjection[A, B]] = semigroup((a, b) => if (a.e.isLeft) a else b)
 
-  implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isLeft) a else b)
+  implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isRight) a else b)
 
   implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
 

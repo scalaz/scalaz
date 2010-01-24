@@ -105,9 +105,9 @@ object Zero {
 
   implicit def GenericArrayZero[A]: Zero[GArray[A]] = zero(new GArray[A](0))
 
-  implicit def EitherLeftZero[A: Zero, B]: Zero[Either.LeftProjection[A, B]] = zero(Left(∅[A]).left)
+  implicit def EitherRightZero[A: Zero, B]: Zero[Either.RightProjection[A, B]] = zero(Left(∅[A]).right)
 
-  implicit def EitherRightZero[A, B: Zero]: Zero[Either.RightProjection[A, B]] = zero(Right(∅[B]).right)
+  implicit def EitherLeftZero[A, B](implicit bz: Zero[B]): Zero[Either.LeftProjection[A, B]] = zero(Right(∅[B]).left)
 
   implicit def Function1ABZero[A, B: Zero]: Zero[A => B] = zero((_: A) => ∅[B])
 
