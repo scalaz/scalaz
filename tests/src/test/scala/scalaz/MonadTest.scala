@@ -19,6 +19,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     type E = Int
     type F = Int
     type G = Int
+    type R = Int
     type Z = Int
 
 
@@ -38,7 +39,18 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     checkMonadLaws[PartialApply4Of5[Tuple5, B, C, D, E]#Apply, A]
     checkMonadLaws[PartialApply5Of6[Tuple6, B, C, D, E, F]#Apply, A]
     checkMonadLaws[PartialApply6Of7[Tuple7, B, C, D, E, F, G]#Apply, A]
-
+    implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {f: (Int => Int) => f(0)}
+    implicit def EqualFunction2 = implicitly[Equal[Int]] ∙ {f: ((Int, Int) => Int) => f(0, 0)}
+    implicit def EqualFunction3 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int) => Int) => f(0, 0, 0)}
+    implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)}
+    implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)}
+//    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
+    checkMonadLaws[PartialApply1Of2[Function1, B]#Apply, A]
+    checkMonadLaws[PartialApply2Of3[Function2, B, C]#Apply, A]
+    checkMonadLaws[PartialApply3Of4[Function3, B, C, D]#Apply, A]
+    checkMonadLaws[PartialApply4Of5[Function4, B, C, D, E]#Apply, A]
+    checkMonadLaws[PartialApply5Of6[Function5, B, C, D, E, F]#Apply, A]
+//    checkMonadLaws[PartialApply6Of7[Function6, B, C, D, E, F, G]#Apply, A]
     ()
   }
 

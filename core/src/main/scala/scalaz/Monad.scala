@@ -27,4 +27,16 @@ object Monad {
   implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](Tuple6Bind, Tuple6Pure)
 
   implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Bind, Tuple7Pure)
+  
+  implicit def Function1Monad[R]: Monad[PartialApply1Of2[Function1, R]#Apply] = monad[PartialApply1Of2[Function1, R]#Apply](Function1Bind, Function1Pure)
+
+  implicit def Function2Monad[R, S]: Monad[PartialApply2Of3[Function2, R, S]#Apply] = monad[PartialApply2Of3[Function2, R, S]#Apply](Function2Bind, Function2Pure)
+
+  implicit def Function3Monad[R, S, T]: Monad[PartialApply3Of4[Function3, R, S, T]#Apply] = monad[PartialApply3Of4[Function3, R, S, T]#Apply](Function3Bind, Function3Pure)
+
+  implicit def Function4Monad[R, S, T, U]: Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply] = monad[PartialApply4Of5[Function4, R, S, T, U]#Apply](Function4Bind, Function4Pure)
+
+  implicit def Function5Monad[R, S, T, U, V]: Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](Function5Bind, Function5Pure)
+
+  implicit def Function6Monad[R, S, T, U, V, W]: Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Bind, Function6Pure)
 }

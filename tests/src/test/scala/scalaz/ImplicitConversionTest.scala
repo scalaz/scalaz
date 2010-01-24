@@ -45,16 +45,19 @@ object ImplicitConversionTest {
     implicitly[Bind[java.util.ArrayList]]
   }
 
-  def monad[A, B] {
+  def monad[A, B, R, S, T, U, V, W] {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
     implicitly[Monad[NonEmptyList]]
-    implicitly[Bind[PartialApply1Of2[State, A]#Apply]]
-    implicitly[Pure[PartialApply1Of2[State, A]#Apply]]
-    implicitly[Apply[PartialApply1Of2[State, A]#Apply]]
-    // todo why are these not working!?
-//    implicitly[Applicative[PartialApply1Of2[State, A]#Apply]]
-//    implicitly[Monad[PartialApply1Of2[State, A]#Apply]]
+    implicitly[Monad[PartialApply1Of2[State, A]#Apply]]
+    implicitly[Monad[PartialApply1Of2[Function1, A]#Apply]]
+    implicitly[Monad[Function0]]
+    implicitly[Monad[PartialApply1Of2[Function1, R]#Apply]]
+    implicitly[Monad[PartialApply2Of3[Function2, R, S]#Apply]]
+    implicitly[Monad[PartialApply3Of4[Function3, R, S, T]#Apply]]
+    implicitly[Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
+    implicitly[Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
+    implicitly[Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
   }
 
   def functor {
