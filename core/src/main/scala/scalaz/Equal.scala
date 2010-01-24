@@ -38,10 +38,26 @@ object Equal {
   implicit def StringEqual: Equal[String] = equalA
 
   def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = implicitly[Equal[B]] ∙ ((_: NewType[B]).value)
-  
-  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = NewTypeEqual[Int, IntMultiplication]
 
-  implicit def AnyValEqual[V <: AnyVal]: Equal[V] = equalA
+  implicit def UnitEqual: Equal[Unit] = equalA
+
+  implicit def IntEqual: Equal[Int] = equalA
+
+  implicit def ByteEqual: Equal[Byte] = equalA
+
+  implicit def BooleanEqual: Equal[Boolean] = equalA
+
+  implicit def CharEqual: Equal[Char] = equalA
+
+  implicit def LongEqual: Equal[Long] = equalA
+
+  implicit def ShortEqual: Equal[Short] = equalA
+
+  implicit def FloatEqual: Equal[Float] = equalA
+
+  implicit def DoubleEqual: Equal[Double] = equalA
+
+  implicit def IntMultiplicationEqual: Equal[IntMultiplication] = NewTypeEqual[Int, IntMultiplication]
 
   implicit def BooleanConjunctionEqual: Equal[BooleanConjunction] = NewTypeEqual[Boolean, BooleanConjunction]
 

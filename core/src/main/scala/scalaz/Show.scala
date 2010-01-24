@@ -26,7 +26,23 @@ object Show {
 
   implicit def StringShow: Show[String] = showA
 
-  implicit def AnyValShow[V <: AnyVal]: Show[V] = showA
+  implicit def UnitShow: Show[Unit] = showA
+
+  implicit def BooleanShow: Show[Boolean] = showA
+
+  implicit def ByteShow: Show[Byte] = showA
+
+  implicit def CharShow: Show[Char] = showA
+
+  implicit def IntShow: Show[Int] = showA
+
+  implicit def LongShow: Show[Long] = showA
+
+  implicit def ShortShow: Show[Short] = showA
+
+  implicit def FloatShow: Show[Float] = showA
+
+  implicit def DoubleShow: Show[Double] = showA
 
   def NewTypeShow[B: Show, A <: NewType[B]]: Show[A] = i[Show[B]] ∙ ((_: NewType[B]).value)
 

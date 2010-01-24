@@ -27,7 +27,6 @@ object ScalazProperties {
   }
 
   object Functor {
-    // todo
     def identity[F[_], X](implicit f: Functor[F],
                           afx: Arbitrary[F[X]],
                           ef: Equal[F[X]]) =

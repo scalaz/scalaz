@@ -10,4 +10,18 @@ object Monad {
     override def pure[A](a: => A) = p.pure(a)
     override def bind[A, B](a: M[A], f: A => M[B]) = b.bind(a, f)
   }
+
+  implicit def StateMonad[A] = monad[PartialApply1Of2[State, A]#Apply]
+
+  implicit def Tuple2Monad[R: Monoid]: Monad[PartialApply1Of2[Tuple2, R]#Apply] = monad[PartialApply1Of2[Tuple2, R]#Apply]
+
+  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[PartialApply2Of3[Tuple3, R, S]#Apply] = monad[PartialApply2Of3[Tuple3, R, S]#Apply]
+
+  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[PartialApply3Of4[Tuple4, R, S, T]#Apply] = monad[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+
+  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = monad[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+
+  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+
+  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
 }

@@ -13,6 +13,12 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
   "monad laws" should {
     type A = Int
     type B = Int
+    type C = Int
+    type D = Int
+    type E = Int
+    type F = Int
+    type G = Int
+    type Z = Int
 
     implicit def IdentityEqual[X] = equalA[Identity[X]]
     checkMonadLaws[Identity, A]
@@ -20,6 +26,17 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     // todo fix arbitrary instance for Stream
 //    checkMonadLaws[Stream, A]
     checkMonadLaws[NonEmptyList, A]
+    
+    implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {s: State[Int, Unit] => s.apply(0)}
+    implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
+    checkMonadLaws[PartialApply1Of2[State, A]#Apply, Unit]
+    checkMonadLaws[PartialApply1Of2[Tuple2, B]#Apply, A]
+    checkMonadLaws[PartialApply2Of3[Tuple3, B, C]#Apply, A]
+    checkMonadLaws[PartialApply3Of4[Tuple4, B, C, D]#Apply, A]
+    checkMonadLaws[PartialApply4Of5[Tuple5, B, C, D, E]#Apply, A]
+    checkMonadLaws[PartialApply5Of6[Tuple6, B, C, D, E, F]#Apply, A]
+    checkMonadLaws[PartialApply6Of7[Tuple7, B, C, D, E, F, G]#Apply, A]
+    ()
   }
 
   def checkMonadLaws[M[_], A](implicit mm: Monad[M],
