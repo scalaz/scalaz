@@ -39,4 +39,16 @@ object Monad {
   implicit def Function5Monad[R, S, T, U, V]: Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](Function5Bind, Function5Pure)
 
   implicit def Function6Monad[R, S, T, U, V, W]: Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Bind, Function6Pure)
+
+  implicit def EitherLeftMonad[X]: Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip] = monad[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftBind, EitherLeftPure)
+  
+  implicit def EitherRightMonad[X]: Monad[PartialApply1Of2[Either.RightProjection, X]#Apply] = monad[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightBind, EitherRightPure)
+  
+  implicit def ValidationMonad[X]: Monad[PartialApply1Of2[Validation, X]#Apply] = monad[PartialApply1Of2[Validation, X]#Apply](ValidationBind, ValidationPure)
+
+  implicit def ValidationFailureMonad[X]: Monad[PartialApply1Of2[FailProjection, X]#Flip] = monad[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureBind, ValidationFailurePure)
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryBind[X: Monoid]: Monad[PartialApply1Of2[Entry, X]#Apply] = monad[PartialApply1Of2[Entry, X]#Apply](MapEntryBind, MapEntryPure)  
 }

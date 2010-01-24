@@ -20,6 +20,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     type F = Int
     type G = Int
     type R = Int
+    type X = Int
     type Z = Int
 
 
@@ -51,6 +52,11 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     checkMonadLaws[PartialApply4Of5[Function4, B, C, D, E]#Apply, A]
     checkMonadLaws[PartialApply5Of6[Function5, B, C, D, E, F]#Apply, A]
 //    checkMonadLaws[PartialApply6Of7[Function6, B, C, D, E, F, G]#Apply, A]
+    checkMonadLaws[PartialApply1Of2[Either.LeftProjection, X]#Flip, A]
+    checkMonadLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]
+//    checkMonadLaws[PartialApply1Of2[Entry, X]#Apply, A]
+    checkMonadLaws[PartialApply1Of2[Validation, X]#Apply, A]
+    checkMonadLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
     ()
   }
 

@@ -117,22 +117,6 @@ object Bind {
     def bind[A, B](r: Option[A], f: A => Option[B]) = r flatMap f
   }
 
-
-  // todo use something like this to reduce duplication between FirstOption and LastOption.
-  //     The same idea could help in Functor, Show, Equal et al.
-  /*trait Convert[X[_], Y[_]] {
-    def XToY[A](x: X[A]): Y[A]
-    def YToX[A](x: Y[A]): X[A]
-  }
-
-  def NewTypeBind[T[_], U[_]](conv: Convert[T, U])
-                             (implicit b: Bind[U]): Bind[T] = {
-    import conv.{XToY => t2u, YToX => u2t}
-    new Bind[T] {
-      def bind[A, B](ta: T[A], f: (A) => T[B]) = u2t(t2u(ta) ∗ ((a: A) => t2u(f(a))))
-    }
-  }*/
-
   implicit def FirstOptionBind: Bind[FirstOption] = new Bind[FirstOption] {
     def bind[A, B](a: FirstOption[A], f: (A) => FirstOption[B]): FirstOption[B] = (a.value flatMap ((x: A) => f(x).value)).fst
   }
