@@ -49,5 +49,5 @@ object Applicative {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryPure[X: Monoid]: Applicative[PartialApply1Of2[Entry, X]#Apply] = applicative[PartialApply1Of2[Entry, X]#Apply](MapEntryPure, MapEntryApply)
+  implicit def MapEntryApplicative[X: Monoid]: Applicative[PartialApply1Of2[Entry, X]#Apply] = applicative[PartialApply1Of2[Entry, X]#Apply](MapEntryPure, MapEntryApply)
 }

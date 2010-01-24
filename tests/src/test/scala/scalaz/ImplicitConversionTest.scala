@@ -73,6 +73,27 @@ object ImplicitConversionTest {
     implicitly[Applicative[PartialApply1Of2[FailProjection, X]#Flip]]
   }
 
+  def pointed[A, B, R, S, T, U, V, W, X] {
+    implicitly[Pointed[Identity]]
+    implicitly[Pointed[List]]
+    implicitly[Pointed[Function0]]
+    implicitly[Pointed[Option]]
+    implicitly[Pointed[PartialApply1Of2[State, A]#Apply]]
+    implicitly[Pointed[Function0]]
+    implicitly[Pointed[PartialApply1Of2[Function1, R]#Apply]]
+    implicitly[Pointed[PartialApply2Of3[Function2, R, S]#Apply]]
+    implicitly[Pointed[PartialApply3Of4[Function3, R, S, T]#Apply]]
+    implicitly[Pointed[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
+    implicitly[Pointed[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
+    implicitly[Pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    implicitly[Pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
+    implicitly[Pointed[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    import java.util.Map.Entry
+    implicitly[Pointed[PartialApply1Of2[Entry, Int]#Apply]]
+    implicitly[Pointed[PartialApply1Of2[Validation, Int]#Apply]]
+    implicitly[Pointed[PartialApply1Of2[FailProjection, X]#Flip]]
+  }
+
   def bind {
     implicitly[Bind[List]]
     implicitly[Bind[GArray]]
