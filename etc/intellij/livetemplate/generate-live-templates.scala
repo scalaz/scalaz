@@ -55,13 +55,6 @@ def escape(xmlText: String): NodeSeq = {
 val imports = Template("isz", "import scalaz._\nimport Scalaz._\n", "imports for Scalaz", List())
 
 val templates = List(
-  method("@", "⊛", Param("f")),
-  method("<@>", "<⊛>", Param("b"), Param("z")),
-  method("<@@>", "<⊛⊛>", Param("b"), Param("c"), Param("z")),
-  method("<@@@>", "<⊛⊛⊛>", Param("b"), Param("c"), Param("d"), Param("z")),
-  method("<@@@@>", "<⊛⊛⊛⊛>", Param("b"), Param("c"), Param("d"), Param("d"), Param("z")),
-  method("@>", "⊛>", Param("b")),
-  method("<@", "<⊛", Param("b")),
   method("<x>", "<×>", Param("b")),
   method("<xx>", "<××>", Param("b"), Param("c")),
   method("<xxx>", "<×××>", Param("b"), Param("c"), Param("d")),

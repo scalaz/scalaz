@@ -1,564 +1,496 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templateSet group="scalaz">
-    <template value=".&#8859;($F$)" description="⊛" toShortenFQNames="true" name=".@" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+    <template
+            value=".&lt;&#215;&gt;($B$)" description="&lt;×&gt;" toShortenFQNames="true" name=".&lt;x&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"/>
         <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-    </template>
-    <template value="&#8859; $F$" description="⊛" toShortenFQNames="true" name="@" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template
-    value=".&lt;&#8859;&gt;($B$, $Z$)" description="&lt;⊛&gt;" toShortenFQNames="true" name=".&lt;@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
+            value="&lt;&#215;&gt; $B$" description="&lt;×&gt;" toShortenFQNames="true" name="&lt;x&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"/>
         <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
-    <template
-    value=".&lt;&#8859;&#8859;&gt;($B$, $C$, $Z$)" description="&lt;⊛⊛&gt;" toShortenFQNames="true" name=".&lt;@@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
-    <template
-    value=".&lt;&#8859;&#8859;&#8859;&gt;($B$, $C$, $D$, $Z$)" description="&lt;⊛⊛⊛&gt;" toShortenFQNames="true" name=".&lt;@@@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
-    <template
-    value=".&lt;&#8859;&#8859;&#8859;&#8859;&gt;($B$, $C$, $D$, $D$, $Z$)" description="&lt;⊛⊛⊛⊛&gt;" toShortenFQNames="true" name=".&lt;@@@@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="Z"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
-    <template value=".&#8859;&gt;($B$)" description="⊛&gt;" toShortenFQNames="true" name=".@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-    </template>
-    <template value="&#8859;&gt; $B$" description="⊛&gt;" toShortenFQNames="true" name="@&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-    </template>
-    <template value=".&lt;&#8859;($B$)" description="&lt;⊛" toShortenFQNames="true" name=".&lt;@" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-    </template>
-    <template value="&lt;&#8859; $B$" description="&lt;⊛" toShortenFQNames="true" name="&lt;@" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template
-    value=".&lt;&#215;&gt;($B$)" description="&lt;×&gt;" toShortenFQNames="true" name=".&lt;x&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+            value=".&lt;&#215;&#215;&gt;($B$, $C$)" description="&lt;××&gt;" toShortenFQNames="true" name=".&lt;xx&gt;"
+            toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
-</template>
+    </template>
     <template
-    value="&lt;&#215;&gt; $B$" description="&lt;×&gt;" toShortenFQNames="true" name="&lt;x&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
+            value=".&lt;&#215;&#215;&#215;&gt;($B$, $C$, $D$)" description="&lt;×××&gt;" toShortenFQNames="true"
+            name=".&lt;xxx&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
-</template>
+    </template>
     <template
-    value=".&lt;&#215;&#215;&gt;($B$, $C$)" description="&lt;××&gt;" toShortenFQNames="true" name=".&lt;xx&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
+            value=".&lt;&#215;&#215;&#215;&#215;&gt;($B$, $C$, $D$, $D$)" description="&lt;××××&gt;"
+            toShortenFQNames="true" name=".&lt;xxxx&gt;" toReformat="false">
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"/>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
-</template>
-    <template
-    value=".&lt;&#215;&#215;&#215;&gt;($B$, $C$, $D$)" description="&lt;×××&gt;" toShortenFQNames="true" name=".&lt;xxx&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
-    <template
-    value=".&lt;&#215;&#215;&#215;&#215;&gt;($B$, $C$, $D$, $D$)" description="&lt;××××&gt;" toShortenFQNames="true" name=".&lt;xxxx&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="B"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="C"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="D"></variable>
-        <context>
-            <option value="true" name="SCALA"></option>
-        </context>
-</template>
+    </template>
     <template value=".&#8728;($F$)" description="∘" toShortenFQNames="true" name=".map" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8728; $F$" description="∘" toShortenFQNames="true" name="map" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8728;&#8728;($F$)" description="∘∘" toShortenFQNames="true" name=".mapmap" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8728;&#8728; $F$" description="∘∘" toShortenFQNames="true" name="mapmap" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8728;($F$)" description="∘" toShortenFQNames="true" name=".o" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8728; $F$" description="∘" toShortenFQNames="true" name="o" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8728;&#8728;($F$)" description="∘∘" toShortenFQNames="true" name=".oo" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8728;&#8728; $F$" description="∘∘" toShortenFQNames="true" name="oo" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8614;($F$)" description="↦" toShortenFQNames="true" name=".|-&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8614; $F$" description="↦" toShortenFQNames="true" name="|-&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8727;($F$)" description="∗" toShortenFQNames="true" name=".bind" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8727; $F$" description="∗" toShortenFQNames="true" name="bind" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8889;($A$)" description="⊹" toShortenFQNames="true" name=".plus" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8889; $A$" description="⊹" toShortenFQNames="true" name="plus" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#10140;: $A$" description="➜:" toShortenFQNames="true" name="appendpure" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#10141;: $A$" description="➝:" toShortenFQNames="true" name="pluspure" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8721;" description="∑" toShortenFQNames="true" name=".sum" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8721; " description="∑" toShortenFQNames="true" name="sum" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8721;" description="∑" toShortenFQNames="true" name=".suml" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8721; " description="∑" toShortenFQNames="true" name="suml" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8707;($F$)" description="∃" toShortenFQNames="true" name=".exists" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8707; $F$" description="∃" toShortenFQNames="true" name="exists" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8704;($F$)" description="∀" toShortenFQNames="true" name=".forall" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8704; $F$" description="∀" toShortenFQNames="true" name="forall" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8611;($F$)" description="↣" toShortenFQNames="true" name=".traversemonoid" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8611; $F$" description="↣" toShortenFQNames="true" name="traversemonoid" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#956;" description="μ" toShortenFQNames="true" name=".join" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#956; " description="μ" toShortenFQNames="true" name="join" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#965;" description="υ" toShortenFQNames="true" name=".cojoin" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#965; " description="υ" toShortenFQNames="true" name="cojoin" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#949;" description="ε" toShortenFQNames="true" name=".copure" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#949; " description="ε" toShortenFQNames="true" name="copure" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8729;($F$)" description="∙" toShortenFQNames="true" name=".comap" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8729; $F$" description="∙" toShortenFQNames="true" name="comap" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#951;" description="η" toShortenFQNames="true" name=".pure" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#951; " description="η" toShortenFQNames="true" name="pure" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#9734;($F$)" description="☆" toShortenFQNames="true" name="kleisli" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#9733;($F$)" description="★" toShortenFQNames="true" name="cokleisli" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="F"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#963;" description="σ" toShortenFQNames="true" name=".dual" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#963; " description="σ" toShortenFQNames="true" name="dual" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8799;($A$)" description="≟" toShortenFQNames="true" name=".equal" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8799; $A$" description="≟" toShortenFQNames="true" name="equal" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8800;($A$)" description="≠" toShortenFQNames="true" name=".notequal" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8800; $A$" description="≠" toShortenFQNames="true" name="notequal" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8804;($A$)" description="≤" toShortenFQNames="true" name=".&lt;=" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8804; $A$" description="≤" toShortenFQNames="true" name="&lt;=" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8805;($A$)" description="≥" toShortenFQNames="true" name=".&gt;=" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8805; $A$" description="≥" toShortenFQNames="true" name="&gt;=" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8808;($A$)" description="≨" toShortenFQNames="true" name=".&lt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8808; $A$" description="≨" toShortenFQNames="true" name="&lt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8921;($A$)" description="⋙" toShortenFQNames="true" name=".&gt;&gt;&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8921; $A$" description="⋙" toShortenFQNames="true" name="&gt;&gt;&gt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8920;($A$)" description="⋘" toShortenFQNames="true" name=".&lt;&lt;&lt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8920; $A$" description="⋘" toShortenFQNames="true" name="&lt;&lt;&lt;" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8869;" description="⊥" toShortenFQNames="true" name="undefined" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8743;($A$)" description="∧" toShortenFQNames="true" name=".^" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8743; $A$" description="∧" toShortenFQNames="true" name="^" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8743;($A$)" description="∧" toShortenFQNames="true" name=".conjunction" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8743; $A$" description="∧" toShortenFQNames="true" name="conjunction" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8744;($A$)" description="∨" toShortenFQNames="true" name=".disjunction" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8744; $A$" description="∨" toShortenFQNames="true" name="disjunction" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8744;($A$)" description="∨" toShortenFQNames="true" name=".v" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8744; $A$" description="∨" toShortenFQNames="true" name="v" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8656;($A$)" description="⇐" toShortenFQNames="true" name=".&lt;==" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8656; $A$" description="⇐" toShortenFQNames="true" name="&lt;==" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#656;" description="ʐ" toShortenFQNames="true" name=".zipstream" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#656; " description="ʐ" toShortenFQNames="true" name="zipstream" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8719;" description="∏" toShortenFQNames="true" name=".mult" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8719; " description="∏" toShortenFQNames="true" name="mult" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8709;" description="∅" toShortenFQNames="true" name="zero" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#215;" description="×" toShortenFQNames="true" name="x" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8658;" description="⇒" toShortenFQNames="true" name="=&gt;" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8715;($A$)" description="∋" toShortenFQNames="true" name=".3" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8715; $A$" description="∋" toShortenFQNames="true" name="3" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value=".&#8715;($A$)" description="∋" toShortenFQNames="true" name=".contains" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8715; $A$" description="∋" toShortenFQNames="true" name="contains" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template value="&#8712;: $A$" description="∈:" toShortenFQNames="true" name="memberof" toReformat="false">
-        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"></variable>
+        <variable defaultValue=" " alwaysStopAt="true" expression=" " name="A"/>
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
     </template>
     <template
-    value="import scalaz._&#10;import Scalaz.&#10;" description="imports for Scalaz" toShortenFQNames="true" name="isz" toReformat="false">
+            value="import scalaz._&#10;import Scalaz._&#10;" description="imports for Scalaz" toShortenFQNames="true"
+            name="isz" toReformat="false">
         <context>
-            <option value="true" name="SCALA"></option>
+            <option value="true" name="SCALA"/>
         </context>
-</template>
+    </template>
 </templateSet>
