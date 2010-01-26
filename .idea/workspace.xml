@@ -16,17 +16,8 @@
   </component>
   <component name="ChangeListManager" verified="true">
     <list default="true" readonly="true" id="40db7d7b-16c3-4c78-908e-55cfbdefeae4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/example/src/main/scala/scalaz/ExampleApplicative.scala" afterPath="$PROJECT_DIR$/example/src/main/scala/scalaz/ExampleApplicative.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/main/scala/scalaz/Identity.scala" afterPath="$PROJECT_DIR$/core/src/main/scala/scalaz/Identity.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala" afterPath="$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/main/scala/scalaz/Kleisli.scala" afterPath="$PROJECT_DIR$/core/src/main/scala/scalaz/Kleisli.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/example/example.iml" afterPath="$PROJECT_DIR$/example/example.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scalacheck-binding/scalacheck-binding.iml" afterPath="$PROJECT_DIR$/scalacheck-binding/scalacheck-binding.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/http/src/main/scala/scalaz/http/request/Request.scala" afterPath="$PROJECT_DIR$/http/src/main/scala/scalaz/http/request/Request.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/example/src/main/scala/scalaz/ExamplePlus.scala" afterPath="$PROJECT_DIR$/example/src/main/scala/scalaz/ExamplePlus.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/main/scala/scalaz/MA.scala" afterPath="$PROJECT_DIR$/core/src/main/scala/scalaz/MA.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/tests.iml" afterPath="$PROJECT_DIR$/tests/tests.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/core.iml" afterPath="$PROJECT_DIR$/core/core.iml" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="trunk.iws" />
@@ -37,6 +28,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="Commander">
+    <leftPanel />
+    <rightPanel />
+    <splitter proportion="0.5" />
+  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
     <option name="REVERSE_PATCH" value="false" />
@@ -86,15 +82,6 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="MAB.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/MAB.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="65" selection-start="882" selection-end="882" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Kleisli.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Kleisli.scala">
           <provider selected="true" editor-type-id="text-editor">
@@ -113,6 +100,24 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="Identity.scala" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Identity.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="141" column="76" selection-start="4597" selection-end="4597" vertical-scroll-proportion="0.67105263">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Scalaz.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Scalaz.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="95" column="42" selection-start="1988" selection-end="1988" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ExampleApplicative.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/src/main/scala/scalaz/ExampleApplicative.scala">
           <provider selected="true" editor-type-id="text-editor">
@@ -122,10 +127,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ScalazArbitrary.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ScalazArbitrary.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="139" column="15" selection-start="6699" selection-end="6699" vertical-scroll-proportion="0.33252132">
+            <state line="146" column="57" selection-start="6787" selection-end="6787" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -167,15 +172,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExamplePlus.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/src/main/scala/scalaz/ExamplePlus.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="9" selection-start="278" selection-end="278" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FindManager">
@@ -193,6 +189,8 @@
         <option value="$PROJECT_DIR$/core/src/main/scala/scalaz/MA.scala" />
         <option value="$PROJECT_DIR$/example/src/main/scala/scalaz/ExampleApplicative.scala" />
         <option value="$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala" />
+        <option value="$PROJECT_DIR$/core/src/main/scala/scalaz/Scalaz.scala" />
+        <option value="$PROJECT_DIR$/core/src/main/scala/scalaz/Identity.scala" />
       </list>
     </option>
   </component>
@@ -492,18 +490,18 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24923454" sideWeight="0.4960182" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39987752" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24923454" sideWeight="0.4960182" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -537,20 +535,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Applicative.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="7" selection-start="152" selection-end="152" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Apply.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="6" selection-start="92" selection-end="92" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/ArrayByte.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="6" selection-start="145" selection-end="145" vertical-scroll-proportion="0.0">
@@ -635,6 +619,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="146" column="57" selection-start="6787" selection-end="6787" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/example/src/main/scala/scalaz/ExampleApplicative.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="29" column="15" selection-start="1334" selection-end="1334" vertical-scroll-proportion="0.0">
@@ -642,9 +633,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazArbitrary.scala">
+    <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Scalaz.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="139" column="15" selection-start="6699" selection-end="6699" vertical-scroll-proportion="0.33252132">
+        <state line="95" column="42" selection-start="1988" selection-end="1988" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/scala/scalaz/Identity.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="141" column="76" selection-start="4597" selection-end="4597" vertical-scroll-proportion="0.67105263">
           <folding />
         </state>
       </provider>

@@ -11,7 +11,8 @@ sealed trait Identity[A] extends PimpedType[A] {
    */
   def pure[F[_]](implicit p: Pure[F]): F[A] = η
 
-  def σ: Dual[A] = value
+  def dual: Dual[A] = value
+  def σ: Dual[A] = dual
 
   def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
@@ -56,6 +57,14 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def ≱(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
+  def lte(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
+
+  def gte(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
+
+  def lt(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
+
+  def gt(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
+    
   def show(implicit s: Show[A]): List[Char] = s.show(value)
 
   def shows(implicit s: Show[A]): String = s.show(value).mkString
@@ -119,7 +128,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   def whileDo(f: A => A, p: A => Boolean): A =
     if(p(value)) f(value).whileDo(f, p) else value
 
-  def ×× : (A, A) = ×[A, A].μ apply value
+  def squared : (A, A) = ×[A, A].μ apply value 
 
   override def toString = value.toString
 
