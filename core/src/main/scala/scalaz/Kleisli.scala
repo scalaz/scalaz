@@ -22,11 +22,11 @@ sealed trait Kleisli[M[_], A, B] {
 }
 
 trait Kleislis {
-  def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
+  def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
     def apply(a: A) = f(a)
   }
 
-  def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = ☆(f)
+  def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
 
   implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
 }

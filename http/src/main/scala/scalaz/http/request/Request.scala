@@ -192,7 +192,7 @@ sealed trait Request[IN[_]] {
    * Returns the first occurrence of the given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def !|(p: String)(implicit f: FoldLeft[IN]) = this.!(p) ⟴ |(p)
+  def !|(p: String)(implicit f: FoldLeft[IN]) = this.!(p) <+> |(p)
 
   /**
    *  Returns the first occurrence of a given request parameter in the request URI if it exists or in the request body
@@ -205,7 +205,7 @@ sealed trait Request[IN[_]] {
    * Returns the first occurrence of the given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def |!(p: String)(implicit f: FoldLeft[IN]) = |(p) ⟴ this.!(p)
+  def |!(p: String)(implicit f: FoldLeft[IN]) = |(p) <+> this.!(p)
 
   /**
    * Returns the first occurrence of a given request parameter in the request body if it exists or in the request URI
@@ -217,7 +217,7 @@ sealed trait Request[IN[_]] {
    * Returns all occurrences of the given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def !!||(p: String)(implicit f: FoldLeft[IN]) = this.!!(p) ⟴ ||(p)
+  def !!||(p: String)(implicit f: FoldLeft[IN]) = this.!!(p) <+> ||(p)
 
   /**
    * Returns all occurrences of a given request parameter in the request URI if it exists or in the request body
@@ -230,7 +230,7 @@ sealed trait Request[IN[_]] {
    * Returns all occurrences of the given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def ||!!(p: String)(implicit f: FoldLeft[IN]) = this.||(p) ⟴ !!(p)
+  def ||!!(p: String)(implicit f: FoldLeft[IN]) = this.||(p) <+> !!(p)
 
   /**
    * Returns all occurrences of a given request parameter in the request body if it exists or in the request URI

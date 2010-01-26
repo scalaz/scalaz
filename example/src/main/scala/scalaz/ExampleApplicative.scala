@@ -13,7 +13,7 @@ object ExampleApplicative {
     List(1, 2, 3) <**> (List(40, 50, 60), (_: Int) * (_: Int)) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
 
     // Lift-2 the List Applicative functor to a pair
-    (List(1, 2, 3) <×> List(40, 50, 60)) assert_≟ List((1, 40), (1, 50), (1, 60), (2, 40), (2, 50), (2, 60), (3, 40), (3, 50), (3, 60))
+    (List(1, 2, 3) <|*|> List(40, 50, 60)) assert_≟ List((1, 40), (1, 50), (1, 60), (2, 40), (2, 50), (2, 60), (3, 40), (3, 50), (3, 60))
 
     // Apply the List Applicative functor with an anonymous right
     (List(1, 2, 3) *> List(40, 50, 60)) assert_≟ List(40, 50, 60, 40, 50, 60, 40, 50, 60)
@@ -47,9 +47,9 @@ object ExampleApplicative {
     f("bang") <* s(8) assert_≟ f("bang")
     f("bang") <* f("bzzt") assert_≟ ff(List("bang", "bzzt"))
 
-    s(7) <×> s(8) assert_≟ s(7, 8)
-    s(7) <×> f("bzzt") assert_≟ List("bzzt").fail
-    f("bang") <×> s(8) assert_≟ List("bang").fail
-    f("bang") <×> f("bzzt") assert_≟ List("bang", "bzzt").fail
+    s(7) <|*|> s(8) assert_≟ s(7, 8)
+    s(7) <|*|> f("bzzt") assert_≟ List("bzzt").fail
+    f("bang") <|*|> s(8) assert_≟ List("bang").fail
+    f("bang") <|*|> f("bzzt") assert_≟ List("bang", "bzzt").fail
   }
 }

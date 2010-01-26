@@ -25,45 +25,47 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def <*[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[A] = <**>(b, (a, _: B) => a)
 
-  def <×>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[(A, B)] = <**>(b, (_: A, _: B))
+  def <|*|>[B](b: M[B])(implicit t: Functor[M], a: Apply[M]): M[(A, B)] = <**>(b, (_: A, _: B))
 
-  def <××>[B, C](b: M[B], c: M[C])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C)] = <***>(b, c, (_: A, _: B, _: C))
+  def <|**|>[B, C](b: M[B], c: M[C])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C)] = <***>(b, c, (_: A, _: B, _: C))
 
-  def <×××>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D)] = <****>(b, c, d, (_: A, _: B, _: C, _: D))
+  def <|***|>[B, C, D](b: M[B], c: M[C], d: M[D])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D)] = <****>(b, c, d, (_: A, _: B, _: C, _: D))
 
-  def <××××>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <*****>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
+  def <|****|>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <*****>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
 
   def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
-    mapM(f)
+    traverse(f)
 
-  def mapM[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
+  def traverse[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     t.traverse(f, value)
 
-  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
+  def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
-  def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = ∗(f)
+  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
 
-  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = ∗(_ => f)
+  def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=(_ => f)
 
-  def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = ∗|(f)
+  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
 
-  def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = ∗(f)
+  def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
 
-  def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = ∗(m)
+  def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = >>=(m)
 
   def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join
 
-  def ∞[B](implicit b: Bind[M]): M[B] = value ∗| value.∞
+  def ∞[B](implicit b: Bind[M]): M[B] = forever
 
-  def ⟴(z: => M[A])(implicit p: Plus[M]): M[A] = p.plus(value, z)
+  def forever[B](implicit b: Bind[M]): M[B] = value ∗| value.forever
 
-  def ➜:(a: A)(implicit s: Semigroup[M[A]], q: Pure[M]): M[A] = s append (q.pure(a), value)
+  def <+>(z: => M[A])(implicit p: Plus[M]): M[A] = p.plus(value, z)
 
-  def ➝:(a: A)(implicit p: Plus[M], q: Pure[M]): M[A] = p.plus(q.pure(a), value)
+  def +>:(a: A)(implicit s: Semigroup[M[A]], q: Pure[M]): M[A] = s append (q.pure(a), value)
 
-  def ➡(f: A => Unit)(implicit e: Each[M]): Unit = e.each(value, f)
+  def <+>:(a: A)(implicit p: Plus[M], q: Pure[M]): M[A] = p.plus(q.pure(a), value)
 
-  def foreach(f: A => Unit)(implicit e: Each[M]): Unit = ➡ (f)
+  def foreach(f: A => Unit)(implicit e: Each[M]): Unit = e.each(value, f)
+
+  def |>|(f: A => Unit)(implicit e: Each[M]): Unit = foreach (f)
 
   def foldl[B](b: B, f: (B, A) => B)(implicit r: FoldLeft[M]): B = r.foldLeft[B, A](value, b, f)
 
@@ -78,9 +80,13 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     b.toList
   }
 
-  def ∑(implicit r: FoldLeft[M], m: Monoid[A]): A = foldl[A](m.zero, m append (_, _))
+  def sum(implicit r: FoldLeft[M], m: Monoid[A]): A = foldl[A](m.zero, m append (_, _))
 
-  def ♯(implicit r: FoldLeft[M]): Int = foldl[Int](0, (b, _) => b + 1)
+  def ∑(implicit r: FoldLeft[M], m: Monoid[A]): A = sum
+
+  def count(implicit r: FoldLeft[M]): Int = foldl[Int](0, (b, _) => b + 1)
+
+  def ♯(implicit r: FoldLeft[M]): Int = count
 
   def len(implicit l: Length[M]): Int = l len value
 
@@ -97,7 +103,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     ∘((a: A) => (a: Char).digit)
 
   def sequence[N[_], B](implicit a: A <:< N[B], t: Traverse[M], n: Applicative[N]): N[M[B]] =
-    ↦((z: A) => (z: N[B]))
+    traverse((z: A) => (z: N[B]))
 
   def traverseDigits(implicit c: A <:< Char, t: Traverse[M]): Option[M[Digit]] = {
     val k = ∘((f: A) => (f: Char)).digits.sequence
@@ -125,15 +131,21 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (error("Index " + n + " out of bounds"))
 
-  def ∃(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr[Boolean](false, p(_) || _)
+  def any(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr[Boolean](false, p(_) || _)
 
-  def ∀(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr[Boolean](true, p(_) && _)
+  def ∃(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = any(p)
+
+  def all(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr[Boolean](true, p(_) && _)
+
+  def ∀(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = all(p)
 
   def empty(implicit r: FoldRight[M]): Boolean = ∀(_ => false)
 
-  def ∈:(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
+  def ∈:(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = element(a)
 
-  def ∋(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
+  def ∋(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = element(a)
+
+  def element(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
     foldr[(List[List[A]], Option[Boolean])]((Nil, None), (a, b) => {
@@ -158,7 +170,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def para[B](b: B, f: (=> A, => M[A], B) => B)(implicit p: Paramorphism[M]): B = p.para(value, b, f)
 
-  def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
+  def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = foldMapDefault(f)
+  
+  def foldMapDefault[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
     case class Acc[B, A](acc: B)
 
     implicit val AccApply = new Apply[PartialApply1Of2[Acc, B]#Apply] {
@@ -219,7 +233,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
     if (n <= 0) ∅ η
-    else value ∗ (a => replicateM[N](n - 1) ∘ (a ➜: _) )
+    else value ∗ (a => replicateM[N](n - 1) ∘ (a +>: _) )
 
   def zipWithA[F[_], B, C](b: M[B], f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
     (b <*> (a.fmap(value, f.curried))).sequence[F, C]
@@ -230,7 +244,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   import concurrent._
 
   def parMap[B](f: A => B)(implicit m: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
-    mapM(f.kleisli[Promise])
+    traverse(f.kleisli[Promise])
 
   def parBind[B](f: A => M[B])(implicit m: Bind[M], g: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
