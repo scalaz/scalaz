@@ -14,8 +14,9 @@ sealed trait Function1W[T, R] {
   def unary_!(implicit m: Memo[T, R]) = m(k)
 
   import concurrent.Strategy
+  import concurrent.Promise
   
-  def concurry(implicit s: Strategy[R]): T => () => R = (t: T) => s(() => k(t))
+  def concurry(implicit s: Strategy[Unit]) = kleisli[Promise]
 
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 }
