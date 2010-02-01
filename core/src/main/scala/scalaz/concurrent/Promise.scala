@@ -53,7 +53,7 @@ object Promise {
     })
   }
 
-  def promise[A](a: => A)(implicit s: Strategy[Unit]) = {
+  def promise[A](a: => A)(implicit s: Strategy[Unit]): Promise[A] = {
     val p = mkPromise[A]
     p.e ! ((Left(() => a), p))
     p
