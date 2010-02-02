@@ -243,10 +243,10 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   import concurrent._
 
-  def parMap[B](f: A => B)(implicit m: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
+  def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     traverse(f.kleisli[Promise])
 
-  def parBind[B](f: A => M[B])(implicit m: Bind[M], g: Functor[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
+  def parBind[B](f: A => M[B])(implicit m: Monad[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
 
   def parZipWith[B, C](f: (A, B) => C, bs: M[B])(implicit z: Applicative[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[C]] =

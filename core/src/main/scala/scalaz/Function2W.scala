@@ -11,7 +11,7 @@ sealed trait Function2W[T1, T2, R] {
   import concurrent.Promise
   import Scalaz._
 
-  def concurry(implicit s: Strategy[Unit]) = (x: T1, y: T2) => x.pure[Promise] <**> (y.pure[Promise], k)
+  def promise(implicit s: Strategy[Unit]) = (x: T1, y: T2) => x.pure[Promise] <**> (y.pure[Promise], k)
 }
 
 trait Function2s {

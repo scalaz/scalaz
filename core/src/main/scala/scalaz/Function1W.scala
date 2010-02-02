@@ -16,7 +16,7 @@ sealed trait Function1W[T, R] {
   import concurrent.Strategy
   import concurrent.Promise
   
-  def concurry(implicit s: Strategy[Unit]) = kleisli[Promise]
+  def promise(implicit s: Strategy[Unit]) = kleisli[Promise]
 
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 }
