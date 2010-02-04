@@ -19,6 +19,10 @@ object Cofunctor {
     def comap[A, B](r: Order[A], f: B => A) = order[B]((b1, b2) => r order (f(b1), f(b2)))
   }
 
+  implicit def OrderingCofunctor: Cofunctor[scala.Ordering] = new Cofunctor[scala.Ordering] {
+    def comap[A, B](r: scala.Ordering[A], f: B => A) = r.on(f)
+  }
+
   implicit def ShowCofunctor: Cofunctor[Show] = new Cofunctor[Show] {
     def comap[A, B](r: Show[A], f: B => A) = {
       if(r == null) error("boo")
