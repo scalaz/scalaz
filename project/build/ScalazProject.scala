@@ -9,9 +9,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
-//  override def localScala = defineScala("2.8.0-custom", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
+  //  override def localScala = defineScala("2.8.0-custom", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
 
-  override def crossScalaVersions = Seq("2.8.0.Beta1-RC8")
+  override def crossScalaVersions = Seq("2.8.0.Beta1")
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
@@ -22,7 +22,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
   override def documentOptions = encodingUtf8.map(SimpleDocOption(_))
-  
+
   override def managedStyle = ManagedStyle.Maven
 
   override def packageDocsJar = defaultJarPath("-javadoc.jar")
@@ -86,5 +86,5 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
-  }  
+  }
 }
