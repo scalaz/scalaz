@@ -9,12 +9,12 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
     if (value.isEmpty) Stream.Empty
     else value.head #:: s.merge(value.tail)
 
-  def toZipper = value match {
+  def toZipper: Option[Zipper[A]] = value match {
     case Stream.Empty => None
     case h #:: t => Some(zipper(Stream.Empty, h, t))
   }
 
-  def zipperEnd = value match {
+  def zipperEnd: Option[Zipper[A]] = value match {
     case Stream.Empty => None
     case _ => {
       val x = value.reverse
@@ -32,7 +32,7 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
     case _ => Stream.Empty
   }
 
-  def zapp[B, C](fs: ZipStream[A => B => C]) = (value ʐ) <*> fs
+  def zapp[B, C](fs: ZipStream[A => B => C]): ZipStream[B => C] = (value ʐ) <*> fs
 
   def unfoldForest[B](f: A => (B, () => Stream[A])): Stream[Tree[B]] = value.map(_.unfoldTree(f))
 
