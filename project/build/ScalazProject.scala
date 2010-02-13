@@ -11,8 +11,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
   //  override def localScala = defineScala("2.8.0-custom", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
 
-  override def crossScalaVersions = Seq("2.8.0.Beta1")
-
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
   override def compileOptions =
