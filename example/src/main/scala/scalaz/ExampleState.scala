@@ -44,7 +44,7 @@ object ExampleState {
       /**
        * As above, but using State as an Applicative Functor rather than as a Monad.
        * This is possible as the generators in the for comprehension above are independent.
-       * Note the correspondence between `<⊛ modify` and `_ <- modify`.
+       * Note the correspondence between `<* modify` and `_ <- modify`.
        */
       def numberSA: State[Int, Tree[(A, Int)]] = this match {
         case Leaf(x) => (init[Int] <* modify((_: Int) + 1)) ∘ {s: Int => Leaf((x, s))}
