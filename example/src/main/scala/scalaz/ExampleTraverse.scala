@@ -58,6 +58,6 @@ object ExampleTraverse {
     (none[Long] ↣ (x => x ∏)).value assert_≟ 1L
 
     // Traverse (collapse) a List using the Int addition monoid    
-    List(100, 200, 300).collapse.value assert_≟ 600
+    List(100, 200, 300).collapse assert_≟ 600
   }
 }
