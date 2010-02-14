@@ -17,7 +17,11 @@ abstract class ApplyLow {
 
 object Apply extends ApplyLow {
   import Scalaz._
- 
+
+  implicit def ConstApply[B: Monoid] = new Apply[PartialApply1Of2[Const, B]#Apply] {
+    def apply[A, X](f: Const[B, A => X], fa: Const[B, A]) = Const[B, X](f.value ⊹ fa.value)
+  }
+
   implicit def StateApply[S]: Apply[PartialApply1Of2[State, S]#Apply] = FunctorBindApply[PartialApply1Of2[State, S]#Apply]
 
   implicit def Tuple2Apply[R: Monoid]: Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]

@@ -66,6 +66,8 @@ object Show {
 
   implicit def BigIntMultiplicationShow: Show[BigIntMultiplication] = NewTypeShow[BigInt, BigIntMultiplication]
 
+  implicit def ConstShow[B: Show, A]: Show[Const[B, A]] = NewTypeShow[B, Const[B, A]]
+
   implicit def NodeSeqShow: Show[xml.NodeSeq] = showA
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = IterableShow[A] ∙ ((_: NonEmptyList[A]).list)

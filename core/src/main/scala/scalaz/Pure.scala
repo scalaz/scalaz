@@ -11,6 +11,10 @@ object Pure {
     def pure[A](a: => A) = a
   }
 
+  implicit def ConstPure[B: Monoid] = new Pure[PartialApply1Of2[Const, B]#Apply] {
+    def pure[A](a: => A) = Const[B, A](∅)
+  }
+
   implicit def NonEmptyListPure: Pure[NonEmptyList] = new Pure[NonEmptyList] {
     def pure[A](a: => A) = a.wrapNel
   }

@@ -15,6 +15,10 @@ object Functor {
     def fmap[A, B](r: NonEmptyList[A], f: A => B) = r map f
   }
 
+  implicit def ConstFunctor[BB: Monoid] = new Functor[PartialApply1Of2[Const, BB]#Apply] {
+    def fmap[A, B](r: Const[BB, A], f: (A) => B) = Const(r.value)
+  }
+
   implicit def StateFunctor[S] = new Functor[PartialApply1Of2[State, S]#Apply] {
     def fmap[A, B](r: State[S, A], f: A => B) = r map f
   }

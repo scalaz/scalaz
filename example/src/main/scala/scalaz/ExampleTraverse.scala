@@ -59,5 +59,28 @@ object ExampleTraverse {
 
     // Traverse (collapse) a List using the Int addition monoid    
     List(100, 200, 300).collapse assert_≟ 600
+
+    wordCount
+  }
+  
+  /**
+   * Character/Line/Word Count from "The Essense of the Iterator Pattern".
+   */
+  def wordCount {
+    val charCountBody: (Char) => Const[Int, Nothing] = {c: Char => Const(1)}
+    def charCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](charCountBody)
+    def test(p: Boolean): Int = if (p) 1 else 0
+    val lineCountBody: (Char) => Const[Int, Nothing] = {c: Char => Const(test(c == '\n'))}
+    def lineCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](lineCountBody)
+
+    val text = "the cat in the hat\n sat on the mat".toList
+
+    (charCount(text): Int, lineCount(text): Int).println
+
+    (charCount(text) <|*|> lineCount(text)).println
+
+    // todo
+    // def wordAndLineCount(text: List[Char]): Const[(Int, Int), Any]
+
   }
 }
