@@ -67,10 +67,11 @@ object ExampleTraverse {
    * Character/Line/Word Count from "The Essense of the Iterator Pattern".
    */
   def wordCount {
-    val charCountBody: (Char) => Const[Int, Nothing] = {c: Char => Const(1)}
+    def liftC[A, B](f: A => B) = {a: A => Const(f(a))}
+    val charCountBody: (Char) => Const[Int, Nothing] = liftC(Function.const(1))
     def charCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](charCountBody)
     def test(p: Boolean): Int = if (p) 1 else 0
-    val lineCountBody: (Char) => Const[Int, Nothing] = {c: Char => Const(test(c == '\n'))}
+    val lineCountBody: (Char) => Const[Int, Nothing] = liftC {c: Char => test(c == '\n')}
     def lineCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](lineCountBody)
 
     val text = "the cat in the hat\n sat on the mat".toList
