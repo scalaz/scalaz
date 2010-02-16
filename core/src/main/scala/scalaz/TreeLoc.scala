@@ -94,6 +94,11 @@ sealed trait TreeLoc[+A] {
     }
   }
 
+  /**
+   * The path from the focus to the root.
+   */
+  def path: Stream[A] = getLabel #:: parents.map(_._2)
+
   private def downParents = (lefts, tree.rootLabel, rights) #:: parents
 
   private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =

@@ -1,5 +1,6 @@
 package scalaz
 
+
 object Example {
   def run {
     ExampleApplicative.run
@@ -18,6 +19,7 @@ object Example {
     ExampleMonoid.run
     ExamplePlus.run
     ExampleState.run
+    ExampleTree.run
     ExampleTraverse.run
     geo.ExampleVincenty.run
     math.ExampleFAD.run
