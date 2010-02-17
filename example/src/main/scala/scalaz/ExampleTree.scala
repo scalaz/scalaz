@@ -11,7 +11,7 @@ object ExampleTree {
   def run {
     val tree: Tree[Int] = node(1, Stream(leaf(2), node(3, Stream(leaf(4)))))
 
-    // A tree of TreeLocs (aka Zipper), rooted at `tree`. Each TreeLoc is focussed on a different node.
+    // A tree of TreeLocs (aka Zipper). Each TreeLoc is rooted at `tree` but focussed on a different node.
     val allTreeLocs: Tree[TreeLoc[Int]] = tree.loc.cojoin.toTree
     // Getting the label of the focussed node from each TreeLoc restores the original tree
     allTreeLocs.map(_.getLabel) assert_≟ tree
