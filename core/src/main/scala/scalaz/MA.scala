@@ -33,6 +33,8 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def <|****|>[B, C, D, E](b: M[B], c: M[C], d: M[D], e: M[E])(implicit t: Functor[M], a: Apply[M]): M[(A, B, C, D, E)] = <*****>(b, c, d, e, (_: A, _: B, _: C, _: D, _: E))
 
+  def xmap[B](f: A => B, g: B => A)(implicit xf: InvariantFunctor[M]): M[B] = xf.xmap(value, f, g)
+  
   def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     traverse(f)
 
