@@ -3,7 +3,7 @@ package scalaz
 trait Cofunctor[F[_]] extends InvariantFunctor[F] {
   def comap[A, B](r: F[A], f: B => A): F[B]
   
-  def xmap[A,B](ma: F[A], f: A => B, g: B => A) = comap(ma, g)
+  final def xmap[A,B](ma: F[A], f: A => B, g: B => A) = comap(ma, g)
 }
 
 object Cofunctor {

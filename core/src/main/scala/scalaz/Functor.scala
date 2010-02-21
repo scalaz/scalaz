@@ -3,7 +3,7 @@ package scalaz
 trait Functor[F[_]] extends InvariantFunctor[F] {
   def fmap[A, B](r: F[A], f: A => B): F[B]
   
-  def xmap[A,B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
+  final def xmap[A,B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
 }
 
 object Functor {
