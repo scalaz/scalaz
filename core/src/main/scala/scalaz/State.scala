@@ -13,9 +13,9 @@ sealed trait State[S, +A] {
     case (s, a) => f(a)(s)
   })
 
-  def !(s: S) = apply(s)._2
+  def !(s: S): A = apply(s)._2
 
-  def ~>(s: S) = apply(s)._1
+  def ~>(s: S): S = apply(s)._1
 
   def withs(f: S => S): State[S, A] = state(f andThen (apply(_)))
 }
