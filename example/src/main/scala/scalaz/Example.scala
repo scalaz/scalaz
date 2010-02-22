@@ -1,7 +1,8 @@
 package scalaz
 
 
-object Example {
+object
+Example {
   def run {
     ExampleApplicative.run
     ExampleArrow.run
@@ -24,6 +25,7 @@ object Example {
     geo.ExampleVincenty.run
     math.ExampleFAD.run
     concurrent.ExampleActor.run
+    WordCount.wordCount
   }
 
   def main(args: Array[String]) = run

@@ -47,7 +47,7 @@ object ExampleTraverse {
 
     // Traverse a GenericArray using the Int addition monoid
     GenericArray(100, 200, 300) ↣ (x => x) assert_≟ 600
-  
+
     // Traverse a Stream using the Int multiplication monoid
     (Stream(100, 200, 300) ↣ (x => x ∏)).value assert_≟ 6000000
 
@@ -59,29 +59,5 @@ object ExampleTraverse {
 
     // Traverse (collapse) a List using the Int addition monoid    
     List(100, 200, 300).collapse assert_≟ 600
-
-    wordCount
-  }
-  
-  /**
-   * Character/Line/Word Count from "The Essense of the Iterator Pattern".
-   */
-  def wordCount {
-    def liftC[A, B](f: A => B) = {a: A => Const(f(a))}
-    val charCountBody: (Char) => Const[Int, Nothing] = liftC(Function.const(1))
-    def charCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](charCountBody)
-    def test(p: Boolean): Int = if (p) 1 else 0
-    val lineCountBody: (Char) => Const[Int, Nothing] = liftC {c: Char => test(c == '\n')}
-    def lineCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](lineCountBody)
-
-    val text = "the cat in the hat\n sat on the mat".toList
-
-    (charCount(text): Int, lineCount(text): Int).println
-
-    (charCount(text) <|*|> lineCount(text)).println
-
-    // todo
-    // def wordAndLineCount(text: List[Char]): Const[(Int, Int), Any]
-
   }
 }
