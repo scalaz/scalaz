@@ -87,7 +87,7 @@ object Comp {
     def pure[A](a: => A): Comp[M, N, A] = comp(a.η[N].η[M])
 
     def apply[A, B](f: Comp[M, N, A => B], a: Comp[M, N, A]): Comp[M, N, B] = {
-      comp(a.value <**> (f.value, _ <*> (_: N[A => B])))
+      comp(a.value.<**>(f.value)(_ <*> _))
     }
   }
 }

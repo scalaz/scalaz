@@ -48,7 +48,7 @@ object ExampleState {
        */
       def numberSA: State[Int, Tree[(A, Int)]] = this match {
         case Leaf(x) => (init[Int] <* modify((_: Int) + 1)) ∘ {s: Int => Leaf((x, s))}
-        case Branch(left, right) => left.numberSA <**> (right.numberSA, Branch.apply[(A, Int)])
+        case Branch(left, right) => left.numberSA.<**>(right.numberSA)(Branch.apply)
       }
     }
 

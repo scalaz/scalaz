@@ -89,7 +89,7 @@ sealed trait Zipper[+A] {
    */
   def deleteOthers = zipper(Stream.Empty, focus, Stream.Empty)
 
-  def length = this.foldr[Int](0, ((a: A, b: Int) => b + 1)(_, _))
+  def length = this.foldr(0)(((a: Any, b: Int) => b + 1)(_, _))
 
   /**
    * Whether the focus is on the first element in the zipper.

@@ -10,7 +10,7 @@ object ExampleApplicative {
     ((List(40, 50, 60) <*> (List(1, 2, 3) ∘ ((_: Int) * (_: Int)).curried))) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
 
     // Lift-2 the List Applicative functor
-    List(1, 2, 3) <**> (List(40, 50, 60), (_: Int) * (_: Int)) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
+    List(1, 2, 3).<**>(List(40, 50, 60))(_ * _) assert_≟ List(40, 50, 60, 80, 100, 120, 120, 150, 180)
 
     // Lift-2 the List Applicative functor to a pair
     (List(1, 2, 3) <|*|> List(40, 50, 60)) assert_≟ List((1, 40), (1, 50), (1, 60), (2, 40), (2, 50), (2, 60), (3, 40), (3, 50), (3, 60))

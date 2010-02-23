@@ -19,7 +19,7 @@ object Fibs {
       if (n < cutoff)
         promise(seqFib(n))
       else
-        fib(n-1) <**> (fib(n-2), (x:Int, y:Int) => x + y)
+        fib(n-1).<**>(fib(n-2))(_ + _)
 
     Stream.range(1,41).traverse(fib) to out
   }

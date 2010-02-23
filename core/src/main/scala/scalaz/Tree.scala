@@ -30,7 +30,7 @@ sealed trait Tree[+A] {
   def flatten = squish[A](Stream.Empty)
 
   private def squish[AA >: A](xs: Stream[AA]): Stream[AA] =
-    Stream.cons(rootLabel, subForest.foldr[Stream[AA]](xs, _.squish(_)))
+    Stream.cons(rootLabel, subForest.foldr(xs)(_.squish(_)))
 
   def levels: Stream[Stream[A]] = {
     val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest)

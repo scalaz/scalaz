@@ -41,7 +41,7 @@ object Traverse {
 
   implicit def StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
     def traverse[F[_]: Applicative, A, B](f: A => F[B], as: Stream[A]): F[Stream[B]] =
-      as.foldr[F[Stream[B]]]((Stream.Empty: Stream[B]) η, (x, ys) => implicitly[Apply[F]].apply(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
+      as.foldr[F[Stream[B]]]((Stream.empty[B]) η)((x, ys) => implicitly[Apply[F]].apply(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
   }
 
   implicit def OptionTraverse: Traverse[Option] = new Traverse[Option] {

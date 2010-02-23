@@ -102,7 +102,7 @@ sealed trait TreeLoc[+A] {
   private def downParents = (lefts, tree.rootLabel, rights) #:: parents
 
   private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
-    ls.foldl(t #:: rs, ((_: A) #:: (_: Stream[A])).flip)
+    ls.foldl(t #:: rs)((a, b) => b #:: a)
 
   private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
     (acc, xs, n) match {

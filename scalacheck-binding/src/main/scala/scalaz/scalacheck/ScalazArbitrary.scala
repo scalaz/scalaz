@@ -28,7 +28,7 @@ object ScalazArbitrary {
 
   implicit def BooleanConjunctionArbitrary: Arbitrary[BooleanConjunction] = arb[Boolean] ∘ ((_: Boolean).|∧|)
 
-  implicit def arbBigInt: Arbitrary[BigInt] = arb[Int] <**> (arb[Int], (_: Int) * (_: Int))
+  implicit def arbBigInt: Arbitrary[BigInt] = arb[Int].<**>(arb[Int])(_ * _)
 
   implicit def arbBigInteger: Arbitrary[BigInteger] = arb[BigInt] ∘ (_.bigInteger)
 
@@ -50,7 +50,7 @@ object ScalazArbitrary {
 
   implicit def DListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[DList[A]] = arb[List[A]] ∘ (as => dlist(_ => as))
 
-  implicit def NonEmptyListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[NonEmptyList[A]] = arb[A] <**> (arb[List[A]], nel(_: A, _: List[A]))
+  implicit def NonEmptyListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[NonEmptyList[A]] = arb[A].<**>(arb[List[A]])(nel _)
 
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
@@ -59,7 +59,7 @@ object ScalazArbitrary {
       case 0 => arbitrary[A] ∘ (leaf _)
       case n => {
         val nextSize = n.abs / 2
-        arbitrary[A] <**> (resize(n, arbStream[Tree[A]](Arbitrary(tree(nextSize))).arbitrary), ((a: A, f: Stream[Tree[A]]) => node(a, f)))
+        arbitrary[A].<**>(resize(n, arbStream[Tree[A]](Arbitrary(tree(nextSize))).arbitrary))(node _)
       }
     }
     Gen.sized(tree _)
@@ -95,30 +95,30 @@ object ScalazArbitrary {
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy[Unit]): Arbitrary[Promise[A]] = arb[A] ∘ ((x: A) => promise(x))
 
-  implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]] <***> (arb[A], arb[Stream[A]], zipper[A]((_: Stream[A]), (_: A), (_: Stream[A])))
+  implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]].<***>(arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
   import geo._
   implicit def AzimuthArbitrary: Arbitrary[Azimuth] = arb[Double] ∘ (azimuth _)
 
   implicit def BearingArbitrary: Arbitrary[Bearing] = arb[Double] ∘ (bearing _)
 
-  implicit def CoordArbitrary: Arbitrary[Coord] = arb[Latitude] <**> (arb[Longitude], coord _)
+  implicit def CoordArbitrary: Arbitrary[Coord] = arb[Latitude].<**>(arb[Longitude])(coord _)
 
-  implicit def ElevatedCurveArbitrary: Arbitrary[ElevatedCurve] = arb[GeodeticCurve] <**> (arb[Elevation], elevatedCurve _)
+  implicit def ElevatedCurveArbitrary: Arbitrary[ElevatedCurve] = arb[GeodeticCurve].<**>(arb[Elevation])(elevatedCurve _)
 
   implicit def ElevationArbitrary: Arbitrary[Elevation] = arb[Double] ∘ (elevation _)
 
-  implicit def EllipsoidArbitrary: Arbitrary[Ellipsoid] = arb[Double] <****> (arb[Double], arb[Double], arb[Double], ellipsoid _)
+  implicit def EllipsoidArbitrary: Arbitrary[Ellipsoid] = arb[Double].<****>(arb[Double], arb[Double], arb[Double])(ellipsoid _)
 
-  implicit def GeodeticCurveArbitrary: Arbitrary[GeodeticCurve] = arb[Double] <***> (arb[Azimuth], arb[Azimuth], curve _)
+  implicit def GeodeticCurveArbitrary: Arbitrary[GeodeticCurve] = arb[Double].<***>(arb[Azimuth], arb[Azimuth])(curve _)
 
   implicit def LatitudeArbitrary: Arbitrary[Latitude] = arb[Double] ∘ (latitude _)
 
   implicit def LongitudeArbitrary: Arbitrary[Longitude] = arb[Double] ∘ (longitude _)
 
-  implicit def PositionArbitrary: Arbitrary[Position] = arb[Coord] <**> (arb[Elevation], position _)
+  implicit def PositionArbitrary: Arbitrary[Position] = arb[Coord].<**>(arb[Elevation])(position _)
 
-  implicit def VectorArbitrary: Arbitrary[Vector] = arb[Coord] <**> (arb[Bearing], vector _)
+  implicit def VectorArbitrary: Arbitrary[Vector] = arb[Coord].<**>(arb[Bearing])(vector _)
 
   trait Duplicate[A] {
     def pair: (A, A)

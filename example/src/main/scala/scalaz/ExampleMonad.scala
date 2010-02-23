@@ -40,16 +40,16 @@ object ExampleMonad {
     (List(1, 2, 3) ∗| (List(3, 4))) assert_≟ List(3, 4, 3, 4, 3, 4)
 
     // Folding left on a List through the List monad
-    List(1, 2).foldLeftM((b: Int, a: Int) => List(10, 20, a, b), 0) assert_≟ List(10, 20, 2, 10, 10, 20, 2, 20, 10, 20, 2, 1, 10, 20, 2, 0)
+    List(1, 2).foldLeftM(0)((b, a) => List(10, 20, a, b)) assert_≟ List(10, 20, 2, 10, 10, 20, 2, 20, 10, 20, 2, 1, 10, 20, 2, 0)
 
     // Folding left on a Stream through the Option monad
-    Stream(1, 2).foldLeftM((b: Int, a: Int) => some(a + b), 0) assert_≟ some(3)
+    Stream(1, 2).foldLeftM(0)((b, a) => some(a + b)) assert_≟ some(3)
 
     // Folding right on a Stream through the List monad
-    Stream(1, 2).foldRightM((b: Int, a: Int) => List(10, 20, a, b), 0) assert_≟ List(10, 20, 1, 10, 10, 20, 1, 20, 10, 20, 1, 2, 10, 20, 1, 0)
+    Stream(1, 2).foldRightM(0)((b, a) => List(10, 20, a, b)) assert_≟ List(10, 20, 1, 10, 10, 20, 1, 20, 10, 20, 1, 2, 10, 20, 1, 0)
 
     // Folding right on a List through the Option monad
-    List(1, 2).foldRightM((b: Int, a: Int) => some(a + b), 0) assert_≟ some(3)
+    List(1, 2).foldRightM(0)((b, a) => some(a + b)) assert_≟ some(3)
 
     // Take-while on a List through the Option monad
     List.range(1, 50).takeWhileM(n => if (n < 100) some(n < 10) else none) assert_≟ some(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
