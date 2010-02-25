@@ -6,9 +6,9 @@ Depends
 * time http://hackage.haskell.org/package/time
 
 
-$LastChangedRevision$
-$LastChangedDate$
-$LastChangedBy$
+$LastChangedRevision: 1348 $
+$LastChangedDate: 2010-01-07 20:28:23 +1000 (Thu, 07 Jan 2010) $
+$LastChangedBy: tonymorris $
 
 -}
 
@@ -22,14 +22,11 @@ import Lastik.Directory
 import Lastik.Util
 import Lastik.Find
 import System.FilePath
-import System.Cmd
-import System.Directory
 import System.Process
 import System.Exit
 import Control.Monad
 import Data.List hiding (find)
 import Data.Time.Clock
-import Data.Time.Calendar
 import Scalaz.Build
 
 s :: FilePath -> S.Scalac

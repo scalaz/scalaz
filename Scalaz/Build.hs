@@ -1,8 +1,8 @@
 {-
 
-$LastChangedRevision$
-$LastChangedDate$
-$LastChangedBy$
+$LastChangedRevision: 1348 $
+$LastChangedDate: 2010-01-07 20:28:23 +1000 (Thu, 07 Jan 2010) $
+$LastChangedBy: tonymorris $
 
 -}
 
@@ -29,21 +29,46 @@ trunk = repo' "trunk"
 artifacts :: String
 artifacts = repo' "artifacts"
 
+exampleDir :: FilePath
 exampleDir = "example"  </> "src" </> "main" </> "scala"
+
+mainDir :: FilePath
 mainDir = "core"  </> "src" </> "main" </> "scala"
+
+httpDir :: FilePath
 httpDir = "http"  </> "src" </> "main" </> "scala"
+
 --scappsDir = "scapps"  </> "src" </> "main" </> "scala"
 -- testDir = "core"  </> "src" </> "test" </> "scala"
+
+resourcesDir :: FilePath
 resourcesDir = "resources"
+
+etcDir :: FilePath
 etcDir = "etc"
 
+build :: FilePath
 build = "build"
+
+buildClasses :: FilePath
 buildClasses = build </> "classes"
+
+buildScalaz :: FilePath
 buildScalaz = build </> "scalaz"
+
+buildScaladoc :: FilePath
 buildScaladoc = buildScalaz </> "scaladoc"
+
+buildJar :: FilePath
 buildJar = buildScalaz
+
+jarFile :: FilePath
 jarFile = "scalaz.jar"
+
+buildJar':: FilePath
 buildJar' = buildJar </> jarFile
+
+buildRelease :: FilePath
 buildRelease = build </> "release"
 
 type Version = String
