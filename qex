@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ghc -e "qrunExample \"$1\"" Scalaz.hs
-

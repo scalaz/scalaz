@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ghc -e "scaladoc" Scalaz.hs
-
