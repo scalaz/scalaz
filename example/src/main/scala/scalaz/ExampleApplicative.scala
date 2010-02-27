@@ -55,7 +55,9 @@ object ExampleApplicative {
     // Using alternative syntax to directly apply a sequence of N applicative
     // arguments to a N-ary function.
     val a, b, c, d = List(1)
+    (a ⊛ b){_ + _}
     a ⊛ b apply {_ + _}
+    (a ⊛ b ⊛ c){_ + _ + _}
     a ⊛ b ⊛ c apply {_ + _ + _}
     a ⊛ b ⊛ c ⊛ d apply {_ + _ + _ + _}
 
