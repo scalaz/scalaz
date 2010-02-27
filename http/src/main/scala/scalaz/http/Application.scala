@@ -9,9 +9,6 @@ import Scalaz._
  * A web application that transforms a request to a response.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 trait Application[IN[_], OUT[_]] {
   /**
@@ -35,9 +32,6 @@ trait Application[IN[_], OUT[_]] {
  * Functions over web applications that transforms a request to a response.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 object Application {
   /**

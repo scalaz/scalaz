@@ -6,9 +6,6 @@ package http
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5">RFC 2616 Section 4.5 General Header Fields</a>.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 sealed trait GeneralHeader {
   /**

@@ -12,9 +12,6 @@ import HttpServletResponse._
  * concrete class.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 abstract class ScalazServlet[IN[_], OUT[_], A <: { def application: ServletApplication[IN, OUT] }](cl: Class[A])(implicit in: InputStreamer[IN], e: Each[OUT]) extends javax.servlet.http.HttpServlet {
   /**

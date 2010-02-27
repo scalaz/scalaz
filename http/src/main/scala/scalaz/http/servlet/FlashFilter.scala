@@ -9,9 +9,6 @@ import HttpServletRequest._
  * A filter that will keep a session variable until the next request where its value is placed in a request attribute.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 final class FlashFilter extends Filter {
   /**

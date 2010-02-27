@@ -6,9 +6,6 @@ package response
  * Type constructors that can be used in request and response bodies.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-09-29 16:50:15 +1000 (Tue, 29 Sep 2009) $<br>
- *          $LastChangedBy: nkpart $
  */
 sealed trait Body[OUT[_], A] {
   /**

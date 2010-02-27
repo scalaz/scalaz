@@ -11,9 +11,6 @@ import Scalaz._
  * A wrapper around Java Servlet <code>HttpServletResponse</code>.
  *
  * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
- * @version $LastChangedRevision<br>
- *          $LastChangedDate: 2009-06-24 20:48:22 +1000 (Wed, 24 Jun 2009) $<br>
- *          $LastChangedBy: tonymorris $
  */
 sealed trait HttpServletResponse {
   /**
