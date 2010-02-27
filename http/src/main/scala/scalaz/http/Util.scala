@@ -4,6 +4,7 @@ package http
 import collection.immutable.{Map, HashMap}
 import Scalaz._
 import java.net.URLDecoder.decode
+import io.Codec
 
 /**
  * Utility functions not specific to any particular context within HTTP.
@@ -27,8 +28,7 @@ object Util {
     x map (chars => {
       val pre = chars takeWhile (_ != '=')
       val post = chars dropWhile (_ != '=')
-      // TODO decode is deprecated
-      (pre, decode(post.mkString).drop(1).toList)
+      (pre, decode(post.mkString, Codec.UTF8.name).drop(1).toList)
     })
   }
 
