@@ -1,5 +1,16 @@
-Build Instructions (Using SBT)
-------------------------------
+Scalaz (Scar-lah-zed) is a library written in the Scala Programming Language. One mandate of the library is to depend
+only on the core Scala API and the core Java 2 Standard Edition API. The intention of Scalaz is to include general
+functions that are not currently available in the core Scala API. Scalaz is released under a BSD open source licence
+making it compatible with the licence of the Scala project.
+
+The source code for Scalaz is hosted on GitHub: http://github.com/scalaz/scalaz
+
+Documentation and downloads are on Google Code: http://code.google.com/p/scalaz/
+
+Snapshots and Releases published to the repository on scala-tools.org.
+
+Build Instructions
+------------------
 
 The root directory of the project contains the SBT launcher, shell script, and Windows command script.
 
@@ -31,15 +42,14 @@ This is the directory structure of the build.
                     | - <scala version M>    All built artifacts (classes, jars, scaladoc) for module N
                                              built for version M of Scala.
 
-0. alias sbt=sh $PWD/sbt.sh (on Unix systems)
-1. sbt update (this step is required after a fresh checkout, after changing the version of 
+1. ./sbt update (this step is required after a fresh checkout, after changing the version of
                      SBT, Scala, or other dependencies)
-2. sbt [compile | package | test-compile | test | publish-local | publish]
+2. ./sbt [compile | package | test-compile | test | publish-local | publish]
 
 For continuous compilation of a module:
 
-1. sbt
-2. > project scalaz-core
-3. > ~compile
+$ ./sbt
+> project scalaz-core
+> ~compile
 
 For other options, read: http://code.google.com/p/simple-build-tool/wiki/DocumentationHome
