@@ -13,35 +13,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   // I've resurrected `⊛` as part of an experiment to allow:
   //    a ⊛ b ⊛ c apply {_ + _ + _}
-  def ⊛[B](b: M[B])(implicit t: Functor[M], ap: Apply[M]) = new Applicative1[B](b)
-
-  class Applicative1[B](b: M[B])(implicit t: Functor[M], ap: Apply[M]) {
-    def apply[C](f: (A, B) => C): M[C] = ap(t.fmap(value, f.curried), b)
-
-    def ⊛[C](c: M[C]) = new Applicative2[C](c)
-
-    class Applicative2[C](c: M[C])(implicit t: Functor[M], ap: Apply[M]) {
-      def apply[D](f: (A, B, C) => D): M[D] = ap(ap(t.fmap(value, f.curried), b), c)
-
-      def ⊛[D](d: M[D]) = new Applicative3[D](d)      
-
-      class Applicative3[D](d: M[D])(implicit t: Functor[M], ap: Apply[M]) {
-        def apply[E](f: (A, B, C, D) => E): M[E] = ap(ap(ap(t.fmap(value, f.curried), b), c), d)
-
-        def ⊛[E](e: M[E]) = new Applicative4[E](e)
-
-        class Applicative4[E](e: M[E])(implicit t: Functor[M], ap: Apply[M]) {
-          def apply[F](f: (A, B, C, D, E) => F): M[F] = ap(ap(ap(ap(t.fmap(value, f.curried), b), c), d), e)
-
-          def ⊛[F](f: M[F]) = new Applicative5[F](f)
-
-          class Applicative5[F](ff: M[F])(implicit t: Functor[M], ap: Apply[M]) {
-            def apply[G](f: (A, B, C, D, E, F) => G): M[G] = ap(ap(ap(ap(ap(t.fmap(value, f.curried), b), c), d), e), ff)
-          }
-        }
-      }
-    }
-  }
+  def ⊛[B](b: M[B])(implicit t: Functor[M], ap: Apply[M]) = new ApplicativeBuilder[M, A, B](value, b)
 
   def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
 
