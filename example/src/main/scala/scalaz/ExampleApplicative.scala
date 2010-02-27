@@ -51,5 +51,15 @@ object ExampleApplicative {
     s(7) <|*|> f("bzzt") assert_≟ List("bzzt").fail
     f("bang") <|*|> s(8) assert_≟ List("bang").fail
     f("bang") <|*|> f("bzzt") assert_≟ List("bang", "bzzt").fail
+
+    // Using alternative syntax to directly apply a sequence of N applicative
+    // arguments to a N-ary function.
+    val a, b, c, d = List(1)
+    a ⊛ b apply {_ + _}
+    a ⊛ b ⊛ c apply {_ + _ + _}
+    a ⊛ b ⊛ c ⊛ d apply {_ + _ + _ + _}
+
+    case class Person(age: Int, name: String)
+    some(10) ⊛ none[String] apply Person.apply
   }
 }
