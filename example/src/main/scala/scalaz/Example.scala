@@ -1,8 +1,7 @@
 package scalaz
 
 
-object
-Example {
+object Example {
   def run {
     ExampleApplicative.run
     ExampleArrow.run
