@@ -5,11 +5,8 @@ import java.io.File
 import scala.Array
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
-        with AutoCompilerPlugins {
+        with AutoCompilerPlugins  {
   val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
-
-  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-latest in build.properties.
-  //  override def localScala = defineScala("2.8.0-custom", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
@@ -48,6 +45,9 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+
+  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.  
+  override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-hudson" asFile) :: Nil
 
   private def noAction = task {None}
 
