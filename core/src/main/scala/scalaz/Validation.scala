@@ -77,6 +77,8 @@ sealed trait FailProjection[+E, +A] {
     case Failure(e) => Failure((e: EE) η)
   }
 
+  def liftNel: Validation[NonEmptyList[E], A] = lift[NonEmptyList, E]
+
   def |||[EE >: E](f: A => EE): EE = validation match {
     case Success(a) => f(a)
     case Failure(e) => e
@@ -96,6 +98,8 @@ sealed trait FailProjection[+E, +A] {
 }
 
 trait Validations {
+  type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
+
   def success[E, A](a: A): Validation[E, A] = Success(a)
 
   def failure[E, A](e: E): Validation[E, A] = Failure(e)

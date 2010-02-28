@@ -110,7 +110,11 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def success[X]: Validation[X, A] = Scalaz.success(value)
 
-  def fail[X]: Validation[A, X] = Scalaz.failure(value)
+  def successNel[X]: ValidationNEL[X, A] = success
+
+  def fail[X]: Validation[A, X] = failure(value)
+  
+  def failNel[X]: ValidationNEL[A, X] = failure(wrapNel)
 
   def some: Option[A] = Some(value)
 
