@@ -37,7 +37,7 @@ object ScalazProperties {
                           axy: Arbitrary[(X => Y)],
                           ayz: Arbitrary[(Y => Z)],
                           ef: Equal[F[Z]]) =
-      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ ((a1 ∘ f1) ∘ f2)).label("associative")
+      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ (a1 ∘ (f1 ∘ f2))).label("associative")
   }
 
   object Monad {
