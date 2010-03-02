@@ -1,5 +1,5 @@
 Main-Class: scalaz.Main
 Implementation-Title: Scalaz
 Implementation-URL: http://code.google.com/p/scalaz
-Implementation-Vendor: Tony Morris
+Implementation-Vendor: Tony Morris, Runar Bjarnason, Tom Adams, Kristian Domagala, Brad Clow, Ricky Clarkson, Paul Chiusano, Trygve Laugstøl, Nick Partridge, Jason Zaugg
 Sealed: true
