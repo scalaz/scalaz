@@ -77,7 +77,8 @@ object Zero {
 
   implicit def NodeSeqZero: Zero[NodeSeq] = zero(NodeSeq.Empty)
 
-  implicit def NodeZero: Zero[Node] = new Zero[Node] {
+  // Not implicit to ensure implicitly[Zero[NodeSeq]].zero === NodeSeqZero.zero
+  def NodeZero: Zero[Node] = new Zero[Node] {
     val zero = new Node {
       override def text = null
       override def label = null
@@ -85,7 +86,8 @@ object Zero {
     }
   }
 
-  implicit def ElemZero: Zero[Elem] = new Zero[Elem] {
+  // Not implicit to ensure implicitly[Zero[NodeSeq]].zero === NodeSeqZero.zero
+  def ElemZero: Zero[Elem] = new Zero[Elem] {
     val zero = new Elem(null, null, scala.xml.Null, xml.TopScope, Nil: _*)
   }
 
