@@ -153,6 +153,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def element(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
+  /**
+   * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
+   */
   def splitWith(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
     foldr((nil[List[A]], none[Boolean]))((a, b) => {
       val pa = p(a)
@@ -162,6 +165,10 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
       }, Some(pa))
     })._1
 
+
+  /**
+   * Selects groups of elements that satisfy p and discards others.
+   */
   def selectSplit(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
     foldr((nil[List[A]], false))((a, xb) => xb match {
       case (x, b) => {

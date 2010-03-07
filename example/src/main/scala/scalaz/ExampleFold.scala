@@ -47,5 +47,9 @@ object ExampleFold {
     (50 ∈: Stream.range(0, 100)) assert_≟ true
 
     Stream.range(0, 100) ∋ 50 assert_≟ true
+
+    (1 to 10).toList splitWith {_ % 5 < 2} assert_≟ List(List(1), List(2, 3, 4), List(5, 6), List(7, 8, 9), List(10))
+
+    (1 to 10).toList selectSplit {_ % 5 < 2} assert_≟ List(List(1), List(5, 6), List(10))
   }
 }
