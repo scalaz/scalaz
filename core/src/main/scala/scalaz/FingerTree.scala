@@ -85,7 +85,7 @@ object FingerTree {
   def node2[A, M <: Measured[A]](a: A, b: A)(implicit m: M) =
     Node2[M#V, A](m.vm.append(m(a), m(b)), a, b)
   def node3[A, M <: Measured[A]](a: A, b: A, c: A)(implicit m: M) =
-    Node3[M#V, A](m.vm.appenf(m(a), m.vm.append(m(b), m(c))), a, b, c)
+    Node3[M#V, A](m.vm.append(m(a), m.vm.append(m(b), m(c))), a, b, c)
   def nodeToFinger[A, M <: Measured[A]](n: Node[M#V, A]) = n match {
     case Node2(_, a, b) => Two(a, b)
     case Node3(_, a, b, c) => Three(a, b, c)
@@ -96,6 +96,6 @@ object FingerTree {
   }
   def deep[A, M <: Measured[A]](pr: Finger[A], m: FingerTree[M#V, Node[M#V, A]], sf: Finger[A])(implicit s: M) =
     DeepFT(s.vm.append(mappendVal(s(pr), m), s(sf)), pr, m, sf)
-  def empty[A, M <: Measured[A]] = EmptyFT[M#V]
+  def empty[A, M <: Measured[A]] = EmptyFT[M#V, A]
   def single[A, M <: Measured[A]](a: A) = SingleFT[M#V, A](a)
 }
