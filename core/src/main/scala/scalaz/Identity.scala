@@ -1,7 +1,5 @@
 package scalaz
 
-import javax.swing.text.html.Option
-
 sealed trait Identity[A] extends PimpedType[A] {
   import Scalaz._
   import geo._
