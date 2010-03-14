@@ -60,6 +60,6 @@ trait Digits {
     case 7L => _7
     case 8L => _8
     case 9L => _9
-    case _ => Math.abs(n) % 10L
+    case _ => scala.math.abs(n) % 10L
   }
 }

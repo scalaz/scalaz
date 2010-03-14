@@ -6,7 +6,7 @@ sealed trait Coord {
   val longitude: Longitude
 
   import Scalaz._
-  import Math._
+  import scala.math._
 
   def |*|(e: Elevation) = position(this, e)
 
