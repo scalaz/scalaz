@@ -15,11 +15,13 @@ object InvariantFunctor {
       val zero = f(ma.zero)
     }
   }
-  
-  implicit val EndoInvariantFunctor = new InvariantFunctor[Endo] {
-    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = {
-      (b: B) => f(ma(g(b)))
-    }
+
+  // The type ascription ': InvariantFunctor[Endo]' works around the following spurious compiler error in March 2010 vintage
+  // compiler builds: "not found: type $anon"
+  //
+  // Reported: https://lampsvn.epfl.ch/trac/scala/ticket/3177
+  implicit val EndoInvariantFunctor: InvariantFunctor[Endo] = new InvariantFunctor[Endo] { //
+    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = (b: B) => f(ma(g(b)))
   }
 
   implicit val SemigroupInvariantFunctor = new InvariantFunctor[Semigroup] {
