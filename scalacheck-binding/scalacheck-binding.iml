@@ -29,12 +29,12 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/scalacheck_2.8.0.Beta1-RC5-1.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/scalacheck_2.8.0.Beta1-1.7-SNAPSHOT.jar!/" />
           <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/test-interface-0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/scalacheck_2.8.0.Beta1-RC5-1.7-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/scalacheck_2.8.0.Beta1-1.7-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
