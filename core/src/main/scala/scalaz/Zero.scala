@@ -117,6 +117,8 @@ object Zero {
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
+  implicit def FingerTreeZero[A, M <: Measured[A]](implicit m: M): Zero[FingerTree[M#V, A]] = zero(FingerTree.empty)
+
   implicit def ZeroKleisliZero[M[_],A,B](implicit z: Zero[M[B]]): Zero[Kleisli[M,A,B]] = zero(☆((_ : A) => ∅))
 
   import concurrent.Strategy
