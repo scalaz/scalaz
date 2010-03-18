@@ -242,6 +242,8 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
     foldl(emptyBKTree[A])(_ + _)
 
+  def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
+  
   import concurrent._
 
   def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
