@@ -118,6 +118,8 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def some: Option[A] = Some(value)
 
+  def pair: (A, A) = (value, value)
+
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
