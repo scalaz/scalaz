@@ -92,8 +92,6 @@ object Scalaz extends ScalazLow
 
   val GArray = collection.mutable.GenericArray
 
-  type ![A <: Applicable, B] = A#Apply[B]
-
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
