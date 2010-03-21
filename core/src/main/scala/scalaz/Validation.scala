@@ -46,6 +46,11 @@ sealed trait Validation[+E, +A] {
     case Failure(e) => Failure(e)
   }
 
+  /**
+   * Wraps the failure value in a NonEmptyList
+   */
+  def liftFailNel: Validation[NonEmptyList[E], A] = fail.liftNel
+
   def |||[AA >: A](f: E => AA): AA = this match {
     case Success(a) => a
     case Failure(e) => f(e)
