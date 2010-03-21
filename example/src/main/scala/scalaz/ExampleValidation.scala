@@ -27,7 +27,7 @@ object ExampleValidation {
     // You cannot pattern match on Validation. Instead, use fold:
     val result: String = s.fold(e => "got error: " + e, s => "got success: " + s.toString)
 
-    // Validation.| is analagous to Option#getOrElse
+    // Validation#| is analogous to Option#getOrElse
     (f | 1) assert_≟ 1
 
     // Validation is a Monad, and can be used in for comprehensions.
@@ -44,7 +44,7 @@ object ExampleValidation {
     } yield i + j
     k2.failure assert_≟ Some("error")
 
-    // Validation is also an Applicative Functor, it the type of the error side of the validation is a Semigroup.
+    // Validation is also an Applicative Functor, if the type of the error side of the validation is a Semigroup.
     // A number of computations are tried. If the all success, a function can combine them into a Success. If any
     // of them fails, the individual errors are accumulated.
 
