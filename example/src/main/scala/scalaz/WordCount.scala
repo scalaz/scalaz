@@ -84,7 +84,7 @@ object Comp {
     comp(g(a) ∘ f)
 
   implicit def CompFunctor[M[_] : Functor, N[_] : Functor] = new Functor[PartialApplyComp[M, N]#Apply] {
-    def fmap[A, B](r: Comp[M, N, A], f: (A) => B) = comp(r.value ∘ ((na: N[A]) => na ∘ f))
+    def fmap[A, B](r: Comp[M, N, A], f: A => B) = comp(r.value ∘∘ f)
   }
 
   def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[PartialApplyComp[M, N]#Apply] {
