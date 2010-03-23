@@ -20,14 +20,9 @@ sealed trait Validation[+E, +A] {
 
   def isFailure = !isSuccess
 
-  def success = this match {
+  def toOption = this match {
     case Success(a) => Some(a)
     case Failure(_) => None
-  }
-
-  def failure = this match {
-    case Success(_) => None
-    case Failure(e) => Some(e)
   }
 
   def >>*<<[EE >: E: Semigroup, AA >: A: Semigroup](x: Validation[EE, AA]): Validation[EE, AA] = (this, x) match {
@@ -76,6 +71,11 @@ sealed trait FailProjection[+E, +A] {
   val validation: Validation[E, A]
 
   import Scalaz._
+
+  def toOption: Option[E] = validation match {
+    case Success(_) => None
+    case Failure(e) => Some(e)
+  }
   
   def lift[M[_]: Pure, EE >: E]: Validation[M[EE], A] = validation match {
     case Success(a) => Success(a)
