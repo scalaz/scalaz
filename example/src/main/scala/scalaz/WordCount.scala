@@ -1,9 +1,13 @@
 package scalaz
 
 import Scalaz._
+import collection.immutable.{Stream, List}
 
 object WordCount {
-  def main(args: Array[String]) = wordCount
+  def main(args: Array[String]) = {
+    wordCount
+    functorComposition
+  }
 
   /**
    * Character/Line/Word Count from "The Essense of the Iterator Pattern".
@@ -34,6 +38,13 @@ object WordCount {
 
     val x = wordCountLineCount(text)
     x.println
+  }
+
+  def functorComposition {
+    val ss = List(Stream(1))
+    ss ∘∘ ((_: Int) * 2) assert_≟ List(Stream(2))
+    import Comp._
+    CompFunctor[List, Stream].fmap(comp(ss), ((_: Int) * 2)).value assert_≟ List(Stream(2))
   }
 }
 
@@ -66,6 +77,7 @@ object Prod {
 }
 
 trait Comp[M[_], N[_], A] {
+  type Apply[A] = M[N[A]]
   def value: M[N[A]]
 }
 
