@@ -8,19 +8,21 @@ import System.FilePath
 
 data Config = Config {
   actions :: [String],
-  outputLog :: String
+  outputLog :: String,
+  command :: String
 }
 
 defaultConfig :: Config
 defaultConfig = Config {
   actions = ["test", "package-all"],
-  outputLog = "build.log"
+  outputLog = "build.log",
+  command = "sbt"
 }
 
 sbt' :: Config -> IO ExitCode
 sbt' c = do h <- openFile (outputLog c) WriteMode
             d <- getCurrentDirectory
-            p <- runProcess (d </> "sbt") (actions c) (Just d) Nothing Nothing (Just h) Nothing
+            p <- runProcess (d </> command c) (actions c) (Just d) Nothing Nothing (Just h) Nothing
             e <- waitForProcess p
             hClose h
             return e
