@@ -4,15 +4,16 @@ import java.util.jar.Attributes.Name._
 import java.io.File
 import scala.Array
 
-abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
-        with AutoCompilerPlugins  {
-  val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
+abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
+        with AutoCompilerPlugins {
+  // val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
+  val scalaToolsSnapshots = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
   override def compileOptions =
-          encodingUtf8.map(CompileOption(_)) :::
-          target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
+    encodingUtf8.map(CompileOption(_)) :::
+            target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
@@ -30,24 +31,44 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info)
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.4-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0.Beta1" % "1.6.4-SNAPSHOT" % "test" withSources
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 }
 
-final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with FileTasks {
+/**
+ * Replaces 'SNAPSHOT' in the project version with the contents of the system property 'build.timestamp',
+ * if provided. 
+ */
+trait OverridableVersion extends Project {
+  lazy val buildTimestamp = system[String]("build.timestamp")
+  
+  override def version = {
+    val realVersion = super.version
+    val v = realVersion.toString
+    val SnapshotVersion = """(.+)-SNAPSHOT""".r
+    (buildTimestamp.get, realVersion.toString) match {
+      case (Some(timestamp), SnapshotVersion(base)) => OpaqueVersion(base + "-" + timestamp)
+      case _ => realVersion
+    }
+  }
+}
+
+final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
   // Sub-projects
   lazy val core = project("core", "scalaz-core", new Core(_))
   lazy val http = project("http", "scalaz-http", new Http(_), core)
   lazy val example = project("example", "scalaz-example", new Example(_), core, http)
   lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core)
   lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, scalacheckBinding)
+  lazy val full = project("full", "scalaz-full", new Full(_), core, scalacheckBinding, http, example, tests)
+  lazy val allModules = Seq(core, http, example, scalacheckBinding, tests)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.  
-  override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-hudson" asFile) :: Nil
+  override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
 
   private def noAction = task {None}
 
@@ -57,17 +78,6 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   override def publishAction = task {None}
 
-  lazy val releaseZipAction = {
-    val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
-    val extra = path("README")
-    zipTask(allJars +++ extra, outputPath / "scalaz-full.zip")
-  }
-
-  def zipTask(sources: PathFinder, zipPath: => Path): Task =
-    fileTask("zip", zipPath from sources) {FileUtilities.zip(sources.get, zipPath, false, log)}
-
-  override def packageToPublishActions = super.packageToPublishActions ++ Seq(releaseZipAction)
-
   class Core(info: ProjectInfo) extends ScalazDefaults(info)
 
   class Http(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -75,7 +85,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7-SNAPSHOT" withSources
+    val scalacheck = "org.scala-tools.testing" % "scalacheck_2.8.0.Beta1" % "1.7-SNAPSHOT" withSources
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -84,5 +94,21 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Fi
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
+  }
+
+  class Full(info: ProjectInfo) extends ScalazDefaults(info) {
+    def packageFullAction = {
+      val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
+      val p = ScalazProject.this.path _
+      val extra = p("README") +++ p("etc").## ** GlobFilter("*")
+      val sourceFiles = allJars +++ extra
+      zipTask(allJars +++ extra, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
+    } describedAs("Zip all artifacts")
+    
+    private def noAction = task {None}
+    
+    override def publishLocalAction = noAction dependsOn packageFullAction
+
+    override def publishAction = noAction dependsOn packageFullAction
   }
 }
