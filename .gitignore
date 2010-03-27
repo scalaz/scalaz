@@ -2,4 +2,5 @@ lib_managed
 target
 .DS_Store
 out
+build.log
 
