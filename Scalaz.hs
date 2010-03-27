@@ -1,31 +1,40 @@
 module Scalaz where
 
+import Control.Applicative
+import Data.Time.Clock
+import Data.Traversable
 import System.Process
 import System.IO
 import System.Exit
 import System.Directory
 import System.FilePath
+import Prelude hiding (mapM)
 
 data Config = Config {
   actions :: [String],
-  outputLog :: String,
-  command :: String
+  outputLog :: Maybe String,
+  command :: String,
+  modules :: [String]
 }
 
 defaultConfig :: Config
 defaultConfig = Config {
   actions = ["test", "package-all"],
-  outputLog = "build.log",
-  command = "sbt"
+  outputLog = Just "build.log",
+  command = "sbt",
+  modules = ["core", "example", "http", "scalacheck-binding", "tests"]
 }
 
 sbt' :: Config -> IO ExitCode
-sbt' c = do h <- openFile (outputLog c) WriteMode
+sbt' c = do h <- (\k -> openFile k WriteMode) `mapM` outputLog c
             d <- getCurrentDirectory
-            p <- runProcess (d </> command c) (actions c) (Just d) Nothing Nothing (Just h) Nothing
+            p <- runProcess (d </> command c) (actions c) (Just d) Nothing Nothing h Nothing
             e <- waitForProcess p
-            hClose h
+            maybe (return ()) hClose h
             return e
 
 sbt :: IO ExitCode
 sbt = sbt' defaultConfig
+
+time :: IO String
+time = (\t -> (show (utctDay t) ++ "+" ++ show (utctDayTime t))) <$> getCurrentTime
