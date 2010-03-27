@@ -3,6 +3,8 @@ module Scalaz where
 import System.Process
 import System.IO
 import System.Exit
+import System.Directory
+import System.FilePath
 
 data Config = Config {
   actions :: [String],
@@ -17,7 +19,8 @@ defaultConfig = Config {
 
 sbt' :: Config -> IO ExitCode
 sbt' c = do h <- openFile (outputLog c) WriteMode
-            p <- runProcess "sbt" (actions c) Nothing Nothing Nothing (Just h) Nothing
+            d <- getCurrentDirectory
+            p <- runProcess (d </> "sbt") (actions c) (Just d) Nothing Nothing (Just h) Nothing
             e <- waitForProcess p
             hClose h
             return e
