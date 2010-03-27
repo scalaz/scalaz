@@ -26,7 +26,7 @@ defaultConfig = Config {
 }
 
 sbt' :: Config -> IO ExitCode
-sbt' c = do h <- (\k -> openFile k WriteMode) `mapM` outputLog c
+sbt' c = do h <- (flip openFile WriteMode) `mapM` outputLog c
             d <- getCurrentDirectory
             p <- runProcess (d </> command c) (actions c) (Just d) Nothing Nothing h Nothing
             e <- waitForProcess p
