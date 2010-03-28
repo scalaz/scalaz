@@ -1,4 +1,4 @@
-package scalaz
+package scalaz.example
 package geo
 
 object ExampleVincenty {

@@ -1,7 +1,9 @@
-package scalaz
+package scalaz.example
 package http
 
+import scalaz._
 import Scalaz._
+import scalaz.http._
 import response._
 import request._
 import Slinky._

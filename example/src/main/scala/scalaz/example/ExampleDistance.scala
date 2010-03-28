@@ -1,4 +1,6 @@
-package scalaz
+package scalaz.example
+
+import scalaz._
 
 // Demonstrates the <---> method to compute edit distance using a metric space such as levenshtein
 object ExampleDistance {

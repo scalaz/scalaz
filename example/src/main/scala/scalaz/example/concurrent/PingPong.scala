@@ -1,3 +1,9 @@
+package scalaz.example
+package concurrent
+
+import scalaz._
+import scalaz.concurrent._
+
 import java.util.concurrent._
 import scalaz.concurrent._
 import scalaz.Scalaz._

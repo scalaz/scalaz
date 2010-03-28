@@ -1,4 +1,6 @@
-package scalaz
+package scalaz.example
+
+import scalaz._
 
 import _root_.java.lang.String
 import collection.immutable.List

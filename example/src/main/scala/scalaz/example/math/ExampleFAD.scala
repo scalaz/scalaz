@@ -1,5 +1,4 @@
-package scalaz
-package math
+package scalaz.example.math
 
 import scalaz._
 import Scalaz._

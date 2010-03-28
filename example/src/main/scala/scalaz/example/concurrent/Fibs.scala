@@ -1,3 +1,7 @@
+package scalaz
+package example
+package concurrent
+
 object Fibs {
   import java.util.concurrent._
   import scalaz.concurrent._

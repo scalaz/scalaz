@@ -1,5 +1,6 @@
-package scalaz
+package scalaz.example
 
+import scalaz._
 import Scalaz._
 import collection.immutable.{Stream, List}
 
@@ -78,6 +79,7 @@ object Prod {
 
 trait Comp[M[_], N[_], A] {
   type Apply[A] = M[N[A]]
+
   def value: M[N[A]]
 }
 
@@ -102,9 +104,8 @@ object Comp {
   def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[PartialApplyComp[M, N]#Apply] {
     def pure[A](a: => A): Comp[M, N, A] = comp(a.η[N].η[M])
 
-    def apply[A, B](f: Comp[M, N, A => B], a: Comp[M, N, A]): Comp[M, N, B] = {
+    def apply[A, B](f: Comp[M, N, A => B], a: Comp[M, N, A]): Comp[M, N, B] =
       comp(a.value.<**>(f.value)(_ <*> _))
-    }
   }
 }
 

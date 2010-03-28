@@ -1,4 +1,6 @@
-package scalaz
+package scalaz.example
+
+import scalaz._
 
 /**
  * Demonstrates how to write an assertion method that depends on Equal,

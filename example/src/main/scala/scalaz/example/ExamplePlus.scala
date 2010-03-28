@@ -1,4 +1,6 @@
-package scalaz
+package scalaz.example
+
+import scalaz._
 
 object ExamplePlus {
   def main(args: Array[String]) = run

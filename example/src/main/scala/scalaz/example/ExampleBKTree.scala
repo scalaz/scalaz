@@ -1,4 +1,6 @@
-package scalaz
+package scalaz.example
+
+import scalaz._
 
 // Example use of a Burkhard-Keller tree for approximate-based searching
 object ExampleBKTree {

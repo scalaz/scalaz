@@ -1,4 +1,4 @@
-package scalaz
+package scalaz.example
 
 
 object Example {
