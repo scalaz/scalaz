@@ -97,12 +97,14 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    def packageFullAction = {
+    def packageFullAction = packageFull dependsOn(fullDoc)
+    
+    def packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
       val p = ScalazProject.this.path _
       val extra = p("README") +++ p("etc").## ** GlobFilter("*")
-      val sourceFiles = allJars +++ extra
-      zipTask(allJars +++ extra, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
+      val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** GlobFilter("*"))
+      zipTask(sourceFiles, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
     } describedAs("Zip all artifacts")
     
     private def noAction = task {None}
@@ -110,5 +112,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     override def publishLocalAction = noAction dependsOn packageFullAction
 
     override def publishAction = noAction dependsOn packageFullAction
+    
+    def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
+  	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
   }
 }
