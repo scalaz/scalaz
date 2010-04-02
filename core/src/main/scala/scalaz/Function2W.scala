@@ -14,6 +14,8 @@ sealed trait Function2W[T1, T2, R] {
   def promise(implicit s: Strategy[Unit]) = (x: T1, y: T2) => x.pure[Promise].<**>(y.pure[Promise])(k)
 
   def comap[TT](f: TT => T1)(implicit ev: T1 =:= T2): (TT, TT) => R = (t1, t2) => k(f(t1), ev(f(t2)))
+
+  def lift[F[_]](implicit f: Applicative[F]) = (a: F[T1], b: F[T2]) => (a <**> b)(this)
 }
 
 trait Function2s {

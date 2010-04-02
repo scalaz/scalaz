@@ -18,6 +18,8 @@ sealed trait Function1W[T, R] {
   
   def promise(implicit s: Strategy[Unit]) = kleisli[Promise]
 
+  def lift[F[_]](implicit f: Functor[F]) = (x: F[T]) => x.map(this)
+
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 }
 
