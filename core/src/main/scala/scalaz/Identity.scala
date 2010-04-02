@@ -64,6 +64,10 @@ sealed trait Identity[A] extends PimpedType[A] {
   def lt(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
   def gt(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
+
+  def min(a: A)(implicit o: Order[A]): A = if (lte(a)) value else a
+ 
+  def max(a: A)(implicit o: Order[A]): A = if (gte(a)) value else a
     
   def show(implicit s: Show[A]): List[Char] = s.show(value)
 
