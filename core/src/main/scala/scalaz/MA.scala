@@ -7,6 +7,13 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
 
+  /**
+   * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is contructed from type constructor `N`.
+   * This allows composition of type classes for `M` and `N`. For example:
+   * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
+   */
+  def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[(M of N)#of, B] = ma[(M of N)#of, B](value ∘ n)
+
   def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
