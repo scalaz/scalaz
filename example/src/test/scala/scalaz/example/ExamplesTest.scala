@@ -1,4 +1,5 @@
-package scalaz
+package scalaz.example
+
 
 import org.specs.{Sugar, Specification}
 
