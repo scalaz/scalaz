@@ -9,6 +9,7 @@ object Example {
     ExampleBKTree.run
     ExampleCategory.run
     ExampleCofunctor.run
+    ExampleComp.run
     ExampleDistance.run
     ExampleFunctor.run
     ExampleFold.run
@@ -21,6 +22,7 @@ object Example {
     ExampleState.run
     ExampleTree.run
     ExampleTraverse.run
+    ExampleValidation.run
     geo.ExampleVincenty.run
     math.ExampleFAD.run
     concurrent.ExampleActor.run
