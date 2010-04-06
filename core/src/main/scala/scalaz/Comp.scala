@@ -14,9 +14,9 @@ trait Comp {
     def fmap[A, B](r: M[N[A]], f: A => B) = r ∘∘ f
   }
 
-  implicit def MofNApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[(M of N)#of] {
-    def pure[A](a: => A): M[N[A]] = a.η[N].η[M]
-
-    def apply[A, B](f: M[N[A => B]], a: M[N[A]]): M[N[B]] = (a <**> f)(_ <*> _)
-  }
+//  implicit def MofNApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[(M of N)#of] {
+//    def pure[A](a: => A): M[N[A]] = a.η[N].η[M]
+//
+//    def apply[A, B](f: M[N[A => B]], a: M[N[A]]): M[N[B]] = (a <**> f)(_ <*> _)
+//  }
 }
