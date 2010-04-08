@@ -69,7 +69,7 @@ object FoldRight {
     def foldRight[A, B](t: ZipStream[A], b: B, f: (A, => B) => B): B = StreamFoldRight.foldRight(t.value, b, f)
   }
 
-  implicit def GenericArrayFoldRight: FoldRight[GArray] = IterableFoldRight[GArray]
+  implicit def ArraySeqFoldRight: FoldRight[ArraySeq] = IterableFoldRight[ArraySeq]
 
   implicit def EitherLeftFoldRight[X] = new FoldRight[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def foldRight[A, B](e: Either.LeftProjection[A, X], b: B, f: (A, => B) => B) = OptionFoldRight.foldRight(e.toOption, b, f)

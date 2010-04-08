@@ -85,7 +85,7 @@ object ScalazArbitrary {
 
   implicit def EitherRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B]] = arb[Either[A, B]] ∘ ((x: Either[A, B]) => x.right)
 
-  implicit def GenericArrayArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[GArray[A]] = arb[List[A]] ∘ ((x: List[A]) => GArray(x: _*))
+  implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
   import java.util.concurrent.Callable
 

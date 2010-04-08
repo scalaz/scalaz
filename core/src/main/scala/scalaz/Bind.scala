@@ -111,7 +111,7 @@ object Bind {
 
   implicit def StreamBind: Bind[Stream] = TraversableBind
 
-  implicit def GenericArrayBind: Bind[GArray] = TraversableBind
+  implicit def ArraySeqBind: Bind[ArraySeq] = TraversableBind
 
   implicit def OptionBind: Bind[Option] = new Bind[Option] {
     def bind[A, B](r: Option[A], f: A => Option[B]) = r flatMap f

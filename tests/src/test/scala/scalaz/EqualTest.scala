@@ -73,7 +73,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     //checkEqualLaws[Promise[A]]
     checkEqualLaws[List[A]]
     checkEqualLaws[Stream[A]]
-    checkEqualLaws[GArray[A]]
+    checkEqualLaws[ArraySeq[A]]
 
     import geo._
     checkEqualLaws[Azimuth]

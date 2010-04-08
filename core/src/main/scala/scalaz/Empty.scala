@@ -27,8 +27,8 @@ object Empty {
     def empty[A] = None
   }
 
-  implicit def GenericArrayEmpty: Empty[GArray] = new Empty[GArray] {
-    def empty[A] = new GArray(0)
+  implicit def ArraySeqEmpty: Empty[ArraySeq] = new Empty[ArraySeq] {
+    def empty[A] = new ArraySeq(0)
   }
 
   implicit def EitherLeftEmpty[X: Zero]: Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

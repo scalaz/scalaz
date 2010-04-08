@@ -101,9 +101,9 @@ object Pure {
     def pure[A](a: => A) = Some(a).lst
   }
 
-  implicit def GenericArrayPure: Pure[GArray] = new Pure[GArray] {
+  implicit def ArraySeqPure: Pure[ArraySeq] = new Pure[ArraySeq] {
     def pure[A](a: => A) = {
-      val t = new GArray[A](1)
+      val t = new ArraySeq[A](1)
       t(0) = a
       t
     }
