@@ -100,8 +100,12 @@ sealed trait Identity[A] extends PimpedType[A] {
     unfold0(∅, f(value))
   }
 
-  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    (n > 0) ?? (value.η ⊹ replicate(n - 1))
+  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+    @tailrec
+    def replicate0(accum: M[A], n: Int): M[A] = if (n > 0) replicate0(value.η ⊹ accum, n - 1) else accum
+
+    replicate0(∅, n)
+  }
 
   def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.η ⊹ repeat
 
