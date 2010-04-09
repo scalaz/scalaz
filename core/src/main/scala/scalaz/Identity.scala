@@ -102,19 +102,24 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
     @tailrec
-    def replicate0(accum: M[A], n: Int): M[A] = if (n > 0) replicate0(value.η ⊹ accum, n - 1) else accum
+    def replicate0(accum: M[A], n: Int): M[A] = if (n > 0) replicate0(accum ⊹ value.η, n - 1) else accum
 
     replicate0(∅, n)
   }
 
   def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
     @tailrec
-    def repeat0(accum: M[A]): M[A] = repeat0(value.η ⊹ accum)
+    def repeat0(accum: M[A]): M[A] = repeat0(accum ⊹ value.η)
+
     repeat0(value.η)
   }
 
-  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
-    value.η ⊹ f(value).iterate(f)
+  def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+    @tailrec
+    def iterate0(accum: M[A], v: A): M[A] = iterate0(accum ⊹ v.η, f(value))
+
+    iterate0(∅, value)
+  }
 
   def zipper: Zipper[A] = Scalaz.zipper(Stream.empty, value, Stream.empty)
 
