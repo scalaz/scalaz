@@ -107,7 +107,11 @@ sealed trait Identity[A] extends PimpedType[A] {
     replicate0(∅, n)
   }
 
-  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.η ⊹ repeat
+  def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+    @tailrec
+    def repeat0(accum: M[A]): M[A] = repeat0(value.η ⊹ accum)
+    repeat0(value.η)
+  }
 
   def iterate[M[_]](f: A => A)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
     value.η ⊹ f(value).iterate(f)
