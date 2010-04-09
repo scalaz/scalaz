@@ -1,6 +1,7 @@
 package scalaz
 
 import collection.immutable.IntMap
+import annotation.tailrec
 
 // http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html
 
@@ -37,7 +38,8 @@ sealed trait BKTree[+A] {
     case BKTreeNode(v, _, c) => v :: c.valuesIterator.toList.flatMap(_.values)
   }
 
-  def -?-[AA >: A: MetricSpace](a: AA): Boolean = this match {
+  @tailrec
+  final def -?-[AA >: A: MetricSpace](a: AA): Boolean = this match {
     case BKTreeEmpty => false
     case BKTreeNode(v, _, c) => {
       val d = (v: AA) <===> a

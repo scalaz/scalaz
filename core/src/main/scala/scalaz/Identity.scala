@@ -1,5 +1,7 @@
 package scalaz
 
+import annotation.tailrec
+
 sealed trait Identity[A] extends PimpedType[A] {
   import Scalaz._
   import geo._
@@ -7,37 +9,38 @@ sealed trait Identity[A] extends PimpedType[A] {
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   /**
-   * Alias for {@link scalaz.Identity#η}
+   * Alias for   { @link scalaz.Identity # η }
    */
   def pure[F[_]](implicit p: Pure[F]): F[A] = η
 
   def dual: Dual[A] = value
-  def σ: Dual[A] = dual
+
+  def σ : Dual[A] = dual
 
   def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
   /**
-   * Alias for {@link scalaz.Identity#⊹}
+   * Alias for   { @link scalaz.Identity # ⊹ }
    */
   def |+|(a: => A)(implicit s: Semigroup[A]): A = ⊹(a)
 
   def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
   /**
-   * Alias for {@link scalaz.Identity#≟}
+   * Alias for   { @link scalaz.Identity # ≟ }
    */
   def ===(a: A)(implicit e: Equal[A]): Boolean = ≟(a)
 
   def ≠(a: A)(implicit e: Equal[A]): Boolean = !(≟(a))
 
   /**
-   * Alias for {@link scalaz.Identity#≠}
+   * Alias for   { @link scalaz.Identity # ≠ }
    */
   def /==(a: A)(implicit e: Equal[A]): Boolean = ≠(a)
 
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
   // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
-  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if(≠(b)) error(shows + " ≠ " + ev(b).shows)
+  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if (≠(b)) error(shows + " ≠ " + ev(b).shows)
 
   def ?|?(a: A)(implicit o: Order[A]): Ordering = o order (value, a)
 
@@ -66,9 +69,9 @@ sealed trait Identity[A] extends PimpedType[A] {
   def gt(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
 
   def min(a: A)(implicit o: Order[A]): A = if (lte(a)) value else a
- 
+
   def max(a: A)(implicit o: Order[A]): A = if (gte(a)) value else a
-    
+
   def show(implicit s: Show[A]): List[Char] = s.show(value)
 
   def shows(implicit s: Show[A]): String = s.show(value).mkString
@@ -77,7 +80,7 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def println(implicit s: Show[A]): Unit = Console.println(shows)
 
-  def mapply[F[_], B](f: F[A => B])(implicit ftr: Functor[F]): F[B] = f ∘ (_(value)) 
+  def mapply[F[_], B](f: F[A => B])(implicit ftr: Functor[F]): F[B] = f ∘ (_(value))
 
   def text(implicit s: Show[A]): xml.Text = xml.Text(value.shows)
 
@@ -87,9 +90,14 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def state[S]: State[S, A] = Scalaz.state((_: S, value))
 
-  def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = f(value) match {
-    case None => m.zero
-    case Some((b, a)) => b.η ⊹ a.unfold(f)
+  def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = {
+    @tailrec
+    def unfold0(accum: M[B], v: Option[(B, A)]): M[B] = v match {
+      case None => accum
+      case Some((b, a)) => unfold0(accum ⊹ b.η, f(a))
+    }
+
+    unfold0(∅, f(value))
   }
 
   def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] =
@@ -108,8 +116,8 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def unfoldTreeM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[B]] = {
     m.bind(f(value), (abs: (B, Stream[A])) =>
-        m.bind(abs._2.unfoldForestM[B, M](f), (ts: Stream[Tree[B]]) =>
-            m.pure(node(abs._1, ts))))
+      m.bind(abs._2.unfoldForestM[B, M](f), (ts: Stream[Tree[B]]) =>
+        m.pure(node(abs._1, ts))))
   }
 
   def success[X]: Validation[X, A] = Scalaz.success(value)
@@ -117,7 +125,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   def successNel[X]: ValidationNEL[X, A] = success
 
   def fail[X]: Validation[A, X] = failure(value)
-  
+
   def failNel[X]: ValidationNEL[A, X] = failure(wrapNel)
 
   def some: Option[A] = Some(value)
@@ -130,15 +138,17 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def toRadians(implicit r: Radians[A]): Double = r.toRadians(value)
 
-  def doWhile(f: A => A, p: A => Boolean): A = {
+  @tailrec
+  final def doWhile(f: A => A, p: A => Boolean): A = {
     val x = f(value)
-    if(p(x)) x.doWhile(f, p) else x
+    if (p(x)) x.doWhile(f, p) else x
   }
 
-  def whileDo(f: A => A, p: A => Boolean): A =
-    if(p(value)) f(value).whileDo(f, p) else value
+  @tailrec
+  final def whileDo(f: A => A, p: A => Boolean): A =
+    if (p(value)) f(value).whileDo(f, p) else value
 
-  def squared : (A, A) = ×[A, A].μ apply value 
+  def squared: (A, A) = ×[A, A].μ apply value
 
   override def toString = value.toString
 

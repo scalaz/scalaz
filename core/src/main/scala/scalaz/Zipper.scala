@@ -1,5 +1,7 @@
 package scalaz
 
+import annotation.tailrec
+
 /**
  * Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
  * position in a stream. Focus can be moved forward and backwards through the stream, elements can be inserted
@@ -67,7 +69,7 @@ sealed trait Zipper[+A] {
   def deleteLeft = rights match {
     case Stream.Empty => None
     case r #:: rs => Some(lefts match {
-      case Stream.Empty => zipper(Stream.Empty, r, rs) 
+      case Stream.Empty => zipper(Stream.Empty, r, rs)
       case l #:: ls => zipper(ls, l, rights)
     })
   }
@@ -104,12 +106,13 @@ sealed trait Zipper[+A] {
   /**
    * Pairs each element with a boolean indicating whether that element has focus.
    */
- def withFocus = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
+  def withFocus = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
 
   /**
    * Moves focus to the nth element of the zipper, or None if there is no such element.
    */
-  def move(n: Int): Option[Zipper[A]] =
+  @tailrec
+  final def move(n: Int): Option[Zipper[A]] =
     if (n < 0 || n >= length) None
     else {
       val l = lefts.length

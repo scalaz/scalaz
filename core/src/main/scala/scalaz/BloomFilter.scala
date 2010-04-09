@@ -4,7 +4,7 @@ class BloomFilter(val size: Int, val expectedElements: Int) {
   require(size > 0)
   require(expectedElements > 0)
 
-  import scala.Math._
+  import scala.math._
 
   private[this] val bitArray = new BitArray(size)
   private[this] val k = ceil((bitArray.size / expectedElements) * log(2.0)).toInt
