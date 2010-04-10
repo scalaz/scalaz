@@ -1,5 +1,6 @@
 package scalaz
 
+
 sealed trait ListW[A] extends PimpedType[List[A]] {
   import Scalaz._
   import annotation.tailrec
@@ -14,10 +15,15 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     intersperse0(nil, value) reverse
   }
 
-  def intercalate(as: List[A]): List[A] = value match {
-    case Nil => Nil
-    case x :: Nil => x :: Nil
-    case h :: t => h :: as ::: t.intercalate(as)
+  def intercalate(as: List[A]): List[A] = {
+    val asr = as reverse
+    @tailrec
+    def intercalate0(accum: List[A], rest: List[A]): List[A] = rest match {
+      case Nil => accum
+      case x :: Nil => x :: accum
+      case h :: t => intercalate0(asr ::: h :: accum, t)
+    }
+    intercalate0(nil, value) reverse
   }
 
   def toNel = value match {
