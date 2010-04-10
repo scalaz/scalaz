@@ -16,6 +16,7 @@ object Example {
     ExampleEqual.run
     ExampleKleisli.run
     ExampleIdentity.run
+    ExampleList.run
     ExampleMonad.run
     ExampleMonoid.run
     ExamplePlus.run
