@@ -15,19 +15,20 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="core" />
-    <orderEntry type="library" name="Scala Latest" level="application" />
     <orderEntry type="module" module-name="http" />
     <orderEntry type="module-library" scope="TEST">
       <library name="lib_managed_test">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/test/specs_2.8.0.Beta1-1.6.4-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT-sources.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/test/specs_2.8.0.Beta1-1.6.4-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="scala" level="project" />
   </component>
 </module>
 

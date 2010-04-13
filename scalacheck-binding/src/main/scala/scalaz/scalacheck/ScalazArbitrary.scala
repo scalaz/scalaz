@@ -24,7 +24,7 @@ object ScalazArbitrary {
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
-  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas ∘ (value _): _*))
+  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas))
 
   implicit def BooleanConjunctionArbitrary: Arbitrary[BooleanConjunction] = arb[Boolean] ∘ ((_: Boolean).|∧|)
 
@@ -46,7 +46,7 @@ object ScalazArbitrary {
 
   implicit def LongMultiplicationArbitrary: Arbitrary[LongMultiplication] = arb[Long] ∘ ((_: Long).∏)
 
-  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits ∘ (value _): _*))
+  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
 
   implicit def DListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[DList[A]] = arb[List[A]] ∘ (as => dlist(_ => as))
 
@@ -59,7 +59,7 @@ object ScalazArbitrary {
       case 0 => arbitrary[A] ∘ (leaf _)
       case n => {
         val nextSize = n.abs / 2
-        arbitrary[A].<**>(resize(n, arbStream[Tree[A]](Arbitrary(tree(nextSize))).arbitrary))(node _)
+        arbitrary[A].<**>(resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node _)
       }
     }
     Gen.sized(tree _)

@@ -25,19 +25,19 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Scala Latest" level="application" />
     <orderEntry type="module" module-name="core" />
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/servlet-api-2.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/compile/servlet-api-2.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.Beta1/compile/servlet-api-2.5-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/compile/servlet-api-2.5-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="scala" level="project" />
   </component>
 </module>
 
