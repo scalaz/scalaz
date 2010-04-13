@@ -59,8 +59,8 @@ object Each {
     def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
-  implicit def GenericArrayEach: Each[GArray] = new Each[GArray] {
-    def each[A](e: GArray[A], f: A => Unit) = e foreach f
+  implicit def ArraySeqEach: Each[ArraySeq] = new Each[ArraySeq] {
+    def each[A](e: ArraySeq[A], f: A => Unit) = e foreach f
   }
 
   implicit def EitherLeftEach[X]: Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

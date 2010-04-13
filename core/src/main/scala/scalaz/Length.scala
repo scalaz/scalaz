@@ -59,8 +59,8 @@ object Length {
     }
   }
 
-  implicit def GenericArrayLength: Length[GArray] = new Length[GArray] {
-    def len[A](a: GArray[A]) = a.length
+  implicit def ArraySeqLength: Length[ArraySeq] = new Length[ArraySeq] {
+    def len[A](a: ArraySeq[A]) = a.length
   }
 
   implicit def ArrayLength: Length[Array] = new Length[Array] {

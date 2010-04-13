@@ -105,7 +105,7 @@ object Zero {
 
   implicit def ArrayZero[A: Manifest]: Zero[Array[A]] = zero(new Array[A](0))
 
-  implicit def GenericArrayZero[A]: Zero[GArray[A]] = zero(new GArray[A](0))
+  implicit def ArraySeqZero[A]: Zero[ArraySeq[A]] = zero(new ArraySeq[A](0))
 
   implicit def EitherRightZero[A: Zero, B]: Zero[Either.RightProjection[A, B]] = zero(Left(∅[A]).right)
 

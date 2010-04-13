@@ -31,8 +31,8 @@ object Index {
     def index[A](a: Option[A], i: Int) = a filter (_ => i == 0)
   }
 
-  implicit def GenericArrayIndex: Index[GArray] = new Index[GArray] {
-    def index[A](a: GArray[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
+  implicit def ArraySeqIndex: Index[ArraySeq] = new Index[ArraySeq] {
+    def index[A](a: ArraySeq[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
   }
 
   implicit def ArrayIndex: Index[Array] = new Index[Array] {

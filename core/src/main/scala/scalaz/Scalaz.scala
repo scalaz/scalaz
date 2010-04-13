@@ -89,9 +89,9 @@ object Scalaz extends ScalazLow
 
   lazy val π2 = π * 2
 
-  type GArray[A] = collection.mutable.GenericArray[A]
+  type ArraySeq[A] = collection.mutable.ArraySeq[A]
 
-  val GArray = collection.mutable.GenericArray
+  val ArraySeq = collection.mutable.ArraySeq
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 

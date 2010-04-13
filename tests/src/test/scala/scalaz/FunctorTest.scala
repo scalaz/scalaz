@@ -51,7 +51,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[Option, A]
     checkFunctorLaws[FirstOption, A]
     checkFunctorLaws[LastOption, A]
-    checkFunctorLaws[GArray, A]
+    checkFunctorLaws[ArraySeq, A]
     checkFunctorLaws[PartialApply1Of2[Either.LeftProjection, X]#Flip, A]
     checkFunctorLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]
 

@@ -9,6 +9,8 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/full" />
+      <excludeFolder url="file://$MODULE_DIR$/project/boot" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -31,7 +33,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Scala Latest" level="application" />
+    <orderEntry type="library" name="scala" level="project" />
   </component>
 </module>
 

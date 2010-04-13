@@ -96,7 +96,7 @@ object ImplicitConversionTest {
 
   def bind {
     implicitly[Bind[List]]
-    implicitly[Bind[GArray]]
+    implicitly[Bind[ArraySeq]]
     implicitly[Bind[java.util.ArrayList]]
   }
 

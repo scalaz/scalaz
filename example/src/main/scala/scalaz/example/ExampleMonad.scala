@@ -6,13 +6,13 @@ object ExampleMonad {
   def main(args: Array[String]) = run
 
   import Scalaz._
-  import collection.mutable.GenericArray
+  import collection.mutable.ArraySeq
 
   def run {
     // zeroOr
     some(7).zeroOr[List] assert_≟ List(7)
     none[Int].zeroOr[List] assert_≟ List()
-    some(7).zeroOr[GenericArray] assert_≟ GenericArray(7)
+    some(7).zeroOr[ArraySeq] assert_≟ ArraySeq(7)
     some(7).zeroOr[Option] assert_≟ some(7)
 
     // guard
@@ -74,8 +74,8 @@ object ExampleMonad {
     // Replicating a List through the Option monoid
     List(1, 2, 3).replicateM[Option](2) assert_≟ List(some(2), some(3), some(4), some(3), some(4), some(5), some(4), some(5), some(6))
 
-    // Replicating an Option through the GenericArray monoid
-    some(7).replicateM[GenericArray](3) assert_≟ some(GenericArray(7, 7, 7))
+    // Replicating an Option through the ArraySeq monoid
+    some(7).replicateM[ArraySeq](3) assert_≟ some(ArraySeq(7, 7, 7))
 
     // Replicating an Option through the Option monoid
     some(7).replicateM[Option](3) assert_≟ some(some(21))

@@ -26,7 +26,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Scala Latest" level="application" />
+    <orderEntry type="library" exported="" name="scala" level="project" />
   </component>
 </module>
 

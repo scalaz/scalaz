@@ -27,8 +27,8 @@ object Plus {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
 
-  implicit def GenericArrayPlus: Plus[GArray] = new Plus[GArray] {
-    def plus[A](a1: GArray[A], a2: => GArray[A]) = a1 ++ a2
+  implicit def ArraySeqPlus: Plus[ArraySeq] = new Plus[ArraySeq] {
+    def plus[A](a1: ArraySeq[A], a2: => ArraySeq[A]) = a1 ++ a2
   }
 
   implicit def EitherLeftPlus[X]: Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

@@ -24,7 +24,7 @@ object ScalazArbitrary {
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
-  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas ∘ (value _): _*))
+  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas))
 
   implicit def BooleanConjunctionArbitrary: Arbitrary[BooleanConjunction] = arb[Boolean] ∘ ((_: Boolean).|∧|)
 
@@ -46,7 +46,7 @@ object ScalazArbitrary {
 
   implicit def LongMultiplicationArbitrary: Arbitrary[LongMultiplication] = arb[Long] ∘ ((_: Long).∏)
 
-  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits ∘ (value _): _*))
+  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
 
   implicit def DListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[DList[A]] = arb[List[A]] ∘ (as => dlist(_ => as))
 
@@ -59,7 +59,7 @@ object ScalazArbitrary {
       case 0 => arbitrary[A] ∘ (leaf _)
       case n => {
         val nextSize = n.abs / 2
-        arbitrary[A].<**>(resize(n, arbStream[Tree[A]](Arbitrary(tree(nextSize))).arbitrary))(node _)
+        arbitrary[A].<**>(resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node _)
       }
     }
     Gen.sized(tree _)
@@ -85,7 +85,7 @@ object ScalazArbitrary {
 
   implicit def EitherRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B]] = arb[Either[A, B]] ∘ ((x: Either[A, B]) => x.right)
 
-  implicit def GenericArrayArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[GArray[A]] = arb[List[A]] ∘ ((x: List[A]) => GArray(x: _*))
+  implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
   import java.util.concurrent.Callable
 

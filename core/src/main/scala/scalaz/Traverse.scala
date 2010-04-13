@@ -81,9 +81,9 @@ object Traverse {
     }
   }
 
-  implicit def GenericArrayTraverse: Traverse[GArray] = new Traverse[GArray] {
-    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: GArray[A]): F[GArray[B]] =
-      as.toList ↦ f ∘ ((x: List[B]) => collection.mutable.GenericArray(x: _*))
+  implicit def ArraySeqTraverse: Traverse[ArraySeq] = new Traverse[ArraySeq] {
+    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: ArraySeq[A]): F[ArraySeq[B]] =
+      as.toList ↦ f ∘ ((x: List[B]) => collection.mutable.ArraySeq(x: _*))
   }
 
   implicit def EitherLeftTraverse[X]: Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

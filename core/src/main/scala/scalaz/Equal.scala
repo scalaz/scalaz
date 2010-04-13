@@ -174,7 +174,7 @@ object Equal {
 
   implicit def StreamEqual[A: Equal]: Equal[Stream[A]] = IterableEqual[A]
 
-  implicit def GArrayEqual[A: Equal]: Equal[GArray[A]] = IterableEqual[A]
+  implicit def GArrayEqual[A: Equal]: Equal[ArraySeq[A]] = IterableEqual[A]
 
   import geo._
 

@@ -1,3 +1,4 @@
+import java.net.URL
 import sbt._
 import sbt.CompileOrder._
 import java.util.jar.Attributes.Name._
@@ -7,7 +8,7 @@ import scala.Array
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
         with AutoCompilerPlugins {
   // val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
-  val scalaToolsSnapshots = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  val scalaToolsSnapshots = "Scala Tools Snapshots" at "http://scala-tools.org/repo-snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
@@ -31,9 +32,12 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0.Beta1" % "1.6.4-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0-SNAPSHOT" % "1.6.5-SNAPSHOT" % "test" withSources
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
+
+  // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
+  override def deliverScalaDependencies = Nil 
 }
 
 /**
@@ -78,6 +82,12 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   override def publishAction = task {None}
 
+  // This is built from scalacheck trunk, 20100413. Replace with a managed dependency
+  // once one is published next time.
+  def scalacheckJar = "lib" / "scalacheck_2.8.0-20100408.013926-+.jar"
+
+  val parentPath = path _
+
   class Core(info: ProjectInfo) extends ScalazDefaults(info)
 
   class Http(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -85,7 +95,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = "org.scala-tools.testing" % "scalacheck_2.8.0.Beta1" % "1.7-SNAPSHOT" withSources
+    override def compileClasspath = super.compileClasspath +++ scalacheckJar
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -94,14 +104,18 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
+
+    override def testClasspath = super.testClasspath +++ scalacheckJar
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
+    override def compileClasspath = super.compileClasspath +++ scalacheckJar
+
     def packageFullAction = packageFull dependsOn(fullDoc)
     
     def packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
-      val p = ScalazProject.this.path _
+      val p = parentPath
       val extra = p("README") +++ p("etc").## ** GlobFilter("*")
       val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** GlobFilter("*"))
       zipTask(sourceFiles, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
@@ -115,5 +129,16 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     
     def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
   	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
+        
+    lazy val retrieveAdditionalSources = task {
+      import FileUtilities._
+      val scalaToolsSnapshots = "http://scala-tools.org/repo-snapshots"
+      val explicitScalaVersion = buildScalaVersion.replaceAll("""\+""", "353")
+      val source = new URL(scalaToolsSnapshots + "/org/scala-lang/scala-library/2.8.0-SNAPSHOT/scala-library-" + explicitScalaVersion + "-sources.jar")
+      val dest = (ScalazProject.this.info.bootPath / ("scala-" + buildScalaVersion) / "lib" / "scala-library-sources.jar" asFile)
+      download(source, dest, log)
+      log.info("downloaded: %s to %s".format(source.toExternalForm, dest))
+      None
+    } describedAs ("download sources for scala library.")
   }
 }

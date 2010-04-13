@@ -107,8 +107,8 @@ object Functor {
     def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
   }
 
-  implicit def GenericArrayFunctor: Functor[GArray] = new Functor[GArray] {
-    def fmap[A, B](r: GArray[A], f: A => B) = r map f
+  implicit def ArraySeqFunctor: Functor[ArraySeq] = new Functor[ArraySeq] {
+    def fmap[A, B](r: ArraySeq[A], f: A => B) = r map f
   }
 
   implicit def EitherLeftFunctor[X]: Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

@@ -99,7 +99,7 @@ object Show {
 
   implicit def StreamShow[A: Show]: Show[Stream[A]] = IterableShow
 
-  implicit def GArrayShow[A: Show]: Show[GArray[A]] = IterableShow
+  implicit def GArrayShow[A: Show]: Show[ArraySeq[A]] = IterableShow
 
   implicit def ListShow[A: Show]: Show[List[A]] = IterableShow
 

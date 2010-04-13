@@ -48,8 +48,8 @@ object FoldLeft {
     def foldLeft[B, A](t: ZipStream[A], b: B, f: (B, A) => B): B = IterableFoldLeft.foldLeft(t.value, b, f)
   }
 
-  implicit def GenericArrayFoldLeft: FoldLeft[GArray] = new FoldLeft[GArray] {
-    def foldLeft[B, A](t: GArray[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
+  implicit def ArraySeqFoldLeft: FoldLeft[ArraySeq] = new FoldLeft[ArraySeq] {
+    def foldLeft[B, A](t: ArraySeq[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
   }
 
   implicit def EitherLeftFoldLeft[X]: FoldLeft[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new FoldLeft[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
