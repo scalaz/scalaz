@@ -8,7 +8,7 @@ import scala.Array
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
         with AutoCompilerPlugins {
   // val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
-  val scalaToolsSnapshots = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  val scalaToolsSnapshots = "Scala Tools Snapshots" at "http://scala-tools.org/repo-snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
