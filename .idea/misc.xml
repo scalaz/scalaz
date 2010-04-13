@@ -3,6 +3,48 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="Scala">
+        <modules>
+          <module name="example">
+            <files>
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/Example.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleApplicative.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleArrow.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleBKTree.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleBifunctor.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleCategory.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleCofunctor.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleComp.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleDistance.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleEqual.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleFold.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleFunctor.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleIdentity.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleKleisli.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleList.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleMonad.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleMonoid.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExamplePlus.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleState.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleTraverse.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleTree.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/ExampleValidation.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/WordCount.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/concurrent/ExampleActor.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/concurrent/Fibs.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/concurrent/PingPong.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/geo/ExampleVincenty.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/http/ExampleApplication.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/main/scala/scalaz/example/math/ExampleFAD.scala" />
+              <file url="file://$PROJECT_DIR$/example/src/test/scala/scalaz/example/ExamplesTest.scala" />
+            </files>
+          </module>
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="IdProvider" IDEtalkID="0D0154C24C8A5C6952C67BE36E0FA84E" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
