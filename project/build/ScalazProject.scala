@@ -14,6 +14,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   override def compileOptions =
     encodingUtf8.map(CompileOption(_)) :::
+             CompileOption("-no-specialization") ::
             target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
@@ -84,7 +85,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   // This is built from scalacheck trunk, 20100413. Replace with a managed dependency
   // once one is published next time.
-  def scalacheckJar = "lib" / "scalacheck_2.8.0-20100408.013926-+.jar"
+  def scalacheckJar = "lib" / "scalacheck_2.8.0.RC1.jar"
 
   val parentPath = path _
 
