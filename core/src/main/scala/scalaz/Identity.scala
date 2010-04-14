@@ -9,7 +9,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   /**
-   * Alias for   { @link scalaz.Identity # η }
+   * Alias for {@link scalaz.Identity#η}
    */
   def pure[F[_]](implicit p: Pure[F]): F[A] = η
 
@@ -20,21 +20,21 @@ sealed trait Identity[A] extends PimpedType[A] {
   def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
   /**
-   * Alias for   { @link scalaz.Identity # ⊹ }
+   * Alias for {@link scalaz.Identity#⊹}
    */
   def |+|(a: => A)(implicit s: Semigroup[A]): A = ⊹(a)
 
   def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
   /**
-   * Alias for   { @link scalaz.Identity # ≟ }
+   * Alias for {@link scalaz.Identity#≟}
    */
   def ===(a: A)(implicit e: Equal[A]): Boolean = ≟(a)
 
   def ≠(a: A)(implicit e: Equal[A]): Boolean = !(≟(a))
 
   /**
-   * Alias for   { @link scalaz.Identity # ≠ }
+   * Alias for {@link scalaz.Identity#≠}
    */
   def /==(a: A)(implicit e: Equal[A]): Boolean = ≠(a)
 
@@ -135,6 +135,10 @@ sealed trait Identity[A] extends PimpedType[A] {
   def some: Option[A] = Some(value)
 
   def pair: (A, A) = (value, value)
+
+  def left[B]: Either[A, B] = Left(value)
+
+  def right[B]: Either[B, A] = Right(value)
 
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
