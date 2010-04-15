@@ -110,8 +110,6 @@ object Semigroup {
   implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
     semigroup((x, y) => y.value ⊹ x.value)
 
-  implicit def FingerTreeSemigroup[A, M <: Measured[A]](implicit m: M): Semigroup[FingerTree[M#V, A]] = semigroup(_ >< _)
-
   implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
 
   import concurrent.Strategy
