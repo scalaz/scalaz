@@ -28,7 +28,7 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/scalacheck_2.8.0-20100408.013926-+.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/scalacheck_2.8.0.RC1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
