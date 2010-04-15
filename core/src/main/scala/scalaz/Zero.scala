@@ -117,7 +117,7 @@ object Zero {
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
-  implicit def FingerTreeZero[A, M <: Measured[A]](implicit m: M): Zero[FingerTree[M#V, A]] = zero(FingerTree.empty)
+  implicit def FingerTreeZero[V,A](implicit m: Measured[V,A], vm: Monoid[V]): Zero[FingerTree[V,A]] = zero(FingerTrees().empty)
 
   implicit def ZeroKleisliZero[M[_],A,B](implicit z: Zero[M[B]]): Zero[Kleisli[M,A,B]] = zero(☆((_ : A) => ∅))
 

@@ -243,9 +243,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     foldl(emptyBKTree[A])(_ + _)
 
   import concurrent._
-  def &:(a: A) = new scalaz.&:[M, A](a, value)
+  def &:(a: A) = OnL[M,A](a, value)
   
-  def :&(a: A) = new scalaz.:&[M, A](value, a)
+  def :&(a: A) = OnR[M,A](value, a)
 
 
   def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
