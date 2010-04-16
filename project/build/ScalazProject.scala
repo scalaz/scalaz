@@ -83,6 +83,17 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   override def publishAction = task {None}
 
+  lazy val retrieveAdditionalSources = task {
+      import FileUtilities._
+      val scalaToolsSnapshots = "http://scala-tools.org/repo-snapshots"
+      val explicitScalaVersion = buildScalaVersion.replaceAll("""\+""", "353")
+      val source = new URL(scalaToolsSnapshots + "/org/scala-lang/scala-library/2.8.0-SNAPSHOT/scala-library-" + explicitScalaVersion + "-sources.jar")
+      val dest = (ScalazProject.this.info.bootPath / ("scala-" + buildScalaVersion) /  "lib" / "scala-library-sources.jar" asFile)
+      download(source, dest, log)
+      log.info("downloaded: %s to %s".format(source.toExternalForm, dest))
+      None
+    } describedAs ("download sources for scala library.")
+
   // This is built from scalacheck trunk, 20100413. Replace with a managed dependency
   // once one is published next time.
   def scalacheckJar = "lib" / "scalacheck_2.8.0.RC1.jar"
@@ -131,15 +142,6 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
   	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
         
-    lazy val retrieveAdditionalSources = task {
-      import FileUtilities._
-      val scalaToolsSnapshots = "http://scala-tools.org/repo-snapshots"
-      val explicitScalaVersion = buildScalaVersion.replaceAll("""\+""", "353")
-      val source = new URL(scalaToolsSnapshots + "/org/scala-lang/scala-library/2.8.0-SNAPSHOT/scala-library-" + explicitScalaVersion + "-sources.jar")
-      val dest = (ScalazProject.this.info.bootPath / ("scala-" + buildScalaVersion) / "lib" / "scala-library-sources.jar" asFile)
-      download(source, dest, log)
-      log.info("downloaded: %s to %s".format(source.toExternalForm, dest))
-      None
-    } describedAs ("download sources for scala library.")
+
   }
 }
