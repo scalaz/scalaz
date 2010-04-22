@@ -58,7 +58,7 @@ sealed trait Zipper[+A] {
   def insertRight[AA >: A](y: AA): Zipper[AA] = zipper(focus #:: lefts, y, rights)
 
   /**
-   * An alias for deleteRigth
+   * An alias for deleteRight
    */
   def delete: Option[Zipper[A]] = deleteRight
 
