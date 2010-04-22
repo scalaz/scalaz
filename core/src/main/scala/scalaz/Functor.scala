@@ -172,14 +172,16 @@ object Functor {
     }
   }
 
+  import FingerTree._
+
   implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new  Functor[PartialType2[ViewL, S]#Apply] {
     def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
-      t.fold(EmptyL[S,B](), (x, xs) => f(x) &: s.fmap(xs, f))
+      t.fold(EmptyL[S,B], (x, xs) => f(x) &: s.fmap(xs, f))
   }
 
   implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new  Functor[PartialType2[ViewR, S]#Apply] {
     def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
-      t.fold(EmptyR[S,B](), (xs, x) => s.fmap(xs, f) :& f(x))
+      t.fold(EmptyR[S,B], (xs, x) => s.fmap(xs, f) :& f(x))
   }
 
   import scalaz.concurrent.Promise
