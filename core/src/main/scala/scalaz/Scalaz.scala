@@ -138,8 +138,11 @@ object Scalaz extends ScalazLow
 
   implicit def MapEntryMA[X, A](e: Entry[X, A]): MA[PartialApply1Of2[Entry, X]#Apply, A] = ma[PartialApply1Of2[Entry, X]#Apply, A](e)
 
-  // Seq[A] implements Function1[Int, A]. Without this, Function1FlipMA would be used.
-  implicit def SeqMA[M[_] <: Seq[_], A](l: M[A]): MA[M, A] = ma[M, A](l)
+  // Seq[A] implements Function1[Int, A]. Without this, Function1ApplyMA would be used.
+  implicit def SeqMA[M[X] <: Seq[X], A](l: M[A]): MA[M, A] = ma[M, A](l)
+
+  // Set[A] implements Function1[Int, B]. Without this, Function1ApplyMA would be used.
+  implicit def SetMA[M[X] <: Set[X], A](s: M[A]): MA[M, A] = ma[M, A](s)
 
   implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[PartialApplyKA[Kleisli, M, A]#Apply, B] = ma[PartialApplyKA[Kleisli, M, A]#Apply, B](k)
 

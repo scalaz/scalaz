@@ -36,6 +36,8 @@ object ExampleFold {
     // which lazily handles the infinite Stream.
     (Stream.continually(1) ∃ (_ > 0)) assert_≟ true
 
+    Set(1, 2, 3) ∃ { _ % 2 == 0 } assert_≟ true
+
     // Checking if all elements satisfy a predicate, using Stream FoldRight,
     // which lazily handles the infinite Stream.
     (Stream.continually(1) ∀ (_ == 0)) assert_≟ false
