@@ -251,12 +251,12 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
   
-  import concurrent._
+  import FingerTree._
   def &:(a: A) = OnL[M,A](a, value)
   
   def :&(a: A) = OnR[M,A](value, a)
 
-
+  import concurrent._
   def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     traverse(f.kleisli[Promise])
 
