@@ -37,7 +37,7 @@ final class ExampleApplication extends StreamStreamServletApplication {
 
   val application = new ServletApplication[Stream, Stream] {
     def application(implicit servlet: HttpServlet, servletRequest: HttpServletRequest, request: Request[Stream]) = {
-      handle getOrElse resource(x => OK << x.toStream, Slinky.responseFromStatus(NotFound).xhtml)
+      handle | resource(x => OK << x.toStream, NotFound.xhtml)
     }
   }
 }

@@ -38,6 +38,8 @@ sealed trait Identity[A] extends PimpedType[A] {
    */
   def /==(a: A)(implicit e: Equal[A]): Boolean = ≠(a)
 
+  def ??(d: => A): A = Option(value) getOrElse d
+
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
   // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
   def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if (≠(b)) error(shows + " ≠ " + ev(b).shows)

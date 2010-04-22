@@ -30,11 +30,11 @@
     <orderEntry type="module-library">
       <library name="lib_managed_test">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC1/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0-20100408.013926-+/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC1/test/specs_2.8.0-SNAPSHOT-1.6.5-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
