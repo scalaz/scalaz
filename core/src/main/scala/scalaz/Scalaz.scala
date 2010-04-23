@@ -24,7 +24,7 @@ object Scalaz extends ScalazLow
     with    CharSets
     with    Cokleislis
     with    Coords
-    with    Comp
+    with    Comps
     with    Digits
     with    DLists
     with    DoubleWs
