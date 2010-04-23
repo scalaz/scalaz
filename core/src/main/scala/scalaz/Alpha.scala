@@ -12,82 +12,82 @@ sealed trait Alpha {
   override def toString = toChar.toString
 }
 
-private case object A extends Alpha {
+case object A extends Alpha {
   val toChar = 'a'
 }
-private case object B extends Alpha {
+case object B extends Alpha {
   val toChar = 'b'
 }
-private case object C extends Alpha {
+case object C extends Alpha {
   val toChar = 'c'
 }
-private case object D extends Alpha {
+case object D extends Alpha {
   val toChar = 'd'
 }
-private case object E extends Alpha {
+case object E extends Alpha {
   val toChar = 'e'
 }
-private case object F extends Alpha {
+case object F extends Alpha {
   val toChar = 'f'
 }
-private case object G extends Alpha {
+case object G extends Alpha {
   val toChar = 'g'
 }
-private case object H extends Alpha {
+case object H extends Alpha {
   val toChar = 'h'
 }
-private case object I extends Alpha {
+case object I extends Alpha {
   val toChar = 'i'
 }
-private case object J extends Alpha {
+case object J extends Alpha {
   val toChar = 'j'
 }
-private case object K extends Alpha {
+case object K extends Alpha {
   val toChar = 'k'
 }
-private case object L extends Alpha {
+case object L extends Alpha {
   val toChar = 'l'
 }
-private case object M extends Alpha {
+case object M extends Alpha {
   val toChar = 'm'
 }
-private case object N extends Alpha {
+case object N extends Alpha {
   val toChar = 'n'
 }
-private case object O extends Alpha {
+case object O extends Alpha {
   val toChar = 'o'
 }
-private case object P extends Alpha {
+case object P extends Alpha {
   val toChar = 'p'
 }
-private case object Q extends Alpha {
+case object Q extends Alpha {
   val toChar = 'q'
 }
-private case object R extends Alpha {
+case object R extends Alpha {
   val toChar = 'r'
 }
-private case object S extends Alpha {
+case object S extends Alpha {
   val toChar = 's'
 }
-private case object T extends Alpha {
+case object T extends Alpha {
   val toChar = 't'
 }
-private case object U extends Alpha {
+case object U extends Alpha {
   val toChar = 'u'
 }
-private case object V extends Alpha {
+case object V extends Alpha {
   val toChar = 'v'
 }
-private case object W extends Alpha {
+case object W extends Alpha {
   val toChar = 'w'
 }
-private case object X extends Alpha {
+case object X extends Alpha {
   val toChar = 'x'
 }
-private case object Y extends Alpha {
+case object Y extends Alpha {
   val toChar = 'y'
 }
-private case object Z extends Alpha {
+case object Z extends Alpha {
   val toChar = 'z'
 }
 
