@@ -33,7 +33,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" % "specs_2.8.0-SNAPSHOT" % "1.6.5-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5-SNAPSHOT" % "test" withSources
+
+  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.7-SNAPSHOT" withSources
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 
@@ -82,22 +84,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   override def publishLocalAction = noAction
 
   override def publishAction = task {None}
-
-  lazy val retrieveAdditionalSources = task {
-      import FileUtilities._
-      val scalaToolsSnapshots = "http://scala-tools.org/repo-snapshots"
-      val explicitScalaVersion = buildScalaVersion.replaceAll("""\+""", "353")
-      val source = new URL(scalaToolsSnapshots + "/org/scala-lang/scala-library/2.8.0-SNAPSHOT/scala-library-" + explicitScalaVersion + "-sources.jar")
-      val dest = (ScalazProject.this.info.bootPath / ("scala-" + buildScalaVersion) /  "lib" / "scala-library-sources.jar" asFile)
-      download(source, dest, log)
-      log.info("downloaded: %s to %s".format(source.toExternalForm, dest))
-      None
-    } describedAs ("download sources for scala library.")
-
-  // This is built from scalacheck trunk, 20100413. Replace with a managed dependency
-  // once one is published next time.
-  def scalacheckJar = "lib" / "scalacheck_2.8.0.RC1.jar"
-
+  
   val parentPath = path _
 
   class Core(info: ProjectInfo) extends ScalazDefaults(info)
@@ -107,7 +94,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    override def compileClasspath = super.compileClasspath +++ scalacheckJar
+    val scalacheck = scalacheckDependency
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -116,13 +103,9 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
-
-    override def testClasspath = super.testClasspath +++ scalacheckJar
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    override def compileClasspath = super.compileClasspath +++ scalacheckJar
-
     def packageFullAction = packageFull dependsOn(fullDoc)
     
     def packageFull = {
