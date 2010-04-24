@@ -28,6 +28,7 @@
           <root url="jar://$MODULE_DIR$/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.7.3/jsch-0.1.31.jar!/" />
           <root url="jar://$MODULE_DIR$/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.7.3/control_2.7.7-0.7.3.jar!/" />
           <root url="jar://$MODULE_DIR$/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.7.3/compile_2.7.7-0.7.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/boot/scala-2.7.7/org.scala-tools.sbt/sbt/0.7.3/xsbti/interface-0.7.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

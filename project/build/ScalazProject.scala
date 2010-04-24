@@ -1,13 +1,8 @@
-import java.net.URL
 import sbt._
-import sbt.CompileOrder._
 import java.util.jar.Attributes.Name._
-import java.io.File
-import scala.Array
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
         with AutoCompilerPlugins {
-  // val scalaTools2_8_0Snapshots = Resolver.url("2.8.0 snapshots") artifacts "http://scala-tools.org/repo-snapshots/org/scala-lang/[module]/2.8.0-SNAPSHOT/[artifact]-[revision].[ext]"
   val scalaToolsSnapshots = "Scala Tools Snapshots" at "http://scala-tools.org/repo-snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
@@ -41,24 +36,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil 
-}
-
-/**
- * Replaces 'SNAPSHOT' in the project version with the contents of the system property 'build.timestamp',
- * if provided. 
- */
-trait OverridableVersion extends Project {
-  lazy val buildTimestamp = system[String]("build.timestamp")
-  
-  override def version = {
-    val realVersion = super.version
-    val v = realVersion.toString
-    val SnapshotVersion = """(.+)-SNAPSHOT""".r
-    (buildTimestamp.get, realVersion.toString) match {
-      case (Some(timestamp), SnapshotVersion(base)) => OpaqueVersion(base + "-" + timestamp)
-      case _ => realVersion
-    }
-  }
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
@@ -123,8 +100,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     override def publishAction = noAction dependsOn packageFullAction
     
     def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
-  	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
-        
 
+  	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
   }
 }
