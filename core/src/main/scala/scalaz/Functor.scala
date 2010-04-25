@@ -1,5 +1,16 @@
 package scalaz
 
+/**
+ * Covariant function application in an environment. i.e. a covariant Functor.
+ *
+ * <p>
+ * All functor instances must satisfy 2 laws:
+ * <ol>
+ * <li><strong>identity</strong><br/><code>forall a. a == fmap(a, identity)</code></li>
+ * <li><strong>composition</strong><br/><code>forall a f g. fmap(a, f compose g) == fmap(fmap(g, a), f)</code></li>
+ * </ol>
+ * </p>
+ */
 trait Functor[F[_]] extends InvariantFunctor[F] {
   def fmap[A, B](r: F[A], f: A => B): F[B]
   
