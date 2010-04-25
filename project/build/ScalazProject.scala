@@ -64,7 +64,10 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   
   val parentPath = path _
 
-  class Core(info: ProjectInfo) extends ScalazDefaults(info)
+  class Core(info: ProjectInfo) extends ScalazDefaults(info) with Boilerplate {    
+    override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala##
+    override def compileAction = super.compileAction dependsOn(generateCollectionTypeClassInstances)
+  }
 
   class Http(info: ProjectInfo) extends ScalazDefaults(info) {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources

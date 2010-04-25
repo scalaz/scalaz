@@ -4,7 +4,7 @@ trait Plus[P[_]] {
   def plus[A](a1: P[A], a2: => P[A]): P[A]
 }
 
-object Plus {
+object Plus extends PlusCollections {
   import Scalaz._
 
   implicit def NonEmptyListPlus: Plus[NonEmptyList] = new Plus[NonEmptyList] {
@@ -15,10 +15,6 @@ object Plus {
     def plus[A](a1: ZipStream[A], a2: => ZipStream[A]) = a1.value append a2.value ʐ
   }
 
-  implicit def ListPlus: Plus[List] = new Plus[List] {
-    def plus[A](a1: List[A], a2: => List[A]) = a1 ::: a2
-  }
-
   implicit def StreamPlus: Plus[Stream] = new Plus[Stream] {
     def plus[A](a1: Stream[A], a2: => Stream[A]) = a1 append a2
   }
@@ -27,9 +23,6 @@ object Plus {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
 
-  implicit def ArraySeqPlus: Plus[ArraySeq] = new Plus[ArraySeq] {
-    def plus[A](a1: ArraySeq[A], a2: => ArraySeq[A]) = a1 ++ a2
-  }
 
   implicit def EitherLeftPlus[X]: Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {

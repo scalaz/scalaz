@@ -4,7 +4,7 @@ trait Pure[+P[_]] {
   def pure[A](a: => A): P[A]
 }
 
-object Pure {
+object Pure extends PureCollections {
   import Scalaz._
 
   implicit def IdentityPure: Pure[Identity] = new Pure[Identity] {
@@ -81,14 +81,6 @@ object Pure {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
 
-  implicit def ListPure: Pure[List] = new Pure[List] {
-    def pure[A](a: => A) = List(a)
-  }
-
-  implicit def StreamPure: Pure[Stream] = new Pure[Stream] {
-    def pure[A](a: => A) = Stream(a)
-  }
-
   implicit def OptionPure: Pure[Option] = new Pure[Option] {
     def pure[A](a: => A) = Some(a)
   }
@@ -99,14 +91,6 @@ object Pure {
   
   implicit def LastOptionPure: Pure[LastOption] = new Pure[LastOption] {
     def pure[A](a: => A) = Some(a).lst
-  }
-
-  implicit def ArraySeqPure: Pure[ArraySeq] = new Pure[ArraySeq] {
-    def pure[A](a: => A) = {
-      val t = new ArraySeq[A](1)
-      t(0) = a
-      t
-    }
   }
 
   implicit def EitherLeftPure[X]: Pure[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Pure[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

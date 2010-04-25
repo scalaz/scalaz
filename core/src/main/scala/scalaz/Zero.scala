@@ -27,7 +27,7 @@ trait Zeros {
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
 }
 
-object Zero {
+object Zero extends ZeroCollections {
   import Scalaz._
   import xml.{Elem, Node, NodeSeq}
   
@@ -93,10 +93,6 @@ object Zero {
 
   implicit def ZipStreamZero[A]: Zero[ZipStream[A]] = zero(zip(Stream.Empty))
 
-  implicit def ListZero[A]: Zero[List[A]] = zero(Nil)
-
-  implicit def StreamZero[A]: Zero[Stream[A]] = zero(Stream.Empty)
-
   implicit def OptionZero[A]: Zero[Option[A]] = zero(None)
 
   implicit def FirstOptionZero[A]: Zero[FirstOption[A]] = zero(None)
@@ -104,8 +100,6 @@ object Zero {
   implicit def LastOptionZero[A]: Zero[LastOption[A]] = zero(None)
 
   implicit def ArrayZero[A: Manifest]: Zero[Array[A]] = zero(new Array[A](0))
-
-  implicit def ArraySeqZero[A]: Zero[ArraySeq[A]] = zero(new ArraySeq[A](0))
 
   implicit def EitherRightZero[A: Zero, B]: Zero[Either.RightProjection[A, B]] = zero(Left(∅[A]).right)
 

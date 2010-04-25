@@ -17,7 +17,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] {
   final def xmap[A,B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
 }
 
-object Functor {
+object Functor extends FunctorCollections {
   import Scalaz._
 
   implicit def IdentityFunctor: Functor[Identity] = new Functor[Identity] {
@@ -96,14 +96,6 @@ object Functor {
 
   implicit def Function6Functor[R, S, T, U, V, W]: Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
     def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
-  }
-
-  implicit def ListFunctor: Functor[List] = new Functor[List] {
-    def fmap[A, B](r: List[A], f: A => B) = r map f
-  }
-
-  implicit def StreamFunctor: Functor[Stream] = new Functor[Stream] {
-    def fmap[A, B](r: Stream[A], f: A => B) = r map f
   }
 
   implicit def OptionFunctor: Functor[Option] = new Functor[Option] {
