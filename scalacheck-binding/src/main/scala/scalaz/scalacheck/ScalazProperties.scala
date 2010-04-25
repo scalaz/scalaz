@@ -6,6 +6,9 @@ import org.scalacheck.{Arbitrary, Prop}
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
+// todo
+// dibblego: I think the ScalazProperties.Functor should have identity+composition (not associativity)
+// dibblego: and Monad should have: associativity, right identity, left identity
 object ScalazProperties {
   import Scalaz._
   import Prop.forAll
