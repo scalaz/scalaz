@@ -26,6 +26,7 @@ object Example {
     ExampleValidation.run
     geo.ExampleVincenty.run
     concurrent.ExampleActor.run
+    concurrent.Fibs.run
     WordCount.wordCount
   }
 
