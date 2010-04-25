@@ -1,5 +1,15 @@
 package scalaz
 
+/**
+ * Contra-variant function application in an environment.
+ *
+ * <p>
+ * All contra-variant functor instances must satisfy 2 laws:
+ * <ol>
+ * <li><strong>identity</strong><br/><code>forall a. a == comap(a, identity)</code></li>
+ * <li><strong>composition</strong><br/><code>forall a f g. comap(a, f compose g) == comap(comap(a, f), g)</code></li>
+ * </p>
+ */
 trait Cofunctor[F[_]] extends InvariantFunctor[F] {
   def comap[A, B](r: F[A], f: B => A): F[B]
   

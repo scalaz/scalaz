@@ -1,5 +1,15 @@
 package scalaz
 
+/**
+ * A categorical monoid.
+ *
+ * <p>
+ * All monoid instances must satisfy the semigroup law and 2 additional laws:
+ * <ol>
+ * <li><strong>left identity</strong><br/><code>forall a. append(zero, a) == a</code></li>
+ * <li><strong>right identity</strong><br/><code>forall a. append(a, zero) == a</code></li>
+ * </p>
+ */
 trait Monoid[M] extends Zero[M] with Semigroup[M]
 
 abstract class MonoidLow {
