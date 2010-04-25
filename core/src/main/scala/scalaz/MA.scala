@@ -8,7 +8,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
 
   /**
-   * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is contructed from type constructor `N`.
+   * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
    * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
    */
@@ -273,7 +273,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 }
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
-// This is a hack to fix the pressing problem that this caused.
+// We can probably merge MA and MACofunctor when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
 trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
   def ∙[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = t.comap(value, f)
 
