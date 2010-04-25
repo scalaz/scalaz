@@ -68,7 +68,7 @@ object Semigroup {
 
   implicit def BigIntegerSemigroup: Semigroup[java.math.BigInteger] = semigroup(_ add _)
 
-  implicit def BigIntegerMutliplicationSemigroup: Semigroup[BigIntegerMultiplication] = semigroup(_.value multiply _.value ∏)
+  implicit def BigIntegerMultiplicationSemigroup: Semigroup[BigIntegerMultiplication] = semigroup(_.value multiply _.value ∏)
 
   implicit def BigIntSemigroup: Semigroup[BigInt] = semigroup(_ + _)
 
