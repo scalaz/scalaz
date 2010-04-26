@@ -25,6 +25,8 @@ trait Zeros {
    * @usecase def ∅[Z]: Z
    */
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
+
+  def mempty[Z](implicit z: Zero[Z]): Z = z.zero
 }
 
 object Zero {
