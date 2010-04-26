@@ -5,8 +5,12 @@ sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] {
 
   def <-:[C](f: A => C)(implicit b: Bifunctor[M]): M[C, B] = b.bimap(value, f, identity[B])
 
+  def >>>[C](k: M[B, C])(implicit c: Category[M]): M[A, C] = c compose (k, value)
+ 
   def ⋙[C](k: M[B, C])(implicit c: Category[M]): M[A, C] = c compose (k, value)
 
+  def <<<[C](k: M[C, A])(implicit c: Category[M]): M[C, B] = c compose (value, k)
+ 
   def ⋘[C](k: M[C, A])(implicit c: Category[M]): M[C, B] = c compose (value, k)
 
   def first[C](implicit a: Arrow[M]): M[(A, C), (B, C)] = a first value
