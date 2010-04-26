@@ -7,6 +7,7 @@ sealed trait Coord {
 
   import Scalaz._
   import scala.math._
+  import Geo._
 
   def |*|(e: Elevation) = position(this, e)
 
@@ -142,4 +143,16 @@ trait Coords {
     val latitude = lat
     val longitude = lon
   }
+}
+
+object Coord {
+  import Predef.{implicitly => i}
+  import Scalaz._
+  import Geo._
+
+  implicit def CoordShow: Show[Coord] = shows((c: Coord) => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
+
+  implicit def CoordEqual: Equal[Coord] = i[Equal[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+
+  implicit def CoordOrder: Order[Coord] = i[Order[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
 }

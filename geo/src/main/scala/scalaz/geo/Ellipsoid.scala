@@ -42,3 +42,15 @@ trait Ellipsoids {
   lazy val clarke1880 = semiMajorInverseF(6378249.145, 293.465)
   lazy val sphere = semiMajorFlattening(6371000, 0)
 }
+
+object Ellipsoid {
+  import Predef.{implicitly => i}
+  import Scalaz._
+  
+  implicit def EllipsoidShow: Show[Ellipsoid] = i[Show[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+
+  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.
+          flattening, e.inverseFlattening))
+
+  implicit def EllipsoidOrder: Order[Ellipsoid] = i[Order[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
+}

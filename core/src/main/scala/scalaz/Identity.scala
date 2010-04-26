@@ -4,7 +4,6 @@ import annotation.tailrec
 
 sealed trait Identity[A] extends PimpedType[A] {
   import Scalaz._
-  import geo._
 
   def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
@@ -145,8 +144,6 @@ sealed trait Identity[A] extends PimpedType[A] {
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
-
-  def toRadians(implicit r: Radians[A]): Double = r.toRadians(value)
 
   @tailrec
   final def doWhile(f: A => A, p: A => Boolean): A = {

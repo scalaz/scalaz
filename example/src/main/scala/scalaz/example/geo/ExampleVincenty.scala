@@ -1,10 +1,11 @@
-package scalaz.example
-package geo
+package scalaz.example.geo
 
 object ExampleVincenty {
   def main(args: Array[String]) = run
 
   import scalaz.Scalaz._
+  import scalaz.geo._
+  import Geo._
 
   def run {
     // Mount Barney, Queensland, Australia

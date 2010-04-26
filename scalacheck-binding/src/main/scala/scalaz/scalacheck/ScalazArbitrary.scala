@@ -98,6 +98,7 @@ object ScalazArbitrary {
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]].<***>(arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
   import geo._
+  import Geo._
   implicit def AzimuthArbitrary: Arbitrary[Azimuth] = arb[Double] ∘ (azimuth _)
 
   implicit def BearingArbitrary: Arbitrary[Bearing] = arb[Double] ∘ (bearing _)

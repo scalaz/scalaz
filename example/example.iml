@@ -29,6 +29,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="scala" level="project" />
+    <orderEntry type="module" module-name="geo" />
   </component>
 </module>
 

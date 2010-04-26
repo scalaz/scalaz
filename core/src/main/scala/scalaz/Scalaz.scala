@@ -8,8 +8,6 @@ object Scalaz extends ScalazLow
     with    Alphas
     with    Applys
     with    ArrayBytes
-    with    Azimuths
-    with    Bearings
     with    BigIntegerMultiplications
     with    BigIntegers
     with    BigIntMultiplications
@@ -23,16 +21,12 @@ object Scalaz extends ScalazLow
     with    Chars
     with    CharSets
     with    Cokleislis
-    with    Coords
     with    Comps
     with    Digits
     with    DLists
     with    DoubleWs
     with    Duals
     with    Effects
-    with    Elevations
-    with    ElevatedCurves
-    with    Ellipsoids
     with    Emptys
     with    Endos
     with    Enumerations
@@ -41,7 +35,6 @@ object Scalaz extends ScalazLow
     with    Function0s
     with    Function1s
     with    Function2s
-    with    GeodeticCurves
     with    Kleislis
     with    Identitys
     with    InputStreams
@@ -49,9 +42,7 @@ object Scalaz extends ScalazLow
     with    Ints
     with    Iterables
     with    LastOptions
-    with    Latitudes
     with    Lists
-    with    Longitudes
     with    LongMultiplications
     with    Longs
     with    MAs
@@ -60,9 +51,7 @@ object Scalaz extends ScalazLow
     with    NonEmptyLists
     with    Options
     with    Orders
-    with    Positions
     with    Promises
-    with    Radianss
     with    Semigroups
     with    ShortMultiplications
     with    Shorts
@@ -73,7 +62,6 @@ object Scalaz extends ScalazLow
     with    Trees
     with    TreeLocs
     with    Validations
-    with    Vectors
     with    Zeros
     with    Zippers
     with    ZipStreams {

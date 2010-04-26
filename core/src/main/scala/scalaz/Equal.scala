@@ -176,31 +176,6 @@ object Equal {
 
   implicit def GArrayEqual[A: Equal]: Equal[ArraySeq[A]] = IterableEqual[A]
 
-  import geo._
-
-  implicit def AzimuthEqual: Equal[Azimuth] = i[Equal[Double]] ∙ (_.value)
-
-  implicit def BearingEqual: Equal[Bearing] = i[Equal[Double]] ∙ (_.value)
-
-  implicit def CoordEqual: Equal[Coord] = i[Equal[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
-
-  implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = i[Equal[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
-
-  implicit def ElevationEqual: Equal[Elevation] = i[Equal[Double]] ∙ (_.value)
-
-  implicit def EllipsoidEqual: Equal[Ellipsoid] = i[Equal[(Double, Double, Double, Double)]] ∙ (e => (e.semiMajor, e.semiMinor, e.
-          flattening, e.inverseFlattening))
-
-  implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = i[Equal[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
-
-  implicit def LatitudeEqual: Equal[Latitude] = i[Equal[Double]] ∙ (_.value)
-
-  implicit def LongitudeEqual: Equal[Longitude] = i[Equal[Double]] ∙ (_.value)
-
-  implicit def PositionEqual: Equal[Position] = i[Equal[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
-
-  implicit def VectorEqual: Equal[Vector] = i[Equal[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
-
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
     val i2 = a2.iterator
