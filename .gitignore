@@ -1,4 +1,6 @@
 lib_managed
+project/boot
+src_managed
 target
 .DS_Store
 out

@@ -7,6 +7,7 @@
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC1/lib/scala-library-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC1/lib/scala-compiler-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

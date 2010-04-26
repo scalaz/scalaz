@@ -22,7 +22,7 @@ trait Semigroups {
   }
 }
 
-object Semigroup {
+object Semigroup extends SemigroupCollections {
   import Scalaz._
   import xml.NodeSeq
 
@@ -68,7 +68,7 @@ object Semigroup {
 
   implicit def BigIntegerSemigroup: Semigroup[java.math.BigInteger] = semigroup(_ add _)
 
-  implicit def BigIntegerMutliplicationSemigroup: Semigroup[BigIntegerMultiplication] = semigroup(_.value multiply _.value ∏)
+  implicit def BigIntegerMultiplicationSemigroup: Semigroup[BigIntegerMultiplication] = semigroup(_.value multiply _.value ∏)
 
   implicit def BigIntSemigroup: Semigroup[BigInt] = semigroup(_ + _)
 
@@ -79,8 +79,6 @@ object Semigroup {
   implicit def NonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = semigroup(_.list <::: _)
   
   implicit def ZipStreamSemigroup[A]: Semigroup[ZipStream[A]] = semigroup(_.value append _.value ʐ)
-
-  implicit def ListSemigroup[A]: Semigroup[List[A]] = semigroup(_ ::: _)
 
   implicit def StreamSemigroup[A]: Semigroup[Stream[A]] = semigroup(_ append _)
 

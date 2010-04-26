@@ -1,5 +1,16 @@
 package scalaz
 
+/**
+ * Abstract a model that sequences computation through an environment.
+ *
+ * <p>
+ * All monad instances must satisfy 3 laws:
+ * <ol>
+ * <li><strong>left identity</strong><br/><code>forall a f. f(a) == bind(pure(a), f)</code></li>
+ * <li><strong>right identity</strong><br/><code>forall a. a == bind(a, x => pure(x))</code></li>
+ * <li><strong>associativity</strong><br/><code>forall a f g. bind(a, x => bind(f(x), g)) == bind(bind(a, f), g)</code></li>
+ * </p>
+ */
 trait Monad[M[_]] extends Applicative[M] with Bind[M] with Pointed[M] {
   override def fmap[A, B](fa: M[A], f: A => B) = bind(fa, (a: A) => pure(f(a)))
   override def apply[A, B](f: M[A => B], a: M[A]): M[B] = bind(f, (k: A => B) => fmap(a, k(_: A)))

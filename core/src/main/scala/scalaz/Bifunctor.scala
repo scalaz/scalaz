@@ -1,5 +1,16 @@
 package scalaz
 
+/**
+ * Binary covariant functor.
+ *
+ * <p>
+ * All binary functor instances must satisfy 2 laws:
+ * <ol>
+ * <li><strong>identity</strong><br/><code>forall a. a == bimap(a, identity, identity)</code></li>
+ * <li><strong>composition</strong><br/><code>forall a f g h i. bimap(a, f compose g, h compose i) == bimap(bimap(a, g, i), f, h)</code></li>
+ * </ol>
+ * </p>
+ */
 trait Bifunctor[F[_, _]] {
   def bimap[A, B, C, D](k: F[A, B], f: A => C, g: B => D): F[C, D]
 }

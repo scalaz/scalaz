@@ -45,11 +45,7 @@ object FoldLeft {
   }
 
   implicit def ZipStreamFoldLeft: FoldLeft[ZipStream] = new FoldLeft[ZipStream] {
-    def foldLeft[B, A](t: ZipStream[A], b: B, f: (B, A) => B): B = IterableFoldLeft.foldLeft(t.value, b, f)
-  }
-
-  implicit def ArraySeqFoldLeft: FoldLeft[ArraySeq] = new FoldLeft[ArraySeq] {
-    def foldLeft[B, A](t: ArraySeq[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
+    def foldLeft[B, A](t: ZipStream[A], b: B, f: (B, A) => B): B = TraversableOnceFoldLeft.foldLeft(t.value, b, f)
   }
 
   implicit def EitherLeftFoldLeft[X]: FoldLeft[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new FoldLeft[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
@@ -74,8 +70,8 @@ object FoldLeft {
     }
   }
 
-  implicit def IterableFoldLeft: FoldLeft[Iterable] = new FoldLeft[Iterable] {
-    def foldLeft[B, A](t: Iterable[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
+  implicit def TraversableOnceFoldLeft[C[X] <: TraversableOnce[X]]: FoldLeft[C] = new FoldLeft[C] {
+    def foldLeft[B, A](t: C[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
   }
 
   implicit def JavaIterableFoldLeft: FoldLeft[java.lang.Iterable] = new FoldLeft[java.lang.Iterable] {

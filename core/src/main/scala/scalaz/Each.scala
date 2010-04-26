@@ -55,12 +55,12 @@ object Each {
     def each[A](e: Function0[A], f: A => Unit) = f(e.apply)
   }
 
-  implicit def OptionEachEach: Each[Option] = new Each[Option] {
-    def each[A](e: Option[A], f: A => Unit) = e foreach f
+  implicit def TraversableOnceEach[A]: Each[TraversableOnce] = new Each[TraversableOnce] {
+    def each[A](e: TraversableOnce[A], f: A => Unit) = e foreach  f
   }
 
-  implicit def ArraySeqEach: Each[ArraySeq] = new Each[ArraySeq] {
-    def each[A](e: ArraySeq[A], f: A => Unit) = e foreach f
+  implicit def OptionEachEach: Each[Option] = new Each[Option] {
+    def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
   implicit def EitherLeftEach[X]: Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
@@ -85,10 +85,6 @@ object Each {
 
   implicit def MapEntryEach[X]: Each[PartialApply1Of2[Entry, X]#Apply] = new Each[PartialApply1Of2[Entry, X]#Apply] {
     def each[A](e: Entry[X, A], f: A => Unit) = f(e.getValue)
-  }
-
-  implicit def IterableEach: Each[Iterable] = new Each[Iterable] {
-    def each[A](e: Iterable[A], f: A => Unit) = e foreach f
   }
 
   import concurrent.Promise

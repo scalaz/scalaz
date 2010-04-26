@@ -8,11 +8,11 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
 
   /**
-   * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is contructed from type constructor `N`.
+   * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
    * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
    */
-  def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[(M of N)#of, B] = ma[(M of N)#of, B](value ∘ n)
+  def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[Comp[M, N]#Apply, B] = ma[Comp[M, N]#Apply, B](value ∘ n)
 
   def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
 
@@ -251,12 +251,12 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
   
-  import concurrent._
+  import FingerTree._
   def &:(a: A) = OnL[M,A](a, value)
   
   def :&(a: A) = OnR[M,A](value, a)
 
-
+  import concurrent._
   def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     traverse(f.kleisli[Promise])
 
@@ -273,7 +273,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 }
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
-// This is a hack to fix the pressing problem that this caused.
+// We can probably merge MA and MACofunctor when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
 trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
   def ∙[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = t.comap(value, f)
 

@@ -2,37 +2,23 @@ package scalaz
 
 // We can't make this contra-variant and have a specific instance for Stream with
 // the current rules for implicit prioritization in Scala.
-trait FoldRight[F[_]] {
+trait FoldRight[F[_]] extends FoldRightCollections {
   def foldRight[A, B](t: F[A], b: B, f: (A, => B) => B): B
 }
 
-object FoldRight {
+object FoldRight extends FoldRightCollections {
   import Scalaz._
 
   implicit def IdentityFoldRight = new FoldRight[Identity] {
     def foldRight[A, B](t: Identity[A], b: B, f: (A, => B) => B) = f(t.value, b)
   }
 
-  def IterableFoldRight[I[X] <: Iterable[X]]: FoldRight[I] = new FoldRight[I] {
+  def IterableSubtypeFoldRight[I[X] <: Iterable[X]]: FoldRight[I] = new FoldRight[I] {
     def foldRight[A, B](t: I[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
   }
 
-  implicit val IterableFoldRight0: FoldRight[Iterable] = IterableFoldRight[Iterable]
-
-  implicit def ListFoldRight: FoldRight[List] = IterableFoldRight[List]
-
-  implicit def VectorFoldRight: FoldRight[Vector] = IterableFoldRight[Vector]
-
-  import collection.mutable.Buffer
-
-  implicit def BufferFoldRight: FoldRight[Buffer] = IterableFoldRight[Buffer]
-
-  implicit def SetFoldRight: FoldRight[Set] = IterableFoldRight[Set]
-
-  implicit def SeqFoldRight: FoldRight[Seq] = IterableFoldRight[Seq]
-
   implicit def NonEmptyListFoldRight = new FoldRight[NonEmptyList] {
-    def foldRight[A, B](t: NonEmptyList[A], b: B, f: (A, => B) => B) = IterableFoldRight.foldRight(t.list, b, f)
+    def foldRight[A, B](t: NonEmptyList[A], b: B, f: (A, => B) => B) = IterableSubtypeFoldRight.foldRight(t.list, b, f)
   }
 
   implicit def StateFoldRight = new FoldRight[PartialApply1Of2[State, Unit]#Apply] {
@@ -68,8 +54,6 @@ object FoldRight {
   implicit def ZipStreamFoldRight: FoldRight[ZipStream] = new FoldRight[ZipStream] {
     def foldRight[A, B](t: ZipStream[A], b: B, f: (A, => B) => B): B = StreamFoldRight.foldRight(t.value, b, f)
   }
-
-  implicit def ArraySeqFoldRight: FoldRight[ArraySeq] = IterableFoldRight[ArraySeq]
 
   implicit def EitherLeftFoldRight[X] = new FoldRight[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def foldRight[A, B](e: Either.LeftProjection[A, X], b: B, f: (A, => B) => B) = OptionFoldRight.foldRight(e.toOption, b, f)
@@ -110,7 +94,7 @@ object FoldRight {
           def next = k.next
         }
       }
-      IterableFoldRight[Iterable].foldRight[A, B](i, b, f)
+      IterableSubtypeFoldRight[Iterable].foldRight[A, B](i, b, f)
     }
   }
 

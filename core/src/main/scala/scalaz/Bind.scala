@@ -4,7 +4,7 @@ trait Bind[Z[_]] {
   def bind[A, B](a: Z[A], f: A => Z[B]): Z[B]
 }
 
-object Bind {
+object Bind extends BindCollections {
   import Scalaz._
   
   implicit def IdentityBind: Bind[Identity] = new Bind[Identity] {
@@ -92,26 +92,6 @@ object Bind {
   implicit def Function6Bind[R, S, T, U, V, W]: Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
     def bind[A, B](r: (R, S, T, U, V, W) => A, f: A => (R, S, T, U, V, W) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
-
-  import collection.Traversable
-  // todo make implicit and remove specific conversions after: http://lampsvn.epfl.ch/trac/scala/ticket/2781
-  def TraversableBind[M[X] <: Traversable[X]]: Bind[M] = new Bind[M] {
-    def bind[A, B](r: M[A], f: A => M[B]): M[B] = {
-      import collection.generic.CanBuildFrom
-      implicit object cbf extends CanBuildFrom[Traversable[A], B, M[B]] {
-        def apply(from: Traversable[A]) = apply
-
-        def apply() = r.companion.newBuilder[B].asInstanceOf[collection.mutable.Builder[B, M[B]]]
-      }
-      r flatMap f
-    }
-  }
-
-  implicit def ListBind: Bind[List] = TraversableBind
-
-  implicit def StreamBind: Bind[Stream] = TraversableBind
-
-  implicit def ArraySeqBind: Bind[ArraySeq] = TraversableBind
 
   implicit def OptionBind: Bind[Option] = new Bind[Option] {
     def bind[A, B](r: Option[A], f: A => Option[B]) = r flatMap f

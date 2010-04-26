@@ -8,27 +8,15 @@ trait Emptys {
   def <∅>[E[_], A](implicit e: Empty[E]): E[A] = e.empty
 }
 
-object Empty {
+object Empty extends EmptyCollections {
   import Scalaz._
 
   implicit def ZipStreamEmpty = new Empty[ZipStream] {
     def empty[A] = emptyZipStream
   }
 
-  implicit def ListEmpty: Empty[List] = new Empty[List] {
-    def empty[A] = Nil
-  }
-
-  implicit def StreamEmpty: Empty[Stream] = new Empty[Stream] {
-    def empty[A] = Stream.empty
-  }
-
   implicit def OptionEmpty: Empty[Option] = new Empty[Option] {
     def empty[A] = None
-  }
-
-  implicit def ArraySeqEmpty: Empty[ArraySeq] = new Empty[ArraySeq] {
-    def empty[A] = new ArraySeq(0)
   }
 
   implicit def EitherLeftEmpty[X: Zero]: Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] {

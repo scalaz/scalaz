@@ -26,8 +26,13 @@ object ExampleValidation {
     f.toOption assert_≟ none[Int]
     f.fail.toOption assert_≟ some("error")
 
-    // You cannot pattern match on Validation. Instead, use fold:
+    // It is recommended to use fold rather than pattern matching:
     val result: String = s.fold(e => "got error: " + e, s => "got success: " + s.toString)
+
+    s match {
+      case Success(a) => "success"
+      case Failure(e) => "fail"
+    }
 
     // Validation#| is analogous to Option#getOrElse
     (f | 1) assert_≟ 1

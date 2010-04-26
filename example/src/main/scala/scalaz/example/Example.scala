@@ -25,8 +25,8 @@ object Example {
     ExampleTraverse.run
     ExampleValidation.run
     geo.ExampleVincenty.run
-    math.ExampleFAD.run
     concurrent.ExampleActor.run
+    concurrent.Fibs.run
     WordCount.wordCount
   }
 

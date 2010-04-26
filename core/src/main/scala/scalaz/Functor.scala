@@ -1,12 +1,23 @@
 package scalaz
 
+/**
+ * Covariant function application in an environment. i.e. a covariant Functor.
+ *
+ * <p>
+ * All functor instances must satisfy 2 laws:
+ * <ol>
+ * <li><strong>identity</strong><br/><code>forall a. a == fmap(a, identity)</code></li>
+ * <li><strong>composition</strong><br/><code>forall a f g. fmap(a, f compose g) == fmap(fmap(g, a), f)</code></li>
+ * </ol>
+ * </p>
+ */
 trait Functor[F[_]] extends InvariantFunctor[F] {
   def fmap[A, B](r: F[A], f: A => B): F[B]
   
   final def xmap[A,B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
 }
 
-object Functor {
+object Functor extends FunctorCollections {
   import Scalaz._
 
   implicit def IdentityFunctor: Functor[Identity] = new Functor[Identity] {
@@ -87,14 +98,6 @@ object Functor {
     def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
-  implicit def ListFunctor: Functor[List] = new Functor[List] {
-    def fmap[A, B](r: List[A], f: A => B) = r map f
-  }
-
-  implicit def StreamFunctor: Functor[Stream] = new Functor[Stream] {
-    def fmap[A, B](r: Stream[A], f: A => B) = r map f
-  }
-
   implicit def OptionFunctor: Functor[Option] = new Functor[Option] {
     def fmap[A, B](r: Option[A], f: A => B) = r map f
   }
@@ -172,14 +175,16 @@ object Functor {
     }
   }
 
+  import FingerTree._
+
   implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new  Functor[PartialType2[ViewL, S]#Apply] {
     def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
-      t.fold(EmptyL[S,B](), (x, xs) => f(x) &: s.fmap(xs, f))
+      t.fold(EmptyL[S,B], (x, xs) => f(x) &: s.fmap(xs, f))
   }
 
   implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new  Functor[PartialType2[ViewR, S]#Apply] {
     def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
-      t.fold(EmptyR[S,B](), (xs, x) => s.fmap(xs, f) :& f(x))
+      t.fold(EmptyR[S,B], (xs, x) => s.fmap(xs, f) :& f(x))
   }
 
   import scalaz.concurrent.Promise
