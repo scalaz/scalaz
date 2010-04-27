@@ -31,6 +31,7 @@ object Scalaz extends ScalazLow
     with    Endos
     with    Enumerations
     with    Equals
+    with    Extras
     with    FirstOptions
     with    Function0s
     with    Function1s
@@ -138,4 +139,7 @@ object Scalaz extends ScalazLow
   implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
 
   implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[PartialApplyK[Cokleisli, M]#Apply, A, B] = mab[PartialApplyK[Cokleisli, M]#Apply, A, B](k)
+
+  implicit def Const2MAB[M:Monoid, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
+    mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)
 }

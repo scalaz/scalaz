@@ -24,13 +24,12 @@ object Category {
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }
 
-  type Morphism[A,B,C] = A
-
   /** Every monoid gives rise to a category **/
-  implicit def MonoidToCategory[M: Monoid] = new Category[PartialApply1Of3[Morphism,M]#Apply] {
-    def id[A] = mempty
-    def compose[X, Y, Z](f: M, g: M) = f |+| g
+  implicit def MonoidCategory[M: Monoid] = new Category[PartialApply1Of3[Const2,M]#Apply] {
+    def id[A] = Const2(implicitly[Zero[M]].zero)
+    def compose[X, Y, Z](f: Const2[M, Y, Z], g: Const2[M, X, Y]) = Const2(f.value |+| g.value)
   }
 
-  implicit def ObjectToMorphism[A](a: A): PartialApply1Of3[Morphism,A]#Apply[Unit,Unit] = a
+  implicit def ObjectToMorphism[A,B,C](a: A): Const2[A,Unit,Unit] = Const2(a)
+  implicit def MorphismToObject[A,B,C](a: Const2[A,B,C]) = a.value
 }
