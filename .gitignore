@@ -5,5 +5,7 @@ src_managed
 target
 .DS_Store
 out
+tags
+*~
 build.log
 full

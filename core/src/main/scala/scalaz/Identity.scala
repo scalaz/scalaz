@@ -165,6 +165,8 @@ sealed trait Identity[A] extends PimpedType[A] {
   override def hashCode = value.hashCode
 
   override def equals(o: Any) = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+
+  def <&>[B](b: => B) = lazyTuple(value, b)
 }
 
 trait Identitys {

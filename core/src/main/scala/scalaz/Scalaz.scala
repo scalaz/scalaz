@@ -1,7 +1,6 @@
 package scalaz
 
 import concurrent._
-import geo._
 
 object Scalaz extends ScalazLow
     with    Actors
@@ -31,6 +30,7 @@ object Scalaz extends ScalazLow
     with    Endos
     with    Enumerations
     with    Equals
+    with    Extras
     with    FirstOptions
     with    Function0s
     with    Function1s
@@ -42,6 +42,7 @@ object Scalaz extends ScalazLow
     with    Ints
     with    Iterables
     with    LastOptions
+    with    LazyTuples
     with    Lists
     with    LongMultiplications
     with    Longs
