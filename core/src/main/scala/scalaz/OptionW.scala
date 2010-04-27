@@ -97,7 +97,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  def zeroOr[M[_]: Pure : Empty]: M[A] = value match {
+  def orEmpty[M[_]: Pure : Empty]: M[A] = value match {
     case Some(a) => a η
     case None => <∅>
   }

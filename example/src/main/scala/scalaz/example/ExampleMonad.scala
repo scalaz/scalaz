@@ -10,10 +10,10 @@ object ExampleMonad {
 
   def run {
     // zeroOr
-    some(7).zeroOr[List] assert_≟ List(7)
-    none[Int].zeroOr[List] assert_≟ List()
-    some(7).zeroOr[ArraySeq] assert_≟ ArraySeq(7)
-    some(7).zeroOr[Option] assert_≟ some(7)
+    some(7).orEmpty[List] assert_≟ List(7)
+    none[Int].orEmpty[List] assert_≟ List()
+    some(7).orEmpty[ArraySeq] assert_≟ ArraySeq(7)
+    some(7).orEmpty[Option] assert_≟ some(7)
 
     // guard
     true.guard[List](7) assert_≟ List(7)

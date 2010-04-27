@@ -26,7 +26,10 @@ trait Zeros {
    */
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
 
-  def mempty[Z](implicit z: Zero[Z]): Z = z.zero
+  /**
+   * Alias for {@link scalaz.Zeros#∅}
+   */
+  def mzero[Z](implicit z: Zero[Z]): Z = z.zero
 }
 
 object Zero extends ZeroCollections {
