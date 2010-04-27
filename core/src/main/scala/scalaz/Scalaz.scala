@@ -140,6 +140,6 @@ object Scalaz extends ScalazLow
 
   implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[PartialApplyK[Cokleisli, M]#Apply, A, B] = mab[PartialApplyK[Cokleisli, M]#Apply, A, B](k)
 
-  implicit def Const2MAB[M:Monoid, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
+  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
     mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)
 }
