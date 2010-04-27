@@ -31,7 +31,6 @@ object Scalaz extends ScalazLow
     with    Endos
     with    Enumerations
     with    Equals
-    with    Extras
     with    FirstOptions
     with    Function0s
     with    Function1s
