@@ -6,6 +6,7 @@ object Example {
     ExampleApplicative.run
     ExampleArrow.run
     ExampleBifunctor.run
+    ExampleBoolean.run
     ExampleBKTree.run
     ExampleCategory.run
     ExampleCofunctor.run

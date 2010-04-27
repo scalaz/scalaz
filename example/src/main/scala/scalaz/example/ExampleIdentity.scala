@@ -27,5 +27,8 @@ object ExampleIdentity {
     // to generate the Collatz sequence. In homage to http://xkcd.com/710/
     def collatz(n: Int) = n.iterate[Stream](a => (a % 2 == 0) ? (a/2) | 3*a + 1).takeWhile(_ > 1)
     collatz(7).toList assert_≟ List(7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2)
+
+    // Elvis operator
+    (null: String) ?? "default" assert_≟ "default"
   }
 }
