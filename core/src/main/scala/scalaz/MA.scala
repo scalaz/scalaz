@@ -240,7 +240,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(z, a)))
 
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
-    if (n <= 0) ∅ η
+    if (n <= 0) ∅[N[A]].η[M]
     else value ∗ (a => replicateM[N](n - 1) ∘ (a +>: _) )
 
   def zipWithA[F[_], B, C](b: M[B])(f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =

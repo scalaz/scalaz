@@ -124,6 +124,12 @@ object ImplicitConversionTest {
     implicitly[Functor[java.util.PriorityQueue]]
   }
 
+  def pure {
+    implicitly[Pure[Iterable]]
+    implicitly[Pure[List]]
+    implicitly[Pure[Vector]]
+  }
+
   def foldRight[A] {
     implicitly[FoldRight[Stream]]
     implicitly[FoldRight[List]]
