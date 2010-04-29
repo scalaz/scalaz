@@ -41,8 +41,7 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
     checkMonoidLaws[FirstOption[A]]
     checkMonoidLaws[LastOption[A]]
     checkMonoidLaws[ArraySeq[A]]
-    // todo try to pass EitherLeftMonoid implicitly.
-    checkMonoidLaws[Either.LeftProjection[A, B]](Monoid.EitherLeftMonoid, implicitly, implicitly, implicitly)
+    checkMonoidLaws[Either.LeftProjection[A, B]]
     checkMonoidLaws[Either.RightProjection[B, A]]
     // todo more types
   }
