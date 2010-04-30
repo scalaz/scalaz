@@ -32,23 +32,23 @@ object Pure extends PureCollections {
   }
 
   implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[PartialApply2Of3[Tuple3, R, S]#Apply] = new Pure[PartialApply2Of3[Tuple3, R, S]#Apply] {
-    def pure[A](a: => A) = (∅, ∅, a)
+    def pure[A](a: => A) = (∅[R], ∅[S], a)
   }
 
   implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
-    def pure[A](a: => A) = (∅, ∅, ∅, a)
+    def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], a)
   }
 
   implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
-    def pure[A](a: => A) = (∅, ∅, ∅, ∅, a)
+    def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], a)
   }
 
   implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
-    def pure[A](a: => A) = (∅, ∅, ∅, ∅, ∅, a)
+    def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], a)
   }
 
   implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
-    def pure[A](a: => A) = (∅, ∅, ∅, ∅, ∅, ∅, a)
+    def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], ∅[W], a)
   }
 
   implicit def Function0Pure: Pure[Function0] = new Pure[Function0] {

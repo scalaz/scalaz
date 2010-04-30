@@ -1,12 +1,12 @@
 package scalaz
 
 /**
- * A Zero in type Z provides the identity element for the operation {@link scalaz.Semigroup#append}
- * in the corresponding {@link scalaz.Semigroup} in type Z.
+ * A Zero in type Z provides the identity element for the operation  { @link scalaz.Semigroup # append }
+ * in the corresponding  { @link scalaz.Semigroup } in type Z.
  * <p/>
  * ∀ a in S, append(a, zero) = a
  */
-trait Zero[+Z] {
+trait Zero[Z] {
   val zero: Z
 }
 
@@ -27,7 +27,7 @@ trait Zeros {
   def ∅[Z](implicit z: Zero[Z]): Z = z.zero
 
   /**
-   * Alias for {@link scalaz.Zeros#∅}
+   * Alias for  { @link scalaz.Zeros # ∅ }
    */
   def mzero[Z](implicit z: Zero[Z]): Z = z.zero
 }
@@ -35,7 +35,7 @@ trait Zeros {
 object Zero extends ZeroCollections {
   import Scalaz._
   import xml.{Elem, Node, NodeSeq}
-  
+
   implicit def DigitZero: Zero[Digit] = zero(_0)
 
   implicit def OrderingZero: Zero[Ordering] = zero(EQ)
@@ -86,7 +86,9 @@ object Zero extends ZeroCollections {
   def NodeZero: Zero[Node] = new Zero[Node] {
     val zero = new Node {
       override def text = null
+
       override def label = null
+
       override def child = Nil
     }
   }
@@ -116,9 +118,9 @@ object Zero extends ZeroCollections {
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
-  implicit def FingerTreeZero[V,A](implicit m: Measured[V,A], vm: Monoid[V]): Zero[FingerTree[V,A]] = zero(FingerTrees().empty)
+  implicit def FingerTreeZero[V, A](implicit m: Measured[V, A], vm: Monoid[V]): Zero[FingerTree[V, A]] = zero(FingerTrees().empty)
 
-  implicit def ZeroKleisliZero[M[_],A,B](implicit z: Zero[M[B]]): Zero[Kleisli[M,A,B]] = zero(☆((_ : A) => ∅))
+  implicit def ZeroKleisliZero[M[_], A, B](implicit z: Zero[M[B]]): Zero[Kleisli[M, A, B]] = zero(☆((_: A) => ∅[M[B]]))
 
   import concurrent.Strategy
   import concurrent.strategy.Id
