@@ -3,7 +3,7 @@ package scalaz
 sealed trait ByteW extends PimpedType[Byte] {
   import Scalaz._
   
-  def ∏ = multiplication(value)
+  def ∏ : ByteMultiplication = multiplication(value)
 }
 
 trait Bytes {

@@ -20,6 +20,8 @@ trait Dinatural[F[_,_], G[_,_]] {
 
 trait Extras {
   type Id[A] = A
-  trait Konst[A] { type Apply[B] = A }
+  trait Konst[A] {
+    type Apply[B] = A
+  }
 }
 

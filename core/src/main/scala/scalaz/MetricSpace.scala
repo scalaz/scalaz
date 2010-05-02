@@ -1,15 +1,12 @@
 package scalaz
 
-/*
-1.
-(distance(a, b) == 0) == (a == b)
-
-2. Commutativity
-distance(a, b) == distance(b, a)
-
-3. Triangle Equality
-distance(a, b) + distance(b, c) >= distance(a, c)
-*/
+/**
+ * <ol>
+ * <li>(distance(a, b) == 0) == (a == b)</li>
+ * <li>Commutativity: distance(a, b) == distance(b, a)</li>
+ * <li>Triangle Equality: distance(a, b) + distance(b, c) >= distance(a, c)</li>
+ * <ol>
+ */
 sealed trait MetricSpace[-A] {
   def distance(a1: A, a2: A): Int
 }

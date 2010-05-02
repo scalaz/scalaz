@@ -23,7 +23,6 @@ object Scalaz extends ScalazLow
     with    Comps
     with    Digits
     with    DLists
-    with    DoubleWs
     with    Duals
     with    Effects
     with    Emptys

@@ -3,11 +3,11 @@ package scalaz
 sealed trait LongW extends PimpedType[Long] {
   import Scalaz._
 
-  def ∏ = multiplication(value)  
+  def ∏ : LongMultiplication = multiplication(value)
 
   def digits: List[Digit] =
-    if(value == 0) List(0L)
-    else if(value < 10) List(value)
+    if (value == 0) List(0L)
+    else if (value < 10) List(value)
     else value % 10L :: (value / 10L digits)
 }
 

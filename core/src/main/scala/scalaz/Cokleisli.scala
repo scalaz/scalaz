@@ -5,7 +5,7 @@ trait Cokleisli[W[_], A, B] {
 
   import Scalaz._
 
-  def <<=(a: W[A])(implicit w: Comonad[W]) = a =>> apply
+  def <<=(a: W[A])(implicit w: Comonad[W]): W[B] = a =>> apply
 
   def =>=[C](c: Cokleisli[W, B, C])(implicit b: Comonad[W]): Cokleisli[W, A, C] = ★(e => c(e =>> (Cokleisli.this(_))))
 
@@ -17,9 +17,9 @@ trait Cokleisli[W[_], A, B] {
 }
 
 trait Cokleislis {
-  def ★[W[_], A, B](f: W[A] => B) = new Cokleisli[W, A, B] {
+  def ★[W[_], A, B](f: W[A] => B): Cokleisli[W, A, B] = new Cokleisli[W, A, B] {
     def apply(a: W[A]) = f(a)
   }
 
-  def cokleisli[W[_], A, B](f: W[A] => B) = ★(f)
+  def cokleisli[W[_], A, B](f: W[A] => B): Cokleisli[W, A, B] = ★(f)
 }

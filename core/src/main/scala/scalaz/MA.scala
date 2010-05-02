@@ -292,11 +292,11 @@ trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
 
 
 trait MAsLow {
-  implicit def maImplicit[MM[_], A](a: MM[A]): MA[MM, A] = new MA[MM, A] {
+  implicit def maImplicit[M[_], A](a: M[A]): MA[M, A] = new MA[M, A] {
     val value = a
   }
 
-  implicit def maCofunctorImplicit[MM[_], A](a: MM[A]): MACofunctor[MM, A] = new MACofunctor[MM, A] {
+  implicit def maCofunctorImplicit[M[_], A](a: M[A]): MACofunctor[M, A] = new MACofunctor[M, A] {
     val value = a
   }
 }

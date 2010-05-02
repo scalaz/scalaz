@@ -3,9 +3,9 @@ package scalaz
 sealed trait IntW extends PimpedType[Int] {
   import Scalaz._
 
-  def ∏ = multiplication(value)
+  def ∏ : IntMultiplication = multiplication(value)
 
-  def ordering = if(value < 0) LT else if(value > 0) GT else EQ
+  def ordering: Ordering = if (value < 0) LT else if (value > 0) GT else EQ
 }
 
 trait Ints {

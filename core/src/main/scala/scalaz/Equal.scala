@@ -1,7 +1,7 @@
 package scalaz
 
 /**
- * A type safe alternative to {@scala.Any.==}.
+ * A type safe alternative to   { @scala.Any.= = }.
  * <p/>
  * For example:
  * <pre>
@@ -10,8 +10,8 @@ package scalaz
  *   (1 ≟ "1") // compile error
  *   (1 ≟ 0L) // compile error
  * </pre>
- * @see scalaz.Identity#≟
- * @see scalaz.Identity#≠
+ * @see scalaz.Identity # ≟
+ * @see scalaz.Identity # ≠
  */
 trait Equal[-A] {
   def equal(a1: A, a2: A): Boolean
@@ -22,7 +22,7 @@ trait Equals {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
-  def equalA[A] = equal[A](_ == _)
+  def equalA[A]: Equal[A] = equal[A](_ == _)
 }
 
 object Equal {
@@ -107,7 +107,7 @@ object Equal {
 
   implicit def Tuple7Equal[A: Equal, B: Equal, C: Equal, D: Equal, E: Equal, F: Equal, G: Equal]: Equal[(A, B, C, D, E, F, G)] = equal {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 ≟ a2 && b1 ≟ b2 && c1 ≟ c2 && d1 ≟ d2 && e1 ≟ e2 && f1 ≟ f2 && g1 ≟ g2
-  }                             
+  }
 
   implicit def Function0Equal[A: Equal]: Equal[Function0[A]] = equal(_.apply ≟ _.apply)
 
@@ -126,27 +126,31 @@ object Equal {
     case _ => false
   }
 
-  implicit def EitherLeftEqual[A: Equal, X]: Equal[Either.LeftProjection[A, X]] = equal((a1, a2) => (a1.toOption, a2.toOption) match {
-    case (Some(a1), Some(a2)) => a1 ≟ a2
-    case (a1, a2) => a1.isDefined == a2.isDefined
-  })
+  implicit def EitherLeftEqual[A: Equal, X]: Equal[Either.LeftProjection[A, X]] = equal((a1, a2) =>
+    (a1.toOption, a2.toOption) match {
+      case (Some(a1), Some(a2)) => a1 ≟ a2
+      case (a1, a2) => a1.isDefined == a2.isDefined
+    })
 
-  implicit def EitherRightEqual[X, A: Equal]: Equal[Either.RightProjection[X, A]] = equal((a1, a2) => (a1.toOption, a2.toOption) match {
-    case (Some(a1), Some(a2)) => a1 ≟ a2
-    case (a1, a2) => a1.isDefined == a2.isDefined
-  })
+  implicit def EitherRightEqual[X, A: Equal]: Equal[Either.RightProjection[X, A]] = equal((a1, a2) =>
+    (a1.toOption, a2.toOption) match {
+      case (Some(a1), Some(a2)) => a1 ≟ a2
+      case (a1, a2) => a1.isDefined == a2.isDefined
+    })
 
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = EitherEqual[E, A] ∙ ((_: Validation[E, A]).either)
 
   implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] = ValidationEqual[E, A] ∙ ((_: FailProjection[E, A]).validation)
 
   implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
-    equal[Tree[A]]((a1, a2) => a1.rootLabel ≟ a2.rootLabel
-        && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
+    equal[Tree[A]]((a1, a2) =>
+      a1.rootLabel ≟ a2.rootLabel
+              && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
 
   implicit def TreeLocEqual[A: Equal]: Equal[TreeLoc[A]] = {
-    equal[TreeLoc[A]]((a1, a2) => a1.tree ≟ a2.tree
-        && a1.lefts ≟ a2.lefts && a1.rights ≟ a2.rights && a1.parents ≟ a2.parents)
+    equal[TreeLoc[A]]((a1, a2) =>
+      a1.tree ≟ a2.tree
+              && a1.lefts ≟ a2.lefts && a1.rights ≟ a2.rights && a1.parents ≟ a2.parents)
   }
 
   import concurrent.Promise
