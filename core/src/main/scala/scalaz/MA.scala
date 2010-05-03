@@ -18,9 +18,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
-  // I've resurrected `⊛` as part of an experiment to allow:
-  //    a ⊛ b ⊛ c apply {_ + _ + _}
   def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
+
+  def |@|[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
   def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
 

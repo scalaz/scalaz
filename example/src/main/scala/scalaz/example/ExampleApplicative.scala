@@ -62,8 +62,10 @@ object ExampleApplicative {
     (a ⊛ b ⊛ c){_ + _ + _}
     a ⊛ b ⊛ c apply {_ + _ + _}
     a ⊛ b ⊛ c ⊛ d apply {_ + _ + _ + _}
+    a |@| b |@| c |@| d apply {_ + _ + _ + _}
 
-    a ⊛ b ⊛ c ⊛ d tupled
+    (a ⊛ b ⊛ c ⊛ d).tupled
+    (a |@| b |@| c |@| d).tupled
 
     case class Person(age: Int, name: String)
     some(10) ⊛ none[String] apply Person.apply
