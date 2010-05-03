@@ -7,16 +7,12 @@ object Scalaz extends ScalazLow
     with    Alphas
     with    Applys
     with    ArrayBytes
-    with    BigIntegerMultiplications
     with    BigIntegers
-    with    BigIntMultiplications
     with    BigInts
     with    BKTrees
     with    Booleans
     with    BooleanConjunctions
-    with    ByteMultiplications
     with    Bytes
-    with    CharMultiplications
     with    Chars
     with    CharSets
     with    Cokleislis
@@ -37,23 +33,21 @@ object Scalaz extends ScalazLow
     with    Kleislis
     with    Identitys
     with    InputStreams
-    with    IntMultiplications
     with    Ints
     with    Iterables
     with    LastOptions
     with    LazyTuples
     with    Lists
-    with    LongMultiplications
     with    Longs
     with    MAs
     with    MetricSpaces
     with    Memos
+    with    Multiplications
     with    NonEmptyLists
     with    Options
     with    Orders
     with    Promises
-    with    Semigroups
-    with    ShortMultiplications
+    with    Semigroups 
     with    Shorts
     with    Shows
     with    States
