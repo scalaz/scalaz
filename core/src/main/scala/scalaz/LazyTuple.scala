@@ -1,11 +1,11 @@
 package scalaz
 
-trait LazyTuple2[A,B] {
+sealed trait LazyTuple2[A,B] {
   def _1: A
   def _2: B
 }
 
-trait LazyTuple3[A,B,C] {
+sealed trait LazyTuple3[A,B,C] {
   def _1: A
   def _2: B
   def _3: C

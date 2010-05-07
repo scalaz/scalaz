@@ -4,8 +4,8 @@ sealed trait Function0W[T] {
   val k: () => T
 
   import Scalaz._
-  
-  def throws = try { success(k()) } catch { case e => failure(e) }
+
+  def throws: Validation[Throwable, T] = try {success(k())} catch {case e => failure(e)}
 }
 
 trait Function0s {

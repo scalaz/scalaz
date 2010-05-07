@@ -3,7 +3,7 @@ package scalaz
 trait Order[-A] extends Equal[A] {
   def order(a1: A, a2: A): Ordering
 
-  final def equal(a1: A, a2: A) = order(a1, a2) == EQ
+  final def equal(a1: A, a2: A): Boolean = order(a1, a2) == EQ
 }
 
 trait Orders {
@@ -75,28 +75,30 @@ object Order {
 
   implicit def Tuple1Order[A: Order]: Order[Tuple1[A]] = order(_._1 ?|? _._1)
 
+  import Foldable._
+
   implicit def Tuple2Order[A: Order, B: Order]: Order[(A, B)] = order {
-    case ((a1, b1), (a2, b2)) => List(a1 ?|? a2, b1 ?|? b2) ∑
+    case ((a1, b1), (a2, b2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2))
   }
 
   implicit def Tuple3Order[A: Order, B: Order, C: Order]: Order[(A, B, C)] = order {
-    case ((a1, b1, c1), (a2, b2, c2)) => List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2) ∑
+    case ((a1, b1, c1), (a2, b2, c2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2))
   }
 
   implicit def Tuple4Order[A: Order, B: Order, C: Order, D: Order]: Order[(A, B, C, D)] = order {
-    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2) ∑
+    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2))
   }
 
   implicit def Tuple5Order[A: Order, B: Order, C: Order, D: Order, E: Order]: Order[(A, B, C, D, E)] = order {
-    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2) ∑
+    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2))
   }
 
   implicit def Tuple6Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order]: Order[(A, B, C, D, E, F)] = order {
-    case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) => List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2) ∑
+    case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2))
   }
 
   implicit def Tuple7Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order, G: Order]: Order[(A, B, C, D, E, F, G)] = order {
-    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2, g1 ?|? g2) ∑
+    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2, g1 ?|? g2))
   }
 
   implicit def Function0Order[A: Order]: Order[Function0[A]] = order(_.apply ?|? _.apply)

@@ -5,7 +5,7 @@ sealed trait CharSet {
 }
 
 trait CharSets {
-  def charset(v: String) = new CharSet {
+  def charset(v: String): CharSet = new CharSet {
     val value = v
   }
 

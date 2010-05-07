@@ -230,7 +230,7 @@ sealed trait Zipper[+A] {
 }
 
 trait Zippers {
-  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]) = new Zipper[A] {
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] = new Zipper[A] {
     val focus = a
     val lefts = ls
     val rights = rs

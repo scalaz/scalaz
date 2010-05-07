@@ -8,7 +8,7 @@ trait InvariantFunctor[F[_]] {
 }
 
 object InvariantFunctor {
-  implicit val MonoidInvariantFunctor = new InvariantFunctor[Monoid] {
+  implicit val MonoidInvariantFunctor: InvariantFunctor[Monoid] = new InvariantFunctor[Monoid] {
     def xmap[A, B](ma: Monoid[A], f: A => B, g: B => A): Monoid[B] = new Monoid[B] {
       def append(b1: B, b2: => B) = f(ma append (g(b1), g(b2)))
 

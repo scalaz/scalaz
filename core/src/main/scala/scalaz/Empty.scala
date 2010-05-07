@@ -11,7 +11,7 @@ trait Emptys {
 object Empty extends EmptyCollections {
   import Scalaz._
 
-  implicit def ZipStreamEmpty = new Empty[ZipStream] {
+  implicit def ZipStreamEmpty: Empty[ZipStream] = new Empty[ZipStream] {
     def empty[A] = emptyZipStream
   }
 

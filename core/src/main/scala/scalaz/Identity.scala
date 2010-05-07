@@ -160,13 +160,26 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def squared: (A, A) = ×[A, A].μ apply value
 
-  override def toString = value.toString
+  override def toString: String = value.toString
 
-  override def hashCode = value.hashCode
+  override def hashCode: Int = value.hashCode
 
-  override def equals(o: Any) = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+  override def equals(o: Any): Boolean = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
 
+  /** A pair lazy in its right value, with this value on the left and the given value on the right. **/
   def <&>[B](b: => B) = lazyTuple(value, b)
+
+  /** Convert the value into a monoid **/
+  def unit[M](implicit r: Reducer[A,M]) = r.unit(value)
+
+  /** Convert the value into a monoid in a pointed functor **/
+  def pureUnit[M[_], N](implicit m: Pure[M], r: Reducer[A,N]) = unit.pure
+
+  /** Append the value to a monoid for use in left-to-right reduction **/ 
+  def |+>[M](m: M)(implicit r: Reducer[A,M]) = r.snoc(m, value)
+
+  /** Prepend the value to a monoid for use in right-to-left reduction **/
+  def <+|[M](m: M)(implicit r: Reducer[A,M]) = r.cons(value, m)
 }
 
 trait Identitys {

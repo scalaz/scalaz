@@ -5,13 +5,13 @@ trait Show[-A] {
 }
 
 trait Shows {
-  def show[A](f: A => List[Char]) = new Show[A] {
+  def show[A](f: A => List[Char]): Show[A] = new Show[A] {
     def show(a: A) = f(a)
   }
 
   def shows[A](f: A => String): Show[A] = show[A](f(_).toList)
 
-  def showA[A] = shows[A](_.toString)
+  def showA[A]: Show[A] = shows[A](_.toString)
 }
 
 object Show {
@@ -75,13 +75,13 @@ object Show {
   implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] = IterableShow[A] ∙ ((_: ZipStream[A]).value)
 
   implicit def ZipperShow[A: Show]: Show[Zipper[A]] = show((z: Zipper[A]) =>
-      z.lefts.reverse.show ++ " " ++ z.focus.show ++ " " ++ z.rights.show)
+    z.lefts.reverse.show ++ " " ++ z.focus.show ++ " " ++ z.rights.show)
 
   implicit def TreeShow[A: Show]: Show[Tree[A]] = show((t: Tree[A]) =>
-      '{' :: t.rootLabel.show ++ " " ++ t.subForest.show ++ "}")
+    '{' :: t.rootLabel.show ++ " " ++ t.subForest.show ++ "}")
 
   implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
-      t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
+    t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
   def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
     val i = as.iterator

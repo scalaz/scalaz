@@ -13,7 +13,7 @@ sealed trait Tree[+A] {
   def foldMap[B: Monoid](f: A => B): B =
     f(rootLabel) ⊹ subForest.foldMap((_: Tree[A]).foldMap(f))
 
-  def drawTree(implicit sh: Show[A]) = draw.foldMap(_ + "\n")
+  def drawTree(implicit sh: Show[A]): String = draw.foldMap(_ + "\n")
 
   def draw(implicit sh: Show[A]): Stream[String] = {
     def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
@@ -27,14 +27,14 @@ sealed trait Tree[+A] {
     rootLabel.shows #:: drawSubTrees(subForest)
   }
 
-  def flatten = squish[A](Stream.Empty)
+  def flatten: Stream[A] = squish[A](Stream.Empty)
 
   private def squish[AA >: A](xs: Stream[AA]): Stream[AA] =
     Stream.cons(rootLabel, subForest.foldr(xs)(_.squish(_)))
 
   def levels: Stream[Stream[A]] = {
     val f = (s: Stream[Tree[A]]) => s.foldMap(_.subForest)
-    Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty) ∘∘ ((_: Tree[A]).rootLabel) 
+    Stream(this).iterate[Stream](f).takeWhile(!_.isEmpty) ∘∘ ((_: Tree[A]).rootLabel)
   }
 
   def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), () => t.subForest))
@@ -45,6 +45,7 @@ sealed trait Tree[+A] {
 trait Trees {
   def node[A](root: A, forest: Stream[Tree[A]]): Tree[A] = new Tree[A] {
     val rootLabel = root
+
     def subForest = forest
   }
 

@@ -5,20 +5,20 @@ sealed trait Function1W[T, R] {
 
   import Scalaz._
 
-  def on[X](f: (R, R) => X, t1: T, t2: T) = f(k(t1), k(t2))
+  def on[X](f: (R, R) => X, t1: T, t2: T): X = f(k(t1), k(t2))
 
-  def arrow[A[_, _]](implicit a: Arrow[A]) = a arrow k
+  def arrow[A[_, _]](implicit a: Arrow[A]): A[T, R] = a arrow k
 
   def kleisli[Z[_]](implicit z: Pure[Z]): Kleisli[Z, T, R] = Scalaz.kleisli((t: T) => z pure k(t))
 
-  def unary_!(implicit m: Memo[T, R]) = m(k)
+  def unary_!(implicit m: Memo[T, R]): (T) => R = m(k)
 
   import concurrent.Strategy
   import concurrent.Promise
   
-  def promise(implicit s: Strategy[Unit]) = kleisli[Promise]
+  def promise(implicit s: Strategy[Unit]): Kleisli[Promise, T, R] = kleisli[Promise]
 
-  def lift[F[_]](implicit f: Functor[F]) = (x: F[T]) => x.map(this)
+  def lift[F[_]](implicit f: Functor[F]): (F[T]) => F[R] = (x: F[T]) => x.map(this)
 
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 }

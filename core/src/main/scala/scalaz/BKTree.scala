@@ -8,9 +8,9 @@ import annotation.tailrec
 sealed trait BKTree[+A] {
   import Scalaz._
 
-  def isEmpty = this == BKTreeEmpty
+  def isEmpty : Boolean = this == BKTreeEmpty
 
-  def size = this match {
+  def size : Int = this match {
     case BKTreeEmpty => 0
     case BKTreeNode(_, s, _) => s
   }

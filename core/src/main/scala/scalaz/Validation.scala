@@ -3,24 +3,24 @@ package scalaz
 sealed trait Validation[+E, +A] {
   import Scalaz._
 
-  def fold[X](e: E => X, a: A => X) = this match {
+  def fold[X](e: E => X, a: A => X): X = this match {
     case Success(x) => a(x)
     case Failure(x) => e(x)
   }
 
-  def either = this match {
+  def either : Either[E, A] = this match {
     case Success(a) => Right(a)
     case Failure(e) => Left(e)
   }
 
-  def isSuccess = this match {
+  def isSuccess : Boolean = this match {
     case Success(_) => true
     case Failure(_) => false
   }
 
-  def isFailure = !isSuccess
+  def isFailure : Boolean = !isSuccess
 
-  def toOption = this match {
+  def toOption : Option[A] = this match {
     case Success(a) => Some(a)
     case Failure(_) => None
   }
@@ -32,7 +32,7 @@ sealed trait Validation[+E, +A] {
     case (Failure(e1), Failure(e2)) => Failure((e1: EE) ⊹ e2)
   }
 
-  def fail = new FailProjection[E, A] {
+  def fail : FailProjection[E, A] = new FailProjection[E, A] {
     val validation = Validation.this
   }
 
@@ -51,14 +51,14 @@ sealed trait Validation[+E, +A] {
     case Failure(e) => f(e)
   }
 
-  def |[AA >: A](f: => AA) = |||[AA](_ => f)
+  def |[AA >: A](f: => AA): AA = |||[AA](_ => f)
 
-  def exists(f: A => Boolean) = this match {
+  def exists(f: A => Boolean): Boolean = this match {
     case Success(a) => f(a)
     case Failure(_) => false
   }
 
-  def forall(f: A => Boolean) = this match {
+  def forall(f: A => Boolean): Boolean = this match {
     case Success(a) => f(a)
     case Failure(_) => true
   }
@@ -89,14 +89,14 @@ sealed trait FailProjection[+E, +A] {
     case Failure(e) => e
   }
 
-  def |[EE >: E](f: => EE) = |||[EE](_ => f)
+  def |[EE >: E](f: => EE): EE = |||[EE](_ => f)
 
-  def exists(f: E => Boolean) = validation match {
+  def exists(f: E => Boolean): Boolean = validation match {
     case Success(_) => false
     case Failure(e) => f(e)
   }
 
-  def forall(f: E => Boolean) = validation match {
+  def forall(f: E => Boolean): Boolean = validation match {
     case Success(_) => true
     case Failure(e) => f(e)
   }
