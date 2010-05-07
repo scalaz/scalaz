@@ -172,6 +172,9 @@ sealed trait Identity[A] extends PimpedType[A] {
   /** Convert the value into a monoid **/
   def unit[M](implicit r: Reducer[A,M]) = r.unit(value)
 
+  /** Convert the value into a monoid in a pointed functor **/
+  def pureUnit[M[_], N](implicit m: Pure[M], r: Reducer[A,N]) = unit.pure
+
   /** Append the value to a monoid for use in left-to-right reduction **/ 
   def |+>[M](m: M)(implicit r: Reducer[A,M]) = r.snoc(m, value)
 

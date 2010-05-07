@@ -13,9 +13,15 @@ import Scalaz._
  * 
  * Based on a Haskell library by Edward Kmett
  **/
-abstract class Reducer[C, M](implicit monoid: Monoid[M]) {
+abstract class Reducer[C, M](implicit mn: Monoid[M]) {
+  val monoid = mn
   def unit(c: C): M = snoc(mzero, c)
   def snoc(m: M, c: C): M = m |+| unit(c)
   def cons(c: C, m: M): M = unit(c) |+| m
 }
 
+trait Reducers {
+  implicit def ReducerMonoid[C, M](c: Reducer[C, M]): Monoid[M] = c.monoid
+
+
+}

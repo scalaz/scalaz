@@ -47,6 +47,7 @@ object Scalaz extends ScalazLow
     with    Options
     with    Orders
     with    Promises
+    with    Reducers
     with    Semigroups 
     with    Shorts
     with    Shows

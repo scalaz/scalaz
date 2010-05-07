@@ -53,10 +53,10 @@ object Foldable extends FoldableCollections {
     override def foldRight[A, B](t: NonEmptyList[A], b: => B, f: (A, => B) => B) = ListFoldable.foldRight(t.list, b, f)
   }
 
-  implicit def ListFoldable: Foldable[List] = new Foldable[List] {
-    def foldLeft[A, B](t: List[A], z: B, f: (B, A) => B): B =
+  implicit val ListFoldable: Foldable[List] = new Foldable[List] {
+    override def foldLeft[A, B](t: List[A], z: B, f: (B, A) => B): B =
       t.foldLeft(z)(f)
-    def foldRight[A, B](t: List[A], z: => B, op: (A, => B) => B): B = {
+    override def foldRight[A, B](t: List[A], z: => B, op: (A, => B) => B): B = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A] 
       t.foreach(a => s += a)
