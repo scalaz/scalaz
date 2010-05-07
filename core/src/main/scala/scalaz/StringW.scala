@@ -11,7 +11,7 @@ sealed trait StringW extends PimpedType[String] {
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
    * is appended.
    */
-  def plural(n: Long) = if(n == 1L) s else
+  def plural(n: Long): String = if(n == 1L) s else
                        if((s endsWith "y") && (List("ay", "ey","iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
                        else s + "s"
 
@@ -22,7 +22,7 @@ sealed trait StringW extends PimpedType[String] {
    * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
    * otherwise, the string representation (using show) of the value is returned in an element with the given label.
    */
-  def node[A: Show](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]) =
+  def node[A: Show](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]): Node =
     a match {
       case Some(t) => Elem(prefix, s, Null, TopScope, t.text)
       case None => Text("")
@@ -42,7 +42,7 @@ sealed trait StringW extends PimpedType[String] {
   def |:|[A: Show](a: Option[A]): Node =
     node(null, a)
 
-  def encode(implicit c: CharSet) = s getBytes c.value
+  def encode(implicit c: CharSet): Array[Byte] = s getBytes c.value
 
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
@@ -54,13 +54,13 @@ sealed trait StringW extends PimpedType[String] {
    */
   def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.charsNel getOrElse e
 
-  def charsNelErr(message: => String) = charsNel(error(message))
+  def charsNelErr(message: => String): NonEmptyList[Char] = charsNel(error(message))
 
-  def unsafeCharsNel = charsNelErr("cannot turn empty string into NonEmptyList")
+  def unsafeCharsNel : NonEmptyList[Char] = charsNelErr("cannot turn empty string into NonEmptyList")
 
   import java.io.FileInputStream
 
-  def readFile[X](x: X, f: (X, Byte) => X) = {
+  def readFile[X](x: X, f: (X, Byte) => X): X = {
     val in = new FileInputStream(s)
 
     try {

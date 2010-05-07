@@ -13,7 +13,7 @@ trait Endos {
 
   implicit def EndoFrom[A](e: Endo[A]): A => A = e.apply(_)
 
-  def constantEndo[A](a: => A) = EndoTo[A](_ => a)
+  def constantEndo[A](a: => A): Endo[A] = EndoTo[A](_ => a)
 
-  def idEndo[A] = EndoTo[A](a => a)
+  def idEndo[A]: Endo[A] = EndoTo[A](a => a)
 }

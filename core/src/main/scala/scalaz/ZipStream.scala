@@ -9,7 +9,7 @@ trait ZipStreams {
     val value = s
   }
 
-  def emptyZipStream = zip(Stream.Empty)
+  def emptyZipStream : ZipStream[Nothing] = zip(Stream.Empty)
 
   implicit def ZipStreamFrom[A](z: ZipStream[A]): Stream[A] = z.value
 }

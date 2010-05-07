@@ -3,15 +3,15 @@ package scalaz
 
 sealed trait Digit {
   val toInt: Int
-  def toLong = toInt.toLong
+  def toLong : Long = toInt.toLong
 
-  def toChar = (toLong + 48).toChar
+  def toChar : Char = (toLong + 48).toChar
 
-  override def equals(o: Any) = o != null && o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
+  override def equals(o: Any): Boolean = o != null && o.isInstanceOf[Digit] && o.asInstanceOf[Digit].toInt == toInt
 
-  override def hashCode = toInt.hashCode
+  override def hashCode: Int = toInt.hashCode
 
-  override def toString = toInt.toString
+  override def toString: String = toInt.toString
 }
 case object _0 extends Digit {
   override val toInt = 0
@@ -45,7 +45,7 @@ case object _9 extends Digit {
 }
 
 trait Digits {
-  val digits = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+  val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 

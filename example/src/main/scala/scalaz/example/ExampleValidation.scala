@@ -130,7 +130,11 @@ object ExampleValidation {
    */
   def parse(text: String): ValidationNEL[String, List[Int]] = {
     val lines = text.lines.toList
-    def parseInt(s: String): ValidationNEL[String, Int] = (s.parseInt.fail ∘ (_.toString)).lift
+    def parseInt(s: String): ValidationNEL[String, Int] = {
+      val projection: FailProjection[String, Int] = s.parseInt.fail ∘ (_.toString)
+      // todo this can't be inferred if Pure is invariant. Why not? 
+      projection.lift[NonEmptyList, String]
+    }
     val listVals: List[ValidationNEL[String, Int]] = lines.map(parseInt(_))
     // Sequence the List using the Validation Applicative Functor.
     listVals.sequence[PartialApply1Of2[ValidationNEL, String]#Apply, Int]

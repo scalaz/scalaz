@@ -3,13 +3,13 @@ package scalaz
 sealed trait Alpha {
   val toChar: Char
 
-  def toUpperChar = toChar.toUpper
+  def toUpperChar : Char = toChar.toUpper
 
-  override def equals(o: Any) = o != null && o.isInstanceOf[Alpha] && o.asInstanceOf[Alpha].toChar == toChar
+  override def equals(o: Any): Boolean = o != null && o.isInstanceOf[Alpha] && o.asInstanceOf[Alpha].toChar == toChar
 
-  override def hashCode = toChar.hashCode
+  override def hashCode: Int = toChar.hashCode
 
-  override def toString = toChar.toString
+  override def toString: String = toChar.toString
 }
 
 case object A extends Alpha {
@@ -92,7 +92,7 @@ case object Z extends Alpha {
 }
 
 trait Alphas {
-  val alphas = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
+  val alphas: List[Alpha] = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
 
-  implicit def AlphaChar(a: Alpha) = a.toChar
+  implicit def AlphaChar(a: Alpha): Char = a.toChar
 }

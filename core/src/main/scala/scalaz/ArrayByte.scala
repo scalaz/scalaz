@@ -1,7 +1,7 @@
 package scalaz
 
 sealed trait ArrayByte extends PimpedType[Array[Byte]] {
-  def decode(implicit c: CharSet) = new String(value, c.value)
+  def decode(implicit c: CharSet): String = new String(value, c.value)
 }
 
 trait ArrayBytes {

@@ -15,7 +15,7 @@ package scalaz
  * </p>
  */
 trait Applicative[Z[_]] extends Pointed[Z] with Apply[Z] {
-  override def fmap[A, B](fa: Z[A], f: A => B) = this(pure(f), fa)
+  override def fmap[A, B](fa: Z[A], f: A => B): Z[B] = this(pure(f), fa)
 }
 
 object Applicative {

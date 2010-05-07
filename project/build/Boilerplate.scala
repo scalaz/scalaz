@@ -46,13 +46,14 @@ trait Boilerplate {
       |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename)
   }
 
-  case object FoldRight extends TypeClass {
+  case object Foldable extends TypeClass {
     def gen(typename: String): String =
       """|
-      |  implicit def %sFoldRight[A]: FoldRight[%s] = new FoldRight[%s] {
-      |    def foldRight[A, B](t: %s[A], b: B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
+      |  implicit def %sFoldable[A]: Foldable[%s] = new Foldable[%s] {
+      |    override def foldRight[A, B](t: %s[A], b: => B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
+      |    override def foldLeft[A, B](t: %s[A], b: B, f: (B, A) => B): B = t.foldLeft(b)(f(_, _))
       |  }
-      |""".stripMargin.format(identifierFor(typename), typename, typename, typename)
+      |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename)
   }
 
   case object Zero extends TypeClass {
@@ -78,7 +79,7 @@ trait Boilerplate {
       |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename)
   }
 
-  val allTypeClasses = Seq(Pure, Empty, Functor, Bind, FoldRight, Zero, Semigroup, Plus)
+  val allTypeClasses = Seq(Pure, Empty, Functor, Bind, Foldable, Zero, Semigroup, Plus)
 
   lazy val generateCollectionTypeClassInstances = {
     val cleanSrcManaged = cleanTask(srcManagedScala) named ("clean src_managed")
@@ -140,7 +141,7 @@ trait Boilerplate {
     "collection.immutable.IndexedSeq" -> allTypeClasses,
     "collection.immutable.Iterable" -> allTypeClasses,
     "collection.immutable.LinearSeq" -> allTypeClasses,
-    "collection.immutable.List" -> allTypeClasses,
+    "collection.immutable.List" ->  Seq(Pure, Empty, Functor, Bind, Zero, Semigroup, Plus),
     "collection.immutable.PagedSeq" -> Seq(),
     "collection.immutable.Queue" -> allTypeClasses,
     "collection.immutable.Seq" -> allTypeClasses,

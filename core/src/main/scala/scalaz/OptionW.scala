@@ -20,14 +20,14 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    * Returns the provided function `s` applied to item contained in the Option if it is defined,
    * otherwise, the provided value `n`.
    * <p/>
-   * This is a syntactic alternative to {@link scalaz.OptionW#cata}
+   * This is a syntactic alternative to  { @link scalaz.OptionW # cata }
    * <p/>
    * Example:
    * <code>
    * option.some(_ * 2).none(0)
    * </code>
    */
-  def some[X](s: A => X) = new Fold[X] {
+  def some[X](s: A => X): Fold[X] = new Fold[X] {
     def none(n: => X): X = cata(s, n)
   }
 
@@ -43,7 +43,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    * option ? "defined" | "undefined"
    * </code>
    */
-  def ?[X](s: => X) = new Conditional[X] {
+  def ?[X](s: => X): Conditional[X] = new Conditional[X] {
     def |(n: => X): X = value match {
       case None => n
       case Some(_) => s
@@ -53,17 +53,17 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Executes the provided side effect if the Option if it is undefined.
    */
-  def ifNone(n: => Unit) = if(value.isEmpty) n
+  def ifNone(n: => Unit): Unit = if (value.isEmpty) n
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
    */
-  def err(message: => String) = value getOrElse (error(message))
+  def err(message: => String): A = value getOrElse (error(message))
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
    */
-  def |(a: => A) = value getOrElse a
+  def |(a: => A): A = value getOrElse a
 
   @deprecated("use Option.orNull")
   def toNull[A1 >: A](implicit ev: Null <:< A1): A1 = value orNull
@@ -79,12 +79,12 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    */
   def unary_~(implicit z: Zero[A]): A = value getOrElse z.zero
 
-  def toSuccess[E](e: => E) : Validation[E, A] = value match {
+  def toSuccess[E](e: => E): Validation[E, A] = value match {
     case Some(a) => Success(a)
     case None => Failure(e)
   }
 
-  def toFailure[B](b: => B) : Validation[A, B] = value match {
+  def toFailure[B](b: => B): Validation[A, B] = value match {
     case Some(e) => Failure(e)
     case None => Success(b)
   }
@@ -97,7 +97,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  def orEmpty[M[_]: Pure : Empty]: M[A] = value match {
+  def orEmpty[M[_] : Pure : Empty]: M[A] = value match {
     case Some(a) => a η
     case None => <∅>
   }

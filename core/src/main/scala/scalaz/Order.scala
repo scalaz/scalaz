@@ -3,7 +3,7 @@ package scalaz
 trait Order[-A] extends Equal[A] {
   def order(a1: A, a2: A): Ordering
 
-  final def equal(a1: A, a2: A) = order(a1, a2) == EQ
+  final def equal(a1: A, a2: A): Boolean = order(a1, a2) == EQ
 }
 
 trait Orders {

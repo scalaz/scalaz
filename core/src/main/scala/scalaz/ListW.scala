@@ -59,7 +59,7 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     }
   }
 
-  def powerset = filterM(_ => List(true, false))
+  def powerset: List[List[A]] = filterM(_ => List(true, false))
 
   def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = value match {
     case Nil => (nil[A], nil[A]) η

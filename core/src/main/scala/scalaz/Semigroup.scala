@@ -17,7 +17,7 @@ trait Semigroup[S] {
 }
 
 trait Semigroups {
-  def semigroup[S](f: (S, => S) => S) = new Semigroup[S] {
+  def semigroup[S](f: (S, => S) => S): Semigroup[S] = new Semigroup[S] {
     def append(s1: S, s2: => S) = f(s1, s2)
   }
 }

@@ -160,11 +160,11 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def squared: (A, A) = ×[A, A].μ apply value
 
-  override def toString = value.toString
+  override def toString: String = value.toString
 
-  override def hashCode = value.hashCode
+  override def hashCode: Int = value.hashCode
 
-  override def equals(o: Any) = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+  override def equals(o: Any): Boolean = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
 
   /** A pair lazy in its right value, with this value on the left and the given value on the right. **/
   def <&>[B](b: => B) = lazyTuple(value, b)

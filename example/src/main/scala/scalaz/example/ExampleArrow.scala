@@ -71,7 +71,7 @@ object ExampleArrow {
       val nums = nel1(1, 2, 3)
       nums.υ assert_≟ nel1(nel1(1, 2, 3), nel1(2, 3), nel1(3))
       val sum = ★((m: NonEmptyList[Int]) => m.∑)
-      val max = ★((m: NonEmptyList[Int]) => m.min)
+      val min = ★((m: NonEmptyList[Int]) => m.min)
       // todo this causes StackOverflowError.
 //      ((sum &&& max) apply nums) assert_≟ nel1((some(6), some(1)), (some(5), some(2), (some(3), some(3))
     }

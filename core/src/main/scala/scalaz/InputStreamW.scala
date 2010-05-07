@@ -5,7 +5,7 @@ import java.io.InputStream
 sealed trait InputStreamW extends PimpedType[InputStream] {
   import Scalaz._
 
-  implicit def elements =
+  implicit def elements: Iterator[Byte] =
     new Iterator[Byte] {
       var i: Int = _
       var b = false

@@ -18,9 +18,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
-  // I've resurrected `⊛` as part of an experiment to allow:
-  //    a ⊛ b ⊛ c apply {_ + _ + _}
   def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
+
+  def |@|[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
   def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
 
@@ -80,36 +80,33 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def |>|(f: A => Unit)(implicit e: Each[M]): Unit = foreach (f)
 
-  def foldl[B](b: B)(f: (B, A) => B)(implicit r: FoldLeft[M]): B = r.foldLeft[B, A](value, b, f)
+  def foldl[B](b: B)(f: (B, A) => B)(implicit r: Foldable[M]): B = r.foldLeft[A, B](value, b, f)
 
-  def foldl1(f: (A, A) => A)(implicit r: FoldLeft[M]): Option[A] = foldl(none[A])((a1, a2) => Some(a1 match {
-    case None => a2
-    case Some(x) => f(a2, x)
-  }))
+  def foldl1(f: (A, A) => A)(implicit r: Foldable[M]): Option[A] = r.foldl1(value, f)
 
-  def listl(implicit r: FoldLeft[M]): List[A] = {
+  def listl(implicit r: Foldable[M]): List[A] = {
     val b = new scala.collection.mutable.ListBuffer[A]
     foldl(())((_, a) => b += a)
     b.toList
   }
 
-  def sum(implicit r: FoldLeft[M], m: Monoid[A]): A = foldl(m.zero)(m append (_, _))
+  def sum(implicit r: Foldable[M], m: Monoid[A]): A = foldl(m.zero)(m append (_, _))
 
-  def ∑(implicit r: FoldLeft[M], m: Monoid[A]): A = sum
+  def ∑(implicit r: Foldable[M], m: Monoid[A]): A = sum
 
-  def count(implicit r: FoldLeft[M]): Int = foldl(0)((b, _) => b + 1)
+  def count(implicit r: Foldable[M]): Int = foldl(0)((b, _) => b + 1)
 
-  def ♯(implicit r: FoldLeft[M]): Int = count
+  def ♯(implicit r: Foldable[M]): Int = count
 
   def len(implicit l: Length[M]): Int = l len value
 
-  def max(implicit r: FoldLeft[M], ord: Order[A]): Option[A] =
+  def max(implicit r: Foldable[M], ord: Order[A]): Option[A] =
     foldl1((x: A, y: A) => if (x ≩ y) x else y)
 
-  def min(implicit r: FoldLeft[M], ord: Order[A]): Option[A] =
+  def min(implicit r: Foldable[M], ord: Order[A]): Option[A] =
     foldl1((x: A, y: A) => if (x ≨ y) x else y)
 
-  def longDigits(implicit d: A <:< Digit, t: FoldLeft[M]): Long =
+  def longDigits(implicit d: A <:< Digit, t: Foldable[M]): Long =
     foldl(0L)((n, a) => n * 10L + (a: Digit))
 
   def digits(implicit c: A <:< Char, t: Functor[M]): M[Option[Digit]] =
@@ -123,47 +120,44 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
     k
   }
 
-  def foldr[B](b: B)(f: (A, => B) => B)(implicit r: FoldRight[M]): B = r.foldRight(value, b, f)
+  def foldr[B](b: B)(f: (A, => B) => B)(implicit r: Foldable[M]): B = r.foldRight(value, b, f)
 
-  def foldr1(f: (A, => A) => A)(implicit r: FoldRight[M]): Option[A] = foldr(none[A])((a1, a2) => Some(a2 match {
-    case None => a1
-    case Some(x) => f(a1, x)
-  }))
+  def foldr1(f: (A, => A) => A)(implicit r: Foldable[M]): Option[A] = r.foldr1(value, f)
 
-  def ∑∑(implicit r: FoldRight[M], m: Monoid[A]): A = foldr(m.zero)(m append (_, _))
+  def ∑∑(implicit r: Foldable[M], m: Monoid[A]): A = foldr(m.zero)(m append (_, _))
 
-  def foldMap[B](f: A => B)(implicit r: FoldRight[M], m: Monoid[B]): B = foldr(m.zero)((a, b) => m.append(f(a), b))
+  def foldMap[B](f: A => B)(implicit r: Foldable[M], m: Monoid[B]): B = r.foldMap(value, f)
 
-  def listr(implicit r: FoldRight[M]): List[A] = foldr(nil[A])(_ :: _)
+  def listr(implicit r: Foldable[M]): List[A] = foldr(nil[A])(_ :: _)
 
-  def stream(implicit r: FoldRight[M]): Stream[A] = foldr(Stream.empty[A])(Stream.cons(_, _))
+  def stream(implicit r: Foldable[M]): Stream[A] = foldr(Stream.empty[A])(Stream.cons(_, _))
 
-  def !!(n: Int)(implicit r: FoldRight[M]): A = stream(r)(n)
+  def !!(n: Int)(implicit r: Foldable[M]): A = stream(r)(n)
 
   def !(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
 
   def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (error("Index " + n + " out of bounds"))
 
-  def any(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr(false)(p(_) || _)
+  def any(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(false)(p(_) || _)
 
-  def ∃(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = any(p)
+  def ∃(p: A => Boolean)(implicit r: Foldable[M]): Boolean = any(p)
 
-  def all(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = foldr(true)(p(_) && _)
+  def all(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(true)(p(_) && _)
 
-  def ∀(p: A => Boolean)(implicit r: FoldRight[M]): Boolean = all(p)
+  def ∀(p: A => Boolean)(implicit r: Foldable[M]): Boolean = all(p)
 
-  def empty(implicit r: FoldRight[M]): Boolean = ∀(_ => false)
+  def empty(implicit r: Foldable[M]): Boolean = ∀(_ => false)
 
-  def ∈:(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = element(a)
+  def ∈:(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
 
-  def ∋(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = element(a)
+  def ∋(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
 
-  def element(a: A)(implicit r: FoldRight[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
+  def element(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
-  def splitWith(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
+  def splitWith(p: A => Boolean)(implicit r: Foldable[M]): List[List[A]] =
     foldr((nil[List[A]], none[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
@@ -176,7 +170,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   /**
    * Selects groups of elements that satisfy p and discards others.
    */
-  def selectSplit(p: A => Boolean)(implicit r: FoldRight[M]): List[List[A]] =
+  def selectSplit(p: A => Boolean)(implicit r: Foldable[M]): List[List[A]] =
     foldr((nil[List[A]], false))((a, xb) => xb match {
       case (x, b) => {
         val pa = p(a)
@@ -233,20 +227,20 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def ifM[B](t: => M[B], f: => M[B])(implicit a: Monad[M], b: A <:< Boolean): M[B] = ∗ ((x: A) => if (x) t else f)
 
-  def foldLeftM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: FoldLeft[M], m: Monad[N]): N[B] =
+  def foldLeftM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
     foldl[N[B]](b η)((b, a) => b ∗ ((z: B) => f(z, a)))
 
-  def foldRightM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: FoldRight[M], m: Monad[N]): N[B] =
+  def foldRightM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
     foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(z, a)))
 
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
-    if (n <= 0) ∅ η
+    if (n <= 0) ∅[N[A]].η[M]
     else value ∗ (a => replicateM[N](n - 1) ∘ (a +>: _) )
 
   def zipWithA[F[_], B, C](b: M[B])(f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
     (b <*> (a.fmap(value, f.curried))).sequence[F, C]
 
-  def bktree(implicit f: FoldLeft[M], m: MetricSpace[A]) =
+  def bktree(implicit f: Foldable[M], m: MetricSpace[A]) =
     foldl(emptyBKTree[A])(_ + _)
 
   def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
@@ -292,11 +286,11 @@ trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
 
 
 trait MAsLow {
-  implicit def maImplicit[MM[_], A](a: MM[A]): MA[MM, A] = new MA[MM, A] {
+  implicit def maImplicit[M[_], A](a: M[A]): MA[M, A] = new MA[M, A] {
     val value = a
   }
 
-  implicit def maCofunctorImplicit[MM[_], A](a: MM[A]): MACofunctor[MM, A] = new MACofunctor[MM, A] {
+  implicit def maCofunctorImplicit[M[_], A](a: M[A]): MACofunctor[M, A] = new MACofunctor[M, A] {
     val value = a
   }
 }

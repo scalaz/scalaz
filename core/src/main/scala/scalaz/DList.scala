@@ -3,30 +3,30 @@ package scalaz
 sealed trait DList[A] {
   def apply(as: List[A]): List[A]
 
-  def toList = apply(Nil)
+  def toList: List[A] = apply(Nil)
 
   import Scalaz._
 
-  def head = toList.headOption
+  def head: Option[A] = toList.headOption
 
-  def tail = toList match {
+  def tail: Option[List[A]] = toList match {
     case Nil => None
     case _ :: t => Some(t)
   }
 
-  def ::(a: A) = dlist(a :: apply(_: List[A]))
+  def ::(a: A): DList[A] = dlist(a :: apply(_: List[A]))
 
-  def ::>(a: A) = dlist((d: List[A]) => apply(a :: d))
+  def ::>(a: A): DList[A] = dlist((d: List[A]) => apply(a :: d))
 
-  def :::(as: DList[A]) = dlist((d: List[A]) => apply(as(d)))
+  def :::(as: DList[A]): DList[A] = dlist((d: List[A]) => apply(as(d)))
 
   def foldRight[B](b: B, f: (A, B) => B): B = toList.foldRight(b)(f)
 
-  def map[B](f: A => B) = foldRight[DList[B]](emptyDList[B], f(_) :: _)
+  def map[B](f: A => B): DList[B] = foldRight[DList[B]](emptyDList[B], f(_) :: _)
 
-  def flatMap[B](f: A => DList[B]) = foldRight[DList[B]](emptyDList[B], f(_) ::: _)
+  def flatMap[B](f: A => DList[B]): DList[B] = foldRight[DList[B]](emptyDList[B], f(_) ::: _)
 
-  def foreach(f: A => Unit) = toList foreach f
+  def foreach(f: A => Unit): Unit = toList foreach f
 
   override def toString = 'D' + toList.toString
 }
@@ -36,5 +36,5 @@ trait DLists {
     def apply(as: List[A]) = f(as)
   }
 
-  def emptyDList[A] = dlist(identity(_: List[A]))
+  def emptyDList[A]: DList[A] = dlist(identity(_: List[A]))
 }

@@ -6,11 +6,11 @@ sealed trait NonEmptyList[+A] {
 
   import Scalaz._
 
-  def <::[B >: A](b: B) = nel(b, head :: tail)
+  def <::[B >: A](b: B): NonEmptyList[B] = nel(b, head :: tail)
 
   import collection.mutable.ListBuffer
 
-  def <:::[B >: A](bs: List[B]) = {
+  def <:::[B >: A](bs: List[B]): NonEmptyList[B] = {
     val b = new ListBuffer[B]
     b ++= bs
     b += head
@@ -21,9 +21,9 @@ sealed trait NonEmptyList[+A] {
 
   def :::>[B >: A](bs: List[B]): NonEmptyList[B] = nel(head, tail ::: bs)
 
-  def map[B](f: A => B) = nel(f(head), tail.map(f))
+  def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
-  def flatMap[B](f: A => NonEmptyList[B])  = {
+  def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val b = new ListBuffer[B]
     val p = f(head)
     b += p.head
@@ -37,16 +37,16 @@ sealed trait NonEmptyList[+A] {
     nel(bb.head, bb.tail)
   }
 
-  lazy val list = head :: tail
+  lazy val list: List[A] = head :: tail
 
-  lazy val stream = head #:: tail.toStream
+  lazy val stream: Stream[A] = head #:: tail.toStream
 
-  def tails : NonEmptyList[NonEmptyList[A]] = nel(this, tail.toNel match {
+  def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail.toNel match {
     case None => Nil
-    case Some(t) => t.tails.list    
+    case Some(t) => t.tails.list
   })
 
-  override def toString = "NonEmpty" + (head :: tail)
+  override def toString: String = "NonEmpty" + (head :: tail)
 }
 
 trait NonEmptyLists {

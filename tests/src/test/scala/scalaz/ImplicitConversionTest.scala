@@ -100,6 +100,12 @@ object ImplicitConversionTest {
     implicitly[Bind[java.util.ArrayList]]
   }
 
+  def monoid {
+    implicitly[Monoid[List[Int]]]
+    implicitly[Monoid[Iterable[Int]]]
+    implicitly[Monoid[Seq[Int]]]
+  }
+
   def monad[A, B, R, S, T, U, V, W, X] {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
@@ -122,6 +128,12 @@ object ImplicitConversionTest {
 
   def functor {
     implicitly[Functor[java.util.PriorityQueue]]
+  }
+
+  def pure {
+    implicitly[Pure[Iterable]]
+    implicitly[Pure[List]]
+    implicitly[Pure[Vector]]
   }
 
   def foldRight[A] {
