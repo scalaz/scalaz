@@ -32,4 +32,11 @@ object Category {
 
   implicit def ObjectToMorphism[A,B,C](a: A): Const2[A,Unit,Unit] = Const2(a)
   implicit def MorphismToObject[A,B,C](a: Const2[A,B,C]) = a.value
+
+  case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
+
+  implicit def DiscreteCategory[X] = new Category[PartialApply1Of3[Discrete,X]#Apply] {
+    def id[A] = Discrete(x => x)
+    def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
+  }
 }
