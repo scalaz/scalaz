@@ -9,7 +9,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   override def compileOptions =
     encodingUtf8.map(CompileOption(_)) :::
-             CompileOption("-no-specialization") ::
             target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
