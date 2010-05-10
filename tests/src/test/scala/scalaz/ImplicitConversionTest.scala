@@ -137,9 +137,9 @@ object ImplicitConversionTest {
   }
 
   def foldRight[A] {
-    implicitly[FoldRight[Stream]]
-    implicitly[FoldRight[List]]
-    implicitly[FoldRight[Set]]
+    implicitly[Foldable[Stream]]
+    implicitly[Foldable[List]]
+    implicitly[Foldable[Set]]
   }
 
   def partialApply {

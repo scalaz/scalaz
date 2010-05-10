@@ -173,13 +173,13 @@ sealed trait Identity[A] extends PimpedType[A] {
   def unit[M](implicit r: Reducer[A,M]) = r.unit(value)
 
   /** Convert the value into a monoid in a pointed functor **/
-  def pureUnit[M[_], N](implicit m: Pure[M], r: Reducer[A,N]) = unit.pure
+  def pureUnit[M[_], N](implicit m: Pure[M], r: Reducer[A,N]) = unit[N].pure
 
   /** Append the value to a monoid for use in left-to-right reduction **/ 
-  def |+>[M](m: M)(implicit r: Reducer[A,M]) = r.snoc(m, value)
+  def snoc[C](c: C)(implicit r: Reducer[C,A]) = r.snoc(value, c)
 
   /** Prepend the value to a monoid for use in right-to-left reduction **/
-  def <+|[M](m: M)(implicit r: Reducer[A,M]) = r.cons(value, m)
+  def cons[M](m: M)(implicit r: Reducer[A,M]) = r.cons(value, m)
 }
 
 trait Identitys {

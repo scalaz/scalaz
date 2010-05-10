@@ -146,7 +146,7 @@ trait Boilerplate {
     "collection.immutable.Queue" -> allTypeClasses,
     "collection.immutable.Seq" -> allTypeClasses,
     "collection.immutable.Set" -> allTypeClasses,
-    "collection.immutable.Stream" -> Seq(Pure, Empty, Functor, Bind, Zero),
+    "collection.immutable.Stream" -> allTypeClasses,
     "collection.immutable.Vector" -> allTypeClasses,
     "collection.mutable.ArrayBuffer" -> allTypeClasses,
     "collection.mutable.ArraySeq" -> allTypeClasses,

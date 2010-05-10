@@ -51,7 +51,7 @@ object Util {
   def mapHeads[K, C](p: Map[K, NonEmptyList[C]]) = p.transform((h, v) => v.head)
 
   trait AsHashMap[T[_], SM[_]] {
-    def apply[K, V](kvs: T[(K, V)])(implicit f: FoldLeft[T], s: Semigroup[SM[V]], md: Monad[SM]): Map[K, SM[V]]
+    def apply[K, V](kvs: T[(K, V)])(implicit f: Foldable[T], s: Semigroup[SM[V]], md: Monad[SM]): Map[K, SM[V]]
   }
 
   /**
@@ -59,7 +59,7 @@ object Util {
    * support fold-left and the index is created in constant space.
    */
   def asHashMap[T[_], SM[_]] = new AsHashMap[T, SM] {
-    def apply[K, V](kvs: T[(K, V)])(implicit f: FoldLeft[T], s: Semigroup[SM[V]], md: Monad[SM]) =
+    def apply[K, V](kvs: T[(K, V)])(implicit f: Foldable[T], s: Semigroup[SM[V]], md: Monad[SM]) =
       asMap(new HashMap[K, SM[V]], kvs)
   }
 
@@ -68,8 +68,8 @@ object Util {
    * fold-left and the index is created in constant space.
    */
   def asMap[T[_], SM[_], K, V](e: Map[K, SM[V]], kvs: T[(K, V)])
-                   (implicit f: FoldLeft[T], s: Semigroup[SM[V]], md: Monad[SM]): Map[K, SM[V]] =
-      f.foldLeft[Map[K, SM[V]], (K, V)](kvs, e, (m, kv) => m + ((kv._1, m.get(kv._1) match {
+                   (implicit f: Foldable[T], s: Semigroup[SM[V]], md: Monad[SM]): Map[K, SM[V]] =
+      f.foldLeft[(K, V), Map[K, SM[V]]](kvs, e, (m, kv) => m + ((kv._1, m.get(kv._1) match {
         case None => md.pure(kv._2)
         case Some(vv) => s.append(md.pure(kv._2), vv)
       })))
@@ -98,16 +98,16 @@ object Util {
     /**
      * Converts the given long value to a sequence of digits.
      */
-    def longDigits[T[_]](n: Long)(implicit f: FoldLeft[T], p: Pure[T], e : Empty[T], plus : Plus[T], m : Monoid[T[Digit]]): T[Digit] = {
+    def longDigits[T[_]](n: Long)(implicit f: Foldable[T], p: Pure[T], e : Empty[T], plus : Plus[T], m : Monoid[T[Digit]]): T[Digit] = {
       val xxx = n.unfold((b: Long) => if (b == 0) None else Some(b % 10L: Digit, b / 10L))
       // TODO this is just a reverse, which should get into scalaz4
-      if (n == 0) p.pure(_0) else f.foldLeft[T[Digit], Digit](xxx, e.empty[Digit], (b, a) => plus.plus(p.pure(a), b))
+      if (n == 0) p.pure(_0) else f.foldLeft[Digit, T[Digit]](xxx, e.empty[Digit], (b, a) => plus.plus(p.pure(a), b))
     }
 
     /**
      * Converts the given sequence of digits to a long value.
      */
-    def digitsLong[T[_]](ds: T[Digit])(implicit f: FoldLeft[T]) =
-      f.foldLeft[Long, Digit](ds, 0L, (a, b) => a * 10L + b)
+    def digitsLong[T[_]](ds: T[Digit])(implicit f: Foldable[T]) =
+      f.foldLeft[Digit, Long](ds, 0L, (a, b) => a * 10L + b)
   }
 }

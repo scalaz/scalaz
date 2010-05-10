@@ -112,6 +112,15 @@ object Zero extends ZeroCollections {
 
   implicit def EitherLeftZero[A, B](implicit bz: Zero[B]): Zero[Either.LeftProjection[A, B]] = zero(Right(∅[B]).left)
 
+  implicit def Tuple2Zero[A, B](implicit az: Zero[A], bz: Zero[B]): Zero[(A, B)] =
+    zero((az.zero, bz.zero))
+
+  implicit def Tuple3Zero[A, B, C](implicit az: Zero[A], bz: Zero[B], cz: Zero[C]): Zero[(A, B, C)] =
+    zero((az.zero, bz.zero, cz.zero))
+
+  implicit def Tuple4Zero[A, B, C, D](implicit az: Zero[A], bz: Zero[B], cz: Zero[C], dz: Zero[D]): Zero[(A, B, C, D)] =
+    zero((az.zero, bz.zero, cz.zero, dz.zero))
+
   implicit def Function1ABZero[A, B: Zero]: Zero[A => B] = zero((_: A) => ∅[B])
 
   implicit def EndoZero[A]: Zero[Endo[A]] = zero(identity(_: A))

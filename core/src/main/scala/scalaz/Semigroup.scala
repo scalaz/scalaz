@@ -101,6 +101,15 @@ object Semigroup extends SemigroupCollections {
 
   implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isRight) a else b)
 
+  implicit def Tuple2Semigroup[A, B](implicit as: Semigroup[A], bs: Semigroup[B]): Semigroup[(A, B)] =
+    semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2))
+
+  implicit def Tuple3Semigroup[A, B, C](implicit as: Semigroup[A], bs: Semigroup[B], cs: Semigroup[C]): Semigroup[(A, B, C)] =
+    semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2, a._3 |+| b._3))
+
+  implicit def Tuple4Semigroup[A, B, C, D](implicit as: Semigroup[A], bs: Semigroup[B], cs: Semigroup[C], ds: Semigroup[D]): Semigroup[(A, B, C, D)] =
+    semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2, a._3 |+| b._3, a._4 |+| b._4))
+
   implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
 
   implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => ((a: A) => x(y.apply(a))))

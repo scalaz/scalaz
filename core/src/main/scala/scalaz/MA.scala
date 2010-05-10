@@ -245,7 +245,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
 
-  def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]) = foldMap(_.unit)(f, r)
+  def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]) = foldMap(_.unit[B])(f, r)
   
   import FingerTree._
   def &:(a: A) = OnL[M,A](a, value)

@@ -90,13 +90,13 @@ sealed trait Request[IN[_]] {
    */
   lazy val headersMapHeads = mapHeads(headersMap)
 
-  private val m = immutableHashMapMemo[FoldLeft[IN], List[(List[Char], List[Char])]]
+  private val m = immutableHashMapMemo[Foldable[IN], List[(List[Char], List[Char])]]
 
   /**
    * Provides look up for POST request parameters in the request body. Only the first invocation uses the given
    * fold-left and subsequent invocations look-up using a memoisation table (scoped to each request).
    */
-  def post(implicit f: FoldLeft[IN]) = new {
+  def post(implicit f: Foldable[IN]) = new {
     val parameters = m(f => Util.parameters(ma(body).listl(f) map (_.toChar)))(f)
     lazy val parametersMap = asHashMap[List, NonEmptyList](parameters)
     lazy val parametersMapHeads = mapHeads(parametersMap)
@@ -157,83 +157,83 @@ sealed trait Request[IN[_]] {
   /**
    * Returns the first occurrence of the given request parameter in the request body.
    */
-  def |(p: String)(implicit f: FoldLeft[IN]) = post | p
+  def |(p: String)(implicit f: Foldable[IN]) = post | p
 
   /**
    *  Returns the first occurrence of a given request parameter in the request body.
    */
-  def ^|^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, List[Char]] = kleisli(this | (_: String))
+  def ^|^(implicit f: Foldable[IN]) : Kleisli[Option, String, List[Char]] = kleisli(this | (_: String))
 
   /**
    * Returns <code>true</code> if the given request parameter occurs in the request body.
    */
-  def |?(p: String)(implicit f: FoldLeft[IN]) = this | p isDefined
+  def |?(p: String)(implicit f: Foldable[IN]) = this | p isDefined
 
   /**
    * Returns <code>false</code> if the given request parameter occurs in the request body.
    */
-  def ~|?(p: String)(implicit f: FoldLeft[IN]) = this | p isEmpty
+  def ~|?(p: String)(implicit f: Foldable[IN]) = this | p isEmpty
 
   /**
    * Returns all occurrences of the given request parameter in the request body.
    */
-  def ||(p: String)(implicit f: FoldLeft[IN]) : List[List[Char]] = post || p
+  def ||(p: String)(implicit f: Foldable[IN]) : List[List[Char]] = post || p
 
   /**
    *  Returns all occurrences of a given request parameter in the request body.
    */
-  def ^||^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
+  def ^||^(implicit f: Foldable[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
     kleisli((p : String) => {(this || p).toNel })
 
   /**
    * Returns the first occurrence of the given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def !|(p: String)(implicit f: FoldLeft[IN]) = this.!(p) <+> |(p)
+  def !|(p: String)(implicit f: Foldable[IN]) = this.!(p) <+> |(p)
 
   /**
    *  Returns the first occurrence of a given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def ^!|^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, List[Char]] =
+  def ^!|^(implicit f: Foldable[IN]) : Kleisli[Option, String, List[Char]] =
     kleisli((this !| (_: String)))
 
   /**
    * Returns the first occurrence of the given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def |!(p: String)(implicit f: FoldLeft[IN]) = |(p) <+> this.!(p)
+  def |!(p: String)(implicit f: Foldable[IN]) = |(p) <+> this.!(p)
 
   /**
    * Returns the first occurrence of a given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def ^|!^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, List[Char]] = kleisli(this |! (_: String))
+  def ^|!^(implicit f: Foldable[IN]) : Kleisli[Option, String, List[Char]] = kleisli(this |! (_: String))
 
   /**
    * Returns all occurrences of the given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def !!||(p: String)(implicit f: FoldLeft[IN]) = this.!!(p) <+> ||(p)
+  def !!||(p: String)(implicit f: Foldable[IN]) = this.!!(p) <+> ||(p)
 
   /**
    * Returns all occurrences of a given request parameter in the request URI if it exists or in the request body
    * otherwise.
    */
-  def ^!!||^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
+  def ^!!||^(implicit f: Foldable[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
     kleisli((p : String) => {(this !!|| p).toNel })
 
   /**
    * Returns all occurrences of the given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def ||!!(p: String)(implicit f: FoldLeft[IN]) = this.||(p) <+> !!(p)
+  def ||!!(p: String)(implicit f: Foldable[IN]) = this.||(p) <+> !!(p)
 
   /**
    * Returns all occurrences of a given request parameter in the request body if it exists or in the request URI
    * otherwise.
    */
-  def ^||!!^(implicit f: FoldLeft[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
+  def ^||!!^(implicit f: Foldable[IN]) : Kleisli[Option, String, NonEmptyList[List[Char]]] =
     kleisli((p : String) => {(this ||!! p).toNel })
 
   /**

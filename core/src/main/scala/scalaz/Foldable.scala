@@ -104,8 +104,8 @@ object Foldable extends FoldableCollections {
   }
 
   implicit def ZipStreamFoldable: Foldable[ZipStream] = new Foldable[ZipStream] {
-    override def foldLeft[A, B](t: ZipStream[A], b: B, f: (B, A) => B): B = TraversableOnceFoldable.foldLeft(t.value, b, f)
-    override def foldRight[A, B](t: ZipStream[A], b: => B, f: (A, => B) => B): B = TraversableOnceFoldable.foldRight(t.value, b, f)
+    override def foldLeft[A, B](t: ZipStream[A], b: B, f: (B, A) => B): B = implicitly[Foldable[Stream]].foldLeft(t.value, b, f)
+    override def foldRight[A, B](t: ZipStream[A], b: => B, f: (A, => B) => B): B = implicitly[Foldable[Stream]].foldRight(t.value, b, f)
   }
 
   implicit def EitherLeftFoldable[X]: Foldable[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Foldable[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
@@ -138,11 +138,6 @@ object Foldable extends FoldableCollections {
       case Success(_) => b
       case Failure(e) => f(e, b)
     }
-  }
-
-  implicit def TraversableOnceFoldable[C[X] <: TraversableOnce[X]]: Foldable[C] = new Foldable[C] {
-    override def foldLeft[A, B](t: C[A], b: B, f: (B, A) => B) = t.foldLeft(b)(f)
-    override def foldRight[A, B](t: C[A], b: => B, f: (A, => B) => B) = t.foldRight(b)(f(_, _))
   }
 
   implicit def JavaIterableFoldable: Foldable[java.lang.Iterable] = new Foldable[java.lang.Iterable] {

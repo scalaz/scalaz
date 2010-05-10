@@ -23,30 +23,30 @@ object ExampleFold {
     // Folding left over an empty List, using the first value as the starting value.
     (List.empty[Int] foldl1 (_ + _)) assert_≟ none
 
-    // Summing over a List using FoldLeft, using the Int Monoid to combine the elements.
+    // Summing over a List using Foldable, using the Int Monoid to combine the elements.
     (List(1, 2, 3) ∑) assert_≟ 6
 
-    // Summing over a List using FoldLeft, using the String Monoid to combine the elements.
+    // Summing over a List using Foldable, using the String Monoid to combine the elements.
     (List("a", "b", "c") ∑) assert_≟ "abc"
 
     // Checking for existence of an element that satisfies a predicate.
     ("abC".toList ∃ (c => Character.isUpperCase(c))) assert_≟ true
 
-    // Checking for existence of an element that satisfies a predicate, using Stream FoldRight,
+    // Checking for existence of an element that satisfies a predicate, using Stream Foldable,
     // which lazily handles the infinite Stream.
     (Stream.continually(1) ∃ (_ > 0)) assert_≟ true
 
     Set(1, 2, 3) ∃ { _ % 2 == 0 } assert_≟ true
 
-    // Checking if all elements satisfy a predicate, using Stream FoldRight,
+    // Checking if all elements satisfy a predicate, using Stream Foldable,
     // which lazily handles the infinite Stream.
     (Stream.continually(1) ∀ (_ == 0)) assert_≟ false
 
-    // Counting the elements using Seq FoldRight
+    // Counting the elements using Seq Foldable
     ("123".toSeq ♯) assert_≟ 3
 
-    // Counting the elements using Option FoldRight
-    (Some(0) ♯) assert_≟ 1
+    // Counting the elements using Option Foldable
+    (some(0) ♯) assert_≟ 1
 
     (50 ∈: Stream.range(0, 100)) assert_≟ true
 
