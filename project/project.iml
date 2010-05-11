@@ -2,13 +2,23 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Scala" name="Scala">
-      <configuration />
+      <configuration>
+        <option name="myScalaCompilerJarPaths">
+          <array>
+            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIdea90/Scala/lib/scala-compiler.jar" />
+          </array>
+        </option>
+        <option name="myScalaSdkJarPaths">
+          <array>
+            <option value="$MODULE_DIR$/../../../Library/Application Support/IntelliJIdea90/Scala/lib/scala-library.jar" />
+          </array>
+        </option>
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/build" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/boot" />
       <excludeFolder url="file://$MODULE_DIR$/build/target" />
     </content>

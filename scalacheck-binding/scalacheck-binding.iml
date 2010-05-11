@@ -28,16 +28,16 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC1/compile/scalacheck_2.8.0.RC1-1.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC2/compile/scalacheck_2.8.0.RC2-1.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC1/compile/scalacheck_2.8.0.RC1-1.7-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC2/compile/scalacheck_2.8.0.RC2-1.7-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="library" name="scala" level="project" />
-    <orderEntry type="module" module-name="geo" />
+    <orderEntry type="module" module-name="geo" exported="" />
   </component>
 </module>
 
