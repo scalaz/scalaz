@@ -49,6 +49,9 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   lazy val allModules = Seq(core, http, example, scalacheckBinding, tests)
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  // Use this instead, for releases only!
+  // val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
+
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.  
