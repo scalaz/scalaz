@@ -91,10 +91,10 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     def packageFullAction = packageFull dependsOn(fullDoc)
     
     def packageFull = {
-      val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** GlobFilter("*jar")
+      val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** "*jar"
       val p = parentPath
-      val extra = p("README") +++ p("etc").## ** GlobFilter("*")
-      val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** GlobFilter("*"))
+      val extra = p("README") +++ p("etc").## ** "*"
+      val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** "*")
       zipTask(sourceFiles, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
     } describedAs("Zip all artifacts")
     
@@ -105,6 +105,15 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     override def publishAction = noAction dependsOn packageFullAction
     
     def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
+
+    def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
+
+    val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
+
+    override def documentOptions =
+      SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
+      SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
+      super.documentOptions
 
   	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
   }
