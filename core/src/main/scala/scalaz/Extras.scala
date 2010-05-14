@@ -28,6 +28,14 @@ trait Dinatural[F[_,_], G[_,_]] {
   def apply[A](f: F[A,A]): G[A,A]
 }
 
+trait Biff[P[_,_], F[_], G[_]] {
+  type Apply[A, B] = P[F[A], G[B]]
+}
+
+trait On[P[_,_], F[_]] { 
+  type Apply[A, B] = P[F[A], F[B]]
+}
+
 trait Extras {
   type Id[A] = A
   trait Konst[A] {
