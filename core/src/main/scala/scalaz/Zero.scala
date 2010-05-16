@@ -127,7 +127,9 @@ object Zero extends ZeroCollections {
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 
-  implicit def FingerTreeZero[V, A](implicit m: Measured[V, A], vm: Monoid[V]): Zero[FingerTree[V, A]] = zero(FingerTrees().empty)
+  implicit def FingerTreeZero[V, A](implicit m: Reducer[A, V]): Zero[FingerTree[V, A]] = {
+    zero(FingerTree.empty)
+  }
 
   implicit def ZeroKleisliZero[M[_], A, B](implicit z: Zero[M[B]]): Zero[Kleisli[M, A, B]] = zero(☆((_: A) => ∅[M[B]]))
 
