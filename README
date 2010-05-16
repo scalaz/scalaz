@@ -1,4 +1,4 @@
-Scalaz (Scar-lah-zed) is a library written in the Scala Programming Language. One mandate of the library is to depend
+Scalaz is a library written in the Scala Programming Language. One mandate of the library is to depend
 only on the core Scala API and the core Java 2 Standard Edition API. The intention of Scalaz is to include general
 functions that are not currently available in the core Scala API. Scalaz is released under a BSD open source licence
 making it compatible with the licence of the Scala project.
