@@ -35,8 +35,21 @@ object Category {
 
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
+  /** Discrete categories, whose only morphism is the identity function. **/
   implicit def DiscreteCategory[X] = new Category[PartialApply1Of3[Discrete,X]#Apply] {
     def id[A] = Discrete(x => x)
     def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
+  }
+
+  sealed class Ord2[X, A, B](implicit o: Order[X]) {
+    def compare(a: X, b: X) = a lte b
+  }
+
+  /** Every partial order gives rise to a category **/
+  implicit def PosetCategory[X: Order] = new Category[PartialApply1Of3[Ord2,X]#Apply] {
+    def id[A] = new Ord2[X, A, A]
+    def compose[A, B, C](f: Ord2[X, B, C], g: Ord2[X, A, B]) = new Ord2[X, A, C] {
+      override def compare(a: X, b: X) = f.compare(a, b) == g.compare(a, b)
+    } 
   }
 }
