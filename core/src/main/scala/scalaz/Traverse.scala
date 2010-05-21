@@ -8,7 +8,7 @@ trait Traverse[T[_]] extends Functor[T] {
   override def fmap[A, B](k: T[A], f: A => B) = traverse[Identity, A, B](f(_), k)
 }
 
-object Traverse {
+object Traverse extends TraverseCollections {
   import Scalaz._
 
   implicit def IdentityTraverse: Traverse[Identity] = new Traverse[Identity] {
@@ -39,11 +39,6 @@ object Traverse {
     }
   }
 
-  implicit def StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
-    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: Stream[A]): F[Stream[B]] =
-      as.foldr[F[Stream[B]]]((Stream.empty[B]) η)((x, ys) => implicitly[Apply[F]].apply(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
-  }
-
   implicit def OptionTraverse: Traverse[Option] = new Traverse[Option] {
     def traverse[F[_]: Applicative, A, B](f: A => F[B], ta: Option[A]): F[Option[B]] =
       ta match {
@@ -62,14 +57,14 @@ object Traverse {
     def traverse[F[_]: Applicative, A, B](f: A => F[B], za: Zipper[A]): F[Zipper[B]] = {
       val z = (zipper(_: Stream[B], _: B, _: Stream[B])).curried
       val a = implicitly[Applicative[F]]
-      a.apply(a.apply(a.fmap(a.fmap(StreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_: Stream[B]).reverse),
-        z), f(za.focus)), StreamTraverse.traverse[F, A, B](f, za.rights))
+      a.apply(a.apply(a.fmap(a.fmap(ImmutableStreamTraverse.traverse[F, A, B](f, za.lefts.reverse), (_: Stream[B]).reverse),
+        z), f(za.focus)), ImmutableStreamTraverse.traverse[F, A, B](f, za.rights))
     }
   }
 
   implicit def ZipStreamTraverse: Traverse[ZipStream] = new Traverse[ZipStream] {
     def traverse[F[_]: Applicative, A, B](f: A => F[B], za: ZipStream[A]): F[ZipStream[B]] =
-      StreamTraverse.traverse[F, A, B](f, za.value) ∘ ((_: Stream[B]) ʐ)
+      ImmutableStreamTraverse.traverse[F, A, B](f, za.value) ∘ ((_: Stream[B]) ʐ)
   }
 
   implicit def TreeTraverse: Traverse[Tree] = new Traverse[Tree] {
@@ -77,7 +72,7 @@ object Traverse {
       val trav = (t: Tree[A]) => traverse[F, A, B](f, t)
       val cons = (x: B) => (xs: Stream[Tree[B]]) => node(x, xs)
       val a = implicitly[Applicative[F]]
-      a.apply(a.fmap(f(ta.rootLabel), cons), StreamTraverse.traverse[F, Tree[A], Tree[B]](trav, ta.subForest))
+      a.apply(a.fmap(f(ta.rootLabel), cons), ImmutableStreamTraverse.traverse[F, Tree[A], Tree[B]](trav, ta.subForest))
     }
   }
 

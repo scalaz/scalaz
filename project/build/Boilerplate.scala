@@ -56,6 +56,16 @@ trait Boilerplate {
       |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename)
   }
 
+  case object Traverse extends TypeClass {
+    def gen(typename: String): String =
+      """|
+      |  implicit def %sTraverse: Traverse[%s] = new Traverse[%s] {
+      |    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: %s[A]): F[%s[B]] =
+      |      as.foldr[F[%s[B]]]((%s.empty[B]) η)((x, ys) => implicitly[Apply[F]].apply(f(x) ∘ ((a: B) => (b: %s[B]) => a +: b), ys))
+      |  }
+      |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename, typename, typename, typename)
+  }
+
   case object Zero extends TypeClass {
     def gen(typename: String): String =
       """|
@@ -79,7 +89,8 @@ trait Boilerplate {
       |""".stripMargin.format(identifierFor(typename), typename, typename, typename, typename)
   }
 
-  val allTypeClasses = Seq(Pure, Empty, Functor, Bind, Foldable, Zero, Semigroup, Plus)
+  val mainTypeClasses = Seq(Pure, Empty, Functor, Bind, Foldable, Zero, Semigroup, Plus)
+  val allTypeClasses = Seq(Pure, Empty, Functor, Bind, Foldable, Zero, Semigroup, Plus, Traverse)
 
   lazy val generateCollectionTypeClassInstances = {
     val cleanSrcManaged = cleanTask(srcManagedScala) named ("clean src_managed")
@@ -130,42 +141,42 @@ trait Boilerplate {
 
   val collections = Seq(
     "collection.BufferedIterator" -> Seq(),
-    "collection.IndexedSeq" -> allTypeClasses,
-    "collection.Iterable" -> allTypeClasses,
-    "collection.LinearSeq" -> allTypeClasses,
-    "collection.Seq" -> allTypeClasses,
-    "collection.Set" -> allTypeClasses,
+    "collection.IndexedSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.Iterable" -> mainTypeClasses,
+    "collection.LinearSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.Seq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.Set" -> mainTypeClasses,
     "collection.SortedSet" -> Seq(),
-    "collection.Traversable" -> allTypeClasses,
+    "collection.Traversable" -> mainTypeClasses,
     "collection.TraversableOnce" -> Seq(),
-    "collection.immutable.IndexedSeq" -> allTypeClasses,
-    "collection.immutable.Iterable" -> allTypeClasses,
-    "collection.immutable.LinearSeq" -> allTypeClasses,
-    "collection.immutable.List" ->  Seq(Pure, Empty, Functor, Bind, Zero, Semigroup, Plus),
+    "collection.immutable.IndexedSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.immutable.Iterable" -> (mainTypeClasses),
+    "collection.immutable.LinearSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.immutable.List" -> Seq(Pure, Empty, Functor, Bind, Zero, Semigroup, Plus),
     "collection.immutable.PagedSeq" -> Seq(),
-    "collection.immutable.Queue" -> allTypeClasses,
-    "collection.immutable.Seq" -> allTypeClasses,
-    "collection.immutable.Set" -> allTypeClasses,
-    "collection.immutable.Stream" -> Seq(Pure, Empty, Functor, Bind, Zero, Semigroup, Plus),
-    "collection.immutable.Vector" -> allTypeClasses,
-    "collection.mutable.ArrayBuffer" -> allTypeClasses,
-    "collection.mutable.ArraySeq" -> allTypeClasses,
+    "collection.immutable.Queue" -> mainTypeClasses,
+    "collection.immutable.Seq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.immutable.Set" -> mainTypeClasses,
+    "collection.immutable.Stream" -> Seq(Pure, Empty, Functor, Bind, Zero, Semigroup, Plus, Traverse),
+    "collection.immutable.Vector" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.mutable.ArrayBuffer" -> (mainTypeClasses),
+    "collection.mutable.ArraySeq" -> mainTypeClasses,
     "collection.mutable.ArrayStack" -> Seq(),
-    "collection.mutable.Buffer" -> allTypeClasses,
-    "collection.mutable.DoubleLinkedList" -> allTypeClasses,
-    "collection.mutable.HashSet" -> allTypeClasses,
-    "collection.mutable.IndexedSeq" -> allTypeClasses,
-    "collection.mutable.Iterable" -> allTypeClasses,
-    "collection.mutable.LinearSeq" -> allTypeClasses,
-    "collection.mutable.LinkedHashSet" -> allTypeClasses,
-    "collection.mutable.LinkedList" -> allTypeClasses,
-    "collection.mutable.ListBuffer" -> allTypeClasses,
+    "collection.mutable.Buffer" -> mainTypeClasses,
+    "collection.mutable.DoubleLinkedList" -> mainTypeClasses,
+    "collection.mutable.HashSet" -> mainTypeClasses,
+    "collection.mutable.IndexedSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.mutable.Iterable" -> mainTypeClasses,
+    "collection.mutable.LinearSeq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.mutable.LinkedHashSet" -> mainTypeClasses,
+    "collection.mutable.LinkedList" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.mutable.ListBuffer" -> mainTypeClasses,
     "collection.mutable.MutableList" -> Seq(),
     "collection.mutable.PriorityQueue" -> Seq(),
     "collection.mutable.Queue" -> Seq(Pure),
-    "collection.mutable.Seq" -> allTypeClasses,
-    "collection.mutable.Set" -> allTypeClasses,
+    "collection.mutable.Seq" -> (mainTypeClasses ++ Seq(Traverse)),
+    "collection.mutable.Set" -> mainTypeClasses,
     "collection.mutable.Stack" -> Seq(),
-    "collection.mutable.Traversable" -> allTypeClasses
-  )
+    "collection.mutable.Traversable" -> mainTypeClasses
+    )
 }
