@@ -57,8 +57,8 @@ object ExampleState {
     final case class Leaf[A](a: A) extends Tree[A]
     final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
 
-    implicit val TreeShow = showA[Tree[_]]
-    implicit val TreeEqual = equalA[Tree[_]]
+    implicit def TreeShow[X] = showA[Tree[X]]
+    implicit def TreeEqual[X] = equalA[Tree[X]]
 
     val tree = Branch(Leaf("one"), Branch(Leaf("two"), Leaf("three")))
     tree.number(1)._1 assert_≟ Branch(Leaf(("one", 1)), Branch(Leaf(("two", 2)), Leaf(("three", 3))))
