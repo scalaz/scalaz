@@ -106,7 +106,7 @@ object Show {
   implicit def StreamShow[A: Show]: Show[Stream[A]] =
     IterableShow[A] comap (x => x)
 
-  implicit def GArrayShow[A: Show]: Show[ArraySeq[A]] =
+  implicit def ArraySeqShow[A: Show]: Show[ArraySeq[A]] =
     IterableShow[A] comap (x => x)
 
   implicit def ListShow[A: Show]: Show[List[A]] =

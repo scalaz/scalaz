@@ -178,7 +178,7 @@ object Equal {
 
   implicit def StreamEqual[A: Equal]: Equal[Stream[A]] = IterableEqual[A]
 
-  implicit def GArrayEqual[A: Equal]: Equal[ArraySeq[A]] = IterableEqual[A]
+  implicit def ArraySeqEqual[A: Equal]: Equal[ArraySeq[A]] = IterableEqual[A]
 
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
