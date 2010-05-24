@@ -13,9 +13,13 @@ sealed trait Tree[+A] {
   def foldMap[B: Monoid](f: A => B): B =
     f(rootLabel) ⊹ subForest.foldMap((_: Tree[A]).foldMap(f))
 
-  def drawTree(implicit sh: Show[A]): String = draw.foldMap(_ + "\n")
+  def drawTree[B >: A](implicit sh: Show[B]): String = {
+    implicit val showa: Show[A] = sh comap (x => x)
+    draw.foldMap(_ + "\n")
+  }
 
-  def draw(implicit sh: Show[A]): Stream[String] = {
+  def draw[B >: A](implicit sh: Show[B]): Stream[String] = {
+    implicit val showa: Show[A] = sh comap (x => x)
     def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
       case Stream.Empty => Stream.Empty
       case Stream(t) => "|" #:: shift("`- ", "   ", t.draw)

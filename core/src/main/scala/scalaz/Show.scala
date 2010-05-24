@@ -1,6 +1,6 @@
 package scalaz
 
-trait Show[-A] {
+trait Show[A] {
   def show(a: A): List[Char]
 }
 
@@ -72,6 +72,12 @@ object Show {
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = IterableShow[A] ∙ ((_: NonEmptyList[A]).list)
 
+  implicit def SetShow[A: Show]: Show[Set[A]] = 
+    IterableShow[A] comap ((_: Set[A]).toList)
+
+  implicit def Function1Show[A, B]: Show[A => B] =
+    show((f: A => B) => "<function>".toList)
+
   implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] = IterableShow[A] ∙ ((_: ZipStream[A]).value)
 
   implicit def ZipperShow[A: Show]: Show[Zipper[A]] = show((z: Zipper[A]) =>
@@ -83,7 +89,7 @@ object Show {
   implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
     t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
-  def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
+  implicit def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
     val i = as.iterator
     val k = new collection.mutable.ListBuffer[Char]
     k += '['
@@ -97,11 +103,14 @@ object Show {
     k.toList
   })
 
-  implicit def StreamShow[A: Show]: Show[Stream[A]] = IterableShow
+  implicit def StreamShow[A: Show]: Show[Stream[A]] =
+    IterableShow[A] comap (x => x)
 
-  implicit def GArrayShow[A: Show]: Show[ArraySeq[A]] = IterableShow
+  implicit def GArrayShow[A: Show]: Show[ArraySeq[A]] =
+    IterableShow[A] comap (x => x)
 
-  implicit def ListShow[A: Show]: Show[List[A]] = IterableShow
+  implicit def ListShow[A: Show]: Show[List[A]] =
+    IterableShow[A] comap (x => x)
 
   implicit def Tuple1Show[A: Show]: Show[Tuple1[A]] = show(a => {
     val k = new collection.mutable.ListBuffer[Char]
