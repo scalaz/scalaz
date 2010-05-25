@@ -1,5 +1,17 @@
 package scalaz
 
+/**
+ * Defines a category.
+ *
+ * <p>
+ * All instances must satisfy 3 laws:
+ * <ol>
+ * <li><strong>left identity</strong><br/><code>∀ a. compose(id, a) == a</code></li>
+ * <li><strong>right identity</strong><br/><code>∀ a. compose(a, id) == a</code></li>
+ * <li><strong>associativity</strong><br/><code>∀ a b c. compose(a, compose(b, c)) == compose(compose(a, b), c)</code></li>
+ * </ol>
+ * </p>
+ */
 trait Category[C[_, _]] {
   def id[A]: C[A, A]
   def compose[X, Y, Z](f: C[Y, Z], g: C[X, Y]): C[X, Z]
