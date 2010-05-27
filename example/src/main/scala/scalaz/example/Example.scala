@@ -29,6 +29,7 @@ object Example {
     concurrent.ExampleActor.run
     concurrent.Fibs.run
     WordCount.wordCount
+    ExampleIteratee.run
   }
 
   def main(args: Array[String]) = run
