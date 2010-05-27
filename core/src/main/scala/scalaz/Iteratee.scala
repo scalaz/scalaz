@@ -9,7 +9,7 @@ sealed trait Input[E] {
 
 /** A pure iteratee computation which is either done or needs more input **/
 sealed trait Iteratee[E, A] {
-  import Input._
+  import Iteratee._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[E, A]) => Z): Z
   def apply[F[_]](f: F[E])(implicit e: Enumerator[F]): Iteratee[E, A] = e(f, this)
   def run: Option[A] = {
@@ -50,8 +50,6 @@ object Iteratee {
         cont = f => Right(f)).left.toOption
   }
 
-  import Input._
-
   /** An iteratee that consumes the head of the input **/
   def head[E] = {
     def step(s: Input[E]): Iteratee[E, Option[E]] =
@@ -88,9 +86,7 @@ object Iteratee {
         eof = Done(acc, EOF[E]))
     Cont(step(0))
   }
-}
 
-object Input {
   /** Input that has a value available **/
   object Empty {
     def apply[E] = new Input[E] {

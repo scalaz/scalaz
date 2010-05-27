@@ -5,7 +5,7 @@ object ExampleIteratee {
 
   import scalaz._
   import Scalaz._
-  import Input._
+  import Iteratee._
 
   implicit val StreamEnumerator = new Enumerator[Stream] {
     def apply[E, A](e: Stream[E], i: Iteratee[E, A]): Iteratee[E, A] = e match {
@@ -15,7 +15,6 @@ object ExampleIteratee {
   }
 
   def run {
-    import Iteratee._
     head(Stream(1, 2, 3)).run.join assert_≟ Some(1)
     length(Stream(10, 20, 30)).run assert_≟ Some(3)
     peek(Stream(1, 2, 3)).run.join assert_≟ Some(1)
