@@ -28,11 +28,11 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/scalacheck_2.8.0.RC3-1.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/scalacheck_2.8.0.RC3-1.8-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/scalacheck_2.8.0.RC3-1.7-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/scalacheck_2.8.0.RC3-1.8-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
