@@ -99,27 +99,30 @@ object ScalazArbitrary {
 
   import geo._
   import Geo._
-  implicit def AzimuthArbitrary: Arbitrary[Azimuth] = arb[Double] ∘ (azimuth _)
+  implicit def AzimuthArbitrary: Arbitrary[Azimuth] = arbDouble ∘ (azimuth _)
 
-  implicit def BearingArbitrary: Arbitrary[Bearing] = arb[Double] ∘ (bearing _)
+  implicit def BearingArbitrary: Arbitrary[Bearing] = arbDouble ∘ (bearing _)
 
   implicit def CoordArbitrary: Arbitrary[Coord] = arb[Latitude].<**>(arb[Longitude])(coord _)
 
   implicit def ElevatedCurveArbitrary: Arbitrary[ElevatedCurve] = arb[GeodeticCurve].<**>(arb[Elevation])(elevatedCurve _)
 
-  implicit def ElevationArbitrary: Arbitrary[Elevation] = arb[Double] ∘ (elevation _)
+  implicit def ElevationArbitrary: Arbitrary[Elevation] = arbDouble ∘ (elevation _)
 
-  implicit def EllipsoidArbitrary: Arbitrary[Ellipsoid] = arb[Double].<****>(arb[Double], arb[Double], arb[Double])(ellipsoid _)
+  implicit def EllipsoidArbitrary: Arbitrary[Ellipsoid] = arbDouble.<****>(arbDouble, arbDouble, arbDouble)(ellipsoid _)
 
-  implicit def GeodeticCurveArbitrary: Arbitrary[GeodeticCurve] = arb[Double].<***>(arb[Azimuth], arb[Azimuth])(curve _)
+  implicit def GeodeticCurveArbitrary: Arbitrary[GeodeticCurve] = arbDouble.<***>(arb[Azimuth], arb[Azimuth])(curve _)
 
-  implicit def LatitudeArbitrary: Arbitrary[Latitude] = arb[Double] ∘ (latitude _)
+  implicit def LatitudeArbitrary: Arbitrary[Latitude] = arbDouble ∘ (latitude _)
 
-  implicit def LongitudeArbitrary: Arbitrary[Longitude] = arb[Double] ∘ (longitude _)
+  implicit def LongitudeArbitrary: Arbitrary[Longitude] = arbDouble ∘ (longitude _)
 
   implicit def PositionArbitrary: Arbitrary[Position] = arb[Coord].<**>(arb[Elevation])(position _)
 
   implicit def VectorArbitrary: Arbitrary[Vector] = arb[Coord].<**>(arb[Bearing])(vector _)
+
+  // workaround bug in Scalacheck 1.8-SNAPSHOT.
+  private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 
   trait Duplicate[A] {
     def pair: (A, A)
