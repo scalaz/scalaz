@@ -126,6 +126,16 @@ object Functor extends FunctorCollections {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
   
+  implicit def IterateeFunctor[X]: Functor[PartialApply1Of2[Iteratee, X]#Apply] = new Functor[PartialApply1Of2[Iteratee, X]#Apply] {
+    import Iteratee._
+    def fmap[A, B](r: Iteratee[X, A], f: A => B) = {
+      r fold (
+        done = (a, i) => Done(f(a), i), 
+        cont = k => Cont(i => fmap(k(i), f))
+      )
+    }
+  }
+  
   implicit def KleisliFunctor[M[_],P](implicit ff: Functor[M]): Functor[PartialApplyKA[Kleisli,M,P]#Apply] = new Functor[PartialApplyKA[Kleisli,M,P]#Apply] {
     def fmap[A, B](k: Kleisli[M, P, A], f: A => B): Kleisli[M, P, B] = ☆((p: P) => ff.fmap(k(p), f))
   }

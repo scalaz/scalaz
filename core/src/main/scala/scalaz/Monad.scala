@@ -60,15 +60,7 @@ object Monad {
 
   implicit def ValidationFailureMonad[X]: Monad[PartialApply1Of2[FailProjection, X]#Flip] = monad[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureBind, ValidationFailurePure)
 
-  implicit def IterateeMonad[E] = new Monad[PartialApply1Of2[Iteratee, E]#Apply] {
-    import Iteratee._
-    override def pure[A](a: => A) = Done(a, Empty[E])
-    override def bind[A, B](a: Iteratee[E, A], f: A => Iteratee[E, B]) = a.fold(
-      done = (x, str) => f(x).fold(
-        done = (x2, _) => Done(x2, str),
-        cont = _(str)),
-      cont = k => Cont(str2 => bind(k(str2), f)))
-  }
+  implicit def IterateeMonad[E] = monad[PartialApply1Of2[Iteratee, E]#Apply](IterateeBind, IterateePure)
 
   import java.util.Map.Entry
 

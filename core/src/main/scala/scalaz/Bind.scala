@@ -158,6 +158,15 @@ object Bind extends BindCollections {
   implicit def PromiseBind = new Bind[Promise] {
     def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
   }
+  
+  implicit def IterateeBind[E] = new Bind[PartialApply1Of2[Iteratee, E]#Apply] {
+    import Iteratee._
+    def bind[A, B](a: Iteratee[E, A], f: A => Iteratee[E, B]) = a.fold(
+      done = (x, str) => f(x).fold(
+        done = (x2, _) => Done(x2, str),
+        cont = _(str)),
+      cont = k => Cont(str2 => bind(k(str2), f)))
+  }
 
   import java.util._
   import java.util.concurrent._

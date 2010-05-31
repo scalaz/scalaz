@@ -129,6 +129,11 @@ object Pure extends PureCollections {
   implicit def ValidationFailurePure[X]: Pure[PartialApply1Of2[FailProjection, X]#Flip] = new Pure[PartialApply1Of2[FailProjection, X]#Flip] {
     def pure[A](a: => A) = Failure(a).fail
   }
+  
+  implicit def IterateePure[E] = new Pure[PartialApply1Of2[Iteratee, E]#Apply] {
+    import Iteratee._
+    def pure[A](a: => A) = Done(a, Empty[E])
+  }
 
   implicit def ZipperPure = new Pure[Zipper] {
     def pure[A](a: => A) = a.zipper
