@@ -32,7 +32,7 @@ object Iteratee {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[E, A]) => Z): Z = done(a, i)
     }
-    def unfold[E, A](r: Iteratee[E, A]) =
+    def unapply[E, A](r: Iteratee[E, A]) =
       r.fold[Either[Iteratee[E, A], (A,Input[E])]](
         done = (a, i) => Right((a, i)),
         cont = f => Left(Cont(f))).left.toOption
@@ -44,7 +44,7 @@ object Iteratee {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[E, A]) => Z): Z = cont(f)
     }
-    def unfold[E, A](r: Iteratee[E, A]) =
+    def unapply[E, A](r: Iteratee[E, A]) =
       r.fold[Either[Iteratee[E, A], Input[E] => Iteratee[E, A]]](
         done = (a, i) => Left(Done(a, i)),
         cont = f => Right(f)).left.toOption
@@ -92,7 +92,7 @@ object Iteratee {
     def apply[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = empty
     }
-    def unfold[E](r: Input[E]) =
+    def unapply[E](r: Input[E]) =
         r.apply[Either[Input[E], Boolean]](
           empty = Right(true),
           el = e => Left(El(e)),
@@ -104,7 +104,7 @@ object Iteratee {
     def apply[E](e0: => E) = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = el(e0)
     }
-    def unfold[E](r: Input[E]) =
+    def unapply[E](r: Input[E]) =
       r.apply[Either[Input[E], (E)]](
         empty = Left(Empty[E]),
         el = e => Right(e),
@@ -116,7 +116,7 @@ object Iteratee {
     def apply[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = eof
     }
-    def unfold[E](r: Input[E]) =
+    def unapply[E](r: Input[E]) =
       r.apply[Either[Input[E], Boolean]](
         empty = Left(Empty[E]),
         el = e => Left(El(e)),
