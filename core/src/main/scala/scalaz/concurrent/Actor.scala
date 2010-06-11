@@ -12,7 +12,7 @@ sealed trait Actor[A] {
   private def work = {
     val mt = mbox.isEmpty
     if (mt) () => ()
-    else if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (())
+    else if (suspended.compareAndSet(!mt, false)) act ! (())
     else () => ()
   }
 
