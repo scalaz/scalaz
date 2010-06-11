@@ -9,29 +9,36 @@ sealed trait Actor[A] {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
-  private def work = if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (()) else () => ()
+  private def work = {
+    val mt = mbox.isEmpty
+    if (mt) () => ()
+    else if (suspended.compareAndSet(!mbox.isEmpty, false)) act ! (())
+    else () => ()
+  }
 
-  val toEffect: Effect[A] = effect[A]((a) => this ! a)(strategy)
+  val toEffect: Effect[A] = effect[A]((a) => this ! a)
 
   def !(a: A) = if (mbox offer a) work else toEffect ! a
 
   def apply(a: A) = this ! a
   
   private val act: Effect[Unit] = effect((u: Unit) => {
-    val m = mbox.remove()
-    try {e(m)} catch {
+    val m = mbox.poll
+    if (m != null) { try {
+      e(m)
+      act ! u
+    } catch {
       case e => onError(e)
     }
-    if (mbox.isEmpty) {
+    } else {
       suspended.set(true)
       work
     }
-    else act ! u
-  })(strategy)
+  })
   
   val e: A => Unit
 
-  val strategy: Strategy[Unit]
+  implicit val strategy: Strategy[Unit]
 
   val onError: Throwable => Unit
 }
@@ -40,7 +47,7 @@ trait Actors {
   def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new {
     val e = c
 
-    val strategy = s
+    implicit val strategy = s
 
     val onError = err
   } with Actor[A]
