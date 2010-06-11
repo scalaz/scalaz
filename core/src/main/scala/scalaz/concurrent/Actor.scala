@@ -24,13 +24,11 @@ sealed trait Actor[A] {
   
   private val act: Effect[Unit] = effect((u: Unit) => {
     val m = mbox.poll
-    if (m != null) { try {
+    if (m != null) try {
       e(m)
       act ! u
-    } catch {
-      case e => onError(e)
-    }
-    } else {
+    } catch { case e => onError(e) }
+    else {
       suspended.set(true)
       work
     }
