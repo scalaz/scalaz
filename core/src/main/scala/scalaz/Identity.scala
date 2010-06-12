@@ -94,14 +94,9 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def state[S]: State[S, A] = Scalaz.state((_: S, value))
 
-  def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = {
-    @tailrec
-    def unfold0(accum: M[B], v: Option[(B, A)]): M[B] = v match {
-      case None => accum
-      case Some((b, a)) => unfold0(accum ⊹ b.η, f(a))
-    }
-
-    unfold0(∅, f(value))
+  def unfold[M[_], B](f: A => Option[(B, A)])(implicit p: Pure[M], m: Monoid[M[B]]): M[B] = f(value) match {
+    case None => m.zero
+    case Some((b, a)) => b.η ⊹ a.unfold(f)
   }
 
   def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
