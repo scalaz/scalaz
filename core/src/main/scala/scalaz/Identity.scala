@@ -143,6 +143,11 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
 
+  /**
+   * @returns the result of pf(value) if defined, otherwise the the Zero element of type B.
+   */
+  def matchOrZero[B: Zero](pf: PartialFunction[A, B]) = ~pf.lift(value)
+
   @tailrec
   final def doWhile(f: A => A, p: A => Boolean): A = {
     val x = f(value)

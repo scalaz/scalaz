@@ -30,5 +30,9 @@ object ExampleIdentity {
 
     // Elvis operator
     (null: String) ?? "default" assert_≟ "default"
+
+    1 matchOrZero { case x: Int => x * 2 } assert_≟ 2
+    
+    1 matchOrZero { case x: Int if false => x * 2 } assert_≟ 0
   }
 }
