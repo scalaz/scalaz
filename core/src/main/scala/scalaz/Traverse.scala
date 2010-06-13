@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.Seq
+
 trait Traverse[T[_]] extends Functor[T] {
   def traverse[F[_] : Applicative, A, B](f: A => F[B], t: T[A]): F[T[B]]
 
@@ -8,7 +10,21 @@ trait Traverse[T[_]] extends Functor[T] {
   override def fmap[A, B](k: T[A], f: A => B) = traverse[Identity, A, B](f(_), k)
 }
 
-object Traverse {
+trait TraverseLow {
+  import Scalaz._
+  
+  implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
+      val ap: Apply[F] = implicitly[Apply[F]]
+
+      // TODO Using a builder with += rather than +: would be more efficient.
+      as.reverse.foldLeft((<∅>[CC, B]).η[F])((ys, x) => ap(f(x) ∘ ((a: B) => (b: CC[B]) => a +: b), ys))
+    }
+  }
+}
+
+object Traverse extends TraverseLow {
   import Scalaz._
 
   implicit def IdentityTraverse: Traverse[Identity] = new Traverse[Identity] {
@@ -19,14 +35,10 @@ object Traverse {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: NonEmptyList[A]) = (as.list ↦ f) ∘ ((x: List[B]) => nel(x.head, x.tail))
   }
 
-  implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] = {
-      import collection.mutable.Builder
-      val builder: Builder[B, CC[B]] = implicitly[CanBuildAnySelf[CC]].apply[Nothing, B]
-      val ap: Apply[F] = implicitly[Apply[F]]
-      as.reverse.foldLeft[F[Builder[B, CC[B]]]](builder.η[F]) {(ys, x) =>
-        ap.apply(f(x) ∘ ((a: B) => (b: Builder[B, CC[B]]) => {b += a; b}), ys)
-      } map {_.result reverse}
+  implicit def ListTraverse: Traverse[List] = new Traverse[List] {
+    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: List[A]): F[List[B]] = {
+      val a = implicitly[Apply[F]]
+      as.reverse.foldLeft((Nil: List[B]) η)((ys, x) => a(f(x) ∘ ((a: B) => (b: List[B]) => a :: b), ys))
     }
   }
 
