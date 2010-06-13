@@ -78,6 +78,8 @@ object Scalaz extends ScalazLow
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
+  import scala.collection.generic.CanBuildFrom
+  
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip, A](a)
 

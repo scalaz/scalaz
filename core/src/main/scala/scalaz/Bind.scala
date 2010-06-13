@@ -4,7 +4,7 @@ trait Bind[Z[_]] {
   def bind[A, B](a: Z[A], f: A => Z[B]): Z[B]
 }
 
-object Bind extends BindCollections {
+object Bind {
   import Scalaz._
   
   implicit def IdentityBind: Bind[Identity] = new Bind[Identity] {
@@ -17,6 +17,13 @@ object Bind extends BindCollections {
 
   implicit def StateBind[S]: Bind[PartialApply1Of2[State, S]#Apply] = new Bind[PartialApply1Of2[State, S]#Apply] {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
+  }
+
+  implicit def TraversableBind[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf]: Bind[CC] = new Bind[CC] {
+    def bind[A, B](r: CC[A], f: A => CC[B]) = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
+      r.flatMap[B, CC[B]](f)(cbf)
+    }
   }
 
   implicit def Tuple1Bind: Bind[Tuple1] = new Bind[Tuple1] {
@@ -155,11 +162,11 @@ object Bind extends BindCollections {
   }
 
   import concurrent.Promise
-  implicit def PromiseBind = new Bind[Promise] {
+  implicit def PromiseBind: Bind[Promise] = new Bind[Promise] {
     def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
   }
   
-  implicit def IterateeBind[E] = new Bind[PartialApply1Of2[Iteratee, E]#Apply] {
+  implicit def IterateeBind[E]: Bind[PartialApply1Of2[Iteratee, E]#Apply] = new Bind[PartialApply1Of2[Iteratee, E]#Apply] {
     import Iteratee._
     def bind[A, B](a: Iteratee[E, A], f: A => Iteratee[E, B]) = a.fold(
       done = (x, str) => f(x).fold(

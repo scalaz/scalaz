@@ -13,15 +13,22 @@ package scalaz
  */
 trait Functor[F[_]] extends InvariantFunctor[F] {
   def fmap[A, B](r: F[A], f: A => B): F[B]
-  
-  final def xmap[A,B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
+
+  final def xmap[A, B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
 }
 
-object Functor extends FunctorCollections {
+object Functor {
   import Scalaz._
 
   implicit def IdentityFunctor: Functor[Identity] = new Functor[Identity] {
     def fmap[A, B](r: Identity[A], f: A => B) = f(r.value)
+  }
+
+  implicit def TraversableFunctor[CC[X] <: collection.TraversableLike[X, CC[X]] : CanBuildAnySelf]: Functor[CC] = new Functor[CC] {
+    def fmap[A, B](r: CC[A], f: A => B) = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
+      r map f
+    }
   }
 
   implicit def NonEmptyListFunctor = new Functor[NonEmptyList] {
@@ -110,10 +117,6 @@ object Functor extends FunctorCollections {
     def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
   }
 
-  implicit def ArraySeqFunctor: Functor[ArraySeq] = new Functor[ArraySeq] {
-    def fmap[A, B](r: ArraySeq[A], f: A => B) = r map f
-  }
-
   implicit def EitherLeftFunctor[X]: Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def fmap[A, B](r: Either.LeftProjection[A, X], f: A => B) = r.map(f).left
   }
@@ -125,18 +128,18 @@ object Functor extends FunctorCollections {
   implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
-  
+
   implicit def IterateeFunctor[X]: Functor[PartialApply1Of2[Iteratee, X]#Apply] = new Functor[PartialApply1Of2[Iteratee, X]#Apply] {
     import Iteratee._
     def fmap[A, B](r: Iteratee[X, A], f: A => B) = {
       r fold (
-        done = (a, i) => Done(f(a), i), 
-        cont = k => Cont(i => fmap(k(i), f))
-      )
+              done = (a, i) => Done(f(a), i),
+              cont = k => Cont(i => fmap(k(i), f))
+              )
     }
   }
-  
-  implicit def KleisliFunctor[M[_],P](implicit ff: Functor[M]): Functor[PartialApplyKA[Kleisli,M,P]#Apply] = new Functor[PartialApplyKA[Kleisli,M,P]#Apply] {
+
+  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[PartialApplyKA[Kleisli, M, P]#Apply] = new Functor[PartialApplyKA[Kleisli, M, P]#Apply] {
     def fmap[A, B](k: Kleisli[M, P, A], f: A => B): Kleisli[M, P, B] = ☆((p: P) => ff.fmap(k(p), f))
   }
 
@@ -187,14 +190,14 @@ object Functor extends FunctorCollections {
 
   import FingerTree._
 
-  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new  Functor[PartialType2[ViewL, S]#Apply] {
+  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new Functor[PartialType2[ViewL, S]#Apply] {
     def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
-      t.fold(EmptyL[S,B], (x, xs) => f(x) &: s.fmap(xs, f))
+      t.fold(EmptyL[S, B], (x, xs) => f(x) &: s.fmap(xs, f))
   }
 
-  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new  Functor[PartialType2[ViewR, S]#Apply] {
+  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new Functor[PartialType2[ViewR, S]#Apply] {
     def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
-      t.fold(EmptyR[S,B], (xs, x) => s.fmap(xs, f) :& f(x))
+      t.fold(EmptyR[S, B], (xs, x) => s.fmap(xs, f) :& f(x))
   }
 
   import scalaz.concurrent.Promise
@@ -207,7 +210,7 @@ object Functor extends FunctorCollections {
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
   // http://lampsvn.epfl.ch/trac/scala/ticket/2782
   /*implicit*/
-  def JavaCollectionFunctor[S[X] <: java.util.Collection[X]: Empty]: Functor[S] = new Functor[S] {
+  def JavaCollectionFunctor[S[X] <: java.util.Collection[X] : Empty]: Functor[S] = new Functor[S] {
     def fmap[A, B](r: S[A], f: A => B) = {
       val a: S[B] = <∅>
       val i = r.iterator

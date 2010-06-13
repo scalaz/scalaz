@@ -38,7 +38,15 @@ trait Foldable[F[_]] {
   }
 }
 
-object Foldable extends FoldableCollections {
+trait FoldableLow {
+ implicit def TraversableFoldable[CC[X] <: Traversable[X]]: Foldable[CC] = new Foldable[CC] {
+    override def foldRight[A, B](t: CC[A], b: => B, f: (A, => B) => B): B = t.foldRight(b)(f(_, _))
+   
+    override def foldLeft[A, B](t: CC[A], b: B, f: (B, A) => B): B = t.foldLeft(b)(f(_, _))
+  }
+}
+
+object Foldable extends FoldableLow {
   import Scalaz._
 
   implicit def IdentityFoldable: Foldable[Identity] = new Foldable[Identity] {

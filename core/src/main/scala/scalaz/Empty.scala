@@ -1,6 +1,8 @@
 package scalaz
 
-trait Empty[+E[_]] {
+import collection.TraversableLike
+
+trait Empty[E[_]] {
   def empty[A]: E[A]
 }
 
@@ -8,7 +10,7 @@ trait Emptys {
   def <∅>[E[_], A](implicit e: Empty[E]): E[A] = e.empty
 }
 
-object Empty extends EmptyCollections {
+object Empty {
   import Scalaz._
 
   implicit def ZipStreamEmpty: Empty[ZipStream] = new Empty[ZipStream] {
@@ -25,6 +27,13 @@ object Empty extends EmptyCollections {
 
   implicit def EitherRightEmpty[X: Zero]: Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] {
     def empty[A] = Left(∅).right
+  }
+  
+  implicit def TraversableEmpty[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Empty[CC] = new Empty[CC] {
+    def empty[A] = {
+      val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]
+      builder.result
+    }
   }
 
   import java.util._

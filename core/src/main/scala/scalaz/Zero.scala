@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.TraversableLike
+
 /**
  * A Zero in type Z provides the identity element for the operation  { @link scalaz.Semigroup # append }
  * in the corresponding  { @link scalaz.Semigroup } in type Z.
@@ -32,7 +34,7 @@ trait Zeros {
   def mzero[Z](implicit z: Zero[Z]): Z = z.zero
 }
 
-object Zero extends ZeroCollections {
+object Zero {
   import Scalaz._
   import xml.{Elem, Node, NodeSeq}
 
@@ -80,7 +82,10 @@ object Zero extends ZeroCollections {
 
   implicit def BigIntMutliplicationZero: Zero[BigIntMultiplication] = zero(BigInt(1) ∏)
 
-  implicit def NodeSeqZero: Zero[NodeSeq] = zero(NodeSeq.Empty)
+  implicit def TraversableZero[X, CC[Y] <: TraversableLike[Y, CC[Y]] : CanBuildAnySelf]: Zero[CC[X]] = {
+    val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, X]
+    zero(builder.result)
+  }
 
   // Not implicit to ensure implicitly[Zero[NodeSeq]].zero === NodeSeqZero.zero
   def NodeZero: Zero[Node] = new Zero[Node] {

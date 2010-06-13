@@ -4,7 +4,16 @@ trait Plus[P[_]] {
   def plus[A](a1: P[A], a2: => P[A]): P[A]
 }
 
-object Plus extends PlusCollections {
+trait PlusLow {  
+  implicit def TraversablePlus[CC[Y] <: collection.TraversableLike[Y, CC[Y]] : CanBuildAnySelf]: Plus[CC] = new Plus[CC] {
+    def plus[X](s1: CC[X], s2: => CC[X]): CC[X] = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[X, X]
+      s1 ++ s2
+    }
+  }
+}
+
+object Plus extends PlusLow {
   import Scalaz._
 
   implicit def NonEmptyListPlus: Plus[NonEmptyList] = new Plus[NonEmptyList] {
@@ -22,7 +31,6 @@ object Plus extends PlusCollections {
   implicit def OptionPlus: Plus[Option] = new Plus[Option] {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
-
 
   implicit def EitherLeftPlus[X]: Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
     def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {

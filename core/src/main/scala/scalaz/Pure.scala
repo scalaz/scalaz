@@ -1,10 +1,13 @@
 package scalaz
 
+import collection.generic.GenericTraversableTemplate
+import collection.TraversableLike
+
 trait Pure[P[_]] {
   def pure[A](a: => A): P[A]
 }
 
-object Pure extends PureCollections {
+object Pure {
   import Scalaz._
 
   implicit def IdentityPure: Pure[Identity] = new Pure[Identity] {
@@ -17,6 +20,14 @@ object Pure extends PureCollections {
 
   implicit def NonEmptyListPure: Pure[NonEmptyList] = new Pure[NonEmptyList] {
     def pure[A](a: => A) = a.wrapNel
+  }
+
+  implicit def TraversablePure[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Pure[CC] = new Pure[CC] {
+    def pure[A](a: => A) = {
+      val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]
+      builder += a
+      builder.result
+    }
   }
 
   implicit def StatePure[S]: Pure[PartialApply1Of2[State, S]#Apply] = new Pure[PartialApply1Of2[State, S]#Apply] {

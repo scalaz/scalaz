@@ -22,7 +22,16 @@ trait Semigroups {
   }
 }
 
-object Semigroup extends SemigroupCollections {
+trait SemigroupLow {
+  implicit def TraversableSemigroup[X, CC[Y] <: collection.TraversableLike[Y, CC[Y]] : CanBuildAnySelf]: Semigroup[CC[X]] = new Semigroup[CC[X]] {
+    def append(s1: CC[X], s2: => CC[X]): CC[X] = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[X, X]
+      s1 ++ s2
+    }
+  }  
+}
+
+object Semigroup extends SemigroupLow {
   import Scalaz._
   import xml.NodeSeq
 
