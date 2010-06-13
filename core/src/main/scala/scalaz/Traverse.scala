@@ -1,7 +1,5 @@
 package scalaz
 
-import collection.Seq
-
 trait Traverse[T[_]] extends Functor[T] {
   def traverse[F[_] : Applicative, A, B](f: A => F[B], t: T[A]): F[T[B]]
 
