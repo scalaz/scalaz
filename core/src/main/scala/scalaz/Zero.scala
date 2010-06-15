@@ -1,6 +1,6 @@
 package scalaz
 
-import collection.TraversableLike
+import collection.generic.CanBuildFrom
 
 /**
  * A Zero in type Z provides the identity element for the operation  { @link scalaz.Semigroup # append }
@@ -82,10 +82,8 @@ object Zero {
 
   implicit def BigIntMutliplicationZero: Zero[BigIntMultiplication] = zero(BigInt(1) ∏)
 
-  implicit def TraversableZero[X, CC[Y] <: TraversableLike[Y, CC[Y]] : CanBuildAnySelf]: Zero[CC[X]] = {
-    val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, X]
-    zero(builder.result)
-  }
+  implicit def TraversableZero[CC <: Traversable[_]](implicit cbf: CanBuildFrom[Nothing, Nothing, CC]): Zero[CC] =
+    zero(cbf.apply.result)
 
   // Not implicit to ensure implicitly[Zero[NodeSeq]].zero === NodeSeqZero.zero
   def NodeZero: Zero[Node] = new Zero[Node] {

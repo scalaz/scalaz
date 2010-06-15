@@ -106,6 +106,10 @@ object ImplicitConversionTest {
     implicitly[Monoid[Seq[Int]]]
   }
 
+  def zero {
+    implicitly[Zero[Map[Int, Int]]]
+  }
+
   def monad[A, B, R, S, T, U, V, W, X] {
     implicitly[Monad[List]]
     implicitly[Monad[Stream]]
