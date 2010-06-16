@@ -193,6 +193,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       x => single(f(x)),
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
+
+  import scala.collection.immutable.Stream
+  import scala.collection.immutable.Stream._
+
+  def toStream: Stream[A] = map(x => x)(StreamReducer[A]).measure 
 }
 
 object FingerTree {
