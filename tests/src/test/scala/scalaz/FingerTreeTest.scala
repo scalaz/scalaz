@@ -23,4 +23,11 @@ class FingerTreeTest extends Specification with Sugar with ScalaCheck {
     (x <+: tree).toStream ≟ (x +: tree.toStream)
   }
 
+  "converting a stream to a finger-tree and back produces an equal stream" verifies {(stream: Stream[Int]) =>
+    streamToTree(stream).toStream ≟ stream
+  }
+
+  "appending two trees works correctly"  verifies {(tree1: SequenceTree[Int], tree2: SequenceTree[Int]) =>
+    (tree1 <++> tree2).toStream ≟ (tree1.toStream ++ tree2.toStream)
+  }
 }
