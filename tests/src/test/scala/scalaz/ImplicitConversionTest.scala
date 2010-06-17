@@ -146,6 +146,18 @@ object ImplicitConversionTest {
     implicitly[Foldable[Set]]
   }
 
+  def equal {
+    type A = Int
+    type B = Int
+    implicitly[Equal[(A, B)]]
+    implicitly[Equal[Seq[A]]]
+    implicitly[Equal[List[A]]]
+    implicitly[Equal[ArraySeq[A]]]
+    implicitly[Equal[Stream[A]]]
+    implicitly[Equal[Map[A, B]]]
+    implicitly[Equal[collection.SortedMap[A, B]]]
+  }
+
   def partialApply {
     trait A
     trait B
