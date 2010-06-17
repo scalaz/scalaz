@@ -26,4 +26,3 @@ object CanBuildAnySelf {
     def builder[A, B] = implicitly[CanBuildSelfExistential[CC]].asInstanceOf[CanBuildSelf[CC, A, B]]
   }
 }
-

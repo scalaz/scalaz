@@ -87,6 +87,32 @@ object ScalazArbitrary {
 
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
+  import FingerTree._
+  
+  implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
+    arbitrary[A] ∘ (one(_): Finger[V, A]),
+    (arbitrary[A] ⊛ arbitrary[A])(two(_, _): Finger[V, A]),
+    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(three(_, _, _): Finger[V, A]),
+    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(four(_, _, _, _): Finger[V, A])
+  ))
+
+  implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
+    (arbitrary[A] ⊛ arbitrary[A])(node2[V, A] _),
+    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(node3[V, A] _)
+  ))
+
+  implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
+    def fingerTree[A](n: Int)(implicit a1: Arbitrary[A], measure1: Reducer[A, V]): Gen[FingerTree[V, A]] = n match {
+      case 0 => empty[V, A]
+      case 1 => arbitrary[A] ∘ (single[V, A] _)
+      case n => {
+        val nextSize = n.abs / 2
+        (arbitrary[Finger[V, A]] ⊛ fingerTree[Node[V, A]](nextSize) ⊛ arbitrary[Finger[V, A]])(deep[V, A](_, _, _))
+      }
+    }
+    Gen.sized(fingerTree[A] _)
+  }
+
   import java.util.concurrent.Callable
 
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = arb[A] ∘ ((x: A) => x.η[Callable])
