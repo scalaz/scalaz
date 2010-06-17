@@ -402,7 +402,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   import scala.collection.immutable.Stream._
 
   def toStream: Stream[A] = map(x => x)(StreamReducer[A]).measure 
-  def toList: List[A] = map(x => x)(ListReducer[A]).measure
+  def toList: List[A] = toStream.toList
 
   import FingerTree._
 
@@ -511,7 +511,8 @@ object FingerTree {
              (implicit ms: Reducer[A, V]): FingerTree[V, A] = 
     new FingerTree[V, A] {
       implicit val nodeMeasure = NodeMeasure[A, V]
+      lazy val mz = m
       def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
-        d(v, pr, m, sf)
+        d(v, pr, mz, sf)
     }
 }
