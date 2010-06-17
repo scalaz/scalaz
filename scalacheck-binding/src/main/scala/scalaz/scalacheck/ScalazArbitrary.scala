@@ -104,7 +104,7 @@ object ScalazArbitrary {
   implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
     def fingerTree[A](n: Int)(implicit a1: Arbitrary[A], measure1: Reducer[A, V]): Gen[FingerTree[V, A]] = n match {
       case 0 => empty[V, A]
-      case 1 => arbitrary[A] ∘ (single[V, A] _)
+      case 1 => arbitrary[A] ∘ (single[V, A](_))
       case n => {
         val nextSize = n.abs / 2
         (arbitrary[Finger[V, A]] ⊛ fingerTree[Node[V, A]](nextSize) ⊛ arbitrary[Finger[V, A]])(deep[V, A](_, _, _))

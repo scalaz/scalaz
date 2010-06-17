@@ -414,7 +414,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 }
 
 object FingerTree {
-  implicit def FingerTreeShow[V: Show, A: Show] = shows((t: FingerTree[V,A]) => t.fold(
+  implicit def FingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = shows((t: FingerTree[V,A]) => t.fold(
     empty = v => v + " []",
     single = (v, x) => v + " [" + x.shows + "]",
     deep = (v, pf, m, sf) => v + " [" + pf.toList.shows + ", ?, " + sf.toList.shows + "]"
