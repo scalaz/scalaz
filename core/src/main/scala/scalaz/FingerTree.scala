@@ -33,7 +33,7 @@ sealed abstract class Finger[V, A] {
 
   def measure: V
 
-  def toList = map(x => x)(StreamReducer[A]).measure
+  def toList = map(x => x)(ListReducer[A]).measure
 }
 case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1)
@@ -151,7 +151,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
 
-  def fold[B](empty: V => B, single: (V, A) => B, deep: (=> V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
+  def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
   def <+:(a: A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
@@ -493,13 +493,13 @@ object FingerTree {
   }
 
   def empty[V, A](implicit ms: Reducer[A, V]) = new FingerTree[V, A] {
-    def fold[B](b: V => B, s: (V, A) => B, d: (=> V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = b(ms.monoid.zero)
+    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = b(ms.monoid.zero)
   }
 
   def single[V, A](a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(a.unit[V], a)
 
   def single[V, A](v: V, a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = new FingerTree[V, A] {
-    def fold[B](b: V => B, s: (V, A) => B, d: (=> V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
+    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
   }
 
   def deep[V, A](pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A])
@@ -511,7 +511,7 @@ object FingerTree {
              (implicit ms: Reducer[A, V]): FingerTree[V, A] = 
     new FingerTree[V, A] {
       implicit val nodeMeasure = NodeMeasure[A, V]
-      def fold[B](b: V => B, f: (V, A) => B, d: (=> V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
+      def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, m, sf)
     }
 }
