@@ -282,4 +282,11 @@ object FingerTree {
       def fold[B](b: => B, f: A => B, d: (V, Finger[V, A], FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(mappendVal(pr.unit[V], m) snoc sf, pr, m, sf)
     }
+
+  /*implicit def FingerShow[V: Show, A: Show]: Show[Finger[V, A]]
+
+  implicit def FingerTreeShow[V: Show, A: Show]: Show[FingerTree[V, A]] = show((t: FingerTree[V, A]) =>
+    t.fold("Empty".toList, x => "Single(".toList ++ x.show ++ ")",
+      (v, pf, it, sf) => "Deep(".toList ++ v.show ++ "," ++ pf.show ++ "," ++ it.show ++ "," ++ sf.show ++ ")")
+  )*/
 }
