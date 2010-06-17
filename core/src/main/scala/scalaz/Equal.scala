@@ -197,6 +197,9 @@ object Equal {
     !(b || i1.hasNext || i2.hasNext)
   })
 
+  implicit def MapEqual[A: Equal, B: Equal] =
+    equal((a: Iterable[(A,B)], b: Iterable[(A, B)]) => a == b)
+
   implicit def JavaMapEntry[K: Equal, V: Equal]: Equal[java.util.Map.Entry[K, V]] = equal((a1, a2) => a1.getKey ≟ a2.getKey)
 
   implicit def JavaMapEqual[K: Equal, V: Equal]: Equal[java.util.Map[K, V]] = equal(_.entrySet ≟ _.entrySet)

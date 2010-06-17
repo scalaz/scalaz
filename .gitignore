@@ -1,3 +1,4 @@
+*.swo
 *.swp
 lib_managed
 project/boot

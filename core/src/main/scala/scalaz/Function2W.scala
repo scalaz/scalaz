@@ -16,6 +16,8 @@ sealed trait Function2W[T1, T2, R] {
   def comap[TT](f: TT => T1)(implicit ev: T1 =:= T2): (TT, TT) => R = (t1, t2) => k(f(t1), ev(f(t2)))
 
   def lift[F[_]](implicit f: Applicative[F]): (F[T1], F[T2]) => F[R] = (a: F[T1], b: F[T2]) => (a <**> b)(this)
+
+  def byName: (=> T1, => T2) => R = (t1, t2) => k(t1, t2)
 }
 
 trait Function2s {

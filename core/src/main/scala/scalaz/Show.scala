@@ -237,6 +237,8 @@ object Show {
     case Failure(e) => "Failure(" + e.shows + ")"
   }
 
+  implicit def MapShow[A:Show,B:Show]: Show[Map[A,B]] = show((m:Iterable[(A,B)]) => m.show)
+
   implicit def JavaIterableShow[A: Show]: Show[java.lang.Iterable[A]] = show(as => {
     val k = new collection.mutable.ListBuffer[Char]
     val i = as.iterator

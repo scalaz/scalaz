@@ -129,9 +129,9 @@ object Functor {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
 
-  implicit def IterateeFunctor[X]: Functor[PartialApply1Of2[Iteratee, X]#Apply] = new Functor[PartialApply1Of2[Iteratee, X]#Apply] {
-    import Iteratee._
-    def fmap[A, B](r: Iteratee[X, A], f: A => B) = {
+  implicit def IterVFunctor[X]: Functor[PartialApply1Of2[IterV, X]#Apply] = new Functor[PartialApply1Of2[IterV, X]#Apply] {
+    import IterV._
+    def fmap[A, B](r: IterV[X, A], f: A => B) = {
       r fold (
               done = (a, i) => Done(f(a), i),
               cont = k => Cont(i => fmap(k(i), f))
