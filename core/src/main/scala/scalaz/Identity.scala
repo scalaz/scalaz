@@ -140,6 +140,8 @@ sealed trait Identity[A] extends PimpedType[A] {
   def some: Option[A] = Some(value)
 
   def pair: (A, A) = (value, value)
+  
+  def squared: (A, A) = pair
 
   def left[B]: Either[A, B] = Left(value)
 
@@ -163,8 +165,6 @@ sealed trait Identity[A] extends PimpedType[A] {
   @tailrec
   final def whileDo(f: A => A, p: A => Boolean): A =
     if (p(value)) f(value).whileDo(f, p) else value
-
-  def squared: (A, A) = ×[A, A].μ apply value
 
   /** A pair lazy in its right value, with this value on the left and the given value on the right. **/
   def <&>[B](b: => B): (A :&: B) = lazyTuple(value, b)
