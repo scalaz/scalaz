@@ -141,8 +141,8 @@ object Pure {
     def pure[A](a: => A) = Failure(a).fail
   }
   
-  implicit def IterateePure[E] = new Pure[PartialApply1Of2[Iteratee, E]#Apply] {
-    import Iteratee._
+  implicit def IterVPure[E] = new Pure[PartialApply1Of2[IterV, E]#Apply] {
+    import IterV._
     def pure[A](a: => A) = Done(a, Empty[E])
   }
 

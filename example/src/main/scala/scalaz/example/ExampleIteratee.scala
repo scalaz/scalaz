@@ -5,10 +5,10 @@ object ExampleIteratee {
 
   import scalaz._
   import Scalaz._
-  import Iteratee._
+  import IterV._
 
   implicit val StreamEnumerator = new Enumerator[Stream] {
-    def apply[E, A](e: Stream[E], i: Iteratee[E, A]): Iteratee[E, A] = e match {
+    def apply[E, A](e: Stream[E], i: IterV[E, A]): IterV[E, A] = e match {
       case Stream() => i
       case x #:: xs => i.fold(done = (_, _) => i, cont = k => apply(xs, k(El(x))))
     }

@@ -60,7 +60,7 @@ object Monad {
 
   implicit def ValidationFailureMonad[X]: Monad[PartialApply1Of2[FailProjection, X]#Flip] = monad[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureBind, ValidationFailurePure)
 
-  implicit def IterateeMonad[E] = monad[PartialApply1Of2[Iteratee, E]#Apply](IterateeBind, IterateePure)
+  implicit def IterVMonad[E] = monad[PartialApply1Of2[IterV, E]#Apply](IterVBind, IterVPure)
 
   import java.util.Map.Entry
 

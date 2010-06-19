@@ -79,9 +79,9 @@ object Equal {
 
   implicit def NodeSeqEqual: Equal[NodeSeq] = equalA
 
-  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = IterableEqual[A] ∙ ((_: NonEmptyList[A]).list)
+  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = implicitly[Equal[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
 
-  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = IterableEqual[A] ∙ ((_: ZipStream[A]).value)
+  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = implicitly[Equal[Iterable[A]]] ∙ ((_: ZipStream[A]).value)
 
   implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equal(_._1 ≟ _._1)
 
@@ -145,7 +145,7 @@ object Equal {
   implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) =>
       a1.rootLabel ≟ a2.rootLabel
-              && IterableEqual[Tree[A]].equal(a1.subForest, a2.subForest))
+              && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest, a2.subForest))
 
   implicit def TreeLocEqual[A: Equal]: Equal[TreeLoc[A]] = {
     equal[TreeLoc[A]]((a1, a2) =>
@@ -157,7 +157,7 @@ object Equal {
   implicit def PromiseEqual[A: Equal]: Equal[Promise[A]] =
     equal[Promise[A]]((a1, a2) => a1.get ≟ a2.get)
 
-  def IterableEqual[A: Equal]: Equal[Iterable[A]] = equal((a1, a2) => {
+  implicit def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
     val i2 = a2.iterator
     var b = false
@@ -174,11 +174,8 @@ object Equal {
     !(b || i1.hasNext || i2.hasNext)
   })
 
-  implicit def ListEqual[A: Equal]: Equal[List[A]] = IterableEqual[A]
-
-  implicit def StreamEqual[A: Equal]: Equal[Stream[A]] = IterableEqual[A]
-
-  implicit def ArraySeqEqual[A: Equal]: Equal[ArraySeq[A]] = IterableEqual[A]
+  implicit def MapEqual[CC[K, V] <: collection.Map[K, V], A: Equal, B: Equal]: Equal[collection.Map[A, B]] =
+    implicitly[Equal[Iterable[(A, B)]]] ∙ ((m: collection.Map[A, B]) => m : Iterable[(A, B)] )
 
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator

@@ -166,9 +166,9 @@ object Bind {
     def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
   }
   
-  implicit def IterateeBind[E]: Bind[PartialApply1Of2[Iteratee, E]#Apply] = new Bind[PartialApply1Of2[Iteratee, E]#Apply] {
-    import Iteratee._
-    def bind[A, B](a: Iteratee[E, A], f: A => Iteratee[E, B]) = a.fold(
+  implicit def IterVBind[E]: Bind[PartialApply1Of2[IterV, E]#Apply] = new Bind[PartialApply1Of2[IterV, E]#Apply] {
+    import IterV._
+    def bind[A, B](a: IterV[E, A], f: A => IterV[E, B]) = a.fold(
       done = (x, str) => f(x).fold(
         done = (x2, _) => Done(x2, str),
         cont = _(str)),

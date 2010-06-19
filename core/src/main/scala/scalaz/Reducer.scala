@@ -41,7 +41,7 @@ trait Reducers {
     }
   }
 
-  implicit def Reducer[M: Monoid]: Reducer[M, M] = Reducer(x => x)
+  def Reducer[M: Monoid]: Reducer[M, M] = Reducer(x => x)
 
   def ListReducer[C] = new Reducer[C, List[C]] {
     override def unit(c: C) = List(c)

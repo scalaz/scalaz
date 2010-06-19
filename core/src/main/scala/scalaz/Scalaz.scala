@@ -121,7 +121,7 @@ object Scalaz extends ScalazLow
 
   implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[PartialApply1Of2[FailProjection, A]#Flip, E] = ma[PartialApply1Of2[FailProjection, A]#Flip, E](f)
   
-  implicit def IterateeMA[A, E](v: Iteratee[E, A]): MA[PartialApply1Of2[Iteratee, E]#Apply, A] = ma[PartialApply1Of2[Iteratee, E]#Apply, A](v)
+  implicit def IterVMA[A, E](v: IterV[E, A]): MA[PartialApply1Of2[IterV, E]#Apply, A] = ma[PartialApply1Of2[IterV, E]#Apply, A](v)
 
   import java.util.Map.Entry
 

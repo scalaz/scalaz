@@ -42,4 +42,3 @@ trait Extras {
     type Apply[B] = A
   }
 }
-

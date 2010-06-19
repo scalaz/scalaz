@@ -21,6 +21,8 @@ sealed trait Function1W[T, R] {
   def lift[F[_]](implicit f: Functor[F]): (F[T]) => F[R] = (x: F[T]) => x.map(this)
 
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
+
+  def byName: (=> T) => R = t => k(t)
 }
 
 trait Function1s {
