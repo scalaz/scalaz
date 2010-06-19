@@ -7,9 +7,13 @@ trait Order[-A] extends Equal[A] {
 }
 
 trait Orders {
+  import Scalaz._
+  
   def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
     def order(a1: A, a2: A) = f(a1, a2)
-  }              
+  }
+
+  def orderBy[A, B: Order](f: A => B): Order[A] = implicitly[Order[B]] ∙ f
 }
 
 object Order {
@@ -17,7 +21,7 @@ object Order {
   import java.math.BigInteger
   import Predef.{implicitly => i}
 
-  implicit def DigitOrder: Order[Digit] = IntOrder ∙ ((_: Digit).toInt)
+  implicit def DigitOrder: Order[Digit] = orderBy(_.toInt)
 
   implicit def OrderingOrder: Order[Ordering] = order {
     case (a, EQ) => a
@@ -35,27 +39,27 @@ object Order {
 
   implicit def IntOrder: Order[Int] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def IntMultiplicationOrder: Order[IntMultiplication] = i[Order[Int]] ∙ ((_: IntMultiplication).value)
+  implicit def IntMultiplicationOrder: Order[IntMultiplication] = orderBy(_.value)
 
   implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = i[Order[Boolean]] ∙ ((_: BooleanConjunction).value)
+  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = orderBy(_.value)
 
   implicit def CharOrder: Order[Char] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def CharMultiplicationOrder: Order[CharMultiplication] = i[Order[Char]] ∙ ((_: CharMultiplication).value)
+  implicit def CharMultiplicationOrder: Order[CharMultiplication] = orderBy(_.value)
 
   implicit def ByteOrder: Order[Byte] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = i[Order[Byte]] ∙ ((_: ByteMultiplication).value)
+  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = orderBy(_.value)
 
   implicit def LongOrder: Order[Long] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def LongMultiplicationOrder: Order[LongMultiplication] = i[Order[Long]] ∙ ((_: LongMultiplication).value)
+  implicit def LongMultiplicationOrder: Order[LongMultiplication] = orderBy(_.value)
 
   implicit def ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = i[Order[Short]] ∙ ((_: ShortMultiplication).value)
+  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = orderBy(_.value)
 
   implicit def FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
@@ -63,15 +67,15 @@ object Order {
 
   implicit def BigIntegerOrder: Order[BigInteger] = order(_ compareTo _ ordering)
 
-  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = i[Order[BigInteger]] ∙ ((_: BigIntegerMultiplication).value)
+  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = orderBy(_.value)
 
   implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
 
-  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = i[Order[BigInt]] ∙ ((_: BigIntMultiplication).value)
+  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = orderBy(_.value)
 
-  implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] = IterableOrder[A] ∙ ((_: NonEmptyList[A]).list)
+  implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] = orderBy(_.list)
 
-  implicit def ZipStreamOrder[A: Order]: Order[ZipStream[A]] = IterableOrder[A] ∙ ((_: ZipStream[A]).value)
+  implicit def ZipStreamOrder[A: Order]: Order[ZipStream[A]] = orderBy(_.value)
 
   implicit def Tuple1Order[A: Order]: Order[Tuple1[A]] = order(_._1 ?|? _._1)
 
@@ -157,7 +161,7 @@ object Order {
     case (None, None) => EQ
   })
 
-  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = EitherOrder[E, A] ∙ ((_: Validation[E, A]).either)
+  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = orderBy(_.either)
 
   implicit def JavaIterableOrder[A: Order]: Order[java.lang.Iterable[A]] = {
     import collection.JavaConversions._
