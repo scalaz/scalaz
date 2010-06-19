@@ -5,6 +5,7 @@ trait Show[A] {
 }
 
 trait Shows {
+  import Scalaz._
   def show[A](f: A => List[Char]): Show[A] = new Show[A] {
     def show(a: A) = f(a)
   }
@@ -12,13 +13,15 @@ trait Shows {
   def shows[A](f: A => String): Show[A] = show[A](f(_).toList)
 
   def showA[A]: Show[A] = shows[A](_.toString)
+  
+  def showBy[A, B: Show](f: A => B): Show[A] = implicitly[Show[B]] ∙ f
 }
 
 object Show {
   import Scalaz._
   import Predef.{implicitly => i}
 
-  implicit def DigitShow: Show[Digit] = i[Show[Int]] ∙ ((_: Digit).toInt)
+  implicit def DigitShow: Show[Digit] = showBy(_.toInt)
 
   implicit def OrderingShow: Show[Ordering] = showA
 
@@ -44,7 +47,7 @@ object Show {
 
   implicit def DoubleShow: Show[Double] = showA
 
-  def NewTypeShow[B: Show, A <: NewType[B]]: Show[A] = i[Show[B]] ∙ ((_: NewType[B]).value)
+  def NewTypeShow[B: Show, A <: NewType[B]]: Show[A] = showBy(_.value)
 
   implicit def IntMultiplicationShow: Show[IntMultiplication] = NewTypeShow[Int, IntMultiplication]
 
@@ -231,7 +234,7 @@ object Show {
 
   implicit def JavaIterableEqual[CC[X] <: jl.Iterable[X], A: Show]: Show[CC[A]] = {
     import scala.collection.JavaConversions._
-    i[Show[Iterable[A]]] ∙ ((as: jl.Iterable[A]) => as: Iterable[A])
+    showBy((i: jl.Iterable[A]) => i: Iterable[A])
   }
 
   implicit def JavaMapShow[K: Show, V: Show]: Show[ju.Map[K, V]] = show(m => {
