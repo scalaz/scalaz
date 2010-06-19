@@ -160,6 +160,7 @@ object ImplicitConversionTest {
     i[Equal[java.util.Map[A, B]]]
     i[Equal[java.util.List[A]]]
     i[Equal[java.lang.Iterable[A]]]
+    i[Equal[IntMultiplication]]
   }
 
   def show {
@@ -175,6 +176,7 @@ object ImplicitConversionTest {
     i[Show[java.util.Map[A, B]]]
     i[Show[java.util.List[A]]]
     i[Show[java.lang.Iterable[A]]]
+    i[Show[IntMultiplication]]
   }
 
   def partialApply {

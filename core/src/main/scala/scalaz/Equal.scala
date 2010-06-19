@@ -18,11 +18,17 @@ trait Equal[-A] {
 }
 
 trait Equals {
+  import Scalaz._
   def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
+  /**
+   * Constructs an `Equal` instance for type `A` based on `Any.==`.
+   */
   def equalA[A]: Equal[A] = equal[A](_ == _)
+
+  def equalBy[A, B: Equal](f: A => B): Equal[A] = implicitly[Equal[B]] ∙ f
 }
 
 object Equal {
@@ -37,7 +43,7 @@ object Equal {
 
   implicit def StringEqual: Equal[String] = equalA
 
-  def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = i[Equal[B]] ∙ ((_: NewType[B]).value)
+  def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = equalBy(_.value)
 
   implicit def UnitEqual: Equal[Unit] = equalA
 
@@ -79,11 +85,11 @@ object Equal {
 
   implicit def NodeSeqEqual: Equal[NodeSeq] = equalA
 
-  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = i[Equal[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
+  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = equalBy(_.list)
 
-  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = i[Equal[Iterable[A]]] ∙ ((_: ZipStream[A]).value)
+  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = equalBy(_.value)
 
-  implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equal(_._1 ≟ _._1)
+  implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equalBy(_._1)
 
   implicit def Tuple2Equal[A: Equal, B: Equal]: Equal[(A, B)] = equal {
     case ((a1, b1), (a2, b2)) => a1 ≟ a2 && b1 ≟ b2
@@ -109,16 +115,16 @@ object Equal {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 ≟ a2 && b1 ≟ b2 && c1 ≟ c2 && d1 ≟ d2 && e1 ≟ e2 && f1 ≟ f2 && g1 ≟ g2
   }
 
-  implicit def Function0Equal[A: Equal]: Equal[Function0[A]] = equal(_.apply ≟ _.apply)
+  implicit def Function0Equal[A: Equal]: Equal[Function0[A]] = equalBy(_.apply)
 
   implicit def OptionEqual[A: Equal]: Equal[Option[A]] = equal {
     case (Some(a1), Some(a2)) => a1 ≟ a2
     case (a1, a2) => a1.isDefined == a2.isDefined
   }
 
-  implicit def OptionFirstEqual[A: Equal]: Equal[FirstOption[A]] = OptionEqual[A] ∙ ((_: FirstOption[A]).value)
+  implicit def OptionFirstEqual[A: Equal]: Equal[FirstOption[A]] = equalBy(_.value)
 
-  implicit def OptionLastEqual[A: Equal]: Equal[LastOption[A]] = OptionEqual[A] ∙ ((_: LastOption[A]).value)
+  implicit def OptionLastEqual[A: Equal]: Equal[LastOption[A]] = equalBy(_.value)
 
   implicit def EitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] = equal {
     case (Left(a1), Left(a2)) => a1 ≟ a2
@@ -138,9 +144,9 @@ object Equal {
       case (a1, a2) => a1.isDefined == a2.isDefined
     })
 
-  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = EitherEqual[E, A] ∙ ((_: Validation[E, A]).either)
+  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = equalBy(_.either)
 
-  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] = ValidationEqual[E, A] ∙ ((_: FailProjection[E, A]).validation)
+  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] = equalBy(_.validation)
 
   implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) =>
@@ -196,9 +202,9 @@ object Equal {
 
   implicit def JavaMapEntry[K: Equal, V: Equal]: Equal[java.util.Map.Entry[K, V]] = equal((a1, a2) => a1.getKey ≟ a2.getKey)
 
-  implicit def JavaMapEqual[K: Equal, V: Equal]: Equal[java.util.Map[K, V]] = equal(_.entrySet ≟ _.entrySet)
+  implicit def JavaMapEqual[K: Equal, V: Equal]: Equal[java.util.Map[K, V]] = equalBy(_.entrySet)
 
-  implicit def CallableEqual[A: Equal]: Equal[java.util.concurrent.Callable[A]] = equal(_.call ≟ _.call)
+  implicit def CallableEqual[A: Equal]: Equal[java.util.concurrent.Callable[A]] = equalBy(_.call)
 
-  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] = i[Equal[Stream[A]]] ∙ ((z: Zipper[A]) => z.stream)
+  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] = equalBy(_.stream)
 }
