@@ -58,7 +58,7 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   val measure = v
 
-  private[scalaz] def split1(pred: V => Boolean, accV: V) = (None, a1, None)
+ private[scalaz] def split1(pred: V => Boolean, accV: V) = (None, a1, None)
 }
 case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2)
@@ -83,12 +83,15 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
 
   val measure = v
 
-  private[scalaz] def split1(pred: V => Boolean, accV: V) = {
-    val accVa1 = accV snoc a1
+  private implicit def sg: Semigroup[V] = measurer.monoid
+
+   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
+    val va1 = r.unit(a1)
+    val accVa1 = accV |+| va1
     if (pred(accVa1))
       (None, a1, Some(one(a2)))
     else
-      (Some(one(a1)), a2, None)
+      (Some(one(va1, a1)), a2, None)
   }
 }
 case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
@@ -114,14 +117,17 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 
   val measure = v
 
+  private implicit def sg: Semigroup[V] = measurer.monoid
+
   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
-    val accVa1 = accV snoc a1
+    val va1 = r.unit(a1)
+    val accVa1 = accV |+| va1
     if (pred(accVa1))
       (None, a1, Some(two(a2, a3)))
     else {
       val accVa2 = accVa1 snoc a2
       if (pred(accVa2))
-        (Some(one(a1)), a2, Some(one(a3)))
+        (Some(one(va1, a1)), a2, Some(one(a3)))
       else
         (Some(two(a1, a2)), a3, None)
     }
@@ -150,14 +156,17 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 
   val measure = v
 
+  private implicit def sg: Semigroup[V] = measurer.monoid
+
   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
-    val accVa1 = accV snoc a1
+    val va1 = r.unit(a1)
+    val accVa1 = accV |+| va1
     if (pred(accVa1))
       (None, a1, Some(three(a2, a3, a4)))
     else {
       val accVa2 = accVa1 snoc a2
       if (pred(accVa2))
-        (Some(one(a1)), a2, Some(two(a3, a4)))
+        (Some(one(va1, a1)), a2, Some(two(a3, a4)))
       else {
         val accVa3 = accVa2 snoc a3
         if (pred(accVa3))
@@ -249,7 +258,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   private type AFinger = Finger[V, A]
   private type NodeTree = FingerTree[V, Node[V, A]]
 
-  private implicit val sg: Semigroup[V] = measurer.monoid
+  private implicit def sg: Semigroup[V] = measurer.monoid
 
   def add1(n: A, right: ATree): ATree = fold(
     v => n <+: right,
