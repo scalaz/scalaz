@@ -487,9 +487,8 @@ object FingerTree {
   def node3[V, A](a: A, b: A, c: A)(implicit measure: Reducer[A, V]) =
     Node3[V, A](a.unit[V] snoc b snoc c, a, b, c)
 
-  def mappendVal[V, A](v: V, t: => FingerTree[V, A])(implicit measure: Reducer[A, V]) = {
-    lazy val lv = v snoc t
-    t.fold(x => v, (x, y) => lv, (x, p, m, s) => lv)
+  def mappendVal[V, A](v: V, t: FingerTree[V, A])(implicit measure: Reducer[A, V]) = {
+    t.fold(x => v, (x, y) => v snoc t, (x, p, m, s) => v snoc t)
   }
 
   def empty[V, A](implicit ms: Reducer[A, V]) = new FingerTree[V, A] {
