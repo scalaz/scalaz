@@ -146,13 +146,12 @@ trait Coords {
 }
 
 object Coord {
-  import Predef.{implicitly => i}
   import Scalaz._
   import Geo._
 
   implicit def CoordShow: Show[Coord] = shows((c: Coord) => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
 
-  implicit def CoordEqual: Equal[Coord] = i[Equal[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+  implicit def CoordEqual: Equal[Coord] = equalBy(((_: Coord).latitude) &&& ((_: Coord).longitude))
 
-  implicit def CoordOrder: Order[Coord] = i[Order[(Latitude, Longitude)]] ∙ (((_: Coord).latitude) &&& ((_: Coord).longitude))
+  implicit def CoordOrder: Order[Coord] = orderBy(((_: Coord).latitude) &&& ((_: Coord).longitude))
 }

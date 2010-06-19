@@ -12,12 +12,11 @@ trait Bearings {
 }
 
 object Bearing {
-  import Predef.{implicitly => i}
   import Scalaz._
 
   implicit def BearingShow: Show[Bearing] = shows(_.value.shows + "°")
 
-  implicit def BearingEqual: Equal[Bearing] = i[Equal[Double]] ∙ (_.value)
+  implicit def BearingEqual: Equal[Bearing] = equalBy(_.value)
 
-  implicit def BearingOrder: Order[Bearing] = i[Order[Double]] ∙ (_.value)
+  implicit def BearingOrder: Order[Bearing] = orderBy(_.value)
 }

@@ -19,7 +19,6 @@ trait Orders {
 object Order {
   import Scalaz._
   import java.math.BigInteger
-  import Predef.{implicitly => i}
 
   implicit def DigitOrder: Order[Digit] = orderBy(_.toInt)
 

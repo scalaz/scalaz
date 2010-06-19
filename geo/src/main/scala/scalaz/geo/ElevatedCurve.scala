@@ -20,12 +20,11 @@ trait ElevatedCurves {
 }
 
 object ElevatedCurve {
-  import Predef.{implicitly => i}
   import Scalaz._
   
-  implicit def ElevatedCurveShow: Show[ElevatedCurve] = i[Show[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveShow: Show[ElevatedCurve] = showBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
-  implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = i[Equal[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = equalBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
-  implicit def ElevatedCurveOrder: Order[ElevatedCurve] = i[Order[(GeodeticCurve, Elevation)]] ∙ (((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
+  implicit def ElevatedCurveOrder: Order[ElevatedCurve] = orderBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 }

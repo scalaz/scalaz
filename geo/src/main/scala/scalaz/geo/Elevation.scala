@@ -12,12 +12,11 @@ trait Elevations {
 }
 
 object Elevation {
-  import Predef.{implicitly => i}
   import Scalaz._
 
   implicit def ElevationShow: Show[Elevation] = shows(_.value.shows + "m")
 
-  implicit def ElevationEqual: Equal[Elevation] = i[Equal[Double]] ∙ (_.value)
+  implicit def ElevationEqual: Equal[Elevation] = equalBy(_.value)
 
-  implicit def ElevationOrder: Order[Elevation] = i[Order[Double]] ∙ (_.value)
+  implicit def ElevationOrder: Order[Elevation] = orderBy(_.value)
 }

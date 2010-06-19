@@ -16,12 +16,11 @@ trait Latitudes {
 }
 
 object Latitude {
-  import Predef.{implicitly => i}
   import Scalaz._
 
   implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
 
-  implicit def LatitudeEqual: Equal[Latitude] = i[Equal[Double]] ∙ (_.value)
+  implicit def LatitudeEqual: Equal[Latitude] = equalBy(_.value)
 
-  implicit def LatitudeOrder: Order[Latitude] = i[Order[Double]] ∙ (_.value)
+  implicit def LatitudeOrder: Order[Latitude] = orderBy(_.value)
 }

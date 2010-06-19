@@ -17,7 +17,7 @@ object Longitude {
 
   implicit def LongitudeShow: Show[Longitude] = shows(_.value.shows + "°")
 
-  implicit def LongitudeEqual: Equal[Longitude] = i[Equal[Double]] ∙ (_.value)
+  implicit def LongitudeEqual: Equal[Longitude] = equalBy(_.value)
 
-  implicit def LongitudeOrder: Order[Longitude] = i[Order[Double]] ∙ (_.value)
+  implicit def LongitudeOrder: Order[Longitude] = orderBy(_.value)
 }

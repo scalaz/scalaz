@@ -14,12 +14,11 @@ trait Vectors {
 }
 
 object Vector {
-  import Predef.{implicitly => i}
   import Scalaz._
 
-  implicit def VectorShow: Show[Vector] = i[Show[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorShow: Show[Vector] = showBy(((_: Vector).coord) &&& ((_: Vector).bearing))
 
-  implicit def VectorEqual: Equal[Vector] = i[Equal[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorEqual: Equal[Vector] = equalBy(((_: Vector).coord) &&& ((_: Vector).bearing))
 
-  implicit def VectorOrder: Order[Vector] = i[Order[(Coord, Bearing)]] ∙ (((_: Vector).coord) &&& ((_: Vector).bearing))
+  implicit def VectorOrder: Order[Vector] = orderBy(((_: Vector).coord) &&& ((_: Vector).bearing))
 }

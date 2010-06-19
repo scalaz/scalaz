@@ -17,9 +17,9 @@ object Position {
   import Predef.{implicitly => i}
   import Scalaz._
 
-  implicit def PositionShow: Show[Position] = i[Show[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+  implicit def PositionShow: Show[Position] = showBy(((_: Position).coord) &&& ((_: Position).elevation))
 
-  implicit def PositionEqual: Equal[Position] = i[Equal[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))
+  implicit def PositionEqual: Equal[Position] = equalBy(((_: Position).coord) &&& ((_: Position).elevation))
 
-  implicit def PositionOrder: Order[Position] = i[Order[(Coord, Elevation)]] ∙ (((_: Position).coord) &&& ((_: Position).elevation))  
+  implicit def PositionOrder: Order[Position] = orderBy(((_: Position).coord) &&& ((_: Position).elevation))  
 }

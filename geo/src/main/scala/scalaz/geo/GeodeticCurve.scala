@@ -16,12 +16,11 @@ trait GeodeticCurves {
 }
 
 object GeodeticCurve {
-  import Predef.{implicitly => i}
   import Scalaz._
 
   implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance.shows + " " + c.azi.shows + " " + c.reverseAzi.shows + "]")
 
-  implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = i[Equal[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
+  implicit def GeodeticCurveEqual: Equal[GeodeticCurve] = equalBy(c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
 
-  implicit def GeodeticCurveOrder: Order[GeodeticCurve] = i[Order[(Double, Azimuth, Azimuth)]] ∙ (c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
+  implicit def GeodeticCurveOrder: Order[GeodeticCurve] = orderBy(c => (c.ellipsoidalDistance, c.azi, c.reverseAzi))
 }
