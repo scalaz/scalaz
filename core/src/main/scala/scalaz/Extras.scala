@@ -5,7 +5,7 @@ trait Distributes[F[_], G[_]] {
 }
 
 /** A natural transformation beween functors F and G **/
-trait :~>[F[_], G[_]] {
+trait ~>[F[_], G[_]] {
   def apply[A](f: F[A]): G[A]
 }
 
@@ -15,7 +15,7 @@ trait Constrained[F[_], G[_], E[_]] {
 }
 
 /** A transformation natural in both sides of a bifunctor **/
-trait :~~>[F[_,_], G[_,_]] {
+trait ~~>[F[_,_], G[_,_]] {
   def apply[A,B](f: F[A,B]): G[A,B]
 }
 
