@@ -37,7 +37,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
   override def deliverScalaDependencies = Nil 
 }
 
-final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
+final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion with ScalaVersionBumper {
   // Sub-projects
   lazy val core = project("core", "scalaz-core", new Core(_))
   lazy val geo = project("geo", "scalaz-geo", new Geo(_), core)

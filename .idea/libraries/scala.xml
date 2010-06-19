@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="scala">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC5/lib/scala-compiler.jar!/" />
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC5/lib/scala-library.jar!/" />
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC6/lib/scala-compiler.jar!/" />
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC6/lib/scala-library.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC5/lib/scala-library-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC5/lib/scala-compiler-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC6/lib/scala-library-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.8.0.RC6/lib/scala-compiler-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
