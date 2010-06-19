@@ -37,7 +37,7 @@ object Equal {
 
   implicit def StringEqual: Equal[String] = equalA
 
-  def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = implicitly[Equal[B]] ∙ ((_: NewType[B]).value)
+  def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = i[Equal[B]] ∙ ((_: NewType[B]).value)
 
   implicit def UnitEqual: Equal[Unit] = equalA
 
@@ -79,9 +79,9 @@ object Equal {
 
   implicit def NodeSeqEqual: Equal[NodeSeq] = equalA
 
-  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = implicitly[Equal[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
+  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = i[Equal[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
 
-  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = implicitly[Equal[Iterable[A]]] ∙ ((_: ZipStream[A]).value)
+  implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = i[Equal[Iterable[A]]] ∙ ((_: ZipStream[A]).value)
 
   implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equal(_._1 ≟ _._1)
 
@@ -145,7 +145,7 @@ object Equal {
   implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
     equal[Tree[A]]((a1, a2) =>
       a1.rootLabel ≟ a2.rootLabel
-              && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest, a2.subForest))
+              && i[Equal[Iterable[Tree[A]]]].equal(a1.subForest, a2.subForest))
 
   implicit def TreeLocEqual[A: Equal]: Equal[TreeLoc[A]] = {
     equal[TreeLoc[A]]((a1, a2) =>
@@ -175,7 +175,7 @@ object Equal {
   })
 
   implicit def MapEqual[CC[K, V] <: collection.Map[K, V], A: Equal, B: Equal]: Equal[collection.Map[A, B]] =
-    implicitly[Equal[Iterable[(A, B)]]] ∙ ((m: collection.Map[A, B]) => m : Iterable[(A, B)] )
+    i[Equal[Iterable[(A, B)]]] covary
 
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
@@ -200,5 +200,5 @@ object Equal {
 
   implicit def CallableEqual[A: Equal]: Equal[java.util.concurrent.Callable[A]] = equal(_.call ≟ _.call)
 
-  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] = implicitly[Equal[Stream[A]]] ∙ ((z: Zipper[A]) => z.stream)
+  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] = i[Equal[Stream[A]]] ∙ ((z: Zipper[A]) => z.stream)
 }

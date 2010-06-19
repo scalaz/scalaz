@@ -34,7 +34,6 @@ object Scalaz extends ScalazLow
     with    Identitys
     with    InputStreams
     with    Ints
-    with    Iterables
     with    LastOptions
     with    LazyTuples
     with    Lists

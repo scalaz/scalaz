@@ -159,5 +159,8 @@ object Order {
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = EitherOrder[E, A] ∙ ((_: Validation[E, A]).either)
 
-  implicit def JavaIterableOrder[A: Order]: Order[java.lang.Iterable[A]] = IterableOrder[A] ∙ (x => x)
+  implicit def JavaIterableOrder[A: Order]: Order[java.lang.Iterable[A]] = {
+    import collection.JavaConversions._
+    IterableOrder[A] ∙ (x => x)
+  }
 }

@@ -156,6 +156,24 @@ object ImplicitConversionTest {
     implicitly[Equal[Stream[A]]]
     implicitly[Equal[Map[A, B]]]
     implicitly[Equal[collection.SortedMap[A, B]]]
+    implicitly[Equal[java.util.Map[A, B]]]
+    implicitly[Equal[java.util.List[A]]]
+    implicitly[Equal[java.lang.Iterable[A]]]
+  }
+
+  def show {
+    type A = Int
+    type B = Int
+    implicitly[Show[(A, B)]]
+    implicitly[Show[Seq[A]]]
+    implicitly[Show[List[A]]]
+    implicitly[Show[ArraySeq[A]]]
+    implicitly[Show[Stream[A]]]
+    implicitly[Show[Map[A, B]]]
+    implicitly[Show[collection.SortedMap[A, B]]]
+    implicitly[Show[java.util.Map[A, B]]]
+    implicitly[Show[java.util.List[A]]]
+    implicitly[Show[java.lang.Iterable[A]]]
   }
 
   def partialApply {

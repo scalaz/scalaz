@@ -70,15 +70,12 @@ object Show {
 
   implicit def NodeSeqShow: Show[xml.NodeSeq] = showA
 
-  implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = IterableShow[A] ∙ ((_: NonEmptyList[A]).list)
-
-  implicit def SetShow[A: Show]: Show[Set[A]] = 
-    IterableShow[A] comap ((_: Set[A]).toList)
+  implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = implicitly[Show[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
 
   implicit def Function1Show[A, B]: Show[A => B] =
     show((f: A => B) => "<function>".toList)
 
-  implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] = IterableShow[A] ∙ ((_: ZipStream[A]).value)
+  implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] = implicitly[Show[Stream[A]]] ∙ ((_: ZipStream[A]).value)
 
   implicit def ZipperShow[A: Show]: Show[Zipper[A]] = show((z: Zipper[A]) =>
     z.lefts.reverse.show ++ " " ++ z.focus.show ++ " " ++ z.rights.show)
@@ -89,7 +86,7 @@ object Show {
   implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
     t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
-  implicit def IterableShow[A: Show]: Show[Iterable[A]] = show(as => {
+  implicit def IterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = show((as: CC[A]) => {
     val i = as.iterator
     val k = new collection.mutable.ListBuffer[Char]
     k += '['
@@ -102,15 +99,6 @@ object Show {
     k += ']'
     k.toList
   })
-
-  implicit def StreamShow[A: Show]: Show[Stream[A]] =
-    IterableShow[A] comap (x => x)
-
-  implicit def ArraySeqShow[A: Show]: Show[ArraySeq[A]] =
-    IterableShow[A] comap (x => x)
-
-  implicit def ListShow[A: Show]: Show[List[A]] =
-    IterableShow[A] comap (x => x)
 
   implicit def Tuple1Show[A: Show]: Show[Tuple1[A]] = show(a => {
     val k = new collection.mutable.ListBuffer[Char]
@@ -237,23 +225,18 @@ object Show {
     case Failure(e) => "Failure(" + e.shows + ")"
   }
 
-  implicit def MapShow[A:Show,B:Show]: Show[Map[A,B]] = show((m:Iterable[(A,B)]) => m.show)
+  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] covary
 
-  implicit def JavaIterableShow[A: Show]: Show[java.lang.Iterable[A]] = show(as => {
-    val k = new collection.mutable.ListBuffer[Char]
-    val i = as.iterator
-    k += '['
-    while (i.hasNext) {
-      val n = i.next
-      k ++= n.show
-      if (i.hasNext)
-        k += ','
-    }
-    k += ']'
-    k.toList
-  })
+  import java.{lang => jl, util => ju}
 
-  implicit def JavaMapShow[K: Show, V: Show]: Show[java.util.Map[K, V]] = show(m => {
+  implicit def JavaIterableEqual[CC[X] <: jl.Iterable[X], A: Show]: Show[CC[A]] = {
+    import scala.collection.JavaConversions._
+    i[Show[Iterable[A]]] ∙ ((as: jl.Iterable[A]) => as: Iterable[A])
+  }
+
+  implicit def JavaMapShow[K: Show, V: Show]: Show[ju.Map[K, V]] = show(m => {
+    import collection.JavaConversions
+
     val z = new collection.mutable.ListBuffer[Char]
     z += '{'
     val i = m.keySet.iterator
