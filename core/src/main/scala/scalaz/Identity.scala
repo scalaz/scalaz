@@ -12,7 +12,7 @@ sealed trait Identity[A] extends PimpedType[A] {
    */
   def pure[F[_]](implicit p: Pure[F]): F[A] = η
 
-  def dual: Dual[A] = value
+  def dual: Dual[A] = DualTo(value)
 
   def σ : Dual[A] = dual
 
@@ -44,6 +44,10 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
   // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
+
+  /**
+   * Raises an error if `value ≠ b`, according to the given `Equal`. The message is formated with the given `Show`.
+   */
   def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if (≠(b)) error(shows + " ≠ " + ev(b).shows)
 
   def ?|?(a: A)(implicit o: Order[A]): Ordering = o order (value, a)
@@ -85,6 +89,8 @@ sealed trait Identity[A] extends PimpedType[A] {
   def println(implicit s: Show[A]): Unit = Console.println(shows)
 
   def mapply[F[_], B](f: F[A => B])(implicit ftr: Functor[F]): F[B] = f ∘ (_(value))
+
+  def |>[B](f: A => B): B = f(value)
 
   def text(implicit s: Show[A]): xml.Text = xml.Text(value.shows)
 
@@ -144,7 +150,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
 
   /**
-   * @returns the result of pf(value) if defined, otherwise the the Zero element of type B.
+   * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */
   def matchOrZero[B: Zero](pf: PartialFunction[A, B]) = ~pf.lift(value)
 
