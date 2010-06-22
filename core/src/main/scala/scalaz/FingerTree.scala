@@ -2,12 +2,12 @@ package scalaz
 
 import scalaz.Scalaz._
 
-sealed abstract class ViewL[S, A] {
-  def fold[B](b: => B, f: (A, S) => B): B
+sealed abstract class ViewL[S[_], A] {
+  def fold[B](b: => B, f: (A, S[A]) => B): B
 }
 
-sealed abstract class ViewR[S, A] {
-  def fold[B](b: => B, f: (S, A) => B): B
+sealed abstract class ViewR[S[_], A] {
+  def fold[B](b: => B, f: (S[A], A) => B): B
 }
 
 import FingerTree._
@@ -525,37 +525,41 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def isEmpty = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
 
-  def viewl: ViewL[FingerTree[V, A], A] =
+  def viewl: ViewL[PartialApply1Of2[FingerTree, V]#Apply, A] =
     fold(
-      v => EmptyL,
-      (v, x) => OnL(x, empty),
+      v => EmptyL[PartialApply1Of2[FingerTree, V]#Apply, A],
+      (v, x) => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](x, empty),
       (v, pr, m, sf) =>
         pr match {
-          case One(v, x) => OnL(x, rotL(m, sf))
-          case _ => OnL(pr.lhead, deep(pr.ltail, m, sf))
+          case One(v, x) => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](x, rotL(m, sf))
+          case _ => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](pr.lhead, deep(pr.ltail, m, sf))
         })
 
-  def viewr: ViewR[FingerTree[V, A], A] =
+  def viewr: ViewR[PartialApply1Of2[FingerTree, V]#Apply, A] =
     fold(
-      v => EmptyR,
-      (v, x) => OnR(empty, x),
+      v => EmptyR[PartialApply1Of2[FingerTree, V]#Apply, A],
+      (v, x) => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](empty, x),
       (v, pr, m, sf) =>
         sf match {
-          case One(v, x) => OnR(rotR(pr, m), x)
-          case _ => OnR(deep(pr, m, sf.rtail), sf.rhead)
+          case One(v, x) => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](rotR(pr, m), x)
+          case _ => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
   def lheadOption: Option[A] = fold(
-      v => None,
-      (v, x) => Some(x),
-      (v, pr, m, sf) => Some(pr.lhead)
-    )
+    v => None,
+    (v, x) => Some(x),
+    (v, pr, m, sf) => Some(pr.lhead)
+  )
 
   def rheadOption: Option[A] = fold(
     v => None,
     (v, x) => Some(x),
     (v, pr, m, sf) => Some(sf.rhead)
   )
+
+  def ltailOption: Option[FingerTree[V, A]] = viewl.fold(None, (x, t) => Some(t))
+
+  def rtailOption: Option[FingerTree[V, A]] = viewr.fold(None, (i, x) => Some(i))
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
     implicit val nm = NodeMeasure[B, V2]
@@ -599,20 +603,20 @@ object FingerTree {
     val measure = v
   }
 
-  def EmptyR[S, A] = new ViewR[S, A] {
-    def fold[B](b: => B, f: (S, A) => B) = b
+  def EmptyR[S[_], A] = new ViewR[S, A] {
+    def fold[B](b: => B, f: (S[A], A) => B) = b
   }
 
-  def OnR[S, A](sa: S, a: A) = new ViewR[S, A] {
-    def fold[B](b: => B, f: (S, A) => B) = f(sa, a)
+  def OnR[S[_], A](sa: S[A], a: A) = new ViewR[S, A] {
+    def fold[B](b: => B, f: (S[A], A) => B) = f(sa, a)
   }
 
-  def EmptyL[S, A] = new ViewL[S, A] {
-    def fold[B](b: => B, f: (A, S) => B) = b
+  def EmptyL[S[_], A] = new ViewL[S, A] {
+    def fold[B](b: => B, f: (A, S[A]) => B) = b
   }
 
-  def OnL[S, A](a: A, sa: S) = new ViewL[S, A] {
-    def fold[B](b: => B, f: (A, S) => B) = f(a, sa)
+  def OnL[S[_], A](a: A, sa: S[A]) = new ViewL[S, A] {
+    def fold[B](b: => B, f: (A, S[A]) => B) = f(a, sa)
   }
 
   implicit def FingerFoldable[V] = new Foldable[PartialApply1Of2[Finger, V]#Apply] {

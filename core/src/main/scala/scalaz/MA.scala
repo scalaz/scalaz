@@ -247,6 +247,11 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]) = foldMap(_.unit[B])(f, r)
   
+  import FingerTree._
+  def &:(a: A) = OnL[M,A](a, value)
+  
+  def :&(a: A) = OnR[M,A](value, a)
+
   import concurrent._
   def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
     traverse(f.kleisli[Promise])

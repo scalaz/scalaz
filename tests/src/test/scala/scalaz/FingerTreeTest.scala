@@ -55,13 +55,21 @@ class FingerTreeTest extends Specification with Sugar with ScalaCheck {
     tree.rheadOption ≟ tree.toStream.lastOption
   }
 
-  "viewl works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
-    val asStream = tree.toStream
-    tree.isEmpty || tree.viewl.fold(false, (x, t) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
-  } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
-
-  "viewr works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
-    val asStream = tree.toStream
-    tree.isEmpty || tree.viewr.fold(false, (i, x) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+  "ltailOption works correctly" verifies {(tree: SequenceTree[Int]) =>
+    tree.ltailOption.cata(t => t.toStream ≟ tree.toStream.tail, tree.isEmpty)
   }
+
+  "rtailOption works correctly" verifies {(tree: SequenceTree[Int]) =>
+    tree.rtailOption.cata(t => t.toStream ≟ tree.toStream.init, tree.isEmpty)
+  }
+
+//  "viewl works correctly" verifies {(tree: SequenceTree[Int]) =>
+//    val asStream = tree.toStream
+//    tree.viewl.fold[Boolean](true, (x: Int, t: PartialApply1Of2[FingerTree, Int]#Apply) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
+//  }
+//
+//  "viewr works correctly" verifies {(tree: SequenceTree[Int]) =>
+//    val asStream = tree.toStream
+//    tree.viewr.fold[Boolean](true, (i: PartialApply1Of2[FingerTree, Int]#Apply, x: Int) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+//  }
 }
