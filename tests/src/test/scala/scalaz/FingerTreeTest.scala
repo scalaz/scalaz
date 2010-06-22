@@ -54,4 +54,14 @@ class FingerTreeTest extends Specification with Sugar with ScalaCheck {
   "rheadOption works correctly" verifies {(tree: SequenceTree[Int]) =>
     tree.rheadOption ≟ tree.toStream.lastOption
   }
+
+  "viewl works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
+    val asStream = tree.toStream
+    tree.isEmpty || tree.viewl.fold(false, (x, t) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
+  } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
+
+  "viewr works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
+    val asStream = tree.toStream
+    tree.isEmpty || tree.viewr.fold(false, (i, x) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+  }
 }

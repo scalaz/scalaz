@@ -540,7 +540,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       v => EmptyR,
       (v, x) => OnR(empty, x),
       (v, pr, m, sf) =>
-        pr match {
+        sf match {
           case One(v, x) => OnR(rotR(pr, m), x)
           case _ => OnR(deep(pr, m, sf.rtail), sf.rhead)
         })
