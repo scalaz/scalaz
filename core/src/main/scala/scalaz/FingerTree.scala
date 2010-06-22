@@ -10,8 +10,8 @@ sealed abstract class ViewL[S[_], A] {
 
 sealed abstract class ViewR[S[_], A] {
   def fold[B](b: => B, f: (=> S[A], => A) => B): B
-  def head: A = fold(error("Head on empty view"), (sa, a) => a)
-  def tail: S[A] = fold(error("Tail on empty view"), (sa, a) => sa)
+  def last: A = fold(error("Head on empty view"), (sa, a) => a)
+  def init: S[A] = fold(error("Tail on empty view"), (sa, a) => sa)
 }
 
 import FingerTree._
@@ -543,21 +543,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           case _ => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
-  def lheadOption: Option[A] = fold(
-    v => None,
-    (v, x) => Some(x),
-    (v, pr, m, sf) => Some(pr.lhead)
-  )
+  def head = viewl.head
 
-  def rheadOption: Option[A] = fold(
-    v => None,
-    (v, x) => Some(x),
-    (v, pr, m, sf) => Some(sf.rhead)
-  )
+  def last = viewr.last
 
-  def ltailOption: Option[FingerTree[V, A]] = viewl.fold(None, (x, t) => Some(t))
+  def tail = viewl.tail
 
-  def rtailOption: Option[FingerTree[V, A]] = viewr.fold(None, (i, x) => Some(i))
+  def init = viewr.init
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
     implicit val nm = NodeMeasure[B, V2]
