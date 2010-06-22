@@ -38,4 +38,20 @@ class FingerTreeTest extends Specification with Sugar with ScalaCheck {
     val splitTree = tree.split(_ > index)
     (splitTree._1.toStream, splitTree._2.toStream) ≟ asStream.splitAt(index)
   }
+
+  "replacing last element works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
+    tree.isEmpty || ((tree :-| x).toStream ≟ (tree.toStream.init :+ x))
+  } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
+
+  "replacing first element works correctly" verifies {(tree: SequenceTree[Int], x: Int) =>
+    tree.isEmpty || ((x |-: tree).toStream ≟ (x +: tree.toStream.tail))
+  }
+
+  "lheadOption works correctly" verifies {(tree: SequenceTree[Int]) =>
+    tree.lheadOption ≟ tree.toStream.headOption
+  }
+
+  "rheadOption works correctly" verifies {(tree: SequenceTree[Int]) =>
+    tree.rheadOption ≟ tree.toStream.lastOption
+  }
 }

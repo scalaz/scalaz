@@ -19,6 +19,10 @@ sealed abstract class Finger[V, A] {
 
   def :+>(a: A): Finger[V, A]
 
+  def |-:(a: A): Finger[V, A]
+
+  def :-|(a: A): Finger[V, A]
+
   def lhead: A
 
   def ltail: Finger[V, A]
@@ -44,6 +48,10 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def :+>(a: A) = Two(v snoc a, a1, a)
 
+  def |-:(a: A) = one(a)
+
+  def :-|(a: A) = one(a)
+
   def lhead = a1
 
   def ltail = error("Tail on the digit One")
@@ -66,6 +74,10 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
   def <+:(a: A) = Three(a cons v, a, a1, a2)
 
   def :+>(a: A) = Three(v snoc a, a1, a2, a)
+
+  def |-:(a: A) = two(a, a2)
+
+  def :-|(a: A) = two(a1, a)
 
   def lhead = a1
 
@@ -100,6 +112,10 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
   def <+:(a: A) = Four(a cons v, a, a1, a2, a3)
 
   def :+>(a: A) = Four(v snoc a, a1, a2, a3, a)
+
+  def |-:(a: A) = three(a, a2, a3)
+
+  def :-|(a: A) = three(a1, a2, a)
 
   def lhead = a1
 
@@ -139,6 +155,10 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
   def <+:(a: A) = error("Digit overflow")
 
   def :+>(a: A) = error("Digit overflow")
+
+  def |-:(a: A) = four(a, a2, a3, a4)
+
+  def :-|(a: A) = four(a1, a2, a3, a)
 
   def lhead = a1
 
@@ -228,6 +248,20 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
 
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
+
+  def |-:(a: A): FingerTree[V, A] = {
+    fold(
+      v => throw new UnsupportedOperationException("Replacing first element of an empty FingerTree"),
+      (v, b) => single(a),
+      (v, pr, m, sf) => deep(a |-: pr, m, sf))
+  }
+
+  def :-|(a: A): FingerTree[V, A] = {
+    fold(
+      v => throw new UnsupportedOperationException("Replacing last element of an empty FingerTree"),
+      (v, b) => single(a),
+      (v, pr, m, sf) => deep(pr, m, sf :-| a))
+  }
 
   def <+:(a: A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
@@ -466,7 +500,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def split1(pred: V => Boolean): (FingerTree[V, A], A, FingerTree[V, A]) = split1(pred, measurer.monoid.zero)
 
   private def split1(pred: V => Boolean, accV: V): (FingerTree[V, A], A, FingerTree[V, A]) = fold(
-    v => throw new IllegalArgumentException, // we can never get here
+    v => throw new UnsupportedOperationException("Splitting an empty FingerTree"), // we can never get here
     (v, x) => (empty, x, empty),
     (v, pr, m, sf) => {
       val accVpr = accV snoc pr
@@ -510,6 +544,18 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           case One(v, x) => OnR(rotR(pr, m), x)
           case _ => OnR(deep(pr, m, sf.rtail), sf.rhead)
         })
+
+  def lheadOption: Option[A] = fold(
+      v => None,
+      (v, x) => Some(x),
+      (v, pr, m, sf) => Some(pr.lhead)
+    )
+
+  def rheadOption: Option[A] = fold(
+    v => None,
+    (v, x) => Some(x),
+    (v, pr, m, sf) => Some(sf.rhead)
+  )
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
     implicit val nm = NodeMeasure[B, V2]
