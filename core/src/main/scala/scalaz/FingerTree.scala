@@ -273,14 +273,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def |-:(a: A): FingerTree[V, A] = {
     fold(
-      v => throw new UnsupportedOperationException("Replacing first element of an empty FingerTree"),
+      v => error("Replacing first element of an empty FingerTree"),
       (v, b) => single(a),
       (v, pr, m, sf) => deep(a |-: pr, m, sf))
   }
 
   def :-|(a: A): FingerTree[V, A] = {
     fold(
-      v => throw new UnsupportedOperationException("Replacing last element of an empty FingerTree"),
+      v => error("Replacing last element of an empty FingerTree"),
       (v, b) => single(a),
       (v, pr, m, sf) => deep(pr, m, sf :-| a))
   }
@@ -498,7 +498,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def split1(pred: V => Boolean): (FingerTree[V, A], A, FingerTree[V, A]) = split1(pred, measurer.monoid.zero)
 
   private def split1(pred: V => Boolean, accV: V): (FingerTree[V, A], A, FingerTree[V, A]) = fold(
-    v => throw new UnsupportedOperationException("Splitting an empty FingerTree"), // we can never get here
+    v => error("Splitting an empty FingerTree"), // we can never get here
     (v, x) => (empty, x, empty),
     (v, pr, m, sf) => {
       val accVpr = accV snoc pr
