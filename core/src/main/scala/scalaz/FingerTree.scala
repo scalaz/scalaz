@@ -231,20 +231,26 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def <+:(a: A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
-    fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) =>
-      pr match {
-        case Four(vf, b, c, d, e) => deep(a cons v, two(a, b), node3(c, d, e) <+: m, sf)
-        case _ => deep(a cons v, a <+: pr, m, sf)
-      })
+    fold(
+      v => single(a cons v, a),
+      (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)),
+      (v, pr, m, sf) =>
+        pr match {
+          case Four(vf, b, c, d, e) => deep(a cons v, two(a, b), node3(c, d, e) <+: m, sf)
+          case _ => deep(a cons v, a <+: pr, m, sf)
+        })
   }
 
   def :+>(a: A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
-    fold(v => single(v snoc a, a), (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)), (v, pr, m, sf) =>
-      sf match {
-        case Four(vf, b, c, d, e) => deep(v snoc a, pr, (m :+> node3(b, c, d)), two(e, a))
-        case _ => deep(v snoc a, pr, m, sf :+> a)
-      })
+    fold(
+      v => single(v snoc a, a),
+      (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)),
+      (v, pr, m, sf) =>
+        sf match {
+          case Four(vf, b, c, d, e) => deep(v snoc a, pr, (m :+> node3(b, c, d)), two(e, a))
+          case _ => deep(v snoc a, pr, m, sf :+> a)
+        })
   }
 
   def <++>(right: FingerTree[V, A]): FingerTree[V, A] = fold(
