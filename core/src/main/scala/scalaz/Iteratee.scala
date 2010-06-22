@@ -32,22 +32,21 @@ trait Enumerator[F[_]] {
   def apply[E, A](f: F[E], i: IterV[E, A]): IterV[E, A]
 }
 
-/** An EnumeratorM[M, _, _] feeds data in a monad M to an iteratee **/
-trait EnumeratorM[M[_], E, A] {
-  def apply(i: IterV[E, A]): M[IterV[E, A]]
-}
 
 object IterV {
+  /** An EnumeratorM[M, _, _] feeds data in a monad M to an iteratee **/
+  type EnumeratorM[M[_], E, A] = IterV[E, A] => M[IterV[E, A]]
+
   /** A computation that has finished **/
   object Done {
     def apply[E, A](a: => A, i: => Input[E]) = new IterV[E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => IterV[E, A]) => Z): Z = done(a, i)
     }
-    def unapply[E, A](r: IterV[E, A]) =
+    def unapply[E, A](r: IterV[E, A]): Option[(A, Input[E])] =
       r.fold[Either[IterV[E, A], (A,Input[E])]](
         done = (a, i) => Right((a, i)),
-        cont = f => Left(Cont(f))).left.toOption
+        cont = f => Left(Cont(f))).right.toOption
   }
 
   /** A computation that takes an element from an input to yield a new computation **/
@@ -56,10 +55,10 @@ object IterV {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => IterV[E, A]) => Z): Z = cont(f)
     }
-    def unapply[E, A](r: IterV[E, A]) =
+    def unapply[E, A](r: IterV[E, A]): Option[Input[E] => IterV[E, A]] =
       r.fold[Either[IterV[E, A], Input[E] => IterV[E, A]]](
         done = (a, i) => Left(Done(a, i)),
-        cont = f => Right(f)).left.toOption
+        cont = f => Right(f)).right.toOption
   }
 
   /** An iteratee that consumes the head of the input **/
@@ -104,7 +103,7 @@ object IterV {
     def apply[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = empty
     }
-    def unapply[E](r: Input[E]) =
+    def unapply[E](r: Input[E]): Boolean =
         r.apply[Either[Input[E], Boolean]](
           empty = Right(true),
           el = e => Left(El(e)),
@@ -116,11 +115,11 @@ object IterV {
     def apply[E](e0: => E) = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = el(e0)
     }
-    def unapply[E](r: Input[E]) =
+    def unapply[E](r: Input[E]): Option[E] =
       r.apply[Either[Input[E], (E)]](
         empty = Left(Empty[E]),
         el = e => Right(e),
-        eof = Left(EOF[E])).left.toOption
+        eof = Left(EOF[E])).right.toOption
   }
 
   /** Input that is exhausted **/
@@ -128,7 +127,7 @@ object IterV {
     def apply[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = eof
     }
-    def unapply[E](r: Input[E]) =
+    def unapply[E](r: Input[E]): Boolean =
       r.apply[Either[Input[E], Boolean]](
         empty = Left(Empty[E]),
         el = e => Left(El(e)),
