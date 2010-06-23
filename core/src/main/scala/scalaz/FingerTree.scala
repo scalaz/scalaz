@@ -744,13 +744,16 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       def append(k1: Key[A], k2: => Key[A]) = Key(k2.value orElse k1.value)
       val zero: Key[A] = Key(None)
     }
-    implicit def keyer[A] = Reducer((a: A) => Key(Some(a)))
-    case class OrdSeq[A:Order](value: FingerTree[Key[A], A]) extends NewType[FingerTree[Key[A], A]] {
-      def partition(a: A) = (OrdSeq[A](_)).product.apply(value.split(_ gte Key(Some(a))))
+    implicit def keyer[A] = Reducer((a: A) => Key(Some(a))) &&& Reducer((a: A) => 1)
+    case class OrdSeq[A:Order](value: FingerTree[(Key[A], Int), A]) extends NewType[FingerTree[(Key[A], Int), A]] {
+      def apply(i: Int): A =
+        value.split(p => p._2 > i)._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))
+      def partition(a: A) = (OrdSeq[A](_)).product.apply(value.split(p => p._1 gte Key(Some(a))))
       def insert(a: A) = partition(a) match {
         case (l, r) => OrdSeq(l <++> (a +: r))
       }
+      def ++(xs: OrdSeq[A]) = xs.toStream.foldLeft(this)((x, y) => x insert y)
     }
-    def ordSeq[A:Order](as: A*): OrdSeq[A] = as.foldLeft(OrdSeq(empty[Key[A], A]))((x, y) => x insert y)
+    def ordSeq[A:Order](as: A*): OrdSeq[A] = as.foldLeft(OrdSeq(empty[(Key[A], Int), A]))((x, y) => x insert y)
   }
 }
