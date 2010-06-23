@@ -10,6 +10,9 @@ package scalaz
  */
 trait NewType[X] {
   val value: X
+
+  override def toString =
+    value.toString
 }
 
 object NewType {

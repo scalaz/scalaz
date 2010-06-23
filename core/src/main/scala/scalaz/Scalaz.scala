@@ -48,6 +48,7 @@ object Scalaz extends ScalazLow
     with    Promises
     with    Reducers
     with    Semigroups 
+    with    FingerTree.IndSeqs
     with    Shorts
     with    Shows
     with    States
@@ -134,12 +135,17 @@ object Scalaz extends ScalazLow
 
   implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[PartialApplyKA[Kleisli, M, A]#Apply, B] = ma[PartialApplyKA[Kleisli, M, A]#Apply, B](k)
 
+  implicit def FingerTreeMA[V, A](t: FingerTree[V, A]): MA[PartialApply1Of2[FingerTree, V]#Apply, A] = ma[PartialApply1Of2[FingerTree, V]#Apply, A](t)
+
+  implicit def FingerMA[V, A](t: Finger[V, A]): MA[PartialApply1Of2[Finger, V]#Apply, A] = ma[PartialApply1Of2[Finger, V]#Apply, A](t)
+
+  implicit def NodeMA[V, A](t: Node[V, A]): MA[PartialApply1Of2[Node, V]#Apply, A] = ma[PartialApply1Of2[Node, V]#Apply, A](t)
+
   // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
 
   implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[PartialApplyK[Cokleisli, M]#Apply, A, B] = mab[PartialApplyK[Cokleisli, M]#Apply, A, B](k)
 
   implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
-    mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)
-    
+    mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)    
 }

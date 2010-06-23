@@ -2,16 +2,35 @@ package scalaz
 
 import scalaz.Scalaz._
 
+/**
+ * Finger Trees provide a base for implementations of various collection types,
+ * as described in "Finger trees: a simple general-purpose data structure", by
+ * Ralf Hinze and Ross Paterson.
+ * <br>
+ * Finger Trees have excellent (amortized) asymptotics:
+ * <br>
+ * Access to the first and last elements is O(1).
+ * Appending/prepending a single value is O(1).
+ * Concatenating two trees is (O lg min(l1, l2)) where l1 and l2 are their sizes.
+ * Random access to an element at n is O(lg min(n, l - n)), where
+ *   l is the size of the tree.
+ * Constructing a tree with n copies of a value is O(lg n).
+ **/
+
 sealed abstract class ViewL[S[_], A] {
   def fold[B](b: => B, f: (=> A, => S[A]) => B): B
-  def head: A = fold(error("Head on empty view"), (a, sa) => a)
-  def tail: S[A] = fold(error("Tail on empty view"), (a, sa) => sa)
+  def headOption: Option[A] = fold(None, (a, sa) => Some(a))
+  def tailOption: Option[S[A]] = fold(None, (a, sa) => Some(sa))
+  def head: A = headOption.getOrElse(error("Head on empty view"))
+  def tail: S[A] = tailOption.getOrElse(error("Tail on empty view"))
 }
 
 sealed abstract class ViewR[S[_], A] {
   def fold[B](b: => B, f: (=> S[A], => A) => B): B
-  def last: A = fold(error("Head on empty view"), (sa, a) => a)
-  def init: S[A] = fold(error("Tail on empty view"), (sa, a) => sa)
+  def lastOption: Option[A] = fold(None, (sa, a) => Some(a))
+  def initOption: Option[S[A]] = fold(None, (sa, a) => Some(sa))
+  def last: A = lastOption.getOrElse(error("Last on empty view"))
+  def init: S[A] = initOption.getOrElse(error("Init on empty view"))
 }
 
 import FingerTree._
@@ -697,4 +716,23 @@ object FingerTree {
     m.viewr.fold(
       pr.toTree,
       (mm, a) => deep(mappendVal(pr.measure, m), pr, mm, a.toDigit))
+
+  // Indexed sequences
+  trait IndSeqs {
+    case class IndSeq[A](value: FingerTree[Int, A]) extends NewType[FingerTree[Int, A]] {
+      implicit def sizer[A] = Reducer((a: A) => 1)
+      def apply(i: Int): A =
+        value.split(_ > i)._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))
+      def ++(xs: IndSeq[A]) = IndSeq(value <++> xs.value)
+      def :+(x: A) = IndSeq(value :+ x)
+      def +:(x: A) = IndSeq(x +: value)
+      def tail = IndSeq(value.tail)
+      def init = IndSeq(value.init)
+      def map[B](f: A => B) = IndSeq(value map f)
+      def flatMap[B](f: A => IndSeq[B]) =
+        IndSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x)))
+    }
+
+    def indSeq[A](as: A*) = IndSeq(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+  }
 }

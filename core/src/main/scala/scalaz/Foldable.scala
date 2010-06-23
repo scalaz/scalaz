@@ -173,6 +173,37 @@ object Foldable extends FoldableLow {
     }
   }
 
+  implicit def FingerFoldable[V] = new Foldable[PartialApply1Of2[Finger, V]#Apply] {
+    override def foldMap[A, M: Monoid](t: Finger[V, A], f: A => M): M = t foldMap f
+  }
+
+  implicit def NodeFoldable[V] = new Foldable[PartialApply1Of2[Node, V]#Apply] {
+    override def foldMap[A, M: Monoid](t: Node[V, A], f: A => M): M = t foldMap f
+  }
+
+  implicit def FingerTreeFoldable[V]:Foldable[PartialApply1Of2[FingerTree, V]#Apply] =
+    new Foldable[PartialApply1Of2[FingerTree, V]#Apply] {
+    override def foldMap[A, M: Monoid](t: FingerTree[V, A], f: A => M): M = t foldMap f
+    override def foldRight[A, B](t: FingerTree[V, A], b: => B, f: (A, => B) => B): B =
+      t.fold(v => b,
+             (v, a) => f(a, b), 
+             (v, pr, m, sf) =>
+               FingerFoldable[V].foldRight(pr,
+                                           foldRight[Node[V, A], B](m,
+                                                     FingerFoldable[V].foldRight(sf, b, f),
+                                                     (x, y) => NodeFoldable[V].foldRight(x, y, f)),
+                                           f))
+    override def foldLeft[A, B](t: FingerTree[V, A], b: B, f: (B, A) => B): B =
+      t.fold(v => b,
+             (v, a) => f(b, a), 
+             (v, pr, m, sf) =>
+               FingerFoldable[V].foldLeft(pr,
+                                           foldLeft[Node[V, A], B](m,
+                                                     FingerFoldable[V].foldLeft(sf, b, f),
+                                                     (x, y) => NodeFoldable[V].foldLeft(y, x, f)),
+                                           f))
+  }
+
   implicit def JavaIterableFoldable: Foldable[java.lang.Iterable] = new Foldable[java.lang.Iterable] {
     override def foldLeft[A, B](t: java.lang.Iterable[A], b: B, f: (B, A) => B) = {
       var x = b
