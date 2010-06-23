@@ -38,13 +38,13 @@ import FingerTree._
 sealed abstract class Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]): B
 
-  def +:(a: A): Finger[V, A]
+  def +:(a: => A): Finger[V, A]
 
-  def :+(a: A): Finger[V, A]
+  def :+(a: => A): Finger[V, A]
 
-  def |-:(a: A): Finger[V, A]
+  def |-:(a: => A): Finger[V, A]
 
-  def :-|(a: A): Finger[V, A]
+  def :-|(a: => A): Finger[V, A]
 
   def lhead: A
 
@@ -67,13 +67,13 @@ sealed abstract class Finger[V, A] {
 case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1)
 
-  def +:(a: A) = Two(a cons v, a, a1)
+  def +:(a: => A) = Two(a cons v, a, a1)
 
-  def :+(a: A) = Two(v snoc a, a1, a)
+  def :+(a: => A) = Two(v snoc a, a1, a)
 
-  def |-:(a: A) = one(a)
+  def |-:(a: => A) = one(a)
 
-  def :-|(a: A) = one(a)
+  def :-|(a: => A) = one(a)
 
   def lhead = a1
 
@@ -94,13 +94,13 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2)
 
-  def +:(a: A) = Three(a cons v, a, a1, a2)
+  def +:(a: => A) = Three(a cons v, a, a1, a2)
 
-  def :+(a: A) = Three(v snoc a, a1, a2, a)
+  def :+(a: => A) = Three(v snoc a, a1, a2, a)
 
-  def |-:(a: A) = two(a, a2)
+  def |-:(a: => A) = two(a, a2)
 
-  def :-|(a: A) = two(a1, a)
+  def :-|(a: => A) = two(a1, a)
 
   def lhead = a1
 
@@ -132,13 +132,13 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
 case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3)
 
-  def +:(a: A) = Four(a cons v, a, a1, a2, a3)
+  def +:(a: => A) = Four(a cons v, a, a1, a2, a3)
 
-  def :+(a: A) = Four(v snoc a, a1, a2, a3, a)
+  def :+(a: => A) = Four(v snoc a, a1, a2, a3, a)
 
-  def |-:(a: A) = three(a, a2, a3)
+  def |-:(a: => A) = three(a, a2, a3)
 
-  def :-|(a: A) = three(a1, a2, a)
+  def :-|(a: => A) = three(a1, a2, a)
 
   def lhead = a1
 
@@ -175,13 +175,13 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3) |+| f(a4)
 
-  def +:(a: A) = error("Digit overflow")
+  def +:(a: => A) = error("Digit overflow")
 
-  def :+(a: A) = error("Digit overflow")
+  def :+(a: => A) = error("Digit overflow")
 
-  def |-:(a: A) = four(a, a2, a3, a4)
+  def |-:(a: => A) = four(a, a2, a3, a4)
 
-  def :-|(a: A) = four(a1, a2, a3, a)
+  def :-|(a: => A) = four(a1, a2, a3, a)
 
   def lhead = a1
 
@@ -222,7 +222,7 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 }
 
 sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
-  def fold[B](two: (V, A, A) => B, three: (V, A, A, A) => B): B
+  def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B): B
 
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]): B = fold(
     (v, a1, a2) => f(a1) |+| f(a2),
@@ -270,18 +270,18 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
 
-  def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
+  def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
-  def +:(a: A): FingerTree[V, A] = {
+  def +:(a: => A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
-    fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) =>
+    fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
       pr match {
         case Four(vf, b, c, d, e) => deep(a cons v, two(a, b), node3(c, d, e) +: m, sf)
         case _ => deep(a cons v, a +: pr, m, sf)
-      })
+      }})
   }
 
-  def :+(a: A): FingerTree[V, A] = {
+  def :+(a: => A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
     fold(v => single(v snoc a, a), (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)), (v, pr, m, sf) =>
       sf match {
@@ -290,14 +290,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       })
   }
 
-  def |-:(a: A): FingerTree[V, A] = {
+  def |-:(a: => A): FingerTree[V, A] = {
     fold(
       v => error("Replacing first element of an empty FingerTree"),
       (v, b) => single(a),
       (v, pr, m, sf) => deep(a |-: pr, m, sf))
   }
 
-  def :-|(a: A): FingerTree[V, A] = {
+  def :-|(a: => A): FingerTree[V, A] = {
     fold(
       v => error("Replacing last element of an empty FingerTree"),
       (v, b) => single(a),
@@ -319,9 +319,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   private type AFinger = Finger[V, A]
   private type NodeTree = FingerTree[V, Node[V, A]]
 
-  private implicit def sg: Semigroup[V] = measurer.monoid
+  private implicit def sg: Monoid[V] = measurer.monoid
 
-  def add1(n: A, right: ATree): ATree = fold(
+  def add1(n: A, right: => ATree): ATree = fold(
     v => n +: right,
     (v, x) => x +: n +: right,
     (v1, pr1, m1, sf1) =>
@@ -333,7 +333,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       )
   )
 
-  def add2(n1: A, n2: A, right: ATree): ATree = fold(
+  def add2(n1: => A, n2: => A, right: => ATree): ATree = fold(
     v => n1 +: n2 +: right,
     (v, x) => x +: n1 +: n2 +: right,
     (v1, pr1, m1, sf1) =>
@@ -345,7 +345,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       )
   )
 
-  def add3(n1: A, n2: A, n3: A, right: ATree): ATree = fold(
+  def add3(n1: => A, n2: => A, n3: => A, right: => ATree): ATree = fold(
     v => n1 +: n2 +: n3 +: right,
     (v, x) => x +: n1 +: n2 +: n3 +: right,
     (v1, pr1, m1, sf1) =>
@@ -358,7 +358,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       )
   )
 
-  def add4(n1: A, n2: A, n3: A, n4: A, right: ATree): ATree = fold(
+  def add4(n1: => A, n2: => A, n3: => A, n4: => A, right: => ATree): ATree = fold(
     v => n1 +: n2 +: n3 +: n4 +: right,
     (v, x) => x +: n1 +: n2 +: n3 +: n4 +: right,
     (v1, pr1, m1, sf1) =>
@@ -371,7 +371,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       )
   )
 
-  def addDigits0(m1: NodeTree, dig1: AFinger, dig2: AFinger, m2: NodeTree): NodeTree = dig1 match {
+  def addDigits0(m1: => NodeTree, dig1: => AFinger, dig2: => AFinger, m2: => NodeTree): NodeTree = dig1 match {
     case One(_, a) => dig2 match {
       case One(_, b) => m1.add1(node2(a, b), m2)
       case Two(_, b,c) => m1.add1(node3(a,b,c), m2)
@@ -398,7 +398,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
-  def addDigits1(m1: NodeTree, d1: AFinger, x: A, d2: AFinger, m2: NodeTree): NodeTree = d1 match {
+  def addDigits1(m1: => NodeTree, d1: => AFinger, x: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
     case One(_, a) => d2 match {
       case One(_, b) => m1.add1(node3(a,x,b), m2)
       case Two(_, b,c) => m1.add2(node2(a,x), node2(b,c), m2)
@@ -425,7 +425,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
-  def addDigits2(m1: NodeTree, d1: AFinger, x: A, y: A, d2: AFinger, m2: NodeTree): NodeTree = d1 match {
+  def addDigits2(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
     case One(_, a) => d2 match {
       case One(_, b) => m1.add2(node2(a,x), node2(y,b), m2)
       case Two(_, b,c) => m1.add2(node3(a,x,y), node2(b,c), m2)
@@ -452,7 +452,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
-  def addDigits3(m1: NodeTree, d1: AFinger, x: A, y: A, z: A, d2: AFinger, m2: NodeTree): NodeTree = d1 match {
+  def addDigits3(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, z: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
     case One(_, a) => d2 match {
       case One(_, b) => m1.add2(node3(a,x,y), node2(z,b), m2)
       case Two(_, b,c) => m1.add2(node3(a,x,y), node3(z,b,c), m2)
@@ -479,7 +479,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
-  def addDigits4(m1: NodeTree, d1: AFinger, x: A, y: A, z: A, w: A, d2: AFinger, m2: NodeTree): NodeTree = d1 match {
+  def addDigits4(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, z: => A, w: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
     case One(_, a) => d2 match {
       case One(_, b) => m1.add2(node3(a,x,y), node3(z,w,b), m2)
       case Two(_, b,c) => m1.add3(node3(a,x,y), node2(z,w), node2(b,c), m2)
@@ -600,14 +600,14 @@ object FingerTree {
     deep = (v, pf, m, sf) => v + " [" + pf.toList.shows + ", ?, " + sf.toList.shows + "]"
   ))
 
-  def Node2[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) = new Node[V, A] {
-    def fold[B](two: (V, A, A) => B, three: (V, A, A, A) => B) =
+  def Node2[V, A](v: V, a1: => A, a2: => A)(implicit r: Reducer[A, V]) = new Node[V, A] {
+    def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
       two(v, a1, a2)
     val measure = v
   }
 
-  def Node3[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) = new Node[V, A] {
-    def fold[B](two: (V, A, A) => B, three: (V, A, A, A) => B) =
+  def Node3[V, A](v: V, a1: => A, a2: => A, a3: => A)(implicit r: Reducer[A, V]) = new Node[V, A] {
+    def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
       three(v, a1, a2, a3)
     val measure = v
   }
@@ -649,22 +649,22 @@ object FingerTree {
     Reducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
   }
 
-  def one[V, A](a: A)(implicit measure: Reducer[A, V]) = 
+  def one[V, A](a: => A)(implicit measure: Reducer[A, V]) = 
     One(a.unit[V], a)
 
-  def two[V, A](a1: A, a2: A)(implicit measure: Reducer[A, V]) = 
+  def two[V, A](a1: => A, a2: => A)(implicit measure: Reducer[A, V]) = 
     Two(a1.unit[V] snoc a2, a1, a2)
 
-  def three[V, A](a1: A, a2: A, a3: A)(implicit measure: Reducer[A, V]) = 
+  def three[V, A](a1: => A, a2: => A, a3: => A)(implicit measure: Reducer[A, V]) = 
     Three(a1.unit[V] snoc a2 snoc a3, a1, a2, a3)
 
-  def four[V, A](a1: A, a2: A, a3: A, a4: A)(implicit measure: Reducer[A, V]) = 
+  def four[V, A](a1: => A, a2: => A, a3: => A, a4: => A)(implicit measure: Reducer[A, V]) = 
     Four(a1.unit[V] snoc a2 snoc a3 snoc a4, a1, a2, a3, a4)
 
-  def node2[V, A](a: A, b: A)(implicit measure: Reducer[A, V]) =
+  def node2[V, A](a: => A, b: => A)(implicit measure: Reducer[A, V]) =
     Node2[V, A](a.unit[V] snoc b, a, b)
 
-  def node3[V, A](a: A, b: A, c: A)(implicit measure: Reducer[A, V]) =
+  def node3[V, A](a: => A, b: => A, c: => A)(implicit measure: Reducer[A, V]) =
     Node3[V, A](a.unit[V] snoc b snoc c, a, b, c)
 
   private def mappendVal[V, A](v: V, t: FingerTree[V, A])(implicit measure: Reducer[A, V]) = {
@@ -672,13 +672,13 @@ object FingerTree {
   }
 
   def empty[V, A](implicit ms: Reducer[A, V]) = new FingerTree[V, A] {
-    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = b(ms.monoid.zero)
+    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = b(ms.monoid.zero)
   }
 
-  def single[V, A](a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(a.unit[V], a)
+def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(a.unit[V], a)
 
-  def single[V, A](v: V, a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = new FingerTree[V, A] {
-    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
+  def single[V, A](v: V, a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = new FingerTree[V, A] {
+    def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
   }
 
   def deep[V, A](pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A])
@@ -691,7 +691,7 @@ object FingerTree {
     new FingerTree[V, A] {
       implicit val nodeMeasure = NodeMeasure[A, V]
       lazy val mz = m
-      def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
+      def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz, sf)
     }
 
@@ -724,15 +724,33 @@ object FingerTree {
       def apply(i: Int): A =
         value.split(_ > i)._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))
       def ++(xs: IndSeq[A]) = IndSeq(value <++> xs.value)
-      def :+(x: A) = IndSeq(value :+ x)
-      def +:(x: A) = IndSeq(x +: value)
+      def :+(x: => A) = IndSeq(value :+ x)
+      def +:(x: => A) = IndSeq(x +: value)
       def tail = IndSeq(value.tail)
       def init = IndSeq(value.init)
       def map[B](f: A => B) = IndSeq(value map f)
       def flatMap[B](f: A => IndSeq[B]) =
-        IndSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x)))
+        IndSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
     }
 
     def indSeq[A](as: A*) = IndSeq(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+  }
+
+  // Ordered sequences
+  trait OrdSeqs {
+    case class Key[A](value: Option[A]) extends NewType[Option[A]]
+    implicit def KeyOrder[A: Order]: Order[Key[A]] = orderBy(_.value)
+    implicit def keyMonoid[A] = new Monoid[Key[A]] {
+      def append(k1: Key[A], k2: => Key[A]) = Key(k2.value orElse k1.value)
+      val zero: Key[A] = Key(None)
+    }
+    implicit def keyer[A] = Reducer((a: A) => Key(Some(a)))
+    case class OrdSeq[A:Order](value: FingerTree[Key[A], A]) extends NewType[FingerTree[Key[A], A]] {
+      def partition(a: A) = (OrdSeq[A](_)).product.apply(value.split(_ gte Key(Some(a))))
+      def insert(a: A) = partition(a) match {
+        case (l, r) => OrdSeq(l <++> (a +: r))
+      }
+    }
+    def ordSeq[A:Order](as: A*): OrdSeq[A] = as.foldLeft(OrdSeq(empty[Key[A], A]))((x, y) => x insert y)
   }
 }
