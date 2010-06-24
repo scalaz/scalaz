@@ -719,7 +719,8 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
   // Indexed sequences
   trait IndSeqs {
-    case class IndSeq[A](value: FingerTree[Int, A]) extends NewType[FingerTree[Int, A]] {
+    sealed trait IndSeq[A] extends NewType[FingerTree[Int, A]] {
+      val value: FingerTree[Int, A]
       implicit def sizer[A] = Reducer((a: A) => 1)
       def apply(i: Int): A =
         value.split(_ > i)._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))
@@ -733,27 +734,37 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
         IndSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
     }
 
+    private def IndSeq[A](v: FingerTree[Int, A]) = new IndSeq[A] {
+      val value = v
+    }
+
     def indSeq[A](as: A*) = IndSeq(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
   }
 
   // Ordered sequences
   trait OrdSeqs {
-    case class Key[A](value: Option[A]) extends NewType[Option[A]]
-    implicit def KeyOrder[A: Order]: Order[Key[A]] = orderBy(_.value)
-    implicit def keyMonoid[A] = new Monoid[Key[A]] {
-      def append(k1: Key[A], k2: => Key[A]) = Key(k2.value orElse k1.value)
-      val zero: Key[A] = Key(None)
-    }
-    implicit def keyer[A] = Reducer((a: A) => Key(Some(a))) &&& Reducer((a: A) => 1)
-    case class OrdSeq[A:Order](value: FingerTree[(Key[A], Int), A]) extends NewType[FingerTree[(Key[A], Int), A]] {
-      def apply(i: Int): A =
-        value.split(p => p._2 > i)._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))
-      def partition(a: A) = (OrdSeq[A](_)).product.apply(value.split(p => p._1 gte Key(Some(a))))
+    sealed trait OrdSeq[A] extends NewType[FingerTree[Option[A], A]] {
+      val value: FingerTree[Option[A], A]
+      implicit val ord: Order[A]
+      def partition(a: A) = (OrdSeq[A](_)).product.apply(value.split(_ gte some(a)))
       def insert(a: A) = partition(a) match {
         case (l, r) => OrdSeq(l <++> (a +: r))
       }
       def ++(xs: OrdSeq[A]) = xs.toStream.foldLeft(this)((x, y) => x insert y)
     }
-    def ordSeq[A:Order](as: A*): OrdSeq[A] = as.foldLeft(OrdSeq(empty[(Key[A], Int), A]))((x, y) => x insert y)
+
+    private def OrdSeq[A:Order](t: FingerTree[Option[A], A]) = new OrdSeq[A] {
+      val value = t
+      val ord = implicitly[Order[A]]
+    }
+
+    def ordSeq[A:Order](as: A*): OrdSeq[A] = {
+      implicit def keyMonoid[A] = new Monoid[Option[A]] {
+        def append(k1: Option[A], k2: => Option[A]) = k2 orElse k1
+        val zero: Option[A] = none
+      }
+      implicit def keyer[A] = Reducer((a: A) => some(a))
+      as.foldLeft(OrdSeq(empty[Option[A], A]))((x, y) => x insert y)
+    }
   }
 }
