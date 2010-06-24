@@ -755,7 +755,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       def insert(a: A) = partition(a) match {
         case (l, r) => ordSeq(l <++> (a +: r))
       }
-      def ++(xs: OrdSeq[A]) = xs.toList.foldLeft(value)((x, y) => x insert y)
+      def ++(xs: OrdSeq[A]) = xs.toList.foldLeft(this)(_ insert _)
     }
 
     private def ordSeq[A:Order](t: FingerTree[Option[A], A]) = new OrdSeq[A] {
