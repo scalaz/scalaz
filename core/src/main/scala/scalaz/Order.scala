@@ -32,6 +32,14 @@ object Order {
     case (GT, _) => GT
   }
 
+  implicit def OrderOrdering[A: Order]: scala.Ordering[A] = new scala.Ordering[A] {
+    def compare(a1: A, a2: A) = (a1 ?|? a2) match {
+      case EQ => 0
+      case LT => -1
+      case GT => 1
+    }
+  }
+
   implicit def UnitOrder: Order[Unit] = order((_, _) => EQ)
 
   implicit def StringOrder: Order[String] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
