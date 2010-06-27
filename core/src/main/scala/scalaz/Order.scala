@@ -8,12 +8,25 @@ trait Order[-A] extends Equal[A] {
 
 trait Orders {
   import Scalaz._
-  
+
   def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
   def orderBy[A, B: Order](f: A => B): Order[A] = implicitly[Order[B]] ∙ f
+
+}
+
+trait OrderLow {
+  import Scalaz._
+
+  implicit def ScalaOrderingOrder[T: scala.Ordering]: Order[T] = order {(t1, t2) =>
+    implicitly[scala.Ordering[T]].compare(t1, t2) match {
+      case -1 => LT
+      case 0 => EQ
+      case 1 => GT
+    }
+  }
 }
 
 object Order {
@@ -42,41 +55,41 @@ object Order {
 
   implicit def UnitOrder: Order[Unit] = order((_, _) => EQ)
 
-  implicit def StringOrder: Order[String] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def StringOrder: Order[String] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
-  implicit def IntOrder: Order[Int] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def IntOrder: Order[Int] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def IntMultiplicationOrder: Order[IntMultiplication] = orderBy(_.value)
 
-  implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = orderBy(_.value)
 
-  implicit def CharOrder: Order[Char] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def CharOrder: Order[Char] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def CharMultiplicationOrder: Order[CharMultiplication] = orderBy(_.value)
 
-  implicit def ByteOrder: Order[Byte] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def ByteOrder: Order[Byte] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = orderBy(_.value)
 
-  implicit def LongOrder: Order[Long] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def LongOrder: Order[Long] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def LongMultiplicationOrder: Order[LongMultiplication] = orderBy(_.value)
 
-  implicit def ShortOrder: Order[Short] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def ShortOrder: Order[Short] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = orderBy(_.value)
 
-  implicit def FloatOrder: Order[Float] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def FloatOrder: Order[Float] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
-  implicit def DoubleOrder: Order[Double] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def DoubleOrder: Order[Double] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def BigIntegerOrder: Order[BigInteger] = order(_ compareTo _ ordering)
 
   implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = orderBy(_.value)
 
-  implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if(a1 > a2) GT else if(a1 < a2) LT else EQ)
+  implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = orderBy(_.value)
 
@@ -120,19 +133,19 @@ object Order {
     var b = true
     var r: Ordering = EQ
 
-    while(i1.hasNext && i2.hasNext && b) {
+    while (i1.hasNext && i2.hasNext && b) {
       val a1 = i1.next
       val a2 = i2.next
 
       val o = a1 ?|? a2
-      if(o != EQ) {
+      if (o != EQ) {
         r = o
         b = false
       }
     }
 
-    if(i1.hasNext)
-      if(i2.hasNext)
+    if (i1.hasNext)
+      if (i2.hasNext)
         r
       else
         GT
@@ -154,19 +167,21 @@ object Order {
     case (Right(_), Left(_)) => GT
   }
 
-  implicit def EitherLeftOrder[A: Order, B]: Order[Either.LeftProjection[A, B]] = order((a1, a2) => (a1.toOption, a2.toOption) match {
-    case (Some(a1), Some(a2)) => a1 ?|? a2
-    case (Some(_), None) => GT
-    case (None, Some(_)) => LT
-    case (None, None) => EQ
-  })
+  implicit def EitherLeftOrder[A: Order, B]: Order[Either.LeftProjection[A, B]] = order((a1, a2) =>
+    (a1.toOption, a2.toOption) match {
+      case (Some(a1), Some(a2)) => a1 ?|? a2
+      case (Some(_), None) => GT
+      case (None, Some(_)) => LT
+      case (None, None) => EQ
+    })
 
-  implicit def EitherRightOrder[A, B: Order]: Order[Either.RightProjection[A, B]] = order((b1, b2) => (b1.toOption, b2.toOption) match {
-    case (Some(b1), Some(b2)) => b1 ?|? b2
-    case (Some(_), None) => GT
-    case (None, Some(_)) => LT
-    case (None, None) => EQ
-  })
+  implicit def EitherRightOrder[A, B: Order]: Order[Either.RightProjection[A, B]] = order((b1, b2) =>
+    (b1.toOption, b2.toOption) match {
+      case (Some(b1), Some(b2)) => b1 ?|? b2
+      case (Some(_), None) => GT
+      case (None, Some(_)) => LT
+      case (None, None) => EQ
+    })
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = orderBy(_.either)
 
