@@ -97,8 +97,8 @@ object ScalazArbitrary {
   ))
 
   implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
-    (arbitrary[A] ⊛ arbitrary[A])(node2[V, A] _),
-    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(node3[V, A] _)
+    (arbitrary[A] ⊛ arbitrary[A])((a, b) => node2[V, A](a, b)),
+    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])((a, b, c) => node3[V, A](a, b, c))
   ))
 
   implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
