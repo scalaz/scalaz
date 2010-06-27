@@ -154,7 +154,7 @@ sealed trait Identity[A] extends PimpedType[A] {
   /**
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */
-  def matchOrZero[B: Zero](pf: PartialFunction[A, B]) = ~pf.lift(value)
+  def matchOrZero[B: Zero](pf: PartialFunction[A, B]): B = ~pf.lift(value)
 
   @tailrec
   final def doWhile(f: A => A, p: A => Boolean): A = {
