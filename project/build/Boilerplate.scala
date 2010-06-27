@@ -20,16 +20,25 @@ trait Boilerplate {
 
       for (arity: Int <- arities) {
         val tupleWSource: String = {
-          val chars = (0 until arity).map(n => ('A' + n).toChar.toString).toList
-          val tparams = chars.mkString(", ")
-          val params = (1 to arity).map("_" + _).mkString(", ")
-          val ztparams = (1 to arity).map(_ => "Z").mkString(", ")
-          val mapallTParams = chars.map(x => double(x.toString)).mkString(", ")
-          val mapallParams = chars.zipWithIndex map { case (c, i) => "_%d: (%s => %s) = identity[%s] _".format(i + 1, c, double(c), c) } mkString(", ")
-          val mapallApply = chars.zipWithIndex map{ case (c, i) => "_%d(value._%d)".format(i + 1, i + 1) } mkString(", ")
+          case class N(n: Int) {
+            val alpha: String = ('A' + (n - 1)).toChar.toString
+            val alpha2: String = alpha + alpha
+            val element: String = "_" + n
+          }
+          val ns = (1 to arity) map N.apply
+          def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          val copyParams = chars.zipWithIndex map { case (c, i) => "_%d: %s = value._%d".format(i + 1, double(c), i + 1) } mkString(", ")
-          val copyApply = chars.zipWithIndex map{ case (c, i) => "_%d".format(i + 1) } mkString(", ")
+          val tparams = mapMkString {n => n.alpha}
+          val params = mapMkString {n => n.element}
+
+          val ztparams = mapMkString {_ => "Z"}
+
+          val mapallTParams = mapMkString { n => n.alpha2 }
+          val mapallParams = mapMkString { n => "%s: (%s => %s) = identity[%s] _".format(n.element, n.alpha, n.alpha2, n.alpha) }
+          val mapallApply = mapMkString { n => "%s(value.%s)".format(n.element, n.element) }
+
+          val copyParams = mapMkString { n => "%s: %s = value.%s".format(n.element, n.alpha2, n.element) }
+          val copyApply = mapMkString { n => "%s".format(n.element) }
           val pimp = """|
           |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
