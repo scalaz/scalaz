@@ -16,16 +16,31 @@ trait Boilerplate {
         write(file, source)
       }
 
+      def double(s: String) = s + s
+
       for (arity: Int <- arities) {
         val tupleWSource: String = {
-          val tparams = (0 until arity).map(n => ('A' + n).toChar).mkString(", ")
+          val chars = (0 until arity).map(n => ('A' + n).toChar.toString).toList
+          val tparams = chars.mkString(", ")
           val params = (1 to arity).map("_" + _).mkString(", ")
           val ztparams = (1 to arity).map(_ => "Z").mkString(", ")
+          val mapallTParams = chars.map(x => double(x.toString)).mkString(", ")
+          val mapallParams = chars.zipWithIndex map { case (c, i) => "_%d: (%s => %s) = identity[%s] _".format(i + 1, c, double(c), c) } mkString(", ")
+          val mapallApply = chars.zipWithIndex map{ case (c, i) => "_%d(value._%d)".format(i + 1, i + 1) } mkString(", ")
+
+          val copyParams = chars.zipWithIndex map { case (c, i) => "_%d: %s = value._%d".format(i + 1, double(c), i + 1) } mkString(", ")
+          val copyApply = chars.zipWithIndex map{ case (c, i) => "_%d".format(i + 1) } mkString(", ")
           val pimp = """|
           |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
-          |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity, ztparams, params)
+          |  def mapAll[%s](%s): (%s) = (%s)
+          |  def copy[%s](%s): (%s) = (%s)
+          |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
+            ztparams, params,
+            mapallTParams, mapallParams, mapallTParams, mapallApply,
+            mapallTParams, copyParams, mapallTParams, copyApply
+            )
 
           val conv = """|
           |trait Tuple%dWs {
