@@ -53,6 +53,8 @@ object ImmutableArray {
     y.asInstanceOf[ImmutableArray[A]]
   }
 
+  def fromString(str: String): ImmutableArray[Char] = new StringArray(str) 
+
   // override def newBuilder[A]: Builder[A, ImmutableArray[A]] = newBuilder(implicitly[ClassManifest[A]])
   // override def newBuilder[A]: Builder[A, ImmutableArray[A]] = (new ArrayBuffer[A]).mapResult(b => fromArray(b.toArray))
 

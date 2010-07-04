@@ -46,16 +46,24 @@ class ImmutableArrayTest extends Specification with Sugar with ScalaCheck {
   }
 
   "Behave like arrays" in {
-    "Conversion from array" in {
-      val array = Array(2,3)
-      IA.fromArray(array).toList must (beEqual(array.toList))
-      // IA.fromArray(array) must beTheSameSeqAs array // doesn't compile
+    "Conversion from array" verifies {(array: Array[Int]) =>
+      val ia = IA.fromArray(array)
+      if (array.isEmpty) (ia must beEmpty) else (ia must beTheSameSeqAs(array))
+      // IA.fromArray(array) must beTheSameSeqAs(array)
     }
 
-    "Appending arrays" in {
-      val arr1 = Array(1)
-      val arr2 = Array(2)
-      (IA.fromArray(arr1) ++ IA.fromArray(arr2)) must (haveSuperClass[ImmutableArray[_]] and verify(_.toList == (arr1 ++ arr2).toList))
+    "Appending arrays" verifies {(array1: Array[Int], array2: Array[Int]) =>
+      val array = array1 ++ array2
+      val ia = IA.fromArray(array1) ++ IA.fromArray(array2)
+      if (array.isEmpty) (ia must beEmpty) else (ia must (haveSuperClass[ImmutableArray[_]] and beTheSameSeqAs(array)))
+    }
+
+    "Appending strings" verifies {(str1: String, str2: String) =>
+      val str = str1 ++ str2
+      val ia = IA.fromString(str1) ++ IA.fromString(str2)
+      if (str.isEmpty) (ia must beEmpty) else (ia must (haveSuperClass[ImmutableArray[_]] and beTheSameSeqAs(str)))
+      // (IA.fromString(str1) ++ IA.fromString(str2)) must (haveClass[IA.ofString] and beTheSameSeqAs(str1 ++ str2))
+      // doesn't pass at the moment but would be desirable. Can IA.canBuildFrom be specialized suitably?
     }
   }
 }
