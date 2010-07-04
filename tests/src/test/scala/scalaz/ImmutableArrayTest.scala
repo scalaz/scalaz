@@ -8,7 +8,7 @@ import Arbitrary._
 import scalacheck.ScalaCheckBinding._
 import Scalaz._
 import scalacheck.ScalazArbitrary._
-import ImmutableArray._
+import scalaz.{ImmutableArray => IA}
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,17 +21,17 @@ import ImmutableArray._
 class ImmutableArrayTest extends Specification with Sugar with ScalaCheck {
   "Arrays are created with correct types" in {
     "Int" in {
-      ImmutableArray.fromArray(Array(2,3)) must haveClass[ImmutableArray.ofInt]
+      IA.fromArray(Array(2,3)) must haveClass[IA.ofInt]
     }
 
     "Boolean" in {
-      ImmutableArray.fromArray(Array(true)) must haveClass[ImmutableArray.ofBoolean]
+      IA.fromArray(Array(true)) must haveClass[IA.ofBoolean]
     }
 
     "String" in {
-      val immArray = ImmutableArray.fromArray(Array("a", "b"))
+      val immArray = IA.fromArray(Array("a", "b"))
       "Array's type" in {
-        immArray must haveClass[ImmutableArray.ofRef[_]] // can't check more precisely due to erasure
+        immArray must haveClass[IA.ofRef[_]] // can't check more precisely due to erasure
         // immArray must not(haveClass[ImmutableArray.ofRef[StringBuilder]]) // doesn't pass
       }
       //// can't check this, because elemManifest can't be accessible outside due to variance
@@ -41,13 +41,21 @@ class ImmutableArrayTest extends Specification with Sugar with ScalaCheck {
     }
 
     "StringArray" in {
-      ImmutableArray.make("abc") must haveClass[ImmutableArray.StringArray]
+      IA.make("abc") must haveClass[IA.StringArray]
     }
   }
 
   "Behave like arrays" in {
-    val array = Array(2,3)
-    ImmutableArray.fromArray(array) must (contain(2) and not(contain(4)))
-    // ImmutableArray.fromArray(array) must beSameSeqAs array // doesn't compile
+    "Conversion from array" in {
+      val array = Array(2,3)
+      IA.fromArray(array).toList must (beEqual(array.toList))
+      // IA.fromArray(array) must beTheSameSeqAs array // doesn't compile
+    }
+
+    "Appending arrays" in {
+      val arr1 = Array(1)
+      val arr2 = Array(2)
+      (IA.fromArray(arr1) ++ IA.fromArray(arr2)) must (haveSuperClass[ImmutableArray[_]] and verify(_.toList == (arr1 ++ arr2).toList))
+    }
   }
 }

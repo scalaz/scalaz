@@ -14,7 +14,6 @@ trait ImmutableArray[+A] extends IndexedSeq[A] with IndexedSeqOptimized[A, Immut
   override def stringPrefix = "ImmutableArray"
   protected[this] override def newBuilder: Builder[A, ImmutableArray[A]] =
     error("calling newBuilder directly on ImmutableArray[A]; this should be overridden in all subclasses")
-  // override def companion = ImmutableArray
 }
 
 object ImmutableArray {
@@ -59,6 +58,12 @@ object ImmutableArray {
 
   def newBuilder[A](elemManifest: ClassManifest[A]): Builder[A, ImmutableArray[A]] =
     ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
+
+  implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
+    new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
+      def apply(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] = newBuilder(m)
+      def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
+    }
 
   abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
