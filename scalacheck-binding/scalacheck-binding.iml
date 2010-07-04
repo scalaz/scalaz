@@ -17,8 +17,8 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/scala_2.8.0.RC6/classes" />
-    <output-test url="file://$MODULE_DIR$/target/scala_2.8.0.RC6/test-classes" />
+    <output url="file://$MODULE_DIR$/target/scala_2.8.0.RC7/classes" />
+    <output-test url="file://$MODULE_DIR$/target/scala_2.8.0.RC7/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />
@@ -30,12 +30,12 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC6/compile/test-interface-0.3.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC6/compile/scalacheck_2.8.0.RC6-1.8-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC7/compile/test-interface-0.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC7/compile/scalacheck_2.8.0.RC7-1.8-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC6/compile/scalacheck_2.8.0.RC6-1.8-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC7/compile/scalacheck_2.8.0.RC7-1.8-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
