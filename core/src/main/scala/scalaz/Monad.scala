@@ -28,6 +28,8 @@ object Monad {
 
   implicit def StateMonad[A] = monad[PartialApply1Of2[State, A]#Apply](StateBind, StatePure)
 
+  implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) = monad[PartialApplyKA[StateT, M, A]#Apply](StateTBind(b), StateTPure(p))
+
   implicit def Tuple2Monad[R: Monoid]: Monad[PartialApply1Of2[Tuple2, R]#Apply] = monad[PartialApply1Of2[Tuple2, R]#Apply](Tuple2Bind, Tuple2Pure)
 
   implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[PartialApply2Of3[Tuple3, R, S]#Apply] = monad[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Bind, Tuple3Pure)

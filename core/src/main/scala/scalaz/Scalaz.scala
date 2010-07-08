@@ -81,6 +81,10 @@ object Scalaz extends ScalazLow
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
+  def pure[F[_]:Pure] = new (Id ~> F) {
+    def apply[A](a: A) = implicitly[Pure[F]].pure(a)
+  }
+
   import scala.collection.generic.CanBuildFrom
   
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
