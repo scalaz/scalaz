@@ -119,7 +119,7 @@ object ScalazArbitrary {
 
   import concurrent.Promise
 
-  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy[Unit]): Arbitrary[Promise[A]] = arb[A] ∘ ((x: A) => promise(x))
+  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = arb[A] ∘ ((x: A) => promise(x))
 
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]].<***>(arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 

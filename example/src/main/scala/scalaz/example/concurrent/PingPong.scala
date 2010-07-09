@@ -12,7 +12,7 @@ object PingPong {
   val actors = 10000
   val pings = 3
   implicit val pool = Executors.newFixedThreadPool(5)
-  implicit val s = strategy.Executor.strategy[Unit]
+  implicit val s = Strategies.Executor
 
   class Pong
    { val p: Actor[Ping] = actor((m: Ping) => m.p ! Pong.this) }

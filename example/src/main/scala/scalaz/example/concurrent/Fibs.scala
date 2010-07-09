@@ -9,7 +9,7 @@ object Fibs {
 
   def run {
     implicit val pool = Executors.newFixedThreadPool(5)
-    implicit val s = strategy.Executor.strategy[Unit]
+    implicit val s = Strategies.Executor
 
     val out = actor((xs: Stream[Int]) => {
       xs.zipWithIndex.foreach(p => println("n=" + (p._2 + 1) + " => " + p._1))

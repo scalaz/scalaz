@@ -16,7 +16,7 @@ sealed trait Function1W[T, R] {
   import concurrent.Strategy
   import concurrent.Promise
   
-  def promise(implicit s: Strategy[Unit]): Kleisli[Promise, T, R] = kleisli[Promise]
+  def promise(implicit s: Strategy): Kleisli[Promise, T, R] = kleisli[Promise]
 
   def lift[F[_]](implicit f: Functor[F]): (F[T]) => F[R] = (x: F[T]) => x.map(this)
 

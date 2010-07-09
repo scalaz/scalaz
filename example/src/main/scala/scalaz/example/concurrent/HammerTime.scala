@@ -4,7 +4,6 @@ import scalaz._
 import Scalaz._
 
 import concurrent._
-import concurrent.strategy._
 import java.util.concurrent.Executors._
 import java.util.concurrent.ExecutorService
 
@@ -12,7 +11,7 @@ object HammerTime {
 
   def main(args: Array[String]): Unit = {
     implicit val pool = newCachedThreadPool
-    implicit val strategy = Executor.strategy[Unit]
+    implicit val strategy = Strategies.Executor
 
     val done = actor((u: Unit) => {
       println("TEST SUCCEEDED")

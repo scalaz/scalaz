@@ -253,19 +253,15 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def :&(a: A) = OnR[M,A](value, a)
 
   import concurrent._
-  def parMap[B](f: A => B)(implicit s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
+  def parMap[B](f: A => B)(implicit s: Strategy, t: Traverse[M]): Promise[M[B]] =
     traverse(f.kleisli[Promise])
 
-  def parBind[B](f: A => M[B])(implicit m: Monad[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[B]] =
+  def parBind[B](f: A => M[B])(implicit m: Monad[M], s: Strategy, t: Traverse[M]): Promise[M[B]] =
     parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
 
-  def parZipWith[B, C](bs: M[B])(f: (A, B) => C)(implicit z: Applicative[M], s: Strategy[Unit], t: Traverse[M]): Promise[M[C]] =
+  def parZipWith[B, C](bs: M[B])(f: (A, B) => C)(implicit z: Applicative[M], s: Strategy, t: Traverse[M]): Promise[M[C]] =
     zipWithA(bs)((x, y) => promise(f(x, y)))
 
-  import concurrent.Strategy
-
-  def parM[B](implicit b: A <:< (() => B), m: Functor[M], s: Strategy[B]): () => M[B] =
-    () => value ∘ (z => s(z).apply)
 }
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].

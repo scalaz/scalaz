@@ -9,7 +9,7 @@ sealed trait Promise[A] {
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Option[A] = None
   protected val e: Actor[(Either[() => A, A => Unit], Promise[A])]
-  val strategy: Strategy[Unit]
+  val strategy: Strategy
 
   def get = {
     latch.await
@@ -29,11 +29,11 @@ sealed trait Promise[A] {
 }
 
 trait Promises {
-  def promise[A](a: => A)(implicit s: Strategy[Unit]): Promise[A] = Promise.promise(a) 
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = Promise.promise(a) 
 }
 
 object Promise {
-  private def mkPromise[A](implicit s: Strategy[Unit]) = new Promise[A] {
+  private def mkPromise[A](implicit s: Strategy) = new Promise[A] {
     val strategy = s
     val e = actor((p: (Either[() => A, A => Unit], Promise[A])) => {
       val promise = p._2
@@ -53,7 +53,7 @@ object Promise {
     })
   }
 
-  def promise[A](a: => A)(implicit s: Strategy[Unit]): Promise[A] = {
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
     val p = mkPromise[A]
     p.e ! ((Left(() => a), p))
     p

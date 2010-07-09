@@ -172,7 +172,7 @@ object Pure {
   }
 
   import concurrent._
-  implicit def PromisePure(implicit s: Strategy[Unit]): Pure[Promise] = new Pure[Promise] {
+  implicit def PromisePure(implicit s: Strategy): Pure[Promise] = new Pure[Promise] {
     def pure[A](a: => A) = promise(a)
   }
 

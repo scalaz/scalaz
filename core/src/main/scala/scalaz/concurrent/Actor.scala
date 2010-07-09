@@ -36,13 +36,13 @@ sealed trait Actor[A] {
   
   val e: A => Unit
 
-  implicit val strategy: Strategy[Unit]
+  implicit val strategy: Strategy
 
   val onError: Throwable => Unit
 }
 
 trait Actors {
-  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = new {
+  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy): Actor[A] = new {
     val e = c
 
     implicit val strategy = s
@@ -50,7 +50,7 @@ trait Actors {
     val onError = err
   } with Actor[A]
 
-  def actor[A](c: A => Unit)(implicit s: Strategy[Unit]): Actor[A] = actor[A]((e: Throwable) => throw e, c): Actor[A]
+  def actor[A](c: A => Unit)(implicit s: Strategy): Actor[A] = actor[A]((e: Throwable) => throw e, c): Actor[A]
 
   implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _ 
 }
