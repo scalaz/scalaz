@@ -67,6 +67,15 @@ object Length {
     def len[A](a: Array[A]) = a.length
   }
 
+  implicit def ImmutableArrayLength: Length[ImmutableArray] = new Length[ImmutableArray] {
+    def len[A](a: ImmutableArray[A]) = a.length
+  }
+
+  import FingerTree.ftip2ft
+  implicit def RopeLength: Length[Rope] = new Length[Rope] {
+    def len[A](a: Rope[A]) = a.value.measure
+  }
+
   implicit def IterableLength: Length[Iterable] = new Length[Iterable] {
     def len[A](a: Iterable[A]) = {
       var n = 0

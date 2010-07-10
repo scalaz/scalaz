@@ -70,7 +70,7 @@ object ImmutableArray {
       def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
     }
 
-  implicit def canBuildFromChar: CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+  implicit def canBuildFromChar(implicit m: ClassManifest[Char]): CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
     new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
       def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
       def apply: Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder

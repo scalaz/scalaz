@@ -595,6 +595,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 }
 
+class FingerTreeIntPlus[A](val value: FingerTree[Int, A]) {
+  // A placeholder for a FingerTree specialized to the (Int, +) monoid
+  // Will need to see how much it helps performance
+}
+
 object FingerTree {
   implicit def FingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = shows((t: FingerTree[V,A]) => t.fold(
     empty = v => v + " []",
@@ -718,6 +723,63 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
     m.viewr.fold(
       pr.toTree,
       (mm, a) => deep(mappendVal(pr.measure, m), pr, mm, a.toDigit))
+
+  implicit def ft2ftip[A](ft: FingerTree[Int, A]): FingerTreeIntPlus[A] = new FingerTreeIntPlus(ft)
+
+  implicit def ftip2ft[A](ft: FingerTreeIntPlus[A]): FingerTree[Int, A] = ft.value
+
+  trait Ropes {
+    import ImmutableArray._
+    
+    sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]]) extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] {
+      implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
+      
+      def apply(i: Int): A = {
+        val split = value.split(_ > i)
+        split._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))(i - split._1.value.measure)
+      }
+
+      def ++(xs: Rope[A]) = rope(value <++> xs.value)
+
+      def :+(x: => A) =
+        rope(
+          value.viewr.fold(
+            single(fromArray(Array(x))),
+            (init, last) => init :+ (last :+ x)
+          )
+        )
+
+      def +:(x: => A) =
+        rope(
+          value.viewl.fold(
+            single(fromArray(Array(x))),
+            (head, tail) => (x +: head) +: tail
+          )
+        )
+      
+      def tail = rope(value.tail)
+      def init = rope(value.init)
+//      def map[B](f: A => B) = rope(value map f)
+//      def flatMap[B](f: A => Rope[B]) =
+//        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
+
+      def chunks = value.toStream
+
+      def toStream = chunks.flatten
+
+      def length = value.measure
+    }
+
+    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
+
+    object Rope {
+      implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = Reducer(_.length)
+      def fromArray[A : ClassManifest](a: Array[A]): Rope[A] = rope(single(ImmutableArray.fromArray(a)))
+      def fromString(str: String): Rope[Char] = rope(single(ImmutableArray.fromString(str)))
+//      def apply[A](as: A*) = fromSeq(as)
+//      def fromSeq[A](as: Seq[A]) = rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+    }
+  }
 
   // Indexed sequences
   trait IndSeqs {
