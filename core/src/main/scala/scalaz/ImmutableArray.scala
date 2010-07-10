@@ -58,13 +58,22 @@ object ImmutableArray {
   // override def newBuilder[A]: Builder[A, ImmutableArray[A]] = newBuilder(implicitly[ClassManifest[A]])
   // override def newBuilder[A]: Builder[A, ImmutableArray[A]] = (new ArrayBuffer[A]).mapResult(b => fromArray(b.toArray))
 
-  def newBuilder[A](elemManifest: ClassManifest[A]): Builder[A, ImmutableArray[A]] =
+  def newBuilder[A](implicit elemManifest: ClassManifest[A]): Builder[A, ImmutableArray[A]] =
     ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
+
+  def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
+    (new StringBuilder).mapResult(fromString(_))
 
   implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
     new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
       def apply(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] = newBuilder(m)
       def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
+    }
+
+  implicit def canBuildFromChar: CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+    new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
+      def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
+      def apply: Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
     }
 
   abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {

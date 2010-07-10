@@ -59,9 +59,7 @@ class ImmutableArrayTest extends Specification with Sugar with ScalaCheck {
     "Appending strings" verifies {(str1: String, str2: String) =>
       val str = str1 ++ str2
       val ia = IA.fromString(str1) ++ IA.fromString(str2)
-      ia must (haveSuperClass[ImmutableArray[_]] and beTheSameSeqAs(str))
-      // (IA.fromString(str1) ++ IA.fromString(str2)) must (haveClass[IA.ofString] and beTheSameSeqAs(str1 ++ str2))
-      // doesn't pass at the moment but would be desirable. Can IA.canBuildFrom be specialized suitably?
+      ia must (haveClass[IA.StringArray] and beTheSameSeqAs(str1 ++ str2))
     }
   }
 }
