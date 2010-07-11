@@ -63,6 +63,8 @@ sealed abstract class Finger[V, A] {
 
   def iterator: Iterator[A]
 
+  def reverseIterator: Iterator[A]
+
   def measure: V
 
   def toList = map(x => x)(ListReducer[A]).measure
@@ -96,7 +98,9 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
     f(a1)
   }
 
-  def iterator: Iterator[A] = Iterator.single(a1)
+  def iterator = Iterator.single(a1)
+
+  def reverseIterator = Iterator.single(a1)
 
   val measure = v
 
@@ -132,7 +136,9 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
     f(a2)
   }
 
-  def iterator: Iterator[A] = Iterator(a1, a2)
+  def iterator = Iterator(a1, a2)
+
+  def reverseIterator = Iterator(a2, a1)
 
   val measure = v
 
@@ -178,7 +184,9 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
     f(a3)
   }
 
-  def iterator: Iterator[A] = Iterator(a1, a2, a3)
+  def iterator = Iterator(a1, a2, a3)
+
+  def reverseIterator = Iterator(a3, a2, a1)
 
   val measure = v
 
@@ -230,7 +238,9 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
     f(a4)
   }
 
-  def iterator: Iterator[A] = Iterator(a1, a2, a3, a4)
+  def iterator = Iterator(a1, a2, a3, a4)
+
+  def reverseIterator = Iterator(a4, a3, a2, a1)
 
   val measure = v
 
@@ -282,6 +292,10 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   def iterator = fold(
     (_, a1, a2) => Iterator(a1, a2),
     (_, a1, a2, a3) => Iterator(a1, a2, a3))
+
+  def reverseIterator = fold(
+    (_, a1, a2) => Iterator(a2, a1),
+    (_, a1, a2, a3) => Iterator(a3, a2, a1))
 
   private implicit def sg: Semigroup[V] = r.monoid
   
@@ -637,6 +651,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     (_, x) => Iterator.single(x),                                           
     (_, pr, m, sf) => pr.iterator ++ m.iterator.flatMap(_.iterator) ++ sf.iterator)
 
+  def reverseIterator: Iterator[A] = fold(
+    _ => Iterator.empty,
+    (_, x) => Iterator.single(x),
+    (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
+
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
 
@@ -847,13 +866,17 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
       override def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
 
+      override def reverseIterator: Iterator[A] = value.reverseIterator.flatMap(_.reverseIterator)
+
+      // TODO override def reverse
+      
       def chunks = value.toStream
 
       override def toStream = chunks.flatten
 
       override def length = value.measure
 
-      // TODO find a definition which takes advantage of Rope's structure
+      // TODO find a definition which takes advantage of Rope's structure; this always creates a single-chunk Rope
       protected[this] override def newBuilder: Builder[A, Rope[A]] =
         IA.newBuilder[A].mapResult(chunk => rope(single(chunk)))
     }
