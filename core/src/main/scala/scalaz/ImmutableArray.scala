@@ -1,6 +1,7 @@
 package scalaz
 import reflect.ClassManifest
-import collection.{IndexedSeq, IndexedSeqOptimized}
+import collection.{IndexedSeqOptimized}
+import collection.immutable.IndexedSeq
 import scala.collection.generic._
 import collection.mutable.{ArrayBuffer, ArrayBuilder, Builder}
 

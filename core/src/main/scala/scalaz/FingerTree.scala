@@ -805,6 +805,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
   implicit def ftip2ft[A](ft: FingerTreeIntPlus[A]): FingerTree[Int, A] = ft.value
 
   import collection.IndexedSeqLike
+  import collection.immutable.IndexedSeq
   import collection.mutable.Builder
   import collection.generic.CanBuildFrom
 
