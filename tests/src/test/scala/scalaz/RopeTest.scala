@@ -43,9 +43,9 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
 //    streamToTree(stream).toStream ≟ stream
 //  }
 
-//  "appending two trees works correctly" verifies {(tree1: Rope[Int], tree2: Rope[Int]) =>
-//    (tree1 <++> tree2).toStream ≟ (tree1.toStream ++ tree2.toStream)
-//  }
+  "appending ropes works correctly" verifies {(rope1: Rope[Int], rope2: Rope[Int]) =>
+    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameSeqAs(rope1.toStream ++ rope2.toStream))
+  }
 //
 //  "splitting a tree works the same as splitting a stream" verifies {(tree: Rope[Int], index: Int) =>
 //    val asStream = tree.toStream

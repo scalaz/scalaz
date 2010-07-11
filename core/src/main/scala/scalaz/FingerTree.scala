@@ -806,6 +806,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
   import collection.IndexedSeqLike
   import collection.mutable.Builder
+  import collection.generic.CanBuildFrom
 
   trait Ropes {
     import scalaz.{ImmutableArray => IA}
@@ -876,15 +877,13 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
       override def length = value.measure
 
-      // TODO find a definition which takes advantage of Rope's structure; this always creates a single-chunk Rope
-      protected[this] override def newBuilder: Builder[A, Rope[A]] =
-        IA.newBuilder[A].mapResult(chunk => rope(single(chunk)))
+      protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
     }
 
     def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
 
     object Rope {
-      private val baseChunkLength = 16
+      private[Ropes] val baseChunkLength = 16
       implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = Reducer(_.length)
       def empty[A : ClassManifest] = rope(FingerTree.empty[Int, ImmutableArray[A]])
       def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
@@ -895,6 +894,52 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
         rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
 //      def apply[A](as: A*) = fromSeq(as)
 //      def fromSeq[A](as: Seq[A]) = rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+
+      def newBuilder[A : ClassManifest]: Builder[A, Rope[A]] = new RopeBuilder[A]
+
+      implicit def canBuildFrom[T : ClassManifest]: CanBuildFrom[Rope[_], T, Rope[T]] =
+        new CanBuildFrom[Rope[_], T, Rope[T]] {
+          def apply(from: Rope[_]): Builder[T, Rope[T]] = newBuilder[T]
+          def apply: Builder[T, Rope[T]] = newBuilder[T]
+        }
+    }
+
+    final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
+      import Rope._
+      private var startRope: Rope[A] = Rope.empty[A]
+      private var tailBuilder: Builder[A, ImmutableArray[A]] = IA.newBuilder[A]
+      private var tailLength = 0
+
+      def clear {
+        startRope = Rope.empty[A]
+        tailBuilder = IA.newBuilder[A]
+        tailLength = 0
+      }
+
+      def +=(elem: A) = {
+        if (tailLength < baseChunkLength) {
+          tailBuilder += elem
+          tailLength += 1
+        }
+        else {
+          startRope ::+= tailBuilder.result
+          tailBuilder.clear
+          tailBuilder += elem
+          tailLength = 1
+        }
+        this
+      }
+
+      def result = startRope ::+ tailBuilder.result
+
+      override def sizeHint(size: Int) {
+        tailBuilder.sizeHint(math.min(size - startRope.length, baseChunkLength))
+      }
+
+//      override def ++=(xs: TraversableOnce[A]) = {
+//        // TODO
+//        this
+//      }
     }
   }
 
