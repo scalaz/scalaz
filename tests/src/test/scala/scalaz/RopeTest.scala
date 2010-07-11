@@ -25,6 +25,11 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
   "building a rope from chunks and converting it back is the same as filtering out empty chunks" verifies {(chunks: List[ImmutableArray[Int]]) =>
     Rope.fromChunks(chunks).chunks must beTheSameSeqAs(chunks.filterNot(_.isEmpty))
   }
+
+  "a rope converted to a stream is the same sequence as the original rope" verifies {(rope: Rope[Int]) =>
+    rope must beTheSameSeqAs(rope.toStream)
+  }
+
 //
 //  "appending one element works correctly" verifies {(tree: Rope[Int], x: Int) =>
 //    (tree :+ x).toStream ≟ (tree.toStream :+ x)

@@ -1,7 +1,7 @@
 package scalaz
 
-import scala.collection.Iterator
 import scalaz.Scalaz._
+import collection.Iterator
 
 /**
  * Finger Trees provide a base for implementations of various collection types,
@@ -785,10 +785,14 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
   implicit def ftip2ft[A](ft: FingerTreeIntPlus[A]): FingerTree[Int, A] = ft.value
 
+  import collection.IndexedSeqLike
+  import collection.mutable.Builder
+
   trait Ropes {
     import scalaz.{ImmutableArray => IA}
 
-    sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]]) extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] {
+    sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]])
+        extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] with IndexedSeq[A] with IndexedSeqLike[A, Rope[A]] {
       import Rope._
       implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
       
@@ -833,21 +837,25 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
       def +:(x: => A) = IA.fromArray(Array(x)) +:: this
       
-      def tail = rope(value.tail)
-      def init = rope(value.init)
+      override def tail = rope(value.tail)
+      override def init = rope(value.init)
 //      def map[B](f: A => B) = rope(value map f)
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
 
-      def foreach(f: A => Unit): Unit = value.foreach(_.foreach(f))
+      override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
 
-      def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
+      override def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
 
       def chunks = value.toStream
 
-      def toStream = chunks.flatten
+      override def toStream = chunks.flatten
 
-      def length = value.measure
+      override def length = value.measure
+
+      // TODO find a definition which takes advantage of Rope's structure
+      protected[this] override def newBuilder: Builder[A, Rope[A]] =
+        IA.newBuilder[A].mapResult(chunk => rope(single(chunk)))
     }
 
     def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
