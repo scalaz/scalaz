@@ -786,9 +786,10 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
   implicit def ftip2ft[A](ft: FingerTreeIntPlus[A]): FingerTree[Int, A] = ft.value
 
   trait Ropes {
-    import ImmutableArray._
-    
+    import scalaz.{ImmutableArray => IA}
+
     sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]]) extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] {
+      import Rope._
       implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
       
       def apply(i: Int): A = {
@@ -798,21 +799,39 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
       def ++(xs: Rope[A]) = rope(value <++> xs.value)
 
-      def :+(x: => A) =
-        rope(
-          value.viewr.fold(
-            single(fromArray(Array(x))),
-            (init, last) => init :+ (last :+ x)
+      def ::+(chunk: => ImmutableArray[A]) =
+        if (chunk.isEmpty)
+          this
+        else
+          rope(
+            value.viewr.fold(
+              single(chunk),
+              (_, last) =>
+                if (last.length + chunk.length <= baseChunkLength)
+                  value :-| (last ++ chunk)
+                else
+                  value :+ chunk
+            )
           )
-        )
 
-      def +:(x: => A) =
-        rope(
-          value.viewl.fold(
-            single(fromArray(Array(x))),
-            (head, tail) => (x +: head) +: tail
+      def +::(chunk: => ImmutableArray[A]) =
+        if (chunk.isEmpty)
+          this
+        else
+          rope(
+            value.viewl.fold(
+              single(chunk),
+              (head, _) =>
+                if (chunk.length + head.length <= baseChunkLength)
+                  (chunk ++ head) |-: value
+                else
+                  chunk +: value
+            )
           )
-        )
+
+      def :+(x: => A) = this ::+ IA.fromArray(Array(x))
+
+      def +:(x: => A) = IA.fromArray(Array(x)) +:: this
       
       def tail = rope(value.tail)
       def init = rope(value.init)
@@ -834,9 +853,15 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
     def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
 
     object Rope {
+      private val baseChunkLength = 16
       implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = Reducer(_.length)
-      def fromArray[A : ClassManifest](a: Array[A]): Rope[A] = rope(single(ImmutableArray.fromArray(a)))
-      def fromString(str: String): Rope[Char] = rope(single(ImmutableArray.fromString(str)))
+      def empty[A : ClassManifest] = rope(FingerTree.empty[Int, ImmutableArray[A]])
+      def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
+        if (a.isEmpty) empty[A] else rope(single(IA.fromArray(a)))
+      def fromString(str: String): Rope[Char] =
+        if (str.isEmpty) empty[Char] else rope(single(IA.fromString(str)))
+      def fromChunks[A : ClassManifest](chunks: Seq[ImmutableArray[A]]): Rope[A] =
+        rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
 //      def apply[A](as: A*) = fromSeq(as)
 //      def fromSeq[A](as: Seq[A]) = rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
     }

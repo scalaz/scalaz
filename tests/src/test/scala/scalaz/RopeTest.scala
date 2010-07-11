@@ -2,15 +2,13 @@ package scalaz
 
 import Scalaz._
 import scalacheck.ScalazArbitrary._
-import org.specs.{ScalaCheck, Specification}
-import org.specs.{Sugar}
+import org.specs.{ScalaCheck, Specification, Sugar}
 class RopeTest extends Specification with Sugar with ScalaCheck {
   "converting an array gives a rope of the same length" verifies {(array: Array[Int]) =>
     Rope.fromArray(array).length ≟ array.length
   }
 
   "indexing a rope converted from an array is the same as indexing this array" verifies {(array: Array[Int], i: Int) =>
-    // Rope.fromArray(array).apply(i) must (beEqualTo(array(i)) or throwA[RuntimeException])
     if (i >= 0 && i < array.length) (Rope.fromArray(array).apply(i) must (beEqualTo(array(i))))
     else (Rope.fromArray(array).apply(i) must throwA[RuntimeException])
   }
@@ -20,14 +18,13 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
   }
 
   "indexing a rope is the same as converting it to a stream and indexing that" verifies {(rope: Rope[Int], i: Int) =>
-    // Rope.fromArray(array).apply(i) must (beEqualTo(array(i)) or throwA[RuntimeException])
     if (i >= 0 && i < rope.length) (rope(i) must (beEqualTo(rope.toStream(i))))
     else (rope(i) must throwA[RuntimeException])
   }
 
-//  def streamToTree[A](stream: Stream[A]): Rope[A] = stream.foldl(FingerTree.empty(SizeReducer[A])) {
-//    case (t, x) => (t :+ x)
-//  }
+  "building a rope from chunks and converting it back is the same as filtering out empty chunks" verifies {(chunks: List[ImmutableArray[Int]]) =>
+    Rope.fromChunks(chunks).chunks must beTheSameSeqAs(chunks.filterNot(_.isEmpty))
+  }
 //
 //  "appending one element works correctly" verifies {(tree: Rope[Int], x: Int) =>
 //    (tree :+ x).toStream ≟ (tree.toStream :+ x)
