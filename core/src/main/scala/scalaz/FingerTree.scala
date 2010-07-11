@@ -922,8 +922,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
           tailLength += 1
         }
         else {
-          startRope ::+= tailBuilder.result
-          tailBuilder.clear
+          cleanTail
           tailBuilder += elem
           tailLength = 1
         }
@@ -936,10 +935,32 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
         tailBuilder.sizeHint(math.min(size - startRope.length, baseChunkLength))
       }
 
+      // TODO fix and reinstate
+//      import collection.mutable.ArrayLike
 //      override def ++=(xs: TraversableOnce[A]) = {
-//        // TODO
+//        xs match {
+//          case xs: Rope[A] => {
+//            cleanTail
+//            startRope ++= xs
+//          }
+//          case xs: ImmutableArray[A] => {
+//            cleanTail
+//            startRope ::+= xs
+//          }
+//          case xs: ArrayLike[A, _] => {
+//            cleanTail
+//            tailBuilder ++= xs
+//          }
+//          case _ =>  super.++=(xs)
+//        }
 //        this
 //      }
+//    }
+
+      private def cleanTail {
+        startRope ::+= tailBuilder.result
+        tailBuilder.clear
+      }
     }
   }
 
