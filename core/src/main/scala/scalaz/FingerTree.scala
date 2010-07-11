@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.collection.Iterator
 import scalaz.Scalaz._
 
 /**
@@ -58,6 +59,10 @@ sealed abstract class Finger[V, A] {
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): Finger[V2, B]
 
+  def foreach(f: A => Unit): Unit
+
+  def iterator: Iterator[A]
+
   def measure: V
 
   def toList = map(x => x)(ListReducer[A]).measure
@@ -87,6 +92,12 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = one(f(a1))
 
+  def foreach(f: A => Unit) {
+    f(a1)
+  }
+
+  def iterator: Iterator[A] = Iterator.single(a1)
+
   val measure = v
 
   private[scalaz] def split1(pred: V => Boolean, accV: V) = (None, a1, None)
@@ -115,6 +126,13 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
   }
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = two(f(a1), f(a2))
+
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+  }
+
+  def iterator: Iterator[A] = Iterator(a1, a2)
 
   val measure = v
 
@@ -153,6 +171,14 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
   }
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = three(f(a1), f(a2), f(a3))
+
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+    f(a3)
+  }
+
+  def iterator: Iterator[A] = Iterator(a1, a2, a3)
 
   val measure = v
 
@@ -197,6 +223,15 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = four(f(a1), f(a2), f(a3), f(a4))
 
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+    f(a3)
+    f(a4)
+  }
+
+  def iterator: Iterator[A] = Iterator(a1, a2, a3, a4)
+
   val measure = v
 
   private implicit def sg: Semigroup[V] = r.monoid
@@ -237,6 +272,16 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]) = fold(
     (v, a1, a2) => node2(f(a1), f(a2)),
     (v, a1, a2, a3) => node3(f(a1), f(a2), f(a3)))
+
+  def foreach(f: A => Unit) {
+    fold(
+      (_, a1, a2) => { f(a1); f(a2) },
+      (_, a1, a2, a3) => { f(a1); f(a2); f(a3) }
+    )}
+
+  def iterator = fold(
+    (_, a1, a2) => Iterator(a1, a2),
+    (_, a1, a2, a3) => Iterator(a1, a2, a3))
 
   private implicit def sg: Semigroup[V] = r.monoid
   
@@ -580,6 +625,18 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
 
+  def foreach(f: A => Unit) {
+    fold(
+      _ => {},
+      (_, x) => { f(x) },
+      (_, pr, m, sf) => { pr.foreach(f); m.foreach(_.foreach(f)); sf.foreach(f) }
+    )}
+
+  def iterator: Iterator[A] = fold(
+    _ => Iterator.empty,
+    (_, x) => Iterator.single(x),                                           
+    (_, pr, m, sf) => pr.iterator ++ m.iterator.flatMap(_.iterator) ++ sf.iterator)
+
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
 
@@ -762,6 +819,10 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 //      def map[B](f: A => B) = rope(value map f)
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
+
+      def foreach(f: A => Unit): Unit = value.foreach(_.foreach(f))
+
+      def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
 
       def chunks = value.toStream
 
