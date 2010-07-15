@@ -2,7 +2,6 @@ package scalaz
 package concurrent
 
 import Scalaz._
-import java.util.concurrent.Executors
 
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
