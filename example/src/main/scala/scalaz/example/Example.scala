@@ -27,6 +27,7 @@ object Example {
     ExampleValidation.run
     geo.ExampleVincenty.run
     concurrent.ExampleActor.run
+    concurrent.HammerTime.run
     WordCount.wordCount
     ExampleIteratee.run
   }

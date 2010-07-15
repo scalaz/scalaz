@@ -137,7 +137,7 @@ object Zero {
   implicit def ZeroKleisliZero[M[_], A, B](implicit z: Zero[M[B]]): Zero[Kleisli[M, A, B]] = zero(☆((_: A) => ∅[M[B]]))
 
   import concurrent.Strategy
-  import concurrent.Strategies.Id
+  import concurrent.Strategy.Id
 
   implicit def StrategyZero[A]: Zero[Strategy] = zero(Id)
 

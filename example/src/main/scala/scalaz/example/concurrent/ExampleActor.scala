@@ -18,7 +18,7 @@ object ExampleActor {
     case class ChatMessage(from: String, message: String) extends Event
 
     implicit val executor = Executors.newFixedThreadPool(5)
-    import Strategies.Executor
+    import Strategy.Executor
     
     val chatServer = actor[Event] {
       (e: Event) => e match {

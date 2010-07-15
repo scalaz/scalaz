@@ -2,6 +2,7 @@ package scalaz
 package concurrent
 
 import Scalaz._
+import java.util.concurrent.Executors
 
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
@@ -21,6 +22,8 @@ object Strategy {
       () => v
     }
   }
+
+  import java.util.concurrent.{ExecutorService, Executors}
 
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
@@ -53,7 +56,7 @@ object Strategy {
   /**
    * A strategy that evaluates its arguments using the pool of Swing worker threads.
    */
-  implicit object SwingWorkerStrategy extends Strategy {
+  implicit object SwingWorker extends Strategy {
     import javax.swing.SwingWorker
     def apply[A](a: => A) = {
       val worker = new SwingWorker[A, Unit] {
@@ -67,7 +70,7 @@ object Strategy {
   /**
    * A strategy that evaluates its arguments on the Swing Event Dispatching thread.
    */
-  implicit object EventDispatchingThreadStrategy extends Strategy {
+  implicit object SwingInvokeLater extends Strategy {
     import javax.swing.SwingUtilities
     import SwingUtilities.invokeLater
     import java.util.concurrent.{Callable, FutureTask}    
