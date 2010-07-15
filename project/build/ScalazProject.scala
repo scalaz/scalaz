@@ -29,7 +29,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5-SNAPSHOT" % "test" withSources
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8-SNAPSHOT" withSources
+  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8-SNAPSHOT" 
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 
@@ -50,7 +50,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   // Use this instead, for releases only!
-  // val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
+//  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
 
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
