@@ -23,7 +23,7 @@ object Strategy {
     }
   }
 
-  import java.util.concurrent.{ExecutorService, Executors}
+  import java.util.concurrent.ExecutorService
 
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
