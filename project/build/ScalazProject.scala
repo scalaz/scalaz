@@ -91,14 +91,19 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    def packageFullAction = packageFull dependsOn(fullDoc)
+    lazy val packageFullAction = packageFull dependsOn(fullDoc)
     
-    def packageFull = {
+    lazy val packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** "*jar"
       val p = parentPath
       val extra = p("README") +++ p("etc").## ** "*"
       val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** "*")
-      zipTask(sourceFiles, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
+      val packageName = "scalaz-full_" + buildScalaVersion + "-" + version.toString
+      val copy = task {
+        sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
+        None
+      } 
+      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
     } describedAs("Zip all artifacts")
     
     private def noAction = task {None}
