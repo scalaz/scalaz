@@ -25,11 +25,11 @@ object ExampleTuple {
 
     // Map functions over the elements of a tuple to generate a new tuple.
     //
-    // mapAll accepts as parameters N functions that are applied to respective elements of the TupleN to generate
+    // mapElements accepts as parameters N functions that are applied to respective elements of the TupleN to generate
     // a new Tuple. The parameters are named identically to the member methods of TupleN, and default to the
     // identity function.
-    t1 mapAll (_ * 2, _ * 3, _ * 4) assert_≟ (2, 6, 12)
-    t1 mapAll (_3 = "x" * _) assert_≟ (1, 2, "xxx")
+    t1 mapElements (_ * 2, _ * 3, _ * 4) assert_≟ (2, 6, 12)
+    t1 mapElements (_3 = "x" * _) assert_≟ (1, 2, "xxx")
 
     // Convert a TupleN to an IndexedSeq.
     val t1Seq = t1.toIndexedSeq

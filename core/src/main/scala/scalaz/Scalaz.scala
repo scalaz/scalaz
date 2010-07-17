@@ -55,7 +55,7 @@ object Scalaz extends ScalazLow
     with    Streams
     with    Strings
     with    Trees
-    with    TupleWs
+    with    Tuples
     with    TreeLocs
     with    Validations
     with    Zeros
