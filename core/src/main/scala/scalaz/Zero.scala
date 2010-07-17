@@ -38,7 +38,7 @@ object Zero {
   import Scalaz._
   import xml.{Elem, Node, NodeSeq}
 
-  implicit def DigitZero: Zero[Digit] = zero(_0)
+  implicit def DigitZero: Zero[Digit] = zero(Digit._0)
 
   implicit def OrderingZero: Zero[Ordering] = zero(EQ)
 
