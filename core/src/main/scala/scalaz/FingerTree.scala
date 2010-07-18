@@ -864,7 +864,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
 
-      override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
+      // override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
 
       override def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
 

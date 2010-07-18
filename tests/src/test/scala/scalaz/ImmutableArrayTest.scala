@@ -46,20 +46,22 @@ class ImmutableArrayTest extends Specification with Sugar with ScalaCheck {
   }
 
   "Behave like arrays" in {
+    def beTheSameSeqAsForIA[A] = beTheSameSeqAs(_: Seq[A]) ^^ (IA.wrapArray(_: ImmutableArray[A]))
+    
     "Conversion from array" verifies {(array: Array[Int]) =>
-      IA.fromArray(array) must beTheSameSeqAs(array)
+      IA.fromArray(array) must beTheSameSeqAsForIA(array)
     }
 
     "Appending arrays" verifies {(array1: Array[Int], array2: Array[Int]) =>
       val array = array1 ++ array2
       val ia = IA.fromArray(array1) ++ IA.fromArray(array2)
-      ia must (haveSuperClass[ImmutableArray[_]] and beTheSameSeqAs(array))
+      ia must (haveSuperClass[ImmutableArray[_]] and beTheSameSeqAsForIA(array))
     }
 
     "Appending strings" verifies {(str1: String, str2: String) =>
       val str = str1 ++ str2
       val ia = IA.fromString(str1) ++ IA.fromString(str2)
-      ia must (haveClass[IA.StringArray] and beTheSameSeqAs(str1 ++ str2))
+      ia must (haveClass[IA.StringArray] and beTheSameSeqAsForIA(str1 ++ str2))
     }
   }
 }
