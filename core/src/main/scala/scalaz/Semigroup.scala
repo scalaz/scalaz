@@ -130,7 +130,10 @@ object Semigroup extends SemigroupLow {
 
   import concurrent.Strategy
   
-  implicit def StrategySemigroup[A]: Semigroup[Strategy[A]] = semigroup((x, y) => ((a: () => A) => x(y.apply(a))))
+  implicit def StrategySemigroup: Semigroup[Strategy] =
+    semigroup((x, y) => new Strategy {
+      def apply[A](a: => A) = x(y.apply(a).apply)
+    })
 
   import java.util._
   import java.util.concurrent._

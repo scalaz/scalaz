@@ -101,7 +101,7 @@ object Util {
     def longDigits[T[_]](n: Long)(implicit f: Foldable[T], p: Pure[T], e : Empty[T], plus : Plus[T], m : Monoid[T[Digit]]): T[Digit] = {
       val xxx = n.unfold((b: Long) => if (b == 0) None else Some(b % 10L: Digit, b / 10L))
       // TODO this is just a reverse, which should get into scalaz4
-      if (n == 0) p.pure(_0) else f.foldLeft[Digit, T[Digit]](xxx, e.empty[Digit], (b, a) => plus.plus(p.pure(a), b))
+      if (n == 0) p.pure(Digit._0) else f.foldLeft[Digit, T[Digit]](xxx, e.empty[Digit], (b, a) => plus.plus(p.pure(a), b))
     }
 
     /**

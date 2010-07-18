@@ -12,17 +12,17 @@ sealed trait IterV[E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterV[E, A]) => Z): Z
   def apply[F[_]](f: F[E])(implicit e: Enumerator[F]): IterV[E, A] = e(f, this)
-  def run: Option[A] = {
+  def run: A = {
     def runCont(i: IterV[E, A]) = i.fold(done = (x, _) => Some(x), cont = _ => None)
-    fold(done = (x, _) => Some(x),
-          cont = k => runCont(k(EOF[E])))
+    fold(done = (x, _) => x,
+          cont = k => runCont(k(EOF[E])).getOrElse(error("Diverging iteratee!")))
   }
 }
 
 /** Monadic Iteratees **/
 sealed trait IterVM[M[_], E, A] {
   import IterV._
-  def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z)
+  def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 
 case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[IterVM[M, E, A]]]
@@ -44,9 +44,9 @@ object IterV {
                   cont: (Input[E] => IterV[E, A]) => Z): Z = done(a, i)
     }
     def unapply[E, A](r: IterV[E, A]): Option[(A, Input[E])] =
-      r.fold[Either[IterV[E, A], (A,Input[E])]](
-        done = (a, i) => Right((a, i)),
-        cont = f => Left(Cont(f))).right.toOption
+      r.fold[Option[(A,Input[E])]](
+        done = (a, i) => Some((a, i)),
+        cont = f => None)
   }
 
   /** A computation that takes an element from an input to yield a new computation **/
@@ -56,9 +56,32 @@ object IterV {
                   cont: (Input[E] => IterV[E, A]) => Z): Z = cont(f)
     }
     def unapply[E, A](r: IterV[E, A]): Option[Input[E] => IterV[E, A]] =
-      r.fold[Either[IterV[E, A], Input[E] => IterV[E, A]]](
-        done = (a, i) => Left(Done(a, i)),
-        cont = f => Right(f)).right.toOption
+      r.fold[Option[Input[E] => IterV[E, A]]](
+        done = (a, i) => None,
+        cont = Some(_))
+  }
+
+  /** A monadic computation that has finished **/
+  object DoneM {
+    def apply[M[_], E, A](a: => A, i: => Input[E]) = new IterVM[M, E, A] {
+      def fold[Z](done: (=> A, => Input[E]) => Z,
+                  cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = done(a, i)
+    }
+    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[(A, Input[E])] =
+      r.fold[Option[(A, Input[E])]](
+        done = (a, i) => Some((a, i)),
+        cont = f => None)
+  }
+
+  object ContM {
+    def apply[M[_], E, A](f: Input[E] => Iteratee[M, E, A]) = new IterVM[M, E, A] {
+      def fold[Z](done: (=> A, => Input[E]) => Z,
+                  cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = cont(f)
+    }
+    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[Input[E] => Iteratee[M, E, A]] =
+      r.fold[Option[Input[E] => Iteratee[M, E, A]]](
+        done = (a, i) => None,
+        cont = f => Some(f))
   }
 
   /** An iteratee that consumes the head of the input **/

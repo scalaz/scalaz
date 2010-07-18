@@ -38,7 +38,7 @@ object Zero {
   import Scalaz._
   import xml.{Elem, Node, NodeSeq}
 
-  implicit def DigitZero: Zero[Digit] = zero(_0)
+  implicit def DigitZero: Zero[Digit] = zero(Digit._0)
 
   implicit def OrderingZero: Zero[Ordering] = zero(EQ)
 
@@ -137,9 +137,9 @@ object Zero {
   implicit def ZeroKleisliZero[M[_], A, B](implicit z: Zero[M[B]]): Zero[Kleisli[M, A, B]] = zero(☆((_: A) => ∅[M[B]]))
 
   import concurrent.Strategy
-  import concurrent.strategy.Id
+  import concurrent.Strategy.Id
 
-  implicit def StrategyZero[A]: Zero[Strategy[A]] = zero(Id.strategy[A])
+  implicit def StrategyZero[A]: Zero[Strategy] = zero(Id)
 
   import java.util._
   import java.util.concurrent._

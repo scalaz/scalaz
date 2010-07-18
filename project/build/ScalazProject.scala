@@ -29,12 +29,21 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5-SNAPSHOT" % "test" withSources
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8-SNAPSHOT" withSources
+  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8-SNAPSHOT" 
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
-  override def deliverScalaDependencies = Nil 
+  override def deliverScalaDependencies = Nil
+
+    override def consoleInit =
+"""
+import scalaz._
+import Scalaz._
+implicit val executor = java.util.concurrent.Executors.newFixedThreadPool(2)
+import concurrent.Strategy.Executor
+
+"""
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion with ScalaVersionBumper {
@@ -50,7 +59,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   // Use this instead, for releases only!
-  // val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
+//  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
 
   Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
@@ -91,14 +100,19 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    def packageFullAction = packageFull dependsOn(fullDoc)
+    lazy val packageFullAction = packageFull dependsOn(fullDoc)
     
-    def packageFull = {
+    lazy val packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** "*jar"
       val p = parentPath
       val extra = p("README") +++ p("etc").## ** "*"
       val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** "*")
-      zipTask(sourceFiles, outputPath / ("scalaz-full_" + buildScalaVersion + "-" + version.toString + ".zip") )
+      val packageName = "scalaz-full_" + buildScalaVersion + "-" + version.toString
+      val copy = task {
+        sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
+        None
+      } 
+      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
     } describedAs("Zip all artifacts")
     
     private def noAction = task {None}

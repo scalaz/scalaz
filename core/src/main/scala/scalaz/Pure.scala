@@ -34,6 +34,11 @@ object Pure {
     def pure[A](a: => A) = a.state[S]
   }
 
+  implicit def StateTPure[S, M[_]: Pure]: Pure[PartialApplyKA[StateT, M, S]#Apply] =
+    new Pure[PartialApplyKA[StateT, M, S]#Apply] {
+      def pure[A](a: => A) = stateT(s => ((s, a)).pure[M])
+    }
+
   implicit def Tuple1Pure = new Pure[Tuple1] {
     def pure[A](a: => A) = Tuple1(a)
   }
@@ -167,7 +172,7 @@ object Pure {
   }
 
   import concurrent._
-  implicit def PromisePure(implicit s: Strategy[Unit]): Pure[Promise] = new Pure[Promise] {
+  implicit def PromisePure(implicit s: Strategy): Pure[Promise] = new Pure[Promise] {
     def pure[A](a: => A) = promise(a)
   }
 

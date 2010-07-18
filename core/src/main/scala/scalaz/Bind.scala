@@ -19,6 +19,10 @@ object Bind {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
   }
 
+  implicit def StateTBind[M[_]:Bind, S]: Bind[PartialApplyKA[StateT, M, S]#Apply] = new Bind[PartialApplyKA[StateT, M, S]#Apply] {
+    def bind[A, B](r: StateT[M, S, A], f: A => StateT[M, S, B]) = r flatMap f
+  }
+
   implicit def TraversableBind[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf]: Bind[CC] = new Bind[CC] {
     def bind[A, B](r: CC[A], f: A => CC[B]) = {
       implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]

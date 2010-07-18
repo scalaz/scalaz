@@ -17,8 +17,10 @@ trait ScalaVersionBumper extends Project {
       val oldVersion = buildScalaVersion
       val oldText = read(f)
       val newText = oldText.replaceAll("\\Q" + oldVersion, newVersion)
-      log.info("Updating: " + f.getAbsolutePath)
-      write(f, newText)
+      if (oldText != newText) {
+        log.info("Updating: " + f.getAbsolutePath)
+        write(f, newText)
+      }
     }
     buildScalaVersions() = newVersion
     None

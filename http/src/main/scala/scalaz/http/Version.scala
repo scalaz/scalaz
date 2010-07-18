@@ -74,6 +74,8 @@ object Version extends Versions {
   /**
    * A version for HTTP/1.0.
    */
+  import Digit._
+
   val version10 = version(_1, _0)
 
   /**

@@ -65,6 +65,8 @@ object StatusLine {
    * if it has one associated.
    * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1">RFC 2616 Section 6.1.1 Status Code and Reason Phrase</a>.
    */
+  import Digit._
+  
   implicit def statusLine10(status: Status) = statusLine(version(_1, _0), status)
 
   /**

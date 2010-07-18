@@ -56,7 +56,7 @@ object Scalaz extends ScalazLow
     with    Streams
     with    Strings
     with    Trees
-    with    TupleWs
+    with    Tuples
     with    TreeLocs
     with    Validations
     with    Zeros
@@ -81,6 +81,10 @@ object Scalaz extends ScalazLow
   val ArraySeq = collection.mutable.ArraySeq
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
+
+  def pure[F[_]:Pure] = new (Id ~> F) {
+    def apply[A](a: => A) = implicitly[Pure[F]].pure(a)
+  }
 
   import scala.collection.generic.CanBuildFrom
   

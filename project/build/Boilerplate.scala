@@ -18,7 +18,7 @@ trait Boilerplate {
 
       def double(s: String) = s + s
 
-      for (arity: Int <- arities) {
+      val tuples = for (arity: Int <- arities) yield {
         val tupleWSource: String = {
           case class N(n: Int) {
             val alpha: String = ('A' + (n - 1)).toChar.toString
@@ -43,7 +43,7 @@ trait Boilerplate {
           |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
-          |  def mapAll[%s](%s): (%s) = (%s)
+          |  def mapElements[%s](%s): (%s) = (%s)
           |  def copy[%s](%s): (%s) = (%s)
           |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
             ztparams, params,
@@ -52,18 +52,17 @@ trait Boilerplate {
             )
 
           val conv = """|
-          |trait Tuple%dWs {
-          |  implicit def ToTuple%dW[%s](t: (%s)): Tuple%dW[%s] = new { val value = t } with Tuple%dW[%s]
-          |}
-          |""".stripMargin.format(arity, arity, tparams, tparams, arity, tparams, arity, tparams)
+          |implicit def ToTuple%dW[%s](t: (%s)): Tuple%dW[%s] = new { val value = t } with Tuple%dW[%s]
+          |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
           pimp + "\n" + conv
         }
-
-        val source = "package scalaz\n\n" + tupleWSource
-        writeFileScalazPackage("Tuple%dWs.scala".format(arity), source)
+        tupleWSource
       }
 
-      val source = "package scalaz\n\n" + "trait TupleWs extends " + arities.map(n => "Tuple%dWs".format(n)).mkString("\n     with ")
+      val source = "package scalaz\n\n" +
+              "trait Tuples {\n" +
+              "  " + tuples.map("  " +).mkString("\n") +
+              "}"
       writeFileScalazPackage("TupleW.scala", source)
       None
     } dependsOn (cleanSrcManaged)
