@@ -18,8 +18,9 @@ trait ImmutableArray[+A] {
 
   def apply(index: Int): A
   def length: Int
+  def isEmpty = length == 0
   // def toArray: Array[A]
-  // def toArray[B >: A : ClassManifest]
+  def toArray[B >: A : ClassManifest]: Array[B]
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
   def ++[B >: A](other: ImmutableArray[B]): ImmutableArray[A]

@@ -3,7 +3,13 @@ package scalaz
 import Scalaz._
 import scalacheck.ScalazArbitrary._
 import org.specs.{ScalaCheck, Specification, Sugar}
+import reflect.ClassManifest
+
 class RopeTest extends Specification with Sugar with ScalaCheck {
+  def beTheSameSeqAsForRope[A : ClassManifest] = beTheSameSeqAs(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
+  // import scala.Predef.{implicitly => ?}
+  def m[A](implicit man: ClassManifest[A]) = man
+
   "converting an array gives a rope of the same length" verifies {(array: Array[Int]) =>
     Rope.fromArray(array).length ≟ array.length
   }
@@ -27,7 +33,7 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
   }
 
   "a rope converted to a stream is the same sequence as the original rope" verifies {(rope: Rope[Int]) =>
-    rope must beTheSameSeqAs(rope.toStream)
+    rope must beTheSameSeqAsForRope(m[Int])(rope.toStream)
   }
 
 //
@@ -44,7 +50,7 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
 //  }
 
   "appending ropes works correctly" verifies {(rope1: Rope[Int], rope2: Rope[Int]) =>
-    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameSeqAs(rope1.toStream ++ rope2.toStream))
+    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameSeqAsForRope(m[Int])(rope1.toStream ++ rope2.toStream))
   }
 //
 //  "splitting a tree works the same as splitting a stream" verifies {(tree: Rope[Int], index: Int) =>

@@ -813,9 +813,11 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
     import scalaz.{ImmutableArray => IA}
 
     sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]])
-        extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] with IndexedSeq[A] with IndexedSeqLike[A, Rope[A]] {
+        extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] {
       import Rope._
       implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
+
+      def length = value.measure
       
       def apply(i: Int): A = {
         val split = value.split(_ > i)
@@ -824,7 +826,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
 
       def ++(xs: Rope[A]) = rope(value <++> xs.value)
 
-      def ::+(chunk: => ImmutableArray[A]) =
+      def ::+(chunk: ImmutableArray[A]) =
         if (chunk.isEmpty)
           this
         else
@@ -839,7 +841,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
             )
           )
 
-      def +::(chunk: => ImmutableArray[A]) =
+      def +::(chunk: ImmutableArray[A]) =
         if (chunk.isEmpty)
           this
         else
@@ -854,34 +856,27 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
             )
           )
 
-      def :+(x: => A) = this ::+ IA.fromArray(Array(x))
+      def :+(x: A) = this ::+ IA.fromArray(Array(x))
 
-      def +:(x: => A) = IA.fromArray(Array(x)) +:: this
+      def +:(x: A) = IA.fromArray(Array(x)) +:: this
       
-      override def tail = rope(value.tail)
-      override def init = rope(value.init)
+      def tail = rope(value.tail)
+      def init = rope(value.init)
 //      def map[B](f: A => B) = rope(value map f)
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
 
       // override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
 
-      override def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
-
-      override def reverseIterator: Iterator[A] = value.reverseIterator.flatMap(_.reverseIterator)
+      def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
+      def reverseIterator: Iterator[A] = value.reverseIterator.flatMap(_.reverseIterator)
 
       // TODO override def reverse
       
       def chunks = value.toStream
 
-      override def toStream = chunks.flatten
-
-      override def length = value.measure
-
-      protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
+      // protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
     }
-
-    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
 
     object Rope {
       private[Ropes] val baseChunkLength = 16
@@ -904,6 +899,42 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
           def apply: Builder[T, Rope[T]] = newBuilder[T]
         }
     }
+    
+    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
+
+    sealed class WrappedRope[A : ClassManifest](val value: Rope[A])
+        extends NewType[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
+      import Rope._
+
+      def apply(i: Int): A = value(i)
+
+      def ++(xs: WrappedRope[A]) = wrapRope(value ++ xs.value)
+      
+      // override def :+(x: A) = wrapRope(value :+ x)
+      // override def +:(x: A) = wrapRope(x +: value)
+      override def tail = rope(value.tail)
+      override def init = rope(value.init)
+//      def map[B](f: A => B) = rope(value map f)
+//      def flatMap[B](f: A => Rope[B]) =
+//        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
+
+      // override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
+
+      override def iterator: Iterator[A] = value.value.iterator.flatMap(_.iterator)
+
+      override def reverseIterator: Iterator[A] = value.value.reverseIterator.flatMap(_.reverseIterator)
+
+      // TODO override def reverse
+
+      override def toStream = value.chunks.flatten
+
+      override def length = value.length
+
+      protected[this] override def newBuilder = new RopeBuilder[A].mapResult(wrapRope(_))
+    }
+
+    implicit def wrapRope[A : ClassManifest](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
+    implicit def unwrapRope[A : ClassManifest](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.value
 
     final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
       import Rope._
