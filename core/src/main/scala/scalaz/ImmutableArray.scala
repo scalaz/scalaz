@@ -1,9 +1,9 @@
 package scalaz
 import reflect.ClassManifest
 import collection.IndexedSeqOptimized
-import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
+import collection.immutable.{StringLike, IndexedSeq}
 
 /**
  * An immutable wrapper for arrays
@@ -115,6 +115,9 @@ object ImmutableArray {
 
   final class ofChar(array: Array[Char]) extends ImmutableArray1[Char](array) {
     protected[this] def elemManifest = ClassManifest.Char
+
+    // def mkString = new String(arr)
+    // TODO why can elemManifest be protected, but arr can't?
   }
 
   final class ofInt(array: Array[Int]) extends ImmutableArray1[Int](array) {
@@ -244,5 +247,15 @@ object ImmutableArray {
     final class ofUnit(array: IA.ofUnit) extends ofImmutableArray1[Unit](array) {
       protected[this] def elemManifest = ClassManifest.Unit
     }
+  }
+
+  implicit def asStringLike(array: ImmutableArray[Char]): StringLike[ImmutableArray[Char]] = new StringLike[ImmutableArray[Char]] {
+    override def toString = array match {
+      case a: StringArray => a.str
+      case a: ofChar => wrapArray(a).mkString
+      case _ => error("Unknown subtype of ImmutableArray[Char]")
+    }
+
+    override protected[this] def newBuilder = newStringArrayBuilder
   }
 }

@@ -2,6 +2,7 @@ package scalaz
 
 import scalaz.Scalaz._
 import collection.Iterator
+import collection.immutable.StringLike
 
 /**
  * Finger Trees provide a base for implementations of various collection types,
@@ -993,6 +994,16 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
         startRope ::+= tailBuilder.result
         tailBuilder.clear
       }
+    }
+
+    implicit def asStringLike(rope: Rope[Char]): StringLike[Rope[Char]] = new StringLike[Rope[Char]] {
+      override def toString = {
+        val strBuilder = new StringBuilder(rope.length)
+        rope.chunks.foreach(ia => strBuilder.append(IA.asStringLike(ia)))
+        strBuilder.toString
+      }
+
+      override protected[this] def newBuilder = Rope.newBuilder[Char]
     }
   }
 

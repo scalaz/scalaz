@@ -86,4 +86,8 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
 //    val asStream = tree.toStream
 //    tree.viewr.fold[Boolean](true, (i: PartialApply1Of2[FingerTree, Int]#Apply, x: Int) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
 //  }
+
+  "StringLike instance" verifies {(strings: List[String]) =>
+    val rope = Rope.fromChunks(strings.map(ImmutableArray.fromString))
+    asStringLike(rope).toString must beEqualTo(strings.mkString)}
 }
