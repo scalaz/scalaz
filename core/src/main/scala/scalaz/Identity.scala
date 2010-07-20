@@ -189,8 +189,8 @@ sealed trait Identity[A] extends PimpedType[A] {
 }
 
 trait Identitys {
-  implicit def IdentityTo[A](x: A): Identity[A] = new Identity[A] {
-    val value = x
+  implicit def IdentityTo[A](x: => A): Identity[A] = new Identity[A] {
+    lazy val value = x
   }
 
   val unital = IdentityTo(())
