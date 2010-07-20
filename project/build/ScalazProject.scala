@@ -40,8 +40,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 """
 import scalaz._
 import Scalaz._
-implicit val executor = java.util.concurrent.Executors.newFixedThreadPool(2)
-import concurrent.Strategy.Executor
 
 """
 }
