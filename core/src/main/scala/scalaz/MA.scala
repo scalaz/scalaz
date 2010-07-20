@@ -52,6 +52,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def traverse[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     t.traverse(f, value)
 
+  def traverse_[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Foldable[M]): F[Unit] =
+    value.foldl(().pure)(((x, y) => x <* f(y)))
+
   def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
