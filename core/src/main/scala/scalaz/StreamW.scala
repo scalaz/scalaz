@@ -6,7 +6,7 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
   def ʐ: ZipStream[A] = zip(value)
 
   def merge(s: Stream[A]): Stream[A] =
-    if (value.isEmpty) Stream.Empty
+    if (value.isEmpty) s
     else value.head #:: s.merge(value.tail)
 
   def toZipper: Option[Zipper[A]] = value match {
