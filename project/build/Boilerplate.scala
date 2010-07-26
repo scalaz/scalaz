@@ -37,18 +37,14 @@ trait Boilerplate {
           val mapallParams = mapMkString { n => "%s: (%s => %s) = identity[%s] _".format(n.element, n.alpha, n.alpha2, n.alpha) }
           val mapallApply = mapMkString { n => "%s(value.%s)".format(n.element, n.element) }
 
-          val copyParams = mapMkString { n => "%s: %s = value.%s".format(n.element, n.alpha2, n.element) }
-          val copyApply = mapMkString { n => "%s".format(n.element) }
           val pimp = """|
           |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
           |  def mapElements[%s](%s): (%s) = (%s)
-          |  def copy[%s](%s): (%s) = (%s)
           |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
             ztparams, params,
-            mapallTParams, mapallParams, mapallTParams, mapallApply,
-            mapallTParams, copyParams, mapallTParams, copyApply
+            mapallTParams, mapallParams, mapallTParams, mapallApply
             )
 
           val conv = """|

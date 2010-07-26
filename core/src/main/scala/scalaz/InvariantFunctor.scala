@@ -24,10 +24,20 @@ object InvariantFunctor {
     def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = (b: B) => f(ma(g(b)))
   }
 
-  implicit val SemigroupInvariantFunctor = new InvariantFunctor[Semigroup] {
+  implicit val SemigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {
     def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] = new Semigroup[B] {
       def append(b1: B, b2: => B): B = f(ma append (g(b1), g(b2)))
     }
   }
-  
+
+  implicit def MemoInvariantFunctor[V]: InvariantFunctor[PartialApply1Of2[Memo, V]#Flip] = new InvariantFunctor[PartialApply1Of2[Memo, V]#Flip] {
+    def xmap[A, B](ma: Memo[A, V], f: A => B, g: B => A): Memo[B, V] = {
+      memo {
+        (h: B => V) =>
+          val m = ma { h ∙ f }
+          (b: B) => m(g(b))
+      }
+    }
+  }
+
 }

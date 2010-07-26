@@ -51,6 +51,8 @@ object Promise {
         }
       }
     })
+
+    override def toString = "<promise>"
   }
 
   def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {

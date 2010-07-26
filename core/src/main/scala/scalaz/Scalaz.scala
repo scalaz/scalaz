@@ -146,6 +146,8 @@ object Scalaz extends ScalazLow
 
   implicit def NodeMA[V, A](t: Node[V, A]): MA[PartialApply1Of2[Node, V]#Apply, A] = ma[PartialApply1Of2[Node, V]#Apply, A](t)
 
+  implicit def MemoMA[V, A](m: Memo[A, V]): MA[PartialApply1Of2[Memo, V]#Flip, A] = ma[PartialApply1Of2[Memo, V]#Flip, A](m)
+
   // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
 
