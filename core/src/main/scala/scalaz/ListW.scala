@@ -31,6 +31,12 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     case h :: t => Some(Scalaz.nel(h, t))
   }
 
+  def toZipper: Option[Zipper[A]] =
+    value.toStream.toZipper
+
+  def zipperEnd: Option[Zipper[A]] =
+    value.toStream.zipperEnd
+
   def <^>[B: Zero](f: NonEmptyList[A] => B): B = value match {
     case Nil => ∅
     case h :: t => f(Scalaz.nel(h, t))
