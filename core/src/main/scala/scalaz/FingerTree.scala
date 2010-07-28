@@ -999,11 +999,11 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
     sealed class RopeCharW(val value: Rope[Char]) extends PimpedType[Rope[Char]] {
       def asString = {
         val stringBuilder = new StringBuilder(value.length)
-        appendToStringBuilder(stringBuilder)
+        appendTo(stringBuilder)
         stringBuilder.toString
       }
 
-      def appendToStringBuilder(stringBuilder: StringBuilder) {
+      def appendTo(stringBuilder: StringBuilder) {
         value.chunks.foreach(ia => stringBuilder.append(ia.asString))
       }
     }
