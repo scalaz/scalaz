@@ -162,8 +162,24 @@ object Equal {
   import concurrent.Promise
   implicit def PromiseEqual[A: Equal]: Equal[Promise[A]] =
     equal[Promise[A]]((a1, a2) => a1.get ≟ a2.get)
+  
+  implicit def TraversableEqual[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf, A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+    def equal(a: CC[A], b: CC[A]) = {
+      import Scalaz._
+      // This is a horribly inefficient, but general way to implement equality with respect to the element equality for an unknown
+      // collection type CC. It ensures that Set(1, 2, 3) === Set(3, 2, 1). We should move this to EqualLow, and add specific
+      // implementations of Equal for common collection types, such as List, Stream, Vector, and Array.
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
+      case class EqualWrap[A: Equal](a: A) {
+        override def equals(other: Any) = other matchOrZero {
+          case EqualWrap(b) => a === b.asInstanceOf[A]
+        }
+      }
+      a.map(new EqualWrap(_)) == a.map(new EqualWrap(_))
+    }
+  }
 
-  implicit def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = equal((a1, a2) => {
+  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
     val i2 = a2.iterator
     var b = false

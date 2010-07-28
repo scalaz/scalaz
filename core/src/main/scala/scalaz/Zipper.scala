@@ -17,6 +17,12 @@ sealed trait Zipper[+A] {
   import Scalaz._
 
   /**
+   * Get the Stream representation of this Zipper.
+   */
+  def toStream: Stream[A] =
+    lefts ++ focus #:: rights
+
+  /**
    * Possibly moves to next element to the right of focus.
    */
   def next: Option[Zipper[A]] = rights match {
@@ -113,15 +119,14 @@ sealed trait Zipper[+A] {
    */
   def move(n: Int): Option[Zipper[A]] = {
     @tailrec
-    def move0(z: Zipper[A], n: Int): Option[Zipper[A]] =
-      if (n < 0 || n >= length) None
+    def move0(z: Option[Zipper[A]], n: Int): Option[Zipper[A]] =
+      if (n > 0 && rights.isEmpty || n < 0 && lefts.isEmpty) None
       else {
-        val l = lefts.length
-        if (l == n) Some(this)
-        else if (l >= n) move0(tryPrevious, n)
-        else move0(tryNext, n)
+        if (n == 0) z
+        else if (n > 0) move0(z >>= (_.next), n - 1)
+        else move0(z >>= (_.previous), n + 1)
       }
-    move0(this, n)
+    move0(Some(this), n)
   }
 
   /**

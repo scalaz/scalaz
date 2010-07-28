@@ -211,4 +211,8 @@ object ImplicitConversionTest {
 
     i[PartialApply6Of7[T7, A, B, C, D, E, F]#Apply[G] =:= T7[A, B, C, D, E, F, G]]
   }
+  
+  def strategy {
+    i[concurrent.Strategy]
+  }
 }
