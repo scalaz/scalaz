@@ -89,5 +89,5 @@ class RopeTest extends Specification with Sugar with ScalaCheck {
 
   "StringLike instance" verifies {(strings: List[String]) =>
     val rope = Rope.fromChunks(strings.map(ImmutableArray.fromString))
-    asStringLike(rope).toString must beEqualTo(strings.mkString)}
+    rope.asString must beEqualTo(strings.mkString)}
 }

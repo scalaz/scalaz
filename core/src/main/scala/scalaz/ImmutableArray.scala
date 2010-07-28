@@ -249,13 +249,13 @@ object ImmutableArray {
     }
   }
 
-  implicit def asStringLike(array: ImmutableArray[Char]): StringLike[ImmutableArray[Char]] = new StringLike[ImmutableArray[Char]] {
-    override def toString = array match {
+  sealed class ImmutableArrayCharW(val value: ImmutableArray[Char]) extends PimpedType[ImmutableArray[Char]] {
+    def asString = value match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString
       case _ => error("Unknown subtype of ImmutableArray[Char]")
     }
-
-    override protected[this] def newBuilder = newStringArrayBuilder
   }
+
+  implicit def wrapRopeChar(array: ImmutableArray[Char]): ImmutableArrayCharW = new ImmutableArrayCharW(array)
 }

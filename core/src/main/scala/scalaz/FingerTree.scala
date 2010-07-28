@@ -996,15 +996,19 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       }
     }
 
-    implicit def asStringLike(rope: Rope[Char]): StringLike[Rope[Char]] = new StringLike[Rope[Char]] {
-      override def toString = {
-        val strBuilder = new StringBuilder(rope.length)
-        rope.chunks.foreach(ia => strBuilder.append(IA.asStringLike(ia)))
-        strBuilder.toString
+    sealed class RopeCharW(val value: Rope[Char]) extends PimpedType[Rope[Char]] {
+      def asString = {
+        val stringBuilder = new StringBuilder(value.length)
+        appendToStringBuilder(stringBuilder)
+        stringBuilder.toString
       }
 
-      override protected[this] def newBuilder = Rope.newBuilder[Char]
+      def appendToStringBuilder(stringBuilder: StringBuilder) {
+        value.chunks.foreach(ia => stringBuilder.append(ia.asString))
+      }
     }
+
+    implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   }
 
   // Indexed sequences
