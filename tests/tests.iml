@@ -16,12 +16,13 @@
     <orderEntry type="module-library">
       <library name="lib_managed_test">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/test/specs_2.8.0-1.6.5-SNAPSHOT.jar!/" />
+          <root url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/test/jar" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/test/specs_2.8.0-1.6.5-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/test/src/specs_2.8.0-1.6.5-SNAPSHOT-sources.jar!/" />
         </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/test/jar" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="library" name="scala" level="project" />

@@ -15,12 +15,13 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/servlet-api-2.5.jar!/" />
+          <root url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0.RC3/compile/servlet-api-2.5-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/src/servlet-api-2.5-sources.jar!/" />
         </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="library" name="scala" level="project" />
