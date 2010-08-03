@@ -18,16 +18,16 @@ object EphemeralStream {
     }
   }
 
-  def apply[A](as: A*) =
+  def apply[A](as: A*): EphemeralStream[A] =
     unfold(0, (b: Int) =>
       if (b < as.size) Some(as(b), b + 1)
       else None)
 
-  implicit val ephemeralStreamPure = new Pure[EphemeralStream] {
+  implicit val ephemeralStreamPure: Pure[EphemeralStream] = new Pure[EphemeralStream] {
     def pure[A](a: => A) = EphemeralStream(a)
   }
 
-  implicit val ephemeralStreamBind = new Bind[EphemeralStream] {
+  implicit val ephemeralStreamBind: Bind[EphemeralStream] = new Bind[EphemeralStream] {
     def bind[A, B](a: EphemeralStream[A], f: A => EphemeralStream[B]) =
       a.flatMap(f)
   }
@@ -52,7 +52,7 @@ object EphemeralStream {
     case h #:: t => cons(h, fromStream(t))
   }
 
-  implicit def toIterable[A](e: EphemeralStream[A]) = new Iterable[A] {
+  implicit def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
     def iterator = new Iterator[A] {
       var cur = e
       def next = {
@@ -81,12 +81,14 @@ object EphemeralStream {
 
 sealed trait EphemeralStream[+A] {
   import EphemeralStream._
+  import Scalaz._
+
   def isEmpty: Boolean
   def head: () => A
   def tail: () => EphemeralStream[A]
   def toList: List[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
-    foldLeft[List[A]](Nil)(lcons _).reverse
+    foldLeft(nil[A])(lcons _).reverse
   }
 
   def foldRight[B](z: => B)(f: (=> A) => (=> B) => B): B =
@@ -103,9 +105,9 @@ sealed trait EphemeralStream[+A] {
   }
 
   def filter(p: A => Boolean): EphemeralStream[A] = {
-	var rest = this dropWhile (!p(_))
-	if (rest.isEmpty) empty
-	else cons(rest.head(), rest.tail() filter p)
+    var rest = this dropWhile (!p(_))
+    if (rest.isEmpty) empty
+    else cons(rest.head(), rest.tail() filter p)
   }
 
   def dropWhile(p: A => Boolean): EphemeralStream[A] = {
