@@ -1,6 +1,8 @@
 package scalaz
 
 import scalaz.Scalaz._
+import collection.Iterator
+import collection.immutable.StringLike
 
 /**
  * Finger Trees provide a base for implementations of various collection types,
@@ -58,6 +60,12 @@ sealed abstract class Finger[V, A] {
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): Finger[V2, B]
 
+  def foreach(f: A => Unit): Unit
+
+  def iterator: Iterator[A]
+
+  def reverseIterator: Iterator[A]
+
   def measure: V
 
   def toList = map(x => x)(ListReducer[A]).measure
@@ -87,6 +95,14 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = one(f(a1))
 
+  def foreach(f: A => Unit) {
+    f(a1)
+  }
+
+  def iterator = Iterator.single(a1)
+
+  def reverseIterator = Iterator.single(a1)
+
   val measure = v
 
   private[scalaz] def split1(pred: V => Boolean, accV: V) = (None, a1, None)
@@ -115,6 +131,15 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
   }
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = two(f(a1), f(a2))
+
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+  }
+
+  def iterator = Iterator(a1, a2)
+
+  def reverseIterator = Iterator(a2, a1)
 
   val measure = v
 
@@ -153,6 +178,16 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
   }
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = three(f(a1), f(a2), f(a3))
+
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+    f(a3)
+  }
+
+  def iterator = Iterator(a1, a2, a3)
+
+  def reverseIterator = Iterator(a3, a2, a1)
 
   val measure = v
 
@@ -197,6 +232,17 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = four(f(a1), f(a2), f(a3), f(a4))
 
+  def foreach(f: A => Unit) {
+    f(a1)
+    f(a2)
+    f(a3)
+    f(a4)
+  }
+
+  def iterator = Iterator(a1, a2, a3, a4)
+
+  def reverseIterator = Iterator(a4, a3, a2, a1)
+
   val measure = v
 
   private implicit def sg: Semigroup[V] = r.monoid
@@ -237,6 +283,20 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]) = fold(
     (v, a1, a2) => node2(f(a1), f(a2)),
     (v, a1, a2, a3) => node3(f(a1), f(a2), f(a3)))
+
+  def foreach(f: A => Unit) {
+    fold(
+      (_, a1, a2) => { f(a1); f(a2) },
+      (_, a1, a2, a3) => { f(a1); f(a2); f(a3) }
+    )}
+
+  def iterator = fold(
+    (_, a1, a2) => Iterator(a1, a2),
+    (_, a1, a2, a3) => Iterator(a1, a2, a3))
+
+  def reverseIterator = fold(
+    (_, a1, a2) => Iterator(a2, a1),
+    (_, a1, a2, a3) => Iterator(a3, a2, a1))
 
   private implicit def sg: Semigroup[V] = r.monoid
   
@@ -580,6 +640,23 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
 
+  def foreach(f: A => Unit) {
+    fold(
+      _ => {},
+      (_, x) => { f(x) },
+      (_, pr, m, sf) => { pr.foreach(f); m.foreach(_.foreach(f)); sf.foreach(f) }
+    )}
+
+  def iterator: Iterator[A] = fold(
+    _ => Iterator.empty,
+    (_, x) => Iterator.single(x),                                           
+    (_, pr, m, sf) => pr.iterator ++ m.iterator.flatMap(_.iterator) ++ sf.iterator)
+
+  def reverseIterator: Iterator[A] = fold(
+    _ => Iterator.empty,
+    (_, x) => Iterator.single(x),
+    (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
+
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
 
@@ -593,6 +670,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     implicit val a = showA[A]
     this.shows
   }
+}
+
+class FingerTreeIntPlus[A](val value: FingerTree[Int, A]) {
+  // A placeholder for a FingerTree specialized to the (Int, +) monoid
+  // Will need to see how much it helps performance
 }
 
 object FingerTree {
@@ -718,6 +800,216 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
     m.viewr.fold(
       pr.toTree,
       (mm, a) => deep(mappendVal(pr.measure, m), pr, mm, a.toDigit))
+
+  implicit def ft2ftip[A](ft: FingerTree[Int, A]): FingerTreeIntPlus[A] = new FingerTreeIntPlus(ft)
+
+  implicit def ftip2ft[A](ft: FingerTreeIntPlus[A]): FingerTree[Int, A] = ft.value
+
+  import collection.IndexedSeqLike
+  import collection.immutable.IndexedSeq
+  import collection.mutable.Builder
+  import collection.generic.CanBuildFrom
+
+  trait Ropes {
+    import scalaz.{ImmutableArray => IA}
+
+    sealed class Rope[A : ClassManifest](val value: FingerTreeIntPlus[ImmutableArray[A]])
+        extends NewType[FingerTreeIntPlus[ImmutableArray[A]]] {
+      import Rope._
+      implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
+
+      def length = value.measure
+      
+      def apply(i: Int): A = {
+        val split = value.split(_ > i)
+        split._2.viewl.headOption.getOrElse(error("Index " + i + " > " + value.measure))(i - split._1.value.measure)
+      }
+
+      def ++(xs: Rope[A]) = rope(value <++> xs.value)
+
+      def ::+(chunk: ImmutableArray[A]) =
+        if (chunk.isEmpty)
+          this
+        else
+          rope(
+            value.viewr.fold(
+              single(chunk),
+              (_, last) =>
+                if (last.length + chunk.length <= baseChunkLength)
+                  value :-| (last ++ chunk)
+                else
+                  value :+ chunk
+            )
+          )
+
+      def +::(chunk: ImmutableArray[A]) =
+        if (chunk.isEmpty)
+          this
+        else
+          rope(
+            value.viewl.fold(
+              single(chunk),
+              (head, _) =>
+                if (chunk.length + head.length <= baseChunkLength)
+                  (chunk ++ head) |-: value
+                else
+                  chunk +: value
+            )
+          )
+
+      def :+(x: A) = this ::+ IA.fromArray(Array(x))
+
+      def +:(x: A) = IA.fromArray(Array(x)) +:: this
+      
+      def tail = rope(value.tail)
+      def init = rope(value.init)
+//      def map[B](f: A => B) = rope(value map f)
+//      def flatMap[B](f: A => Rope[B]) =
+//        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
+
+      // override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
+
+      def iterator: Iterator[A] = value.iterator.flatMap(_.iterator)
+      def reverseIterator: Iterator[A] = value.reverseIterator.flatMap(_.reverseIterator)
+
+      // TODO override def reverse
+      
+      def chunks = value.toStream
+
+      // protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
+    }
+
+    object Rope {
+      private[Ropes] val baseChunkLength = 16
+      implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = Reducer(_.length)
+      def empty[A : ClassManifest] = rope(FingerTree.empty[Int, ImmutableArray[A]])
+      def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
+        if (a.isEmpty) empty[A] else rope(single(IA.fromArray(a)))
+      def fromString(str: String): Rope[Char] =
+        if (str.isEmpty) empty[Char] else rope(single(IA.fromString(str)))
+      def fromChunks[A : ClassManifest](chunks: Seq[ImmutableArray[A]]): Rope[A] =
+        rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
+//      def apply[A](as: A*) = fromSeq(as)
+//      def fromSeq[A](as: Seq[A]) = rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+
+      def newBuilder[A : ClassManifest]: Builder[A, Rope[A]] = new RopeBuilder[A]
+
+      implicit def canBuildFrom[T : ClassManifest]: CanBuildFrom[Rope[_], T, Rope[T]] =
+        new CanBuildFrom[Rope[_], T, Rope[T]] {
+          def apply(from: Rope[_]): Builder[T, Rope[T]] = newBuilder[T]
+          def apply: Builder[T, Rope[T]] = newBuilder[T]
+        }
+    }
+    
+    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
+
+    sealed class WrappedRope[A : ClassManifest](val value: Rope[A])
+        extends NewType[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
+      import Rope._
+
+      def apply(i: Int): A = value(i)
+
+      def ++(xs: WrappedRope[A]) = wrapRope(value ++ xs.value)
+      
+      // override def :+(x: A) = wrapRope(value :+ x)
+      // override def +:(x: A) = wrapRope(x +: value)
+      override def tail = rope(value.tail)
+      override def init = rope(value.init)
+//      def map[B](f: A => B) = rope(value map f)
+//      def flatMap[B](f: A => Rope[B]) =
+//        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
+
+      // override def foreach[U](f: A => U): Unit = value.foreach(_.foreach(f))
+
+      override def iterator: Iterator[A] = value.value.iterator.flatMap(_.iterator)
+
+      override def reverseIterator: Iterator[A] = value.value.reverseIterator.flatMap(_.reverseIterator)
+
+      // TODO override def reverse
+
+      override def toStream = value.chunks.flatten
+
+      override def length = value.length
+
+      protected[this] override def newBuilder = new RopeBuilder[A].mapResult(wrapRope(_))
+    }
+
+    implicit def wrapRope[A : ClassManifest](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
+    implicit def unwrapRope[A : ClassManifest](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.value
+
+    final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
+      import Rope._
+      private var startRope: Rope[A] = Rope.empty[A]
+      private var tailBuilder: Builder[A, ImmutableArray[A]] = IA.newBuilder[A]
+      private var tailLength = 0
+
+      def clear {
+        startRope = Rope.empty[A]
+        tailBuilder = IA.newBuilder[A]
+        tailLength = 0
+      }
+
+      def +=(elem: A) = {
+        if (tailLength < baseChunkLength) {
+          tailBuilder += elem
+          tailLength += 1
+        }
+        else {
+          cleanTail
+          tailBuilder += elem
+          tailLength = 1
+        }
+        this
+      }
+
+      def result = startRope ::+ tailBuilder.result
+
+      override def sizeHint(size: Int) {
+        tailBuilder.sizeHint(math.min(size - startRope.length, baseChunkLength))
+      }
+
+      // TODO fix and reinstate
+//      import collection.mutable.ArrayLike
+//      override def ++=(xs: TraversableOnce[A]) = {
+//        xs match {
+//          case xs: Rope[A] => {
+//            cleanTail
+//            startRope ++= xs
+//          }
+//          case xs: ImmutableArray[A] => {
+//            cleanTail
+//            startRope ::+= xs
+//          }
+//          case xs: ArrayLike[A, _] => {
+//            cleanTail
+//            tailBuilder ++= xs
+//          }
+//          case _ =>  super.++=(xs)
+//        }
+//        this
+//      }
+//    }
+
+      private def cleanTail {
+        startRope ::+= tailBuilder.result
+        tailBuilder.clear
+      }
+    }
+
+    sealed class RopeCharW(val value: Rope[Char]) extends PimpedType[Rope[Char]] {
+      def asString = {
+        val stringBuilder = new StringBuilder(value.length)
+        appendTo(stringBuilder)
+        stringBuilder.toString
+      }
+
+      def appendTo(stringBuilder: StringBuilder) {
+        value.chunks.foreach(ia => stringBuilder.append(ia.asString))
+      }
+    }
+
+    implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
+  }
 
   // Indexed sequences
   trait IndSeqs {

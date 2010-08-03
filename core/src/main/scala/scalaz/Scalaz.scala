@@ -49,6 +49,7 @@ object Scalaz extends ScalazLow
     with    Reducers
     with    Semigroups 
     with    FingerTree.IndSeqs
+    with    FingerTree.Ropes
     with    Shorts
     with    Shows
     with    States

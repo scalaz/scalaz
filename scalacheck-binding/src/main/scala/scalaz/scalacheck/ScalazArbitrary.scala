@@ -19,6 +19,9 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
+    arbArray[A] ∘ (ImmutableArray.fromArray[A](_))
+
   implicit def IdentityArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Identity[A]] =
     a ∘ ((x: A) => IdentityTo(x))
 
@@ -112,6 +115,10 @@ object ScalazArbitrary {
     }
     Gen.sized(fingerTree[A] _)
   }
+
+  import FingerTree.ft2ftip
+  implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
+    FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]) ∘ (rope[A](_))
 
   import java.util.concurrent.Callable
 
