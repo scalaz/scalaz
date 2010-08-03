@@ -17,10 +17,11 @@ sealed trait Zipper[+A] {
   import Scalaz._
 
   /**
-   * Get the Stream representation of this Zipper.
+   * Get the Stream representation of this Zipper. This fully traverses `lefts`. `rights` is
+   * not evaluated.
    */
   def toStream: Stream[A] =
-    lefts ++ focus #:: rights
+    lefts.reverse ++ focus #:: rights
 
   /**
    * Possibly moves to next element to the right of focus.
