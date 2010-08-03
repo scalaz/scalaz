@@ -37,6 +37,22 @@ trait Memos {
         })
   }
 
+  def weakHashMapMemo[K, V]: Memo[K, V] = {
+    val a = new java.util.WeakHashMap[K, V]
+
+    memo[K, V](f =>
+      k => {
+        val v = a get k
+        if (v == null) {
+          val nv = f(k)
+          a put (k, nv)
+          nv
+        } else {
+          v
+        }
+      })
+  }
+
   private def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
     var a = m
 
