@@ -22,6 +22,8 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
   override def packageSrcJar = defaultJarPath("-sources.jar")
 
   override def packageTestSrcJar = defaultJarPath("-test-sources.jar")
+  
+  override def outputPattern = "[conf]/[type]/[artifact](-[revision])(-[classifier]).[ext]"
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 

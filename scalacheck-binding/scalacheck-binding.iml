@@ -14,13 +14,13 @@
     <orderEntry type="module-library" exported="">
       <library name="lib_managed">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/test-interface-0.3.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/scalacheck_2.8.0-1.8-SNAPSHOT.jar!/" />
+          <root url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/scalacheck_2.8.0-1.8-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/src/scalacheck_2.8.0-1.8-SNAPSHOT-sources.jar!/" />
         </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="library" name="scala" level="project" />
