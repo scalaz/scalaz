@@ -56,6 +56,10 @@ sealed trait NonEmptyList[+A] {
     case Some(t) => t.tails.list
   })
 
+  def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
+    case x :: xs => nel(x, xs) 
+  }
+
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 
