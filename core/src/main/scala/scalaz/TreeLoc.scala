@@ -119,6 +119,8 @@ trait TreeLocs {
       val lefts = l
       val rights = r
       val parents = p
+
+      override def toString = "<treeloc>"
     }
 
   def fromForest[A](ts: Stream[Tree[A]]) = ts match {

@@ -51,6 +51,9 @@ trait Trees {
     val rootLabel = root
 
     def subForest = forest
+
+
+    override def toString = "<tree>"
   }
 
   def leaf[A](root: A): Tree[A] = node(root, Stream.empty)

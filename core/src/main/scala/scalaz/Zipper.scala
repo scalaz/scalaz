@@ -240,5 +240,7 @@ trait Zippers {
     val focus = a
     val lefts = ls
     val rights = rs
+
+    override def toString = "<zipper>"
   }
 }
