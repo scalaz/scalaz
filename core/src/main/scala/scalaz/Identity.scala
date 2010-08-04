@@ -120,14 +120,18 @@ sealed trait Identity[A] extends PimpedType[A] {
   def zipper: Zipper[A] = Scalaz.zipper(Stream.empty, value, Stream.empty)
 
   def unfoldTree[B](f: A => (B, () => Stream[A])): Tree[B] = f(value) match {
-    case (a, bs) => node(a, bs.apply.unfoldForest(f))
+    case (a, bs) => Scalaz.node(a, bs.apply.unfoldForest(f))
   }
 
   def unfoldTreeM[B, M[_]](f: A => M[(B, Stream[A])])(implicit m: Monad[M]): M[Tree[B]] = {
     m.bind(f(value), (abs: (B, Stream[A])) =>
       m.bind(abs._2.unfoldForestM[B, M](f), (ts: Stream[Tree[B]]) =>
-        m.pure(node(abs._1, ts))))
+        m.pure(Scalaz.node(abs._1, ts))))
   }
+
+  def node(subForest: Tree[A]*): Tree[A] = Scalaz.node(value, subForest.toStream)
+  
+  def leaf: Tree[A] = Scalaz.leaf(value)
 
   def success[X]: Validation[X, A] = Scalaz.success(value)
 
