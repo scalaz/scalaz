@@ -149,7 +149,7 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
-  def wrapNel: NonEmptyList[A] = Scalaz.nel1(value)
+  def wrapNel: NonEmptyList[A] = Scalaz.nel(value)
 
   /**
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.

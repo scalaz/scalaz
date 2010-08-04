@@ -66,7 +66,7 @@ object ExampleValidation {
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
     val k4 = (fNel <**> fNel){ _ + _ }
-    k4.fail.toOption assert_≟ some(nel1("error", "error"))
+    k4.fail.toOption assert_≟ some(nel("error", "error"))
 
     person
     parseNumbers
@@ -97,7 +97,7 @@ object ExampleValidation {
     def mkPerson(name: String, age: Int) = (Name(name).liftFailNel ⊛ Age(age).liftFailNel){ (n, a) => Person(n, a)}
 
     mkPerson("Bob", 31).isSuccess assert_≟ true
-    mkPerson("bob", 131).fail.toOption assert_≟ some(nel1("Name must start with a capital letter", "Age must be in range"))
+    mkPerson("bob", 131).fail.toOption assert_≟ some(nel("Name must start with a capital letter", "Age must be in range"))
   }
 
   def parseNumbers {
@@ -118,7 +118,7 @@ object ExampleValidation {
             |aasf
             |314
             |xxx""".stripMargin
-    parse(badInput) assert_≟ nel1("java.lang.NumberFormatException: For input string: \"aasf\"",
+    parse(badInput) assert_≟ nel("java.lang.NumberFormatException: For input string: \"aasf\"",
       "java.lang.NumberFormatException: For input string: \"xxx\"").fail[List[Int]]
     val validInput = """42
             |314""".stripMargin

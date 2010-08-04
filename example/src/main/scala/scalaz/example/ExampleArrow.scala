@@ -68,8 +68,8 @@ object ExampleArrow {
 
     // Cokleisli Arrow
     {
-      val nums = nel1(1, 2, 3)
-      nums.υ assert_≟ nel1(nel1(1, 2, 3), nel1(2, 3), nel1(3))
+      val nums = nel(1, 2, 3)
+      nums.υ assert_≟ nel(nel(1, 2, 3), nel(2, 3), nel(3))
       val sum = ★((m: NonEmptyList[Int]) => m.∑)
       val min = ★((m: NonEmptyList[Int]) => m.min)
       // todo this causes StackOverflowError.

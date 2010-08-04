@@ -60,25 +60,20 @@ sealed trait NonEmptyList[+A] {
 }
 
 trait NonEmptyLists {
+  def nel[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
+    val head = h
+    val tail = t.toList
+  }
+
   def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
     val head = h
-    val tail = t
-  }
-
-  def nel1[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
     val tail = t.toList
   }
 
-  def nel[A](h: A, t1: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t1 :: t.toList
-  }
+  @deprecated("use nel")
+  def nel1[A](h: A, t: A*): NonEmptyList[A] = nel(h, t: _*)
 }
 
-object NonEmptyList {
-  def apply[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t.toList
-  }
+object NonEmptyList extends NonEmptyLists {
+  def apply[A](h: A, t: A*): NonEmptyList[A] = nel(h, t: _*)
 }
