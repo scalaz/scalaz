@@ -17,6 +17,20 @@ object ExampleTree {
       3.node(
         4.leaf))
 
+    // Tree is a Pointed Functor...
+    1.η[Tree] assert_≟ 1.leaf
+    tree ∘ (1 +) assert_≟ 2.node(3.leaf, 4.node(5.leaf))
+
+    // ...and a Monad
+    val t2 = tree ∗ (x => (x == 2) ? x.leaf | x.node((-x).leaf))
+    t2 assert_≟ 1.node(2.node((-2).leaf), 3.node(4.leaf))
+
+    // ...and Traversable
+    tree.collapse assert_≟ 10
+
+    // ...and Foldable
+    tree.foldMap(_.toString) assert_≟ "1234"
+
     // A tree of TreeLocs (aka Zipper). Each TreeLoc is rooted at `tree` but focussed on a different node.
     val allTreeLocs: Tree[TreeLoc[Int]] = tree.loc.cojoin.toTree
     // Getting the label of the focussed node from each TreeLoc restores the original tree
