@@ -41,6 +41,16 @@ sealed trait NonEmptyList[+A] {
 
   lazy val stream: Stream[A] = head #:: tail.toStream
 
+  def toZipper: Zipper[A] = zipper(Stream.Empty, head, tail.toStream)
+
+  def zipperEnd: Zipper[A] = {
+    import Stream._
+    tail reverse match {
+      case Nil => zipper(empty, head, empty)
+      case t :: ts => zipper(ts.toStream :+ head, t, empty)
+    }
+  }
+
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail.toNel match {
     case None => Nil
     case Some(t) => t.tails.list
@@ -58,6 +68,11 @@ trait NonEmptyLists {
   def nel1[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
     val head = h
     val tail = t.toList
+  }
+
+  def nel[A](h: A, t1: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
+    val head = h
+    val tail = t1 :: t.toList
   }
 }
 
