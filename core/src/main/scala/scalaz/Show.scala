@@ -29,6 +29,8 @@ object Show {
 
   implicit def StringShow: Show[String] = showA
 
+  implicit def SymbolShow: Show[Symbol] = showA
+
   implicit def UnitShow: Show[Unit] = showA
 
   implicit def BooleanShow: Show[Boolean] = showA

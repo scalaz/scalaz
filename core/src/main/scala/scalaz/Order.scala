@@ -57,6 +57,8 @@ object Order {
 
   implicit def StringOrder: Order[String] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
+  implicit def SymbolOrder: Order[Symbol] = orderBy(_.name)
+
   implicit def IntOrder: Order[Int] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
 
   implicit def IntMultiplicationOrder: Order[IntMultiplication] = orderBy(_.value)

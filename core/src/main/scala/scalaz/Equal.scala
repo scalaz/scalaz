@@ -43,6 +43,8 @@ object Equal {
 
   implicit def StringEqual: Equal[String] = equalA
 
+  implicit def SymbolEqual: Equal[Symbol] = equalA
+
   def NewTypeEqual[B: Equal, A <: NewType[B]]: Equal[A] = equalBy(_.value)
 
   implicit def UnitEqual: Equal[Unit] = equalA
