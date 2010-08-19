@@ -23,7 +23,7 @@ object ExampleTree {
 
     // ...and a Monad
     val t2 = tree ∗ (x => (x == 2) ? x.leaf | x.node((-x).leaf))
-    t2 assert_≟ 1.node(2.node((-2).leaf), 3.node(4.leaf))
+    t2 assert_≟ 1.node((-1).leaf, 2.leaf, 3.node((-3).leaf, 4.node((-4).leaf)))
 
     // ...and Traversable
     tree.collapse assert_≟ 10
