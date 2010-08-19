@@ -3,9 +3,9 @@ package scalaz
 sealed trait Validation[+E, +A] {
   import Scalaz._
 
-  def fold[X](e: E => X, a: A => X): X = this match {
-    case Success(x) => a(x)
-    case Failure(x) => e(x)
+  def fold[X](failure: E => X = identity[E] _, success: A => X = identity[A] _): X = this match {
+    case Success(x) => success(x)
+    case Failure(x) => failure(x)
   }
 
   def either : Either[E, A] = this match {
