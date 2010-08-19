@@ -101,6 +101,11 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     def equalityConsistent[C](c1: C, c2: C)(implicit eq: Equal[C]): Boolean = (c1 == c2) must be_==(c1 === c2)
     equalityConsistent(Set(1, 2, 3), Set(3, 2, 1))
     equalityConsistent(Map(1 -> 2, 2 -> 3, 3 -> 4), Map(3 -> 4, 1 -> 2, 2 -> 3))
+
+    class A(val a: Int)
+    
+    implicit val aEq: Equal[A] = equalBy(_.a)
+    equalityConsistent(Set(new A(1), new A(1), new A(2)), Set(new A(2), new A(1)))
   }
 
   def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {

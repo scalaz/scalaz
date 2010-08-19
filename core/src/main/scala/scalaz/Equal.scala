@@ -23,10 +23,13 @@ trait Equals {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
+  trait NaturalEqual
   /**
    * Constructs an `Equal` instance for type `A` based on `Any.==`.
    */
-  def equalA[A]: Equal[A] = equal[A](_ == _)
+  def equalA[A]: Equal[A] = new Equal[A] with NaturalEqual {
+    def equal(a1: A, a2: A) = a1 == a2
+  }
 
   def equalBy[A, B: Equal](f: A => B): Equal[A] = implicitly[Equal[B]] ∙ f
 }
@@ -168,16 +171,21 @@ object Equal {
   implicit def TraversableEqual[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf, A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     def equal(a: CC[A], b: CC[A]) = {
       import Scalaz._
-      // This is a horribly inefficient, but general way to implement equality with respect to the element equality for an unknown
-      // collection type CC. It ensures that Set(1, 2, 3) === Set(3, 2, 1). We should move this to EqualLow, and add specific
-      // implementations of Equal for common collection types, such as List, Stream, Vector, and Array.
-      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
-      case class EqualWrap[A: Equal](a: A) {
-        override def equals(other: Any) = other matchOrZero {
-          case EqualWrap(b) => a === b.asInstanceOf[A]
-        }
+      implicitly[Equal[A]] match {
+        case eq: NaturalEqual =>
+          // Performance optimisation.
+          a == b
+        case _ =>
+          // This is an inefficient, but general, way to implement equality with respect to the element equality for an unknown
+          // collection type CC with respect to a non-natural equality.
+          implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
+          case class EqualWrap[A: Equal](a: A) {
+            override def equals(other: Any) = other matchOrZero {
+              case EqualWrap(b) => a === b.asInstanceOf[A]
+            }
+          }
+          a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
       }
-      a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
     }
   }
 
