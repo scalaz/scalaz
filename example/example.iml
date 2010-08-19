@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="scala" name="Scala">
       <configuration>
-        <option name="compilerLibraryLevel" value="PROJECT" />
+        <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="scala" />
       </configuration>
     </facet>
