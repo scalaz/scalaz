@@ -1,7 +1,7 @@
 package scalaz
 
 /**
- * A type safe alternative to   { @scala.Any.= = }.
+ * A type safe alternative to   { @scala.Any.== }.
  * <p/>
  * For example:
  * <pre>
@@ -177,7 +177,7 @@ object Equal {
           case EqualWrap(b) => a === b.asInstanceOf[A]
         }
       }
-      a.map(new EqualWrap(_)) == a.map(new EqualWrap(_))
+      a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
     }
   }
 
@@ -190,7 +190,7 @@ object Equal {
       val x1 = i1.next
       val x2 = i2.next
 
-      if (x1 ≠ x2) {
+      if (x1 /== x2) {
         b = true
       }
     }
