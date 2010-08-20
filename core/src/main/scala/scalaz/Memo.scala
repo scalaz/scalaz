@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Memo[K, V] {
+sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
   def apply(z: K => V): K => V
 }
 
@@ -11,10 +11,9 @@ trait Memos {
 
   def nilMemo[K, V]: Memo[K, V] = memo[K, V](z => z)
 
-  def arrayMemo[V: Manifest](n: Int): Memo[Int, V] = {
-    val a = new Array[V](n)
-
-    memo[Int, V](f =>
+  private class ArrayMemo[V >: Null: ClassManifest](n: Int) extends Memo[Int, V] {
+    override def apply(f: (Int) => V) = {
+      lazy val a = new Array[V](n)
       k => {
         val t = a(k)
         if (t == null) {
@@ -22,8 +21,32 @@ trait Memos {
           a(k) = v
           v
         } else t
-      })
+      }
+    }
   }
+
+  private class DoubleArrayMemo(n: Int, sentinel: Double) extends Memo[Int, Double] {
+    override def apply(f: (Int) => Double) = {
+      lazy val a = {
+        if (sentinel == 0d) {
+          new Array[Double](n)
+        } else {
+          Array.fill(n)(sentinel)
+        }
+      }
+      k => {
+        val t = a(k)
+        if (t == sentinel) {
+          val v = f(k)
+          a(k) = v
+          v
+        } else t
+      }
+    }
+  }
+
+  def arrayMemo[V >: Null : ClassManifest](n: Int): Memo[Int, V] = new ArrayMemo(n)
+  def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
   def mutableHashMapMemo[K, V]: Memo[K, V] = {
     val a = new collection.mutable.HashMap[K, V]
@@ -72,5 +95,5 @@ trait Memos {
 
   def immutableListMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new ListMap[K, V])
 
-  def immutableTreeMapMemo[K <: Ordered[K], V]: Memo[K, V] = immutableMapMemo(new TreeMap[K, V])
+  def immutableTreeMapMemo[K: scala.Ordering, V]: Memo[K, V] = immutableMapMemo(new TreeMap[K, V])
 }
