@@ -5,11 +5,11 @@ sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
 }
 
 trait Memos {
-  def memo[K, V](f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
+  def memo[@specialized(Int) K, @specialized(Int, Long, Double) V](f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
     def apply(z: K => V) = f(z)
   }
 
-  def nilMemo[K, V]: Memo[K, V] = memo[K, V](z => z)
+  def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[K, V] = memo[K, V](z => z)
 
   private class ArrayMemo[V >: Null: ClassManifest](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
