@@ -207,7 +207,7 @@ object Equal {
   })
 
   implicit def MapEqual[CC[K, V] <: collection.Map[K, V], A: Equal, B: Equal]: Equal[collection.Map[A, B]] =
-    i[Equal[Iterable[(A, B)]]] covary
+    equalBy(_.toSet)
 
   implicit def JavaIterableEqual[A: Equal]: Equal[java.lang.Iterable[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
