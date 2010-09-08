@@ -25,6 +25,22 @@ object Arrow {
       (db: (D, B)) => (db._1, a(db._2))
   }
 
+  implicit def PartialFunctionArrow: Arrow[PartialFunction] = new Arrow[PartialFunction] {
+    val category = Category.PartialFunctionCategory
+
+    def arrow[B, C](f: B => C) = {
+      case b => f(b)
+    }
+
+    def first[B, C, D](a: PartialFunction[B, C]) = {
+      case (b, d) if a isDefinedAt b => (a(b), d)
+    }
+
+    def second[B, C, D](a: PartialFunction[B, C]): PartialFunction[(D, B), (D, C)] = {
+      case (d, b) if a isDefinedAt b => (d, a(b))
+    }
+  }
+
   implicit def KleisliArrow[M[_]: Monad]: Arrow[PartialApplyK[Kleisli, M]#Apply] = new Arrow[PartialApplyK[Kleisli, M]#Apply] {
     val category = Category.KleisliCategory
 

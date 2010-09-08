@@ -26,6 +26,14 @@ object Category {
     def compose[X, Y, Z](f: Y => Z, g: X => Y) = f compose g   
   }
 
+  implicit def PartialFunctionCategory: Category[PartialFunction] = new Category[PartialFunction] {
+    def id[A] = {case a => a}
+    def compose[X, Y, Z](f: PartialFunction[Y, Z], g: PartialFunction[X, Y]) = new PartialFunction[X, Z] {
+      def isDefinedAt(x: X) = g.isDefinedAt(x) && f.isDefinedAt(g(x))
+      def apply(x: X) = f(g(x))
+    }
+  }
+
   implicit def KleisliCategory[M[_]: Monad]: Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
     def id[A] = ☆(_ η)
     def compose[X, Y, Z](f: Kleisli[M, Y, Z], g: Kleisli[M, X, Y]) = f <=< g
