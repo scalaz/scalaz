@@ -89,6 +89,13 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
     val scalacheck = scalacheckDependency
+
+    override def consoleInit = super.consoleInit + 
+"""
+import org.scalacheck._
+import org.scalacheck.Prop._
+"""
+
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
