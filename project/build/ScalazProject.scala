@@ -13,7 +13,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
-  override def documentOptions = encodingUtf8.map(SimpleDocOption(_))
+  override def documentOptions = encodingUtf8.map(SimpleDocOption(_)): List[ScaladocOption]
 
   override def managedStyle = ManagedStyle.Maven
 
@@ -79,16 +79,24 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   class Core(info: ProjectInfo) extends ScalazDefaults(info) with Boilerplate {
     override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala##
     override def compileAction = super.compileAction dependsOn(generateTupleW)
+
+    override def documentOptions = documentTitle("Scalaz Core") :: super.documentOptions
   }
 
   class Http(info: ProjectInfo) extends ScalazDefaults(info) {
     val servlet = "javax.servlet" % "servlet-api" % "2.5" withSources
+
+    override def documentOptions = documentTitle("Scalaz HTTP") :: super.documentOptions
   }
 
-  class Geo(info: ProjectInfo) extends ScalazDefaults(info)
+  class Geo(info: ProjectInfo) extends ScalazDefaults(info) {
+    override def documentOptions = documentTitle("Scalaz Geodetic") :: super.documentOptions
+  }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
     val scalacheck = scalacheckDependency
+
+    override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
     override def consoleInit = super.consoleInit + 
 """
@@ -100,10 +108,14 @@ import org.scalacheck.Prop._
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
+
+    override def documentOptions = documentTitle("Scalaz Example") :: super.documentOptions
   }
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
     val specs = specsDependency
+
+    override def documentOptions = documentTitle("Scalaz Tests") :: super.documentOptions
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
