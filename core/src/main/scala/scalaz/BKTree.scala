@@ -85,7 +85,7 @@ sealed trait BKTree[+A] {
   private def splitMap[AA >: A](m: Map[Int, BKTree[AA]], k: Int): (Map[Int, BKTree[AA]], Map[Int, BKTree[AA]]) = {
     var m1: Map[Int, BKTree[AA]] = IntMap.empty
     var m2: Map[Int, BKTree[AA]] = IntMap.empty
-    for((i, v) <- m.elements) {
+    for((i, v) <- m.iterator) {
       if(i < k)
         m1 = m1 + ((i, v))
       else if(i > k)

@@ -9,7 +9,7 @@ trait Boilerplate {
   lazy val generateTupleW = {
     val cleanSrcManaged = cleanTask(srcManagedScala) named ("clean src_managed")
     task {
-      val arities = 2 to 22
+      val arities = 2 to 12
 
       def writeFileScalazPackage(fileName: String, source: String): Unit = {
         val file = (srcManagedScala / "scalaz" / fileName).asFile
