@@ -29,9 +29,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test" withSources
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8-SNAPSHOT" 
+  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.0" % "1.8-SNAPSHOT" 
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 
