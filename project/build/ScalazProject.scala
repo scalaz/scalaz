@@ -17,23 +17,19 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   override def managedStyle = ManagedStyle.Maven
 
-  override def packageDocsJar = defaultJarPath("-javadoc.jar")
-
   override def packageSrcJar = defaultJarPath("-sources.jar")
 
   override def packageTestSrcJar = defaultJarPath("-test-sources.jar")
-  
+
   override def outputPattern = "[conf]/[type]/[artifact](-[revision])(-[classifier]).[ext]"
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  lazy val docsArtifact = Artifact(artifactID, "docs", "jar", Some("javadoc"), Nil, None)
-
   def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test" withSources
 
-  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.0" % "1.8-SNAPSHOT" 
+  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.0" % "1.8-SNAPSHOT"
 
-  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
+  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil
@@ -73,7 +69,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   override def publishLocalAction = noAction
 
   override def publishAction = task {None}
-  
+
   val parentPath = path _
 
   class Core(info: ProjectInfo) extends ScalazDefaults(info) with Boilerplate {
@@ -98,7 +94,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
     override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
-    override def consoleInit = super.consoleInit + 
+    override def consoleInit = super.consoleInit +
 """
 import org.scalacheck._
 import org.scalacheck.Prop._
@@ -119,8 +115,8 @@ import org.scalacheck.Prop._
   }
 
   class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    lazy val packageFullAction = packageFull dependsOn(fullDoc)
-    
+    lazy val packageFullAction = packageFull
+
     lazy val packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, example, http).map(_.outputPath)).## ** "*jar"
       val p = parentPath
@@ -130,16 +126,16 @@ import org.scalacheck.Prop._
       val copy = task {
         sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
         None
-      } 
+      }
       zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
     } describedAs("Zip all artifacts")
-    
+
     private def noAction = task {None}
-    
+
     override def publishLocalAction = noAction dependsOn packageFullAction
 
     override def publishAction = noAction dependsOn packageFullAction
-    
+
     def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
 
     def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
@@ -150,7 +146,5 @@ import org.scalacheck.Prop._
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
       SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
       super.documentOptions
-
-  	lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
   }
 }
