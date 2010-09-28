@@ -42,12 +42,4 @@ trait Extras {
     type Apply[B] = A
   }
   type Thunk[A] = () => A
-
-  /** A function type encoded as a natural transformation */
-  type ->[A, B] = Konst[A]#Apply ~> Konst[B]#Apply
-
-  /** A universally quantified and lazy identity function */
-  def id = new (Id ~> Id) {
-    def apply[A](a: => A) = a
-  }
 }

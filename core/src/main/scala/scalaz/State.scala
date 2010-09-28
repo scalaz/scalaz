@@ -53,9 +53,4 @@ trait States {
   def init[S]: State[S, S] = state[S, S](s => (s, s))
 
   def modify[S](f: S => S) = init[S] flatMap (s => state(_ => (f(s), ())))
-
-  def put[S](s: S) = state[S, Unit](_ => (s, ()))
-
-  def gets[S,A](f: S => A): State[S, A] = 
-    for (s <- init) yield f(s)
 }
