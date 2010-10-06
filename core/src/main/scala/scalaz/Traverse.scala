@@ -24,8 +24,8 @@ object Traverse {
       implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
       val ap: Apply[F] = implicitly[Apply[F]]
 
-      // Build up the result using lists to avoid potentially expensive prepend operation on other collections.
-      val flistbs: F[List[B]] = as.toList.reverse.foldLeft(nil[B].η[F])((ys, x) => ap(f(x) ∘ ((a: B) => (b: List[B]) => a :: b), ys))
+      // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
+      val flistbs: F[Stream[B]] = as.toStream.foldr(Stream.empty[B].η[F])((x, ys) => ap(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
       flistbs ∘ (_.map(identity)(collection.breakOut))
     }
   }

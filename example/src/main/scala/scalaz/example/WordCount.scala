@@ -73,7 +73,11 @@ object Prod {
 
     def pure[A](a: => A): Prod[M, N, A] = prod(a.η[M], a.η[N])
 
-    def apply[A, B](f: Prod[M, N, A => B], a: Prod[M, N, A]): Prod[M, N, B] = prod(a.m <*> f.m, a.n <*> f.n)
+    def apply[A, B](f: => Prod[M, N, A => B], a: => Prod[M, N, A]): Prod[M, N, B] = {
+      lazy val fv = f;
+      lazy val av = a;
+      prod(av.m <*> fv.m, av.n <*> fv.n)
+    }
   }
 }
 
@@ -104,8 +108,11 @@ object Comp {
   def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[PartialApplyComp[M, N]#Apply] {
     def pure[A](a: => A): Comp[M, N, A] = comp(a.η[N].η[M])
 
-    def apply[A, B](f: Comp[M, N, A => B], a: Comp[M, N, A]): Comp[M, N, B] =
-      comp(a.value.<**>(f.value)(_ <*> _))
+    def apply[A, B](f: => Comp[M, N, A => B], a: => Comp[M, N, A]): Comp[M, N, B] = {
+      lazy val fv = f
+      lazy val av = a
+      comp(av.value.<**>(fv.value)(_ <*> _))
+    }
   }
 }
 
