@@ -26,7 +26,7 @@ object Traverse {
 
       // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
       val flistbs: F[Stream[B]] = as.toStream.foldr(Stream.empty[B].η[F])((x, ys) => ap(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
-      flistbs ∘ (_.toList.map(identity)(collection.breakOut))
+      flistbs ∘ (_.toIterable.map(identity)(collection.breakOut))
     }
   }
 
