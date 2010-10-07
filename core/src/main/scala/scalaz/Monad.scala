@@ -13,7 +13,11 @@ package scalaz
  */
 trait Monad[M[_]] extends Applicative[M] with Bind[M] with Pointed[M] {
   override def fmap[A, B](fa: M[A], f: A => B) = bind(fa, (a: A) => pure(f(a)))
-  override def apply[A, B](f: M[A => B], a: M[A]): M[B] = bind(f, (k: A => B) => fmap(a, k(_: A)))
+  override def apply[A, B](f: => M[A => B], a: => M[A]): M[B] = {
+    lazy val fv = f
+    lazy val av = a
+    bind(fv, (k: A => B) => fmap(av, k(_: A)))
+  }
 }
 
 object Monad {

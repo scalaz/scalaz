@@ -1,13 +1,16 @@
 package scalaz
 
 trait Apply[Z[_]] {
-  def apply[A, B](f: Z[A => B], a: Z[A]): Z[B]
+  def apply[A, B](f: => Z[A => B], a: => Z[A]): Z[B]
 }
 
 trait Applys {
   def FunctorBindApply[Z[_]](implicit t: Functor[Z], b: Bind[Z]) = new Apply[Z] {
-    def apply[A, B](f: Z[A => B], a: Z[A]): Z[B] =
-      b.bind(f, (g: A => B) => t.fmap(a, g(_: A)))
+    def apply[A, B](f: => Z[A => B], a: => Z[A]): Z[B] = {
+      lazy val fv = f
+      lazy val fa = a
+      b.bind(fv, (g: A => B) => t.fmap(fa, g(_: A)))
+    }
   }
 }
 
@@ -19,7 +22,11 @@ object Apply extends ApplyLow {
   import Scalaz._
 
   implicit def ConstApply[B: Monoid] = new Apply[PartialApply1Of2[Const, B]#Apply] {
-    def apply[A, X](f: Const[B, A => X], fa: Const[B, A]) = Const[B, X](f.value ⊹ fa.value)
+    def apply[A, X](f: => Const[B, A => X], fa: => Const[B, A]) = {
+      lazy val fv = f;
+      lazy val fav = fa;
+      Const[B, X](fv.value ⊹ fav.value)
+    }
   }
 
   implicit def StateApply[S]: Apply[PartialApply1Of2[State, S]#Apply] = FunctorBindApply[PartialApply1Of2[State, S]#Apply]
@@ -57,7 +64,7 @@ object Apply extends ApplyLow {
   implicit def MapEntryApply[X: Semigroup]: Apply[PartialApply1Of2[Entry, X]#Apply] = FunctorBindApply[PartialApply1Of2[Entry, X]#Apply]
 
   implicit def ValidationApply[X: Semigroup]: Apply[PartialApply1Of2[Validation, X]#Apply] = new Apply[PartialApply1Of2[Validation, X]#Apply] {
-    def apply[A, B](f: Validation[X, A => B], a: Validation[X, A]) = (f, a) match {
+    def apply[A, B](f: => Validation[X, A => B], a: => Validation[X, A]) = (f, a) match {
       case (Success(f), Success(a)) => success(f(a))
       case (Success(_), Failure(e)) => failure(e)
       case (Failure(e), Success(_)) => failure(e)
@@ -66,7 +73,7 @@ object Apply extends ApplyLow {
   }
 
   implicit def ValidationFailureApply[X]: Apply[PartialApply1Of2[FailProjection, X]#Flip] = new Apply[PartialApply1Of2[FailProjection, X]#Flip] {
-    def apply[A, B](f: FailProjection[A => B, X], a: FailProjection[A, X]) = ((f.validation, a.validation) match {
+    def apply[A, B](f: => FailProjection[A => B, X], a: => FailProjection[A, X]) = ((f.validation, a.validation) match {
       case (Success(x1), Success(_)) => success(x1)
       case (Success(x1), Failure(_)) => success(x1)
       case (Failure(_), Success(x2)) => success(x2)
@@ -75,14 +82,14 @@ object Apply extends ApplyLow {
   }
 
   implicit def ZipperApply: Apply[Zipper] = new Apply[Zipper] {
-    def apply[A, B](f: Zipper[A => B], a: Zipper[A]): Zipper[B] =
+    def apply[A, B](f: => Zipper[A => B], a: => Zipper[A]): Zipper[B] =
       zipper((a.lefts ʐ) <*> (f.lefts ʐ),
         (f.focus)(a.focus),
         (a.rights ʐ) <*> (f.rights ʐ))
   }
 
   implicit def ZipStreamApply: Apply[ZipStream] = new Apply[ZipStream] {
-    def apply[A, B](f: ZipStream[A => B], a: ZipStream[A]): ZipStream[B] = {
+    def apply[A, B](f: => ZipStream[A => B], a: => ZipStream[A]): ZipStream[B] = {
       val ff = f.value
       val aa = a.value
       (if (ff.isEmpty || aa.isEmpty) Stream.empty
@@ -91,7 +98,7 @@ object Apply extends ApplyLow {
   }
 
   val ZipTreeApply: Apply[Tree] = new Apply[Tree] {
-    def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
+    def apply[A, B](f: => Tree[A => B], a: => Tree[A]): Tree[B] =
       node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
   }
 
