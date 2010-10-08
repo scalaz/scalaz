@@ -256,8 +256,10 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def :&(a: A) = OnR[M,A](value, a)
 
   import concurrent._
+
+  // This uses (sequence . map) instead of traverse since it needs to be fully strict.
   def parMap[B](f: A => B)(implicit s: Strategy, t: Traverse[M]): Promise[M[B]] =
-    traverse(f.kleisli[Promise])
+    map(f.promise).sequence
 
   def parBind[B](f: A => M[B])(implicit m: Monad[M], s: Strategy, t: Traverse[M]): Promise[M[B]] =
     parMap(f).map(((_: MA[M, M[B]]) μ) compose (ma(_)))
