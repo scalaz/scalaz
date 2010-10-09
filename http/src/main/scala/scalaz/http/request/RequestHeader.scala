@@ -210,7 +210,7 @@ trait RequestHeaders {
    * then it if it is a known general header, then it is used. If not then it is an entity header.
    */
   implicit def StringRequestHeader(s: String): Option[RequestHeader] =
-    RequestHeader.headers find {case (n, h) => n == s} map (_._2) orElse
+    RequestHeader.headers find {case (n, h) => n.equalsIgnoreCase(s) } map (_._2) orElse
             (s: Option[GeneralHeader]) ∘ (scalaz.http.request.General(_)) orElse
             (s: Option[EntityHeader]) ∘ (scalaz.http.request.Entity(_))
 
