@@ -1,13 +1,10 @@
 <component name="libraryTable">
-  <library name="scala-2.7.7">
+  <library name="defScala">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/project/boot/scala-2.7.7/lib/scala-compiler.jar!/" />
       <root url="jar://$PROJECT_DIR$/project/boot/scala-2.7.7/lib/scala-library.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.7.7/lib/scala-compiler-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.7.7/lib/scala-library-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

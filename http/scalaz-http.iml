@@ -4,35 +4,33 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="scala" />
+        <option name="compilerLibraryName" value="buildScala" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/scala_2.8.0/classes" />
-    <output-test url="file://$MODULE_DIR$/target/scala_2.8.0/test-classes" />
+    <output url="file://$MODULE_DIR$/target/scala_2.8.1/classes" />
+    <output-test url="file://$MODULE_DIR$/target/scala_2.8.1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/lib_managed" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="core" />
+    <orderEntry type="library" name="buildScala" level="project" />
+    <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module-library" exported="">
-      <library name="lib_managed">
+      <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/jar/servlet-api-2.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/src/servlet-api-2.5-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/src/servlet-api-2.5-sources.jar!/" />
         </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib_managed/scala_2.8.0/compile/jar" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="scala" level="project" />
   </component>
 </module>
 
