@@ -3,6 +3,22 @@ package scalaz
 sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   import Scalaz._
 
+  /**
+   * Use this to force implicit conversion of M[A] to MA[M, A]. Useful when the original
+   * type contains a member with the same name as MA, for example:
+   *
+   * scala> List(1, 2, 3).min
+   * res0: Int = 1
+   * scala> List(1, 2, 3).asMA.min
+   * res1: Option[Int] = Some(1)
+   *
+   * This is less noisy than the alternative:
+   *
+   * scala> (List(1, 2, 3): MA[List, Int]).min
+   * res2: Option[Int] = Some(1)
+   */
+  def asMA: MA[M, A] = this
+  
   def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = t.fmap(value, f)
 
   def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
@@ -11,6 +27,8 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
    * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
    * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
+   *
+   * This method is experimental, and can crash the compiler.
    */
   def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[Comp[M, N]#Apply, B] = ma[Comp[M, N]#Apply, B](value ∘ n)
 
@@ -18,8 +36,20 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
+  /**
+   * Accumulates values MA[A] and MA[B], and returns an ApplicativeBuilder that can accumulate
+   * further such values. These values can be then applied to a provided function through the Applicative Functor for M.
+   *
+   * Example:
+   *
+   *  (1.some ⊛ 2.some) apply { (a, b, c) => a + b + c) } === Some(3)
+   *  (1.some ⊛ 2.some ⊛ 3.some) tupled === Some((1, 2, 3))
+   *
+   * @return An ApplicativeBuilder that has accumulated `value: M[A]` and `b: M[B]`.
+   */
   def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
+  /** Alias for ⊛ */
   def |@|[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
   def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
@@ -248,7 +278,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def fpair(implicit f: Functor[M]): M[(A, A)] = ∘(_.pair)
 
-  def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]) = foldMap(_.unit[B])(f, r)
+  def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]): B = foldMap(_.unit[B])(f, r)
   
   import FingerTree._
   def &:(a: A) = OnL[M,A](a, value)
