@@ -23,6 +23,8 @@ sealed trait Function1W[T, R] {
   def toValidation[E](error: => E)(implicit ev: R <:< Boolean): T => Validation[NonEmptyList[E], T] = (t: T) => (k(t): Boolean).option(t).toSuccess(error.wrapNel); 
 
   def byName: (=> T) => R = t => k(t)
+
+  def endo(implicit ev: R =:= T): Endo[T] = k ∘ ev
 }
 
 trait Function1s {

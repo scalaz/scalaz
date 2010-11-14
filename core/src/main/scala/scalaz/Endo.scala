@@ -1,17 +1,15 @@
 package scalaz
 
-sealed trait Endo[A] {
-  def apply(a: A): A
+sealed trait Endo[A] extends NewType[A => A] {
+  def apply(a: A): A = value(a)
 
   def fix: A = apply(fix)
 }
 
 trait Endos {
   implicit def EndoTo[A](f: A => A): Endo[A] = new Endo[A] {
-    def apply(a: A) = f(a)
+    val value = f
   }
-
-  implicit def EndoFrom[A](e: Endo[A]): A => A = e.apply(_)
 
   def constantEndo[A](a: => A): Endo[A] = EndoTo[A](_ => a)
 

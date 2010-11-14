@@ -12,6 +12,7 @@ object Example {
     ExampleCofunctor.run
     ExampleComp.run
     ExampleDistance.run
+    ExampleEndo.run
     ExampleFunctor.run
     ExampleFold.run
     ExampleEqual.run
