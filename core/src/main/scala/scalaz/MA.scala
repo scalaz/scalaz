@@ -245,9 +245,9 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
         lazy val e = t ≟ u
 
         val g = m {case (a, b) => get(a, b)}
-        val a = g(i - 1, j) + 1
-        val b = g(i - 1, j - 1) + (if (e) 0 else 1)
-        def c = g(i, j - 1) + 1
+        val a = g((i - 1, j)) + 1
+        val b = g((i - 1, j - 1)) + (if (e) 0 else 1)
+        def c = g((i, j - 1)) + 1
         if (a < b) a else if (b <= c) b else c
       }
 
