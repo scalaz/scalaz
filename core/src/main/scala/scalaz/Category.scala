@@ -68,8 +68,8 @@ object Category {
     Iso(c, _.value)
 
   /** A Functor that is not necessarily an endofunctor in the Scala category. */
-  trait GeneralizedFunctor[->>[_,_], ->>>[_,_], F[_]] {
-    def fmap[A, B](f: A ->> B): F[A] ->>> F[B]
+  trait GeneralizedFunctor[C[_,_], D[_,_], F[_]] {
+    def fmap[A, B](f: C[A, B]): D[F[A], F[B]]
   }
 
   def endoFunctorInScala[F[_]](f: Functor[F]): GeneralizedFunctor[Function1, Function1, F] =
@@ -84,8 +84,8 @@ object Category {
         f.comap(_, h.value)
     }
 
-  trait GeneralizedCofunctor[->[_,_], ->>[_,_], F[_]] {
-    def comap[A, B](f: A -> B): F[B] ->> F[A]
+  trait GeneralizedCofunctor[C[_,_], D[_,_], F[_]] {
+    def comap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
   implicit def opCoFunctor[R]: Cofunctor[PartialApply1Of2[<=,R]#Apply] =
@@ -117,7 +117,7 @@ object Category {
         Compose(a.value comap (_ comap f))
     }
 
-  /** Natural transformations */
+  /** Generalized natural transformations */
   trait Nat[Arr[_,_], F[_], G[_]] {
     type Apply[A] = Arr[F[A], G[A]]
   }
