@@ -12,6 +12,9 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
     case Some(a) => some(a)
   }
 
+  /** Alias for `cata` */
+  def fold[X](some: A => X, none: => X): X = cata(some, none)
+
   sealed trait Fold[X] {
     def none(s: => X): X
   }
