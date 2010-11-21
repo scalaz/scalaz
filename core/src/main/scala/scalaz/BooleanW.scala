@@ -126,6 +126,11 @@ sealed trait BooleanW {
    */
   def when(f: => Unit) = if(isTrue) f
 
+  /**
+   * @return `a` if true, `b` otherwise
+   */
+  def fold[A](a: => A, b: => A): A = if (isTrue) a else b
+
   trait Conditional[X] {
     def |(f: => X): X
   }
@@ -158,9 +163,9 @@ sealed trait BooleanW {
    * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
    * argument.
    */
-  def ??[A: Zero](a: => A) = if(isTrue) a else ∅
+  def ??[A: Zero](a: => A): A = if(isTrue) a else ∅
 
-  def !?[A: Zero](a: => A) = if(!isTrue) a else ∅
+  def !?[A: Zero](a: => A): A = if(!isTrue) a else ∅
 
   trait GuardPrevent[M[_]] {
     def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]): M[A]
