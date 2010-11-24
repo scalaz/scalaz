@@ -79,6 +79,8 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    */
   def unary_~(implicit z: Zero[A]): A = value getOrElse z.zero
 
+  def orZero(implicit z: Zero[A]): A = ~this
+
   def toSuccess[E](e: => E): Validation[E, A] = value match {
     case Some(a) => Success(a)
     case None => Failure(e)
