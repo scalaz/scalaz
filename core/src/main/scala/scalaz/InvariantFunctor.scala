@@ -21,7 +21,7 @@ object InvariantFunctor {
   //
   // Reported: https://lampsvn.epfl.ch/trac/scala/ticket/3177
   implicit val EndoInvariantFunctor: InvariantFunctor[Endo] = new InvariantFunctor[Endo] { //
-    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = (b: B) => f(ma(g(b)))
+    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = EndoTo((b: B) => f(ma(g(b))))
   }
 
   implicit val SemigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {

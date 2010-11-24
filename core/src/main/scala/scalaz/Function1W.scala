@@ -24,7 +24,7 @@ sealed trait Function1W[T, R] {
 
   def byName: (=> T) => R = t => k(t)
 
-  def endo(implicit ev: R =:= T): Endo[T] = k ∘ ev
+  def endo(implicit ev: R =:= T): Endo[T] = EndoTo(k ∘ ev)
 }
 
 trait Function1s {
