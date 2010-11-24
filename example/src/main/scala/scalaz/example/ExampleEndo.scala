@@ -9,8 +9,7 @@ object ExampleEndo {
 
   def run {
     // An Endofunction is a function from of type (A => A).
-    // Implicit conversions exist in both directions: Endo[A] <==> (A => A)
-    val inc: Endo[Int] = (i: Int) => i + 1
+    val inc: Endo[Int] = ((i: Int) => i + 1).endo
 
     // Two endofunctions can be combined through the Endo Monoid
     // This is equivalent to inc andThen inc.
