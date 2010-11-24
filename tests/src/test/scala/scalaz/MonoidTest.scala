@@ -5,6 +5,10 @@ import org.scalacheck.Arbitrary
 import java.math.BigInteger
 import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
 
+object test extends Application {
+  new MonoidTest
+}
+
 class MonoidTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
   import ScalaCheckBinding._
@@ -15,7 +19,7 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
     f(1) must_== 4
   }
 
-  "monoid laws" should {
+  "monoid laws" in {
     type A = Int
     type B = Int
 

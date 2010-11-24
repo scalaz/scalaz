@@ -24,20 +24,16 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/jar/scalacheck_2.8.0-1.8-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/jar/test-interface-0.5.jar!/" />
         </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/docs/scalacheck_2.8.0-1.8-SNAPSHOT-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/src/scalacheck_2.8.0-1.8-SNAPSHOT-sources.jar!/" />
-        </SOURCES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/jar/test-interface-0.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/compile/jar/scalacheck_2.8.1-1.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

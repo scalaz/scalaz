@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/project/sbt_project_definition.iml" filepath="$PROJECT_DIR$/project/sbt_project_definition.iml" />
+      <module fileurl="file://$PROJECT_DIR$/project/project.iml" filepath="$PROJECT_DIR$/project/project.iml" />
+      <module fileurl="file://$PROJECT_DIR$//scalaz.iml" filepath="$PROJECT_DIR$//scalaz.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/scalaz-core.iml" filepath="$PROJECT_DIR$/core/scalaz-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/scalaz-example.iml" filepath="$PROJECT_DIR$/example/scalaz-example.iml" />
       <module fileurl="file://$PROJECT_DIR$/full/scalaz-full.iml" filepath="$PROJECT_DIR$/full/scalaz-full.iml" />
