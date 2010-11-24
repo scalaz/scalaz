@@ -126,7 +126,7 @@ object Zero {
 
   implicit def Function1ABZero[A, B: Zero]: Zero[A => B] = zero((_: A) => ∅[B])
 
-  implicit def EndoZero[A]: Zero[Endo[A]] = zero(identity(_: A))
+  implicit def EndoZero[A]: Zero[Endo[A]] = zero(EndoTo(identity(_: A)))
 
   implicit def DualZero[A: Zero]: Zero[Dual[A]] = zero(∅[A] σ)
 

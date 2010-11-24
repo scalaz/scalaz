@@ -59,7 +59,7 @@ trait Reducers {
 
   def AllReducer: Reducer[Boolean, BooleanConjunction] = Reducer(x => conjunction(x))
 
-  def EndoReducer[A]: Reducer[A => A, Endo[A]] = Reducer(x => x)
+  def EndoReducer[A]: Reducer[A => A, Endo[A]] = Reducer(EndoTo(_))
 
   def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = Reducer(_.dual)
 

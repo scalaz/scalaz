@@ -7,7 +7,7 @@ sealed trait Endo[A] extends NewType[A => A] {
 }
 
 trait Endos {
-  implicit def EndoTo[A](f: A => A): Endo[A] = new Endo[A] {
+  def EndoTo[A](f: A => A): Endo[A] = new Endo[A] {
     val value = f
   }
 

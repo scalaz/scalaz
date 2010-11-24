@@ -121,7 +121,7 @@ object Semigroup extends SemigroupLow {
 
   implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
 
-  implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => ((a: A) => x(y.apply(a))))
+  implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => (EndoTo(x compose y)))
 
   implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
     semigroup((x, y) => y.value ⊹ x.value)

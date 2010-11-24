@@ -13,15 +13,15 @@ trait Foldable[F[_]] {
 
   /**Map each element of the structure to a monoid, and combine the results. **/
   def foldMap[A, M: Monoid](t: F[A], f: A => M): M =
-    foldRight[A, M](t, mzero, (x, y) => f(x) |+| y)
+    foldRight[A, M](t, mzero[M], (x, y) => f(x) |+| y)
 
   /**Right-associative fold of a structure. **/
   def foldRight[A, B](t: F[A], z: => B, f: (A, => B) => B): B =
-    foldMap(t, (a: A) => ((f.curried(a)(_: B)): Endo[B])) apply z
+    foldMap(t, (a: A) => (EndoTo(f.curried(a)(_: B)))) apply z
 
   /**Left-associative fold of a structure. **/
   def foldLeft[A, B](t: F[A], z: B, f: (B, A) => B): B =
-    foldMap(t, (a: A) => (f.flip.curried(a): Endo[B]) σ).value(z)
+    foldMap(t, (a: A) => (EndoTo(f.flip.curried(a))) σ).value(z)
 
   /**A variant of 'foldr' that has no base case,
    *  and thus is undefined for empty structures. **/
