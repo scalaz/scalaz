@@ -13,7 +13,7 @@ import scala._
  * forall b. lens(lens.set(a,b)) = b
  * forall a. lens.set(a,lens(a)) = a
  */
-case class Lens[A,B](get: A => B, set: (A,B) => A) extends Function1[A,B] with Immutable {
+case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   def apply(whole:A): B   = get(whole)
   def mod(a:A, f: B => B) = set(a, f(this(a)))
   def modf[F[_]:Functor](a:A, f: B => F[B]): F[A] = f(this(a)).map((b:B) => set(a,b))
@@ -32,9 +32,10 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Function1[A,B] with I
     (a,c) => set(a,g(c))
   )
   def |||[C](that: Lens[C,B]) = Lens[Either[A,C],B](
-    _.fold(this,that), 
-    { 
-      case (Left(a),  b) => Left (set(a,b))
+    { case Left(a) => this(a)
+      case Right(b) => that(b)
+    },
+    { case (Left(a),  b) => Left (set(a,b))
       case (Right(c), b) => Right(that.set(c,b))
     }
   )
@@ -59,25 +60,25 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Function1[A,B] with I
 
   def flatMap[C](f : B => State[A,C]) : State[A,C] = state[A,C](a => f(this(a))(a))
   def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(this(a))))
-
-  // override def toString() = "Lens[" + classOf[A].getShortName + "," + classOf[B].getShortName + "]"
 }
 
 object Lens { 
-  implicit def category = new Category[Lens] {
+  implicit def category : Category[Lens] = new Category[Lens] {
     def compose[A,B,C](g: Lens[B,C], f: Lens[A,B]): Lens[A,C] = f andThen g
     def id[A]: Lens[A,A] = self[A] 
   }
 
-  implicit def asState[A,B](lens: Lens[A,B]) = lens.toState
+  implicit def asState[A,B](lens: Lens[A,B]): State[A,B] = lens.toState
 
-  implicit def invariantFunctor[A] = new InvariantFunctor[PartialApply1Of2[Lens,A]#Apply] {
-    def xmap[B,C](lens: Lens[A,B], f: B => C, g: C => B) = lens.xmap[C](f)(g)
-  }
+  implicit def invariantFunctor[A] : InvariantFunctor[PartialApply1Of2[Lens,A]#Apply] = 
+    new InvariantFunctor[PartialApply1Of2[Lens,A]#Apply] {
+      def xmap[B,C](lens: Lens[A,B], f: B => C, g: C => B) = lens.xmap[C](f)(g)
+    }
 
-  implicit def generalizedFunctor[A] = new Category.GeneralizedFunctor[Lens,Function1,Id] {
-    def fmap[A,B](lens: Lens[A,B]) = lens.apply
-  }
+  implicit def generalizedFunctor[A] : GeneralizedFunctor[Lens,Function1,Id] = 
+    new GeneralizedFunctor[Lens,Function1,Id] {
+      def fmap[A,B](lens: Lens[A,B]) = lens.apply
+    }
  
   def fst[A,B]   = Lens[(A,B),A](_._1, (ab,a) => (a,ab._2))
   def snd[A,B]   = Lens[(A,B),B](_._2, (ab,b) => (ab._1,b))
@@ -94,9 +95,9 @@ object Lens {
 
   implicit def addableLens[S,A,Repr <: Addable[A,Repr]] = AddableLens[S,A,Repr](_)
   case class AddableLens[S,A,Repr <: Addable[A, Repr]](lens: Lens[A,Repr]) { 
-    def += (elem: A)                       = lens.mods (_ + elem)
+    def += (elem: A) = lens.mods (_ + elem)
     def += (elem1: A, elem2: A, elems: A*) = lens.mods (_ + elem1 + elem2 ++ elems)
-    def ++= (xs: TraversableOnce[A])       = lens.mods (_ ++ xs)
+    def ++= (xs: TraversableOnce[A]) = lens.mods (_ ++ xs)
   }
 
   implicit def setLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]] = SetLikeLens[S,K,Repr](_)
@@ -118,8 +119,9 @@ object Lens {
     // behavior undefined for accessing an element not present in the map!
     def at(k:K)     = Lens[S,V](lens.get(_)(k), (s, v) => lens.mod(s, _ + (k -> v)))
     def +=(elem1: (K,V), elem2: (K,V), elems: (K,V)*) = lens.mods (_ + elem1 + elem2 ++ elems)
-    def +=(elem: (K, V))                              = lens.mods (_ + elem) 
-    def update(key: K, value: V)                      = lens.mods_(_.updated(key,value))
+    def +=(elem: (K,V)) = lens.mods (_ + elem) 
+    def ++=(xs: TraversableOnce[(K,V)]) = lens.mods (_ ++ xs)
+    def update(key: K, value: V) = lens.mods_(_.updated(key,value))
   }
 
   implicit def seqLens[S,A,Repr <: SeqLike[A,Repr]] = SeqLikeLens[S,A,Repr](_)
@@ -142,8 +144,8 @@ object Lens {
   implicit def queueLens[S,A] = QueueLens[S,A](_)
   case class QueueLens[S,A](lens: Lens[S,Queue[A]]) {
     def enqueue(elem: A) = lens.mods_(_ enqueue elem)
-    def dequeue          = lens.modps(_.dequeue.swap)
-    def length           = lens.map(_.length) 
+    def dequeue = lens.modps(_.dequeue.swap)
+    def length = lens.map(_.length) 
   }
 
   implicit def arrayLens[S,A] = ArrayLens[S,Array[A]](_)
