@@ -7,7 +7,7 @@ package scalaz
   */
 
 trait Leibniz[A,B] {
-  def apply[F[_]](p: F[A]) : F[B]
+  def subst[F[_]](p: F[A]) : F[B]
 
   final def *[+[_,_],C,D](that: Leibniz[C,D]) : Leibniz[A+C,B+D] = Leibniz.lift2(this,that)
   final def andThen[C](that: Leibniz[B,C]) : Leibniz[A,C] = Leibniz.trans(that,this)
@@ -21,24 +21,22 @@ object Leibniz {
   type ~[A,B] = Leibniz[A,B] 
 
   /** We can witness equality by using it to convert between types */
-  implicit def witness[A,B](eq: A ~ B)(a: A) : B = {
-     type Id[X] = X
-     eq[Id](a)
-  }
+  implicit def witness[A,B](f: A ~ B) : A => B = 
+     f.subst[PartialApply1Of2[Function1,A]#Apply](x => x)
 
   /** Equality is reflexive */
   implicit def refl[A] : (A ~ A) = new (A ~ A) {
-    def apply[F[_]](p:F[A]): F[A]= p
+    def subst[F[_]](p:F[A]): F[A]= p
   }
 
   /** Equality is transitive */
   def trans[A,B,C](f: B ~ C, g: A ~ B) = new (A ~ C) {
-    def apply[F[_]](p:F[A]): F[C] = f[PartialApply1Of2[~,A]#Apply](g)(p)
+    def subst[F[_]](p:F[A]): F[C] = f.subst[PartialApply1Of2[~,A]#Apply](g).subst(p)
   }
  
   /** Equality is symmetric */
   def symm[A,B](f: A ~ B) : B ~ A = new (B ~ A) {
-    def apply[F[_]](p:F[B]): F[A] = f[PartialApply1Of2[~,A]#Flip](refl)(p)
+    def subst[F[_]](p:F[B]): F[A] = f.subst[PartialApply1Of2[~,A]#Flip](refl).subst(p)
   }
 
   /** Equivalence forms a category */
@@ -52,9 +50,9 @@ object Leibniz {
     a: A ~ A2
   ) : (T[A] ~ T[A2]) = 
   new (T[A] ~ T[A2]) {
-    def apply[F[_]](p: F[T[A]]) : F[T[A2]] = {
+    def subst[F[_]](p: F[T[A]]) : F[T[A2]] = {
       type a[X] = T[A] ~ T[X]
-      a[a](refl)(p)
+      a.subst[a](refl).subst(p)
     }
   }
 
@@ -63,10 +61,10 @@ object Leibniz {
     a: A ~ A2, b: B ~ B2
   ) : (T[A,B] ~ T[A2,B2]) = 
   new (T[A,B] ~ T[A2,B2]) {
-    def apply[F[_]](p : F[T[A,B]]) : F[T[A2,B2]] = {
+    def subst[F[_]](p : F[T[A,B]]) : F[T[A2,B2]] = {
       type a[X] = T[A,B] ~ T[X, B]
       type b[X] = T[A,B] ~ T[A2,X]
-      b[b](a[a](refl))(p)
+      b.subst[b](a.subst[a](refl)).subst(p)
     }
   }
 
@@ -75,11 +73,11 @@ object Leibniz {
     a: A ~ A2, b: B ~ B2, c: C ~ C2
   ) : (T[A,B,C] ~ T[A2,B2,C2]) = 
   new (T[A,B,C] ~ T[A2,B2,C2]) {
-    def apply[F[_]](p: F[T[A,B,C]]) : F[T[A2,B2,C2]] = {
+    def subst[F[_]](p: F[T[A,B,C]]) : F[T[A2,B2,C2]] = {
       type a[X] = T[A,B,C] ~ T[X ,B, C]
       type b[X] = T[A,B,C] ~ T[A2,X, C]
       type c[X] = T[A,B,C] ~ T[A2,B2,X]
-      c[c](b[b](a[a](refl)))(p)
+      c.subst[c](b.subst[b](a.subst[a](refl))).subst(p)
     }
   }
 
@@ -88,12 +86,12 @@ object Leibniz {
     a: A ~ A2, b: B ~ B2, c: C ~ C2, d: D ~ D2
   ) : (T[A,B,C,D] ~ T[A2,B2,C2,D2]) = 
   new (T[A,B,C,D] ~ T[A2,B2,C2,D2]) {
-    def apply[F[_]](p: F[T[A,B,C,D]]) : F[T[A2,B2,C2,D2]] = {
+    def subst[F[_]](p: F[T[A,B,C,D]]) : F[T[A2,B2,C2,D2]] = {
       type a[X] = T[A,B,C,D] ~ T[X, B, C, D]
       type b[X] = T[A,B,C,D] ~ T[A2,X, C, D]
       type c[X] = T[A,B,C,D] ~ T[A2,B2,X, D]
       type d[X] = T[A,B,C,D] ~ T[A2,B2,C2,X]
-      d[d](c[c](b[b](a[a](refl))))(p)
+      d.subst[d](c.subst[c](b.subst[b](a.subst[a](refl)))).subst(p)
     }
   }
 
@@ -102,13 +100,13 @@ object Leibniz {
     a: A ~ A2, b: B ~ B2, c: C ~ C2, d: D ~ D2,e : E ~ E2
   ) : (T[A,B,C,D,E] ~ T[A2,B2,C2,D2,E2]) = 
   new (T[A,B,C,D,E] ~ T[A2,B2,C2,D2,E2]) {
-    def apply[F[_]](p: F[T[A,B,C,D,E]]) : F[T[A2,B2,C2,D2,E2]] = {
+    def subst[F[_]](p: F[T[A,B,C,D,E]]) : F[T[A2,B2,C2,D2,E2]] = {
       type a[X] = T[A,B,C,D,E] ~ T[X, B, C, D, E]
       type b[X] = T[A,B,C,D,E] ~ T[A2,X, C, D, E]
       type c[X] = T[A,B,C,D,E] ~ T[A2,B2,X, D, E]
       type d[X] = T[A,B,C,D,E] ~ T[A2,B2,C2,X, E]
       type e[X] = T[A,B,C,D,E] ~ T[A2,B2,C2,D2,X]
-      e[e](d[d](c[c](b[b](a[a](refl)))))(p)
+      e.subst[e](d.subst[d](c.subst[c](b.subst[b](a.subst[a](refl))))).subst(p)
     }
   }
 
@@ -142,7 +140,7 @@ object Leibniz {
 
   /** Unsafe coercion between types */
   def force[A,B] : (A ~ B) = new (A ~ B) { 
-    def apply[F[_]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
+    def subst[F[_]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
   }
 
   def lower[T[_]:Injective,A,A2](
