@@ -22,7 +22,7 @@ object Leibniz {
 
   /** We can witness equality by using it to convert between types */
   implicit def witness[A,B](f: A ~ B) : A => B = 
-     f.subst[PartialApply1Of2[Function1,A]#Apply](x => x)
+     f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
 
   /** Equality is reflexive */
   implicit def refl[A] : (A ~ A) = new (A ~ A) {
