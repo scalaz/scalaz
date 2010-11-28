@@ -95,9 +95,29 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
 
   /** Mapping a lens yields a state action to avoid ambiguity */
   def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(this(a))))
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
+    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
+  )
 }
 
 object Lens { 
+  /** The identity lens for a given object */
+  def self[A]    = Lens[A,A](a => a, (_, a) => a)
+
+  /** The trivial lens that can retrieve Unit from anything */
+  def trivial[A] = Lens[A,Unit](_ => Unit, (a, _) => a)
+
+  /** A lens that discards the choice of Right or Left from Either */
+  def codiag[A]  : Lens[Either[A,A],A] = self[A] ||| self[A]
+
+  /** Access the first field of a tuple */
+  def fst[A,B] = Lens[(A,B),A](_._1, (ab,a) => (a,ab._2))
+
+  /** Access the second field of a tuple */
+  def snd[A,B] = Lens[(A,B),B](_._2, (ab,b) => (ab._1,b))
+
   /** Lenses form a category */
   implicit def category : Category[Lens] = new Category[Lens] {
     def compose[A,B,C](g: Lens[B,C], f: Lens[A,B]): Lens[A,C] = f andThen g
@@ -118,18 +138,6 @@ object Lens {
     new GeneralizedFunctor[Lens,Function1,Id] {
       def fmap[A,B](lens: Lens[A,B]) = lens.apply
     }
-
-  /** Access the first field of a tuple */
-  def fst[A,B] = Lens[(A,B),A](_._1, (ab,a) => (a,ab._2))
-
-  /** Access the second field of a tuple */
-  def snd[A,B] = Lens[(A,B),B](_._2, (ab,b) => (ab._1,b))
-
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))), 
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
-  )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple3Lens[S,A,B,C](lens: Lens[S,(A,B,C)]) = (
@@ -176,14 +184,6 @@ object Lens {
     Lens[S,G](s => lens(s)._7, (s,a) => lens.mod(s, t => t copy (_7 = a)))
   )
 
-  /** The identity lens for a given object */
-  def self[A]    = Lens[A,A](a => a, (_, a) => a)
-
-  /** The trivial lens that can retrieve Unit from anything */
-  def trivial[A] = Lens[A,Unit](_ => Unit, (a, _) => a)
-
-  /** A lens that discards the choice of Right or Left from Either */
-  def codiag[A]  : Lens[Either[A,A],A] = self[A] ||| self[A]
 
   /** A lens that views a Subtractable type can provide the appearance of in place mutation */
   implicit def subtractableLens[S,A,Repr <: Subtractable[A,Repr]] = SubtractableLens[S,A,Repr](_)
