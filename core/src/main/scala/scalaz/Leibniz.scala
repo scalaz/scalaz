@@ -20,13 +20,14 @@ object Leibniz {
   /** A convenient type alias for Leibniz */
   type ~[A,B] = Leibniz[A,B] 
 
+  /** We can witness equality by using it to convert between types */
   implicit def witness[A,B](eq: A ~ B)(a: A) : B = {
      type Id[X] = X
      eq[Id](a)
   }
 
   /** Equality is reflexive */
-  implicit def refl[A] = new (A ~ A) {
+  implicit def refl[A] : (A ~ A) = new (A ~ A) {
     def apply[F[_]](p:F[A]): F[A]= p
   }
 
