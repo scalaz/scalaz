@@ -26,6 +26,18 @@ object Category {
     def compose[X, Y, Z](f: Y => Z, g: X => Y) = f compose g   
   }
 
+  implicit val `<:<_Category` : Category[<:<] = new Category[<:<] {
+    def compose[X, Y, Z](f: <:<[Y, Z], g: <:<[X, Y]) = f.asInstanceOf[X <:< Z]
+
+    def id[A] = implicitly[A <:< A]
+  }
+
+  implicit val `=:=_Category` : Category[=:=] = new Category[=:=] {
+    def compose[X, Y, Z](f: =:=[Y, Z], g: =:=[X, Y]) = f.asInstanceOf[X =:= Z]
+
+    def id[A] = implicitly[A =:= A]
+  }
+
   /** The flipped Function1 type */
   case class <=[A,B](value: B => A) extends NewType[B => A]
 
