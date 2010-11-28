@@ -1,6 +1,11 @@
 package scalaz
 
-/** Leibnizian equality: A better =:= */
+/** Leibnizian equality: A better =:= 
+  *
+  * This technique was first used in "Typing Dynamic Typing" (Baars and Swierstra, ICFP 2002) 
+  * http://portal.acm.org/citation.cfm?id=583852.581494
+  */
+
 trait Leibniz[A,B] {
   def apply[F[_]](p: F[A]) : F[B]
 
@@ -11,11 +16,17 @@ trait Leibniz[A,B] {
 }
 
 object Leibniz { 
+
   /** A convenient type alias for Leibniz */
   type ~[A,B] = Leibniz[A,B] 
 
+  implicit def witness[A,B](eq: A ~ B)(a: A) : B = {
+     type Id[X] = X
+     eq[Id](a)
+  }
+
   /** Equality is reflexive */
-  def refl[A] = new (A ~ A) {
+  implicit def refl[A] = new (A ~ A) {
     def apply[F[_]](p:F[A]): F[A]= p
   }
 
@@ -99,4 +110,70 @@ object Leibniz {
       e[e](d[d](c[c](b[b](a[a](refl)))))(p)
     }
   }
+
+  /** This is an assertion that a type is injective. 
+    * Pure Leibnizian equality cannot check injectivity without 'subtractive contexts', which Scala lacks. So we cheat.
+    * This issue was raised in "Leibniz equality can be injective" (Oleg Kiselyov, Haskell Cafe Mailing List 2010):
+    * http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html
+    */
+
+  case class Injective[T[_]]()
+  case class Injective2[T[_,_]]()
+  case class Injective3[T[_,_,_]]()
+  case class Injective4[T[_,_,_,_]]()
+  case class Injective5[T[_,_,_,_,_]]()
+
+  implicit def ListInjective = Injective[List]
+  implicit def SetInjective = Injective[Set]
+  implicit def EitherInjective = Injective2[Either]
+  implicit def ValidationInjective = Injective2[Validation]
+
+  implicit def Tuple2Injective = Injective2[Tuple2]
+  implicit def Tuple3Injective = Injective3[Tuple3]
+  implicit def Tuple4Injective = Injective4[Tuple4]
+  implicit def Tuple5Injective = Injective5[Tuple5]
+
+  implicit def Function0Injective = Injective[Function0]
+  implicit def Function1Injective = Injective2[Function1]
+  implicit def Function2Injective = Injective3[Function2]
+  implicit def Function3Injective = Injective4[Function3]
+  implicit def Function4Injective = Injective5[Function4]
+
+  /** Unsafe coercion between types */
+  def force[A,B] : (A ~ B) = new (A ~ B) { 
+    def apply[F[_]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
+  }
+
+  def lower[T[_]:Injective,A,A2](
+    t: T[A] ~ T[A2]
+  ) : (A ~ A2)
+    = force[A,A2]
+
+  def lower2[T[_,_]:Injective2,A,A2,B,B2](
+    t: T[A,B] ~ T[A2,B2]
+  ) : (A ~ A2, B ~ B2)
+    = (force[A,A2], force[B,B2])
+
+  def lower3[T[_,_,_]:Injective3,A,A2,B,B2,C,C2](
+    t: T[A,B,C] ~ T[A2,B2,C2]
+  ) : (A ~ A2, B ~ B2, C ~ C2)
+    = (force[A,A2], force[B,B2], force[C,C2])
+
+  def lower4[T[_,_,_,_]:Injective4,A,A2,B,B2,C,C2,D,D2](
+    t: T[A,B,C,D] ~ T[A2,B2,C2,D2]
+  ) : (A ~ A2, B ~ B2, C ~ C2, D ~ D2)
+    = (force[A,A2], force[B,B2], force[C,C2], force[D,D2])
+
+  def lower5[T[_,_,_,_,_]:Injective5,A,A2,B,B2,C,C2,D,D2,E,E2](
+    t: T[A,B,C,D,E] ~ T[A2,B2,C2,D2,E2]
+  ) : (A ~ A2, B ~ B2, C ~ C2, D ~ D2, E ~ E2)
+    = (force[A,A2], force[B,B2], force[C,C2], force[D,D2], force[E,E2])
+
+  /*
+  implicit leibnizFunction1Functor : GeneralizedFunctor[Id,~,Function1] = new GeneralizedFunctor[Id,~,Function1] {
+    def dom = implicitly[Category[~]]
+    def cod = implicitly[Category[Function1]]
+    def fmap[A,B](f: A ~ B)(a : A) : B = witness[A,B](f)(a)
+  }
+  */
 }
