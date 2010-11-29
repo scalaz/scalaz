@@ -219,8 +219,8 @@ object Lens {
   case class MapLens[S,K,V](lens: Lens[S,Map[K,V]]) {
     /** Allows both viewing and setting the value of a member of the map */
     def member(k:K) = Lens[S,Option[V]](
-	s => lens(s).get(k), 
-	(s, opt) => lens.mod(s, m => opt.cata(v => m + (k -> v), m - k)))
+        s => lens(s).get(k), 
+        (s, opt) => lens.mod(s, m => opt.cata(v => m + (k -> v), m - k)))
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k:K)     = Lens[S,V](lens.get(_)(k), (s, v) => lens.mod(s, _ + (k -> v)))
 
@@ -263,7 +263,7 @@ object Lens {
     def at(i : Int) = Lens[S,A](
       s => lens(s)(i),
       (s, v) => lens.mod(s, array => {
-	val copy = array.clone() 
+        val copy = array.clone() 
         copy.update(i,v)
         copy
       })

@@ -1,7 +1,8 @@
 package scalaz
 
-/** Liskov substitutability : A better <:<
-  */
+/**
+ * Liskov substitutability : A better <:<
+ */
 
 trait Liskov[-A,+B] {
   def subst[F[-_]](p: F[B]) : F[A]
