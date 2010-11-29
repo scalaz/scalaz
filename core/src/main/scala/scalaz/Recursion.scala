@@ -41,7 +41,8 @@ object Nu {
   ) : Nu[G] = v.asInstanceOf[Nu[G]]
 }
 
-/* Positive recursion */
+/** Positive recursion */
+
 // ideal: trait Mu[+F[+_]] extends Nu[F] with Mu_[F] {
 // works: trait Mu[+F[+_]] extends Nu[F] {
 trait Mu[F[+_]] extends Nu[F] with Mu_[F] {
@@ -55,7 +56,7 @@ object Mu {
   ) : Mu[G] = v.asInstanceOf[Mu[G]]
 }
 
-// Cofree corecursion 
+/** Cofree corecursion */
 trait Cofree_[F[_],A] {
   val extract: A
   def out: F[Cofree_[F,A]]
@@ -114,6 +115,7 @@ object CofreeRec_ {
 }
 
 /** Positive cofree recursion */
+
 // ideal: trait CofreeRec[+F[+_],A] extends Mu[F] with CofreeRec_[F,A] {
 // works: trait CofreeRec[+F[+_],A] extends Mu[F] {
 trait CofreeRec[F[+_],A] extends Mu[F] with CofreeRec_[F,A] {
