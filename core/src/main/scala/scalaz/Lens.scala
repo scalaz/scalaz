@@ -21,37 +21,37 @@ import scala._
 
 case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   /** A Lens[A,B] can be used as a function from A => B, or implicitly via Lens.asState as a State[A,B] action */
-  def apply(whole:A): B   = get(whole)
+  def apply(whole:A): B = get(whole)
 
   /** Modify the value viewed through the lens */
-  def mod(a:A, f: B => B) : A = set(a, f(this(a)))
+  def mod(a:A, f: B => B) : A = set(a, f(get(a)))
 
   /** Modify the value viewed through the lens, a functor full of results */
-  def modf[F[_]:Functor](a:A, f: B => F[B]): F[A] = f(this(a)).map((b:B) => set(a,b))
+  def modf[F[_]:Functor](a:A, f: B => F[B]): F[A] = f(get(a)).map((b:B) => set(a,b))
 
   /** modp[C] = modf[PartialApply1Of2[Tuple,C]#Flip], but is more convenient to think about */
   def modp[C](a: A, f: B => (B, C)): (A, C) = {
-    val (b,c) = f(this(a))
+    val (b,c) = f(get(a))
     (set(a,b),c)
   }
 
   /** Lenses can be composed */
   def compose[C](that: Lens[C,A]) = Lens[C,B](
-    c => this(that(c)),
+    c => get(that.get(c)),
     (c, b) => that.mod(c, set(_, b))
   )
   def andThen[C](that: Lens[B,C]) = that compose this
 
   /** You can apply an isomorphism to the value viewed through the lens to obtain a new lens. */
   def xmap[C](f: B => C)(g: C => B) = Lens[A,C](
-    a => f(this(a)),
+    a => f(get(a)),
     (a,c) => set(a,g(c))
   )
 
   /** Two lenses that view a value of the same type can be joined */
   def |||[C](that: Lens[C,B]) = Lens[Either[A,C],B](
-    { case Left(a) => this(a)
-      case Right(b) => that(b)
+    { case Left(a) => get(a)
+      case Right(b) => that.get(b)
     },
     { case (Left(a),  b) => Left (set(a,b))
       case (Right(c), b) => Right(that.set(c,b))
@@ -60,7 +60,7 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
 
   /** Two disjoint lenses can be paired */
   def ***[C,D](that: Lens[C,D]) = Lens[(A,C),(B,D)](
-    ac => (this(ac._1), that(ac._2)),
+    ac => (get(ac._1), that.get(ac._2)),
     (ac,bd) => (set(ac._1,bd._1),that.set(ac._2,bd._2))
   )
 
@@ -73,7 +73,7 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   // def +++[C,D](that: Lens[C,D]): Lens[Either[A,C],Either[B,D]]
 
   /** A Lens[A,B] can be used directly as a State[A,B] that retrieves the value viewed from the state */
-  def toState                 : State[A,B]    = state[A,B](a => (a, this(a)))
+  implicit def toState : State[A,B] = state[A,B](a => (a, get(a)))
 
   /** We can contravariantly map the state of a state monad through a lens */
   def lifts[C](s: State[B,C]) : State[A,C]    = state[A,C](a => modp(a,s.apply))
@@ -91,10 +91,10 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   def :=(b: B)                : State[A,Unit] = state[A,Unit](a => (set(a,b), Unit))
 
   /** flatMapping a lens yields a state action to avoid ambiguity */
-  def flatMap[C](f : B => State[A,C]) : State[A,C] = state[A,C](a => f(this(a))(a))
+  def flatMap[C](f : B => State[A,C]) : State[A,C] = state[A,C](a => f(get(a))(a))
 
   /** Mapping a lens yields a state action to avoid ambiguity */
-  def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(this(a))))
+  def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(get(a))))
 
 }
 
@@ -132,58 +132,58 @@ object Lens {
   /** There exists a generalized functor from Lenses to Function1, which just forgets how to set the value */
   implicit def generalizedFunctor[A] : GeneralizedFunctor[Lens,Function1,Id] = 
     new GeneralizedFunctor[Lens,Function1,Id] {
-      def fmap[A,B](lens: Lens[A,B]) = lens.apply
+      def fmap[A,B](lens: Lens[A,B]) = lens.get
     }
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
   )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple3Lens[S,A,B,C](lens: Lens[S,(A,B,C)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
-    Lens[S,C](s => lens(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
+    Lens[S,C](s => lens.get(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a)))
   )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple4Lens[S,A,B,C,D](lens: Lens[S,(A,B,C,D)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
-    Lens[S,C](s => lens(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
-    Lens[S,D](s => lens(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
+    Lens[S,C](s => lens.get(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
+    Lens[S,D](s => lens.get(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a)))
   )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple5Lens[S,A,B,C,D,E](lens: Lens[S,(A,B,C,D,E)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
-    Lens[S,C](s => lens(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
-    Lens[S,D](s => lens(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
-    Lens[S,E](s => lens(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
+    Lens[S,C](s => lens.get(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
+    Lens[S,D](s => lens.get(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
+    Lens[S,E](s => lens.get(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a)))
   )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple6Lens[S,A,B,C,D,E,F](lens: Lens[S,(A,B,C,D,E,F)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
-    Lens[S,C](s => lens(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
-    Lens[S,D](s => lens(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
-    Lens[S,E](s => lens(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a))),
-    Lens[S,F](s => lens(s)._6, (s,a) => lens.mod(s, t => t copy (_6 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
+    Lens[S,C](s => lens.get(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
+    Lens[S,D](s => lens.get(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
+    Lens[S,E](s => lens.get(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a))),
+    Lens[S,F](s => lens.get(s)._6, (s,a) => lens.mod(s, t => t copy (_6 = a)))
   )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple7Lens[S,A,B,C,D,E,F,G](lens: Lens[S,(A,B,C,D,E,F,G)]) = (
-    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
-    Lens[S,C](s => lens(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
-    Lens[S,D](s => lens(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
-    Lens[S,E](s => lens(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a))),
-    Lens[S,F](s => lens(s)._6, (s,a) => lens.mod(s, t => t copy (_6 = a))),
-    Lens[S,G](s => lens(s)._7, (s,a) => lens.mod(s, t => t copy (_7 = a)))
+    Lens[S,A](s => lens.get(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens.get(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a))),
+    Lens[S,C](s => lens.get(s)._3, (s,a) => lens.mod(s, t => t copy (_3 = a))),
+    Lens[S,D](s => lens.get(s)._4, (s,a) => lens.mod(s, t => t copy (_4 = a))),
+    Lens[S,E](s => lens.get(s)._5, (s,a) => lens.mod(s, t => t copy (_5 = a))),
+    Lens[S,F](s => lens.get(s)._6, (s,a) => lens.mod(s, t => t copy (_6 = a))),
+    Lens[S,G](s => lens.get(s)._7, (s,a) => lens.mod(s, t => t copy (_7 = a)))
   )
 
 
@@ -208,7 +208,7 @@ object Lens {
   case class SetLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]](lens: Lens[S,Repr]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = Lens[S,Boolean](
-      s => lens(s).contains(key),
+      s => lens.get(s).contains(key),
       (s, b) => lens.mod(s, m => if (b) m + key else m - key)
     )
     def &= (that: Set[K]) = lens.mods(_ & that)
@@ -221,7 +221,7 @@ object Lens {
   case class MapLens[S,K,V](lens: Lens[S,Map[K,V]]) {
     /** Allows both viewing and setting the value of a member of the map */
     def member(k:K) = Lens[S,Option[V]](
-        s => lens(s).get(k), 
+        s => lens.get(s).get(k), 
         (s, opt) => lens.mod(s, m => opt.cata(v => m + (k -> v), m - k)))
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k:K)     = Lens[S,V](lens.get(_)(k), (s, v) => lens.mod(s, _ + (k -> v)))
@@ -263,7 +263,7 @@ object Lens {
   implicit def arrayLens[S,A] = ArrayLens[S,Array[A]](_)
   case class ArrayLens[S,A](lens: Lens[S,Array[A]]) {
     def at(i : Int) = Lens[S,A](
-      s => lens(s)(i),
+      s => lens.get(s)(i),
       (s, v) => lens.mod(s, array => {
         val copy = array.clone() 
         copy.update(i,v)
