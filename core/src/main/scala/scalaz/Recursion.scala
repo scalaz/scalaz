@@ -1,6 +1,9 @@
 package scala
 
+import scalaz.Scalaz._
 import scalaz.Liskov._
+import scalaz.Applicative
+import scalaz.Traverse
 
 /**
  * Possibly negative corecursion 
@@ -61,7 +64,7 @@ object Mu {
 }
 
 /** Cofree corecursion */
-trait Cofree_[F[_],A] {
+trait Cofree_[F[_],A] extends Immutable {
   val extract: A
   def out: F[Cofree_[F,A]]
 }
@@ -76,6 +79,16 @@ object Cofree_ {
   }
   def unapply[F[_],A](v: Cofree_[F,A]) = Some((v.extract, v.out))
   implicit def unwrap[F[_],A](v: Cofree_[F,A]) = (v.extract, v.out)
+  trait PartialApplyCofree_[T[+_]] { 
+     type Apply[A] = Cofree_[T,A]
+  }
+  implicit def Cofree_Traverse[T[+_]:Traverse]
+    : Traverse[PartialApplyCofree_[T]#Apply] = 
+  new Traverse[PartialApplyCofree_[T]#Apply] {
+    def traverse[F[_]: Applicative, A, B](f : A => F[B], t : Cofree_[T,A]) : F[Cofree_[T,B]] = { 
+       (f(t.extract) <**> t.out.traverse(traverse(f,_)))((a, o) => Cofree_(a,o))
+    }
+  }
 }
 
 /** Positive cofree corecursion */
@@ -99,6 +112,17 @@ object Cofree {
     implicit lt: F[Cofree[F,A]] <~: G[Cofree[F,A]]
   ) : Cofree[G,B] = v.asInstanceOf[Cofree[G,B]]
   implicit def unwrap[F[+_],A](v: Cofree[F,A]) = (v.extract, v.out)
+
+  trait PartialApplyCofree[T[+_]] { 
+     type Apply[A] = Cofree[T,A]
+  }
+  implicit def CofreeTraverse[T[+_]:Traverse]
+    : Traverse[PartialApplyCofree[T]#Apply] = 
+  new Traverse[PartialApplyCofree[T]#Apply] {
+    def traverse[F[_]: Applicative, A, B](f : A => F[B], t : Cofree[T,A]) : F[Cofree[T,B]] = { 
+       (f(t.extract) <**> t.out.traverse(traverse(f,_)))((a, o) => Cofree(a,o))
+    }
+  }
 }
 
 /** Cofree recursion */
@@ -117,6 +141,16 @@ object CofreeRec_ {
   }
   def unapply[F[_],A](v: CofreeRec_[F,A]) = Some((v.extract, v.out))
   implicit def unwrap[F[_],A](v: CofreeRec_[F,A]) = (v.extract, v.out)
+  trait PartialApplyCofreeRec_[T[+_]] { 
+     type Apply[A] = CofreeRec_[T,A]
+  }
+  implicit def CofreeRec_Traverse[T[+_]:Traverse]
+    : Traverse[PartialApplyCofreeRec_[T]#Apply] = 
+  new Traverse[PartialApplyCofreeRec_[T]#Apply] {
+    def traverse[F[_]: Applicative, A, B](f : A => F[B], t : CofreeRec_[T,A]) : F[CofreeRec_[T,B]] = { 
+       (f(t.extract) <**> t.out.traverse(traverse(f,_)))((a, o) => CofreeRec_(a,o))
+    }
+  }
 }
 
 /** Positive cofree recursion */
@@ -141,4 +175,14 @@ object CofreeRec {
     implicit lt: F[CofreeRec[F,A]] <~: G[CofreeRec[F,A]]
   ) : CofreeRec[G,B] = v.asInstanceOf[CofreeRec[G,A]]
   implicit def unwrap[F[+_],A](v: CofreeRec[F,A]) = (v.extract, v.out)
+  trait PartialApplyCofreeRec[T[+_]] { 
+     type Apply[A] = CofreeRec[T,A]
+  }
+  implicit def CofreeRecTraverse[T[+_]:Traverse]
+    : Traverse[PartialApplyCofreeRec[T]#Apply] = 
+  new Traverse[PartialApplyCofreeRec[T]#Apply] {
+    def traverse[F[_]: Applicative, A, B](f : A => F[B], t : CofreeRec[T,A]) : F[CofreeRec[T,B]] = { 
+       (f(t.extract) <**> t.out.traverse(traverse(f,_)))((a, o) => CofreeRec(a,o))
+    }
+  }
 }
