@@ -274,22 +274,22 @@ object Lens {
   }
 
   /** Allow the illusion of imperative updates to numbers viewed through a lens */
-  implicit def numericLens[S,N:Numeric] = NumericLens[S,N](_)
-  case class NumericLens[S,N](lens: Lens[S,N])(implicit num: Numeric[N]) {
+  implicit def numericLens[S,N:Numeric](lens: Lens[S,N]) = NumericLens[S,N](lens, implicitly[Numeric[N]])
+  case class NumericLens[S,N](lens: Lens[S,N], num : Numeric[N]) { 
     def +=(that:N) = lens.mods(num.plus(_,that))
     def -=(that:N) = lens.mods(num.minus(_,that))
     def *=(that:N) = lens.mods(num.times(_,that))
   }
 
   /** Allow the illusion of imperative updates to numbers viewed through a lens */
-  implicit def fractionalLens[S,F:Fractional] = FractionalLens[S,F](_)
-  case class FractionalLens[S,F](lens: Lens[S,F])(implicit frac: Fractional[F]) { 
+  implicit def fractionalLens[S,F:Fractional](lens: Lens[S,F]) = FractionalLens[S,F](lens, implicitly[Fractional[F]])
+  case class FractionalLens[S,F](lens: Lens[S,F], frac: Fractional[F]) { 
     def /=(that:F) = lens.mods(frac.div(_,that))
   }
 
   /** Allow the illusion of imperative updates to numbers viewed through a lens */
-  implicit def integralLens[S,I:Integral] = IntegralLens[S,I](_)
-  case class IntegralLens[S,I](lens: Lens[S,I])(implicit int: Integral[I]) { 
+  implicit def integralLens[S,I:Integral](lens: Lens[S,I]) = IntegralLens[S,I](lens, implicitly[Integral[I]])
+  case class IntegralLens[S,I](lens: Lens[S,I], int: Integral[I]) { 
     def %=(that:I) = lens.mods(int.quot(_,that))
   }
 }
