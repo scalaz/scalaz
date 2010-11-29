@@ -186,26 +186,45 @@ object Lens {
     Lens[S,G](s => lens.get(s)._7, (s,a) => lens.mod(s, t => t copy (_7 = a)))
   )
 
+  trait WrappedLens[S,A] { 
+    def lens : Lens[S,A]
+  }
 
   /** A lens that views a Subtractable type can provide the appearance of in place mutation */
-  implicit def subtractableLens[S,A,Repr <: Subtractable[A,Repr]] = SubtractableLens[S,A,Repr](_)
-  case class SubtractableLens[S,A,Repr <: Subtractable[A, Repr]](lens: Lens[A,Repr]) {
+  implicit def subtractableLens[S,A,Repr <: Subtractable[A,Repr]](
+    l : Lens[S,Repr]
+  ) : SubtractableLens[S,A,Repr] = 
+  new SubtractableLens[S,A,Repr] {
+    def lens : Lens[S,Repr] = l
+  }
+
+  trait SubtractableLens[S,A,Repr <: Subtractable[A, Repr]] extends WrappedLens[S,Repr] {
     def -=  (elem: A)                       = lens.mods (_ - elem)
     def -=  (elem1: A, elem2: A, elems: A*) = lens.mods (_ - elem1 - elem2 -- elems)
     def --= (xs: TraversableOnce[A])        = lens.mods (_ -- xs)
   }
 
   /** A lens that views an Addable type can provide the appearance of in place mutation */
-  implicit def addableLens[S,A,Repr <: Addable[A,Repr]] = AddableLens[S,A,Repr](_)
-  case class AddableLens[S,A,Repr <: Addable[A, Repr]](lens: Lens[A,Repr]) { 
+  implicit def addableLens[S,A,Repr <: Addable[A,Repr]](
+    l: Lens[S,Repr]
+  ) : AddableLens[S,A,Repr] = 
+  new AddableLens[S,A,Repr] {
+    def lens : Lens[S,Repr] = l
+  }
+
+  trait AddableLens[S,A,Repr <: Addable[A, Repr]] extends WrappedLens[S,Repr] { 
     def += (elem: A) = lens.mods (_ + elem)
     def += (elem1: A, elem2: A, elems: A*) = lens.mods (_ + elem1 + elem2 ++ elems)
     def ++= (xs: TraversableOnce[A]) = lens.mods (_ ++ xs)
   }
 
   /** A lens that views an SetLike type can provide the appearance of in place mutation */
-  implicit def setLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]] = SetLikeLens[S,K,Repr](_)
-  case class SetLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]](lens: Lens[S,Repr]) {
+  implicit def setLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]](l: Lens[S,Repr]) : SetLikeLens[S,K,Repr] = new SetLikeLens[S,K,Repr] {
+    def lens : Lens[S,Repr] = l
+  }
+  implicit def setLens[S,K] = setLikeLens[S,K,Set[K]](_)
+
+  trait SetLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]] extends AddableLens[S,K,Repr] with SubtractableLens[S,K,Repr] {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = Lens[S,Boolean](
       s => lens.get(s).contains(key),
@@ -218,7 +237,7 @@ object Lens {
 
   /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */
   implicit def mapLens[S,K,V] = MapLens[S,K,V](_)
-  case class MapLens[S,K,V](lens: Lens[S,Map[K,V]]) {
+  case class MapLens[S,K,V](lens: Lens[S,Map[K,V]]) extends SubtractableLens[S,K,Map[K,V]] {
     /** Allows both viewing and setting the value of a member of the map */
     def member(k:K) = Lens[S,Option[V]](
         s => lens.get(s).get(k), 
@@ -233,7 +252,8 @@ object Lens {
   }
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
-  implicit def seqLens[S,A,Repr <: SeqLike[A,Repr]] = SeqLikeLens[S,A,Repr](_)
+  implicit def seqLikeLens[S,A,Repr <: SeqLike[A,Repr]] = SeqLikeLens[S,A,Repr](_)
+  implicit def seqLens[S,A] = seqLikeLens[S,A,scala.collection.immutable.Seq[A]]
   case class SeqLikeLens[S, A, Repr <: SeqLike[A,Repr]](lens: Lens[S,Repr]) {
     def sortWith(lt: (A,A) => Boolean)          = lens.mods_(_ sortWith lt)
     def sortBy[B:math.Ordering](f:A=>B)              = lens.mods_(_ sortBy f)
