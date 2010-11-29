@@ -22,11 +22,17 @@ trait GeneralizedCategory {
   def compose[A>:L<:H, B>:L<:H, C>:L<:H](f: B ~> C, g: A ~> B): A ~> C
 }
 
+trait GeneralizedGroupoid extends GeneralizedCategory { 
+  def invert[A>:L<:H,B>:L<:H](f : A ~> B): B ~> A
+}
+
 trait Category[X[_, _]] extends GeneralizedCategory {
   type L = Nothing
   type H = Any
   type ~>[A, B] = X[A, B]
 }
+
+trait Groupoid[X[_, _]] extends GeneralizedGroupoid with Category[X]
 
 object Category {
   import Scalaz._
