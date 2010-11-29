@@ -1,8 +1,12 @@
 package scalaz
 
-/**
- * Liskov substitutability : A better <:<
- */
+
+/** Liskov substitutability: A better <:<
+  * 
+  * A <: B holds whenever A could be used in any negative context that expects a B.
+  * (e.g. if you could pass an A into any function that expects a B.)
+  */
+
 
 trait Liskov[-A,+B] {
   def subst[F[-_]](p: F[B]) : F[A]
@@ -24,6 +28,7 @@ object Liskov {
   implicit def isa[A,B >: A] : A <~: B = new (A <~: B) {
     def subst[F[-_]](p: F[B]) : F[A] = p
   }
+
 
   /** We can witness equality by using it to convert between types */
   implicit def witness[A,B](lt: A <~: B) : A => B = {
@@ -246,6 +251,41 @@ object Liskov {
     r.subst[r](d.subst[d](c.subst[c](b.subst[b](a.subst[a](refl)))))
   }
 
-  // def bracket[A,B](_: A <~: B, _: A :~> B): Leibniz[A,B] = Leibniz.force[A,B]
+  /** If A <: B and B :> A then A = B */
+  def bracket[A,B](
+    ab : A <~: B, 
+    ba : A :~> B
+  ): Leibniz[A,B] = Leibniz.force[A,B]
+
+  /** Unsafely force a claim that A is a subtype of B */
+  def force[A,B]: A <~: B = new (A <~: B) { 
+    def subst[F[-_]](p: F[B]) : F[A] = p.asInstanceOf[F[A]]
+  }
+
+  import Injectivity._
+
+  def unco[F[+_]:Injective,Z,A](
+    a: F[A] <~: F[Z]
+  ) : (A <~: Z) = force[A,Z]
+
+  def unco2_1[F[+_,_]:Injective2,Z,A,B](
+    a: F[A,B] <~: F[Z,B]
+  ) : (A <~: Z) = force[A,Z]
+
+  def unco2_2[F[_,+_]:Injective2,Z,A,B](
+    a: F[A,B] <~: F[A,Z]
+  ) : (B <~: Z) = force[B,Z]
+
+  def uncontra[F[-_]:Injective,Z,A](
+    a: F[A] <~: F[Z]
+  ) : (Z <~: A) = force[Z,A]
+
+  def uncontra2_1[F[-_,_]:Injective2,Z,A,B](
+    a: F[A,B] <~: F[Z,B]
+  ) : (Z <~: A) = force[Z,A]
+
+  def uncontra2_2[F[_,-_]:Injective2,Z,A,B](
+    a: F[A,B] <~: F[A,Z]
+  ) : (Z <~: B) = force[Z,B]
 }
 
