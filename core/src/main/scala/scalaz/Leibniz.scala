@@ -137,7 +137,9 @@ object Leibniz {
     = (force[A,A2], force[B,B2], force[C,C2], force[D,D2], force[E,E2])
 
   /*
-  implicit leibnizFunction1Functor : GeneralizedFunctor[Id,~,Function1] = new GeneralizedFunctor[Id,~,Function1] {
+  implicit leibnizFunction1Functor 
+    : GeneralizedFunctor[Id,~,Function1] = 
+  new GeneralizedFunctor[Id,~,Function1] {
     def dom = implicitly[Category[~]]
     def cod = implicitly[Category[Function1]]
     def fmap[A,B](f: A ~ B): A => B = witness(f)

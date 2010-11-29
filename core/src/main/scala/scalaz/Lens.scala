@@ -96,10 +96,6 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   /** Mapping a lens yields a state action to avoid ambiguity */
   def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(this(a))))
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
-    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
-  )
 }
 
 object Lens { 
@@ -138,6 +134,12 @@ object Lens {
     new GeneralizedFunctor[Lens,Function1,Id] {
       def fmap[A,B](lens: Lens[A,B]) = lens.apply
     }
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
+    Lens[S,A](s => lens(s)._1, (s,a) => lens.mod(s, t => t copy (_1 = a))),
+    Lens[S,B](s => lens(s)._2, (s,a) => lens.mod(s, t => t copy (_2 = a)))
+  )
 
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple3Lens[S,A,B,C](lens: Lens[S,(A,B,C)]) = (
