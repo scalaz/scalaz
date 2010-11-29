@@ -18,9 +18,9 @@ object Nu_ {
 }
 
 /** 
- * Possibly negative recursion. Note Mu_ is not a subtype of Nu_ 
- * because generating Nu_[F] from Mu_[F] requires a Functor for F
- * or subtyping.
+ * Possibly negative recursion. 
+ * Note Mu_ is not a subtype of Nu_, because generating Nu_[F] from Mu_[F] 
+ * requires a Functor for F or subtyping.
  */
 trait Mu_[F[_]] extends Immutable {
   val out: F[Mu_[F]]
@@ -31,7 +31,7 @@ object Mu_ {
   implicit def unwrap[F[_]](v: Mu_[F]) = v.out
 } 
 
-/** Positive corecursion.  */
+/** Positive corecursion */
 
 // ideal: trait Nu[+F[+_]] extends Nu_[F] {
 // works: trait Nu[+F[+_]] { 

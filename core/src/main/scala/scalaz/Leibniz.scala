@@ -100,7 +100,7 @@ object Leibniz {
     def subst[F[_]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
   }
 
-  /** Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) ~ (C,D)) => (A ~ C)</code> is inhabited without appealing to force.
+  /** Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) ~ (C,D)) => (A ~ C)</code> is inhabited.
     * <p>
     * Haskell can work around this issue by abusing type families as noted in
     * <a href="http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html">Leibniz equality can be injective</a> (Oleg Kiselyov, Haskell Cafe Mailing List 2010)
