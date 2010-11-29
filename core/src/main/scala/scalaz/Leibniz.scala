@@ -1,9 +1,10 @@
 package scalaz
 
+
 /** Leibnizian equality: A better =:= 
   *
-  * This technique was first used in "Typing Dynamic Typing" (Baars and Swierstra, ICFP 2002) 
-  * http://portal.acm.org/citation.cfm?id=583852.581494
+  * This technique was first used in 
+  * <a href="http://portal.acm.org/citation.cfm?id=583852.581494">Typing Dynamic Typing</a> (Baars and Swierstra, ICFP 2002).
   */
 
 trait Leibniz[A,B] {
@@ -91,38 +92,24 @@ object Leibniz {
     e.subst[e](d.subst[d](c.subst[c](b.subst[b](a.subst[a](refl)))))
   }
 
-  /** This is an assertion that a type is injective. 
-    * Pure Leibnizian equality cannot check injectivity without 'subtractive contexts', which Scala lacks. So we cheat.
-    * This issue was raised in "Leibniz equality can be injective" (Oleg Kiselyov, Haskell Cafe Mailing List 2010):
-    * http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html
-    */
 
-  case class Injective[T[_]]()
-  case class Injective2[T[_,_]]()
-  case class Injective3[T[_,_,_]]()
-  case class Injective4[T[_,_,_,_]]()
-  case class Injective5[T[_,_,_,_,_]]()
-
-  implicit def ListInjective = Injective[List]
-  implicit def SetInjective = Injective[Set]
-  implicit def EitherInjective = Injective2[Either]
-  implicit def ValidationInjective = Injective2[Validation]
-
-  implicit def Tuple2Injective = Injective2[Tuple2]
-  implicit def Tuple3Injective = Injective3[Tuple3]
-  implicit def Tuple4Injective = Injective4[Tuple4]
-  implicit def Tuple5Injective = Injective5[Tuple5]
-
-  implicit def Function0Injective = Injective[Function0]
-  implicit def Function1Injective = Injective2[Function1]
-  implicit def Function2Injective = Injective3[Function2]
-  implicit def Function3Injective = Injective4[Function3]
-  implicit def Function4Injective = Injective5[Function4]
+  /** Force abuses asInstanceOf to explicitly coerce types. It is unsafe, but needed where Leibnizian equality isn't sufficient */
 
   /** Unsafe coercion between types */
   def force[A,B] : (A ~ B) = new (A ~ B) { 
     def subst[F[_]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
   }
+
+  /** Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) ~ (C,D)) => (A ~ C)</code> is inhabited without appealing to force.
+    * <p>
+    * Haskell can work around this issue by abusing type families as noted in
+    * <a href="http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html">Leibniz equality can be injective</a> (Oleg Kiselyov, Haskell Cafe Mailing List 2010)
+    * but we instead turn to force.
+    * </p>
+    *
+    */
+
+  import Injectivity._
 
   def lower[T[_]:Injective,A,A2](
     t: T[A] ~ T[A2]
