@@ -46,17 +46,17 @@ object Monad {
 
   implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Bind, Tuple7Pure)
   
-  implicit def Function1Monad[R]: Monad[({type λ[α]=Function1[R, α]})#λ] = monad[({type λ[α]=Function1[R, α]})#λ](Function1Bind, Function1Pure)
+  implicit def Function1Monad[R]: Monad[({type λ[α]=(R) => α})#λ] = monad[({type λ[α]=(R) => α})#λ](Function1Bind, Function1Pure)
 
-  implicit def Function2Monad[R, S]: Monad[({type λ[α]=Function2[R, S, α]})#λ] = monad[({type λ[α]=Function2[R, S, α]})#λ](Function2Bind, Function2Pure)
+  implicit def Function2Monad[R, S]: Monad[({type λ[α]=(R, S) => α})#λ] = monad[({type λ[α]=(R, S) => α})#λ](Function2Bind, Function2Pure)
 
-  implicit def Function3Monad[R, S, T]: Monad[({type λ[α]=Function3[R, S, T, α]})#λ] = monad[({type λ[α]=Function3[R, S, T, α]})#λ](Function3Bind, Function3Pure)
+  implicit def Function3Monad[R, S, T]: Monad[({type λ[α]=(R, S, T) => α})#λ] = monad[({type λ[α]=(R, S, T) => α})#λ](Function3Bind, Function3Pure)
 
-  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α]=Function4[R, S, T, U, α]})#λ] = monad[({type λ[α]=Function4[R, S, T, U, α]})#λ](Function4Bind, Function4Pure)
+  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α]=(R, S, T, U) => α})#λ] = monad[({type λ[α]=(R, S, T, U) => α})#λ](Function4Bind, Function4Pure)
 
-  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Bind, Function5Pure)
+  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=(R, S, T, U, V) => α})#λ] = monad[({type λ[α]=(R, S, T, U, V) => α})#λ](Function5Bind, Function5Pure)
 
-  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = monad[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ](Function6Bind, Function6Pure)
+  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
 
   implicit def EitherLeftMonad[X]: Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip] = monad[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftBind, EitherLeftPure)
   

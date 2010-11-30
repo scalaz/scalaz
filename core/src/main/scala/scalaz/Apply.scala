@@ -43,17 +43,17 @@ object Apply extends ApplyLow {
 
   implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ]
     
-  implicit def Function1Apply[R]: Apply[({type λ[α]=Function1[R, α]})#λ] = FunctorBindApply[({type λ[α]=Function1[R, α]})#λ]
+  implicit def Function1Apply[R]: Apply[({type λ[α]=(R) => α})#λ] = FunctorBindApply[({type λ[α]=(R) => α})#λ]
 
-  implicit def Function2Apply[R, S]: Apply[({type λ[α]=Function2[R, S, α]})#λ] = FunctorBindApply[({type λ[α]=Function2[R, S, α]})#λ]
+  implicit def Function2Apply[R, S]: Apply[({type λ[α]=(R, S) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S) => α})#λ]
 
-  implicit def Function3Apply[R, S, T]: Apply[({type λ[α]=Function3[R, S, T, α]})#λ] = FunctorBindApply[({type λ[α]=Function3[R, S, T, α]})#λ]
+  implicit def Function3Apply[R, S, T]: Apply[({type λ[α]=(R, S, T) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T) => α})#λ]
 
-  implicit def Function4Apply[R, S, T, U]: Apply[({type λ[α]=Function4[R, S, T, U, α]})#λ] = FunctorBindApply[({type λ[α]=Function4[R, S, T, U, α]})#λ]
+  implicit def Function4Apply[R, S, T, U]: Apply[({type λ[α]=(R, S, T, U) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U) => α})#λ]
 
-  implicit def Function5Apply[R, S, T, U, V]: Apply[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = FunctorBindApply[({type λ[α]=Function5[R, S, T, U, V, α]})#λ]
+  implicit def Function5Apply[R, S, T, U, V]: Apply[({type λ[α]=(R, S, T, U, V) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V) => α})#λ]
 
-  implicit def Function6Apply[R, S, T, U, V, W]: Apply[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = FunctorBindApply[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]
+  implicit def Function6Apply[R, S, T, U, V, W]: Apply[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
   implicit def EitherLeftApply[X]: Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip] = FunctorBindApply[PartialApply1Of2[Either.LeftProjection, X]#Flip]
 

@@ -24,7 +24,7 @@ object Index {
   }
 
   implicit def Function0Index: Index[Function0] = new Index[Function0] {
-    def index[A](a: Function0[A], i: Int) = if(i == 0) Some(a.apply) else None
+    def index[A](a: () => A, i: Int) = if(i == 0) Some(a.apply) else None
   }
 
   implicit def OptionIndex: Index[Option] = new Index[Option] {

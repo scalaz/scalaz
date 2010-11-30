@@ -56,7 +56,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     checkEqualLaws[(A, B, C, D, E)]
     checkEqualLaws[(A, B, C, D, E, F)]
     checkEqualLaws[(A, B, C, D, E, F, G)]
-    checkEqualLaws[Function0[A]]
+    checkEqualLaws[() => A]
     checkEqualLaws[Option[A]]
     checkEqualLaws[FirstOption[A]]
     checkEqualLaws[LastOption[A]]

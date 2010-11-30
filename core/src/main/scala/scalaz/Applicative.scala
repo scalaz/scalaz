@@ -45,17 +45,17 @@ object Applicative {
 
   implicit def Tuple7Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Applicative[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = applicative[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Pure, Tuple7Apply)
   
-  implicit def Function1Applicative[R]: Applicative[({type λ[α]=Function1[R, α]})#λ] = applicative[({type λ[α]=Function1[R, α]})#λ](Function1Pure, Function1Apply)
+  implicit def Function1Applicative[R]: Applicative[({type λ[α]=(R) => α})#λ] = applicative[({type λ[α]=(R) => α})#λ](Function1Pure, Function1Apply)
 
-  implicit def Function2Applicative[R, S]: Applicative[({type λ[α]=Function2[R, S, α]})#λ] = applicative[({type λ[α]=Function2[R, S, α]})#λ](Function2Pure, Function2Apply)
+  implicit def Function2Applicative[R, S]: Applicative[({type λ[α]=(R, S) => α})#λ] = applicative[({type λ[α]=(R, S) => α})#λ](Function2Pure, Function2Apply)
 
-  implicit def Function3Applicative[R, S, T]: Applicative[({type λ[α]=Function3[R, S, T, α]})#λ] = applicative[({type λ[α]=Function3[R, S, T, α]})#λ](Function3Pure, Function3Apply)
+  implicit def Function3Applicative[R, S, T]: Applicative[({type λ[α]=(R, S, T) => α})#λ] = applicative[({type λ[α]=(R, S, T) => α})#λ](Function3Pure, Function3Apply)
 
-  implicit def Function4Applicative[R, S, T, U]: Applicative[({type λ[α]=Function4[R, S, T, U, α]})#λ] = applicative[({type λ[α]=Function4[R, S, T, U, α]})#λ](Function4Pure, Function4Apply)
+  implicit def Function4Applicative[R, S, T, U]: Applicative[({type λ[α]=(R, S, T, U) => α})#λ] = applicative[({type λ[α]=(R, S, T, U) => α})#λ](Function4Pure, Function4Apply)
 
-  implicit def Function5Applicative[R, S, T, U, V]: Applicative[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = applicative[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Pure, Function5Apply)
+  implicit def Function5Applicative[R, S, T, U, V]: Applicative[({type λ[α]=(R, S, T, U, V) => α})#λ] = applicative[({type λ[α]=(R, S, T, U, V) => α})#λ](Function5Pure, Function5Apply)
 
-  implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = applicative[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ](Function6Pure, Function6Apply)
+  implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Pure, Function6Apply)
 
   implicit def EitherLeftApplicative[X]: Applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip] = applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftPure, EitherLeftApply)
   

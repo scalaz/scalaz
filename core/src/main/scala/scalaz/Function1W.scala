@@ -32,5 +32,5 @@ trait Function1s {
     val k = f
   }
 
-  implicit def Function1From[T, R](f: Function1W[T, R]): Function1[T, R] = f.k
+  implicit def Function1From[T, R](f: Function1W[T, R]): (T) => R = f.k
 }

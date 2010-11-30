@@ -73,27 +73,27 @@ object Pure {
     }
   }
 
-  implicit def Function1Pure[R]: Pure[({type λ[α]=Function1[R, α]})#λ] = new Pure[({type λ[α]=Function1[R, α]})#λ] {
+  implicit def Function1Pure[R]: Pure[({type λ[α]=(R) => α})#λ] = new Pure[({type λ[α]=(R) => α})#λ] {
     def pure[A](a: => A) = (_: R) => a
   }
 
-  implicit def Function2Pure[R, S]: Pure[({type λ[α]=Function2[R, S, α]})#λ] = new Pure[({type λ[α]=Function2[R, S, α]})#λ] {
+  implicit def Function2Pure[R, S]: Pure[({type λ[α]=(R, S) => α})#λ] = new Pure[({type λ[α]=(R, S) => α})#λ] {
     def pure[A](a: => A) = (_: R, _: S) => a
   }
 
-  implicit def Function3Pure[R, S, T]: Pure[({type λ[α]=Function3[R, S, T, α]})#λ] = new Pure[({type λ[α]=Function3[R, S, T, α]})#λ] {
+  implicit def Function3Pure[R, S, T]: Pure[({type λ[α]=(R, S, T) => α})#λ] = new Pure[({type λ[α]=(R, S, T) => α})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T) => a
   }
 
-  implicit def Function4Pure[R, S, T, U]: Pure[({type λ[α]=Function4[R, S, T, U, α]})#λ] = new Pure[({type λ[α]=Function4[R, S, T, U, α]})#λ] {
+  implicit def Function4Pure[R, S, T, U]: Pure[({type λ[α]=(R, S, T, U) => α})#λ] = new Pure[({type λ[α]=(R, S, T, U) => α})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U) => a
   }
 
-  implicit def Function5Pure[R, S, T, U, V]: Pure[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = new Pure[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] {
+  implicit def Function5Pure[R, S, T, U, V]: Pure[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Pure[({type λ[α]=(R, S, T, U, V) => α})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
   }
 
-  implicit def Function6Pure[R, S, T, U, V, W]: Pure[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Pure[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
+  implicit def Function6Pure[R, S, T, U, V, W]: Pure[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Pure[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
 

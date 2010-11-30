@@ -19,7 +19,7 @@ trait Cofunctor[F[_]] extends InvariantFunctor[F] {
 object Cofunctor {
   import Scalaz._
 
-  implicit def Function1Cofunctor[X]: Cofunctor[({type λ[α]=Function1[α, X]})#λ] = new Cofunctor[({type λ[α]=Function1[α, X]})#λ] {
+  implicit def Function1Cofunctor[X]: Cofunctor[({type λ[α]=(α) => X})#λ] = new Cofunctor[({type λ[α]=(α) => X})#λ] {
     def comap[A, B](r: A => X, f: B => A) = r compose f
   }
 

@@ -24,7 +24,7 @@ object Length {
   }
 
   implicit def Function0Length: Length[Function0] = new Length[Function0] {
-    def len[A](a: Function0[A]) = 1
+    def len[A](a: () => A) = 1
   }
 
   implicit def OptionLength: Length[Option] = new Length[Option] {

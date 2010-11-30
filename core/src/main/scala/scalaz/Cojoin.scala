@@ -24,7 +24,7 @@ object Cojoin {
   }
 
   implicit def Function0Cojoin: Cojoin[Function0] = new Cojoin[Function0] {
-    def cojoin[A](a: Function0[A]) = () => a
+    def cojoin[A](a: () => A) = () => a
   }
 
   import java.util.concurrent.Callable

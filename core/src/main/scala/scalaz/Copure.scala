@@ -28,7 +28,7 @@ object Copure {
   }
 
   implicit def Function0Copure: Copure[Function0] = new Copure[Function0] {
-    def copure[A](a: Function0[A]) = a.apply
+    def copure[A](a: () => A) = a.apply
   }
 
   import java.util.concurrent.Callable

@@ -77,30 +77,30 @@ object Bind {
   }
 
   implicit def Function0Bind: Bind[Function0] = new Bind[Function0] {
-    def bind[A, B](r: Function0[A], f: A => Function0[B]) = f(r.apply)
+    def bind[A, B](r: () => A, f: A => (() => B)) = f(r.apply)
   }
 
-  implicit def Function1Bind[R]: Bind[({type λ[α]=Function1[R, α]})#λ] = new Bind[({type λ[α]=Function1[R, α]})#λ] {
+  implicit def Function1Bind[R]: Bind[({type λ[α]=(R) => α})#λ] = new Bind[({type λ[α]=(R) => α})#λ] {
     def bind[A, B](r: R => A, f: A => R => B) = (t: R) => f(r(t))(t)
   }
 
-  implicit def Function2Bind[R, S]: Bind[({type λ[α]=Function2[R, S, α]})#λ] = new Bind[({type λ[α]=Function2[R, S, α]})#λ] {
+  implicit def Function2Bind[R, S]: Bind[({type λ[α]=(R, S) => α})#λ] = new Bind[({type λ[α]=(R, S) => α})#λ] {
     def bind[A, B](r: (R, S) => A, f: A => (R, S) => B) = (t1: R, t2: S) => f(r(t1, t2))(t1, t2)
   }
 
-  implicit def Function3Bind[R, S, T]: Bind[({type λ[α]=Function3[R, S, T, α]})#λ] = new Bind[({type λ[α]=Function3[R, S, T, α]})#λ] {
+  implicit def Function3Bind[R, S, T]: Bind[({type λ[α]=(R, S, T) => α})#λ] = new Bind[({type λ[α]=(R, S, T) => α})#λ] {
     def bind[A, B](r: (R, S, T) => A, f: A => (R, S, T) => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))(t1, t2, t3)
   }
 
-  implicit def Function4Bind[R, S, T, U]: Bind[({type λ[α]=Function4[R, S, T, U, α]})#λ] = new Bind[({type λ[α]=Function4[R, S, T, U, α]})#λ] {
+  implicit def Function4Bind[R, S, T, U]: Bind[({type λ[α]=(R, S, T, U) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U) => α})#λ] {
     def bind[A, B](r: (R, S, T, U) => A, f: A => (R, S, T, U) => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))(t1, t2, t3, t4)
   }
 
-  implicit def Function5Bind[R, S, T, U, V]: Bind[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = new Bind[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] {
+  implicit def Function5Bind[R, S, T, U, V]: Bind[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U, V) => α})#λ] {
     def bind[A, B](r: (R, S, T, U, V) => A, f: A => (R, S, T, U, V) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
   }
 
-  implicit def Function6Bind[R, S, T, U, V, W]: Bind[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Bind[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
+  implicit def Function6Bind[R, S, T, U, V, W]: Bind[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W) => A, f: A => (R, S, T, U, V, W) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 

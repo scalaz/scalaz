@@ -102,9 +102,9 @@ object Foldable extends FoldableLow {
   }
 
   implicit def Function0Foldable: Foldable[Function0] = new Foldable[Function0] {
-    override def foldLeft[A, B](t: Function0[A], b: B, f: (B, A) => B) = f(b, t.apply)
+    override def foldLeft[A, B](t: () => A, b: B, f: (B, A) => B) = f(b, t.apply)
 
-    override def foldRight[A, B](t: Function0[A], b: => B, f: (A, => B) => B) = f(t.apply, b)
+    override def foldRight[A, B](t: () => A, b: => B, f: (A, => B) => B) = f(t.apply, b)
   }
 
   implicit def OptionFoldable: Foldable[Option] = new Foldable[Option] {

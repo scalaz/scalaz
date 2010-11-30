@@ -81,27 +81,27 @@ object Functor {
     }
   }
 
-  implicit def Function1Functor[R]: Functor[({type λ[α]=Function1[R, α]})#λ] = new Functor[({type λ[α]=Function1[R, α]})#λ] {
+  implicit def Function1Functor[R]: Functor[({type λ[α]=(R) => α})#λ] = new Functor[({type λ[α]=(R) => α})#λ] {
     def fmap[A, B](r: R => A, f: A => B) = r andThen f
   }
 
-  implicit def Function2Functor[R, S]: Functor[({type λ[α]=Function2[R, S, α]})#λ] = new Functor[({type λ[α]=Function2[R, S, α]})#λ] {
+  implicit def Function2Functor[R, S]: Functor[({type λ[α]=(R, S) => α})#λ] = new Functor[({type λ[α]=(R, S) => α})#λ] {
     def fmap[A, B](r: (R, S) => A, f: A => B) = (t1: R, t2: S) => f(r(t1, t2))
   }
 
-  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=Function3[R, S, T, α]})#λ] = new Functor[({type λ[α]=Function3[R, S, T, α]})#λ] {
+  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=(R, S, T) => α})#λ] = new Functor[({type λ[α]=(R, S, T) => α})#λ] {
     def fmap[A, B](r: (R, S, T) => A, f: A => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
   }
 
-  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=Function4[R, S, T, U, α]})#λ] = new Functor[({type λ[α]=Function4[R, S, T, U, α]})#λ] {
+  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
   }
 
-  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = new Functor[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] {
+  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U, V) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
   }
 
-  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Functor[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 

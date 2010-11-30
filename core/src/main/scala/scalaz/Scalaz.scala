@@ -93,19 +93,19 @@ object Scalaz extends ScalazLow
 
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[PartialApply1Of2[Either.RightProjection, X]#Apply, A] = ma[PartialApply1Of2[Either.RightProjection, X]#Apply, A](a)
 
-  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[({type λ[α]=Function1[α, A]})#λ, R] = maCofunctor[({type λ[α]=Function1[α, A]})#λ, R](f)
+  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[({type λ[α]=(α) => A})#λ, R] = maCofunctor[({type λ[α]=(α) => A})#λ, R](f)
 
-  implicit def Function1ApplyMA[A, R](f: A => R): MA[({type λ[α]=Function1[A, α]})#λ, R] = ma[({type λ[α]=Function1[A, α]})#λ, R](f)
+  implicit def Function1ApplyMA[A, R](f: A => R): MA[({type λ[α]=(A) => α})#λ, R] = ma[({type λ[α]=(A) => α})#λ, R](f)
 
-  implicit def Function2MA[R, S, A](a: (R, S) => A): MA[({type λ[α]=Function2[R, S, α]})#λ, A] = ma[({type λ[α]=Function2[R, S, α]})#λ, A](a)
+  implicit def Function2MA[R, S, A](a: (R, S) => A): MA[({type λ[α]=(R, S) => α})#λ, A] = ma[({type λ[α]=(R, S) => α})#λ, A](a)
 
-  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A): MA[({type λ[α]=Function3[R, S, T, α]})#λ, A] = ma[({type λ[α]=Function3[R, S, T, α]})#λ, A](a)
+  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A): MA[({type λ[α]=(R, S, T) => α})#λ, A] = ma[({type λ[α]=(R, S, T) => α})#λ, A](a)
 
-  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A): MA[({type λ[α]=Function4[R, S, T, U, α]})#λ, A] = ma[({type λ[α]=Function4[R, S, T, U, α]})#λ, A](a)
+  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A): MA[({type λ[α]=(R, S, T, U) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U) => α})#λ, A](a)
 
-  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A): MA[({type λ[α]=Function5[R, S, T, U, V, α]})#λ, A] = ma[({type λ[α]=Function5[R, S, T, U, V, α]})#λ, A](a)
+  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A): MA[({type λ[α]=(R, S, T, U, V) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U, V) => α})#λ, A](a)
 
-  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ, A] = ma[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ, A](a)
+  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[({type λ[α]=(R, S, T, U, V, W) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, W) => α})#λ, A](a)
 
   implicit def ConstMA[B, A](c: Const[B, A]): MA[({type λ[α]=Const[B, α]})#λ, A] = ma[({type λ[α]=Const[B, α]})#λ, A](c)
 

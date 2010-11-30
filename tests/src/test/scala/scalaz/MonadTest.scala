@@ -46,11 +46,11 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)}
     implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)}
 //    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[({type λ[α]=Function1[B, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Function2[B, C, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Function3[B, C, D, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Function4[B, C, D, E, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Function5[B, C, D, E, F, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=(B) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F) => α})#λ, A]
 //    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
     checkMonadLaws[PartialApply1Of2[Either.LeftProjection, X]#Flip, A]
     checkMonadLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]

@@ -40,7 +40,7 @@ object Traverse {
   }
 
   implicit def Function0Traverse: Traverse[Function0] = new Traverse[Function0] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Function0[A]) = f(t.apply) ∘ ((b: B) => () => b)
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], t: () => A) = f(t.apply) ∘ ((b: B) => () => b)
   }
 
   implicit def OptionTraverse: Traverse[Option] = new Traverse[Option] {

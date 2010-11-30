@@ -52,7 +52,7 @@ object Each {
   }
 
   implicit def Function0Each: Each[Function0] = new Each[Function0] {
-    def each[A](e: Function0[A], f: A => Unit) = f(e.apply)
+    def each[A](e: () => A, f: A => Unit) = f(e.apply)
   }
 
   implicit def TraversableOnceEach[A]: Each[TraversableOnce] = new Each[TraversableOnce] {
