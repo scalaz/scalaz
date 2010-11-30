@@ -5,7 +5,7 @@ package scalaz
   * This represents an assertion that is used by other code that requires this condition.
   * 
   */
-case class Injective[T[_]]()
+case class Injective [T[_]]() 
 case class Injective2[T[_,_]]()
 case class Injective3[T[_,_,_]]()
 case class Injective4[T[_,_,_,_]]()
