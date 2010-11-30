@@ -13,37 +13,39 @@ package scalaz
  * </p>
  */
 
-trait GeneralizedCategory {
-  // Type members used instead of type parameters to work around http://lampsvn.epfl.ch/trac/scala/ticket/4043
-  type L
-  type H >: L
+trait GeneralizedCategory[L,H>:L] {
+  // Type member used instead of type parameter to work around http://lampsvn.epfl.ch/trac/scala/ticket/4043
   type ~>[_ >: L <: H, _ >: L <: H]
 
   def id[A>:L<:H]: A ~> A
   def compose[A>:L<:H, B>:L<:H, C>:L<:H](f: B ~> C, g: A ~> B): A ~> C
+
+/*
+  def *[LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]](
+    that : GeneralizedCategory[LY,HY] { type ~>[A>:LY<:HY,B>:LY<:HY] = Y[A,B]; }
+  ) = Category.Product[L,H,~>,LY,HY,Y](this,that)
+*/
 }
 
-trait GeneralizedGroupoid extends GeneralizedCategory { 
+trait GeneralizedGroupoid[L,H>:L] extends GeneralizedCategory[L,H] { 
   def invert[A>:L<:H,B>:L<:H](f : A ~> B): B ~> A
 }
 
-trait Category[X[_, _]] extends GeneralizedCategory {
-  type L = Nothing
-  type H = Any
+trait Category[X[_, _]] extends GeneralizedCategory[Nothing,Any] {
   type ~>[A, B] = X[A, B]
 }
 
-trait Groupoid[X[_, _]] extends GeneralizedGroupoid with Category[X]
+trait Groupoid[X[_, _]] extends GeneralizedGroupoid[Nothing,Any] with Category[X]
 
 object Category {
   import Scalaz._
   import Leibniz._
 
-
   /* 
    * Product Categories
    */
 
+  /** Index for a product category. This is a pair enriched with its member types */
   case class P[+IX,+IY](_1: IX, _2: IY) { type _1 = IX; type _2 = IY }
 
   abstract sealed class Product[
@@ -57,13 +59,13 @@ object Category {
     ):(X[AX,BX],Y[AY,BY])
   }
 
-  implicit def ProductCategory[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
-    implicit x: GeneralizedCategory {type L=LX; type H=HX; type ~>[A>:L<:H,B>:L<:H]=X[A,B]},
-             y: GeneralizedCategory {type L=LY; type H=HY; type ~>[A>:L<:H,B>:L<:H]=Y[A,B]}
-  ) : GeneralizedCategory = new GeneralizedCategory {
+  implicit def Product[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
+    implicit x: GeneralizedCategory[LX,HX] { type ~>[A>:LX<:HX,B>:LX<:HX]=X[A,B]},
+             y: GeneralizedCategory[LY,HY] { type ~>[A>:LY<:HY,B>:LY<:HY]=Y[A,B]}
+  ) : GeneralizedCategory[P[LX,LY],P[HX,HY]] = new GeneralizedCategory[P[LX,LY],P[HX,HY]] {
     type L = P[LX,LY]
     type H = P[HX,HY]
-    type ~>[A >: L <: H, B >: L <: H] = Product[LX, HX, X, LY, HY, Y, A, B]
+    type ~>[A>:L<:H,B>:L<:H] = Product[LX,HX,X,LY,HY,Y,A,B]
 
     def id[A>:P[LX,LY]<:P[HX,HY]] = new Product[LX,HX,X, LY,HY,Y, A, A] {
       def pair[AX>:LX<:HX,AY>:LY<:HY,BX>:LX<:HX,BY>:LY<:HY](
@@ -112,9 +114,7 @@ object Category {
     type Apply[A,B] = M
   }
 
-  implicit def MonoidCategory[M](monoid : Monoid[M]) = new GeneralizedCategory { 
-    type L = Nothing
-    type H = Nothing
+  implicit def MonoidCategory[M](monoid : Monoid[M]) = new GeneralizedCategory[Nothing,Nothing] { 
     type ~>[A,B] = Mon[M]#Apply[A,B]
     def id[A] = monoid.zero
     def compose[A,B,C](m: M, n : M) : M = monoid.append(m, n)

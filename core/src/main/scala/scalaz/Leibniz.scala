@@ -9,14 +9,15 @@ package scalaz
   * It is generalized here to handle subtyping so that it can be used with constrained type constructors
   */
 
-trait Leibniz[-L<:H,+H>:L,A>:L<:H,B>:L<:H] {
+trait Leibniz[-L,+H>:L,A>:L<:H,B>:L<:H] {
   def subst[F[_>:L<:H]](p: F[A]) : F[B]
 }
 
 object Leibniz {
+  /** (A ~ B) is a supertype of Leibniz[L,H,A,B] */
   type ~[A,B] = Leibniz[Nothing,Any,A,B]
 
-  trait PartialApplyLeibniz[-L<:H,+H>:L] {
+  trait PartialApplyLeibniz[-L,+H>:L] {
     type Apply[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
   }
 
@@ -32,20 +33,18 @@ object Leibniz {
      f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
 
   /** Equality is transitive */
-  def trans[L<:H,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](f: Leibniz[L,H,B,C], g: Leibniz[L,H,A,B]) : Leibniz[L,H,A,C] = {
+  def trans[L,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](f: Leibniz[L,H,B,C], g: Leibniz[L,H,A,B]) : Leibniz[L,H,A,C] = {
     type f[X>:L<:H] = Leibniz[L,H,A,X]
     f.subst[f](g)
   }
 
   /** Equality is symmetric */
-  def symm[L<:H,H>:L,A>:L<:H,B>:L<:H](f: Leibniz[L,H,A,B]) : Leibniz[L,H,B,A] = {
+  def symm[L,H>:L,A>:L<:H,B>:L<:H](f: Leibniz[L,H,A,B]) : Leibniz[L,H,B,A] = {
     type f[X>:L<:H] = Leibniz[L,H,X,A]
     f.subst[f](refl)
   }
 
-  sealed class LeibnizGroupoid[L_ <: H_,H_ >: L_] extends GeneralizedGroupoid {
-    type L = L_
-    type H = H_
+  sealed class LeibnizGroupoid[L,H>:L] extends GeneralizedGroupoid[L,H] {
     type ~>[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
 
     def id[A>:L<:H] : Leibniz[A,A,A,A] = refl[A]
@@ -60,11 +59,11 @@ object Leibniz {
     ) : Leibniz[L,H,B,A] = symm(ab)
   }
 
-  implicit def leibnizGroupoid[L<:H,H>:L] : LeibnizGroupoid[L,H] = new LeibnizGroupoid[L,H]
+  implicit def leibnizGroupoid[L,H>:L] : LeibnizGroupoid[L,H] = new LeibnizGroupoid[L,H]
 
   /** We can lift equality into any type constructor */
   def lift[
-    LA<:HA,LT<:HT,
+    LA,LT,
     HA>:LA,HT>:LT,
     T[_>:LA<:HA]>:LT<:HT,
     A>:LA<:HA,A2>:LA<:HA
@@ -77,7 +76,7 @@ object Leibniz {
 
   /** We can lift equality into any type constructor */
   def lift2[
-    LA<:HA,LB<:HB,LT<:HT,
+    LA,LB,LT,
     HA>:LA,HB>:LB,HT>:LT,
     T[_>:LA<:HA,_>:LB<:HB]>:LT<:HT,
     A>:LA<:HA,A2>:LA<:HA,
@@ -93,7 +92,7 @@ object Leibniz {
 
   /** We can lift equality into any type constructor */
   def lift3[
-   LA<:HA,LB<:HB,LC<:HC,LT<:HT,
+   LA,LB,LC,LT,
    HA>:LA,HB>:LB,HC>:LC,HT>:LT,
    T[_>:LA<:HA,_>:LB<:HB,_>:LC<:HC]>:LT<:HT,
    A>:LA<:HA,A2>:LA<:HA,
@@ -116,7 +115,7 @@ object Leibniz {
    * It is unsafe, but needed where Leibnizian equality isn't sufficient 
    */
 
-  def force[L<:H,H>:L,A>:L<:H,B>:L<:H] : Leibniz[L,H,A,B] = new Leibniz[L,H,A,B] {
+  def force[L,H>:L,A>:L<:H,B>:L<:H] : Leibniz[L,H,A,B] = new Leibniz[L,H,A,B] {
     def subst[F[_>:L<:H]](fa: F[A]) : F[B] = fa.asInstanceOf[F[B]]
   }
 
@@ -133,8 +132,8 @@ object Leibniz {
   // import Injectivity._
 
   def lower[
-    LA<:HA,HA>:LA,
-    LT<:HT,HT>:LT,
+    LA,HA>:LA,
+    LT,HT>:LT,
     T[_>:LA<:HA]>:LT<:HT, //:Injective,
     A>:LA<:HA,A2>:LA<:HA
   ](
@@ -143,8 +142,8 @@ object Leibniz {
       = force[LA,HA,A,A2]
 
   def lower2[
-    LA<:HA,HA>:LA,
-    LB<:HB,HB>:LB,
+    LA,HA>:LA,
+    LB,HB>:LB,
     T[_>:LA<:HA,_>:LB<:HB], // :Injective2,
     A>:LA<:HA,A2>:LA<:HA,
     B>:LB<:HB,B2>:LB<:HB
