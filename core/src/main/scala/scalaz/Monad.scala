@@ -32,7 +32,7 @@ object Monad {
 
   implicit def StateMonad[A] = monad[({type λ[α]=State[A, α]})#λ](StateBind, StatePure)
 
-  implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) = monad[PartialApplyKA[StateT, M, A]#Apply](StateTBind(b), StateTPure(p))
+  implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) = monad[({type λ[α]=StateT[M, A, α]})#λ](StateTBind(b), StateTPure(p))
 
   implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=(R, α)})#λ] = monad[({type λ[α]=(R, α)})#λ](Tuple2Bind, Tuple2Pure)
 

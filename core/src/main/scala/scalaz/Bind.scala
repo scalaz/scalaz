@@ -19,7 +19,7 @@ object Bind {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
   }
 
-  implicit def StateTBind[M[_]:Bind, S]: Bind[PartialApplyKA[StateT, M, S]#Apply] = new Bind[PartialApplyKA[StateT, M, S]#Apply] {
+  implicit def StateTBind[M[_]:Bind, S]: Bind[({type λ[α]=StateT[M, S, α]})#λ] = new Bind[({type λ[α]=StateT[M, S, α]})#λ] {
     def bind[A, B](r: StateT[M, S, A], f: A => StateT[M, S, B]) = r flatMap f
   }
 

@@ -139,7 +139,7 @@ object Functor {
     }
   }
 
-  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[PartialApplyKA[Kleisli, M, P]#Apply] = new Functor[PartialApplyKA[Kleisli, M, P]#Apply] {
+  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[({type λ[α]=Kleisli[M, P, α]})#λ] = new Functor[({type λ[α]=Kleisli[M, P, α]})#λ] {
     def fmap[A, B](k: Kleisli[M, P, A], f: A => B): Kleisli[M, P, B] = ☆((p: P) => ff.fmap(k(p), f))
   }
 
@@ -190,12 +190,12 @@ object Functor {
 
   import FingerTree._
 
-  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new Functor[PartialType2[ViewL, S]#Apply] {
+  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
     def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
       t.fold(EmptyL[S, B], (x, xs) => f(x) &: s.fmap(xs, f))
   }
 
-  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new Functor[PartialType2[ViewR, S]#Apply] {
+  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
     def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
       t.fold(EmptyR[S, B], (xs, x) => s.fmap(xs, f) :& f(x))
   }

@@ -139,7 +139,7 @@ object Scalaz extends ScalazLow
   // Set[A] implements Function1[Int, B]. Without this, Function1ApplyMA would be used.
   implicit def SetMA[M[X] <: Set[X], A](s: M[A]): MA[M, A] = ma[M, A](s)
 
-  implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[PartialApplyKA[Kleisli, M, A]#Apply, B] = ma[PartialApplyKA[Kleisli, M, A]#Apply, B](k)
+  implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[({type λ[α]=Kleisli[M, A, α]})#λ, B] = ma[({type λ[α]=Kleisli[M, A, α]})#λ, B](k)
 
   implicit def FingerTreeMA[V, A](t: FingerTree[V, A]): MA[({type λ[α]=FingerTree[V, α]})#λ, A] = ma[({type λ[α]=FingerTree[V, α]})#λ, A](t)
 
@@ -150,10 +150,10 @@ object Scalaz extends ScalazLow
   implicit def MemoMA[V, A](m: Memo[A, V]): MA[({type λ[α]=Memo[α, V]})#λ, A] = ma[({type λ[α]=Memo[α, V]})#λ, A](m)
 
   // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
-  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
+  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[({type λ[α, β]=Kleisli[M, α, β]})#λ, A, B] = mab[({type λ[α, β]=Kleisli[M, α, β]})#λ, A, B](k)
 
-  implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[PartialApplyK[Cokleisli, M]#Apply, A, B] = mab[PartialApplyK[Cokleisli, M]#Apply, A, B](k)
+  implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[({type λ[α, β]=Cokleisli[M, α, β]})#λ, A, B] = mab[({type λ[α, β]=Cokleisli[M, α, β]})#λ, A, B](k)
 
-  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
-    mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)    
+  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[({type λ[α, β]=Const2[M, α, β]})#λ, A, B] =
+    mab[({type λ[α, β]=Const2[M, α, β]})#λ, A, B](k)
 }

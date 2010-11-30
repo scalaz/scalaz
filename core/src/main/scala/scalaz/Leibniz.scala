@@ -29,7 +29,7 @@ object Leibniz {
    * We rely on subtyping to enable this to work for any Leibniz arrow 
    */
   implicit def witness[A,B](f: A ~ B) : A => B = 
-     f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
+     f.subst[({type λ[α]=A => α})#λ](identity)
 
   /** Equality is transitive */
   def trans[L<:H,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](f: Leibniz[L,H,B,C], g: Leibniz[L,H,A,B]) : Leibniz[L,H,A,C] = {

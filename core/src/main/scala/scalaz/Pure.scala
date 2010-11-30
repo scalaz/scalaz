@@ -34,8 +34,8 @@ object Pure {
     def pure[A](a: => A) = a.state[S]
   }
 
-  implicit def StateTPure[S, M[_]: Pure]: Pure[PartialApplyKA[StateT, M, S]#Apply] =
-    new Pure[PartialApplyKA[StateT, M, S]#Apply] {
+  implicit def StateTPure[S, M[_]: Pure]: Pure[({type λ[α]=StateT[M, S, α]})#λ] =
+    new Pure[({type λ[α]=StateT[M, S, α]})#λ] {
       def pure[A](a: => A) = stateT(s => ((s, a)).pure[M])
     }
 
