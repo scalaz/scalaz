@@ -18,6 +18,7 @@ object Leibniz {
 
   trait PartialApplyLeibniz[-L<:H,+H>:L] {
     type Apply[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+
   }
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
