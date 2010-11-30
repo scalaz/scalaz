@@ -1,21 +1,29 @@
 package scalaz
 
 
-/** Leibnizian equality: A better =:= 
-  *
-  * This technique was first used in 
-  * <a href="http://portal.acm.org/citation.cfm?id=583852.581494">Typing Dynamic Typing</a> (Baars and Swierstra, ICFP 2002).
-  *
-  * It is generalized here to handle subtyping so that it can be used with constrained type constructors
-  */
+/** 
+ * Leibnizian equality: A better =:= 
+ *
+ * This technique was first used in 
+ * <a href="http://portal.acm.org/citation.cfm?id=583852.581494">Typing Dynamic Typing</a> (Baars and Swierstra, ICFP 2002).
+ *
+ * It is generalized here to handle subtyping so that it can be used with constrained type constructors.
+ *
+ * Leibniz[L,H,A,B] says that A = B, and that both of its types are between L and H. Subtyping lets you
+ * loosen the bounds on L and H.
+ * 
+ * If you just need a witness that A = B, then you can use A===B which is a supertype of any Leibniz[L,H,A,B]
+ *
+ * The more refined types are useful if you need to be able to substitute into restricted contexts. 
+ */
 
 trait Leibniz[-L,+H>:L,A>:L<:H,B>:L<:H] {
   def subst[F[_>:L<:H]](p: F[A]) : F[B]
 }
 
 object Leibniz {
-  /** (A ~ B) is a supertype of Leibniz[L,H,A,B] */
-  type ~[A,B] = Leibniz[Nothing,Any,A,B]
+  /** (A === B) is a supertype of Leibniz[L,H,A,B] */
+  type ===[A,B] = Leibniz[Nothing,Any,A,B]
 
   trait PartialApplyLeibniz[-L,+H>:L] {
     type Apply[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
@@ -29,34 +37,39 @@ object Leibniz {
   /** We can witness equality by using it to convert between types 
    * We rely on subtyping to enable this to work for any Leibniz arrow 
    */
-  implicit def witness[A,B](f: A ~ B) : A => B = 
+  implicit def witness[A,B](f: A === B) : A => B = 
      f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
 
   /** Equality is transitive */
-  def trans[L,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](f: Leibniz[L,H,B,C], g: Leibniz[L,H,A,B]) : Leibniz[L,H,A,C] = {
+  def trans[L,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](
+    f: Leibniz[L,H,B,C], 
+    g: Leibniz[L,H,A,B]
+  )  : Leibniz[L,H,A,C] = {
     type f[X>:L<:H] = Leibniz[L,H,A,X]
     f.subst[f](g)
   }
 
   /** Equality is symmetric */
-  def symm[L,H>:L,A>:L<:H,B>:L<:H](f: Leibniz[L,H,A,B]) : Leibniz[L,H,B,A] = {
+  def symm[L,H>:L,A>:L<:H,B>:L<:H](
+    f: Leibniz[L,H,A,B]
+  )  : Leibniz[L,H,B,A] = {
     type f[X>:L<:H] = Leibniz[L,H,X,A]
     f.subst[f](refl)
   }
 
   sealed class LeibnizGroupoid[L,H>:L] extends GeneralizedGroupoid[L,H] {
-    type ~>[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+    type =>:[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
 
     def id[A>:L<:H] : Leibniz[A,A,A,A] = refl[A]
 
     def compose[A>:L<:H,B>:L<:H,C>:L<:H](
       bc: Leibniz[L,H,B,C],
       ab: Leibniz[L,H,A,B]
-    ) : Leibniz[L,H,A,C] = trans[L,H,A,B,C](bc,ab)
+    )   : Leibniz[L,H,A,C] = trans[L,H,A,B,C](bc,ab)
 
     def invert[A>:L<:H,B>:L<:H](
       ab: Leibniz[L,H,A,B]
-    ) : Leibniz[L,H,B,A] = symm(ab)
+    )   : Leibniz[L,H,B,A] = symm(ab)
   }
 
   implicit def leibnizGroupoid[L,H>:L] : LeibnizGroupoid[L,H] = new LeibnizGroupoid[L,H]
@@ -120,7 +133,7 @@ object Leibniz {
   }
 
   /**
-   * Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) ~ (C,D)) => (A ~ C)</code> is inhabited.
+   * Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) === (C,D)) => (A === C)</code> is inhabited.
    * <p>
    * Haskell can work around this issue by abusing type families as noted in
    * <a href="http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html">Leibniz equality can be injective</a> (Oleg Kiselyov, Haskell Cafe Mailing List 2010)
@@ -133,11 +146,10 @@ object Leibniz {
 
   def lower[
     LA,HA>:LA,
-    LT,HT>:LT,
-    T[_>:LA<:HA]>:LT<:HT, //:Injective,
+    T[_>:LA<:HA], //:Injective,
     A>:LA<:HA,A2>:LA<:HA
   ](
-    t: Leibniz[LT,HT,T[A],T[A2]]
+    t: T[A] === T[A2]
   ) : Leibniz[LA,HA,A,A2]
       = force[LA,HA,A,A2]
 
@@ -148,7 +160,7 @@ object Leibniz {
     A>:LA<:HA,A2>:LA<:HA,
     B>:LB<:HB,B2>:LB<:HB
   ](
-    t: T[A,B] ~ T[A2,B2]
+    t: T[A,B] === T[A2,B2]
   ) : (Leibniz[LA,HA,A,A2], Leibniz[LB,HB,B,B2])
     = (force  [LA,HA,A,A2], force  [LB,HB,B,B2])
 }
