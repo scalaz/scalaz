@@ -14,6 +14,7 @@ package scalaz
  */
 
 trait GeneralizedCategory {
+  // Type members used instead of type parameters to work around http://lampsvn.epfl.ch/trac/scala/ticket/4043
   type L
   type H >: L
   type ~>[_ >: L <: H, _ >: L <: H]
