@@ -102,6 +102,7 @@ object Category {
 
   trait PartialApplyProduct[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] {
     type Apply[A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY]] = Product[LX,HX,X, LY,HY,Y, A, B]
+//    ({type L = P[LX,LY]; type H = P[HX,HY]; type λ[α >: L <: H, β >: L <: H]= Product[LX,HX,X, LY,HY,Y, α, β]}#λ
   }
 
   /*
@@ -200,8 +201,8 @@ object Category {
     def comap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
-  implicit def opCoFunctor[R]: Cofunctor[PartialApply1Of2[<=,R]#Apply] =
-    new Cofunctor[PartialApply1Of2[<=,R]#Apply] {
+  implicit def opCoFunctor[R]: Cofunctor[({type λ[α]=R <= α})#λ] =
+    new Cofunctor[({type λ[α]=R <= α})#λ] {
       def comap[A, B](b: R <= A, t: B => A): R <= B =
         <=(b.value compose t)
     }
@@ -281,12 +282,12 @@ object Category {
     }
   }
 
-  implicit def KleisliCategory[M[_]: Monad]: Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
+  implicit def KleisliCategory[M[_]: Monad]: Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] {
     def id[A] = ☆(_ η)
     def compose[X, Y, Z](f: Kleisli[M, Y, Z], g: Kleisli[M, X, Y]) = f <=< g
   }
 
-  implicit def CokleisliCategory[M[_]: Comonad]: Category[PartialApplyK[Cokleisli, M]#Apply] = new Category[PartialApplyK[Cokleisli, M]#Apply] {
+  implicit def CokleisliCategory[M[_]: Comonad]: Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] {
     def id[A] = ★(_ ε)
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }
@@ -304,7 +305,7 @@ object Category {
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
   /** Discrete categories, whose only morphism is the identity function. **/
-  implicit def DiscreteCategory[X] = new Category[PartialApply1Of3[Discrete,X]#Apply] {
+  implicit def DiscreteCategory[X] = new Category[({type λ[α, β]=Discrete[X, α, β]})#λ] {
     def id[A] = Discrete(x => x)
     def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
   }
@@ -314,7 +315,7 @@ object Category {
   }
 
   /** Every partial order gives rise to a category **/
-  implicit def PosetCategory[X: Order] = new Category[PartialApply1Of3[Ord2,X]#Apply] {
+  implicit def PosetCategory[X: Order] = new Category[({type λ[α, β]=Ord2[X, α, β]})#λ] {
     def id[A] = new Ord2[X, A, A]
     def compose[A, B, C](f: Ord2[X, B, C], g: Ord2[X, A, B]) = new Ord2[X, A, C] {
       override def compare(a: X, b: X) = f.compare(a, b) == g.compare(a, b)
