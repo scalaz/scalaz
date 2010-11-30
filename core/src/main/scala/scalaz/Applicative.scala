@@ -35,25 +35,25 @@ object Applicative {
 
   implicit def Tuple2Applicative[R: Monoid]: Applicative[({type λ[α]=Tuple2[R, α]})#λ] = applicative[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Pure, Tuple2Apply)
 
-  implicit def Tuple3Applicative[R: Monoid, S: Monoid]: Applicative[PartialApply2Of3[Tuple3, R, S]#Apply] = applicative[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Pure, Tuple3Apply)
+  implicit def Tuple3Applicative[R: Monoid, S: Monoid]: Applicative[({type λ[α]=Tuple3[R, S, α]})#λ] = applicative[({type λ[α]=Tuple3[R, S, α]})#λ](Tuple3Pure, Tuple3Apply)
 
-  implicit def Tuple4Applicative[R: Monoid, S: Monoid, T: Monoid]: Applicative[PartialApply3Of4[Tuple4, R, S, T]#Apply] = applicative[PartialApply3Of4[Tuple4, R, S, T]#Apply](Tuple4Pure, Tuple4Apply)
+  implicit def Tuple4Applicative[R: Monoid, S: Monoid, T: Monoid]: Applicative[({type λ[α]=Tuple4[R, S, T, α]})#λ] = applicative[({type λ[α]=Tuple4[R, S, T, α]})#λ](Tuple4Pure, Tuple4Apply)
 
-  implicit def Tuple5Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Applicative[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = applicative[PartialApply4Of5[Tuple5, R, S, T, U]#Apply](Tuple5Pure, Tuple5Apply)
+  implicit def Tuple5Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Applicative[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = applicative[({type λ[α]=Tuple5[R, S, T, U, α]})#λ](Tuple5Pure, Tuple5Apply)
 
-  implicit def Tuple6Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Applicative[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = applicative[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](Tuple6Pure, Tuple6Apply)
+  implicit def Tuple6Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Applicative[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = applicative[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Pure, Tuple6Apply)
 
   implicit def Tuple7Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Applicative[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = applicative[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Pure, Tuple7Apply)
   
   implicit def Function1Applicative[R]: Applicative[({type λ[α]=Function1[R, α]})#λ] = applicative[({type λ[α]=Function1[R, α]})#λ](Function1Pure, Function1Apply)
 
-  implicit def Function2Applicative[R, S]: Applicative[PartialApply2Of3[Function2, R, S]#Apply] = applicative[PartialApply2Of3[Function2, R, S]#Apply](Function2Pure, Function2Apply)
+  implicit def Function2Applicative[R, S]: Applicative[({type λ[α]=Function2[R, S, α]})#λ] = applicative[({type λ[α]=Function2[R, S, α]})#λ](Function2Pure, Function2Apply)
 
-  implicit def Function3Applicative[R, S, T]: Applicative[PartialApply3Of4[Function3, R, S, T]#Apply] = applicative[PartialApply3Of4[Function3, R, S, T]#Apply](Function3Pure, Function3Apply)
+  implicit def Function3Applicative[R, S, T]: Applicative[({type λ[α]=Function3[R, S, T, α]})#λ] = applicative[({type λ[α]=Function3[R, S, T, α]})#λ](Function3Pure, Function3Apply)
 
-  implicit def Function4Applicative[R, S, T, U]: Applicative[PartialApply4Of5[Function4, R, S, T, U]#Apply] = applicative[PartialApply4Of5[Function4, R, S, T, U]#Apply](Function4Pure, Function4Apply)
+  implicit def Function4Applicative[R, S, T, U]: Applicative[({type λ[α]=Function4[R, S, T, U, α]})#λ] = applicative[({type λ[α]=Function4[R, S, T, U, α]})#λ](Function4Pure, Function4Apply)
 
-  implicit def Function5Applicative[R, S, T, U, V]: Applicative[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = applicative[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](Function5Pure, Function5Apply)
+  implicit def Function5Applicative[R, S, T, U, V]: Applicative[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = applicative[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Pure, Function5Apply)
 
   implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = applicative[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Pure, Function6Apply)
 

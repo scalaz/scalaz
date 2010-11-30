@@ -31,19 +31,19 @@ object Each {
     def each[A](e: (R, A), f: A => Unit) = f(e._2)
   }
 
-  implicit def Tuple3Each[R, S]: Each[PartialApply2Of3[Tuple3, R, S]#Apply] = new Each[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Each[R, S]: Each[({type λ[α]=Tuple3[R, S, α]})#λ] = new Each[({type λ[α]=Tuple3[R, S, α]})#λ] {
     def each[A](e: (R, S, A), f: A => Unit) = f(e._3)
   }
 
-  implicit def Tuple4Each[R, S, T]: Each[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Each[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Each[R, S, T]: Each[({type λ[α]=Tuple4[R, S, T, α]})#λ] = new Each[({type λ[α]=Tuple4[R, S, T, α]})#λ] {
     def each[A](e: (R, S, T, A), f: A => Unit) = f(e._4)
   }
 
-  implicit def Tuple5Each[R, S, T, U]: Each[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Each[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Each[R, S, T, U]: Each[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = new Each[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] {
     def each[A](e: (R, S, T, U, A), f: A => Unit) = f(e._5)
   }
 
-  implicit def Tuple6Each[R, S, T, U, V]: Each[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Each[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Each[R, S, T, U, V]: Each[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = new Each[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] {
     def each[A](e: (R, S, T, U, V, A), f: A => Unit) = f(e._6)
   }
 

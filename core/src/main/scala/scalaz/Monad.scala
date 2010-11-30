@@ -36,25 +36,25 @@ object Monad {
 
   implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=Tuple2[R, α]})#λ] = monad[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Bind, Tuple2Pure)
 
-  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[PartialApply2Of3[Tuple3, R, S]#Apply] = monad[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Bind, Tuple3Pure)
+  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[({type λ[α]=Tuple3[R, S, α]})#λ] = monad[({type λ[α]=Tuple3[R, S, α]})#λ](Tuple3Bind, Tuple3Pure)
 
-  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[PartialApply3Of4[Tuple4, R, S, T]#Apply] = monad[PartialApply3Of4[Tuple4, R, S, T]#Apply](Tuple4Bind, Tuple4Pure)
+  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[({type λ[α]=Tuple4[R, S, T, α]})#λ] = monad[({type λ[α]=Tuple4[R, S, T, α]})#λ](Tuple4Bind, Tuple4Pure)
 
-  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = monad[PartialApply4Of5[Tuple5, R, S, T, U]#Apply](Tuple5Bind, Tuple5Pure)
+  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = monad[({type λ[α]=Tuple5[R, S, T, U, α]})#λ](Tuple5Bind, Tuple5Pure)
 
-  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](Tuple6Bind, Tuple6Pure)
+  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Bind, Tuple6Pure)
 
   implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Bind, Tuple7Pure)
   
   implicit def Function1Monad[R]: Monad[({type λ[α]=Function1[R, α]})#λ] = monad[({type λ[α]=Function1[R, α]})#λ](Function1Bind, Function1Pure)
 
-  implicit def Function2Monad[R, S]: Monad[PartialApply2Of3[Function2, R, S]#Apply] = monad[PartialApply2Of3[Function2, R, S]#Apply](Function2Bind, Function2Pure)
+  implicit def Function2Monad[R, S]: Monad[({type λ[α]=Function2[R, S, α]})#λ] = monad[({type λ[α]=Function2[R, S, α]})#λ](Function2Bind, Function2Pure)
 
-  implicit def Function3Monad[R, S, T]: Monad[PartialApply3Of4[Function3, R, S, T]#Apply] = monad[PartialApply3Of4[Function3, R, S, T]#Apply](Function3Bind, Function3Pure)
+  implicit def Function3Monad[R, S, T]: Monad[({type λ[α]=Function3[R, S, T, α]})#λ] = monad[({type λ[α]=Function3[R, S, T, α]})#λ](Function3Bind, Function3Pure)
 
-  implicit def Function4Monad[R, S, T, U]: Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply] = monad[PartialApply4Of5[Function4, R, S, T, U]#Apply](Function4Bind, Function4Pure)
+  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α]=Function4[R, S, T, U, α]})#λ] = monad[({type λ[α]=Function4[R, S, T, U, α]})#λ](Function4Bind, Function4Pure)
 
-  implicit def Function5Monad[R, S, T, U, V]: Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](Function5Bind, Function5Pure)
+  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Bind, Function5Pure)
 
   implicit def Function6Monad[R, S, T, U, V, W]: Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Bind, Function6Pure)
 

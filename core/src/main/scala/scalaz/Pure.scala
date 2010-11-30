@@ -47,19 +47,19 @@ object Pure {
     def pure[A](a: => A) = (∅, a)
   }
 
-  implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[PartialApply2Of3[Tuple3, R, S]#Apply] = new Pure[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[({type λ[α]=Tuple3[R, S, α]})#λ] = new Pure[({type λ[α]=Tuple3[R, S, α]})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], a)
   }
 
-  implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Pure[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[({type λ[α]=Tuple4[R, S, T, α]})#λ] = new Pure[({type λ[α]=Tuple4[R, S, T, α]})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], a)
   }
 
-  implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Pure[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = new Pure[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], a)
   }
 
-  implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Pure[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = new Pure[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], a)
   }
 
@@ -77,19 +77,19 @@ object Pure {
     def pure[A](a: => A) = (_: R) => a
   }
 
-  implicit def Function2Pure[R, S]: Pure[PartialApply2Of3[Function2, R, S]#Apply] = new Pure[PartialApply2Of3[Function2, R, S]#Apply] {
+  implicit def Function2Pure[R, S]: Pure[({type λ[α]=Function2[R, S, α]})#λ] = new Pure[({type λ[α]=Function2[R, S, α]})#λ] {
     def pure[A](a: => A) = (_: R, _: S) => a
   }
 
-  implicit def Function3Pure[R, S, T]: Pure[PartialApply3Of4[Function3, R, S, T]#Apply] = new Pure[PartialApply3Of4[Function3, R, S, T]#Apply] {
+  implicit def Function3Pure[R, S, T]: Pure[({type λ[α]=Function3[R, S, T, α]})#λ] = new Pure[({type λ[α]=Function3[R, S, T, α]})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T) => a
   }
 
-  implicit def Function4Pure[R, S, T, U]: Pure[PartialApply4Of5[Function4, R, S, T, U]#Apply] = new Pure[PartialApply4Of5[Function4, R, S, T, U]#Apply] {
+  implicit def Function4Pure[R, S, T, U]: Pure[({type λ[α]=Function4[R, S, T, U, α]})#λ] = new Pure[({type λ[α]=Function4[R, S, T, U, α]})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U) => a
   }
 
-  implicit def Function5Pure[R, S, T, U, V]: Pure[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = new Pure[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] {
+  implicit def Function5Pure[R, S, T, U, V]: Pure[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = new Pure[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
   }
 

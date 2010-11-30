@@ -15,25 +15,25 @@ object Pointed {
 
   implicit def Tuple2Pointed[R: Monoid]: Pointed[({type λ[α]=Tuple2[R, α]})#λ] = pointed[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Functor, Tuple2Pure)
 
-  implicit def Tuple3Pointed[R: Monoid, S: Monoid]: Pointed[PartialApply2Of3[Tuple3, R, S]#Apply] = pointed[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Functor, Tuple3Pure)
+  implicit def Tuple3Pointed[R: Monoid, S: Monoid]: Pointed[({type λ[α]=Tuple3[R, S, α]})#λ] = pointed[({type λ[α]=Tuple3[R, S, α]})#λ](Tuple3Functor, Tuple3Pure)
 
-  implicit def Tuple4Pointed[R: Monoid, S: Monoid, T: Monoid]: Pointed[PartialApply3Of4[Tuple4, R, S, T]#Apply] = pointed[PartialApply3Of4[Tuple4, R, S, T]#Apply](Tuple4Functor, Tuple4Pure)
+  implicit def Tuple4Pointed[R: Monoid, S: Monoid, T: Monoid]: Pointed[({type λ[α]=Tuple4[R, S, T, α]})#λ] = pointed[({type λ[α]=Tuple4[R, S, T, α]})#λ](Tuple4Functor, Tuple4Pure)
 
-  implicit def Tuple5Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Pointed[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = pointed[PartialApply4Of5[Tuple5, R, S, T, U]#Apply](Tuple5Functor, Tuple5Pure)
+  implicit def Tuple5Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Pointed[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = pointed[({type λ[α]=Tuple5[R, S, T, U, α]})#λ](Tuple5Functor, Tuple5Pure)
 
-  implicit def Tuple6Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Pointed[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = pointed[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply](Tuple6Functor, Tuple6Pure)
+  implicit def Tuple6Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Functor, Tuple6Pure)
 
   implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Functor, Tuple7Pure)
   
   implicit def Function1Pointed[R]: Pointed[({type λ[α]=Function1[R, α]})#λ] = pointed[({type λ[α]=Function1[R, α]})#λ](Function1Functor, Function1Pure)
 
-  implicit def Function2Pointed[R, S]: Pointed[PartialApply2Of3[Function2, R, S]#Apply] = pointed[PartialApply2Of3[Function2, R, S]#Apply](Function2Functor, Function2Pure)
+  implicit def Function2Pointed[R, S]: Pointed[({type λ[α]=Function2[R, S, α]})#λ] = pointed[({type λ[α]=Function2[R, S, α]})#λ](Function2Functor, Function2Pure)
 
-  implicit def Function3Pointed[R, S, T]: Pointed[PartialApply3Of4[Function3, R, S, T]#Apply] = pointed[PartialApply3Of4[Function3, R, S, T]#Apply](Function3Functor, Function3Pure)
+  implicit def Function3Pointed[R, S, T]: Pointed[({type λ[α]=Function3[R, S, T, α]})#λ] = pointed[({type λ[α]=Function3[R, S, T, α]})#λ](Function3Functor, Function3Pure)
 
-  implicit def Function4Pointed[R, S, T, U]: Pointed[PartialApply4Of5[Function4, R, S, T, U]#Apply] = pointed[PartialApply4Of5[Function4, R, S, T, U]#Apply](Function4Functor, Function4Pure)
+  implicit def Function4Pointed[R, S, T, U]: Pointed[({type λ[α]=Function4[R, S, T, U, α]})#λ] = pointed[({type λ[α]=Function4[R, S, T, U, α]})#λ](Function4Functor, Function4Pure)
 
-  implicit def Function5Pointed[R, S, T, U, V]: Pointed[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = pointed[PartialApply5Of6[Function5, R, S, T, U, V]#Apply](Function5Functor, Function5Pure)
+  implicit def Function5Pointed[R, S, T, U, V]: Pointed[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = pointed[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Functor, Function5Pure)
 
   implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Functor, Function6Pure)
 
