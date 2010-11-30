@@ -64,7 +64,7 @@ object Monad {
   
   implicit def ValidationMonad[X]: Monad[({type λ[α]=Validation[X, α]})#λ] = monad[({type λ[α]=Validation[X, α]})#λ](ValidationBind, ValidationPure)
 
-  implicit def ValidationFailureMonad[X]: Monad[PartialApply1Of2[FailProjection, X]#Flip] = monad[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureBind, ValidationFailurePure)
+  implicit def ValidationFailureMonad[X]: Monad[({type λ[α]=FailProjection[α, X]})#λ] = monad[({type λ[α]=FailProjection[α, X]})#λ](ValidationFailureBind, ValidationFailurePure)
 
   implicit def IterVMonad[E] = monad[({type λ[α]=IterV[E, α]})#λ](IterVBind, IterVPure)
 

@@ -151,7 +151,7 @@ object Bind {
     }
   }
 
-  implicit def ValidationFailureBind[X]: Bind[PartialApply1Of2[FailProjection, X]#Flip] = new Bind[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureBind[X]: Bind[({type λ[α]=FailProjection[α, X]})#λ] = new Bind[({type λ[α]=FailProjection[α, X]})#λ] {
     def bind[A, B](r: FailProjection[A, X], f: A => FailProjection[B, X]) = r.validation match {
       case Success(a) => a.success.fail
       case Failure(e) => f(e)

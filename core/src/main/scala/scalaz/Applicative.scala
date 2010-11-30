@@ -63,7 +63,7 @@ object Applicative {
   
   implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α]=Validation[X, α]})#λ] = applicative[({type λ[α]=Validation[X, α]})#λ](ValidationPure, ValidationApply)
 
-  implicit def ValidationFailureApplicative[X]: Applicative[PartialApply1Of2[FailProjection, X]#Flip] = applicative[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailurePure, ValidationFailureApply)
+  implicit def ValidationFailureApplicative[X]: Applicative[({type λ[α]=FailProjection[α, X]})#λ] = applicative[({type λ[α]=FailProjection[α, X]})#λ](ValidationFailurePure, ValidationFailureApply)
 
   import java.util.Map.Entry
 

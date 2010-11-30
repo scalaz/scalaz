@@ -72,7 +72,7 @@ object Apply extends ApplyLow {
     }
   }
 
-  implicit def ValidationFailureApply[X]: Apply[PartialApply1Of2[FailProjection, X]#Flip] = new Apply[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureApply[X]: Apply[({type λ[α]=FailProjection[α, X]})#λ] = new Apply[({type λ[α]=FailProjection[α, X]})#λ] {
     def apply[A, B](f: => FailProjection[A => B, X], a: => FailProjection[A, X]) = ((f.validation, a.validation) match {
       case (Success(x1), Success(_)) => success(x1)
       case (Success(x1), Failure(_)) => success(x1)

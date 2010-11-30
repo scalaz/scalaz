@@ -56,7 +56,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     checkMonadLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]
 //    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
     checkMonadLaws[({type λ[α]=Validation[X, α]})#λ, A]
-    checkMonadLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
+    checkMonadLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
     ()
   }
 

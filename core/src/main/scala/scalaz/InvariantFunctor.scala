@@ -30,7 +30,7 @@ object InvariantFunctor {
     }
   }
 
-  implicit def MemoInvariantFunctor[V]: InvariantFunctor[PartialApply1Of2[Memo, V]#Flip] = new InvariantFunctor[PartialApply1Of2[Memo, V]#Flip] {
+  implicit def MemoInvariantFunctor[V]: InvariantFunctor[({type λ[α]=Memo[α, V]})#λ] = new InvariantFunctor[({type λ[α]=Memo[α, V]})#λ] {
     def xmap[A, B](ma: Memo[A, V], f: A => B, g: B => A): Memo[B, V] = {
       memo {
         (h: B => V) =>

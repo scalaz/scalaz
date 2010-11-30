@@ -52,7 +52,7 @@ object Length {
     }
   }
 
-  implicit def ValidationFailureLength[X]: Length[PartialApply1Of2[FailProjection, X]#Flip] = new Length[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureLength[X]: Length[({type λ[α]=FailProjection[α, X]})#λ] = new Length[({type λ[α]=FailProjection[α, X]})#λ] {
     def len[A](a: FailProjection[A, X]) = a.validation match {
       case Success(_) => 0
       case Failure(_) => 1

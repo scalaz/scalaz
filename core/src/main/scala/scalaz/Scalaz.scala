@@ -93,7 +93,7 @@ object Scalaz extends ScalazLow
 
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[PartialApply1Of2[Either.RightProjection, X]#Apply, A] = ma[PartialApply1Of2[Either.RightProjection, X]#Apply, A](a)
 
-  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[PartialApply1Of2[Function1, A]#Flip, R] = maCofunctor[PartialApply1Of2[Function1, A]#Flip, R](f)
+  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[({type λ[α]=Function1[α, A]})#λ, R] = maCofunctor[({type λ[α]=Function1[α, A]})#λ, R](f)
 
   implicit def Function1ApplyMA[A, R](f: A => R): MA[({type λ[α]=Function1[A, α]})#λ, R] = ma[({type λ[α]=Function1[A, α]})#λ, R](f)
 
@@ -125,7 +125,7 @@ object Scalaz extends ScalazLow
 
   implicit def ValidationMA[A, E](v: Validation[E, A]): MA[({type λ[α]=Validation[E, α]})#λ, A] = ma[({type λ[α]=Validation[E, α]})#λ, A](v)
 
-  implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[PartialApply1Of2[FailProjection, A]#Flip, E] = ma[PartialApply1Of2[FailProjection, A]#Flip, E](f)
+  implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[({type λ[α]=FailProjection[α, A]})#λ, E] = ma[({type λ[α]=FailProjection[α, A]})#λ, E](f)
   
   implicit def IterVMA[A, E](v: IterV[E, A]): MA[({type λ[α]=IterV[E, α]})#λ, A] = ma[({type λ[α]=IterV[E, α]})#λ, A](v)
 
@@ -147,7 +147,7 @@ object Scalaz extends ScalazLow
 
   implicit def NodeMA[V, A](t: Node[V, A]): MA[({type λ[α]=Node[V, α]})#λ, A] = ma[({type λ[α]=Node[V, α]})#λ, A](t)
 
-  implicit def MemoMA[V, A](m: Memo[A, V]): MA[PartialApply1Of2[Memo, V]#Flip, A] = ma[PartialApply1Of2[Memo, V]#Flip, A](m)
+  implicit def MemoMA[V, A](m: Memo[A, V]): MA[({type λ[α]=Memo[α, V]})#λ, A] = ma[({type λ[α]=Memo[α, V]})#λ, A](m)
 
   // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
   implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)

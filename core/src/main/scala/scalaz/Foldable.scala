@@ -161,7 +161,7 @@ object Foldable extends FoldableLow {
     }
   }
 
-  implicit def ValidationFailureFoldable[X] = new Foldable[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureFoldable[X] = new Foldable[({type λ[α]=FailProjection[α, X]})#λ] {
     override def foldLeft[A, B](e: FailProjection[A, X], b: B, f: (B, A) => B) = e.validation match {
       case Success(_) => b
       case Failure(e) => f(b, e)

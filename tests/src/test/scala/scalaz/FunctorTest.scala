@@ -68,7 +68,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
 
     //    checkFunctorLaws[({type λ[α]=Entry[X, α]})#λ, A]
     checkFunctorLaws[({type λ[α]=Validation[X, α]})#λ, A]
-    checkFunctorLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
+    checkFunctorLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
     checkFunctorLaws[Zipper, A]
 
     // todo

@@ -51,7 +51,7 @@ object Index {
     def index[A](a: Validation[X, A], i: Int) = a.either.right.toOption filter (_ => i == 0)
   }
 
-  implicit def ValidationFailureIndex[X]: Index[PartialApply1Of2[FailProjection, X]#Flip] = new Index[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureIndex[X]: Index[({type λ[α]=FailProjection[α, X]})#λ] = new Index[({type λ[α]=FailProjection[α, X]})#λ] {
     def index[A](a: FailProjection[A, X], i: Int) = a.validation.either.left.toOption filter (_ => i == 0)
   }
 

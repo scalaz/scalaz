@@ -104,7 +104,7 @@ object Traverse {
     }
   }
 
-  implicit def ValidationFailureTraverse[X]: Traverse[PartialApply1Of2[FailProjection, X]#Flip] = new Traverse[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureTraverse[X]: Traverse[({type λ[α]=FailProjection[α, X]})#λ] = new Traverse[({type λ[α]=FailProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: FailProjection[A, X]): F[FailProjection[B, X]] =
       as.validation match {
         case Success(x) => (Success(x).fail: FailProjection[B, X]) η

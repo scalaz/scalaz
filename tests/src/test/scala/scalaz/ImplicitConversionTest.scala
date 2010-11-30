@@ -8,7 +8,7 @@ object ImplicitConversionTest {
   def MAs[A, B, C, D, E, F, G, H] {
     i[List[A] <%< MA[List, A]]
     i[Option[A] <%< MA[Option, A]]
-    i[(A => B) <%< MACofunctor[PartialApply1Of2[Function1, B]#Flip, A]]
+    i[(A => B) <%< MACofunctor[({type λ[α]=Function1[α, B]})#λ, A]]
     i[(A => B) <%< MA[({type λ[α]=Function1[A, α]})#λ, B]]
     i[((A, B) => C) <%< MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
     i[((A, B, C) => D) <%< MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
@@ -16,7 +16,7 @@ object ImplicitConversionTest {
     i[((A, B, C, D, E) => F) <%< MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
     i[((A, B, C, D, E, F) => G) <%< MA[PartialApply6Of7[Function6, A, B, C, D, E, F]#Apply, G]]
     i[Validation[A, B] <%< MA[({type λ[α]=Validation[A, α]})#λ, B]]
-    i[FailProjection[A, B] <%< MA[PartialApply1Of2[FailProjection, B]#Flip, A]]
+    i[FailProjection[A, B] <%< MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
     i[Either.LeftProjection[A, B] <%< MA[PartialApply1Of2[Either.LeftProjection, B]#Flip, A]]
     i[Either.RightProjection[A, B] <%< MA[PartialApply1Of2[Either.RightProjection, A]#Apply, B]]
     i[(A, B) <%< MA[({type λ[α]=Tuple2[A, α]})#λ, B]]
@@ -50,7 +50,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Apply[({type λ[α]=Entry[Int, α]})#λ]]
     i[Apply[({type λ[α]=Validation[Int, α]})#λ]]
-    i[Apply[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Apply[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def applicative[A, B, R, S, T, U, V, W, X] {
@@ -71,7 +71,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Applicative[({type λ[α]=Entry[Int, α]})#λ]]
     i[Applicative[({type λ[α]=Validation[Int, α]})#λ]]
-    i[Applicative[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Applicative[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
@@ -92,7 +92,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Pointed[({type λ[α]=Entry[Int, α]})#λ]]
     i[Pointed[({type λ[α]=Validation[Int, α]})#λ]]
-    i[Pointed[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Pointed[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def bind {
@@ -128,7 +128,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry    
     i[Monad[({type λ[α]=Entry[Int, α]})#λ]]
     i[Monad[({type λ[α]=Validation[X, α]})#λ]]
-    i[Monad[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Monad[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def functor {
@@ -197,7 +197,7 @@ object ImplicitConversionTest {
     trait T7[A, B, C, D, E, F, G]
 
     i[({type λ[α]=T2[A, α]})#λ[B] =:= T2[A, B]]
-    i[PartialApply1Of2[T2, A]#Flip[B] =:= T2[B, A]]
+    i[({type λ[α]=T2[α, A]})#λ[B] =:= T2[B, A]]
 
     i[PartialApply2Of3[T3, A, B]#Apply[C] =:= T3[A, B, C]]
     i[PartialApply2Of3[T3, A, B]#ApplyA[C] =:= T3[C, A, B]]

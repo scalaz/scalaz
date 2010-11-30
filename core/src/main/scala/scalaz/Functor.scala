@@ -165,7 +165,7 @@ object Functor {
     }
   }
 
-  implicit def ValidationFailureFunctor[X]: Functor[PartialApply1Of2[FailProjection, X]#Flip] = new Functor[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
     def fmap[A, B](r: FailProjection[A, X], f: A => B) = (r.validation match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(f(e))

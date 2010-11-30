@@ -43,7 +43,7 @@ object Pointed {
   
   implicit def ValidationPointed[X: Semigroup]: Pointed[({type λ[α]=Validation[X, α]})#λ] = pointed[({type λ[α]=Validation[X, α]})#λ](ValidationFunctor, ValidationPure)
 
-  implicit def ValidationFailurePointed[X]: Pointed[PartialApply1Of2[FailProjection, X]#Flip] = pointed[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureFunctor, ValidationFailurePure)
+  implicit def ValidationFailurePointed[X]: Pointed[({type λ[α]=FailProjection[α, X]})#λ] = pointed[({type λ[α]=FailProjection[α, X]})#λ](ValidationFailureFunctor, ValidationFailurePure)
 
   import java.util.Map.Entry
 
