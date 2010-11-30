@@ -55,9 +55,9 @@ object Apply extends ApplyLow {
 
   implicit def Function6Apply[R, S, T, U, V, W]: Apply[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
-  implicit def EitherLeftApply[X]: Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip] = FunctorBindApply[PartialApply1Of2[Either.LeftProjection, X]#Flip]
+  implicit def EitherLeftApply[X]: Apply[({type λ[α]=Either.LeftProjection[α, X]})#λ] = FunctorBindApply[({type λ[α]=Either.LeftProjection[α, X]})#λ]
 
-  implicit def EitherRightApply[X]: Apply[PartialApply1Of2[Either.RightProjection, X]#Apply] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
+  implicit def EitherRightApply[X]: Apply[({type λ[α]=Either.RightProjection[X, α]})#λ] = FunctorBindApply[({type λ[α]=Either.RightProjection[X, α]})#λ]
 
   import java.util.Map.Entry
 

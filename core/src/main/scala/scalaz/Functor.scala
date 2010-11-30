@@ -117,11 +117,11 @@ object Functor {
     def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
   }
 
-  implicit def EitherLeftFunctor[X]: Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def fmap[A, B](r: Either.LeftProjection[A, X], f: A => B) = r.map(f).left
   }
 
-  implicit def EitherRightFunctor[X]: Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightFunctor[X]: Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
 

@@ -89,9 +89,9 @@ object Scalaz extends ScalazLow
   import scala.collection.generic.CanBuildFrom
   
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
-  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip, A](a)
+  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[({type λ[α]=Either.LeftProjection[α, X]})#λ, A](a)
 
-  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[PartialApply1Of2[Either.RightProjection, X]#Apply, A] = ma[PartialApply1Of2[Either.RightProjection, X]#Apply, A](a)
+  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[({type λ[α]=Either.RightProjection[X, α]})#λ, A] = ma[({type λ[α]=Either.RightProjection[X, α]})#λ, A](a)
 
   implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[({type λ[α]=(α) => A})#λ, R] = maCofunctor[({type λ[α]=(α) => A})#λ, R](f)
 

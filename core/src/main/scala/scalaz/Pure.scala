@@ -109,11 +109,11 @@ object Pure {
     def pure[A](a: => A) = Some(a).lst
   }
 
-  implicit def EitherLeftPure[X]: Pure[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Pure[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftPure[X]: Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def pure[A](a: => A) = Left(a).left
   }
 
-  implicit def EitherRightPure[X]: Pure[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Pure[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightPure[X]: Pure[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Pure[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def pure[A](a: => A) = Right(a).right
   }
 

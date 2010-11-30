@@ -31,14 +31,14 @@ object Length {
     def len[A](a: Option[A]) = a map (_ => 1) getOrElse 0
   }
 
-  implicit def EitherLeftLength[X]: Length[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Length[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftLength[X]: Length[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Length[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def len[A](a: Either.LeftProjection[A, X]) = a.e match {
       case Right(_) => 0
       case Left(_) => 1
     }
   }
 
-  implicit def EitherRightLength[X]: Length[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Length[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightLength[X]: Length[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Length[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def len[A](a: Either.RightProjection[X, A]) = a.e match {
       case Right(_) => 1
       case Left(_) => 0

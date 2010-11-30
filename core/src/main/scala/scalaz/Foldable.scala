@@ -137,13 +137,13 @@ object Foldable extends FoldableLow {
     override def foldRight[A, B](t: ZipStream[A], b: => B, f: (A, => B) => B): B = implicitly[Foldable[Stream]].foldRight(t.value, b, f)
   }
 
-  implicit def EitherLeftFoldable[X]: Foldable[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Foldable[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftFoldable[X]: Foldable[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Foldable[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     override def foldLeft[A, B](e: Either.LeftProjection[A, X], b: B, f: (B, A) => B) = OptionFoldable.foldLeft(e.toOption, b, f)
 
     override def foldRight[A, B](e: Either.LeftProjection[A, X], b: => B, f: (A, => B) => B) = OptionFoldable.foldRight(e.toOption, b, f)
   }
 
-  implicit def EitherRightFoldable[X]: Foldable[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Foldable[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightFoldable[X]: Foldable[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Foldable[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     override def foldLeft[A, B](e: Either.RightProjection[X, A], b: B, f: (B, A) => B) = OptionFoldable.foldLeft(e.toOption, b, f)
 
     override def foldRight[A, B](e: Either.RightProjection[X, A], b: => B, f: (A, => B) => B) = OptionFoldable.foldRight(e.toOption, b, f)

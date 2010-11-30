@@ -81,7 +81,7 @@ object Traverse {
     }
   }
 
-  implicit def EitherLeftTraverse[X]: Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftTraverse[X]: Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Either.LeftProjection[A, X]): F[Either.LeftProjection[B, X]] =
       as.e match {
         case Right(x) => (Right(x).left: Either.LeftProjection[B, X]) η
@@ -89,7 +89,7 @@ object Traverse {
       }
   }
 
-  implicit def EitherRightTraverse[X]: Traverse[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Traverse[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightTraverse[X]: Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Either.RightProjection[X, A]): F[Either.RightProjection[X, B]] =
       as.e match {
         case Left(x) => (Left(x).right: Either.RightProjection[X, B]) η

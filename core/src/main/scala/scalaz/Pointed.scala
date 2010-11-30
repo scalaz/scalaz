@@ -37,9 +37,9 @@ object Pointed {
 
   implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Functor, Function6Pure)
 
-  implicit def EitherLeftPointed[X]: Pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip] = pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftFunctor, EitherLeftPure)
+  implicit def EitherLeftPointed[X]: Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ] = pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ](EitherLeftFunctor, EitherLeftPure)
   
-  implicit def EitherRightPointed[X]: Pointed[PartialApply1Of2[Either.RightProjection, X]#Apply] = pointed[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightFunctor, EitherRightPure)
+  implicit def EitherRightPointed[X]: Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ] = pointed[({type λ[α]=Either.RightProjection[X, α]})#λ](EitherRightFunctor, EitherRightPure)
   
   implicit def ValidationPointed[X: Semigroup]: Pointed[({type λ[α]=Validation[X, α]})#λ] = pointed[({type λ[α]=Validation[X, α]})#λ](ValidationFunctor, ValidationPure)
 

@@ -116,11 +116,11 @@ object Bind {
     def bind[A, B](a: LastOption[A], f: (A) => LastOption[B]): LastOption[B] = (a.value flatMap ((x: A) => f(x).value)).lst
   } 
 
-  implicit def EitherLeftBind[X]: Bind[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Bind[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftBind[X]: Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def bind[A, B](r: Either.LeftProjection[A, X], f: A => Either.LeftProjection[B, X]) = r.flatMap(f(_).e).left
   }
 
-  implicit def EitherRightBind[X]: Bind[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Bind[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightBind[X]: Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
 

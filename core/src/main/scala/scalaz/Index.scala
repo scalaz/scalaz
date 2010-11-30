@@ -39,11 +39,11 @@ object Index {
     def index[A](a: Array[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
   }
 
-  implicit def EitherLeftIndex[X]: Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftIndex[X]: Index[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Index[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def index[A](a: Either.LeftProjection[A, X], i: Int) = a.toOption filter (_ => i == 0)
   }
 
-  implicit def EitherRightIndex[X]: Index[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Index[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightIndex[X]: Index[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Index[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def index[A](a: Either.RightProjection[X, A], i: Int) = a.toOption filter (_ => i == 0)
   }
 

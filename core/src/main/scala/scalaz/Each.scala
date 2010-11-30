@@ -63,11 +63,11 @@ object Each {
     def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
-  implicit def EitherLeftEach[X]: Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftEach[X]: Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def each[A](e: Either.LeftProjection[A, X], f: A => Unit) = e foreach f
   }
 
-  implicit def EitherRightEach[X]: Each[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Each[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightEach[X]: Each[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Each[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 

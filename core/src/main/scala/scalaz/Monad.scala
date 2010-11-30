@@ -58,9 +58,9 @@ object Monad {
 
   implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
 
-  implicit def EitherLeftMonad[X]: Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip] = monad[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftBind, EitherLeftPure)
+  implicit def EitherLeftMonad[X]: Monad[({type λ[α]=Either.LeftProjection[α, X]})#λ] = monad[({type λ[α]=Either.LeftProjection[α, X]})#λ](EitherLeftBind, EitherLeftPure)
   
-  implicit def EitherRightMonad[X]: Monad[PartialApply1Of2[Either.RightProjection, X]#Apply] = monad[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightBind, EitherRightPure)
+  implicit def EitherRightMonad[X]: Monad[({type λ[α]=Either.RightProjection[X, α]})#λ] = monad[({type λ[α]=Either.RightProjection[X, α]})#λ](EitherRightBind, EitherRightPure)
   
   implicit def ValidationMonad[X]: Monad[({type λ[α]=Validation[X, α]})#λ] = monad[({type λ[α]=Validation[X, α]})#λ](ValidationBind, ValidationPure)
 

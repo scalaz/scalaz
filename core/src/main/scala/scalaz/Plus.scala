@@ -32,7 +32,7 @@ object Plus extends PlusLow {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
 
-  implicit def EitherLeftPlus[X]: Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftPlus[X]: Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {
       case Left(_) => a1
       case Right(_) => a2.e match {
@@ -42,7 +42,7 @@ object Plus extends PlusLow {
     }
   }
 
-  implicit def EitherRightPlus[X]: Plus[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Plus[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightPlus[X]: Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = a2.e match {
       case Right(_) => a1
       case Left(_) => a2.e match {

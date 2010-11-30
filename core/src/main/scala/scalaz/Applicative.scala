@@ -57,9 +57,9 @@ object Applicative {
 
   implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Pure, Function6Apply)
 
-  implicit def EitherLeftApplicative[X]: Applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip] = applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftPure, EitherLeftApply)
+  implicit def EitherLeftApplicative[X]: Applicative[({type λ[α]=Either.LeftProjection[α, X]})#λ] = applicative[({type λ[α]=Either.LeftProjection[α, X]})#λ](EitherLeftPure, EitherLeftApply)
   
-  implicit def EitherRightApplicative[X]: Applicative[PartialApply1Of2[Either.RightProjection, X]#Apply] = applicative[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightPure, EitherRightApply)
+  implicit def EitherRightApplicative[X]: Applicative[({type λ[α]=Either.RightProjection[X, α]})#λ] = applicative[({type λ[α]=Either.RightProjection[X, α]})#λ](EitherRightPure, EitherRightApply)
   
   implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α]=Validation[X, α]})#λ] = applicative[({type λ[α]=Validation[X, α]})#λ](ValidationPure, ValidationApply)
 
