@@ -76,7 +76,7 @@ object ScalazArbitrary {
 
   implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
-  implicit def Tuple1Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[(A)] = arb[A] ∘ ((x: A) => Tuple1(x))
+  implicit def Tuple1Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tuple1[A]] = arb[A] ∘ ((x: A) => Tuple1(x))
 
   implicit def Function0Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[() => A] = arb[A] ∘ ((x: A) => () => x)
 
