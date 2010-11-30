@@ -11,19 +11,6 @@ package scalaz
 
 trait Leibniz[-L<:H,+H>:L,A>:L<:H,B>:L<:H] {
   def subst[F[_>:L<:H]](p: F[A]) : F[B]
-/*
-  final def *[
-    L2<:H2,LT<:HT,
-    H2>:L2,HT>:LT,
-    +[_>:L<:H,_>:L2<:H2]>:LT<:HT,
-    C>:L2<:H2,D>:L2<:H2
-  ](
-    that: Leibniz[L2,H2,C,D]
-  ) : Leibniz[LT,HT,A+C,B+D] = Leibniz.lift2[L,L2,LT,H,H2,HT,+,A,B,C,D](this,that)
-  final def andThen[C>:L<:H](that: Leibniz[L,H,B,C]) : Leibniz[L,H,A,C] = Leibniz.trans[L,H,A,B,C](that,this)
-  final def compose[C>:L<:H](that: Leibniz[L,H,C,A]) : Leibniz[L,H,C,B] = Leibniz.trans[L,H,C,A,B](this,that)
-  final def inverse : Leibniz[L,H,B,A] = Leibniz.symm(this)
-*/
 }
 
 object Leibniz {
@@ -41,7 +28,7 @@ object Leibniz {
   /** We can witness equality by using it to convert between types 
    * We rely on subtyping to enable this to work for any Leibniz arrow 
    */
-  implicit def witness[L<:H,H>:L,A>:L<:H,B>:L<:H](f: Leibniz[L,H,A,B]) : A => B = 
+  implicit def witness[A,B](f: A ~ B) : A => B = 
      f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
 
   /** Equality is transitive */
@@ -61,8 +48,7 @@ object Leibniz {
     type H = H_
     type ~>[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
 
-    //def id[A>:L<:H] : Leibniz[L,H,A,A] = refl[L,H,A]
-    def id[A>:L<:H] : Leibniz[L,H,A,A] = refl[A]
+    def id[A>:L<:H] : Leibniz[A,A,A,A] = refl[A]
 
     def compose[A>:L<:H,B>:L<:H,C>:L<:H](
       bc: Leibniz[L,H,B,C],
@@ -144,12 +130,12 @@ object Leibniz {
    *
    */
 
-  import Injectivity._
+  // import Injectivity._
 
   def lower[
     LA<:HA,HA>:LA,
     LT<:HT,HT>:LT,
-    T[_>:LA<:HA] >:LT <:HT, //:Injective,
+    T[_>:LA<:HA]>:LT<:HT, //:Injective,
     A>:LA<:HA,A2>:LA<:HA
   ](
     t: Leibniz[LT,HT,T[A],T[A2]]
@@ -166,14 +152,4 @@ object Leibniz {
     t: T[A,B] ~ T[A2,B2]
   ) : (Leibniz[LA,HA,A,A2], Leibniz[LB,HB,B,B2])
     = (force  [LA,HA,A,A2], force  [LB,HB,B,B2])
-
-  /*
-  implicit leibnizFunction1Functor 
-    : GeneralizedFunctor[Id,~,Function1] = 
-  new GeneralizedFunctor[Id,~,Function1] {
-    def dom = implicitly[Category[~]]
-    def cod = implicitly[Category[Function1]]
-    def fmap[A,B](f: A ~ B): A => B = witness(f)
-  }
-  */
 }

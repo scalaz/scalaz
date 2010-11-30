@@ -45,15 +45,20 @@ object Category {
 
   case class P[+IX,+IY](_1: IX, _2: IY) { type _1 = IX; type _2 = IY }
 
-  abstract sealed class Product[LX<:HX,HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY<:HY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY]] {
+  abstract sealed class Product[
+    LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], // left category
+    LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY], // right category
+    A>:P[LX,LY]<:P[HX,HY], // from
+    B>:P[LX,LY]<:P[HX,HY]  // to
+  ]{
     def pair[AX>:LX<:HX, AY>:LY<:HY, BX>:LX<:HX, BY>:LY<:HY](
       implicit a: A ~ P[AX,AY], b: B ~ P[BX,BY]
-    ) : (X[AX,BX], Y[AY,BY])
+    ):(X[AX,BX],Y[AY,BY])
   }
 
-  implicit def ProductCategory[LX<:HX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY<:HY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
-    implicit x: GeneralizedCategory {type L = LX; type H = HX; type ~>[A >: L <: H, B >: L <: H] = X[A, B]},
-             y: GeneralizedCategory {type L = LY; type H = HY; type ~>[A >: L <: H, B >: L <: H] = Y[A, B]}
+  implicit def ProductCategory[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
+    implicit x: GeneralizedCategory {type L=LX; type H=HX; type ~>[A>:L<:H,B>:L<:H]=X[A,B]},
+             y: GeneralizedCategory {type L=LY; type H=HY; type ~>[A>:L<:H,B>:L<:H]=Y[A,B]}
   ) : GeneralizedCategory = new GeneralizedCategory {
     type L = P[LX,LY]
     type H = P[HX,HY]
@@ -62,9 +67,7 @@ object Category {
     def id[A>:P[LX,LY]<:P[HX,HY]] = new Product[LX,HX,X, LY,HY,Y, A, A] {
       def pair[AX>:LX<:HX,AY>:LY<:HY,BX>:LX<:HX,BY>:LY<:HY](
         implicit a: A ~ P[AX,AY], b: A ~ P[BX,BY]
-      ) : (X[AX,BX],Y[AY,BY]) = 
-          (x.id[AX],y.id[AY]).asInstanceOf
-         [(X[AX,BX],Y[AY,BY])]
+      ) : (X[AX,BX], Y[AY,BY]) = (x.id[AX], y.id[AY]).asInstanceOf[(X[AX,BX], Y[AY,BY])]
     }
     def compose [A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY], C>:P[LX,LY]<:P[HX,HY]](
       f: Product[LX,HX,X, LY,HY,Y, B, C],
@@ -83,11 +86,11 @@ object Category {
     }
   }
 
-  implicit def productToPair[LX<:HX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY<:HY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
+  implicit def productToPair[LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
     p: Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]]
   ) = p.pair[AX, AY, BX, BY]
 
-  implicit def pairToProduct[LX<:HX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY<:HY, HY>:LX, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
+  implicit def pairToProduct[LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
     p: (X[AX,BX], Y[AY,BY])
   ) : Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]] =
   new Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]] {
@@ -96,7 +99,7 @@ object Category {
     ) : (X[AX_,BX_], Y[AY_,BY_]) = p.asInstanceOf[(X[AX_,BX_],Y[AY_,BY_])]
   }
 
-  trait PartialApplyProduct[LX<:HX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], LY<:HY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] {
+  trait PartialApplyProduct[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] {
     type Apply[A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY]] = Product[LX,HX,X, LY,HY,Y, A, B]
   }
 
