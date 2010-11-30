@@ -31,7 +31,7 @@ object WordCount {
 
     val wordCountLineCountBody = ⊗[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ, Char, Any](charCountBody, lineCountBody) _
     def wordCountLineCount(text: List[Char]) = {
-      val result = text.traverse[PartialApplyProd[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ]#Apply, Any](wordCountLineCountBody)(
+      val result = text.traverse[({type C1[α]=Const[Int, α]; type λ[α]=Prod[C1, C1, α]})#λ, Any](wordCountLineCountBody)(
         ProdApplicative[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ],
         implicitly)
       (result.m.value, result.n.value)
@@ -64,11 +64,7 @@ object Prod {
 
   def ⊗[M[_], N[_], A, B](fm: A => M[B], fn: A => N[B])(a: A): (Prod[M, N, B]) = prod(fm(a), fn(a))
 
-  trait PartialApplyProd[M[_], N[_]] {
-    type Apply[A] = Prod[M, N, A]
-  }
-
-  def ProdApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[PartialApplyProd[M, N]#Apply] {
+  def ProdApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[({type λ[α]=Prod[M, N, α]})#λ] {
     import Scalaz._
 
     def pure[A](a: => A): Prod[M, N, A] = prod(a.η[M], a.η[N])
@@ -94,18 +90,14 @@ object Comp {
     def value = mna
   }
 
-  trait PartialApplyComp[M[_], N[_]] {
-    type Apply[A] = Comp[M, N, A]
-  }
-
   def ⊙[M[_] : Functor, N[_] : Functor, A, B, C](f: B => N[C], g: A => M[B])(a: A): Comp[M, N, C] =
     comp(g(a) ∘ f)
 
-  implicit def CompFunctor[M[_] : Functor, N[_] : Functor] = new Functor[PartialApplyComp[M, N]#Apply] {
+  implicit def CompFunctor[M[_] : Functor, N[_] : Functor] = new Functor[({type λ[α]=Comp[M, N, α]})#λ] {
     def fmap[A, B](r: Comp[M, N, A], f: A => B) = comp(r.value ∘∘ f)
   }
 
-  def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[PartialApplyComp[M, N]#Apply] {
+  def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[({type λ[α]=Comp[M, N, α]})#λ] {
     def pure[A](a: => A): Comp[M, N, A] = comp(a.η[N].η[M])
 
     def apply[A, B](f: => Comp[M, N, A => B], a: => Comp[M, N, A]): Comp[M, N, B] = {
