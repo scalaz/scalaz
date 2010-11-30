@@ -19,12 +19,12 @@ object ImplicitConversionTest {
     i[FailProjection[A, B] <%< MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
     i[Either.LeftProjection[A, B] <%< MA[PartialApply1Of2[Either.LeftProjection, B]#Flip, A]]
     i[Either.RightProjection[A, B] <%< MA[PartialApply1Of2[Either.RightProjection, A]#Apply, B]]
-    i[(A, B) <%< MA[({type λ[α]=Tuple2[A, α]})#λ, B]]
+    i[(A, B) <%< MA[({type λ[α]=(A, α)})#λ, B]]
     i[(A, B, C) <%< MA[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
     i[(A, B, C, D) <%< MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
     i[(A, B, C, D, E) <%< MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
     i[(A, B, C, D, E, F) <%< MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
-    i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=Tuple7[A, B, C, D, E, F, α]})#λ, G]]
+    i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=(A, B, C, D, E, F, α)})#λ, G]]
 
     // via higher kind inference
     trait T[A]

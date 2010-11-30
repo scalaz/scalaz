@@ -43,27 +43,27 @@ object Pure {
     def pure[A](a: => A) = Tuple1(a)
   }
 
-  implicit def Tuple2Pure[R: Zero]: Pure[({type λ[α]=Tuple2[R, α]})#λ] = new Pure[({type λ[α]=Tuple2[R, α]})#λ] {
+  implicit def Tuple2Pure[R: Zero]: Pure[({type λ[α]=(R, α)})#λ] = new Pure[({type λ[α]=(R, α)})#λ] {
     def pure[A](a: => A) = (∅, a)
   }
 
-  implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[({type λ[α]=Tuple3[R, S, α]})#λ] = new Pure[({type λ[α]=Tuple3[R, S, α]})#λ] {
+  implicit def Tuple3Pure[R: Zero, S: Zero]: Pure[({type λ[α]=(R, S, α)})#λ] = new Pure[({type λ[α]=(R, S, α)})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], a)
   }
 
-  implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[({type λ[α]=Tuple4[R, S, T, α]})#λ] = new Pure[({type λ[α]=Tuple4[R, S, T, α]})#λ] {
+  implicit def Tuple4Pure[R: Zero, S: Zero, T: Zero]: Pure[({type λ[α]=(R, S, T, α)})#λ] = new Pure[({type λ[α]=(R, S, T, α)})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], a)
   }
 
-  implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = new Pure[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] {
+  implicit def Tuple5Pure[R: Zero, S: Zero, T: Zero, U: Zero]: Pure[({type λ[α]=(R, S, T, U, α)})#λ] = new Pure[({type λ[α]=(R, S, T, U, α)})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], a)
   }
 
-  implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = new Pure[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] {
+  implicit def Tuple6Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pure[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Pure[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], a)
   }
 
-  implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Pure[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
+  implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Pure[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], ∅[W], a)
   }
 

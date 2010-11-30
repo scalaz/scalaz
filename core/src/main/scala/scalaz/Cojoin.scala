@@ -19,7 +19,7 @@ object Cojoin {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
   }
 
-  implicit def Tuple2Cojoin[R]: Cojoin[({type λ[α]=Tuple2[R, α]})#λ] = new Cojoin[({type λ[α]=Tuple2[R, α]})#λ] {
+  implicit def Tuple2Cojoin[R]: Cojoin[({type λ[α]=(R, α)})#λ] = new Cojoin[({type λ[α]=(R, α)})#λ] {
     def cojoin[A](a: (R, A)) = (a._1, a)
   }
 

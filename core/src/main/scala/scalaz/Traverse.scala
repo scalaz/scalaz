@@ -34,8 +34,8 @@ object Traverse {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Tuple1[A]) = f(t._1) ∘ (Tuple1(_: B))
   }
 
-  implicit def Tuple2Traverse[X]: Traverse[({type λ[α]=Tuple2[X, α]})#λ] = new Traverse[({type λ[α]=Tuple2[X, α]})#λ] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Tuple2[X, A]): F[Tuple2[X, B]] =
+  implicit def Tuple2Traverse[X]: Traverse[({type λ[α]=(X, α)})#λ] = new Traverse[({type λ[α]=(X, α)})#λ] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: (X, A)): F[(X, B)] =
       f(as._2) ∘ ((b: B) => (as._1, b))
   }
 

@@ -49,7 +49,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     // checkEqualLaws[xml.NodeSeq]
     checkEqualLaws[NonEmptyList[A]]
     checkEqualLaws[ZipStream[A]]
-    checkEqualLaws[Tuple1[A]]
+    checkEqualLaws[(A)]
     checkEqualLaws[(A, B)]
     checkEqualLaws[(A, B, C)]
     checkEqualLaws[(A, B, C, D)]

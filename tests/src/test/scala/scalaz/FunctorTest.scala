@@ -27,11 +27,11 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]
-    checkFunctorLaws[({type λ[α]=Tuple2[R, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Tuple3[R, S, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Tuple4[R, S, T, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Tuple5[R, S, T, U, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, α)})#λ, A]
 
     // todo
     //    checkFunctorLaws[Function0, A]

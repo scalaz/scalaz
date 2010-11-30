@@ -34,17 +34,17 @@ object Monad {
 
   implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) = monad[PartialApplyKA[StateT, M, A]#Apply](StateTBind(b), StateTPure(p))
 
-  implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=Tuple2[R, α]})#λ] = monad[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Bind, Tuple2Pure)
+  implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=(R, α)})#λ] = monad[({type λ[α]=(R, α)})#λ](Tuple2Bind, Tuple2Pure)
 
-  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[({type λ[α]=Tuple3[R, S, α]})#λ] = monad[({type λ[α]=Tuple3[R, S, α]})#λ](Tuple3Bind, Tuple3Pure)
+  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[({type λ[α]=(R, S, α)})#λ] = monad[({type λ[α]=(R, S, α)})#λ](Tuple3Bind, Tuple3Pure)
 
-  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[({type λ[α]=Tuple4[R, S, T, α]})#λ] = monad[({type λ[α]=Tuple4[R, S, T, α]})#λ](Tuple4Bind, Tuple4Pure)
+  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[({type λ[α]=(R, S, T, α)})#λ] = monad[({type λ[α]=(R, S, T, α)})#λ](Tuple4Bind, Tuple4Pure)
 
-  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = monad[({type λ[α]=Tuple5[R, S, T, U, α]})#λ](Tuple5Bind, Tuple5Pure)
+  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[({type λ[α]=(R, S, T, U, α)})#λ] = monad[({type λ[α]=(R, S, T, U, α)})#λ](Tuple5Bind, Tuple5Pure)
 
-  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Bind, Tuple6Pure)
+  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[({type λ[α]=(R, S, T, U, V, α)})#λ] = monad[({type λ[α]=(R, S, T, U, V, α)})#λ](Tuple6Bind, Tuple6Pure)
 
-  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Bind, Tuple7Pure)
+  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = monad[({type λ[α]=(R, S, T, U, V, W, α)})#λ](Tuple7Bind, Tuple7Pure)
   
   implicit def Function1Monad[R]: Monad[({type λ[α]=(R) => α})#λ] = monad[({type λ[α]=(R) => α})#λ](Function1Bind, Function1Pure)
 

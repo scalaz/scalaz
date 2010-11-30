@@ -51,27 +51,27 @@ object Functor {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
 
-  implicit def Tuple2Functor[R]: Functor[({type λ[α]=Tuple2[R, α]})#λ] = new Functor[({type λ[α]=Tuple2[R, α]})#λ] {
+  implicit def Tuple2Functor[R]: Functor[({type λ[α]=(R, α)})#λ] = new Functor[({type λ[α]=(R, α)})#λ] {
     def fmap[A, B](r: (R, A), f: A => B) = (r._1, f(r._2))
   }
 
-  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=Tuple3[R, S, α]})#λ] = new Functor[({type λ[α]=Tuple3[R, S, α]})#λ] {
+  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=(R, S, α)})#λ] = new Functor[({type λ[α]=(R, S, α)})#λ] {
     def fmap[A, B](r: (R, S, A), f: A => B) = (r._1, r._2, f(r._3))
   }
 
-  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=Tuple4[R, S, T, α]})#λ] = new Functor[({type λ[α]=Tuple4[R, S, T, α]})#λ] {
+  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=(R, S, T, α)})#λ] = new Functor[({type λ[α]=(R, S, T, α)})#λ] {
     def fmap[A, B](r: (R, S, T, A), f: A => B) = (r._1, r._2, r._3, f(r._4))
   }
 
-  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = new Functor[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] {
+  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, A), f: A => B) = (r._1, r._2, r._3, r._4, f(r._5))
   }
 
-  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = new Functor[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] {
+  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, f(r._6))
   }
 
-  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Functor[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
   }
 

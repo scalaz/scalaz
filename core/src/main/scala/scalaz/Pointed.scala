@@ -13,17 +13,17 @@ object Pointed {
   
   implicit def StatePointed[A] = pointed[({type λ[α]=State[A, α]})#λ](StateFunctor, StatePure)
 
-  implicit def Tuple2Pointed[R: Monoid]: Pointed[({type λ[α]=Tuple2[R, α]})#λ] = pointed[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Functor, Tuple2Pure)
+  implicit def Tuple2Pointed[R: Monoid]: Pointed[({type λ[α]=(R, α)})#λ] = pointed[({type λ[α]=(R, α)})#λ](Tuple2Functor, Tuple2Pure)
 
-  implicit def Tuple3Pointed[R: Monoid, S: Monoid]: Pointed[({type λ[α]=Tuple3[R, S, α]})#λ] = pointed[({type λ[α]=Tuple3[R, S, α]})#λ](Tuple3Functor, Tuple3Pure)
+  implicit def Tuple3Pointed[R: Monoid, S: Monoid]: Pointed[({type λ[α]=(R, S, α)})#λ] = pointed[({type λ[α]=(R, S, α)})#λ](Tuple3Functor, Tuple3Pure)
 
-  implicit def Tuple4Pointed[R: Monoid, S: Monoid, T: Monoid]: Pointed[({type λ[α]=Tuple4[R, S, T, α]})#λ] = pointed[({type λ[α]=Tuple4[R, S, T, α]})#λ](Tuple4Functor, Tuple4Pure)
+  implicit def Tuple4Pointed[R: Monoid, S: Monoid, T: Monoid]: Pointed[({type λ[α]=(R, S, T, α)})#λ] = pointed[({type λ[α]=(R, S, T, α)})#λ](Tuple4Functor, Tuple4Pure)
 
-  implicit def Tuple5Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Pointed[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = pointed[({type λ[α]=Tuple5[R, S, T, U, α]})#λ](Tuple5Functor, Tuple5Pure)
+  implicit def Tuple5Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Pointed[({type λ[α]=(R, S, T, U, α)})#λ] = pointed[({type λ[α]=(R, S, T, U, α)})#λ](Tuple5Functor, Tuple5Pure)
 
-  implicit def Tuple6Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Functor, Tuple6Pure)
+  implicit def Tuple6Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Pointed[({type λ[α]=(R, S, T, U, V, α)})#λ] = pointed[({type λ[α]=(R, S, T, U, V, α)})#λ](Tuple6Functor, Tuple6Pure)
 
-  implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = pointed[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Functor, Tuple7Pure)
+  implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ](Tuple7Functor, Tuple7Pure)
   
   implicit def Function1Pointed[R]: Pointed[({type λ[α]=(R) => α})#λ] = pointed[({type λ[α]=(R) => α})#λ](Function1Functor, Function1Pure)
 

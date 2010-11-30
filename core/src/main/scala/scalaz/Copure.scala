@@ -23,8 +23,8 @@ object Copure {
     def copure[A](a: Tuple1[A]) = a._1
   }
 
-  implicit def Tuple2Copure[R]: Copure[({type λ[α]=Tuple2[R, α]})#λ] = new Copure[({type λ[α]=Tuple2[R, α]})#λ] {
-    def copure[A](a: Tuple2[R, A]) = a._2
+  implicit def Tuple2Copure[R]: Copure[({type λ[α]=(R, α)})#λ] = new Copure[({type λ[α]=(R, α)})#λ] {
+    def copure[A](a: (R, A)) = a._2
   }
 
   implicit def Function0Copure: Copure[Function0] = new Copure[Function0] {

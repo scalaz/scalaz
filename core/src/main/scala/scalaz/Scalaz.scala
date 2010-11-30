@@ -111,17 +111,17 @@ object Scalaz extends ScalazLow
 
   implicit def StateMA[S, A](s: State[S, A]): MA[({type λ[α]=State[S, α]})#λ, A] = ma[({type λ[α]=State[S, α]})#λ, A](s)
 
-  implicit def Tuple2MA[R, A](a: (R, A)): MA[({type λ[α]=Tuple2[R, α]})#λ, A] = ma[({type λ[α]=Tuple2[R, α]})#λ, A](a)
+  implicit def Tuple2MA[R, A](a: (R, A)): MA[({type λ[α]=(R, α)})#λ, A] = ma[({type λ[α]=(R, α)})#λ, A](a)
 
-  implicit def Tuple3MA[R, S, A](a: (R, S, A)): MA[({type λ[α]=Tuple3[R, S, α]})#λ, A] = ma[({type λ[α]=Tuple3[R, S, α]})#λ, A](a)
+  implicit def Tuple3MA[R, S, A](a: (R, S, A)): MA[({type λ[α]=(R, S, α)})#λ, A] = ma[({type λ[α]=(R, S, α)})#λ, A](a)
 
-  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)): MA[({type λ[α]=Tuple4[R, S, T, α]})#λ, A] = ma[({type λ[α]=Tuple4[R, S, T, α]})#λ, A](a)
+  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)): MA[({type λ[α]=(R, S, T, α)})#λ, A] = ma[({type λ[α]=(R, S, T, α)})#λ, A](a)
 
-  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)): MA[({type λ[α]=Tuple5[R, S, T, U, α]})#λ, A] = ma[({type λ[α]=Tuple5[R, S, T, U, α]})#λ, A](a)
+  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)): MA[({type λ[α]=(R, S, T, U, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, α)})#λ, A](a)
 
-  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)): MA[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ, A] = ma[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ, A](a)
+  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)): MA[({type λ[α]=(R, S, T, U, V, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, α)})#λ, A](a)
 
-  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ, A] = ma[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ, A](a)
+  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A](a)
 
   implicit def ValidationMA[A, E](v: Validation[E, A]): MA[({type λ[α]=Validation[E, α]})#λ, A] = ma[({type λ[α]=Validation[E, α]})#λ, A](v)
 

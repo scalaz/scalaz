@@ -34,12 +34,12 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {s: State[Int, Unit] => s.apply(0)}
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
     checkMonadLaws[({type λ[α]=State[A, α]})#λ, Unit]
-    checkMonadLaws[({type λ[α]=Tuple2[B, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Tuple3[B, C, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Tuple4[B, C, D, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Tuple5[B, C, D, E, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Tuple6[B, C, D, E, F, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Tuple7[B, C, D, E, F, G, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F, G, α)})#λ, A]
     implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {f: (Int => Int) => f(0)}
     implicit def EqualFunction2 = implicitly[Equal[Int]] ∙ {f: ((Int, Int) => Int) => f(0, 0)}
     implicit def EqualFunction3 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int) => Int) => f(0, 0, 0)}

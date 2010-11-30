@@ -34,42 +34,42 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
-  implicit def Tuple2Bind[R: Semigroup]: Bind[({type λ[α]=Tuple2[R, α]})#λ] = new Bind[({type λ[α]=Tuple2[R, α]})#λ] {
+  implicit def Tuple2Bind[R: Semigroup]: Bind[({type λ[α]=(R, α)})#λ] = new Bind[({type λ[α]=(R, α)})#λ] {
     def bind[A, B](r: (R, A), f: A => (R, B)) = {
       val (rr, b) = f(r._2)
       (r._1 ⊹ rr, b)
     }
   }
 
-  implicit def Tuple3Bind[R: Semigroup, S: Semigroup]: Bind[({type λ[α]=Tuple3[R, S, α]})#λ] = new Bind[({type λ[α]=Tuple3[R, S, α]})#λ] {
+  implicit def Tuple3Bind[R: Semigroup, S: Semigroup]: Bind[({type λ[α]=(R, S, α)})#λ] = new Bind[({type λ[α]=(R, S, α)})#λ] {
     def bind[A, B](r: (R, S, A), f: A => (R, S, B)) = {
       val (rr, s, b) = f(r._3)
       (r._1 ⊹ rr, r._2 ⊹ s, b)
     }
   }
 
-  implicit def Tuple4Bind[R: Semigroup, S: Semigroup, T: Semigroup]: Bind[({type λ[α]=Tuple4[R, S, T, α]})#λ] = new Bind[({type λ[α]=Tuple4[R, S, T, α]})#λ] {
+  implicit def Tuple4Bind[R: Semigroup, S: Semigroup, T: Semigroup]: Bind[({type λ[α]=(R, S, T, α)})#λ] = new Bind[({type λ[α]=(R, S, T, α)})#λ] {
     def bind[A, B](r: (R, S, T, A), f: A => (R, S, T, B)) = {
       val (rr, s, t, b) = f(r._4)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, b)
     }
   }
 
-  implicit def Tuple5Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Bind[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = new Bind[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] {
+  implicit def Tuple5Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Bind[({type λ[α]=(R, S, T, U, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, A), f: A => (R, S, T, U, B)) = {
       val (rr, s, t, u, b) = f(r._5)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, b)
     }
   }
 
-  implicit def Tuple6Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Bind[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = new Bind[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] {
+  implicit def Tuple6Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Bind[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, V, A), f: A => (R, S, T, U, V, B)) = {
       val (rr, s, t, u, v, b) = f(r._6)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, b)
     }
   }
 
-  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Bind[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
+  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
       val (rr, s, t, u, v, w, b) = f(r._7)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, r._6 ⊹ w, b)

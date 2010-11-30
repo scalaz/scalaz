@@ -31,17 +31,17 @@ object Apply extends ApplyLow {
 
   implicit def StateApply[S]: Apply[({type λ[α]=State[S, α]})#λ] = FunctorBindApply[({type λ[α]=State[S, α]})#λ]
 
-  implicit def Tuple2Apply[R: Monoid]: Apply[({type λ[α]=Tuple2[R, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple2[R, α]})#λ]
+  implicit def Tuple2Apply[R: Monoid]: Apply[({type λ[α]=(R, α)})#λ] = FunctorBindApply[({type λ[α]=(R, α)})#λ]
 
-  implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[({type λ[α]=Tuple3[R, S, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple3[R, S, α]})#λ]
+  implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[({type λ[α]=(R, S, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, α)})#λ]
 
-  implicit def Tuple4Apply[R: Monoid, S: Monoid, T: Monoid]: Apply[({type λ[α]=Tuple4[R, S, T, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple4[R, S, T, α]})#λ]
+  implicit def Tuple4Apply[R: Monoid, S: Monoid, T: Monoid]: Apply[({type λ[α]=(R, S, T, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, α)})#λ]
 
-  implicit def Tuple5Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Apply[({type λ[α]=Tuple5[R, S, T, U, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple5[R, S, T, U, α]})#λ]
+  implicit def Tuple5Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Apply[({type λ[α]=(R, S, T, U, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, α)})#λ]
 
-  implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ]
+  implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[({type λ[α]=(R, S, T, U, V, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, α)})#λ]
 
-  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ]
+  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, W, α)})#λ]
     
   implicit def Function1Apply[R]: Apply[({type λ[α]=(R) => α})#λ] = FunctorBindApply[({type λ[α]=(R) => α})#λ]
 
