@@ -18,10 +18,10 @@ object WordCount {
   def wordCount {
     def liftC[A, B](f: A => B) = {a: A => Const(f(a))}
     val charCountBody: (Char) => Const[Int, Nothing] = liftC(Function.const(1))
-    def charCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](charCountBody)
+    def charCount(text: List[Char]): Const[Int, Any] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Any](charCountBody)
     def test(p: Boolean): Int = if (p) 1 else 0
     val lineCountBody: (Char) => Const[Int, Nothing] = liftC {c: Char => test(c == '\n')}
-    def lineCount(text: List[Char]): Const[Int, Any] = text.traverse[PartialApply1Of2[Const, Int]#Apply, Any](lineCountBody)
+    def lineCount(text: List[Char]): Const[Int, Any] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Any](lineCountBody)
 
     val text = "the cat in the hat\n sat on the mat".toList
 
@@ -29,10 +29,10 @@ object WordCount {
 
     import Prod._
 
-    val wordCountLineCountBody = ⊗[PartialApply1Of2[Const, Int]#Apply, PartialApply1Of2[Const, Int]#Apply, Char, Any](charCountBody, lineCountBody) _
+    val wordCountLineCountBody = ⊗[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ, Char, Any](charCountBody, lineCountBody) _
     def wordCountLineCount(text: List[Char]) = {
-      val result = text.traverse[PartialApplyProd[PartialApply1Of2[Const, Int]#Apply, PartialApply1Of2[Const, Int]#Apply]#Apply, Any](wordCountLineCountBody)(
-        ProdApplicative[PartialApply1Of2[Const, Int]#Apply, PartialApply1Of2[Const, Int]#Apply],
+      val result = text.traverse[PartialApplyProd[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ]#Apply, Any](wordCountLineCountBody)(
+        ProdApplicative[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ],
         implicitly)
       (result.m.value, result.n.value)
     }

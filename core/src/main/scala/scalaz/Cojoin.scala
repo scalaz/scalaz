@@ -19,7 +19,7 @@ object Cojoin {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
   }
 
-  implicit def Tuple2Cojoin[R]: Cojoin[PartialApply1Of2[Tuple2, R]#Apply] = new Cojoin[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Cojoin[R]: Cojoin[({type λ[α]=Tuple2[R, α]})#λ] = new Cojoin[({type λ[α]=Tuple2[R, α]})#λ] {
     def cojoin[A](a: (R, A)) = (a._1, a)
   }
 
@@ -38,7 +38,7 @@ object Cojoin {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryCojoin[X]: Cojoin[PartialApply1Of2[Entry, X]#Apply] = new Cojoin[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryCojoin[X]: Cojoin[({type λ[α]=Entry[X, α]})#λ] = new Cojoin[({type λ[α]=Entry[X, α]})#λ] {
     def cojoin[A](a: Entry[X, A]) = new SimpleImmutableEntry(a.getKey, a)
   }
 

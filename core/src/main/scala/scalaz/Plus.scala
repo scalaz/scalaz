@@ -52,7 +52,7 @@ object Plus extends PlusLow {
     }
   }
 
-  implicit def ValidationPlus[X]: Plus[PartialApply1Of2[Validation, X]#Apply] = new Plus[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationPlus[X]: Plus[({type λ[α]=Validation[X, α]})#λ] = new Plus[({type λ[α]=Validation[X, α]})#λ] {
     def plus[A](a1: Validation[X, A], a2: => Validation[X, A]) = a1 match {
       case Success(_) => a1
       case Failure(_) => a2 match {

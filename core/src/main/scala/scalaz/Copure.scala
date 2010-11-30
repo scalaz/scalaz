@@ -23,7 +23,7 @@ object Copure {
     def copure[A](a: Tuple1[A]) = a._1
   }
 
-  implicit def Tuple2Copure[R]: Copure[PartialApply1Of2[Tuple2, R]#Apply] = new Copure[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Copure[R]: Copure[({type λ[α]=Tuple2[R, α]})#λ] = new Copure[({type λ[α]=Tuple2[R, α]})#λ] {
     def copure[A](a: Tuple2[R, A]) = a._2
   }
 
@@ -39,7 +39,7 @@ object Copure {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryCopure[X]: Copure[PartialApply1Of2[Entry, X]#Apply] = new Copure[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryCopure[X]: Copure[({type λ[α]=Entry[X, α]})#λ] = new Copure[({type λ[α]=Entry[X, α]})#λ] {
     def copure[A](a: Entry[X, A]) = a.getValue
   }
 

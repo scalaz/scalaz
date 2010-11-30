@@ -27,7 +27,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]
-    checkFunctorLaws[PartialApply1Of2[Tuple2, R]#Apply, A]
+    checkFunctorLaws[({type λ[α]=Tuple2[R, α]})#λ, A]
     checkFunctorLaws[PartialApply2Of3[Tuple3, R, S]#Apply, A]
     checkFunctorLaws[PartialApply3Of4[Tuple4, R, S, T]#Apply, A]
     checkFunctorLaws[PartialApply4Of5[Tuple5, R, S, T, U]#Apply, A]
@@ -35,7 +35,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
 
     // todo
     //    checkFunctorLaws[Function0, A]
-    //    checkFunctorLaws[PartialApply1Of2[Function1, R]#Apply, A]
+    //    checkFunctorLaws[({type λ[α]=Function1[R, α]})#λ, A]
     //    checkFunctorLaws[PartialApply2Of3[Function2, R, S]#Apply, A]
     //    checkFunctorLaws[PartialApply3Of4[Function3, R, S, T]#Apply, A]
     //    checkFunctorLaws[PartialApply4Of5[Function4, R, S, T, U]#Apply, A]
@@ -66,8 +66,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     import java.util.Map.Entry
     import java.util.AbstractMap.SimpleImmutableEntry
 
-    //    checkFunctorLaws[PartialApply1Of2[Entry, X]#Apply, A]
-    checkFunctorLaws[PartialApply1Of2[Validation, X]#Apply, A]
+    //    checkFunctorLaws[({type λ[α]=Entry[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α]=Validation[X, α]})#λ, A]
     checkFunctorLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
     checkFunctorLaws[Zipper, A]
 

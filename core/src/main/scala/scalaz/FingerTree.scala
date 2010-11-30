@@ -604,24 +604,24 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def isEmpty = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
 
-  def viewl: ViewL[PartialApply1Of2[FingerTree, V]#Apply, A] =
+  def viewl: ViewL[({type λ[α]=FingerTree[V, α]})#λ, A] =
     fold(
-      v => EmptyL[PartialApply1Of2[FingerTree, V]#Apply, A],
-      (v, x) => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](x, empty[V, A]),
+      v => EmptyL[({type λ[α]=FingerTree[V, α]})#λ, A],
+      (v, x) => OnL[({type λ[α]=FingerTree[V, α]})#λ, A](x, empty[V, A]),
       (v, pr, m, sf) =>
         pr match {
-          case One(v, x) => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](x, rotL(m, sf))
-          case _ => OnL[PartialApply1Of2[FingerTree, V]#Apply, A](pr.lhead, deep(pr.ltail, m, sf))
+          case One(v, x) => OnL[({type λ[α]=FingerTree[V, α]})#λ, A](x, rotL(m, sf))
+          case _ => OnL[({type λ[α]=FingerTree[V, α]})#λ, A](pr.lhead, deep(pr.ltail, m, sf))
         })
 
-  def viewr: ViewR[PartialApply1Of2[FingerTree, V]#Apply, A] =
+  def viewr: ViewR[({type λ[α]=FingerTree[V, α]})#λ, A] =
     fold(
-      v => EmptyR[PartialApply1Of2[FingerTree, V]#Apply, A],
-      (v, x) => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](empty[V, A], x),
+      v => EmptyR[({type λ[α]=FingerTree[V, α]})#λ, A],
+      (v, x) => OnR[({type λ[α]=FingerTree[V, α]})#λ, A](empty[V, A], x),
       (v, pr, m, sf) =>
         sf match {
-          case One(v, x) => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](rotR(pr, m), x)
-          case _ => OnR[PartialApply1Of2[FingerTree, V]#Apply, A](deep(pr, m, sf.rtail), sf.rhead)
+          case One(v, x) => OnR[({type λ[α]=FingerTree[V, α]})#λ, A](rotR(pr, m), x)
+          case _ => OnR[({type λ[α]=FingerTree[V, α]})#λ, A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
   def head = viewl.head
@@ -712,7 +712,7 @@ object FingerTree {
     def fold[B](b: => B, f: (=> A, => S[A]) => B) = f(a, sa)
   }
 
-  implicit def FingerFoldable[V] = new Foldable[PartialApply1Of2[Finger, V]#Apply] {
+  implicit def FingerFoldable[V] = new Foldable[({type λ[α]=Finger[V, α]})#λ] {
     override def foldMap[A, M: Monoid](v: Finger[V, A], f: A => M) = v.foldMap(f)
   }
 

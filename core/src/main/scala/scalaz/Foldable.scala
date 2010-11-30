@@ -89,7 +89,7 @@ object Foldable extends FoldableLow {
     override def foldLeft[A, B](t: Stream[A], b: B, f: (B, A) => B): B = t.foldLeft(b)(f(_, _))
   }
 
-  implicit def StateFoldable: Foldable[PartialApply1Of2[State, Unit]#Apply] = new Foldable[PartialApply1Of2[State, Unit]#Apply] {
+  implicit def StateFoldable: Foldable[({type λ[α]=State[Unit, α]})#λ] = new Foldable[({type λ[α]=State[Unit, α]})#λ] {
     override def foldLeft[A, B](t: State[Unit, A], b: B, f: (B, A) => B) = f(b, t(())._2)
 
     override def foldRight[A, B](t: State[Unit, A], b: => B, f: (A, => B) => B) = f(t(())._2, b)
@@ -149,7 +149,7 @@ object Foldable extends FoldableLow {
     override def foldRight[A, B](e: Either.RightProjection[X, A], b: => B, f: (A, => B) => B) = OptionFoldable.foldRight(e.toOption, b, f)
   }
 
-  implicit def ValidationFoldable[X] = new Foldable[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationFoldable[X] = new Foldable[({type λ[α]=Validation[X, α]})#λ] {
     override def foldLeft[A, B](e: Validation[X, A], b: B, f: (B, A) => B) = e match {
       case Success(a) => f(b, a)
       case Failure(_) => b
@@ -173,16 +173,16 @@ object Foldable extends FoldableLow {
     }
   }
 
-  implicit def FingerFoldable[V] = new Foldable[PartialApply1Of2[Finger, V]#Apply] {
+  implicit def FingerFoldable[V] = new Foldable[({type λ[α]=Finger[V, α]})#λ] {
     override def foldMap[A, M: Monoid](t: Finger[V, A], f: A => M): M = t foldMap f
   }
 
-  implicit def NodeFoldable[V] = new Foldable[PartialApply1Of2[Node, V]#Apply] {
+  implicit def NodeFoldable[V] = new Foldable[({type λ[α]=Node[V, α]})#λ] {
     override def foldMap[A, M: Monoid](t: Node[V, A], f: A => M): M = t foldMap f
   }
 
-  implicit def FingerTreeFoldable[V]:Foldable[PartialApply1Of2[FingerTree, V]#Apply] =
-    new Foldable[PartialApply1Of2[FingerTree, V]#Apply] {
+  implicit def FingerTreeFoldable[V]:Foldable[({type λ[α]=FingerTree[V, α]})#λ] =
+    new Foldable[({type λ[α]=FingerTree[V, α]})#λ] {
     override def foldMap[A, M: Monoid](t: FingerTree[V, A], f: A => M): M = t foldMap f
     override def foldRight[A, B](t: FingerTree[V, A], b: => B, f: (A, => B) => B): B =
       t.fold(v => b,

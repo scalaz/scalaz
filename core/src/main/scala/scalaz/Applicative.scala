@@ -28,12 +28,12 @@ object Applicative {
   import Apply._
   import Scalaz._
 
-  implicit def MonoidalApplicative[B: Monoid]: Applicative[PartialApply1Of2[Const, B]#Apply]
-      = applicative[PartialApply1Of2[Const, B]#Apply](ConstPure, ConstApply)
+  implicit def MonoidalApplicative[B: Monoid]: Applicative[({type λ[α]=Const[B, α]})#λ]
+      = applicative[({type λ[α]=Const[B, α]})#λ](ConstPure, ConstApply)
 
-  implicit def StateApplicative[A] = applicative[PartialApply1Of2[State, A]#Apply](StatePure, StateApply)
+  implicit def StateApplicative[A] = applicative[({type λ[α]=State[A, α]})#λ](StatePure, StateApply)
 
-  implicit def Tuple2Applicative[R: Monoid]: Applicative[PartialApply1Of2[Tuple2, R]#Apply] = applicative[PartialApply1Of2[Tuple2, R]#Apply](Tuple2Pure, Tuple2Apply)
+  implicit def Tuple2Applicative[R: Monoid]: Applicative[({type λ[α]=Tuple2[R, α]})#λ] = applicative[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Pure, Tuple2Apply)
 
   implicit def Tuple3Applicative[R: Monoid, S: Monoid]: Applicative[PartialApply2Of3[Tuple3, R, S]#Apply] = applicative[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Pure, Tuple3Apply)
 
@@ -45,7 +45,7 @@ object Applicative {
 
   implicit def Tuple7Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Applicative[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = applicative[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Pure, Tuple7Apply)
   
-  implicit def Function1Applicative[R]: Applicative[PartialApply1Of2[Function1, R]#Apply] = applicative[PartialApply1Of2[Function1, R]#Apply](Function1Pure, Function1Apply)
+  implicit def Function1Applicative[R]: Applicative[({type λ[α]=Function1[R, α]})#λ] = applicative[({type λ[α]=Function1[R, α]})#λ](Function1Pure, Function1Apply)
 
   implicit def Function2Applicative[R, S]: Applicative[PartialApply2Of3[Function2, R, S]#Apply] = applicative[PartialApply2Of3[Function2, R, S]#Apply](Function2Pure, Function2Apply)
 
@@ -61,11 +61,11 @@ object Applicative {
   
   implicit def EitherRightApplicative[X]: Applicative[PartialApply1Of2[Either.RightProjection, X]#Apply] = applicative[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightPure, EitherRightApply)
   
-  implicit def ValidationApplicative[X: Semigroup]: Applicative[PartialApply1Of2[Validation, X]#Apply] = applicative[PartialApply1Of2[Validation, X]#Apply](ValidationPure, ValidationApply)
+  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α]=Validation[X, α]})#λ] = applicative[({type λ[α]=Validation[X, α]})#λ](ValidationPure, ValidationApply)
 
   implicit def ValidationFailureApplicative[X]: Applicative[PartialApply1Of2[FailProjection, X]#Flip] = applicative[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailurePure, ValidationFailureApply)
 
   import java.util.Map.Entry
 
-  implicit def MapEntryApplicative[X: Monoid]: Applicative[PartialApply1Of2[Entry, X]#Apply] = applicative[PartialApply1Of2[Entry, X]#Apply](MapEntryPure, MapEntryApply)
+  implicit def MapEntryApplicative[X: Monoid]: Applicative[({type λ[α]=Entry[X, α]})#λ] = applicative[({type λ[α]=Entry[X, α]})#λ](MapEntryPure, MapEntryApply)
 }

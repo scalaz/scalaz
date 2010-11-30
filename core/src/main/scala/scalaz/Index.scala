@@ -47,7 +47,7 @@ object Index {
     def index[A](a: Either.RightProjection[X, A], i: Int) = a.toOption filter (_ => i == 0)
   }
 
-  implicit def ValidationIndex[X]: Index[PartialApply1Of2[Validation, X]#Apply] = new Index[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationIndex[X]: Index[({type λ[α]=Validation[X, α]})#λ] = new Index[({type λ[α]=Validation[X, α]})#λ] {
     def index[A](a: Validation[X, A], i: Int) = a.either.right.toOption filter (_ => i == 0)
   }
 

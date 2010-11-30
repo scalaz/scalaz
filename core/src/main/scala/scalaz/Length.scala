@@ -45,7 +45,7 @@ object Length {
     }
   }
 
-  implicit def ValidationLength[X]: Length[PartialApply1Of2[Validation, X]#Apply] = new Length[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationLength[X]: Length[({type λ[α]=Validation[X, α]})#λ] = new Length[({type λ[α]=Validation[X, α]})#λ] {
     def len[A](a: Validation[X, A]) = a match {
       case Success(_) => 1
       case Failure(_) => 0

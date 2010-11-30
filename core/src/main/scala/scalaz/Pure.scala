@@ -14,7 +14,7 @@ object Pure {
     def pure[A](a: => A) = a
   }
 
-  implicit def ConstPure[B: Monoid] = new Pure[PartialApply1Of2[Const, B]#Apply] {
+  implicit def ConstPure[B: Monoid] = new Pure[({type λ[α]=Const[B, α]})#λ] {
     def pure[A](a: => A) = Const[B, A](∅)
   }
 
@@ -30,7 +30,7 @@ object Pure {
     }
   }
 
-  implicit def StatePure[S]: Pure[PartialApply1Of2[State, S]#Apply] = new Pure[PartialApply1Of2[State, S]#Apply] {
+  implicit def StatePure[S]: Pure[({type λ[α]=State[S, α]})#λ] = new Pure[({type λ[α]=State[S, α]})#λ] {
     def pure[A](a: => A) = a.state[S]
   }
 
@@ -43,7 +43,7 @@ object Pure {
     def pure[A](a: => A) = Tuple1(a)
   }
 
-  implicit def Tuple2Pure[R: Zero]: Pure[PartialApply1Of2[Tuple2, R]#Apply] = new Pure[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Pure[R: Zero]: Pure[({type λ[α]=Tuple2[R, α]})#λ] = new Pure[({type λ[α]=Tuple2[R, α]})#λ] {
     def pure[A](a: => A) = (∅, a)
   }
 
@@ -73,7 +73,7 @@ object Pure {
     }
   }
 
-  implicit def Function1Pure[R]: Pure[PartialApply1Of2[Function1, R]#Apply] = new Pure[PartialApply1Of2[Function1, R]#Apply] {
+  implicit def Function1Pure[R]: Pure[({type λ[α]=Function1[R, α]})#λ] = new Pure[({type λ[α]=Function1[R, α]})#λ] {
     def pure[A](a: => A) = (_: R) => a
   }
 
@@ -134,11 +134,11 @@ object Pure {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryPure[X: Zero]: Pure[PartialApply1Of2[Entry, X]#Apply] = new Pure[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryPure[X: Zero]: Pure[({type λ[α]=Entry[X, α]})#λ] = new Pure[({type λ[α]=Entry[X, α]})#λ] {
     def pure[A](a: => A) = new SimpleImmutableEntry(∅, a)
   }
 
-  implicit def ValidationPure[X]: Pure[PartialApply1Of2[Validation, X]#Apply] = new Pure[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationPure[X]: Pure[({type λ[α]=Validation[X, α]})#λ] = new Pure[({type λ[α]=Validation[X, α]})#λ] {
     def pure[A](a: => A) = a.success
   }
 
@@ -146,7 +146,7 @@ object Pure {
     def pure[A](a: => A) = Failure(a).fail
   }
   
-  implicit def IterVPure[E] = new Pure[PartialApply1Of2[IterV, E]#Apply] {
+  implicit def IterVPure[E] = new Pure[({type λ[α]=IterV[E, α]})#λ] {
     import IterV._
     def pure[A](a: => A) = Done(a, Empty[E])
   }

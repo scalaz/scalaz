@@ -11,9 +11,9 @@ object Pointed {
   import Functor._
   import Pure._
   
-  implicit def StatePointed[A] = pointed[PartialApply1Of2[State, A]#Apply](StateFunctor, StatePure)
+  implicit def StatePointed[A] = pointed[({type λ[α]=State[A, α]})#λ](StateFunctor, StatePure)
 
-  implicit def Tuple2Pointed[R: Monoid]: Pointed[PartialApply1Of2[Tuple2, R]#Apply] = pointed[PartialApply1Of2[Tuple2, R]#Apply](Tuple2Functor, Tuple2Pure)
+  implicit def Tuple2Pointed[R: Monoid]: Pointed[({type λ[α]=Tuple2[R, α]})#λ] = pointed[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Functor, Tuple2Pure)
 
   implicit def Tuple3Pointed[R: Monoid, S: Monoid]: Pointed[PartialApply2Of3[Tuple3, R, S]#Apply] = pointed[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Functor, Tuple3Pure)
 
@@ -25,7 +25,7 @@ object Pointed {
 
   implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Functor, Tuple7Pure)
   
-  implicit def Function1Pointed[R]: Pointed[PartialApply1Of2[Function1, R]#Apply] = pointed[PartialApply1Of2[Function1, R]#Apply](Function1Functor, Function1Pure)
+  implicit def Function1Pointed[R]: Pointed[({type λ[α]=Function1[R, α]})#λ] = pointed[({type λ[α]=Function1[R, α]})#λ](Function1Functor, Function1Pure)
 
   implicit def Function2Pointed[R, S]: Pointed[PartialApply2Of3[Function2, R, S]#Apply] = pointed[PartialApply2Of3[Function2, R, S]#Apply](Function2Functor, Function2Pure)
 
@@ -41,11 +41,11 @@ object Pointed {
   
   implicit def EitherRightPointed[X]: Pointed[PartialApply1Of2[Either.RightProjection, X]#Apply] = pointed[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightFunctor, EitherRightPure)
   
-  implicit def ValidationPointed[X: Semigroup]: Pointed[PartialApply1Of2[Validation, X]#Apply] = pointed[PartialApply1Of2[Validation, X]#Apply](ValidationFunctor, ValidationPure)
+  implicit def ValidationPointed[X: Semigroup]: Pointed[({type λ[α]=Validation[X, α]})#λ] = pointed[({type λ[α]=Validation[X, α]})#λ](ValidationFunctor, ValidationPure)
 
   implicit def ValidationFailurePointed[X]: Pointed[PartialApply1Of2[FailProjection, X]#Flip] = pointed[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureFunctor, ValidationFailurePure)
 
   import java.util.Map.Entry
 
-  implicit def MapEntryPointed[X: Monoid]: Pointed[PartialApply1Of2[Entry, X]#Apply] = pointed[PartialApply1Of2[Entry, X]#Apply](MapEntryFunctor, MapEntryPure)
+  implicit def MapEntryPointed[X: Monoid]: Pointed[({type λ[α]=Entry[X, α]})#λ] = pointed[({type λ[α]=Entry[X, α]})#λ](MapEntryFunctor, MapEntryPure)
 }

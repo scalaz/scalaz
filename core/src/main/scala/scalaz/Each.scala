@@ -15,7 +15,7 @@ object Each {
     def each[A](e: NonEmptyList[A], f: A => Unit) = e.list foreach f
   }
 
-  implicit def StateEach: Each[PartialApply1Of2[State, Unit]#Apply] = new Each[PartialApply1Of2[State, Unit]#Apply] {
+  implicit def StateEach: Each[({type λ[α]=State[Unit, α]})#λ] = new Each[({type λ[α]=State[Unit, α]})#λ] {
     def each[A](e: State[Unit, A], f: A => Unit) = f(e(())._2)
   }
 
@@ -27,7 +27,7 @@ object Each {
     def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
 
-  implicit def Tuple2Each[R]: Each[PartialApply1Of2[Tuple2, R]#Apply] = new Each[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Each[R]: Each[({type λ[α]=Tuple2[R, α]})#λ] = new Each[({type λ[α]=Tuple2[R, α]})#λ] {
     def each[A](e: (R, A), f: A => Unit) = f(e._2)
   }
 
@@ -83,7 +83,7 @@ object Each {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryEach[X]: Each[PartialApply1Of2[Entry, X]#Apply] = new Each[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryEach[X]: Each[({type λ[α]=Entry[X, α]})#λ] = new Each[({type λ[α]=Entry[X, α]})#λ] {
     def each[A](e: Entry[X, A], f: A => Unit) = f(e.getValue)
   }
 

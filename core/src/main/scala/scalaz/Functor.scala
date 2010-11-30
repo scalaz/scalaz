@@ -35,11 +35,11 @@ object Functor {
     def fmap[A, B](r: NonEmptyList[A], f: A => B) = r map f
   }
 
-  implicit def ConstFunctor[BB: Monoid] = new Functor[PartialApply1Of2[Const, BB]#Apply] {
+  implicit def ConstFunctor[BB: Monoid] = new Functor[({type λ[α]=Const[BB, α]})#λ] {
     def fmap[A, B](r: Const[BB, A], f: (A) => B) = Const(r.value)
   }
 
-  implicit def StateFunctor[S] = new Functor[PartialApply1Of2[State, S]#Apply] {
+  implicit def StateFunctor[S] = new Functor[({type λ[α]=State[S, α]})#λ] {
     def fmap[A, B](r: State[S, A], f: A => B) = r map f
   }
 
@@ -51,7 +51,7 @@ object Functor {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
 
-  implicit def Tuple2Functor[R]: Functor[PartialApply1Of2[Tuple2, R]#Apply] = new Functor[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Functor[R]: Functor[({type λ[α]=Tuple2[R, α]})#λ] = new Functor[({type λ[α]=Tuple2[R, α]})#λ] {
     def fmap[A, B](r: (R, A), f: A => B) = (r._1, f(r._2))
   }
 
@@ -81,7 +81,7 @@ object Functor {
     }
   }
 
-  implicit def Function1Functor[R]: Functor[PartialApply1Of2[Function1, R]#Apply] = new Functor[PartialApply1Of2[Function1, R]#Apply] {
+  implicit def Function1Functor[R]: Functor[({type λ[α]=Function1[R, α]})#λ] = new Functor[({type λ[α]=Function1[R, α]})#λ] {
     def fmap[A, B](r: R => A, f: A => B) = r andThen f
   }
 
@@ -129,7 +129,7 @@ object Functor {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
 
-  implicit def IterVFunctor[X]: Functor[PartialApply1Of2[IterV, X]#Apply] = new Functor[PartialApply1Of2[IterV, X]#Apply] {
+  implicit def IterVFunctor[X]: Functor[({type λ[α]=IterV[X, α]})#λ] = new Functor[({type λ[α]=IterV[X, α]})#λ] {
     import IterV._
     def fmap[A, B](r: IterV[X, A], f: A => B) = {
       r fold (
@@ -154,11 +154,11 @@ object Functor {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryFunctor[X]: Functor[PartialApply1Of2[Entry, X]#Apply] = new Functor[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryFunctor[X]: Functor[({type λ[α]=Entry[X, α]})#λ] = new Functor[({type λ[α]=Entry[X, α]})#λ] {
     def fmap[A, B](r: Entry[X, A], f: A => B) = new SimpleImmutableEntry(r.getKey, f(r.getValue))
   }
 
-  implicit def ValidationFunctor[X]: Functor[PartialApply1Of2[Validation, X]#Apply] = new Functor[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
     def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
       case Success(a) => Success(f(a))
       case Failure(e) => Failure(e)

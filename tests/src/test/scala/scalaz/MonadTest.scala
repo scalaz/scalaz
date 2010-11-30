@@ -33,8 +33,8 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
 
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {s: State[Int, Unit] => s.apply(0)}
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
-    checkMonadLaws[PartialApply1Of2[State, A]#Apply, Unit]
-    checkMonadLaws[PartialApply1Of2[Tuple2, B]#Apply, A]
+    checkMonadLaws[({type λ[α]=State[A, α]})#λ, Unit]
+    checkMonadLaws[({type λ[α]=Tuple2[B, α]})#λ, A]
     checkMonadLaws[PartialApply2Of3[Tuple3, B, C]#Apply, A]
     checkMonadLaws[PartialApply3Of4[Tuple4, B, C, D]#Apply, A]
     checkMonadLaws[PartialApply4Of5[Tuple5, B, C, D, E]#Apply, A]
@@ -46,7 +46,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)}
     implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)}
 //    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[PartialApply1Of2[Function1, B]#Apply, A]
+    checkMonadLaws[({type λ[α]=Function1[B, α]})#λ, A]
     checkMonadLaws[PartialApply2Of3[Function2, B, C]#Apply, A]
     checkMonadLaws[PartialApply3Of4[Function3, B, C, D]#Apply, A]
     checkMonadLaws[PartialApply4Of5[Function4, B, C, D, E]#Apply, A]
@@ -54,8 +54,8 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
 //    checkMonadLaws[PartialApply6Of7[Function6, B, C, D, E, F, G]#Apply, A]
     checkMonadLaws[PartialApply1Of2[Either.LeftProjection, X]#Flip, A]
     checkMonadLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]
-//    checkMonadLaws[PartialApply1Of2[Entry, X]#Apply, A]
-    checkMonadLaws[PartialApply1Of2[Validation, X]#Apply, A]
+//    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=Validation[X, α]})#λ, A]
     checkMonadLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
     ()
   }

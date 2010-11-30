@@ -34,7 +34,7 @@ object Traverse {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Tuple1[A]) = f(t._1) ∘ (Tuple1(_: B))
   }
 
-  implicit def Tuple2Traverse[X]: Traverse[PartialApply1Of2[Tuple2, X]#Apply] = new Traverse[PartialApply1Of2[Tuple2, X]#Apply] {
+  implicit def Tuple2Traverse[X]: Traverse[({type λ[α]=Tuple2[X, α]})#λ] = new Traverse[({type λ[α]=Tuple2[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Tuple2[X, A]): F[Tuple2[X, B]] =
       f(as._2) ∘ ((b: B) => (as._1, b))
   }
@@ -97,7 +97,7 @@ object Traverse {
       }
   }
 
-  implicit def ValidationTraverse[X]: Traverse[PartialApply1Of2[Validation, X]#Apply] = new Traverse[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationTraverse[X]: Traverse[({type λ[α]=Validation[X, α]})#λ] = new Traverse[({type λ[α]=Validation[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Validation[X, A]): F[Validation[X, B]] = as match {
       case Success(x) => f(x) ∘ (Success(_: B))
       case Failure(x) => (Failure(x): Validation[X, B]) η
@@ -124,7 +124,7 @@ object Traverse {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryTraverse[X]: Traverse[PartialApply1Of2[Entry, X]#Apply] = new Traverse[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryTraverse[X]: Traverse[({type λ[α]=Entry[X, α]})#λ] = new Traverse[({type λ[α]=Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Entry[X, A]): F[Entry[X, B]] = f(as.getValue) ∘ ((b: B) => new SimpleImmutableEntry(as.getKey, b))
   }
 }

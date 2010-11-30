@@ -30,11 +30,11 @@ object Monad {
   import Pure._
   import Scalaz._
 
-  implicit def StateMonad[A] = monad[PartialApply1Of2[State, A]#Apply](StateBind, StatePure)
+  implicit def StateMonad[A] = monad[({type λ[α]=State[A, α]})#λ](StateBind, StatePure)
 
   implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) = monad[PartialApplyKA[StateT, M, A]#Apply](StateTBind(b), StateTPure(p))
 
-  implicit def Tuple2Monad[R: Monoid]: Monad[PartialApply1Of2[Tuple2, R]#Apply] = monad[PartialApply1Of2[Tuple2, R]#Apply](Tuple2Bind, Tuple2Pure)
+  implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=Tuple2[R, α]})#λ] = monad[({type λ[α]=Tuple2[R, α]})#λ](Tuple2Bind, Tuple2Pure)
 
   implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[PartialApply2Of3[Tuple3, R, S]#Apply] = monad[PartialApply2Of3[Tuple3, R, S]#Apply](Tuple3Bind, Tuple3Pure)
 
@@ -46,7 +46,7 @@ object Monad {
 
   implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Bind, Tuple7Pure)
   
-  implicit def Function1Monad[R]: Monad[PartialApply1Of2[Function1, R]#Apply] = monad[PartialApply1Of2[Function1, R]#Apply](Function1Bind, Function1Pure)
+  implicit def Function1Monad[R]: Monad[({type λ[α]=Function1[R, α]})#λ] = monad[({type λ[α]=Function1[R, α]})#λ](Function1Bind, Function1Pure)
 
   implicit def Function2Monad[R, S]: Monad[PartialApply2Of3[Function2, R, S]#Apply] = monad[PartialApply2Of3[Function2, R, S]#Apply](Function2Bind, Function2Pure)
 
@@ -62,13 +62,13 @@ object Monad {
   
   implicit def EitherRightMonad[X]: Monad[PartialApply1Of2[Either.RightProjection, X]#Apply] = monad[PartialApply1Of2[Either.RightProjection, X]#Apply](EitherRightBind, EitherRightPure)
   
-  implicit def ValidationMonad[X]: Monad[PartialApply1Of2[Validation, X]#Apply] = monad[PartialApply1Of2[Validation, X]#Apply](ValidationBind, ValidationPure)
+  implicit def ValidationMonad[X]: Monad[({type λ[α]=Validation[X, α]})#λ] = monad[({type λ[α]=Validation[X, α]})#λ](ValidationBind, ValidationPure)
 
   implicit def ValidationFailureMonad[X]: Monad[PartialApply1Of2[FailProjection, X]#Flip] = monad[PartialApply1Of2[FailProjection, X]#Flip](ValidationFailureBind, ValidationFailurePure)
 
-  implicit def IterVMonad[E] = monad[PartialApply1Of2[IterV, E]#Apply](IterVBind, IterVPure)
+  implicit def IterVMonad[E] = monad[({type λ[α]=IterV[E, α]})#λ](IterVBind, IterVPure)
 
   import java.util.Map.Entry
 
-  implicit def MapEntryBind[X: Monoid]: Monad[PartialApply1Of2[Entry, X]#Apply] = monad[PartialApply1Of2[Entry, X]#Apply](MapEntryBind, MapEntryPure)  
+  implicit def MapEntryBind[X: Monoid]: Monad[({type λ[α]=Entry[X, α]})#λ] = monad[({type λ[α]=Entry[X, α]})#λ](MapEntryBind, MapEntryPure)  
 }

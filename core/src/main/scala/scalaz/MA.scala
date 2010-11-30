@@ -220,7 +220,7 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
   def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = foldMapDefault(f)
   
   def foldMapDefault[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
-    t.traverse[PartialApply1Of2[Const, B]#Apply, A, B](a => Const[B, B](f(a)), value)
+    t.traverse[({type λ[α]=Const[B, α]})#λ, A, B](a => Const[B, B](f(a)), value)
   }
 
   def collapse(implicit t: Traverse[M], m: Monoid[A]): A = ↣(identity[A])

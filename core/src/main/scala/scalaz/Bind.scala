@@ -15,7 +15,7 @@ object Bind {
     def bind[A, B](r: NonEmptyList[A], f: A => NonEmptyList[B]) = r flatMap f
   }
 
-  implicit def StateBind[S]: Bind[PartialApply1Of2[State, S]#Apply] = new Bind[PartialApply1Of2[State, S]#Apply] {
+  implicit def StateBind[S]: Bind[({type λ[α]=State[S, α]})#λ] = new Bind[({type λ[α]=State[S, α]})#λ] {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
   }
 
@@ -34,7 +34,7 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
-  implicit def Tuple2Bind[R: Semigroup]: Bind[PartialApply1Of2[Tuple2, R]#Apply] = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Bind[R: Semigroup]: Bind[({type λ[α]=Tuple2[R, α]})#λ] = new Bind[({type λ[α]=Tuple2[R, α]})#λ] {
     def bind[A, B](r: (R, A), f: A => (R, B)) = {
       val (rr, b) = f(r._2)
       (r._1 ⊹ rr, b)
@@ -80,7 +80,7 @@ object Bind {
     def bind[A, B](r: Function0[A], f: A => Function0[B]) = f(r.apply)
   }
 
-  implicit def Function1Bind[R]: Bind[PartialApply1Of2[Function1, R]#Apply] = new Bind[PartialApply1Of2[Function1, R]#Apply] {
+  implicit def Function1Bind[R]: Bind[({type λ[α]=Function1[R, α]})#λ] = new Bind[({type λ[α]=Function1[R, α]})#λ] {
     def bind[A, B](r: R => A, f: A => R => B) = (t: R) => f(r(t))(t)
   }
 
@@ -137,14 +137,14 @@ object Bind {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryBind[X: Semigroup]: Bind[PartialApply1Of2[Entry, X]#Apply] = new Bind[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryBind[X: Semigroup]: Bind[({type λ[α]=Entry[X, α]})#λ] = new Bind[({type λ[α]=Entry[X, α]})#λ] {
     def bind[A, B](r: Entry[X, A], f: A => Entry[X, B]) = {
       val e = f(r.getValue)
       new SimpleImmutableEntry(r.getKey ⊹ e.getKey, e.getValue)
     }
   }
   
-  implicit def ValidationBind[X]: Bind[PartialApply1Of2[Validation, X]#Apply] = new Bind[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationBind[X]: Bind[({type λ[α]=Validation[X, α]})#λ] = new Bind[({type λ[α]=Validation[X, α]})#λ] {
     def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
       case Success(a) => f(a)
       case Failure(e) => Failure(e)
@@ -170,7 +170,7 @@ object Bind {
     def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
   }
   
-  implicit def IterVBind[E]: Bind[PartialApply1Of2[IterV, E]#Apply] = new Bind[PartialApply1Of2[IterV, E]#Apply] {
+  implicit def IterVBind[E]: Bind[({type λ[α]=IterV[E, α]})#λ] = new Bind[({type λ[α]=IterV[E, α]})#λ] {
     import IterV._
     def bind[A, B](a: IterV[E, A], f: A => IterV[E, B]) = a.fold(
       done = (x, str) => f(x).fold(
