@@ -251,11 +251,14 @@ object Liskov {
     r.subst[r](d.subst[d](c.subst[c](b.subst[b](a.subst[a](refl)))))
   }
 
-  /** If A <: B and B :> A then A = B */
+  /** If A <: B and B :> A then A = B 
+
   def bracket[A,B](
     ab : A <~: B, 
     ba : A :~> B
   ): Leibniz[A,B] = Leibniz.force[A,B]
+
+  */
 
   /** Unsafely force a claim that A is a subtype of B */
   def force[A,B]: A <~: B = new (A <~: B) { 

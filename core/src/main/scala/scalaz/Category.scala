@@ -58,9 +58,10 @@ object Category {
     def pair[AX_ >:LX<:HX, AY_ >:LY<:HY, BX_ >:LX<:HX, BY_ >:LY<:HY](
       implicit a: P[AX,AY] ~ P[AX_,AY_], b: P[BX,BY] ~ P[BX_,BY_]
     ) = {
-      val (a1,a2) = lower2[P, AX, AX_, AY, AY_](a)
-      val (b1,b2) = lower2[P, BX, BX_, BY, BY_](b)
-      ( force(p._1), force(p._2) )
+      // val (a1,a2) = lower2[P, AX, AX_, AY, AY_](a)
+      // val (b1,b2) = lower2[P, BX, BX_, BY, BY_](b)
+      error("WOOHOO")
+      // ( force(p._1), force(p._2) )
       // ( liftB2[X,LX,HX,LY,HY,AX,AX_,BX,BX_](a1,b1)(p._1), liftB2[Y,LX,HX,LY,HY,AY,AY_,BY,BY_](a2,b2)(p._2))
     }
   }
@@ -80,8 +81,9 @@ object Category {
 
     def id[A>:P[LX,LY]<:P[HX,HY]] = new Product[LX,HX,X, LY,HY,Y, A, A] {
       def pair[AX>:LX<:HX,AY>:LY<:HY,BX>:LX<:HX,BY>:LY<:HY](implicit a: A ~ P[AX,AY], b: A ~ P[BX,BY]) : (X[AX,BX],Y[AY,BY]) = {
-        val (axbx, ayby) = lower2[P,AX,BX,AY,BY](b compose a.inverse)
-        ( force(x.id[AX]), force(y.id[AY]) )
+        // val (axbx, ayby) = lower2[P,AX,BX,AY,BY](b compose a.inverse)
+        error("TODO")
+        // ( force(x.id[AX]), force(y.id[AY]) )
         //(witness(lift2[X,AX,AX,AX,BX](refl, axbx))(x.id[AX]), witness(lift2[Y,AY,AY,AY,BY](refl, ayby))(y.id[AY]))
       }
     }
@@ -98,7 +100,8 @@ object Category {
           val (gx,gy) = g.pair(a, b)
 	  (x.compose[AX,BX,CX](fx,gx), y.compose[AY,BY,CY](fy, gy))
 	}
-	go[B#_1,B#_2](force[B,P[B#_1,B#_2]])
+        error("FORCE")
+	//go[B#_1,B#_2](force[B,P[B#_1,B#_2]])
       }
     }
   }
