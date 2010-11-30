@@ -44,7 +44,7 @@ object Monad {
 
   implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Bind, Tuple6Pure)
 
-  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Bind, Tuple7Pure)
+  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = monad[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Bind, Tuple7Pure)
   
   implicit def Function1Monad[R]: Monad[({type λ[α]=Function1[R, α]})#λ] = monad[({type λ[α]=Function1[R, α]})#λ](Function1Bind, Function1Pure)
 
@@ -56,7 +56,7 @@ object Monad {
 
   implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = monad[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Bind, Function5Pure)
 
-  implicit def Function6Monad[R, S, T, U, V, W]: Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Bind, Function6Pure)
+  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = monad[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ](Function6Bind, Function6Pure)
 
   implicit def EitherLeftMonad[X]: Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip] = monad[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftBind, EitherLeftPure)
   

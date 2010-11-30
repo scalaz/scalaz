@@ -40,7 +40,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     //    checkFunctorLaws[({type λ[α]=Function3[R, S, T, α]})#λ, A]
     //    checkFunctorLaws[({type λ[α]=Function4[R, S, T, U, α]})#λ, A]
     //    checkFunctorLaws[({type λ[α]=Function5[R, S, T, U, V, α]})#λ, A]
-    //    checkFunctorLaws[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply, A]
+    //    checkFunctorLaws[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ, A]
 
     checkFunctorLaws[List, A]
 

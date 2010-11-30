@@ -14,7 +14,7 @@ object ImplicitConversionTest {
     i[((A, B, C) => D) <%< MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
     i[((A, B, C, D) => E) <%< MA[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
     i[((A, B, C, D, E) => F) <%< MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
-    i[((A, B, C, D, E, F) => G) <%< MA[PartialApply6Of7[Function6, A, B, C, D, E, F]#Apply, G]]
+    i[((A, B, C, D, E, F) => G) <%< MA[({type λ[α]=Function6[A, B, C, D, E, F, α]})#λ, G]]
     i[Validation[A, B] <%< MA[({type λ[α]=Validation[A, α]})#λ, B]]
     i[FailProjection[A, B] <%< MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
     i[Either.LeftProjection[A, B] <%< MA[PartialApply1Of2[Either.LeftProjection, B]#Flip, A]]
@@ -24,7 +24,7 @@ object ImplicitConversionTest {
     i[(A, B, C, D) <%< MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
     i[(A, B, C, D, E) <%< MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
     i[(A, B, C, D, E, F) <%< MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
-    i[(A, B, C, D, E, F, G) <%< MA[PartialApply6Of7[Tuple7, A, B, C, D, E, F]#Apply, G]]
+    i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=Tuple7[A, B, C, D, E, F, α]})#λ, G]]
 
     // via higher kind inference
     trait T[A]
@@ -44,7 +44,7 @@ object ImplicitConversionTest {
     i[Apply[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Apply[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Apply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    i[Apply[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]]
     i[Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
     i[Apply[PartialApply1Of2[Either.RightProjection, X]#Apply]]
     import java.util.Map.Entry
@@ -65,7 +65,7 @@ object ImplicitConversionTest {
     i[Applicative[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Applicative[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Applicative[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Applicative[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    i[Applicative[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]]
     i[Applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
     i[Applicative[PartialApply1Of2[Either.RightProjection, X]#Apply]]
     import java.util.Map.Entry
@@ -86,7 +86,7 @@ object ImplicitConversionTest {
     i[Pointed[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Pointed[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Pointed[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    i[Pointed[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]]
     i[Pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
     i[Pointed[PartialApply1Of2[Either.RightProjection, X]#Apply]]
     import java.util.Map.Entry
@@ -122,7 +122,7 @@ object ImplicitConversionTest {
     i[Monad[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
+    i[Monad[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]]
     i[Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
     i[Monad[PartialApply1Of2[Either.RightProjection, X]#Apply]]
     import java.util.Map.Entry    
@@ -209,7 +209,7 @@ object ImplicitConversionTest {
 
     i[PartialApply5Of6[T6, A, B, C, D, E]#Apply[F] =:= T6[A, B, C, D, E, F]]
 
-    i[PartialApply6Of7[T7, A, B, C, D, E, F]#Apply[G] =:= T7[A, B, C, D, E, F, G]]
+    i[({type λ[α]=T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
   }
   
   def strategy {

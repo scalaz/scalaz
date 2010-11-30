@@ -41,7 +41,7 @@ object Apply extends ApplyLow {
 
   implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ]
 
-  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = FunctorBindApply[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ]
     
   implicit def Function1Apply[R]: Apply[({type λ[α]=Function1[R, α]})#λ] = FunctorBindApply[({type λ[α]=Function1[R, α]})#λ]
 
@@ -53,7 +53,7 @@ object Apply extends ApplyLow {
 
   implicit def Function5Apply[R, S, T, U, V]: Apply[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = FunctorBindApply[({type λ[α]=Function5[R, S, T, U, V, α]})#λ]
 
-  implicit def Function6Apply[R, S, T, U, V, W]: Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]
+  implicit def Function6Apply[R, S, T, U, V, W]: Apply[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = FunctorBindApply[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ]
 
   implicit def EitherLeftApply[X]: Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip] = FunctorBindApply[PartialApply1Of2[Either.LeftProjection, X]#Flip]
 

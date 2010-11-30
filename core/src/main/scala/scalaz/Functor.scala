@@ -71,7 +71,7 @@ object Functor {
     def fmap[A, B](r: (R, S, T, U, V, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, f(r._6))
   }
 
-  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Functor[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Functor[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
   }
 
@@ -101,7 +101,7 @@ object Functor {
     def fmap[A, B](r: (R, S, T, U, V) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
   }
 
-  implicit def Function6Functor[R, S, T, U, V, W]: Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Functor[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 

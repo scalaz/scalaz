@@ -63,7 +63,7 @@ object Pure {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], a)
   }
 
-  implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Pure[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Pure[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pure[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Pure[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
     def pure[A](a: => A) = (∅[R], ∅[S], ∅[T], ∅[U], ∅[V], ∅[W], a)
   }
 
@@ -93,7 +93,7 @@ object Pure {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
   }
 
-  implicit def Function6Pure[R, S, T, U, V, W]: Pure[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Pure[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+  implicit def Function6Pure[R, S, T, U, V, W]: Pure[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Pure[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
     def pure[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
 

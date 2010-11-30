@@ -69,7 +69,7 @@ object Bind {
     }
   }
 
-  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Bind[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
       val (rr, s, t, u, v, w, b) = f(r._7)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, r._6 ⊹ w, b)
@@ -100,7 +100,7 @@ object Bind {
     def bind[A, B](r: (R, S, T, U, V) => A, f: A => (R, S, T, U, V) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
   }
 
-  implicit def Function6Bind[R, S, T, U, V, W]: Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+  implicit def Function6Bind[R, S, T, U, V, W]: Bind[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = new Bind[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W) => A, f: A => (R, S, T, U, V, W) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 

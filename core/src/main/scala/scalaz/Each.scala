@@ -47,7 +47,7 @@ object Each {
     def each[A](e: (R, S, T, U, V, A), f: A => Unit) = f(e._6)
   }
 
-  implicit def Tuple7Each[R, S, T, U, V, W]: Each[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Each[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Each[R, S, T, U, V, W]: Each[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = new Each[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] {
     def each[A](e: (R, S, T, U, V, W, A), f: A => Unit) = f(e._7)
   }
 

@@ -23,7 +23,7 @@ object Pointed {
 
   implicit def Tuple6Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ] = pointed[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ](Tuple6Functor, Tuple6Pure)
 
-  implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = pointed[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply](Tuple7Functor, Tuple7Pure)
+  implicit def Tuple7Pointed[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Pointed[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ] = pointed[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ](Tuple7Functor, Tuple7Pure)
   
   implicit def Function1Pointed[R]: Pointed[({type λ[α]=Function1[R, α]})#λ] = pointed[({type λ[α]=Function1[R, α]})#λ](Function1Functor, Function1Pure)
 
@@ -35,7 +35,7 @@ object Pointed {
 
   implicit def Function5Pointed[R, S, T, U, V]: Pointed[({type λ[α]=Function5[R, S, T, U, V, α]})#λ] = pointed[({type λ[α]=Function5[R, S, T, U, V, α]})#λ](Function5Functor, Function5Pure)
 
-  implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply](Function6Functor, Function6Pure)
+  implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ] = pointed[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ](Function6Functor, Function6Pure)
 
   implicit def EitherLeftPointed[X]: Pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip] = pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip](EitherLeftFunctor, EitherLeftPure)
   

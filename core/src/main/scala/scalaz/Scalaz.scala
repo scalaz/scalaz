@@ -105,7 +105,7 @@ object Scalaz extends ScalazLow
 
   implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A): MA[({type λ[α]=Function5[R, S, T, U, V, α]})#λ, A] = ma[({type λ[α]=Function5[R, S, T, U, V, α]})#λ, A](a)
 
-  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply, A] = ma[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply, A](a)
+  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ, A] = ma[({type λ[α]=Function6[R, S, T, U, V, W, α]})#λ, A](a)
 
   implicit def ConstMA[B, A](c: Const[B, A]): MA[({type λ[α]=Const[B, α]})#λ, A] = ma[({type λ[α]=Const[B, α]})#λ, A](c)
 
@@ -121,7 +121,7 @@ object Scalaz extends ScalazLow
 
   implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)): MA[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ, A] = ma[({type λ[α]=Tuple6[R, S, T, U, V, α]})#λ, A](a)
 
-  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply, A] = ma[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply, A](a)
+  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ, A] = ma[({type λ[α]=Tuple7[R, S, T, U, V, W, α]})#λ, A](a)
 
   implicit def ValidationMA[A, E](v: Validation[E, A]): MA[({type λ[α]=Validation[E, α]})#λ, A] = ma[({type λ[α]=Validation[E, α]})#λ, A](v)
 
