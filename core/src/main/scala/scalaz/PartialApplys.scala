@@ -1,11 +1,14 @@
 package scalaz
 
-// Scala doesn't currently have a way to directly express a
-// type function, such as `[A]Either[A, Int]`. Instead, we must
-// pass type constructor and fixed types as arguments to one
-// of the traits below. For example, the type function mentioned
-// above is expressed as `({type λ[α]=Either[α, Int]})#λ`.
-
+/**
+ * Scala doesn't currently have a way to directly express a
+ * type function, such as `[A]Either[A, Int]`. Instead, we must
+ * pass type constructor and fixed types as arguments to one
+ * of the traits below. For example, the type function mentioned
+ * above is expressed as `PartialApply1Of2[Either, Int]#Flip`
+ *
+ * This can also be expressed as `({type λ[α]=Either[α, Int]})#λ`.
+*/
 trait PartialApply1Of2[T[_, _], A] {
   type Apply[B] = T[A, B]
 
