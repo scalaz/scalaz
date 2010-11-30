@@ -9,8 +9,9 @@ package scalaz
   * It is generalized here to handle subtyping so that it can be used with constrained type constructors
   */
 
-trait Leibniz[L<:H,H>:L,A>:L<:H,B>:L<:H] {
+trait Leibniz[-L<:H,+H>:L,A>:L<:H,B>:L<:H] {
   def subst[F[_>:L<:H]](p: F[A]) : F[B]
+/*
   final def *[
     L2<:H2,LT<:HT,
     H2>:L2,HT>:LT,
@@ -22,18 +23,19 @@ trait Leibniz[L<:H,H>:L,A>:L<:H,B>:L<:H] {
   final def andThen[C>:L<:H](that: Leibniz[L,H,B,C]) : Leibniz[L,H,A,C] = Leibniz.trans[L,H,A,B,C](that,this)
   final def compose[C>:L<:H](that: Leibniz[L,H,C,A]) : Leibniz[L,H,C,B] = Leibniz.trans[L,H,C,A,B](this,that)
   final def inverse : Leibniz[L,H,B,A] = Leibniz.symm(this)
+*/
 }
 
 object Leibniz {
   type ~[A,B] = Leibniz[Nothing,Any,A,B]
 
-  trait PartialApplyLeibniz[L<:H,H>:L] {
+  trait PartialApplyLeibniz[-L<:H,+H>:L] {
     type Apply[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
   }
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
-  implicit def refl[L<:H,H>:L,A>:L<:H] : Leibniz[L,H,A,A] = new Leibniz[L,H,A,A] {
-    def subst[F[_>:L<:H]](p:F[A]): F[A]= p
+  implicit def refl[A] : Leibniz[A,A,A,A] = new Leibniz[A,A,A,A] {
+    def subst[F[_>:A<:A]](p:F[A]): F[A]= p
   }
 
   /** We can witness equality by using it to convert between types 
@@ -59,7 +61,8 @@ object Leibniz {
     type H = H_
     type ~>[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
 
-    def id[A>:L<:H] : Leibniz[L,H,A,A] = refl[L,H,A]
+    //def id[A>:L<:H] : Leibniz[L,H,A,A] = refl[L,H,A]
+    def id[A>:L<:H] : Leibniz[L,H,A,A] = refl[A]
 
     def compose[A>:L<:H,B>:L<:H,C>:L<:H](
       bc: Leibniz[L,H,B,C],
