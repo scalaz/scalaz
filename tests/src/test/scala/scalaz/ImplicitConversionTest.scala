@@ -8,23 +8,23 @@ object ImplicitConversionTest {
   def MAs[A, B, C, D, E, F, G, H] {
     i[List[A] <%< MA[List, A]]
     i[Option[A] <%< MA[Option, A]]
-    i[(A => B) <%< MACofunctor[PartialApply1Of2[Function1, B]#Flip, A]]
-    i[(A => B) <%< MA[PartialApply1Of2[Function1, A]#Apply, B]]
+    i[(A => B) <%< MACofunctor[({type λ[α]=(α) => B})#λ, A]]
+    i[(A => B) <%< MA[({type λ[α]=(A) => α})#λ, B]]
     i[((A, B) => C) <%< MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
     i[((A, B, C) => D) <%< MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
     i[((A, B, C, D) => E) <%< MA[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
     i[((A, B, C, D, E) => F) <%< MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
-    i[((A, B, C, D, E, F) => G) <%< MA[PartialApply6Of7[Function6, A, B, C, D, E, F]#Apply, G]]
-    i[Validation[A, B] <%< MA[PartialApply1Of2[Validation, A]#Apply, B]]
-    i[FailProjection[A, B] <%< MA[PartialApply1Of2[FailProjection, B]#Flip, A]]
-    i[Either.LeftProjection[A, B] <%< MA[PartialApply1Of2[Either.LeftProjection, B]#Flip, A]]
-    i[Either.RightProjection[A, B] <%< MA[PartialApply1Of2[Either.RightProjection, A]#Apply, B]]
-    i[(A, B) <%< MA[PartialApply1Of2[Tuple2, A]#Apply, B]]
+    i[((A, B, C, D, E, F) => G) <%< MA[({type λ[α]=(A, B, C, D, E, F) => α})#λ, G]]
+    i[Validation[A, B] <%< MA[({type λ[α]=Validation[A, α]})#λ, B]]
+    i[FailProjection[A, B] <%< MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
+    i[Either.LeftProjection[A, B] <%< MA[({type λ[α]=Either.LeftProjection[α, B]})#λ, A]]
+    i[Either.RightProjection[A, B] <%< MA[({type λ[α]=Either.RightProjection[A, α]})#λ, B]]
+    i[(A, B) <%< MA[({type λ[α]=(A, α)})#λ, B]]
     i[(A, B, C) <%< MA[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
     i[(A, B, C, D) <%< MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
     i[(A, B, C, D, E) <%< MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
     i[(A, B, C, D, E, F) <%< MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
-    i[(A, B, C, D, E, F, G) <%< MA[PartialApply6Of7[Tuple7, A, B, C, D, E, F]#Apply, G]]
+    i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=(A, B, C, D, E, F, α)})#λ, G]]
 
     // via higher kind inference
     trait T[A]
@@ -37,20 +37,20 @@ object ImplicitConversionTest {
     i[Apply[List]]
     i[Apply[Function0]]
     i[Apply[Option]]
-    i[Apply[PartialApply1Of2[State, A]#Apply]]
+    i[Apply[({type λ[α]=State[A, α]})#λ]]
     i[Apply[Function0]]
-    i[Apply[PartialApply1Of2[Function1, R]#Apply]]
+    i[Apply[({type λ[α]=(R) => α})#λ]]
     i[Apply[PartialApply2Of3[Function2, R, S]#Apply]]
     i[Apply[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Apply[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Apply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
-    i[Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
-    i[Apply[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    i[Apply[({type λ[α]=(R, S, T, U, V, W) => α})#λ]]
+    i[Apply[({type λ[α]=Either.LeftProjection[α, X]})#λ]]
+    i[Apply[({type λ[α]=Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry
-    i[Apply[PartialApply1Of2[Entry, Int]#Apply]]
-    i[Apply[PartialApply1Of2[Validation, Int]#Apply]]
-    i[Apply[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Apply[({type λ[α]=Entry[Int, α]})#λ]]
+    i[Apply[({type λ[α]=Validation[Int, α]})#λ]]
+    i[Apply[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def applicative[A, B, R, S, T, U, V, W, X] {
@@ -58,20 +58,20 @@ object ImplicitConversionTest {
     i[Applicative[List]]
     i[Applicative[Function0]]
     i[Applicative[Option]]
-    i[Applicative[PartialApply1Of2[State, A]#Apply]]
+    i[Applicative[({type λ[α]=State[A, α]})#λ]]
     i[Applicative[Function0]]
-    i[Applicative[PartialApply1Of2[Function1, R]#Apply]]
+    i[Applicative[({type λ[α]=(R) => α})#λ]]
     i[Applicative[PartialApply2Of3[Function2, R, S]#Apply]]
     i[Applicative[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Applicative[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Applicative[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Applicative[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
-    i[Applicative[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
-    i[Applicative[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    i[Applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ]]
+    i[Applicative[({type λ[α]=Either.LeftProjection[α, X]})#λ]]
+    i[Applicative[({type λ[α]=Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry
-    i[Applicative[PartialApply1Of2[Entry, Int]#Apply]]
-    i[Applicative[PartialApply1Of2[Validation, Int]#Apply]]
-    i[Applicative[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Applicative[({type λ[α]=Entry[Int, α]})#λ]]
+    i[Applicative[({type λ[α]=Validation[Int, α]})#λ]]
+    i[Applicative[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
@@ -79,20 +79,20 @@ object ImplicitConversionTest {
     i[Pointed[List]]
     i[Pointed[Function0]]
     i[Pointed[Option]]
-    i[Pointed[PartialApply1Of2[State, A]#Apply]]
+    i[Pointed[({type λ[α]=State[A, α]})#λ]]
     i[Pointed[Function0]]
-    i[Pointed[PartialApply1Of2[Function1, R]#Apply]]
+    i[Pointed[({type λ[α]=(R) => α})#λ]]
     i[Pointed[PartialApply2Of3[Function2, R, S]#Apply]]
     i[Pointed[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Pointed[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Pointed[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Pointed[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
-    i[Pointed[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
-    i[Pointed[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    i[Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ]]
+    i[Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ]]
+    i[Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry
-    i[Pointed[PartialApply1Of2[Entry, Int]#Apply]]
-    i[Pointed[PartialApply1Of2[Validation, Int]#Apply]]
-    i[Pointed[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Pointed[({type λ[α]=Entry[Int, α]})#λ]]
+    i[Pointed[({type λ[α]=Validation[Int, α]})#λ]]
+    i[Pointed[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def bind {
@@ -115,20 +115,20 @@ object ImplicitConversionTest {
     i[Monad[List]]
     i[Monad[Stream]]
     i[Monad[NonEmptyList]]
-    i[Monad[PartialApply1Of2[State, A]#Apply]]
+    i[Monad[({type λ[α]=State[A, α]})#λ]]
     i[Monad[Function0]]
-    i[Monad[PartialApply1Of2[Function1, R]#Apply]]
+    i[Monad[({type λ[α]=(R) => α})#λ]]
     i[Monad[PartialApply2Of3[Function2, R, S]#Apply]]
     i[Monad[PartialApply3Of4[Function3, R, S, T]#Apply]]
     i[Monad[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
     i[Monad[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Monad[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]]
-    i[Monad[PartialApply1Of2[Either.LeftProjection, X]#Flip]]
-    i[Monad[PartialApply1Of2[Either.RightProjection, X]#Apply]]
+    i[Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ]]
+    i[Monad[({type λ[α]=Either.LeftProjection[α, X]})#λ]]
+    i[Monad[({type λ[α]=Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry    
-    i[Monad[PartialApply1Of2[Entry, Int]#Apply]]
-    i[Monad[PartialApply1Of2[Validation, X]#Apply]]
-    i[Monad[PartialApply1Of2[FailProjection, X]#Flip]]
+    i[Monad[({type λ[α]=Entry[Int, α]})#λ]]
+    i[Monad[({type λ[α]=Validation[X, α]})#λ]]
+    i[Monad[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def functor {
@@ -196,8 +196,8 @@ object ImplicitConversionTest {
     trait T6[A, B, C, D, E, F]
     trait T7[A, B, C, D, E, F, G]
 
-    i[PartialApply1Of2[T2, A]#Apply[B] =:= T2[A, B]]
-    i[PartialApply1Of2[T2, A]#Flip[B] =:= T2[B, A]]
+    i[({type λ[α]=T2[A, α]})#λ[B] =:= T2[A, B]]
+    i[({type λ[α]=T2[α, A]})#λ[B] =:= T2[B, A]]
 
     i[PartialApply2Of3[T3, A, B]#Apply[C] =:= T3[A, B, C]]
     i[PartialApply2Of3[T3, A, B]#ApplyA[C] =:= T3[C, A, B]]
@@ -209,7 +209,7 @@ object ImplicitConversionTest {
 
     i[PartialApply5Of6[T6, A, B, C, D, E]#Apply[F] =:= T6[A, B, C, D, E, F]]
 
-    i[PartialApply6Of7[T7, A, B, C, D, E, F]#Apply[G] =:= T7[A, B, C, D, E, F, G]]
+    i[({type λ[α]=T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
   }
   
   def strategy {

@@ -28,7 +28,6 @@ object Applicative {
   import Apply._
   import Scalaz._
 
-  implicit def MonoidalApplicative[B: Monoid]: Applicative[PartialApply1Of2[Const, B]#Apply]
-      = applicative[PartialApply1Of2[Const, B]#Apply](ConstPure, ConstApply)
-
+  implicit def MonoidalApplicative[B: Monoid]: Applicative[({type λ[α]=Const[B, α]})#λ]
+      = applicative[({type λ[α]=Const[B, α]})#λ](ConstPure, ConstApply)
 }

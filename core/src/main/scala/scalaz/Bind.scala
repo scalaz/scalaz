@@ -15,11 +15,11 @@ object Bind {
     def bind[A, B](r: NonEmptyList[A], f: A => NonEmptyList[B]) = r flatMap f
   }
 
-  implicit def StateBind[S]: Bind[PartialApply1Of2[State, S]#Apply] = new Bind[PartialApply1Of2[State, S]#Apply] {
+  implicit def StateBind[S]: Bind[({type λ[α]=State[S, α]})#λ] = new Bind[({type λ[α]=State[S, α]})#λ] {
     def bind[A, B](r: State[S, A], f: A => State[S, B]) = r flatMap f
   }
 
-  implicit def StateTBind[M[_]:Bind, S]: Bind[PartialApplyKA[StateT, M, S]#Apply] = new Bind[PartialApplyKA[StateT, M, S]#Apply] {
+  implicit def StateTBind[M[_]:Bind, S]: Bind[({type λ[α]=StateT[M, S, α]})#λ] = new Bind[({type λ[α]=StateT[M, S, α]})#λ] {
     def bind[A, B](r: StateT[M, S, A], f: A => StateT[M, S, B]) = r flatMap f
   }
 
@@ -34,42 +34,42 @@ object Bind {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
 
-  implicit def Tuple2Bind[R: Semigroup]: Bind[PartialApply1Of2[Tuple2, R]#Apply] = new Bind[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Bind[R: Semigroup]: Bind[({type λ[α]=(R, α)})#λ] = new Bind[({type λ[α]=(R, α)})#λ] {
     def bind[A, B](r: (R, A), f: A => (R, B)) = {
       val (rr, b) = f(r._2)
       (r._1 ⊹ rr, b)
     }
   }
 
-  implicit def Tuple3Bind[R: Semigroup, S: Semigroup]: Bind[PartialApply2Of3[Tuple3, R, S]#Apply] = new Bind[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Bind[R: Semigroup, S: Semigroup]: Bind[({type λ[α]=(R, S, α)})#λ] = new Bind[({type λ[α]=(R, S, α)})#λ] {
     def bind[A, B](r: (R, S, A), f: A => (R, S, B)) = {
       val (rr, s, b) = f(r._3)
       (r._1 ⊹ rr, r._2 ⊹ s, b)
     }
   }
 
-  implicit def Tuple4Bind[R: Semigroup, S: Semigroup, T: Semigroup]: Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Bind[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Bind[R: Semigroup, S: Semigroup, T: Semigroup]: Bind[({type λ[α]=(R, S, T, α)})#λ] = new Bind[({type λ[α]=(R, S, T, α)})#λ] {
     def bind[A, B](r: (R, S, T, A), f: A => (R, S, T, B)) = {
       val (rr, s, t, b) = f(r._4)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, b)
     }
   }
 
-  implicit def Tuple5Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Bind[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Bind[({type λ[α]=(R, S, T, U, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, A), f: A => (R, S, T, U, B)) = {
       val (rr, s, t, u, b) = f(r._5)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, b)
     }
   }
 
-  implicit def Tuple6Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Bind[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Bind[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, V, A), f: A => (R, S, T, U, V, B)) = {
       val (rr, s, t, u, v, b) = f(r._6)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, b)
     }
   }
 
-  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Bind[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Bind[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W, A), f: A => (R, S, T, U, V, W, B)) = {
       val (rr, s, t, u, v, w, b) = f(r._7)
       (r._1 ⊹ rr, r._2 ⊹ s, r._3 ⊹ t, r._4 ⊹ u, r._5 ⊹ v, r._6 ⊹ w, b)
@@ -77,30 +77,30 @@ object Bind {
   }
 
   implicit def Function0Bind: Bind[Function0] = new Bind[Function0] {
-    def bind[A, B](r: Function0[A], f: A => Function0[B]) = f(r.apply)
+    def bind[A, B](r: () => A, f: A => (() => B)) = f(r.apply)
   }
 
-  implicit def Function1Bind[R]: Bind[PartialApply1Of2[Function1, R]#Apply] = new Bind[PartialApply1Of2[Function1, R]#Apply] {
+  implicit def Function1Bind[R]: Bind[({type λ[α]=(R) => α})#λ] = new Bind[({type λ[α]=(R) => α})#λ] {
     def bind[A, B](r: R => A, f: A => R => B) = (t: R) => f(r(t))(t)
   }
 
-  implicit def Function2Bind[R, S]: Bind[PartialApply2Of3[Function2, R, S]#Apply] = new Bind[PartialApply2Of3[Function2, R, S]#Apply] {
+  implicit def Function2Bind[R, S]: Bind[({type λ[α]=(R, S) => α})#λ] = new Bind[({type λ[α]=(R, S) => α})#λ] {
     def bind[A, B](r: (R, S) => A, f: A => (R, S) => B) = (t1: R, t2: S) => f(r(t1, t2))(t1, t2)
   }
 
-  implicit def Function3Bind[R, S, T]: Bind[PartialApply3Of4[Function3, R, S, T]#Apply] = new Bind[PartialApply3Of4[Function3, R, S, T]#Apply] {
+  implicit def Function3Bind[R, S, T]: Bind[({type λ[α]=(R, S, T) => α})#λ] = new Bind[({type λ[α]=(R, S, T) => α})#λ] {
     def bind[A, B](r: (R, S, T) => A, f: A => (R, S, T) => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))(t1, t2, t3)
   }
 
-  implicit def Function4Bind[R, S, T, U]: Bind[PartialApply4Of5[Function4, R, S, T, U]#Apply] = new Bind[PartialApply4Of5[Function4, R, S, T, U]#Apply] {
+  implicit def Function4Bind[R, S, T, U]: Bind[({type λ[α]=(R, S, T, U) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U) => α})#λ] {
     def bind[A, B](r: (R, S, T, U) => A, f: A => (R, S, T, U) => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))(t1, t2, t3, t4)
   }
 
-  implicit def Function5Bind[R, S, T, U, V]: Bind[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = new Bind[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] {
+  implicit def Function5Bind[R, S, T, U, V]: Bind[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U, V) => α})#λ] {
     def bind[A, B](r: (R, S, T, U, V) => A, f: A => (R, S, T, U, V) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
   }
 
-  implicit def Function6Bind[R, S, T, U, V, W]: Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Bind[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+  implicit def Function6Bind[R, S, T, U, V, W]: Bind[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Bind[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def bind[A, B](r: (R, S, T, U, V, W) => A, f: A => (R, S, T, U, V, W) => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 
@@ -116,11 +116,11 @@ object Bind {
     def bind[A, B](a: LastOption[A], f: (A) => LastOption[B]): LastOption[B] = (a.value flatMap ((x: A) => f(x).value)).lst
   } 
 
-  implicit def EitherLeftBind[X]: Bind[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Bind[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftBind[X]: Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def bind[A, B](r: Either.LeftProjection[A, X], f: A => Either.LeftProjection[B, X]) = r.flatMap(f(_).e).left
   }
 
-  implicit def EitherRightBind[X]: Bind[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Bind[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightBind[X]: Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
 
@@ -137,21 +137,21 @@ object Bind {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryBind[X: Semigroup]: Bind[PartialApply1Of2[Entry, X]#Apply] = new Bind[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryBind[X: Semigroup]: Bind[({type λ[α]=Entry[X, α]})#λ] = new Bind[({type λ[α]=Entry[X, α]})#λ] {
     def bind[A, B](r: Entry[X, A], f: A => Entry[X, B]) = {
       val e = f(r.getValue)
       new SimpleImmutableEntry(r.getKey ⊹ e.getKey, e.getValue)
     }
   }
   
-  implicit def ValidationBind[X]: Bind[PartialApply1Of2[Validation, X]#Apply] = new Bind[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationBind[X]: Bind[({type λ[α]=Validation[X, α]})#λ] = new Bind[({type λ[α]=Validation[X, α]})#λ] {
     def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
       case Success(a) => f(a)
       case Failure(e) => Failure(e)
     }
   }
 
-  implicit def ValidationFailureBind[X]: Bind[PartialApply1Of2[FailProjection, X]#Flip] = new Bind[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureBind[X]: Bind[({type λ[α]=FailProjection[α, X]})#λ] = new Bind[({type λ[α]=FailProjection[α, X]})#λ] {
     def bind[A, B](r: FailProjection[A, X], f: A => FailProjection[B, X]) = r.validation match {
       case Success(a) => a.success.fail
       case Failure(e) => f(e)
@@ -170,7 +170,7 @@ object Bind {
     def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
   }
   
-  implicit def IterVBind[E]: Bind[PartialApply1Of2[IterV, E]#Apply] = new Bind[PartialApply1Of2[IterV, E]#Apply] {
+  implicit def IterVBind[E]: Bind[({type λ[α]=IterV[E, α]})#λ] = new Bind[({type λ[α]=IterV[E, α]})#λ] {
     import IterV._
     def bind[A, B](a: IterV[E, A], f: A => IterV[E, B]) = a.fold(
       done = (x, str) => f(x).fold(

@@ -13,95 +13,108 @@ package scalaz
  * </p>
  */
 
-trait GeneralizedCategory {
-  // Type members used instead of type parameters to work around http://lampsvn.epfl.ch/trac/scala/ticket/4043
-  type L
-  type H >: L
-  type ~>[_ >: L <: H, _ >: L <: H]
+trait GeneralizedCategory[L,H>:L] {
+  // Type member used instead of type parameter to work around http://lampsvn.epfl.ch/trac/scala/ticket/4043
+  type =>:[_ >: L <: H, _ >: L <: H]
 
-  def id[A>:L<:H]: A ~> A
-  def compose[A>:L<:H, B>:L<:H, C>:L<:H](f: B ~> C, g: A ~> B): A ~> C
+  def id[A>:L<:H]: A =>: A
+  def compose[A>:L<:H, B>:L<:H, C>:L<:H](f: B =>: C, g: A =>: B): A =>: C
+
+/*
+  def *[LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]](
+    that : GeneralizedCategory[LY,HY] { type =>:[A>:LY<:HY,B>:LY<:HY] = Y[A,B]; }
+  ) = Category.Product[L,H,=>:,LY,HY,Y](this,that)
+*/
 }
 
-trait GeneralizedGroupoid extends GeneralizedCategory { 
-  def invert[A>:L<:H,B>:L<:H](f : A ~> B): B ~> A
+trait GeneralizedGroupoid[L,H>:L] extends GeneralizedCategory[L,H] { 
+  def invert[A>:L<:H,B>:L<:H](f : A =>: B): B =>: A
 }
 
-trait Category[X[_, _]] extends GeneralizedCategory {
-  type L = Nothing
-  type H = Any
-  type ~>[A, B] = X[A, B]
+trait Category[X[_, _]] extends GeneralizedCategory[Nothing,Any] {
+  type =>:[A, B] = X[A, B]
 }
 
-trait Groupoid[X[_, _]] extends GeneralizedGroupoid with Category[X]
+trait Groupoid[X[_, _]] extends GeneralizedGroupoid[Nothing,Any] with Category[X]
 
 object Category {
   import Scalaz._
   import Leibniz._
 
-
   /* 
    * Product Categories
    */
 
-  case class P[+IX,+IY](_1: IX, _2: IY) { type _1 = IX; type _2 = IY }
+  /** Index for a product category. This is a pair enriched with its member types */
+  case class <>[+IX,+IY](_1: IX, _2: IY) { type _1 = IX; type _2 = IY }
 
   abstract sealed class Product[
     LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], // left category
     LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY], // right category
-    A>:P[LX,LY]<:P[HX,HY], // from
-    B>:P[LX,LY]<:P[HX,HY]  // to
+    A>:LX<>LY<:HX<>HY, // from
+    B>:LX<>LY<:HX<>HY  // to
   ]{
     def pair[AX>:LX<:HX, AY>:LY<:HY, BX>:LX<:HX, BY>:LY<:HY](
-      implicit a: A ~ P[AX,AY], b: B ~ P[BX,BY]
+      implicit a: A === (AX<>AY), b: B === (BX<>BY)
     ):(X[AX,BX],Y[AY,BY])
   }
 
-  implicit def ProductCategory[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
-    implicit x: GeneralizedCategory {type L=LX; type H=HX; type ~>[A>:L<:H,B>:L<:H]=X[A,B]},
-             y: GeneralizedCategory {type L=LY; type H=HY; type ~>[A>:L<:H,B>:L<:H]=Y[A,B]}
-  ) : GeneralizedCategory = new GeneralizedCategory {
-    type L = P[LX,LY]
-    type H = P[HX,HY]
-    type ~>[A >: L <: H, B >: L <: H] = Product[LX, HX, X, LY, HY, Y, A, B]
+  implicit def Product[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX],LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] (
+    implicit x: GeneralizedCategory[LX,HX] { type =>:[A>:LX<:HX,B>:LX<:HX]=X[A,B]},
+             y: GeneralizedCategory[LY,HY] { type =>:[A>:LY<:HY,B>:LY<:HY]=Y[A,B]}
+  ) : GeneralizedCategory[LX<>LY,HX<>HY] = new GeneralizedCategory[LX<>LY,HX<>HY] {
+    type L = LX<>LY
+    type H = HX<>HY
+    type =>:[A>:L<:H,B>:L<:H] = Product[LX,HX,X,LY,HY,Y,A,B]
 
-    def id[A>:P[LX,LY]<:P[HX,HY]] = new Product[LX,HX,X, LY,HY,Y, A, A] {
+    def id[A>:L<:H] = new Product[LX,HX,X, LY,HY,Y, A, A] {
       def pair[AX>:LX<:HX,AY>:LY<:HY,BX>:LX<:HX,BY>:LY<:HY](
-        implicit a: A ~ P[AX,AY], b: A ~ P[BX,BY]
+        implicit a: A === (AX<>AY), b: A === (BX<>BY)
       ) : (X[AX,BX], Y[AY,BY]) = (x.id[AX], y.id[AY]).asInstanceOf[(X[AX,BX], Y[AY,BY])]
     }
-    def compose [A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY], C>:P[LX,LY]<:P[HX,HY]](
+    def compose [A>:L<:H, B>:L<:H, C>:L<:H](
       f: Product[LX,HX,X, LY,HY,Y, B, C],
       g: Product[LX,HX,X, LY,HY,Y, A, B]
     ) = new Product[LX,HX,X, LY,HY,Y, A, C] {
       def pair[AX>:LX<:HX,AY>:LY<:HY,CX>:LX<:HX,CY>:LY<:HY](
-        implicit a: A ~ P[AX,AY], c: C ~ P[CX,CY]
+        implicit a: A ===  (AX<>AY), c: C === (CX<>CY)
       ) : (X[AX,CX], Y[AY,CY]) = {
-	def go[BX>:LX<:HX,BY >:LY<:HY](b : B ~ P[BX,BY]): (X[AX,CX], Y[AY,CY]) = {
+	def go[BX>:LX<:HX,BY >:LY<:HY](b : B === (BX<>BY)): (X[AX,CX], Y[AY,CY]) = {
           val (fx,fy) = f.pair(b, c)
           val (gx,gy) = g.pair(a, b)
 	  (x.compose[AX,BX,CX](fx,gx), y.compose[AY,BY,CY](fy, gy))
 	}
-	go[B#_1,B#_2](force[P[LX,LY],P[HX,HY],B,P[B#_1,B#_2]])
+	go[B#_1,B#_2](force[Nothing, Any, B, B#_1 <> B#_2])
       }
     }
   }
 
-  implicit def productToPair[LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
-    p: Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]]
+  implicit def productToPair[
+    LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], 
+    LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], 
+    AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY
+  ](
+    p: Product[LX,HX,X, LY,HY,Y, AX<>AY, BX<>BY]
   ) = p.pair[AX, AY, BX, BY]
 
-  implicit def pairToProduct[LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX], LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY], AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY](
+  implicit def pairToProduct[
+    LX, HX>:LX, X[_>:LX<:HX,_>:LX<:HX],
+    LY, HY>:LY, Y[_>:LY<:HY,_>:LY<:HY],
+    AX>:LX<:HX, BX>:LX<:HX, AY>:LY<:HY, BY>:LY<:HY
+  ](
     p: (X[AX,BX], Y[AY,BY])
-  ) : Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]] =
-  new Product[LX,HX,X, LY,HY,Y, P[AX,AY], P[BX,BY]] {
+  ) : Product[LX,HX,X, LY,HY,Y, AX<>AY, BX<>BY] =
+  new Product[LX,HX,X, LY,HY,Y, AX<>AY, BX<>BY] {
     def pair[AX_ >:LX<:HX, AY_ >:LY<:HY, BX_ >:LX<:HX, BY_ >:LY<:HY](
-      implicit a: P[AX,AY] ~ P[AX_,AY_], b: P[BX,BY] ~ P[BX_,BY_]
+      implicit a: (AX<>AY) === (AX_ <> AY_), 
+               b: (BX<>BY) === (BX_ <> BY_)
     ) : (X[AX_,BX_], Y[AY_,BY_]) = p.asInstanceOf[(X[AX_,BX_],Y[AY_,BY_])]
   }
 
   trait PartialApplyProduct[LX,HX>:LX,X[_>:LX<:HX,_>:LX<:HX], LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]] {
-    type Apply[A>:P[LX,LY]<:P[HX,HY], B>:P[LX,LY]<:P[HX,HY]] = Product[LX,HX,X, LY,HY,Y, A, B]
+    type L = LX <> LY
+    type H = HX <> HY
+    type Apply[A>:L<:H, B>:L<:H] = Product[LX,HX,X,LY,HY,Y,A,B]
   }
 
   /*
@@ -112,10 +125,8 @@ object Category {
     type Apply[A,B] = M
   }
 
-  implicit def MonoidCategory[M](monoid : Monoid[M]) = new GeneralizedCategory { 
-    type L = Nothing
-    type H = Nothing
-    type ~>[A,B] = Mon[M]#Apply[A,B]
+  implicit def MonoidCategory[M](monoid : Monoid[M]) = new GeneralizedCategory[Nothing,Nothing] { 
+    type =>:[A,B] = Mon[M]#Apply[A,B]
     def id[A] = monoid.zero
     def compose[A,B,C](m: M, n : M) : M = monoid.append(m, n)
   }
@@ -200,8 +211,8 @@ object Category {
     def comap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
-  implicit def opCoFunctor[R]: Cofunctor[PartialApply1Of2[<=,R]#Apply] =
-    new Cofunctor[PartialApply1Of2[<=,R]#Apply] {
+  implicit def opCoFunctor[R]: Cofunctor[({type λ[α]=R <= α})#λ] =
+    new Cofunctor[({type λ[α]=R <= α})#λ] {
       def comap[A, B](b: R <= A, t: B => A): R <= B =
         <=(b.value compose t)
     }
@@ -234,7 +245,7 @@ object Category {
     type Apply[A] = Arr[F[A], G[A]]
   }
 
-  type Alpha[Arr[_,_], X, Y] = PartialApply1Of2[Arr, X]#Flip ~> PartialApply1Of2[Arr, Y]#Flip
+  type Alpha[Arr[_,_], X, Y] = ({type λ[α]=Arr[α, X]})#λ ~> ({type λ[α]=Arr[α, Y]})#λ
 
   /** The Yoneda Lemma */
   def yoneda[Arr[_,_]:Category, X, Y]: Iso[Function1, Alpha[Arr, X, Y], Arr[X, Y]] = {
@@ -281,12 +292,12 @@ object Category {
     }
   }
 
-  implicit def KleisliCategory[M[_]: Monad]: Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
+  implicit def KleisliCategory[M[_]: Monad]: Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] {
     def id[A] = ☆(_ η)
     def compose[X, Y, Z](f: Kleisli[M, Y, Z], g: Kleisli[M, X, Y]) = f <=< g
   }
 
-  implicit def CokleisliCategory[M[_]: Comonad]: Category[PartialApplyK[Cokleisli, M]#Apply] = new Category[PartialApplyK[Cokleisli, M]#Apply] {
+  implicit def CokleisliCategory[M[_]: Comonad]: Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] {
     def id[A] = ★(_ ε)
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }
@@ -304,7 +315,7 @@ object Category {
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
   /** Discrete categories, whose only morphism is the identity function. **/
-  implicit def DiscreteCategory[X] = new Category[PartialApply1Of3[Discrete,X]#Apply] {
+  implicit def DiscreteCategory[X] = new Category[({type λ[α, β]=Discrete[X, α, β]})#λ] {
     def id[A] = Discrete(x => x)
     def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
   }
@@ -314,7 +325,7 @@ object Category {
   }
 
   /** Every partial order gives rise to a category **/
-  implicit def PosetCategory[X: Order] = new Category[PartialApply1Of3[Ord2,X]#Apply] {
+  implicit def PosetCategory[X: Order] = new Category[({type λ[α, β]=Ord2[X, α, β]})#λ] {
     def id[A] = new Ord2[X, A, A]
     def compose[A, B, C](f: Ord2[X, B, C], g: Ord2[X, A, B]) = new Ord2[X, A, C] {
       override def compare(a: X, b: X) = f.compare(a, b) == g.compare(a, b)

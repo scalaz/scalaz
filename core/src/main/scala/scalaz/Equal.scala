@@ -120,7 +120,7 @@ object Equal {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => a1 ≟ a2 && b1 ≟ b2 && c1 ≟ c2 && d1 ≟ d2 && e1 ≟ e2 && f1 ≟ f2 && g1 ≟ g2
   }
 
-  implicit def Function0Equal[A: Equal]: Equal[Function0[A]] = equalBy(_.apply)
+  implicit def Function0Equal[A: Equal]: Equal[() => A] = equalBy(_.apply)
 
   implicit def OptionEqual[A: Equal]: Equal[Option[A]] = equal {
     case (Some(a1), Some(a2)) => a1 ≟ a2

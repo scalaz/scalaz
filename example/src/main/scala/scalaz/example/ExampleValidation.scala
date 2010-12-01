@@ -136,6 +136,6 @@ object ExampleValidation {
     }
     val listVals: List[ValidationNEL[String, Int]] = lines.map(parseInt(_))
     // Sequence the List using the Validation Applicative Functor.
-    listVals.sequence[PartialApply1Of2[ValidationNEL, String]#Apply, Int]
+    listVals.sequence[({type λ[α]=ValidationNEL[String, α]})#λ, Int]
   }
 }

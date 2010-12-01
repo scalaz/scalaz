@@ -215,7 +215,7 @@ object Show {
     }
   }
 
-  implicit def Function0Show[A: Show]: Show[Function0[A]] = show(_.apply.show)
+  implicit def Function0Show[A: Show]: Show[() => A] = show(_.apply.show)
 
   implicit def OptionShow[A: Show]: Show[Option[A]] = shows(_ map (_.shows) toString)
 

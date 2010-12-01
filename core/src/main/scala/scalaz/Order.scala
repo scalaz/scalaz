@@ -127,7 +127,7 @@ object Order {
     case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2, g1 ?|? g2))
   }
 
-  implicit def Function0Order[A: Order]: Order[Function0[A]] = order(_.apply ?|? _.apply)
+  implicit def Function0Order[A: Order]: Order[() => A] = order(_.apply ?|? _.apply)
 
   implicit def IterableOrder[A: Order]: Order[Iterable[A]] = order((a1, a2) => {
     val i1 = a1.iterator
