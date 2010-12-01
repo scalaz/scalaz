@@ -20,11 +20,9 @@ trait GeneralizedCategory[L,H>:L] {
   def id[A>:L<:H]: A =>: A
   def compose[A>:L<:H, B>:L<:H, C>:L<:H](f: B =>: C, g: A =>: B): A =>: C
 
-/*
   def *[LY,HY>:LY,Y[_>:LY<:HY,_>:LY<:HY]](
     that : GeneralizedCategory[LY,HY] { type =>:[A>:LY<:HY,B>:LY<:HY] = Y[A,B]; }
   ) = Category.Product[L,H,=>:,LY,HY,Y](this,that)
-*/
 }
 
 trait GeneralizedGroupoid[L,H>:L] extends GeneralizedCategory[L,H] { 

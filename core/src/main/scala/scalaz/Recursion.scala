@@ -42,7 +42,7 @@ object Nu {
   def apply[F[+_]](v: => F[Nu[F]]) : Nu[F] = new Nu[F] { def out = v }
   def unapply[F[+_]](v : Nu[F]) = Some(v.out)
   implicit def rewrap[F[+_],G[+_]](v : Nu[F])(
-    implicit lt: F[Nu[F]] <~: G[Nu[F]]
+    implicit lt: F[Nu[F]] <~< G[Nu[F]]
   ) : Nu[G] = v.asInstanceOf[Nu[G]]
   implicit def unwrap[F[_]](v: Mu_[F]) = v.out
 }
@@ -58,7 +58,7 @@ object Mu {
   def apply[F[+_]](v: F[Mu[F]]) : Mu[F] = new Mu[F] { val out = v } 
   def unapply[F[+_]](v: Mu[F]) = Some(v.out)
   implicit def rewrap[F[+_],G[+_]](v : Mu[F])(
-    implicit lt: F[Mu[F]] <~: G[Mu[F]]
+    implicit lt: F[Mu[F]] <~< G[Mu[F]]
   ) : Mu[G] = v.asInstanceOf[Mu[G]]
   implicit def unwrap[F[+_]](v: Mu[F]) = v.out
 }
@@ -109,7 +109,7 @@ object Cofree {
   }
   def unapply[F[+_],A](v: Cofree[F,A]) = Some((v.extract, v.out))
   implicit def rewrap[F[+_],G[+_],A,B >: A](v : Cofree[F,A])(
-    implicit lt: F[Cofree[F,A]] <~: G[Cofree[F,A]]
+    implicit lt: F[Cofree[F,A]] <~< G[Cofree[F,A]]
   ) : Cofree[G,B] = v.asInstanceOf[Cofree[G,B]]
   implicit def unwrap[F[+_],A](v: Cofree[F,A]) = (v.extract, v.out)
 
@@ -172,7 +172,7 @@ object CofreeRec {
   }
   def unapply[F[+_],A](v: CofreeRec[F,A]) = Some((v.extract, v.out))
   implicit def rewrap[F[+_],G[+_],A,B >: A](v : CofreeRec[F,A])(
-    implicit lt: F[CofreeRec[F,A]] <~: G[CofreeRec[F,A]]
+    implicit lt: F[CofreeRec[F,A]] <~< G[CofreeRec[F,A]]
   ) : CofreeRec[G,B] = v.asInstanceOf[CofreeRec[G,A]]
   implicit def unwrap[F[+_],A](v: CofreeRec[F,A]) = (v.extract, v.out)
   trait PartialApplyCofreeRec[T[+_]] { 

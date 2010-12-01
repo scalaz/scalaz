@@ -1,6 +1,5 @@
 package scalaz
 
-
 /** 
  * Leibnizian equality: A better =:= 
  *
@@ -19,9 +18,14 @@ package scalaz
 
 trait Leibniz[-L,+H>:L,A>:L<:H,B>:L<:H] {
   def subst[F[_>:L<:H]](p: F[A]) : F[B]
+  def compose[L2<:L,H2>:H,C>:L2<:H2](that: Leibniz[L2,H2,C,A]) : Leibniz[L2,H2,C,B] = Leibniz.trans[L2,H2,C,A,B](this,that)
+  def andThen[L2<:L,H2>:H,C>:L2<:H2](that: Leibniz[L2,H2,B,C]) : Leibniz[L2,H2,A,C] = Leibniz.trans[L2,H2,A,B,C](that,this)
 }
 
+
 object Leibniz {
+
+
   /** (A === B) is a supertype of Leibniz[L,H,A,B] */
   type ===[A,B] = Leibniz[Nothing,Any,A,B]
 
@@ -38,24 +42,20 @@ object Leibniz {
    * We rely on subtyping to enable this to work for any Leibniz arrow 
    */
   implicit def witness[A,B](f: A === B) : A => B = 
-     f.subst[PartialApply1Of2[Function1,A]#Apply](identity)
+     f.subst[({type λ[X]= A => X})#λ](identity)
 
   /** Equality is transitive */
   def trans[L,H>:L,A>:L<:H,B>:L<:H,C>:L<:H](
     f: Leibniz[L,H,B,C], 
     g: Leibniz[L,H,A,B]
-  )  : Leibniz[L,H,A,C] = {
-    type f[X>:L<:H] = Leibniz[L,H,A,X]
-    f.subst[f](g)
-  }
+  )  : Leibniz[L,H,A,C] = 
+    f.subst[({type λ[X>:L<:H]= Leibniz[L,H,A,X] })#λ](g)
 
   /** Equality is symmetric */
   def symm[L,H>:L,A>:L<:H,B>:L<:H](
     f: Leibniz[L,H,A,B]
-  )  : Leibniz[L,H,B,A] = {
-    type f[X>:L<:H] = Leibniz[L,H,X,A]
-    f.subst[f](refl)
-  }
+  )  : Leibniz[L,H,B,A] = 
+    f.subst[({type λ[X>:L<:H]=Leibniz[L,H,X,A]})#λ](refl)
 
   sealed class LeibnizGroupoid[L,H>:L] extends GeneralizedGroupoid[L,H] {
     type =>:[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
@@ -82,10 +82,8 @@ object Leibniz {
     A>:LA<:HA,A2>:LA<:HA
   ](
     a: Leibniz[LA,HA,A,A2]
-  ) : Leibniz[LT,HT,T[A],T[A2]] = {
-    type a[X>:LA<:HA] = Leibniz[LT,HT,T[A],T[X]]
-    a.subst[a](refl)
-  }
+  ) : Leibniz[LT,HT,T[A],T[A2]] = 
+    a.subst[({type λ[X>:LA<:HA] = Leibniz[LT,HT,T[A],T[X]]})#λ](refl)
 
   /** We can lift equality into any type constructor */
   def lift2[
@@ -97,11 +95,10 @@ object Leibniz {
   ](
     a: Leibniz[LA,HA,A,A2],
     b: Leibniz[LB,HB,B,B2]
-  ) : Leibniz[LT,HT,T[A,B],T[A2,B2]] = {
-    type a[X>:LA<:HA] = Leibniz[LT,HT,T[A,B],T[X, B]]
-    type b[X>:LB<:HB] = Leibniz[LT,HT,T[A,B],T[A2,X]]
-    b.subst[b](a.subst[a](refl))
-  }
+  ) : Leibniz[LT,HT,T[A,B],T[A2,B2]] =
+    b.subst[({type λ[X>:LB<:HB]=Leibniz[LT,HT,T[A,B],T[A2,X]]})#λ](
+      a.subst[({type λ[X>:LA<:HA] = Leibniz[LT,HT,T[A,B],T[X,B]]})#λ](
+        refl))
 
   /** We can lift equality into any type constructor */
   def lift3[
@@ -115,13 +112,11 @@ object Leibniz {
     a: Leibniz[LA,HA,A,A2],
     b: Leibniz[LB,HB,B,B2],
     c: Leibniz[LC,HC,C,C2]
-  ) : Leibniz[LT,HT,T[A,B,C],T[A2,B2,C2]] = {
-    type a[X>:LA<:HA] = Leibniz[LT,HT,T[A,B,C],T[X, B, C]]
-    type b[X>:LB<:HB] = Leibniz[LT,HT,T[A,B,C],T[A2,X, C]]
-    type c[X>:LC<:HC] = Leibniz[LT,HT,T[A,B,C],T[A2,B2,X]]
-    c.subst[c](b.subst[b](a.subst[a](refl)))
-  }
-
+  ) : Leibniz[LT,HT,T[A,B,C],T[A2,B2,C2]] =
+    c.subst[({type λ[X>:LC<:HC] = Leibniz[LT,HT,T[A,B,C],T[A2,B2,X]]})#λ](
+      b.subst[({type λ[X>:LB<:HB] = Leibniz[LT,HT,T[A,B,C],T[A2,X, C]]})#λ](
+        a.subst[({type λ[X>:LA<:HA] = Leibniz[LT,HT,T[A,B,C],T[X, B, C]]})#λ](
+          refl)))
 
   /** 
    * Unsafe coercion between types. force abuses asInstanceOf to explicitly coerce types. 
