@@ -124,8 +124,8 @@ sealed trait Zipper[+A] {
       if (n > 0 && rights.isEmpty || n < 0 && lefts.isEmpty) None
       else {
         if (n == 0) z
-        else if (n > 0) move0(z >>= (_.next), n - 1)
-        else move0(z >>= (_.previous), n + 1)
+        else if (n > 0) move0(z >>= ((_:Zipper[A]).next), n - 1)
+        else move0(z >>= ((_:Zipper[A]).previous), n + 1)
       }
     move0(Some(this), n)
   }

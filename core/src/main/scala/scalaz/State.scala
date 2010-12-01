@@ -36,8 +36,8 @@ sealed trait StateT[M[_], S, A] extends States /* TODO SCALA29 Remove extends */
     stateT(f map (apply(_)))
   def map[B](f: A => B)(implicit m: Functor[M]): StateT[M, S, B] =
     stateT(s => apply(s) map (_ :-> f))
-  def flatMap[B](f: A => StateT[M, S, B])(implicit m: Bind[M]) =
-    stateT[M,S,B](s => apply(s) >>= { case (sp, a) => f(a)(sp) })
+  def flatMap[B](f: A => StateT[M, S, B])(implicit m: Bind[M]): StateT[M, S, B] =
+    stateT[M,S,B](s => apply(s) >>= ((x: (S, A)) => x match { case (sp, a) => f(a)(sp) }))
 }
 
 trait States {

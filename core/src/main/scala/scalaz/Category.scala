@@ -251,7 +251,7 @@ object Category {
   def yoneda[Arr[_,_]:Category, X, Y]: Iso[Function1, Alpha[Arr, X, Y], Arr[X, Y]] = {
     def to(alpha: Alpha[Arr, X, Y]): Arr[X, Y] = alpha(implicitly[Category[Arr]].id)
     def from(f: Arr[X, Y]): Alpha[Arr, X, Y] = new Alpha[Arr, X, Y] {
-      def apply[A](a: => Arr[A, X]) = f <<< a
+      def apply[A](a: Arr[A, X]) = f <<< a
     }
     Iso(to, from)
   }
@@ -278,10 +278,10 @@ object Category {
 //  def stateAdjunction[S]: Adjunction[Writer[S]#Apply, Reader[S]#Apply] =
 //    Iso3[~~>, Biff[Function1, Writer[S]#Apply, Id]#Apply, Biff[Function1, Id, Reader[S]#Apply]#Apply](
 //      new (Biff[Function1, Writer[S]#Apply, Id]#Apply ~~> Biff[Function1, Id, Reader[S]#Apply]#Apply) {
-//        def apply[A,B](f: => ((S, A)) => B): A => S => B =
+//        def apply[A,B](f: ((S, A)) => B): A => S => B = 
 //          a => s => f.apply((s, a))
 //      }, new (Biff[Function1, Id, Reader[S]#Apply]#Apply ~~> Biff[Function1, Writer[S]#Apply, Id]#Apply) {
-//        def apply[A,B](f: => A => S => B): ((S, A)) => B =
+//        def apply[A,B](f: A => S => B): ((S, A)) => B = 
 //          p => f.apply(p._2)(p._1)
 //      })
 

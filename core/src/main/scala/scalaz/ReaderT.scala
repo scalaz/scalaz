@@ -2,8 +2,10 @@ package scalaz
 
 import Scalaz._
 
-// Reader monad transformer
-// Can be used to add environment reading capabilities to other monads
+/** Reader monad transformer
+  * Can be used to add environment reading capabilities to other monads
+  * Note: ReaderT[M,R,A] is isomorphic to Kleisli[M,R,A].
+  */
 case class ReaderT[M[_], R, A](value: R => M[A]) extends NewType[R => M[A]]
 
 object ReaderT {
