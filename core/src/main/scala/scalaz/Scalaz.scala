@@ -42,6 +42,7 @@ object Scalaz extends ScalazLow
     with    MetricSpaces
     with    Memos
     with    Multiplications
+    with    Names
     with    NonEmptyLists
     with    Options
     with    Orders
@@ -83,7 +84,7 @@ object Scalaz extends ScalazLow
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
   def pure[F[_]:Pure] = new (Id ~> F) {
-    def apply[A](a: => A) = implicitly[Pure[F]].pure(a)
+    def apply[A](a: A) = implicitly[Pure[F]].pure(a)
   }
 
   import scala.collection.generic.CanBuildFrom

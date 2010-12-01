@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait MA[M[_], A] extends PimpedType[M[A]] {
+trait MA[M[_], A] extends PimpedType[M[A]] {
   import Scalaz._
 
   /**
@@ -89,15 +89,15 @@ sealed trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
 
-  def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=(_ => f)
+  def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
 
   def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
 
-  def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
+  def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = >>=(m)
 
-  def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join
+  def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join(m, b)
 
   def ∞[B](implicit b: Bind[M]): M[B] = forever
 
