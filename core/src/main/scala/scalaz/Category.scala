@@ -274,15 +274,16 @@ object Category {
   }
 
   /** The adjunction induced by curry and uncurry being isomorphic */
-  def stateAdjunction[S]: Adjunction[Writer[S]#Apply, Reader[S]#Apply] =
-    Iso3[~~>, Biff[Function1, Writer[S]#Apply, Id]#Apply, Biff[Function1, Id, Reader[S]#Apply]#Apply](
-      new (Biff[Function1, Writer[S]#Apply, Id]#Apply ~~> Biff[Function1, Id, Reader[S]#Apply]#Apply) {
-        def apply[A,B](f: => ((S, A)) => B): A => S => B = 
-          a => s => f.apply((s, a))
-      }, new (Biff[Function1, Id, Reader[S]#Apply]#Apply ~~> Biff[Function1, Writer[S]#Apply, Id]#Apply) {
-        def apply[A,B](f: => A => S => B): ((S, A)) => B = 
-          p => f.apply(p._2)(p._1)
-      })
+  // TODO SCALA29 Reinstate
+//  def stateAdjunction[S]: Adjunction[Writer[S]#Apply, Reader[S]#Apply] =
+//    Iso3[~~>, Biff[Function1, Writer[S]#Apply, Id]#Apply, Biff[Function1, Id, Reader[S]#Apply]#Apply](
+//      new (Biff[Function1, Writer[S]#Apply, Id]#Apply ~~> Biff[Function1, Id, Reader[S]#Apply]#Apply) {
+//        def apply[A,B](f: => ((S, A)) => B): A => S => B =
+//          a => s => f.apply((s, a))
+//      }, new (Biff[Function1, Id, Reader[S]#Apply]#Apply ~~> Biff[Function1, Writer[S]#Apply, Id]#Apply) {
+//        def apply[A,B](f: => A => S => B): ((S, A)) => B =
+//          p => f.apply(p._2)(p._1)
+//      })
 
   implicit def PartialFunctionCategory: Category[PartialFunction] = new Category[PartialFunction] {
     def id[A] = {case a => a}

@@ -23,7 +23,7 @@ sealed trait State[S, +A] {
 /**
  * State monad transformer
  **/
-sealed trait StateT[M[_], S, A] {
+sealed trait StateT[M[_], S, A] extends States /* TODO SCALA29 Remove extends */ {
   def apply(s: S): M[(S, A)]
 
   import Scalaz._

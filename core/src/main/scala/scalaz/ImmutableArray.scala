@@ -69,7 +69,7 @@ object ImmutableArray {
     ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
-    (new StringBuilder).mapResult(fromString(_))
+    (new StringBuilder).mapResult((str: StringBuilder) => fromString(str.toString)) // TODO SCALA29 Review
 
   implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
     new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
@@ -199,7 +199,7 @@ object ImmutableArray {
   object WrappedImmutableArray {
     import scalaz.{ImmutableArray => IA}
     class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
-      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(new StringArray(_))
+      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str.toString))
     }
 
     abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
