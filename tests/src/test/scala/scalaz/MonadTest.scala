@@ -33,30 +33,30 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
 
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {s: State[Int, Unit] => s.apply(0)}
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
-    checkMonadLaws[PartialApply1Of2[State, A]#Apply, Unit]
-    checkMonadLaws[PartialApply1Of2[Tuple2, B]#Apply, A]
-    checkMonadLaws[PartialApply2Of3[Tuple3, B, C]#Apply, A]
-    checkMonadLaws[PartialApply3Of4[Tuple4, B, C, D]#Apply, A]
-    checkMonadLaws[PartialApply4Of5[Tuple5, B, C, D, E]#Apply, A]
-    checkMonadLaws[PartialApply5Of6[Tuple6, B, C, D, E, F]#Apply, A]
-    checkMonadLaws[PartialApply6Of7[Tuple7, B, C, D, E, F, G]#Apply, A]
+    checkMonadLaws[({type λ[α]=State[A, α]})#λ, Unit]
+    checkMonadLaws[({type λ[α]=(B, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F, α)})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F, G, α)})#λ, A]
     implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {f: (Int => Int) => f(0)}
     implicit def EqualFunction2 = implicitly[Equal[Int]] ∙ {f: ((Int, Int) => Int) => f(0, 0)}
     implicit def EqualFunction3 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int) => Int) => f(0, 0, 0)}
     implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)}
     implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)}
 //    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[PartialApply1Of2[Function1, B]#Apply, A]
-    checkMonadLaws[PartialApply2Of3[Function2, B, C]#Apply, A]
-    checkMonadLaws[PartialApply3Of4[Function3, B, C, D]#Apply, A]
-    checkMonadLaws[PartialApply4Of5[Function4, B, C, D, E]#Apply, A]
-    checkMonadLaws[PartialApply5Of6[Function5, B, C, D, E, F]#Apply, A]
-//    checkMonadLaws[PartialApply6Of7[Function6, B, C, D, E, F, G]#Apply, A]
-    checkMonadLaws[PartialApply1Of2[Either.LeftProjection, X]#Flip, A]
-    checkMonadLaws[PartialApply1Of2[Either.RightProjection, X]#Apply, A]
-//    checkMonadLaws[PartialApply1Of2[Entry, X]#Apply, A]
-    checkMonadLaws[PartialApply1Of2[Validation, X]#Apply, A]
-    checkMonadLaws[PartialApply1Of2[FailProjection, X]#Flip, A]
+    checkMonadLaws[({type λ[α]=(B) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E) => α})#λ, A]
+    checkMonadLaws[({type λ[α]=(B, C, D, E, F) => α})#λ, A]
+//    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
+    checkMonadLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
+//    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=Validation[X, α]})#λ, A]
+    checkMonadLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
     ()
   }
 

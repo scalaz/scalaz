@@ -2,40 +2,42 @@ package scalaz
 
 import annotation.tailrec
 
-sealed trait Identity[A] extends PimpedType[A] {
+sealed abstract trait Identity[A] extends Equals {
+  def value: A
+
   import Scalaz._
 
-  def η[F[_]](implicit p: Pure[F]): F[A] = p pure value
+  def η[F[_]](implicit p: Pure[F]): F[A] = pure
 
   /**
    * Alias for {@link scalaz.Identity#η}
    */
-  def pure[F[_]](implicit p: Pure[F]): F[A] = η
+  def pure[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   def dual: Dual[A] = DualTo(value)
 
   def σ : Dual[A] = dual
 
-  def ⊹(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
+  def ⊹(a: => A)(implicit s: Semigroup[A]): A = |+|(a)
 
   /**
    * Alias for {@link scalaz.Identity#⊹}
    */
-  def |+|(a: => A)(implicit s: Semigroup[A]): A = ⊹(a)
+  def |+|(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
-  def ≟(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
+  def ≟(a: A)(implicit e: Equal[A]): Boolean = ===(a)
 
   /**
    * Alias for {@link scalaz.Identity#≟}
    */
-  def ===(a: A)(implicit e: Equal[A]): Boolean = ≟(a)
+  def ===(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
-  def ≠(a: A)(implicit e: Equal[A]): Boolean = !(≟(a))
+  def ≠(a: A)(implicit e: Equal[A]): Boolean = /==(a)
 
   /**
    * Alias for {@link scalaz.Identity#≠}
    */
-  def /==(a: A)(implicit e: Equal[A]): Boolean = ≠(a)
+  def /==(a: A)(implicit e: Equal[A]): Boolean = !(===(a))
 
   /**
    * Returns `a` if it is non-null, otherwise returns `d`.
@@ -193,13 +195,21 @@ sealed trait Identity[A] extends PimpedType[A] {
 
   override def hashCode: Int = value.hashCode
 
-  override def equals(o: Any): Boolean = o != null && o.isInstanceOf[Identity[_]] && value == o.asInstanceOf[Identity[_]].value
+  override def equals(o: Any): Boolean = canEqual(o) && value == o.asInstanceOf[Identity[_]].value
+
+  def canEqual(o: Any): Boolean = o != null && o.isInstanceOf[Identity[_]]
+}
+
+object Identity { 
+  def apply[A](a: => A) = new Identity[A] {
+    def value = a
+  }
+  def unapply[A](v: Identity[A]): Option[A] = Some(v.value)
 }
 
 trait Identitys {
-  implicit def IdentityTo[A](x: => A): Identity[A] = new Identity[A] {
-    lazy val value = x
-  }
+  implicit def mkIdentity[A](x: => A): Identity[A] = Identity(x)
+  implicit def unMkIdentity[A](x: Identity[A]): A = x.value
 
-  val unital = IdentityTo(())
+  val unital = mkIdentity(())
 }

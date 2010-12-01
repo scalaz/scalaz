@@ -24,7 +24,7 @@ object Index {
   }
 
   implicit def Function0Index: Index[Function0] = new Index[Function0] {
-    def index[A](a: Function0[A], i: Int) = if(i == 0) Some(a.apply) else None
+    def index[A](a: () => A, i: Int) = if(i == 0) Some(a.apply) else None
   }
 
   implicit def OptionIndex: Index[Option] = new Index[Option] {
@@ -39,19 +39,19 @@ object Index {
     def index[A](a: Array[A], i: Int) = if(i >= 0 && i < a.length) Some(a(i)) else None
   }
 
-  implicit def EitherLeftIndex[X]: Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Index[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftIndex[X]: Index[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Index[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def index[A](a: Either.LeftProjection[A, X], i: Int) = a.toOption filter (_ => i == 0)
   }
 
-  implicit def EitherRightIndex[X]: Index[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Index[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightIndex[X]: Index[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Index[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def index[A](a: Either.RightProjection[X, A], i: Int) = a.toOption filter (_ => i == 0)
   }
 
-  implicit def ValidationIndex[X]: Index[PartialApply1Of2[Validation, X]#Apply] = new Index[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationIndex[X]: Index[({type λ[α]=Validation[X, α]})#λ] = new Index[({type λ[α]=Validation[X, α]})#λ] {
     def index[A](a: Validation[X, A], i: Int) = a.either.right.toOption filter (_ => i == 0)
   }
 
-  implicit def ValidationFailureIndex[X]: Index[PartialApply1Of2[FailProjection, X]#Flip] = new Index[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureIndex[X]: Index[({type λ[α]=FailProjection[α, X]})#λ] = new Index[({type λ[α]=FailProjection[α, X]})#λ] {
     def index[A](a: FailProjection[A, X], i: Int) = a.validation.either.left.toOption filter (_ => i == 0)
   }
 

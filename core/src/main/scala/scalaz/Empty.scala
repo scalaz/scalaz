@@ -21,11 +21,11 @@ object Empty {
     def empty[A] = None
   }
 
-  implicit def EitherLeftEmpty[X: Zero]: Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Empty[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftEmpty[X: Zero]: Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def empty[A] = Right(∅).left
   }
 
-  implicit def EitherRightEmpty[X: Zero]: Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Empty[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightEmpty[X: Zero]: Empty[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Empty[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def empty[A] = Left(∅).right
   }
   

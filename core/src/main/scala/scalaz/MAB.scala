@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] {
+sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] with MA[({type λ[X]=M[A,X]})#λ, B] {
   def asMAB: MAB[M, A, B] = this
 
   def :->[D](g: B => D)(implicit b: Bifunctor[M]): M[A, D] = b.bimap(value, identity[A], g)

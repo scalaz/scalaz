@@ -23,7 +23,7 @@ object ScalazArbitrary {
     arbArray[A] ∘ (ImmutableArray.fromArray[A](_))
 
   implicit def IdentityArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Identity[A]] =
-    a ∘ ((x: A) => IdentityTo(x))
+    a ∘ ((x: A) => mkIdentity(x))
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 

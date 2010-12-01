@@ -21,7 +21,7 @@ abstract class ApplyLow {
 object Apply extends ApplyLow {
   import Scalaz._
 
-  implicit def ConstApply[B: Monoid] = new Apply[PartialApply1Of2[Const, B]#Apply] {
+  implicit def ConstApply[B: Monoid] = new Apply[({type λ[α]=Const[B, α]})#λ] {
     def apply[A, X](f: => Const[B, A => X], fa: => Const[B, A]) = {
       lazy val fv = f;
       lazy val fav = fa;
@@ -29,41 +29,41 @@ object Apply extends ApplyLow {
     }
   }
 
-  implicit def StateApply[S]: Apply[PartialApply1Of2[State, S]#Apply] = FunctorBindApply[PartialApply1Of2[State, S]#Apply]
+  implicit def StateApply[S]: Apply[({type λ[α]=State[S, α]})#λ] = FunctorBindApply[({type λ[α]=State[S, α]})#λ]
 
-  implicit def Tuple2Apply[R: Monoid]: Apply[PartialApply1Of2[Tuple2, R]#Apply] = FunctorBindApply[PartialApply1Of2[Tuple2, R]#Apply]
+  implicit def Tuple2Apply[R: Monoid]: Apply[({type λ[α]=(R, α)})#λ] = FunctorBindApply[({type λ[α]=(R, α)})#λ]
 
-  implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[PartialApply2Of3[Tuple3, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Tuple3, R, S]#Apply]
+  implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[({type λ[α]=(R, S, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, α)})#λ]
 
-  implicit def Tuple4Apply[R: Monoid, S: Monoid, T: Monoid]: Apply[PartialApply3Of4[Tuple4, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Tuple4, R, S, T]#Apply]
+  implicit def Tuple4Apply[R: Monoid, S: Monoid, T: Monoid]: Apply[({type λ[α]=(R, S, T, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, α)})#λ]
 
-  implicit def Tuple5Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Apply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Tuple5, R, S, T, U]#Apply]
+  implicit def Tuple5Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Apply[({type λ[α]=(R, S, T, U, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, α)})#λ]
 
-  implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply]
+  implicit def Tuple6Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Apply[({type λ[α]=(R, S, T, U, V, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, α)})#λ]
 
-  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply]
+  implicit def Tuple7Apply[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Apply[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, W, α)})#λ]
     
-  implicit def Function1Apply[R]: Apply[PartialApply1Of2[Function1, R]#Apply] = FunctorBindApply[PartialApply1Of2[Function1, R]#Apply]
+  implicit def Function1Apply[R]: Apply[({type λ[α]=(R) => α})#λ] = FunctorBindApply[({type λ[α]=(R) => α})#λ]
 
-  implicit def Function2Apply[R, S]: Apply[PartialApply2Of3[Function2, R, S]#Apply] = FunctorBindApply[PartialApply2Of3[Function2, R, S]#Apply]
+  implicit def Function2Apply[R, S]: Apply[({type λ[α]=(R, S) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S) => α})#λ]
 
-  implicit def Function3Apply[R, S, T]: Apply[PartialApply3Of4[Function3, R, S, T]#Apply] = FunctorBindApply[PartialApply3Of4[Function3, R, S, T]#Apply]
+  implicit def Function3Apply[R, S, T]: Apply[({type λ[α]=(R, S, T) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T) => α})#λ]
 
-  implicit def Function4Apply[R, S, T, U]: Apply[PartialApply4Of5[Function4, R, S, T, U]#Apply] = FunctorBindApply[PartialApply4Of5[Function4, R, S, T, U]#Apply]
+  implicit def Function4Apply[R, S, T, U]: Apply[({type λ[α]=(R, S, T, U) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U) => α})#λ]
 
-  implicit def Function5Apply[R, S, T, U, V]: Apply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = FunctorBindApply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]
+  implicit def Function5Apply[R, S, T, U, V]: Apply[({type λ[α]=(R, S, T, U, V) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V) => α})#λ]
 
-  implicit def Function6Apply[R, S, T, U, V, W]: Apply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = FunctorBindApply[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply]
+  implicit def Function6Apply[R, S, T, U, V, W]: Apply[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = FunctorBindApply[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
-  implicit def EitherLeftApply[X]: Apply[PartialApply1Of2[Either.LeftProjection, X]#Flip] = FunctorBindApply[PartialApply1Of2[Either.LeftProjection, X]#Flip]
+  implicit def EitherLeftApply[X]: Apply[({type λ[α]=Either.LeftProjection[α, X]})#λ] = FunctorBindApply[({type λ[α]=Either.LeftProjection[α, X]})#λ]
 
-  implicit def EitherRightApply[X]: Apply[PartialApply1Of2[Either.RightProjection, X]#Apply] = FunctorBindApply[PartialApply1Of2[Either.RightProjection, X]#Apply]
+  implicit def EitherRightApply[X]: Apply[({type λ[α]=Either.RightProjection[X, α]})#λ] = FunctorBindApply[({type λ[α]=Either.RightProjection[X, α]})#λ]
 
   import java.util.Map.Entry
 
-  implicit def MapEntryApply[X: Semigroup]: Apply[PartialApply1Of2[Entry, X]#Apply] = FunctorBindApply[PartialApply1Of2[Entry, X]#Apply]
+  implicit def MapEntryApply[X: Semigroup]: Apply[({type λ[α]=Entry[X, α]})#λ] = FunctorBindApply[({type λ[α]=Entry[X, α]})#λ]
 
-  implicit def ValidationApply[X: Semigroup]: Apply[PartialApply1Of2[Validation, X]#Apply] = new Apply[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationApply[X: Semigroup]: Apply[({type λ[α]=Validation[X, α]})#λ] = new Apply[({type λ[α]=Validation[X, α]})#λ] {
     def apply[A, B](f: => Validation[X, A => B], a: => Validation[X, A]) = (f, a) match {
       case (Success(f), Success(a)) => success(f(a))
       case (Success(_), Failure(e)) => failure(e)
@@ -72,7 +72,7 @@ object Apply extends ApplyLow {
     }
   }
 
-  implicit def ValidationFailureApply[X]: Apply[PartialApply1Of2[FailProjection, X]#Flip] = new Apply[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureApply[X]: Apply[({type λ[α]=FailProjection[α, X]})#λ] = new Apply[({type λ[α]=FailProjection[α, X]})#λ] {
     def apply[A, B](f: => FailProjection[A => B, X], a: => FailProjection[A, X]) = ((f.validation, a.validation) match {
       case (Success(x1), Success(_)) => success(x1)
       case (Success(x1), Failure(_)) => success(x1)

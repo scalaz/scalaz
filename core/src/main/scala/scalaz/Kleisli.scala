@@ -18,7 +18,7 @@ sealed trait Kleisli[M[_], A, B] {
   def traverse[F[_], AA <: A](f: F[AA])(implicit a: Applicative[M], t: Traverse[F]): M[F[B]] =
     f ↦ (Kleisli.this(_)) 
 
-  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a, apply)  
+  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a, apply _)  
 }
 
 trait Kleislis {
@@ -29,4 +29,27 @@ trait Kleislis {
   def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
 
   implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
+
+  def kleisliPure[M[_], R](implicit m: Pure[M])
+    : Pure[({type λ[x]=Kleisli[M, R, x]})#λ] =
+  new Pure[({type λ[x]=Kleisli[M, R, x]})#λ] {
+      def pure[A](a: => A) = kleisli((r: R) => m.pure(a))
+    }
+
+/*
+  implicit def kleisliBind[M[_]:Bind, R]
+    : Bind[({type λ[x]=Kleisli[M, R, x]})#λ] =
+  new Bind[({type λ[x]=Kleisli[M, R, x]})#λ] {
+      def bind[A,B](m: Kleisli[M, R, A], k: A => Kleisli[M, R, B]) =
+        kleisli((r: R) => m.apply(r) >>= ((a: A) => k(a).apply(r)))
+    }
+*/
+
+  implicit def kleisliBind[M[_], R](implicit b: Bind[M])
+    : Bind[({type λ[x]=Kleisli[M, R, x]})#λ] =
+  new Bind[({type λ[x]=Kleisli[M, R, x]})#λ] {
+      def bind[A,B](m: Kleisli[M, R, A], k: A => Kleisli[M, R, B]) =
+        kleisli((r: R) => b.bind[A,B](m.apply(r),((a: A) => k(a).apply(r))))
+    }
 }
+

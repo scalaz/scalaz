@@ -59,11 +59,11 @@ class FingerTreeTest extends Specification with Sugar with ScalaCheck {
 
 //  "viewl works correctly" verifies {(tree: SequenceTree[Int]) =>
 //    val asStream = tree.toStream
-//    tree.viewl.fold[Boolean](true, (x: Int, t: PartialApply1Of2[FingerTree, Int]#Apply) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
+//    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
 //  }
 //
 //  "viewr works correctly" verifies {(tree: SequenceTree[Int]) =>
 //    val asStream = tree.toStream
-//    tree.viewr.fold[Boolean](true, (i: PartialApply1Of2[FingerTree, Int]#Apply, x: Int) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+//    tree.viewr.fold[Boolean](true, (i: ({type λ[α]=FingerTree[Int, α]})#λ, x: Int) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
 //  }
 }

@@ -35,11 +35,11 @@ object Functor {
     def fmap[A, B](r: NonEmptyList[A], f: A => B) = r map f
   }
 
-  implicit def ConstFunctor[BB: Monoid] = new Functor[PartialApply1Of2[Const, BB]#Apply] {
+  implicit def ConstFunctor[BB: Monoid] = new Functor[({type λ[α]=Const[BB, α]})#λ] {
     def fmap[A, B](r: Const[BB, A], f: (A) => B) = Const(r.value)
   }
 
-  implicit def StateFunctor[S] = new Functor[PartialApply1Of2[State, S]#Apply] {
+  implicit def StateFunctor[S] = new Functor[({type λ[α]=State[S, α]})#λ] {
     def fmap[A, B](r: State[S, A], f: A => B) = r map f
   }
 
@@ -51,27 +51,27 @@ object Functor {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
 
-  implicit def Tuple2Functor[R]: Functor[PartialApply1Of2[Tuple2, R]#Apply] = new Functor[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Functor[R]: Functor[({type λ[α]=(R, α)})#λ] = new Functor[({type λ[α]=(R, α)})#λ] {
     def fmap[A, B](r: (R, A), f: A => B) = (r._1, f(r._2))
   }
 
-  implicit def Tuple3Functor[R, S]: Functor[PartialApply2Of3[Tuple3, R, S]#Apply] = new Functor[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=(R, S, α)})#λ] = new Functor[({type λ[α]=(R, S, α)})#λ] {
     def fmap[A, B](r: (R, S, A), f: A => B) = (r._1, r._2, f(r._3))
   }
 
-  implicit def Tuple4Functor[R, S, T]: Functor[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Functor[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=(R, S, T, α)})#λ] = new Functor[({type λ[α]=(R, S, T, α)})#λ] {
     def fmap[A, B](r: (R, S, T, A), f: A => B) = (r._1, r._2, r._3, f(r._4))
   }
 
-  implicit def Tuple5Functor[R, S, T, U]: Functor[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Functor[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, A), f: A => B) = (r._1, r._2, r._3, r._4, f(r._5))
   }
 
-  implicit def Tuple6Functor[R, S, T, U, V]: Functor[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Functor[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, f(r._6))
   }
 
-  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Functor[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
   }
 
@@ -81,27 +81,27 @@ object Functor {
     }
   }
 
-  implicit def Function1Functor[R]: Functor[PartialApply1Of2[Function1, R]#Apply] = new Functor[PartialApply1Of2[Function1, R]#Apply] {
+  implicit def Function1Functor[R]: Functor[({type λ[α]=(R) => α})#λ] = new Functor[({type λ[α]=(R) => α})#λ] {
     def fmap[A, B](r: R => A, f: A => B) = r andThen f
   }
 
-  implicit def Function2Functor[R, S]: Functor[PartialApply2Of3[Function2, R, S]#Apply] = new Functor[PartialApply2Of3[Function2, R, S]#Apply] {
+  implicit def Function2Functor[R, S]: Functor[({type λ[α]=(R, S) => α})#λ] = new Functor[({type λ[α]=(R, S) => α})#λ] {
     def fmap[A, B](r: (R, S) => A, f: A => B) = (t1: R, t2: S) => f(r(t1, t2))
   }
 
-  implicit def Function3Functor[R, S, T]: Functor[PartialApply3Of4[Function3, R, S, T]#Apply] = new Functor[PartialApply3Of4[Function3, R, S, T]#Apply] {
+  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=(R, S, T) => α})#λ] = new Functor[({type λ[α]=(R, S, T) => α})#λ] {
     def fmap[A, B](r: (R, S, T) => A, f: A => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
   }
 
-  implicit def Function4Functor[R, S, T, U]: Functor[PartialApply4Of5[Function4, R, S, T, U]#Apply] = new Functor[PartialApply4Of5[Function4, R, S, T, U]#Apply] {
+  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
   }
 
-  implicit def Function5Functor[R, S, T, U, V]: Functor[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] = new Functor[PartialApply5Of6[Function5, R, S, T, U, V]#Apply] {
+  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U, V) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
   }
 
-  implicit def Function6Functor[R, S, T, U, V, W]: Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] = new Functor[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply] {
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
@@ -117,11 +117,11 @@ object Functor {
     def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
   }
 
-  implicit def EitherLeftFunctor[X]: Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Functor[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def fmap[A, B](r: Either.LeftProjection[A, X], f: A => B) = r.map(f).left
   }
 
-  implicit def EitherRightFunctor[X]: Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Functor[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightFunctor[X]: Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
 
@@ -129,7 +129,7 @@ object Functor {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
 
-  implicit def IterVFunctor[X]: Functor[PartialApply1Of2[IterV, X]#Apply] = new Functor[PartialApply1Of2[IterV, X]#Apply] {
+  implicit def IterVFunctor[X]: Functor[({type λ[α]=IterV[X, α]})#λ] = new Functor[({type λ[α]=IterV[X, α]})#λ] {
     import IterV._
     def fmap[A, B](r: IterV[X, A], f: A => B) = {
       r fold (
@@ -139,7 +139,7 @@ object Functor {
     }
   }
 
-  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[PartialApplyKA[Kleisli, M, P]#Apply] = new Functor[PartialApplyKA[Kleisli, M, P]#Apply] {
+  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[({type λ[α]=Kleisli[M, P, α]})#λ] = new Functor[({type λ[α]=Kleisli[M, P, α]})#λ] {
     def fmap[A, B](k: Kleisli[M, P, A], f: A => B): Kleisli[M, P, B] = ☆((p: P) => ff.fmap(k(p), f))
   }
 
@@ -154,18 +154,18 @@ object Functor {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryFunctor[X]: Functor[PartialApply1Of2[Entry, X]#Apply] = new Functor[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryFunctor[X]: Functor[({type λ[α]=Entry[X, α]})#λ] = new Functor[({type λ[α]=Entry[X, α]})#λ] {
     def fmap[A, B](r: Entry[X, A], f: A => B) = new SimpleImmutableEntry(r.getKey, f(r.getValue))
   }
 
-  implicit def ValidationFunctor[X]: Functor[PartialApply1Of2[Validation, X]#Apply] = new Functor[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
     def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
       case Success(a) => Success(f(a))
       case Failure(e) => Failure(e)
     }
   }
 
-  implicit def ValidationFailureFunctor[X]: Functor[PartialApply1Of2[FailProjection, X]#Flip] = new Functor[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
     def fmap[A, B](r: FailProjection[A, X], f: A => B) = (r.validation match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(f(e))
@@ -190,12 +190,12 @@ object Functor {
 
   import FingerTree._
 
-  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewL, S]#Apply] = new Functor[PartialType2[ViewL, S]#Apply] {
+  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
     def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
       t.fold(EmptyL[S, B], (x, xs) => f(x) &: s.fmap(xs, f))
   }
 
-  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[PartialType2[ViewR, S]#Apply] = new Functor[PartialType2[ViewR, S]#Apply] {
+  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
     def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
       t.fold(EmptyR[S, B], (xs, x) => s.fmap(xs, f) :& f(x))
   }

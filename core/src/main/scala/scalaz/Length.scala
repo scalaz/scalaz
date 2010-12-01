@@ -24,35 +24,35 @@ object Length {
   }
 
   implicit def Function0Length: Length[Function0] = new Length[Function0] {
-    def len[A](a: Function0[A]) = 1
+    def len[A](a: () => A) = 1
   }
 
   implicit def OptionLength: Length[Option] = new Length[Option] {
     def len[A](a: Option[A]) = a map (_ => 1) getOrElse 0
   }
 
-  implicit def EitherLeftLength[X]: Length[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Length[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftLength[X]: Length[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Length[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def len[A](a: Either.LeftProjection[A, X]) = a.e match {
       case Right(_) => 0
       case Left(_) => 1
     }
   }
 
-  implicit def EitherRightLength[X]: Length[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Length[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightLength[X]: Length[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Length[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def len[A](a: Either.RightProjection[X, A]) = a.e match {
       case Right(_) => 1
       case Left(_) => 0
     }
   }
 
-  implicit def ValidationLength[X]: Length[PartialApply1Of2[Validation, X]#Apply] = new Length[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationLength[X]: Length[({type λ[α]=Validation[X, α]})#λ] = new Length[({type λ[α]=Validation[X, α]})#λ] {
     def len[A](a: Validation[X, A]) = a match {
       case Success(_) => 1
       case Failure(_) => 0
     }
   }
 
-  implicit def ValidationFailureLength[X]: Length[PartialApply1Of2[FailProjection, X]#Flip] = new Length[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureLength[X]: Length[({type λ[α]=FailProjection[α, X]})#λ] = new Length[({type λ[α]=FailProjection[α, X]})#λ] {
     def len[A](a: FailProjection[A, X]) = a.validation match {
       case Success(_) => 0
       case Failure(_) => 1

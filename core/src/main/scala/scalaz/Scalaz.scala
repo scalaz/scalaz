@@ -42,6 +42,7 @@ object Scalaz extends ScalazLow
     with    MetricSpaces
     with    Memos
     with    Multiplications
+    with    Names
     with    NonEmptyLists
     with    Options
     with    Orders
@@ -83,55 +84,55 @@ object Scalaz extends ScalazLow
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
   def pure[F[_]:Pure] = new (Id ~> F) {
-    def apply[A](a: => A) = implicitly[Pure[F]].pure(a)
+    def apply[A](a: A) = implicitly[Pure[F]].pure(a)
   }
 
   import scala.collection.generic.CanBuildFrom
   
   // todo move these to MAs, once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
-  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[PartialApply1Of2[Either.LeftProjection, X]#Flip, A](a)
+  implicit def EitherLeftMA[X, A](a: Either.LeftProjection[A, X]) = ma[({type λ[α]=Either.LeftProjection[α, X]})#λ, A](a)
 
-  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[PartialApply1Of2[Either.RightProjection, X]#Apply, A] = ma[PartialApply1Of2[Either.RightProjection, X]#Apply, A](a)
+  implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]): MA[({type λ[α]=Either.RightProjection[X, α]})#λ, A] = ma[({type λ[α]=Either.RightProjection[X, α]})#λ, A](a)
 
-  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[PartialApply1Of2[Function1, A]#Flip, R] = maCofunctor[PartialApply1Of2[Function1, A]#Flip, R](f)
+  implicit def Function1FlipMACofunctor[A, R](f: R => A): MACofunctor[({type λ[α]=(α) => A})#λ, R] = maCofunctor[({type λ[α]=(α) => A})#λ, R](f)
 
-  implicit def Function1ApplyMA[A, R](f: A => R): MA[PartialApply1Of2[Function1, A]#Apply, R] = ma[PartialApply1Of2[Function1, A]#Apply, R](f)
+  implicit def Function1ApplyMA[A, R](f: A => R): MA[({type λ[α]=(A) => α})#λ, R] = ma[({type λ[α]=(A) => α})#λ, R](f)
 
-  implicit def Function2MA[R, S, A](a: (R, S) => A): MA[PartialApply2Of3[Function2, R, S]#Apply, A] = ma[PartialApply2Of3[Function2, R, S]#Apply, A](a)
+  implicit def Function2MA[R, S, A](a: (R, S) => A): MA[({type λ[α]=(R, S) => α})#λ, A] = ma[({type λ[α]=(R, S) => α})#λ, A](a)
 
-  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A): MA[PartialApply3Of4[Function3, R, S, T]#Apply, A] = ma[PartialApply3Of4[Function3, R, S, T]#Apply, A](a)
+  implicit def Function3MA[R, S, T, A](a: (R, S, T) => A): MA[({type λ[α]=(R, S, T) => α})#λ, A] = ma[({type λ[α]=(R, S, T) => α})#λ, A](a)
 
-  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A): MA[PartialApply4Of5[Function4, R, S, T, U]#Apply, A] = ma[PartialApply4Of5[Function4, R, S, T, U]#Apply, A](a)
+  implicit def Function4MA[R, S, T, U, A](a: (R, S, T, U) => A): MA[({type λ[α]=(R, S, T, U) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U) => α})#λ, A](a)
 
-  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A): MA[PartialApply5Of6[Function5, R, S, T, U, V]#Apply, A] = ma[PartialApply5Of6[Function5, R, S, T, U, V]#Apply, A](a)
+  implicit def Function5MA[R, S, T, U, V, A](a: (R, S, T, U, V) => A): MA[({type λ[α]=(R, S, T, U, V) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U, V) => α})#λ, A](a)
 
-  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply, A] = ma[PartialApply6Of7[Function6, R, S, T, U, V, W]#Apply, A](a)
+  implicit def Function6MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A): MA[({type λ[α]=(R, S, T, U, V, W) => α})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, W) => α})#λ, A](a)
 
-  implicit def ConstMA[B, A](c: Const[B, A]): MA[PartialApply1Of2[Const, B]#Apply, A] = ma[PartialApply1Of2[Const, B]#Apply, A](c)
+  implicit def ConstMA[B, A](c: Const[B, A]): MA[({type λ[α]=Const[B, α]})#λ, A] = ma[({type λ[α]=Const[B, α]})#λ, A](c)
 
-  implicit def StateMA[S, A](s: State[S, A]): MA[PartialApply1Of2[State, S]#Apply, A] = ma[PartialApply1Of2[State, S]#Apply, A](s)
+  implicit def StateMA[S, A](s: State[S, A]): MA[({type λ[α]=State[S, α]})#λ, A] = ma[({type λ[α]=State[S, α]})#λ, A](s)
 
-  implicit def Tuple2MA[R, A](a: (R, A)): MA[PartialApply1Of2[Tuple2, R]#Apply, A] = ma[PartialApply1Of2[Tuple2, R]#Apply, A](a)
+  implicit def Tuple2MA[R, A](a: (R, A)): MA[({type λ[α]=(R, α)})#λ, A] = ma[({type λ[α]=(R, α)})#λ, A](a)
 
-  implicit def Tuple3MA[R, S, A](a: (R, S, A)): MA[PartialApply2Of3[Tuple3, R, S]#Apply, A] = ma[PartialApply2Of3[Tuple3, R, S]#Apply, A](a)
+  implicit def Tuple3MA[R, S, A](a: (R, S, A)): MA[({type λ[α]=(R, S, α)})#λ, A] = ma[({type λ[α]=(R, S, α)})#λ, A](a)
 
-  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)): MA[PartialApply3Of4[Tuple4, R, S, T]#Apply, A] = ma[PartialApply3Of4[Tuple4, R, S, T]#Apply, A](a)
+  implicit def Tuple4MA[R, S, T, A](a: (R, S, T, A)): MA[({type λ[α]=(R, S, T, α)})#λ, A] = ma[({type λ[α]=(R, S, T, α)})#λ, A](a)
 
-  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)): MA[PartialApply4Of5[Tuple5, R, S, T, U]#Apply, A] = ma[PartialApply4Of5[Tuple5, R, S, T, U]#Apply, A](a)
+  implicit def Tuple5MA[R, S, T, U, A](a: (R, S, T, U, A)): MA[({type λ[α]=(R, S, T, U, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, α)})#λ, A](a)
 
-  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)): MA[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply, A] = ma[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply, A](a)
+  implicit def Tuple6MA[R, S, T, U, V, A](a: (R, S, T, U, V, A)): MA[({type λ[α]=(R, S, T, U, V, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, α)})#λ, A](a)
 
-  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply, A] = ma[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply, A](a)
+  implicit def Tuple7MA[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)): MA[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A] = ma[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A](a)
 
-  implicit def ValidationMA[A, E](v: Validation[E, A]): MA[PartialApply1Of2[Validation, E]#Apply, A] = ma[PartialApply1Of2[Validation, E]#Apply, A](v)
+  implicit def ValidationMA[A, E](v: Validation[E, A]): MA[({type λ[α]=Validation[E, α]})#λ, A] = ma[({type λ[α]=Validation[E, α]})#λ, A](v)
 
-  implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[PartialApply1Of2[FailProjection, A]#Flip, E] = ma[PartialApply1Of2[FailProjection, A]#Flip, E](f)
+  implicit def ValidationFailureMA[A, E](f: FailProjection[E, A]): MA[({type λ[α]=FailProjection[α, A]})#λ, E] = ma[({type λ[α]=FailProjection[α, A]})#λ, E](f)
   
-  implicit def IterVMA[A, E](v: IterV[E, A]): MA[PartialApply1Of2[IterV, E]#Apply, A] = ma[PartialApply1Of2[IterV, E]#Apply, A](v)
+  implicit def IterVMA[A, E](v: IterV[E, A]): MA[({type λ[α]=IterV[E, α]})#λ, A] = ma[({type λ[α]=IterV[E, α]})#λ, A](v)
 
   import java.util.Map.Entry
 
-  implicit def MapEntryMA[X, A](e: Entry[X, A]): MA[PartialApply1Of2[Entry, X]#Apply, A] = ma[PartialApply1Of2[Entry, X]#Apply, A](e)
+  implicit def MapEntryMA[X, A](e: Entry[X, A]): MA[({type λ[α]=Entry[X, α]})#λ, A] = ma[({type λ[α]=Entry[X, α]})#λ, A](e)
 
   // Seq[A] implements Function1[Int, A]. Without this, Function1ApplyMA would be used.
   implicit def SeqMA[M[X] <: Seq[X], A](l: M[A]): MA[M, A] = ma[M, A](l)
@@ -139,21 +140,21 @@ object Scalaz extends ScalazLow
   // Set[A] implements Function1[Int, B]. Without this, Function1ApplyMA would be used.
   implicit def SetMA[M[X] <: Set[X], A](s: M[A]): MA[M, A] = ma[M, A](s)
 
-  implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[PartialApplyKA[Kleisli, M, A]#Apply, B] = ma[PartialApplyKA[Kleisli, M, A]#Apply, B](k)
+  implicit def KleisliMA[M[_], A, B](k: Kleisli[M,A,B]): MA[({type λ[α]=Kleisli[M, A, α]})#λ, B] = ma[({type λ[α]=Kleisli[M, A, α]})#λ, B](k)
 
-  implicit def FingerTreeMA[V, A](t: FingerTree[V, A]): MA[PartialApply1Of2[FingerTree, V]#Apply, A] = ma[PartialApply1Of2[FingerTree, V]#Apply, A](t)
+  implicit def FingerTreeMA[V, A](t: FingerTree[V, A]): MA[({type λ[α]=FingerTree[V, α]})#λ, A] = ma[({type λ[α]=FingerTree[V, α]})#λ, A](t)
 
-  implicit def FingerMA[V, A](t: Finger[V, A]): MA[PartialApply1Of2[Finger, V]#Apply, A] = ma[PartialApply1Of2[Finger, V]#Apply, A](t)
+  implicit def FingerMA[V, A](t: Finger[V, A]): MA[({type λ[α]=Finger[V, α]})#λ, A] = ma[({type λ[α]=Finger[V, α]})#λ, A](t)
 
-  implicit def NodeMA[V, A](t: Node[V, A]): MA[PartialApply1Of2[Node, V]#Apply, A] = ma[PartialApply1Of2[Node, V]#Apply, A](t)
+  implicit def NodeMA[V, A](t: Node[V, A]): MA[({type λ[α]=Node[V, α]})#λ, A] = ma[({type λ[α]=Node[V, α]})#λ, A](t)
 
-  implicit def MemoMA[V, A](m: Memo[A, V]): MA[PartialApply1Of2[Memo, V]#Flip, A] = ma[PartialApply1Of2[Memo, V]#Flip, A](m)
+  implicit def MemoMA[V, A](m: Memo[A, V]): MA[({type λ[α]=Memo[α, V]})#λ, A] = ma[({type λ[α]=Memo[α, V]})#λ, A](m)
 
   // move to MABs once https://lampsvn.epfl.ch/trac/scala/ticket/2741 is solved.
-  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[PartialApplyK[Kleisli, M]#Apply, A, B] = mab[PartialApplyK[Kleisli, M]#Apply, A, B](k)
+  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]): MAB[({type λ[α, β]=Kleisli[M, α, β]})#λ, A, B] = mab[({type λ[α, β]=Kleisli[M, α, β]})#λ, A, B](k)
 
-  implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[PartialApplyK[Cokleisli, M]#Apply, A, B] = mab[PartialApplyK[Cokleisli, M]#Apply, A, B](k)
+  implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]): MAB[({type λ[α, β]=Cokleisli[M, α, β]})#λ, A, B] = mab[({type λ[α, β]=Cokleisli[M, α, β]})#λ, A, B](k)
 
-  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[PartialApply1Of3[Const2,M]#Apply, A, B] =
-    mab[PartialApply1Of3[Const2, M]#Apply, A, B](k)    
+  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]): MAB[({type λ[α, β]=Const2[M, α, β]})#λ, A, B] =
+    mab[({type λ[α, β]=Const2[M, α, β]})#λ, A, B](k)
 }

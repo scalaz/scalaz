@@ -34,13 +34,13 @@ object Traverse {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Tuple1[A]) = f(t._1) ∘ (Tuple1(_: B))
   }
 
-  implicit def Tuple2Traverse[X]: Traverse[PartialApply1Of2[Tuple2, X]#Apply] = new Traverse[PartialApply1Of2[Tuple2, X]#Apply] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Tuple2[X, A]): F[Tuple2[X, B]] =
+  implicit def Tuple2Traverse[X]: Traverse[({type λ[α]=(X, α)})#λ] = new Traverse[({type λ[α]=(X, α)})#λ] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: (X, A)): F[(X, B)] =
       f(as._2) ∘ ((b: B) => (as._1, b))
   }
 
   implicit def Function0Traverse: Traverse[Function0] = new Traverse[Function0] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Function0[A]) = f(t.apply) ∘ ((b: B) => () => b)
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], t: () => A) = f(t.apply) ∘ ((b: B) => () => b)
   }
 
   implicit def OptionTraverse: Traverse[Option] = new Traverse[Option] {
@@ -81,7 +81,7 @@ object Traverse {
     }
   }
 
-  implicit def EitherLeftTraverse[X]: Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Traverse[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftTraverse[X]: Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Either.LeftProjection[A, X]): F[Either.LeftProjection[B, X]] =
       as.e match {
         case Right(x) => (Right(x).left: Either.LeftProjection[B, X]) η
@@ -89,7 +89,7 @@ object Traverse {
       }
   }
 
-  implicit def EitherRightTraverse[X]: Traverse[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Traverse[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightTraverse[X]: Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Either.RightProjection[X, A]): F[Either.RightProjection[X, B]] =
       as.e match {
         case Left(x) => (Left(x).right: Either.RightProjection[X, B]) η
@@ -97,14 +97,14 @@ object Traverse {
       }
   }
 
-  implicit def ValidationTraverse[X]: Traverse[PartialApply1Of2[Validation, X]#Apply] = new Traverse[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationTraverse[X]: Traverse[({type λ[α]=Validation[X, α]})#λ] = new Traverse[({type λ[α]=Validation[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Validation[X, A]): F[Validation[X, B]] = as match {
       case Success(x) => f(x) ∘ (Success(_: B))
       case Failure(x) => (Failure(x): Validation[X, B]) η
     }
   }
 
-  implicit def ValidationFailureTraverse[X]: Traverse[PartialApply1Of2[FailProjection, X]#Flip] = new Traverse[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailureTraverse[X]: Traverse[({type λ[α]=FailProjection[α, X]})#λ] = new Traverse[({type λ[α]=FailProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: FailProjection[A, X]): F[FailProjection[B, X]] =
       as.validation match {
         case Success(x) => (Success(x).fail: FailProjection[B, X]) η
@@ -124,7 +124,7 @@ object Traverse {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryTraverse[X]: Traverse[PartialApply1Of2[Entry, X]#Apply] = new Traverse[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryTraverse[X]: Traverse[({type λ[α]=Entry[X, α]})#λ] = new Traverse[({type λ[α]=Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Entry[X, A]): F[Entry[X, B]] = f(as.getValue) ∘ ((b: B) => new SimpleImmutableEntry(as.getKey, b))
   }
 }

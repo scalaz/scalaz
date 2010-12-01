@@ -124,8 +124,8 @@ object Lens {
   implicit def asState[A,B](lens: Lens[A,B]): State[A,B] = lens.toState
 
   /** Lenses are an invariant functor. xmap can be used to transform a view into an isomorphic form */
-  implicit def invariantFunctor[A] : InvariantFunctor[PartialApply1Of2[Lens,A]#Apply] = 
-    new InvariantFunctor[PartialApply1Of2[Lens,A]#Apply] {
+  implicit def invariantFunctor[A] : InvariantFunctor[({type λ[α]=Lens[A, α]})#λ] =
+    new InvariantFunctor[({type λ[α]=Lens[A, α]})#λ] {
       def xmap[B,C](lens: Lens[A,B], f: B => C, g: C => B) = lens.xmap[C](f)(g)
     }
 

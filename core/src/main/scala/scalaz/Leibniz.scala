@@ -31,6 +31,7 @@ object Leibniz {
 
   trait PartialApplyLeibniz[-L,+H>:L] {
     type Apply[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+
   }
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
@@ -57,8 +58,13 @@ object Leibniz {
   )  : Leibniz[L,H,B,A] = 
     f.subst[({type λ[X>:L<:H]=Leibniz[L,H,X,A]})#λ](refl)
 
-  sealed class LeibnizGroupoid[L,H>:L] extends GeneralizedGroupoid[L,H] {
-    type =>:[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+/*
+  sealed class LeibnizGroupoid[L_ ,H_ >:L_] extends GeneralizedGroupoid { 
+    type U = Hom {
+      type L = L_
+      type H = H_
+      type C[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+    }
 
     def id[A>:L<:H] : Leibniz[A,A,A,A] = refl[A]
 
@@ -73,6 +79,7 @@ object Leibniz {
   }
 
   implicit def leibnizGroupoid[L,H>:L] : LeibnizGroupoid[L,H] = new LeibnizGroupoid[L,H]
+*/
 
   /** We can lift equality into any type constructor */
   def lift[

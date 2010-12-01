@@ -15,7 +15,7 @@ object Each {
     def each[A](e: NonEmptyList[A], f: A => Unit) = e.list foreach f
   }
 
-  implicit def StateEach: Each[PartialApply1Of2[State, Unit]#Apply] = new Each[PartialApply1Of2[State, Unit]#Apply] {
+  implicit def StateEach: Each[({type λ[α]=State[Unit, α]})#λ] = new Each[({type λ[α]=State[Unit, α]})#λ] {
     def each[A](e: State[Unit, A], f: A => Unit) = f(e(())._2)
   }
 
@@ -27,32 +27,32 @@ object Each {
     def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
 
-  implicit def Tuple2Each[R]: Each[PartialApply1Of2[Tuple2, R]#Apply] = new Each[PartialApply1Of2[Tuple2, R]#Apply] {
+  implicit def Tuple2Each[R]: Each[({type λ[α]=(R, α)})#λ] = new Each[({type λ[α]=(R, α)})#λ] {
     def each[A](e: (R, A), f: A => Unit) = f(e._2)
   }
 
-  implicit def Tuple3Each[R, S]: Each[PartialApply2Of3[Tuple3, R, S]#Apply] = new Each[PartialApply2Of3[Tuple3, R, S]#Apply] {
+  implicit def Tuple3Each[R, S]: Each[({type λ[α]=(R, S, α)})#λ] = new Each[({type λ[α]=(R, S, α)})#λ] {
     def each[A](e: (R, S, A), f: A => Unit) = f(e._3)
   }
 
-  implicit def Tuple4Each[R, S, T]: Each[PartialApply3Of4[Tuple4, R, S, T]#Apply] = new Each[PartialApply3Of4[Tuple4, R, S, T]#Apply] {
+  implicit def Tuple4Each[R, S, T]: Each[({type λ[α]=(R, S, T, α)})#λ] = new Each[({type λ[α]=(R, S, T, α)})#λ] {
     def each[A](e: (R, S, T, A), f: A => Unit) = f(e._4)
   }
 
-  implicit def Tuple5Each[R, S, T, U]: Each[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] = new Each[PartialApply4Of5[Tuple5, R, S, T, U]#Apply] {
+  implicit def Tuple5Each[R, S, T, U]: Each[({type λ[α]=(R, S, T, U, α)})#λ] = new Each[({type λ[α]=(R, S, T, U, α)})#λ] {
     def each[A](e: (R, S, T, U, A), f: A => Unit) = f(e._5)
   }
 
-  implicit def Tuple6Each[R, S, T, U, V]: Each[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] = new Each[PartialApply5Of6[Tuple6, R, S, T, U, V]#Apply] {
+  implicit def Tuple6Each[R, S, T, U, V]: Each[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Each[({type λ[α]=(R, S, T, U, V, α)})#λ] {
     def each[A](e: (R, S, T, U, V, A), f: A => Unit) = f(e._6)
   }
 
-  implicit def Tuple7Each[R, S, T, U, V, W]: Each[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] = new Each[PartialApply6Of7[Tuple7, R, S, T, U, V, W]#Apply] {
+  implicit def Tuple7Each[R, S, T, U, V, W]: Each[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Each[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def each[A](e: (R, S, T, U, V, W, A), f: A => Unit) = f(e._7)
   }
 
   implicit def Function0Each: Each[Function0] = new Each[Function0] {
-    def each[A](e: Function0[A], f: A => Unit) = f(e.apply)
+    def each[A](e: () => A, f: A => Unit) = f(e.apply)
   }
 
   implicit def TraversableOnceEach[A]: Each[TraversableOnce] = new Each[TraversableOnce] {
@@ -63,11 +63,11 @@ object Each {
     def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
-  implicit def EitherLeftEach[X]: Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Each[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftEach[X]: Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def each[A](e: Either.LeftProjection[A, X], f: A => Unit) = e foreach f
   }
 
-  implicit def EitherRightEach[X]: Each[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Each[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightEach[X]: Each[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Each[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 
@@ -83,7 +83,7 @@ object Each {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryEach[X]: Each[PartialApply1Of2[Entry, X]#Apply] = new Each[PartialApply1Of2[Entry, X]#Apply] {
+  implicit def MapEntryEach[X]: Each[({type λ[α]=Entry[X, α]})#λ] = new Each[({type λ[α]=Entry[X, α]})#λ] {
     def each[A](e: Entry[X, A], f: A => Unit) = f(e.getValue)
   }
 

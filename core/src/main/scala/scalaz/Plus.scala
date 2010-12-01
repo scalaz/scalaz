@@ -32,7 +32,7 @@ object Plus extends PlusLow {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
 
-  implicit def EitherLeftPlus[X]: Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] = new Plus[PartialApply1Of2[Either.LeftProjection, X]#Flip] {
+  implicit def EitherLeftPlus[X]: Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {
       case Left(_) => a1
       case Right(_) => a2.e match {
@@ -42,7 +42,7 @@ object Plus extends PlusLow {
     }
   }
 
-  implicit def EitherRightPlus[X]: Plus[PartialApply1Of2[Either.RightProjection, X]#Apply] = new Plus[PartialApply1Of2[Either.RightProjection, X]#Apply] {
+  implicit def EitherRightPlus[X]: Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = a2.e match {
       case Right(_) => a1
       case Left(_) => a2.e match {
@@ -52,7 +52,7 @@ object Plus extends PlusLow {
     }
   }
 
-  implicit def ValidationPlus[X]: Plus[PartialApply1Of2[Validation, X]#Apply] = new Plus[PartialApply1Of2[Validation, X]#Apply] {
+  implicit def ValidationPlus[X]: Plus[({type λ[α]=Validation[X, α]})#λ] = new Plus[({type λ[α]=Validation[X, α]})#λ] {
     def plus[A](a1: Validation[X, A], a2: => Validation[X, A]) = a1 match {
       case Success(_) => a1
       case Failure(_) => a2 match {
@@ -62,7 +62,7 @@ object Plus extends PlusLow {
     }
   }
 
-  implicit def ValidationFailurePlus[X]: Plus[PartialApply1Of2[FailProjection, X]#Flip] = new Plus[PartialApply1Of2[FailProjection, X]#Flip] {
+  implicit def ValidationFailurePlus[X]: Plus[({type λ[α]=FailProjection[α, X]})#λ] = new Plus[({type λ[α]=FailProjection[α, X]})#λ] {
     def plus[A](a1: FailProjection[A, X], a2: => FailProjection[A, X]) = a1.validation match {
       case Success(_) => a2.validation match {
         case Failure(_) => a2
