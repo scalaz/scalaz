@@ -6,7 +6,7 @@ trait Bind[Z[_]] {
 
 object Bind {
   import Scalaz._
-  
+
   implicit def IdentityBind: Bind[Identity] = new Bind[Identity] {
     def bind[A, B](a: Identity[A], f: A => Identity[B]) = f(a.value)
   }

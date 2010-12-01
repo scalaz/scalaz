@@ -139,7 +139,7 @@ object Pure {
   }
 
   implicit def ValidationPure[X]: Pure[PartialApply1Of2[Validation, X]#Apply] = new Pure[PartialApply1Of2[Validation, X]#Apply] {
-    def pure[A](a: => A) = a.success
+    def pure[A](a: => A) = a.success 
   }
 
   implicit def ValidationFailurePure[X]: Pure[PartialApply1Of2[FailProjection, X]#Flip] = new Pure[PartialApply1Of2[FailProjection, X]#Flip] {
