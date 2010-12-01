@@ -1,5 +1,6 @@
 package scala
 
+import annotation.unchecked.uncheckedVariance
 import scalaz.Scalaz._
 import scalaz.Liskov._
 import scalaz.Applicative
@@ -33,9 +34,7 @@ object Mu_ {
 
 /** Positive corecursion */
 
-// ideal: trait Nu[+F[+_]] extends Nu_[F] {
-// works: trait Nu[+F[+_]] { 
-trait Nu[F[+_]] extends Nu_[F] {
+trait Nu[+F[+_]] extends Nu_[F @uncheckedVariance] {
   def out: F[Nu[F]]
 }
 object Nu { 
@@ -49,9 +48,7 @@ object Nu {
 
 /** Positive recursion */
 
-// ideal: trait Mu[+F[+_]] extends Nu[F] with Mu_[F] {
-// works: trait Mu[+F[+_]] extends Nu[F] {
-trait Mu[F[+_]] extends Nu[F] with Mu_[F] {
+trait Mu[+F[+_]] extends Nu[F] with Mu_[F @uncheckedVariance] {
   val out: F[Mu[F]]
 }
 object Mu {
@@ -90,9 +87,7 @@ object Cofree_ {
 }
 
 /** Positive cofree corecursion */
-// ideal: trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F,A] {
-// works: trait Cofree[+F[+_],+A] extends Nu[F] {
-trait Cofree[F[+_],A] extends Nu[F] with Cofree_[F,A] {
+trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F @uncheckedVariance, A @uncheckedVariance] {
   val extract: A 
   def out: F[Cofree[F,A]]
 }
