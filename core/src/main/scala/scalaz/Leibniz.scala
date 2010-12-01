@@ -58,13 +58,11 @@ object Leibniz {
   )  : Leibniz[L,H,B,A] = 
     f.subst[({type λ[X>:L<:H]=Leibniz[L,H,X,A]})#λ](refl)
 
-/*
-  sealed class LeibnizGroupoid[L_ ,H_ >:L_] extends GeneralizedGroupoid { 
-    type U = Hom {
-      type L = L_
-      type H = H_
-      type C[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
-    }
+  sealed class LeibnizGroupoid[L_ ,H_ >:L_] extends GeneralizedGroupoid with Hom { 
+    type L = L_
+    type H = H_
+    type C[A>:L<:H,B>:L<:H] = Leibniz[L,H,A,B]
+    type U = LeibnizGroupoid[L,H]
 
     def id[A>:L<:H] : Leibniz[A,A,A,A] = refl[A]
 
@@ -79,7 +77,6 @@ object Leibniz {
   }
 
   implicit def leibnizGroupoid[L,H>:L] : LeibnizGroupoid[L,H] = new LeibnizGroupoid[L,H]
-*/
 
   /** We can lift equality into any type constructor */
   def lift[
