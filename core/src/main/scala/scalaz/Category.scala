@@ -164,7 +164,7 @@ object Category {
 
   def cofunctorInScala[F[_]](f: Cofunctor[F]): GeneralizedFunctor[<=, Function1, F] =
     new GeneralizedFunctor[<=, Function1, F] {
-    def fmap[A, B](h: A <= B): F[A] => F[B] =
+      def fmap[A, B](h: A <= B): F[A] => F[B] =
         f.comap(_, h.value)
     }
 
@@ -172,8 +172,8 @@ object Category {
     def comap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
-  implicit def opCoFunctor[R]: Cofunctor[PartialApply1Of2[<=,R]#Apply] =
-    new Cofunctor[PartialApply1Of2[<=,R]#Apply] {
+  implicit def opCoFunctor[R]: Cofunctor[({type λ[α]=R <= α})#λ] =
+    new Cofunctor[({type λ[α]=R <= α})#λ] {
       def comap[A, B](b: R <= A, t: B => A): R <= B =
         <=(b.value compose t)
     }
@@ -206,7 +206,7 @@ object Category {
     type Apply[A] = Arr[F[A], G[A]]
   }
 
-  type Alpha[Arr[_,_], X, Y] = PartialApply1Of2[Arr, X]#Flip ~> PartialApply1Of2[Arr, Y]#Flip
+  type Alpha[Arr[_,_], X, Y] = ({type λ[α]=Arr[α, X]})#λ ~> ({type λ[α]=Arr[α, Y]})#λ
 
 
   /** The Yoneda Lemma 
