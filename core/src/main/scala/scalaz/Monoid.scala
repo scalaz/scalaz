@@ -24,5 +24,5 @@ object Monoid extends MonoidLow {
   import Semigroup._
   import Zero._
 
-  implicit def EitherLeftMonoid[A, B](implicit bz: Zero[B]): Monoid[Either.LeftProjection[A, B]] = monoid[Either.LeftProjection[A, B]](EitherLeftSemigroup, EitherLeftZero[A, B](bz))
+  implicit def EitherLeftMonoid[A, B](implicit bz: Zero[B]) = monoid[Either.LeftProjection[A, B]](EitherLeftSemigroup, EitherLeftZero[A, B](bz))
 }

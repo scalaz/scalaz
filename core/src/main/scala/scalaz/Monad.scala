@@ -36,39 +36,39 @@ object Monad {
 
   implicit def Tuple2Monad[R: Monoid]: Monad[({type λ[α]=(R, α)})#λ] = monad[({type λ[α]=(R, α)})#λ](Tuple2Bind, Tuple2Pure)
 
-  implicit def Tuple3Monad[R: Monoid, S: Monoid]: Monad[({type λ[α]=(R, S, α)})#λ] = monad[({type λ[α]=(R, S, α)})#λ](Tuple3Bind, Tuple3Pure)
+  implicit def Tuple3Monad[R: Monoid, S: Monoid] = monad[({type λ[α]=(R, S, α)})#λ](Tuple3Bind, Tuple3Pure)
 
-  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid]: Monad[({type λ[α]=(R, S, T, α)})#λ] = monad[({type λ[α]=(R, S, T, α)})#λ](Tuple4Bind, Tuple4Pure)
+  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid] = monad[({type λ[α]=(R, S, T, α)})#λ](Tuple4Bind, Tuple4Pure)
 
-  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid]: Monad[({type λ[α]=(R, S, T, U, α)})#λ] = monad[({type λ[α]=(R, S, T, U, α)})#λ](Tuple5Bind, Tuple5Pure)
+  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid] = monad[({type λ[α]=(R, S, T, U, α)})#λ](Tuple5Bind, Tuple5Pure)
 
-  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid]: Monad[({type λ[α]=(R, S, T, U, V, α)})#λ] = monad[({type λ[α]=(R, S, T, U, V, α)})#λ](Tuple6Bind, Tuple6Pure)
+  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid] = monad[({type λ[α]=(R, S, T, U, V, α)})#λ](Tuple6Bind, Tuple6Pure)
 
-  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid]: Monad[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = monad[({type λ[α]=(R, S, T, U, V, W, α)})#λ](Tuple7Bind, Tuple7Pure)
+  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid] = monad[({type λ[α]=(R, S, T, U, V, W, α)})#λ](Tuple7Bind, Tuple7Pure)
   
-  implicit def Function1Monad[R]: Monad[({type λ[α]=(R) => α})#λ] = monad[({type λ[α]=(R) => α})#λ](Function1Bind, Function1Pure)
+  implicit def Function1Monad[R] = monad[({type λ[α]=(R) => α})#λ](Function1Bind, Function1Pure)
 
-  implicit def Function2Monad[R, S]: Monad[({type λ[α]=(R, S) => α})#λ] = monad[({type λ[α]=(R, S) => α})#λ](Function2Bind, Function2Pure)
+  implicit def Function2Monad[R, S] = monad[({type λ[α]=(R, S) => α})#λ](Function2Bind, Function2Pure)
 
-  implicit def Function3Monad[R, S, T]: Monad[({type λ[α]=(R, S, T) => α})#λ] = monad[({type λ[α]=(R, S, T) => α})#λ](Function3Bind, Function3Pure)
+  implicit def Function3Monad[R, S, T] = monad[({type λ[α]=(R, S, T) => α})#λ](Function3Bind, Function3Pure)
 
-  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α]=(R, S, T, U) => α})#λ] = monad[({type λ[α]=(R, S, T, U) => α})#λ](Function4Bind, Function4Pure)
+  implicit def Function4Monad[R, S, T, U] = monad[({type λ[α]=(R, S, T, U) => α})#λ](Function4Bind, Function4Pure)
 
-  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=(R, S, T, U, V) => α})#λ] = monad[({type λ[α]=(R, S, T, U, V) => α})#λ](Function5Bind, Function5Pure)
+  implicit def Function5Monad[R, S, T, U, V] = monad[({type λ[α]=(R, S, T, U, V) => α})#λ](Function5Bind, Function5Pure)
 
-  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
+  implicit def Function6Monad[R, S, T, U, V, W] = monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
 
-  implicit def EitherLeftMonad[X]: Monad[({type λ[α]=Either.LeftProjection[α, X]})#λ] = monad[({type λ[α]=Either.LeftProjection[α, X]})#λ](EitherLeftBind, EitherLeftPure)
+  implicit def EitherLeftMonad[X] = monad[({type λ[α]=Either.LeftProjection[α, X]})#λ](EitherLeftBind, EitherLeftPure)
   
-  implicit def EitherRightMonad[X]: Monad[({type λ[α]=Either.RightProjection[X, α]})#λ] = monad[({type λ[α]=Either.RightProjection[X, α]})#λ](EitherRightBind, EitherRightPure)
+  implicit def EitherRightMonad[X] = monad[({type λ[α]=Either.RightProjection[X, α]})#λ](EitherRightBind, EitherRightPure)
   
-  implicit def ValidationMonad[X]: Monad[({type λ[α]=Validation[X, α]})#λ] = monad[({type λ[α]=Validation[X, α]})#λ](ValidationBind, ValidationPure)
+  implicit def ValidationMonad[X] = monad[({type λ[α]=Validation[X, α]})#λ](ValidationBind, ValidationPure)
 
-  implicit def ValidationFailureMonad[X]: Monad[({type λ[α]=FailProjection[α, X]})#λ] = monad[({type λ[α]=FailProjection[α, X]})#λ](ValidationFailureBind, ValidationFailurePure)
+  implicit def ValidationFailureMonad[X] = monad[({type λ[α]=FailProjection[α, X]})#λ](ValidationFailureBind, ValidationFailurePure)
 
   implicit def IterVMonad[E] = monad[({type λ[α]=IterV[E, α]})#λ](IterVBind, IterVPure)
 
   import java.util.Map.Entry
 
-  implicit def MapEntryBind[X: Monoid]: Monad[({type λ[α]=Entry[X, α]})#λ] = monad[({type λ[α]=Entry[X, α]})#λ](MapEntryBind, MapEntryPure)  
+  implicit def MapEntryMonad[X: Monoid] = monad[({type λ[α]=Entry[X, α]})#λ](MapEntryBind, MapEntryPure)
 }
