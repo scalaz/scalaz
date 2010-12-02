@@ -116,7 +116,7 @@ sealed trait EphemeralStream[+A] {
     these
   }
 
-  def ++[BB >: A](e: EphemeralStream[BB]): EphemeralStream[BB] =
+  def ++[BB >: A](e: => EphemeralStream[BB]): EphemeralStream[BB] =
     foldRight[EphemeralStream[BB]](e)((cons[BB](_, _)).curried)
 
   def flatMap[B](f: A => EphemeralStream[B]): EphemeralStream[B] =
