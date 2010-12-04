@@ -31,7 +31,7 @@ object Empty {
   
   implicit def TraversableEmpty[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Empty[CC] = new Empty[CC] {
     def empty[A] = {
-      val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]
+      val builder = implicitly[CanBuildAnySelf[CC]].apply[⊥, A]
       builder.result
     }
   }
