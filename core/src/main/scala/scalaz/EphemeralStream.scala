@@ -20,7 +20,7 @@ object EphemeralStream {
 
   def apply[A](as: A*): EphemeralStream[A] =
     unfold(0, (b: Int) =>
-      if (b < as.size) Some(as(b), b + 1)
+      if (b < as.size) Some((as(b), b + 1))
       else None)
 
   implicit val ephemeralStreamPure: Pure[EphemeralStream] = new Pure[EphemeralStream] {
