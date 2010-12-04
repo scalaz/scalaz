@@ -1,5 +1,7 @@
 package scalaz
 
+import Scalaz.{⊥, ⊤}
+
 /**
  * Defines a category.
  *
@@ -21,10 +23,10 @@ trait Hom {
 
 trait GeneralizedCategory { 
   type U <: Hom
-  type =>:[A>:U#L<:U#H,B>:U#L<:U#H] = U#C[A,B]
+  type =>:[A >: U#L <: U#H, B >: U#L <: U#H] = U#C[A, B]
 
-  def id[A>:U#L<:U#H]: A =>: A
-  def compose[A>:U#L<:U#H, B>:U#L<:U#H, C>:U#L<:U#H](
+  def id[A >: U#L <: U#H]: A =>: A
+  def compose[A >: U#L <: U#H, B >: U#L <: U#H, C >: U#L <: U#H](
     f: B =>: C,
     g: A =>: B
   ): A =>: C
@@ -32,14 +34,14 @@ trait GeneralizedCategory {
 }
 
 trait GeneralizedGroupoid extends GeneralizedCategory { 
-  def invert[A>:U#L<:U#H,B>:U#L<:U#H](f : A =>: B): B =>: A
+  def invert[A >: U#L <: U#H, B >: U#L <: U#H](f : A =>: B): B =>: A
 }
 
 trait Category[~>:[_,_]] extends GeneralizedCategory { 
   trait U extends Hom { 
-    type L = Nothing
-    type H = Any
-    type C[A,B] = ~>:[A,B] 
+    type L = ⊥
+    type H = ⊤
+    type C[A, B] = ~>:[A, B]
   }
 }
 
@@ -54,41 +56,40 @@ object Category {
    */
 
   /** Index for a product category */
-  sealed trait P[+IX,+IY] { type _1 = IX; type _2 = IY }
+  sealed trait P[+IX, +IY] { type _1 = IX; type _2 = IY }
 
-  case class ProductCategory[UX<:Hom,UY<:Hom](
+  case class ProductCategory[UX <: Hom, UY <: Hom](
     _1: GeneralizedCategory {type U = UX}, _2: GeneralizedCategory {type U = UY} 
   ) extends GeneralizedCategory with Hom {
     type _1 = _1.type
     type _2 = _2.type
-    type L = P[UX#L,UY#L]
-    type H = P[UX#H,UY#H]
-    case class C[A>:L<:H,B>:L<:H](
-      _1: UX#C[A#_1,B#_1], _2: UY#C[A#_2,B#_2]
-    ) extends P[UX#C[A#_1,B#_1], UY#C[A#_2,B#_2]]
-    type U = ProductCategory[UX,UY]
+    type L = P[UX#L, UY#L]
+    type H = P[UX#H, UY#H]
+    case class C[A >: L <: H, B >: L <: H](
+      _1: UX#C[A#_1, B#_1], _2: UY#C[A#_2, B#_2]
+    ) extends P[UX#C[A#_1, B#_1], UY#C[A#_2, B#_2]]
+    type U = ProductCategory[UX, UY]
 
     def id[A>:U#L<:U#H] = C(_1.id[A#_1],_2.id[A#_2])
-    def compose [A>:U#L<:U#H, B>:U#L<:U#H, C>:U#L<:U#H](
+    def compose[A >: U#L <: U#H, B >: U#L <: U#H, C >: U#L <: U#H](
       f: B =>: C, g: A =>: B
-    ) = C(_1.compose(f._1,g._1), _2.compose(f._2,g._2))
+    ) = C(_1.compose(f._1, g._1), _2.compose(f._2, g._2))
   }
 
-  implicit def productCategory[UX<:Hom,UY<:Hom](
+  implicit def productCategory[UX <: Hom, UY <: Hom](
     implicit x: GeneralizedCategory {type U=UX},
              y: GeneralizedCategory {type U=UY}
-  ) = ProductCategory[UX,UY](x,y)
+  ) = ProductCategory[UX, UY](x, y)
 
   sealed class MonoidCategory[M](
     implicit monoid : Monoid[M]
   ) extends GeneralizedCategory with Hom {
-    type L = Nothing
-    type H = Nothing
-    type C[A>:Nothing<:Nothing,B>:Nothing<:Nothing] = M
+    type L = ⊥
+    type H = ⊥
+    type C[A <: ⊥, B <: ⊥] = M
     type U = MonoidCategory[M]
-    def id[A>:Nothing<:Nothing] = monoid.zero
-    def compose[A>:Nothing<:Nothing,B>:Nothing<:Nothing,C>:Nothing<:Nothing](m:M,n:M):M = 
-      monoid.append(m, n)
+    def id[A <: ⊥] = monoid.zero
+    def compose[A <: ⊥, B <: ⊥, C <: ⊥](m: M, n: M): M = monoid.append(m, n)
   }
   implicit def monoidCategory[M:Monoid] : MonoidCategory[M] = new MonoidCategory[M]
   
@@ -116,7 +117,7 @@ object Category {
   /** The opposite category of the <b>Set</b> category. */
   implicit val OpCategory: Category[<=] = new Category[<=] {
     def id[A] = <=((x: A) => x)
-    def compose[X,Y,Z](f: Y <= Z, g: X <= Y): X <= Z =
+    def compose[X, Y, Z](f: Y <= Z, g: X <= Y): X <= Z =
       <=(f.value andThen g.value)
   }
 
@@ -275,8 +276,8 @@ object Category {
   }
   */
 
-  implicit def ObjectToMorphism[A,B,C](a: A): Const2[A,Unit,Unit] = Const2(a)
-  implicit def MorphismToObject[A,B,C](a: Const2[A,B,C]) = a.value
+  implicit def ObjectToMorphism[A, B, C](a: A): Const2[A, Unit, Unit] = Const2(a)
+  implicit def MorphismToObject[A, B, C](a: Const2[A, B, C]) = a.value
 
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
