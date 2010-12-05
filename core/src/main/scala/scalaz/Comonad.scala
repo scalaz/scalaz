@@ -8,4 +8,13 @@ object Comonad {
     def fmap[A, B](a: W[A], f: A => B) = p.fmap(a, f)
     def copure[A](a: W[A]) = p.copure(a)
   }
+
+  import Cojoin._
+  import Copointed._
+
+  implicit def Tuple2Comonad[A] = comonad[({type λ[α]=(A, α)})#λ](Tuple2Cojoin, Tuple2Copointed)
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryComonad[X] = comonad[({type λ[α]=Entry[X, α]})#λ](MapEntryCojoin, MapEntryCopointed)
 }
