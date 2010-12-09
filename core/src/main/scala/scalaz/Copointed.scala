@@ -7,4 +7,12 @@ object Copointed {
     def fmap[A, B](a: C[A], f: A => B) = t.fmap(a, f)
     def copure[A](a: C[A]): A = c.copure(a)
   }
+
+  import Functor._
+  import Copure._
+
+  implicit def Tuple2Copointed[A] = copointed[({type λ[α]=(A, α)})#λ](Tuple2Functor, Tuple2Copure)
+
+  import java.util.Map.Entry
+  implicit def MapEntryCopointed[X] = copointed[({type λ[α]=Entry[X, α]})#λ](MapEntryFunctor, MapEntryCopure)
 }

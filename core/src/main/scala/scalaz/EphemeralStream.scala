@@ -4,10 +4,10 @@ import Scalaz._
 import java.lang.ref.WeakReference
 
 object EphemeralStream {
-  val empty = new EphemeralStream[Nothing] {
+  val empty = new EphemeralStream[⊥] {
     def isEmpty = true
-    def head: () => Nothing = () => error("head of empty stream")
-    def tail: () => Nothing = () => error("tail of empty stream")
+    def head: () => ⊥ = () => error("head of empty stream")
+    def tail: () => ⊥ = () => error("tail of empty stream")
   }
 
   object cons {
@@ -20,7 +20,7 @@ object EphemeralStream {
 
   def apply[A](as: A*): EphemeralStream[A] =
     unfold(0, (b: Int) =>
-      if (b < as.size) Some(as(b), b + 1)
+      if (b < as.size) Some((as(b), b + 1))
       else None)
 
   implicit val ephemeralStreamPure: Pure[EphemeralStream] = new Pure[EphemeralStream] {

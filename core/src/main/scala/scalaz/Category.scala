@@ -1,5 +1,7 @@
 package scalaz
 
+import Scalaz.{⊥, ⊤}
+
 /**
  * Defines a category.
  *
@@ -21,10 +23,10 @@ trait Hom {
 
 trait GeneralizedCategory { 
   type U <: Hom
-  type =>:[A>:U#L<:U#H,B>:U#L<:U#H] = U#C[A,B]
+  type =>:[A >: U#L <: U#H, B >: U#L <: U#H] = U#C[A, B]
 
-  def id[A>:U#L<:U#H]: A =>: A
-  def compose[A>:U#L<:U#H, B>:U#L<:U#H, C>:U#L<:U#H](
+  def id[A >: U#L <: U#H]: A =>: A
+  def compose[A >: U#L <: U#H, B >: U#L <: U#H, C >: U#L <: U#H](
     f: B =>: C,
     g: A =>: B
   ): A =>: C
@@ -32,14 +34,14 @@ trait GeneralizedCategory {
 }
 
 trait GeneralizedGroupoid extends GeneralizedCategory { 
-  def invert[A>:U#L<:U#H,B>:U#L<:U#H](f : A =>: B): B =>: A
+  def invert[A >: U#L <: U#H, B >: U#L <: U#H](f : A =>: B): B =>: A
 }
 
 trait Category[~>:[_,_]] extends GeneralizedCategory { 
   trait U extends Hom { 
-    type L = Nothing
-    type H = Any
-    type C[A,B] = ~>:[A,B] 
+    type L = ⊥
+    type H = ⊤
+    type C[A, B] = ~>:[A, B]
   }
 }
 
@@ -54,41 +56,40 @@ object Category {
    */
 
   /** Index for a product category */
-  sealed trait P[+IX,+IY] { type _1 = IX; type _2 = IY }
+  sealed trait P[+IX, +IY] { type _1 = IX; type _2 = IY }
 
-  case class ProductCategory[UX<:Hom,UY<:Hom](
+  case class ProductCategory[UX <: Hom, UY <: Hom](
     _1: GeneralizedCategory {type U = UX}, _2: GeneralizedCategory {type U = UY} 
   ) extends GeneralizedCategory with Hom {
     type _1 = _1.type
     type _2 = _2.type
-    type L = P[UX#L,UY#L]
-    type H = P[UX#H,UY#H]
-    case class C[A>:L<:H,B>:L<:H](
-      _1: UX#C[A#_1,B#_1], _2: UY#C[A#_2,B#_2]
-    ) extends P[UX#C[A#_1,B#_1], UY#C[A#_2,B#_2]]
-    type U = ProductCategory[UX,UY]
+    type L = P[UX#L, UY#L]
+    type H = P[UX#H, UY#H]
+    case class C[A >: L <: H, B >: L <: H](
+      _1: UX#C[A#_1, B#_1], _2: UY#C[A#_2, B#_2]
+    ) extends P[UX#C[A#_1, B#_1], UY#C[A#_2, B#_2]]
+    type U = ProductCategory[UX, UY]
 
     def id[A>:U#L<:U#H] = C(_1.id[A#_1],_2.id[A#_2])
-    def compose [A>:U#L<:U#H, B>:U#L<:U#H, C>:U#L<:U#H](
+    def compose[A >: U#L <: U#H, B >: U#L <: U#H, C >: U#L <: U#H](
       f: B =>: C, g: A =>: B
-    ) = C(_1.compose(f._1,g._1), _2.compose(f._2,g._2))
+    ) = C(_1.compose(f._1, g._1), _2.compose(f._2, g._2))
   }
 
-  implicit def productCategory[UX<:Hom,UY<:Hom](
+  implicit def productCategory[UX <: Hom, UY <: Hom](
     implicit x: GeneralizedCategory {type U=UX},
              y: GeneralizedCategory {type U=UY}
-  ) = ProductCategory[UX,UY](x,y)
+  ) = ProductCategory[UX, UY](x, y)
 
   sealed class MonoidCategory[M](
     implicit monoid : Monoid[M]
   ) extends GeneralizedCategory with Hom {
-    type L = Nothing
-    type H = Nothing
-    type C[A>:Nothing<:Nothing,B>:Nothing<:Nothing] = M
+    type L = ⊥
+    type H = ⊥
+    type C[A <: ⊥, B <: ⊥] = M
     type U = MonoidCategory[M]
-    def id[A>:Nothing<:Nothing] = monoid.zero
-    def compose[A>:Nothing<:Nothing,B>:Nothing<:Nothing,C>:Nothing<:Nothing](m:M,n:M):M = 
-      monoid.append(m, n)
+    def id[A <: ⊥] = monoid.zero
+    def compose[A <: ⊥, B <: ⊥, C <: ⊥](m: M, n: M): M = monoid.append(m, n)
   }
   implicit def monoidCategory[M:Monoid] : MonoidCategory[M] = new MonoidCategory[M]
   
@@ -116,7 +117,7 @@ object Category {
   /** The opposite category of the <b>Set</b> category. */
   implicit val OpCategory: Category[<=] = new Category[<=] {
     def id[A] = <=((x: A) => x)
-    def compose[X,Y,Z](f: Y <= Z, g: X <= Y): X <= Z =
+    def compose[X, Y, Z](f: Y <= Z, g: X <= Y): X <= Z =
       <=(f.value andThen g.value)
   }
 
@@ -164,7 +165,7 @@ object Category {
 
   def cofunctorInScala[F[_]](f: Cofunctor[F]): GeneralizedFunctor[<=, Function1, F] =
     new GeneralizedFunctor[<=, Function1, F] {
-    def fmap[A, B](h: A <= B): F[A] => F[B] =
+      def fmap[A, B](h: A <= B): F[A] => F[B] =
         f.comap(_, h.value)
     }
 
@@ -172,8 +173,8 @@ object Category {
     def comap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
-  implicit def opCoFunctor[R]: Cofunctor[PartialApply1Of2[<=,R]#Apply] =
-    new Cofunctor[PartialApply1Of2[<=,R]#Apply] {
+  implicit def opCoFunctor[R]: Cofunctor[({type λ[α]=R <= α})#λ] =
+    new Cofunctor[({type λ[α]=R <= α})#λ] {
       def comap[A, B](b: R <= A, t: B => A): R <= B =
         <=(b.value compose t)
     }
@@ -195,7 +196,7 @@ object Category {
     }
 
   /** Compose cofunctors */
-  implicit def ComposeCoFunctors[F[_]:Cofunctor, G[_]:Cofunctor]: Functor[(F <*> G)#In[<=]#Apply] =
+  implicit def ComposeCofunctors[F[_]:Cofunctor, G[_]:Cofunctor]: Functor[(F <*> G)#In[<=]#Apply] =
     new Functor[(F <*> G)#In[<=]#Apply] {
       def fmap[A, B](a: Compose[F, G, <=, A], f: A => B): Compose[F, G, <=, B] =
         Compose(a.value comap (_ comap f))
@@ -206,7 +207,7 @@ object Category {
     type Apply[A] = Arr[F[A], G[A]]
   }
 
-  type Alpha[Arr[_,_], X, Y] = PartialApply1Of2[Arr, X]#Flip ~> PartialApply1Of2[Arr, Y]#Flip
+  type Alpha[Arr[_,_], X, Y] = ({type λ[α]=Arr[α, X]})#λ ~> ({type λ[α]=Arr[α, Y]})#λ
 
 
   /** The Yoneda Lemma 
@@ -258,12 +259,12 @@ object Category {
     }
   }
 
-  implicit def KleisliCategory[M[_]: Monad]: Category[PartialApplyK[Kleisli, M]#Apply] = new Category[PartialApplyK[Kleisli, M]#Apply] {
+  implicit def KleisliCategory[M[_]: Monad]: Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Kleisli[M, α, β]})#λ] {
     def id[A] = ☆(_ η)
     def compose[X, Y, Z](f: Kleisli[M, Y, Z], g: Kleisli[M, X, Y]) = f <=< g
   }
 
-  implicit def CokleisliCategory[M[_]: Comonad]: Category[PartialApplyK[Cokleisli, M]#Apply] = new Category[PartialApplyK[Cokleisli, M]#Apply] {
+  implicit def CokleisliCategory[M[_]: Comonad]: Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] {
     def id[A] = ★(_ ε)
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }
@@ -275,13 +276,13 @@ object Category {
   }
   */
 
-  implicit def ObjectToMorphism[A,B,C](a: A): Const2[A,Unit,Unit] = Const2(a)
-  implicit def MorphismToObject[A,B,C](a: Const2[A,B,C]) = a.value
+  implicit def ObjectToMorphism[A, B, C](a: A): Const2[A, Unit, Unit] = Const2(a)
+  implicit def MorphismToObject[A, B, C](a: Const2[A, B, C]) = a.value
 
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
   /** Discrete categories, whose only morphism is the identity function. **/
-  implicit def DiscreteCategory[X] = new Category[PartialApply1Of3[Discrete,X]#Apply] {
+  implicit def DiscreteCategory[X] = new Category[({type λ[α, β]=Discrete[X, α, β]})#λ] {
     def id[A] = Discrete(x => x)
     def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
   }
@@ -291,7 +292,7 @@ object Category {
   }
 
   /** Every partial order gives rise to a category **/
-  implicit def PosetCategory[X: Order] = new Category[PartialApply1Of3[Ord2,X]#Apply] {
+  implicit def PosetCategory[X: Order]: Category[({type λ[α, β]=Ord2[X, α, β]})#λ] = new Category[({type λ[α, β]=Ord2[X, α, β]})#λ] {
     def id[A] = new Ord2[X, A, A]
     def compose[A, B, C](f: Ord2[X, B, C], g: Ord2[X, A, B]) = new Ord2[X, A, C] {
       override def compare(a: X, b: X) = f.compare(a, b) == g.compare(a, b)

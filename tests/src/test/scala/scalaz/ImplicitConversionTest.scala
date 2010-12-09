@@ -211,6 +211,21 @@ object ImplicitConversionTest {
 
     i[({type λ[α]=T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
   }
+
+  def copointed {
+    type A = Int
+    i[Copointed[({type λ[α]=(A, α)})#λ]]
+
+    import java.util.Map.Entry
+    i[Copointed[({type λ[α]=Entry[A, α]})#λ]]
+  }
+
+  def comonad {
+    type A = Int
+    i[Comonad[({type λ[α]=(A, α)})#λ]]
+    import java.util.Map.Entry
+    i[Comonad[({type λ[α]=Entry[A, α]})#λ]]
+  }
   
   def strategy {
     i[concurrent.Strategy]
