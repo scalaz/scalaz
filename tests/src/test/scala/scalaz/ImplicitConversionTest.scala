@@ -78,6 +78,7 @@ object ImplicitConversionTest {
     i[Applicative[({type λ[α]=Entry[Int, α]})#λ]]
     i[Applicative[({type λ[α]=Validation[Int, α]})#λ]]
     i[Applicative[({type λ[α]=FailProjection[α, X]})#λ]]
+    i[Applicative[({type λ[α] = State[A, α]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
