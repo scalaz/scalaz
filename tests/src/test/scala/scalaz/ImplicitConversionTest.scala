@@ -5,6 +5,12 @@ object ImplicitConversionTest {
   import Scalaz._
   import Predef.{implicitly => i}
 
+  // Ambiguous implicits with 2.8.1
+  trait F[S,A] {
+    type M[B] = State[S,B]
+    i[Applicative[M]]
+  }
+
   def MAs[A, B, C, D, E, F, G, H] {
     i[List[A] <%< MA[List, A]]
     i[Option[A] <%< MA[Option, A]]
@@ -58,7 +64,7 @@ object ImplicitConversionTest {
     i[Applicative[List]]
     i[Applicative[Function0]]
     i[Applicative[Option]]
-    i[Applicative[({type λ[α]=State[A, α]})#λ]]
+    //i[Applicative[({type λ[α]=State[A, α]})#λ]]
     i[Applicative[Function0]]
     i[Applicative[({type λ[α]=(R) => α})#λ]]
     i[Applicative[PartialApply2Of3[Function2, R, S]#Apply]]
@@ -72,6 +78,7 @@ object ImplicitConversionTest {
     i[Applicative[({type λ[α]=Entry[Int, α]})#λ]]
     i[Applicative[({type λ[α]=Validation[Int, α]})#λ]]
     i[Applicative[({type λ[α]=FailProjection[α, X]})#λ]]
+    i[Applicative[({type λ[α] = State[A, α]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {

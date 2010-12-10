@@ -21,12 +21,15 @@ trait Monad[M[_]] extends Applicative[M] with Bind[M] with Pointed[M] {
   }
 }
 
-object Monad {
+trait MonadLow {
   implicit def monad[M[_]](implicit b: Bind[M], p: Pure[M]): Monad[M] = new Monad[M] {
     override def pure[A](a: => A) = p.pure(a)
 
     override def bind[A, B](a: M[A], f: A => M[B]) = b.bind(a, f)
   }
+}
+
+object Monad extends MonadLow {
 
   import Bind._
   import Pure._
