@@ -27,8 +27,6 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
    * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
    * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
-   *
-   * This method is experimental, and can crash the compiler.
    */
   def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[({type λ[α]=M[N[α]]})#λ, B] = ma[({type λ[α]=M[N[α]]})#λ, B](value ∘ n)
 
