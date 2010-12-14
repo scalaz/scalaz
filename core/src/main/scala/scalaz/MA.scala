@@ -30,7 +30,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
    *
    * This method is experimental, and can crash the compiler.
    */
-  def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[Comp[M, N]#Apply, B] = ma[Comp[M, N]#Apply, B](value ∘ n)
+  def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[({type λ[α]=M[N[α]]})#λ, B] = ma[({type λ[α]=M[N[α]]})#λ, B](value ∘ n)
 
   def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
 
