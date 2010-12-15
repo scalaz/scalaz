@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz._
 import Scalaz._
-import collection.immutable.{Stream, List}
+import collection.immutable.List
 
 object WordCount {
   def main(args: Array[String]) = {
@@ -30,9 +30,7 @@ object WordCount {
 
     val wordCountLineCountBody = (a: Char) => (charCountBody(a), lineCountBody(a))
     def wordCountLineCount(text: List[Char]) = {
-      val result = text.traverse[({type C1[α]=Const[Int, α]; type λ[α]=(C1[α], C1[α])})#λ, Any](wordCountLineCountBody)(
-        Prod.ProdApplicative[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ],
-        implicitly)
+      val result = text.traverse[({type λ[α]=(Const[Int, α], Const[Int, α])})#λ, ⊤](wordCountLineCountBody)(Prod.ProdApplicative[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ], implicitly)
       (result._1.value, result._2.value)
     }
 
