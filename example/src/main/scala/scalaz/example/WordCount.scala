@@ -7,7 +7,6 @@ import collection.immutable.{Stream, List}
 object WordCount {
   def main(args: Array[String]) = {
     wordCount
-    functorComposition
   }
 
   /**
@@ -40,13 +39,6 @@ object WordCount {
     val x = wordCountLineCount(text)
     x.println
   }
-
-  def functorComposition {
-    val ss = List(Stream(1))
-    ss ∘∘ ((_: Int) * 2) assert_≟ List(Stream(2))
-    import Comp._
-    CompFunctor[List, Stream].fmap(comp(ss), ((_: Int) * 2)).value assert_≟ List(Stream(2))
-  }
 }
 
 trait Prod[M[_], N[_], A] {
@@ -74,51 +66,5 @@ object Prod {
       lazy val av = a;
       prod(av.m <*> fv.m, av.n <*> fv.n)
     }
-  }
-}
-
-trait Comp[M[_], N[_], A] {
-  type Apply[A] = M[N[A]]
-
-  def value: M[N[A]]
-}
-
-object Comp {
-  import Scalaz._
-
-  def comp[M[_], N[_], A](mna: M[N[A]]) = new Comp[M, N, A] {
-    def value = mna
-  }
-
-  def ⊙[M[_] : Functor, N[_] : Functor, A, B, C](f: B => N[C], g: A => M[B])(a: A): Comp[M, N, C] =
-    comp(g(a) ∘ f)
-
-  implicit def CompFunctor[M[_] : Functor, N[_] : Functor] = new Functor[({type λ[α]=Comp[M, N, α]})#λ] {
-    def fmap[A, B](r: Comp[M, N, A], f: A => B) = comp(r.value ∘∘ f)
-  }
-
-  def CompApplicative[M[_] : Applicative, N[_] : Applicative] = new Applicative[({type λ[α]=Comp[M, N, α]})#λ] {
-    def pure[A](a: => A): Comp[M, N, A] = comp(a.η[N].η[M])
-
-    def apply[A, B](f: Comp[M, N, A => B], a: Comp[M, N, A]): Comp[M, N, B] = {
-      lazy val fv = f
-      lazy val av = a
-      comp(av.value.<**>(fv.value)(_ <*> _))
-    }
-  }
-}
-
-trait Coerce[A, B] {
-  def wrap(b: B): A
-
-  def unwrap(a: A): B
-}
-
-object Coerce {
-  import Scalaz._
-  def IdentityCoerce[B]: Coerce[Identity[B], B] = new Coerce[Identity[B], B] {
-    def wrap(b: B) = b
-
-    def unwrap(a: Identity[B]) = a
   }
 }
