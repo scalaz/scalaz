@@ -35,6 +35,10 @@ object Semigroup extends SemigroupLow {
   import Scalaz._
   import xml.NodeSeq
 
+  def FirstSemigroup[A]: Semigroup[A] = semigroup((a, b) => a)
+
+  def LastSemigroup[A]: Semigroup[A] = semigroup((a, b) => b)
+
   implicit def DigitSemigroup: Semigroup[Digit] = semigroup((a, b) => a.toInt + b.toInt)
 
   implicit def OrderingSemigroup: Semigroup[Ordering] = semigroup {
@@ -98,9 +102,9 @@ object Semigroup extends SemigroupLow {
     case (None, None) => None
   }})
 
-  implicit def FirstSemigroup[A]: Semigroup[FirstOption[A]] = semigroup((a, b) => a orElse b)
+  implicit def FirstOptionSemigroup[A]: Semigroup[FirstOption[A]] = semigroup((a, b) => a orElse b)
 
-  implicit def LastSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => b orElse a)
+  implicit def LastOptionSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => b orElse a)
 
   implicit def ArraySemigroup[A: Manifest]: Semigroup[Array[A]] = semigroup(Array.concat(_, _))
 
