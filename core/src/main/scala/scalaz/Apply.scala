@@ -59,6 +59,8 @@ object Apply extends ApplyLow {
 
   implicit def EitherRightApply[X]: Apply[({type λ[α]=Either.RightProjection[X, α]})#λ] = FunctorBindApply[({type λ[α]=Either.RightProjection[X, α]})#λ]
 
+  implicit def EitherApply[X]: Apply[({type λ[α]=Either[X, α]})#λ] = FunctorBindApply[({type λ[α]=Either[X, α]})#λ]
+
   import java.util.Map.Entry
 
   implicit def MapEntryApply[X: Semigroup]: Apply[({type λ[α]=Entry[X, α]})#λ] = FunctorBindApply[({type λ[α]=Entry[X, α]})#λ]
@@ -101,6 +103,8 @@ object Apply extends ApplyLow {
     def apply[A, B](f: Tree[A => B], a: Tree[A]): Tree[B] =
       node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
   }
+
+  implicit val ResponderApply = FunctorBindApply[Responder]
 
   import concurrent.Promise
   implicit val PromiseApply = FunctorBindApply[Promise]

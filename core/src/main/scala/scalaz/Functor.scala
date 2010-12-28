@@ -125,6 +125,13 @@ object Functor {
     def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
   }
 
+  implicit def EitherFunctor[X]: Functor[({type λ[α]=Either[X, α]})#λ] = new Functor[({type λ[α]=Either[X, α]})#λ] {
+    def fmap[A, B](r: Either[X, A], f: A => B) = r match {
+      case Left(a) => Left(a)
+      case Right(a) => Right(f(a))
+    }
+  }
+
   implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
     def fmap[A, B](r: Responder[A], f: A => B) = r map f
   }
