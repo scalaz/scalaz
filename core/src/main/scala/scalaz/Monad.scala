@@ -83,11 +83,17 @@ object Monad extends MonadLow {
   implicit def EitherRightMonad[X] =
     monad[({type λ[α] = Either.RightProjection[X, α]})#λ](EitherRightBind, EitherRightPure)
 
+  implicit def EitherMonad[X] =
+    monad[({type λ[α] = Either[X, α]})#λ](EitherBind, EitherPure)
+
+  // These are inconsistent with the underlying Applicative instance
+  /*
   implicit def ValidationMonad[X] =
     monad[({type λ[α] = Validation[X, α]})#λ](ValidationBind, ValidationPure)
 
   implicit def ValidationFailureMonad[X] =
     monad[({type λ[α] = FailProjection[α, X]})#λ](ValidationFailureBind, ValidationFailurePure)
+  */
 
   implicit def IterVMonad[E] =
     monad[({type λ[α] = IterV[E, α]})#λ](IterVBind, IterVPure)
