@@ -104,6 +104,8 @@ object Apply extends ApplyLow {
       node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
   }
 
+  implicit val ResponderApply = FunctorBindApply[Responder]
+
   import concurrent.Promise
   implicit val PromiseApply = FunctorBindApply[Promise]
 

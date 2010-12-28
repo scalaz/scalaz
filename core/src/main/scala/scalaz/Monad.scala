@@ -77,6 +77,9 @@ object Monad extends MonadLow {
   implicit def Function6Monad[R, S, T, U, V, W] =
     monad[({type λ[α] = (R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
 
+  implicit def ResponderMonad[X] = 
+    monad[Responder](ResponderBind, ResponderPure)
+
   implicit def EitherLeftMonad[X] =
     monad[({type λ[α] = Either.LeftProjection[α, X]})#λ](EitherLeftBind, EitherLeftPure)
 
@@ -85,6 +88,7 @@ object Monad extends MonadLow {
 
   implicit def EitherMonad[X] =
     monad[({type λ[α] = Either[X, α]})#λ](EitherBind, EitherPure)
+
 
   // These are inconsistent with the underlying Applicative instance
   /*
@@ -102,4 +106,6 @@ object Monad extends MonadLow {
 
   implicit def MapEntryMonad[X: Monoid] =
     monad[({type λ[α] = Entry[X, α]})#λ](MapEntryBind, MapEntryPure)
+
+
 }
