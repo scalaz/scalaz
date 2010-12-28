@@ -4,62 +4,101 @@ package concurrent
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
 import Scalaz._
 
-sealed trait Promise[A] {
+
+sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
+  import Promise._
+
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
-  @volatile private var v: Option[A] = None
-  protected val e: Actor[(Either[() => A, A => Unit], Promise[A])]
-  val strategy: Strategy
+  @volatile private var v: Promise.State[A] = Promise.Unfulfilled
+  @volatile private var borked: Boolean = false
+  protected val e = actor((a: Signal[A]) => a.eval)
 
   def get = {
     latch.await
     v.get
   }
 
-  def to(a: A => Unit) = e ! ((Right(a), this))
+  def to(k: A => Unit) = e ! new Cont(k, this)
+  def fulfill(a: => A) = e ! new Done(a, this)
+  def fulfilled: Boolean = v.fulfilled
+  def broken = borked
 
-  def bind[B](f: A => Promise[B]) = {
-    val r = Promise.mkPromise[B](strategy)
-    val ab = effect[B]((b: B) => r.e ! ((Left(() => b), r)))(strategy)
-    to(a => f(a).to(ab))
+  // out of band signal
+  def break { borked = true }
+
+  def map[B](f: A => B) = flatMap(a => Promise(f(a)))
+  def flatMap[B](f: A => Promise[B]) = {
+    val r = new Promise[B]()
+    to(a => f(a) to effect[B](b => r fulfill b))
     r
   }
 
   def apply = get
+  override def toString = "<promise>"
+
+  def spec[B](f: A => B, actual: Promise[A]): Promise[B] = {
+    val speculation = this map f
+    actual flatMap (a => this flatMap (g => if (a == g) speculation else {
+      speculation.break
+      promise(f(a))
+    }))
+  }
 }
 
 trait Promises {
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = Promise.promise(a) 
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = Promise(a) 
 }
 
 object Promise {
-  private def mkPromise[A](implicit s: Strategy) = new Promise[A] {
-    val strategy = s
-    val e = actor((p: (Either[() => A, A => Unit], Promise[A])) => {
-      val promise = p._2
-      val as = promise.waiting
-      p._1 match {
-        case Left(l) => {
-          val a = l()
-          promise.v = Some(a)
-          promise.latch.countDown
-          while (!as.isEmpty) (as.remove())(a)
-        }
-        case Right(r) => {
-          if (promise.v.isEmpty) as.offer(r)
-          else r(promise.v.get)
-        }
-      }
-    })
-
-    override def toString = "<promise>"
-  }
-
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
-    val p = mkPromise[A]
-    p.e ! ((Left(() => a), p))
+  def apply[A](a: => A)(implicit s: Strategy): Promise[A] = { 
+    val p = new Promise[A]()(s)
+    p.e ! new Done(a, p)
     p
   }
 
-  implicit def PromiseFrom[A](implicit a: Promise[A]) = () => a.get  
+  private sealed abstract class State[+A] {
+    def get: A
+    def fulfill[B>:A](a: B, promise: Promise[B]): Unit
+    def fulfilled: Boolean
+  }
+  private class Thrown(e: Throwable) extends State[Nothing] {
+    def get: Nothing = throw e
+    def fulfill[B](a: B, promise: Promise[B]) = throw new AlreadyFulfilledException
+    val fulfilled = true
+  }
+  private class Fulfilled[A](val get: A) extends State[A] {
+    def fulfill[B>:A](a: B, promise: Promise[B]) = throw new AlreadyFulfilledException
+    val fulfilled = true
+  }
+  private object Unfulfilled extends State[Nothing] {
+    def get: Nothing = throw new UnfulfilledException
+    def fulfill[B](a: B, promise: Promise[B]) {
+      promise.v = new Fulfilled(a)
+      promise.latch.countDown
+      val as = promise.waiting
+      while (!as.isEmpty) (as.remove())(a)
+    }
+    val fulfilled = false
+  }
+  
+  sealed class UnfulfilledException extends Exception 
+  sealed class AlreadyFulfilledException extends Exception
+
+
+  private abstract sealed class Signal[+A] {
+    def eval: Unit
+  }
+  private class Done[+A](a: => A, promise: Promise[A]) extends Signal[A] {
+    def eval {
+      if (!promise.borked) 
+        promise.v.fulfill(a, promise)
+    }
+  }
+  private class Cont[+A](k: A => Unit, promise: Promise[A]) extends Signal[A] {
+    def eval {
+      if (promise.v.fulfilled) k(promise.v.get)
+      else promise.waiting.offer(k)
+    }
+  }
 }

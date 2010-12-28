@@ -173,7 +173,7 @@ object Pure {
 
   import concurrent._
   implicit def PromisePure(implicit s: Strategy): Pure[Promise] = new Pure[Promise] {
-    def pure[A](a: => A) = promise(a)
+    def pure[A](a: => A) = Promise(a)
   }
 
   import java.util._

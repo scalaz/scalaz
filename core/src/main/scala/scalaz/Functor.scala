@@ -202,9 +202,7 @@ object Functor {
 
   import scalaz.concurrent.Promise
   implicit def PromiseFunctor: Functor[Promise] = new Functor[Promise] {
-    def fmap[A, B](t: Promise[A], f: A => B): Promise[B] = {
-      t.bind(a => promise(f(a))(t.strategy))
-    }
+    def fmap[A, B](t: Promise[A], f: A => B): Promise[B] = t map f
   }
 
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.

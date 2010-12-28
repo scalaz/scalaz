@@ -167,7 +167,7 @@ object Bind {
 
   import concurrent.Promise
   implicit def PromiseBind: Bind[Promise] = new Bind[Promise] {
-    def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
+    def bind[A, B](r: Promise[A], f: A => Promise[B]) = r flatMap f
   }
   
   implicit def IterVBind[E]: Bind[({type λ[α]=IterV[E, α]})#λ] = new Bind[({type λ[α]=IterV[E, α]})#λ] {
