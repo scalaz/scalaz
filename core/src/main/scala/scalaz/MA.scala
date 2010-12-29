@@ -296,7 +296,6 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def parZipWith[B, C](bs: M[B])(f: (A, B) => C)(implicit z: Applicative[M], s: Strategy, t: Traverse[M]): Promise[M[C]] =
     zipWithA(bs)((x, y) => promise(f(x, y)))
-
 }
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
