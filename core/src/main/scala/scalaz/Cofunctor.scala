@@ -37,7 +37,7 @@ object Cofunctor {
 
   implicit def ShowCofunctor: Cofunctor[Show] = new Cofunctor[Show] {
     def comap[A, B](r: Show[A], f: B => A) = {
-      if(r == null) error("boo")
+      if(r == null) system.error("boo")
       show[B](b => r show (f(b)))
     }
   }

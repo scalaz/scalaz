@@ -238,7 +238,7 @@ object Category {
 
   /** The adjunction induced by curry and uncurry being isomorphic */
 
-  def stateAdjunction[S]: Adjunction[Writer[S]#Apply, Reader[S]#Apply] = error("crap")
+  def stateAdjunction[S]: Adjunction[Writer[S]#Apply, Reader[S]#Apply] = system.error("crap")
 /*
     Iso3[~~>, Biff[Function1, Writer[S]#Apply, Id]#Apply, Biff[Function1, Id, Reader[S]#Apply]#Apply](
       new (Biff[Function1, Writer[S]#Apply, Id]#Apply ~~> Biff[Function1, Id, Reader[S]#Apply]#Apply) {

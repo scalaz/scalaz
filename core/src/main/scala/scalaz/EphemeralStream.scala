@@ -6,8 +6,8 @@ import java.lang.ref.WeakReference
 object EphemeralStream {
   val empty = new EphemeralStream[Nothing] {
     def isEmpty = true
-    def head: () => Nothing = () => error("head of empty stream")
-    def tail: () => Nothing = () => error("tail of empty stream")
+    def head: () => Nothing = () => system.error("head of empty stream")
+    def tail: () => Nothing = () => system.error("tail of empty stream")
   }
 
   object cons {

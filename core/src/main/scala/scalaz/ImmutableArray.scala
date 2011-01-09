@@ -192,7 +192,7 @@ object ImmutableArray {
     override def stringPrefix = "ImmutableArray"
 
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]] =
-      error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+      system.error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
     override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 
@@ -253,7 +253,7 @@ object ImmutableArray {
     def asString = value match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString
-      case _ => error("Unknown subtype of ImmutableArray[Char]")
+      case _ => system.error("Unknown subtype of ImmutableArray[Char]")
     }
   }
 

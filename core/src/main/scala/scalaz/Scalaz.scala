@@ -63,7 +63,7 @@ object Scalaz extends ScalazLow
     with    Zeros
     with    Zippers
     with    ZipStreams {
-  def ⊥ = error("undefined")
+  def ⊥ = system.error("undefined")
 
   def undefined = ⊥
 
