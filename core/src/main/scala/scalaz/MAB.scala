@@ -34,8 +34,16 @@ sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] with MA[({type λ[X]
   def ^<<[C](f: B => C)(implicit a: Arrow[M]): M[A, C] = a.category.compose(a.arrow(f), value)
 }
 
-trait MABs {
+trait MABLow {
   implicit def mab[M[_, _], A, B](a: M[A, B]): MAB[M, A, B] = new MAB[M, A, B] {
     val value = a
   }
+}
+
+trait MABs extends MABLow {
+  implicit def KleisliMAB[M[_], A, B](k: Kleisli[M, A, B]) = mab[({type λ[α, β]=Kleisli[M, α, β]})#λ, A, B](k)
+
+  implicit def CokleisliMAB[M[_], A, B](k: Cokleisli[M, A, B]) = mab[({type λ[α, β]=Cokleisli[M, α, β]})#λ, A, B](k)
+
+  implicit def Const2MAB[M, A, B](k: Const2[M,A,B]) = mab[({type λ[α, β]=Const2[M, α, β]})#λ, A, B](k)
 }

@@ -117,6 +117,10 @@ object Pure {
     def pure[A](a: => A) = Right(a).right
   }
 
+  implicit def EitherPure[X]: Pure[({type λ[α]=Either[X, α]})#λ] = new Pure[({type λ[α]=Either[X, α]})#λ] {
+    def pure[A](a: => A) = Right(a)
+  }
+
   implicit def ResponderPure: Pure[Responder] = new Pure[Responder] {
     def pure[A](a: => A) = new Responder[A] {
       def respond(k: A => Unit) = k(a)
@@ -173,7 +177,7 @@ object Pure {
 
   import concurrent._
   implicit def PromisePure(implicit s: Strategy): Pure[Promise] = new Pure[Promise] {
-    def pure[A](a: => A) = promise(a)
+    def pure[A](a: => A) = Promise(a)
   }
 
   import java.util._

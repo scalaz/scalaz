@@ -49,7 +49,7 @@ object Cofunctor {
   import concurrent.{Actor, Effect}
 
   implicit def ActorCofunctor: Cofunctor[Actor] = new Cofunctor[Actor] {
-    def comap[A, B](r: Actor[A], f: B => A): Actor[B] = actor[B](r.onError, (b: B) => (r ! f(b))())(r.strategy)
+    def comap[A, B](r: Actor[A], f: B => A): Actor[B] = actor[B]((b: B) => (r ! f(b))(), r.onError)(r.strategy)
   }
 
   implicit def EffectCofunctor: Cofunctor[Effect] = new Cofunctor[Effect] {

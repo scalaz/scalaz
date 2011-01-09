@@ -5,6 +5,12 @@ object ImplicitConversionTest {
   import Scalaz._
   import Predef.{implicitly => i}
 
+  // Ambiguous implicits with 2.8.1
+  trait F[S,A] {
+    type M[B] = State[S,B]
+    i[Applicative[M]]
+  }
+
   def MAs[A, B, C, D, E, F, G, H] {
     i[List[A] <%< MA[List, A]]
     i[Option[A] <%< MA[Option, A]]
@@ -58,7 +64,7 @@ object ImplicitConversionTest {
     i[Applicative[List]]
     i[Applicative[Function0]]
     i[Applicative[Option]]
-    i[Applicative[({type λ[α]=State[A, α]})#λ]]
+    //i[Applicative[({type λ[α]=State[A, α]})#λ]]
     i[Applicative[Function0]]
     i[Applicative[({type λ[α]=(R) => α})#λ]]
     i[Applicative[PartialApply2Of3[Function2, R, S]#Apply]]
@@ -72,6 +78,7 @@ object ImplicitConversionTest {
     i[Applicative[({type λ[α]=Entry[Int, α]})#λ]]
     i[Applicative[({type λ[α]=Validation[Int, α]})#λ]]
     i[Applicative[({type λ[α]=FailProjection[α, X]})#λ]]
+    i[Applicative[({type λ[α] = State[A, α]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
@@ -210,6 +217,21 @@ object ImplicitConversionTest {
     i[PartialApply5Of6[T6, A, B, C, D, E]#Apply[F] =:= T6[A, B, C, D, E, F]]
 
     i[({type λ[α]=T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
+  }
+
+  def copointed {
+    type A = Int
+    i[Copointed[({type λ[α]=(A, α)})#λ]]
+
+    import java.util.Map.Entry
+    i[Copointed[({type λ[α]=Entry[A, α]})#λ]]
+  }
+
+  def comonad {
+    type A = Int
+    i[Comonad[({type λ[α]=(A, α)})#λ]]
+    import java.util.Map.Entry
+    i[Comonad[({type λ[α]=Entry[A, α]})#λ]]
   }
   
   def strategy {

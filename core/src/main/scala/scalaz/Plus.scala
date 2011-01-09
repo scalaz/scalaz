@@ -43,9 +43,19 @@ object Plus extends PlusLow {
   }
 
   implicit def EitherRightPlus[X]: Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Plus[({type λ[α]=Either.RightProjection[X, α]})#λ] {
-    def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = a2.e match {
+    def plus[A](a1: Either.RightProjection[X, A], a2: => Either.RightProjection[X, A]) = a1.e match {
       case Right(_) => a1
       case Left(_) => a2.e match {
+        case Right(_) => a2
+        case Left(_) => a1
+      }
+    }
+  }
+
+  implicit def EitherPlus[X]: Plus[({type λ[α]=Either[X, α]})#λ] = new Plus[({type λ[α]=Either[X, α]})#λ] {
+    def plus[A](a1: Either[X, A], a2: => Either[X, A]) = a1 match {
+      case Right(_) => a1
+      case Left(_) => a2 match {
         case Right(_) => a2
         case Left(_) => a1
       }

@@ -9,6 +9,8 @@ sealed abstract trait Identity[A] extends Equals {
 
   def η[F[_]](implicit p: Pure[F]): F[A] = pure
 
+  def ok = Value(value)
+
   /**
    * Alias for {@link scalaz.Identity#η}
    */

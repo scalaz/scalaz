@@ -124,6 +124,10 @@ object Bind {
     def bind[A, B](r: Either.RightProjection[X, A], f: A => Either.RightProjection[X, B]) = r.flatMap(f(_).e).right
   }
 
+  implicit def EitherBind[X]: Bind[({type λ[α]=Either[X, α]})#λ] = new Bind[({type λ[α]=Either[X, α]})#λ] {
+    def bind[A, B](r: Either[X, A], f: A => Either[X, B]) = r.fold(Left(_), f)
+  }
+
   implicit def ResponderBind: Bind[Responder] = new Bind[Responder] {
     def bind[A, B](r: Responder[A], f: A => Responder[B]) = r flatMap f
   }
@@ -144,6 +148,8 @@ object Bind {
     }
   }
   
+  // These are inconsistent with the applicative instance for Validation. Use Either or Either.RightProjection instead
+  /*
   implicit def ValidationBind[X]: Bind[({type λ[α]=Validation[X, α]})#λ] = new Bind[({type λ[α]=Validation[X, α]})#λ] {
     def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
       case Success(a) => f(a)
@@ -157,6 +163,7 @@ object Bind {
       case Failure(e) => f(e)
     }
   }
+  */
 
   implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
     def bind[A, B](t: Tree[A], f: A => Tree[B]): Tree[B] = {
@@ -167,7 +174,7 @@ object Bind {
 
   import concurrent.Promise
   implicit def PromiseBind: Bind[Promise] = new Bind[Promise] {
-    def bind[A, B](r: Promise[A], f: A => Promise[B]) = r bind f
+    def bind[A, B](r: Promise[A], f: A => Promise[B]) = r flatMap f
   }
   
   implicit def IterVBind[E]: Bind[({type λ[α]=IterV[E, α]})#λ] = new Bind[({type λ[α]=IterV[E, α]})#λ] {

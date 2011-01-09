@@ -14,19 +14,22 @@ package scalaz
 trait Monad[M[_]] extends Applicative[M] with Bind[M] with Pointed[M] {
   override def fmap[A, B](fa: M[A], f: A => B) = bind(fa, (a: A) => pure(f(a)))
 
-  override def apply[A, B](f: => M[A => B], a: => M[A]): M[B] = {
+  override def apply[A, B](f: M[A => B], a: M[A]): M[B] = {
     lazy val fv = f
     lazy val av = a
     bind(fv, (k: A => B) => fmap(av, k(_: A)))
   }
 }
 
-object Monad {
+trait MonadLow {
   implicit def monad[M[_]](implicit b: Bind[M], p: Pure[M]): Monad[M] = new Monad[M] {
     override def pure[A](a: => A) = p.pure(a)
 
     override def bind[A, B](a: M[A], f: A => M[B]) = b.bind(a, f)
   }
+}
+
+object Monad extends MonadLow {
 
   import Bind._
   import Pure._
@@ -74,17 +77,27 @@ object Monad {
   implicit def Function6Monad[R, S, T, U, V, W] =
     monad[({type λ[α] = (R, S, T, U, V, W) => α})#λ](Function6Bind, Function6Pure)
 
+  implicit def ResponderMonad[X] = 
+    monad[Responder](ResponderBind, ResponderPure)
+
   implicit def EitherLeftMonad[X] =
     monad[({type λ[α] = Either.LeftProjection[α, X]})#λ](EitherLeftBind, EitherLeftPure)
 
   implicit def EitherRightMonad[X] =
     monad[({type λ[α] = Either.RightProjection[X, α]})#λ](EitherRightBind, EitherRightPure)
 
+  implicit def EitherMonad[X] =
+    monad[({type λ[α] = Either[X, α]})#λ](EitherBind, EitherPure)
+
+
+  // These are inconsistent with the underlying Applicative instance
+  /*
   implicit def ValidationMonad[X] =
     monad[({type λ[α] = Validation[X, α]})#λ](ValidationBind, ValidationPure)
 
   implicit def ValidationFailureMonad[X] =
     monad[({type λ[α] = FailProjection[α, X]})#λ](ValidationFailureBind, ValidationFailurePure)
+  */
 
   implicit def IterVMonad[E] =
     monad[({type λ[α] = IterV[E, α]})#λ](IterVBind, IterVPure)
@@ -93,4 +106,6 @@ object Monad {
 
   implicit def MapEntryMonad[X: Monoid] =
     monad[({type λ[α] = Entry[X, α]})#λ](MapEntryBind, MapEntryPure)
+
+
 }

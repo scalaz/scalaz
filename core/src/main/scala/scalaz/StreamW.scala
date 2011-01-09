@@ -28,7 +28,7 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
   }
 
   def tails: Stream[Stream[A]] = value match {
-    case h #:: t => value #:: (t: StreamW).tails
+    case h #:: t => value #:: (t: StreamW[A]).tails
     case _ => Stream.Empty
   }
 

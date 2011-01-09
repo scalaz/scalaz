@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
 import Scalaz._
                   
-sealed trait Actor[A] {
+sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = throw(_))(implicit val strategy: Strategy) { 
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
@@ -33,24 +33,9 @@ sealed trait Actor[A] {
       work
     }
   })
-  
-  val e: A => Unit
-
-  implicit val strategy: Strategy
-
-  val onError: Throwable => Unit
 }
 
 trait Actors {
-  def actor[A](err: Throwable => Unit, c: A => Unit)(implicit s: Strategy): Actor[A] = new {
-    val e = c
-
-    implicit val strategy = s
-
-    val onError = err
-  } with Actor[A]
-
-  def actor[A](c: A => Unit)(implicit s: Strategy): Actor[A] = actor[A]((e: Throwable) => throw e, c): Actor[A]
-
+  def actor[A](e: A => Unit, err: Throwable => Unit = throw(_))(implicit s: Strategy): Actor[A] = Actor[A](e,err)
   implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _ 
 }
