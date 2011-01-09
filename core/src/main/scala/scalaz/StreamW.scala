@@ -26,11 +26,11 @@ sealed trait StreamW[A] extends PimpedType[Stream[A]] {
     case h #:: t => Stream(h) #:: t.heads.map(h #:: _)
     case _ => Stream.Empty
   }
-/* TODO SCALA29 clashes with new standard lib method
+
   def tails: Stream[Stream[A]] = value match {
-    case h #:: t => value #:: t.tails
+    case h #:: t => value #:: (t: StreamW).tails
     case _ => Stream.Empty
-  }*/
+  }
 
   def zapp[B, C](fs: ZipStream[A => B => C]): ZipStream[B => C] = (value ʐ) <*> fs
 
