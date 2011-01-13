@@ -134,8 +134,6 @@ object ImplicitConversionTest {
     i[Monad[({type λ[α]=Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry    
     i[Monad[({type λ[α]=Entry[Int, α]})#λ]]
-    i[Monad[({type λ[α]=Validation[X, α]})#λ]]
-    i[Monad[({type λ[α]=FailProjection[α, X]})#λ]]
   }
 
   def functor {

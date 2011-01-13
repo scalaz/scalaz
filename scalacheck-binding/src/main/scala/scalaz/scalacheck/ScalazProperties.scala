@@ -43,22 +43,29 @@ object ScalazProperties {
       forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ (a1 ∘ (f1 ∘ f2))).label("associative")
   }
 
+  class MonadLaws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]], af: Arbitrary[Int => M[Int]], e: Equal[M[Int]])
+        extends Properties("Monad Laws") { 
+    property("Right identity") = Monad.rightIdentity[M, Int]
+    property("Left identity") = Monad.leftIdentity[M, Int, Int]
+    property("Associativity") = Monad.associativity[M, Int, Int, Int]
+  }
+ 
   object Monad {
-    def identity[M[_], X](implicit m: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
-      forAll((a: M[X]) => ((a ∗ ((_: X).η))) ≟ a).label("identity")
+    def rightIdentity[M[_], X](implicit m: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
+      forAll((a: M[X]) => ((a ∗ ((_: X).η))) ≟ a).label("Right identity")
     
-    def unit[M[_], X, Y](implicit am: Monad[M],
+    def leftIdentity[M[_], X, Y](implicit am: Monad[M],
                          emy: Equal[M[Y]],
                          ax: Arbitrary[X],
                          af: Arbitrary[(X => M[Y])]) =
-      forAll((a: X, f: X => M[Y]) => ((a.η ∗ f) ≟ f(a))).label("unit")
+      forAll((a: X, f: X => M[Y]) => ((a.η ∗ f) ≟ f(a))).label("Left identity")
 
-    def composition[M[_], X, Y, Z](implicit mm: Monad[M],
-                                   amx: Arbitrary[M[X]],
-                                   af: Arbitrary[(X => M[Y])],
-                                   ag: Arbitrary[(Y => M[Z])],
-                                   emz: Equal[M[Z]]) =
-      forAll((a: M[X], f: X => M[Y], g: Y => M[Z]) => ((a ∗ f ∗ g) ≟ (a ∗ ((x) => f(x) ∗ g)))).label("composition")
+    def associativity[M[_], X, Y, Z](implicit mm: Monad[M],
+                                     amx: Arbitrary[M[X]],
+                                     af: Arbitrary[(X => M[Y])],
+                                     ag: Arbitrary[(Y => M[Z])],
+                                     emz: Equal[M[Z]]) =
+      forAll((a: M[X], f: X => M[Y], g: Y => M[Z]) => ((a ∗ f ∗ g) ≟ (a ∗ ((x) => f(x) ∗ g)))).label("Associativity")
   }
 
   class ApplicativeLaws[F[_]](implicit a: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
