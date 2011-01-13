@@ -1,7 +1,7 @@
 package scalaz
 package scalacheck
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.{Arbitrary, Prop, Properties}
 
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
@@ -59,5 +59,32 @@ object ScalazProperties {
                                    ag: Arbitrary[(Y => M[Z])],
                                    emz: Equal[M[Z]]) =
       forAll((a: M[X], f: X => M[Y], g: Y => M[Z]) => ((a ∗ f ∗ g) ≟ (a ∗ ((x) => f(x) ∗ g)))).label("composition")
+  }
+
+  class ApplicativeLaws[F[_]](implicit a: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
+        extends Properties("Applicative Laws") {
+    property("identity") = Applicative.identity[F, Int]
+    property("composition") = Applicative.composition[F, Int, Int, Int]
+    property("homomorphism") = Applicative.homomorphism[F, Int, Int]
+    property("interchange") = Applicative.interchange[F, Int, Int]
+  }
+
+  object Applicative {
+    def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll((v: F[X]) => v <*> ((x: X) => x).pure[F] === v)
+
+    def composition[F[_], X, Y, Z](implicit ap: Applicative[F], 
+                                   afx: Arbitrary[F[X]],
+                                   au: Arbitrary[F[Y => Z]],
+                                   av: Arbitrary[F[X => Y]],
+                                   e: Equal[F[Z]]) =
+      forAll((u: F[Y => Z], v: F[X => Y], w: F[X]) =>
+        (w <*> (v <*> (u <*> (((f: Y => Z) => (g: X => Y) => f compose g).pure[F])))) === (w <*> v) <*> u)
+
+    def homomorphism[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], af: Arbitrary[X => Y], e: Equal[F[Y]]) =
+      forAll((f: X => Y, x: X) => x.pure[F] <*> f.pure[F] === f(x).pure[F])
+
+    def interchange[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], afx: Arbitrary[F[X => Y]], e: Equal[F[Y]]) =
+      forAll((u: F[X => Y], y: X) => y.pure[F] <*> u === u <*> ((f: X => Y) => f(y)).pure[F])
   }
 }
