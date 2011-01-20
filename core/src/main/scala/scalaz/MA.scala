@@ -327,7 +327,7 @@ trait MAsLow {
   }
 }
 
-trait MAs {
+trait MAs extends MAsLow {
   def ma[M[_], A](a: M[A]): MA[M, A] = new MA[M, A] {
     val value = a
   }

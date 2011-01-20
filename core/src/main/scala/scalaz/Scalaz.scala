@@ -2,8 +2,7 @@ package scalaz
 
 import concurrent._
 
-object Scalaz extends ScalazLow
-    with    Actors
+object Scalaz extends Actors
     with    Alphas
     with    Applys
     with    ArrayBytes
@@ -38,6 +37,7 @@ object Scalaz extends ScalazLow
     with    Lists
     with    Longs
     with    MAs
+    with    MABs
     with    MetricSpaces
     with    Memos
     with    Multiplications

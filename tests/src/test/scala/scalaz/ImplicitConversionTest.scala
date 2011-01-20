@@ -32,6 +32,11 @@ object ImplicitConversionTest {
     i[(A, B, C, D, E, F) <%< MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
     i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=(A, B, C, D, E, F, α)})#λ, G]]
 
+    // Test for: https://github.com/scalaz/scalaz/commit/1b66206e7579ac9f85a9b127795503220c54b2b3#commitcomment-245733
+    trait Connection
+    type DB[A] = Connection => A
+    i[DB[Unit] <%< MA[DB, Unit]]
+
     // via higher kind inference
     trait T[A]
     i[T[A] <%< MACofunctor[T, A]]
