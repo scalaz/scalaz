@@ -4,7 +4,7 @@ package scalaz
  * A multi-way tree, also known as a rose tree.
  */
 sealed trait Tree[+A] {
-  val rootLabel: A
+  def rootLabel: A
 
   def subForest: Stream[Tree[A]]
 
@@ -16,6 +16,11 @@ sealed trait Tree[+A] {
   def drawTree[B >: A](implicit sh: Show[B]): String = {
     implicit val showa: Show[A] = sh comap (x => x)
     draw.foldMap(_ + "\n")
+  }
+
+  def scanr[A,B](g: (A, Stream[Tree[B]]) => B): Tree[A] => Tree[B] = t => {
+    val c = t.subForest.map(scanr(g))
+    node(g(t.rootLabel, c), c)
   }
 
   def draw[B >: A](implicit sh: Show[B]): Stream[String] = {
@@ -44,17 +49,21 @@ sealed trait Tree[+A] {
   def cobind[B](f: Tree[A] => B): Tree[B] = this.unfoldTree((t: Tree[A]) => (f(t), () => t.subForest))
 
   def loc: TreeLoc[A] = Scalaz.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
-}
 
+  def unzip[A1, A2](implicit p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
+    lazy val uz = subForest.map(_.unzip)
+    lazy val fst = uz map (_._1)
+    lazy val snd = uz map (_._2)
+    (node(rootLabel._1, fst), node(rootLabel._2, snd))
+  }
+}
+  
 trait Trees {
   def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
-    val rootLabel = root
-
-    def subForest = forest
-
-
+    lazy val rootLabel = root
+    lazy val subForest = forest
     override def toString = "<tree>"
   }
 
-  def leaf[A](root: A): Tree[A] = node(root, Stream.empty)
+  def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
 }
