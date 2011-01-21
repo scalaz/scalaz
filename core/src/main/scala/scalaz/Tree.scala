@@ -18,9 +18,9 @@ sealed trait Tree[+A] {
     draw.foldMap(_ + "\n")
   }
 
-  def scanr[A,B](g: (A, Stream[Tree[B]]) => B): Tree[A] => Tree[B] = t => {
-    val c = t.subForest.map(scanr(g))
-    node(g(t.rootLabel, c), c)
+  def scanr[B](g: (A, Stream[Tree[B]]) => B): Tree[B] = {
+    lazy val c = subForest.map(_.scanr(g))
+    node(g(rootLabel, c), c)
   }
 
   def draw[B >: A](implicit sh: Show[B]): Stream[String] = {
