@@ -1,9 +1,7 @@
-package scala
+package scalaz
 
-import scalaz.Scalaz._
-import scalaz.Liskov._
-import scalaz.Applicative
-import scalaz.Traverse
+import Scalaz._
+import Liskov._
 
 /**
  * Possibly negative corecursion 
