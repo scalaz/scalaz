@@ -47,8 +47,6 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     (before == prefix) option after
   }
 
-  def dlist: DList[A] = Scalaz.dlist(value ::: (_: List[A]))
-
   def takeWhileM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = value match {
     case Nil => nil[A] η
     case h :: t => p(h) ∗ (if (_) (t takeWhileM p) ∘ (h :: _) else nil[A] η)

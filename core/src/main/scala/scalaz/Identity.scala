@@ -159,8 +159,6 @@ sealed trait Identity[A] extends Equals {
 
   def right[B]: Either[B, A] = Right(value)
 
-  def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
-
   def wrapNel: NonEmptyList[A] = Scalaz.nel(value)
 
   /**

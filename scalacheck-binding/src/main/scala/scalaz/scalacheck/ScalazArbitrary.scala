@@ -51,8 +51,6 @@ object ScalazArbitrary {
 
   implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
 
-  implicit def DListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[DList[A]] = arb[List[A]] ∘ (as => dlist(_ => as))
-
   implicit def NonEmptyListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[NonEmptyList[A]] = arb[A].<**>(arb[List[A]])(nel _)
 
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
