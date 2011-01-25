@@ -15,7 +15,7 @@ object ExampleAscii {
     // Functor map
     (is ∘ (1 +)) assert_≟ (is map (1 +))
 
-    // ContraFunctor map
+    // Contravariant map
     case class IntWrap(i: Int)
     val intShow = implicitly[Show[Int]]
     (intShow ∙ ((_: IntWrap).i)).show(IntWrap(0)) assert_≟ (intShow contramap ((_: IntWrap).i)).show(IntWrap(0))
