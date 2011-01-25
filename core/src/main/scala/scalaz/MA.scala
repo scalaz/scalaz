@@ -185,6 +185,12 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def element(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
+  def getOrElseM(a: M[Option[A]])(implicit m: Monad[M]): M[A] =
+    a >>= {
+      case None => value
+      case Some(z) => z.pure
+    }
+
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
