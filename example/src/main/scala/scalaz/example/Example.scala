@@ -9,7 +9,7 @@ object Example {
     ExampleBoolean.run
     ExampleBKTree.run
     ExampleCategory.run
-    ExampleCofunctor.run
+    ExampleContravariant.run
     ExampleComp.run
     ExampleDistance.run
     ExampleEndo.run
