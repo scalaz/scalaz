@@ -64,8 +64,8 @@ trait Bodys {
 //  /**
 //   * The cofunctor implementation for a body.
 //   */
-//  def bodyCofunctor[OUT[_]]: Cofunctor[PartialType2[Body, OUT]#Apply] = new Cofunctor[PartialType2[Body, OUT]#Apply] {
-//    def comap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
+//  def bodyCofunctor[OUT[_]]: ContraFunctor[PartialType2[Body, OUT]#Apply] = new ContraFunctor[PartialType2[Body, OUT]#Apply] {
+//    def contramap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
 //      def apply(b: B) = body(f(b))
 //    }
 //  }

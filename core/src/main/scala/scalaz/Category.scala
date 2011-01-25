@@ -163,19 +163,19 @@ object Category {
         f.fmap(_, h)
     }
 
-  def cofunctorInScala[F[_]](f: Cofunctor[F]): GeneralizedFunctor[<=, Function1, F] =
+  def cofunctorInScala[F[_]](f: ContraFunctor[F]): GeneralizedFunctor[<=, Function1, F] =
     new GeneralizedFunctor[<=, Function1, F] {
       def fmap[A, B](h: A <= B): F[A] => F[B] =
-        f.comap(_, h.value)
+        f.contramap(_, h.value)
     }
 
   trait GeneralizedCofunctor[C[_,_], D[_,_], F[_]] {
-    def comap[A, B](f: C[A, B]): D[F[B], F[A]]
+    def contramap[A, B](f: C[A, B]): D[F[B], F[A]]
   }
 
-  implicit def opCoFunctor[R]: Cofunctor[({type λ[α]=R <= α})#λ] =
-    new Cofunctor[({type λ[α]=R <= α})#λ] {
-      def comap[A, B](b: R <= A, t: B => A): R <= B =
+  implicit def opCoFunctor[R]: ContraFunctor[({type λ[α]=R <= α})#λ] =
+    new ContraFunctor[({type λ[α]=R <= α})#λ] {
+      def contramap[A, B](b: R <= A, t: B => A): R <= B =
         <=(b.value compose t)
     }
 
@@ -196,10 +196,10 @@ object Category {
     }
 
   /** Compose cofunctors */
-  implicit def ComposeCofunctors[F[_]:Cofunctor, G[_]:Cofunctor]: Functor[(F <*> G)#In[<=]#Apply] =
+  implicit def ComposeCofunctors[F[_]:ContraFunctor, G[_]:ContraFunctor]: Functor[(F <*> G)#In[<=]#Apply] =
     new Functor[(F <*> G)#In[<=]#Apply] {
       def fmap[A, B](a: Compose[F, G, <=, A], f: A => B): Compose[F, G, <=, B] =
-        Compose(a.value comap (_ comap f))
+        Compose(a.value contramap (_ contramap f))
     }
 
   /** Generalized natural transformations */

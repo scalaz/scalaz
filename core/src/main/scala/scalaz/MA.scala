@@ -301,19 +301,19 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
 // We can probably merge MA and MACofunctor when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
 trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
-  def ∙[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = t.comap(value, f)
+  def ∙[B](f: B => A)(implicit t: ContraFunctor[M]): M[B] = t.contramap(value, f)
 
   /**
    * Alias for {@link scalaz.MACofunctor#∙}
    */
-  def comap[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = ∙(f)
+  def contramap[B](f: B => A)(implicit t: ContraFunctor[M]): M[B] = ∙(f)
 
   /**
-   * Comap the identity function
+   * contramap the identity function
    */
-  def covary[B <: A](implicit t: Cofunctor[M]): M[B] = ∙[B](identity)
+  def covary[B <: A](implicit t: ContraFunctor[M]): M[B] = ∙[B](identity)
 
-  def |<[B](f: => A)(implicit t: Cofunctor[M]): M[B] = ∙((_: B) => f)
+  def |<[B](f: => A)(implicit t: ContraFunctor[M]): M[B] = ∙((_: B) => f)
 }
 
 
@@ -332,7 +332,7 @@ trait MAs extends MAsLow {
     val value = a
   }
 
-  def maCofunctor[M[_], A](a: M[A])(implicit cf: Cofunctor[M]): MACofunctor[M, A] = new MACofunctor[M, A] {
+  def maCofunctor[M[_], A](a: M[A])(implicit cf: ContraFunctor[M]): MACofunctor[M, A] = new MACofunctor[M, A] {
     val value = a
   }
 

@@ -15,10 +15,10 @@ object ExampleAscii {
     // Functor map
     (is ∘ (1 +)) assert_≟ (is map (1 +))
 
-    // Cofunctor map
+    // ContraFunctor map
     case class IntWrap(i: Int)
     val intShow = implicitly[Show[Int]]
-    (intShow ∙ ((_: IntWrap).i)).show(IntWrap(0)) assert_≟ (intShow comap ((_: IntWrap).i)).show(IntWrap(0))
+    (intShow ∙ ((_: IntWrap).i)).show(IntWrap(0)) assert_≟ (intShow contramap ((_: IntWrap).i)).show(IntWrap(0))
 
     // Functor bind. Caution: '∗' is Unicode, not Ascii '*'!
     (is ∗ (i => List(i, i))) assert_≟ (is flatMap (i => List(i, i)))
