@@ -55,8 +55,6 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     checkMonadLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
     checkMonadLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
 //    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Validation[X, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
     ()
   }
 
@@ -70,9 +68,9 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     val typeName = man.toString
     typeName in {
       import ScalazProperties.Monad._
-      identity[M, A] must pass
-      unit[M, A, A] must pass
-      composition[M, A, A, A] must pass
+      leftIdentity[M, A, A] must pass
+      rightIdentity[M, A] must pass
+      associativity[M, A, A, A] must pass
     }
   }
 }
