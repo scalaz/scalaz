@@ -16,14 +16,10 @@ import Scalaz._
 
 case class Ranked[A](rank: Int, value: A)
 
-trait Heap[A] {
+sealed trait Heap[A] {
   import Heap._
   
-  def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B = 
-    this match {
-      case NilHeap() => empty
-      case ConsHeap(s, o, h) => nonempty(s, o, h)
-    }
+  def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B
 
   /** Is the heap empty? O(1)*/
   def isEmpty = fold(true, (_, _, _) => false)
@@ -37,58 +33,151 @@ trait Heap[A] {
   private def insertWith(f: (A, A) => Boolean, x: A) =
     fold(singletonWith(f, x), (s, _, t) => {
       val y = t.rootLabel.value
-      if (f(x, y)) ConsHeap(s + 1, f, node(Ranked(0, x), Stream(t))) else
-         ConsHeap(s + 1, f, node(Ranked(0, y),
+      if (f(x, y)) Heap(s + 1, f, node(Ranked(0, x), Stream(t))) else
+         Heap(s + 1, f, node(Ranked(0, y),
                   skewInsert(f, node(Ranked(0, x), Stream()), t.subForest)))
     })
 
   /** Meld the values from two heaps into one heap. O(1)*/
   def union(as: Heap[A]) = (this, as) match {
-    case (NilHeap(), q) => q
-    case (q, NilHeap()) => q
-    case (ConsHeap(s1, leq, t1@Node(Ranked(r1, x1), f1)),
-          ConsHeap(s2, _, t2@Node(Ranked(r2, x2), f2))) =>
+    case (Empty(), q) => q
+    case (q, Empty()) => q
+    case (Heap(s1, leq, t1@Node(Ranked(r1, x1), f1)),
+          Heap(s2, _, t2@Node(Ranked(r2, x2), f2))) =>
       if (leq(x1, x2))
-        ConsHeap(s1 + s2, leq, node(Ranked(0, x1), skewInsert(leq, t2, f1)))
+        Heap(s1 + s2, leq, node(Ranked(0, x1), skewInsert(leq, t2, f1)))
       else
-        ConsHeap(s1 + s2, leq, node(Ranked(0, x2), skewInsert(leq, t1, f2)))
+        Heap(s1 + s2, leq, node(Ranked(0, x2), skewInsert(leq, t1, f2)))
   }
 
-  /** Split the heap into the minimum element and the remainder.*/
-  def uncons: Option[A :&: Heap[A]] =
-    fold(None, (_, _, t) => Some(lazyTuple(t.rootLabel.value, deleteMin)))
+  /** Split the heap into the minimum element and the remainder. O(log n)*/
+  def uncons: Option[(A, Heap[A])] =
+    fold(None, (_, _, t) => Some((t.rootLabel.value, deleteMin)))
 
   /** Get the minimum key on the (nonempty) heap. O(1) */
   def minimum: A = fold(error("Heap.minimum: empty heap"), (_, _, t) => t.rootLabel.value)
 
-  /** Delete the minimum key from the heap and return the resulting heap. */
+  /** Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
-    fold(empty[A], (s, leq, t) => t match {
-      case Node(_, Stream()) => empty[A]
+    fold(Empty[A], (s, leq, t) => t match {
+      case Node(_, Stream()) => Empty[A]
       case Node(_, f0) => {
         val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
         val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
         val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
         val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
-        heap(s - 1, leq, node(Ranked(0, x), f3))
+        Heap(s - 1, leq, node(Ranked(0, x), f3))
       }
     })
   }
+  
+  def adjustMin(f: A => A): Heap[A] = this match {
+    case Heap(s, leq, Node(Ranked(r, x), xs)) =>
+      Heap(s, leq, heapify(leq)(node(Ranked(r, f(x)), xs)))
+  }
+
+  def toUnsortedStream: Stream[A] = fold(Stream(), (_, _, t) => t.flatten.map(_.value))
+  def toUnsortedList: List[A] = toStream.toList
+  def toStream: Stream[A] = this.unfold[Stream, A](_.uncons)
+  def toList: List[A] = this.unfold[List, A](_.uncons)
+
+  def map[B:Order](f: A => B) = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
 }
-case class NilHeap[A]() extends Heap[A]
-case class ConsHeap[A](sz: Int, ord: (A, A) => Boolean, heap: Tree[Ranked[A]]) extends Heap[A]
 
 object Heap {
   type Forest[A] = Stream[Tree[Ranked[A]]]
 
-  /** The empty heap */
-  def empty[A]: Heap[A] = NilHeap()
+  def apply[A](sz: Int, leq: (A, A) => Boolean, t: Tree[Ranked[A]]) = new Heap[A] {
+    def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B) =
+      nonempty(sz, leq, t)
+  }
 
-  /** A nonempty heap */
-  def heap[A] = ConsHeap[A](_, _, _)
+  def unapply[A](h: Heap[A]): Option[(Int, (A, A) => Boolean, Tree[Ranked[A]])] =
+    h.fold(None, (sz, leq, t) => Some((sz, leq, t)))
+
+  /** The empty heap */
+  object Empty {
+    def apply[A] = new Heap[A] {
+      def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B = empty
+    }
+    def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
+  }
+
+  def fromData[F[_]: Foldable, A: Order](as: F[A]): Heap[A] =
+    as.foldl(Empty[A])(_ insert _)
+  def fromCodata[F[_]: Foldable, A: Order](as: F[A]): Heap[A] =
+    as.foldr(Empty[A])((x, y) => y insert x)
+
+  def fromDataWith[F[_]: Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
+    as.foldl(Empty[A])((x, y) => x.insertWith(f, y))
+
+  /** Heap sort */
+  def sort[F[_]:Foldable, A:Order](xs: F[A]) = fromData(xs).toList
+
+  /** Heap sort */
+  def sortWith[F[_]: Foldable, A](f: (A, A) => Boolean, xs: F[A]) = fromDataWith(f, xs).toList
+
+  implicit def heapMonoid[A] = new Monoid[Heap[A]] {
+    val zero: Heap[A] = Empty[A]
+    def append(m1: Heap[A], m2: => Heap[A]) = m1 union m2
+  }
+
+  implicit val heapFoldable = new Foldable[Heap] {
+    override def foldMap[A, B:Monoid](xs: Heap[A], f: A => B): B =
+      xs.fold(mzero[B], (_, _, t) => f(t.rootLabel.value) |+| foldMap(xs.deleteMin, f))
+  }
+
+  type ForestZipper[A] = (Forest[A], Forest[A])
+
+  private def rightZ[A]: ForestZipper[A] => ForestZipper[A] = {
+    case (path, x #:: xs) => (x #:: path, xs)
+  }
+
+  private def adjustZ[A](f: Tree[Ranked[A]] => Tree[Ranked[A]]):
+    ForestZipper[A] => ForestZipper[A] = {
+      case (path, x #:: xs) => (path, f(x) #:: xs)
+      case z => z
+    }
+
+  private def rezip[A]: ForestZipper[A] => Forest[A] = {
+    case (Stream(), xs) => xs
+    case (x #:: path, xs) => rezip((path, x #:: xs))
+  }
+
+  private def rootZ[A]: ForestZipper[A] => A = {
+    case (_, x #:: _) => x.rootLabel.value
+    case _ => error("Heap.rootZ: empty zipper")
+  }
+
+  private def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)
+
+  private def emptyZ[A]: ForestZipper[A] = (Stream(), Stream())
+
+  private def minZ[A](f: (A, A) => Boolean): Forest[A] => ForestZipper[A] = {
+    case Stream() => emptyZ
+    case xs => {
+      val z = zipper(xs)
+      minZp(f)(z, z)
+    }
+  }
+
+  private def minZp[A](leq: (A, A) => Boolean):
+    (ForestZipper[A], ForestZipper[A]) => ForestZipper[A] = {
+      case (lo, (_, Stream())) => lo
+      case (lo, z) => minZp(leq)(if (leq(rootZ(lo), rootZ(z))) lo else z, rightZ(z))
+    }
+
+  private def heapify[A](leq: (A, A) => Boolean): Tree[Ranked[A]] => Tree[Ranked[A]] = {
+    case n@Node(_, Stream()) => n
+    case n@Node(Ranked(r, a), as) => {
+      val (left, Node(Ranked(rp, ap), asp) #:: right) = minZ(leq)(as)
+      if (leq(a, ap)) n else
+        node(Ranked(r, ap), rezip((left, heapify(leq)(node(Ranked(rp, a), asp)) #:: right)))
+    }
+  }
 
   private def singletonWith[A](f: (A, A) => Boolean, a: A) =
-    heap(1, f, node(Ranked(0, a), Stream()))
+    Heap(1, f, node(Ranked(0, a), Stream()))
   
   /** A heap with one element. */
   def singleton[A:Order](a: A) = singletonWith[A](_ lte _, a)
@@ -104,7 +193,7 @@ object Heap {
       if (y == 1) x union z else
         g(x union x, (y - 1) / 2, x union z)
     if (i < 0) error("Heap.replicate: negative length") else
-    if (i == 0) empty else
+    if (i == 0) Empty[A] else
        f(singleton(a), i)
   }
 
@@ -115,15 +204,15 @@ object Heap {
                t1: Tree[Ranked[A]],
                t2: Tree[Ranked[A]]): Tree[Ranked[A]] = (t0, t1, t2) match {
     case (Node(Ranked(r0, x0), cf0), Node(Ranked(r1, x1), cf1), Node(Ranked(r2, x2), cf2)) =>
-      if (f(x1, x0) && f(x1, x2)) Node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1) else
-      if (f(x2, x0) && f(x2, x1)) Node(Ranked(r2 + 1, x2), t0 #:: t1 #:: cf2) else
-       Node(Ranked(r1 + 1, x0), t1 #:: t2 #:: cf0)
+      if (f(x1, x0) && f(x1, x2)) node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1) else
+      if (f(x2, x0) && f(x2, x1)) node(Ranked(r2 + 1, x2), t0 #:: t1 #:: cf2) else
+       node(Ranked(r1 + 1, x0), t1 #:: t2 #:: cf0)
   }
   private def link[A](f: (A, A) => Boolean):
     (Tree[Ranked[A]], Tree[Ranked[A]]) => Tree[Ranked[A]] = {
       case (t1@Node(Ranked(r1, x1), cf1), t2@Node(Ranked(r2, x2), cf2)) =>
-        if (f(x1, x2)) Node(Ranked(r1 + 1, x1), t2 #:: cf1) else
-           Node(Ranked(r2 + 1, x2), t1 #:: cf2)
+        if (f(x1, x2)) node(Ranked(r1 + 1, x1), t2 #:: cf1) else
+           node(Ranked(r2 + 1, x2), t1 #:: cf2)
     }
   private def skewInsert[A](f: (A, A) => Boolean, t: Tree[Ranked[A]], ts: Forest[A]): Forest[A] =
     ts match {
