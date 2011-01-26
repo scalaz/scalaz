@@ -16,7 +16,6 @@ object Scalaz extends Actors
     with    CharSets
     with    Cokleislis
     with    Digits
-    with    DLists
     with    Duals
     with    Effects
     with    Emptys

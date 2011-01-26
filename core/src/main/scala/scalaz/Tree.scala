@@ -19,7 +19,7 @@ sealed trait Tree[+A] {
 
   /** A 2D String representation of this Tree. */
   def drawTree[B >: A](implicit sh: Show[B]): String = {
-    implicit val showa: Show[A] = sh comap (x => x)
+    implicit val showa: Show[A] = sh contramap (x => x)
     draw.foldMap(_ + "\n")
   }
 
@@ -33,7 +33,7 @@ sealed trait Tree[+A] {
 
   /** A 2D String representation of this Tree, separated into lines. */
   def draw[B >: A](implicit sh: Show[B]): Stream[String] = {
-    implicit val showa: Show[A] = sh comap (x => x)
+    implicit val showa: Show[A] = sh contramap (x => x)
     def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
       case Stream.Empty => Stream.Empty
       case Stream(t) => "|" #:: shift("`- ", "   ", t.draw)

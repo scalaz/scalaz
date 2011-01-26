@@ -76,7 +76,7 @@ val templates = List(
   method("join", "μ"),
   method("cojoin", "υ"),
   method("copure", "ε"),
-  method("comap", "∙", Param("f")),
+  method("contramap", "∙", Param("f")),
   method("pure", "η"),
   function("kleisli", "☆", Param("f")),
   function("cokleisli", "★", Param("f")),
