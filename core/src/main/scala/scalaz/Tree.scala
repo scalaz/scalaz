@@ -73,6 +73,12 @@ sealed trait Tree[+A] {
 }
   
 trait Trees {
+
+  object Node {
+    def apply[A](root: => A, forest: => Stream[Tree[A]]) = node(root, forest)
+    def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
+  }
+
   /** Construct a new Tree node. */
   def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
     lazy val rootLabel = root
