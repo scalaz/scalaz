@@ -40,20 +40,24 @@ trait Resources {
     def close(t: T) = cl(t)
   }
 
-  def withResource[T, R](t: => T, ec: Throwable => Unit = _ => ())(implicit r: Resource[T]): (T => R) => (Throwable => R) => R = {
-    k => e => try {
-      val u = t
+  def withResource[T, R](
+                          value: => T
+                        , evaluate: T => R
+                        , whenComputing: Throwable => R = (t: Throwable) => throw t
+                        , whenClosing: Throwable => Unit = _ => ()
+                        )(implicit r: Resource[T]): R =
+    try {
+      val u = value
       try {
-        k(t)
+        evaluate(u)
       } finally {
         try {
-          r close t
+          r close u
         } catch {
-          case ex => ec(ex)
+          case ex => whenClosing(ex)
         }
       }
     } catch {
-      case ex => e(ex)
+      case ex => whenComputing(ex)
     }
-  }
 }
