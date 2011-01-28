@@ -81,7 +81,88 @@ sealed trait Heap[A] {
   def toStream: Stream[A] = this.unfold[Stream, A](_.uncons)
   def toList: List[A] = this.unfold[List, A](_.uncons)
 
+  /** Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B:Order](f: A => B) = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
+
+  /** Filter the heap, retaining only values that satisfy the predicate. O(n)*/
+  def filter(p: A => Boolean): Heap[A] = 
+    fold(Empty[A], (_, leq, t) => t foldMap (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
+
+  /** Partition the heap according to a predicate. The first heap contains all elements that
+    * satisfy the predicate. The second contains all elements that fail the predicate. O(n)*/
+  def partition(p: A => Boolean): (Heap[A], Heap[A]) =
+    fold((Empty[A], Empty[A]), (_, leq, t) => t foldMap (x =>
+      if (p(x.value)) (singletonWith(leq, x.value), Empty[A]) else
+                      (Empty[A], singletonWith(leq, x.value))))
+
+  /** Partition the heap of the elements that are less than, equal to, and greater than a given value. O(n)*/
+  def split(a: A): (Heap[A], Heap[A], Heap[A]) = {
+    fold((Empty[A], Empty[A], Empty[A]), (s, leq, t) => {
+      def f(x: A) = if (leq(x, a)) if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A]) else
+                                                  (singletonWith(leq, x), Empty[A], Empty[A]) else
+                                                  (Empty[A], Empty[A], singletonWith(leq, x))
+      t foldMap (x => f(x.value))
+    })
+  }
+  
+  /** Return a heap consisting of the least n elements of this heap. O(n log n) */
+  def take(n: Int) = withList(_.take(n))
+
+  /** Return a heap consisting of all the members of this heap except for the least n. O(n log n) */
+  def drop(n: Int) = withList(_.drop(n))
+
+  /** Split into two heaps, the first containing the n least elements, the second containing the n
+    * greatest elements. O(n log n) */
+  def splitAt(n: Int) = splitWithList(_.splitAt(n))
+
+  /** Returns a tuple where the first element is a heap consisting of the longest prefix of least elements
+    * in this heap that do not satisfy the given predicate, and the second element is the remainder
+    * of the elements. O(n log n) */
+  def break(p: A => Boolean): (Heap[A], Heap[A]) =
+    span(x => !p(x))
+
+  /** Returns a tuple where the first element is a heap consisting of the longest prefix of least elements
+    * in this heap that satisfy the given predicate and the second element is the remainder of the elements.
+    * O(n log n)*/
+  def span(p: A => Boolean): (Heap[A], Heap[A]) =
+    splitWithList(_.span(p))
+
+  /** Returns a heap consisting of the longest prefix of least elements of this heap that satisfy the predicate.
+    * O(n log n) */
+  def takeWhile(p: A => Boolean) = 
+    withList(_.takeWhile(p))
+
+  /** Returns a heap consisting of the longest prefix of least elements of this heap that do not
+    * satisfy the predicate. O(n log n) */
+  def dropWhile(p: A => Boolean) = 
+    withList(_.dropWhile(p))
+
+  /** Remove duplicate entries from the heap. O(n log n)*/
+  def nub: Heap[A] = fold(Empty[A], (_, leq, t) => {
+    val x = t.rootLabel.value
+    val xs = deleteMin
+    val zs = xs.dropWhile(leq(_, x))
+    zs.nub.insertWith(leq, x)
+  })
+
+  /** Construct heaps from each element in this heap and union them together into a new heap. O(n)*/
+  def flatMap[B:Order](f: A => Heap[B]): Heap[B] = 
+    fold(Empty[B], (_, _, t) => t foldMap (x => f(x.value)))
+
+  /** Traverse the elements of the heap in sorted order and produce a new heap with applicative effects.
+    * O(n log n)*/
+  def traverse[F[_]:Applicative, B:Order](f: A => F[B]): F[Heap[B]] =
+    toStream.traverse(f).map(fromCodata[Stream, B])
+
+  private def withList(f: List[A] => List[A]) =
+    fold(Empty[A], (_, leq, _) => fromDataWith(leq, f(toList)))
+
+  private def splitWithList(f: List[A] => (List[A], List[A])) =
+    fold((Empty[A], Empty[A]), (_, leq, _) => {
+      val g = (x: List[A]) => fromDataWith(leq, x)
+      val x = f(toList)
+      (g(x._1), g(x._2))
+    })
 }
 
 object Heap {
