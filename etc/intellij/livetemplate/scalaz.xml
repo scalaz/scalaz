@@ -218,13 +218,13 @@
       <option name="SCALA" value="true" />
     </context>
   </template>
-  <template name=".comap" value=".∙($F$)" description="∙" toReformat="false" toShortenFQNames="true">
+  <template name=".contramap" value=".∙($F$)" description="∙" toReformat="false" toShortenFQNames="true">
     <variable name="F" expression=" " defaultValue=" " alwaysStopAt="true" />
     <context>
       <option name="SCALA" value="true" />
     </context>
   </template>
-  <template name="comap" value="∙ $F$" description="∙" toReformat="false" toShortenFQNames="true">
+  <template name="contramap" value="∙ $F$" description="∙" toReformat="false" toShortenFQNames="true">
     <variable name="F" expression=" " defaultValue=" " alwaysStopAt="true" />
     <context>
       <option name="SCALA" value="true" />

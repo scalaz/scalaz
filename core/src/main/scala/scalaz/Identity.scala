@@ -2,7 +2,7 @@ package scalaz
 
 import annotation.tailrec
 
-sealed abstract trait Identity[A] extends Equals {
+sealed trait Identity[A] extends Equals {
   def value: A
 
   import Scalaz._
