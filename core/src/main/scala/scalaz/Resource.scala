@@ -1,7 +1,7 @@
 package scalaz
 
-import java.sql.{ResultSet, Statement, Connection}
 import java.io.{OutputStream, InputStream}
+import java.sql.{PreparedStatement, ResultSet, Statement, Connection}
 
 sealed trait Resource[T] {
   def close(t: T): Unit
@@ -28,6 +28,10 @@ object Resource {
 
   implicit val SQLStatementResource: Resource[Statement] = new Resource[Statement] {
     def close(c: Statement) = c.close
+  }
+
+  implicit val SQLPreparedStatementResource: Resource[PreparedStatement] = new Resource[PreparedStatement] {
+    def close(c: PreparedStatement) = c.close
   }
 
   implicit val SQLResultSetResource: Resource[ResultSet] = new Resource[ResultSet] {
