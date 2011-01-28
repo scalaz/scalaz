@@ -46,6 +46,7 @@ object Scalaz extends Actors
     with    Orders
     with    Promises
     with    Reducers
+    with    Resources
     with    Semigroups 
     with    FingerTree.IndSeqs
     with    FingerTree.Ropes
