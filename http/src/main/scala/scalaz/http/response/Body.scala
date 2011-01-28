@@ -62,28 +62,28 @@ trait Bodys {
 
   
 //  /**
-//   * The cofunctor implementation for a body.
+//   * The contravariant implementation for a body.
 //   */
-//  def bodyCofunctor[OUT[_]]: Cofunctor[PartialType2[Body, OUT]#Apply] = new Cofunctor[PartialType2[Body, OUT]#Apply] {
-//    def comap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
+//  def bodyContravariant[OUT[_]]: Contravariant[PartialType2[Body, OUT]#Apply] = new Contravariant[PartialType2[Body, OUT]#Apply] {
+//    def contramap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B => A): Body[OUT, B] = new Body[OUT, B] {
 //      def apply(b: B) = body(f(b))
 //    }
 //  }
 
   /**
-   * The cofunctor wrapper implementation for a body.
+   * The contravariant wrapper implementation for a body.
    */
-  //def bodyCofunctorW[OUT[_], A](c: PartialType2[Body, OUT]#Apply[A]): scalaz.CofunctorW[PartialType2[Body, OUT]#Apply, A] = cofunctor[PartialType2[Body, OUT]#Apply](c)(bodyCofunctor[OUT])
+  //def bodyContravariantW[OUT[_], A](c: PartialType2[Body, OUT]#Apply[A]): scalaz.ContravariantW[PartialType2[Body, OUT]#Apply, A] = contravariant[PartialType2[Body, OUT]#Apply](c)(bodyContravariant[OUT])
 
   /**
-   * The cofunctor implementation for a stream body.
+   * The contravariant implementation for a stream body.
    */
-//  implicit val StreamBodyCofunctor = bodyCofunctor[Stream]
+//  implicit val StreamBodyContravariant = bodyContravariant[Stream]
 
   /**
-   * The cofunctor wrapper implementation for a stream body.
+   * The contravariant wrapper implementation for a stream body.
    */
-  //implicit def StreamBodyCofunctorW[A](c: PartialType2[Body, Stream]#Apply[A]) = bodyCofunctorW[Stream, A](c)
+  //implicit def StreamBodyContravariantW[A](c: PartialType2[Body, Stream]#Apply[A]) = bodyContravariantW[Stream, A](c)
 }
 /**
  * Type constructors that can be used in request and response bodies.

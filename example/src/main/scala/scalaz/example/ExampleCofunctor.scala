@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz._
 
-object ExampleCofunctor {
+object ExampleContravariant {
   def main(args: Array[String]) = run
 
   import Scalaz._

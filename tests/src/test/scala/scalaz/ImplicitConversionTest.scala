@@ -14,7 +14,7 @@ object ImplicitConversionTest {
   def MAs[A, B, C, D, E, F, G, H] {
     i[List[A] <%< MA[List, A]]
     i[Option[A] <%< MA[Option, A]]
-    i[(A => B) <%< MACofunctor[({type λ[α]=(α) => B})#λ, A]]
+    i[(A => B) <%< MAContravariant[({type λ[α]=(α) => B})#λ, A]]
     i[(A => B) <%< MA[({type λ[α]=(A) => α})#λ, B]]
     i[((A, B) => C) <%< MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
     i[((A, B, C) => D) <%< MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
@@ -39,7 +39,7 @@ object ImplicitConversionTest {
 
     // via higher kind inference
     trait T[A]
-    i[T[A] <%< MACofunctor[T, A]]
+    i[T[A] <%< MAContravariant[T, A]]
     i[T[A] <%< MA[T, A]]
   }
 

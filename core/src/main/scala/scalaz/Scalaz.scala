@@ -16,7 +16,6 @@ object Scalaz extends Actors
     with    CharSets
     with    Cokleislis
     with    Digits
-    with    DLists
     with    Duals
     with    Effects
     with    Emptys
@@ -47,6 +46,7 @@ object Scalaz extends Actors
     with    Orders
     with    Promises
     with    Reducers
+    with    Resources
     with    Semigroups 
     with    FingerTree.IndSeqs
     with    FingerTree.Ropes

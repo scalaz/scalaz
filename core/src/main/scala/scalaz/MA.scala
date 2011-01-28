@@ -185,6 +185,12 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def element(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
+  def getOrElseM(a: M[Option[A]])(implicit m: Monad[M]): M[A] =
+    a >>= {
+      case None => value
+      case Some(z) => z.pure
+    }
+
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
@@ -299,21 +305,21 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 }
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
-// We can probably merge MA and MACofunctor when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
-trait MACofunctor[M[_], A] extends PimpedType[M[A]] {
-  def ∙[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = t.comap(value, f)
+// We can probably merge MA and MAContravariant when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
+trait MAContravariant[M[_], A] extends PimpedType[M[A]] {
+  def ∙[B](f: B => A)(implicit t: Contravariant[M]): M[B] = t.contramap(value, f)
 
   /**
-   * Alias for {@link scalaz.MACofunctor#∙}
+   * Alias for {@link scalaz.MAContravariant#∙}
    */
-  def comap[B](f: B => A)(implicit t: Cofunctor[M]): M[B] = ∙(f)
+  def contramap[B](f: B => A)(implicit t: Contravariant[M]): M[B] = ∙(f)
 
   /**
-   * Comap the identity function
+   * contramap the identity function
    */
-  def covary[B <: A](implicit t: Cofunctor[M]): M[B] = ∙[B](identity)
+  def covary[B <: A](implicit t: Contravariant[M]): M[B] = ∙[B](identity)
 
-  def |<[B](f: => A)(implicit t: Cofunctor[M]): M[B] = ∙((_: B) => f)
+  def |<[B](f: => A)(implicit t: Contravariant[M]): M[B] = ∙((_: B) => f)
 }
 
 
@@ -322,7 +328,7 @@ trait MAsLow {
     val value = a
   }
 
-  implicit def maCofunctorImplicit[M[_], A](a: M[A]): MACofunctor[M, A] = new MACofunctor[M, A] {
+  implicit def maContravariantImplicit[M[_], A](a: M[A]): MAContravariant[M, A] = new MAContravariant[M, A] {
     val value = a
   }
 }
@@ -332,7 +338,7 @@ trait MAs extends MAsLow {
     val value = a
   }
 
-  def maCofunctor[M[_], A](a: M[A])(implicit cf: Cofunctor[M]): MACofunctor[M, A] = new MACofunctor[M, A] {
+  def maContravariant[M[_], A](a: M[A])(implicit cf: Contravariant[M]): MAContravariant[M, A] = new MAContravariant[M, A] {
     val value = a
   }
 
@@ -340,7 +346,7 @@ trait MAs extends MAsLow {
 
   implicit def EitherRightMA[X, A](a: Either.RightProjection[X, A]) = ma[({type λ[α]=Either.RightProjection[X, α]})#λ, A](a)
 
-  implicit def Function1FlipMACofunctor[A, R](f: R => A) = maCofunctor[({type λ[α]=(α) => A})#λ, R](f)
+  implicit def Function1FlipMAContravariant[A, R](f: R => A) = maContravariant[({type λ[α]=(α) => A})#λ, R](f)
 
   implicit def Function1ApplyMA[A, R](f: A => R) = ma[({type λ[α]=(A) => α})#λ, R](f)
 

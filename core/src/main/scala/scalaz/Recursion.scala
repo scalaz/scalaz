@@ -1,9 +1,7 @@
-package scala
+package scalaz
 
-import scalaz.Scalaz._
-import scalaz.Liskov._
-import scalaz.Applicative
-import scalaz.Traverse
+import Scalaz._
+import Liskov._
 
 /**
  * Possibly negative corecursion 
@@ -67,6 +65,10 @@ object Mu {
 trait Cofree_[F[_],A] extends Immutable {
   val extract: A
   def out: F[Cofree_[F,A]]
+  def scanr[B](g: (A, F[Cofree_[F,B]]) => B)(implicit f: Functor[F]): Cofree_[F, B] = {
+    lazy val qs = out map (_.scanr(g))
+    Cofree_[F, B](g(extract, qs), qs)
+  }
 }
 object Cofree_ {
   def apply[F[_],A](
@@ -95,6 +97,10 @@ object Cofree_ {
 trait Cofree[F[+_],A] extends Nu[F] with Cofree_[F,A] {
   val extract: A 
   def out: F[Cofree[F,A]]
+  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F]): Cofree[F, B] = {
+    lazy val qs = out map (_.scanr(g))
+    Cofree[B, F](g(extract, qs), qs)
+  }
 }
 object Cofree { 
   def apply[A,F[+_]](

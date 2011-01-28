@@ -51,18 +51,16 @@ object ScalazArbitrary {
 
   implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
 
-  implicit def DListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[DList[A]] = arb[List[A]] ∘ (as => dlist(_ => as))
-
   implicit def NonEmptyListArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[NonEmptyList[A]] = arb[A].<**>(arb[List[A]])(nel _)
 
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
   implicit def TreeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tree[A]] = Arbitrary {
     def tree(n: Int): Gen[Tree[A]] = n match {
-      case 0 => arbitrary[A] ∘ (leaf _)
+      case 0 => arbitrary[A] ∘ (leaf(_))
       case n => {
         val nextSize = n.abs / 2
-        arbitrary[A].<**>(resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node _)
+        arbitrary[A].<**>(resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
       }
     }
     Gen.sized(tree _)
@@ -91,7 +89,7 @@ object ScalazArbitrary {
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
   import FingerTree._
-  
+
   implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
     arbitrary[A] ∘ (one(_): Finger[V, A]),
     (arbitrary[A] ⊛ arbitrary[A])(two(_, _): Finger[V, A]),

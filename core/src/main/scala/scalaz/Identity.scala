@@ -2,7 +2,7 @@ package scalaz
 
 import annotation.tailrec
 
-sealed abstract trait Identity[A] extends Equals {
+sealed trait Identity[A] extends Equals {
   def value: A
 
   import Scalaz._
@@ -158,8 +158,6 @@ sealed abstract trait Identity[A] extends Equals {
   def left[B]: Either[A, B] = Left(value)
 
   def right[B]: Either[B, A] = Right(value)
-
-  def dlist: DList[A] = Scalaz.dlist(value :: (_: List[A]))
 
   def wrapNel: NonEmptyList[A] = Scalaz.nel(value)
 
