@@ -2,6 +2,7 @@ package scalaz
 
 import Scalaz._
 import Liskov._
+import scala.annotation.uncheckedVariance
 
 /**
  * Possibly negative corecursion 
