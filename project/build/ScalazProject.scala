@@ -48,7 +48,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   lazy val geo = project("geo", "scalaz-geo", new Geo(_), core)
   lazy val http = project("http", "scalaz-http", new Http(_), core)
   lazy val example = project("example", "scalaz-example", new Example(_), core, geo, http)
-  lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core, geo)
+  lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core)
+  lazy val scalacheckGeo = project("geo-scalacheck", "scalaz-geo-scalacheck", new GeoScalacheck(_), core, scalacheckBinding, geo)
   lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, scalacheckBinding)
   lazy val full = project("full", "scalaz-full", new Full(_), core, scalacheckBinding, http, example, tests)
   lazy val allModules = Seq(core, http, example, scalacheckBinding, tests)
@@ -100,6 +101,10 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 """
 
+  }
+
+  class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
+    override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
