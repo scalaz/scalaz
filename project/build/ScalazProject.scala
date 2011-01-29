@@ -54,16 +54,23 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   lazy val full = project("full", "scalaz-full", new Full(_), core, scalacheckBinding, http, example, tests)
   lazy val allModules = Seq(core, http, example, scalacheckBinding, tests)
 
-  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
-  // Use this instead, for releases only!
-//  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
+  val pubishToRepoName = "Sonatype Nexus Repository Manager"
+
+  val publishTo = {
+    val repoUrl = "http://nexus.scala-tools.org/content/repositories/" + (if (version.toString.endsWith("-SNAPSHOT"))
+      "snapshots"
+    else
+      "releases")
+
+    pubishToRepoName at repoUrl
+  }
 
   lazy val publishUser = system[String]("build.publish.user")
   lazy val publishPassword = system[String]("build.publish.password")
 
   (publishUser.get, publishPassword.get) match {
     case (Some(u), Some(p)) =>
-      Credentials.add("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", u, p)
+      Credentials.add(pubishToRepoName, "nexus.scala-tools.org", u, p)
     case _ =>
       Credentials(Path.userHome / ".ivy2" / ".credentials", log)
   }
