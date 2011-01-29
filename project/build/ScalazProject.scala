@@ -25,9 +25,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7" % "test"
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8"
+  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck_2.8.1" % "1.8"
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
@@ -58,9 +58,17 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   // Use this instead, for releases only!
 //  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
 
-  Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+  lazy val publishUser = system[String]("build.publish.user")
+  lazy val publishPassword = system[String]("build.publish.password")
 
-  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.  
+  (publishUser.get, publishPassword.get) match {
+    case (Some(u), Some(p)) =>
+      Credentials.add("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", u, p)
+    case _ =>
+      Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+  }
+
+  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
   override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
 
   private def noAction = task {None}
