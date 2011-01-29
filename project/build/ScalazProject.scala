@@ -25,9 +25,9 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7-SNAPSHOT" % "test" withSources
+  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7" % "test"
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck" % "1.8"
+  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
@@ -48,18 +48,34 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   lazy val geo = project("geo", "scalaz-geo", new Geo(_), core)
   lazy val http = project("http", "scalaz-http", new Http(_), core)
   lazy val example = project("example", "scalaz-example", new Example(_), core, geo, http)
-  lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core, geo)
-  lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, scalacheckBinding)
+  lazy val scalacheckBinding = project("scalacheck-binding", "scalaz-scalacheck-binding", new ScalacheckBinding(_), core)
+  lazy val scalacheckGeo = project("geo-scalacheck", "scalaz-geo-scalacheck", new GeoScalacheck(_), core, scalacheckBinding, geo)
+  lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, geo, scalacheckBinding, scalacheckGeo)
   lazy val full = project("full", "scalaz-full", new Full(_), core, scalacheckBinding, http, example, tests)
   lazy val allModules = Seq(core, http, example, scalacheckBinding, tests)
 
-  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
-  // Use this instead, for releases only!
-//  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
+  val pubishToRepoName = "Sonatype Nexus Repository Manager"
 
-  Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+  val publishTo = {
+    val repoUrl = "http://nexus.scala-tools.org/content/repositories/" + (if (version.toString.endsWith("-SNAPSHOT"))
+      "snapshots"
+    else
+      "releases")
 
-  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.  
+    pubishToRepoName at repoUrl
+  }
+
+  lazy val publishUser = system[String]("build.publish.user")
+  lazy val publishPassword = system[String]("build.publish.password")
+
+  (publishUser.get, publishPassword.get) match {
+    case (Some(u), Some(p)) =>
+      Credentials.add(pubishToRepoName, "nexus.scala-tools.org", u, p)
+    case _ =>
+      Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+  }
+
+  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
   override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
 
   private def noAction = task {None}
@@ -100,6 +116,10 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 """
 
+  }
+
+  class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
+    override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {

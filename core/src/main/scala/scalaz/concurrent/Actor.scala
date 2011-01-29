@@ -23,15 +23,21 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
   def apply(a: A) = this ! a
   
   private val act: Effect[Unit] = effect((u: Unit) => {
-    val m = mbox.poll
-    if (m != null) try {
-      e(m)
-      act ! u
-    } catch { case e => onError(e) }
-    else {
-      suspended.set(true)
-      work
+    var go = true
+    var i = 0 
+    while (go && i < 1000) {
+      val m = mbox.poll
+      if (m != null) try {
+        e(m)
+        i = i + 1
+      } catch { case e => onError(e) }
+      else {
+        suspended.set(true)
+        work
+        go = false
+      }
     }
+    if (mbox.peek != null) act ! u else ()
   })
 }
 

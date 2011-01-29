@@ -76,6 +76,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     checkEqualLaws[ArraySeq[A]]
 
     import geo._
+    import scalaz.scalacheck.ArbitraryGeo._
     checkEqualLaws[Azimuth]
     checkEqualLaws[Bearing]
     checkEqualLaws[Coord]
