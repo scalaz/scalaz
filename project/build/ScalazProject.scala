@@ -27,7 +27,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7" % "test"
 
-  def scalacheckDependency = "org.scala-tools.testing" %% "scalacheck_2.8.1" % "1.8"
+  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
 
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
