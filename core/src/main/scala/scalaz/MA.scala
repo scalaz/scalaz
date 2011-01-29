@@ -167,7 +167,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def !(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
 
-  def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (system.error("Index " + n + " out of bounds"))
+  def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (sys.error("Index " + n + " out of bounds"))
 
   def any(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(false)(p(_) || _)
 

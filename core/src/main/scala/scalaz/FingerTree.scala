@@ -23,16 +23,16 @@ sealed abstract class ViewL[S[_], A] {
   def fold[B](b: => B, f: (=> A, => S[A]) => B): B
   def headOption: Option[A] = fold(None, (a, sa) => Some(a))
   def tailOption: Option[S[A]] = fold(None, (a, sa) => Some(sa))
-  def head: A = headOption.getOrElse(system.error("Head on empty view"))
-  def tail: S[A] = tailOption.getOrElse(system.error("Tail on empty view"))
+  def head: A = headOption.getOrElse(sys.error("Head on empty view"))
+  def tail: S[A] = tailOption.getOrElse(sys.error("Tail on empty view"))
 }
 
 sealed abstract class ViewR[S[_], A] {
   def fold[B](b: => B, f: (=> S[A], => A) => B): B
   def lastOption: Option[A] = fold(None, (sa, a) => Some(a))
   def initOption: Option[S[A]] = fold(None, (sa, a) => Some(sa))
-  def last: A = lastOption.getOrElse(system.error("Last on empty view"))
-  def init: S[A] = initOption.getOrElse(system.error("Init on empty view"))
+  def last: A = lastOption.getOrElse(sys.error("Last on empty view"))
+  def init: S[A] = initOption.getOrElse(sys.error("Init on empty view"))
 }
 
 import FingerTree._
@@ -85,11 +85,11 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def lhead = a1
 
-  def ltail = system.error("Tail on the digit One")
+  def ltail = sys.error("Tail on the digit One")
 
   def rhead = a1
 
-  def rtail = system.error("Tail on the digit One")
+  def rtail = sys.error("Tail on the digit One")
 
   def toTree = single(a1)
 
@@ -210,9 +210,9 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3) |+| f(a4)
 
-  def +:(a: => A) = system.error("Digit overflow")
+  def +:(a: => A) = sys.error("Digit overflow")
 
-  def :+(a: => A) = system.error("Digit overflow")
+  def :+(a: => A) = sys.error("Digit overflow")
 
   def |-:(a: => A) = four(a, a2, a3, a4)
 
@@ -354,14 +354,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def |-:(a: => A): FingerTree[V, A] = {
     fold(
-      v => system.error("Replacing first element of an empty FingerTree"),
+      v => sys.error("Replacing first element of an empty FingerTree"),
       (v, b) => single(a),
       (v, pr, m, sf) => deep(a |-: pr, m, sf))
   }
 
   def :-|(a: => A): FingerTree[V, A] = {
     fold(
-      v => system.error("Replacing last element of an empty FingerTree"),
+      v => sys.error("Replacing last element of an empty FingerTree"),
       (v, b) => single(a),
       (v, pr, m, sf) => deep(pr, m, sf :-| a))
   }
@@ -579,7 +579,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def split1(pred: V => Boolean): (FingerTree[V, A], A, FingerTree[V, A]) = split1(pred, measurer.monoid.zero)
 
   private def split1(pred: V => Boolean, accV: V): (FingerTree[V, A], A, FingerTree[V, A]) = fold(
-    v => system.error("Splitting an empty FingerTree"), // we can never get here
+    v => sys.error("Splitting an empty FingerTree"), // we can never get here
     (v, x) => (empty, x, empty),
     (v, pr, m, sf) => {
       val accVpr = accV snoc pr
@@ -822,7 +822,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       
       def apply(i: Int): A = {
         val split = value.split(_ > i)
-        split._2.viewl.headOption.getOrElse(system.error("Index " + i + " > " + value.measure))(i - split._1.value.measure)
+        split._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + value.measure))(i - split._1.value.measure)
       }
 
       def ++(xs: Rope[A]) = rope(value <++> xs.value)
@@ -1017,7 +1017,7 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       val value: FingerTree[Int, A]
       implicit def sizer[A] = Reducer((a: A) => 1)
       def apply(i: Int): A =
-        value.split(_ > i)._2.viewl.headOption.getOrElse(system.error("Index " + i + " > " + value.measure))
+        value.split(_ > i)._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + value.measure))
       def ++(xs: IndSeq[A]) = indSeq(value <++> xs.value)
       def :+(x: => A) = indSeq(value :+ x)
       def +:(x: => A) = indSeq(x +: value)
