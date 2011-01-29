@@ -12,7 +12,7 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
-  protected val e = actor[Signal[A]](_.eval)
+  private val e = actor[Signal[A]](_.eval)
 
   def get = {
     latch.await

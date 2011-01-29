@@ -92,7 +92,7 @@ object Cofree_ {
 trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F @uncheckedVariance, A @uncheckedVariance] {
   val extract: A 
   def out: F[Cofree[F,A]]
-  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F]): Cofree[F, B] = {
+  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F @uncheckedVariance /* TODO is this safe?*/]): Cofree[F, B] = {
     lazy val qs = out map (_.scanr(g))
     Cofree[B, F](g(extract, qs), qs)
   }
