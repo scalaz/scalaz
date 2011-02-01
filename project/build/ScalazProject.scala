@@ -25,7 +25,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing_2.8.1" % "specs" % "1.6.7.2" % "test"
+  def specsDependency = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.7.2" % "test"
 
   def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
 
