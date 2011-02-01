@@ -52,7 +52,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   lazy val scalacheckGeo = project("geo-scalacheck", "scalaz-geo-scalacheck", new GeoScalacheck(_), core, scalacheckBinding, geo)
   lazy val tests = project("tests", "scalaz-test-suite", new TestSuite(_), core, geo, scalacheckBinding, scalacheckGeo)
   lazy val full = project("full", "scalaz-full", new Full(_), core, scalacheckBinding, http, example, tests)
-  lazy val allModules = Seq(core, http, geo /*, example, scalacheckBinding, tests*/)
+  lazy val allModules = Seq(core, http, geo, example, scalacheckBinding, scalacheckGeo, tests)
 
   val pubishToRepoName = "Sonatype Nexus Repository Manager"
 
