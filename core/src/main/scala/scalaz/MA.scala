@@ -116,10 +116,10 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def len(implicit l: Length[M]): Int = l len value
 
   def max(implicit r: Foldable[M], ord: Order[A]): Option[A] =
-    foldl1((x: A, y: A) => if (x ≩ y) x else y)
+    foldl1((x: A, y: A) => if (x gt y) x else y)
 
   def min(implicit r: Foldable[M], ord: Order[A]): Option[A] =
-    foldl1((x: A, y: A) => if (x ≨ y) x else y)
+    foldl1((x: A, y: A) => if (x lt y) x else y)
 
   def longDigits(implicit d: A <:< Digit, t: Foldable[M]): Long =
     foldl(0L)((n, a) => n * 10L + (a: Digit))

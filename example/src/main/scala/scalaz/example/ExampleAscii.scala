@@ -36,10 +36,6 @@ object ExampleAscii {
     // Semigroup append
     (1 ⊹ 1) assert_≟ (1 |+| 1)
 
-    // Order
-    (1 ≤ 2) assert_≟ (1 lte 2)
-    // etc
-
     // Dual
     ("1".σ ⊹ "2".σ).value assert_≟ ("1".dual |+| "2".dual).value
 

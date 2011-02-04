@@ -2,54 +2,27 @@ package scalaz
 
 import annotation.tailrec
 
-sealed trait Identity[A] extends Equals {
+sealed trait Identity[A] extends Equals with IdentitySugar[A] {
   def value: A
 
   import Scalaz._
 
-  def η[F[_]](implicit p: Pure[F]): F[A] = pure
-
   def ok = Value(value)
 
-  /**
-   * Alias for {@link scalaz.Identity#η}
-   */
   def pure[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   def dual: Dual[A] = DualTo(value)
 
-  def σ : Dual[A] = dual
-
-  def ⊹(a: => A)(implicit s: Semigroup[A]): A = |+|(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#⊹}
-   */
   def |+|(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
-  def ≟(a: A)(implicit e: Equal[A]): Boolean = ===(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#≟}
-   */
   def ===(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
-  def ≠(a: A)(implicit e: Equal[A]): Boolean = /==(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#≠}
-   */
   def /==(a: A)(implicit e: Equal[A]): Boolean = !(===(a))
 
   /**
    * Returns `a` if it is non-null, otherwise returns `d`.
    */
   def ??(d: => A)(implicit ev: Null <:< A): A = Option(value) getOrElse d
-
-  /**
-   * Alias for assert_===
-   */
-  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = assert_===(b)
 
   /**
    * Raises an error if `value ≠ b`, according to the given `Equal`. The message is formated with the given `Show`.
@@ -59,22 +32,6 @@ sealed trait Identity[A] extends Equals {
   def assert_===[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if (≠(b)) error(shows + " ≠ " + ev(b).shows)
 
   def ?|?(a: A)(implicit o: Order[A]): Ordering = o order (value, a)
-
-  def ≤(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
-
-  def ≥(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
-
-  def ≨(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
-
-  def ≩(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
-
-  def ≮(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
-
-  def ≯(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
-
-  def ≰(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
-
-  def ≱(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
   def lte(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
 
@@ -212,4 +169,26 @@ trait Identitys {
   implicit def unMkIdentity[A](x: Identity[A]): A = x.value
 
   val unital = mkIdentity(())
+}
+
+sealed trait IdentitySugar[A] {
+  self: Identity[A] =>
+
+  /** Alias for {@link scalaz.Identity#pure} */
+  def η[F[_]](implicit p: Pure[F]): F[A] = pure
+
+  /** Alias for {@link scalaz.Identity#dual} */
+  def σ : Dual[A] = dual
+
+    /** Alias for {@link scalaz.Identity#|+|} */
+  def ⊹(a: => A)(implicit s: Semigroup[A]): A = |+|(a)
+
+  /** Alias for {@link scalaz.Identity#===} */
+  def ≟(a: A)(implicit e: Equal[A]): Boolean = ===(a)
+
+  /** Alias for {@link scalaz.Identity#/==} */
+  def ≠(a: A)(implicit e: Equal[A]): Boolean = /==(a)
+
+  /** Alias for assert_=== */
+  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = assert_===(b)
 }
