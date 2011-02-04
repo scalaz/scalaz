@@ -166,10 +166,7 @@ object Functor {
   }
 
   implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
-    def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
-      case Success(a) => Success(f(a))
-      case Failure(e) => Failure(e)
-    }
+    def fmap[A, B](r: Validation[X, A], f: A => B) = r map f
   }
 
   implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {

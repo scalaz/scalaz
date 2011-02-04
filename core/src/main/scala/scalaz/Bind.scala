@@ -148,23 +148,6 @@ object Bind {
     }
   }
   
-  // These are inconsistent with the applicative instance for Validation. Use Either or Either.RightProjection instead
-  /*
-  implicit def ValidationBind[X]: Bind[({type λ[α]=Validation[X, α]})#λ] = new Bind[({type λ[α]=Validation[X, α]})#λ] {
-    def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
-      case Success(a) => f(a)
-      case Failure(e) => Failure(e)
-    }
-  }
-
-  implicit def ValidationFailureBind[X]: Bind[({type λ[α]=FailProjection[α, X]})#λ] = new Bind[({type λ[α]=FailProjection[α, X]})#λ] {
-    def bind[A, B](r: FailProjection[A, X], f: A => FailProjection[B, X]) = r.validation match {
-      case Success(a) => a.success.fail
-      case Failure(e) => f(e)
-    }
-  }
-  */
-
   implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
     def bind[A, B](t: Tree[A], f: A => Tree[B]): Tree[B] = {
       val r = f(t.rootLabel)
