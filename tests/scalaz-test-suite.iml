@@ -22,14 +22,15 @@
     <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module" module-name="scalaz-geo" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" />
+    <orderEntry type="module" module-name="scalaz-geo-scalacheck" />
     <orderEntry type="module-library" exported="" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/jar/specs_2.8.1-1.6.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/jar/specs_2.8.1-1.6.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/src/specs_2.8.1-1.6.7-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/src/specs_2.8.1-1.6.7-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
