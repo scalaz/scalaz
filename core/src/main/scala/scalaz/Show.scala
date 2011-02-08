@@ -230,7 +230,7 @@ object Show {
     case Failure(e) => "Failure(" + e.shows + ")"
   }
 
-  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] covary
+  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] contravary
 
   import java.{lang => jl, util => ju}
 

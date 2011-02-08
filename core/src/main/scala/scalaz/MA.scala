@@ -24,7 +24,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   /**
    * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
-   * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
+   * <code>(List(List(1)).comp.map {2 +}) assert_=== List(List(3))</code>
    */
   def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[({type λ[α]=M[N[α]]})#λ, B] = ma[({type λ[α]=M[N[α]]})#λ, B](value ∘ n)
 
@@ -77,11 +77,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
-  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
-
   def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
-
-  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
 
   def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
@@ -201,7 +197,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
     t.traverse[({type λ[α]=Const[B, α]})#λ, A, B](a => Const[B, B](f(a)), value)
   }
 
-  def collapse(implicit t: Traverse[M], m: Monoid[A]): A = ↣(identity[A])
+  def collapse(implicit t: Traverse[M], m: Monoid[A]): A = foldMapDefault(identity[A])
 
   def =>>[B](f: M[A] => B)(implicit w: Comonad[M]): M[B] = w.fmap(w.cojoin(value), f)
 
@@ -283,7 +279,7 @@ trait MAContravariant[M[_], A] extends PimpedType[M[A]] with MAContravariantSuga
   /**
    * contramap the identity function
    */
-  def covary[B <: A](implicit t: Contravariant[M]): M[B] = contramap[B](identity)
+  def contravary[B <: A](implicit t: Contravariant[M]): M[B] = contramap[B](identity)
 
   def |<[B](f: => A)(implicit t: Contravariant[M]): M[B] = contramap((_: B) => f)
 }
@@ -372,47 +368,43 @@ trait MAs extends MAsLow {
 trait MASugar[M[_], A] {
   self: MA[M, A] =>
 
+  /** Alias for map */
   def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = map(f)
 
+  /** Alias for map2 */
   def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = map2(f)
 
-  /**Alias for |@| */
+  /** Alias for >>= and flatMap */
+  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
+
+  /** Alias for >>=| */
+  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
+
+  /** Alias for |@| */
   def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
-  def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
-    traverse(f)
+  /** Alias for traverse */
+  def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] = traverse(f)
 
+  /** Alias for join */
   def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join(m, b)
 
-  def ∞[B](implicit b: Bind[M]): M[B] = forever
-
-  def ∑(implicit r: Foldable[M], m: Monoid[A]): A = sum
-
-  def ♯(implicit r: Foldable[M]): Int = count
-
-  def ∑∑(implicit r: Foldable[M], m: Monoid[A]): A = sumr
-
+  /** Alias for any */
   def ∃(p: A => Boolean)(implicit r: Foldable[M]): Boolean = any(p)
 
+  /** Alias for all */
   def ∀(p: A => Boolean)(implicit r: Foldable[M]): Boolean = all(p)
 
+  /** Right associative alias for element */
   def ∈:(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
 
+  /** Alias for element */
   def ∋(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
-
-  def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = foldMapDefault(f)
-
-  def ε(implicit p: Copure[M]): A = copure
-
-  def υ(implicit j: Cojoin[M]): M[M[A]] = cojoin
 }
 
 trait MAContravariantSugar[M[_], A] {
   self: MAContravariant[M, A] =>
 
-  /**
-   * Alias for {@link scalaz.MAContravariant#contramap}
-   */
+  /** Alias for {@link scalaz.MAContravariant#contramap} */
   def ∙[B](f: B => A)(implicit t: Contravariant[M]): M[B] = t.contramap(value, f)
-
 }

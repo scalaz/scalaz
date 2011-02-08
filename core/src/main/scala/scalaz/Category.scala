@@ -265,7 +265,7 @@ object Category {
   }
 
   implicit def CokleisliCategory[M[_]: Comonad]: Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] = new Category[({type λ[α, β]=Cokleisli[M, α, β]})#λ] {
-    def id[A] = ★(_ ε)
+    def id[A] = ★(_ copure)
     def compose[X, Y, Z](f: Cokleisli[M, Y, Z], g: Cokleisli[M, X, Y]) = f =<= g 
   }
 

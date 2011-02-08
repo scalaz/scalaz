@@ -61,8 +61,8 @@ object ExampleState {
     implicit def TreeEqual[X] = equalA[Tree[X]]
 
     val tree = Branch(Leaf("one"), Branch(Leaf("two"), Leaf("three")))
-    tree.number(1)._1 assert_≟ Branch(Leaf(("one", 1)), Branch(Leaf(("two", 2)), Leaf(("three", 3))))
-    tree.numberSM ! 1 assert_≟ tree.number(1)._1
-    tree.numberSA ! 1 assert_≟ tree.number(1)._1
+    tree.number(1)._1 assert_=== Branch(Leaf(("one", 1)), Branch(Leaf(("two", 2)), Leaf(("three", 3))))
+    tree.numberSM ! 1 assert_=== tree.number(1)._1
+    tree.numberSA ! 1 assert_=== tree.number(1)._1
   }
 }

@@ -12,9 +12,9 @@ object ExampleCategory {
     val g = (s: String) => s.reverse.toInt
 
     // Right composition of the Function1 category
-    (f ⋙ g apply 33) assert_≟ 132
+    (f ⋙ g apply 33) assert_=== 132
 
     // Left composition of the Function1 category
-    (g ⋘ f apply 33) assert_≟ 132
+    (g ⋘ f apply 33) assert_=== 132
   }
 }

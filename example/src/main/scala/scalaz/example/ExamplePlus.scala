@@ -9,9 +9,9 @@ object ExamplePlus {
 
   def run {
     // Using the List Plus for appending
-    List(1, 2, 3) <+> List(4, 5, 6) assert_≟ List(1, 2, 3, 4, 5, 6)
+    List(1, 2, 3) <+> List(4, 5, 6) assert_=== List(1, 2, 3, 4, 5, 6)
 
     // Prepended elements with List Pure then Plus 
-    1 <+>: 2 <+>: 3 <+>: List(4, 5, 6) assert_≟ List(1, 2, 3, 4, 5, 6)
+    1 <+>: 2 <+>: 3 <+>: List(4, 5, 6) assert_=== List(1, 2, 3, 4, 5, 6)
   }
 }

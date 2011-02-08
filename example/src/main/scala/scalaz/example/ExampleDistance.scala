@@ -13,12 +13,12 @@ object ExampleDistance {
     val k = "altruistic" toArray
 
     // Compute the edit distance between "algorithm" and "altruistic"
-    j <---> k assert_≟ 6
+    j <---> k assert_=== 6
 
     val x = 1638452297 digits
     val y = 444488444 digits
 
     // Compute the edit distance between two strings of digits
-    x <---> y assert_≟ 9
+    x <---> y assert_=== 9
   }
 }

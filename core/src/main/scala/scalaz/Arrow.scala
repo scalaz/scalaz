@@ -58,7 +58,7 @@ object Arrow {
   implicit def CokleisliArrow[M[_]: Comonad]: Arrow[({type λ[α, β]=Cokleisli[M, α, β]})#λ] = new Arrow[({type λ[α, β]=Cokleisli[M, α, β]})#λ] {
     val category = Category.CokleisliCategory
 
-    def arrow[B, C](f: B => C) = ★(r => f(r ε))
+    def arrow[B, C](f: B => C) = ★(r => f(r copure))
 
     def first[B, C, D](a: Cokleisli[M, B, C]) = ★(a *** arrow(identity(_: D)) apply (_: M[(B, D)]))
 

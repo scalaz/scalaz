@@ -82,7 +82,7 @@ object Scalaz extends Actors
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
-  def pure[F[_]:Pure] = new (Id ~> F) {
+  def pure[F[_] : Pure] = new (Id ~> F) {
     def apply[A](a: A) = implicitly[Pure[F]].pure(a)
   }
 }
