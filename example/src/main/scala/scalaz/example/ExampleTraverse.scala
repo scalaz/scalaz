@@ -46,19 +46,19 @@ object ExampleTraverse {
     ArraySeq('1', 'x', '3').traverseDigits assert_=== none
 
     // Traverse a List using the String monoid
-    List(100, 200, 300) ↣ (_.toString) assert_=== "100200300"
+    List(100, 200, 300).foldMapDefault(_.toString) assert_=== "100200300"
 
     // Traverse a ArraySeq using the Int addition monoid
-    ArraySeq(100, 200, 300) ↣ (x => x) assert_=== 600
+    ArraySeq(100, 200, 300).foldMapDefault(x => x) assert_=== 600
 
     // Traverse a Stream using the Int multiplication monoid
-    (Stream(100, 200, 300) ↣ (x => x ∏)).value assert_=== 6000000
+    (Stream(100, 200, 300).foldMapDefault(x => x ∏)).value assert_=== 6000000
 
     // Traverse an Option using the Int multiplication monoid
-    (some(100) ↣ (x => x ∏)).value assert_=== 100
+    (some(100).foldMapDefault(x => x ∏)).value assert_=== 100
 
     // Traverse an Option using the Int multiplication monoid
-    (none[Long] ↣ (x => x ∏)).value assert_=== 1L
+    (none[Long].foldMapDefault(x => x ∏)).value assert_=== 1L
 
     // Traverse (collapse) a List using the Int addition monoid    
     List(100, 200, 300).collapse assert_=== 600

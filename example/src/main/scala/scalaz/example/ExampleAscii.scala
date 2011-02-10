@@ -46,8 +46,6 @@ object ExampleAscii {
     (is ↦ (_.some)) assert_=== (is traverse (_.some))
 
     // Foldable count, sum, any, all
-    is.∑ assert_=== (is: MA[List, Int]).sum
-    is.♯ assert_=== (is: MA[List, Int]).count
     is.∃(_ < 0) assert_=== is.any(_ < 0)
     is.∀(_ < 0) assert_=== is.all(_ < 0)
 

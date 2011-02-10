@@ -24,10 +24,10 @@ object ExampleFold {
     (List.empty[Int] foldl1 (_ + _)) assert_=== none
 
     // Summing over a List using Foldable, using the Int Monoid to combine the elements.
-    (List(1, 2, 3) ∑) assert_=== 6
+    (List(1, 2, 3).asMA.sum) assert_=== 6
 
     // Summing over a List using Foldable, using the String Monoid to combine the elements.
-    (List("a", "b", "c") ∑) assert_=== "abc"
+    (List("a", "b", "c").asMA.sum) assert_=== "abc"
 
     // Checking for existence of an element that satisfies a predicate.
     ("abC".toList ∃ (c => Character.isUpperCase(c))) assert_=== true
@@ -43,10 +43,10 @@ object ExampleFold {
     (Stream.continually(1) ∀ (_ == 0)) assert_=== false
 
     // Counting the elements using Seq Foldable
-    ("123".toSeq ♯) assert_=== 3
+    ("123".toSeq.asMA.count) assert_=== 3
 
     // Counting the elements using Option Foldable
-    (some(0) ♯) assert_=== 1
+    (some(0).asMA.count) assert_=== 1
 
     (50 ∈: Stream.range(0, 100)) assert_=== true
 
