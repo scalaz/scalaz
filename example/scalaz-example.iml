@@ -26,11 +26,11 @@
     <orderEntry type="module-library" exported="" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/jar/specs_2.8.1-1.6.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/jar/specs_2.8.1-1.6.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/src/specs_2.8.1-1.6.7-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/src/specs_2.8.1-1.6.7.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
