@@ -102,6 +102,10 @@ object IterV {
     Cont(step)
   }
 
+  /** Peeks and returns either a Done iteratee with the given value or runs the given function with the peeked value **/
+  def peekDoneOr[A, B](b: => B, f: A => IterV[A, B]): IterV[A, B] =
+    IterV.peek[A] >>= (_.iterDoneOr(b, f))
+
   /** An iteratee that skips the first n elements of the input **/
   def drop[E](n: Int): IterV[E, Unit] = {
     def step(s: Input[E]): IterV[E, Unit] =
