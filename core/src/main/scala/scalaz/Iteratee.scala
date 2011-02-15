@@ -133,7 +133,7 @@ object IterV {
 
     def step(acc: F[A], a: A): IterV[A, F[A]] = {
       if (pred(a))
-        IterV.drop(1) >>=| peekStepDoneOr(acc |+| a.pure[F])
+        IterV.drop(1) >>=| peekStepDoneOr(acc |+| a.η[F])
       else
         IterV.Done(acc, IterV.EOF.apply)
     }
@@ -149,6 +149,24 @@ object IterV {
       case Some(h) => takeWhile(pred(_, h))
     }
   }
+
+  /**
+   * Repeats the given iteratee by appending with the given monoid.
+   */
+  def repeat[E,A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[E, F[A]] = {
+	  def step(s: F[A]): Input[E] => IterV[E, F[A]] = {
+	    case IterV.EOF() => IterV.Done(s, IterV.EOF.apply)
+	    case IterV.Empty() => IterV.Cont(step(s))
+	    case IterV.El(e) => iter match {
+	      case IterV.Done(a, _) => IterV.Done(s |+| a.η[F], IterV.El(e))
+	      case IterV.Cont(k) => for {
+	        h <- k(IterV.El(e))
+	        t <- repeat(iter)
+	      } yield s |+| h.η[F] |+| t
+	    }
+	  }
+	  IterV.Cont(step(∅[F[A]]))
+	}
 
   /** Input that has a value available **/
   object Empty {
