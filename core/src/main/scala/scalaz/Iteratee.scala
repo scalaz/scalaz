@@ -125,6 +125,31 @@ object IterV {
     Cont(step(0))
   }
 
+  /**
+   * Takes while the given predicate holds, appending with the given monoid.
+   */
+  def takeWhile[A, F[_]](pred: A => Boolean)(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[A, F[A]] = {
+    def peekStepDoneOr(z: F[A]) = peekDoneOr(z, step(z, _: A))
+
+    def step(acc: F[A], a: A): IterV[A, F[A]] = {
+      if (pred(a))
+        IterV.drop(1) >>=| peekStepDoneOr(acc |+| a.pure[F])
+      else
+        IterV.Done(acc, IterV.EOF.apply)
+    }
+    peekStepDoneOr(∅[F[A]])
+  }
+
+  /**
+   * Produces chunked output split by the given predicate.
+   */
+  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[A, F[A]] = {
+    IterV.peek >>= {
+      case None => IterV.Done(∅[F[A]], IterV.Empty.apply)
+      case Some(h) => takeWhile(pred(_, h))
+    }
+  }
+
   /** Input that has a value available **/
   object Empty {
     def apply[E] : Input[E] = new Input[E] {
