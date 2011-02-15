@@ -104,7 +104,7 @@ object IterV {
 
   /** Peeks and returns either a Done iteratee with the given value or runs the given function with the peeked value **/
   def peekDoneOr[A, B](b: => B, f: A => IterV[A, B]): IterV[A, B] =
-    IterV.peek[A] >>= (_.iterDoneOr(b, f))
+    peek[A] >>= (_.iterDoneOr(b, f))
 
   /** An iteratee that skips the first n elements of the input **/
   def drop[E](n: Int): IterV[E, Unit] = {
@@ -133,9 +133,9 @@ object IterV {
 
     def step(acc: F[A], a: A): IterV[A, F[A]] = {
       if (pred(a))
-        IterV.drop(1) >>=| peekStepDoneOr(acc |+| a.η[F])
+        drop(1) >>=| peekStepDoneOr(acc |+| a.η[F])
       else
-        IterV.Done(acc, IterV.EOF.apply)
+        Done(acc, EOF.apply)
     }
     peekStepDoneOr(∅[F[A]])
   }
@@ -145,7 +145,7 @@ object IterV {
    */
   def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[A, F[A]] = {
     IterV.peek >>= {
-      case None => IterV.Done(∅[F[A]], IterV.Empty.apply)
+      case None => Done(∅[F[A]], Empty[A])
       case Some(h) => takeWhile(pred(_, h))
     }
   }
@@ -155,17 +155,17 @@ object IterV {
    */
   def repeat[E,A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[E, F[A]] = {
 	  def step(s: F[A]): Input[E] => IterV[E, F[A]] = {
-	    case IterV.EOF() => IterV.Done(s, IterV.EOF.apply)
-	    case IterV.Empty() => IterV.Cont(step(s))
-	    case IterV.El(e) => iter match {
-	      case IterV.Done(a, _) => IterV.Done(s |+| a.η[F], IterV.El(e))
-	      case IterV.Cont(k) => for {
-	        h <- k(IterV.El(e))
+	    case EOF() => Done(s, EOF.apply)
+	    case Empty() => Cont(step(s))
+	    case El(e) => iter match {
+	      case Done(a, _) => Done(s |+| a.η[F], El(e))
+	      case Cont(k) => for {
+	        h <- k(El(e))
 	        t <- repeat(iter)
 	      } yield s |+| h.η[F] |+| t
 	    }
 	  }
-	  IterV.Cont(step(∅[F[A]]))
+	  Cont(step(∅[F[A]]))
 	}
 
   /** Input that has a value available **/
