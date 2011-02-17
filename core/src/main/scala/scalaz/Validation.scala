@@ -13,6 +13,11 @@ sealed trait Validation[+E, +A] {
     case Failure(e) => Failure(e)
   }
 
+  def foreach[U](f: A => U): Unit = this match {
+    case Success(a) => f(a)
+    case Failure(e) =>
+  }
+
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] = this match {
     case Success(a) => f(a)
     case Failure(e) => Failure(e)

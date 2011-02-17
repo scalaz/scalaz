@@ -71,6 +71,10 @@ object Each {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
   }
 
+  implicit def ValidationEach[X]: Each[({type λ[α]=Validation[X, α]})#λ] = new Each[({type λ[α]=Validation[X, α]})#λ] {
+    def each[A](v: Validation[X, A], f: A => Unit) = v.foreach(f)
+  }
+
   implicit def ResponderEach: Each[Responder] = new Each[Responder] {
     def each[A](e: Responder[A], f: A => Unit) = e respond f
   }
