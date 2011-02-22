@@ -14,15 +14,6 @@ object ExampleTuple {
     // Folding a TupleN with a FunctionN to a single value
     t1 fold (_ + _ + _) assert_=== 6
 
-    // Copy a tuple, changing the value and possibly the type of some elements.
-    //
-    // copy accepts as parameters N values that are used to generate a new TupleN.
-    // The parameters are named identically to the member methods of TupleN, and default to the
-    // previous value of the element.
-    //
-    // This is identical to the copy method that is automatically added to case classes since Scala 2.8.
-    t1 copy (_1 = 0) assert_=== (0, 2, 3)
-
     // Map functions over the elements of a tuple to generate a new tuple.
     //
     // mapElements accepts as parameters N functions that are applied to respective elements of the TupleN to generate
