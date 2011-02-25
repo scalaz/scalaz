@@ -130,6 +130,9 @@ object Semigroup extends SemigroupLow {
   implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
     semigroup((x, y) => y.value ⊹ x.value)
 
+  implicit def FingerTreeSemigroup[V, A](implicit m: Reducer[A, V]): Semigroup[FingerTree[V, A]]=
+    semigroup((x, y) => x <++> y)
+
   implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
 
   import concurrent.Strategy
