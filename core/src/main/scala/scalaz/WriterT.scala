@@ -7,10 +7,6 @@ sealed trait WriterT[M[_], W, A] extends NewType[M[(W, A)]] {
 }
 
 object WriterT {
-  def writerT[M[_], W, A](v: M[(W, A)]): WriterT[M, W, A] = new WriterT[M, W, A] {
-    val value = v
-  }
-
   implicit def WriterTPure[M[_]: Pure, W: Zero]: Pure[({type λ[α]= WriterT[M, W, α]})#λ] = new Pure[({type λ[α]=WriterT[M, W, α]})#λ] {
     def pure[A](a: => A) = writerT((∅[W], a).η[M])
   }
@@ -37,5 +33,11 @@ object WriterT {
 
   implicit def WriterTEach[M[_]: Each, W]: Each[({type λ[α]=WriterT[M, W, α]})#λ] = new Each[({type λ[α]= WriterT[M, W, α]})#λ] {
     def each[A](x: WriterT[M, W, A], f: A => Unit) = x.value foreach { case (_, a) => f(a) }
+  }
+}
+
+trait WriterTs {
+  def writerT[M[_], W, A](v: M[(W, A)]): WriterT[M, W, A] = new WriterT[M, W, A] {
+    val value = v
   }
 }
