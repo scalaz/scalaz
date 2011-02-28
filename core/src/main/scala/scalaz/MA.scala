@@ -228,6 +228,22 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
     k(l.len(value), l.len(w))
   }
 
+  def put[W](w: W)(implicit f: Functor[M]): WriterT[M, W, A] =
+    writerT[M, W, A](value ∘ (a => (w, a)))
+
+  def putWith[W](w: A => W)(implicit f: Functor[M]): WriterT[M, W, A] =
+    writerT[M, W, A](value ∘ (a => (w(a), a)))
+
+  def liftw[F[_]](implicit f: Functor[M], p: Pure[F]) = new (Id ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
+    def apply[W](w: W): WriterT[M, F[W], A] =
+      writerT[M, F[W], A](value ∘ (a => (w.value.η[F], a)))
+  }
+
+  def liftwWith[F[_]](implicit f: Functor[M], p: Pure[F]) = new (((({type λ[α]= Function1[A, α]})#λ)) ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
+    def apply[W](w: A => W) =
+      writerT[M, F[W], A](value ∘ (a => (w(a).η[F], a)))
+  }
+
   def ifM[B](t: => M[B], f: => M[B])(implicit a: Monad[M], b: A <:< Boolean): M[B] = ∗ ((x: A) => if (x) t else f)
 
   def foldLeftM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
