@@ -147,7 +147,11 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
 
   /** Prepend the value to a monoid for use in right-to-left reduction **/
   def cons[M](m: M)(implicit r: Reducer[A,M]): M = r.cons(value, m)
-  
+
+  /** Constructs a writer with the given value for writing */
+  def set[W](w: W): Writer[W, A] =
+    writerT[Identity, W, A]((w, value))
+
   override def toString: String = value.toString
 
   override def hashCode: Int = value.hashCode

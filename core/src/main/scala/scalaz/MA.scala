@@ -228,17 +228,21 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
     k(l.len(value), l.len(w))
   }
 
+  /** Puts the given write value into a writer transformer and associates with this M[A] value */
   def put[W](w: W)(implicit f: Functor[M]): WriterT[M, W, A] =
     writerT[M, W, A](value ∘ (a => (w, a)))
 
+  /** Puts the write value that is produced by applying the given function into a writer transformer and associates with this M[A] value */
   def putWith[W](w: A => W)(implicit f: Functor[M]): WriterT[M, W, A] =
     writerT[M, W, A](value ∘ (a => (w(a), a)))
 
+  /** Puts the given write value into a writer transformer, lifted into a pointed functor, and associates with this M[A] value */
   def liftw[F[_]](implicit f: Functor[M], p: Pure[F]) = new (Id ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
     def apply[W](w: W): WriterT[M, F[W], A] =
       writerT[M, F[W], A](value ∘ (a => (w.value.η[F], a)))
   }
 
+  /** Puts the given write value that is produced by applying the given function into a writer transformer, lifted into a pointed functor, and associates with this M[A] value */
   def liftwWith[F[_]](implicit f: Functor[M], p: Pure[F]) = new (((({type λ[α]= Function1[A, α]})#λ)) ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
     def apply[W](w: A => W) =
       writerT[M, F[W], A](value ∘ (a => (w(a).η[F], a)))

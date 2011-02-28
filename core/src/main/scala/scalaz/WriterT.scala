@@ -46,4 +46,7 @@ trait WriterTs {
   def writerT[M[_], W, A](v: M[(W, A)]): WriterT[M, W, A] = new WriterT[M, W, A] {
     val value = v
   }
+
+  type Writer[W, A] =
+    WriterT[Identity, W, A]
 }
