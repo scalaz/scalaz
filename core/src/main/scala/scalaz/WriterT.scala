@@ -7,6 +7,8 @@ sealed trait WriterT[M[_], W, A] extends NewType[M[(W, A)]] {
 }
 
 object WriterT {
+  implicit def WriterTInjective[M[_], W] = Injective[({type λ[α]= WriterT[M, W, α]})#λ]
+
   implicit def WriterTPure[M[_]: Pure, W: Zero]: Pure[({type λ[α]= WriterT[M, W, α]})#λ] = new Pure[({type λ[α]=WriterT[M, W, α]})#λ] {
     def pure[A](a: => A) = new WriterT[M, W, A] {
       val value = (∅[W], a).η[M]
