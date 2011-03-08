@@ -23,6 +23,10 @@ object Each {
     def each[A](e: ZipStream[A], f: A => Unit) = e.value foreach f
   }
 
+  implicit def IndSeqEach[A]: Each[IndSeq] = new Each[IndSeq] {
+    def each[A](e: IndSeq[A], f: A => Unit) = e.toList foreach f
+  }
+
   implicit def Tuple1Each: Each[Tuple1] = new Each[Tuple1] {
     def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
