@@ -31,6 +31,8 @@ object Apply extends ApplyLow {
 
   implicit def StateApply[S]: Apply[({type λ[α]=State[S, α]})#λ] = FunctorBindApply[({type λ[α]=State[S, α]})#λ]
 
+  implicit def IndSeqApply[A]: Apply[IndSeq] = FunctorBindApply[IndSeq]
+
   implicit def Tuple2Apply[R: Monoid]: Apply[({type λ[α]=(R, α)})#λ] = FunctorBindApply[({type λ[α]=(R, α)})#λ]
 
   implicit def Tuple3Apply[R: Monoid, S: Monoid]: Apply[({type λ[α]=(R, S, α)})#λ] = FunctorBindApply[({type λ[α]=(R, S, α)})#λ]

@@ -30,6 +30,10 @@ object Bind {
     }
   }
 
+  implicit def IndSeqBind: Bind[IndSeq] = new Bind[IndSeq] {
+    def bind[A, B](r: IndSeq[A], f: A => IndSeq[B]) = r flatMap f
+  }
+
   implicit def Tuple1Bind: Bind[Tuple1] = new Bind[Tuple1] {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }

@@ -22,6 +22,10 @@ object Pure {
     def pure[A](a: => A) = a.wrapNel
   }
 
+  implicit def IndSeqPure: Pure[IndSeq] = new Pure[IndSeq] {
+    def pure[A](a: => A) = IndSeq.apply(a)
+  }
+
   implicit def TraversablePure[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Pure[CC] = new Pure[CC] {
     def pure[A](a: => A) = {
       val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]

@@ -114,6 +114,8 @@ object Semigroup extends SemigroupLow {
 
   implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isRight) a else b)
 
+  implicit def IndSeqSemigroup[A]: Semigroup[IndSeq[A]] = semigroup(_ ++ _)
+
   implicit def Tuple2Semigroup[A, B](implicit as: Semigroup[A], bs: Semigroup[B]): Semigroup[(A, B)] =
     semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2))
 

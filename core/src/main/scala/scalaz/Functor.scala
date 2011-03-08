@@ -47,6 +47,10 @@ object Functor {
     def fmap[A, B](r: ZipStream[A], f: A => B) = r.value map f ʐ
   }
 
+  implicit def IndSeqFunctor: Functor[IndSeq] = new Functor[IndSeq] {
+    def fmap[A, B](r: IndSeq[A], f: A => B) = r map f
+  }
+
   implicit def Tuple1Functor: Functor[Tuple1] = new Functor[Tuple1] {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
