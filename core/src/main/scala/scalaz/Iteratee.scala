@@ -17,6 +17,7 @@ sealed trait IterV[E, A] {
     fold(done = (x, _) => x,
           cont = k => runCont(k(EOF[E])).getOrElse(error("Diverging iteratee!")))
   }
+  def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
 }
 
 /** Monadic Iteratees **/
