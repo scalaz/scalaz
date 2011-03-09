@@ -108,6 +108,19 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   }
 
   /**
+   * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
+   */
+  def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pure[F]): B = value match {
+    case None    => b
+    case Some(a) => k(a.η[F])
+  }
+
+  /**
+   * Returns the given value if None, otherwise lifts the Some value to Option and passes it to the given function.
+   */
+  def foldLiftOpt[B](b: => B, k: Option[A] => B): B = foldLift[Option, B](b, k)
+
+  /**
    * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
    */
   def iterDoneOr[B](b: => B, f: A => IterV[A, B]): IterV[A, B] = value match {
