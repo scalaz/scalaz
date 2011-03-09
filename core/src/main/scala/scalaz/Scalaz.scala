@@ -44,6 +44,7 @@ object Scalaz extends Actors
     with    Names
     with    NonEmptyLists
     with    Options
+    with    OptionTs
     with    Orders
     with    Promises
     with    Reducers
