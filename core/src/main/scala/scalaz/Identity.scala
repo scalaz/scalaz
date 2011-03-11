@@ -150,7 +150,7 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
 
   /** Constructs a writer with the given value for writing */
   def set[W](w: W): Writer[W, A] =
-    writerT[Identity, W, A]((w, value))
+    writer[W, A](w, value)
 
   override def toString: String = value.toString
 

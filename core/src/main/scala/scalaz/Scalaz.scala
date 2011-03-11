@@ -60,6 +60,7 @@ object Scalaz extends Actors
     with    Trees
     with    Tuples
     with    TreeLocs
+    with    Writers
     with    WriterTs
     with    Validations
     with    Zeros
