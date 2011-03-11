@@ -60,6 +60,39 @@ object Writer {
     def each[A](x: Writer[W, A], f: A => Unit) =
       x foreach f
   }
+
+  implicit def WriterIndex[W]: Index[({type λ[α]=Writer[W, α]})#λ] = new Index[({type λ[α]=Writer[W, α]})#λ] {
+    def index[A](a: Writer[W, A], n: Int) =
+      if(n == 0) Some(a.over) else None
+  }
+
+  implicit def WriterFoldable[W]: Foldable[({type λ[α]=Writer[W, α]})#λ] = new Foldable[({type λ[α]=Writer[W, α]})#λ] {
+    override def foldRight[A, B](t: Writer[W, A], b: => B, f: (A, => B) => B) =
+      f(t.over, b)
+  }
+
+  implicit def WriterTraverse[W]: Traverse[({type λ[α]=Writer[W, α]})#λ] = new Traverse[({type λ[α]=Writer[W, α]})#λ] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], t: Writer[W, A]) =
+      f(t.over) ∘ (b => new Writer[W, B] {
+        val value = (t.written, b)
+      })
+  }
+
+  implicit def WriterShow[W : Show, A : Show]: Show[Writer[W, A]] = new Show[Writer[W, A]] {
+    def show(a: Writer[W, A]) =
+      ("Writer(" + a.written.shows + "," + a.over.shows + ")").toList
+  }
+
+  implicit def WriterEqual[W, A: Equal]: Equal[Writer[W, A]] = new Equal[Writer[W, A]] {
+    def equal(a1: Writer[W, A], a2: Writer[W, A]) =
+      a1.over === a2.over
+  }
+
+  implicit def WriterZero[W : Zero, A: Zero]: Zero[Writer[W, A]] = new Zero[Writer[W, A]] {
+    val zero = new Writer[W, A] {
+      val value = (∅[W], ∅[A])
+    }
+  }
 }
 
 trait Writers {
