@@ -88,6 +88,11 @@ object Writer {
       a1.over === a2.over
   }
 
+  implicit def WriterOrder[W, A: Order]: Order[Writer[W, A]] = new Order[Writer[W, A]] {
+    def order(a1: Writer[W, A], a2: Writer[W, A]) =
+      a1.over ?|? a2.over
+  }
+
   implicit def WriterZero[W : Zero, A: Zero]: Zero[Writer[W, A]] = new Zero[Writer[W, A]] {
     val zero = new Writer[W, A] {
       val value = (∅[W], ∅[A])
