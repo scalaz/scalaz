@@ -154,27 +154,51 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
 
   import Logger.LOG
 
+  /**
+   * Transform the log by the given function.
+   */
   def withLog[L](k: LOG[L] => LOG[L])(implicit log: Logger[A, L]): A =
     log.setLog(k(log toLog value))(value)
 
+  /**
+   * Transform each log value by the given function.
+   */
   def withEachLog[L](k: L => L)(implicit log: Logger[A, L]): A =
     withLog[L](_ ∘ k)
 
+  /**
+   * Set the log to the given value, losing any previous value.
+   */
   def setLog[L](l: LOG[L])(implicit log: Logger[A, L]): A =
     withLog[L](_ => l)
 
+  /**
+   * Append the given value to the current log.
+   */
   def :+->[L](e: L)(implicit log: Logger[A, L]): A =
     withLog[L](_ |+| e.η[LOG])
 
+  /**
+   * Prepend the given value to the current log.
+   */
   def <-+:[L](e: L)(implicit log: Logger[A, L]): A =
     withLog[L](e.η[LOG] |+| _)
 
+  /**
+   * Append the given value to the current log.
+   */
   def :++->[L](e: LOG[L])(implicit log: Logger[A, L]): A =
     withLog[L](_ |+| e)
 
+  /**
+   * Prepend the given value to the current log.
+   */
   def <-++:[L](e: LOG[L])(implicit log: Logger[A, L]): A =
     withLog[L](e |+| _)
 
+  /**
+   * Set the log to be empty.
+   */
   def resetLog[L](implicit log: Logger[A, L]): A =
     withLog[L](_ => ∅[LOG[L]])
 
