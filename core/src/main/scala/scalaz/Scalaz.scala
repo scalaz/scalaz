@@ -34,7 +34,6 @@ object Scalaz extends Actors
     with    LastOptions
     with    LazyTuples
     with    Lists
-    with    Loggers
     with    Longs
     with    MAs
     with    MABs

@@ -32,6 +32,47 @@ sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] with MA[({type λ[X]
   def <<^[C](f: C => A)(implicit a: Arrow[M]): M[C, B] = a.category.compose(value, a.arrow(f))
 
   def ^<<[C](f: B => C)(implicit a: Arrow[M]): M[A, C] = a.category.compose(a.arrow(f), value)
+
+  import Logger.LOG
+  import Scalaz._
+
+  def withWriter(k: Writer[LOG[A], B] => Writer[LOG[A], B])(implicit log: Logger[M]): M[A, B] =
+    log fromWriter k(log toWriter asMAB)
+
+  def withLog(k: LOG[A] => LOG[A])(implicit log: Logger[M]): M[A, B] =
+    withWriter(w => w.over set k(w.written))
+
+  def withEachLog(k: A => A)(implicit log: Logger[M]): M[A, B] =
+    withLog(_ ∘ k)
+
+  def setLog(l: LOG[A])(implicit log: Logger[M]): M[A, B] =
+    withLog(_ => l)
+
+  def :+->(e: A)(implicit log: Logger[M]): M[A, B] =
+    withLog(_ |+| e.η[LOG])
+
+  def <-+:(e: A)(implicit log: Logger[M]): M[A, B] =
+    withLog(e.η[LOG] |+| _)
+
+  def :++->(e: LOG[A])(implicit log: Logger[M]): M[A, B] =
+    withLog(_ |+| e)
+
+  def <-++:(e: LOG[A])(implicit log: Logger[M]): M[A, B] =
+    withLog(e |+| _)
+
+  def resetLog(implicit log: Logger[M]): M[A, B] =
+    withLog(_ => ∅[LOG[A]])
+
+  // CAUTION: side-effect
+  def flushLog(k: LOG[A] => Unit)(implicit log: Logger[M]): M[A, B] = {
+    k((log toWriter asMAB).written)
+    resetLog
+  }
+
+  // CAUTION: side-effect
+  def flushEachLog(k: A => Unit)(implicit log: Logger[M]): M[A, B] = {
+    flushLog(_ ∘ k)
+  }
 }
 
 trait MABLow {
