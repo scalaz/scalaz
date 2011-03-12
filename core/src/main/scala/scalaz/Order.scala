@@ -101,6 +101,8 @@ object Order {
 
   implicit def Tuple1Order[A: Order]: Order[Tuple1[A]] = order(_._1 ?|? _._1)
 
+  implicit def IndSeqOrder[A: Order]: Order[IndSeq[A]] = orderBy(_.toList)
+
   import Foldable._
 
   implicit def Tuple2Order[A: Order, B: Order]: Order[(A, B)] = order {

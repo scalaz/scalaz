@@ -94,6 +94,8 @@ object Equal {
 
   implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = equalBy(_.value)
 
+  implicit def IndSeqEqual[A: Equal]: Equal[IndSeq[A]] = equalBy(_.toList)
+
   implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equalBy(_._1)
 
   implicit def Tuple2Equal[A: Equal, B: Equal]: Equal[(A, B)] = equal {

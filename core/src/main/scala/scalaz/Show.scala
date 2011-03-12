@@ -77,6 +77,8 @@ object Show {
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = implicitly[Show[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
 
+  implicit def IndSeqShow[A: Show]: Show[IndSeq[A]] = showBy(_.toList)
+
   implicit def Function1Show[A, B]: Show[A => B] =
     show((f: A => B) => "<function>".toList)
 
