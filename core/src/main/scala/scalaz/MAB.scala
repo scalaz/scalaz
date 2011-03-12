@@ -63,44 +63,60 @@ sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] with MA[({type λ[X]
   def resetLog(implicit log: Logger[M]): M[A, B] =
     withLog(_ => ∅[LOG[A]])
 
-  // CAUTION: side-effect
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
   def effectLog(k: LOG[A] => Unit)(implicit log: Logger[M]): M[A, B] = {
     k((log toWriter asMAB).written)
     asMAB
   }
 
-  // CAUTION: side-effect
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
   def effectEachLog(k: A => Unit)(implicit log: Logger[M]): M[A, B] = {
     effectLog(_ ∘ k)
   }
 
-  // CAUTION: side-effect
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
   def flushLog(k: LOG[A] => Unit)(implicit log: Logger[M]): M[A, B] = {
     effectLog(k)
     resetLog
   }
 
-  // CAUTION: side-effect
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
   def flushEachLog(k: A => Unit)(implicit log: Logger[M]): M[A, B] = {
     flushLog(_ ∘ k)
   }
 
-  // CAUTION: side-effect
+  /**
+   * Prints the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
   def printLog(implicit log: Logger[M], s: Show[A]): M[A, B] = {
     effectLog(_.println)
   }
 
-  // CAUTION: side-effect
+  /**
+   * Prints each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
   def printEachLog(implicit log: Logger[M], s: Show[A]): M[A, B] = {
     effectEachLog(_.println)
   }
 
-  // CAUTION: side-effect
+  /**
+   * Prints the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
   def printFlushLog(implicit log: Logger[M], s: Show[A]): M[A, B] = {
     flushLog(_.println)
   }
 
-  // CAUTION: side-effect
+  /**
+   * Prints each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
   def printFlushEachLog(implicit log: Logger[M], s: Show[A]): M[A, B] = {
     flushEachLog(_.println)
   }
