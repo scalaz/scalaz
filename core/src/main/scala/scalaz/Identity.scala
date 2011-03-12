@@ -152,6 +152,84 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
   def set[W](w: W): Writer[W, A] =
     writer[W, A](w, value)
 
+  import Logger.LOG
+
+  def withLog[L](k: LOG[L] => LOG[L])(implicit log: Logger[A, L]): A =
+    log.setLog(k(log toLog value))(value)
+
+  def withEachLog[L](k: L => L)(implicit log: Logger[A, L]): A =
+    withLog[L](_ ∘ k)
+
+  def setLog[L](l: LOG[L])(implicit log: Logger[A, L]): A =
+    withLog[L](_ => l)
+
+  def :+->[L](e: L)(implicit log: Logger[A, L]): A =
+    withLog[L](_ |+| e.η[LOG])
+
+  def <-+:[L](e: L)(implicit log: Logger[A, L]): A =
+    withLog[L](e.η[LOG] |+| _)
+
+  def :++->[L](e: LOG[L])(implicit log: Logger[A, L]): A =
+    withLog[L](_ |+| e)
+
+  def <-++:[L](e: LOG[L])(implicit log: Logger[A, L]): A =
+    withLog[L](e |+| _)
+
+  def resetLog[L](implicit log: Logger[A, L]): A =
+    withLog[L](_ => ∅[LOG[L]])
+
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  def effectLog[L](k: LOG[L] => Unit)(implicit log: Logger[A, L]): A = {
+    k(log toLog value)
+    value
+  }
+
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  def effectEachLog[L](k: L => Unit)(implicit log: Logger[A, L]): A =
+    effectLog[L](_ ∘ k)
+
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  def flushLog[L](k: LOG[L] => Unit)(implicit log: Logger[A, L]): A = {
+    effectLog[L](k)
+    resetLog[L]
+  }
+
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  def flushEachLog[L](k: L => Unit)(implicit log: Logger[A, L]): A =
+    flushLog[L](_ ∘ k)
+
+  /**
+   * Prints the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  def printLog[L](implicit log: Logger[A, L], s: Show[L]): A =
+    effectLog[L](_.println)
+
+  /**
+   * Prints each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  def printEachLog[L](implicit log: Logger[A, L], s: Show[L]): A =
+    effectEachLog[L](_.println)
+
+  /**
+   * Prints the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  def printFlushLog[L](implicit log: Logger[A, L], s: Show[L]): A =
+    flushLog[L](_.println)
+
+  /**
+   * Prints each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  def printFlushEachLog[L](implicit log: Logger[A, L], s: Show[L]): A =
+    flushEachLog[L](_.println)
+
   override def toString: String = value.toString
 
   override def hashCode: Int = value.hashCode

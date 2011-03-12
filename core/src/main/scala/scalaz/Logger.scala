@@ -1,11 +1,10 @@
 package scalaz
 
-trait Logger[Z[_, _]] {
+trait Logger[Z, L] {
   import Logger._
 
-  def toWriter[E, A]: Z[E, A] => Writer[LOG[E], A]
-
-  def fromWriter[E, A]: Writer[LOG[E], A] => Z[E, A]
+  def toLog: Z => LOG[L]
+  def setLog: LOG[L] => Z => Z
 }
 
 import Scalaz._
@@ -13,8 +12,8 @@ import Scalaz._
 object Logger {
   type LOG[C] = IndSeq[C]
 
-  implicit val WriterLogger: Logger[({type λ[α, β]=Writer[LOG[α], β]})#λ] = new Logger[({type λ[α, β]= Writer[LOG[α], β]})#λ] {
-    def toWriter[E, A] = w => w
-    def fromWriter[E, A] = w => w
+  implicit def WriterLogger[W, A]: Logger[Writer[LOG[W], A], W] = new Logger[Writer[LOG[W], A], W] {
+    def toLog = _.written
+    def setLog = l => w => writer(l, w.over)
   }
 }
