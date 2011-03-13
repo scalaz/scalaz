@@ -53,10 +53,22 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
     withLog(_ |+| e.η[LOG])
 
   /**
+   * Append the given value to the current log by applying to the underlying value.
+   */
+  def ::->(e: A => L): Logger[L, A] =
+    :+->(e(over))
+
+  /**
    * Prepend the given value to the current log.
    */
   def <-+:(e: L): Logger[L, A] =
     withLog(e.η[LOG] |+| _)
+
+  /**
+   * Prepend the given value to the current log by applying to the underlying value.
+   */
+  def <-::(e: A => L): Logger[L, A] =
+    <-+:(e(over))
 
   /**
    * Append the given value to the current log.
@@ -65,10 +77,22 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
     withLog(_ |+| e)
 
   /**
+   * Append the given value to the current log by applying to the underlying value.
+   */
+  def ::+->(e: A => LOG[L]): Logger[L, A] =
+    withLog(_ |+| e(over))
+
+  /**
    * Prepend the given value to the current log.
    */
   def <-++:(e: LOG[L]): Logger[L, A] =
     withLog(e |+| _)
+
+  /**
+   * Prepend the given value to the current log by applying to the underlying value.
+   */
+  def <-+::(e: A => LOG[L]): Logger[L, A] =
+    <-++:(e(over))
 
   /**
    * Set the log to be empty.
