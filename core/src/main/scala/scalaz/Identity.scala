@@ -152,6 +152,10 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
   def set[W](w: W): Writer[W, A] =
     writer[W, A](w, value)
 
+  /** Attaches a logger to this value, which accepts log values of the given type L */
+  def logger[L]: Logger[L, A] =
+    mkLogger(value)
+
   override def toString: String = value.toString
 
   override def hashCode: Int = value.hashCode

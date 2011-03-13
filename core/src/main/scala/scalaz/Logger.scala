@@ -212,7 +212,7 @@ object Logger {
 trait Loggers {
   import Logger._
 
-  def logger[L] = new (Id ~> (({type λ[α]= Logger[L, α]})#λ)) {
+  def mkLogger[L] = new (Id ~> (({type λ[α]= Logger[L, α]})#λ)) {
     def apply[A](a: A) = new Logger[L, A] {
       val log = ∅[LOG[L]]
       val over = a
