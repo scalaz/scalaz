@@ -5,8 +5,8 @@ import Scalaz._
 trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   import Logger._
 
-  val log: LOG[L]
-  val over: A
+  def log: LOG[L]
+  def over: A
 
   val value = writer(log, over)
 
@@ -55,7 +55,7 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   /**
    * Append the given value to the current log by applying to the underlying value.
    */
-  def ::->(e: A => L): Logger[L, A] =
+  def :->>(e: A => L): Logger[L, A] =
     :+->(e(over))
 
   /**
@@ -67,7 +67,7 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   /**
    * Prepend the given value to the current log by applying to the underlying value.
    */
-  def <-::(e: A => L): Logger[L, A] =
+  def <<-:(e: A => L): Logger[L, A] =
     <-+:(e(over))
 
   /**
@@ -79,7 +79,7 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   /**
    * Append the given value to the current log by applying to the underlying value.
    */
-  def ::+->(e: A => LOG[L]): Logger[L, A] =
+  def :+->>(e: A => LOG[L]): Logger[L, A] =
     withLog(_ |+| e(over))
 
   /**
@@ -91,7 +91,7 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   /**
    * Prepend the given value to the current log by applying to the underlying value.
    */
-  def <-+::(e: A => LOG[L]): Logger[L, A] =
+  def <<-+:(e: A => LOG[L]): Logger[L, A] =
     <-++:(e(over))
 
   /**
@@ -112,7 +112,7 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
    * Runs the given side-effect on each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
    */
   def effectEachLog(k: L => Unit): Logger[L, A] =
-    effectLog(_ ∘ k)
+    effectLog(_ foreach k)
 
   /**
    * Runs the given side-effect on the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
@@ -125,8 +125,10 @@ trait Logger[L, A] extends NewType[Writer[IndSeq[L], A]] {
   /**
    * Runs the given side-effect on each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
    */
-  def flushEachLog(k: L => Unit): Logger[L, A] =
-    flushLog(_ ∘ k)
+  def flushEachLog(k: L => Unit): Logger[L, A] = {
+    effectLog(_ foreach k)
+    resetLog
+  }
 
   /**
    * Prints the log, then returns this underlying value. '''CAUTION: side-effect'''
@@ -157,6 +159,11 @@ object Logger {
   type LOG[C] = IndSeq[C]
 
   implicit def LoggerInjective[L] = Injective[({type λ[α]= Logger[L, α]})#λ]
+
+  implicit val LoggerBifunctor: Bifunctor[Logger] = new Bifunctor[Logger] {
+    def bimap[A, B, C, D](k: Logger[A, B], f: A => C, g: B => D): Logger[C, D] =
+      mkLogger(g(k.over)) setLog (k.log map f)
+  }
 
   implicit def LoggerPure[L]: Pure[({type λ[α]= Logger[L, α]})#λ] = new Pure[({type λ[α]=Logger[L, α]})#λ] {
     def pure[A](a: => A) = new Logger[L, A] {
@@ -238,8 +245,8 @@ trait Loggers {
 
   def mkLogger[L] = new (Id ~> (({type λ[α]= Logger[L, α]})#λ)) {
     def apply[A](a: A) = new Logger[L, A] {
-      val log = ∅[LOG[L]]
-      val over = a
+      def log = ∅[LOG[L]]
+      def over = a
     }
   }
 }

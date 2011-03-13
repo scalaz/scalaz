@@ -5,11 +5,11 @@ import Scalaz._
 sealed trait Writer[W, A] extends NewType[(W, A)] {
   val value: (W, A)
 
-  val written = value._1
+  def written = value._1
 
-  val over = value._2
+  def over = value._2
 
-  val toWriterT: WriterT[Identity, W, A] =
+  def toWriterT: WriterT[Identity, W, A] =
     writerT[Identity, W, A](value)
 
   def map[B](f: A => B): Writer[W, B] = new Writer[W, B] {
@@ -29,6 +29,11 @@ sealed trait Writer[W, A] extends NewType[(W, A)] {
 
 object Writer {
   implicit def WriterInjective[W] = Injective[({type λ[α]= Writer[W, α]})#λ]
+
+  implicit val WriterBifunctor: Bifunctor[Writer] = new Bifunctor[Writer] {
+    def bimap[A, B, C, D](k: Writer[A, B], f: A => C, g: B => D): Writer[C, D] =
+      writer(f(k.written), g(k.over))
+  }
 
   implicit def WriterPure[W: Zero]: Pure[({type λ[α]= Writer[W, α]})#λ] = new Pure[({type λ[α]=Writer[W, α]})#λ] {
     def pure[A](a: => A) = new Writer[W, A] {
