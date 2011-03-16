@@ -10,7 +10,10 @@ sealed trait LazyOption[+A] {
 
   def isEmpty: Boolean = !isDefined
 
-  def getOrElse[B >: A](default: => B): B = fold[B](ifNone = default)
+  def orSome[B >: A](default: => B): B = fold[B](ifNone = default)
+
+  /** An alias for `orSome` */
+  def getOrElse[B >: A](default: => B): B = orSome(default)
 
   def get: A = getOrElse(throw new NoSuchElementException())
 
@@ -36,6 +39,11 @@ sealed trait LazyOption[+A] {
   def orElse[B >: A](alternative: => LazyOption[B]): LazyOption[B] =
     if (isEmpty) alternative else this
 
+  /** Forces evaluation of the contents of this `LazyOption` */
+  def force: LazyOption[A] = this
+
+  def toOption[AA >: A]: Option[A] = fold(Some(_), None)
+
   def toRight[X](left: => X) = if (isEmpty) Left(left) else Right(get)
 
   def toLeft[X](right: => X) = if (isEmpty) Right(right) else Left(get)
@@ -59,6 +67,7 @@ sealed trait LazyOption[+A] {
 
 object LazyOption {
   def some[A](a: => A): LazyOption[A] = new Some(a)
+  def strictSome[A](a: A): LazyOption[A] = new StrictSome(a)
 
   def none[A]: LazyOption[A] = None
 
@@ -66,6 +75,14 @@ object LazyOption {
     lazy val aa = a
 
     def fold[B](ifSome: (A) => B, ifNone: => B) = ifSome(aa)
+
+    def isDefined = true
+
+    override def force = new StrictSome(a)
+  }
+
+  private class StrictSome[+A](a: A) extends LazyOption[A] {
+    def fold[B](ifSome: (A) => B, ifNone: => B) = ifSome(a)
 
     def isDefined = true
   }
