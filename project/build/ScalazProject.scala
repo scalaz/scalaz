@@ -1,6 +1,5 @@
 import sbt._
 import java.util.jar.Attributes.Name._
-import tools.nsc.Settings
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
         with AutoCompilerPlugins {
@@ -41,20 +40,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 //import Scalaz._
 //
 //"""
-
-  def consolePrintTask(classpath: PathFinder): Task = {
-    def enablePrint(s: Settings): Settings = {
-      s.print.value = List("typer")
-      s
-    }
-
-    interactiveTask {
-      Run.console(classpath.get, enablePrint, log)
-    }
-  }
-
-  lazy val consolePrint = consolePrintTask(consoleClasspath).dependsOn(testCompile) describedAs "Start a console with -Xprint:typer"
-
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
@@ -130,6 +115,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 import org.scalacheck._
 import org.scalacheck.Prop._
 """
+
   }
 
   class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
@@ -182,47 +168,5 @@ import org.scalacheck.Prop._
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
       SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
       super.documentOptions
-  }
-}
-
-
-/** This module is an interface to starting the scala interpreter or runner.*/
-import scala.tools.nsc.{interpreter, util, GenericRunnerCommand, InterpreterLoop, ObjectRunner, Settings}
-import util.ClassPath
-import java.net.URL
-
-object Run {
-  /**Starts an interactive scala interpreter session with the given classpath.*/
-  def console(classpath: Iterable[Path], f: Settings => Settings, log: Logger) =
-    createSettings(log) {
-      (settings: Settings) => {
-        settings.classpath.value = Path.makeString(classpath)
-        log.info("Starting scala interpreter...")
-        log.debug("  Classpath: " + settings.classpath.value)
-        log.info("")
-        Control.trapUnit("Error during session: ", log) {
-          val loop = new InterpreterLoop
-          executeTrapExit(loop.main(settings), log)
-        }
-      }
-    }
-
-  /**Executes the given function, trapping calls to System.exit. */
-  private def executeTrapExit(f: => Unit, log: Logger): Option[String] = {
-    TrapExit(f, log) match {
-      case 0 =>
-        log.debug("Exited with code 0")
-        None
-      case exitCode => Some("Nonzero exit code: " + exitCode)
-    }
-  }
-
-  /**Create a settings object and execute the provided function if the settings are created ok.*/
-  private def createSettings(log: Logger)(f: Settings => Option[String]) = {
-    val command = new GenericRunnerCommand(Nil, message => log.error(message))
-    if (command.ok)
-      f(command.settings)
-    else
-      Some(command.usageMsg)
   }
 }
