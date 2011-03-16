@@ -4,7 +4,7 @@ import Scalaz._
 
 sealed trait LazyOption[+A] {
   self =>
-  def fold[B](ifSome: A => B = identity[A] _, ifNone: => B = LazyOption.none[B]): B
+  def fold[B](ifSome: ((=> A) => B) = (a => a): ((=> A) => A), ifNone: => B = LazyOption.none[B]): B
 
   def isDefined: Boolean
 
@@ -19,22 +19,22 @@ sealed trait LazyOption[+A] {
 
   def orNull[A1 >: A](implicit ev: Null <:< A1): A1 = this getOrElse null
 
-  def map[B](f: A => B): LazyOption[B] = fold(a => LazyOption.some(f(a)))
+  def map[B](f: (=> A) => B): LazyOption[B] = fold(a => LazyOption.some(f(a)))
 
-  def flatMap[B](f: A => LazyOption[B]): LazyOption[B] = fold(f)
+  def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] = fold(f)
 
-  def filter(f: (A => Boolean)): LazyOption[A] = new LazyOption[A] {
+  def filter(f: ((=> A) => Boolean)): LazyOption[A] = new LazyOption[A] {
     lazy val isDefined = self.fold(f, false)
-    def fold[B](ifSome: (A) => B, ifNone: => B) = if (isDefined) self.fold(ifSome, ifNone) else ifNone
+    def fold[B](ifSome: (=> A) => B, ifNone: => B) = if (isDefined) self.fold(ifSome, ifNone) else ifNone
   }
 
   def foreach[U](f: A => U) {
-    fold(f)
+    fold(a => f(a))
   }
 
-  def withFilter(p: A => Boolean): WithFilter = new WithFilter(p)
+  def withFilter(p: (=> A) => Boolean): WithFilter = new WithFilter(p)
 
-  def exists(p: A => Boolean): Boolean = fold(p, false)
+  def exists(p: (=> A) => Boolean): Boolean = fold(p, false)
 
   def orElse[B >: A](alternative: => LazyOption[B]): LazyOption[B] =
     if (isEmpty) alternative else this
@@ -52,16 +52,16 @@ sealed trait LazyOption[+A] {
 
   def lst[AA >: A]: LastLazyOption[AA] = this
 
-  class WithFilter(p: A => Boolean) {
-    def map[B](f: A => B): LazyOption[B] = self filter p map f
+  class WithFilter(p: (=> A) => Boolean) {
+    def map[B](f: (=> A) => B): LazyOption[B] = self filter p map f
 
-    def flatMap[B](f: A => LazyOption[B]): LazyOption[B] = self filter p flatMap f
+    def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] = self filter p flatMap f
 
     def foreach[U](f: A => U) {
       self filter p foreach f
     }
 
-    def withFilter(q: A => Boolean): WithFilter = new WithFilter(x => p(x) && q(x))
+    def withFilter(q: (=> A) => Boolean): WithFilter = new WithFilter(x => p(x) && q(x))
   }
 }
 
@@ -74,7 +74,7 @@ object LazyOption {
   private class Some[+A](a: => A) extends LazyOption[A] {
     lazy val aa = a
 
-    def fold[B](ifSome: (A) => B, ifNone: => B) = ifSome(aa)
+    def fold[B](ifSome: ((=> A) => B), ifNone: => B): B = ifSome(aa)
 
     def isDefined = true
 
@@ -82,13 +82,13 @@ object LazyOption {
   }
 
   private class StrictSome[+A](a: A) extends LazyOption[A] {
-    def fold[B](ifSome: (A) => B, ifNone: => B) = ifSome(a)
+    def fold[B](ifSome: ((=> A) => B), ifNone: => B): B = ifSome(a)
 
     def isDefined = true
   }
 
   private object None extends LazyOption[Nothing] {
-    def fold[B](ifSome: (Nothing) => B, ifNone: => B) = ifNone
+    def fold[B](ifSome: ((=> Nothing) => B), ifNone: => B): B = ifNone
 
     def isDefined = false
   }

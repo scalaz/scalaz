@@ -122,15 +122,15 @@ object Functor {
   }
 
   implicit def LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
-    def fmap[A, B](r: LazyOption[A], f: A => B) = r map f
+    def fmap[A, B](r: LazyOption[A], f: A => B) = r map (a => f(a))
   }
 
   implicit def FirstLazyOptionFunctor: Functor[FirstLazyOption] = new Functor[FirstLazyOption] {
-    def fmap[A, B](r: FirstLazyOption[A], f: A => B) = (r.value map f).fst
+    def fmap[A, B](r: FirstLazyOption[A], f: A => B) = (r.value map(a => f(a))).fst
   }
 
   implicit def LastLazyOptionFunctor: Functor[LastLazyOption] = new Functor[LastLazyOption] {
-    def fmap[A, B](r: LastLazyOption[A], f: A => B) = (r.value map f).lst
+    def fmap[A, B](r: LastLazyOption[A], f: A => B) = (r.value map(a => f(a))).lst
   }
 
   implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {

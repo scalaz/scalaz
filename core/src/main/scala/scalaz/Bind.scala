@@ -121,15 +121,15 @@ object Bind {
   }
 
   implicit def LazyOptionBind: Bind[LazyOption] = new Bind[LazyOption] {
-    def bind[A, B](r: LazyOption[A], f: A => LazyOption[B]) = r flatMap f
+    def bind[A, B](r: LazyOption[A], f: A => LazyOption[B]) = r flatMap (a => f(a))
   }
 
   implicit def FirstLazyOptionBind: Bind[FirstLazyOption] = new Bind[FirstLazyOption] {
-    def bind[A, B](a: FirstLazyOption[A], f: (A) => FirstLazyOption[B]): FirstLazyOption[B] = (a.value flatMap ((x: A) => f(x).value)).fst
+    def bind[A, B](a: FirstLazyOption[A], f: (A) => FirstLazyOption[B]): FirstLazyOption[B] = (a.value flatMap (x => f(x).value)).fst
   }
 
   implicit def LastLazyOptionBind: Bind[LastLazyOption] = new Bind[LastLazyOption] {
-    def bind[A, B](a: LastLazyOption[A], f: (A) => LastLazyOption[B]): LastLazyOption[B] = (a.value flatMap ((x: A) => f(x).value)).lst
+    def bind[A, B](a: LastLazyOption[A], f: (A) => LastLazyOption[B]): LastLazyOption[B] = (a.value flatMap (x => f(x).value)).lst
   }
 
   implicit def EitherLeftBind[X]: Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
