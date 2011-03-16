@@ -109,6 +109,12 @@ object Zero {
 
   implicit def LastOptionZero[A]: Zero[LastOption[A]] = zero(None)
 
+  implicit def LazyOptionZero[A]: Zero[LazyOption[A]] = zero(LazyOption.none)
+
+  implicit def FirstLazyOptionZero[A]: Zero[FirstLazyOption[A]] = zero(LazyOption.none[A])
+
+  implicit def LastLazyOptionZero[A]: Zero[FirstLazyOption[A]] = zero(LazyOption.none[A])
+
   implicit def ArrayZero[A: Manifest]: Zero[Array[A]] = zero(new Array[A](0))
 
   implicit def EitherLeftZero[A, B](implicit bz: Zero[B]): Zero[Either.LeftProjection[A, B]] = zero(Right(∅[B]).left)

@@ -127,6 +127,12 @@ object Foldable extends FoldableLow {
     }
   }
 
+  implicit def LazyOptionFoldable: Foldable[LazyOption] = new Foldable[LazyOption] {
+    override def foldLeft[A, B](t: LazyOption[A], b: B, f: (B, A) => B) = t.fold(a => f(b, a), b)
+
+    override def foldRight[A, B](t: LazyOption[A], b: => B, f: (A, => B) => B) = t.fold(a => f(a, b), b)
+  }
+
   implicit def TreeFoldable: Foldable[Tree] = new Foldable[Tree] {
     override def foldMap[A, M: Monoid](t: Tree[A], f: A => M) = t.foldMap(f)
   }

@@ -112,6 +112,18 @@ object Pure {
   implicit def LastOptionPure: Pure[LastOption] = new Pure[LastOption] {
     def pure[A](a: => A) = Some(a).lst
   }
+  
+  implicit def LazyOptionPure: Pure[LazyOption] = new Pure[LazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a)
+  }
+
+  implicit def FirstLazyOptionPure: Pure[FirstLazyOption] = new Pure[FirstLazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a).fst
+  }
+  
+  implicit def LastLazyOptionPure: Pure[LastLazyOption] = new Pure[LastLazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a).lst
+  }
 
   implicit def EitherLeftPure[X]: Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def pure[A](a: => A) = Left(a).left

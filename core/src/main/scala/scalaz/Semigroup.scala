@@ -106,6 +106,14 @@ object Semigroup extends SemigroupLow {
 
   implicit def LastOptionSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => b orElse a)
 
+  implicit def LazyOptionSemigroup[A : Semigroup]: Semigroup[LazyOption[A]] = semigroup((a, b) =>
+     a.fold(aa => LazyOption.some(b.fold(bb => aa ⊹ bb, aa)), b.fold(bb => LazyOption.some(bb)))
+  )
+
+  implicit def FirstLazyOptionSemigroup[A]: Semigroup[FirstLazyOption[A]] = semigroup((a, b) => a orElse b)
+
+  implicit def LastLazyOptionSemigroup[A]: Semigroup[LastLazyOption[A]] = semigroup((a, b) => b orElse a)
+
   implicit def ArraySemigroup[A: Manifest]: Semigroup[Array[A]] = semigroup(Array.concat(_, _))
 
   implicit def ArraySeqSemigroup[A]: Semigroup[ArraySeq[A]] = semigroup(_ ++ _)

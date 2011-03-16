@@ -24,6 +24,7 @@ object Scalaz extends Actors
     with    Equals
     with    Extras
     with    FirstOptions
+    with    FirstLazyOptions
     with    Function0s
     with    Function1s
     with    Function2s
@@ -32,6 +33,7 @@ object Scalaz extends Actors
     with    InputStreams
     with    Ints
     with    LastOptions
+    with    LastLazyOptions
     with    LazyTuples
     with    Lists
     with    Loggers

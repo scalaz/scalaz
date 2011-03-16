@@ -133,6 +133,14 @@ object Equal {
 
   implicit def OptionLastEqual[A: Equal]: Equal[LastOption[A]] = equalBy(_.value)
 
+  implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = equal {
+    (a, b) => a.fold(aa => b.fold(bb => aa === bb, false), false)
+  }
+
+  implicit def LazyOptionFirstEqual[A: Equal]: Equal[FirstLazyOption[A]] = equalBy(_.value)
+
+  implicit def LazyOptionLastEqual[A: Equal]: Equal[LastLazyOption[A]] = equalBy(_.value)
+
   implicit def EitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] = equal {
     case (Left(a1), Left(a2)) => a1 ≟ a2
     case (Right(b1), Right(b2)) => b1 ≟ b2

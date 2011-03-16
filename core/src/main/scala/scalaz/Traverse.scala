@@ -45,6 +45,11 @@ object Traverse {
       }
   }
 
+  implicit def LazyOptionTraverse: Traverse[LazyOption] = new Traverse[LazyOption] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], ta: LazyOption[A]): F[LazyOption[B]] =
+      ta.fold(a => f(a) ∘ (LazyOption.some(_: B)), (LazyOption.none[B]) η)
+  }
+
   import concurrent.Promise
 
   implicit def PromiseTraverse: Traverse[Promise] = new Traverse[Promise] {
