@@ -1,6 +1,8 @@
 package scalaz
 
-sealed class StreamT[M[_],A](step: => M[StreamT.Step[A, StreamT[M,A]]]) {
+sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
+  def step: M[StreamT.Step[A, StreamT[M,A]]] = stepper
+
   import StreamT._
   import Scalaz._
 
