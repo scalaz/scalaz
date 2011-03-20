@@ -1,6 +1,6 @@
 package scalaz
 
-sealed class ListT[M[_],A](step : M[ListT.Step[A, ListT[M,A]]]) {
+sealed class ListT[M[_],A](val step : M[ListT.Step[A, ListT[M,A]]]) {
   import ListT._
   import Scalaz._
 
