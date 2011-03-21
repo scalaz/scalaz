@@ -77,7 +77,7 @@ object ST {
 
   /** Run a state thread */
   def runST[A](f: Forall[({type λ[S] = ST[S, A]})#λ]): A =
-    f.apply.f(World())._2
+    f.apply.f(realWorld)._2
 
   /** Allocates a fresh mutable reference. */
   def newVar[S, A](a: A): ST[S, STRef[S, A]] =
@@ -120,8 +120,8 @@ object ST {
     def equal(s1: STRef[S, A], s2: STRef[S, A]): Boolean = s1 == s2
   }
     
-  type RealWorld = World[Nothing]
-
+  trait RealWorld
+  val realWorld = World[RealWorld]()
   type IO[A] = ST[RealWorld, A]
 }
 
