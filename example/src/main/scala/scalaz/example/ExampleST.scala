@@ -17,12 +17,12 @@ object ExampleST {
   def e2[A] = e1[A].flatMap(_.read)
 
   // Run e2, returning the final value of the mutable reference.
-  def test = cps[({type o[S] = ST[S, Int]})#o](
+  def test = Forall[({type o[S] = ST[S, Int]})#o](
     (k : (ST[S, Int] => Nothing) forSome { type S }) => k(e2))
 
   // Will not compile because it exposes a mutable variable.
   // def test2 = Forall[({type o[S] = ST[S, STRef[S, Int]]})#o](
-  //   (k: (ST[S, STRef[S, Int]] => Nothing) forSome {type S}) => k(mycomp2))
+  //   (k: (ST[S, STRef[S, Int]] => Nothing) forSome {type S}) => k(e1))
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
