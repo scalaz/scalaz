@@ -120,8 +120,8 @@ object ST {
     def equal(s1: STRef[S, A], s2: STRef[S, A]): Boolean = s1 == s2
   }
     
-  trait RealWorld
-  val realWorld = World[RealWorld]()
+  sealed trait RealWorld
+  private val realWorld = World[RealWorld]()
   type IO[A] = ST[RealWorld, A]
 }
 
