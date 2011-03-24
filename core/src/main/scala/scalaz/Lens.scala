@@ -76,7 +76,13 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
   implicit def toState : State[A,B] = state[A,B](a => (a, get(a)))
 
   /** We can contravariantly map the state of a state monad through a lens */
-  def lifts[C](s: State[B,C]) : State[A,C]    = state[A,C](a => modp(a,s.apply))
+  def lifts[C](s: State[B,C]) : State[A,C] = state[A,C](a => modp(a,s.apply))
+
+  /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
+  def liftsNT: ({type M[X] = State[B,X]})#M ~> ({type N[X] = State[A,X]})#N =
+    new (({type M[X] = State[B,X]})#M ~> ({type N[X] = State[A,X]})#N) {
+      def apply[C](s : State[B,C]): State[A,C] = state[A,C](a => modp(a,s.apply))
+    }
 
   /** modify the state, and return a derived value as a state monadic action. */
   def modps[C](f: B => (B,C)) : State[A,C]    = lifts(state(f))
@@ -95,7 +101,6 @@ case class Lens[A,B](get: A => B, set: (A,B) => A) extends Immutable {
 
   /** Mapping a lens yields a state action to avoid ambiguity */
   def map[C](f: B => C) : State[A,C] = state[A,C](a => (a,f(get(a))))
-
 }
 
 object Lens { 
@@ -113,6 +118,8 @@ object Lens {
 
   /** Access the second field of a tuple */
   def snd[A,B] = Lens[(A,B),B](_._2, (ab,b) => (ab._1,b))
+
+
 
   /** Lenses form a category */
   implicit def category : Category[Lens] = new Category[Lens] {

@@ -25,6 +25,15 @@ sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
       case Done => Done
     }
   )
+
+  def trans[N[_]:Functor](t: M ~> N): StreamT[N,A] = StreamT[N,A](
+    t(step) map { 
+      case Yield(a,as) => Yield(a, as trans t)
+      case Skip(as) => Skip(as trans t)
+      case Done => Done
+    }
+  )
+
   def dropWhile(p: A => Boolean)(implicit M: Functor[M]): StreamT[M,A] = StreamT[M,A](
     step map { 
       case Yield(a,as) => if (p(a)) Skip(as dropWhile p) else Yield(a,as)
@@ -92,8 +101,15 @@ sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
     def addOne(c: => Int, a: => A) = 1 + c
     foldLeft(0)(addOne _)
   }
+
+  def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = step flatMap {
+    case Yield(a,s) => f(a) flatMap (_ => s.foreach(f))
+    case Skip(s) => s.foreach(f)
+    case Done => M.pure(())
+  }
+  
 }
-object StreamT { 
+object StreamT extends Extras { 
   def apply[M[_],A](step: => M[Step[A, StreamT[M,A]]]): StreamT[M,A] = new StreamT[M,A](step)
   def empty[M[_],A](implicit M:Pure[M]): StreamT[M,A] = new StreamT[M,A](M pure Done)
 
@@ -102,36 +118,46 @@ object StreamT {
   case class Skip[+S](s: S) extends Step[Nothing,S]
   case object Done extends Step[Nothing,Nothing]
 
-  implicit def listTEmpty[M[_]:Pure]
+  implicit def streamTEmpty[M[_]:Pure]
     : Empty[({type λ[X] = StreamT[M,X]})#λ] =
   new Empty[({type λ[X] = StreamT[M,X]})#λ] {
     def empty[A] = StreamT.empty[M,A]
   }
-  implicit def listTFunctor[M[_]:Functor]
+  implicit def streamTFunctor[M[_]:Functor]
     : Functor[({type λ[X] = StreamT[M,X]})#λ] =
   new Functor[({type λ[X] = StreamT[M,X]})#λ] {
     def fmap[A,B](r: StreamT[M, A], f: A => B) = r map f
   }
-  implicit def listTPure[M[_]:Pure]
+  implicit def streamTPure[M[_]:Pure]
     : Pure[({type λ[X] = StreamT[M,X]})#λ] =
   new Pure[({type λ[X] = StreamT[M,X]})#λ] {
     def pure[A](a: => A) = a :: empty[M,A]
   }
 
-  implicit def listTBind[M[_]:Functor]
+  implicit def streamTBind[M[_]:Functor]
     : Bind[({type λ[X] = StreamT[M,X]})#λ] =
   new Bind[({type λ[X] = StreamT[M,X]})#λ] {
     def bind[A, B](a: StreamT[M,A], f: A => StreamT[M,B]) = a flatMap f 
   }
-  implicit def listTSemigroup[M[_]:Functor,A]
+  implicit def streamTSemigroup[M[_]:Functor,A]
     : Semigroup[StreamT[M,A]] = 
   new Semigroup[StreamT[M,A]] { 
     def append(s1: StreamT[M,A], s2: => StreamT[M,A]) = s1 ++ s2
   }
 
-  implicit def listTZero[M[_]:Pure,A]
+  implicit def streamTZero[M[_]:Pure,A]
     : Zero[StreamT[M,A]] =
   new Zero[StreamT[M,A]] {
     val zero = empty[M,A]
   }
+
+  def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S)
+    : StreamT[Id,A] 
+    = StreamT[Id,A](
+      stream.step(s0) match { 
+        case (s1, Yield(a, as)) => Yield(a, runStreamT(as, s1))
+        case (s1, Skip(as)) => Skip(runStreamT(as, s1))
+        case (_, Done) => Done
+      }
+    )
 }
