@@ -80,7 +80,9 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
 
   def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = value match {
     case Nil => nil[List[A]] η
-    case h :: t => spanM(p(h, _)) ∗ {case (x, y) => (y groupByM p) ∘ ((h :: x) :: _)}
+    case h :: t => t.spanM(p(h, _)) ∗ {
+      case (x, y) => (y groupByM p) ∘ ((h :: x) :: _)
+    }
   }
 
   def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = value match {
