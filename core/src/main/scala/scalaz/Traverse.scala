@@ -20,8 +20,19 @@ object Traverse {
   }
 
   implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] =
-      as.foldLeft(implicitly[CanBuildAnySelf[CC]].builder[B, B]().η[F])((b, a) => (b <**> f(a))(_ += _)) ∘ (_.result)
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
+      val ap: Apply[F] = implicitly[Apply[F]]
+
+      // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
+      val flistbs: F[Stream[B]] = as.toStream.foldr(Stream.empty[B].η[F])((x, ys) => ap(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
+      flistbs ∘ {xs =>
+        val builder = cbf.apply()
+        for (x <- xs) builder += x
+        builder.result
+      }
+    }
+
   }
 
   implicit def Tuple1Traverse: Traverse[Tuple1] = new Traverse[Tuple1] {
