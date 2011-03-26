@@ -12,35 +12,35 @@ object ImplicitConversionTest {
   }
 
   def MAs[A, B, C, D, E, F, G, H] {
-    i[List[A] <%< MA[List, A]]
-    i[Option[A] <%< MA[Option, A]]
-    i[(A => B) <%< MAContravariant[({type λ[α]=(α) => B})#λ, A]]
-    i[(A => B) <%< MA[({type λ[α]=(A) => α})#λ, B]]
-    i[((A, B) => C) <%< MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
-    i[((A, B, C) => D) <%< MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
-    i[((A, B, C, D) => E) <%< MA[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
-    i[((A, B, C, D, E) => F) <%< MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
-    i[((A, B, C, D, E, F) => G) <%< MA[({type λ[α]=(A, B, C, D, E, F) => α})#λ, G]]
-    i[Validation[A, B] <%< MA[({type λ[α]=Validation[A, α]})#λ, B]]
-    i[FailProjection[A, B] <%< MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
-    i[Either.LeftProjection[A, B] <%< MA[({type λ[α]=Either.LeftProjection[α, B]})#λ, A]]
-    i[Either.RightProjection[A, B] <%< MA[({type λ[α]=Either.RightProjection[A, α]})#λ, B]]
-    i[(A, B) <%< MA[({type λ[α]=(A, α)})#λ, B]]
-    i[(A, B, C) <%< MA[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
-    i[(A, B, C, D) <%< MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
-    i[(A, B, C, D, E) <%< MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
-    i[(A, B, C, D, E, F) <%< MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
-    i[(A, B, C, D, E, F, G) <%< MA[({type λ[α]=(A, B, C, D, E, F, α)})#λ, G]]
+    i[List[A] => MA[List, A]]
+    i[Option[A] => MA[Option, A]]
+    i[(A => B) => MAContravariant[({type λ[α]=(α) => B})#λ, A]]
+    i[(A => B) => MA[({type λ[α]=(A) => α})#λ, B]]
+    i[((A, B) => C) => MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
+    i[((A, B, C) => D) => MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
+    i[((A, B, C, D) => E) => MA[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
+    i[((A, B, C, D, E) => F) => MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
+    i[((A, B, C, D, E, F) => G) => MA[({type λ[α]=(A, B, C, D, E, F) => α})#λ, G]]
+    i[Validation[A, B] => MA[({type λ[α]=Validation[A, α]})#λ, B]]
+    i[FailProjection[A, B] => MA[({type λ[α]=FailProjection[α, B]})#λ, A]]
+    i[Either.LeftProjection[A, B] => MA[({type λ[α]=Either.LeftProjection[α, B]})#λ, A]]
+    i[Either.RightProjection[A, B] => MA[({type λ[α]=Either.RightProjection[A, α]})#λ, B]]
+    i[(A, B) => MA[({type λ[α]=(A, α)})#λ, B]]
+    i[(A, B, C) => MA[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
+    i[(A, B, C, D) => MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
+    i[(A, B, C, D, E) => MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
+    i[(A, B, C, D, E, F) => MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
+    i[(A, B, C, D, E, F, G) => MA[({type λ[α]=(A, B, C, D, E, F, α)})#λ, G]]
 
     // Test for: https://github.com/scalaz/scalaz/commit/1b66206e7579ac9f85a9b127795503220c54b2b3#commitcomment-245733
     trait Connection
     type DB[A] = Connection => A
-    i[DB[Unit] <%< MA[DB, Unit]]
+    i[DB[Unit] => MA[DB, Unit]]
 
     // via higher kind inference
     trait T[A]
-    i[T[A] <%< MAContravariant[T, A]]
-    i[T[A] <%< MA[T, A]]
+    i[T[A] => MAContravariant[T, A]]
+    i[T[A] => MA[T, A]]
   }
 
   def apply[A, B, R, S, T, U, V, W, X] {
