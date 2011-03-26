@@ -25,10 +25,6 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" %% "specs" % "1.6.7" % "test"
-
-  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
-
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
@@ -108,7 +104,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = scalacheckDependency
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
@@ -121,19 +117,18 @@ import org.scalacheck.Prop._
   }
 
   class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
-    override val scalacheck = scalacheckDependency
-
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
     override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
-    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar")
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Example") :: super.documentOptions
   }
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
-    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar")
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Tests") :: super.documentOptions
   }
