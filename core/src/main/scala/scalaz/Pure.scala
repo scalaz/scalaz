@@ -22,6 +22,10 @@ object Pure {
     def pure[A](a: => A) = a.wrapNel
   }
 
+  implicit def IndSeqPure: Pure[IndSeq] = new Pure[IndSeq] {
+    def pure[A](a: => A) = IndSeq.apply(a)
+  }
+
   implicit def TraversablePure[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Pure[CC] = new Pure[CC] {
     def pure[A](a: => A) = {
       val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]
@@ -107,6 +111,18 @@ object Pure {
   
   implicit def LastOptionPure: Pure[LastOption] = new Pure[LastOption] {
     def pure[A](a: => A) = Some(a).lst
+  }
+  
+  implicit def LazyOptionPure: Pure[LazyOption] = new Pure[LazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a)
+  }
+
+  implicit def FirstLazyOptionPure: Pure[FirstLazyOption] = new Pure[FirstLazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a).fst
+  }
+  
+  implicit def LastLazyOptionPure: Pure[LastLazyOption] = new Pure[LastLazyOption] {
+    def pure[A](a: => A) = LazyOption.some(a).lst
   }
 
   implicit def EitherLeftPure[X]: Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Pure[({type λ[α]=Either.LeftProjection[α, X]})#λ] {

@@ -32,6 +32,10 @@ object Plus extends PlusLow {
     def plus[A](a1: Option[A], a2: => Option[A]) = a1 orElse a2
   }
 
+  implicit def LazyOptionPlus: Plus[LazyOption] = new Plus[LazyOption] {
+    def plus[A](a1: LazyOption[A], a2: => LazyOption[A]) = a1 orElse a2
+  }
+
   implicit def EitherLeftPlus[X]: Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Plus[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def plus[A](a1: Either.LeftProjection[A, X], a2: => Either.LeftProjection[A, X]) = a1.e match {
       case Left(_) => a1

@@ -8,6 +8,21 @@ sealed trait Validation[+E, +A] {
     case Failure(x) => failure(x)
   }
 
+  def map[B](f: A => B): Validation[E, B] = this match {
+    case Success(a) => Success(f(a))
+    case Failure(e) => Failure(e)
+  }
+
+  def foreach[U](f: A => U): Unit = this match {
+    case Success(a) => f(a)
+    case Failure(e) =>
+  }
+
+  def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] = this match {
+    case Success(a) => f(a)
+    case Failure(e) => Failure(e)
+  }
+
   def either : Either[E, A] = this match {
     case Success(a) => Right(a)
     case Failure(e) => Left(e)
@@ -110,4 +125,24 @@ trait Validations {
   def failure[E, A](e: E): Validation[E, A] = Failure(e)
 
   def validation[E, A](e: Either[E, A]): Validation[E, A] = e.fold(Failure(_), Success(_))
+}
+
+object Validation {
+  import Scalaz._
+  
+  /**
+   * This instance is inconsistent with the Applicative instance for Validation -- errors are *not*
+   * accumulated. Consider using Either or Either.RightProjection instead.
+   *
+   * If you want to us this, explicitly `import Validation.Monad._`
+   */
+  object Monad {
+    implicit def apply[X]: Monad[({type λ[α]=Validation[X, α]})#λ] = new Monad[({type λ[α]=Validation[X, α]})#λ] {
+      def pure[A](a: => A) = success(a)
+
+      override def fmap[A, B](fa: Validation[X, A], f: (A => B)) = fa map f
+
+      def bind[A, B](fa: Validation[X, A], f: (A => Validation[X, B])) = fa flatMap f
+    }
+  }
 }

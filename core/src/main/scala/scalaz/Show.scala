@@ -77,6 +77,8 @@ object Show {
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = implicitly[Show[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
 
+  implicit def IndSeqShow[A: Show]: Show[IndSeq[A]] = showBy(_.toList)
+
   implicit def Function1Show[A, B]: Show[A => B] =
     show((f: A => B) => "<function>".toList)
 
@@ -222,7 +224,13 @@ object Show {
   implicit def FirstOptionShow[A: Show]: Show[FirstOption[A]] = OptionShow[A] ∙ ((_: FirstOption[A]).value)
 
   implicit def LastOptionShow[A: Show]: Show[LastOption[A]] = OptionShow[A] ∙ ((_: LastOption[A]).value)
+  
+  implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] = shows(_ map (_.shows) fold("Some(" + _ + ")", "None"))
 
+  implicit def FirstLazyOptionShow[A: Show]: Show[FirstLazyOption[A]] = LazyOptionShow[A] ∙ ((_: FirstLazyOption[A]).value)
+
+  implicit def LastLazyOptionShow[A: Show]: Show[LastLazyOption[A]] = LazyOptionShow[A] ∙ ((_: LastLazyOption[A]).value)
+  
   implicit def EitherShow[A: Show, B: Show]: Show[Either[A, B]] = shows(e => (((_: A).shows) <-: e :-> (_.shows)).toString)
 
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] = shows {
@@ -230,7 +238,7 @@ object Show {
     case Failure(e) => "Failure(" + e.shows + ")"
   }
 
-  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] covary
+  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] contravary
 
   import java.{lang => jl, util => ju}
 

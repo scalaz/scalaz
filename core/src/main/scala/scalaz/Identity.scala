@@ -2,43 +2,21 @@ package scalaz
 
 import annotation.tailrec
 
-sealed trait Identity[A] extends Equals {
+sealed trait Identity[A] extends Equals with IdentitySugar[A] {
   def value: A
 
   import Scalaz._
 
-  def η[F[_]](implicit p: Pure[F]): F[A] = pure
-
   def ok = Value(value)
 
-  /**
-   * Alias for {@link scalaz.Identity#η}
-   */
   def pure[F[_]](implicit p: Pure[F]): F[A] = p pure value
 
   def dual: Dual[A] = DualTo(value)
 
-  def σ : Dual[A] = dual
-
-  def ⊹(a: => A)(implicit s: Semigroup[A]): A = |+|(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#⊹}
-   */
   def |+|(a: => A)(implicit s: Semigroup[A]): A = s append (value, a)
 
-  def ≟(a: A)(implicit e: Equal[A]): Boolean = ===(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#≟}
-   */
   def ===(a: A)(implicit e: Equal[A]): Boolean = e equal (value, a)
 
-  def ≠(a: A)(implicit e: Equal[A]): Boolean = /==(a)
-
-  /**
-   * Alias for {@link scalaz.Identity#≠}
-   */
   def /==(a: A)(implicit e: Equal[A]): Boolean = !(===(a))
 
   /**
@@ -47,34 +25,13 @@ sealed trait Identity[A] extends Equals {
   def ??(d: => A)(implicit ev: Null <:< A): A = Option(value) getOrElse d
 
   /**
-   * Alias for assert_===
-   */
-  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = assert_===(b)
-
-  /**
    * Raises an error if `value ≠ b`, according to the given `Equal`. The message is formated with the given `Show`.
    */
-  // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_≟ "".
-  // the simpler signature is def assert_≟(b: A)(implicit e: Equal[A], s: Show[A])
+  // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_=== "".
+  // the simpler signature is def assert_===(b: A)(implicit e: Equal[A], s: Show[A])
   def assert_===[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = if (≠(b)) sys.error(shows + " ≠ " + ev(b).shows)
 
   def ?|?(a: A)(implicit o: Order[A]): Ordering = o order (value, a)
-
-  def ≤(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
-
-  def ≥(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
-
-  def ≨(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
-
-  def ≩(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
-
-  def ≮(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != LT
-
-  def ≯(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
-
-  def ≰(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == GT
-
-  def ≱(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) == LT
 
   def lte(a: A)(implicit o: Order[A]): Boolean = o.order(value, a) != GT
 
@@ -190,7 +147,15 @@ sealed trait Identity[A] extends Equals {
 
   /** Prepend the value to a monoid for use in right-to-left reduction **/
   def cons[M](m: M)(implicit r: Reducer[A,M]): M = r.cons(value, m)
-  
+
+  /** Constructs a writer with the given value for writing */
+  def set[W](w: W): Writer[W, A] =
+    writer[W, A](w, value)
+
+  /** Attaches a logger to this value, which accepts log values of the given type L */
+  def logger[L]: Logger[L, A] =
+    mkLogger(value)
+
   override def toString: String = value.toString
 
   override def hashCode: Int = value.hashCode
@@ -212,4 +177,26 @@ trait Identitys {
   implicit def unMkIdentity[A](x: Identity[A]): A = x.value
 
   val unital = mkIdentity(())
+}
+
+sealed trait IdentitySugar[A] {
+  self: Identity[A] =>
+
+  /** Alias for {@link scalaz.Identity#pure} */
+  def η[F[_]](implicit p: Pure[F]): F[A] = pure
+
+  /** Alias for {@link scalaz.Identity#dual} */
+  def σ : Dual[A] = dual
+
+    /** Alias for {@link scalaz.Identity#|+|} */
+  def ⊹(a: => A)(implicit s: Semigroup[A]): A = |+|(a)
+
+  /** Alias for {@link scalaz.Identity#===} */
+  def ≟(a: A)(implicit e: Equal[A]): Boolean = ===(a)
+
+  /** Alias for {@link scalaz.Identity#/==} */
+  def ≠(a: A)(implicit e: Equal[A]): Boolean = /==(a)
+
+  /** Alias for assert_=== */
+  def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) = assert_===(b)
 }

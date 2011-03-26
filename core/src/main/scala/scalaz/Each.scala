@@ -23,6 +23,10 @@ object Each {
     def each[A](e: ZipStream[A], f: A => Unit) = e.value foreach f
   }
 
+  implicit def IndSeqEach[A]: Each[IndSeq] = new Each[IndSeq] {
+    def each[A](e: IndSeq[A], f: A => Unit) = e.toList foreach f
+  }
+
   implicit def Tuple1Each: Each[Tuple1] = new Each[Tuple1] {
     def each[A](e: Tuple1[A], f: A => Unit) = f(e._1)
   }
@@ -63,12 +67,20 @@ object Each {
     def each[A](e: Option[A], f: A => Unit) = e foreach f
   }
 
+  implicit def LazyOptionEachEach: Each[LazyOption] = new Each[LazyOption] {
+    def each[A](e: LazyOption[A], f: A => Unit) = e foreach f
+  }
+
   implicit def EitherLeftEach[X]: Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def each[A](e: Either.LeftProjection[A, X], f: A => Unit) = e foreach f
   }
 
   implicit def EitherRightEach[X]: Each[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Each[({type λ[α]=Either.RightProjection[X, α]})#λ] {
     def each[A](e: Either.RightProjection[X, A], f: A => Unit) = e foreach f
+  }
+
+  implicit def ValidationEach[X]: Each[({type λ[α]=Validation[X, α]})#λ] = new Each[({type λ[α]=Validation[X, α]})#λ] {
+    def each[A](v: Validation[X, A], f: A => Unit) = v.foreach(f)
   }
 
   implicit def ResponderEach: Each[Responder] = new Each[Responder] {

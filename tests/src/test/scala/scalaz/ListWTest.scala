@@ -32,4 +32,9 @@ class ListWTest extends Specification with Sugar with ScalaCheck {
     }
     (a: List[Int], b: List[Int]) => (a.intercalate(b) ≟ intercalate(a, b))
   }
+
+  "groupByM joined (in Identity) produces the same list" verifies {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupByM[Identity]((a, b) => p(a, b).η[Identity]).value.join === a
+  }
 }

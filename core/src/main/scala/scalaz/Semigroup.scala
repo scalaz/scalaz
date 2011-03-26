@@ -106,6 +106,14 @@ object Semigroup extends SemigroupLow {
 
   implicit def LastOptionSemigroup[A]: Semigroup[LastOption[A]] = semigroup((a, b) => b orElse a)
 
+  implicit def LazyOptionSemigroup[A : Semigroup]: Semigroup[LazyOption[A]] = semigroup((a, b) =>
+     a.fold(aa => LazyOption.some(b.fold(bb => aa ⊹ bb, aa)), b.fold(bb => LazyOption.some(bb)))
+  )
+
+  implicit def FirstLazyOptionSemigroup[A]: Semigroup[FirstLazyOption[A]] = semigroup((a, b) => a orElse b)
+
+  implicit def LastLazyOptionSemigroup[A]: Semigroup[LastLazyOption[A]] = semigroup((a, b) => b orElse a)
+
   implicit def ArraySemigroup[A: Manifest]: Semigroup[Array[A]] = semigroup(Array.concat(_, _))
 
   implicit def ArraySeqSemigroup[A]: Semigroup[ArraySeq[A]] = semigroup(_ ++ _)
@@ -113,6 +121,8 @@ object Semigroup extends SemigroupLow {
   implicit def EitherLeftSemigroup[A, B]: Semigroup[Either.LeftProjection[A, B]] = semigroup((a, b) => if (a.e.isLeft) a else b)
 
   implicit def EitherRightSemigroup[A, B]: Semigroup[Either.RightProjection[B, A]] = semigroup((a, b) => if (a.e.isRight) a else b)
+
+  implicit def IndSeqSemigroup[A]: Semigroup[IndSeq[A]] = semigroup(_ ++ _)
 
   implicit def Tuple2Semigroup[A, B](implicit as: Semigroup[A], bs: Semigroup[B]): Semigroup[(A, B)] =
     semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2))
@@ -129,6 +139,9 @@ object Semigroup extends SemigroupLow {
 
   implicit def DualSemigroup[A: Semigroup]: Semigroup[Dual[A]] =
     semigroup((x, y) => y.value ⊹ x.value)
+
+  implicit def FingerTreeSemigroup[V, A](implicit m: Reducer[A, V]): Semigroup[FingerTree[V, A]]=
+    semigroup((x, y) => x <++> y)
 
   implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
 

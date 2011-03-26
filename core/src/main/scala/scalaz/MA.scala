@@ -1,6 +1,6 @@
 package scalaz
 
-trait MA[M[_], A] extends PimpedType[M[A]] {
+trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   import Scalaz._
 
   /**
@@ -18,19 +18,17 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
    * res2: Option[Int] = Some(1)
    */
   def asMA: MA[M, A] = this
-  
-  def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = t.fmap(value, f)
 
-  def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
+  def map2[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = ∘(k => (k: N[B]) ∘ f)
 
   /**
    * Returns a MA with the type parameter `M` equal to [A] M[N[A]], given that type `A` is constructed from type constructor `N`.
    * This allows composition of type classes for `M` and `N`. For example:
-   * <code>(List(List(1)).comp.map {2 +}) assert_≟ List(List(3))</code>
+   * <code>(List(List(1)).comp.map {2 +}) assert_=== List(List(3))</code>
    */
   def comp[N[_], B](implicit n: A <:< N[B], f: Functor[M]): MA[({type λ[α]=M[N[α]]})#λ, B] = ma[({type λ[α]=M[N[α]]})#λ, B](value ∘ n)
 
-  def map[B](f: A => B)(implicit t: Functor[M]): M[B] = ∘(f)
+  def map[B](f: A => B)(implicit t: Functor[M]): M[B] = t.fmap(value, f)
 
   def >|[B](f: => B)(implicit t: Functor[M]): M[B] = ∘(_ => f)
 
@@ -45,9 +43,6 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
    *
    * @return An ApplicativeBuilder that has accumulated `value: M[A]` and `b: M[B]`.
    */
-  def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
-
-  /** Alias for ⊛ */
   def |@|[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
 
   def <*>[B](f: M[A => B])(implicit a: Apply[M]): M[B] = a(f, value)
@@ -74,9 +69,6 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def xmap[B](f: A => B)(g: B => A)(implicit xf: InvariantFunctor[M]): M[B] = xf.xmap(value, f, g)
   
-  def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
-    traverse(f)
-
   def traverse[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] =
     t.traverse(f, value)
 
@@ -85,19 +77,11 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
-  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
-
   def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
-
-  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
 
   def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = >>=(m)
-
-  def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join(m, b)
-
-  def ∞[B](implicit b: Bind[M]): M[B] = forever
 
   def forever[B](implicit b: Bind[M]): M[B] = value ∗| value.forever
 
@@ -123,31 +107,27 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def sum(implicit r: Foldable[M], m: Monoid[A]): A = foldl(m.zero)(m append (_, _))
 
-  def ∑(implicit r: Foldable[M], m: Monoid[A]): A = sum
-
   def count(implicit r: Foldable[M]): Int = foldl(0)((b, _) => b + 1)
-
-  def ♯(implicit r: Foldable[M]): Int = count
 
   def len(implicit l: Length[M]): Int = l len value
 
   def max(implicit r: Foldable[M], ord: Order[A]): Option[A] =
-    foldl1((x: A, y: A) => if (x ≩ y) x else y)
+    foldl1((x: A, y: A) => if (x gt y) x else y)
 
   def min(implicit r: Foldable[M], ord: Order[A]): Option[A] =
-    foldl1((x: A, y: A) => if (x ≨ y) x else y)
+    foldl1((x: A, y: A) => if (x lt y) x else y)
 
   def longDigits(implicit d: A <:< Digit, t: Foldable[M]): Long =
     foldl(0L)((n, a) => n * 10L + (a: Digit))
 
   def digits(implicit c: A <:< Char, t: Functor[M]): M[Option[Digit]] =
-    ∘((a: A) => (a: Char).digit)
+    map((a: A) => (a: Char).digit)
 
   def sequence[N[_], B](implicit a: A <:< N[B], t: Traverse[M], n: Applicative[N]): N[M[B]] =
     traverse((z: A) => (z: N[B]))
 
   def traverseDigits(implicit c: A <:< Char, t: Traverse[M]): Option[M[Digit]] = {
-    val k = ∘((f: A) => (f: Char)).digits.sequence
+    val k = map((f: A) => (f: Char)).digits.sequence
     k
   }
 
@@ -155,7 +135,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def foldr1(f: (A, => A) => A)(implicit r: Foldable[M]): Option[A] = r.foldr1(value, f)
 
-  def ∑∑(implicit r: Foldable[M], m: Monoid[A]): A = foldr(m.zero)(m append (_, _))
+  def sumr(implicit r: Foldable[M], m: Monoid[A]): A = foldr(m.zero)(m append (_, _))
 
   def foldMap[B](f: A => B)(implicit r: Foldable[M], m: Monoid[B]): B = r.foldMap(value, f)
 
@@ -171,17 +151,9 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def any(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(false)(p(_) || _)
 
-  def ∃(p: A => Boolean)(implicit r: Foldable[M]): Boolean = any(p)
-
   def all(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(true)(p(_) && _)
 
-  def ∀(p: A => Boolean)(implicit r: Foldable[M]): Boolean = all(p)
-
   def empty(implicit r: Foldable[M]): Boolean = ∀(_ => false)
-
-  def ∈:(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
-
-  def ∋(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
 
   def element(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = ∃(a ≟ _)
 
@@ -221,23 +193,17 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
   def para[B](b: B, f: (=> A, => M[A], B) => B)(implicit p: Paramorphism[M]): B = p.para(value, b, f)
 
-  def ↣[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = foldMapDefault(f)
-  
   def foldMapDefault[B](f: A => B)(implicit t: Traverse[M], m: Monoid[B]): B = {
     t.traverse[({type λ[α]=Const[B, α]})#λ, A, B](a => Const[B, B](f(a)), value)
   }
 
-  def collapse(implicit t: Traverse[M], m: Monoid[A]): A = ↣(identity[A])
+  def collapse(implicit t: Traverse[M], m: Monoid[A]): A = foldMapDefault(identity[A])
 
   def =>>[B](f: M[A] => B)(implicit w: Comonad[M]): M[B] = w.fmap(w.cojoin(value), f)
 
   def copure(implicit p: Copure[M]): A = p copure value
 
-  def ε(implicit p: Copure[M]): A = copure
-
   def cojoin(implicit j: Cojoin[M]): M[M[A]] = j cojoin value
-
-  def υ(implicit j: Cojoin[M]): M[M[A]] = cojoin
 
   def <--->(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): Int = {
     def levenshteinMatrix(w: M[A])(implicit l: Length[M], ind: Index[M], equ: Equal[A]): (Int, Int) => Int = {
@@ -260,6 +226,26 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
     val k = levenshteinMatrix(w)
     k(l.len(value), l.len(w))
+  }
+
+  /** Puts the given write value into a writer transformer and associates with this M[A] value */
+  def put[W](w: W)(implicit f: Functor[M]): WriterT[M, W, A] =
+    writerT[M, W, A](value ∘ (a => (w, a)))
+
+  /** Puts the write value that is produced by applying the given function into a writer transformer and associates with this M[A] value */
+  def putWith[W](w: A => W)(implicit f: Functor[M]): WriterT[M, W, A] =
+    writerT[M, W, A](value ∘ (a => (w(a), a)))
+
+  /** Puts the given write value into a writer transformer, lifted into a pointed functor, and associates with this M[A] value */
+  def liftw[F[_]](implicit f: Functor[M], p: Pure[F]) = new (Id ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
+    def apply[W](w: W): WriterT[M, F[W], A] =
+      writerT[M, F[W], A](value ∘ (a => (w.value.η[F], a)))
+  }
+
+  /** Puts the given write value that is produced by applying the given function into a writer transformer, lifted into a pointed functor, and associates with this M[A] value */
+  def liftwWith[F[_]](implicit f: Functor[M], p: Pure[F]) = new (((({type λ[α]= Function1[A, α]})#λ)) ~> (({type λ[α]= WriterT[M, F[α], A]})#λ)) {
+    def apply[W](w: A => W) =
+      writerT[M, F[W], A](value ∘ (a => (w(a).η[F], a)))
   }
 
   def ifM[B](t: => M[B], f: => M[B])(implicit a: Monad[M], b: A <:< Boolean): M[B] = ∗ ((x: A) => if (x) t else f)
@@ -306,20 +292,16 @@ trait MA[M[_], A] extends PimpedType[M[A]] {
 
 // Previously there was an ambiguity because (A => B) could be considered as MA[(R => _), A] or MA[(_ => R), A].
 // We can probably merge MA and MAContravariant when https://lampsvn.epfl.ch/trac/scala/ticket/3340 is solved.
-trait MAContravariant[M[_], A] extends PimpedType[M[A]] {
-  def ∙[B](f: B => A)(implicit t: Contravariant[M]): M[B] = t.contramap(value, f)
+trait MAContravariant[M[_], A] extends PimpedType[M[A]] with MAContravariantSugar[M, A] {
 
-  /**
-   * Alias for {@link scalaz.MAContravariant#∙}
-   */
   def contramap[B](f: B => A)(implicit t: Contravariant[M]): M[B] = ∙(f)
 
   /**
    * contramap the identity function
    */
-  def covary[B <: A](implicit t: Contravariant[M]): M[B] = ∙[B](identity)
+  def contravary[B <: A](implicit t: Contravariant[M]): M[B] = contramap[B](identity)
 
-  def |<[B](f: => A)(implicit t: Contravariant[M]): M[B] = ∙((_: B) => f)
+  def |<[B](f: => A)(implicit t: Contravariant[M]): M[B] = contramap((_: B) => f)
 }
 
 
@@ -401,4 +383,48 @@ trait MAs extends MAsLow {
   implicit def NodeMA[V, A](t: Node[V, A]) = ma[({type λ[α]=Node[V, α]})#λ, A](t)
 
   implicit def MemoMA[V, A](m: Memo[A, V]) = ma[({type λ[α]=Memo[α, V]})#λ, A](m)
+}
+
+trait MASugar[M[_], A] {
+  self: MA[M, A] =>
+
+  /** Alias for map */
+  def ∘[B](f: A => B)(implicit t: Functor[M]): M[B] = map(f)
+
+  /** Alias for map2 */
+  def ∘∘[N[_], B, C](f: B => C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] = map2(f)
+
+  /** Alias for >>= and flatMap */
+  def ∗[B](f: A => M[B])(implicit b: Bind[M]): M[B] = >>=(f)
+
+  /** Alias for >>=| */
+  def ∗|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
+
+  /** Alias for |@| */
+  def ⊛[B](b: M[B]) = new ApplicativeBuilder[M, A, B](value, b)
+
+  /** Alias for traverse */
+  def ↦[F[_], B](f: A => F[B])(implicit a: Applicative[F], t: Traverse[M]): F[M[B]] = traverse(f)
+
+  /** Alias for join */
+  def μ[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = join(m, b)
+
+  /** Alias for any */
+  def ∃(p: A => Boolean)(implicit r: Foldable[M]): Boolean = any(p)
+
+  /** Alias for all */
+  def ∀(p: A => Boolean)(implicit r: Foldable[M]): Boolean = all(p)
+
+  /** Right associative alias for element */
+  def ∈:(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
+
+  /** Alias for element */
+  def ∋(a: A)(implicit r: Foldable[M], eq: Equal[A]): Boolean = element(a)
+}
+
+trait MAContravariantSugar[M[_], A] {
+  self: MAContravariant[M, A] =>
+
+  /** Alias for {@link scalaz.MAContravariant#contramap} */
+  def ∙[B](f: B => A)(implicit t: Contravariant[M]): M[B] = t.contramap(value, f)
 }

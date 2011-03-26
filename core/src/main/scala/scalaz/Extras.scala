@@ -4,7 +4,7 @@ trait Distributes[F[_], G[_]] {
   def apply[A](f: F[G[A]]): G[F[A]]
 }
 
-/** A natural transformation beween functors F and G **/
+/** A natural transformation between functors F and G **/
 trait ~>[F[_], G[_]] {
   def apply[A](f: F[A]): G[A]
 }

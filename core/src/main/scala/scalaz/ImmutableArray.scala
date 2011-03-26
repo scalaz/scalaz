@@ -69,7 +69,7 @@ object ImmutableArray {
     ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
-    (new StringBuilder).mapResult((str: StringBuilder) => fromString(str.toString)) // TODO SCALA29 Review
+    (new StringBuilder).mapResult(fromString)
 
   implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
     new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {

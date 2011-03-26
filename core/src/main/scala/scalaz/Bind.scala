@@ -30,6 +30,10 @@ object Bind {
     }
   }
 
+  implicit def IndSeqBind: Bind[IndSeq] = new Bind[IndSeq] {
+    def bind[A, B](r: IndSeq[A], f: A => IndSeq[B]) = r flatMap f
+  }
+
   implicit def Tuple1Bind: Bind[Tuple1] = new Bind[Tuple1] {
     def bind[A, B](r: Tuple1[A], f: A => Tuple1[B]) = f(r._1)
   }
@@ -114,7 +118,19 @@ object Bind {
 
   implicit def LastOptionBind: Bind[LastOption] = new Bind[LastOption] {
     def bind[A, B](a: LastOption[A], f: (A) => LastOption[B]): LastOption[B] = (a.value flatMap ((x: A) => f(x).value)).lst
-  } 
+  }
+
+  implicit def LazyOptionBind: Bind[LazyOption] = new Bind[LazyOption] {
+    def bind[A, B](r: LazyOption[A], f: A => LazyOption[B]) = r flatMap (a => f(a))
+  }
+
+  implicit def FirstLazyOptionBind: Bind[FirstLazyOption] = new Bind[FirstLazyOption] {
+    def bind[A, B](a: FirstLazyOption[A], f: (A) => FirstLazyOption[B]): FirstLazyOption[B] = (a.value flatMap (x => f(x).value)).fst
+  }
+
+  implicit def LastLazyOptionBind: Bind[LastLazyOption] = new Bind[LastLazyOption] {
+    def bind[A, B](a: LastLazyOption[A], f: (A) => LastLazyOption[B]): LastLazyOption[B] = (a.value flatMap (x => f(x).value)).lst
+  }
 
   implicit def EitherLeftBind[X]: Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def bind[A, B](r: Either.LeftProjection[A, X], f: A => Either.LeftProjection[B, X]) = r.flatMap(f(_).e).left
@@ -148,23 +164,6 @@ object Bind {
     }
   }
   
-  // These are inconsistent with the applicative instance for Validation. Use Either or Either.RightProjection instead
-  /*
-  implicit def ValidationBind[X]: Bind[({type λ[α]=Validation[X, α]})#λ] = new Bind[({type λ[α]=Validation[X, α]})#λ] {
-    def bind[A, B](r: Validation[X, A], f: A => Validation[X, B]) = r match {
-      case Success(a) => f(a)
-      case Failure(e) => Failure(e)
-    }
-  }
-
-  implicit def ValidationFailureBind[X]: Bind[({type λ[α]=FailProjection[α, X]})#λ] = new Bind[({type λ[α]=FailProjection[α, X]})#λ] {
-    def bind[A, B](r: FailProjection[A, X], f: A => FailProjection[B, X]) = r.validation match {
-      case Success(a) => a.success.fail
-      case Failure(e) => f(e)
-    }
-  }
-  */
-
   implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
     def bind[A, B](t: Tree[A], f: A => Tree[B]): Tree[B] = {
       val r = f(t.rootLabel)

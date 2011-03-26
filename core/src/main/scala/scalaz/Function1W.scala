@@ -25,6 +25,12 @@ sealed trait Function1W[T, R] {
   def byName: (=> T) => R = t => k(t)
 
   def endo(implicit ev: R =:= T): Endo[T] = EndoTo(k ∘ ev)
+
+  def comparing(implicit o: Order[R]): (T, T) => Ordering =
+    (t1, t2) => o.order(k(t1), k(t2))
+
+  def equaling(implicit e: Equal[R]): (T, T) => Boolean =
+    (t1, t2) => e.equal(k(t1), k(t2))
 }
 
 trait Function1s {

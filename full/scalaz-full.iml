@@ -9,8 +9,8 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/scala_2.9.0-SNAPSHOT/classes" />
-    <output-test url="file://$MODULE_DIR$/target/scala_2.9.0-SNAPSHOT/test-classes" />
+    <output url="file://$MODULE_DIR$/target/scala_2.9.0.RC1/classes" />
+    <output-test url="file://$MODULE_DIR$/target/scala_2.9.0.RC1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/target" />
@@ -19,10 +19,11 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="buildScala" level="project" />
     <orderEntry type="module" module-name="scalaz-core" />
-    <orderEntry type="module" module-name="scalaz-geo" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" />
     <orderEntry type="module" module-name="scalaz-http" />
+    <orderEntry type="module" module-name="scalaz-geo" />
     <orderEntry type="module" module-name="scalaz-example" />
+    <orderEntry type="module" module-name="scalaz-geo-scalacheck" />
     <orderEntry type="module" module-name="scalaz-test-suite" />
     <orderEntry type="module-library" exported="">
       <library>

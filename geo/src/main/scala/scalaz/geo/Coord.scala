@@ -130,8 +130,8 @@ sealed trait Coord {
 
     def normalise(d: Double) = if(d >= 360) d - 360 else d
     val (a1, a2) = if(ed.result == Converge) (0D, 0D)
-                           else if(phi1 ≩ phi2) (180D, 0D)
-                           else if(phi1 ≨ phi2) (0D, 180D)
+                           else if(phi1 gt phi2) (180D, 0D)
+                           else if(phi1 lt phi2) (0D, 180D)
                            else (Double.NaN, Double.NaN)
     val (alpha1, alpha2) = (normalise(a1), normalise(a2))
     curve(b * ed.a * (ed.sigma - ed.deltasigma), azimuth(alpha1), azimuth(alpha2))

@@ -79,6 +79,14 @@ object Foldable extends FoldableLow {
     }
   }
 
+  implicit val IndSeqFoldable: Foldable[IndSeq] = new Foldable[IndSeq] {
+    override def foldLeft[A, B](t: IndSeq[A], z: B, f: (B, A) => B) =
+      t.toList.foldLeft(z)(f)
+
+    override def foldRight[A, B](t:IndSeq[A], z: => B, op: (A, => B) => B) =
+      t.toList.foldr(z)(op)
+  }
+
   implicit def StreamFoldable[A]: Foldable[Stream] = new Foldable[Stream] {
     override def foldRight[A, B](t: Stream[A], b: => B, f: (A, => B) => B): B =
       if (t.isEmpty)
@@ -117,6 +125,12 @@ object Foldable extends FoldableLow {
       case Some(a) => f(a, b)
       case None => b
     }
+  }
+
+  implicit def LazyOptionFoldable: Foldable[LazyOption] = new Foldable[LazyOption] {
+    override def foldLeft[A, B](t: LazyOption[A], b: B, f: (B, A) => B) = t.fold(a => f(b, a), b)
+
+    override def foldRight[A, B](t: LazyOption[A], b: => B, f: (A, => B) => B) = t.fold(a => f(a, b), b)
   }
 
   implicit def TreeFoldable: Foldable[Tree] = new Foldable[Tree] {

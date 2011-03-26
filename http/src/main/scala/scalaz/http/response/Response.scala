@@ -138,7 +138,7 @@ sealed trait Response[OUT[_]] {
   /**
    * The length of the response body.
    */
-  def bodyLength(implicit f: Foldable[OUT]) = body ♯
+  def bodyLength(implicit f: Foldable[OUT]) = body.count
 
   /**
    * Returns the response body as a string.

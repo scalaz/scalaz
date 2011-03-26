@@ -47,6 +47,10 @@ object Functor {
     def fmap[A, B](r: ZipStream[A], f: A => B) = r.value map f ʐ
   }
 
+  implicit def IndSeqFunctor: Functor[IndSeq] = new Functor[IndSeq] {
+    def fmap[A, B](r: IndSeq[A], f: A => B) = r map f
+  }
+
   implicit def Tuple1Functor: Functor[Tuple1] = new Functor[Tuple1] {
     def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
   }
@@ -117,6 +121,18 @@ object Functor {
     def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
   }
 
+  implicit def LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
+    def fmap[A, B](r: LazyOption[A], f: A => B) = r map (a => f(a))
+  }
+
+  implicit def FirstLazyOptionFunctor: Functor[FirstLazyOption] = new Functor[FirstLazyOption] {
+    def fmap[A, B](r: FirstLazyOption[A], f: A => B) = (r.value map(a => f(a))).fst
+  }
+
+  implicit def LastLazyOptionFunctor: Functor[LastLazyOption] = new Functor[LastLazyOption] {
+    def fmap[A, B](r: LastLazyOption[A], f: A => B) = (r.value map(a => f(a))).lst
+  }
+
   implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def fmap[A, B](r: Either.LeftProjection[A, X], f: A => B) = r.map(f).left
   }
@@ -166,10 +182,7 @@ object Functor {
   }
 
   implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
-    def fmap[A, B](r: Validation[X, A], f: A => B) = r match {
-      case Success(a) => Success(f(a))
-      case Failure(e) => Failure(e)
-    }
+    def fmap[A, B](r: Validation[X, A], f: A => B) = r map f
   }
 
   implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {

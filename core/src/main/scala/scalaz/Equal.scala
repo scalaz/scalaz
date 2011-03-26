@@ -34,7 +34,30 @@ trait Equals {
   def equalBy[A, B: Equal](f: A => B): Equal[A] = implicitly[Equal[B]] ∙ f
 }
 
-object Equal {
+trait EqualLow {
+  implicit def TraversableEqual[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf, A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+    def equal(a: CC[A], b: CC[A]) = {
+      import Scalaz._
+      implicitly[Equal[A]] match {
+        case eq: NaturalEqual =>
+          // Performance optimisation.
+          a == b
+        case _ =>
+          // This is an inefficient, but general, way to implement equality with respect to the element equality for an unknown
+          // collection type CC with respect to a non-natural equality.
+          implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
+          case class EqualWrap[A: Equal](a: A) {
+            override def equals(other: Any) = other matchOrZero {
+              case EqualWrap(b) => a === b.asInstanceOf[A]
+            }
+          }
+          a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
+      }
+    }
+  }
+}
+
+object Equal extends EqualLow {
   import Scalaz._
   import java.math.BigInteger
   import xml.NodeSeq
@@ -94,6 +117,8 @@ object Equal {
 
   implicit def ZipStreamEqual[A: Equal]: Equal[ZipStream[A]] = equalBy(_.value)
 
+  implicit def IndSeqEqual[A: Equal]: Equal[IndSeq[A]] = equalBy(_.toList)
+
   implicit def Tuple1Equal[A: Equal]: Equal[Tuple1[A]] = equalBy(_._1)
 
   implicit def Tuple2Equal[A: Equal, B: Equal]: Equal[(A, B)] = equal {
@@ -131,6 +156,14 @@ object Equal {
 
   implicit def OptionLastEqual[A: Equal]: Equal[LastOption[A]] = equalBy(_.value)
 
+  implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = equal {
+    (a, b) => a.fold(aa => b.fold(bb => aa === bb, false), false)
+  }
+
+  implicit def LazyOptionFirstEqual[A: Equal]: Equal[FirstLazyOption[A]] = equalBy(_.value)
+
+  implicit def LazyOptionLastEqual[A: Equal]: Equal[LastLazyOption[A]] = equalBy(_.value)
+
   implicit def EitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] = equal {
     case (Left(a1), Left(a2)) => a1 ≟ a2
     case (Right(b1), Right(b2)) => b1 ≟ b2
@@ -167,27 +200,6 @@ object Equal {
   import concurrent.Promise
   implicit def PromiseEqual[A: Equal]: Equal[Promise[A]] =
     equal[Promise[A]]((a1, a2) => a1.get ≟ a2.get)
-  
-  implicit def TraversableEqual[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf, A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
-    def equal(a: CC[A], b: CC[A]) = {
-      import Scalaz._
-      implicitly[Equal[A]] match {
-        case eq: NaturalEqual =>
-          // Performance optimisation.
-          a == b
-        case _ =>
-          // This is an inefficient, but general, way to implement equality with respect to the element equality for an unknown
-          // collection type CC with respect to a non-natural equality.
-          implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
-          case class EqualWrap[A: Equal](a: A) {
-            override def equals(other: Any) = other matchOrZero {
-              case EqualWrap(b) => a === b.asInstanceOf[A]
-            }
-          }
-          a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
-      }
-    }
-  }
 
   def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = equal((a1, a2) => {
     val i1 = a1.iterator

@@ -26,7 +26,7 @@ object WordCount {
 
     val text = "the cat in the hat\n sat on the mat\n".toList
 
-    (charCount(text): Int, lineCount(text): Int) assert_≟ (35, 2)
+    (charCount(text): Int, lineCount(text): Int) assert_=== (35, 2)
 
     val wordCountLineCountBody = (a: Char) => (charCountBody(a), lineCountBody(a))
     def wordCountLineCount(text: List[Char]) = {
@@ -34,6 +34,6 @@ object WordCount {
       (result._1.value, result._2.value)
     }
 
-    wordCountLineCount(text) assert_≟ (35, 2)
+    wordCountLineCount(text) assert_=== (35, 2)
   }
 }

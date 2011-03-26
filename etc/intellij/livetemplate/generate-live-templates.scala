@@ -55,12 +55,8 @@ def escape(xmlText: String): NodeSeq = {
 val imports = Template("isz", "import scalaz._\nimport Scalaz._\n", "imports for Scalaz", List())
 
 val templates = List(
-  method("<x>", "<×>", Param("b")),
-  method("<xx>", "<××>", Param("b"), Param("c")),
-  method("<xxx>", "<×××>", Param("b"), Param("c"), Param("d")),
-  method("<xxxx>", "<××××>", Param("b"), Param("c"), Param("d"), Param("d")),
   method("map", "∘", Param("f")),
-  method("mapmap", "∘∘", Param("f")),
+  method("map2", "∘∘", Param("f")),
   method("o", "∘", Param("f")),
   method("oo", "∘∘", Param("f")),
   method("|->", "↦", Param("f")),
@@ -74,8 +70,6 @@ val templates = List(
   method("forall", "∀", Param("f")),
   method("traversemonoid", "↣", Param("f")),
   method("join", "μ"),
-  method("cojoin", "υ"),
-  method("copure", "ε"),
   method("contramap", "∙", Param("f")),
   method("pure", "η"),
   function("kleisli", "☆", Param("f")),
@@ -83,9 +77,6 @@ val templates = List(
   method("dual", "σ"),
   method("equal", "≟", Param("a")),
   method("notequal", "≠", Param("a")),
-  method("<=", "≤", Param("a")),
-  method(">=", "≥", Param("a")),
-  method("<", "≨", Param("a")),
   method(">>>", "⋙", Param("a")),
   method("<<<", "⋘", Param("a")),
   function("undefined", "⊥"),

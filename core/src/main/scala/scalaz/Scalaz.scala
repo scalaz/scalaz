@@ -24,6 +24,7 @@ object Scalaz extends Actors
     with    Equals
     with    Extras
     with    FirstOptions
+    with    FirstLazyOptions
     with    Function0s
     with    Function1s
     with    Function2s
@@ -32,8 +33,10 @@ object Scalaz extends Actors
     with    InputStreams
     with    Ints
     with    LastOptions
+    with    LastLazyOptions
     with    LazyTuples
     with    Lists
+    with    Loggers
     with    Longs
     with    MAs
     with    MABs
@@ -43,6 +46,7 @@ object Scalaz extends Actors
     with    Names
     with    NonEmptyLists
     with    Options
+    with    OptionTs
     with    Orders
     with    Promises
     with    Reducers
@@ -58,6 +62,8 @@ object Scalaz extends Actors
     with    Trees
     with    Tuples
     with    TreeLocs
+    with    Writers
+    with    WriterTs
     with    Validations
     with    Zeros
     with    Zippers
@@ -82,7 +88,7 @@ object Scalaz extends Actors
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
-  def pure[F[_]:Pure] = new (Id ~> F) {
+  def pure[F[_] : Pure] = new (Id ~> F) {
     def apply[A](a: A) = implicitly[Pure[F]].pure(a)
   }
 }

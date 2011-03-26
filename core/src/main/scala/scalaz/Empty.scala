@@ -21,6 +21,10 @@ object Empty {
     def empty[A] = None
   }
 
+  implicit def LazyOptionEmpty: Empty[LazyOption] = new Empty[LazyOption] {
+    def empty[A] = LazyOption.none[A]
+  }
+
   implicit def EitherLeftEmpty[X: Zero]: Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
     def empty[A] = Right(∅).left
   }

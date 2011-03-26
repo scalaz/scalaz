@@ -74,6 +74,7 @@ trait Names {
   implicit def nameToMapEntry[A,X: Zero] = pureName[({type λ[α]=Entry[X, α]})#λ,A] _
   implicit def nameToNonEmptyList[A] = pureName[NonEmptyList,A] _
   implicit def nameToOption[A] = pureName[Option,A] _
+  implicit def nameToLazyOption[A] = pureName[LazyOption,A] _
   implicit def nameToPromise[A](implicit s: Strategy) = pureName[Promise,A] _
   implicit def nameToResponder[A] = pureName[Responder,A] _
   //implicit def nameToSet[A] = nameToTraversable[A, Set] _

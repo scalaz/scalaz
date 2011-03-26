@@ -12,18 +12,18 @@ object ExampleValidation {
 
   def run {
     // Constructing Validations
-    failure[String, Int]("error") assert_≟ "error".fail[Int]
-    success[String, Int](0) assert_≟ 0.success[String]
-    validation[String, Int](Left("error")) assert_≟ "error".fail[Int]
-    validation[String, Int](Right(0)) assert_≟ 0.success[String]
+    failure[String, Int]("error") assert_=== "error".fail[Int]
+    success[String, Int](0) assert_=== 0.success[String]
+    validation[String, Int](Left("error")) assert_=== "error".fail[Int]
+    validation[String, Int](Right(0)) assert_=== 0.success[String]
 
     // Extracting success or failure values
     val s: Validation[String, Int] = 1.success
     val f: Validation[String, Int] = "error".fail
-    s.toOption assert_≟ some(1)
-    s.fail.toOption assert_≟ none[String]
-    f.toOption assert_≟ none[Int]
-    f.fail.toOption assert_≟ some("error")
+    s.toOption assert_=== some(1)
+    s.fail.toOption assert_=== none[String]
+    f.toOption assert_=== none[Int]
+    f.fail.toOption assert_=== some("error")
 
     // It is recommended to use fold rather than pattern matching:
     val result: String = s.fold(e => "got error: " + e, s => "got success: " + s.toString)
@@ -34,7 +34,7 @@ object ExampleValidation {
     }
 
     // Validation#| is analogous to Option#getOrElse
-    (f | 1) assert_≟ 1
+    (f | 1) assert_=== 1
 
     // Validation is also an Applicative Functor, if the type of the error side of the validation is a Semigroup.
     // A number of computations are tried. If the all success, a function can combine them into a Success. If any
@@ -42,7 +42,7 @@ object ExampleValidation {
 
     // Combining validation errors using the String Semigroup.
     val k3 = (f <**> f){ _ + _ }
-    k3.fail.toOption assert_≟ some("errorerror")
+    k3.fail.toOption assert_=== some("errorerror")
 
     // The String semigroup wasn't particularly useful. A better candidate is NonEmptyList. Below, we use
     // Validation#liftFailNel to convert from Validation[String, Int] to Validation[NonEmptyList[String], Int].
@@ -51,7 +51,7 @@ object ExampleValidation {
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
     val k4 = (fNel <**> fNel){ _ + _ }
-    k4.fail.toOption assert_≟ some(nel("error", "error"))
+    k4.fail.toOption assert_=== some(nel("error", "error"))
 
     person
     parseNumbers
@@ -81,8 +81,8 @@ object ExampleValidation {
     case class Person(name: Name, age: Age)
     def mkPerson(name: String, age: Int) = (Name(name).liftFailNel ⊛ Age(age).liftFailNel){ (n, a) => Person(n, a)}
 
-    mkPerson("Bob", 31).isSuccess assert_≟ true
-    mkPerson("bob", 131).fail.toOption assert_≟ some(nel("Name must start with a capital letter", "Age must be in range"))
+    mkPerson("Bob", 31).isSuccess assert_=== true
+    mkPerson("bob", 131).fail.toOption assert_=== some(nel("Name must start with a capital letter", "Age must be in range"))
   }
 
   def parseNumbers {
@@ -97,17 +97,17 @@ object ExampleValidation {
     // Combine two validations with the Validation Applicative Functor, using only the success
     // values from the first.
     val x: ValidationNEL[String, Int] = only(Seq(1)).liftFailNel <* empty(Seq.empty).liftFailNel
-    x assert_≟ 1.successNel[String]
+    x assert_=== 1.successNel[String]
 
     val badInput = """42
             |aasf
             |314
             |xxx""".stripMargin
-    parse(badInput) assert_≟ nel("java.lang.NumberFormatException: For input string: \"aasf\"",
+    parse(badInput) assert_=== nel("java.lang.NumberFormatException: For input string: \"aasf\"",
       "java.lang.NumberFormatException: For input string: \"xxx\"").fail[List[Int]]
     val validInput = """42
             |314""".stripMargin
-    parse(validInput) assert_≟ List(42, 314).successNel[String]
+    parse(validInput) assert_=== List(42, 314).successNel[String]
   }
 
   /**
