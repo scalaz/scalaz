@@ -1,6 +1,6 @@
-package scalaz.effects
+package scalaz
+package effects
 
-import scalaz._
 import Scalaz._
 
 trait Close[H] {
