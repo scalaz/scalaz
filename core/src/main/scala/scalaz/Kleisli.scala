@@ -30,6 +30,9 @@ trait Kleislis {
 
   implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
 
+  /** Pure Kleisli arrow */
+  def ask[M[_]: Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
+
   def kleisliPure[M[_], R](implicit m: Pure[M])
     : Pure[({type λ[x]=Kleisli[M, R, x]})#λ] =
   new Pure[({type λ[x]=Kleisli[M, R, x]})#λ] {

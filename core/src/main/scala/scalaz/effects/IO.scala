@@ -85,6 +85,7 @@ sealed trait IO[A] {
 class IORef[A](val value: STRef[RealWorld, A]) extends NewType[STRef[RealWorld, A]] {
   def read: IO[A] = stToIO(value.read)
   def write(a: => A): IO[Unit] = stToIO(value.write(a) map (_ => ()))
+  def mod(f: A => A): IO[Unit] = stToIO(value.mod(f)) map (_ => ())
 }
 
 object IO {
