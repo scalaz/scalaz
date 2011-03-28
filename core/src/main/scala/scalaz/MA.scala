@@ -346,6 +346,9 @@ trait MAs extends MAsLow {
 
   implicit def StateMA[S, A](s: State[S, A]) = ma[({type λ[α]=State[S, α]})#λ, A](s)
 
+  import effects._
+  implicit def STMA[S, A](s: ST[S, A]) = ma[({type λ[α]=ST[S, α]})#λ, A](s)
+
   implicit def Tuple2MA[R, A](a: (R, A)) = ma[({type λ[α]=(R, α)})#λ, A](a)
 
   implicit def Tuple3MA[R, S, A](a: (R, S, A)) = ma[({type λ[α]=(R, S, α)})#λ, A](a)

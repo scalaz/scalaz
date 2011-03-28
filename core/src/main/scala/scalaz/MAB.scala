@@ -1,5 +1,6 @@
 package scalaz
 
+
 sealed trait MAB[M[_, _], A, B] extends PimpedType[M[A, B]] with MA[({type λ[X]=M[A,X]})#λ, B] {
   def asMAB: MAB[M, A, B] = this
 
