@@ -4,8 +4,7 @@ package scalaz.example
 object ExampleST {
   import scalaz._
   import Scalaz._
-  import ST._
-  import Forall._
+  import effects._
 
   // Creates a new mutable reference and mutates it
   def e1[A] = for {
