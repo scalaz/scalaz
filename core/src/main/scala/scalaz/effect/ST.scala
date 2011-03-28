@@ -7,7 +7,7 @@ private[effects] case class World[A]()
 sealed trait RealWorld
 
 /** Mutable variable in state thread S containing a value of type A. */
-case class STRef[S, A](a: A) {
+class STRef[S, A](a: A) {
   private var value: A = a
 
   /** Reads the value pointed at by this reference. */
@@ -17,7 +17,7 @@ case class STRef[S, A](a: A) {
   def mod[B](f: A => A): ST[S, STRef[S, A]] = ST((s: World[S]) => {value = f(value); (s, this)})
 
   /** Associates this reference with the given value. */
-  def write(a: A): ST[S, STRef[S, A]] = ST((s: World[S]) => {value = a; (s, this)})
+  def write(a: => A): ST[S, STRef[S, A]] = ST((s: World[S]) => {value = a; (s, this)})
 
   /** Swap the value at this reference with the value at another. */
   def swap(that: STRef[S, A]): ST[S, Unit] = for {
@@ -29,7 +29,7 @@ case class STRef[S, A](a: A) {
 }
 
 /** Mutable array in state thread S containing values of type A. */
-case class STArray[S, A:Manifest](size: Int, z: A) {
+class STArray[S, A:Manifest](val size: Int, z: A) {
   private val value: Array[A] = Array.fill(size)(z)
 
   /** Reads the value at the given index. */
@@ -55,7 +55,6 @@ case class STArray[S, A:Manifest](size: Int, z: A) {
     x <- read(i)
     _ <- write(i, f(x, v))
   } yield ()
-
 }
 
 /** 

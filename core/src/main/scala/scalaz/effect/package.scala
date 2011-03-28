@@ -15,11 +15,11 @@ package object effects {
 
   /** Allocates a fresh mutable reference. */
   def newVar[S, A](a: A): ST[S, STRef[S, A]] =
-    returnST(STRef[S, A](a))
+    returnST(new STRef[S, A](a))
 
   /** Allocates a fresh mutable array. */
   def newArr[S, A:Manifest](size: Int, z: A): ST[S, STArray[S, A]] =
-    returnST(STArray[S, A](size, z))
+    returnST(new STArray[S, A](size, z))
 
   /** Allows the result of a state transformer computation to be used lazily inside the computation. */
   def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = ST(s => {
@@ -55,21 +55,24 @@ package object effects {
   implicit def stRefEqual[S, A]: Equal[STRef[S, A]] = new Equal[STRef[S, A]] {
     def equal(s1: STRef[S, A], s2: STRef[S, A]): Boolean = s1 == s2
   }
+
+  // Implicit conversions between IO and ST
+  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(st(_))
+  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(io(_))
  
-  type IO[A] = ST[RealWorld, A]
-
-  /**
-   * Unsafe operation. Runs I/O and performs side-effects.
-   * Do not call until the end of the universe.
-   */
-  def runIO[A](io: IO[A]): A = io(realWorld)._2
-
   // Standard I/O
-  def getChar: IO[Char] = ST(rw => (rw, readChar))
-  def putChar(c: Char): IO[Unit] = ST(rw => (rw, { print(c); () }))
-  def putStr(s: String): IO[Unit] = ST(rw => (rw, { print(s); () }))
-  def putStrLn(s: String): IO[Unit] = ST((rw => (rw, { println(s); () })))
-  def readLn: IO[String] = ST(rw => (rw, readLine))
-  def print[A](a: A): IO[Unit] = ST(rw => (rw, { Predef.print(a); () }))
+  def getChar: IO[Char] = IO(rw => (rw, readChar))
+  def putChar(c: Char): IO[Unit] = IO(rw => (rw, { print(c); () }))
+  def putStr(s: String): IO[Unit] = IO(rw => (rw, { print(s); () }))
+  def putStrLn(s: String): IO[Unit] = IO((rw => (rw, { println(s); () })))
+  def readLn: IO[String] = IO(rw => (rw, readLine))
+  def print[A](a: A): IO[Unit] = IO(rw => (rw, { Predef.print(a); () }))
+
+  // Mutable variables in the IO monad
+  def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => new IORef(v).pure[IO])
+
+  /** Throw the given error in the IO monad. */
+  def throwIO[A](e: Throwable): IO[A] = IO(rw => (rw, throw e))
+
 }
 
