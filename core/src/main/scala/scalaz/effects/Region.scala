@@ -74,38 +74,4 @@ object RegionT {
   implicit def regionMonad[S, M[_]:Monad]: Monad[({type λ[α] = RegionT[S, M, α]})#λ] =
     Monad.monad[({type λ[α] = RegionT[S, M, α]})#λ](regionTBind, regionTPure)
 
-  /**
-   * Reguster a finalizer in the current region. When the region terminates,
-   * all registered finalizers will be performed if they're not duplicated to a parent region.
-   */
-  def onExit[S, P[_]: MonadIO](finalizer: IO[Unit]):
-    RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
-      RegionT(kleisli(hsIORef => (for {
-        refCntIORef <- newIORef(1)
-        val h = RefCountedFinalizer(finalizer, refCntIORef)
-        _ <- hsIORef.mod(h :: _)
-      } yield FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
-
-
-  /**
-   * Execute a region inside its parent region P. All resources which have been opened in the given
-   * region and which haven't been duplicated using "dup", will be closed on exit from this function
-   * whether by normal termination or by raising an exception.
-   * Also all resources which have been duplicated to this region from a child region are closed
-   * on exit if they haven't been duplicated themselves.
-   * The Forall quantifier prevents resources from being returned by this function.
-   */
-  def runRegionT[P[_]:MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
-    def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
-      hs <- hsIORef.read
-      _ <- hs.traverse_ {
-        case RefCountedFinalizer(finalizer, refCntIORef) => for {
-          refCnt <- refCntIORef.mod(_ - 1)
-          _ <- if (refCnt == 0) finalizer else ().pure[IO]
-        } yield ()
-      }
-    } yield ()
-    newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value(s))
-  }
-
 }
