@@ -74,5 +74,14 @@ package object effects {
   /** Throw the given error in the IO monad. */
   def throwIO[A](e: Throwable): IO[A] = IO(rw => (rw, throw e))
 
+  type RunInBase[M[_], Base[_]] = Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
+
+  def idLiftControl[M[_]: Monad, A](f: RunInBase[M, M] => M[A]): M[A] = 
+    f(new RunInBase[M, M] { def apply[B] = (x: M[B]) => x.pure[M] })
+
+  def controlIO[M[_], A](f: RunInBase[M, IO] => IO[M[A]])(implicit m: MonadControlIO[M]): M[A] = {
+    implicit val monad: Monad[M] = m.value
+    m.liftControlIO(f).join
+  }
 }
 

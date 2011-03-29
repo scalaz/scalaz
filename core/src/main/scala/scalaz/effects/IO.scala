@@ -10,14 +10,18 @@ sealed trait IO[A] {
    * Do not call until the end of the universe.
    */
   def unsafePerformIO: A = apply(realWorld)._2
+
   def flatMap[B](f: A => IO[B]): IO[B] = IO(rw => {
     val (nw, a) = apply(rw)
     f(a)(nw)
   })
+
   def map[B](f: A => B): IO[B] = IO(rw => {
     val (nw, a) = apply(rw)
     (nw, f(a))
   })
+
+  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] = m.liftIO(this)  
   
   /** Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] = 
@@ -76,6 +80,9 @@ sealed trait IO[A] {
     a <- this
     r <- during(a) onException after(a)
   } yield r
+
+  def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadControlIO[M]): M[B] =
+    controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 
 /** 
@@ -85,7 +92,7 @@ sealed trait IO[A] {
 class IORef[A](val value: STRef[RealWorld, A]) extends NewType[STRef[RealWorld, A]] {
   def read: IO[A] = stToIO(value.read)
   def write(a: => A): IO[Unit] = stToIO(value.write(a) map (_ => ()))
-  def mod(f: A => A): IO[Unit] = stToIO(value.mod(f)) map (_ => ())
+  def mod(f: A => A): IO[A] = stToIO(value.mod(f) >>= (_.read))
 }
 
 object IO {
@@ -93,8 +100,10 @@ object IO {
     private[effects] def apply(rw: World[RealWorld]) = f(rw)
   }
 
-  implicit val ioMonad: Monad[IO] = new Monad[IO] {
+  implicit val ioPure: Pure[IO] = new Pure[IO] {
     def pure[A](a: => A) = IO(rw => (rw, a))
+  }
+  implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f
   }
 

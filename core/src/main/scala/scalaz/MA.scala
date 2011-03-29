@@ -271,7 +271,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def fpure[N[_]](implicit f: Functor[M], p: Pure[N]): M[N[A]] = ∘(a => p.pure(a))
 
   def foldReduce[B](implicit f: Foldable[M], r: Reducer[A, B]): B = foldMap(_.unit[B])(f, r)
-  
+
   import FingerTree._
   def &:(a: A) = OnL[M,A](a, value)
   
