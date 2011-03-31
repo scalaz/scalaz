@@ -28,12 +28,6 @@ package object effects {
     ans
   })
 
-  /** A monoid for sequencing ST effects. */
-  implicit def stMonoid[S]: Monoid[ST[S, Unit]] = new Monoid[ST[S, Unit]] {
-    val zero: ST[S, Unit] = returnST(())
-    def append(x: ST[S, Unit], y: => ST[S, Unit]) = x >>=| y
-  }
-
   /** Accumulates an integer-associated list into an immutable array. */
   def accumArray[F[_]:Foldable, A: Manifest, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)]): ImmutableArray[A] = { 
     type STA[S] = ST[S, ImmutableArray[A]]
@@ -45,6 +39,11 @@ package object effects {
       } yield frozen
     })
   }
+
+  implicit def stMonoid[S, A: Monoid]: Monoid[ST[S, A]] = Monoid.liftMonoid[({ type λ[A] = ST[S, A] })#λ, A]
+  implicit def ioMonoid[A: Monoid]: Monoid[IO[A]] = Monoid.liftMonoid
+
+  implicit def stApplicative[S]: Applicative[({ type λ[A] = ST[S, A] })#λ] = stMonad[S]
 
   implicit def stMonad[S]: Monad[({ type λ[A] = ST[S, A] })#λ] = new Monad[({ type λ[A] = ST[S, A] })#λ] {
     def pure[A](a: => A) = returnST(a)

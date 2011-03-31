@@ -16,13 +16,15 @@ package scalaz
  */
 trait Applicative[Z[_]] extends Pointed[Z] with Apply[Z] {
   override def fmap[A, B](fa: Z[A], f: A => B): Z[B] = this(pure(f), fa)
+  override def apply[A, B](f: Z[A => B], a: Z[A]): Z[B] = liftA2(f, a, (_:A => B)(_: A))
+  def liftA2[A, B, C](a: Z[A], b: Z[B], f: (A, B) => C): Z[C] = apply(fmap(a, f.curried), b)
 }
 
 trait ApplicativeLow {
   implicit def applicative[Z[_]](implicit p: Pure[Z], a: Apply[Z]): Applicative[Z] = new Applicative[Z] {
       def pure[A](a: => A) = p.pure(a)
 
-      def apply[A, B](f: Z[A => B], x: Z[A]) = a(f, x)
+      override def apply[A, B](f: Z[A => B], x: Z[A]) = a(f, x)
     }
 }
 

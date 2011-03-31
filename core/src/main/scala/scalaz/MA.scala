@@ -79,11 +79,14 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
 
+  /** Alias for >>=| */
+  def >|>[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
+
   def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = >>=(m)
 
-  def forever[B](implicit b: Bind[M]): M[B] = value ∗| value.forever
+  def forever[B](implicit b: Bind[M]): M[B] = value >|> value.forever
 
   def <+>(z: => M[A])(implicit p: Plus[M]): M[A] = p.plus(value, z)
 

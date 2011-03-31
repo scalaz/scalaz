@@ -25,4 +25,10 @@ object Monoid extends MonoidLow {
   import Zero._
 
   implicit def EitherLeftMonoid[A, B](implicit bz: Zero[B]) = monoid[Either.LeftProjection[A, B]](EitherLeftSemigroup, EitherLeftZero[A, B](bz))
+
+  /** A monoid for sequencing Applicative effects. */
+  def liftMonoid[F[_], M](implicit m: Monoid[M], a: Applicative[F]): Monoid[F[M]] = new Monoid[F[M]] {
+    val zero: F[M] = a.pure(m.zero)
+    def append(x: F[M], y: => F[M]): F[M] = a.liftA2(x, y, (m1: M, m2: M) => m.append(m1, m2))
+  }
 }
