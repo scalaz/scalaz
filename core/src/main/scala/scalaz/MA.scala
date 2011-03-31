@@ -263,6 +263,12 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
     if (n <= 0) ∅[N[A]].η[M]
     else value ∗ (a => replicateM[N](n - 1) ∘ (a +>: _) )
 
+  def replicateM_(n: Int)(implicit m: Monad[M]): M[Unit] = {
+    def replicateM__(a: M[Unit], i: Int): M[Unit] =
+      if (i > 0) replicateM__(value >|> a, i - 1) else a
+    replicateM__(().pure[M], n)
+  }
+
   def zipWithA[F[_], B, C](b: M[B])(f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
     (b <*> (a.fmap(value, f.curried))).sequence[F, C]
 
