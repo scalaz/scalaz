@@ -65,7 +65,7 @@ package object effects {
   def putStr(s: String): IO[Unit] = IO(rw => (rw, { print(s); () }))
   def putStrLn(s: String): IO[Unit] = IO((rw => (rw, { println(s); () })))
   def readLn: IO[String] = IO(rw => (rw, readLine))
-  def print[A](a: A): IO[Unit] = IO(rw => (rw, { Predef.print(a); () }))
+  def putOut[A](a: A): IO[Unit] = IO(rw => (rw, { print(a); () }))
 
   // Mutable variables in the IO monad
   def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => new IORef(v).pure[IO])
