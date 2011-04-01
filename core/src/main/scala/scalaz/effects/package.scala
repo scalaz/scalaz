@@ -88,12 +88,12 @@ package object effects {
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
   def onExit[S, P[_]: MonadIO](finalizer: IO[Unit]):
-    RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
-      RegionT(kleisli(hsIORef => (for {
+    Region[S, P, FinalizerHandle[({type λ[α] = Region[S, P, α]})#λ]] =
+      Region(kleisli(hsIORef => (for {
         refCntIORef <- newIORef(1)
         val h = RefCountedFinalizer(finalizer, refCntIORef)
         _ <- hsIORef.mod(h :: _)
-      } yield FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
+      } yield FinalizerHandle[({type λ[α] = Region[S, P, α]})#λ](h)).liftIO[P]))
 
 
   /**
@@ -104,7 +104,7 @@ package object effects {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegionT[P[_]:MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
+  def runRegion[P[_]:MonadControlIO, A](r: Forall[({type λ[S] = Region[S, P, A]})#λ]): P[A] = {
     def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.traverse_ {
@@ -118,7 +118,23 @@ package object effects {
   }
 
   /** Duplicates a handle to its parent region. */
-  def dup[H[_[_]]: Dup, PP[_]:MonadIO, CS, PS](h: H[({type λ[α] = RegionT[CS, ({type λ[β] = RegionT[PS, PP, β]})#λ, α]})#λ]):
-    RegionT[CS, ({type λ[α] = RegionT[PS, PP, α]})#λ, H[({type λ[β] = RegionT[PS, PP, β]})#λ]] = implicitly[Dup[H]].dup.apply(h)
+  def dup[H[_[_]]: Dup, PP[_]:MonadIO, CS, PS](h: H[({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ]):
+    Region[CS, ({type λ[α] = Region[PS, PP, α]})#λ, H[({type λ[β] = Region[PS, PP, β]})#λ]] = implicitly[Dup[H]].dup.apply(h)
+
+  // Handles
+  def mkIOMode[M](implicit m: MkIOMode[M]): IOMode[M] = m.mkIOMode
+
+  // Root region handles (these are always open)
+  lazy val stdin: Handle[ReadMode, RootRegion] = handleFromInputStream(System.in)
+  lazy val stdout: Handle[WriteMode, RootRegion] = handleFromOutputStream(System.out)
+  lazy val stderr: Handle[WriteMode, RootRegion] = handleFromOutputStream(System.err)
+
+  /** Open a file in a region. The file is guaranteed to be closed when the region exits. */
+  def openFile[S, M, PR: MonadControlIO](ar: File, ioMode: IOMode[M]):
+    Region[S, PR, Handle[IOMode, Region[S, PR]]] =
+      for {
+        h <- filePath.open(ioMode).liftIO
+        ch <- onExit(h.close)
+      } yield h
 }
 

@@ -11,7 +11,7 @@ package effects
  * to return an opened resorce from the region, and no I/O with closed
  * resources is possible.
  */
-case class RegionT[S, P[_], A](value: Kleisli[P, IORef[List[RefCountedFinalizer]], A])
+case class Region[S, P[_], A](value: Kleisli[P, IORef[List[RefCountedFinalizer]], A])
   extends NewType[Kleisli[P, IORef[List[RefCountedFinalizer]], A]]
 
 /**
@@ -30,48 +30,71 @@ case class FinalizerHandle[R[_]](finalizer: RefCountedFinalizer)
 /** Duplicate a handle in the parent region. */
 trait Dup[H[_[_]]] {
   def dup[PP[_]:MonadIO, CS, PS]:
-    H[({type λ[α] = RegionT[CS, ({type λ[β] = RegionT[PS, PP, β]})#λ, α]})#λ] =>
-    RegionT[CS, ({type λ[α] = RegionT[PS, PP, α]})#λ, H[({type λ[β] = RegionT[PS, PP, β]})#λ]]
+    H[({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ] =>
+    Region[CS, ({type λ[α] = Region[PS, PP, α]})#λ, H[({type λ[β] = Region[PS, PP, β]})#λ]]
 }
 
 object Dup {
   import Scalaz._
   implicit val finalizerHandleDup: Dup[FinalizerHandle] = new Dup[FinalizerHandle] {
     def dup[PP[_]: MonadIO, CS, PS]:
-      FinalizerHandle[({type λ[α] = RegionT[CS, ({type λ[β] = RegionT[PS, PP, β]})#λ, α]})#λ] =>
-      RegionT[CS, ({type λ[α] = RegionT[PS, PP, α]})#λ, FinalizerHandle[({type λ[β] = RegionT[PS, PP, β]})#λ]] = h => 
-        RegionT[CS, ({type λ[α] = RegionT[PS, PP, α]})#λ, FinalizerHandle[({type λ[β] = RegionT[PS, PP, β]})#λ]](
-          kleisli[({type λ[α] = RegionT[PS, PP, α]})#λ,
+      FinalizerHandle[({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ] =>
+      Region[CS, ({type λ[α] = Region[PS, PP, α]})#λ, FinalizerHandle[({type λ[β] = Region[PS, PP, β]})#λ]] = h => 
+        Region[CS, ({type λ[α] = Region[PS, PP, α]})#λ, FinalizerHandle[({type λ[β] = Region[PS, PP, β]})#λ]](
+          kleisli[({type λ[α] = Region[PS, PP, α]})#λ,
                   IORef[List[RefCountedFinalizer]],
-                  FinalizerHandle[({type λ[β] = RegionT[PS, PP, β]})#λ]](hsIORef =>
-                    copy[PS, PP, ({type λ[α] = RegionT[CS, ({type λ[β] = RegionT[PS, PP, β]})#λ, α]})#λ](h)))
+                  FinalizerHandle[({type λ[β] = Region[PS, PP, β]})#λ]](hsIORef =>
+                    copy[PS, PP, ({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ](h)))
   }
 
   def copy[S, P[_]: MonadIO, R[_]](h: FinalizerHandle[R]):
-    RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] = h match {
+    Region[S, P, FinalizerHandle[({type λ[α] = Region[S, P, α]})#λ]] = h match {
       case FinalizerHandle(h@RefCountedFinalizer(_, refCntIORef)) => 
-        RegionT(kleisli(hsIORef => (for {
+        Region(kleisli(hsIORef => (for {
           _ <- refCntIORef.mod(_ + 1)
           _ <- hsIORef.mod(h :: _)
-        } yield FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
+        } yield FinalizerHandle[({type λ[α] = Region[S, P, α]})#λ](h)).liftIO[P]))
     }
 }
 
-object RegionT {
+sealed trait AncestorRegion[P[_], C[_]]
+sealed trait RootRegion[A]
+trait LocalRegion[SL, S, A]
+trait Local[S]
+
+object Region {
   import Scalaz._
 
-  implicit def regionTBind[S, M[_]:Bind]: Bind[({type λ[α] = RegionT[S, M, α]})#λ] =
-    new Bind[({type λ[α] = RegionT[S, M, α]})#λ] {
-      def bind[A, B](m: RegionT[S, M, A], f: A => RegionT[S, M, B]): RegionT[S, M, B] = 
-        RegionT(kleisli(s => m.value(s) >>= (a => f(a).value(s))))
+  implicit def regionBind[S, M[_]:Bind]: Bind[({type λ[α] = Region[S, M, α]})#λ] =
+    new Bind[({type λ[α] = Region[S, M, α]})#λ] {
+      def bind[A, B](m: Region[S, M, A], f: A => Region[S, M, B]): Region[S, M, B] = 
+        Region(kleisli(s => m.value(s) >>= (a => f(a).value(s))))
     }
 
-  implicit def regionTPure[S, M[_]:Pure]: Pure[({type λ[α] = RegionT[S, M, α]})#λ] =
-    new Pure[({type λ[α] = RegionT[S, M, α]})#λ] {
-      def pure[A](a: => A): RegionT[S, M, A] = RegionT(kleisli(s => a.pure[M]))
+  implicit def regionPure[S, M[_]:Pure]: Pure[({type λ[α] = Region[S, M, α]})#λ] =
+    new Pure[({type λ[α] = Region[S, M, α]})#λ] {
+      def pure[A](a: => A): Region[S, M, A] = Region(kleisli(s => a.pure[M]))
     }
 
-  implicit def regionMonad[S, M[_]:Monad]: Monad[({type λ[α] = RegionT[S, M, α]})#λ] =
-    Monad.monad[({type λ[α] = RegionT[S, M, α]})#λ](regionTBind, regionTPure)
+  implicit def regionMonad[S, M[_]:Monad]: Monad[({type λ[α] = Region[S, M, α]})#λ] =
+    Monad.monad[({type λ[α] = Region[S, M, α]})#λ](regionTBind, regionTPure)
+
+  implicit val reflexivity[S, M[_]]: AncestorRegion[({type λ[α] = Region[S, M, α]})#λ, ({type λ[α] = Region[S, M, α]})#λ] =
+    new AncestorRegion[({type λ[α] = Region[S, M, α]})#λ, ({type λ[α] = Region[S, M, α]})#λ] {}
+
+  implicit val transitivity[S, P[_], C[_]](implicit witness: AncestorRegion[P, C]):
+    AncestorRegion[P, ({type λ[α] = Region[S, M, α]})#λ] = new AncestorRegion[P, ({type λ[α] = Region[S, M, α]})#λ] {}
+
+  implicit val initiality[S, M[_]]: AncestorRegion[RootRegion, Region[S, M]] =
+    new AncestorRegion[RootRegion, Region[S, M]]
+
+  implicit val localAncestor[SF, S, M[_]]: AncestorRegion[LocalRegion[SF, S], ({type λ[α] = Region[Local[S], M, α]})#λ] =
+    new AncestorRegion[LocalRegion[SF, S], ({type λ[α] = Region[Local[S], M, α]})#λ] {}
+
+  implicit val localToRegion[S, M[_]]: AncestorRegion[({type λ[α] = Region[S, M, α]})#λ, ({type λ[α] = Region[Local[S], M, α]})#λ] =
+    new AncestorRegion[({type λ[α] = Region[S, M, α]})#λ, ({type λ[α] = Region[Local[S], M, α]})#λ] {}
+
+  implicit val regionToLocal[S, M[_]]: AncestorRegion[({type λ[α] = Region[Local[S], M, α]})#λ, ({type λ[α] = Region[S, M, α]})#λ] =
+    new AncestorRegion[({type λ[α] = Region[Local[S], M, α]})#λ, ({type λ[α] = Region[S, M, α]})#λ] {}
 
 }
