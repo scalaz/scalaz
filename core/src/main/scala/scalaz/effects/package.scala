@@ -1,5 +1,7 @@
 package scalaz
 
+import java.io._
+
 package object effects {
 
   import Scalaz._
@@ -78,16 +80,19 @@ package object effects {
   def idLiftControl[M[_]: Monad, A](f: RunInBase[M, M] => M[A]): M[A] = 
     f(new RunInBase[M, M] { def apply[B] = (x: M[B]) => x.pure[M] })
 
-  def controlIO[M[_], A](f: RunInBase[M, IO] => IO[M[A]])(implicit m: MonadControlIO[M]): M[A] = {
-    implicit val monad: Monad[M] = m.value
+  def liftLiftControlBase[T[_[_],_], M[_], B[_], A](lftCtrlBase: (RunInBase[M, B] => B[A]) => M[A],
+                                                     f: RunInBase[({type λ[x] = T[M, x]})#λ, B] => B[A])
+    (implicit mtc: MonadTransControl[T], m: Monad[M], mt: Monad[({type λ[x] = T[M, x]})#λ], base: Monad[B]): M[A] =
+      mtc.liftControl(run1 => lftCtrlBase(runInBase => f(x => runInBase(run1(x)).map(y => mtc.lift(y).join))))
+
+  def controlIO[M[_], A](f: RunInBase[M, IO] => IO[M[A]])(implicit m: MonadIO[M], mo: Monad[M]): M[A] = 
     m.liftControlIO(f).join
-  }
 
   /**
    * Register a finalizer in the current region. When the region terminates,
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
-  def onExit[S, P[_]: MonadIO](finalizer: IO[Unit]):
+  def onExit[S, P[_]: MonadIO: Monad](finalizer: IO[Unit]):
     Region[S, P, FinalizerHandle[({type λ[α] = Region[S, P, α]})#λ]] =
       Region(kleisli(hsIORef => (for {
         refCntIORef <- newIORef(1)
@@ -104,7 +109,7 @@ package object effects {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegion[P[_]:MonadControlIO, A](r: Forall[({type λ[S] = Region[S, P, A]})#λ]): P[A] = {
+  def runRegion[P[_]:MonadIO: Monad, A](r: Forall[({type λ[S] = Region[S, P, A]})#λ]): P[A] = {
     def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.traverse_ {
@@ -118,23 +123,23 @@ package object effects {
   }
 
   /** Duplicates a handle to its parent region. */
-  def dup[H[_[_]]: Dup, PP[_]:MonadIO, CS, PS](h: H[({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ]):
+  def dup[H[_[_]]: Dup, PP[_]:MonadIO:Monad, CS, PS](h: H[({type λ[α] = Region[CS, ({type λ[β] = Region[PS, PP, β]})#λ, α]})#λ]):
     Region[CS, ({type λ[α] = Region[PS, PP, α]})#λ, H[({type λ[β] = Region[PS, PP, β]})#λ]] = implicitly[Dup[H]].dup.apply(h)
 
   // Handles
   def mkIOMode[M](implicit m: MkIOMode[M]): IOMode[M] = m.mkIOMode
 
   // Root region handles (these are always open)
-  lazy val stdin: Handle[ReadMode, RootRegion] = handleFromInputStream(System.in)
-  lazy val stdout: Handle[WriteMode, RootRegion] = handleFromOutputStream(System.out)
-  lazy val stderr: Handle[WriteMode, RootRegion] = handleFromOutputStream(System.err)
+  lazy val stdin: Handle[RMode, RootRegion] = Handle.wrapInputStream[RootRegion](System.in)
+  lazy val stdout: Handle[WMode, RootRegion] = Handle.wrapOutputStream[RootRegion](System.out)
+  lazy val stderr: Handle[WMode, RootRegion] = Handle.wrapOutputStream[RootRegion](System.err)
 
   /** Open a file in a region. The file is guaranteed to be closed when the region exits. */
-  def openFile[S, M, PR: MonadControlIO](ar: File, ioMode: IOMode[M]):
-    Region[S, PR, Handle[IOMode, Region[S, PR]]] =
+  def openFile[S, M, PR[_]](f: File, ioMode: IOMode[M])(implicit cmio: MonadIO[PR], m: Monad[PR]):
+    Region[S, PR, Handle[M, ({type λ[α] = Region[S, PR, α]})#λ]] =
       for {
-        h <- filePath.open(ioMode).liftIO
-        ch <- onExit(h.close)
+        h <- ioMode.open(f).liftIO(MonadIO.regionTMonadIO[PR, S](cmio, m))
+        ch <- onExit[S, PR](h.close)(cmio, m)
       } yield h
 }
 
