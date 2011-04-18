@@ -146,6 +146,9 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def stream(implicit r: Foldable[M]): Stream[A] = foldr(Stream.empty[A])(Stream.cons(_, _))
 
+  def asStream[B](f: Stream[A] => Stream[B])(implicit r: Foldable[M], m: Monoid[M[B]], p: Pure[M]): M[B] =
+    f(stream).foldr(m.zero)(p.pure(_) |+| _)
+
   def !!(n: Int)(implicit r: Foldable[M]): A = stream(r)(n)
 
   def !(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
