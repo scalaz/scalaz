@@ -12,6 +12,8 @@ abstract class MonadIO[M[_]] {
 abstract class MonadTransControl[T[_[_],_]] {
   import MonadTransControl._
   def liftControl[M[_]:Monad, A](f: Run[T] => M[A]): T[M, A]
+  def lift[M[_]:Monad, A](m: M[A]): T[M, A]
+  def join[M[_]:Monad, A](m: T[M, T[M, A]]): T[M, A]
 }
 
 object MonadTransControl {
@@ -38,6 +40,7 @@ object MonadTransControl {
               }
           })
         )
+      def lift[M[_], A](m: M[A]): Kleisli[M, R, A] = kleisli(_ => m)
     }
 }
 
@@ -52,7 +55,8 @@ object MonadIO {
     MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] = 
       new MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] {
         def liftIO[A](a: IO[A]): Kleisli[M, R, A] = kleisli(r => mio.liftIO(a))
-        def liftControlIO[A](f: RunInBase[({type λ[x] = Kleisli[M, R, x]})#λ, IO] => IO[A]): Kleisli[M, R, A] = liftLiftControlBase(mio.liftControlIO)(f)
+        def liftControlIO[A](f: RunInBase[({type λ[x] = Kleisli[M, R, x]})#λ, IO] => IO[A]): Kleisli[M, R, A] =
+          liftLiftControlBase[M, IO, R, A](mio.liftControlIO, f)
       }
 
   implicit def regionMonadIO[M[_], S](implicit mio: MonadIO[M], m: Monad[M]):

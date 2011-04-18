@@ -80,10 +80,15 @@ package object effects {
   def idLiftControl[M[_]: Monad, A](f: RunInBase[M, M] => M[A]): M[A] = 
     f(new RunInBase[M, M] { def apply[B] = (x: M[B]) => x.pure[M] })
 
-  def liftLiftControlBase[T[_[_],_], M[_], B[_], A](lftCtrlBase: (RunInBase[M, B] => B[A]) => M[A],
-                                                     f: RunInBase[({type λ[x] = T[M, x]})#λ, B] => B[A])
-    (implicit mtc: MonadTransControl[T], m: Monad[M], mt: Monad[({type λ[x] = T[M, x]})#λ], base: Monad[B]): M[A] =
-      mtc.liftControl(run1 => lftCtrlBase(runInBase => f(x => runInBase(run1(x)).map(y => mtc.lift(y).join))))
+  def liftLiftControlBase[M[_], B[_], R, A](lftCtrlBase: (RunInBase[M, B] => B[A]) => M[A],
+                                            f: RunInBase[({type λ[x] = Kleisli[M, R, x]})#λ, B] => B[A])
+                                           (implicit m: Monad[M], base: Monad[B],
+                                            mb: Monad[({type λ[x] = Kleisli[B, R, x]})#λ]): Kleisli[M, R, A] =
+      readerMonadTransControl[R].liftControl(run1 =>
+        lftCtrlBase(runInBase => f(new RunInBase[({type λ[x] = Kleisli[M, R, x]})#λ, B] {
+          def apply[C] = x => runInBase.apply.apply(run1.apply[M].apply[B].apply.apply(x)).map(y =>
+            kleisli((_: R) => y).join)
+        })))
 
   def controlIO[M[_], A](f: RunInBase[M, IO] => IO[M[A]])(implicit m: MonadIO[M], mo: Monad[M]): M[A] = 
     m.liftControlIO(f).join
@@ -138,7 +143,7 @@ package object effects {
   def openFile[S, M, PR[_]](f: File, ioMode: IOMode[M])(implicit cmio: MonadIO[PR], m: Monad[PR]):
     Region[S, PR, Handle[M, ({type λ[α] = Region[S, PR, α]})#λ]] =
       for {
-        h <- ioMode.open(f).liftIO(MonadIO.regionTMonadIO[PR, S](cmio, m))
+        h <- ioMode.open(f).liftIO(MonadIO.regionMonadIO[PR, S](cmio, m))
         ch <- onExit[S, PR](h.close)(cmio, m)
       } yield h
 }
