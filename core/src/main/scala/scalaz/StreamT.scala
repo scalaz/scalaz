@@ -43,7 +43,7 @@ sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
   )
   def takeWhile(p: A => Boolean)(implicit M: Functor[M]): StreamT[M,A] = StreamT[M,A](
     step map { 
-      case Yield(a,as) => if (!p(a)) Skip(as takeWhile p) else Yield(a,as)
+      case Yield(a,as) => if (!p(a)) Done else Yield(a,as takeWhile p)
       case Skip(as) => Skip(as takeWhile p)
       case Done => Done
     }
