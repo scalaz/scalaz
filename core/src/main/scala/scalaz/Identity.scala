@@ -70,11 +70,11 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
     case Some((b, a)) => b.η ⊹ a.unfold(f)
   }
 
-  def replicate[M[_]](n: Int)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
+  def replicate[M[_]](n: Int, f: A => A = a => a)(implicit p: Pure[M], m: Monoid[M[A]]): M[A] = {
     @tailrec
-    def replicate0(accum: M[A], n: Int): M[A] = if (n > 0) replicate0(accum ⊹ value.η, n - 1) else accum
+    def replicate0(accum: M[A], n: Int, a: A): M[A] = if (n > 0) replicate0(accum ⊹ a.η, n - 1, f(a)) else accum
 
-    replicate0(∅, n)
+    replicate0(∅, n, value)
   }
 
   def repeat[M[_]](implicit p: Pure[M], m: Monoid[M[A]]): M[A] = value.η ⊹ repeat

@@ -79,11 +79,14 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
 
+  /** Alias for >>=| */
+  def >|>[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=|(f)
+
   def flatMap[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def join[B](implicit m: A <:< M[B], b: Bind[M]): M[B] = >>=(m)
 
-  def forever[B](implicit b: Bind[M]): M[B] = value ∗| value.forever
+  def forever[B](implicit b: Bind[M]): M[B] = value >|> value.forever
 
   def <+>(z: => M[A])(implicit p: Plus[M]): M[A] = p.plus(value, z)
 
@@ -142,6 +145,9 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def listr(implicit r: Foldable[M]): List[A] = foldr(nil[A])(_ :: _)
 
   def stream(implicit r: Foldable[M]): Stream[A] = foldr(Stream.empty[A])(Stream.cons(_, _))
+
+  def asStream[B](f: Stream[A] => Stream[B])(implicit r: Foldable[M], m: Monoid[M[B]], p: Pure[M]): M[B] =
+    f(stream).foldr(m.zero)(p.pure(_) |+| _)
 
   def !!(n: Int)(implicit r: Foldable[M]): A = stream(r)(n)
 
@@ -259,6 +265,12 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
     if (n <= 0) ∅[N[A]].η[M]
     else value ∗ (a => replicateM[N](n - 1) ∘ (a +>: _) )
+
+  def replicateM_(n: Int)(implicit m: Monad[M]): M[Unit] = {
+    def replicateM__(a: M[Unit], i: Int): M[Unit] =
+      if (i > 0) replicateM__(value >|> a, i - 1) else a
+    replicateM__(().pure[M], n)
+  }
 
   def zipWithA[F[_], B, C](b: M[B])(f: (A, B) => F[C])(implicit a: Applicative[M], t: Traverse[M], z: Applicative[F]): F[M[C]] =
     (b <*> (a.fmap(value, f.curried))).sequence[F, C]

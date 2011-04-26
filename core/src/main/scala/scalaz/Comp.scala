@@ -10,6 +10,6 @@ object Comp {
   implicit def CompApplicative[M[_], N[_]](implicit ma: Applicative[M], na: Applicative[N]): Applicative[({type λ[α]=M[N[α]]})#λ] = new Applicative[({type λ[α]=M[N[α]]})#λ] {
     def pure[A](a: => A): M[N[A]] = a.η[N].η[M]
 
-    def apply[A, B](f: M[N[A => B]], a: M[N[A]]): M[N[B]] = (a <**> f)(_ <*> _)
+    override def apply[A, B](f: M[N[A => B]], a: M[N[A]]): M[N[B]] = (a <**> f)(_ <*> _)
   }
 }
