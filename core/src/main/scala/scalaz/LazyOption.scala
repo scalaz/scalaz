@@ -28,8 +28,8 @@ sealed trait LazyOption[+A] {
     def fold[B](ifSome: (=> A) => B, ifNone: => B) = if (isDefined) self.fold(ifSome, ifNone) else ifNone
   }
 
-  def foreach[U](f: A => U) {
-    fold(a => f(a))
+  def foreach[U](f: (=> A) => U) {
+    fold(f)
   }
 
   def withFilter(p: (=> A) => Boolean): WithFilter = new WithFilter(p)
@@ -57,7 +57,7 @@ sealed trait LazyOption[+A] {
 
     def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] = self filter p flatMap f
 
-    def foreach[U](f: A => U) {
+    def foreach[U](f: (=> A) => U) {
       self filter p foreach f
     }
 
