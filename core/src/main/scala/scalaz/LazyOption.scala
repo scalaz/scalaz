@@ -36,6 +36,8 @@ sealed trait LazyOption[+A] {
 
   def exists(p: (=> A) => Boolean): Boolean = fold(p, false)
 
+  def forall(p: (=> A) => Boolean): Boolean = fold(p, true)
+
   def orElse[B >: A](alternative: => LazyOption[B]): LazyOption[B] =
     if (isEmpty) alternative else this
 
