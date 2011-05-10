@@ -68,9 +68,6 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    */
   def |(a: => A): A = value getOrElse a
 
-  @deprecated("use Option.orNull")
-  def toNull[A1 >: A](implicit ev: Null <:< A1): A1 = value orNull
-
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
    * <p/>

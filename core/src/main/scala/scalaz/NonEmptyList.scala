@@ -73,9 +73,6 @@ trait NonEmptyLists {
     val head = h
     val tail = t.toList
   }
-
-  @deprecated("use nel")
-  def nel1[A](h: A, t: A*): NonEmptyList[A] = nel(h, t: _*)
 }
 
 object NonEmptyList extends NonEmptyLists {
