@@ -68,7 +68,7 @@ object Each {
   }
 
   implicit def LazyOptionEachEach: Each[LazyOption] = new Each[LazyOption] {
-    def each[A](e: LazyOption[A], f: A => Unit) = e foreach f
+    def each[A](e: LazyOption[A], f: A => Unit) = e foreach (a => f(a))
   }
 
   implicit def EitherLeftEach[X]: Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Each[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
