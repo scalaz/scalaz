@@ -59,16 +59,73 @@ package object effects {
   implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(st(_))
   implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(io(_))
  
-  // Standard I/O
+  /** Perform the given side-effect in an IO action */
+  def io[A](a: => A) = a.pure[IO]
+
+  /** Get the next character from standard input */
   def getChar: IO[Char] = IO(rw => (rw, readChar))
+
+  /** Write a character to standard output */
   def putChar(c: Char): IO[Unit] = IO(rw => (rw, { print(c); () }))
+
+  /** Write a String to standard output */
   def putStr(s: String): IO[Unit] = IO(rw => (rw, { print(s); () }))
+
+  /** Write a String to standard output, followed by a newline */
   def putStrLn(s: String): IO[Unit] = IO((rw => (rw, { println(s); () })))
+
+  /** Read the next line from standard input */
   def readLn: IO[String] = IO(rw => (rw, readLine))
+
+  /** Print the given object to standard output */
   def putOut[A](a: A): IO[Unit] = IO(rw => (rw, { print(a); () }))
 
+  import IterV._
+  import java.io._
+
+  /** Repeatedly apply the given action, enumerating the results. */
+  def enumerateBy[A](action: IO[A]): EnumeratorM[IO, A] = new EnumeratorM[IO, A] {
+    def apply[B](i: IterV[A, B]): IO[IterV[A, B]] = i match {
+      case Done(a, s) => io { Done(a, s) }
+      case Cont(k) => action map (a => k(El(a)))
+    }
+  }
+
+  /** Enumerate the lines on standard input as Strings */
+  val getLines: EnumeratorM[IO, String] = getReaderLines(new BufferedReader(new InputStreamReader(System.in)))
+
+  /** Read a line from a buffered reader */
+  def rReadLn(r: BufferedReader): IO[Option[String]] = io { Option(r.readLine) }
+
+  /** Write a string to a PrintWriter */
+  def wPutStr(w: PrintWriter, s: String): IO[Unit] = io { w.print(s) }
+
+  /** Write a String to a PrintWriter, followed by a newline */
+  def wPutStrLn(w: PrintWriter, s: String): IO[Unit] = io { w.println(s) }
+
+  /** Enumerate the lines from a BufferedReader */
+  def getReaderLines(r: => BufferedReader): EnumeratorM[IO, String] = new EnumeratorM[IO, String] {
+    def apply[A](it: IterV[String, A]) = {
+      def loop: IterV[String, A] => IO[IterV[String, A]] = {
+        case i@Done(_, _) => io { i }
+        case i@Cont(k) => for {
+          s <- rReadLn(r)
+          a <- s.map(l => loop(k(El(l)))).getOrElse(io(i))
+        } yield a
+      }
+      loop(it)
+    }
+  }
+  def closeReader(r: Reader): IO[Unit] = io { r.close }
+
+  def getFileLines(f: File): EnumeratorM[IO, String] = new EnumeratorM[IO, String] {
+    def apply[A](i: IterV[String, A]) = bufferFile(f).bracket(closeReader)(getReaderLines(_)(i))
+  }
+
+  def bufferFile(f: File): IO[BufferedReader] = io { new BufferedReader(new FileReader(f)) }
+
   // Mutable variables in the IO monad
-  def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => new IORef(v).pure[IO])
+  def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => io { new IORef(v) })
 
   /** Throw the given error in the IO monad. */
   def throwIO[A](e: Throwable): IO[A] = IO(rw => (rw, throw e))
