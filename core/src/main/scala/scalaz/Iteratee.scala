@@ -36,7 +36,7 @@ trait Enumerator[F[_]] {
 
 object IterV {
   /** An EnumeratorM[M, _, _] feeds data in a monad M to an iteratee **/
-  type EnumeratorM[M[_], E, A] = IterV[E, A] => M[IterV[E, A]]
+  type EnumeratorM[M[_], E] = ({type λ[α] = IterV[E, α]})#λ ~> ({type λ[α] = M[IterV[E, α]]})#λ
 
   /** A computation that has finished **/
   object Done {
