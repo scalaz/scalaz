@@ -238,7 +238,7 @@ object Equal extends EqualLow {
     !(b || i1.hasNext || i2.hasNext)
   })
 
-  implicit def JavaMapEntry[K: Equal, V: Equal]: Equal[java.util.Map.Entry[K, V]] = equal((a1, a2) => a1.getKey ≟ a2.getKey)
+  implicit def JavaMapEntryEqual[K: Equal, V: Equal]: Equal[java.util.Map.Entry[K, V]] = equal((a1, a2) => a1.getKey ≟ a2.getKey && a1.getValue ≟ a2.getValue)
 
   implicit def JavaMapEqual[K: Equal, V: Equal]: Equal[java.util.Map[K, V]] = equalBy(_.entrySet)
 
