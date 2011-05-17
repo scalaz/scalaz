@@ -21,8 +21,6 @@ sealed trait IO[A] {
     (nw, f(a))
   })
 
-  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] = m.liftIO(this)  
-  
   /** Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] = 
     IO(rw => try { this(rw) } catch { case e => handler(e)(rw) })
@@ -81,8 +79,6 @@ sealed trait IO[A] {
     r <- during(a) onException after(a)
   } yield r
 
-  def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadIO[M], mo: Monad[M]): M[B] =
-    controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 
 /** 
