@@ -19,6 +19,12 @@ sealed trait Kleisli[M[_], A, B] {
     f ↦ (Kleisli.this(_)) 
 
   def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a, apply _)  
+  
+  def map[C](f: B => C)(implicit m: Functor[M]): Kleisli[M, A, C] =
+    kleisli(a => m.fmap(apply(a), f))
+
+  def flatMap[C](f: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] =
+    kleisli(a => m.bind(apply(a), f))
 }
 
 trait Kleislis {

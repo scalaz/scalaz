@@ -5,6 +5,14 @@ trait Forall[P[_]] {
   def apply[A]: P[A]
 }
 
+trait ForallK[K, P[_]] {
+  def apply[A](implicit k: K): P[A]
+}
+
+trait ForallM[K[_[_]], P[_[_]]] {
+  def apply[M[_]:K]: P[M]
+}
+
 object Forall {
   /** Universal quantification by doubly negating an existential. */
   type Not[A] = A => Nothing

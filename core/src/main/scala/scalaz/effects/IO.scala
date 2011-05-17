@@ -81,7 +81,7 @@ sealed trait IO[A] {
     r <- during(a) onException after(a)
   } yield r
 
-  def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadControlIO[M]): M[B] =
+  def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadIO[M], mo: Monad[M]): M[B] =
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 

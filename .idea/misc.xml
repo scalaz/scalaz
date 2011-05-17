@@ -24,6 +24,24 @@
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
   </component>
+  <component name="NullableNotNullManager">
+    <option value="org.jetbrains.annotations.Nullable" name="myDefaultNullable" />
+    <option value="org.jetbrains.annotations.NotNull" name="myDefaultNotNull" />
+    <option name="myNullables">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+    <option name="myNotNulls">
+      <value>
+        <list size="3">
+          <item itemvalue="org.jetbrains.annotations.NotNull" class="java.lang.String" index="0" />
+          <item itemvalue="javax.annotation.Nonnull" class="java.lang.String" index="1" />
+          <item itemvalue="edu.umd.cs.findbugs.annotations.NonNull" class="java.lang.String" index="2" />
+        </list>
+      </value>
+    </option>
+  </component>
   <component name="ProjectDetails">
     <option value="scalaz" name="projectName" />
   </component>
