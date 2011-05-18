@@ -55,4 +55,10 @@ trait Arrows {
     val arr = a
     val first = f
   }
+
+  implicit val Function1Arrow: Arrow[Function1] =
+    arrow[Function1]
+
+  implicit val PartialFunctionArrow: Arrow[PartialFunction] =
+    arrow[PartialFunction]
 }

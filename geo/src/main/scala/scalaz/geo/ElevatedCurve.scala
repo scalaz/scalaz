@@ -20,8 +20,11 @@ trait ElevatedCurves {
 }
 
 object ElevatedCurve {
-  import Scalaz._
-  
+  import Show._
+  import Equal._
+  import Order._
+  import data.*->*->*._
+
   implicit def ElevatedCurveShow: Show[ElevatedCurve] = showBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
   implicit def ElevatedCurveEqual: Equal[ElevatedCurve] = equalBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))

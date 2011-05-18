@@ -16,7 +16,10 @@ trait GeodeticCurves {
 }
 
 object GeodeticCurve {
-  import Scalaz._
+  import Show._
+  import Equal._
+  import Order._
+  import data.*._
 
   implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance.shows + " " + c.azi.shows + " " + c.reverseAzi.shows + "]")
 

@@ -16,7 +16,10 @@ trait Latitudes {
 }
 
 object Latitude {
-  import Scalaz._
+  import Show._
+  import Equal._
+  import Order._
+  import data.*._
 
   implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
 

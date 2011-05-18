@@ -12,8 +12,10 @@ trait Longitudes {
 }
 
 object Longitude {
-  import Predef.{implicitly => i}
-  import Scalaz._
+  import Show._
+  import Equal._
+  import Order._
+  import data.*._
 
   implicit def LongitudeShow: Show[Longitude] = shows(_.value.shows + "°")
 

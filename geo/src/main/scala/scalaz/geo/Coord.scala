@@ -146,8 +146,11 @@ trait Coords {
 }
 
 object Coord {
-  import Scalaz._
-  import Geo._
+  import Show._
+  import Equal._
+  import Order._
+  import data.*._
+  import data.*->*->*._
 
   implicit def CoordShow: Show[Coord] = shows((c: Coord) => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
 

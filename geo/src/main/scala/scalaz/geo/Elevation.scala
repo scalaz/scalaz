@@ -12,7 +12,10 @@ trait Elevations {
 }
 
 object Elevation {
-  import Scalaz._
+  import Show._
+  import Equal._
+  import Order._
+  import data.*._
 
   implicit def ElevationShow: Show[Elevation] = shows(_.value.shows + "m")
 

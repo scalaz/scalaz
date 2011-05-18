@@ -2,9 +2,10 @@ package scalaz
 package geo
 
 
-sealed trait GeoDoubleW extends PimpedType[Double] {
-  import Scalaz._
-  import Geo._  
+sealed trait GeoDoubleW {
+  val value: Double
+
+  import Geo._
 
   def fromRadians[A](implicit r: Radians[A]) = r.fromRadians(value)
 
