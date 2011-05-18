@@ -9,7 +9,10 @@ import java.io._
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
  */
 object ScalazArbitrary {
-  import Scalaz._
+  import data.*->*._
+  import data._, Ident._, Alpha._
+  import newtypes._
+  import wrap.BooleanW._
   import Arbitrary._
   import Gen._
   import ScalaCheckBinding._
@@ -22,15 +25,15 @@ object ScalazArbitrary {
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     arbArray[A] ∘ (ImmutableArray.fromArray[A](_))
 
-  implicit def IdentityArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Identity[A]] =
-    a ∘ ((x: A) => mkIdentity(x))
+  implicit def IdentArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Ident[A]] =
+    a ∘ ((x: A) => ident(x))
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
-  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas))
+  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(alphas.toSeq))
 
   implicit def BooleanConjunctionArbitrary: Arbitrary[BooleanConjunction] = arb[Boolean] ∘ ((_: Boolean).|∧|)
-
+                 /*
   implicit def arbBigInt: Arbitrary[BigInt] = arb[Int].<**>(arb[Int])(_ * _)
 
   implicit def arbBigInteger: Arbitrary[BigInteger] = arb[BigInt] ∘ (_.bigInteger)
@@ -184,7 +187,7 @@ private[scalacheck] object Serialization {
     finally {
       in.close
     }
-  }
+  }                   */
 }
 
 

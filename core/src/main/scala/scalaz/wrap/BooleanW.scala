@@ -280,6 +280,8 @@ sealed trait BooleanW {
   }
 }
 
+object BooleanW extends BooleanWs
+
 trait BooleanWs {
   implicit def BooleanTo(n: Boolean): BooleanW = new BooleanW {
     val value = n

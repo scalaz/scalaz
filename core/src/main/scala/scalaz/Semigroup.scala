@@ -27,6 +27,16 @@ trait Semigroups {
   implicit def ListSemigroup[A]: Semigroup[List[A]] =
     semigroup(a1 => a2 => a1 ::: a2)
 
+  implicit def OptionSemigroup[A : Semigroup]: Semigroup[Option[A]] =
+    semigroup(a => b =>
+      (a,b) match {
+        case (Some(va), Some(vb)) => Some(implicitly[Semigroup[A]].append(va, vb))
+        case (Some(va), None) => Some(va)
+        case (None, Some(vb)) => Some(vb)
+        case (None, None) => None
+      }
+    )
+
   implicit def Tuple2Semigroup[A, B](implicit sa: Semigroup[A], sb: Semigroup[B]): Semigroup[(A, B)] =
     semigroup(a1 => a2 =>
       (sa.append(a1._1, a2._1), sb.append(a1._2, a2._2)))

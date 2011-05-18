@@ -23,6 +23,10 @@ trait Functors {
       r => const(r.value)
   }
 
+  implicit def Function1Functor[T]: Functor[({type λ[α] = Function1[T, α]})#λ] = new Functor[({type λ[α] = Function1[T, α]})#λ] {
+    def fmap[A, B](f: A => B) = _ andThen f
+  }
+
   implicit val OptionFunctor: Functor[Option] = new Functor[Option] {
     def fmap[A, B](f: A => B) = _ map f
   }

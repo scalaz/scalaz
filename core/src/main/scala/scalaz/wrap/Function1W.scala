@@ -1,9 +1,14 @@
 package scalaz
 package wrap
 
+import data.*->*
+
 
 sealed trait Function1W[T, R] {
   val k: T => R
+
+  def *->* : (({type λ[α] = Function1[T, α]})#λ *->* R) =
+    data.*->*.**->**[({type λ[α] = Function1[T, α]})#λ, R](k)
 
   import scalaz.concurrent.{Promise, Strategy}
   import data.{Kleisli, Validation, NonEmptyList, Endo, Ordering}, Validation._, NonEmptyList._

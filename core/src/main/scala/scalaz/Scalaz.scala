@@ -53,4 +53,6 @@ trait Scalazs extends {
     def apply[A](a: A) = implicitly[Pointed[F]].point(a)
   }
 
+  def ∅[Z](implicit z: Zero[Z]): Z =
+    z.zero
 }

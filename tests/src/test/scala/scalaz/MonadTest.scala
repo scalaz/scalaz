@@ -3,7 +3,7 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
 import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class MonadTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
@@ -67,7 +67,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
           ): Unit = {
     val typeName = man.toString
     typeName in {
-      import ScalazProperties.Monad._
+      import ScalazProperty.Monad._
       leftIdentity[M, A, A] must pass
       rightIdentity[M, A] must pass
       associativity[M, A, A, A] must pass

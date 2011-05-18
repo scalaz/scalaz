@@ -26,6 +26,9 @@ trait Zeros {
   implicit def ListZero[A]: Zero[List[A]] =
     zero(Nil)
 
+  implicit def OptionZero[A]: Zero[Option[A]] =
+    zero(None)
+
   implicit def Tuple2Zero[A, B](implicit za: Zero[A], zb: Zero[B]): Zero[(A, B)] =
     zero(za.zero, zb.zero)
 

@@ -2,7 +2,7 @@ package scalaz
 
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class FunctorTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
@@ -102,7 +102,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
                                 arba: Arbitrary[A]): Unit = {
     val typeName = man.toString
     typeName in {
-      import ScalazProperties.Functor._
+      import ScalazProperty.Functor._
       identity[F, A] must pass
       associative[F, A, A, A] must pass
     }

@@ -4,7 +4,7 @@ import concurrent.Promise
 import org.scalacheck.{Arbitrary, Prop}
 import org.specs.{Specification, ScalaCheck, Sugar}
 import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class EqualTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
@@ -111,7 +111,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
   def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {
     val typeName = manifest[A].toString
     typeName in {
-      import ScalazProperties.Equal._
+      import ScalazProperty.Equal._
       commutativity[A] must pass
       identity[A] must pass
     }
