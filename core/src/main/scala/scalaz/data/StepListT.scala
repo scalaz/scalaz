@@ -146,13 +146,13 @@ sealed trait StepListT[F[_], A] {
 
 object StepListT extends StepListTs {
 
-  protected sealed trait Step[A, S]
+  sealed trait Step[A, S]
 
-  protected case class Yield[A, S](a: A, s: S) extends Step[A, S]
+  case class Yield[A, S](a: A, s: S) extends Step[A, S]
 
-  protected case class Skip[A, S](s: S) extends Step[A, S]
+  case class Skip[A, S](s: S) extends Step[A, S]
 
-  protected case class Done[A, S]() extends Step[A, S]
+  case class Done[A, S]() extends Step[A, S]
 
   protected def listT[F[_], A](s: F[Step[A, StepListT[F, A]]]): StepListT[F, A] = new StepListT[F, A] {
     val step = s

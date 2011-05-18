@@ -146,13 +146,13 @@ sealed trait StepStreamT[F[_], A] {
 
 object StepStreamT extends StepStreamTs {
 
-  protected sealed trait Step[A, S]
+  sealed trait Step[A, S]
 
-  protected case class Yield[A, S](a: A, s: S) extends Step[A, S]
+  case class Yield[A, S](a: A, s: S) extends Step[A, S]
 
-  protected case class Skip[A, S](s: S) extends Step[A, S]
+  case class Skip[A, S](s: S) extends Step[A, S]
 
-  protected case class Done[A, S]() extends Step[A, S]
+  case class Done[A, S]() extends Step[A, S]
 
   protected def streamT[F[_], A](s: F[Step[A, StepStreamT[F, A]]]): StepStreamT[F, A] = new StepStreamT[F, A] {
     val step = s

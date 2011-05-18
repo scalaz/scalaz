@@ -67,6 +67,16 @@ sealed trait Promise[A] {
 }
 
 object Promise extends Promises {
+  def apply[A](a: => A)(implicit s: Strategy): Promise[A] =
+    promise(a)
+
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
+    val p = new Promise[A] {
+      implicit val strategy = s
+    }
+    p.e ! new Promise.Done(a, p)
+    p
+  }
 
   protected sealed abstract class State[+A] {
     def get: A
@@ -156,19 +166,11 @@ object Promise extends Promises {
       promise.v.break(promise)
     }
   }
-
-  protected def promiseActor[A](p: Promise[A]): Actor[Signal[A]] =
-    p.e
 }
 
 trait Promises {
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
-    val p = new Promise[A] {
-      implicit val strategy = s
-    }
-    Promise.promiseActor[A](p) ! new Promise.Done(a, p)
-    p
-  }
+
+  import Promise._
 
   implicit def PromisePointed(implicit s: Strategy): Pointed[Promise] = new Pointed[Promise] {
     def point[A](a: => A) = promise(a)
