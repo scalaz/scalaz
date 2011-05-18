@@ -68,7 +68,7 @@ object Scalaz extends Actors
     with    Zeros
     with    Zippers
     with    ZipStreams {
-  def ⊥ = sys.error("undefined")
+  def ⊥ = error("undefined")
 
   def undefined = ⊥
 

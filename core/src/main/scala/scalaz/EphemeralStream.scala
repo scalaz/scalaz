@@ -6,8 +6,8 @@ import java.lang.ref.WeakReference
 object EphemeralStream {
   val empty = new EphemeralStream[⊥] {
     def isEmpty = true
-    def head: () => ⊥ = () => sys.error("head of empty stream")
-    def tail: () => ⊥ = () => sys.error("tail of empty stream")
+    def head: () => ⊥ = () => error("head of empty stream")
+    def tail: () => ⊥ = () => error("tail of empty stream")
   }
 
   object cons {
@@ -116,7 +116,7 @@ sealed trait EphemeralStream[+A] {
     these
   }
 
-  def ++[BB >: A](e: EphemeralStream[BB]): EphemeralStream[BB] =
+  def ++[BB >: A](e: => EphemeralStream[BB]): EphemeralStream[BB] =
     foldRight[EphemeralStream[BB]](e)((cons[BB](_, _)).curried)
 
   def flatMap[B](f: A => EphemeralStream[B]): EphemeralStream[B] =

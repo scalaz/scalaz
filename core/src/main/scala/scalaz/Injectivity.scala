@@ -12,6 +12,7 @@ case class Injective4[T[_,_,_,_]]()
 case class Injective5[T[_,_,_,_,_]]()
 
 object Injectivity { 
+  implicit def CellInjective       = Injective[Cell]
   implicit def EitherInjective     = Injective2[Either]
   implicit def EitherRightProjectionInjective = Injective2[Either.RightProjection]
   implicit def EitherLeftProjectionInjective = Injective2[Either.LeftProjection]

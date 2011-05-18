@@ -2,7 +2,6 @@ package scalaz
 
 import Scalaz._
 import Liskov._
-import scala.annotation.unchecked.uncheckedVariance
 
 /**
  * Possibly negative corecursion 
@@ -32,7 +31,9 @@ object Mu_ {
 
 /** Positive corecursion */
 
-trait Nu[+F[+_]] extends Nu_[F @uncheckedVariance] {
+// ideal: trait Nu[+F[+_]] extends Nu_[F] {
+// works: trait Nu[+F[+_]] { 
+trait Nu[F[+_]] extends Nu_[F] {
   def out: F[Nu[F]]
 }
 object Nu { 
@@ -46,7 +47,9 @@ object Nu {
 
 /** Positive recursion */
 
-trait Mu[+F[+_]] extends Nu[F] with Mu_[F @uncheckedVariance] {
+// ideal: trait Mu[+F[+_]] extends Nu[F] with Mu_[F] {
+// works: trait Mu[+F[+_]] extends Nu[F] {
+trait Mu[F[+_]] extends Nu[F] with Mu_[F] {
   val out: F[Mu[F]]
 }
 object Mu {
@@ -89,10 +92,12 @@ object Cofree_ {
 }
 
 /** Positive cofree corecursion */
-trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F @uncheckedVariance, A @uncheckedVariance] {
+// ideal: trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F,A] {
+// works: trait Cofree[+F[+_],+A] extends Nu[F] {
+trait Cofree[F[+_],A] extends Nu[F] with Cofree_[F,A] {
   val extract: A 
   def out: F[Cofree[F,A]]
-  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F @uncheckedVariance /* TODO is this safe?*/]): Cofree[F, B] = {
+  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F]): Cofree[F, B] = {
     lazy val qs = out map (_.scanr(g))
     Cofree[B, F](g(extract, qs), qs)
   }
