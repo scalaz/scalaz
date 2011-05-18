@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary
 import java.math.BigInteger
 import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
 
-object test extends Application {
+object test extends App {
   new MonoidTest
 }
 
