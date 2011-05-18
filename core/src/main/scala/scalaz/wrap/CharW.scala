@@ -1,17 +1,28 @@
 package scalaz
+package wrap
 
-sealed trait CharW extends PimpedType[Char] {
-  import Scalaz._
-  
-  def ∏ : CharMultiplication = multiplication(value)
+sealed trait CharW {
 
-  def digit : Option[Digit] = digits find (_.toChar == value)
+  import data._, Digit._, Alpha._
+  import newtypes._
 
-  def alpha : Option[Alpha] = alphas find(_.toChar == value)
+  val value: Char
+
+  def multiplication: CharMultiplication =
+    Pack.pack[Char, CharMultiplication](value)
+
+  def ∏ : CharMultiplication =
+    multiplication
+
+  def digit: Option[Digit] =
+    digits find (_.toChar == value)
+
+  def alpha: Option[Alpha] =
+    alphas find (_.toChar == value)
 }
 
-trait Chars {
-  implicit def CharTo(c: Char): CharW = new CharW {
-    val value = c
+trait CharWs {
+  implicit def CharTo(n: Char): CharW = new CharW {
+    val value = n
   }
 }

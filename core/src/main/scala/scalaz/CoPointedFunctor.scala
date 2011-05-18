@@ -1,21 +1,26 @@
 package scalaz
 
-trait Copointed[C[_]] extends Functor[C] with Copure[C]
+import java.util.Map.Entry
 
-trait CopointedLow {
-  implicit def copointed[C[_]](implicit t: Functor[C], c: Copure[C]): Copointed[C] = new Copointed[C] {
-    def fmap[A, B](a: C[A], f: A => B) = t.fmap(a, f)
+trait CoPointedFunctor[F[_]] {
+  val functor: Functor[F]
+  val coPointed: CoPointed[F]
 
-    def copure[A](a: C[A]): A = c.copure(a)
-  }
+  def fmap[A, B](f: A => B): F[A] => F[B] =
+    functor.fmap(f)
+
+  def coPoint[A]: F[A] => A =
+    coPointed.coPoint[A]
 }
 
-object Copointed extends CopointedLow {
-  import Functor._
-  import Copure._
+object CoPointedFunctor extends CoPointedFunctors
 
-  implicit def Tuple2Copointed[A] = copointed[({type λ[α]=(A, α)})#λ](Tuple2Functor, Tuple2Copure)
+trait CoPointedFunctors {
+  implicit def coPointedFunctor[F[_]](implicit t: Functor[F], c: CoPointed[F]): CoPointedFunctor[F] = new CoPointedFunctor[F] {
+    val functor = t
+    val coPointed = c
+  }
 
-  import java.util.Map.Entry
-  implicit def MapEntryCopointed[X] = copointed[({type λ[α]=Entry[X, α]})#λ](MapEntryFunctor, MapEntryCopure)
+  implicit def MapEntryCoPointedFunctor[X]: CoPointedFunctor[({type λ[α] = Entry[X, α]})#λ] =
+    coPointedFunctor[({type λ[α] = Entry[X, α]})#λ]
 }

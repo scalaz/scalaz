@@ -1,20 +1,22 @@
 package scalaz
 
-/**
- * Sub class to create a wrapper type for `X` as documentation that the sub class is a wrapper type
- * used in type class instances.
- * <p/>
- * The companion object provides an implicit conversion to unwrap `value`.
- *
- * @see scalaz.BooleanConjunction
- */
-trait NewType[X] {
-  val value: X
 
-  override def toString =
-    value.toString
+trait Newtype[T, R] {
+  val unpack: Unpack[T, R]
+  val pack: Pack[T, R]
+
+  def unpk: T => R =
+    unpack.unpack
+
+  def pk: R => T =
+    pack.pack
 }
 
-object NewType {
-  implicit def UnwrapNewType[X](n: NewType[X]): X = n.value
+object Newtype extends Newtypes
+
+trait Newtypes {
+  def newtype[T, R](implicit u: Unpack[T, R], p: Pack[T, R]): Newtype[T, R] = new Newtype[T, R] {
+    val unpack = u
+    val pack = p
+  }
 }

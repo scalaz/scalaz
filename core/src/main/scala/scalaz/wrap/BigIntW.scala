@@ -1,12 +1,20 @@
 package scalaz
+package wrap
 
-sealed trait BigIntW extends PimpedType[BigInt] {
-  import Scalaz._
-  
-  def ∏ : BigIntMultiplication = multiplication(value)
+sealed trait BigIntW {
+
+  import newtypes._
+
+  val value: BigInt
+
+  def multiplication: BigIntMultiplication =
+    Pack.pack[BigInt, BigIntMultiplication](value)
+
+  def ∏ : BigIntMultiplication =
+    multiplication
 }
 
-trait BigInts {
+trait BigIntWs {
   implicit def BigIntTo(n: BigInt): BigIntW = new BigIntW {
     val value = n
   }

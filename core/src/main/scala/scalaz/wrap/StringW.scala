@@ -1,62 +1,52 @@
 package scalaz
+package wrap
 
-sealed trait StringW extends PimpedType[String] {
-  /**
-   * The value of this string.
-   */
-  lazy val s: String = value
+sealed trait StringW {
+  val s: String
+
+  import data.{NonEmptyList, Validation}, Validation._
+  import InputStreamW._
+  import xml._
 
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
    * is appended.
    */
-  def plural(n: Long): String = if(n == 1L) s else
-                       if((s endsWith "y") && (List("ay", "ey","iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
-                       else s + "s"
-
-  import xml._
-  import Scalaz._
+  def plural(n: Long): String = if (n == 1L) s
+  else
+  if ((s endsWith "y") && (List("ay", "ey", "iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
+  else s + "s"
 
   /**
    * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
    * otherwise, the string representation (using show) of the value is returned in an element with the given label.
    */
-  def node[A: Show](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]): Node =
+  def node[A: Show](
+                       a: Option[A],
+                       prefix: Option[String] = None,
+                       attributes: MetaData = Null,
+                       scope: NamespaceBinding = TopScope
+                       ): Node =
     a match {
-      case Some(t) => Elem(prefix, s, Null, TopScope, t.text)
+      case Some(t) => Elem(prefix.orNull, s, attributes, scope, Text(implicitly[Show[A]].shows(t)))
       case None => Text("")
     }
 
   /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](prefix: String, a: Option[A]): Node =
-    node(prefix, Null, TopScope, a)
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def |:|[A: Show](a: Option[A]): Node =
-    node(null, a)
-
-  def encode(implicit c: CharSet): Array[Byte] = s getBytes c.value
-
-  /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def charsNel : Option[NonEmptyList[Char]] = s.toList.toNel
+  def charsNel: Option[NonEmptyList[Char]] =
+    s.toList match {
+      case Nil => None
+      case h :: t => Some(NonEmptyList.nel(h, t))
+    }
 
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
    */
-  def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.charsNel getOrElse e
-
-  def charsNelErr(message: => String): NonEmptyList[Char] = charsNel(sys.error(message))
-
-  def unsafeCharsNel : NonEmptyList[Char] = charsNelErr("cannot turn empty string into NonEmptyList")
+  def charsNel(e: => NonEmptyList[Char]): NonEmptyList[Char] =
+    charsNel getOrElse e
 
   import java.io.FileInputStream
 
@@ -89,10 +79,10 @@ sealed trait StringW extends PimpedType[String] {
       val i = in.elements
       val lineSeparators = List('\r'.toByte, '\n'.toByte)
 
-      while(i.hasNext) {
+      while (i.hasNext) {
         val c = i.next.toChar
 
-        if(lineSeparators.contains(c)) {
+        if (lineSeparators.contains(c)) {
           u = g(u, t)
           t = x
         } else
@@ -150,8 +140,10 @@ sealed trait StringW extends PimpedType[String] {
   }
 }
 
-trait Strings {
+object StringW extends StringWs
+
+trait StringWs {
   implicit def StringTo(ss: String): StringW = new StringW {
-    val value = ss
+    val s = ss
   }
 }

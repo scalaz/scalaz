@@ -1,9 +1,14 @@
 package scalaz
+package wrap
 
+sealed trait ListW[A] {
 
-sealed trait ListW[A] extends PimpedType[List[A]] {
-  import Scalaz._
+  import ListW._
+  import StreamW._
   import annotation.tailrec
+  import data.{Zipper, NonEmptyList}
+
+  val value: List[A]
 
   def intersperse(a: A): List[A] = {
     @tailrec
@@ -26,7 +31,7 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     intercalate0(nil, value) reverse
   }
 
-  def toNel = value match {
+  def toNel: Option[NonEmptyList[A]] = value match {
     case Nil => None
     case h :: t => Some(Scalaz.nel(h, t))
   }
@@ -38,50 +43,62 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     value.toStream.zipperEnd
 
   def <^>[B: Zero](f: NonEmptyList[A] => B): B = value match {
-    case Nil => ∅
-    case h :: t => f(Scalaz.nel(h, t))
+    case Nil => implicitly[Zero[B]].zero
+    case h :: t => f(NonEmptyList.nel(h, t))
   }
 
   def stripPrefix(prefix: List[A]): Option[List[A]] = {
     val (before, after) = value splitAt prefix.length
-    (before == prefix) option after
+    if (before == prefix) Some(after) else None
   }
 
   def takeWhileM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = value match {
-    case Nil => nil[A] η
-    case h :: t => p(h) ∗ (if (_) (t takeWhileM p) ∘ (h :: _) else nil[A] η)
+    case Nil => implicitly[Monad[M]].point(nil[A])
+    case h :: t => implicitly[Monad[M]].bd((b: Boolean) =>
+      if (b) t takeWhileM p else implicitly[Monad[M]].point(nil[A]))(p(h))
   }
 
   def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] =
-    takeWhileM(p(_) ∘ (!_))
+    takeWhileM((a: A) => implicitly[Monad[M]].fmap((b: Boolean) => !b)(p(a)))
 
   def filterM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = value match {
-    case Nil => nil[A] η
+    case Nil => implicitly[Monad[M]].point(nil[A])
     case h :: t => {
       def g = t filterM p
-      p(h) ∗ (if (_) g ∘ (h :: _) else g)
+      implicitly[Monad[M]].bd((b: Boolean) =>
+        if (b) implicitly[Monad[M]].fmap((tt: List[A]) => h :: tt)(g) else g)(p(h))
     }
   }
 
   def powerset: List[List[A]] = filterM(_ => List(true, false))
 
   def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = value match {
-    case Nil => (nil[A], nil[A]) η
-    case h :: t => p(h) ∗ (b => (t partitionM p) ∘ {case (x, y) => if (b) (h :: x, y) else (x, h :: y)})
+    case Nil => implicitly[Monad[M]].point(nil[A], nil[A])
+    case h :: t =>
+      implicitly[Monad[M]].bd((b: Boolean) =>
+        implicitly[Monad[M]].fmap((xy: (List[A], List[A])) =>
+          if (b) (h :: xy._1, xy._2) else (xy._1, h :: xy._2))(t partitionM p))(p(h))
   }
 
   def spanM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = value match {
-    case Nil => (nil[A], nil[A]) η
-    case h :: t => p(h) ∗ (if (_) (t spanM p) ∘ ((h :: (_: List[A])) <-: _) else (nil[A], value) η)
+    case Nil => implicitly[Monad[M]].point(nil[A], nil[A])
+    case h :: t =>
+      implicitly[Monad[M]].bd((b: Boolean) =>
+        if (b) implicitly[Monad[M]].fmap((k: (List[A], List[A])) =>
+          (h :: k._1, k._2))(t spanM p)
+        else
+          implicitly[Monad[M]].point(nil[A], value))(p(h))
   }
 
   def breakM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] =
-    spanM(p(_) ∘ (!_))
+    spanM(a => implicitly[Monad[M]].fmap((b: Boolean) => !b)(p(a)))
 
   def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = value match {
-    case Nil => nil[List[A]] η
-    case h :: t => t.spanM(p(h, _)) ∗ {
-      case (x, y) => (y groupByM p) ∘ ((h :: x) :: _)
+    case Nil => implicitly[Monad[M]].point(nil[List[A]])
+    case h :: t => {
+      implicitly[Monad[M]].bd((xy: (List[A], List[A])) =>
+        implicitly[Monad[M]].fmap((g: List[List[A]]) =>
+          (h :: xy._1) :: g)(xy._2 groupByM p))(t.spanM(p(h, _)))
     }
   }
 
@@ -89,7 +106,8 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     case Nil => (c, Nil)
     case h :: t => {
       val (i, j) = f(c, h)
-      t.mapAccumLeft(i, f) :-> (j :: _)
+      val (k, l) = t.mapAccumLeft(i, f)
+      (k, j :: l)
     }
   }
 
@@ -97,24 +115,33 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     case Nil => (c, Nil)
     case h :: t => {
       val (i, j) = t.mapAccumRight(c, f)
-      f(i, h) :-> (_ :: j)
+      val (k, l) = f(i, h)
+      (k, l :: j)
     }
   }
 
   def tails: List[List[A]] = value match {
     case Nil => List(Nil)
-    case xxs@(_::xs) => xxs :: (xs: ListW[A]).tails
+    case xxs@(_ :: xs) => xxs :: xs.tails
   }
 
   def inits: List[List[A]] = value match {
     case Nil => List(Nil)
-    case xxs@(x::xs) => List(Nil) ++ (xs.inits map (x :: _))
+    case xxs@(x :: xs) => Nil :: (xs.inits map (x :: _))
   }
 
-  def pairs: List[(A, A)] = (value: ListW[A]).tails.tail >>= (value.zip(_))
+  def allPairs: List[(A, A)] =
+    value.tails.tail flatMap (value zip _)
+
+  def adjacentPairs: List[(A, A)] = value match {
+    case Nil => Nil
+    case (_ :: t) => value zip t
+  }
 }
 
-trait Lists {
+object ListW extends ListWs
+
+trait ListWs {
   implicit def ListTo[A](as: List[A]): ListW[A] = new ListW[A] {
     val value = as
   }

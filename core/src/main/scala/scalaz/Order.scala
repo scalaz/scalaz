@@ -1,196 +1,286 @@
 package scalaz
 
-trait Order[-A] extends Equal[A] {
-  def order(a1: A, a2: A): Ordering
+import data._
 
-  final def equal(a1: A, a2: A): Boolean = order(a1, a2) == EQ
+sealed trait Order[A] {
+  val order: A => A => Ordering
+
+  def isGT: A => A => Boolean =
+    a1 => a2 => order(a1)(a2) == GT
+
+  def isLT: A => A => Boolean =
+    a1 => a2 => order(a1)(a2) == LT
+
+  def isEQ: A => A => Boolean =
+    a1 => a2 => order(a1)(a2) == EQ
+
+  def isLTE: A => A => Boolean =
+    a1 => a2 => order(a1)(a2) != GT
+
+  def isGTE: A => A => Boolean =
+    a1 => a2 => order(a1)(a2) != LT
+
+  def min(a1: A)(a2: A): A =
+    if (order(a1)(a2) != GT)
+      a1
+    else a2
+
+  def max(a1: A)(a2: A): A =
+    if (order(a1)(a2) != LT)
+      a1
+    else a2
+
+  def contramap[B](f: B => A): Order[B] =
+    Order.order(b1 => b2 => Order.this.order(f(b1))(f(b2)))
 }
+
+object Order extends Orders
 
 trait Orders {
-  import Scalaz._
-
-  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = f(a1, a2)
+  def order[A](f: A => A => Ordering): Order[A] = new Order[A] {
+    val order = f
   }
 
-  def orderBy[A, B: Order](f: A => B): Order[A] = implicitly[Order[B]] ∙ f
+  def orderC[A](f: (A, A) => Ordering): Order[A] =
+    order(a1 => a2 => f(a1, a2))
 
-}
+  def orderI[A](f: (A, A) => Int): Order[A] =
+    order(a1 => a2 => {
+      val k = f(a1, a2)
+      if (k < 0) LT
+      else if (k > 0) GT
+      else EQ
+    })
 
-trait OrderLow {
-  import Scalaz._
+  def orderBy[A, B: Order](f: A => B): Order[A] =
+    implicitly[Order[B]] contramap f
 
-  implicit def ScalaOrderingOrder[T: scala.Ordering]: Order[T] = order {(t1, t2) =>
-    implicitly[scala.Ordering[T]].compare(t1, t2) match {
-      case -1 => LT
-      case 0 => EQ
-      case 1 => GT
-    }
-  }
-}
-
-object Order {
-  import Scalaz._
-  import java.math.BigInteger
-
-  implicit def DigitOrder: Order[Digit] = orderBy(_.toInt)
-
-  implicit def OrderingOrder: Order[Ordering] = order {
-    case (a, EQ) => a
-    case (EQ, LT) => GT
-    case (EQ, GT) => LT
-    case (LT, LT) => EQ
-    case (LT, _) => LT
-    case (GT, GT) => EQ
-    case (GT, _) => GT
+  implicit def ScalaOrderingOrder[T: scala.Ordering]: Order[T] = orderC {
+    (t1, t2) =>
+      val k = implicitly[scala.Ordering[T]].compare(t1, t2)
+      if (k < 0) LT
+      else if (k > 0) GT
+      else EQ
   }
 
-  implicit def OrderOrdering[A: Order]: scala.Ordering[A] = new scala.Ordering[A] {
-    def compare(a1: A, a2: A) = (a1 ?|? a2) match {
-      case EQ => 0
-      case LT => -1
-      case GT => 1
-    }
-  }
+  import Predef.{implicitly => i}
 
-  implicit def UnitOrder: Order[Unit] = order((_, _) => EQ)
-
-  implicit def StringOrder: Order[String] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def StringOrder: Order[String] = ScalaOrderingOrder
 
   implicit def SymbolOrder: Order[Symbol] = orderBy(_.name)
 
-  implicit def IntOrder: Order[Int] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def UnitOrder: Order[Unit] = ScalaOrderingOrder
 
-  implicit def IntMultiplicationOrder: Order[IntMultiplication] = orderBy(_.value)
+  implicit def BooleanOrder: Order[Boolean] = ScalaOrderingOrder
 
-  implicit def BooleanOrder: Order[Boolean] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def ByteOrder: Order[Byte] = ScalaOrderingOrder
 
-  implicit def BooleanConjunctionOrder: Order[BooleanConjunction] = orderBy(_.value)
+  implicit def CharOrder: Order[Char] = ScalaOrderingOrder
 
-  implicit def CharOrder: Order[Char] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def IntOrder: Order[Int] = ScalaOrderingOrder
 
-  implicit def CharMultiplicationOrder: Order[CharMultiplication] = orderBy(_.value)
+  implicit def LongOrder: Order[Long] = ScalaOrderingOrder
 
-  implicit def ByteOrder: Order[Byte] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def ShortOrder: Order[Short] = ScalaOrderingOrder
 
-  implicit def ByteMultiplicationOrder: Order[ByteMultiplication] = orderBy(_.value)
+  implicit def FloatOrder: Order[Float] = ScalaOrderingOrder
 
-  implicit def LongOrder: Order[Long] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def DoubleOrder: Order[Double] = ScalaOrderingOrder
 
-  implicit def LongMultiplicationOrder: Order[LongMultiplication] = orderBy(_.value)
+  def UnpackOrder[T, R](implicit s: Order[R], u: Unpack[T, R]): Order[T] =
+    implicitly[Order[R]] contramap (u.unpack(_))
 
-  implicit def ShortOrder: Order[Short] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def BigIntegerOrder: Order[java.math.BigInteger] = orderI(_ compareTo _)
 
-  implicit def ShortMultiplicationOrder: Order[ShortMultiplication] = orderBy(_.value)
+  implicit def BigIntOrder: Order[BigInt] = ScalaOrderingOrder
 
-  implicit def FloatOrder: Order[Float] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+  implicit def IterableOrder[CC[X] <: Iterable[X], A: Order]: Order[CC[A]] =
+    order(a1 => a2 => {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = true
+      var r: Ordering = EQ
 
-  implicit def DoubleOrder: Order[Double] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
+      while (i1.hasNext && i2.hasNext && b) {
+        val a1 = i1.next
+        val a2 = i2.next
 
-  implicit def BigIntegerOrder: Order[BigInteger] = order(_ compareTo _ ordering)
-
-  implicit def BigIntegerMultiplicationOrder: Order[BigIntegerMultiplication] = orderBy(_.value)
-
-  implicit def BigIntOrder: Order[BigInt] = order((a1, a2) => if (a1 > a2) GT else if (a1 < a2) LT else EQ)
-
-  implicit def BigIntMultplicationOrder: Order[BigIntMultiplication] = orderBy(_.value)
-
-  implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] = orderBy(_.list)
-
-  implicit def ZipStreamOrder[A: Order]: Order[ZipStream[A]] = orderBy(_.value)
-
-  implicit def Tuple1Order[A: Order]: Order[Tuple1[A]] = order(_._1 ?|? _._1)
-
-  implicit def IndSeqOrder[A: Order]: Order[IndSeq[A]] = orderBy(_.toList)
-
-  import Foldable._
-
-  implicit def Tuple2Order[A: Order, B: Order]: Order[(A, B)] = order {
-    case ((a1, b1), (a2, b2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2))
-  }
-
-  implicit def Tuple3Order[A: Order, B: Order, C: Order]: Order[(A, B, C)] = order {
-    case ((a1, b1, c1), (a2, b2, c2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2))
-  }
-
-  implicit def Tuple4Order[A: Order, B: Order, C: Order, D: Order]: Order[(A, B, C, D)] = order {
-    case ((a1, b1, c1, d1), (a2, b2, c2, d2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2))
-  }
-
-  implicit def Tuple5Order[A: Order, B: Order, C: Order, D: Order, E: Order]: Order[(A, B, C, D, E)] = order {
-    case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2))
-  }
-
-  implicit def Tuple6Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order]: Order[(A, B, C, D, E, F)] = order {
-    case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2))
-  }
-
-  implicit def Tuple7Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order, G: Order]: Order[(A, B, C, D, E, F, G)] = order {
-    case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) => ListFoldable.fold(List(a1 ?|? a2, b1 ?|? b2, c1 ?|? c2, d1 ?|? d2, e1 ?|? e2, f1 ?|? f2, g1 ?|? g2))
-  }
-
-  implicit def Function0Order[A: Order]: Order[() => A] = order(_.apply ?|? _.apply)
-
-  implicit def IterableOrder[A: Order]: Order[Iterable[A]] = order((a1, a2) => {
-    val i1 = a1.iterator
-    val i2 = a2.iterator
-    var b = true
-    var r: Ordering = EQ
-
-    while (i1.hasNext && i2.hasNext && b) {
-      val a1 = i1.next
-      val a2 = i2.next
-
-      val o = a1 ?|? a2
-      if (o != EQ) {
-        r = o
-        b = false
+        val o = implicitly[Order[A]].order(a1)(a2)
+        if (o != EQ) {
+          r = o
+          b = false
+        }
       }
+
+      if (i1.hasNext)
+        if (i2.hasNext)
+          r
+        else
+          GT
+      else
+        LT
+    })
+
+  implicit def Function0Order[A: Order]: Order[Function0[A]] = orderBy(_.apply)
+
+  implicit def Tuple1Order[A: Order]: Order[Tuple1[A]] = orderBy(_._1)
+
+  implicit def Tuple2Order[A: Order, B: Order]: Order[(A, B)] =
+    orderC {
+      case ((a1, b1), (a2, b2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+        ))
     }
 
-    if (i1.hasNext)
-      if (i2.hasNext)
-        r
+  implicit def Tuple3Order[A: Order, B: Order, C: Order]: Order[(A, B, C)] =
+    orderC {
+      case ((a1, b1, c1), (a2, b2, c2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+          , implicitly[Order[C]].order(c1)(c2)
+        ))
+    }
+
+  implicit def Tuple4Order[A: Order, B: Order, C: Order, D: Order]: Order[(A, B, C, D)] =
+    orderC {
+      case ((a1, b1, c1, d1), (a2, b2, c2, d2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+          , implicitly[Order[C]].order(c1)(c2)
+          , implicitly[Order[D]].order(d1)(d2)
+        ))
+    }
+
+  implicit def Tuple5Order[A: Order, B: Order, C: Order, D: Order, E: Order]: Order[(A, B, C, D, E)] =
+    orderC {
+      case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+          , implicitly[Order[C]].order(c1)(c2)
+          , implicitly[Order[D]].order(d1)(d2)
+          , implicitly[Order[E]].order(e1)(e2)
+        ))
+    }
+
+  implicit def Tuple6Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order]: Order[(A, B, C, D, E, F)] =
+    orderC {
+      case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+          , implicitly[Order[C]].order(c1)(c2)
+          , implicitly[Order[D]].order(d1)(d2)
+          , implicitly[Order[E]].order(e1)(e2)
+          , implicitly[Order[F]].order(f1)(f2)
+        ))
+    }
+
+  implicit def Tuple7Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order, G: Order]: Order[(A, B, C, D, E, F, G)] =
+    orderC {
+      case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[A]].order(a1)(a2)
+          , implicitly[Order[B]].order(b1)(b2)
+          , implicitly[Order[C]].order(c1)(c2)
+          , implicitly[Order[D]].order(d1)(d2)
+          , implicitly[Order[E]].order(e1)(e2)
+          , implicitly[Order[F]].order(f1)(f2)
+          , implicitly[Order[G]].order(g1)(g2)
+        ))
+    }
+
+  implicit def OptionOrder[A: Order]: Order[Option[A]] =
+    orderC {
+      case (Some(x), Some(y)) => implicitly[Order[A]].order(x)(y)
+      case (Some(_), None) => GT
+      case (None, Some(_)) => LT
+      case (None, None) => EQ
+    }
+
+  implicit def EitherOrder[A: Order, B: Order]: Order[Either[A, B]] =
+    orderC {
+      case (Left(x), Left(y)) => implicitly[Order[A]].order(x)(y)
+      case (Right(x), Right(y)) => implicitly[Order[B]].order(x)(y)
+      case (Left(_), Right(_)) => LT
+      case (Right(_), Left(_)) => GT
+    }
+
+  implicit def SetOrder[CC[A] <: collection.Set[A], A: Order]: Order[CC[A]] =
+    orderC((a1, a2) => {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = true
+      var r: Ordering = EQ
+
+      while (i1.hasNext && i2.hasNext && b) {
+        val a1 = i1.next
+        val a2 = i2.next
+
+        val o = implicitly[Order[A]].order(a1)(a2)
+        if (o != EQ) {
+          r = o
+          b = false
+        }
+      }
+
+      if (i1.hasNext)
+        if (i2.hasNext)
+          r
+        else
+          GT
       else
-        GT
-    else
-      LT
-  })
-
-  implicit def OptionOrder[A: Order]: Order[Option[A]] = order {
-    case (Some(x), Some(y)) => x ?|? y
-    case (Some(_), None) => GT
-    case (None, Some(_)) => LT
-    case (None, None) => EQ
-  }
-
-  implicit def EitherOrder[A: Order, B: Order]: Order[Either[A, B]] = order {
-    case (Left(x), Left(y)) => x ?|? y
-    case (Right(x), Right(y)) => x ?|? y
-    case (Left(_), Right(_)) => LT
-    case (Right(_), Left(_)) => GT
-  }
-
-  implicit def EitherLeftOrder[A: Order, B]: Order[Either.LeftProjection[A, B]] = order((a1, a2) =>
-    (a1.toOption, a2.toOption) match {
-      case (Some(a1), Some(a2)) => a1 ?|? a2
-      case (Some(_), None) => GT
-      case (None, Some(_)) => LT
-      case (None, None) => EQ
+        LT
     })
 
-  implicit def EitherRightOrder[A, B: Order]: Order[Either.RightProjection[A, B]] = order((b1, b2) =>
-    (b1.toOption, b2.toOption) match {
-      case (Some(b1), Some(b2)) => b1 ?|? b2
-      case (Some(_), None) => GT
-      case (None, Some(_)) => LT
-      case (None, None) => EQ
+  implicit def MapOrder[CC[K, V] <: collection.Map[K, V], A: Order, B: Order]: Order[CC[A, B]] =
+    orderBy(_.toSet)
+
+  import java.{lang => jl, util => ju}
+
+  implicit def JavaIterableOrder[CC[X] <: jl.Iterable[X], A: Order]: Order[CC[A]] =
+    orderC((a1, a2) => {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = true
+      var r: Ordering = EQ
+
+      while (i1.hasNext && i2.hasNext && b) {
+        val a1 = i1.next
+        val a2 = i2.next
+
+        val o = implicitly[Order[A]].order(a1)(a2)
+        if (o != EQ) {
+          r = o
+          b = false
+        }
+      }
+
+      if (i1.hasNext)
+        if (i2.hasNext)
+          r
+        else
+          GT
+      else
+        LT
     })
 
-  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = orderBy(_.either)
+  implicit def JavaMapEntryOrder[K: Order, V: Order]: Order[java.util.Map.Entry[K, V]] =
+    orderC {
+      case (a1, a2) =>
+        implicitly[FoldMap[List]].foldU(List(
+          implicitly[Order[K]].order(a1.getKey)(a2.getKey)
+          , implicitly[Order[V]].order(a1.getValue)(a2.getValue)
+        ))
+    }
 
-  implicit def JavaIterableOrder[A: Order]: Order[java.lang.Iterable[A]] = {
-    import collection.JavaConversions._
-    IterableOrder[A] ∙ (x => x)
-  }
+  implicit def JavaMapOrder[K: Order, V: Order]: Order[ju.Map[K, V]] =
+    orderBy(_.entrySet)
+
+  implicit def CallableOrder[A: Order]: Order[java.util.concurrent.Callable[A]] =
+    orderBy(_.call)
 }

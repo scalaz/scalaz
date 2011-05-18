@@ -1,14 +1,20 @@
 package scalaz
+package wrap
 
-sealed trait ShortW extends PimpedType[Short] {
+sealed trait ShortW {
+
+  import newtypes._
+
   val value: Short
 
-  import Scalaz._
+  def multiplication: ShortMultiplication =
+    Pack.pack[Short, ShortMultiplication](value)
 
-  def ∏ : ShortMultiplication = multiplication(value)
+  def ∏ : ShortMultiplication =
+    multiplication
 }
 
-trait Shorts {
+trait ShortWs {
   implicit def ShortTo(n: Short): ShortW = new ShortW {
     val value = n
   }

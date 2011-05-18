@@ -1,34 +1,60 @@
 package scalaz
 
-/**
- * A categorical monoid.
- *
- * <p>
- * All monoid instances must satisfy the semigroup law and 2 additional laws:
- * <ol>
- * <li><strong>left identity</strong><br/><code>forall a. append(zero, a) == a</code></li>
- * <li><strong>right identity</strong><br/><code>forall a. append(a, zero) == a</code></li>
- * </p>
- */
-trait Monoid[M] extends Zero[M] with Semigroup[M]
+trait Monoid[A] {
+  val zero: Zero[A]
+  val semigroup: Semigroup[A]
 
-abstract class MonoidLow {
-  implicit def monoid[M](implicit s: Semigroup[M], z: Zero[M]): Monoid[M] = new Monoid[M] {
-    def append(s1: M, s2: => M) = s append (s1, s2)
+  def z: A =
+    zero.zero
 
-    val zero = z.zero
-  }
+  def append(a1: A, a2: => A): A =
+    semigroup.append(a1, a2)
 }
 
-object Monoid extends MonoidLow {
-  import Semigroup._
-  import Zero._
+object Monoid extends Monoids
 
-  implicit def EitherLeftMonoid[A, B](implicit bz: Zero[B]) = monoid[Either.LeftProjection[A, B]](EitherLeftSemigroup, EitherLeftZero[A, B](bz))
+trait Monoids {
+  def monoid[A](implicit zz: Zero[A], s: Semigroup[A]): Monoid[A] = new Monoid[A] {
+    val zero = zz
+    val semigroup = s
+  }
 
-  /** A monoid for sequencing Applicative effects. */
+  implicit val UnitMonoid: Monoid[Unit] =
+    monoid
+
+  implicit val BooleanMonoid: Monoid[Boolean] =
+    monoid
+
+  implicit val StringMonoid: Monoid[String] =
+    monoid
+
+  implicit def StreamMonoid[A]: Monoid[Stream[A]] =
+    monoid
+
+  implicit def ListMonoid[A]: Monoid[List[A]] =
+    monoid
+
+  implicit def Tuple2Monoid[A, B](implicit ma: Monoid[A], mb: Monoid[B]): Monoid[(A, B)] = {
+    implicit val sa = implicitly[Monoid[(A, B)]].semigroup
+    implicit val za = implicitly[Monoid[(A, B)]].zero
+    monoid[(A, B)]
+  }
+
+  implicit def Tuple3Monoid[A, B, C](implicit ma: Monoid[A], mb: Monoid[B], mc: Monoid[C]): Monoid[(A, B, C)] = {
+    implicit val sa = implicitly[Monoid[(A, B, C)]].semigroup
+    implicit val za = implicitly[Monoid[(A, B, C)]].zero
+    monoid[(A, B, C)]
+  }
+
+  /**A monoid for sequencing Applicative effects. */
   def liftMonoid[F[_], M](implicit m: Monoid[M], a: Applicative[F]): Monoid[F[M]] = new Monoid[F[M]] {
-    val zero: F[M] = a.pure(m.zero)
-    def append(x: F[M], y: => F[M]): F[M] = a.liftA2(x, y, (m1: M, m2: M) => m.append(m1, m2))
+    val zero = new Zero[F[M]] {
+      val zero =
+        a.point(m.z)
+    }
+    val semigroup: Semigroup[F[M]] = new Semigroup[F[M]] {
+      def append(x: F[M], y: => F[M]) =
+        a.liftA2[M, M, M](m1 => m2 => m.append(m1, m2))(x)(y)
+    }
   }
 }

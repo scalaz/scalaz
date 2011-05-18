@@ -8,7 +8,7 @@ package scalaz
  * above is expressed as `PartialApply1Of2[Either, Int]#Flip`
  *
  * This can also be expressed as `({type λ[α]=Either[α, Int]})#λ`.
-*/
+ */
 trait PartialApply1Of2[T[_, _], A] {
   type Apply[B] = T[A, B]
 
@@ -16,7 +16,7 @@ trait PartialApply1Of2[T[_, _], A] {
 }
 
 trait PartialApply1Of3[T[_, _, _], A] {
-  type Apply[B,C] = T[A, B, C]
+  type Apply[B, C] = T[A, B, C]
 }
 
 trait PartialApply2Of3[T[_, _, _], A, B] {
@@ -55,8 +55,6 @@ trait PartialApplyKA[T[_[_], _, _], M[_], A] {
 
 /**
  * Applies one type argument of two where one of the type arguments has a kind * -> *.
- *
- * @author <a href="mailto:code@tmorris.net">Tony Morris</a>
  */
 trait PartialType2[T[_[_], _], A[_]] {
   type Apply[B] = T[A, B]

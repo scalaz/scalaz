@@ -1,11 +1,21 @@
 package scalaz
+package wrap
 
 sealed trait BooleanW {
-  val isTrue: Boolean
 
-  import Scalaz._
-  
-  def |∧| : BooleanConjunction = conjunction(isTrue)
+  import data._, LazyEither._
+  import newtypes._
+
+  val value: Boolean
+
+  def conjunction: BooleanConjunction =
+    Pack.pack[Boolean, BooleanConjunction](value)
+
+  def |∧| : BooleanConjunction =
+    conjunction
+
+  def |/\| : BooleanConjunction =
+    conjunction
 
   /**
    * Conjunction. (AND)
@@ -18,7 +28,22 @@ sealed trait BooleanW {
    * 1 1  1
    * </pre>
    */
-  def ∧(q: => BooleanW) = isTrue && q.isTrue
+  def ∧(q: => Boolean) =
+    value && q
+
+  /**
+   * Conjunction. (AND)
+   *
+   * <pre>
+   * p q  p /\ q
+   * 0 0  0
+   * 0 1  0
+   * 1 0  0
+   * 1 1  1
+   * </pre>
+   */
+  def /\(q: => Boolean) =
+    ∧(q)
 
   /**
    * Disjunction. (OR)
@@ -31,59 +56,78 @@ sealed trait BooleanW {
    * 1 1  1
    * </pre>
    */
-  def ∨(q: => BooleanW) = isTrue || q.isTrue
+  def ∨(q: => Boolean) =
+    value || q
+
+  /**
+   * Disjunction. (OR)
+   *
+   * <pre>
+   * p q  p \/ q
+   * 0 0  0
+   * 0 1  1
+   * 1 0  1
+   * 1 1  1
+   * </pre>
+   */
+  def \/(q: => Boolean) =
+    ∨(q)
 
   /**
    * Negation of Conjunction. (NOR)
    *
    * <pre>
-   * p q  p ⊽ q
+   * p q  p !&& q
    * 0 0  1
    * 0 1  1
    * 1 0  1
    * 1 1  0
    * </pre>
    */
-  def ⊽(q: => BooleanW) = !isTrue || !q.isTrue
+  def !&&(q: => Boolean) =
+    !value || !q
 
   /**
    * Negation of Disjunction. (NAND)
    *
    * <pre>
-   * p q  p ⊼ q
+   * p q  p !|| q
    * 0 0  1
    * 0 1  0
    * 1 0  0
    * 1 1  0
    * </pre>
    */
-  def ⊼(q: => BooleanW) = !isTrue && !q.isTrue
+  def !||(q: => Boolean) =
+    !value && !q
 
   /**
    * Conditional.
    *
    * <pre>
-   * p q  p → q
+   * p q  p --> q
    * 0 0  1
    * 0 1  1
    * 1 0  0
    * 1 1  1
    * </pre>
    */
-  def →(q: => BooleanW) = !isTrue || q.isTrue
+  def -->(q: => Boolean) =
+    !value || q
 
   /**
    * Inverse Conditional.
    *
    * <pre>
-   * p q  p ⇐ q
+   * p q  p <-- q
    * 0 0  1
    * 0 1  0
    * 1 0  1
    * 1 1  1
    * </pre>
    */
-  def ⇐(q: => BooleanW) = isTrue || !q.isTrue
+  def <--(q: => Boolean) =
+    value || !q
 
   /**
    * Negational of Conditional.
@@ -96,7 +140,36 @@ sealed trait BooleanW {
    * 1 1  0
    * </pre>
    */
-  def ⇏(q: => BooleanW) = isTrue && !q.isTrue
+  def ⇏(q: => Boolean) =
+    value && !q
+
+  /**
+   * Negational of Conditional.
+   *
+   * <pre>
+   * p q  p -/> q
+   * 0 0  0
+   * 0 1  0
+   * 1 0  1
+   * 1 1  0
+   * </pre>
+   */
+  def -/>(q: => Boolean) =
+    ⇏(q)
+
+  /**
+   * Negation of Inverse Conditional.
+   *
+   * <pre>
+   * p q  p <\- q
+   * 0 0  0
+   * 0 1  1
+   * 1 0  0
+   * 1 1  0
+   * </pre>
+   */
+  def ⇍(q: => Boolean) =
+    !value && q
 
   /**
    * Negation of Inverse Conditional.
@@ -109,27 +182,25 @@ sealed trait BooleanW {
    * 1 1  0
    * </pre>
    */
-  def ⇍(q: => BooleanW) = !isTrue && q.isTrue
-
-  /**
-   * Executes the given side-effect if this boolean value is <code>true</code>.
-   */
-  def !(t: => Unit) = if(isTrue) t
+  def <\-(q: => Boolean) =
+    ⇍(q)
 
   /**
    * Executes the given side-effect if this boolean value is <code>false</code>.
    */
-  def unless(f: => Unit) = if(!isTrue) f
+  def unless(f: => Unit) =
+    if (!value) f
 
   /**
    * Executes the given side-effect if this boolean value is <code>true</code>.
    */
-  def when(f: => Unit) = if(isTrue) f
+  def when(f: => Unit) =
+    if (value) f
 
   /**
    * @return `a` if true, `b` otherwise
    */
-  def fold[A](a: => A, b: => A): A = if (isTrue) a else b
+  def fold[A](a: => A, b: => A): A = if (value) a else b
 
   trait Conditional[X] {
     def |(f: => X): X
@@ -138,14 +209,21 @@ sealed trait BooleanW {
   /**
    * Conditional operator that returns the first argument if this is <code>true</code>, the second argument otherwise.
    */
-  def ?[X](t: => X) = new Conditional[X] {
-    def |(f: => X) = if(isTrue) t else f
+  def ?[X](t: => X): Conditional[X] = new Conditional[X] {
+    def |(f: => X) = if (value) t else f
   }
 
   /**
    * Returns the given argument in <code>Some</code> if this is <code>true</code>, <code>None</code> otherwise.
    */
-  def option[A](a: => A) = if(isTrue) Some(a) else None
+  def option[A](a: => A): Option[A] =
+    if (value) Some(a) else None
+
+  /**
+   * Returns the given argument in <code>lazySome</code> if this is <code>true</code>, <code>lazyNone</code> otherwise.
+   */
+  def lazyOption[A](a: => A): LazyOption[A] =
+    if (value) LazyOption.lazySome(a) else LazyOption.lazyNone
 
   trait ConditionalEither[A] {
     def or[B](b: => B): Either[A, B]
@@ -156,34 +234,54 @@ sealed trait BooleanW {
    * <code>Right</code>.
    */
   def either[A, B](a: => A) = new ConditionalEither[A] {
-    def or[B](b: => B) = if(isTrue) Left(a) else Right(b)
+    def or[B](b: => B) =
+      if (value) Left(a) else Right(b)
+  }
+
+  trait ConditionalLazyEither[A] {
+    def or[B](b: => B): LazyEither[A, B]
+  }
+
+  /**
+   * Returns the first argument in <code>Left</code> if this is <code>true</code>, otherwise the second argument in
+   * <code>Right</code>.
+   */
+  def lazyEither[A, B](a: => A) = new ConditionalLazyEither[A] {
+    def or[B](b: => B) =
+      if (value) lazyLeft(a) else lazyRight(b)
   }
 
   /**
    * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
    * argument.
    */
-  def ??[A: Zero](a: => A): A = if(isTrue) a else ∅
+  def ??[A](a: => A)(implicit z: Zero[A]): A =
+    if (value) a else z.zero
 
-  def !?[A: Zero](a: => A): A = if(!isTrue) a else ∅
+  /**
+   * Returns the given argument if this is <code>false</code>, otherwise, the zero element for the type of the given
+   * argument.
+   */
+  def !?[A](a: => A)(implicit z: Zero[A]): A =
+    if (value) z.zero else a
 
   trait GuardPrevent[M[_]] {
-    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]): M[A]
+    def apply[A](a: => A)(implicit p: PointedEmpty[M]): M[A]
   }
 
   def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) a η else <∅>
+    def apply[A](a: => A)(implicit p: PointedEmpty[M]) =
+      if (value) p.point(a) else p.e
   }
 
   def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit e: Empty[M], p: Pure[M]) = if(isTrue) <∅> else a η
+    def apply[A](a: => A)(implicit p: PointedEmpty[M]) =
+      if (value) p.e else p.point(a)
   }
 }
 
-trait Booleans {
-  implicit def BooleanTo(b: Boolean): BooleanW = new BooleanW {
-    val isTrue = b
+trait BooleanWs {
+  implicit def BooleanTo(n: Boolean): BooleanW = new BooleanW {
+    val value = n
   }
-
-  implicit def BooleanFrom(b: BooleanW): Boolean = b.isTrue
 }

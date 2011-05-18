@@ -1,7 +1,14 @@
 package scalaz
+package wrap
 
-sealed trait OptionW[A] extends PimpedType[Option[A]] {
-  import Scalaz._
+sealed trait OptionW[A] {
+  val value: Option[A]
+
+  import data.*._
+  import data.Validation, Validation._
+  import newtypes.{FirstOption, LastOption}
+  import iteratee.IterVT, IterVT._
+  import iteratee.Input._
 
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
@@ -12,7 +19,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
     case Some(a) => some(a)
   }
 
-  /** Alias for `cata` */
+  /**Alias for `cata` */
   def fold[X](some: A => X, none: => X): X = cata(some, none)
 
   sealed trait Fold[X] {
@@ -61,7 +68,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
    */
-  def err(message: => String): A = value getOrElse (sys.error(message))
+  def err(message: => String): A = value getOrElse (error(message))
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
@@ -79,37 +86,37 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    */
   def unary_~(implicit z: Zero[A]): A = value getOrElse z.zero
 
-  def orZero(implicit z: Zero[A]): A = ~this
-
   def toSuccess[E](e: => E): Validation[E, A] = value match {
-    case Some(a) => Success(a)
-    case None => Failure(e)
+    case Some(a) => success(a)
+    case None => failure(e)
   }
 
   def toFailure[B](b: => B): Validation[A, B] = value match {
-    case Some(e) => Failure(e)
-    case None => Success(b)
+    case Some(e) => failure(e)
+    case None => success(b)
   }
 
-  def fst: FirstOption[A] = value
+  def first: FirstOption[A] =
+    value.pack[FirstOption[A]]
 
-  def lst: LastOption[A] = value
+  def last: LastOption[A] =
+    value.pack[LastOption[A]]
 
   /**
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  def orEmpty[M[_] : Pure : Empty]: M[A] = value match {
-    case Some(a) => a η
-    case None => <∅>
+  def orEmpty[M[_] : Pointed : Empty]: M[A] = value match {
+    case Some(a) => implicitly[Pointed[M]].point(a)
+    case None => implicitly[Empty[M]].empty
   }
 
   /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
-  def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pure[F]): B = value match {
-    case None    => b
-    case Some(a) => k(a.η[F])
+  def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = value match {
+    case None => b
+    case Some(a) => k(implicitly[Pointed[F]].point(a))
   }
 
   /**
@@ -120,13 +127,15 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
    */
-  def iterDoneOr[B](b: => B, f: A => IterV[A, B]): IterV[A, B] = value match {
-    case None    => IterV.Done(b, IterV.EOF.apply)
+  def doneOr[F[_], B](b: => B, f: A => IterVT[A, F, B]): IterVT[A, F, B] = value match {
+    case None => doneT(b, eofInput)
     case Some(a) => f(a)
   }
 }
 
-trait Options {
+object OptionW extends OptionWs
+
+trait OptionWs {
   implicit def OptionTo[A](o: Option[A]): OptionW[A] = new OptionW[A] {
     val value = o
   }

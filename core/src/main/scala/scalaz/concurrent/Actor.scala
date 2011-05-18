@@ -3,9 +3,12 @@ package concurrent
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
-import Scalaz._
-                  
-sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = throw(_))(implicit val strategy: Strategy) { 
+import Run._
+
+sealed trait Actor[A] {
+  val onError: Throwable => Unit
+  val e: A => Unit
+  implicit val strategy: Strategy
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
@@ -16,21 +19,23 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
     else () => ()
   }
 
-  val toEffect: Effect[A] = effect[A]((a) => this ! a)
+  val toEffect: Run[A] = effect[A]((a) => this ! a)
 
   def !(a: A) = if (mbox offer a) work else toEffect ! a
 
   def apply(a: A) = this ! a
-  
-  private val act: Effect[Unit] = effect((u: Unit) => {
+
+  private val act: Run[Unit] = effect((u: Unit) => {
     var go = true
-    var i = 0 
+    var i = 0
     while (go && i < 1000) {
       val m = mbox.poll
       if (m != null) try {
         e(m)
         i = i + 1
-      } catch { case e => onError(e) }
+      } catch {
+        case e => onError(e)
+      }
       else {
         suspended.set(true)
         work
@@ -41,7 +46,14 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
   })
 }
 
+object Actor extends Actors
+
 trait Actors {
-  def actor[A](e: A => Unit, err: Throwable => Unit = throw(_))(implicit s: Strategy): Actor[A] = Actor[A](e,err)
-  implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _ 
+  def actor[A](et: A => Unit, err: Throwable => Unit = throw (_))(implicit s: Strategy): Actor[A] = new Actor[A] {
+    implicit val strategy = s
+    val e = et
+    val onError = err
+  }
+
+  implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _
 }
