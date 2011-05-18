@@ -1,8 +1,9 @@
 package scalaz
+package data
 
-class BloomFilter(val size: Int, val expectedElements: Int) {
-  require(size > 0)
-  require(expectedElements > 0)
+sealed trait BloomFilter {
+  val size: Int
+  val expectedElements: Int
 
   import scala.math._
 
@@ -60,5 +61,22 @@ class BloomFilter(val size: Int, val expectedElements: Int) {
       n
     }
   }
+
 }
 
+object BloomFilter extends BloomFilters {
+  def apply(invariants: => BloomFilter): Int => Int => BloomFilter =
+    bloomFilter(invariants)
+}
+
+trait BloomFilters {
+  def bloomFilter(invariants: => BloomFilter): Int => Int => BloomFilter =
+    s => e =>
+      if (s > 0 && e > 0)
+        new BloomFilter {
+          val size = s
+          val expectedElements = e
+        }
+      else
+        invariants
+}

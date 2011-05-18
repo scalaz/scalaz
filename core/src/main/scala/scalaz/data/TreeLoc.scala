@@ -1,19 +1,26 @@
 package scalaz
+package data
 
-import Scalaz._
+sealed trait TreeLoc[A] {
 
-sealed trait TreeLoc[+A] {
+  import TreeLoc._
+  import Tree._
+
   val tree: Tree[A]
-  val lefts: Stream[Tree[A]]
-  val rights: Stream[Tree[A]]
-  val parents: Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]
+  val lefts: TreeForest[A]
+  val rights: TreeForest[A]
+  val parents: Parents[A]
 
   def parent: Option[TreeLoc[A]] = parents match {
     case (pls, v, prs) #:: ps => Some(loc(node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
     case Stream.Empty => None
   }
 
-  def root: TreeLoc[A] = parent.some(_.root).none(this)
+  def root: TreeLoc[A] =
+    parent match {
+      case Some(z) => z.root
+      case None => this
+    }
 
   def left: Option[TreeLoc[A]] = lefts match {
     case t #:: ts => Some(loc(t, ts, tree #:: rights, parents))
@@ -36,12 +43,12 @@ sealed trait TreeLoc[+A] {
   }
 
   def getChild(n: Int): Option[TreeLoc[A]] =
-    for{lr <- splitChildren(Stream.Empty, tree.subForest, n)
-        ls = lr._1
+    for {lr <- splitChildren(Stream.Empty, tree.subForest, n)
+         ls = lr._1
     } yield loc(ls.head, ls.tail, lr._2, downParents)
 
   def findChild(p: Tree[A] => Boolean): Option[TreeLoc[A]] = {
-    def split(acc: Stream[Tree[A]], xs: Stream[Tree[A]]): Option[(Stream[Tree[A]], Tree[A], Stream[Tree[A]])] =
+    def split(acc: TreeForest[A], xs: TreeForest[A]): Option[(TreeForest[A], Tree[A], TreeForest[A])] =
       (acc, xs) match {
         case (acc, Stream.cons(x, xs)) => if (p(x)) Some((acc, x, xs)) else split(Stream.cons(x, acc), xs)
         case _ => None
@@ -51,7 +58,7 @@ sealed trait TreeLoc[+A] {
 
   def toTree: Tree[A] = root.tree
 
-  def toForest: Stream[Tree[A]] = combChildren(root.lefts, root.tree, root.rights)
+  def toForest: TreeForest[A] = combChildren(root.lefts, root.tree, root.rights)
 
   def isRoot: Boolean = parents.isEmpty
 
@@ -65,25 +72,25 @@ sealed trait TreeLoc[+A] {
 
   def hasChildren: Boolean = !isLeaf
 
-  def setTree[AA >: A](t: Tree[AA]): TreeLoc[AA] = loc(t, lefts, rights, parents)
+  def setTree(t: Tree[A]): TreeLoc[A] = loc(t, lefts, rights, parents)
 
-  def modifyTree[AA >: A](f: Tree[AA] => Tree[AA]): TreeLoc[AA] = setTree(f(tree))
+  def modifyTree(f: Tree[A] => Tree[A]): TreeLoc[A] = setTree(f(tree))
 
-  def modifyLabel[AA >: A](f: AA => AA): TreeLoc[AA] = setLabel(f(getLabel))
+  def modifyLabel(f: A => A): TreeLoc[A] = setLabel(f(getLabel))
 
   def getLabel: A = tree.rootLabel
 
-  def setLabel[AA >: A](a: AA): TreeLoc[AA] = modifyTree((t: Tree[AA]) => node(a, t.subForest))
+  def setLabel(a: A): TreeLoc[A] = modifyTree((t: Tree[A]) => node(a, t.subForest))
 
-  def insertLeft[AA >: A](t: Tree[AA]): TreeLoc[AA] = loc(t, lefts, Stream.cons(tree, rights), parents)
+  def insertLeft(t: Tree[A]): TreeLoc[A] = loc(t, lefts, Stream.cons(tree, rights), parents)
 
-  def insertRight[AA >: A](t: Tree[AA]): TreeLoc[AA] = loc(t, Stream.cons(tree, lefts), rights, parents)
+  def insertRight(t: Tree[A]): TreeLoc[A] = loc(t, Stream.cons(tree, lefts), rights, parents)
 
-  def insertDownFirst[AA >: A](t: Tree[AA]): TreeLoc[AA] = loc(t, Stream.Empty, tree.subForest, downParents)
+  def insertDownFirst(t: Tree[A]): TreeLoc[A] = loc(t, Stream.Empty, tree.subForest, downParents)
 
-  def insertDownLast[AA >: A](t: Tree[AA]): TreeLoc[AA] = loc(t, tree.subForest.reverse, Stream.Empty, downParents)
+  def insertDownLast(t: Tree[A]): TreeLoc[A] = loc(t, tree.subForest.reverse, Stream.Empty, downParents)
 
-  def insertDownAt[AA >: A](n: Int, t: Tree[AA]): Option[TreeLoc[AA]] =
+  def insertDownAt(n: Int, t: Tree[A]): Option[TreeLoc[A]] =
     for (lr <- splitChildren(Stream.Empty, tree.subForest, n)) yield loc(t, lr._1, lr._2, downParents)
 
   def delete: Option[TreeLoc[A]] = rights match {
@@ -102,28 +109,53 @@ sealed trait TreeLoc[+A] {
   private def downParents = (lefts, tree.rootLabel, rights) #:: parents
 
   private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
-    ls.foldl(t #:: rs)((a, b) => b #:: a)
+    ls.foldLeft(t #:: rs)((a, b) => b #:: a)
 
   private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
     (acc, xs, n) match {
       case (acc, xs, 0) => Some((acc, xs))
       case (acc, Stream.cons(x, xs), n) => splitChildren(Stream.cons(x, acc), xs, n - 1)
       case _ => None
-    }  
+    }
+}
+
+object TreeLoc extends TreeLocs {
+  def apply[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
+    loc(t, l, r, p)
 }
 
 trait TreeLocs {
-  def loc[A](t: Tree[A], l: Stream[Tree[A]], r: Stream[Tree[A]], p: Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]): TreeLoc[A] =
+  type TreeForest[A] =
+  Stream[Tree[A]]
+
+  type Parent[A] =
+  (TreeForest[A], A, TreeForest[A])
+
+  type Parents[A] =
+  Stream[Parent[A]]
+
+  def loc[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
     new TreeLoc[A] {
       val tree = t
       val lefts = l
       val rights = r
       val parents = p
-
-      override def toString = "<treeloc>"
     }
 
-  def fromForest[A](ts: Stream[Tree[A]]) = ts match {
+  def fromForest[A](ts: TreeForest[A]) = ts match {
     case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))
+  }
+
+  implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] =
+    Show.show((t: TreeLoc[A]) =>
+      implicitly[Show[Tree[A]]].show(t.toTree) ++ "@" ++ implicitly[Show[Stream[Int]]].show(t.parents.map(_._1.length).reverse))
+
+  implicit def TreeLocEqual[A: Equal]: Equal[TreeLoc[A]] = {
+    Equal.equalC[TreeLoc[A]]((a1, a2) =>
+      implicitly[Equal[Tree[A]]].equal(a1.tree)(a2.tree)
+          && implicitly[Equal[Stream[Tree[A]]]].equal(a1.lefts)(a2.lefts)
+          && implicitly[Equal[Stream[Tree[A]]]].equal(a1.rights)(a2.rights)
+          && implicitly[Equal[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]].equal(a1.parents)(a2.parents)
+    )
   }
 }
