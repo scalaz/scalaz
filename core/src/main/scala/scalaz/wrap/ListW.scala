@@ -120,18 +120,18 @@ sealed trait ListW[A] {
     }
   }
 
-  def tails: List[List[A]] = value match {
+  def tailz: List[List[A]] = value match {
     case Nil => List(Nil)
-    case xxs@(_ :: xs) => xxs :: xs.tails
+    case xxs@(_ :: xs) => xxs :: xs.tailz
   }
 
-  def inits: List[List[A]] = value match {
+  def initz: List[List[A]] = value match {
     case Nil => List(Nil)
-    case xxs@(x :: xs) => Nil :: (xs.inits map (x :: _))
+    case xxs@(x :: xs) => Nil :: (xs.initz map (x :: _))
   }
 
   def allPairs: List[(A, A)] =
-    value.tails.tail flatMap (value zip _)
+    value.tailz.tail flatMap (value zip _)
 
   def adjacentPairs: List[(A, A)] = value match {
     case Nil => Nil
