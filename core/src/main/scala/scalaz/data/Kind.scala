@@ -388,6 +388,15 @@ trait *->*[F[_], A] {
   def <**>[B, C](b: F[B])(f: (A, B) => C)(implicit ap: ApplicFunctor[F]): F[C] =
     ap(ap.fmap(f.curried)(value))(b)
 
+  def <***>[B, C, D](b: F[B], c: F[C])(f: (A, B, C) => D)(implicit ap: ApplicFunctor[F]): F[D] =
+    ap(ap(ap.fmap(f.curried)(value))(b))(c)
+
+  def <****>[B, C, D, E](b: F[B], c: F[C], d: F[D])(f: (A, B, C, D) => E)(implicit ap: ApplicFunctor[F]): F[E] =
+    ap(ap(ap(ap.fmap(f.curried)(value))(b))(c))(d)
+
+  def <*****>[B, C, D, E, FF](b: F[B], c: F[C], d: F[D], e: F[E])(f: (A, B, C, D, E) => FF)(implicit ap: ApplicFunctor[F]): F[FF] =
+    ap(ap(ap(ap(ap.fmap(f.curried)(value))(b))(c))(d))(e)
+
   def *>[B](b: F[B])(implicit ap: ApplicFunctor[F]): F[B] =
     <**>(b)((_, b) => b)
 
@@ -910,4 +919,10 @@ trait **->**->** {
   implicit def **->**->**[A, F[_, _], B](a: F[A, B]): *->*->*[A, F, B] = new *->*->*[A, F, B] {
     val value = a
   }
+}
+
+trait |*->*|->*->*[F[_[_], _], G[_], A] {
+  val value: F[G, A]
+  def lower(implicit e: Extend[G], m: CoMonadTrans[F]): G[A] =
+    m.lower(value)
 }

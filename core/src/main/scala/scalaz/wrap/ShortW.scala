@@ -14,6 +14,8 @@ sealed trait ShortW {
     multiplication
 }
 
+object ShortW extends ShortWs
+
 trait ShortWs {
   implicit def ShortTo(n: Short): ShortW = new ShortW {
     val value = n

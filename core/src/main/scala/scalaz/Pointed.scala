@@ -9,6 +9,7 @@ object Pointed extends Pointeds
 trait Pointeds {
 
   import Const._
+  import java.util.concurrent.Callable
 
   implicit def ConstPointed[A: Zero]: Pointed[({type λ[α] = Const[A, α]})#λ] = new Pointed[({type λ[α] = Const[A, α]})#λ] {
     def point[B](a: => B) = const[B](implicitly[Zero[A]].zero)
@@ -25,5 +26,11 @@ trait Pointeds {
   implicit val StreamPointed: Pointed[Stream] = new Pointed[Stream] {
     def point[A](a: => A) = Stream(a)
   }
+
+  implicit def CallablePointed: Pointed[Callable] = new Pointed[Callable] {
+      def point[A](a: => A) = new Callable[A] {
+        def call = a
+      }
+    }
 
 }

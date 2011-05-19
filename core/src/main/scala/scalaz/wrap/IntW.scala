@@ -14,6 +14,9 @@ sealed trait IntW {
     multiplication
 }
 
+object IntW extends IntWs
+
+
 trait IntWs {
   implicit def IntTo(n: Int): IntW = new IntW {
     val value = n

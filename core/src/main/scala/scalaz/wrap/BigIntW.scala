@@ -14,6 +14,8 @@ sealed trait BigIntW {
     multiplication
 }
 
+object BigIntW extends BigIntWs
+
 trait BigIntWs {
   implicit def BigIntTo(n: BigInt): BigIntW = new BigIntW {
     val value = n

@@ -141,6 +141,9 @@ trait Validations {
       def apply[E](e: E) = Failure(e)
     }
 
+  def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
+    e.fold(e => failure[A].apply[E](e), a => success[E].apply[A](a))
+
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
     Show.shows(_.fold(
       "Success(" + implicitly[Show[E]].shows(_) + ")"

@@ -14,6 +14,8 @@ sealed trait ByteW {
     multiplication
 }
 
+object ByteW extends ByteWs
+
 trait ByteWs {
   implicit def ByteTo(n: Byte): ByteW = new ByteW {
     val value = n

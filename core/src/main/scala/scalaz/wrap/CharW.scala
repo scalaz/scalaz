@@ -21,6 +21,8 @@ sealed trait CharW {
     alphas find (_.toChar == value)
 }
 
+object CharW extends CharWs
+
 trait CharWs {
   implicit def CharTo(n: Char): CharW = new CharW {
     val value = n

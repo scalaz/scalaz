@@ -41,7 +41,7 @@ sealed trait StepListT[F[_], A] {
     m.fmap((_: Option[(A, StepListT[F, A])]).isDefined)(uncons)
 
   def head(implicit m: Monad[F]): F[A] =
-    m.fmap((_: Option[(A, StepListT[F, A])]).getOrElse(error("head: emptyEphemeralStream StepListT"))._1)(uncons)
+    m.fmap((_: Option[(A, StepListT[F, A])]).getOrElse(error("head: empty StepListT"))._1)(uncons)
 
   /**Don't use iteratively! */
   def tail(implicit m: Functor[F]): StepListT[F, A] =
@@ -49,11 +49,11 @@ sealed trait StepListT[F[_], A] {
       stepMap {
         case Yield(a, s) => Skip(s)
         case Skip(s) => Skip(s.tail)
-        case Done() => error("tail: emptyEphemeralStream StepListT")
+        case Done() => error("tail: empty StepListT")
       })
 
   def tailM(implicit m: Monad[F]): F[StepListT[F, A]] =
-    m.fmap((_: Option[(A, StepListT[F, A])]).getOrElse(error("tailM: emptyEphemeralStream StepListT"))._2)(uncons)
+    m.fmap((_: Option[(A, StepListT[F, A])]).getOrElse(error("tailM: empty StepListT"))._2)(uncons)
 
   def filter(p: A => Boolean)(implicit m: Functor[F]): StepListT[F, A] =
     listT[F, A](

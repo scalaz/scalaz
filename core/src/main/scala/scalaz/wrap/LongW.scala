@@ -14,6 +14,8 @@ sealed trait LongW {
     multiplication
 }
 
+object LongW extends LongWs
+
 trait LongWs {
   implicit def LongTo(n: Long): LongW = new LongW {
     val value = n
