@@ -907,6 +907,9 @@ trait *->*->*[A, F[_, _], B] {
   def &&&[C](k: F[A, C])(implicit a: Arrow[F]): F[A, (B, C)] =
     a.combine(value)(k)
 
+  def product(implicit a: Arrow[F]): F[(A, A), (B, B)] =
+    ***(value)
+
   def ^>>[C](f: C => A)(implicit a: Arrow[F]): F[C, B] =
     a.mapfst(f)(value)
 
