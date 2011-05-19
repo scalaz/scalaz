@@ -103,7 +103,7 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
 
   def tails: List[List[A]] = value match {
     case Nil => List(Nil)
-    case xxs@(_::xs) => xxs :: (xs: ListW[A]).tails
+    case xxs@(_::xs) => xxs :: xs.tails
   }
 
   def inits: List[List[A]] = value match {
@@ -111,7 +111,7 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
     case xxs@(x::xs) => List(Nil) ++ (xs.inits map (x :: _))
   }
 
-  def pairs: List[(A, A)] = (value: ListW[A]).tails.tail >>= (value.zip(_))
+  def pairs: List[(A, A)] = value.tails.tail >>= (value.zip(_))
 }
 
 trait Lists {

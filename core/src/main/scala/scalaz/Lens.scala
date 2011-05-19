@@ -211,13 +211,27 @@ object Lens {
     def --= (xs: TraversableOnce[A])        = lens.mods (_ -- xs)
   }
 
+  /** A lens that views an Addable type can provide the appearance of in place mutation */
+  implicit def addableLens[S,A,Repr <: Addable[A,Repr]](
+    l: Lens[S,Repr]
+  ) : AddableLens[S,A,Repr] = 
+  new AddableLens[S,A,Repr] {
+    def lens : Lens[S,Repr] = l
+  }
+
+  trait AddableLens[S,A,Repr <: Addable[A, Repr]] extends WrappedLens[S,Repr] { 
+    def += (elem: A) = lens.mods (_ + elem)
+    def += (elem1: A, elem2: A, elems: A*) = lens.mods (_ + elem1 + elem2 ++ elems)
+    def ++= (xs: TraversableOnce[A]) = lens.mods (_ ++ xs)
+  }
+
   /** A lens that views an SetLike type can provide the appearance of in place mutation */
   implicit def setLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]](l: Lens[S,Repr]) : SetLikeLens[S,K,Repr] = new SetLikeLens[S,K,Repr] {
     def lens : Lens[S,Repr] = l
   }
   implicit def setLens[S,K] = setLikeLens[S,K,Set[K]](_)
 
-  trait SetLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]] extends SubtractableLens[S,K,Repr] {
+  trait SetLikeLens[S,K,Repr <: SetLike[K,Repr] with Set[K]] extends AddableLens[S,K,Repr] with SubtractableLens[S,K,Repr] {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = Lens[S,Boolean](
       s => lens.get(s).contains(key),
@@ -226,10 +240,6 @@ object Lens {
     def &= (that: Set[K]) = lens.mods(_ & that)
     def &~=(that: Set[K]) = lens.mods(_ &~ that)
     def |= (that: Set[K]) = lens.mods(_ | that)
-
-		def += (elem: K) = lens.mods (_ + elem)
-    def += (elem1: K, elem2: K, elems: K*) = lens.mods (_ + elem1 + elem2 ++ elems)
-    def ++= (xs: TraversableOnce[K]) = lens.mods (_ ++ xs)
   }
 
   /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */

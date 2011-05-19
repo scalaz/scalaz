@@ -37,7 +37,7 @@ object Contravariant {
 
   implicit def ShowContravariant: Contravariant[Show] = new Contravariant[Show] {
     def contramap[A, B](r: Show[A], f: B => A) = {
-      if(r == null) sys.error("boo")
+      if(r == null) error("boo")
       show[B](b => r show (f(b)))
     }
   }

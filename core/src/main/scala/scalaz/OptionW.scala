@@ -61,7 +61,7 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
   /**
    * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
    */
-  def err(message: => String): A = value getOrElse (sys.error(message))
+  def err(message: => String): A = value getOrElse (error(message))
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
