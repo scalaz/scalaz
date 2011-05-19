@@ -1,5 +1,5 @@
 package scalaz.example
-
+package wrap
 
 object ExampleList {
   def main(args: Array[String]) = run

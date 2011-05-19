@@ -1,10 +1,11 @@
 package scalaz.example
+package effect
 
 // Purely functional typed mutable state threads
 object ExampleST {
   import scalaz._
   import Scalaz._
-  import effects._
+  import effect._
 
   // Creates a new mutable reference and mutates it
   def e1[A] = for {

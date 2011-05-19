@@ -1,4 +1,5 @@
 package scalaz.example
+package data
 
 import scalaz._
 import Scalaz._

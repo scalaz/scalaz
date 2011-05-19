@@ -1,4 +1,5 @@
 package scalaz.example
+package wrap
 
 object ExampleBoolean {
   def main(args: Array[String]) = {

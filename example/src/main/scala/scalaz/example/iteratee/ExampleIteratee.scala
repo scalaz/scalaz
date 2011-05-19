@@ -1,4 +1,5 @@
 package scalaz.example
+package iteratee
 
 object ExampleIteratee {
   def main(args: Array[String]) = run
