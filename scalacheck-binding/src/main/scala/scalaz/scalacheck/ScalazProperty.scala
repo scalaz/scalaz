@@ -46,7 +46,7 @@ trait ScalazPropertys {
                           axy: Arbitrary[(X => Y)],
                           ayz: Arbitrary[(Y => Z)],
                           ef: Equal[F[Z]]) =
-      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ (a1 ∘ (f1.*->* ∘ f2))).label("composition")
+      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ (a1 ∘ (f1 ∘ f2))).label("composition")
   }
 
   class MonadLaws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]], af: Arbitrary[Int => M[Int]], e: Equal[M[Int]])

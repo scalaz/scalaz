@@ -704,6 +704,10 @@ trait **->** {
   implicit def **->**[F[_], A](a: F[A]): (F *->* A) = new (F *->* A) {
     val value = a
   }
+
+  implicit def Function1_*->*[A, R](f: A => R) = **->**[({type λ[α]=A => α})#λ, R](f)
+  implicit def Validation_*->*[E, A](x: Validation[E, A]) = **->**[({type λ[α]=Validation[E, α]})#λ, A](x)
+  implicit def List_*->*[A](x: List[A]) = **->**[List, A](x)
 }
 
 sealed trait ApplicativeBuilder[M[_], A, B] {

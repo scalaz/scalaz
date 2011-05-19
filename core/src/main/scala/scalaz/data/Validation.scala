@@ -155,4 +155,23 @@ trait Validations {
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
     Order.orderBy(_.either)
+
+  implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α]=Validation[X, α]})#λ] = new Applic[({type λ[α]=Validation[X, α]})#λ] {
+    def applic[A, B](f: Validation[X, A => B]) =
+      a => (f, a) match {
+        case (Success(f), Success(a)) => success(f(a))
+        case (Success(_), Failure(e)) => failure(e)
+        case (Failure(e), Success(_)) => failure(e)
+        case (Failure(e1), Failure(e2)) => failure(implicitly[Semigroup[X]].append(e1, e2))
+      }
+  }
+
+  implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α]=Validation[X, α]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α]=Validation[X, α]})#λ]
+
 }

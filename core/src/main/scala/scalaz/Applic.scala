@@ -30,4 +30,9 @@ trait Applics {
     def applic[A, B](f: Stream[A => B]) =
       a => f flatMap (a map _)
   }
+
+  implicit def Function1Applic[T]: Applic[({type λ[α] = Function1[T, α]})#λ] = new Applic[({type λ[α] = Function1[T, α]})#λ] {
+    def applic[A, B](f: T => A => B) =
+      g => x => f(x)(g(x))
+  }
 }

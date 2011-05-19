@@ -31,4 +31,7 @@ trait ApplicFunctors {
 
   implicit val StreamApplicFunctor: ApplicFunctor[Stream] =
     applicFunctor
+
+  implicit def Function1ApplicFunctor[T]: ApplicFunctor[({type λ[α] = Function1[T, α]})#λ] =
+    applicFunctor[({type λ[α] = Function1[T, α]})#λ]
 }
