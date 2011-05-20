@@ -37,17 +37,16 @@ object ExampleArrow {
       val t = kleisli((n: Int) => if(n > 100) None else Some(n * 13))
 
       // Applying first on the Kleisli arrow using the Option monad.
-      val o = **->**->**[List[Int], ({type λ[α, β]=Kleisli[α, Option, β]})#λ, List[String]](k)
-      o.first run ((44 to 49).toList, "abc") assert_=== (List("44","54","64","74","84","94"), "abc").some
-      o.first run ((44 to 49).toList, "abc") assert_=== (List("44","54","64","74","84","94"), "abc").some
-      o.first run (Nil, "abc") assert_=== None
+      k.first run ((44 to 49).toList, "abc") assert_=== (List("44","54","64","74","84","94"), "abc").some
+      k.first run ((44 to 49).toList, "abc") assert_=== (List("44","54","64","74","84","94"), "abc").some
+      k.first run (Nil, "abc") assert_=== None
 
       // Applying second on the Kleisli arrow using the Option monad.
-      o.second run ("abc", (44 to 49).toList) assert_=== ("abc", List("44","54","64","74","84","94")).some
-      o.second run ("abc", Nil) assert_=== None
+      k.second run ("abc", (44 to 49).toList) assert_=== ("abc", List("44","54","64","74","84","94")).some
+      k.second run ("abc", Nil) assert_=== None
 
       // Combine k and s on the Kleisli arrow using the Option monad.
-      val p = o *** s
+      val p = k *** s
       p run ((44 to 49).toList, 18) assert_=== (List("44","54","64","74","84","94"), 72).some
       p run ((44 to 49).toList, 14) assert_=== None
       p run (Nil, 18) assert_=== None
