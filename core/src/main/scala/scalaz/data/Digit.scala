@@ -9,49 +9,7 @@ sealed trait Digit {
   def toChar: Char = (toLong + 48).toChar
 }
 
-object Digit extends Digits {
-
-  case object _0 extends Digit {
-    override val toInt = 0
-  }
-
-  case object _1 extends Digit {
-    override val toInt = 1
-  }
-
-  case object _2 extends Digit {
-    override val toInt = 2
-  }
-
-  case object _3 extends Digit {
-    override val toInt = 3
-  }
-
-  case object _4 extends Digit {
-    override val toInt = 4
-  }
-
-  case object _5 extends Digit {
-    override val toInt = 5
-  }
-
-  case object _6 extends Digit {
-    override val toInt = 6
-  }
-
-  case object _7 extends Digit {
-    override val toInt = 7
-  }
-
-  case object _8 extends Digit {
-    override val toInt = 8
-  }
-
-  case object _9 extends Digit {
-    override val toInt = 9
-  }
-
-}
+object Digit extends Digits
 
 trait Digits {
 
@@ -73,4 +31,45 @@ trait Digits {
   implicit def DigitOrder: Order[Digit] =
     Order.orderBy(_.toInt)
 
+  object Digit {
+    case object _0 extends Digit {
+      override val toInt = 0
+    }
+
+    case object _1 extends Digit {
+      override val toInt = 1
+    }
+
+    case object _2 extends Digit {
+      override val toInt = 2
+    }
+
+    case object _3 extends Digit {
+      override val toInt = 3
+    }
+
+    case object _4 extends Digit {
+      override val toInt = 4
+    }
+
+    case object _5 extends Digit {
+      override val toInt = 5
+    }
+
+    case object _6 extends Digit {
+      override val toInt = 6
+    }
+
+    case object _7 extends Digit {
+      override val toInt = 7
+    }
+
+    case object _8 extends Digit {
+      override val toInt = 8
+    }
+
+    case object _9 extends Digit {
+      override val toInt = 9
+    }
+  }
 }
