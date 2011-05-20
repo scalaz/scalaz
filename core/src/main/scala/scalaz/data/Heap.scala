@@ -165,7 +165,7 @@ sealed trait Heap[A] {
     implicit val ftr = implicitly[Applicative[F]].functor
     toStream.traverse(f).map(fromCodata[Stream, B])
     // todo this is not compiling because of the implicits in Kind.scala.
-    // will have to implement low-priority implicits.
+    // will havKe to implement low-priority implicits.
   }
 
   private def withList(f: List[A] => List[A]) =

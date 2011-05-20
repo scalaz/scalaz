@@ -68,8 +68,36 @@ sealed trait LazyEither[A, B] {
     val e = LazyEither.this
   }
 
+}
+
+private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
+
+private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
+
+object LazyEither extends LazyEithers
+
+trait LazyEithers {
+
+  trait LazyLeftConstruct[B] {
+    def apply[A](a: => A): LazyEither[A, B]
+  }
+
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
+    def apply[A](a: => A) = LazyLeft(() => a)
+  }
+
+  trait LazyRightConstruct[A] {
+    def apply[B](b: => B): LazyEither[A, B]
+  }
+
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
+    def apply[B](b: => B) = LazyRight(() => b)
+  }
+
   sealed trait LeftProjection[A, B] {
     val e: LazyEither[A, B]
+
+    import LazyOption._
 
     def getOrElse(default: => A): A =
       e.fold(z => z, _ => default)
@@ -103,32 +131,6 @@ sealed trait LazyEither[A, B] {
 
     def flatMap[C](f: (=> A) => LazyEither[C, B]): LazyEither[C, B] =
       e.fold(f, lazyRight(_))
-  }
-
-}
-
-private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
-
-private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
-
-object LazyEither extends LazyEithers
-
-trait LazyEithers {
-
-  trait LazyLeftConstruct[B] {
-    def apply[A](a: => A): LazyEither[A, B]
-  }
-
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
-    def apply[A](a: => A) = LazyLeft(() => a)
-  }
-
-  trait LazyRightConstruct[A] {
-    def apply[B](b: => B): LazyEither[A, B]
-  }
-
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
-    def apply[B](b: => B) = LazyRight(() => b)
   }
 }
 
@@ -241,8 +243,36 @@ sealed trait LazyEitherT[A, F[_], B] {
     val e = LazyEitherT.this
   }
 
+}
+
+object LazyEitherT extends LazyEitherTs {
+  def apply[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] =
+    lazyEitherT(a)
+}
+
+trait LazyEitherTs {
+  def lazyEitherT[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] = new LazyEitherT[A, F, B] {
+    val runT = a
+  }
+
+  import LazyEither._
+
+  def lazyLeftT[A, F[_], B](implicit p: Pointed[F]): (=> A) => LazyEitherT[A, F, B] =
+    a => lazyEitherT(p.point(lazyLeft(a)))
+
+  def lazyRightT[A, F[_], B](implicit p: Pointed[F]): (=> B) => LazyEitherT[A, F, B] =
+    b => lazyEitherT(p.point(lazyRight(b)))
+
+  implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): LazyEitherT[Z, G, A] =
+      lazyEitherT(implicitly[Monad[G]].fmap((a: A) => lazyRight(a): LazyEither[Z, A])(a))
+  }
+
   sealed trait LeftLazyProjectionT[A, F[_], B] {
     val e: LazyEitherT[A, F, B]
+
+    import OptionT._
+    import LazyOptionT._
 
     def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
       ftr.fmap((_: LazyEither[A, B]).left getOrElse default)(e.runT)
@@ -302,28 +332,4 @@ sealed trait LazyEitherT[A, F[_], B] {
       lazyEitherT(m.bd((_: LazyEither[A, B]).fold(a => f(a).runT, b => m.point(lazyRight[C](b))))(e.runT))
   }
 
-}
-
-object LazyEitherT extends LazyEitherTs {
-  def apply[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] =
-    lazyEitherT(a)
-}
-
-trait LazyEitherTs {
-  def lazyEitherT[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] = new LazyEitherT[A, F, B] {
-    val runT = a
-  }
-
-  import LazyEither._
-
-  def lazyLeftT[A, F[_], B](implicit p: Pointed[F]): (=> A) => LazyEitherT[A, F, B] =
-    a => lazyEitherT(p.point(lazyLeft(a)))
-
-  def lazyRightT[A, F[_], B](implicit p: Pointed[F]): (=> B) => LazyEitherT[A, F, B] =
-    b => lazyEitherT(p.point(lazyRight(b)))
-
-  implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
-    def lift[G[_] : Monad, A](a: G[A]): LazyEitherT[Z, G, A] =
-      lazyEitherT(implicitly[Monad[G]].fmap((a: A) => lazyRight(a): LazyEither[Z, A])(a))
-  }
 }

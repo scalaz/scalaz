@@ -11,6 +11,8 @@ sealed trait MetricSpace[A] {
   val distance: A => A => Int
 }
 
+object MetricSpace extends MetricSpaces
+
 trait MetricSpaces {
   def metricSpace[A](f: A => A => Int): MetricSpace[A] = new MetricSpace[A] {
     val distance = f

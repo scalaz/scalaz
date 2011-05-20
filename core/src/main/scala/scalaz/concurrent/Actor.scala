@@ -19,13 +19,13 @@ sealed trait Actor[A] {
     else () => ()
   }
 
-  val toEffect: Run[A] = effect[A]((a) => this ! a)
+  val toEffect: Run[A] = run[A]((a) => this ! a)
 
   def !(a: A) = if (mbox offer a) work else toEffect ! a
 
   def apply(a: A) = this ! a
 
-  private val act: Run[Unit] = effect((u: Unit) => {
+  private val act: Run[Unit] = run((u: Unit) => {
     var go = true
     var i = 0
     while (go && i < 1000) {

@@ -95,8 +95,16 @@ sealed trait EitherT[A, F[_], B] {
     val e = EitherT.this
   }
 
-  sealed abstract class LeftProjectionT[A, F[_], B] {
+}
+
+object EitherT extends EitherTs {
+  def apply[A, F[_], B](a: F[Either[A, B]]): EitherT[A, F, B] =
+    eitherT[A, F, B](a)
+
+  sealed trait LeftProjectionT[A, F[_], B] {
     val e: EitherT[A, F, B]
+
+    import OptionT._
 
     def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
       ftr.fmap((_: Either[A, B]).left getOrElse default)(e.runT)
@@ -150,11 +158,6 @@ sealed trait EitherT[A, F[_], B] {
       eitherT(m.bd((_: Either[A, B]).fold(a => f(a).runT, b => m.point(Right(b): Either[C, B])))(e.runT))
   }
 
-}
-
-object EitherT extends EitherTs {
-  def apply[A, F[_], B](a: F[Either[A, B]]): EitherT[A, F, B] =
-    eitherT[A, F, B](a)
 }
 
 trait EitherTs {

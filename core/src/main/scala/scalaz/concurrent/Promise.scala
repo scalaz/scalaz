@@ -44,7 +44,7 @@ sealed trait Promise[A] {
     val r = new Promise[B] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => f(a) to effect[B](b => r fulfill b))
+    to(a => f(a) to run[B](b => r fulfill b))
     r
   }
 
@@ -52,7 +52,7 @@ sealed trait Promise[A] {
     val r = new Promise[A] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => promise(p(a)) to effect[Boolean](b => if (b) r fulfill a))
+    to(a => promise(p(a)) to run[Boolean](b => if (b) r fulfill a))
     r
   }
 

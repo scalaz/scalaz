@@ -11,7 +11,7 @@ sealed trait Run[A] {
 object Run extends Runs
 
 trait Runs {
-  def effect[A](c: A => Unit)(implicit s: Strategy): Run[A] = new Run[A] {
+  def run[A](c: A => Unit)(implicit s: Strategy): Run[A] = new Run[A] {
     val apply = (a: A) => c(a)
     val strategy = s
   }
