@@ -701,7 +701,7 @@ trait *->*[F[_], A] {
 object *->* extends **->**
 
 // formerly MAsLow
-trait **->**| {
+trait **->**~ {
   implicit def **->**[F[_], A](a: F[A]): (F *->* A) = new (F *->* A) {
     val value = a
   }
@@ -712,7 +712,7 @@ trait **->**| {
 }
 
 // formerly MAs
-trait **->** extends **->**| {
+trait **->** extends **->**~ {
   def *->*[F[_], A](a: F[A]): (F *->* A) = new (F *->* A) {
     val value = a
   }
@@ -1035,10 +1035,21 @@ trait *->*->*[A, F[_, _], B] {
 
 object *->*->* extends **->**->**
 
-trait **->**->** {
+trait **->**->**~ {
   implicit def **->**->**[A, F[_, _], B](a: F[A, B]): *->*->*[A, F, B] = new *->*->*[A, F, B] {
     val value = a
   }
+}
+
+trait **->**->** extends **->**->**~ {
+  def *->*->*[A, F[_, _], B](a: F[A, B]): *->*->*[A, F, B] = new *->*->*[A, F, B] {
+    val value = a
+  }
+
+  implicit def Kleisli_*->*->*[A, F[_], B](k: Kleisli[A, F, B]) = *->*->*[A, ({type λ[α, β]=Kleisli[α, F, β]})#λ, B](k)
+
+  implicit def Cokleisli_*->*->*[A, F[_], B](k: CoKleisli[A, F, B]) = *->*->*[A, ({type λ[α, β]=CoKleisli[α, F, β]})#λ, B](k)
+
 }
 
 trait |*->*|->*->*[F[_[_], _], G[_], A] {
