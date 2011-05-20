@@ -50,7 +50,7 @@ object ExampleArrow {
       p run ((44 to 49).toList, 18) assert_=== (List("44","54","64","74","84","94"), 72).some
       p run ((44 to 49).toList, 14) assert_=== None
       p run (Nil, 18) assert_=== None
-                            /*
+
       // Perform both s and t on a value on the Kleisli arrow using the Option monad.
       val q = s &&& t
       q run 3 assert_=== (12, 39).some
@@ -61,23 +61,22 @@ object ExampleArrow {
       q run 104 assert_=== None
 
       // Perform k on a pair on the Kleisli arrow using the Option monad.
-      val j = o.product
+      val j = k.product
       j run ((44 to 49).toList, (12 to 18).toList) assert_=== (List("44","54","64","74","84","94"),List("21", "31", "41", "51", "61", "71", "81")).some
       j run (Nil, (12 to 18).toList) assert_=== None
       j run ((44 to 49).toList,Nil) assert_=== None
-      */
     }
-              /*
+
     // Cokleisli Arrow
     {
-      val nums = nel(1, 2, 3)
-      nums.coJoin assert_=== nel(nel(1, 2, 3), nel(2, 3), nel(3))
-      val sum = coKleisli((m: NonEmptyList[Int]) => m.sum)
+      val nums = nels(1, 2, 3)
+      nums.coJoin assert_=== nels(nels(1, 2, 3), nels(2, 3), nels(3))
+      val sum = coKleisli((m: NonEmptyList[Int]) => m.suml)
       val min = coKleisli((m: NonEmptyList[Int]) => m.min)
       // todo this causes StackOverflowError.
 //      ((sum &&& max) apply nums) assert_=== nel1((some(6), some(1)), (some(5), some(2), (some(3), some(3))
     }
-                      */
+
     List(1, 2, 3, 4)
   }
 }

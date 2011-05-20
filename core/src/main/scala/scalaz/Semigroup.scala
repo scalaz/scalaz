@@ -18,6 +18,9 @@ trait Semigroups {
   implicit val BooleanSemigroup: Semigroup[Boolean] =
     semigroup(a => b => a || b)
 
+  implicit val IntSemigroup: Semigroup[Int] =
+    semigroup(a => b => a + b)
+
   implicit val StringSemigroup: Semigroup[String] =
     semigroup(a1 => a2 => a1 + a2)
 

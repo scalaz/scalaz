@@ -17,6 +17,9 @@ trait Zeros {
   implicit val BooleanZero: Zero[Boolean] =
     zero(false)
 
+  implicit val IntZero: Zero[Int] =
+    zero(0)
+
   implicit val StringZero: Zero[String] =
     zero("")
 

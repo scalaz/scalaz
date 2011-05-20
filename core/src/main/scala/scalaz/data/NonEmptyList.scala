@@ -76,9 +76,27 @@ trait NonEmptyLists {
     val tail = t.toList
   }
 
+  def nels[A](h: A, t: A*): NonEmptyList[A] =
+    nel(h, t.toList)
+
   implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
     def point[A](a: => A) = nel(a, Nil)
   }
+
+  implicit def NonEmptyListCojoin: CoJoin[NonEmptyList] = new CoJoin[NonEmptyList] {
+    def coJoin[A] = _.tails
+  }
+
+  implicit val NonEmptyListFoldl: Foldl[NonEmptyList] = new Foldl[NonEmptyList] {
+    def foldl[A, B] = k => b => _.list.foldLeft(b)((b, a) => k(b)(a))
+  }
+
+  implicit val NonEmptyListFoldr: Foldr[NonEmptyList] = new Foldr[NonEmptyList] {
+    def foldr[A, B] = k => b => _.list.foldRight(b)((b, a) => k(b)(a))
+  }
+
+  implicit val NonEmptyListFoldable: Foldable[NonEmptyList] =
+    Foldable.foldable[NonEmptyList]
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)

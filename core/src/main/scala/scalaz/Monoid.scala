@@ -25,6 +25,9 @@ trait Monoids {
   implicit val BooleanMonoid: Monoid[Boolean] =
     monoid
 
+  implicit val IntMonoid: Monoid[Int] =
+    monoid
+
   implicit val StringMonoid: Monoid[String] =
     monoid
 
