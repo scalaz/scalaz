@@ -5,6 +5,7 @@ Applics with
 Applicatives with
 Binds with
 Categorys with
+Comps with
 Foldables with
 Foldls with
 Functors with
