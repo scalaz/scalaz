@@ -529,6 +529,11 @@ trait *->*[F[_], A] {
   def element(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
     any(eq.equal(a))
 
+  /** Right associative alias for element */
+  def ∈:(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
+    element(a)
+
+  /** Alias for element */
   def ∋(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
     element(a)
 

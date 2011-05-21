@@ -9,25 +9,25 @@ object ExampleFold {
 
   def run {
     // Folding left over a List
-    (List(1, 2, 3).foldl("0")((a, b) => "f(" + a.toString + ", " + b + ")")) assert_=== "f(f(f(0, 1), 2), 3)"
+    (List(1, 2, 3).foldl("0")(a => b => "f(" + a.toString + ", " + b + ")")) assert_=== "f(f(f(0, 1), 2), 3)"
 
     // Folding right over a List    
-    (List(1, 2, 3).foldr("0")((a, b) => "f(" + a.toString + ", " + b + ")")) assert_=== "f(1, f(2, f(3, 0)))"
+    (List(1, 2, 3).foldr("0")(a => b => "f(" + a.toString + ", " + b + ")")) assert_=== "f(1, f(2, f(3, 0)))"
 
     // Folding left over a List
-    (List(1, 2, 3).foldl(0)(_ + _)) assert_=== 6
+    (List(1, 2, 3).foldl(0)(a => a + _)) assert_=== 6
 
     // Folding left over a List, using the first value as the starting value.
-    (List(1, 2, 3) foldl1 (_ + _)) assert_=== some(6)
+    (List(1, 2, 3) foldl1 (a => a + _)) assert_=== some(6)
 
     // Folding left over an empty List, using the first value as the starting value.
-    (List.empty[Int] foldl1 (_ + _)) assert_=== none
+    (List.empty[Int] foldl1 (a => a + _)) assert_=== none
 
     // Summing over a List using Foldable, using the Int Monoid to combine the elements.
-    (List(1, 2, 3).asMA.sum) assert_=== 6
+    (List(1, 2, 3).suml) assert_=== 6
 
     // Summing over a List using Foldable, using the String Monoid to combine the elements.
-    (List("a", "b", "c").asMA.sum) assert_=== "abc"
+    (List("a", "b", "c").suml) assert_=== "abc"
 
     // Checking for existence of an element that satisfies a predicate.
     ("abC".toList ∃ (c => Character.isUpperCase(c))) assert_=== true
@@ -43,10 +43,10 @@ object ExampleFold {
     (Stream.continually(1) ∀ (_ == 0)) assert_=== false
 
     // Counting the elements using Seq Foldable
-    ("123".toSeq.asMA.count) assert_=== 3
+    ("123".toSeq.count) assert_=== 3
 
     // Counting the elements using Option Foldable
-    (some(0).asMA.count) assert_=== 1
+    (some(0).count) assert_=== 1
 
     (50 ∈: Stream.range(0, 100)) assert_=== true
 
