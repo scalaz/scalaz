@@ -3,7 +3,10 @@ package wrap
 
 sealed trait LongW {
 
+  import data._
   import newtypes._
+  import LongW._
+  import Digit.Digit._
 
   val value: Long
 
@@ -12,6 +15,12 @@ sealed trait LongW {
 
   def ∏ : LongMultiplication =
     multiplication
+
+  def digits: List[Digit] =
+    Digit.digitFromLong(value) match {
+      case Some(d) => List(d)
+      case None    => Digit.digitFromLong(value % 10L).toList ::: ((value / 10L) digits)
+    }
 }
 
 object LongW extends LongWs

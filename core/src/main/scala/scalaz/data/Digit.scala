@@ -15,12 +15,18 @@ trait Digits {
 
   import Digit._
 
-  val digits: Set[Digit] = Set(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+  val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 
   def digitFromChar(c: Char): Option[Digit] =
     digits.find(_.toChar == c)
+
+  def digitFromInt(i: Int): Option[Digit] =
+    digits.find(_.toInt == i)
+
+  def digitFromLong(i: Long): Option[Digit] =
+    digits.find(_.toLong == i)
 
   implicit def DigitShow: Show[Digit] =
     Show.showBy(_.toInt)
