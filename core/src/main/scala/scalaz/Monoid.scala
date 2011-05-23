@@ -1,5 +1,8 @@
 package scalaz
 
+import collection.generic.CanBuildFrom
+import collection.mutable.ArraySeq
+
 trait Monoid[A] {
   val zero: Zero[A]
   val semigroup: Semigroup[A]
@@ -39,6 +42,9 @@ trait Monoids {
 
   implicit def OptionMonoid[A: Semigroup]: Monoid[Option[A]] =
     monoid
+
+  implicit def ArraySeqMonoid[A]: Monoid[ArraySeq[A]] =
+    monoid[ArraySeq[A]]
 
   implicit def Tuple2Monoid[A, B](implicit ma: Monoid[A], mb: Monoid[B]): Monoid[(A, B)] = {
     implicit val sa = implicitly[Monoid[(A, B)]].semigroup

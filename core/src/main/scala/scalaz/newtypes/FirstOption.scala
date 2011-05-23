@@ -44,4 +44,8 @@ trait FirstOptions {
   implicit def FirstOptionOrder[A: Order]: Order[FirstOption[A]] =
     implicitly[Order[Option[A]]] contramap ((_: FirstOption[A]).value)
 
+  implicit def FirstOptionPointed: Pointed[FirstOption] = new Pointed[FirstOption] {
+    def point[A](a: => A) = implicitly[Pack[FirstOption[A], Option[A]]].pack(Some(a))
+  }
+
 }

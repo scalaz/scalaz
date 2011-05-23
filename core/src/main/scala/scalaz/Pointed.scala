@@ -6,7 +6,7 @@ trait Pointed[F[_]] {
 
 object Pointed extends Pointeds
 
-trait Pointeds {
+trait Pointeds extends PointedsLow {
 
   import Const._
   import java.util.concurrent.Callable
@@ -32,5 +32,17 @@ trait Pointeds {
         def call = a
       }
     }
+}
+
+trait PointedsLow {
+  import collection.TraversableLike
+
+  implicit def TraversablePointed[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Pointed[CC] = new Pointed[CC] {
+    def point[A](a: => A) = {
+      val builder = implicitly[CanBuildAnySelf[CC]].apply[Nothing, A]
+      builder += a
+      builder.result
+    }
+  }
 
 }

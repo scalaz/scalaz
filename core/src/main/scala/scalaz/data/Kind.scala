@@ -323,10 +323,10 @@ trait *->*[F[_], A] {
   def foreach(f: A => Unit)(implicit e: Each[F]): Unit =
     e.each(f)(value)
 
-  def map2[G[_], B, C](f: B => C)(implicit m: A =:= G[B], f1: Functor[F], f2: Functor[G]): F[G[C]] =
+  def map2[G[_], B, C](f: B => C)(implicit m: A <:< G[B], f1: Functor[F], f2: Functor[G]): F[G[C]] =
     ∘(k => (k: G[B]) ∘ f)
 
-  def ∘∘[G[_], B, C](f: B => C)(implicit m: A =:= G[B], f1: Functor[F], f2: Functor[G]): F[G[C]] =
+  def ∘∘[G[_], B, C](f: B => C)(implicit m: A <:< G[B], f1: Functor[F], f2: Functor[G]): F[G[C]] =
     map2(f)
 
   /**
@@ -334,7 +334,7 @@ trait *->*[F[_], A] {
    * This allows composition of type classes for `F` and `G`. For example:
    * <code>(List(List(1)).comp.map {2 +}) assert_=== List(List(3))</code>
    */
-  def comp[G[_], B](implicit n: A =:= G[B], f: Functor[F]): *->*[({type λ[α] = F[G[α]]})#λ, B] =
+  def comp[G[_], B](implicit n: A <:< G[B], f: Functor[F]): *->*[({type λ[α] = F[G[α]]})#λ, B] =
     **->**[({type λ[α] = F[G[α]]})#λ, B](value ∘ n)
 
   def >|[B](f: => B)(implicit t: Functor[F]): F[B] =
@@ -423,10 +423,10 @@ trait *->*[F[_], A] {
   def >|>[B](f: => F[B])(implicit b: Bind[F]): F[B] =
     b.bind((_: A) => f)(value)
 
-  def join[B](implicit m: A =:= F[B], j: Bind[F]): F[B] =
+  def join[B](implicit m: A <:< F[B], j: Bind[F]): F[B] =
     >>=(m)
 
-  def μ[B](implicit m: A =:= F[B], j: Bind[F]): F[B] =
+  def μ[B](implicit m: A <:< F[B], j: Bind[F]): F[B] =
     join
 
   def forever[B](implicit b: Bind[F]): F[B] =
@@ -590,35 +590,35 @@ trait *->*[F[_], A] {
   def minOr(d: => A)(implicit r: Foldl[F], ord: Order[A]): A =
     min getOrElse d
 
-  def longDigits(implicit d: A =:= Digit, t: Foldl[F]): Long =
+  def longDigits(implicit d: A <:< Digit, t: Foldl[F]): Long =
     foldl(0L)(n => a => n * 10L + (a: Digit))
 
-  def digits(implicit c: A =:= Char, t: Functor[F]): OptionT[F, Digit] =
+  def digits(implicit c: A <:< Char, t: Functor[F]): OptionT[F, Digit] =
     OptionT.optionT(map((a: A) => Digit.digitFromChar(a)))
 
-  def digitsOr(d: => Digit)(implicit c: A =:= Char, t: Functor[F]): F[Digit] =
+  def digitsOr(d: => Digit)(implicit c: A <:< Char, t: Functor[F]): F[Digit] =
     map((a: A) => Digit.digitFromChar(a) getOrElse d)
 
-  def digitsCollapse(implicit c: A =:= Char, t: MonadEmpty[F]): F[Digit] =
+  def digitsCollapse(implicit c: A <:< Char, t: MonadEmpty[F]): F[Digit] =
     t.bd((a: A) => Digit.digitFromChar(a) match {
       case None => t.e[Digit]
       case Some(d) => t.point(d)
     })(value)
 
   // generalised catMaybes
-  def unite[T[_], B](implicit c: A =:= T[B], t: MonadEmptyPlus[F], f: Foldr[T]): F[B] =
+  def unite[T[_], B](implicit c: A <:< T[B], t: MonadEmptyPlus[F], f: Foldr[T]): F[B] =
     t.bd((a: A) => f.foldr[B, F[B]](z => b => t.pl(t.point(z), b))(t.e[B])(c(a)))(value)
 
-  def sequence[G[_], B](implicit a: A =:= G[B], t: Traverse[F], p: Applicative[G]): G[F[B]] =
+  def sequence[G[_], B](implicit a: A <:< G[B], t: Traverse[F], p: Applicative[G]): G[F[B]] =
     traverse((z: A) => (z: G[B]))
 
-  def traverseDigits(implicit c: A =:= Char, t: Traverse[F]): Option[F[Digit]] = {
+  def traverseDigits(implicit c: A <:< Char, t: Traverse[F]): Option[F[Digit]] = {
     implicit val ftr = t.functor
     val k = map((f: A) => (f: Char)).digits.runT.sequence
     k
   }
 
-  def traverseDigitsOr(d: => F[Digit])(implicit c: A =:= Char, t: Traverse[F]): F[Digit] =
+  def traverseDigitsOr(d: => F[Digit])(implicit c: A <:< Char, t: Traverse[F]): F[Digit] =
     traverseDigits getOrElse d
 
   def <--->(w: F[A])(implicit l: Length[F], ind: Index[F], equ: Equal[A]): Int = {
@@ -661,9 +661,7 @@ trait *->*[F[_], A] {
   def liftw[G[_]](implicit f: Functor[F], p: Pointed[G]): (I ~> (({type λ[α] = WriterT[G[α], F, A]})#λ)) =
     new (I ~> (({type λ[α] = WriterT[G[α], F, A]})#λ)) {
       def apply[W](w: W): WriterT[G[W], F, A] =
-        error("")
-
-      // writerT[G[W], F, A](map(a => (w.value.point[G], a)))
+        writerT[G[W], F, A](map(a => (w.value.point[G], a)))
     }
 
   /**Puts the given write value that is produced by applying the given function into a writer transformer, lifted into a pointed functor, and associates with this M[A] value */
@@ -673,7 +671,7 @@ trait *->*[F[_], A] {
         writerT[G[W], F, A](map(a => (w(a).point[G], a)))
     }
 
-  def ifM[B](t: => F[B], f: => F[B])(implicit a: Bind[F], b: A =:= Boolean): F[B] =
+  def ifM[B](t: => F[B], f: => F[B])(implicit a: Bind[F], b: A <:< Boolean): F[B] =
     flatMap((x: A) => if (x) t else f)
 
   def bktree(implicit f: Foldl[F], m: MetricSpace[A]) =
@@ -705,6 +703,12 @@ trait *->*[F[_], A] {
   def parZipWith[B, C](f: A => B => C)(bs: F[B])(implicit z: Applicative[F], s: Strategy, t: Traverse[F]): Promise[F[C]] = {
     zipWithA(bs)(x => y => Promise.promise(f(x)(y)))
   }
+
+  def mapPack[B](implicit ftr: Functor[F], p: Pack[B, A]): F[B] =
+    ftr.fmap(p.pack(_: A))(value)
+
+  def mapUnpack[B](implicit ftr: Functor[F], p: Unpack[A, B]): F[B] =
+    ftr.fmap(p.unpack(_: A))(value)
 }
 
 object *->* extends **->**
@@ -1038,7 +1042,7 @@ trait *->*->*[A, F[_, _], B] {
   def >>^[C](f: B => C)(implicit a: Arrow[F]): F[A, C] =
     a.mapsnd(f)(value)
 
-  def <:>[C](f: A => C)(implicit z: B =:= C, t: Bifunctor[F]): F[C, C] =
+  def <:>[C](f: A => C)(implicit z: B <:< C, t: Bifunctor[F]): F[C, C] =
     t.bimap(f, z)(value)
 }
 

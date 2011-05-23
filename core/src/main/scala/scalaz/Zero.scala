@@ -1,12 +1,14 @@
 package scalaz
 
+import collection.generic.CanBuildFrom
+
 trait Zero[A] {
   val zero: A
 }
 
 object Zero extends Zeros
 
-trait Zeros {
+trait Zeros extends ZerosLow {
   def zero[A](a: A): Zero[A] = new Zero[A] {
     val zero = a
   }
@@ -38,4 +40,11 @@ trait Zeros {
   implicit def Tuple3Zero[A, B, C](implicit za: Zero[A], zb: Zero[B], zc: Zero[C]): Zero[(A, B, C)] =
     zero(za.zero, zb.zero, zc.zero)
 
+}
+
+trait ZerosLow {
+  implicit def TraversableZero[CC <: Traversable[_]](implicit cbf: CanBuildFrom[Nothing, Nothing, CC]): Zero[CC] =
+    new Zero[CC] {
+      val zero = cbf.apply.result
+    }
 }
