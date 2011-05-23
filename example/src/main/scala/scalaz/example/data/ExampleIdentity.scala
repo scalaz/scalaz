@@ -1,4 +1,6 @@
-package scalaz.example
+package scalaz
+package example
+package data
 
 import scalaz._
 
@@ -8,10 +10,11 @@ object ExampleIdentity {
   def main(args: Array[String]) = run
 
   import Scalaz._
+  import data.{*, NonEmptyList, Tree}
 
   def run {
     // Any value can be converted to Identity
-    1: Identity[Int]
+    1: *[Int]
 
     // Wrap a value in NonEmptyList
     1.wrapNel assert_=== NonEmptyList(1)

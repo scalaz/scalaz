@@ -66,8 +66,8 @@ sealed trait NonEmptyList[A] {
 }
 
 object NonEmptyList extends NonEmptyLists {
-  def apply[A](h: A, t: List[A]): NonEmptyList[A] =
-    nel(h, t)
+  def apply[A](h: A, t: A*): NonEmptyList[A] =
+    nels(h, t: _*)
 }
 
 trait NonEmptyLists {
