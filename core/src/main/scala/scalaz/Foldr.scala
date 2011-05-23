@@ -12,7 +12,7 @@ trait Foldr[F[_]] {
 
 object Foldr extends Foldrs
 
-trait Foldrs {
+trait Foldrs extends FoldrsLow {
 
   import data.Endo
 
@@ -44,4 +44,11 @@ trait Foldrs {
       else
         k(s.head)(foldr(k)(b)(s.tail))
   }
+}
+
+trait FoldrsLow {
+  implicit def TraversableFoldr[CC[X] <: Traversable[X]]: Foldr[CC] = new Foldr[CC] {
+    def foldr[A, B] = k => b =>
+      _.foldRight(b)((a, b) => k(a)(b))
+   }
 }

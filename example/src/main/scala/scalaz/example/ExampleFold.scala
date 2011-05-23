@@ -43,10 +43,10 @@ object ExampleFold {
     (Stream.continually(1) ∀ (_ == 0)) assert_=== false
 
     // Counting the elements using Seq Foldable
-    ("123".toSeq.count) assert_=== 3
+    ("123".toSeq.continuance) assert_=== 3
 
     // Counting the elements using Option Foldable
-    (some(0).count) assert_=== 1
+    (some(0).continuance) assert_=== 1
 
     (50 ∈: Stream.range(0, 100)) assert_=== true
 

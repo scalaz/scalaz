@@ -9,7 +9,14 @@ trait Foldl[F[_]] {
 
 object Foldl extends Foldls
 
-trait Foldls {
+trait Foldls extends FoldlsLow {
+  implicit val OptionFoldl: Foldl[Option] = new Foldl[Option] {
+    def foldl[A, B] = k => b => {
+      case None    => b
+      case Some(a) => k(b)(a)
+    }
+  }
+
   implicit val ListFoldl: Foldl[List] = new Foldl[List] {
     def foldl[A, B] = k => b => _.foldLeft(b)((b, a) => k(b)(a))
   }
@@ -17,4 +24,12 @@ trait Foldls {
   implicit val StreamFoldl: Foldl[Stream] = new Foldl[Stream] {
     def foldl[A, B] = k => b => _.foldLeft(b)((b, a) => k(b)(a))
   }
+}
+
+
+trait FoldlsLow {
+  implicit def TraversableFoldl[CC[X] <: Traversable[X]]: Foldl[CC] = new Foldl[CC] {
+    def foldl[A, B] = k => b =>
+      _.foldLeft(b)((a, b) => k(a)(b))
+   }
 }

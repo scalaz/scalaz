@@ -571,6 +571,10 @@ trait *->*[F[_], A] {
   def sumr(implicit r: Foldr[F], m: Monoid[A]): A =
     foldr(m.z)(x => y => m append (x, y))
 
+  // formerly count
+  def continuance(implicit r: Foldl[F]): Int =
+    foldl(0)(b => _ => b + 1)
+
   def len(implicit l: Length[F]): Int =
     l len value
 
