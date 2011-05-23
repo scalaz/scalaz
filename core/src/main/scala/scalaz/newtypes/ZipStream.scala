@@ -1,9 +1,7 @@
 package scalaz
 package newtypes
 
-sealed trait ZipStream[A] {
-  val value: Stream[A]
-}
+sealed trait ZipStream[A] extends Pimp[Stream[A]]
 
 object ZipStream extends ZipStreams
 

@@ -3,9 +3,7 @@ package newtypes
 
 import data._
 
-sealed trait FirstLazyOption[A] {
-  val value: LazyOption[A]
-}
+sealed trait FirstLazyOption[A] extends Pimp[LazyOption[A]]
 
 object FirstLazyOption extends FirstLazyOptions
 

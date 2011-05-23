@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait IntMultiplication {
-  val value: Int
-}
+sealed trait IntMultiplication extends Pimp[Int]
 
 object IntMultiplication extends IntMultiplications
 

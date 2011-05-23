@@ -411,6 +411,9 @@ trait *->*[F[_], A] {
     k(value)
   }
 
+  def ↦[G[_], B](f: A => G[B])(implicit a: Applicative[G], t: Traverse[F]): G[F[B]] =
+    traverse(f)
+
   def traverse_[G[_], B](f: A => G[B])(implicit a: Applicative[G], t: Foldl[F]): G[Unit] = {
     implicit val p = a.pointed
     implicit val ap = a.applicFunctor

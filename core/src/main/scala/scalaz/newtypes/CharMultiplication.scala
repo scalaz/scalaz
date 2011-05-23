@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait CharMultiplication {
-  val value: Char
-}
+sealed trait CharMultiplication extends Pimp[Char]
 
 object CharMultiplication extends CharMultiplications
 

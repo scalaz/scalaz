@@ -1,9 +1,7 @@
 package scalaz
 package newtypes
 
-sealed trait BooleanConjunction {
-  val value: Boolean
-}
+sealed trait BooleanConjunction extends Pimp[Boolean]
 
 object BooleanConjunction extends BooleanConjunctions
 

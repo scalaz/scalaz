@@ -1,9 +1,7 @@
 package scalaz
 package newtypes
 
-sealed trait ZipList[A] {
-  val value: List[A]
-}
+sealed trait ZipList[A] extends Pimp[List[A]]
 
 object ZipList extends ZipLists
 

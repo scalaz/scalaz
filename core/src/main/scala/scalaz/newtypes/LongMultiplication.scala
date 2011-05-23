@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait LongMultiplication {
-  val value: Long
-}
+sealed trait LongMultiplication extends Pimp[Long]
 
 object LongMultiplication extends LongMultiplications
 

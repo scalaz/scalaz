@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait BigIntMultiplication {
-  val value: BigInt
-}
+sealed trait BigIntMultiplication extends Pimp[BigInt]
 
 object BigIntMultiplication extends BigIntMultiplications
 

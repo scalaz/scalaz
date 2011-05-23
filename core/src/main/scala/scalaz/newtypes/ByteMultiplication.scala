@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait ByteMultiplication {
-  val value: Byte
-}
+sealed trait ByteMultiplication extends Pimp[Byte]
 
 object ByteMultiplication extends ByteMultiplications
 

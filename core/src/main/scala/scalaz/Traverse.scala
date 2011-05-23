@@ -22,8 +22,14 @@ trait Traverses {
 
   implicit def StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      implicitly[Foldr[Stream]].foldr[A, F[Stream[B]]](x => ys => error(""))(implicitly[Applicative[F]].point(Stream.Empty))
+      implicitly[Foldr[Stream]].foldr[A, F[Stream[B]]](x => ys =>
+        implicitly[Applicative[F]].apply(implicitly[Applicative[F]].fmap((a: B) => (b: Stream[B]) => a #:: b)(f(x)))(ys))(implicitly[Applicative[F]].point(Stream.Empty))
 
-    // _.foldr[F[Stream[B]]]((Stream.Empty: Stream[B]) η, (x, ys) => a(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
+  }
+
+  implicit def ListTraverse: Traverse[List] = new Traverse[List] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      _.reverse.foldLeft(implicitly[Applicative[F]].point(Nil: List[B]))((ys, x) =>
+        implicitly[Applicative[F]].apply(implicitly[Applicative[F]].fmap((a: B) => (b: List[B]) => a :: b)(f(x)))(ys))
   }
 }

@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait ShortMultiplication {
-  val value: Short
-}
+sealed trait ShortMultiplication extends Pimp[Short]
 
 object ShortMultiplication extends ShortMultiplications
 

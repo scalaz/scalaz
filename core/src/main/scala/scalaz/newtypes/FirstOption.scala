@@ -1,9 +1,7 @@
 package scalaz
 package newtypes
 
-sealed trait FirstOption[A] {
-  val value: Option[A]
-}
+sealed trait FirstOption[A] extends Pimp[Option[A]]
 
 object FirstOption extends FirstOptions
 

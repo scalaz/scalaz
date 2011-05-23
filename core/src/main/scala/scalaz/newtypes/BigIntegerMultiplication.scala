@@ -4,9 +4,7 @@ package newtypes
 import scalaz.{Newtype, Pack, Unpack}
 import java.math.BigInteger
 
-sealed trait BigIntegerMultiplication {
-  val value: BigInteger
-}
+sealed trait BigIntegerMultiplication extends Pimp[BigInteger]
 
 object BigIntegerMultiplication extends BigIntegerMultiplications
 

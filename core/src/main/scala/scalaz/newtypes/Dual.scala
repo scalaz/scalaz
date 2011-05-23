@@ -3,9 +3,7 @@ package newtypes
 
 import scalaz.{Newtype, Pack, Unpack}
 
-sealed trait Dual[A] {
-  val value: A
-}
+sealed trait Dual[A] extends Pimp[A]
 
 object Dual extends Duals
 
