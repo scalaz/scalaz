@@ -40,6 +40,9 @@ trait Zeros extends ZerosLow {
   implicit def Tuple3Zero[A, B, C](implicit za: Zero[A], zb: Zero[B], zc: Zero[C]): Zero[(A, B, C)] =
     zero(za.zero, zb.zero, zc.zero)
 
+  implicit def Function1Zero[A, B](implicit zb: Zero[B]): Zero[A => B] =
+    zero((_: A) => zb.zero)
+
 }
 
 trait ZerosLow {

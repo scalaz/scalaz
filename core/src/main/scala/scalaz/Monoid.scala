@@ -58,6 +58,12 @@ trait Monoids {
     monoid[(A, B, C)]
   }
 
+  implicit def Function1Monoid[A, B](implicit mb: Monoid[B]): Monoid[A => B] = {
+    implicit val sb = implicitly[Monoid[A => B]].semigroup
+    implicit val zb = implicitly[Monoid[A => B]].zero
+    monoid[A => B]
+  }
+
   /**A monoid for sequencing Applicative effects. */
   def liftMonoid[F[_], M](implicit m: Monoid[M], a: Applicative[F]): Monoid[F[M]] = new Monoid[F[M]] {
     val zero = new Zero[F[M]] {

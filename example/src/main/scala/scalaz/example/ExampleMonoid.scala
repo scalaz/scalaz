@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz._
+import scalaz._, newtypes._
 
 object ExampleMonoid {
   def main(args: Array[String]) = run
@@ -42,7 +42,12 @@ object ExampleMonoid {
     ∅[IntMultiplication] assert_=== (1 ∏)
 
     // Appending zero must leave t unchanged
-    def assertIdentity[T](t: T)(implicit st: Monoid[T], eq: Equal[T], sh: Show[T]) = (t ⊹ ∅[T]) assert_=== (t)
+    def assertIdentity[T](t: T)(implicit st: Monoid[T], eq: Equal[T], sh: Show[T]) = {
+      implicit val s = st.semigroup
+      implicit val z = st.zero
+      (t ⊹ ∅[T]) assert_=== (t)
+    }
+
     assertIdentity(List(1))
     assertIdentity(1)
     assertIdentity(1 ∏)

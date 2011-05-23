@@ -47,6 +47,11 @@ trait Semigroups extends SemigroupsLow {
   implicit def Tuple3Semigroup[A, B, C](implicit sa: Semigroup[A], sb: Semigroup[B], sc: Semigroup[C]): Semigroup[(A, B, C)] =
     semigroup(a1 => a2 =>
       (sa.append(a1._1, a2._1), sb.append(a1._2, a2._2), sc.append(a1._3, a2._3)))
+
+  implicit def Function1Semigroup[A, B](implicit sb: Semigroup[B]): Semigroup[A => B] =
+    semigroup(a1 => a2 =>
+      a => sb.append(a1(a), a2.apply(a)))
+
 }
 
 trait SemigroupsLow {
