@@ -5,6 +5,12 @@ trait Index[F[_]] {
 
   def indexOr[A](a: F[A], d: => A): Int => A =
     n => index(a)(n) getOrElse d
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Index[G] =
+    new Index[G] {
+      def index[A](a: G[A]) =
+        Index.this.index(n.unpack(a))
+    }
 }
 
 object Index extends Indexs

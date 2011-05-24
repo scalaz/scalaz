@@ -2,6 +2,13 @@ package scalaz
 
 trait Plus[F[_]] {
   def plus[A](a1: F[A], a2: => F[A]): F[A]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Plus[G] =
+    new Plus[G] {
+      def plus[A](a1: G[A], a2: => G[A]) =
+        n.pack(Plus.this.plus(n.unpack(a1), n.unpack(a2)))
+    }
+
 }
 
 object Plus extends Pluss

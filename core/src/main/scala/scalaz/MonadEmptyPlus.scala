@@ -5,6 +5,8 @@ trait MonadEmptyPlus[F[_]] {
   val empty: Empty[F]
   val plus: Plus[F]
 
+  import MonadEmptyPlus._
+
   def bind: Bind[F] = new Bind[F] {
     def bind[A, B](f: A => F[B]): F[A] => F[B] =
       monad.bd(f)
@@ -54,6 +56,13 @@ trait MonadEmptyPlus[F[_]] {
 
   def pl[A](a1: F[A], a2: => F[A]): F[A] =
     plus.plus(a1, a2)
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): MonadEmptyPlus[G] = {
+    implicit val m: Monad[G] = monad.deriving[G]
+    implicit val e: Empty[G] = empty.deriving[G]
+    implicit val p: Plus[G] = plus.deriving[G]
+    monadEmptyPlus[G]
+  }
 }
 
 object MonadEmptyPlus extends MonadEmptyPluss

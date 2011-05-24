@@ -14,6 +14,16 @@ trait Traverse[T[_]] {
 
   def fmap[A, B](f: A => B): T[A] => T[B] =
     functor.fmap(f)
+
+  def deriving[G[_]](implicit n: ^**^[G, T]): Traverse[G] =
+    new Traverse[G] {
+      def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      a => {
+        val tr = Traverse.this.traverse(f)
+        implicitly[Applicative[F]].fmap((z: T[B]) => n.pack(z))(tr(n.unpack(a)))
+      }
+    }
+
 }
 
 object Traverse extends Traverses
@@ -32,4 +42,12 @@ trait Traverses {
       _.reverse.foldLeft(implicitly[Applicative[F]].point(Nil: List[B]))((ys, x) =>
         implicitly[Applicative[F]].apply(implicitly[Applicative[F]].fmap((a: B) => (b: List[B]) => a :: b)(f(x)))(ys))
   }
+
+  implicit def OptionTraverse: Traverse[Option] = new Traverse[Option] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
+      case None => implicitly[Applicative[F]].point(None: Option[B])
+      case Some(x) => implicitly[Applicative[F]].fmap((b: B) => Some(b): Option[B])(f(x))
+    }
+  }
+
 }

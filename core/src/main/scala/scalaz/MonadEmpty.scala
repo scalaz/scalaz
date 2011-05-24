@@ -5,6 +5,8 @@ trait MonadEmpty[F[_]] {
   val monad: Monad[F]
   val empty: Empty[F]
 
+  import MonadEmpty._
+
   def bind: Bind[F] = new Bind[F] {
     def bind[A, B](f: A => F[B]): F[A] => F[B] =
       monad.bd(f)
@@ -46,6 +48,12 @@ trait MonadEmpty[F[_]] {
 
   def e[A]: F[A] =
     empty.empty[A]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): MonadEmpty[G] = {
+    implicit val m: Monad[G] = monad.deriving[G]
+    implicit val e: Empty[G] = empty.deriving[G]
+    monadEmpty[G]
+  }
 }
 
 object MonadEmpty extends MonadEmptys

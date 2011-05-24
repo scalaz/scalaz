@@ -2,6 +2,12 @@ package scalaz
 
 trait Each[F[_]] {
   def each[A](f: A => Unit): F[A] => Unit
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Each[G] =
+    new Each[G] {
+      def each[A](f: A => Unit) =
+        k => Each.this.each(f)(n.unpack(k))
+    }
 }
 
 object Each extends Eachs

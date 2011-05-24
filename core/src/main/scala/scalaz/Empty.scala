@@ -4,6 +4,12 @@ import scalaz.Scalaz._
 
 trait Empty[F[_]] {
   def empty[A]: F[A]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Empty[G] =
+    new Empty[G] {
+      def empty[A] =
+        n.pack(Empty.this.empty[A])
+    }
 }
 
 object Empty extends Emptys

@@ -44,8 +44,61 @@ trait FirstOptions {
   implicit def FirstOptionOrder[A: Order]: Order[FirstOption[A]] =
     implicitly[Order[Option[A]]] contramap ((_: FirstOption[A]).value)
 
-  implicit def FirstOptionPointed: Pointed[FirstOption] = new Pointed[FirstOption] {
-    def point[A](a: => A) = implicitly[^*^[FirstOption[A], Option[A]]].pack(Some(a))
-  }
+  implicit def FirstOptionPointed: Pointed[FirstOption] =
+    implicitly[Pointed[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionFunctor: Functor[FirstOption] =
+    implicitly[Functor[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionApplic: Applic[FirstOption] =
+    implicitly[Applic[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionApplicative: Applicative[FirstOption] =
+    implicitly[Applicative[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionBind: Bind[FirstOption] =
+    implicitly[Bind[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionBindFunctor: BindFunctor[FirstOption] =
+    implicitly[BindFunctor[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionEach: Each[FirstOption] =
+    implicitly[Each[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionFoldr: Foldr[FirstOption] =
+    implicitly[Foldr[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionFoldl: Foldl[FirstOption] =
+    implicitly[Foldl[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionFoldable: Foldable[FirstOption] =
+    implicitly[Foldable[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionIndex: Index[FirstOption] =
+    implicitly[Index[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionLength: Length[FirstOption] =
+    implicitly[Length[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionMonad: Monad[FirstOption] =
+    implicitly[Monad[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionMonadEmpty: MonadEmpty[FirstOption] =
+    implicitly[MonadEmpty[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionMonadEmptyPlus: MonadEmptyPlus[FirstOption] =
+    implicitly[MonadEmptyPlus[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionPlus: Plus[FirstOption] =
+    implicitly[Plus[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionPointedEmpty: PointedEmpty[FirstOption] =
+    implicitly[PointedEmpty[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionPointedFunctor: PointedFunctor[FirstOption] =
+    implicitly[PointedFunctor[Option]].deriving[FirstOption]
+
+  implicit def FirstOptionTraverse: Traverse[FirstOption] =
+    implicitly[Traverse[Option]].deriving[FirstOption]
 
 }

@@ -8,6 +8,13 @@ trait Foldr[F[_]] {
 
   def foldMap[A, M](f: A => M)(implicit m: Monoid[M]): F[A] => M =
     foldr[A, M](a => b => m.append(f(a), b))(m.z)
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Foldr[G] =
+    new Foldr[G] {
+      def foldr[A, B]: (A => (=> B) => B) => B => G[A] => B =
+        k => b => z =>
+          Foldr.this.foldr(k)(b)(n.unpack(z))
+    }
 }
 
 object Foldr extends Foldrs

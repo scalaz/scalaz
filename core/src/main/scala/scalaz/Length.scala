@@ -2,6 +2,12 @@ package scalaz
 
 trait Length[F[_]] {
   def len[A](a: F[A]): Int
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Length[G] =
+    new Length[G] {
+      def len[A](a: G[A]) =
+        Length.this.len(n.unpack(a))
+    }
 }
 
 object Length extends Lengths

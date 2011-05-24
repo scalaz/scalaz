@@ -6,6 +6,8 @@ trait Monad[F[_]] {
   val functor: Functor[F]
   val join: Join[F]
 
+  import Monad._
+
   def pointedFunctor: PointedFunctor[F] = new PointedFunctor[F] {
     val functor = Monad.this.functor
     val pointed = Monad.this.pointed
@@ -44,6 +46,13 @@ trait Monad[F[_]] {
   def liftM2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
     a => b =>
       bd((aa: A) => fmap((bb: B) => f(aa)(bb))(b))(a)
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Monad[G] = {
+    implicit val b: Bind[G] = bind.deriving[G]
+    implicit val p: Pointed[G] = pointed.deriving[G]
+    monadBP[G]
+  }
+
 }
 
 object Monad extends Monads
