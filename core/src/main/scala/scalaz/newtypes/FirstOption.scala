@@ -1,8 +1,6 @@
 package scalaz
 package newtypes
 
-import data.LazyOption
-
 sealed trait FirstOption[A] {
   val value: Option[A]
 }

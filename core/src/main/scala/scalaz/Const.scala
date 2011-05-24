@@ -17,7 +17,7 @@ trait Consts {
     }
   }
 
-  implicit def ConstNewtype[A, B]: ^*^[Const[A, B], A] =
+  implicit def Const_^*^[A, B]: ^*^[Const[A, B], A] =
     ^*^.^*^(_.value, a => new Const[A, B] {
       val value = a
     })
