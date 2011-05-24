@@ -8,7 +8,7 @@ sealed trait BigIntW {
   val value: BigInt
 
   def multiplication: BigIntMultiplication =
-    Newtype.pack[BigInt, BigIntMultiplication](value)
+    ^*^.->^*^[BigInt, BigIntMultiplication](value)
 
   def ∏ : BigIntMultiplication =
     multiplication

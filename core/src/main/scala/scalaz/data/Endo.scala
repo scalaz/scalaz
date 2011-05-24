@@ -27,8 +27,8 @@ trait Endos {
 
   def idEndo[A]: Endo[A] = endo(z => z)
 
-  implicit def EndoNewtype[A]: Newtype[Endo[A], (=> A) => A] =
-    Newtype.newtype(e => e(_), b => new Endo[A] {
+  implicit def EndoNewtype[A]: ^*^[Endo[A], (=> A) => A] =
+    ^*^.^*^(e => e(_), b => new Endo[A] {
       def apply(a: => A) = b(a)
     })
 

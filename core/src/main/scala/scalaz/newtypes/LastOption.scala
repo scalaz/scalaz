@@ -8,20 +8,20 @@ sealed trait LastOption[A] {
 object LastOption extends LastOptions
 
 trait LastOptions {
-  implicit def LastOptionNewtype[A]: Newtype[LastOption[A], Option[A]] =
-    Newtype.newtype(_.value, b => new LastOption[A] {
+  implicit def LastOptionNewtype[A]: ^*^[LastOption[A], Option[A]] =
+    ^*^.^*^(_.value, b => new LastOption[A] {
       val value = b
     })
 
   implicit def OptionLastOption[A](o: Option[A]): LastOption[A] =
-    implicitly[Newtype[LastOption[A], Option[A]]].pack(o)
+    implicitly[^*^[LastOption[A], Option[A]]].pack(o)
 
   implicit def LastOptionZero[A]: Zero[LastOption[A]] =
-    Zero.zero(implicitly[Newtype[LastOption[A], Option[A]]].pack(None))
+    Zero.zero(implicitly[^*^[LastOption[A], Option[A]]].pack(None))
 
   implicit def LastOptionSemigroup[A]: Semigroup[LastOption[A]] = new Semigroup[LastOption[A]] {
     def append(a1: LastOption[A], a2: => LastOption[A]) =
-      implicitly[Newtype[LastOption[A], Option[A]]].pack(a2.value orElse a1.value)
+      implicitly[^*^[LastOption[A], Option[A]]].pack(a2.value orElse a1.value)
   }
 
   implicit def LastOptionMonoid[A]: Monoid[LastOption[A]] =

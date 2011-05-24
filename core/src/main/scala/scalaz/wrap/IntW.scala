@@ -8,7 +8,7 @@ sealed trait IntW {
   val value: Int
 
   def multiplication: IntMultiplication =
-    Newtype.pack[Int, IntMultiplication](value)
+    ^*^.->^*^[Int, IntMultiplication](value)
 
   def ∏ : IntMultiplication =
     multiplication

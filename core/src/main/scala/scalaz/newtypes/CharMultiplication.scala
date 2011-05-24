@@ -8,17 +8,17 @@ sealed trait CharMultiplication {
 object CharMultiplication extends CharMultiplications
 
 trait CharMultiplications {
-  implicit val CharMultiplicationNewtype: Newtype[CharMultiplication, Char] =
-    Newtype.newtype(_.value, b => new CharMultiplication {
+  implicit val CharMultiplicationNewtype: ^*^[CharMultiplication, Char] =
+    ^*^.^*^(_.value, b => new CharMultiplication {
       val value = b
     })
 
   implicit def CharMultiplicationZero: Zero[CharMultiplication] =
-    Zero.zero(implicitly[Newtype[CharMultiplication, Char]].pack(1))
+    Zero.zero(implicitly[^*^[CharMultiplication, Char]].pack(1))
 
   implicit def CharMultiplicationSemigroup: Semigroup[CharMultiplication] = new Semigroup[CharMultiplication] {
     def append(a1: CharMultiplication, a2: => CharMultiplication) =
-      implicitly[Newtype[CharMultiplication, Char]].pack((a1.value.toInt * a2.value.toInt).toChar)
+      implicitly[^*^[CharMultiplication, Char]].pack((a1.value.toInt * a2.value.toInt).toChar)
   }
 
   implicit def CharMultiplicationMonoid: Monoid[CharMultiplication] =

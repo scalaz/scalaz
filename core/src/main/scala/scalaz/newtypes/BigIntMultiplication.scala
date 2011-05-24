@@ -8,17 +8,17 @@ sealed trait BigIntMultiplication {
 object BigIntMultiplication extends BigIntMultiplications
 
 trait BigIntMultiplications {
-  implicit val BigIntMultiplicationNewtype: Newtype[BigIntMultiplication, BigInt] =
-    Newtype.newtype(_.value, b => new BigIntMultiplication {
+  implicit val BigIntMultiplicationNewtype: ^*^[BigIntMultiplication, BigInt] =
+    ^*^.^*^(_.value, b => new BigIntMultiplication {
       val value = b
     })
 
   implicit def BigIntMultiplicationZero: Zero[BigIntMultiplication] =
-    Zero.zero(implicitly[Newtype[BigIntMultiplication, BigInt]].pack(1))
+    Zero.zero(implicitly[^*^[BigIntMultiplication, BigInt]].pack(1))
 
   implicit def BigIntMultiplicationSemigroup: Semigroup[BigIntMultiplication] = new Semigroup[BigIntMultiplication] {
     def append(a1: BigIntMultiplication, a2: => BigIntMultiplication) =
-      implicitly[Newtype[BigIntMultiplication, BigInt]].pack(a1.value * a2.value)
+      implicitly[^*^[BigIntMultiplication, BigInt]].pack(a1.value * a2.value)
   }
 
   implicit def BigIntMultiplicationMonoid: Monoid[BigIntMultiplication] =

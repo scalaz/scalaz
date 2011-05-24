@@ -9,7 +9,7 @@ sealed trait CharW {
   val value: Char
 
   def multiplication: CharMultiplication =
-    Newtype.pack[Char, CharMultiplication](value)
+    ^*^.->^*^[Char, CharMultiplication](value)
 
   def ∏ : CharMultiplication =
     multiplication

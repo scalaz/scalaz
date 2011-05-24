@@ -8,17 +8,17 @@ sealed trait IntMultiplication {
 object IntMultiplication extends IntMultiplications
 
 trait IntMultiplications {
-  implicit val IntMultiplicationNewtype: Newtype[IntMultiplication, Int] =
-    Newtype.newtype(_.value, b => new IntMultiplication {
+  implicit val IntMultiplicationNewtype: ^*^[IntMultiplication, Int] =
+    ^*^.^*^(_.value, b => new IntMultiplication {
       val value = b
     })
 
   implicit def IntMultiplicationZero: Zero[IntMultiplication] =
-    Zero.zero(implicitly[Newtype[IntMultiplication, Int]].pack(1))
+    Zero.zero(implicitly[^*^[IntMultiplication, Int]].pack(1))
 
   implicit def IntMultiplicationSemigroup: Semigroup[IntMultiplication] = new Semigroup[IntMultiplication] {
     def append(a1: IntMultiplication, a2: => IntMultiplication) =
-      implicitly[Newtype[IntMultiplication, Int]].pack(a1.value * a2.value)
+      implicitly[^*^[IntMultiplication, Int]].pack(a1.value * a2.value)
   }
 
   implicit def IntMultiplicationMonoid: Monoid[IntMultiplication] =

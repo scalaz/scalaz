@@ -8,8 +8,8 @@ sealed trait ZipStream[A] {
 object ZipStream extends ZipStreams
 
 trait ZipStreams {
-  implicit def ZipStreamNewtype[A]: Newtype[ZipStream[A], Stream[A]] =
-    Newtype.newtype(_.value, b => new ZipStream[A] {
+  implicit def ZipStreamNewtype[A]: ^*^[ZipStream[A], Stream[A]] =
+    ^*^.^*^(_.value, b => new ZipStream[A] {
       val value = b
     })
 

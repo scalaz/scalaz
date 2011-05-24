@@ -8,17 +8,17 @@ sealed trait LongMultiplication {
 object LongMultiplication extends LongMultiplications
 
 trait LongMultiplications {
-  implicit val LongMultiplicationNewtype: Newtype[LongMultiplication, Long] =
-    Newtype.newtype(_.value, b => new LongMultiplication {
+  implicit val LongMultiplicationNewtype: ^*^[LongMultiplication, Long] =
+    ^*^.^*^(_.value, b => new LongMultiplication {
       val value = b
     })
 
   implicit def LongMultiplicationZero: Zero[LongMultiplication] =
-    Zero.zero(implicitly[Newtype[LongMultiplication, Long]].pack(1))
+    Zero.zero(implicitly[^*^[LongMultiplication, Long]].pack(1))
 
   implicit def LongMultiplicationSemigroup: Semigroup[LongMultiplication] = new Semigroup[LongMultiplication] {
     def append(a1: LongMultiplication, a2: => LongMultiplication) =
-      implicitly[Newtype[LongMultiplication, Long]].pack(a1.value * a2.value)
+      implicitly[^*^[LongMultiplication, Long]].pack(a1.value * a2.value)
   }
 
   implicit def LongMultiplicationMonoid: Monoid[LongMultiplication] =

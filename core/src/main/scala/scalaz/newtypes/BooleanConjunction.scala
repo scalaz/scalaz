@@ -8,18 +8,18 @@ sealed trait BooleanConjunction {
 object BooleanConjunction extends BooleanConjunctions
 
 trait BooleanConjunctions {
-  implicit val BooleanConjunctionNewtype: Newtype[BooleanConjunction, Boolean] =
-    Newtype.newtype(_.value, b => new BooleanConjunction {
+  implicit val BooleanConjunctionNewtype: ^*^[BooleanConjunction, Boolean] =
+    ^*^.^*^(_.value, b => new BooleanConjunction {
       val value = b
     })
 
   implicit val BooleanConjunctionZero: Zero[BooleanConjunction] = new Zero[BooleanConjunction] {
-    val zero = implicitly[Newtype[BooleanConjunction, Boolean]].pack(true)
+    val zero = implicitly[^*^[BooleanConjunction, Boolean]].pack(true)
   }
 
   implicit val BooleanConjunctionSemigroup: Semigroup[BooleanConjunction] = new Semigroup[BooleanConjunction] {
     def append(a1: BooleanConjunction, a2: => BooleanConjunction) =
-      implicitly[Newtype[BooleanConjunction, Boolean]].pack(a1.value && a2.value)
+      implicitly[^*^[BooleanConjunction, Boolean]].pack(a1.value && a2.value)
   }
 
   implicit val BooleanConjunctionMonoid: Monoid[BooleanConjunction] =

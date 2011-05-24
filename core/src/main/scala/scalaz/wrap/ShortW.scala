@@ -8,7 +8,7 @@ sealed trait ShortW {
   val value: Short
 
   def multiplication: ShortMultiplication =
-    Newtype.pack[Short, ShortMultiplication](value)
+    ^*^.->^*^[Short, ShortMultiplication](value)
 
   def ∏ : ShortMultiplication =
     multiplication

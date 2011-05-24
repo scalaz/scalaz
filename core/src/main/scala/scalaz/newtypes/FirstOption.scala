@@ -8,20 +8,20 @@ sealed trait FirstOption[A] {
 object FirstOption extends FirstOptions
 
 trait FirstOptions {
-  implicit def FirstOptionNewtype[A]: Newtype[FirstOption[A], Option[A]] =
-    Newtype.newtype(_.value, b => new FirstOption[A] {
+  implicit def FirstOptionNewtype[A]: ^*^[FirstOption[A], Option[A]] =
+    ^*^.^*^(_.value, b => new FirstOption[A] {
       val value = b
     })
 
   implicit def OptionFirstOption[A](o: Option[A]): FirstOption[A] =
-    implicitly[Newtype[FirstOption[A], Option[A]]].pack(o)
+    implicitly[^*^[FirstOption[A], Option[A]]].pack(o)
 
   implicit def FirstOptionZero[A]: Zero[FirstOption[A]] =
-    Zero.zero(implicitly[Newtype[FirstOption[A], Option[A]]].pack(None))
+    Zero.zero(implicitly[^*^[FirstOption[A], Option[A]]].pack(None))
 
   implicit def FirstOptionSemigroup[A]: Semigroup[FirstOption[A]] = new Semigroup[FirstOption[A]] {
     def append(a1: FirstOption[A], a2: => FirstOption[A]) =
-      implicitly[Newtype[FirstOption[A], Option[A]]].pack(a1.value orElse a2.value)
+      implicitly[^*^[FirstOption[A], Option[A]]].pack(a1.value orElse a2.value)
   }
 
   implicit def FirstOptionMonoid[A]: Monoid[FirstOption[A]] =
@@ -37,7 +37,7 @@ trait FirstOptions {
     implicitly[Order[Option[A]]] contramap ((_: FirstOption[A]).value)
 
   implicit def FirstOptionPointed: Pointed[FirstOption] = new Pointed[FirstOption] {
-    def point[A](a: => A) = implicitly[Newtype[FirstOption[A], Option[A]]].pack(Some(a))
+    def point[A](a: => A) = implicitly[^*^[FirstOption[A], Option[A]]].pack(Some(a))
   }
 
 }

@@ -8,17 +8,17 @@ sealed trait ShortMultiplication {
 object ShortMultiplication extends ShortMultiplications
 
 trait ShortMultiplications {
-  implicit val ShortMultiplicationNewtype: Newtype[ShortMultiplication, Short] =
-    Newtype.newtype(_.value, b => new ShortMultiplication {
+  implicit val ShortMultiplicationNewtype: ^*^[ShortMultiplication, Short] =
+    ^*^.^*^(_.value, b => new ShortMultiplication {
       val value = b
     })
 
   implicit def ShortMultiplicationZero: Zero[ShortMultiplication] =
-    Zero.zero(implicitly[Newtype[ShortMultiplication, Short]].pack(1))
+    Zero.zero(implicitly[^*^[ShortMultiplication, Short]].pack(1))
 
   implicit def ShortMultiplicationSemigroup: Semigroup[ShortMultiplication] = new Semigroup[ShortMultiplication] {
     def append(a1: ShortMultiplication, a2: => ShortMultiplication) =
-      implicitly[Newtype[ShortMultiplication, Short]].pack((a1.value.toInt * a2.value.toInt).toShort)
+      implicitly[^*^[ShortMultiplication, Short]].pack((a1.value.toInt * a2.value.toInt).toShort)
   }
 
   implicit def ShortMultiplicationMonoid: Monoid[ShortMultiplication] =

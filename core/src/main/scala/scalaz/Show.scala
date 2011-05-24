@@ -56,7 +56,7 @@ trait Shows {
 
   implicit def DoubleShow: Show[Double] = showA
 
-  def UnpackShow[T, R](implicit s: Show[R], u: Newtype[T, R]): Show[T] =
+  def UnpackShow[T, R](implicit s: Show[R], u: ^*^[T, R]): Show[T] =
     implicitly[Show[R]] contramap (u.unpack(_))
 
   implicit def BigIntegerShow: Show[java.math.BigInteger] = showA[java.math.BigInteger]

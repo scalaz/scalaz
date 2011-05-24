@@ -14,7 +14,7 @@ Joins with
 Monads with
 Monoids with
 ~>> with
-Newtypes with
+^^*^^ with
 Orders with
 Pointeds with
 PointedFunctors with

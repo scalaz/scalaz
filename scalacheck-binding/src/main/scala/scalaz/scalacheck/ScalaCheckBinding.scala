@@ -112,7 +112,7 @@ trait ScalaCheckBindings {
     val pack = (b: Gen[A]) => Arbitrary(b)
   }
 
-  implicit def ArbitraryNewtype[A]: Newtype[Arbitrary[A], Gen[A]] =
-    Newtype.newtype
+  implicit def ArbitraryNewtype[A]: ^*^[Arbitrary[A], Gen[A]] =
+    ^*^.^*^
 
 }

@@ -8,7 +8,7 @@ sealed trait ByteW {
   val value: Byte
 
   def multiplication: ByteMultiplication =
-    Newtype.pack[Byte, ByteMultiplication](value)
+    ^*^.->^*^[Byte, ByteMultiplication](value)
 
   def ∏ : ByteMultiplication =
     multiplication

@@ -16,31 +16,31 @@ trait *[A] {
   import ~>._
   import wrap.StreamW._
 
-  def pack[B](implicit p: Newtype[B, A]): B =
+  def pack[B](implicit p: ^*^[B, A]): B =
     p.pack(value)
 
-  def unpack[B](implicit p: Newtype[A, B]): B =
+  def unpack[B](implicit p: ^*^[A, B]): B =
     p.unpack(value)
 
   sealed trait Ala[N, O] {
-    def apply[P, Q](k: A => (O => N) => P)(implicit n1: Newtype[N, O], n2: Newtype[P, Q]): Q
+    def apply[P, Q](k: A => (O => N) => P)(implicit n1: ^*^[N, O], n2: ^*^[P, Q]): Q
   }
 
   def ala[N, O]: Ala[N, O] = new Ala[N, O] {
-    def apply[P, Q](k: A => (O => N) => P)(implicit n1: Newtype[N, O], n2: Newtype[P, Q]): Q =
+    def apply[P, Q](k: A => (O => N) => P)(implicit n1: ^*^[N, O], n2: ^*^[P, Q]): Q =
       n2.unpack(k(value)(n1.pack))
   }
 
   sealed trait Alaa[N, O] {
-    def apply[P, Q, Y](k: A => (Y => N) => P)(implicit n1: Newtype[N, O], n2: Newtype[P, Q]): (Y => O) => Q
+    def apply[P, Q, Y](k: A => (Y => N) => P)(implicit n1: ^*^[N, O], n2: ^*^[P, Q]): (Y => O) => Q
   }
 
   def alaa[N, O]: Alaa[N, O] = new Alaa[N, O] {
-    def apply[P, Q, Y](k: A => (Y => N) => P)(implicit n1: Newtype[N, O], n2: Newtype[P, Q]): (Y => O) => Q =
+    def apply[P, Q, Y](k: A => (Y => N) => P)(implicit n1: ^*^[N, O], n2: ^*^[P, Q]): (Y => O) => Q =
       j => n2.unpack(k(value)(y => n1.pack(j(y))))
   }
 
-  def allaa[N, O](k: A => (O => N) => N)(implicit n: Newtype[N, O]): O = {
+  def allaa[N, O](k: A => (O => N) => N)(implicit n: ^*^[N, O]): O = {
     implicit val pack = n.pack
     implicit val unpack = n.unpack
     ala(k)
@@ -707,10 +707,10 @@ trait *->*[F[_], A] {
     zipWithA(bs)(x => y => Promise.promise(f(x)(y)))
   }
 
-  def mapPack[B](implicit ftr: Functor[F], p: Newtype[B, A]): F[B] =
+  def mapPack[B](implicit ftr: Functor[F], p: ^*^[B, A]): F[B] =
     ftr.fmap(p.pack(_: A))(value)
 
-  def mapUnpack[B](implicit ftr: Functor[F], p: Newtype[A, B]): F[B] =
+  def mapUnpack[B](implicit ftr: Functor[F], p: ^*^[A, B]): F[B] =
     ftr.fmap(p.unpack(_: A))(value)
 }
 

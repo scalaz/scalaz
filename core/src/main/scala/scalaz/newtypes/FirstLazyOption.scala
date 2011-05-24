@@ -10,20 +10,20 @@ sealed trait FirstLazyOption[A] {
 object FirstLazyOption extends FirstLazyOptions
 
 trait FirstLazyOptions {
-  implicit def FirstLazyOptionNewtype[A]: Newtype[FirstLazyOption[A], LazyOption[A]] =
-    Newtype.newtype(_.value, b => new FirstLazyOption[A] {
+  implicit def FirstLazyOptionNewtype[A]: ^*^[FirstLazyOption[A], LazyOption[A]] =
+    ^*^.^*^(_.value, b => new FirstLazyOption[A] {
       val value = b
     })
 
   implicit def LazyOptionFirstLazyOption[A](o: LazyOption[A]): FirstLazyOption[A] =
-    implicitly[Newtype[FirstLazyOption[A], LazyOption[A]]].pack(o)
+    implicitly[^*^[FirstLazyOption[A], LazyOption[A]]].pack(o)
 
   implicit def FirstLazyOptionZero[A]: Zero[FirstLazyOption[A]] =
-    Zero.zero(implicitly[Newtype[FirstLazyOption[A], LazyOption[A]]].pack(LazyOption.lazyNone))
+    Zero.zero(implicitly[^*^[FirstLazyOption[A], LazyOption[A]]].pack(LazyOption.lazyNone))
 
   implicit def FirstLazyOptionSemigroup[A]: Semigroup[FirstLazyOption[A]] = new Semigroup[FirstLazyOption[A]] {
     def append(a1: FirstLazyOption[A], a2: => FirstLazyOption[A]) =
-      implicitly[Newtype[FirstLazyOption[A], LazyOption[A]]].pack(a1.value orElse a2.value)
+      implicitly[^*^[FirstLazyOption[A], LazyOption[A]]].pack(a1.value orElse a2.value)
   }
 
   implicit def FirstLazyOptionMonoid[A]: Monoid[FirstLazyOption[A]] =
