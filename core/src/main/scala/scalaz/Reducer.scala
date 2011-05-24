@@ -93,27 +93,27 @@ trait Reducers {
 
   implicit def AnyReducer: Reducer[Boolean, Boolean] = unitReducer(x => x)
 
-  implicit def AllReducer: Reducer[Boolean, BooleanConjunction] = unitReducer(_.pack[BooleanConjunction])
+  implicit def AllReducer: Reducer[Boolean, BooleanConjunction] = unitReducer(_.*-->[BooleanConjunction])
 
-  implicit def EndoReducer[A]: Reducer[(=> A) => A, Endo[A]] = unitReducer(_.pack[Endo[A]])
+  implicit def EndoReducer[A]: Reducer[(=> A) => A, Endo[A]] = unitReducer(_.*-->[Endo[A]])
 
-  implicit def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = unitReducer(_.pack[Dual[A]])
+  implicit def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = unitReducer(_.*-->[Dual[A]])
 
-  implicit def IntProductReducer: Reducer[Int, IntMultiplication] = unitReducer(_.pack[IntMultiplication])
+  implicit def IntProductReducer: Reducer[Int, IntMultiplication] = unitReducer(_.*-->[IntMultiplication])
 
-  implicit def CharProductReducer: Reducer[Char, CharMultiplication] = unitReducer(_.pack[CharMultiplication])
+  implicit def CharProductReducer: Reducer[Char, CharMultiplication] = unitReducer(_.*-->[CharMultiplication])
 
-  implicit def ByteProductReducer: Reducer[Byte, ByteMultiplication] = unitReducer(_.pack[ByteMultiplication])
+  implicit def ByteProductReducer: Reducer[Byte, ByteMultiplication] = unitReducer(_.*-->[ByteMultiplication])
 
-  implicit def LongProductReducer: Reducer[Long, LongMultiplication] = unitReducer(_.pack[LongMultiplication])
+  implicit def LongProductReducer: Reducer[Long, LongMultiplication] = unitReducer(_.*-->[LongMultiplication])
 
-  implicit def ShortProductReducer: Reducer[Short, ShortMultiplication] = unitReducer(_.pack[ShortMultiplication])
+  implicit def ShortProductReducer: Reducer[Short, ShortMultiplication] = unitReducer(_.*-->[ShortMultiplication])
 
-  implicit def BigIntProductReducer: Reducer[BigInt, BigIntMultiplication] = unitReducer(_.pack[BigIntMultiplication])
+  implicit def BigIntProductReducer: Reducer[BigInt, BigIntMultiplication] = unitReducer(_.*-->[BigIntMultiplication])
 
   import java.math.BigInteger
 
-  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.pack[BigIntegerMultiplication])
+  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.*-->[BigIntegerMultiplication])
 
   implicit def FirstReducer[A]: Reducer[A, FirstOption[A]] = unitReducer(x => Some(x))
 

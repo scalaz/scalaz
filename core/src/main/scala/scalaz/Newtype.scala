@@ -20,3 +20,8 @@ trait ^^*^^ {
   def <-^*^[T, R](t: T)(implicit u: ^*^[T, R]): R =
     u.unpack(t)
 }
+
+trait ^**^[F[_], G[_]] {
+  def unpack[A]: F[A] => G[A]
+  def pack[A]: G[A] => F[A]
+}

@@ -8,7 +8,7 @@ sealed trait CharMultiplication {
 object CharMultiplication extends CharMultiplications
 
 trait CharMultiplications {
-  implicit val CharMultiplicationNewtype: ^*^[CharMultiplication, Char] =
+  implicit val CharMultiplication_^*^ : ^*^[CharMultiplication, Char] =
     ^*^.^*^(_.value, b => new CharMultiplication {
       val value = b
     })

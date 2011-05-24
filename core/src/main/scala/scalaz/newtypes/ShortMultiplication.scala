@@ -8,7 +8,7 @@ sealed trait ShortMultiplication {
 object ShortMultiplication extends ShortMultiplications
 
 trait ShortMultiplications {
-  implicit val ShortMultiplicationNewtype: ^*^[ShortMultiplication, Short] =
+  implicit val ShortMultiplication_^*^ : ^*^[ShortMultiplication, Short] =
     ^*^.^*^(_.value, b => new ShortMultiplication {
       val value = b
     })

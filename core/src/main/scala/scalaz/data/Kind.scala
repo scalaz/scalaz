@@ -16,10 +16,10 @@ trait *[A] {
   import ~>._
   import wrap.StreamW._
 
-  def pack[B](implicit p: ^*^[B, A]): B =
+  def *-->[B](implicit p: ^*^[B, A]): B =
     p.pack(value)
 
-  def unpack[B](implicit p: ^*^[A, B]): B =
+  def <--*[B](implicit p: ^*^[A, B]): B =
     p.unpack(value)
 
   sealed trait Ala[N, O] {
@@ -54,7 +54,7 @@ trait *[A] {
     point[F]
 
   def dual: Dual[A] =
-    value.pack[Dual[A]]
+    value.*-->[Dual[A]]
 
   /**Alias for {@link #dual}*/
   def σ : Dual[A] =
@@ -310,6 +310,12 @@ trait *->*[F[_], A] {
    */
   def as: *->*[F, A] =
     this
+
+  def **-->[G[_]](implicit p: ^**^[G, F]): G[A] =
+    p.pack(value)
+
+  def <--**[G[_]](implicit p: ^**^[F, G]): G[A] =
+    p.unpack(value)
 
   def ∘[B](f: A => B)(implicit ftr: Functor[F]): F[B] =
     ftr.fmap(f)(value)

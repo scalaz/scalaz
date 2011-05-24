@@ -8,7 +8,7 @@ sealed trait BooleanConjunction {
 object BooleanConjunction extends BooleanConjunctions
 
 trait BooleanConjunctions {
-  implicit val BooleanConjunctionNewtype: ^*^[BooleanConjunction, Boolean] =
+  implicit val BooleanConjunction_^*^ : ^*^[BooleanConjunction, Boolean] =
     ^*^.^*^(_.value, b => new BooleanConjunction {
       val value = b
     })

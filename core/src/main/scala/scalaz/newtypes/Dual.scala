@@ -8,7 +8,7 @@ sealed trait Dual[A] {
 object Dual extends Duals
 
 trait Duals {
-  implicit def DualUnpack[A]: ^*^[Dual[A], A] =
+  implicit def DualNewtype_^*^[A]: ^*^[Dual[A], A] =
     ^*^.^*^(_.value, b => new Dual[A] {
       val value = b
     })

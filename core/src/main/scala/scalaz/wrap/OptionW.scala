@@ -97,10 +97,10 @@ sealed trait OptionW[A] {
   }
 
   def first: FirstOption[A] =
-    value.pack[FirstOption[A]]
+    value.*-->[FirstOption[A]]
 
   def last: LastOption[A] =
-    value.pack[LastOption[A]]
+    value.*-->[LastOption[A]]
 
   /**
    * Returns the item contained in the Option wrapped in type M if the Option is defined,

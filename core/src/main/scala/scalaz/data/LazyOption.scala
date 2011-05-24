@@ -54,10 +54,10 @@ sealed trait LazyOption[A] {
     fold(_ => this, a)
 
   def first: FirstLazyOption[A] =
-    this.pack[FirstLazyOption[A]]
+    this.*-->[FirstLazyOption[A]]
 
   def last: LastLazyOption[A] =
-    this.pack[LastLazyOption[A]]
+    this.*-->[LastLazyOption[A]]
 
   def map[B](f: (=> A) => B): LazyOption[B] =
     fold(a => lazySome(f(a)), lazyNone)

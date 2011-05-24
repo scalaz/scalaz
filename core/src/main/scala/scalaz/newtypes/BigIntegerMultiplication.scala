@@ -10,7 +10,7 @@ sealed trait BigIntegerMultiplication {
 object BigIntegerMultiplication extends BigIntegerMultiplications
 
 trait BigIntegerMultiplications {
-  implicit val BigIntegerMultiplicationNewtype: ^*^[BigIntegerMultiplication, BigInteger] =
+  implicit val BigIntegerMultiplication_^*^ : ^*^[BigIntegerMultiplication, BigInteger] =
     ^*^.^*^(_.value, b => new BigIntegerMultiplication {
       val value = b
     })

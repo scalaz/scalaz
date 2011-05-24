@@ -8,7 +8,7 @@ sealed trait ByteMultiplication {
 object ByteMultiplication extends ByteMultiplications
 
 trait ByteMultiplications {
-  implicit val ByteMultiplicationNewtype: ^*^[ByteMultiplication, Byte] =
+  implicit val ByteMultiplication_^*^ : ^*^[ByteMultiplication, Byte] =
     ^*^.^*^(_.value, b => new ByteMultiplication {
       val value = b
     })

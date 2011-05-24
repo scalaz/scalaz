@@ -10,7 +10,7 @@ sealed trait StreamW[A] {
   import data.{Zipper, Tree}, Zipper._
 
   def ʐ : ZipStream[A] =
-    value.pack[ZipStream[A]]
+    value.*-->[ZipStream[A]]
 
   def merge(s: Stream[A]): Stream[A] = {
     if (value.isEmpty) s

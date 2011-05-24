@@ -10,10 +10,18 @@ sealed trait FirstLazyOption[A] {
 object FirstLazyOption extends FirstLazyOptions
 
 trait FirstLazyOptions {
-  implicit def FirstLazyOptionNewtype[A]: ^*^[FirstLazyOption[A], LazyOption[A]] =
+  implicit def FirstLazyOption_^*^[A]: ^*^[FirstLazyOption[A], LazyOption[A]] =
     ^*^.^*^(_.value, b => new FirstLazyOption[A] {
       val value = b
     })
+
+  implicit def FirstLazyOption_^**^ : ^**^[FirstLazyOption, LazyOption] =
+    new ^**^[FirstLazyOption, LazyOption] {
+      def unpack[A] = _.value
+      def pack[A] = b => new FirstLazyOption[A] {
+      val value = b
+    }
+  }
 
   implicit def LazyOptionFirstLazyOption[A](o: LazyOption[A]): FirstLazyOption[A] =
     implicitly[^*^[FirstLazyOption[A], LazyOption[A]]].pack(o)

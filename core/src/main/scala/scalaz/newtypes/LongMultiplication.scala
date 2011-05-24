@@ -8,7 +8,7 @@ sealed trait LongMultiplication {
 object LongMultiplication extends LongMultiplications
 
 trait LongMultiplications {
-  implicit val LongMultiplicationNewtype: ^*^[LongMultiplication, Long] =
+  implicit val LongMultiplication_^*^ : ^*^[LongMultiplication, Long] =
     ^*^.^*^(_.value, b => new LongMultiplication {
       val value = b
     })

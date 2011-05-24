@@ -8,7 +8,7 @@ sealed trait IntMultiplication {
 object IntMultiplication extends IntMultiplications
 
 trait IntMultiplications {
-  implicit val IntMultiplicationNewtype: ^*^[IntMultiplication, Int] =
+  implicit val IntMultiplication_^*^ : ^*^[IntMultiplication, Int] =
     ^*^.^*^(_.value, b => new IntMultiplication {
       val value = b
     })

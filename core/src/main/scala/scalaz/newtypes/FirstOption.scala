@@ -1,6 +1,8 @@
 package scalaz
 package newtypes
 
+import data.LazyOption
+
 sealed trait FirstOption[A] {
   val value: Option[A]
 }
@@ -8,10 +10,18 @@ sealed trait FirstOption[A] {
 object FirstOption extends FirstOptions
 
 trait FirstOptions {
-  implicit def FirstOptionNewtype[A]: ^*^[FirstOption[A], Option[A]] =
+  implicit def FirstOption_^*^[A]: ^*^[FirstOption[A], Option[A]] =
     ^*^.^*^(_.value, b => new FirstOption[A] {
       val value = b
     })
+
+  implicit def FirstOption_^**^ : ^**^[FirstOption, Option] =
+    new ^**^[FirstOption, Option] {
+      def unpack[A] = _.value
+      def pack[A] = b => new FirstOption[A] {
+      val value = b
+    }
+  }
 
   implicit def OptionFirstOption[A](o: Option[A]): FirstOption[A] =
     implicitly[^*^[FirstOption[A], Option[A]]].pack(o)
