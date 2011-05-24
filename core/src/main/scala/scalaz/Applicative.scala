@@ -42,6 +42,13 @@ trait Applicative[F[_]] {
 
   def liftA2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
     a => applic.applic(pointedFunctor.fmap(f)(a))
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Applicative[G] = {
+    implicit val p: PointedFunctor[G] = pointedFunctor.deriving[G]
+    implicit val a: Applic[G] = applic.deriving[G]
+    applicative[G]
+  }
+
 }
 
 object Applicative extends Applicatives

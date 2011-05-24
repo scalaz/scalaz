@@ -4,6 +4,12 @@ import java.util.Map.Entry
 
 trait CoBind[F[_]] {
   def coBind[A, B](f: F[A] => B): F[A] => F[B]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): CoBind[G] =
+    new CoBind[G] {
+      def coBind[A, B](f: G[A] => B) =
+        h => n.pack(CoBind.this.coBind((i: F[A]) => f(n.pack(i)))(n.unpack(h)))
+    }
 }
 
 object CoBind extends CoBinds

@@ -5,6 +5,8 @@ trait ApplicFunctor[F[_]] {
   val applic: Applic[F]
   val functor: Functor[F]
 
+  import ApplicFunctor._
+
   def fmap[A, B](f: A => B): F[A] => F[B] =
     functor.fmap(f)
 
@@ -13,6 +15,13 @@ trait ApplicFunctor[F[_]] {
 
   def liftA2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
     a => applic.applic(functor.fmap(f)(a))
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): ApplicFunctor[G] = {
+    implicit val a: Applic[G] = applic.deriving[G]
+    implicit val f: Functor[G] = functor.deriving[G]
+    applicFunctor[G]
+  }
+
 }
 
 object ApplicFunctor extends ApplicFunctors

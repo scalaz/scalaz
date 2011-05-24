@@ -2,6 +2,12 @@ package scalaz
 
 trait Bind[F[_]] {
   def bind[A, B](f: A => F[B]): F[A] => F[B]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Bind[G] =
+    new Bind[G] {
+      def bind[A, B](f: A => G[B]) =
+        k => n.pack(Bind.this.bind((a: A) => n.unpack(f(a)))(n unpack k))
+    }
 }
 
 object Bind extends Binds

@@ -10,12 +10,17 @@ trait Functor[F[_]] {
     def fmap[A, B](f: A => B): F[G[A]] => F[G[B]] =
       Functor.this.fmap(gtr.fmap(f))
   }
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Functor[G] =
+    new Functor[G] {
+      def fmap[A, B](f: A => B) =
+        k => n.pack(Functor.this.fmap(f)(n.unpack(k)))
+    }
 }
 
 object Functor extends Functors
 
 trait Functors {
-
   import Const._
 
   implicit def ConstFunctor[B]: Functor[({type λ[α] = Const[B, α]})#λ] = new Functor[({type λ[α] = Const[B, α]})#λ] {

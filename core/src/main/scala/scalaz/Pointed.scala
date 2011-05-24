@@ -2,6 +2,13 @@ package scalaz
 
 trait Pointed[F[_]] {
   def point[A](a: => A): F[A]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Pointed[G] =
+    new Pointed[G] {
+      def point[A](a: => A) =
+        n.pack(Pointed.this.point(a))
+    }
+
 }
 
 object Pointed extends Pointeds

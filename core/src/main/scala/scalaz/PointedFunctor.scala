@@ -23,6 +23,13 @@ trait PointedFunctor[F[_]] {
 
   def fmap[A, B](f: A => B): F[A] => F[B] =
     functor.fmap(f)
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): PointedFunctor[G] = {
+    implicit val f: Functor[G] = functor.deriving[G]
+    implicit val p: Pointed[G] = pointed.deriving[G]
+    pointedFunctor[G]
+  }
+
 }
 
 object PointedFunctor extends PointedFunctors

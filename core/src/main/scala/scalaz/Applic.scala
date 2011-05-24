@@ -2,6 +2,12 @@ package scalaz
 
 trait Applic[F[_]] {
   def applic[A, B](f: F[A => B]): F[A] => F[B]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Applic[G] =
+    new Applic[G] {
+      def applic[A, B](f: G[A => B]) =
+        k => n.pack(Applic.this.applic(n unpack f)(n unpack k))
+    }
 }
 
 object Applic extends Applics

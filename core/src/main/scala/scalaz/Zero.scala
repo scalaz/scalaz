@@ -4,6 +4,12 @@ import collection.generic.CanBuildFrom
 
 trait Zero[A] {
   val zero: A
+
+  def deriving[B](implicit n: ^*^[B, A]): Zero[B] =
+    new Zero[B] {
+      val zero = n.pack(Zero.this.zero)
+    }
+
 }
 
 object Zero extends Zeros

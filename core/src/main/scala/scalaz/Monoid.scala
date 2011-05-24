@@ -7,11 +7,21 @@ trait Monoid[A] {
   val zero: Zero[A]
   val semigroup: Semigroup[A]
 
+  import Monoid._
+
   def z: A =
     zero.zero
 
   def append(a1: A, a2: => A): A =
     semigroup.append(a1, a2)
+
+  def deriving[B](implicit n: ^*^[B, A]): Monoid[B] =
+    new Monoid[B] {
+      implicit val zero = Monoid.this.zero.deriving
+      implicit val semigroup = Monoid.this.semigroup.deriving
+      monoid[B]
+    }
+
 }
 
 object Monoid extends Monoids

@@ -2,6 +2,13 @@ package scalaz
 
 trait Semigroup[A] {
   def append(a1: A, a2: => A): A
+
+  def deriving[B](implicit n: ^*^[B, A]): Semigroup[B] =
+    new Semigroup[B] {
+      def append(b1: B, b2: => B) =
+        n.pack(Semigroup.this.append(n.unpack(b1), n.unpack(b2)))
+    }
+
 }
 
 object Semigroup extends Semigroups
