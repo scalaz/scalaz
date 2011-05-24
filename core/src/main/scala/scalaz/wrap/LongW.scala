@@ -11,7 +11,7 @@ sealed trait LongW {
   val value: Long
 
   def multiplication: LongMultiplication =
-    Pack.pack[Long, LongMultiplication](value)
+    Newtype.pack[Long, LongMultiplication](value)
 
   def ∏ : LongMultiplication =
     multiplication

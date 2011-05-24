@@ -1,22 +1,22 @@
 package scalaz
 
 
-trait Newtype[T, R] {
-  val unpack: Unpack[T, R]
-  val pack: Pack[T, R]
-
-  def unpk: T => R =
-    unpack.unpack
-
-  def pk: R => T =
-    pack.pack
+sealed trait Newtype[T, R] {
+  val unpack: T => R
+  val pack: R => T
 }
 
 object Newtype extends Newtypes
 
 trait Newtypes {
-  def newtype[T, R](implicit u: Unpack[T, R], p: Pack[T, R]): Newtype[T, R] = new Newtype[T, R] {
+  def newtype[T, R](u: T => R, p: R => T): Newtype[T, R] = new Newtype[T, R] {
     val unpack = u
     val pack = p
   }
+
+  def pack[R, T](r: R)(implicit p: Newtype[T, R]): T =
+    p.pack(r)
+
+  def unpack[T, R](t: T)(implicit u: Newtype[T, R]): R =
+    u.unpack(t)
 }

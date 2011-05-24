@@ -27,18 +27,10 @@ trait Endos {
 
   def idEndo[A]: Endo[A] = endo(z => z)
 
-  implicit def EndoUnpack[A]: Unpack[Endo[A], (=> A) => A] = new Unpack[Endo[A], (=> A) => A] {
-    val unpack: Endo[A] => (=> A) => A = e => e(_)
-  }
-
-  implicit def EndoPack[A]: Pack[Endo[A], (=> A) => A] = new Pack[Endo[A], (=> A) => A] {
-    val pack = (b: (=> A) => A) => new Endo[A] {
-      def apply(a: => A) = b(a)
-    }
-  }
-
   implicit def EndoNewtype[A]: Newtype[Endo[A], (=> A) => A] =
-    Newtype.newtype
+    Newtype.newtype(e => e(_), b => new Endo[A] {
+      def apply(a: => A) = b(a)
+    })
 
   implicit def EndoZero[A]: Zero[Endo[A]] =
     Zero.zero(endo(x => x))

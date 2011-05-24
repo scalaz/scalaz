@@ -16,7 +16,6 @@ IntMultiplications with
 LastLazyOptions with
 LastOptions with
 LongMultiplications with
-Pimps with
 ShortMultiplications with
 ZipLists with
 ZipStreams

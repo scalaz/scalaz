@@ -59,7 +59,7 @@ trait Equals {
 
   implicit def DoubleEqual: Equal[Double] = equalA
 
-  def UnpackEqual[T, R](implicit s: Equal[R], u: Unpack[T, R]): Equal[T] =
+  def UnpackEqual[T, R](implicit s: Equal[R], u: Newtype[T, R]): Equal[T] =
     implicitly[Equal[R]] contramap (u.unpack(_))
 
   implicit def BigIntegerEqual: Equal[java.math.BigInteger] = equalA[java.math.BigInteger]

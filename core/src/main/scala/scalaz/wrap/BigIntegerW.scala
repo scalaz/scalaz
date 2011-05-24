@@ -10,7 +10,7 @@ sealed trait BigIntegerW {
   val value: BigInteger
 
   def multiplication: BigIntegerMultiplication =
-    Pack.pack[BigInteger, BigIntegerMultiplication](value)
+    Newtype.pack[BigInteger, BigIntegerMultiplication](value)
 
   def ∏ : BigIntegerMultiplication =
     multiplication

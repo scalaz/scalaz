@@ -9,7 +9,7 @@ sealed trait BooleanW {
   val value: Boolean
 
   def conjunction: BooleanConjunction =
-    Pack.pack[Boolean, BooleanConjunction](value)
+    Newtype.pack[Boolean, BooleanConjunction](value)
 
   def |∧| : BooleanConjunction =
     conjunction

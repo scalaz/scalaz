@@ -16,12 +16,10 @@ Monoids with
 ~>> with
 Newtypes with
 Orders with
-Packs with
 Pointeds with
 PointedFunctors with
 Semigroups with
 Shows with
-Unpacks with
 Zeros with
 concurrent.Concurrents with
 data.Datas with

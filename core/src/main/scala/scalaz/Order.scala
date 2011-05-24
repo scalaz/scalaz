@@ -87,7 +87,7 @@ trait Orders {
 
   implicit def DoubleOrder: Order[Double] = ScalaOrderingOrder
 
-  def UnpackOrder[T, R](implicit s: Order[R], u: Unpack[T, R]): Order[T] =
+  def UnpackOrder[T, R](implicit s: Order[R], u: Newtype[T, R]): Order[T] =
     implicitly[Order[R]] contramap (u.unpack(_))
 
   implicit def BigIntegerOrder: Order[java.math.BigInteger] = orderI(_ compareTo _)

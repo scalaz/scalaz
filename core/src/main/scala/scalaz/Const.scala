@@ -17,18 +17,10 @@ trait Consts {
     }
   }
 
-  implicit def ConstUnpack[A, B]: Unpack[Const[A, B], A] = new Unpack[Const[A, B], A] {
-    val unpack = (_: Const[A, B]).value
-  }
-
-  implicit def ConstPack[A, B]: Pack[Const[A, B], A] = new Pack[Const[A, B], A] {
-    val pack = (a: A) => new Const[A, B] {
-      val value = a
-    }
-  }
-
   implicit def ConstNewtype[A, B]: Newtype[Const[A, B], A] =
-    Newtype.newtype
+    Newtype.newtype(_.value, a => new Const[A, B] {
+      val value = a
+    })
 
   implicit def ConstShow[B: Show, A]: Show[Const[B, A]] =
     Show.UnpackShow[Const[B, A], B]
