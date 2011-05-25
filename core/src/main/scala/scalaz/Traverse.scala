@@ -28,7 +28,7 @@ trait Traverse[T[_]] {
 
 object Traverse extends Traverses
 
-trait Traverses {
+trait Traverses extends TraversesLow {
 
   implicit def StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
@@ -50,4 +50,24 @@ trait Traverses {
     }
   }
 
+}
+
+trait TraversesLow {
+
+  implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      as => {
+        implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
+        val ap = implicitly[Applicative[F]]
+        // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
+        val flistbs = implicitly[Foldr[Stream]].foldr[A, F[Stream[B]]](x => ys =>
+          implicitly[Applicative[F]].apply(ap.fmap(((a: B) => (b: Stream[B]) => a #:: b))(f(x)))(ys))(ap.point(Stream.empty[B]))(as.toStream)
+        ap.fmap((xs: Stream[B]) => {
+            val builder = cbf.apply()
+            for (x <- xs) builder += x
+            builder.result
+        })(flistbs)
+      }
+
+  }
 }
