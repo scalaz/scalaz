@@ -12,7 +12,7 @@ trait Boilerplate {
       val arities = 2 to 12
 
       def writeFileScalazPackage(fileName: String, source: String): Unit = {
-        val file = (srcManagedScala / "scalaz" / fileName).asFile
+        val file = (srcManagedScala / "scalaz" / "wrap" / fileName).asFile
         write(file, source)
       }
 
@@ -38,7 +38,8 @@ trait Boilerplate {
           val mapallApply = mapMkString { n => "%s(value.%s)".format(n.element, n.element) }
 
           val pimp = """|
-          |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
+          |trait Tuple%dW[%s] {
+          |  val value: Tuple%d[%s]
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
           |  def mapElements[%s](%s): (%s) = (%s)
@@ -55,7 +56,7 @@ trait Boilerplate {
         tupleWSource
       }
 
-      val source = "package scalaz\n\n" +
+      val source = "package scalaz\npackage wrap\n\n" +
               "trait Tuples {\n" +
               "  " + tuples.map("  " +).mkString("\n") +
               "}"

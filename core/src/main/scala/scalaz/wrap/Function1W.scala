@@ -10,7 +10,7 @@ sealed trait Function1W[T, R] {
   def *->* : (({type λ[α] = Function1[T, α]})#λ *->* R) =
     data.*->*.**->**[({type λ[α] = Function1[T, α]})#λ, R](k)
 
-  import scalaz.concurrent.{Promise, Strategy}
+  import concurrent.{Promise, Strategy}
   import data.{Kleisli, Validation, NonEmptyList, Endo, Ordering}, Validation._, NonEmptyList._
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(k(t1), k(t2))

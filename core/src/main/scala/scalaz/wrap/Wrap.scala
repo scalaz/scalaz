@@ -20,4 +20,5 @@ LongWs with
 OptionWs with
 ShortWs with
 StreamWs with
-StringWs
+StringWs with
+Tuples
