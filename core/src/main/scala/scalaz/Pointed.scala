@@ -35,10 +35,10 @@ trait Pointeds extends PointedsLow {
   }
 
   implicit def CallablePointed: Pointed[Callable] = new Pointed[Callable] {
-      def point[A](a: => A) = new Callable[A] {
-        def call = a
-      }
+    def point[A](a: => A) = new Callable[A] {
+      def call = a
     }
+  }
 }
 
 trait PointedsLow {
