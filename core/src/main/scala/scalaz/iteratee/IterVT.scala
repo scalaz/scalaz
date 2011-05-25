@@ -29,7 +29,7 @@ sealed trait IterVT[E, F[_], A] {
       , cont = k =>
         ftr.fmap((d: IterVT[E, F, A]) => d.foldT(
           done = (xx, _) => xx
-          , cont = _ => error("Diverging iteratee")
+          , cont = _ => sys.error("Diverging iteratee")
         ))(k(eofInput[E]))
     )
 
@@ -39,7 +39,7 @@ sealed trait IterVT[E, F[_], A] {
       , cont = k =>
         k(eofInput[E]).fold(
           done = (xx, _) => xx
-          , cont = _ => error("Diverging iteratee")
+          , cont = _ => sys.error("Diverging iteratee")
         )
     )
 

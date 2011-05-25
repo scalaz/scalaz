@@ -59,7 +59,7 @@ sealed trait Heap[A] {
     fold(None, (_, _, t) => Some((t.rootLabel.value, deleteMin)))
 
   /**Get the minimum key on the (nonempty) heap. O(1) */
-  def minimum: A = fold(error("Heap.minimum: emptyEphemeralStream heap"), (_, _, t) => t.rootLabel.value)
+  def minimum: A = fold(sys.error("Heap.minimum: emptyEphemeralStream heap"), (_, _, t) => t.rootLabel.value)
 
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
@@ -216,7 +216,7 @@ object Heap extends Heaps {
 
   private def rootZ[A]: ForestZipper[A] => A = {
     case (_, x #:: _) => x.rootLabel.value
-    case _ => error("Heap.rootZ: emptyEphemeralStream zipper")
+    case _ => sys.error("Heap.rootZ: emptyEphemeralStream zipper")
   }
 
   private def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)
@@ -267,7 +267,7 @@ object Heap extends Heaps {
       if (y == 1) x union z
       else
         g(x union x, (y - 1) / 2, x union z)
-    if (i < 0) error("Heap.replicate: negative length")
+    if (i < 0) sys.error("Heap.replicate: negative length")
     else
     if (i == 0) Empty[A]
     else
@@ -328,7 +328,7 @@ object Heap extends Heaps {
       if (rank(t1) == 0) splitForest(r - 1, t1 #:: zs, t2 #:: ts, cf)
       else
         splitForest(r - 1, zs, t1 #:: ts, t2 #:: cf)
-    case (_, _, _, _) => error("Heap.splitForest: invalid arguments")
+    case (_, _, _, _) => sys.error("Heap.splitForest: invalid arguments")
   }
 
   private def skewMeld[A](f: (A, A) => Boolean, ts: Forest[A], tsp: Forest[A]) =

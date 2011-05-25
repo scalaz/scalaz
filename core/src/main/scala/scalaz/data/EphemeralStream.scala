@@ -67,9 +67,9 @@ trait EphemeralStreams {
   def emptyEphemeralStream[A]: EphemeralStream[A] = new EphemeralStream[A] {
     def isEmpty = true
 
-    def head: () => Nothing = () => error("head of empty stream")
+    def head: () => Nothing = () => sys.error("head of empty stream")
 
-    def tail: () => Nothing = () => error("tail of empty stream")
+    def tail: () => Nothing = () => sys.error("tail of empty stream")
   }
 
   def cons[A](a: => A, as: => EphemeralStream[A]) = new EphemeralStream[A] {

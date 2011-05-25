@@ -51,7 +51,7 @@ sealed trait Zipper[A] {
   /**
    * Moves to the next element to the right of focus, or error if there is no element on the right.
    */
-  def tryNext: Zipper[A] = nextOr(error("cannot move to next element"))
+  def tryNext: Zipper[A] = nextOr(sys.error("cannot move to next element"))
 
   /**
    * Possibly moves to the previous element to the left of focus.
@@ -70,7 +70,7 @@ sealed trait Zipper[A] {
   /**
    * Moves to the previous element to the left of focus, or error if there is no element on the left.
    */
-  def tryPrevious: Zipper[A] = previousOr(error("cannot move to previous element"))
+  def tryPrevious: Zipper[A] = previousOr(sys.error("cannot move to previous element"))
 
   /**
    * An alias for insertRight

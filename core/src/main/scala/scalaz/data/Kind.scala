@@ -93,7 +93,7 @@ trait *[A] {
   // using the implicit parameter ev here gives better compiler error messages for mistyped expressions like  1 assert_=== "".
   // the simpler signature is def assert_===(b: A)(implicit e: Equal[A], s: Show[A])
   def assert_===[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) =
-    if (/==(b)) error(shows + " ≠ " + ev(b).shows)
+    if (/==(b)) sys.error(shows + " ≠ " + ev(b).shows)
 
   /**Alias for  {@link #assert_===}*/
   def assert_≟[B](b: B)(implicit e: Equal[A], s: Show[A], ev: B <:< A) =
@@ -515,7 +515,7 @@ trait *->*[F[_], A] {
     i.index(value)(n)
 
   def -!-(n: Int)(implicit i: Index[F]): A =
-    this.!(n) getOrElse (error("Index " + n + " out of bounds"))
+    this.!(n) getOrElse (sys.error("Index " + n + " out of bounds"))
 
   def indexOr(n: Int, d: => A)(implicit i: Index[F]): A =
     i.indexOr(value, d)(n)
