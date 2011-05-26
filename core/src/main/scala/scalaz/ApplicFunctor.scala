@@ -1,11 +1,31 @@
 package scalaz
 
+import scalaz.Pointed._
+
 
 trait ApplicFunctor[F[_]] {
   val applic: Applic[F]
   val functor: Functor[F]
 
   import ApplicFunctor._
+
+  def compose[G[_]](ga: ApplicFunctor[G]): ApplicFunctor[({type λ[α] = F[G[α]]})#λ] =
+    applicFunctor[({type λ[α] = F[G[α]]})#λ](
+      new Applic[({type λ[α] = F[G[α]]})#λ] {
+        def applic[A, B](f: F[G[A => B]]) =
+          liftA2((ff: G[A => B]) => ga.apply(ff))(f)
+      }
+      , new Functor[({type λ[α] = F[G[α]]})#λ] {
+          def fmap[A, B](f: A => B) =
+            ApplicFunctor.this.fmap(ga.fmap(f))
+        }
+    )
+
+  def **[G[_]: ApplicFunctor]: ApplicFunctor[({type λ[α]=(F[α], G[α])})#λ] = {
+    implicit val a = applic ** implicitly[ApplicFunctor[G]].applic
+    implicit val f = functor ** implicitly[ApplicFunctor[G]].functor
+    applicFunctor[({type λ[α]=(F[α], G[α])})#λ]
+  }
 
   def fmap[A, B](f: A => B): F[A] => F[B] =
     functor.fmap(f)

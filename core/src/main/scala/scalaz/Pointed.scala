@@ -3,6 +3,12 @@ package scalaz
 trait Pointed[F[_]] {
   def point[A](a: => A): F[A]
 
+  def **[G[_]: Pointed]: Pointed[({type λ[α]=(F[α], G[α])})#λ] =
+    new Pointed[({type λ[α]=(F[α], G[α])})#λ] {
+      def point[A](a: => A) =
+        (Pointed.this.point(a), implicitly[Pointed[G]].point(a))
+    }
+
   def deriving[G[_]](implicit n: ^**^[G, F]): Pointed[G] =
     new Pointed[G] {
       def point[A](a: => A) =
