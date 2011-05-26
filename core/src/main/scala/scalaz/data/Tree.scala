@@ -85,6 +85,9 @@ sealed trait Tree[A] {
 
   def foldNode[Z](f: A => Stream[Tree[A]] => Z): Z =
     f(rootLabel)(subForest)
+
+  def map[B](f: A => B): Tree[B] =
+    node(f(rootLabel), subForest map (_ map f))
 }
 
 object Tree extends Trees {
@@ -107,6 +110,9 @@ trait Trees {
     override def toString = "<tree>"
   }
 
+  import newtypes._
+  import wrap.StreamW._
+
   /**Construct a tree node with no children. */
   def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
 
@@ -126,4 +132,24 @@ trait Trees {
     Equal.equalC[Tree[A]]((a1, a2) =>
       implicitly[Equal[A]].equal(a1.rootLabel)(a2.rootLabel)
           && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest)(a2.subForest))
+
+  implicit val TreePointed: Pointed[Tree] = new Pointed[Tree] {
+    def point[A](a: => A) = leaf(a)
+  }
+
+  implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit val TreePointedFunctor: PointedFunctor[Tree] =
+    PointedFunctor.pointedFunctor[Tree]
+
+  implicit val TreeApplic: Applic[Tree] = new Applic[Tree] {
+    def applic[A, B](f: Tree[A => B]) =
+      a =>
+         // node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
+        error("") // todo node((f.rootLabel)(a.rootLabel), implicitly[Applic[ZipStream]].applic(a.subForest ʐ)(error("")))
+  }
+
 }

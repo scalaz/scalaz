@@ -56,6 +56,9 @@ trait FirstOptions {
   implicit def FirstOptionApplicative: Applicative[FirstOption] =
     implicitly[Applicative[Option]].deriving[FirstOption]
 
+  implicit def FirstOptionApplicFunctor: ApplicFunctor[FirstOption] =
+    implicitly[ApplicFunctor[Option]].deriving[FirstOption]
+
   implicit def FirstOptionBind: Bind[FirstOption] =
     implicitly[Bind[Option]].deriving[FirstOption]
 

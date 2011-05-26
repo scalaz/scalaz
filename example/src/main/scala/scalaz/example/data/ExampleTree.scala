@@ -1,7 +1,7 @@
 package scalaz.example
 package data
 
-import scalaz._
+import scalaz._, data._
 
 import collection.immutable.Stream
 
@@ -23,7 +23,7 @@ object ExampleTree {
     tree ∘ (1 +) assert_=== 2.node(3.leaf, 4.node(5.leaf))
 
     // ...and a Monad
-    val t2 = tree ∗ (x => (x == 2) ? x.leaf | x.node((-x).leaf))
+    val t2 = tree >>= (x => (x == 2) ? x.leaf | x.node((-x).leaf))
     t2 assert_=== 1.node((-1).leaf, 2.leaf, 3.node((-3).leaf, 4.node((-4).leaf)))
 
     // ...and Traversable

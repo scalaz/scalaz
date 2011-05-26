@@ -29,4 +29,9 @@ trait Lengths {
     def len[A](a: List[A]) =
       a.length
   }
+
+  implicit def ListStream: Length[Stream] = new Length[Stream] {
+    def len[A](a: Stream[A]) =
+      a.length
+  }
 }

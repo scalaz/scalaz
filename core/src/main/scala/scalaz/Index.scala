@@ -40,4 +40,20 @@ trait Indexs {
         k
       }
   }
+
+  implicit def StreamIndex: Index[Stream] = new Index[Stream] {
+    def index[A](a: Stream[A]) =
+      i => {
+        var n = 0
+        var k: Option[A] = None
+        val it = a.iterator
+        while(it.hasNext && k.isEmpty) {
+          val z = it.next
+          if(n == i) k = Some(z)
+          n = n + 1
+        }
+
+        k
+      }
+  }
 }

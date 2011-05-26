@@ -13,7 +13,11 @@ trait Each[F[_]] {
 object Each extends Eachs
 
 trait Eachs {
-  implicit def OptionEachEach: Each[Option] = new Each[Option] {
+  implicit def OptionEach: Each[Option] = new Each[Option] {
+    def each[A](f: A => Unit) = _ foreach f
+  }
+
+  implicit def StreamEach: Each[Stream] = new Each[Stream] {
     def each[A](f: A => Unit) = _ foreach f
   }
 }
