@@ -10,8 +10,8 @@ object ExampleAscii {
   def run {
     val is = List(1, 2, 3)
 
-    // Pure
-    1.η[List] assert_=== 1.pure[List]
+    // Pointed
+    1.η[List] assert_=== 1.point[List]
 
     // Functor map
     (is ∘ (1 +)) assert_=== (is map (1 +))
@@ -22,9 +22,9 @@ object ExampleAscii {
     (intShow ∙ ((_: IntWrap).i)).show(IntWrap(0)) assert_=== (intShow contramap ((_: IntWrap).i)).show(IntWrap(0))
 
     // Functor bind. Caution: '∗' is Unicode, not Ascii '*'!
-    (is ∗ (i => List(i, i))) assert_=== (is flatMap (i => List(i, i)))
-    (is ∗ (i => List(i, i))) assert_=== (is >>= (i => List(i, i)))
-    (is ∗| List(0, 1)) assert_=== (is >>=| List(0, 1))
+    (is >>= (i => List(i, i))) assert_=== (is flatMap (i => List(i, i)))
+    (is >>= (i => List(i, i))) assert_=== (is >>= (i => List(i, i)))
+    (is >|> List(0, 1)) assert_=== (is >|> List(0, 1))
 
     // Monadic join
     val ll = List(List(1))
