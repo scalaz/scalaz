@@ -1,7 +1,7 @@
 package scalaz.example
 package data
 
-import scalaz._
+import scalaz._, data._
 
 object ExampleEndo {
   def main(args: Array[String]) = run
@@ -22,6 +22,6 @@ object ExampleEndo {
 
     import scala.math._
     val capAndFloor: Endo[Int] = Seq(max(2, _: Int),  min(4, _: Int)).foldMap(_.endo)
-    (0 to 5 toList) ∘ capAndFloor assert_=== List(2, 2, 2, 3, 4, 4)
+    (0 to 5 toList) ∘ (i => capAndFloor(i)) assert_=== List(2, 2, 2, 3, 4, 4)
   }
 }
