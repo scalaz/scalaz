@@ -153,4 +153,25 @@ trait Trees {
         node((f.rootLabel)(a.rootLabel), implicitly[Applic[ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
   }
 
+  implicit val TreeApplicFunctor: ApplicFunctor[Tree] =
+    ApplicFunctor.applicFunctor[Tree]
+
+  implicit val TreeApplicative: Applicative[Tree] =
+    Applicative.applicative[Tree]
+
+  implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
+    def bind[A, B](f: A => Tree[B]) =
+      t => {
+        val r = f(t.rootLabel)
+        node(r.rootLabel, r.subForest #::: t.subForest.map(bind(f): Tree[A] => Tree[B]))
+      }
+  }
+
+  implicit val TreeBindFunctor: BindFunctor[Tree] =
+    BindFunctor.bindFunctor[Tree]
+
+  implicit val TreeMonad: Monad[Tree] =
+    Monad.monadBP[Tree]
+
+
 }
