@@ -30,13 +30,10 @@ object WordCount {
     val wordCountLineCountBody = (a: Char) => (charCountBody(a), lineCountBody(a))
 
     def wordCountLineCount(text: List[Char]) = {
-      val result = text.traverse[({type λ[α]=(Const[Int, α], Const[Int, α])})#λ, Char](wordCountLineCountBody)(Prod.ProdApplicative[({type λ[α]=Const[Int, α]})#λ, ({type λ[α]=Const[Int, α]})#λ], implicitly)
+      val result = text.traverse[({type λ[α]=(Const[Int, α], Const[Int, α])})#λ, Char](wordCountLineCountBody)(implicitly[Applicative[({type λ[α]=Const[Int, α]})#λ]].**[({type λ[α]=Const[Int, α]})#λ](implicitly[Applicative[({type λ[α]=Const[Int, α]})#λ]]), implicitly )
       (result._1.value, result._2.value)
     }
 
-    /*
-
     wordCountLineCount(text) assert_=== (35, 2)
-    */
   }
 }

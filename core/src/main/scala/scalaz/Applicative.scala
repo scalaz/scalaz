@@ -76,12 +76,6 @@ trait Applicatives {
     val applic = a
   }
 
-  implicit def ConstApplicative[A: Monoid] = {
-    implicit val z = implicitly[Monoid[A]].zero
-    implicit val s = implicitly[Monoid[A]].semigroup
-    applicative[({type λ[α] = Const[A, α]})#λ]
-  }
-
   implicit val OptionApplicative: Applicative[Option] =
     applicative[Option]
 

@@ -34,4 +34,25 @@ trait Consts {
   implicit def ConstOrder[B: Order, A]: Order[Const[B, A]] =
     Order.UnpackOrder[Const[B, A], B]
 
+  implicit def ConstApplic[B: Semigroup]: Applic[({type λ[α] = Const[B, α]})#λ] = new Applic[({type λ[α] = Const[B, α]})#λ] {
+    def applic[A, X](f: Const[B, A => X]) =
+      fa =>
+        const[X](implicitly[Semigroup[B]].append(f.value, fa.value))
+  }
+
+  implicit def ConstFunctor[B]: Functor[({type λ[α] = Const[B, α]})#λ] = new Functor[({type λ[α] = Const[B, α]})#λ] {
+    def fmap[A, X](f: A => X) =
+      r => const(r.value)
+  }
+
+  implicit def ConstPointed[A: Zero]: Pointed[({type λ[α] = Const[A, α]})#λ] = new Pointed[({type λ[α] = Const[A, α]})#λ] {
+    def point[B](a: => B) = const[B](implicitly[Zero[A]].zero)
+  }
+
+  implicit def ConstApplicative[A: Monoid] = {
+    implicit val z = implicitly[Monoid[A]].zero
+    implicit val s = implicitly[Monoid[A]].semigroup
+    applicative[({type λ[α] = Const[A, α]})#λ]
+  }
+
 }

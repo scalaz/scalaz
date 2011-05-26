@@ -21,12 +21,7 @@ object Pointed extends Pointeds
 
 trait Pointeds extends PointedsLow {
 
-  import Const._
   import java.util.concurrent.Callable
-
-  implicit def ConstPointed[A: Zero]: Pointed[({type λ[α] = Const[A, α]})#λ] = new Pointed[({type λ[α] = Const[A, α]})#λ] {
-    def point[B](a: => B) = const[B](implicitly[Zero[A]].zero)
-  }
 
   implicit val OptionPointed: Pointed[Option] = new Pointed[Option] {
     def point[A](a: => A) = Some(a)

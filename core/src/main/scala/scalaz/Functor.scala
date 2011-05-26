@@ -28,12 +28,6 @@ trait Functor[F[_]] {
 object Functor extends Functors
 
 trait Functors {
-  import Const._
-
-  implicit def ConstFunctor[B]: Functor[({type λ[α] = Const[B, α]})#λ] = new Functor[({type λ[α] = Const[B, α]})#λ] {
-    def fmap[A, X](f: A => X) =
-      r => const(r.value)
-  }
 
   implicit def Function1Functor[T]: Functor[({type λ[α] = Function1[T, α]})#λ] = new Functor[({type λ[α] = Function1[T, α]})#λ] {
     def fmap[A, B](f: A => B) = _ andThen f
