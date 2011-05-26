@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import wrap.StreamW._
+
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
  */
@@ -148,8 +150,7 @@ trait Trees {
   implicit val TreeApplic: Applic[Tree] = new Applic[Tree] {
     def applic[A, B](f: Tree[A => B]) =
       a =>
-         // node((f.rootLabel)(a.rootLabel), (a.subForest ʐ) <*> (f.subForest.map((apply(_: Tree[A => B], _: Tree[A])).curried) ʐ))
-        error("") // todo node((f.rootLabel)(a.rootLabel), implicitly[Applic[ZipStream]].applic(a.subForest ʐ)(error("")))
+        node((f.rootLabel)(a.rootLabel), implicitly[Applic[ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
   }
 
 }
