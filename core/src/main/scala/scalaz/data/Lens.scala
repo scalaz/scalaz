@@ -21,8 +21,8 @@ sealed trait Lens[A, B] {
   import StateT._
   import Lens._
 
-  def *->* : (({type λ[α] = Lens[A, α]})#λ *->* B) =
-    data.*->*.**->**[({type λ[α] = Lens[A, α]})#λ, B](this)
+  def *->* : (({type λ[α] = A @@ α})#λ *->* B) =
+    data.*->*.**->**[({type λ[α] = A @@ α})#λ, B](this)
 
   def get: A => B =
     a =>
@@ -79,7 +79,7 @@ sealed trait Lens[A, B] {
     })
 
   /**Lenses can be composed */
-  def >=>[C](that: Lens[C, A]): Lens[C, B] =
+  def >=>[C](that: C @@ A): (C @@ B) =
     lens[C, B](c => {
       val (f, a) = that.run(c).run
       val (g, b) = run(a).run
@@ -87,11 +87,11 @@ sealed trait Lens[A, B] {
     })
 
   /**Lenses can be composed */
-  def <=<[C](that: Lens[B, C]): Lens[A, C] =
+  def <=<[C](that: B @@ C): (A @@ C) =
     that >=> this
 
   /**Two lenses that view a value of the same type can be joined */
-  def |||[C](that: Lens[C, B]): Lens[Either[A, C], B] =
+  def |||[C](that: C @@ B): (Either[A, C] @@ B) =
     lensGG[Either[A, C], B](
     {
       case Left(a) => get(a)
@@ -103,26 +103,26 @@ sealed trait Lens[A, B] {
     )
 
   /**Two disjoint lenses can be paired */
-  def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] =
+  def ***[C, D](that: C @@ D): ((A, C) @@ (B, D)) =
     lensGG[(A, C), (B, D)](
       ac => (get(ac._1), that.get(ac._2)),
       (ac, bd) => (set(ac._1)(bd._1), that.set(ac._2)(bd._2))
     )
 
-  def tuple2[C, D](implicit i: B =:= (C, D), j: (C, D) =:= B): (Lens[A, C], Lens[A, D]) =
+  def tuple2[C, D](implicit i: B =:= (C, D), j: (C, D) =:= B): (A @@ C, A @@ D) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
         )
 
-  def tuple3[C, D, E](implicit i: B =:= (C, D, E), j: (C, D, E) =:= B): (Lens[A, C], Lens[A, D], Lens[A, E]) =
+  def tuple3[C, D, E](implicit i: B =:= (C, D, E), j: (C, D, E) =:= B): (A @@ C, A @@ D, A @@ E) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
         , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
         )
 
-  def tuple4[C, D, E, F](implicit i: B =:= (C, D, E, F), j: (C, D, E, F) =:= B): (Lens[A, C], Lens[A, D], Lens[A, E], Lens[A, F]) =
+  def tuple4[C, D, E, F](implicit i: B =:= (C, D, E, F), j: (C, D, E, F) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
@@ -130,7 +130,7 @@ sealed trait Lens[A, B] {
         , lensG(a => get(a)._4, a => b => mod(t => t copy (_4 = b))(a))
         )
 
-  def tuple5[C, D, E, F, G](implicit i: B =:= (C, D, E, F, G), j: (C, D, E, F, G) =:= B): (Lens[A, C], Lens[A, D], Lens[A, E], Lens[A, F], Lens[A, G]) =
+  def tuple5[C, D, E, F, G](implicit i: B =:= (C, D, E, F, G), j: (C, D, E, F, G) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
@@ -139,7 +139,7 @@ sealed trait Lens[A, B] {
         , lensG(a => get(a)._5, a => b => mod(t => t copy (_5 = b))(a))
         )
 
-  def tuple6[C, D, E, F, G, H](implicit i: B =:= (C, D, E, F, G, H), j: (C, D, E, F, G, H) =:= B): (Lens[A, C], Lens[A, D], Lens[A, E], Lens[A, F], Lens[A, G], Lens[A, H]) =
+  def tuple6[C, D, E, F, G, H](implicit i: B =:= (C, D, E, F, G, H), j: (C, D, E, F, G, H) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G, A @@ H) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
@@ -149,7 +149,7 @@ sealed trait Lens[A, B] {
         , lensG(a => get(a)._6, a => b => mod(t => t copy (_6 = b))(a))
         )
 
-  def tuple7[C, D, E, F, G, H, I](implicit i: B =:= (C, D, E, F, G, H, I), j: (C, D, E, F, G, H, I) =:= B): (Lens[A, C], Lens[A, D], Lens[A, E], Lens[A, F], Lens[A, G], Lens[A, H], Lens[A, I]) =
+  def tuple7[C, D, E, F, G, H, I](implicit i: B =:= (C, D, E, F, G, H, I), j: (C, D, E, F, G, H, I) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G, A @@ H, A @@ I) =
     (
         lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
         , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
@@ -193,7 +193,7 @@ sealed trait Lens[A, B] {
 
     def dequeue: State[A, C] =
       %%=(state(b => {
-        val (c, q) = i(b).dequeue
+        val (c, _) = i(b).dequeue
         (c, j(b))
       }))
 
@@ -206,7 +206,7 @@ sealed trait Lens[A, B] {
 
   /**Provide an imperative-seeming API for arrays viewed through a lens */
   case class ArrayLens[C](implicit i: B =:= Array[C], j: Array[C] =:= B) {
-    def at(n: Int): Lens[A, C] =
+    def at(n: Int): (A @@ C) =
       lensG[A, C](
         a => i(get(a))(n),
         a => v => mod(array => {
@@ -263,34 +263,37 @@ object Lens extends Lenss {
 }
 
 trait Lenss {
-  def lens[A, B](r: A => CoState[B, A]): Lens[A, B] = new Lens[A, B] {
+  type @@[A, B] =
+    Lens[A, B]
+
+  def lens[A, B](r: A => CoState[B, A]): (A @@ B) = new (A @@ B) {
     val run = r
   }
 
-  def lensG[A, B](get: A => B, set: A => B => A): Lens[A, B] =
+  def lensG[A, B](get: A => B, set: A => B => A): (A @@ B) =
     lens(a => coState((set(a), get(a))))
 
-  def lensGG[A, B](get: A => B, set: (A, B) => A): Lens[A, B] =
+  def lensGG[A, B](get: A => B, set: (A, B) => A): (A @@ B) =
     lensG(get, a => b => set(a, b))
 
   /**The identity lens for a given object */
-  def lensId[A]: Lens[A, A] =
+  def lensId[A]: (A @@ A) =
     lensG(z => z, _ => z => z)
 
   /**The trivial lens that can retrieve Unit from anything */
-  def trivialLens[A]: Lens[A, Unit] =
+  def trivialLens[A]: (A @@ Unit) =
     lensG[A, Unit](_ => (), a => _ => a)
 
   /**A lens that discards the choice of Right or Left from Either */
-  def codiagLens[A]: Lens[Either[A, A], A] =
+  def codiagLens[A]: (Either[A, A] @@ A) =
     lensId[A] ||| lensId[A]
 
   /**Access the first field of a tuple */
-  def firstLens[A, B]: Lens[(A, B), A] =
+  def firstLens[A, B]: ((A, B) @@ A) =
     lensG[(A, B), A](_._1, ab => a => (a, ab._2))
 
   /**Access the second field of a tuple */
-  def secondLens[A, B]: Lens[(A, B), B] =
+  def secondLens[A, B]: ((A, B) @@ B) =
     lensG[(A, B), B](_._2, ab => b => (ab._1, b))
 
   implicit def LensId: Id[Lens] = new Id[Lens] {
@@ -298,7 +301,7 @@ trait Lenss {
   }
 
   implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
-    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]) =
+    def compose[A, B, C](f: (B @@ C), g: (A @@ B)) =
       f >=> g
   }
 
