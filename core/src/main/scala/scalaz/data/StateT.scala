@@ -22,11 +22,23 @@ sealed trait StateT[S, F[_], A] {
   def evalState(implicit i: F[(A, S)] =:= Ident[(A, S)]): S => A =
     s => run(i)(s)._1
 
+  def evalT(s: S)(implicit f: Functor[F]): F[A] =
+    evalStateT.apply(s)
+
+  def eval(s: S)(implicit i: F[(A, S)] =:= Ident[(A, S)]): A =
+    evalState.apply(s)
+
   def execStateT(implicit f: Functor[F]): S => F[S] =
     s => f.fmap[(A, S), S](_._2)(runT(s))
 
   def execState(implicit i: F[(A, S)] =:= Ident[(A, S)]): S => S =
     s => run(i)(s)._2
+
+  def execT(s: S)(implicit f: Functor[F]): F[S] =
+    execStateT.apply(s)
+
+  def exec(s: S)(implicit i: F[(A, S)] =:= Ident[(A, S)]): S =
+    execState.apply(s)
 
   def withStateT: (S => S) => StateT[S, F, A] =
     f => stateT[S, F, A](runT compose f)
@@ -92,4 +104,58 @@ trait StateTs {
     def lift[G[_] : Monad, A](a: G[A]): StateT[S, G, A] =
       stateT(s => implicitly[Monad[G]].fmap((a: A) => (a, s))(a))
   }
+
+  implicit def StateFunctor[A, F[_] : Functor]: Functor[({type λ[α] = StateT[A, F, α]})#λ] = new Functor[({type λ[α] = StateT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def StatePointed[A, F[_] : Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] = new Pointed[({type λ[α] = StateT[A, F, α]})#λ] {
+    def point[A](a: => A) =
+      stateT(s => implicitly[Pointed[F]].point(a, s))
+  }
+
+  implicit def StateApplic[A: Semigroup, F[_] : ApplicFunctor]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
+    def applic[X, Y](f: StateT[A, F, X => Y]): StateT[A, F, X] => StateT[A, F, Y] =
+      a =>
+        stateT[A, F, Y](s =>
+          implicitly[ApplicFunctor[F]].liftA2((ff: (X => Y, A)) => (aa: (X, A)) =>
+            (ff._1(aa._1), implicitly[Semigroup[A]].append(ff._2, aa._2)))(f runT s)(a runT s))
+  }
+
+  implicit def StateJoin[A, F[_] : Bind]: Join[({type λ[α] = StateT[A, F, α]})#λ] = new Join[({type λ[α] = StateT[A, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def StatePointedFunctor[A: Zero, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[PointedFunctor[F]].functor
+    implicit val pt = implicitly[PointedFunctor[F]].pointed
+    val functor = implicitly[Functor[({type λ[α] = StateT[A, F, α]})#λ]]
+    val pointed = implicitly[Pointed[({type λ[α] = StateT[A, F, α]})#λ]]
+  }
+
+  implicit def StateApplicative[A: Monoid, F[_] : Applicative]: Applicative[({type λ[α] = StateT[A, F, α]})#λ] = new Applicative[({type λ[α] = StateT[A, F, α]})#λ] {
+    implicit val s = implicitly[Monoid[A]].semigroup
+    implicit val z = implicitly[Monoid[A]].zero
+    implicit val ap = implicitly[Applicative[F]].applic
+    implicit val pf = implicitly[Applicative[F]].pointedFunctor
+    implicit val af = implicitly[Applicative[F]].applicFunctor
+    val pointedFunctor = implicitly[PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ]]
+    val applic = implicitly[Applic[({type λ[α] = StateT[A, F, α]})#λ]]
+
+  }
+
+  implicit def StateApplicFunctor[A: Semigroup, F[_] : ApplicFunctor]: ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[ApplicFunctor[F]].functor
+    val functor = implicitly[Functor[({type λ[α] = StateT[A, F, α]})#λ]]
+    val applic = implicitly[Applic[({type λ[α] = StateT[A, F, α]})#λ]]
+  }
+
+  implicit def StateMonad[A, F[_] : Monad]: Monad[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val bind = implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].bind
+    implicit val pointed = implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].pointed
+    Monad.monadBP[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
 }

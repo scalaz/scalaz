@@ -39,6 +39,8 @@ trait Idents {
 
   implicit val IdentApplic: Applic[Ident] = IdentMonad.applic
 
+  implicit val IdentApplicFunctor: ApplicFunctor[Ident] = IdentMonad.applicFunctor
+
   implicit val IdentApplicative: Applicative[Ident] = IdentMonad.applicative
 
   implicit val IdentJoin: Join[Ident] = IdentMonad.join

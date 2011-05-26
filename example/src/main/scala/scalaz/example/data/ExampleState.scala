@@ -16,7 +16,7 @@ object ExampleState {
    * See <a href="http://blog.tmorris.net/the-state-monad-for-scala-users">The State Monad for Scala users</a>
    */
   def treeLabel {
-    sealed abstract class Tree[+A] {
+    sealed abstract class Tree[A] {
       /**
        * Label the Leaf nodes of a the tree with increasing integers, traversing
        * left to right. The current value of the label is be explicitly threaded
@@ -38,7 +38,7 @@ object ExampleState {
        * of the label through the recursion.
        */
       def numberSM: State[Int, Tree[(A, Int)]] = this match {
-        case Leaf(x) => for{s <- init[Int];
+        case Leaf(x) => for{s <- get[Int];
                             _ <- modify((_: Int) + 1)} yield Leaf((x, s))
         case Branch(left, right) => for{l <- left.numberSM
                                         r <- right.numberSM} yield Branch(l, r)
@@ -50,7 +50,7 @@ object ExampleState {
        * Note the correspondence between `<* modify` and `_ <- modify`.
        */
       def numberSA: State[Int, Tree[(A, Int)]] = this match {
-        case Leaf(x) => (init[Int] <* modify((_: Int) + 1)) ∘ {s: Int => Leaf((x, s))}
+        case Leaf(x) => (get[Int] <* modify((_: Int) + 1)) ∘ {s: Int => Leaf((x, s))}
         case Branch(left, right) => left.numberSA.<**>(right.numberSA)(Branch.apply)
       }
     }
@@ -63,7 +63,7 @@ object ExampleState {
 
     val tree = Branch(Leaf("one"), Branch(Leaf("two"), Leaf("three")))
     tree.number(1)._1 assert_=== Branch(Leaf(("one", 1)), Branch(Leaf(("two", 2)), Leaf(("three", 3))))
-    tree.numberSM ! 1 assert_=== tree.number(1)._1
-    tree.numberSA ! 1 assert_=== tree.number(1)._1
+    tree.numberSM eval 1 assert_=== tree.number(1)._1
+    tree.numberSA eval 1 assert_=== tree.number(1)._1
   }
 }

@@ -258,7 +258,7 @@ sealed trait Lens[A, B] {
 }
 
 object Lens extends Lenss {
-  def apply[A, B](r: A => CoState[B, A]): Lens[A, B] =
+  def apply[A, B](r: A => CoState[B, A]): (A @@ B) =
     lens(r)
 }
 
