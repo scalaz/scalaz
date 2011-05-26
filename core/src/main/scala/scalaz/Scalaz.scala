@@ -6,6 +6,7 @@ Applicatives with
 Binds with
 Categorys with
 Comps with
+Consts with
 Equals with
 Foldables with
 Foldls with

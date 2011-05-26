@@ -46,9 +46,6 @@ trait PointedFunctors {
     val pointed = p
   }
 
-  implicit def ConstPointedFunctor[A: Zero] =
-    pointedFunctor[({type λ[α] = Const[A, α]})#λ]
-
   implicit val OptionPointedFunctor: PointedFunctor[Option] =
     pointedFunctor
 

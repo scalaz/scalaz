@@ -49,10 +49,15 @@ trait Consts {
     def point[B](a: => B) = const[B](implicitly[Zero[A]].zero)
   }
 
+  implicit def ConstPointedFunctor[A: Zero]: PointedFunctor[({type λ[α] = Const[A, α]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = Const[A, α]})#λ]
+
   implicit def ConstApplicative[A: Monoid] = {
     implicit val z = implicitly[Monoid[A]].zero
     implicit val s = implicitly[Monoid[A]].semigroup
-    applicative[({type λ[α] = Const[A, α]})#λ]
+    Applicative.applicative[({type λ[α] = Const[A, α]})#λ]
   }
+
+  def liftConst[A, B](f: A => B): A => Const[B, A] = {a: A => Const.const(f(a))}
 
 }

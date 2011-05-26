@@ -17,11 +17,10 @@ object WordCount {
    * This is an experiment to discover which parts of this paper can be brought to Scalaz.
    */
   def wordCount {
-    def liftC[A, B](f: A => B): A => Const[B, A] = {a: A => Const.const(f(a))}
-    val charCountBody: Char => Const[Int, Char] = liftC(Function.const(1))
+    val charCountBody: Char => Const[Int, Char] = liftConst(Function.const(1))
     def charCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Char](charCountBody)
     def test(p: Boolean): Int = if (p) 1 else 0
-    val lineCountBody: Char => Const[Int, Char] = liftC {c: Char => test(c == '\n')}
+    val lineCountBody: Char => Const[Int, Char] = liftConst {c: Char => test(c == '\n')}
     def lineCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Char](lineCountBody)
     val text = "the cat in the hat\n sat on the mat\n".toList
 
