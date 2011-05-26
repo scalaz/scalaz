@@ -44,4 +44,10 @@ trait Orderings {
 
   implicit val OrderingEqual: Equal[Ordering] =
     Equal.equalBy(_.toInt)
+
+  implicit def OrderingContravariant: Contravariant[scala.Ordering] = new Contravariant[scala.Ordering] {
+    def contramap[A, B](f: B => A) =
+      _ on f
+  }
+
 }

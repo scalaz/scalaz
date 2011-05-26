@@ -55,5 +55,10 @@ trait Actors {
     val onError = err
   }
 
+  implicit def ActorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
+    def contramap[A, B](f: B => A) =
+      r => actor[B]((b: B) => (r ! f(b))(), r.onError)(r.strategy)
+  }
+
   implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _
 }

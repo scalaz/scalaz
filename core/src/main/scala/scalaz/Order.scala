@@ -55,6 +55,11 @@ trait Orders {
   def orderBy[A, B: Order](f: A => B): Order[A] =
     implicitly[Order[B]] contramap f
 
+  implicit def OrderContravariant: Contravariant[Order] = new Contravariant[Order] {
+    def contramap[A, B](f: B => A) =
+      r => order[B](b1 => b2 => r.order (f(b1))(f(b2)))
+  }
+
   implicit def ScalaOrderingOrder[T: scala.Ordering]: Order[T] = orderC {
     (t1, t2) =>
       val k = implicitly[scala.Ordering[T]].compare(t1, t2)

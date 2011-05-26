@@ -18,4 +18,10 @@ trait Runs {
 
   implicit def EffectFrom[A](e: Run[A]): A => Unit =
     e ! _
+
+  implicit def RunContravariant: Contravariant[Run] = new Contravariant[Run] {
+    def contramap[A, B](f: B => A) =
+      r => run[B]((b) => r ! f(b))(r.strategy)
+  }
+
 }

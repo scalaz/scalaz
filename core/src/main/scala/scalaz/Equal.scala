@@ -33,6 +33,11 @@ trait Equals {
     val equal = (a1: A) => (a2: A) => o.order(a1)(a2) == EQ
   }
 
+  implicit def EqualContravariant: Contravariant[Equal] = new Contravariant[Equal] {
+    def contramap[A, B](f: B => A) =
+      r => equal[B](b1 => b2 => r.equal(f(b1))(f(b2)))
+  }
+
   import Predef.{implicitly => i}
 
   implicit def ThrowableEqual: Equal[Throwable] = equalA
