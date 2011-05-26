@@ -37,11 +37,11 @@ sealed trait Kleisli[A, F[_], B] {
   def =<<(a: F[A])(implicit b: Bind[F]): F[B] =
     b.bind(run)(a)
 
-  def <=<[C](c: Kleisli[B, F, C])(implicit b: Bind[F]): Kleisli[A, F, C] =
+  def >=>[C](c: Kleisli[B, F, C])(implicit b: Bind[F]): Kleisli[A, F, C] =
     kleisli(a => c =<< run(a))
 
-  def >=>[C](c: Kleisli[C, F, A])(implicit b: Bind[F]): Kleisli[C, F, B] =
-    c <=< this
+  def <=<[C](c: Kleisli[C, F, A])(implicit b: Bind[F]): Kleisli[C, F, B] =
+    c >=> this
 }
 
 object Kleisli extends Kleislis {
@@ -116,7 +116,7 @@ trait Kleislis {
 
   implicit def KleisliCompose[F[_]](implicit bd: Bind[F]): Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
     def compose[A, B, C](f: Kleisli[B, F, C], g: Kleisli[A, F, B]) =
-      f >=> g
+      f <=< g
   }
 
   implicit def KleisliCategory[F[_]](implicit md: Monad[F]): Category[({type λ[α, β] = Kleisli[α, F, β]})#λ] = {
