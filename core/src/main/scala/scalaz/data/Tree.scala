@@ -173,5 +173,17 @@ trait Trees {
   implicit val TreeMonad: Monad[Tree] =
     Monad.monadBP[Tree]
 
+  implicit val TreeTraverse: Traverse[Tree] = new Traverse[Tree] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      ta => {
+        val trav = traverse[F, A, B](f).apply(_: Tree[A])
+        val cons = (x: B) => (xs: Stream[Tree[B]]) => node(x, xs)
+        val a = implicitly[Applicative[F]]
+        // a.apply(error(""): F[Stream[Tree[B]] => Tree[B] => Tree[B]])(a.fmap(cons)(f(ta.rootLabel)))
+        // a.apply(a.fmap(f(ta.rootLabel), cons), TraversableTraverse[Stream].traverse[F, Tree[A], Tree[B]](trav, ta.subForest))
+
+        error("")
+      }
+  }
 
 }
