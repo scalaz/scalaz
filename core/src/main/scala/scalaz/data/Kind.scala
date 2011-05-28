@@ -160,7 +160,7 @@ trait *[A] {
   def unfold[F[_], B](f: A => Option[(B, A)])(implicit p: Pointed[F], m: Monoid[F[B]]): F[B] =
     f(value) match {
       case None => m.z
-      case Some((b, a)) => m.append(p.point(b), a.unfold(f))
+      case Some((b, a)) => m.append(p.point(b), a.unfold[F, B](f))
     }
 
   def replicate[F[_]](n: Int, f: A => A = a => a)(implicit p: Pointed[F], m: Monoid[F[A]]): F[A] = {
@@ -172,10 +172,10 @@ trait *[A] {
   }
 
   def repeat[F[_]](implicit p: Pointed[F], m: Semigroup[F[A]]): F[A] =
-    m.append(p.point(value), repeat)
+    m.append(p.point(value), repeat[F])
 
   def iterate[F[_]](f: A => A)(implicit p: Pointed[F], m: Semigroup[F[A]]): F[A] =
-    m.append(p.point(value), f(value).iterate(f))
+    m.append(p.point(value), f(value).iterate[F](f))
 
   def zipper: Zipper[A] =
     Zipper.zipper(Stream.empty, value, Stream.empty)
