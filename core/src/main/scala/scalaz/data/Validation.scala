@@ -174,4 +174,13 @@ trait Validations {
   implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α]=Validation[X, α]})#λ] =
     ApplicFunctor.applicFunctor[({type λ[α]=Validation[X, α]})#λ]
 
+  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      r =>
+        (r.validation match {
+          case Success(a) => Success(a): Validation[B, X]
+          case Failure(e) => Failure(f(e)): Validation[B, X]
+        }).fail
+  }
+
 }

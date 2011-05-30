@@ -107,4 +107,7 @@ trait NonEmptyLists {
   implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     implicitly[Order[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
 
+  implicit def NonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
+    Semigroup.semigroup(a1 => a1.list <::: _)
+
 }

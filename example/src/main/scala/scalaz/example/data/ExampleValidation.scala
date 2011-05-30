@@ -1,7 +1,7 @@
 package scalaz.example
 package data
 
-import scalaz._
+import scalaz._, data._
 
 import collection.immutable.List
 import collection.Traversable
@@ -13,10 +13,10 @@ object ExampleValidation {
 
   def run {
     // Constructing Validations
-    failure[String, Int]("error") assert_=== "error".fail[Int]
-    success[String, Int](0) assert_=== 0.success[String]
-    validation[String, Int](Left("error")) assert_=== "error".fail[Int]
-    validation[String, Int](Right(0)) assert_=== 0.success[String]
+    failure[Int]("error") assert_=== "error".fail[Int]
+    success[String](0) assert_=== 0.success[String]
+    fromEither[String, Int](Left("error")) assert_=== "error".fail[Int]
+    fromEither[String, Int](Right(0)) assert_=== 0.success[String]
 
     // Extracting success or failure values
     val s: Validation[String, Int] = 1.success
@@ -26,13 +26,8 @@ object ExampleValidation {
     f.toOption assert_=== none[Int]
     f.fail.toOption assert_=== some("error")
 
-    // It is recommended to use fold rather than pattern matching:
+    // Use fold rather than pattern matching:
     val result: String = s.fold(e => "got error: " + e, s => "got success: " + s.toString)
-
-    s match {
-      case Success(a) => "success"
-      case Failure(e) => "fail"
-    }
 
     // Validation#| is analogous to Option#getOrElse
     (f | 1) assert_=== 1
@@ -52,10 +47,12 @@ object ExampleValidation {
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
     val k4 = (fNel <**> fNel){ _ + _ }
-    k4.fail.toOption assert_=== some(nel("error", "error"))
+    k4.fail.toOption assert_=== some(nels("error", "error"))
 
+    /* todo
     person
     parseNumbers
+    */
   }
 
   /**
@@ -63,18 +60,22 @@ object ExampleValidation {
    * and <a href="http://blog.tmorris.net/automated-validation-with-applicatives-and-semigroups-part-2-java/">Part 2</a>
    */
   def person {
-    sealed trait Name extends NewType[String]
+    sealed trait Name {
+      val value: String
+    }
     object Name {
       def apply(s: String): Validation[String, Name] = if (s.headOption.exists(_.isUpper))
-        (new Name {val value = s}).success
+        (new Name {val value = s}: Name).success
       else
         "Name must start with a capital letter".fail
     }
 
-    sealed trait Age extends NewType[Int]
+    sealed trait Age {
+      val value: Int
+    }
     object Age {
       def apply(a: Int): Validation[String, Age] = if (0 to 130 contains a)
-        (new Age {val value = a}).success
+        (new Age {val value = a}: Age).success
       else
         "Age must be in range".fail
     }
@@ -83,17 +84,17 @@ object ExampleValidation {
     def mkPerson(name: String, age: Int) = (Name(name).liftFailNel ⊛ Age(age).liftFailNel){ (n, a) => Person(n, a)}
 
     mkPerson("Bob", 31).isSuccess assert_=== true
-    mkPerson("bob", 131).fail.toOption assert_=== some(nel("Name must start with a capital letter", "Age must be in range"))
+    mkPerson("bob", 131).fail.toOption assert_=== some(nels("Name must start with a capital letter", "Age must be in range"))
   }
-
+    /* todo
   def parseNumbers {
     def only[A](as: Traversable[A]): Validation[String, A] = {
       val firstTwo = as.take(2).toSeq
-      validation((firstTwo.size != 1) either "required exactly one element" or firstTwo.head)
+      fromEither((firstTwo.size != 1) either "required exactly one element" or firstTwo.head)
     }
 
     def empty[A](as: Traversable[A]): Validation[String, Unit] =
-      validation(!as.isEmpty either "expected an empty collection" or ())
+      fromEither(!as.isEmpty either "expected an empty collection" or ())
 
     // Combine two validations with the Validation Applicative Functor, using only the success
     // values from the first.
@@ -109,7 +110,7 @@ object ExampleValidation {
     val validInput = """42
             |314""".stripMargin
     parse(validInput) assert_=== List(42, 314).successNel[String]
-  }
+  }*/
 
   /**
    * Parse text containing a list of integers, each on a separate line.
