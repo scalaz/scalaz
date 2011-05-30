@@ -53,7 +53,7 @@ sealed trait Validation[E, A] {
     val validation = Validation.this
   }
 
-  def lift[M[_] : Pointed]: Validation[E, M[A]] = this match {
+  def pointSuccess[M[_] : Pointed]: Validation[E, M[A]] = this match {
     case Success(a) => Success(implicitly[Pointed[M]].point(a: A))
     case Failure(e) => Failure(e)
   }
@@ -61,7 +61,7 @@ sealed trait Validation[E, A] {
   /**
    * Wraps the failure value in a NonEmptyList
    */
-  def liftFailNel: ValidationNEL[E, A] = fail.liftFailNel
+  def pointFailNel: ValidationNEL[E, A] = fail.pointFailNel
 
   def |||(f: E => A): A = this match {
     case Success(a) => a
@@ -96,12 +96,12 @@ sealed trait FailProjection[E, A] {
     case Failure(e) => Some(e)
   }
 
-  def liftFail[M[_] : Pointed]: Validation[M[E], A] = validation match {
+  def pointFail[M[_] : Pointed]: Validation[M[E], A] = validation match {
     case Success(a) => Success(a)
     case Failure(e) => Failure(implicitly[Pointed[M]].point(e: E))
   }
 
-  def liftFailNel: ValidationNEL[E, A] = liftFail[NonEmptyList]
+  def pointFailNel: ValidationNEL[E, A] = pointFail[NonEmptyList]
 
   def |||(f: A => E): E = validation match {
     case Success(a) => f(a)
@@ -161,6 +161,14 @@ trait Validations {
       _ map f
   }
 
+  implicit def ValidationPointed[X]: Pointed[({type λ[α]=Validation[X, α]})#λ] = new Pointed[({type λ[α]=Validation[X, α]})#λ] {
+    def point[A](a: => A) =
+      Success(a)
+  }
+
+  implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α]=Validation[X, α]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α]=Validation[X, α]})#λ]
+
   implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α]=Validation[X, α]})#λ] = new Applic[({type λ[α]=Validation[X, α]})#λ] {
     def applic[A, B](f: Validation[X, A => B]) =
       a => (f, a) match {
@@ -173,6 +181,9 @@ trait Validations {
 
   implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α]=Validation[X, α]})#λ] =
     ApplicFunctor.applicFunctor[({type λ[α]=Validation[X, α]})#λ]
+
+  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α]=Validation[X, α]})#λ] =
+    Applicative.applicative[({type λ[α]=Validation[X, α]})#λ]
 
   implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
     def fmap[A, B](f: A => B) =

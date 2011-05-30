@@ -43,7 +43,7 @@ object ExampleValidation {
     // The String semigroup wasn't particularly useful. A better candidate is NonEmptyList. Below, we use
     // Validation#liftFailNel to convert from Validation[String, Int] to Validation[NonEmptyList[String], Int].
     // The type alias ValidationNEL makes this more concise.
-    val fNel: ValidationNEL[String, Int] = f.liftFailNel
+    val fNel: ValidationNEL[String, Int] = f.pointFailNel
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
     val k4 = (fNel <**> fNel){ _ + _ }
@@ -81,12 +81,12 @@ object ExampleValidation {
     }
 
     case class Person(name: Name, age: Age)
-    def mkPerson(name: String, age: Int) = (Name(name).liftFailNel ⊛ Age(age).liftFailNel){ (n, a) => Person(n, a)}
+    def mkPerson(name: String, age: Int) = (Name(name).pointFailNel ⊛ Age(age).pointFailNel){ (n, a) => Person(n, a)}
 
     mkPerson("Bob", 31).isSuccess assert_=== true
     mkPerson("bob", 131).fail.toOption assert_=== some(nels("Name must start with a capital letter", "Age must be in range"))
   }
-    /* todo
+
   def parseNumbers {
     def only[A](as: Traversable[A]): Validation[String, A] = {
       val firstTwo = as.take(2).toSeq
@@ -98,19 +98,19 @@ object ExampleValidation {
 
     // Combine two validations with the Validation Applicative Functor, using only the success
     // values from the first.
-    val x: ValidationNEL[String, Int] = only(Seq(1)).liftFailNel <* empty(Seq.empty).liftFailNel
+    val x: ValidationNEL[String, Int] = only(Seq(1)).pointFailNel <* empty(Seq.empty).pointFailNel
     x assert_=== 1.successNel[String]
 
     val badInput = """42
             |aasf
             |314
             |xxx""".stripMargin
-    parse(badInput) assert_=== nel("java.lang.NumberFormatException: For input string: \"aasf\"",
+    parse(badInput) assert_=== nels("java.lang.NumberFormatException: For input string: \"aasf\"",
       "java.lang.NumberFormatException: For input string: \"xxx\"").fail[List[Int]]
     val validInput = """42
             |314""".stripMargin
     parse(validInput) assert_=== List(42, 314).successNel[String]
-  }*/
+  }
 
   /**
    * Parse text containing a list of integers, each on a separate line.
@@ -120,7 +120,7 @@ object ExampleValidation {
     def parseInt(s: String): ValidationNEL[String, Int] = {
       val projection: FailProjection[String, Int] = s.parseInt.fail ∘ (_.toString)
       // todo this can't be inferred if Pure is invariant. Why not? 
-      projection.lift[NonEmptyList, String]
+      projection.pointFailNel
     }
     val listVals: List[ValidationNEL[String, Int]] = lines.map(parseInt(_))
     // Sequence the List using the Validation Applicative Functor.
