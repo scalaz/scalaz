@@ -1,11 +1,10 @@
-package scalaz.example.concurrent
+package scalaz.example
+package concurrent
 
-import scalaz._
-import Scalaz._
+import scalaz._, Scalaz._
 
 import concurrent._
 import java.util.concurrent.Executors._
-import java.util.concurrent.ExecutorService
 
 object HammerTime {
   def main(args: Array[String]): Unit = run

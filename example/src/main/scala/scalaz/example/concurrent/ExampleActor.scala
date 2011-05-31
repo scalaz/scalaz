@@ -1,7 +1,7 @@
 package scalaz.example
 package concurrent
 
-import scalaz._, concurrent._
+import scalaz._
 import java.util.concurrent.{TimeUnit, Executors}
 
 object ExampleActor {
