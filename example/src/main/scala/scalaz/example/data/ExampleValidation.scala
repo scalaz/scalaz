@@ -1,7 +1,7 @@
 package scalaz.example
 package data
 
-import scalaz._
+import scalaz._, data._
 
 import collection.immutable.List
 import collection.Traversable
@@ -13,10 +13,10 @@ object ExampleValidation {
 
   def run {
     // Constructing Validations
-    failure[String, Int]("error") assert_=== "error".fail[Int]
-    success[String, Int](0) assert_=== 0.success[String]
-    validation[String, Int](Left("error")) assert_=== "error".fail[Int]
-    validation[String, Int](Right(0)) assert_=== 0.success[String]
+    failure[Int]("error") assert_=== "error".fail[Int]
+    success[String](0) assert_=== 0.success[String]
+    fromEither[String, Int](Left("error")) assert_=== "error".fail[Int]
+    fromEither[String, Int](Right(0)) assert_=== 0.success[String]
 
     // Extracting success or failure values
     val s: Validation[String, Int] = 1.success
@@ -26,13 +26,8 @@ object ExampleValidation {
     f.toOption assert_=== none[Int]
     f.fail.toOption assert_=== some("error")
 
-    // It is recommended to use fold rather than pattern matching:
+    // Use fold rather than pattern matching:
     val result: String = s.fold(e => "got error: " + e, s => "got success: " + s.toString)
-
-    s match {
-      case Success(a) => "success"
-      case Failure(e) => "fail"
-    }
 
     // Validation#| is analogous to Option#getOrElse
     (f | 1) assert_=== 1
@@ -48,14 +43,16 @@ object ExampleValidation {
     // The String semigroup wasn't particularly useful. A better candidate is NonEmptyList. Below, we use
     // Validation#liftFailNel to convert from Validation[String, Int] to Validation[NonEmptyList[String], Int].
     // The type alias ValidationNEL makes this more concise.
-    val fNel: ValidationNEL[String, Int] = f.liftFailNel
+    val fNel: ValidationNEL[String, Int] = f.pointFailNel
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
     val k4 = (fNel <**> fNel){ _ + _ }
-    k4.fail.toOption assert_=== some(nel("error", "error"))
+    k4.fail.toOption assert_=== some(nels("error", "error"))
 
+    /* todo
     person
     parseNumbers
+    */
   }
 
   /**
@@ -63,48 +60,52 @@ object ExampleValidation {
    * and <a href="http://blog.tmorris.net/automated-validation-with-applicatives-and-semigroups-part-2-java/">Part 2</a>
    */
   def person {
-    sealed trait Name extends NewType[String]
+    sealed trait Name {
+      val value: String
+    }
     object Name {
       def apply(s: String): Validation[String, Name] = if (s.headOption.exists(_.isUpper))
-        (new Name {val value = s}).success
+        (new Name {val value = s}: Name).success
       else
         "Name must start with a capital letter".fail
     }
 
-    sealed trait Age extends NewType[Int]
+    sealed trait Age {
+      val value: Int
+    }
     object Age {
       def apply(a: Int): Validation[String, Age] = if (0 to 130 contains a)
-        (new Age {val value = a}).success
+        (new Age {val value = a}: Age).success
       else
         "Age must be in range".fail
     }
 
     case class Person(name: Name, age: Age)
-    def mkPerson(name: String, age: Int) = (Name(name).liftFailNel ⊛ Age(age).liftFailNel){ (n, a) => Person(n, a)}
+    def mkPerson(name: String, age: Int) = (Name(name).pointFailNel ⊛ Age(age).pointFailNel){ (n, a) => Person(n, a)}
 
     mkPerson("Bob", 31).isSuccess assert_=== true
-    mkPerson("bob", 131).fail.toOption assert_=== some(nel("Name must start with a capital letter", "Age must be in range"))
+    mkPerson("bob", 131).fail.toOption assert_=== some(nels("Name must start with a capital letter", "Age must be in range"))
   }
 
   def parseNumbers {
     def only[A](as: Traversable[A]): Validation[String, A] = {
       val firstTwo = as.take(2).toSeq
-      validation((firstTwo.size != 1) either "required exactly one element" or firstTwo.head)
+      fromEither((firstTwo.size != 1) either "required exactly one element" or firstTwo.head)
     }
 
     def empty[A](as: Traversable[A]): Validation[String, Unit] =
-      validation(!as.isEmpty either "expected an empty collection" or ())
+      fromEither(!as.isEmpty either "expected an empty collection" or ())
 
     // Combine two validations with the Validation Applicative Functor, using only the success
     // values from the first.
-    val x: ValidationNEL[String, Int] = only(Seq(1)).liftFailNel <* empty(Seq.empty).liftFailNel
+    val x: ValidationNEL[String, Int] = only(Seq(1)).pointFailNel <* empty(Seq.empty).pointFailNel
     x assert_=== 1.successNel[String]
 
     val badInput = """42
             |aasf
             |314
             |xxx""".stripMargin
-    parse(badInput) assert_=== nel("java.lang.NumberFormatException: For input string: \"aasf\"",
+    parse(badInput) assert_=== nels("java.lang.NumberFormatException: For input string: \"aasf\"",
       "java.lang.NumberFormatException: For input string: \"xxx\"").fail[List[Int]]
     val validInput = """42
             |314""".stripMargin
@@ -119,7 +120,7 @@ object ExampleValidation {
     def parseInt(s: String): ValidationNEL[String, Int] = {
       val projection: FailProjection[String, Int] = s.parseInt.fail ∘ (_.toString)
       // todo this can't be inferred if Pure is invariant. Why not? 
-      projection.lift[NonEmptyList, String]
+      projection.pointFailNel
     }
     val listVals: List[ValidationNEL[String, Int]] = lines.map(parseInt(_))
     // Sequence the List using the Validation Applicative Functor.

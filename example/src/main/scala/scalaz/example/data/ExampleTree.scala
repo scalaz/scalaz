@@ -33,7 +33,7 @@ object ExampleTree {
     tree.foldMap(_.toString) assert_=== "1234"
 
     // A tree of TreeLocs (aka Zipper). Each TreeLoc is rooted at `tree` but focussed on a different node.
-    val allTreeLocs: Tree[TreeLoc[Int]] = tree.loc.cojoin.toTree
+    val allTreeLocs: Tree[TreeLoc[Int]] = tree.loc.coJoin.toTree
     // Getting the label of the focussed node from each TreeLoc restores the original tree
     allTreeLocs.map(_.getLabel) assert_=== tree
     // Alternatively, we can get the path to root from each node
@@ -47,5 +47,5 @@ object ExampleTree {
    * Returns the paths from each leaf node back to the root node.
    */
   def leafPaths[T](tree: Tree[T]): Stream[Stream[T]]
-  = tree.loc.cojoin.toTree.flatten.filter(_.isLeaf).map(_.path)
+  = tree.loc.coJoin.toTree.flatten.filter(_.isLeaf).map(_.path)
 }
