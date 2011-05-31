@@ -1,4 +1,5 @@
 package scalaz
+package data
 
 import Scalaz._
 import org.scalacheck._
