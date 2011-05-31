@@ -14,6 +14,7 @@ trait Vectors {
 }
 
 object Vector {
+
   import Show._
   import Equal._
   import Order._

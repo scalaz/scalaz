@@ -16,9 +16,10 @@ trait ZipLists {
   implicit def ZipList_^**^ : ^**^[ZipList, List] =
     new ^**^[ZipList, List] {
       def unpack[A] = _.value
+
       def pack[A] = b => new ZipList[A] {
-      val value = b
+        val value = b
+      }
     }
-  }
 
 }

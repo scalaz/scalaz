@@ -2,8 +2,9 @@ package scalaz
 package geo
 
 sealed trait Radians[A] {
+
   import Geo._
-  
+
   val toRadians: A => Double
   val fromRadians: Double => A
 
@@ -14,8 +15,9 @@ sealed trait Radians[A] {
 }
 
 object Radians {
+
   import Scalaz._
-  import Geo._  
+  import Geo._
 
   implicit val DoubleRadians: Radians[Double] = radians(_ * π / 180, _ * 180 / π)
 

@@ -2,6 +2,7 @@ package scalaz.example
 package concurrent
 
 object Fibs {
+
   import java.util.concurrent._
   import scalaz.concurrent._, Promise._
   import scalaz.Scalaz._
@@ -12,9 +13,10 @@ object Fibs {
     implicit val pool = Executors.newFixedThreadPool(5)
     implicit val s = Strategy.Executor
 
-    val out = actor {(xs: Stream[Int]) =>
-      xs.zipWithIndex.foreach(p => println("n=" + (p._2 + 1) + " => " + p._1))
-      pool.shutdown
+    val out = actor {
+      (xs: Stream[Int]) =>
+        xs.zipWithIndex.foreach(p => println("n=" + (p._2 + 1) + " => " + p._1))
+        pool.shutdown
     }
 
     def seqFib(n: Int): Int = if (n < 2) n else seqFib(n - 1) + seqFib(n - 2)

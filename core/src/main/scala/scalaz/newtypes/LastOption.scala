@@ -18,10 +18,11 @@ trait LastOptions {
   implicit def LastOption_^**^ : ^**^[LastOption, Option] =
     new ^**^[LastOption, Option] {
       def unpack[A] = _.value
+
       def pack[A] = b => new LastOption[A] {
-      val value = b
+        val value = b
+      }
     }
-  }
 
   implicit def OptionLastOption[A](o: Option[A]): LastOption[A] =
     implicitly[^*^[LastOption[A], Option[A]]].pack(o)

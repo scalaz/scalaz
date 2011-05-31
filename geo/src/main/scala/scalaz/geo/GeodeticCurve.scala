@@ -16,6 +16,7 @@ trait GeodeticCurves {
 }
 
 object GeodeticCurve {
+
   import Show._
   import Equal._
   import Order._

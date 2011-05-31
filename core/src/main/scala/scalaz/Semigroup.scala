@@ -37,9 +37,9 @@ trait Semigroups extends SemigroupsLow {
   implicit def ListSemigroup[A]: Semigroup[List[A]] =
     semigroup(a1 => a2 => a1 ::: a2)
 
-  implicit def OptionSemigroup[A : Semigroup]: Semigroup[Option[A]] =
+  implicit def OptionSemigroup[A: Semigroup]: Semigroup[Option[A]] =
     semigroup(a => b =>
-      (a,b) match {
+      (a, b) match {
         case (Some(va), Some(vb)) => Some(implicitly[Semigroup[A]].append(va, vb))
         case (Some(va), None) => Some(va)
         case (None, Some(vb)) => Some(vb)

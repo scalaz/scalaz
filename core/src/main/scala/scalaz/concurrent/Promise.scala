@@ -166,6 +166,7 @@ object Promise extends Promises {
       promise.v.break(promise)
     }
   }
+
 }
 
 trait Promises {

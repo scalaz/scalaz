@@ -160,15 +160,16 @@ trait TreeLocs {
   }
 
   implicit def TreeLocCojoin: CoJoin[TreeLoc] = new CoJoin[TreeLoc] {
+
     import *._
 
     private def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => Stream[TreeLoc[A]]) =
       (tz, () => tz.firstChild.unfold[Stream, TreeLoc[A]]((o: Option[TreeLoc[A]]) =>
-          for (c <- o) yield (c, c.right)))
+        for (c <- o) yield (c, c.right)))
 
     private def uf[A](a: TreeLoc[A], f: TreeLoc[A] => Option[TreeLoc[A]]): Stream[Tree[TreeLoc[A]]] =
       f(a).unfold[Stream, Tree[TreeLoc[A]]]((o: Option[TreeLoc[A]]) =>
-          for (c <- o) yield (c.unfoldTree(dwn[A](_: TreeLoc[A])), f(c)))
+        for (c <- o) yield (c.unfoldTree(dwn[A](_: TreeLoc[A])), f(c)))
 
     def coJoin[A] =
       a => {

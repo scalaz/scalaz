@@ -44,6 +44,7 @@ trait Ellipsoids {
 }
 
 object Ellipsoid {
+
   import Show._
   import Equal._
   import Order._
@@ -51,7 +52,7 @@ object Ellipsoid {
   implicit def EllipsoidShow: Show[Ellipsoid] = showBy(e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 
   implicit def EllipsoidEqual: Equal[Ellipsoid] = equalBy(e => (e.semiMajor, e.semiMinor, e.
-          flattening, e.inverseFlattening))
+      flattening, e.inverseFlattening))
 
   implicit def EllipsoidOrder: Order[Ellipsoid] = orderBy(e => (e.semiMajor, e.semiMinor, e.flattening, e.inverseFlattening))
 }

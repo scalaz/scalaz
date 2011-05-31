@@ -4,6 +4,7 @@ package iteratee
 // todo iteratee package is about to undergo significant change
 object ExampleIteratee {
   def main(args: Array[String]) = run
+
   /*
   import scalaz._, iteratee._
   import Scalaz._
@@ -28,6 +29,6 @@ object ExampleIteratee {
     val m1 = head[Int] >>= ((b:Option[Int]) => head[Int] map (b2 => (b <|*|> b2)))
     m1(Stream(1,2,3)).run assert_=== Some(1 -> 2)
     */
-    
+
   }
 }

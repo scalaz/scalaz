@@ -132,6 +132,7 @@ trait LazyEithers {
     def flatMap[C](f: (=> A) => LazyEither[C, B]): LazyEither[C, B] =
       e.fold(f, lazyRight(_))
   }
+
 }
 
 sealed trait LazyEitherT[A, F[_], B] {

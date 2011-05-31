@@ -9,6 +9,7 @@ object ScalazProperty extends ScalazPropertys
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
 trait ScalazPropertys {
+
   import data.*._
   import data.*->*._
   import wrap.Function1W._
@@ -42,31 +43,31 @@ trait ScalazPropertys {
       forAll((a: F[X]) => (a ∘ Predef.identity) ≟ a).label("identity")
 
     def composition[F[_], X, Y, Z](implicit f: Functor[F],
-                          af: Arbitrary[F[X]],
-                          axy: Arbitrary[(X => Y)],
-                          ayz: Arbitrary[(Y => Z)],
-                          ef: Equal[F[Z]]) =
+                                   af: Arbitrary[F[X]],
+                                   axy: Arbitrary[(X => Y)],
+                                   ayz: Arbitrary[(Y => Z)],
+                                   ef: Equal[F[Z]]) =
       forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) ≟ (a1 ∘ (f1 ∘ f2))).label("composition")
   }
 
   class MonadLaws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]], af: Arbitrary[Int => M[Int]], e: Equal[M[Int]])
-        extends Properties("Monad Laws") { 
+      extends Properties("Monad Laws") {
     property("Right identity") = Monad.rightIdentity[M, Int]
     property("Left identity") = Monad.leftIdentity[M, Int, Int]
     property("Associativity") = Monad.associativity[M, Int, Int, Int]
   }
- 
+
   object Monad {
     def rightIdentity[M[_], X](implicit m: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) = {
       implicit val b = m.bind
       implicit val p = m.pointed
       forAll((a: M[X]) => ((a >>= ((_: X).η))) ≟ a).label("Right identity")
     }
-    
+
     def leftIdentity[M[_], X, Y](implicit am: Monad[M],
-                         emy: Equal[M[Y]],
-                         ax: Arbitrary[X],
-                         af: Arbitrary[(X => M[Y])]) = {
+                                 emy: Equal[M[Y]],
+                                 ax: Arbitrary[X],
+                                 af: Arbitrary[(X => M[Y])]) = {
       implicit val b = am.bind
       implicit val p = am.pointed
       forAll((a: X, f: X => M[Y]) => ((a.η >>= f) ≟ f(a))).label("Left identity")
@@ -83,7 +84,7 @@ trait ScalazPropertys {
   }
 
   class ApplicativeLaws[F[_]](implicit a: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
-        extends Properties("Applicative Laws") {
+      extends Properties("Applicative Laws") {
     property("identity") = Applicative.identity[F, Int]
     property("composition") = Applicative.composition[F, Int, Int, Int]
     property("homomorphism") = Applicative.homomorphism[F, Int, Int]
@@ -97,7 +98,7 @@ trait ScalazPropertys {
       forAll((v: F[X]) => v <*> ((x: X) => x).η[F] === v)
     }
 
-    def composition[F[_], X, Y, Z](implicit ap: Applicative[F], 
+    def composition[F[_], X, Y, Z](implicit ap: Applicative[F],
                                    afx: Arbitrary[F[X]],
                                    au: Arbitrary[F[Y => Z]],
                                    av: Arbitrary[F[X => Y]],
@@ -120,4 +121,5 @@ trait ScalazPropertys {
       forAll((u: F[X => Y], y: X) => y.η[F] <*> u === u <*> ((f: X => Y) => f(y)).η[F])
     }
   }
+
 }

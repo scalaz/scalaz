@@ -110,11 +110,11 @@ trait StateTs {
       _ map f
   }
 
-  implicit def StateTPointed[A, F[_]: Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] =
+  implicit def StateTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] =
     new Pointed[({type λ[α] = StateT[A, F, α]})#λ] {
-    def point[A](a: => A) =
-      stateT(s => implicitly[Pointed[F]].point((a, s)))
-  }
+      def point[A](a: => A) =
+        stateT(s => implicitly[Pointed[F]].point((a, s)))
+    }
 
   implicit def StateTApplic[A: Semigroup, F[_] : ApplicFunctor]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
     def applic[X, Y](f: StateT[A, F, X => Y]): StateT[A, F, X] => StateT[A, F, Y] =

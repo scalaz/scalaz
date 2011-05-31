@@ -9,6 +9,7 @@ object ScalaCheckBinding extends ScalaCheckBindings
  * Type class instances for types from <a href="http://code.google.com/p/scalacheck">Scalacheck</a>
  */
 trait ScalaCheckBindings {
+
   import data.*._
   import Semigroup._
   import org.scalacheck.{Gen, Arbitrary}

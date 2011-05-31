@@ -37,7 +37,9 @@ object ExampleValidation {
     // of them fails, the individual errors are accumulated.
 
     // Combining validation errors using the String Semigroup.
-    val k3 = (f <**> f){ _ + _ }
+    val k3 = (f <**> f) {
+      _ + _
+    }
     k3.fail.toOption assert_=== some("errorerror")
 
     // The String semigroup wasn't particularly useful. A better candidate is NonEmptyList. Below, we use
@@ -46,7 +48,9 @@ object ExampleValidation {
     val fNel: ValidationNEL[String, Int] = f.pointFailNel
 
     // Use the NonEmptyList semigroup to accumulate errors using the Validation Applicative Functor.
-    val k4 = (fNel <**> fNel){ _ + _ }
+    val k4 = (fNel <**> fNel) {
+      _ + _
+    }
     k4.fail.toOption assert_=== some(nels("error", "error"))
 
     /* todo
@@ -65,7 +69,9 @@ object ExampleValidation {
     }
     object Name {
       def apply(s: String): Validation[String, Name] = if (s.headOption.exists(_.isUpper))
-        (new Name {val value = s}: Name).success
+        (new Name {
+          val value = s
+        }: Name).success
       else
         "Name must start with a capital letter".fail
     }
@@ -75,13 +81,17 @@ object ExampleValidation {
     }
     object Age {
       def apply(a: Int): Validation[String, Age] = if (0 to 130 contains a)
-        (new Age {val value = a}: Age).success
+        (new Age {
+          val value = a
+        }: Age).success
       else
         "Age must be in range".fail
     }
 
     case class Person(name: Name, age: Age)
-    def mkPerson(name: String, age: Int) = (Name(name).pointFailNel ⊛ Age(age).pointFailNel){ (n, a) => Person(n, a)}
+    def mkPerson(name: String, age: Int) = (Name(name).pointFailNel ⊛ Age(age).pointFailNel) {
+      (n, a) => Person(n, a)
+    }
 
     mkPerson("Bob", 31).isSuccess assert_=== true
     mkPerson("bob", 131).fail.toOption assert_=== some(nels("Name must start with a capital letter", "Age must be in range"))
@@ -124,6 +134,6 @@ object ExampleValidation {
     }
     val listVals: List[ValidationNEL[String, Int]] = lines.map(parseInt(_))
     // Sequence the List using the Validation Applicative Functor.
-    listVals.sequence[({type λ[α]=ValidationNEL[String, α]})#λ, Int]
+    listVals.sequence[({type λ[α] = ValidationNEL[String, α]})#λ, Int]
   }
 }

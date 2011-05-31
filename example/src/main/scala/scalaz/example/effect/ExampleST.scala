@@ -3,6 +3,7 @@ package effect
 
 // Purely functional typed mutable state threads
 object ExampleST {
+
   import scalaz._
   import Scalaz._
   import effect._
@@ -35,7 +36,7 @@ object ExampleST {
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
-  def binSort[A: Manifest](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =   
-    accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
+  def binSort[A: Manifest](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
+    accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for {a <- as} yield (key(a), a))
 }
 

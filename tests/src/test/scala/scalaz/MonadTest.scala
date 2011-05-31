@@ -6,6 +6,7 @@ import java.math.BigInteger
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class MonadTest extends Specification with Sugar with ScalaCheck {
+
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
@@ -31,30 +32,42 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     //    checkMonadLaws[Stream, A]
     checkMonadLaws[NonEmptyList, A]
 
-    implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {s: State[Int, Unit] => s.apply(0)}
+    implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {
+      s: State[Int, Unit] => s.apply(0)
+    }
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
-    checkMonadLaws[({type λ[α]=State[A, α]})#λ, Unit]
-    checkMonadLaws[({type λ[α]=(B, α)})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, α)})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, α)})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, E, α)})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F, α)})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F, G, α)})#λ, A]
-    implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {f: (Int => Int) => f(0)}
-    implicit def EqualFunction2 = implicitly[Equal[Int]] ∙ {f: ((Int, Int) => Int) => f(0, 0)}
-    implicit def EqualFunction3 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int) => Int) => f(0, 0, 0)}
-    implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)}
-    implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)}
-//    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[({type λ[α]=(B) => α})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C) => α})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D) => α})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, E) => α})#λ, A]
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F) => α})#λ, A]
-//    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
-    checkMonadLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
-//    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
+    checkMonadLaws[({type λ[α] = State[A, α]})#λ, Unit]
+    checkMonadLaws[({type λ[α] = (B, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, E, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F, G, α)})#λ, A]
+    implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {
+      f: (Int => Int) => f(0)
+    }
+    implicit def EqualFunction2 = implicitly[Equal[Int]] ∙ {
+      f: ((Int, Int) => Int) => f(0, 0)
+    }
+    implicit def EqualFunction3 = implicitly[Equal[Int]] ∙ {
+      f: ((Int, Int, Int) => Int) => f(0, 0, 0)
+    }
+    implicit def EqualFunction4 = implicitly[Equal[Int]] ∙ {
+      f: ((Int, Int, Int, Int) => Int) => f(0, 0, 0, 0)
+    }
+    implicit def EqualFunction5 = implicitly[Equal[Int]] ∙ {
+      f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)
+    }
+    //    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
+    checkMonadLaws[({type λ[α] = (B) => α})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C) => α})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D) => α})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, E) => α})#λ, A]
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F) => α})#λ, A]
+    //    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
+    checkMonadLaws[({type λ[α] = Either.LeftProjection[α, X]})#λ, A]
+    checkMonadLaws[({type λ[α] = Either.RightProjection[X, α]})#λ, A]
+    //    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
     ()
   }
 
@@ -64,7 +77,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
                               ema: Equal[M[A]],
                               arbma: Arbitrary[M[A]],
                               arba: Arbitrary[A]
-          ): Unit = {
+                                 ): Unit = {
     val typeName = man.toString
     typeName in {
       import ScalazProperty.Monad._

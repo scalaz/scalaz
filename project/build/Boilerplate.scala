@@ -28,14 +28,26 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          val tparams = mapMkString {n => n.alpha}
-          val params = mapMkString {n => n.element}
+          val tparams = mapMkString {
+            n => n.alpha
+          }
+          val params = mapMkString {
+            n => n.element
+          }
 
-          val ztparams = mapMkString {_ => "Z"}
+          val ztparams = mapMkString {
+            _ => "Z"
+          }
 
-          val mapallTParams = mapMkString { n => n.alpha2 }
-          val mapallParams = mapMkString { n => "%s: (%s => %s) = identity[%s] _".format(n.element, n.alpha, n.alpha2, n.alpha) }
-          val mapallApply = mapMkString { n => "%s(value.%s)".format(n.element, n.element) }
+          val mapallTParams = mapMkString {
+            n => n.alpha2
+          }
+          val mapallParams = mapMkString {
+            n => "%s: (%s => %s) = identity[%s] _".format(n.element, n.alpha, n.alpha2, n.alpha)
+          }
+          val mapallApply = mapMkString {
+            n => "%s(value.%s)".format(n.element, n.element)
+          }
 
           val pimp = """|
           |trait Tuple%dW[%s] {
@@ -46,7 +58,7 @@ trait Boilerplate {
           |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
             ztparams, params,
             mapallTParams, mapallParams, mapallTParams, mapallApply
-            )
+          )
 
           val conv = """|
           |implicit def ToTuple%dW[%s](t: (%s)): Tuple%dW[%s] = new { val value = t } with Tuple%dW[%s]
@@ -57,9 +69,9 @@ trait Boilerplate {
       }
 
       val source = "package scalaz\npackage wrap\n\n" +
-              "trait Tuples {\n" +
-              "  " + tuples.map("  " +).mkString("\n") +
-              "}"
+          "trait Tuples {\n" +
+          "  " + tuples.map("  " +).mkString("\n") +
+          "}"
       writeFileScalazPackage("TupleW.scala", source)
       None
     } dependsOn (cleanSrcManaged)

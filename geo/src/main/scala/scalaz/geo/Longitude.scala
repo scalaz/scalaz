@@ -12,6 +12,7 @@ trait Longitudes {
 }
 
 object Longitude {
+
   import Show._
   import Equal._
   import Order._

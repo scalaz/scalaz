@@ -156,20 +156,20 @@ trait Validations {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
     Order.orderBy(_.either)
 
-  implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
+  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
     def fmap[A, B](f: A => B) =
       _ map f
   }
 
-  implicit def ValidationPointed[X]: Pointed[({type λ[α]=Validation[X, α]})#λ] = new Pointed[({type λ[α]=Validation[X, α]})#λ] {
+  implicit def ValidationPointed[X]: Pointed[({type λ[α] = Validation[X, α]})#λ] = new Pointed[({type λ[α] = Validation[X, α]})#λ] {
     def point[A](a: => A) =
       Success(a)
   }
 
-  implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α]=Validation[X, α]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α]=Validation[X, α]})#λ]
+  implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α] = Validation[X, α]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
 
-  implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α]=Validation[X, α]})#λ] = new Applic[({type λ[α]=Validation[X, α]})#λ] {
+  implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α] = Validation[X, α]})#λ] = new Applic[({type λ[α] = Validation[X, α]})#λ] {
     def applic[A, B](f: Validation[X, A => B]) =
       a => (f, a) match {
         case (Success(f), Success(a)) => success(f(a))
@@ -179,13 +179,13 @@ trait Validations {
       }
   }
 
-  implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α]=Validation[X, α]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α]=Validation[X, α]})#λ]
+  implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Validation[X, α]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α] = Validation[X, α]})#λ]
 
-  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α]=Validation[X, α]})#λ] =
-    Applicative.applicative[({type λ[α]=Validation[X, α]})#λ]
+  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
+    Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
 
-  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
+  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] = new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
     def fmap[A, B](f: A => B) =
       r =>
         (r.validation match {

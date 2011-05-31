@@ -2,14 +2,14 @@ import sbt._
 import java.util.jar.Attributes.Name._
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
-        with AutoCompilerPlugins {
+with AutoCompilerPlugins {
   val scalaToolsSnapshots = "Scala Tools Snapshots" at "http://scala-tools.org/repo-snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
   override def compileOptions =
     encodingUtf8.map(CompileOption(_)) :::
-            target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
+        target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
@@ -30,12 +30,12 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil
 
-//    override def consoleInit =
-//"""
-//import scalaz._
-//import Scalaz._
-//
-//"""
+  //    override def consoleInit =
+  //"""
+  //import scalaz._
+  //import Scalaz._
+  //
+  //"""
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
@@ -75,19 +75,24 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
   override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
 
-  private def noAction = task {None}
+  private def noAction = task {
+    None
+  }
 
   override def deliverLocalAction = noAction
 
   override def publishLocalAction = noAction
 
-  override def publishAction = task {None}
+  override def publishAction = task {
+    None
+  }
 
   val parentPath = path _
 
   class Core(info: ProjectInfo) extends ScalazDefaults(info) with Boilerplate {
-    override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala##
-    override def compileAction = super.compileAction dependsOn(generateTupleW)
+    override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala ##
+
+    override def compileAction = super.compileAction dependsOn (generateTupleW)
 
     override def documentOptions = documentTitle("Scalaz Core") :: super.documentOptions
   }
@@ -102,15 +107,16 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
     override def consoleInit = super.consoleInit +
-"""
-import org.scalacheck._
-import org.scalacheck.Prop._
-"""
+        """
+        import org.scalacheck._
+        import org.scalacheck.Prop._
+        """
 
   }
 
   class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
     override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
+
     override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
@@ -139,24 +145,33 @@ import org.scalacheck.Prop._
         sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
         None
       }
-      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
-    } describedAs("Zip all artifacts")
+      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip")) dependsOn (copy)
+    } describedAs ("Zip all artifacts")
 
-    private def noAction = task {None}
+    private def noAction = task {
+      None
+    }
 
     override def publishLocalAction = noAction dependsOn packageFullAction
 
     override def publishAction = noAction dependsOn packageFullAction
 
-    def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
+    def deepSources = Path.finder {
+      topologicalSort.flatMap {
+        case p: ScalaPaths => p.mainSources.getFiles
+      }
+    }
 
-    def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
+    def allSourceRoots = topologicalSort.flatMap {
+      case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)
+    }
 
     val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
 
     override def documentOptions =
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
-      SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
-      super.documentOptions
+          SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
+          super.documentOptions
   }
+
 }

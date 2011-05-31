@@ -25,8 +25,8 @@ object ExampleApplicative {
       // Apply the Function Applicative functor to produce a function that lifts conjunction
       // i.e. x => if(x < 15 && x % 2 == 0) without repeating the application to x.
       val z = (**->**[({type λ[α] = Function1[Int, α]})#λ, Boolean]((_: Int) > 15)).<*>(((_: Int) % 2 == 0) ∘ ((_: Boolean) ∧ (_: Boolean)).curried)(Function1Applic)
-      
-      List(7, 8, 14, 15, 16, 20, 21) ∘ z assert_=== List(false,false,false,false,true,true,false)
+
+      List(7, 8, 14, 15, 16, 20, 21) ∘ z assert_=== List(false, false, false, false, true, true, false)
     }
 
     def s[A](a: A) = a.success[List[String]]
@@ -55,12 +55,24 @@ object ExampleApplicative {
     // Using alternative syntax to directly apply a sequence of N applicative
     // arguments to a N-ary function.
     val a, b, c, d = List(1)
-    (a ⊛ b){_ + _}
-    a ⊛ b apply {_ + _}
-    (a ⊛ b ⊛ c){_ + _ + _}
-    a ⊛ b ⊛ c apply {_ + _ + _}
-    a ⊛ b ⊛ c ⊛ d apply {_ + _ + _ + _}
-    a |@| b |@| c |@| d apply {_ + _ + _ + _}
+    (a ⊛ b) {
+      _ + _
+    }
+    a ⊛ b apply {
+      _ + _
+    }
+    (a ⊛ b ⊛ c) {
+      _ + _ + _
+    }
+    a ⊛ b ⊛ c apply {
+      _ + _ + _
+    }
+    a ⊛ b ⊛ c ⊛ d apply {
+      _ + _ + _ + _
+    }
+    a |@| b |@| c |@| d apply {
+      _ + _ + _ + _
+    }
 
     (a ⊛ b ⊛ c ⊛ d).tupled
     (a |@| b |@| c |@| d).tupled

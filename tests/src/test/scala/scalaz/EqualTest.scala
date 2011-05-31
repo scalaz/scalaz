@@ -7,6 +7,7 @@ import java.math.BigInteger
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class EqualTest extends Specification with Sugar with ScalaCheck {
+
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
@@ -97,7 +98,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
     checkEqualLaws[java.util.concurrent.Callable[A]]
     checkEqualLaws[Zipper[A]]
   }
-  
+
   "collection equality" in {
     def equalityConsistent[C](c1: C, c2: C)(implicit eq: Equal[C]): Boolean = (c1 == c2) must be_==(c1 === c2)
     equalityConsistent(Set(1, 2, 3), Set(3, 2, 1))

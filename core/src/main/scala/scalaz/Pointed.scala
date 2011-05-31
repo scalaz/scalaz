@@ -3,8 +3,8 @@ package scalaz
 trait Pointed[F[_]] {
   def point[A](a: => A): F[A]
 
-  def **[G[_]: Pointed]: Pointed[({type λ[α]=(F[α], G[α])})#λ] =
-    new Pointed[({type λ[α]=(F[α], G[α])})#λ] {
+  def **[G[_] : Pointed]: Pointed[({type λ[α] = (F[α], G[α])})#λ] =
+    new Pointed[({type λ[α] = (F[α], G[α])})#λ] {
       def point[A](a: => A) =
         (Pointed.this.point(a), implicitly[Pointed[G]].point(a))
     }
@@ -43,6 +43,7 @@ trait Pointeds extends PointedsLow {
 }
 
 trait PointedsLow {
+
   import collection.TraversableLike
 
   implicit def TraversablePointed[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Pointed[CC] = new Pointed[CC] {

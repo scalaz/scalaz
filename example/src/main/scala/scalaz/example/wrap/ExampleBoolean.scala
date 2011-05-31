@@ -18,14 +18,22 @@ object ExampleBoolean {
 
     {
       var i = 0
-      true when {i += 2}
-      true unless {i += 4}
+      true when {
+        i += 2
+      }
+      true unless {
+        i += 4
+      }
       i assert_=== 3
     }
     {
       var i = 0
-      false when {i += 2}
-      false unless {i += 4}
+      false when {
+        i += 2
+      }
+      false unless {
+        i += 4
+      }
       i assert_=== 4
     }
     true option 1 assert_=== some(1)

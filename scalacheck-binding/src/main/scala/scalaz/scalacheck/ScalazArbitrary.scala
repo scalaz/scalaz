@@ -13,6 +13,7 @@ object ScalazArbitrary extends ScalazArbitrarys
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
  */
 trait ScalazArbitrarys {
+
   import data.*._
   import data.*->*._
   import data._, Ident._, Alpha._
@@ -37,7 +38,7 @@ trait ScalazArbitrarys {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
-  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
+  implicit def ImmutableArrayArbitrary[A: Arbitrary : ClassManifest] =
     arbArray[A] ∘ (ImmutableArray.fromArray[A](_))
 
   implicit def IdentArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Ident[A]] =
@@ -115,7 +116,9 @@ trait ScalazArbitrarys {
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] = arb[Stream[A]].<***>(arb[A], arb[Stream[A]])(Zipper.zipper[A](_, _, _))
 
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
-  private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
+  private def arbDouble: Arbitrary[Double] = Arbitrary {
+    Gen.oneOf(posNum[Double], negNum[Double])
+  }
 
   trait Duplicate[A] {
     def pair: (A, A)

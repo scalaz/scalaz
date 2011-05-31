@@ -264,7 +264,7 @@ object Lens extends Lenss {
 
 trait Lenss {
   type @@[A, B] =
-    Lens[A, B]
+  Lens[A, B]
 
   def lens[A, B](r: A => CoState[B, A]): (A @@ B) = new (A @@ B) {
     val run = r

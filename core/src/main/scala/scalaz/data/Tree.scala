@@ -163,7 +163,7 @@ trait Trees {
     def bind[A, B](f: A => Tree[B]) =
       t => {
         val r = f(t.rootLabel)
-        node(r.rootLabel, r.subForest #::: t.subForest.map(bind(f): Tree[A] => Tree[B]))
+        node(r.rootLabel, r.subForest #::: t.subForest.map(bind(f): Tree[A] => Tree[B]) )
       }
   }
 

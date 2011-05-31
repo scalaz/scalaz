@@ -18,6 +18,7 @@ trait Alphas {
   implicit def AlphaChar(a: Alpha): Char = a.toChar
 
   object Alpha {
+
     case object A extends Alpha {
       val toChar = 'a'
     }
@@ -121,5 +122,7 @@ trait Alphas {
     case object Z extends Alpha {
       val toChar = 'z'
     }
+
   }
+
 }

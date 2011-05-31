@@ -18,10 +18,12 @@ object WordCount {
    */
   def wordCount {
     val charCountBody: Char => Const[Int, Char] = liftConst(Function.const(1))
-    def charCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Char](charCountBody)
+    def charCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α] = Const[Int, α]})#λ, Char](charCountBody)
     def test(p: Boolean): Int = if (p) 1 else 0
-    val lineCountBody: Char => Const[Int, Char] = liftConst {c: Char => test(c == '\n')}
-    def lineCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α]=Const[Int, α]})#λ, Char](lineCountBody)
+    val lineCountBody: Char => Const[Int, Char] = liftConst {
+      c: Char => test(c == '\n')
+    }
+    def lineCount(text: List[Char]): Const[Int, List[Char]] = text.traverse[({type λ[α] = Const[Int, α]})#λ, Char](lineCountBody)
     val text = "the cat in the hat\n sat on the mat\n".toList
 
     (charCount(text): Int, lineCount(text): Int) assert_=== (35, 2)
@@ -29,7 +31,7 @@ object WordCount {
     val wordCountLineCountBody = (a: Char) => (charCountBody(a), lineCountBody(a))
 
     def wordCountLineCount(text: List[Char]) = {
-      val result = text.traverse[({type λ[α]=(Const[Int, α], Const[Int, α])})#λ, Char](wordCountLineCountBody)(implicitly[Applicative[({type λ[α]=Const[Int, α]})#λ]].**[({type λ[α]=Const[Int, α]})#λ](implicitly[Applicative[({type λ[α]=Const[Int, α]})#λ]]), implicitly )
+      val result = text.traverse[({type λ[α] = (Const[Int, α], Const[Int, α])})#λ, Char](wordCountLineCountBody)(implicitly[Applicative[({type λ[α] = Const[Int, α]})#λ]].**[({type λ[α] = Const[Int, α]})#λ](implicitly[Applicative[({type λ[α] = Const[Int, α]})#λ]]), implicitly)
       (result._1.value, result._2.value)
     }
 

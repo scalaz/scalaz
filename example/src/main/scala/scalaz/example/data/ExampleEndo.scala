@@ -21,7 +21,7 @@ object ExampleEndo {
     f(1) assert_=== 1
 
     import scala.math._
-    val capAndFloor: Endo[Int] = Seq(max(2, _: Int),  min(4, _: Int)).foldMap(_.endo)
+    val capAndFloor: Endo[Int] = Seq(max(2, _: Int), min(4, _: Int)).foldMap(_.endo)
     (0 to 5 toList) ∘ (i => capAndFloor(i)) assert_=== List(2, 2, 2, 3, 4, 4)
   }
 }

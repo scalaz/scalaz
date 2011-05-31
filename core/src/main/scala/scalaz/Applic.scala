@@ -3,8 +3,8 @@ package scalaz
 trait Applic[F[_]] {
   def applic[A, B](f: F[A => B]): F[A] => F[B]
 
-  def **[G[_]: Applic]: Applic[({type λ[α]=(F[α], G[α])})#λ] =
-    new Applic[({type λ[α]=(F[α], G[α])})#λ] {
+  def **[G[_] : Applic]: Applic[({type λ[α] = (F[α], G[α])})#λ] =
+    new Applic[({type λ[α] = (F[α], G[α])})#λ] {
       def applic[A, B](f: (F[A => B], G[A => B])) = {
         case (a, b) => (Applic.this.applic(f._1)(a), implicitly[Applic[G]].applic(f._2)(b))
       }

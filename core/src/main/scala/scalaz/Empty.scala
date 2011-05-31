@@ -29,6 +29,7 @@ trait Emptys extends EmptysLow {
 }
 
 trait EmptysLow {
+
   import collection.TraversableLike
 
   implicit def TraversableEmpty[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Empty[CC] = new Empty[CC] {

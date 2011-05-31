@@ -57,5 +57,5 @@ trait FoldrsLow {
   implicit def TraversableFoldr[CC[X] <: Traversable[X]]: Foldr[CC] = new Foldr[CC] {
     def foldr[A, B] = k => b =>
       _.foldRight(b)((a, b) => k(a)(b))
-   }
+  }
 }

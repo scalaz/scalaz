@@ -538,11 +538,11 @@ trait *->*[F[_], A] {
   def element(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
     any(eq.equal(a))
 
-  /** Right associative alias for element */
+  /**Right associative alias for element */
   def ∈:(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
     element(a)
 
-  /** Alias for element */
+  /**Alias for element */
   def ∋(a: A)(implicit r: Foldr[F], eq: Equal[A]): Boolean =
     element(a)
 
@@ -745,70 +745,71 @@ trait **->** extends **->**~ {
 
   import effect._, data._, iteratee._
 
-  implicit def EitherLeft_*->*[X, A](a: Either.LeftProjection[A, X]) = *->*[({type λ[α]=Either.LeftProjection[α, X]})#λ, A](a)
+  implicit def EitherLeft_*->*[X, A](a: Either.LeftProjection[A, X]) = *->*[({type λ[α] = Either.LeftProjection[α, X]})#λ, A](a)
 
-  implicit def EitherRight_*->*[X, A](a: Either.RightProjection[X, A]) = *->*[({type λ[α]=Either.RightProjection[X, α]})#λ, A](a)
+  implicit def EitherRight_*->*[X, A](a: Either.RightProjection[X, A]) = *->*[({type λ[α] = Either.RightProjection[X, α]})#λ, A](a)
 
-  implicit def Function1_-*->*[A, R](f: R => A) = -*->*[({type λ[α]=(α) => A})#λ, R](f)
+  implicit def Function1_-*->*[A, R](f: R => A) = -*->*[({type λ[α] = (α) => A})#λ, R](f)
 
-  implicit def Function1_*->*[A, R](f: A => R) = *->*[({type λ[α]=(A) => α})#λ, R](f)
+  implicit def Function1_*->*[A, R](f: A => R) = *->*[({type λ[α] = (A) => α})#λ, R](f)
 
-  implicit def Function2_*->*[R, S, A](a: (R, S) => A) = *->*[({type λ[α]=(R, S) => α})#λ, A](a)
+  implicit def Function2_*->*[R, S, A](a: (R, S) => A) = *->*[({type λ[α] = (R, S) => α})#λ, A](a)
 
-  implicit def Function3_*->*[R, S, T, A](a: (R, S, T) => A) = *->*[({type λ[α]=(R, S, T) => α})#λ, A](a)
+  implicit def Function3_*->*[R, S, T, A](a: (R, S, T) => A) = *->*[({type λ[α] = (R, S, T) => α})#λ, A](a)
 
-  implicit def Function4_*->*[R, S, T, U, A](a: (R, S, T, U) => A) = *->*[({type λ[α]=(R, S, T, U) => α})#λ, A](a)
+  implicit def Function4_*->*[R, S, T, U, A](a: (R, S, T, U) => A) = *->*[({type λ[α] = (R, S, T, U) => α})#λ, A](a)
 
-  implicit def Function5_*->*[R, S, T, U, V, A](a: (R, S, T, U, V) => A) = *->*[({type λ[α]=(R, S, T, U, V) => α})#λ, A](a)
+  implicit def Function5_*->*[R, S, T, U, V, A](a: (R, S, T, U, V) => A) = *->*[({type λ[α] = (R, S, T, U, V) => α})#λ, A](a)
 
-  implicit def Function6_*->*[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A) = *->*[({type λ[α]=(R, S, T, U, V, W) => α})#λ, A](a)
+  implicit def Function6_*->*[R, S, T, U, V, W, A](a: (R, S, T, U, V, W) => A) = *->*[({type λ[α] = (R, S, T, U, V, W) => α})#λ, A](a)
 
-  implicit def Const_*->*[B, A](c: Const[B, A]) = *->*[({type λ[α]=Const[B, α]})#λ, A](c)
+  implicit def Const_*->*[B, A](c: Const[B, A]) = *->*[({type λ[α] = Const[B, α]})#λ, A](c)
 
-  implicit def StateT_*->*[S, F[_], A](s: StateT[S, F, A]) = *->*[({type λ[α]=StateT[S, F, α]})#λ, A](s)
+  implicit def StateT_*->*[S, F[_], A](s: StateT[S, F, A]) = *->*[({type λ[α] = StateT[S, F, α]})#λ, A](s)
 
-  implicit def WriterT_*->*[W, F[_], A](s: WriterT[W, F, A]) = *->*[({type λ[α]=WriterT[W, F, α]})#λ, A](s)
+  implicit def WriterT_*->*[W, F[_], A](s: WriterT[W, F, A]) = *->*[({type λ[α] = WriterT[W, F, α]})#λ, A](s)
 
-  implicit def StepListT_*->*[A, F[_]](s: StepListT[F, A]) = *->*[({type λ[α]=StepListT[F, α]})#λ, A](s)
+  implicit def StepListT_*->*[A, F[_]](s: StepListT[F, A]) = *->*[({type λ[α] = StepListT[F, α]})#λ, A](s)
 
-  implicit def StepStreamT_*->*[A, F[_]](s: StepStreamT[F, A]) = *->*[({type λ[α]=StepStreamT[F, α]})#λ, A](s)
+  implicit def StepStreamT_*->*[A, F[_]](s: StepStreamT[F, A]) = *->*[({type λ[α] = StepStreamT[F, α]})#λ, A](s)
 
-  implicit def OptionT_*->*[A, F[_]](s: OptionT[F, A]) = *->*[({type λ[α]=OptionT[F, α]})#λ, A](s)
+  implicit def OptionT_*->*[A, F[_]](s: OptionT[F, A]) = *->*[({type λ[α] = OptionT[F, α]})#λ, A](s)
 
-  implicit def LazyOptionT_*->*[A, F[_]](s: LazyOptionT[F, A]) = *->*[({type λ[α]=LazyOptionT[F, α]})#λ, A](s)
+  implicit def LazyOptionT_*->*[A, F[_]](s: LazyOptionT[F, A]) = *->*[({type λ[α] = LazyOptionT[F, α]})#λ, A](s)
 
-  implicit def EitherT_*->*[A, F[_], B](s: EitherT[A, F, B]) = *->*[({type λ[α]=EitherT[A, F, α]})#λ, B](s)
+  implicit def EitherT_*->*[A, F[_], B](s: EitherT[A, F, B]) = *->*[({type λ[α] = EitherT[A, F, α]})#λ, B](s)
 
-  implicit def EitherTLeft_*->*[A, F[_], B](s: EitherT.LeftProjectionT[A, F, B]) = *->*[({type λ[α]=EitherT.LeftProjectionT[A, F, α]})#λ, B](s)
+  implicit def EitherTLeft_*->*[A, F[_], B](s: EitherT.LeftProjectionT[A, F, B]) = *->*[({type λ[α] = EitherT.LeftProjectionT[A, F, α]})#λ, B](s)
 
-  implicit def LazyEither_*->*[A, B](s: LazyEither[A, B]) = *->*[({type λ[α]=LazyEither[A, α]})#λ, B](s)
+  implicit def LazyEither_*->*[A, B](s: LazyEither[A, B]) = *->*[({type λ[α] = LazyEither[A, α]})#λ, B](s)
 
-  implicit def LazyEitherT_*->*[A, F[_], B](s: LazyEitherT[A, F, B]) = *->*[({type λ[α]=LazyEitherT[A, F, α]})#λ, B](s)
+  implicit def LazyEitherT_*->*[A, F[_], B](s: LazyEitherT[A, F, B]) = *->*[({type λ[α] = LazyEitherT[A, F, α]})#λ, B](s)
 
-  implicit def LazyEitherTLeft_*->*[A, F[_], B](s: LazyEitherT.LeftLazyProjectionT[A, F, B]) = *->*[({type λ[α]=LazyEitherT.LeftLazyProjectionT[A, F, α]})#λ, B](s)
+  implicit def LazyEitherTLeft_*->*[A, F[_], B](s: LazyEitherT.LeftLazyProjectionT[A, F, B]) = *->*[({type λ[α] = LazyEitherT.LeftLazyProjectionT[A, F, α]})#λ, B](s)
 
-  implicit def ST_*->*[S, A](s: ST[S, A]) = *->*[({type λ[α]=ST[S, α]})#λ, A](s)
+  implicit def ST_*->*[S, A](s: ST[S, A]) = *->*[({type λ[α] = ST[S, α]})#λ, A](s)
 
-  implicit def Tuple2_*->*[R, A](a: (R, A)) = *->*[({type λ[α]=(R, α)})#λ, A](a)
+  implicit def Tuple2_*->*[R, A](a: (R, A)) = *->*[({type λ[α] = (R, α)})#λ, A](a)
 
-  implicit def Tuple3_*->*[R, S, A](a: (R, S, A)) = *->*[({type λ[α]=(R, S, α)})#λ, A](a)
+  implicit def Tuple3_*->*[R, S, A](a: (R, S, A)) = *->*[({type λ[α] = (R, S, α)})#λ, A](a)
 
-  implicit def Tuple4_*->*[R, S, T, A](a: (R, S, T, A)) = *->*[({type λ[α]=(R, S, T, α)})#λ, A](a)
+  implicit def Tuple4_*->*[R, S, T, A](a: (R, S, T, A)) = *->*[({type λ[α] = (R, S, T, α)})#λ, A](a)
 
-  implicit def Tuple5_*->*[R, S, T, U, A](a: (R, S, T, U, A)) = *->*[({type λ[α]=(R, S, T, U, α)})#λ, A](a)
+  implicit def Tuple5_*->*[R, S, T, U, A](a: (R, S, T, U, A)) = *->*[({type λ[α] = (R, S, T, U, α)})#λ, A](a)
 
-  implicit def Tuple6_*->*[R, S, T, U, V, A](a: (R, S, T, U, V, A)) = *->*[({type λ[α]=(R, S, T, U, V, α)})#λ, A](a)
+  implicit def Tuple6_*->*[R, S, T, U, V, A](a: (R, S, T, U, V, A)) = *->*[({type λ[α] = (R, S, T, U, V, α)})#λ, A](a)
 
-  implicit def Tuple7_*->*[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)) = *->*[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A](a)
-  implicit def Validation_*->*[A, E](v: Validation[E, A]) = *->*[({type λ[α]=Validation[E, α]})#λ, A](v)
+  implicit def Tuple7_*->*[R, S, T, U, V, W, A](a: (R, S, T, U, V, W, A)) = *->*[({type λ[α] = (R, S, T, U, V, W, α)})#λ, A](a)
 
-  implicit def ValidationFailure_*->*[A, E](f: FailProjection[E, A]) = *->*[({type λ[α]=FailProjection[α, A]})#λ, E](f)
+  implicit def Validation_*->*[A, E](v: Validation[E, A]) = *->*[({type λ[α] = Validation[E, α]})#λ, A](v)
 
-  implicit def IterVT_*->*[E, F[_], A](v: IterVT[E, F, A]) = *->*[({type λ[α]=IterVT[E, F, α]})#λ, A](v)
+  implicit def ValidationFailure_*->*[A, E](f: FailProjection[E, A]) = *->*[({type λ[α] = FailProjection[α, A]})#λ, E](f)
+
+  implicit def IterVT_*->*[E, F[_], A](v: IterVT[E, F, A]) = *->*[({type λ[α] = IterVT[E, F, α]})#λ, A](v)
 
   import java.util.Map.Entry
 
-  implicit def MapEntry_*->*[X, A](e: Entry[X, A]) = *->*[({type λ[α]=Entry[X, α]})#λ, A](e)
+  implicit def MapEntry_*->*[X, A](e: Entry[X, A]) = *->*[({type λ[α] = Entry[X, α]})#λ, A](e)
 
   // Seq[A] implements Function1[Int, A]. Without this, Function1_*->* would be used.
   implicit def Seq_*->*[M[X] <: Seq[X], A](l: M[A]) = *->*[M, A](l)
@@ -816,11 +817,11 @@ trait **->** extends **->**~ {
   // Set[A] implements Function1[Int, B]. Without this, Function1_*->* would be used.
   implicit def Set_*->*[M[X] <: Set[X], A](s: M[A]) = *->*[M, A](s)
 
-  implicit def Kleisli_*->*[A, F[_], B](k: Kleisli[A,F,B]) = *->*[({type λ[α]=Kleisli[A, F, α]})#λ, B](k)
+  implicit def Kleisli_*->*[A, F[_], B](k: Kleisli[A, F, B]) = *->*[({type λ[α] = Kleisli[A, F, α]})#λ, B](k)
 
-  implicit def CoKleisli_*->*[A, F[_], B](k: CoKleisli[A,F,B]) = *->*[({type λ[α]=CoKleisli[A, F, α]})#λ, B](k)
+  implicit def CoKleisli_*->*[A, F[_], B](k: CoKleisli[A, F, B]) = *->*[({type λ[α] = CoKleisli[A, F, α]})#λ, B](k)
 
-  implicit def Memo_*->*[V, A](m: Memo[A, V]) = *->*[({type λ[α]=Memo[α, V]})#λ, A](m)
+  implicit def Memo_*->*[V, A](m: Memo[A, V]) = *->*[({type λ[α] = Memo[α, V]})#λ, A](m)
 
 }
 
@@ -1068,14 +1069,15 @@ trait **->**->** extends **->**->**~ {
     val value = a
   }
 
-  implicit def Kleisli_*->*->*[A, F[_], B](k: Kleisli[A, F, B]) = *->*->*[A, ({type λ[α, β]=Kleisli[α, F, β]})#λ, B](k)
+  implicit def Kleisli_*->*->*[A, F[_], B](k: Kleisli[A, F, B]) = *->*->*[A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B](k)
 
-  implicit def Cokleisli_*->*->*[A, F[_], B](k: CoKleisli[A, F, B]) = *->*->*[A, ({type λ[α, β]=CoKleisli[α, F, β]})#λ, B](k)
+  implicit def Cokleisli_*->*->*[A, F[_], B](k: CoKleisli[A, F, B]) = *->*->*[A, ({type λ[α, β] = CoKleisli[α, F, β]})#λ, B](k)
 
 }
 
 trait |*->*|->*->*[F[_[_], _], G[_], A] {
   val value: F[G, A]
+
   def lower(implicit e: Extend[G], m: CoMonadTrans[F]): G[A] =
     m.lower(value)
 }

@@ -58,6 +58,8 @@ trait Consts {
     Applicative.applicative[({type λ[α] = Const[A, α]})#λ]
   }
 
-  def liftConst[A, B](f: A => B): A => Const[B, A] = {a: A => Const.const(f(a))}
+  def liftConst[A, B](f: A => B): A => Const[B, A] = {
+    a: A => Const.const(f(a))
+  }
 
 }

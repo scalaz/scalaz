@@ -22,7 +22,7 @@ trait Indexs {
 
   implicit def ArrayIndex: Index[Array] = new Index[Array] {
     def index[A](a: Array[A]) =
-      i => if(i >= 0 && i < a.length) Some(a(i)) else None
+      i => if (i >= 0 && i < a.length) Some(a(i)) else None
   }
 
   implicit def ListIndex: Index[List] = new Index[List] {
@@ -31,9 +31,9 @@ trait Indexs {
         var n = 0
         var k: Option[A] = None
         val it = a.iterator
-        while(it.hasNext && k.isEmpty) {
+        while (it.hasNext && k.isEmpty) {
           val z = it.next
-          if(n == i) k = Some(z)
+          if (n == i) k = Some(z)
           n = n + 1
         }
 
@@ -47,9 +47,9 @@ trait Indexs {
         var n = 0
         var k: Option[A] = None
         val it = a.iterator
-        while(it.hasNext && k.isEmpty) {
+        while (it.hasNext && k.isEmpty) {
           val z = it.next
-          if(n == i) k = Some(z)
+          if (n == i) k = Some(z)
           n = n + 1
         }
 

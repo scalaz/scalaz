@@ -18,10 +18,10 @@ trait Applicative[F[_]] {
       }
     )
 
-  def **[G[_]: Applicative]: Applicative[({type λ[α]=(F[α], G[α])})#λ] = {
+  def **[G[_] : Applicative]: Applicative[({type λ[α] = (F[α], G[α])})#λ] = {
     implicit val f = pointedFunctor ** implicitly[Applicative[G]].pointedFunctor
     implicit val a = applic ** implicitly[Applicative[G]].applic
-    applicative[({type λ[α]=(F[α], G[α])})#λ]
+    applicative[({type λ[α] = (F[α], G[α])})#λ]
   }
 
   def functor: Functor[F] = new Functor[F] {

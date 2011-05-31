@@ -18,10 +18,10 @@ trait PointedFunctor[F[_]] {
       }
     )
 
-  def **[G[_]: PointedFunctor]: PointedFunctor[({type λ[α]=(F[α], G[α])})#λ] = {
+  def **[G[_] : PointedFunctor]: PointedFunctor[({type λ[α] = (F[α], G[α])})#λ] = {
     implicit val f = functor ** implicitly[PointedFunctor[G]].functor
     implicit val p = pointed ** implicitly[PointedFunctor[G]].pointed
-    pointedFunctor[({type λ[α]=(F[α], G[α])})#λ]
+    pointedFunctor[({type λ[α] = (F[α], G[α])})#λ]
   }
 
   def point[A](a: => A): F[A] =

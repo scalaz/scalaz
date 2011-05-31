@@ -12,6 +12,7 @@ trait Azimuths {
 }
 
 object Azimuth {
+
   import Show._
   import Equal._
   import Order._

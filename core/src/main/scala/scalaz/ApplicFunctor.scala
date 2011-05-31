@@ -16,15 +16,15 @@ trait ApplicFunctor[F[_]] {
           liftA2((ff: G[A => B]) => ga.apply(ff))(f)
       }
       , new Functor[({type λ[α] = F[G[α]]})#λ] {
-          def fmap[A, B](f: A => B) =
-            ApplicFunctor.this.fmap(ga.fmap(f))
-        }
+        def fmap[A, B](f: A => B) =
+          ApplicFunctor.this.fmap(ga.fmap(f))
+      }
     )
 
-  def **[G[_]: ApplicFunctor]: ApplicFunctor[({type λ[α]=(F[α], G[α])})#λ] = {
+  def **[G[_] : ApplicFunctor]: ApplicFunctor[({type λ[α] = (F[α], G[α])})#λ] = {
     implicit val a = applic ** implicitly[ApplicFunctor[G]].applic
     implicit val f = functor ** implicitly[ApplicFunctor[G]].functor
-    applicFunctor[({type λ[α]=(F[α], G[α])})#λ]
+    applicFunctor[({type λ[α] = (F[α], G[α])})#λ]
   }
 
   def fmap[A, B](f: A => B): F[A] => F[B] =

@@ -18,10 +18,10 @@ trait Traverse[T[_]] {
   def deriving[G[_]](implicit n: ^**^[G, T]): Traverse[G] =
     new Traverse[G] {
       def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      a => {
-        val tr = Traverse.this.traverse(f)
-        implicitly[Applicative[F]].fmap((z: T[B]) => n.pack(z))(tr(n.unpack(a)))
-      }
+        a => {
+          val tr = Traverse.this.traverse(f)
+          implicitly[Applicative[F]].fmap((z: T[B]) => n.pack(z))(tr(n.unpack(a)))
+        }
     }
 
 }
@@ -63,9 +63,9 @@ trait TraversesLow {
         val flistbs = implicitly[Foldr[Stream]].foldr[A, F[Stream[B]]](x => ys =>
           implicitly[Applicative[F]].apply(ap.fmap(((a: B) => (b: Stream[B]) => a #:: b))(f(x)))(ys))(ap.point(Stream.empty[B]))(as.toStream)
         ap.fmap((xs: Stream[B]) => {
-            val builder = cbf.apply()
-            for (x <- xs) builder += x
-            builder.result
+          val builder = cbf.apply()
+          for (x <- xs) builder += x
+          builder.result
         })(flistbs)
       }
 

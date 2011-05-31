@@ -8,6 +8,7 @@ sealed trait ZipStream[A] {
 object ZipStream extends ZipStreams
 
 trait ZipStreams {
+
   import wrap.StreamW._
 
   implicit def ZipStream_^*^[A]: ^*^[ZipStream[A], Stream[A]] =
@@ -18,10 +19,11 @@ trait ZipStreams {
   implicit def ZipStream_^**^ : ^**^[ZipStream, Stream] =
     new ^**^[ZipStream, Stream] {
       def unpack[A] = _.value
+
       def pack[A] = b => new ZipStream[A] {
-      val value = b
+        val value = b
+      }
     }
-  }
 
   implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] =
     implicitly[Show[Stream[A]]] contramap ((_: ZipStream[A]).value)
@@ -56,7 +58,7 @@ trait ZipStreams {
 
   implicit def ZipStreamApplicFunctor: ApplicFunctor[ZipStream] =
     ApplicFunctor.applicFunctor
-    
+
   implicit def ZipStreamEach: Each[ZipStream] =
     implicitly[Each[Stream]].deriving[ZipStream]
 
@@ -74,7 +76,6 @@ trait ZipStreams {
 
   implicit def ZipStreamLength: Length[ZipStream] =
     implicitly[Length[Stream]].deriving[ZipStream]
-  
 
 
 }

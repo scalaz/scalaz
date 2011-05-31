@@ -10,6 +10,7 @@ object test extends App {
 }
 
 class MonoidTest extends Specification with Sugar with ScalaCheck {
+
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._

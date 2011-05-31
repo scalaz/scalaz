@@ -36,7 +36,9 @@ object ExampleFold {
     // which lazily handles the infinite Stream.
     (Stream.continually(1) ∃ (_ > 0)) assert_=== true
 
-    Set(1, 2, 3) ∃ { _ % 2 == 0 } assert_=== true
+    Set(1, 2, 3) ∃ {
+      _ % 2 == 0
+    } assert_=== true
 
     // Checking if all elements satisfy a predicate, using Stream Foldable,
     // which lazily handles the infinite Stream.
@@ -52,8 +54,12 @@ object ExampleFold {
 
     Stream.range(0, 100) ∋ 50 assert_=== true
 
-    (1 to 10).toList splitWith {_ % 5 < 2} assert_=== List(List(1), List(2, 3, 4), List(5, 6), List(7, 8, 9), List(10))
+    (1 to 10).toList splitWith {
+      _ % 5 < 2
+    } assert_=== List(List(1), List(2, 3, 4), List(5, 6), List(7, 8, 9), List(10))
 
-    (1 to 10).toList selectSplit {_ % 5 < 2} assert_=== List(List(1), List(5, 6), List(10))
+    (1 to 10).toList selectSplit {
+      _ % 5 < 2
+    } assert_=== List(List(1), List(5, 6), List(10))
   }
 }

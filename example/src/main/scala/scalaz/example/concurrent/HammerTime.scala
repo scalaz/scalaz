@@ -26,7 +26,7 @@ object HammerTime {
     def hammer(other: => Actor[Int]) = actor(((i: Int) =>
       if (i == 0) done ! ()
       else other ! (i - 1)
-    ), fail)
+        ), fail)
 
     lazy val hammer1: Actor[Int] = hammer(hammer(hammer1))
     hammer1 ! 1000000

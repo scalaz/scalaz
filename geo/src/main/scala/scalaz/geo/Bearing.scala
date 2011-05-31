@@ -12,6 +12,7 @@ trait Bearings {
 }
 
 object Bearing {
+
   import Show._
   import Equal._
   import Order._

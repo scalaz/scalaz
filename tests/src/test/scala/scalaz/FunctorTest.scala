@@ -5,6 +5,7 @@ import org.scalacheck.Arbitrary
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
 class FunctorTest extends Specification with Sugar with ScalaCheck {
+
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
@@ -27,11 +28,11 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]
-    checkFunctorLaws[({type λ[α]=(R, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, U, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, U, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, U, V, α)})#λ, A]
 
     // todo
     //    checkFunctorLaws[Function0, A]
@@ -52,8 +53,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[FirstOption, A]
     checkFunctorLaws[LastOption, A]
     checkFunctorLaws[ArraySeq, A]
-    checkFunctorLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Either.LeftProjection[α, X]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Either.RightProjection[X, α]})#λ, A]
 
     // todo
     //    checkFunctorLaws[Responder, A]
@@ -67,8 +68,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     import java.util.AbstractMap.SimpleImmutableEntry
 
     //    checkFunctorLaws[({type λ[α]=Entry[X, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Validation[X, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Validation[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α] = FailProjection[α, X]})#λ, A]
     checkFunctorLaws[Zipper, A]
 
     // todo

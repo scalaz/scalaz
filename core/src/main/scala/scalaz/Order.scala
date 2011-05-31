@@ -57,7 +57,7 @@ trait Orders {
 
   implicit def OrderContravariant: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](f: B => A) =
-      r => order[B](b1 => b2 => r.order (f(b1))(f(b2)))
+      r => order[B](b1 => b2 => r.order(f(b1))(f(b2)))
   }
 
   implicit def ScalaOrderingOrder[T: scala.Ordering]: Order[T] = orderC {

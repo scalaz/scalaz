@@ -38,10 +38,10 @@ object ExampleState {
        * of the label through the recursion.
        */
       def numberSM: State[Int, Tree[(A, Int)]] = this match {
-        case Leaf(x) => for{s <- get[Int];
-                            _ <- modify((_: Int) + 1)} yield Leaf((x, s))
-        case Branch(left, right) => for{l <- left.numberSM
-                                        r <- right.numberSM} yield Branch(l, r)
+        case Leaf(x) => for {s <- get[Int];
+                             _ <- modify((_: Int) + 1)} yield Leaf((x, s))
+        case Branch(left, right) => for {l <- left.numberSM
+                                         r <- right.numberSM} yield Branch(l, r)
       }
 
       /**
@@ -50,7 +50,9 @@ object ExampleState {
        * Note the correspondence between `<* modify` and `_ <- modify`.
        */
       def numberSA: State[Int, Tree[(A, Int)]] = this match {
-        case Leaf(x) => (get[Int] <* modify((_: Int) + 1)) ∘ {s: Int => Leaf((x, s))}
+        case Leaf(x) => (get[Int] <* modify((_: Int) + 1)) ∘ {
+          s: Int => Leaf((x, s))
+        }
         case Branch(left, right) => left.numberSA.<**>(right.numberSA)(Branch.apply)
       }
     }

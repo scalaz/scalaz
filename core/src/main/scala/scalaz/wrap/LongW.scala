@@ -19,7 +19,7 @@ sealed trait LongW {
   def digits: List[Digit] =
     Digit.digitFromLong(value) match {
       case Some(d) => List(d)
-      case None    => Digit.digitFromLong(value % 10L).toList ::: ((value / 10L) digits)
+      case None => Digit.digitFromLong(value % 10L).toList ::: ((value / 10L) digits)
     }
 }
 

@@ -38,6 +38,7 @@ trait Digits {
     Order.orderBy(_.toInt)
 
   object Digit {
+
     case object _0 extends Digit {
       override val toInt = 0
     }
@@ -77,5 +78,7 @@ trait Digits {
     case object _9 extends Digit {
       override val toInt = 9
     }
+
   }
+
 }

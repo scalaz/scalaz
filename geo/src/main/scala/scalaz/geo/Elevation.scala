@@ -12,6 +12,7 @@ trait Elevations {
 }
 
 object Elevation {
+
   import Show._
   import Equal._
   import Order._

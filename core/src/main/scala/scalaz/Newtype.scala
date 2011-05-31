@@ -23,5 +23,6 @@ trait ^^*^^ {
 
 trait ^**^[F[_], G[_]] {
   def unpack[A]: F[A] => G[A]
+
   def pack[A]: G[A] => F[A]
 }

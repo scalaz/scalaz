@@ -4,15 +4,19 @@ import org.specs.{Sugar, Specification, ScalaCheck}
 import Scalaz._
 
 class ListWTest extends Specification with Sugar with ScalaCheck {
-  "intercalate empty list is identity" verifies {a: List[Int] => a.intercalate(nil) ≟ a}
-
-  "intersperse then remove odd items is identity" verifies {(a: List[Int], b: Int) =>
-    val isEven = (_: Int) % 2 == 0
-    a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) ≟ a
+  "intercalate empty list is identity" verifies {
+    a: List[Int] => a.intercalate(nil) ≟ a
   }
 
-  "intercalate single element lists the same as intersperse" verifies {(a: List[Int], b: Int) =>
-    a.intercalate(List(b)) ≟ a.intersperse(b)
+  "intersperse then remove odd items is identity" verifies {
+    (a: List[Int], b: Int) =>
+      val isEven = (_: Int) % 2 == 0
+      a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) ≟ a
+  }
+
+  "intercalate single element lists the same as intersperse" verifies {
+    (a: List[Int], b: Int) =>
+      a.intercalate(List(b)) ≟ a.intersperse(b)
   }
 
   "intersperse vs benchmark" verifies {

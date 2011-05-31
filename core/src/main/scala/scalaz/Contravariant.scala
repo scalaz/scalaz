@@ -9,7 +9,7 @@ object Contravariant extends Contravariants
 
 trait Contravariants {
 
-  implicit def Function1Contravariant[X]: Contravariant[({type λ[α]=(α) => X})#λ] = new Contravariant[({type λ[α]=(α) => X})#λ] {
+  implicit def Function1Contravariant[X]: Contravariant[({type λ[α] = (α) => X})#λ] = new Contravariant[({type λ[α] = (α) => X})#λ] {
     def contramap[A, B](f: B => A) =
       _ compose f
   }

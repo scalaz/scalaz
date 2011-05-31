@@ -8,6 +8,7 @@ import Arbitrary._
 import Gen._
 
 object ArbitraryGeo {
+
   import geo._
   import Geo._
   import ScalaCheckBinding._

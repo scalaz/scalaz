@@ -19,6 +19,6 @@ object ExampleVincenty {
 
     // Mount Barney to N'ga Peak is 1608.695km
     // TODO failing with Scala 2.9.0.RC3
-//    (mountBarney inverse ngaPeak) assert_=== curve(1608695.5945547633, azimuth(0D), azimuth(180D))
+    //    (mountBarney inverse ngaPeak) assert_=== curve(1608695.5945547633, azimuth(0D), azimuth(180D))
   }
 }

@@ -7,6 +7,7 @@ import Scalaz._
 
 
 trait CanBuildAnySelf[CC[_]] {
+
   import CanBuildAnySelf._
 
   def builder[A, B]: CanBuildSelf[CC, A, B]

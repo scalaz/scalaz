@@ -13,10 +13,10 @@ object ExampleTree {
 
   def run {
     val tree: Tree[Int] =
-    1.node(
-      2.leaf,
-      3.node(
-        4.leaf))
+      1.node(
+        2.leaf,
+        3.node(
+          4.leaf))
 
     // Tree is a Pointed Functor...
     1.η[Tree] assert_=== 1.leaf
