@@ -121,6 +121,11 @@ sealed trait FailProjection[E, A] {
   }
 }
 
+object FailProjection {
+  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] =
+    Equal.equalBy(_.validation)
+}
+
 import ~>._
 
 object Validation extends Validations {

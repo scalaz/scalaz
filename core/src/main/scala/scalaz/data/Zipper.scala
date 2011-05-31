@@ -27,6 +27,9 @@ sealed trait Zipper[A] {
 
   import Zipper._
 
+  def map[B](f: A => B): Zipper[B] =
+    zipper(lefts map f, f(focus), rights map f)
+
   /**
    * Get the Stream representation of this Zipper. This fully traverses `lefts`. `rights` is
    * not evaluated.
@@ -327,5 +330,10 @@ trait Zippers {
 
   implicit def ZipperOrder[A: Order]: Order[Zipper[A]] =
     Order.orderBy(_.toStream)
+
+  implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
 
 }

@@ -105,15 +105,10 @@ trait ScalaCheckBindings {
   implicit val ArbitraryMonad: Monad[Arbitrary] =
     Monad.monadBP[Arbitrary]
 
-  implicit def ArbitraryUnpack[A]: Unpack[Arbitrary[A], Gen[A]] = new Unpack[Arbitrary[A], Gen[A]] {
-    val unpack = (_: Arbitrary[A]).arbitrary
-  }
-
-  implicit def ArbitraryPack[A]: Pack[Arbitrary[A], Gen[A]] = new Pack[Arbitrary[A], Gen[A]] {
-    val pack = (b: Gen[A]) => Arbitrary(b)
-  }
-
   implicit def ArbitraryNewtype[A]: ^*^[Arbitrary[A], Gen[A]] =
-    ^*^.^*^
+    ^*^.^*^(
+      (_: Arbitrary[A]).arbitrary
+    , (b: Gen[A]) => Arbitrary(b)
+    )
 
 }

@@ -3,11 +3,13 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
+import data._
+import newtypes._
 
 class FunctorTest extends Specification with Sugar with ScalaCheck {
 
-  import Scalaz._
-  import ScalaCheckBinding._
+  import scalaz._, Scalaz._
+  import scalaz.scalacheck.ScalaCheckBinding._
   import ScalazArbitrary._
 
   "functor laws" should {
@@ -23,8 +25,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     type M = Int
     type P = Int
 
-    implicit def IdentityEqual[X] = equalA[Identity[X]]
-    checkFunctorLaws[Identity, A]
+    implicit def IdentityEqual[X] = equalA[Ident[X]]
+    checkFunctorLaws[Ident, A]
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]
@@ -105,7 +107,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     typeName in {
       import ScalazProperty.Functor._
       identity[F, A] must pass
-      associative[F, A, A, A] must pass
+      composition[F, A, A, A] must pass
     }
   }
 }

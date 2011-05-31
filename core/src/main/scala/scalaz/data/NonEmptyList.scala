@@ -98,6 +98,11 @@ trait NonEmptyLists {
   implicit val NonEmptyListFoldable: Foldable[NonEmptyList] =
     Foldable.foldable[NonEmptyList]
 
+  implicit val NonEmptyListFunctor: Functor[NonEmptyList] = new Functor[NonEmptyList] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
 

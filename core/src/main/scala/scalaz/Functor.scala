@@ -27,7 +27,7 @@ trait Functor[F[_]] {
 
 object Functor extends Functors
 
-trait Functors {
+trait Functors extends FunctorsLow {
 
   implicit def Function1Functor[T]: Functor[({type λ[α] = Function1[T, α]})#λ] = new Functor[({type λ[α] = Function1[T, α]})#λ] {
     def fmap[A, B](f: A => B) = _ andThen f
@@ -35,6 +35,22 @@ trait Functors {
 
   implicit val OptionFunctor: Functor[Option] = new Functor[Option] {
     def fmap[A, B](f: A => B) = _ map f
+  }
+
+  implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _.map(f).left
+  }
+
+  implicit def EitherRightFunctor[X]: Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+    def fmap[A, B](f: A => B) = _.map(f).right
+  }
+
+  implicit def EitherFunctor[X]: Functor[({type λ[α]=Either[X, α]})#λ] = new Functor[({type λ[α]=Either[X, α]})#λ] {
+    def fmap[A, B](f: A => B) = {
+      case Left(a) => Left(a)
+      case Right(a) => Right(f(a))
+    }
   }
 
   implicit val ListFunctor: Functor[List] = new Functor[List] {
@@ -45,8 +61,99 @@ trait Functors {
     def fmap[A, B](f: A => B) = _ map f
   }
 
+  import java.util.concurrent.Callable
+
+  implicit def CallableFunctor: Functor[Callable] = new Functor[Callable] {
+    def fmap[A, B](f: A => B) =
+      r => new Callable[B] {
+        def call = f(r.call)
+      }
+  }
+
   implicit def MapEntryFunctor[X]: Functor[({type λ[α] = Entry[X, α]})#λ] = new Functor[({type λ[α] = Entry[X, α]})#λ] {
     def fmap[A, B](f: A => B) = r => new SimpleImmutableEntry(r.getKey, f(r.getValue))
   }
 
+  implicit def Tuple1Functor: Functor[Tuple1] = new Functor[Tuple1] {
+    def fmap[A, B](f: A => B) =
+      r => Tuple1(f(r._1))
+  }
+
+  implicit def Tuple2Functor[R]: Functor[({type λ[α]=(R, α)})#λ] = new Functor[({type λ[α]=(R, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, f(r._2))
+  }
+
+  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=(R, S, α)})#λ] = new Functor[({type λ[α]=(R, S, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, f(r._3))
+  }
+
+  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=(R, S, T, α)})#λ] = new Functor[({type λ[α]=(R, S, T, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, f(r._4))
+  }
+
+  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, f(r._5))
+  }
+
+  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, r._5, f(r._6))
+  }
+
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
+  }
+
+  // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
+  // http://lampsvn.epfl.ch/trac/scala/ticket/2782
+  /*implicit*/
+  def JavaCollectionFunctor[S[X] <: java.util.Collection[X] : Empty]: Functor[S] = new Functor[S] {
+    def fmap[A, B](f: A => B) =
+    r => {
+      val a: S[B] = implicitly[Empty[S]].empty
+      val i = r.iterator
+      while (i.hasNext)
+        a.add(f(i.next))
+      a
+    }
+  }
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def JavaArrayListFunctor: Functor[ArrayList] = JavaCollectionFunctor
+
+  implicit def JavaLinkedListFunctor: Functor[LinkedList] = JavaCollectionFunctor
+
+  implicit def JavaPriorityQueueFunctor: Functor[PriorityQueue] = JavaCollectionFunctor
+
+  implicit def JavaStackFunctor: Functor[Stack] = JavaCollectionFunctor
+
+  implicit def JavaVectorFunctor: Functor[Vector] = JavaCollectionFunctor
+
+  implicit def JavaArrayBlockingQueueFunctor: Functor[ArrayBlockingQueue] = JavaCollectionFunctor
+
+  implicit def JavaConcurrentLinkedQueueFunctor: Functor[ConcurrentLinkedQueue] = JavaCollectionFunctor
+
+  implicit def JavaCopyOnWriteArrayListFunctor: Functor[CopyOnWriteArrayList] = JavaCollectionFunctor
+
+  implicit def JavaLinkedBlockingQueueFunctor: Functor[LinkedBlockingQueue] = JavaCollectionFunctor
+
+  implicit def JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = JavaCollectionFunctor
+
+}
+
+trait FunctorsLow {
+  implicit def TraversableFunctor[CC[X] <: collection.TraversableLike[X, CC[X]] : CanBuildAnySelf]: Functor[CC] = new Functor[CC] {
+    def fmap[A, B](f: A => B) =
+      r => {
+        implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
+        r map f
+      }
+  }
 }
