@@ -26,11 +26,11 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     type Z = Int
 
 
-    checkMonadLaws[Ident, A]
-    checkMonadLaws[List, A]
+    checkMonadLaws[Ident, A]("Identity")
+    checkMonadLaws[List, A]("List")
     // todo fix arbitrary instance for Stream
     //    checkMonadLaws[Stream, A]
-    checkMonadLaws[NonEmptyList, A]
+    checkMonadLaws[NonEmptyList, A]("NonEmptyList")
 
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {
       s: State[Int, Unit] => {
@@ -39,13 +39,13 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
       }
     }
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
-    checkMonadLaws[({type λ[α] = State[A, α]})#λ, Unit]
-    checkMonadLaws[({type λ[α] = (B, α)})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, α)})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, α)})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, E, α)})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, E, F, α)})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, E, F, G, α)})#λ, A]
+    checkMonadLaws[({type λ[α] = State[A, α]})#λ, Unit]("State")
+    checkMonadLaws[({type λ[α] = (B, α)})#λ, A]("Tuple1")
+    checkMonadLaws[({type λ[α] = (B, C, α)})#λ, A]("Tuple2")
+    checkMonadLaws[({type λ[α] = (B, C, D, α)})#λ, A]("Tuple3")
+    checkMonadLaws[({type λ[α] = (B, C, D, E, α)})#λ, A]("Tuple4")
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F, α)})#λ, A]("Tuple5")
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F, G, α)})#λ, A]("Tuple6")
     implicit def EqualFunction1 = implicitly[Equal[Int]] ∙ {
       f: (Int => Int) => f(0)
     }
@@ -62,31 +62,28 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
       f: ((Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0)
     }
     //    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[({type λ[α] = (B) => α})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C) => α})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D) => α})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, E) => α})#λ, A]
-    checkMonadLaws[({type λ[α] = (B, C, D, E, F) => α})#λ, A]
+    checkMonadLaws[({type λ[α] = (B) => α})#λ, A]("Function1")
+    checkMonadLaws[({type λ[α] = (B, C) => α})#λ, A]("Function2")
+    checkMonadLaws[({type λ[α] = (B, C, D) => α})#λ, A]("Function3")
+    checkMonadLaws[({type λ[α] = (B, C, D, E) => α})#λ, A]("Function4")
+    checkMonadLaws[({type λ[α] = (B, C, D, E, F) => α})#λ, A]("Function5")
     //    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
-    checkMonadLaws[({type λ[α] = Either.LeftProjection[α, X]})#λ, A]
-    checkMonadLaws[({type λ[α] = Either.RightProjection[X, α]})#λ, A]
+    checkMonadLaws[({type λ[α] = Either.LeftProjection[α, X]})#λ, A]("Either.left")
+    checkMonadLaws[({type λ[α] = Either.RightProjection[X, α]})#λ, A]("Either.right")
     //    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
     ()
   }
 
-  def checkMonadLaws[M[_], A](implicit mm: Monad[M],
-                              ea: Equal[A],
-                              man: Manifest[M[A]],
-                              ema: Equal[M[A]],
-                              arbma: Arbitrary[M[A]],
-                              arba: Arbitrary[A]
-                                 ): Unit = {
-    val typeName = man.toString
-    typeName in {
+  def checkMonadLaws[M[_], A](n: String)(implicit mm: Monad[M],
+                                          ea: Equal[A],
+                                          ema: Equal[M[A]],
+                                          arbma: Arbitrary[M[A]],
+                                          arba: Arbitrary[A]
+                                        ): Unit =
+    n in {
       import ScalazProperty.Monad._
       leftIdentity[M, A, A] must pass
       rightIdentity[M, A] must pass
       associativity[M, A, A, A] must pass
     }
-  }
 }
