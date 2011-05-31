@@ -1,6 +1,7 @@
 package scalaz.example
 
-import scalaz._, data._
+import scalaz._
+import scalaz.data._
 
 object ExampleArrow {
   def main(args: Array[String]) = run
