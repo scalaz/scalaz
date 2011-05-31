@@ -6,5 +6,5 @@ object Concurrent extends Concurrents
 trait Concurrents extends
 Actors with
 Runs with
-Promises with
-Strategys
+Promises /* with
+Strategys */

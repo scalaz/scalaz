@@ -1,12 +1,8 @@
 package scalaz.example
 package concurrent
 
-import scalaz._
-import scalaz.concurrent._
-
 import java.util.concurrent._
-import scalaz.concurrent._
-import scalaz.Scalaz._
+import scalaz._, concurrent._, Scalaz._
 
 object PingPong {
   val actors = 10000
