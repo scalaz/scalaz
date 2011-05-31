@@ -3,7 +3,7 @@ package concurrent
 
 object Fibs {
   import java.util.concurrent._
-  import scalaz.concurrent._
+  import scalaz.concurrent._, Promise._
   import scalaz.Scalaz._
 
   val cutoff = 30
