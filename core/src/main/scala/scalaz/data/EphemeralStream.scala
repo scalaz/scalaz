@@ -84,11 +84,11 @@ trait EphemeralStreams {
       if (b < as.size) Some((as(b), b + 1))
       else None)
 
-  implicit val ephemeralStreamPointed: Pointed[EphemeralStream] = new Pointed[EphemeralStream] {
+  implicit val EphemeralStreamPointed: Pointed[EphemeralStream] = new Pointed[EphemeralStream] {
     def point[A](a: => A) = EphemeralStream(a)
   }
 
-  implicit val ephemeralStreamBind: Bind[EphemeralStream] = new Bind[EphemeralStream] {
+  implicit val EphemeralStreamBind: Bind[EphemeralStream] = new Bind[EphemeralStream] {
     def bind[A, B](f: A => EphemeralStream[B]) =
       _ flatMap f
   }

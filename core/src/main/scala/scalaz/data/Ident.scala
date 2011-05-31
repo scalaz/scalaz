@@ -19,6 +19,15 @@ trait Idents {
     def value = v
   }
 
+  implicit def IdentEqual[A: Equal]: Equal[Ident[A]] =
+    Equal.equalBy(_.value)
+
+  implicit def IdentOrder[A: Order]: Order[Ident[A]] =
+    Order.orderBy(_.value)
+
+  implicit def IdentShow[A: Show]: Show[Ident[A]] =
+    Show.showBy(_.value)
+
   implicit val IdentFunctor: Functor[Ident] = new Functor[Ident] {
     def fmap[A, B](f: A => B) = a => ident(f(a.value))
   }

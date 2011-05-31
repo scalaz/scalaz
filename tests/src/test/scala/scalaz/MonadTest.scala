@@ -8,6 +8,7 @@ import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 class MonadTest extends Specification with Sugar with ScalaCheck {
 
   import Scalaz._
+  import data._
   import ScalaCheckBinding._
   import ScalazArbitrary._
 
@@ -25,15 +26,17 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     type Z = Int
 
 
-    implicit def IdentityEqual[X] = equalA[Identity[X]]
-    checkMonadLaws[Identity, A]
+    checkMonadLaws[Ident, A]
     checkMonadLaws[List, A]
     // todo fix arbitrary instance for Stream
     //    checkMonadLaws[Stream, A]
     checkMonadLaws[NonEmptyList, A]
 
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {
-      s: State[Int, Unit] => s.apply(0)
+      s: State[Int, Unit] => {
+        val (i, j) = s.run.apply(0)
+        (j, i)
+      }
     }
     implicit def StateArb: Arbitrary[State[Int, Unit]] = implicitly[Arbitrary[(Int => Int)]] ∘ (modify _)
     checkMonadLaws[({type λ[α] = State[A, α]})#λ, Unit]

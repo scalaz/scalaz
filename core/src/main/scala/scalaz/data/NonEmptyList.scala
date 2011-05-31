@@ -79,14 +79,6 @@ trait NonEmptyLists {
   def nels[A](h: A, t: A*): NonEmptyList[A] =
     nel(h, t.toList)
 
-  implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
-    def point[A](a: => A) = nel(a, Nil)
-  }
-
-  implicit def NonEmptyListCojoin: CoJoin[NonEmptyList] = new CoJoin[NonEmptyList] {
-    def coJoin[A] = _.tails
-  }
-
   implicit val NonEmptyListFoldl: Foldl[NonEmptyList] = new Foldl[NonEmptyList] {
     def foldl[A, B] = k => b => _.list.foldLeft(b)((b, a) => k(b)(a))
   }
@@ -102,6 +94,49 @@ trait NonEmptyLists {
     def fmap[A, B](f: A => B) =
       _ map f
   }
+
+  implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
+    def point[A](a: => A) =
+      nels(a)
+  }
+
+  implicit val NonEmptyListApplic: Applic[NonEmptyList] = new Applic[NonEmptyList] {
+    def applic[A, B](f: NonEmptyList[A => B]) =
+      r =>
+        for {
+          ff <- f
+          rr <- r
+        } yield ff(rr)
+  }
+
+  implicit val NonEmptyListJoin: Join[NonEmptyList] = new Join[NonEmptyList] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit val NonEmptyListBind: Bind[NonEmptyList] = new Bind[NonEmptyList] {
+    def bind[A, B](f: A => NonEmptyList[B]) =
+      _ flatMap f
+  }
+
+  implicit val NonEmptyListPointedFunctor: PointedFunctor[NonEmptyList] =
+    PointedFunctor.pointedFunctor
+
+  implicit val NonEmptyListApplicative: Applicative[NonEmptyList] =
+    Applicative.applicative
+
+  implicit def NonEmptyListCojoin: CoJoin[NonEmptyList] = new CoJoin[NonEmptyList] {
+    def coJoin[A] = _.tails
+  }
+
+  implicit val NonEmptyListApplicFunctor: ApplicFunctor[NonEmptyList] =
+    ApplicFunctor.applicFunctor
+
+  implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
+    BindFunctor.bindFunctor
+
+  implicit val NonEmptyListMonad: Monad[NonEmptyList] =
+    Monad.monadBP
 
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
