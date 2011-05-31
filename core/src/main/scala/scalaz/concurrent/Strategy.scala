@@ -13,12 +13,12 @@ trait Strategy {
 
 object Strategy extends Strategys
 
-trait Strategys {
+trait Strategys extends StrategysLow {
   /**
    * The default executor service is a fixed thread pool with N daemon threads,
    * where N is equal to the number of available processors.
    */
-  lazy val DefaultExecutorService: ExecutorService = {
+  val DefaultExecutorService: ExecutorService = {
     import Executors._
     newFixedThreadPool(Runtime.getRuntime.availableProcessors, new ThreadFactory {
       def newThread(r: Runnable) = {
@@ -32,7 +32,10 @@ trait Strategys {
   /**
    * A strategy that executes its arguments on {@Strategy# D e f a u l t E x e c u t o r S e r v i c e}.
    */
-  implicit lazy val DefaultStrategy: Strategy = Executor(DefaultExecutorService)
+  implicit val DefaultStrategy: Strategy = Executor(DefaultExecutorService)
+}
+
+trait StrategysLow {
 
   /**
    * A strategy that evaluates its argument in the current thread.

@@ -1,9 +1,7 @@
 package scalaz.example
 package concurrent
 
-import scalaz._
-import scalaz.concurrent._
-
+import scalaz._, concurrent._
 import java.util.concurrent.{TimeUnit, Executors}
 
 object ExampleActor {
@@ -18,8 +16,7 @@ object ExampleActor {
     case class ChatMessage(from: String, message: String) extends Event
 
     implicit val executor = Executors.newFixedThreadPool(5)
-    import Strategy.Executor
-    
+
     val chatServer = actor[Event] {
       (e: Event) => e match {
         case Login(user) => ("user: " + user + " logged in.").println
