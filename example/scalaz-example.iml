@@ -22,7 +22,6 @@
     <orderEntry type="library" name="buildScala" level="project" />
     <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module" module-name="scalaz-geo" />
-    <orderEntry type="module" module-name="scalaz-http" />
   </component>
 </module>
 
