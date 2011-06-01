@@ -154,20 +154,29 @@ object IterV {
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */
-  def repeat[E,A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[E, F[A]] = {
-	  def step(s: F[A]): Input[E] => IterV[E, F[A]] = {
-	    case EOF() => Done(s, EOF.apply)
-	    case Empty() => Cont(step(s))
-	    case El(e) => iter match {
-	      case Done(a, _) => Done(s |+| a.η[F], El(e))
-	      case Cont(k) => for {
-	        h <- k(El(e))
-	        t <- repeat(iter)
-	      } yield s |+| h.η[F] |+| t
-	    }
-	  }
-	  Cont(step(∅[F[A]]))
-	}
+  def repeat[E, A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[E, F[A]] = {
+    def step(acc: F[A])(s: Input[E]): IterV[E, F[A]] =
+      s(el = e => iter.fold(
+          (a, _) => Cont(step(acc |+| a.η[F])),
+          k => k(El(e)).fold(
+            (a, _) => Cont(step(acc |+| a.η[F])),
+            (k2) => Cont(step(acc))
+          )),
+        empty = Cont(step(acc)),
+        eof = Done(acc, EOF.apply))
+    Cont(step(∅[F[A]]))
+  }
+
+  /**
+   * Iteratee that collects all inputs with the given monoid.
+   */
+  def collect[A, F[_]](implicit mon: Monoid[F[A]], pr: Pure[F]): IterV[A, F[A]] = {
+    def step(acc: F[A])(s: Input[A]): IterV[A, F[A]] =
+        s(el = e => Cont(step(acc |+| e.η[F])),
+          empty = Cont(step(acc)),
+          eof = Done(acc, EOF.apply))
+    Cont(step(∅[F[A]]))
+  }
 
   /** Input that has a value available **/
   object Empty {
