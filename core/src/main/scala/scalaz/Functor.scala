@@ -29,10 +29,6 @@ object Functor extends Functors
 
 trait Functors extends FunctorsLow {
 
-  implicit def Function1Functor[T]: Functor[({type λ[α] = Function1[T, α]})#λ] = new Functor[({type λ[α] = Function1[T, α]})#λ] {
-    def fmap[A, B](f: A => B) = _ andThen f
-  }
-
   implicit val OptionFunctor: Functor[Option] = new Functor[Option] {
     def fmap[A, B](f: A => B) = _ map f
   }
@@ -107,6 +103,36 @@ trait Functors extends FunctorsLow {
   implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
+  }
+
+  implicit def Function0Functor: Functor[Function0] = new Functor[Function0] {
+    def fmap[A, B](f: A => B) = r => new Function0[B] {
+      def apply = f(r.apply)
+    }
+  }
+
+  implicit def Function1Functor[R]: Functor[({type λ[α]=(R) => α})#λ] = new Functor[({type λ[α]=(R) => α})#λ] {
+    def fmap[A, B](f: A => B) = _ andThen f
+  }
+
+  implicit def Function2Functor[R, S]: Functor[({type λ[α]=(R, S) => α})#λ] = new Functor[({type λ[α]=(R, S) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S) => f(r(t1, t2))
+  }
+
+  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=(R, S, T) => α})#λ] = new Functor[({type λ[α]=(R, S, T) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
+  }
+
+  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
+  }
+
+  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
+  }
+
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.

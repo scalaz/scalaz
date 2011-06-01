@@ -72,5 +72,26 @@ trait PointedFunctors {
 
   implicit def Tuple7PointedFunctor[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero] =
     pointedFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
-  
+
+  implicit def Function0PointedFunctor: PointedFunctor[Function0] =
+    pointedFunctor[Function0]
+
+  implicit def Function1PointedFunctor[R]: PointedFunctor[({type λ[α]=(R) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R) => α})#λ]
+
+  implicit def Function2PointedFunctor[R, S]: PointedFunctor[({type λ[α]=(R, S) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R, S) => α})#λ]
+
+  implicit def Function3PointedFunctor[R, S, T]: PointedFunctor[({type λ[α]=(R, S, T) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R, S, T) => α})#λ]
+
+  implicit def Function4PointedFunctor[R, S, T, U]: PointedFunctor[({type λ[α]=(R, S, T, U) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R, S, T, U) => α})#λ]
+
+  implicit def Function5PointedFunctor[R, S, T, U, V]: PointedFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ]
+
+  implicit def Function6PointedFunctor[R, S, T, U, V, W]: PointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
+    pointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+    
 }

@@ -129,4 +129,26 @@ trait ApplicFunctors {
     implicit val sw = implicitly[Monoid[W]].semigroup
     applicFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
   }
+
+  implicit def Function0Applicative: ApplicFunctor[Function0] =
+    applicFunctor[Function0]
+
+  implicit def Function1Applicative[R]: ApplicFunctor[({type λ[α]=(R) => α})#λ] =
+    applicFunctor[({type λ[α]=(R) => α})#λ]
+
+  implicit def Function2Applicative[R, S]: ApplicFunctor[({type λ[α]=(R, S) => α})#λ] =
+    applicFunctor[({type λ[α]=(R, S) => α})#λ]
+
+  implicit def Function3Applicative[R, S, T]: ApplicFunctor[({type λ[α]=(R, S, T) => α})#λ] =
+    applicFunctor[({type λ[α]=(R, S, T) => α})#λ]
+
+  implicit def Function4Applicative[R, S, T, U]: ApplicFunctor[({type λ[α]=(R, S, T, U) => α})#λ] =
+    applicFunctor[({type λ[α]=(R, S, T, U) => α})#λ]
+
+  implicit def Function5Applicative[R, S, T, U, V]: ApplicFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ] =
+    applicFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ]
+
+  implicit def Function6Applicative[R, S, T, U, V, W]: ApplicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
+    applicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+
 }

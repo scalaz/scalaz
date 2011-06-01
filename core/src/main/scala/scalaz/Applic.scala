@@ -36,11 +36,6 @@ trait Applics {
       a => f flatMap (a map _)
   }
 
-  implicit def Function1Applic[T]: Applic[({type λ[α] = Function1[T, α]})#λ] = new Applic[({type λ[α] = Function1[T, α]})#λ] {
-    def applic[A, B](f: T => A => B) =
-      g => x => f(x)(g(x))
-  }
-
   implicit def Tuple2Applic[R: Semigroup]: Applic[({type λ[α]=(R, α)})#λ] = new Applic[({type λ[α]=(R, α)})#λ] {
     def applic[A, B](f: (R, A => B)) = {
       case (r, a) => (implicitly[Semigroup[R]].append(f._1, r), f._2(a))
@@ -75,6 +70,41 @@ trait Applics {
     def applic[A, B](f: (R, S, T, U, V, W, A => B)) = {
       case (r, s, t, u, v, w, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), implicitly[Semigroup[T]].append(f._3, t), implicitly[Semigroup[U]].append(f._4, u), implicitly[Semigroup[V]].append(f._5, v), implicitly[Semigroup[W]].append(f._6, w), f._7(a))
     }
+  }
+    
+  implicit def Function0Applic: Applic[Function0] = new Applic[Function0] {
+    def applic[A, B](f: Function0[A => B]) =
+      a => () => f.apply.apply(a.apply)
+  }
+
+  implicit def Function1Applic[R]: Applic[({type λ[α]=(R) => α})#λ] = new Applic[({type λ[α]=(R) => α})#λ] {
+    def applic[A, B](f: Function1[R, A => B]) =
+      a => r => f(r)(a(r))
+  }
+
+  implicit def Function2Applic[R, S]: Applic[({type λ[α]=(R, S) => α})#λ] = new Applic[({type λ[α]=(R, S) => α})#λ] {
+    def applic[A, B](f: Function2[R, S, A => B]) =
+      a => (r, s) => f(r, s)(a(r, s))
+  }
+
+  implicit def Function3Applic[R, S, T]: Applic[({type λ[α]=(R, S, T) => α})#λ] = new Applic[({type λ[α]=(R, S, T) => α})#λ] {
+    def applic[A, B](f: Function3[R, S, T, A => B]) =
+      a => (r, s, t) => f(r, s, t)(a(r, s, t))
+  }
+
+  implicit def Function4Applic[R, S, T, U]: Applic[({type λ[α]=(R, S, T, U) => α})#λ] = new Applic[({type λ[α]=(R, S, T, U) => α})#λ] {
+    def applic[A, B](f: Function4[R, S, T, U, A => B]) =
+      a => (r, s, t, u) => f(r, s, t, u)(a(r, s, t, u))
+  }
+
+  implicit def Function5Applic[R, S, T, U, V]: Applic[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Applic[({type λ[α]=(R, S, T, U, V) => α})#λ] {
+    def applic[A, B](f: Function5[R, S, T, U, V, A => B]) =
+      a => (r, s, t, u, v) => f(r, s, t, u, v)(a(r, s, t, u, v))
+  }
+
+  implicit def Function6Applic[R, S, T, U, V, W]: Applic[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Applic[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
+    def applic[A, B](f: Function6[R, S, T, U, V, W, A => B]) =
+      a => (r, s, t, u, v, w) => f(r, s, t, u, v, w)(a(r, s, t, u, v, w))
   }
 
 }

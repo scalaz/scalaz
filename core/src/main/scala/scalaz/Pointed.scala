@@ -68,6 +68,37 @@ trait Pointeds extends PointedsLow {
   implicit def Tuple7Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, implicitly[Zero[V]].zero, implicitly[Zero[W]].zero, a)
   }
+
+  implicit def Function0Pure: Pointed[Function0] = new Pointed[Function0] {
+    def point[A](a: => A) = new Function0[A] {
+      def apply = a
+    }
+  }
+
+  implicit def Function1Pointed[R]: Pointed[({type λ[α]=(R) => α})#λ] = new Pointed[({type λ[α]=(R) => α})#λ] {
+    def point[A](a: => A) = (_: R) => a
+  }
+
+  implicit def Function2Pointed[R, S]: Pointed[({type λ[α]=(R, S) => α})#λ] = new Pointed[({type λ[α]=(R, S) => α})#λ] {
+    def point[A](a: => A) = (_: R, _: S) => a
+  }
+
+  implicit def Function3Pointed[R, S, T]: Pointed[({type λ[α]=(R, S, T) => α})#λ] = new Pointed[({type λ[α]=(R, S, T) => α})#λ] {
+    def point[A](a: => A) = (_: R, _: S, _: T) => a
+  }
+
+  implicit def Function4Pointed[R, S, T, U]: Pointed[({type λ[α]=(R, S, T, U) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U) => α})#λ] {
+    def point[A](a: => A) = (_: R, _: S, _: T, _: U) => a
+  }
+
+  implicit def Function5Pointed[R, S, T, U, V]: Pointed[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V) => α})#λ] {
+    def point[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
+  }
+
+  implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
+    def point[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
+  }
+  
   
 }
 
