@@ -11,6 +11,8 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
+  import data._
+  import newtypes._
 
   "equal laws" should {
     type A = String
