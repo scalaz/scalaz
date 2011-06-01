@@ -61,6 +61,18 @@ trait ApplicFunctors {
   implicit val StreamApplicFunctor: ApplicFunctor[Stream] =
     applicFunctor
 
+  implicit def EitherLeftApplicFunctor[X] =
+    applicFunctor[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightApplicFunctor[X] =
+    applicFunctor[({type λ[α]=Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherApplicFunctor[X] =
+    applicFunctor[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def Tuple1ApplicFunctor =
+    applicFunctor[Tuple1]
+
   implicit def Tuple2ApplicFunctor[R: Monoid] = {
     implicit val zr = implicitly[Monoid[R]].zero
     implicit val sr = implicitly[Monoid[R]].semigroup

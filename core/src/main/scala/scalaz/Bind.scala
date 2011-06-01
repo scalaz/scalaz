@@ -28,6 +28,21 @@ trait Binds {
       _ flatMap f
   }
 
+  implicit def EitherLeftBind[X]: Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Bind[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+    def bind[A, B](f: A => Either.LeftProjection[B, X]) =
+      _.flatMap(f(_).e).left
+  }
+
+  implicit def EitherRightBind[X]: Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Bind[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+    def bind[A, B](f: A => Either.RightProjection[X, B]) =
+      _.flatMap(f(_).e).right
+  }
+
+  implicit def EitherBind[X]: Bind[({type λ[α]=Either[X, α]})#λ] = new Bind[({type λ[α]=Either[X, α]})#λ] {
+    def bind[A, B](f: A => Either[X, B]) =
+      _.fold(Left(_), f)
+  }
+
   implicit def Tuple1Bind: Bind[Tuple1] = new Bind[Tuple1] {
     def bind[A, B](f: A => Tuple1[B]) =
       r => f(r._1)

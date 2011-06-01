@@ -55,6 +55,18 @@ trait PointedFunctors {
   implicit val StreamPointedFunctor: PointedFunctor[Stream] =
     pointedFunctor
 
+  implicit def EitherLeftPointedFunctor[X] =
+    pointedFunctor[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightPointedFunctor[X] =
+    pointedFunctor[({type λ[α]=Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherPointedFunctor[X] =
+    pointedFunctor[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def Tuple1PointedFunctor =
+    pointedFunctor[Tuple1]
+
   implicit def Tuple2PointedFunctor[R: Zero] =
     pointedFunctor[({type λ[α] = (R, α)})#λ]
 

@@ -85,6 +85,18 @@ trait Applicatives {
   implicit val StreamApplicative: Applicative[Stream] =
     applicative[Stream]
 
+  implicit def EitherLeftApplicative[X] =
+    applicative[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightApplicative[X] =
+    applicative[({type λ[α]=Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherApplicative[X] =
+    applicative[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def Tuple1Applicative: Applicative[Tuple1] =
+    applicative[Tuple1]
+
   implicit def Tuple2Applicative[R: Monoid] = {
     implicit val zr = implicitly[Monoid[R]].zero
     implicit val sr = implicitly[Monoid[R]].semigroup

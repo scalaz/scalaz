@@ -40,8 +40,20 @@ trait Pointeds extends PointedsLow {
       def call = a
     }
   }
-  
-  implicit def Tuple1Pointed = new Pointed[Tuple1] {
+
+  implicit def EitherLeftPointed[X]: Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+    def point[A](a: => A) = Left(a).left
+  }
+
+  implicit def EitherRightPointed[X]: Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+    def point[A](a: => A) = Right(a).right
+  }
+
+  implicit def EitherPointed[X]: Pointed[({type λ[α]=Either[X, α]})#λ] = new Pointed[({type λ[α]=Either[X, α]})#λ] {
+    def point[A](a: => A) = Right(a)
+  }
+
+  implicit def Tuple1Pointed: Pointed[Tuple1] = new Pointed[Tuple1] {
     def point[A](a: => A) = Tuple1(a)
   }
 

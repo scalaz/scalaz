@@ -95,6 +95,19 @@ trait Monads {
   implicit val StreamMonad: Monad[Stream] =
     monadBP
 
+  implicit def EitherLeftMonad[X] =
+    monadBP[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightMonad[X] =
+    monadBP[({type λ[α]=Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherMonad[X] =
+    monadBP[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def Tuple1Monad = {
+    monadBP[Tuple1]
+  }
+
   implicit def Tuple2Monad[R: Monoid] = {
     implicit val zr = implicitly[Monoid[R]].zero
     implicit val sr = implicitly[Monoid[R]].semigroup

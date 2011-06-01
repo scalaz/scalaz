@@ -36,6 +36,29 @@ trait Applics {
       a => f flatMap (a map _)
   }
 
+  implicit def EitherLeftApplic[X]: Applic[({type λ[α]=Either.LeftProjection[α, X]})#λ] =
+    new Applic[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+      def applic[A, B](f: Either.LeftProjection[A => B, X]) =
+      a => f flatMap (g => (a map g)) left
+    }
+
+  implicit def EitherRightApplic[X]: Applic[({type λ[α]=Either.RightProjection[X, α]})#λ] =
+    new Applic[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+      def applic[A, B](f: Either.RightProjection[X, A => B]) =
+        a => f flatMap (a map _) right
+    }
+
+  implicit def EitherApplic[X]: Applic[({type λ[α]=Either[X, α]})#λ] =
+    new Applic[({type λ[α]=Either[X, α]})#λ] {
+      def applic[A, B](f: Either[X, A => B]) =
+        a => f.right flatMap (a.right map _)
+    }
+
+  implicit def Tuple1Applic: Applic[Tuple1] = new Applic[Tuple1] {
+    def applic[A, B](f: Tuple1[A => B]) =
+      a => Tuple1(f._1(a._1))
+  }
+
   implicit def Tuple2Applic[R: Semigroup]: Applic[({type λ[α]=(R, α)})#λ] = new Applic[({type λ[α]=(R, α)})#λ] {
     def applic[A, B](f: (R, A => B)) = {
       case (r, a) => (implicitly[Semigroup[R]].append(f._1, r), f._2(a))

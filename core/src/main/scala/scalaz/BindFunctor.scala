@@ -37,6 +37,19 @@ trait BindFunctors {
   implicit val StreamBindFunctor: BindFunctor[Stream] =
     bindFunctor
 
+  implicit def EitherLeftBindFunctor[X] =
+    bindFunctor[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightBindFunctor[X] =
+    bindFunctor[({type λ[α]=Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherBindFunctor[X] =
+    bindFunctor[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def Tuple1BindFunctor = {
+    bindFunctor[Tuple1]
+  }
+
   implicit def Tuple2BindFunctor[R: Semigroup] = {
     bindFunctor[({type λ[α] = (R, α)})#λ]
   }
