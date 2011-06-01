@@ -278,7 +278,7 @@ trait *[A] {
 object * extends **
 
 trait ** {
-  implicit def **[A](a: A): *[A] = new *[A] {
+  implicit def ******[A](a: A): *[A] = new *[A] {
     val value = a
   }
 }
