@@ -61,4 +61,25 @@ trait BindFunctors {
     bindFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
   }
 
+  implicit def Function0BindFunctor: BindFunctor[Function0] =
+    bindFunctor[Function0]
+
+  implicit def Function1BindFunctor[R]: BindFunctor[({type λ[α]=(R) => α})#λ] =
+    bindFunctor[({type λ[α]=(R) => α})#λ]
+
+  implicit def Function2BindFunctor[R, S]: BindFunctor[({type λ[α]=(R, S) => α})#λ] =
+    bindFunctor[({type λ[α]=(R, S) => α})#λ]
+
+  implicit def Function3BindFunctor[R, S, T]: BindFunctor[({type λ[α]=(R, S, T) => α})#λ] =
+    bindFunctor[({type λ[α]=(R, S, T) => α})#λ]
+
+  implicit def Function4BindFunctor[R, S, T, U]: BindFunctor[({type λ[α]=(R, S, T, U) => α})#λ] =
+    bindFunctor[({type λ[α]=(R, S, T, U) => α})#λ]
+
+  implicit def Function5BindFunctor[R, S, T, U, V]: BindFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ] =
+    bindFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ]
+
+  implicit def Function6BindFunctor[R, S, T, U, V, W]: BindFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
+    bindFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+
 }
