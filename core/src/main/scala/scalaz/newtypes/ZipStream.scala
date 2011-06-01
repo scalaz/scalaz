@@ -25,6 +25,15 @@ trait ZipStreams {
       }
     }
 
+  implicit def ZipStreamZero[A]: Zero[ZipStream[A]] =
+    implicitly[Zero[Stream[A]]].deriving[ZipStream[A]]
+
+  implicit def ZipStreamSemigroup[A]: Semigroup[ZipStream[A]] =
+    implicitly[Semigroup[Stream[A]]].deriving[ZipStream[A]]
+
+  implicit def ZipStreamMonoid[A]: Monoid[ZipStream[A]] =
+    implicitly[Monoid[Stream[A]]].deriving[ZipStream[A]]
+
   implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] =
     implicitly[Show[Stream[A]]] contramap ((_: ZipStream[A]).value)
 
