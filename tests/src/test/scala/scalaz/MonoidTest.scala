@@ -54,6 +54,8 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
   }
 
   def checkMonoidLaws[A: Monoid : Equal : Manifest : Arbitrary]: Unit = {
+    implicit val s = implicitly[Monoid[A]].semigroup
+    implicit val z = implicitly[Monoid[A]].zero
     val typeName = manifest[A].toString
     typeName in {
       import ScalazProperty.Semigroup._
