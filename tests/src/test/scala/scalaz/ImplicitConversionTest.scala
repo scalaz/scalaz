@@ -13,56 +13,56 @@ object ImplicitConversionTest {
   }
 
   def MAs[A, B, C, D, E, F, G, H] {
-    i[List[A] => MA[List, A]]
-    i[Option[A] => MA[Option, A]]
-    i[(A => B) => MAContravariant[({type λ[α] = (α) => B})#λ, A]]
-    i[(A => B) => MA[({type λ[α] = (A) => α})#λ, B]]
-    i[((A, B) => C) => MA[PartialApply2Of3[Function2, A, B]#Apply, C]]
-    i[((A, B, C) => D) => MA[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
-    i[((A, B, C, D) => E) => MA[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
-    i[((A, B, C, D, E) => F) => MA[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
-    i[((A, B, C, D, E, F) => G) => MA[({type λ[α] = (A, B, C, D, E, F) => α})#λ, G]]
-    i[Validation[A, B] => MA[({type λ[α] = Validation[A, α]})#λ, B]]
-    i[FailProjection[A, B] => MA[({type λ[α] = FailProjection[α, B]})#λ, A]]
-    i[Either.LeftProjection[A, B] => MA[({type λ[α] = Either.LeftProjection[α, B]})#λ, A]]
-    i[Either.RightProjection[A, B] => MA[({type λ[α] = Either.RightProjection[A, α]})#λ, B]]
-    i[((A, B)) => MA[({type λ[α] = (A, α)})#λ, B]]
-    i[((A, B, C)) => MA[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
-    i[((A, B, C, D)) => MA[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
-    i[((A, B, C, D, E)) => MA[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
-    i[((A, B, C, D, E, F)) => MA[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
-    i[((A, B, C, D, E, F, G)) => MA[({type λ[α] = (A, B, C, D, E, F, α)})#λ, G]]
+    i[List[A] => *->*[List, A]]
+    i[Option[A] => *->*[Option, A]]
+    i[(A => B) => -*->*[({type λ[α] = (α) => B})#λ, A]]
+    i[(A => B) => *->*[({type λ[α] = (A) => α})#λ, B]]
+    i[((A, B) => C) => *->*[PartialApply2Of3[Function2, A, B]#Apply, C]]
+    i[((A, B, C) => D) => *->*[PartialApply3Of4[Function3, A, B, C]#Apply, D]]
+    i[((A, B, C, D) => E) => *->*[PartialApply4Of5[Function4, A, B, C, D]#Apply, E]]
+    i[((A, B, C, D, E) => F) => *->*[PartialApply5Of6[Function5, A, B, C, D, E]#Apply, F]]
+    i[((A, B, C, D, E, F) => G) => *->*[({type λ[α] = (A, B, C, D, E, F) => α})#λ, G]]
+    i[Validation[A, B] => *->*[({type λ[α] = Validation[A, α]})#λ, B]]
+    i[FailProjection[A, B] => *->*[({type λ[α] = FailProjection[α, B]})#λ, A]]
+    i[Either.LeftProjection[A, B] => *->*[({type λ[α] = Either.LeftProjection[α, B]})#λ, A]]
+    i[Either.RightProjection[A, B] => *->*[({type λ[α] = Either.RightProjection[A, α]})#λ, B]]
+    i[((A, B)) => *->*[({type λ[α] = (A, α)})#λ, B]]
+    i[((A, B, C)) => *->*[PartialApply2Of3[Tuple3, A, B]#Apply, C]]
+    i[((A, B, C, D)) => *->*[PartialApply3Of4[Tuple4, A, B, C]#Apply, D]]
+    i[((A, B, C, D, E)) => *->*[PartialApply4Of5[Tuple5, A, B, C, D]#Apply, E]]
+    i[((A, B, C, D, E, F)) => *->*[PartialApply5Of6[Tuple6, A, B, C, D, E]#Apply, F]]
+    i[((A, B, C, D, E, F, G)) => *->*[({type λ[α] = (A, B, C, D, E, F, α)})#λ, G]]
 
     // Test for: https://github.com/scalaz/scalaz/commit/1b66206e7579ac9f85a9b127795503220c54b2b3#commitcomment-245733
     trait Connection
     type DB[A] = Connection => A
-    i[DB[Unit] => MA[DB, Unit]]
+    i[DB[Unit] => *->*[DB, Unit]]
 
     // via higher kind inference
     trait T[A]
-    i[T[A] => MAContravariant[T, A]]
-    i[T[A] => MA[T, A]]
+    i[T[A] => -*->*[T, A]]
+    i[T[A] => *->*[T, A]]
   }
 
   def apply[A, B, R, S, T, U, V, W, X] {
-    i[Apply[Identity]]
-    i[Apply[List]]
-    i[Apply[Function0]]
-    i[Apply[Option]]
-    i[Apply[({type λ[α] = State[A, α]})#λ]]
-    i[Apply[Function0]]
-    i[Apply[({type λ[α] = (R) => α})#λ]]
-    i[Apply[PartialApply2Of3[Function2, R, S]#Apply]]
-    i[Apply[PartialApply3Of4[Function3, R, S, T]#Apply]]
-    i[Apply[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
-    i[Apply[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
-    i[Apply[({type λ[α] = (R, S, T, U, V, W) => α})#λ]]
-    i[Apply[({type λ[α] = Either.LeftProjection[α, X]})#λ]]
-    i[Apply[({type λ[α] = Either.RightProjection[X, α]})#λ]]
+    i[Applic[Identity]]
+    i[Applic[List]]
+    i[Applic[Function0]]
+    i[Applic[Option]]
+    i[Applic[({type λ[α] = State[A, α]})#λ]]
+    i[Applic[Function0]]
+    i[Applic[({type λ[α] = (R) => α})#λ]]
+    i[Applic[PartialApply2Of3[Function2, R, S]#Apply]]
+    i[Applic[PartialApply3Of4[Function3, R, S, T]#Apply]]
+    i[Applic[PartialApply4Of5[Function4, R, S, T, U]#Apply]]
+    i[Applic[PartialApply5Of6[Function5, R, S, T, U, V]#Apply]]
+    i[Applic[({type λ[α] = (R, S, T, U, V, W) => α})#λ]]
+    i[Applic[({type λ[α] = Either.LeftProjection[α, X]})#λ]]
+    i[Applic[({type λ[α] = Either.RightProjection[X, α]})#λ]]
     import java.util.Map.Entry
-    i[Apply[({type λ[α] = Entry[Int, α]})#λ]]
-    i[Apply[({type λ[α] = Validation[Int, α]})#λ]]
-    i[Apply[({type λ[α] = FailProjection[α, X]})#λ]]
+    i[Applic[({type λ[α] = Entry[Int, α]})#λ]]
+    i[Applic[({type λ[α] = Validation[Int, α]})#λ]]
+    i[Applic[({type λ[α] = FailProjection[α, X]})#λ]]
   }
 
   def applicative[A, B, R, S, T, U, V, W, X] {
@@ -146,10 +146,10 @@ object ImplicitConversionTest {
     i[Functor[java.util.PriorityQueue]]
   }
 
-  def pure {
-    i[Pure[Iterable]]
-    i[Pure[List]]
-    i[Pure[Vector]]
+  def point {
+    i[Pointed[Iterable]]
+    i[Pointed[List]]
+    i[Pointed[Vector]]
   }
 
   def foldRight[A] {
@@ -210,15 +210,15 @@ object ImplicitConversionTest {
     i[({type λ[α] = T2[A, α]})#λ[B] =:= T2[A, B]]
     i[({type λ[α] = T2[α, A]})#λ[B] =:= T2[B, A]]
 
-    i[PartialApply2Of3[T3, A, B]#Apply[C] =:= T3[A, B, C]]
+    i[PartialApply2Of3[T3, A, B]#Applic[C] =:= T3[A, B, C]]
     i[PartialApply2Of3[T3, A, B]#ApplyA[C] =:= T3[C, A, B]]
     i[PartialApply2Of3[T3, A, B]#ApplyB[C] =:= T3[A, C, B]]
 
-    i[PartialApply3Of4[T4, A, B, C]#Apply[D] =:= T4[A, B, C, D]]
+    i[PartialApply3Of4[T4, A, B, C]#Applic[D] =:= T4[A, B, C, D]]
 
-    i[PartialApply4Of5[T5, A, B, C, D]#Apply[E] =:= T5[A, B, C, D, E]]
+    i[PartialApply4Of5[T5, A, B, C, D]#Applic[E] =:= T5[A, B, C, D, E]]
 
-    i[PartialApply5Of6[T6, A, B, C, D, E]#Apply[F] =:= T6[A, B, C, D, E, F]]
+    i[PartialApply5Of6[T6, A, B, C, D, E]#Applic[F] =:= T6[A, B, C, D, E, F]]
 
     i[({type λ[α] = T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
   }
