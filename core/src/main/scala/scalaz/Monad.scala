@@ -94,4 +94,71 @@ trait Monads {
 
   implicit val StreamMonad: Monad[Stream] =
     monadBP
+
+  implicit def Tuple2Monad[R: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    monadBP[({type λ[α] = (R, α)})#λ]
+  }
+
+  implicit def Tuple3Monad[R: Monoid, S: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    monadBP[({type λ[α] = (R, S, α)})#λ]
+  }
+
+  implicit def Tuple4Monad[R: Monoid, S: Monoid, T: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    monadBP[({type λ[α] = (R, S, T, α)})#λ]
+  }
+
+  implicit def Tuple5Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    monadBP[({type λ[α] = (R, S, T, U, α)})#λ]
+  }
+
+  implicit def Tuple6Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    monadBP[({type λ[α] = (R, S, T, U, V, α)})#λ]
+  }
+
+  implicit def Tuple7Monad[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    implicit val zw = implicitly[Monoid[W]].zero
+    implicit val sw = implicitly[Monoid[W]].semigroup
+    monadBP[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
+  }
+
 }

@@ -84,4 +84,71 @@ trait Applicatives {
 
   implicit val StreamApplicative: Applicative[Stream] =
     applicative[Stream]
+
+  implicit def Tuple2Applicative[R: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    applicative[({type λ[α] = (R, α)})#λ]
+  }
+
+  implicit def Tuple3Applicative[R: Monoid, S: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    applicative[({type λ[α] = (R, S, α)})#λ]
+  }
+
+  implicit def Tuple4Applicative[R: Monoid, S: Monoid, T: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    applicative[({type λ[α] = (R, S, T, α)})#λ]
+  }
+
+  implicit def Tuple5Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    applicative[({type λ[α] = (R, S, T, U, α)})#λ]
+  }
+
+  implicit def Tuple6Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    applicative[({type λ[α] = (R, S, T, U, V, α)})#λ]
+  }
+
+  implicit def Tuple7Applicative[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    implicit val zw = implicitly[Monoid[W]].zero
+    implicit val sw = implicitly[Monoid[W]].semigroup
+    applicative[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
+  }
+
 }

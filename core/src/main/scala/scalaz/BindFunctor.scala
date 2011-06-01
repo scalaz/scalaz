@@ -36,4 +36,29 @@ trait BindFunctors {
 
   implicit val StreamBindFunctor: BindFunctor[Stream] =
     bindFunctor
+
+  implicit def Tuple2BindFunctor[R: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, α)})#λ]
+  }
+
+  implicit def Tuple3BindFunctor[R: Semigroup, S: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, S, α)})#λ]
+  }
+
+  implicit def Tuple4BindFunctor[R: Semigroup, S: Semigroup, T: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, S, T, α)})#λ]
+  }
+
+  implicit def Tuple5BindFunctor[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, S, T, U, α)})#λ]
+  }
+
+  implicit def Tuple6BindFunctor[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, S, T, U, V, α)})#λ]
+  }
+
+  implicit def Tuple7BindFunctor[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup] = {
+    bindFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
+  }
+
 }

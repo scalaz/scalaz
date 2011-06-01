@@ -63,4 +63,70 @@ trait ApplicFunctors {
 
   implicit def Function1ApplicFunctor[T]: ApplicFunctor[({type λ[α] = Function1[T, α]})#λ] =
     applicFunctor[({type λ[α] = Function1[T, α]})#λ]
+
+  implicit def Tuple2ApplicFunctor[R: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    applicFunctor[({type λ[α] = (R, α)})#λ]
+  }
+
+  implicit def Tuple3ApplicFunctor[R: Monoid, S: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    applicFunctor[({type λ[α] = (R, S, α)})#λ]
+  }
+
+  implicit def Tuple4ApplicFunctor[R: Monoid, S: Monoid, T: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    applicFunctor[({type λ[α] = (R, S, T, α)})#λ]
+  }
+
+  implicit def Tuple5ApplicFunctor[R: Monoid, S: Monoid, T: Monoid, U: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    applicFunctor[({type λ[α] = (R, S, T, U, α)})#λ]
+  }
+
+  implicit def Tuple6ApplicFunctor[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    applicFunctor[({type λ[α] = (R, S, T, U, V, α)})#λ]
+  }
+
+  implicit def Tuple7ApplicFunctor[R: Monoid, S: Monoid, T: Monoid, U: Monoid, V: Monoid, W: Monoid] = {
+    implicit val zr = implicitly[Monoid[R]].zero
+    implicit val sr = implicitly[Monoid[R]].semigroup
+    implicit val zs = implicitly[Monoid[S]].zero
+    implicit val ss = implicitly[Monoid[S]].semigroup
+    implicit val zt = implicitly[Monoid[T]].zero
+    implicit val st = implicitly[Monoid[T]].semigroup
+    implicit val zu = implicitly[Monoid[U]].zero
+    implicit val su = implicitly[Monoid[U]].semigroup
+    implicit val zv = implicitly[Monoid[V]].zero
+    implicit val sv = implicitly[Monoid[V]].semigroup
+    implicit val zw = implicitly[Monoid[W]].zero
+    implicit val sw = implicitly[Monoid[W]].semigroup
+    applicFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
+  }
 }

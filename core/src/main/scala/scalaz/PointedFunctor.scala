@@ -54,4 +54,23 @@ trait PointedFunctors {
 
   implicit val StreamPointedFunctor: PointedFunctor[Stream] =
     pointedFunctor
+
+  implicit def Tuple2PointedFunctor[R: Zero] =
+    pointedFunctor[({type λ[α] = (R, α)})#λ]
+
+  implicit def Tuple3PointedFunctor[R: Zero, S: Zero] =
+    pointedFunctor[({type λ[α] = (R, S, α)})#λ]
+
+  implicit def Tuple4PointedFunctor[R: Zero, S: Zero, T: Zero] =
+    pointedFunctor[({type λ[α] = (R, S, T, α)})#λ]
+
+  implicit def Tuple5PointedFunctor[R: Zero, S: Zero, T: Zero, U: Zero] =
+    pointedFunctor[({type λ[α] = (R, S, T, U, α)})#λ]
+
+  implicit def Tuple6PointedFunctor[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero] =
+    pointedFunctor[({type λ[α] = (R, S, T, U, V, α)})#λ]
+
+  implicit def Tuple7PointedFunctor[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero] =
+    pointedFunctor[({type λ[α] = (R, S, T, U, V, W, α)})#λ]
+  
 }
