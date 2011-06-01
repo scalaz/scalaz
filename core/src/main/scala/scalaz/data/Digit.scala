@@ -28,6 +28,20 @@ trait Digits {
   def digitFromLong(i: Long): Option[Digit] =
     digits.find(_.toLong == i)
 
+  def mod10Digit(i: Int): Digit =
+    i match {
+      case 0 => _0
+      case 1 => _1
+      case 2 => _2
+      case 3 => _3
+      case 4 => _4
+      case 5 => _5
+      case 6 => _6
+      case 7 => _7
+      case 8 => _8
+      case 9 => _9
+      case _ => mod10Digit(scala.math.abs(i) % 10)
+    }
   implicit def DigitShow: Show[Digit] =
     Show.showBy(_.toInt)
 
@@ -36,6 +50,15 @@ trait Digits {
 
   implicit def DigitOrder: Order[Digit] =
     Order.orderBy(_.toInt)
+
+  implicit def DigitZero: Zero[Digit] =
+    Zero.zero(Digit._0)
+
+  implicit def DigitSemigroup: Semigroup[Digit] =
+    Semigroup.semigroup(a => b => mod10Digit(a.toInt + b.toInt))
+
+  implicit def DigitMonoid: Monoid[Digit] =
+    Monoid.monoid
 
   object Digit {
 

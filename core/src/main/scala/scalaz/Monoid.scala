@@ -2,6 +2,8 @@ package scalaz
 
 import collection.generic.CanBuildFrom
 import collection.mutable.ArraySeq
+import java.math.BigInteger
+import xml.{Elem, Node}
 
 trait Monoid[A] {
   val zero: Zero[A]
@@ -35,27 +37,72 @@ trait Monoids {
   implicit val UnitMonoid: Monoid[Unit] =
     monoid
 
-  implicit val BooleanMonoid: Monoid[Boolean] =
+  implicit val StringMonoid: Monoid[String] =
     monoid
 
   implicit val IntMonoid: Monoid[Int] =
     monoid
 
-  implicit val StringMonoid: Monoid[String] =
+  implicit val BooleanMonoid: Monoid[Boolean] =
     monoid
+
+  implicit val CharMonoid: Monoid[Char] =
+    monoid
+
+  implicit val ByteMonoid: Monoid[Byte] =
+    monoid
+
+  implicit val LongMonoid: Monoid[Long] =
+    monoid
+
+  implicit val ShortMonoid: Monoid[Short] =
+    monoid
+
+  implicit val FloatMonoid: Monoid[Float] =
+    monoid
+
+  implicit val DoubleMonoid: Monoid[Double] =
+    monoid
+
+  implicit def BigIntegerMonoid: Monoid[BigInteger] =
+    monoid
+
+  implicit val BigIntMonoid: Monoid[BigInt] =
+    monoid
+
+  implicit def OptionMonoid[A]: Monoid[Option[A]] = {
+    implicit val s = implicitly[Monoid[Option[A]]].semigroup
+    implicit val z = implicitly[Monoid[Option[A]]].zero
+    monoid[Option[A]]
+  }
+
+  implicit def ArrayMonoid[A: Manifest]: Monoid[Array[A]] =
+    monoid
+
+  implicit def ArraySeqMonoid[A: Manifest]: Monoid[ArraySeq[A]] =
+    monoid
+
+  implicit def EitherLeftMonoid[A, B](implicit bz: Monoid[B]): Monoid[Either.LeftProjection[A, B]] = {
+    implicit val z = implicitly[Monoid[B]].zero
+    monoid[Either.LeftProjection[A, B]]
+  }
+
+  implicit def EitherRightMonoid[A: Monoid, B]: Monoid[Either.RightProjection[A, B]] = {
+    implicit val z = implicitly[Monoid[A]].zero
+    monoid[Either.RightProjection[A, B]]
+  }
+
+  implicit def EitherMonoid[A: Monoid, B]: Monoid[Either[A, B]] = {
+    implicit val z = implicitly[Monoid[A]].zero
+    monoid[Either[A, B]]
+  }
 
   implicit def StreamMonoid[A]: Monoid[Stream[A]] =
     monoid
 
   implicit def ListMonoid[A]: Monoid[List[A]] =
     monoid
-
-  implicit def OptionMonoid[A: Semigroup]: Monoid[Option[A]] =
-    monoid
-
-  implicit def ArraySeqMonoid[A]: Monoid[ArraySeq[A]] =
-    monoid[ArraySeq[A]]
-
+  
   implicit def Tuple2Monoid[A, B](implicit ma: Monoid[A], mb: Monoid[B]): Monoid[(A, B)] = {
     implicit val sa = implicitly[Monoid[(A, B)]].semigroup
     implicit val za = implicitly[Monoid[(A, B)]].zero
