@@ -40,6 +40,35 @@ trait Pointeds extends PointedsLow {
       def call = a
     }
   }
+  
+  implicit def Tuple1Pointed = new Pointed[Tuple1] {
+    def point[A](a: => A) = Tuple1(a)
+  }
+
+  implicit def Tuple2Pointed[R: Zero]: Pointed[({type λ[α]=(R, α)})#λ] = new Pointed[({type λ[α]=(R, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, a)
+  }
+
+  implicit def Tuple3Pointed[R: Zero, S: Zero]: Pointed[({type λ[α]=(R, S, α)})#λ] = new Pointed[({type λ[α]=(R, S, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, a)
+  }
+
+  implicit def Tuple4Pointed[R: Zero, S: Zero, T: Zero]: Pointed[({type λ[α]=(R, S, T, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, a)
+  }
+
+  implicit def Tuple5Pointed[R: Zero, S: Zero, T: Zero, U: Zero]: Pointed[({type λ[α]=(R, S, T, U, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, a)
+  }
+
+  implicit def Tuple6Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pointed[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, implicitly[Zero[V]].zero, a)
+  }
+
+  implicit def Tuple7Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
+    def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, implicitly[Zero[V]].zero, implicitly[Zero[W]].zero, a)
+  }
+  
 }
 
 trait PointedsLow {

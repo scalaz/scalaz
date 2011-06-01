@@ -40,4 +40,41 @@ trait Applics {
     def applic[A, B](f: T => A => B) =
       g => x => f(x)(g(x))
   }
+
+  implicit def Tuple2Applic[R: Semigroup]: Applic[({type λ[α]=(R, α)})#λ] = new Applic[({type λ[α]=(R, α)})#λ] {
+    def applic[A, B](f: (R, A => B)) = {
+      case (r, a) => (implicitly[Semigroup[R]].append(f._1, r), f._2(a))
+    }
+  }
+
+  implicit def Tuple3Applic[R: Semigroup, S: Semigroup]: Applic[({type λ[α]=(R, S, α)})#λ] = new Applic[({type λ[α]=(R, S, α)})#λ] {
+    def applic[A, B](f: (R, S, A => B)) = {
+      case (r, s, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), f._3(a))
+    }
+  }
+
+  implicit def Tuple4Applic[R: Semigroup, S: Semigroup, T: Semigroup]: Applic[({type λ[α]=(R, S, T, α)})#λ] = new Applic[({type λ[α]=(R, S, T, α)})#λ] {
+    def applic[A, B](f: (R, S, T, A => B)) = {
+      case (r, s, t, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), implicitly[Semigroup[T]].append(f._3, t), f._4(a))
+    }
+  }
+
+  implicit def Tuple5Applic[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup]: Applic[({type λ[α]=(R, S, T, U, α)})#λ] = new Applic[({type λ[α]=(R, S, T, U, α)})#λ] {
+    def applic[A, B](f: (R, S, T, U, A => B)) = {
+      case (r, s, t, u, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), implicitly[Semigroup[T]].append(f._3, t), implicitly[Semigroup[U]].append(f._4, u), f._5(a))
+    }
+  }
+
+  implicit def Tuple6Applic[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup]: Applic[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Applic[({type λ[α]=(R, S, T, U, V, α)})#λ] {
+    def applic[A, B](f: (R, S, T, U, V, A => B)) = {
+      case (r, s, t, u, v, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), implicitly[Semigroup[T]].append(f._3, t), implicitly[Semigroup[U]].append(f._4, u), implicitly[Semigroup[V]].append(f._5, v), f._6(a))
+    }
+  }
+
+  implicit def Tuple7Applic[R: Semigroup, S: Semigroup, T: Semigroup, U: Semigroup, V: Semigroup, W: Semigroup]: Applic[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Applic[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
+    def applic[A, B](f: (R, S, T, U, V, W, A => B)) = {
+      case (r, s, t, u, v, w, a) => (implicitly[Semigroup[R]].append(f._1, r), implicitly[Semigroup[S]].append(f._2, s), implicitly[Semigroup[T]].append(f._3, t), implicitly[Semigroup[U]].append(f._4, u), implicitly[Semigroup[V]].append(f._5, v), implicitly[Semigroup[W]].append(f._6, w), f._7(a))
+    }
+  }
+
 }

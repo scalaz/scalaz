@@ -49,7 +49,7 @@ trait *[A] {
   def point[F[_]](implicit p: Pointed[F]): F[A] =
     p point value
 
-  /**Alias for {@link #pure}*/
+  /**Alias for {@link #point}*/
   def η[F[_]](implicit p: Pointed[F]): F[A] =
     point[F]
 
