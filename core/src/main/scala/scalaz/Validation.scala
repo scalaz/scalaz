@@ -121,8 +121,48 @@ sealed trait FailProjection[E, A] {
 }
 
 object FailProjection {
+  implicit def FailProjection_^*^[E, A]: (FailProjection[E, A] ^*^ Validation[E, A]) =
+    ^*^.^*^(_.validation, b => new FailProjection[E, A] {
+      val validation = b
+    })
+
+
+  implicit def FailProjection_^**^[E] : (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) =
+    new (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) {
+      def unpack[A] = _.validation
+
+      def pack[A] = b => new FailProjection[E, A] {
+        val validation = b
+      }
+    }
+
+  implicit def FailProjectionShow[E: Show, A: Show]: Show[FailProjection[E, A]] =
+    Show.showBy(_.validation)
+
   implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] =
     Equal.equalBy(_.validation)
+
+  implicit def FailProjectionOrder[E: Order, A: Order]: Order[FailProjection[E, A]] =
+    Order.orderBy(_.validation)
+
+  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[X, α]})#λ] =
+    implicitly[Functor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
+  implicit def FailProjectionPointed[X]: Pointed[({type λ[α] = FailProjection[X, α]})#λ] = 
+    implicitly[Pointed[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
+  implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[X, α]})#λ] =
+    implicitly[PointedFunctor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
+  implicit def FailProjectionApplic[X: Semigroup]: Applic[({type λ[α] = FailProjection[X, α]})#λ] =
+    implicitly[Applic[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
+  implicit def FailProjectionApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = FailProjection[X, α]})#λ] =
+    implicitly[ApplicFunctor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
+  implicit def FailProjectionApplicative[X: Semigroup]: Applicative[({type λ[α] = FailProjection[X, α]})#λ] =
+    implicitly[Applicative[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+
 }
 
 import ~>._
@@ -188,14 +228,5 @@ trait Validations {
 
   implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
     Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
-
-  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] = new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
-    def fmap[A, B](f: A => B) =
-      r =>
-        (r.validation match {
-          case Success(a) => Success(a): Validation[B, X]
-          case Failure(e) => Failure(f(e)): Validation[B, X]
-        }).fail
-  }
 
 }

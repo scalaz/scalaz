@@ -55,7 +55,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Applic[({type λ[α] = Entry[Int, α]})#λ]]
     i[Applic[({type λ[α] = Validation[Int, α]})#λ]]
-    i[Applic[({type λ[α] = FailProjection[α, X]})#λ]]
+    i[Applic[({type λ[α] = FailProjection[Int, α]})#λ]]
   }
 
   def applicative[A, B, R, S, T, U, V, W, X] {
@@ -75,11 +75,11 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Applicative[({type λ[α] = Entry[Int, α]})#λ]]
     i[Applicative[({type λ[α] = Validation[Int, α]})#λ]]
-    i[Applicative[({type λ[α] = FailProjection[α, X]})#λ]]
+    i[Applicative[({type λ[α] = FailProjection[Int, α]})#λ]]
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
-    i[Pointed[Identity]]
+    i[Pointed[Ident]]
     i[Pointed[List]]
     i[Pointed[Function0]]
     i[Pointed[Option]]
@@ -96,7 +96,7 @@ object ImplicitConversionTest {
     import java.util.Map.Entry
     i[Pointed[({type λ[α] = Entry[Int, α]})#λ]]
     i[Pointed[({type λ[α] = Validation[Int, α]})#λ]]
-    i[Pointed[({type λ[α] = FailProjection[α, X]})#λ]]
+    i[Pointed[({type λ[α] = FailProjection[Int, α]})#λ]]
   }
 
   def bind {
