@@ -43,6 +43,18 @@ trait Binds {
       _.fold(Left(_), f)
   }
 
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryBind[X: Semigroup]: Bind[({type λ[α]=Entry[X, α]})#λ] =
+    new Bind[({type λ[α]=Entry[X, α]})#λ] {
+      def bind[A, B](f: A => Entry[X, B]) =
+        r => {
+          val e = f(r.getValue)
+          new SimpleImmutableEntry(implicitly[Semigroup[X]].append(r.getKey, e.getKey), e.getValue)
+        }
+    }
+
   implicit def Tuple1Bind: Bind[Tuple1] = new Bind[Tuple1] {
     def bind[A, B](f: A => Tuple1[B]) =
       r => f(r._1)

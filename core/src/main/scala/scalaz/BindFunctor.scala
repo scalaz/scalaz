@@ -46,6 +46,11 @@ trait BindFunctors {
   implicit def EitherBindFunctor[X] =
     bindFunctor[({type λ[α]=Either[X, α]})#λ]
 
+  import java.util.Map.Entry
+
+  implicit def MapEntryBindFunctor[X: Semigroup] =
+    bindFunctor[({type λ[α]=Entry[X, α]})#λ]
+
   implicit def Tuple1BindFunctor = {
     bindFunctor[Tuple1]
   }

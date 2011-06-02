@@ -727,7 +727,7 @@ trait **->**~ {
     val value = a
   }
 
-  implicit def !-**->**![F[_], A](a: F[A])(implicit cf: Contravariant[F]): (F -*->* A) = new (F -*->* A) {
+  implicit def !-**->**![F[_], A](a: F[A]): (F -*->* A) = new (F -*->* A) {
     val value = a
   }
 }
@@ -738,7 +738,7 @@ trait **->** extends **->**~ {
     val value = a
   }
 
-  def -*->*[F[_], A](a: F[A])(implicit cf: Contravariant[F]): (F -*->* A) = new (F -*->* A) {
+  def -*->*[F[_], A](a: F[A]): (F -*->* A) = new (F -*->* A) {
     val value = a
   }
 

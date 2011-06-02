@@ -1,5 +1,7 @@
 package scalaz
 
+import java.util.AbstractMap.SimpleImmutableEntry
+
 trait Applic[F[_]] {
   def applic[A, B](f: F[A => B]): F[A] => F[B]
 
@@ -52,6 +54,15 @@ trait Applics {
     new Applic[({type λ[α]=Either[X, α]})#λ] {
       def applic[A, B](f: Either[X, A => B]) =
         a => f.right flatMap (a.right map _)
+    }
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryApply[X: Semigroup]: Applic[({type λ[α]=Entry[X, α]})#λ] =
+    new Applic[({type λ[α]=Entry[X, α]})#λ] {
+      def applic[A, B](f: Entry[X, A => B]) =
+        e => new SimpleImmutableEntry[X, B](implicitly[Semigroup[X]].append(f.getKey, e.getKey), f.getValue.apply(e.getValue))
+
     }
 
   implicit def Tuple1Applic: Applic[Tuple1] = new Applic[Tuple1] {

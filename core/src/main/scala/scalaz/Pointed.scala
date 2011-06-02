@@ -53,6 +53,14 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = Right(a)
   }
 
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryPointed[X: Zero]: Pointed[({type λ[α]=Entry[X, α]})#λ] = new Pointed[({type λ[α]=Entry[X, α]})#λ] {
+    def point[A](a: => A) =
+      new SimpleImmutableEntry(implicitly[Zero[X]].zero, a)
+  }
+
   implicit def Tuple1Pointed: Pointed[Tuple1] = new Pointed[Tuple1] {
     def point[A](a: => A) = Tuple1(a)
   }

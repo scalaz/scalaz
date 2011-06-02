@@ -64,6 +64,14 @@ trait PointedFunctors {
   implicit def EitherPointedFunctor[X] =
     pointedFunctor[({type λ[α]=Either[X, α]})#λ]
 
+  import java.util.Map.Entry
+
+  implicit def MapEntryPointedFunctor[X: Monoid] = {
+    implicit val z = implicitly[Monoid[X]].zero
+    implicit val s = implicitly[Monoid[X]].semigroup
+    pointedFunctor[({type λ[α]=Entry[X, α]})#λ]
+  }
+
   implicit def Tuple1PointedFunctor =
     pointedFunctor[Tuple1]
 

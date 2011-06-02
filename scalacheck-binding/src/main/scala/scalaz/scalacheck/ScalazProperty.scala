@@ -10,8 +10,8 @@ object ScalazProperty extends ScalazPropertys
  */
 trait ScalazPropertys {
 
-  import data.*._
-  import data.*->*._
+  import *._
+  import *->*._
   import wrap.Function1W._
   import Scalazing._
   import Prop.forAll

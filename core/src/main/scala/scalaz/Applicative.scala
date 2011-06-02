@@ -1,5 +1,7 @@
 package scalaz
 
+import java.util.Map.Entry
+
 trait Applicative[F[_]] {
   val pointedFunctor: PointedFunctor[F]
   val applic: Applic[F]
@@ -93,6 +95,12 @@ trait Applicatives {
 
   implicit def EitherApplicative[X] =
     applicative[({type λ[α]=Either[X, α]})#λ]
+
+  implicit def MapEntryApplicative[X: Monoid] = {
+    implicit val z = implicitly[Monoid[X]].zero
+    implicit val s = implicitly[Monoid[X]].semigroup
+    applicative[({type λ[α]=Entry[X, α]})#λ]
+  }
 
   implicit def Tuple1Applicative: Applicative[Tuple1] =
     applicative[Tuple1]

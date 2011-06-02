@@ -70,6 +70,11 @@ trait ApplicFunctors {
   implicit def EitherApplicFunctor[X] =
     applicFunctor[({type λ[α]=Either[X, α]})#λ]
 
+  import java.util.Map.Entry
+
+  implicit def MapEntryApplicFunctor[X: Semigroup] =
+    applicFunctor[({type λ[α]=Entry[X, α]})#λ]
+
   implicit def Tuple1ApplicFunctor =
     applicFunctor[Tuple1]
 

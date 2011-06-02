@@ -104,6 +104,14 @@ trait Monads {
   implicit def EitherMonad[X] =
     monadBP[({type λ[α]=Either[X, α]})#λ]
 
+  import java.util.Map.Entry
+
+  implicit def MapEntryMonad[X: Monoid] = {
+    implicit val z = implicitly[Monoid[X]].zero
+    implicit val s = implicitly[Monoid[X]].semigroup
+    monadBP[({type λ[α]=Entry[X, α]})#λ]
+  }
+
   implicit def Tuple1Monad = {
     monadBP[Tuple1]
   }
