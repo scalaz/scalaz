@@ -5,10 +5,6 @@ import org.scalacheck.Arbitrary
 import java.math.BigInteger
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 
-object test extends App {
-  new MonoidTest
-}
-
 class MonoidTest extends Specification with Sugar with ScalaCheck {
 
   import Scalaz._

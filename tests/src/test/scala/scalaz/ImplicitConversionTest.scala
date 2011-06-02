@@ -12,7 +12,7 @@ object ImplicitConversionTest {
     i[Applicative[M]]
   }
 
-  def MAs[A, B, C, D, E, F, G, H] {
+  def Kinds[A, B, C, D, E, F, G, H] {
     i[List[A] => *->*[List, A]]
     i[Option[A] => *->*[Option, A]]
     i[(A => B) => -*->*[({type λ[α] = (α) => B})#λ, A]]
@@ -45,7 +45,7 @@ object ImplicitConversionTest {
   }
 
   def apply[A, B, R, S, T, U, V, W, X] {
-    i[Applic[Identity]]
+    i[Applic[Ident]]
     i[Applic[List]]
     i[Applic[Function0]]
     i[Applic[Option]]

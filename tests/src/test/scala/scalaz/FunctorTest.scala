@@ -24,7 +24,6 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     type M = Int
     type P = Int
 
-    implicit def IdentityEqual[X] = equalA[Ident[X]]
     checkFunctorLaws[Ident, A]
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
