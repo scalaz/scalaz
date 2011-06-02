@@ -9,10 +9,10 @@ sealed trait IterateeT[E, F[_], A] {
   val iterate: Input[E] => FIterVT[E, F, A]
 
   def *->* : (({type λ[α] = IterateeT[E, F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = IterateeT[E, F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = IterateeT[E, F, α]})#λ, A](this)
 
   def *->*->* : *->*->*[E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A] =
-    scalaz.*->*->*.**->**->**[E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A](this)
+    scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A](this)
 
   import IterateeT._
 

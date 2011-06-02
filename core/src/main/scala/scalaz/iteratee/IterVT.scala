@@ -10,10 +10,10 @@ sealed trait IterVT[E, F[_], A] {
   import IterateeT._
 
   def *->* : (({type λ[α] = IterVT[E, F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = IterVT[E, F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = IterVT[E, F, α]})#λ, A](this)
 
   def *->*->* : *->*->*[E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A] =
-    scalaz.*->*->*.**->**->**[E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A](this)
+    scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A](this)
 
   def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => FIterVT[E, F, A]) => Z): Z
 

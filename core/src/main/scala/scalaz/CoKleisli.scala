@@ -7,10 +7,10 @@ trait CoKleisli[A, W[_], B] {
   import Ident._
 
   def *->* : (({type λ[α] = CoKleisli[A, W, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = CoKleisli[A, W, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = CoKleisli[A, W, α]})#λ, B](this)
 
   def *->*->* : *->*->*[A, ({type λ[α, β] = CoKleisli[α, W, β]})#λ, B] =
-    scalaz.*->*->*.**->**->**[A, ({type λ[α, β] = CoKleisli[α, W, β]})#λ, B](this)
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = CoKleisli[α, W, β]})#λ, B](this)
 
   def contramapValue[C](f: W[C] => W[A]): CoKleisli[C, W, B] =
     coKleisli(run compose f)

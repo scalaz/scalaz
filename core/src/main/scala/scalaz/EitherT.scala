@@ -7,10 +7,10 @@ sealed trait EitherT[A, F[_], B] {
   import OptionT._
 
   def *->* : (({type λ[α] = EitherT[A, F, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = EitherT[A, F, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = EitherT[A, F, α]})#λ, B](this)
 
   def *->*->* : *->*->*[A, ({type λ[α, β] = EitherT[α, F, β]})#λ, B] =
-    scalaz.*->*->*.**->**->**[A, ({type λ[α, β] = EitherT[α, F, β]})#λ, B](this)
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = EitherT[α, F, β]})#λ, B](this)
 
   def run(implicit i: F[Either[A, B]] =:= Ident[Either[A, B]]): Either[A, B] =
     runT.value

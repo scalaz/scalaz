@@ -7,10 +7,10 @@ sealed trait Kleisli[A, F[_], B] {
   import StateT._
 
   def *->* : (({type λ[α] = Kleisli[A, F, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = Kleisli[A, F, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = Kleisli[A, F, α]})#λ, B](this)
 
   def *->*->* : *->*->*[A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B] =
-    scalaz.*->*->*.**->**->**[A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B](this)
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B](this)
 
   def mapValue[C](f: F[B] => F[C]): Kleisli[A, F, C] =
     kleisli(f compose run)

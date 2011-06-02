@@ -8,10 +8,10 @@ sealed trait CoStateT[A, F[_], B] {
   import CoStateT._
 
   def *->* : (({type λ[α] = CoStateT[A, F, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = CoStateT[A, F, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = CoStateT[A, F, α]})#λ, B](this)
 
   def *->*->* : *->*->*[A, ({type λ[α, β] = CoStateT[α, F, β]})#λ, B] =
-    scalaz.*->*->*.**->**->**[A, ({type λ[α, β] = CoStateT[α, F, β]})#λ, B](this)
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = CoStateT[α, F, β]})#λ, B](this)
 
   private def mapRunT[C](f: (A => B) => C)(implicit ftr: Functor[F]): (F[C], A) =
     (ftr.fmap((z: A => B) => f(z))(runT._1), runT._2)
@@ -107,30 +107,6 @@ trait CoStateTs {
     implicit val pt = implicitly[PointedFunctor[F]].pointed
     val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
     val pointed = implicitly[Pointed[({type λ[α] = CoStateT[A, F, α]})#λ]]
-  }
-
-  implicit def CoStateApplic[A: Semigroup, F[_] : ApplicFunctor]: Applic[({type λ[α] = CoStateT[A, F, α]})#λ] = new Applic[({type λ[α] = CoStateT[A, F, α]})#λ] {
-    def applic[X, Y](f: CoStateT[A, F, X => Y]) =
-      a => coStateT[A, F, Y]((
-          implicitly[ApplicFunctor[F]].liftA2((ff: A => X => Y) => (aa: A => X) => (z: A) => ff(z)(aa(z)))(f.runT._1)(a.runT._1), implicitly[Semigroup[A]].append(f.pos, a.pos)
-          ))
-  }
-
-  implicit def CoStateApplicFunctor[A: Semigroup, F[_] : ApplicFunctor]: ApplicFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] = new ApplicFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] {
-    implicit val ftr = implicitly[ApplicFunctor[F]].functor
-    val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
-    val applic = implicitly[Applic[({type λ[α] = CoStateT[A, F, α]})#λ]]
-  }
-
-  implicit def CoStateApplicative[A: Monoid, F[_] : Applicative]: Applicative[({type λ[α] = CoStateT[A, F, α]})#λ] = new Applicative[({type λ[α] = CoStateT[A, F, α]})#λ] {
-    implicit val s = implicitly[Monoid[A]].semigroup
-    implicit val z = implicitly[Monoid[A]].zero
-    implicit val ap = implicitly[Applicative[F]].applic
-    implicit val pf = implicitly[Applicative[F]].pointedFunctor
-    implicit val af = implicitly[Applicative[F]].applicFunctor
-    val pointedFunctor = implicitly[PointedFunctor[({type λ[α] = CoStateT[A, F, α]})#λ]]
-    val applic = implicitly[Applic[({type λ[α] = CoStateT[A, F, α]})#λ]]
-
   }
 
   implicit def CoStateCoBind[A, F[_] : CoBind]: CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] {

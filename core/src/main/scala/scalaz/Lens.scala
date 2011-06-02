@@ -21,7 +21,7 @@ sealed trait Lens[A, B] {
   import Lens._
 
   def *->* : (({type λ[α] = A @@ α})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = A @@ α})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = A @@ α})#λ, B](this)
 
   def get: A => B =
     a =>

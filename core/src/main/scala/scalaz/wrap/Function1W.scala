@@ -6,7 +6,7 @@ sealed trait Function1W[T, R] {
   val k: T => R
 
   def *->* : (({type λ[α] = Function1[T, α]})#λ *->* R) =
-    scalaz.*->*.**->**[({type λ[α] = Function1[T, α]})#λ, R](k)
+    scalaz.*->*.!**->**![({type λ[α] = Function1[T, α]})#λ, R](k)
 
   import concurrent.{Promise, Strategy}
   import Validation._, NonEmptyList._

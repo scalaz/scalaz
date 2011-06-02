@@ -6,7 +6,7 @@ sealed trait OptionT[F[_], A] {
   import OptionT._
 
   def *->* : (({type λ[α] = OptionT[F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = OptionT[F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = OptionT[F, α]})#λ, A](this)
 
   def run(implicit i: F[Option[A]] =:= Ident[Option[A]]): Option[A] =
     runT.value

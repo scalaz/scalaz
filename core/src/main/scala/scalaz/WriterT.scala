@@ -6,10 +6,10 @@ sealed trait WriterT[W, F[_], A] {
   import WriterT._
 
   def *->* : (({type λ[α] = WriterT[W, F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = WriterT[W, F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = WriterT[W, F, α]})#λ, A](this)
 
   def *->*->* : *->*->*[W, ({type λ[α, β] = WriterT[α, F, β]})#λ, A] =
-    scalaz.*->*->*.**->**->**[W, ({type λ[α, β] = WriterT[α, F, β]})#λ, A](this)
+    scalaz.*->*->*.!**->**->**![W, ({type λ[α, β] = WriterT[α, F, β]})#λ, A](this)
 
   def run(implicit i: F[(W, A)] =:= Ident[(W, A)]): (W, A) =
     runT.value

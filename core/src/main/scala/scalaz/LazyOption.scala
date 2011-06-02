@@ -103,7 +103,7 @@ sealed trait LazyOptionT[F[_], A] {
   import EitherT._
 
   def *->* : (({type λ[α] = LazyOptionT[F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = LazyOptionT[F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = LazyOptionT[F, α]})#λ, A](this)
 
   def run(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): LazyOption[A] =
     runT.value

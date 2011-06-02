@@ -9,7 +9,7 @@ sealed trait StepListT[F[_], A] {
   protected def step: F[Step[A, StepListT[F, A]]]
 
   def *->* : (({type λ[α] = StepListT[F, α]})#λ *->* A) =
-    scalaz.*->*.**->**[({type λ[α] = StepListT[F, α]})#λ, A](this)
+    scalaz.*->*.!**->**![({type λ[α] = StepListT[F, α]})#λ, A](this)
 
   private def stepFlatMap[B](k: Step[A, StepListT[F, A]] => F[B])(implicit m: Monad[F]): F[B] =
     m.bd(k)(step)

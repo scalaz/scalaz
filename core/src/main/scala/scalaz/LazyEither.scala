@@ -13,7 +13,7 @@ sealed trait LazyEither[A, B] {
     }
 
   def *->* : (({type λ[α] = LazyEither[A, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = LazyEither[A, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = LazyEither[A, α]})#λ, B](this)
 
   def ?[X](left: => X, right: => X): X =
     fold(_ => left, _ => right)
@@ -144,10 +144,10 @@ sealed trait LazyEitherT[A, F[_], B] {
   import LazyOptionT._
 
   def *->* : (({type λ[α] = LazyEitherT[A, F, α]})#λ *->* B) =
-    scalaz.*->*.**->**[({type λ[α] = LazyEitherT[A, F, α]})#λ, B](this)
+    scalaz.*->*.!**->**![({type λ[α] = LazyEitherT[A, F, α]})#λ, B](this)
 
   def *->*->* : *->*->*[A, ({type λ[α, β] = LazyEitherT[α, F, β]})#λ, B] =
-    scalaz.*->*->*.**->**->**[A, ({type λ[α, β] = LazyEitherT[α, F, β]})#λ, B](this)
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = LazyEitherT[α, F, β]})#λ, B](this)
 
   def run(implicit i: F[LazyEither[A, B]] =:= Ident[LazyEither[A, B]]): LazyEither[A, B] =
     runT.value
