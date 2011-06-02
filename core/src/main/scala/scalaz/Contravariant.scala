@@ -36,10 +36,8 @@ object Contravariant {
   }
 
   implicit def ShowContravariant: Contravariant[Show] = new Contravariant[Show] {
-    def contramap[A, B](r: Show[A], f: B => A) = {
-      if(r == null) error("boo")
+    def contramap[A, B](r: Show[A], f: B => A) =
       show[B](b => r show (f(b)))
-    }
   }
 
   implicit def MetricSpaceContravariant: Contravariant[MetricSpace] = new Contravariant[MetricSpace] {
