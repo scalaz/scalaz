@@ -1,5 +1,4 @@
 package scalaz
-package data
 
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck._

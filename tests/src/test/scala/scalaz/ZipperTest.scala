@@ -1,5 +1,4 @@
 package scalaz
-package data
 
 import Scalaz._
 import org.scalacheck._
@@ -11,8 +10,9 @@ object ZipperTest extends Properties("Zipper") {
         /*
   property("Zipper From Stream") = forAll((xs: NonEmptyList[Int]) =>
     true)
+    */
 
-
+        /*
   property("Zipper Move Then To Stream") = forAll(nels(1, 2, 3, 4)) {
     (n: NonEmptyList[Int]) =>
       n.toZipper.move(2).map(_.toStream).element(n.stream)
