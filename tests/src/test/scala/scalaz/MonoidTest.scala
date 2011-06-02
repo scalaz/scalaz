@@ -14,7 +14,6 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
-  import data._
   import newtypes._
 
   "function monoid" in {

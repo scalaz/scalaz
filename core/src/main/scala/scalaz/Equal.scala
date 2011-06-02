@@ -1,7 +1,5 @@
 package scalaz
 
-import data._
-
 sealed trait Equal[A] {
   val equal: A => A => Boolean
 

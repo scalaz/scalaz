@@ -3,7 +3,7 @@ package wrap
 
 sealed trait BooleanW {
 
-  import data._, LazyEither._
+  import LazyEither._
   import newtypes._
 
   val value: Boolean

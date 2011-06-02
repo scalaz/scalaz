@@ -150,8 +150,8 @@ object Coord {
   import Show._
   import Equal._
   import Order._
-  import data.*._
-  import data.*->*->*._
+  import *._
+  import *->*->*._
 
   implicit def CoordShow: Show[Coord] = shows((c: Coord) => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
 

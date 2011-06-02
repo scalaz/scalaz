@@ -44,8 +44,7 @@ object Reducer extends Reducers {
 trait Reducers {
 
   import newtypes._
-  import data.*._
-  import data.Endo
+  import *._
 
   def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     new Reducer[C, M] {

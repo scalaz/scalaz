@@ -8,7 +8,6 @@ import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 class MonadTest extends Specification with Sugar with ScalaCheck {
 
   import Scalaz._
-  import data._
   import ScalaCheckBinding._
   import ScalazArbitrary._
 

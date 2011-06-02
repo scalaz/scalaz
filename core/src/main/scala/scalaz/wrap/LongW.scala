@@ -3,10 +3,8 @@ package wrap
 
 sealed trait LongW {
 
-  import data._
   import newtypes._
   import LongW._
-  import Digit.Digit._
 
   val value: Long
 

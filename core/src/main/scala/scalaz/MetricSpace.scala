@@ -26,7 +26,7 @@ trait MetricSpaces {
       r => metricSpace[B](b1 => b2 => r.distance(f(b1))(f(b2)))
   }
 
-  import data.*->*._
+  import *->*._
 
   def levenshtein[F[_], A](implicit l: Length[F], i: Index[F], e: Equal[A]): MetricSpace[F[A]] =
     metricSpace[F[A]](a => a <---> _)

@@ -3,7 +3,6 @@ package scalaz
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
 import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
-import data._
 import newtypes._
 
 class FunctorTest extends Specification with Sugar with ScalaCheck {

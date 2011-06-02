@@ -6,8 +6,8 @@ sealed trait StreamW[A] {
 
   import StreamW._
   import newtypes.ZipStream
-  import data.*._
-  import data.{Zipper, Tree}, Zipper._
+  import Zipper._
+  import *._
 
   def ʐ : ZipStream[A] =
     value.*-->[ZipStream[A]]

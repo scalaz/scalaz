@@ -1,7 +1,7 @@
 package scalaz
 package iteratee
 
-import data.LazyOption, LazyOption._
+import LazyOption._
 
 
 /**The input to an iteratee. **/

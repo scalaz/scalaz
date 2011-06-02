@@ -9,7 +9,6 @@ object ExampleIdentity {
   def main(args: Array[String]) = run
 
   import Scalaz._
-  import data.{*, NonEmptyList, Tree}
 
   def run {
     // Any value can be converted to Identity

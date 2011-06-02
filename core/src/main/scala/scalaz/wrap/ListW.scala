@@ -6,7 +6,6 @@ sealed trait ListW[A] {
   import ListW._
   import StreamW._
   import annotation.tailrec
-  import data.{Zipper, NonEmptyList}
 
   val value: List[A]
 

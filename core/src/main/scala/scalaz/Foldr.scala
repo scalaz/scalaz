@@ -21,8 +21,6 @@ object Foldr extends Foldrs
 
 trait Foldrs extends FoldrsLow {
 
-  import data.Endo
-
   def foldMapFoldr[F[_] : FoldMap]: Foldr[F] = new Foldr[F] {
     def foldr[A, B]: (A => (=> B) => B) => B => F[A] => B =
       k => b => as => {

@@ -12,7 +12,7 @@ object Dup extends Dups
 
 trait Dups {
 
-  import data.Kleisli._
+  import Kleisli._
   import RegionT._
   import FinalizerHandle._
 

@@ -2,7 +2,7 @@ package scalaz
 package iteratee
 
 import Input._
-import data.{*->*->*, *->*, Ident}, Ident._
+import Ident._
 
 sealed trait IterVT[E, F[_], A] {
 
@@ -10,10 +10,10 @@ sealed trait IterVT[E, F[_], A] {
   import IterateeT._
 
   def *->* : (({type λ[α] = IterVT[E, F, α]})#λ *->* A) =
-    data.*->*.**->**[({type λ[α] = IterVT[E, F, α]})#λ, A](this)
+    scalaz.*->*.**->**[({type λ[α] = IterVT[E, F, α]})#λ, A](this)
 
   def *->*->* : *->*->*[E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A] =
-    data.*->*->*.**->**->**[E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A](this)
+    scalaz.*->*->*.**->**->**[E, ({type λ[α, β] = IterVT[α, F, β]})#λ, A](this)
 
   def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => FIterVT[E, F, A]) => Z): Z
 

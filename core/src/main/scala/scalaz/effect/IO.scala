@@ -6,7 +6,7 @@ import RegionT._
 import RefCountedFinalizer._
 import FinalizerHandle._
 import ST._
-import data.Kleisli._
+import Kleisli._
 
 sealed trait IO[A] {
   private[effect] def apply(rw: World[RealWorld]): (World[RealWorld], A)

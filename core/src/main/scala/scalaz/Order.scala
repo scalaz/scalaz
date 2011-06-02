@@ -1,7 +1,5 @@
 package scalaz
 
-import data._
-
 sealed trait Order[A] {
   val order: A => A => Ordering
 

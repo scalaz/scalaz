@@ -1,6 +1,6 @@
 package scalaz
 
-import data._, Ident._
+import Ident._
 
 trait Traverse[T[_]] {
   def traverse[F[_] : Applicative, A, B](f: A => F[B]): T[A] => F[T[B]]

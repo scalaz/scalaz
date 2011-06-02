@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-import data.Kleisli, Kleisli._
+import Kleisli._
 
 trait LiftIO[F[_]] {
   def liftIO[A]: IO[A] => F[A]

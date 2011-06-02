@@ -4,8 +4,8 @@ package wrap
 sealed trait OptionW[A] {
   val value: Option[A]
 
-  import data.*._
-  import data.Validation, Validation._
+  import *._
+  import Validation._
   import newtypes.{FirstOption, LastOption}
   import iteratee.IterVT, IterVT._
   import iteratee.Input._

@@ -14,9 +14,7 @@ object ScalazArbitrary extends ScalazArbitrarys
  */
 trait ScalazArbitrarys {
 
-  import data.*._
-  import data.*->*._
-  import data._, Ident._, Alpha._
+  import *._, *->*._, Ident._, Alpha._
   import newtypes._
   import wrap._
   import BooleanW._

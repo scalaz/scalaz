@@ -4,7 +4,7 @@ package wrap
 sealed trait StringW {
   val s: String
 
-  import data.{NonEmptyList, Validation}, Validation._
+  import Validation._
   import InputStreamW._
   import xml._
 

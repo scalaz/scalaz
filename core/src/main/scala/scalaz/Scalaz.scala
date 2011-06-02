@@ -1,34 +1,67 @@
 package scalaz
 
 object Scalaz extends
+Alphas with
 Applics with
 Applicatives with
 Binds with
+BKTrees with
+BloomFilters with
 Categorys with
+CoKleislis with
 Comps with
 Consts with
+CoStateTs with
+Digits with
+EitherTs with
+Endos with
+EphemeralStreams with
 Equals with
 Foldables with
 Foldls with
 Functors with
+Heaps with
+Idents with
+ImmutableArrays with
 Joins with
+Kleislis with
+LazyEithers with
+LazyEitherTs with
+LazyOptions with
+LazyOptionTs with
+LazyTuples with
+Lenss with
 Monads with
 Monoids with
-~>> with
-^^*^^ with
+NonEmptyLists with
+OptionTs with
 Orders with
 Pointeds with
 PointedFunctors with
 Semigroups with
 Shows with
+StateTs with
+StepListTs with
+StepStreamTs with
+Trees with
+TreeLocs with
+Validations with
+WriterTs with
 Zeros with
+Zippers with
 concurrent.Concurrents with
-data.Datas with
 effect.Effects with
 iteratee.Iteratees with
 newtypes.Newtypess with
 wrap.Wraps with
-Scalazs
+Scalazs with
+** with
+**->** with
+**->**->** with
+~>> with
+^^*^^ with
+~** with
+!**
 
 object Scalazing extends Scalazs
 

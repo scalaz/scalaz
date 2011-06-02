@@ -13,7 +13,7 @@ object Generator extends Generators
 
 trait Generators {
 
-  import data.*->*._
+  import *->*._
 
   def FoldrGenerator[F[_] : Foldr]: Generator[F] = new Generator[F] {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =

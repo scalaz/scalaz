@@ -1,7 +1,6 @@
 package scalaz
 package effect
 
-import data.ImmutableArray
 import RealWorld._
 import STRef._
 import STArray._
@@ -56,7 +55,6 @@ sealed trait STArray[S, A] {
   private val value: Array[A] = Array.fill(size)(z)
 
   import ST._
-  import data._
 
   /**Reads the value at the given index. */
   def read(i: Int): ST[S, A] = returnST(value(i))

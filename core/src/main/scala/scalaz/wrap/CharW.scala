@@ -3,7 +3,7 @@ package wrap
 
 sealed trait CharW {
 
-  import data._, Digit._, Alpha._
+  import Digit._, Alpha._
   import newtypes._
 
   val value: Char

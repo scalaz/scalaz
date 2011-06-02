@@ -4,7 +4,7 @@ package wrap
 sealed trait Function0W[T] {
   val k: () => T
 
-  import data.Validation, Validation._
+  import Validation._
 
   def throws: Validation[Throwable, T] =
     try {

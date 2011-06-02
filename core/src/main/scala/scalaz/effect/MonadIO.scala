@@ -1,8 +1,6 @@
 package scalaz
 package effect
 
-import data.Kleisli
-
 trait MonadIO[F[_]] {
   val liftIO: LiftIO[F]
   val monad: Monad[F]

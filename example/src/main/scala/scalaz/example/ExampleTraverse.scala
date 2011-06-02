@@ -1,7 +1,7 @@
 package scalaz.example
 
 import scalaz._, newtypes._
-import scalaz.data.Digit.Digit._
+import Digit.Digit._
 
 object ExampleTraverse {
   def main(args: Array[String]) = run
