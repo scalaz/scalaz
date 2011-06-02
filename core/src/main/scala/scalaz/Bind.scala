@@ -12,7 +12,7 @@ trait Bind[F[_]] {
 
 object Bind extends Binds
 
-trait Binds {
+trait Binds extends BindsLow {
   implicit val OptionBind: Bind[Option] = new Bind[Option] {
     def bind[A, B](f: A => Option[B]) =
       _ flatMap f
@@ -131,4 +131,117 @@ trait Binds {
     def bind[A, B](f: A => (R, S, T, U, V, W) => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def JavaArrayListBind: Bind[ArrayList] = new Bind[ArrayList] {
+    def bind[A, B](f: A => ArrayList[B]) = r => {
+      val a = new ArrayList[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaLinkedListBind: Bind[LinkedList] = new Bind[LinkedList] {
+    def bind[A, B](f: A => LinkedList[B]) = r => {
+      val a = new LinkedList[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaPriorityQueueBind: Bind[PriorityQueue] = new Bind[PriorityQueue] {
+    def bind[A, B](f: A => PriorityQueue[B]) = r => {
+      val a = new PriorityQueue[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaStackBind: Bind[Stack] = new Bind[Stack] {
+    def bind[A, B](f: A => Stack[B]) = r => {
+      val a = new Stack[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaVectorBind: Bind[Vector] = new Bind[Vector] {
+    def bind[A, B](f: A => Vector[B]) = r => {
+      val a = new Vector[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaArrayBlockingQueueBind: Bind[ArrayBlockingQueue] = new Bind[ArrayBlockingQueue] {
+    def bind[A, B](f: A => ArrayBlockingQueue[B]) = r => {
+      val a = new ArrayBlockingQueue[B](r.remainingCapacity)
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaConcurrentLinkedQueueBind: Bind[ConcurrentLinkedQueue] = new Bind[ConcurrentLinkedQueue] {
+    def bind[A, B](f: A => ConcurrentLinkedQueue[B]) = r => {
+      val a = new ConcurrentLinkedQueue[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaCopyOnWriteArrayListBind: Bind[CopyOnWriteArrayList] = new Bind[CopyOnWriteArrayList] {
+    def bind[A, B](f: A => CopyOnWriteArrayList[B]) = r => {
+      val a = new CopyOnWriteArrayList[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaLinkedBlockingQueueBind: Bind[LinkedBlockingQueue] = new Bind[LinkedBlockingQueue] {
+    def bind[A, B](f: A => LinkedBlockingQueue[B]) = r => {
+      val a = new LinkedBlockingQueue[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+  implicit def JavaSynchronousQueueBind: Bind[SynchronousQueue] = new Bind[SynchronousQueue] {
+    def bind[A, B](f: A => SynchronousQueue[B]) = r => {
+      val a = new SynchronousQueue[B]
+      val i = r.iterator
+      while (i.hasNext)
+        a.addAll(f(i.next))
+      a
+    }
+  }
+
+}
+
+trait BindsLow {
+
+  implicit def TraversableBind[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf]: Bind[CC] = new Bind[CC] {
+    def bind[A, B](f: A => CC[B]) = r => {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
+      r.flatMap[B, CC[B]](f)(cbf)
+    }
+  }
 }

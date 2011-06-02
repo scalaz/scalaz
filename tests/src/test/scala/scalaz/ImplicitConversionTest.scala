@@ -216,17 +216,17 @@ object ImplicitConversionTest {
 
   def copointed {
     type A = Int
-    i[Copointed[({type λ[α] = (A, α)})#λ]]
+    i[CoPointed[({type λ[α] = (A, α)})#λ]]
 
     import java.util.Map.Entry
-    i[Copointed[({type λ[α] = Entry[A, α]})#λ]]
+    i[CoPointed[({type λ[α] = Entry[A, α]})#λ]]
   }
 
   def comonad {
     type A = Int
-    i[Comonad[({type λ[α] = (A, α)})#λ]]
+    i[CoMonad[({type λ[α] = (A, α)})#λ]]
     import java.util.Map.Entry
-    i[Comonad[({type λ[α] = Entry[A, α]})#λ]]
+    i[CoMonad[({type λ[α] = Entry[A, α]})#λ]]
   }
 
   def strategy {
