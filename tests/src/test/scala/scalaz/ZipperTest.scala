@@ -7,18 +7,12 @@ import org.scalacheck.Prop._
 object ZipperTest extends Properties("Zipper") {
   property("Zipper From Stream") = forAll((xs: Stream[Int]) =>
     (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs)
-        /*
-  property("Zipper From Stream") = forAll((xs: NonEmptyList[Int]) =>
-    true)
-    */
 
-        /*
   property("Zipper Move Then To Stream") = forAll(nels(1, 2, 3, 4)) {
     (n: NonEmptyList[Int]) =>
       n.toZipper.move(2).map(_.toStream).element(n.stream)
   }
-  */
-   /*
+
   property("Next Affects Lengths") = forAll((xs: Stream[Int]) => {
     (for (z <- xs.toZipper;
           zn <- z.next)
@@ -46,6 +40,6 @@ object ZipperTest extends Properties("Zipper") {
     ((zipper(xs, f, ys).findZ(p)) map (z =>
       p(z.focus)) getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
   })
-  */
+
 }
 

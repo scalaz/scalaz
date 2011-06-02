@@ -277,7 +277,7 @@ trait *[A] {
 object * extends **
 
 trait ** {
-  implicit def ******[A](a: A): *[A] = new *[A] {
+  implicit def !**![A](a: A): *[A] = new *[A] {
     val value = a
   }
 }
@@ -340,7 +340,7 @@ trait *->*[F[_], A] {
    * <code>(List(List(1)).comp.map {2 +}) assert_=== List(List(3))</code>
    */
   def comp[G[_], B](implicit n: A <:< G[B], f: Functor[F]): *->*[({type λ[α] = F[G[α]]})#λ, B] =
-    **->**[({type λ[α] = F[G[α]]})#λ, B](value ∘ n)
+    !**->**![({type λ[α] = F[G[α]]})#λ, B](value ∘ n)
 
   def >|[B](f: => B)(implicit t: Functor[F]): F[B] =
     ∘(_ => f)
@@ -723,11 +723,11 @@ object *->* extends **->**
 
 // formerly MAsLow
 trait **->**~ {
-  implicit def **->**[F[_], A](a: F[A]): (F *->* A) = new (F *->* A) {
+  implicit def !**->**![F[_], A](a: F[A]): (F *->* A) = new (F *->* A) {
     val value = a
   }
 
-  implicit def -**->**[F[_], A](a: F[A]): (F -*->* A) = new (F -*->* A) {
+  implicit def !-**->**![F[_], A](a: F[A])(implicit cf: Contravariant[F]): (F -*->* A) = new (F -*->* A) {
     val value = a
   }
 }
@@ -738,7 +738,7 @@ trait **->** extends **->**~ {
     val value = a
   }
 
-  def -*->*[F[_], A](a: F[A])(implicit cf: Contravariant[F]): -*->*[F, A] = new -*->*[F, A] {
+  def -*->*[F[_], A](a: F[A])(implicit cf: Contravariant[F]): (F -*->* A) = new (F -*->* A) {
     val value = a
   }
 
@@ -1058,7 +1058,7 @@ trait *->*->*[A, F[_, _], B] {
 object *->*->* extends **->**->**
 
 trait **->**->**~ {
-  implicit def **->**->**[A, F[_, _], B](a: F[A, B]): *->*->*[A, F, B] = new *->*->*[A, F, B] {
+  implicit def !**->**->**![A, F[_, _], B](a: F[A, B]): *->*->*[A, F, B] = new *->*->*[A, F, B] {
     val value = a
   }
 }
