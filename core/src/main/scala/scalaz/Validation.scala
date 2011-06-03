@@ -120,7 +120,14 @@ sealed trait FailProjection[E, A] {
   }
 }
 
-object FailProjection {
+import ~>._
+
+object FailProjection extends FailProjections {
+  def apply[A]: (I ~> ({type λ[α] = Validation[α, A]})#λ) =
+    Validation.failure[A]
+}
+
+trait FailProjections {
   implicit def FailProjection_^*^[E, A]: (FailProjection[E, A] ^*^ Validation[E, A]) =
     ^*^.^*^(_.validation, b => new FailProjection[E, A] {
       val validation = b
@@ -196,8 +203,6 @@ object FailProjection {
   implicit def FailProjectionMonad[X]: Monad[({type λ[α] = FailProjection[α, X]})#λ] =
     Monad.monadBP[({type λ[α] = FailProjection[α, X]})#λ]
 }
-
-import ~>._
 
 object Validation extends Validations {
   def apply[E]: (I ~> ({type λ[α] = Validation[E, α]})#λ) =

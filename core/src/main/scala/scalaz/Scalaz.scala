@@ -17,6 +17,7 @@ EitherTs with
 Endos with
 EphemeralStreams with
 Equals with
+FailProjections with
 Foldables with
 Foldls with
 Functors with

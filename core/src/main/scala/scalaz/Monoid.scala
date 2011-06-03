@@ -28,7 +28,7 @@ trait Monoid[A] {
 
 object Monoid extends Monoids
 
-trait Monoids {
+trait Monoids extends MonoidsLow {
   def monoid[A](implicit zz: Zero[A], s: Semigroup[A]): Monoid[A] = new Monoid[A] {
     val zero = zz
     val semigroup = s
@@ -132,4 +132,9 @@ trait Monoids {
         a.liftA2[M, M, M](m1 => m2 => m.append(m1, m2))(x)(y)
     }
   }
+}
+
+trait MonoidsLow {
+  implicit def TraversableMonoid[X, CC[Y] <: Traversable[_] with collection.TraversableLike[Y, CC[Y]]](implicit cba: CanBuildAnySelf[CC], cbf: CanBuildFrom[Nothing, Nothing, CC[X]]): Monoid[CC[X]] =
+    Monoid.monoid
 }
