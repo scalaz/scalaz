@@ -178,6 +178,19 @@ object IterV {
     Cont(step(∅[F[A]]))
   }
 
+  /**
+   * Iteratee that collects all inputs in reverse with the given reducer.
+   *
+   * This iteratee is useful for F[_] with efficient cons, i.e. List.
+   */
+  def reversed[A, F[_]](implicit r: Reducer[A, F[A]]): IterV[A, F[A]] = {
+    def step(acc: F[A])(s: Input[A]): IterV[A, F[A]] =
+        s(el = e => Cont(step(r.cons(e, acc))),
+          empty = Cont(step(acc)),
+          eof = Done(acc, EOF.apply))
+    Cont(step(r.monoid.zero))
+  }
+
   /** Input that has a value available **/
   object Empty {
     def apply[E] : Input[E] = new Input[E] {

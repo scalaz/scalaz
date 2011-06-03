@@ -15,7 +15,7 @@ object ExampleIteratee {
   }
 
   val list = collect[Int, List]
-
+  val reverse = reversed[Int, List](ListReducer)
   val repeatHead = repeat[Int, Option[Int], List](head)
 
   def run {
@@ -25,6 +25,7 @@ object ExampleIteratee {
     head(Stream[Int]()).run assert_=== none[Int]
     list(Stream(1, 2, 3)).run assert_=== List(1, 2, 3)
     repeatHead(Stream(1, 2, 3)).run assert_=== List(Some(1), Some(2), Some(3))
+    reverse(Stream(1, 2, 3)).run assert_=== List(3, 2, 1)
 
     // As a monad
     val m1 = head[Int] >>= ((b:Option[Int]) => head[Int] map (b2 => (b <|*|> b2)))
