@@ -145,10 +145,6 @@ trait NonEmptyLists {
   implicit def NonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
     Semigroup.semigroup(a1 => a1.list <::: _)
 
-  implicit def NonEmptyListCojoin: CoJoin[NonEmptyList] = new CoJoin[NonEmptyList] {
-    def coJoin[A] = _.tails
-  }
-
   implicit def NonEmptyListCoPointed: CoPointed[NonEmptyList] = new CoPointed[NonEmptyList] {
     def coPoint[A] = a => a.head
   }
