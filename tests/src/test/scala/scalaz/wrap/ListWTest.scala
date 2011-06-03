@@ -3,7 +3,6 @@ package wrap
 
 import org.specs.{Sugar, Specification, ScalaCheck}
 import Scalaz._
-import data._
 
 class ListWTest extends Specification with Sugar with ScalaCheck {
   "intercalate empty list is identity" verifies {
