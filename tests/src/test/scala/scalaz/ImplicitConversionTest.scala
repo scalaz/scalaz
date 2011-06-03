@@ -202,15 +202,15 @@ object ImplicitConversionTest {
     i[({type λ[α] = T2[A, α]})#λ[B] =:= T2[A, B]]
     i[({type λ[α] = T2[α, A]})#λ[B] =:= T2[B, A]]
 
-    i[PartialApply2Of3[T3, A, B]#Applic[C] =:= T3[A, B, C]]
+    i[PartialApply2Of3[T3, A, B]#Apply[C] =:= T3[A, B, C]]
     i[PartialApply2Of3[T3, A, B]#ApplyA[C] =:= T3[C, A, B]]
     i[PartialApply2Of3[T3, A, B]#ApplyB[C] =:= T3[A, C, B]]
 
-    i[PartialApply3Of4[T4, A, B, C]#Applic[D] =:= T4[A, B, C, D]]
+    i[PartialApply3Of4[T4, A, B, C]#Apply[D] =:= T4[A, B, C, D]]
 
-    i[PartialApply4Of5[T5, A, B, C, D]#Applic[E] =:= T5[A, B, C, D, E]]
+    i[PartialApply4Of5[T5, A, B, C, D]#Apply[E] =:= T5[A, B, C, D, E]]
 
-    i[PartialApply5Of6[T6, A, B, C, D, E]#Applic[F] =:= T6[A, B, C, D, E, F]]
+    i[PartialApply5Of6[T6, A, B, C, D, E]#Apply[F] =:= T6[A, B, C, D, E, F]]
 
     i[({type λ[α] = T7[A, B, C, D, E, F, α]})#λ[G] =:= T7[A, B, C, D, E, F, G]]
   }
