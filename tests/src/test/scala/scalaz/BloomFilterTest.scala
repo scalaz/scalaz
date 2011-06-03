@@ -11,7 +11,7 @@ import Scalaz._
 
 class BloomFilterTest extends Specification with Sugar with ScalaCheck {
   def filter(added: Set[Int]): BloomFilter = {
-    val filter = new BloomFilter(added.size * 10, added.size)
+    val filter = BloomFilter.bloomFilterA(added.size * 10)(added.size)
     for (a <- added) filter add a.hashCode
     filter
   }

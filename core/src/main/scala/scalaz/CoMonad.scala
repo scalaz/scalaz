@@ -1,5 +1,7 @@
 package scalaz
 
+import java.util.Map.Entry
+
 trait CoMonad[F[_]] {
   val coBind: CoBind[F]
   val coPointed: CoPointed[F]
@@ -68,4 +70,11 @@ trait CoMonads {
     val functor = p.functor
     val coJoin = j
   }
+
+  implicit def MapEntryCoMonad[X]: CoMonad[({type λ[α] = Entry[X, α]})#λ] =
+    coMonadJP[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def Tuple2CoMonad[X]: CoMonad[({type λ[α] = Tuple2[X, α]})#λ] =
+    coMonadJP[({type λ[α] = Tuple2[X, α]})#λ]
+
 }

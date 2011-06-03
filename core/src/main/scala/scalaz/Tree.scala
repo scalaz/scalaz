@@ -180,4 +180,12 @@ trait Trees {
       }
   }
 
+  implicit def TreeCoPointed: CoPointed[Tree] = new CoPointed[Tree] {
+    def coPoint[A] = a => a.rootLabel
+  }
+
+  implicit def TreeCoJoin: CoJoin[Tree] = new CoJoin[Tree] {
+    def coJoin[A] = a => a.cobind(identity(_))
+  }
+
 }

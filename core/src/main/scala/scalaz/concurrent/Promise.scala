@@ -211,4 +211,13 @@ trait Promises {
 
   implicit def PromiseMonad(implicit s: Strategy): Monad[Promise] =
     Monad.monadBP
+
+  implicit def PromiseCoPointed: CoPointed[Promise] = new CoPointed[Promise] {
+    def coPoint[A] = a => a.get
+  }
+
+  implicit def PromiseCoJoin: CoJoin[Promise] = new CoJoin[Promise] {
+    def coJoin[A] = a => promise(a)(a.strategy)
+  }
+
 }

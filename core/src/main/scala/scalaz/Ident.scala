@@ -52,4 +52,14 @@ trait Idents {
   implicit val IdentApplicative: Applicative[Ident] = IdentMonad.applicative
 
   implicit val IdentJoin: Join[Ident] = IdentMonad.join
+
+  implicit def IdentCoPointed: CoPointed[Ident] = new CoPointed[Ident] {
+    def coPoint[A] = a => a.value
+  }
+
+  implicit def IdentCoJoin: CoJoin[Ident] = new CoJoin[Ident] {
+    def coJoin[A] = a => Ident.ident(a)
+  }
+
+
 }

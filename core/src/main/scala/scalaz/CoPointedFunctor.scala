@@ -23,4 +23,7 @@ trait CoPointedFunctors {
 
   implicit def MapEntryCoPointedFunctor[X]: CoPointedFunctor[({type λ[α] = Entry[X, α]})#λ] =
     coPointedFunctor[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def Tuple2CoPointedFunctor[X]: CoPointedFunctor[({type λ[α] = Tuple2[X, α]})#λ] =
+    coPointedFunctor[({type λ[α] = Tuple2[X, α]})#λ]
 }

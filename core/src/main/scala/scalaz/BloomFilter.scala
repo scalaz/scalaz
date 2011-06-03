@@ -64,18 +64,26 @@ sealed trait BloomFilter {
 }
 
 object BloomFilter extends BloomFilters {
-  def apply(invariants: => BloomFilter): Int => Int => BloomFilter =
-    bloomFilter(invariants)
+  def apply(badSize: => BloomFilter, badElements: => BloomFilter): Int => Int => BloomFilter =
+    bloomFilter(badSize, badElements)
 }
 
 trait BloomFilters {
-  def bloomFilter(invariants: => BloomFilter): Int => Int => BloomFilter =
+  def bloomFilterA: Int => Int => BloomFilter =
+    bloomFilterE(sys.error("size and elements invariants were not met"))
+
+  def bloomFilterE(bad: => BloomFilter): Int => Int => BloomFilter =
+    bloomFilter(bad, bad)
+
+  def bloomFilter(badSize: => BloomFilter, badElements: => BloomFilter): Int => Int => BloomFilter =
     s => e =>
-      if (s > 0 && e > 0)
+      if(s <= 0)
+        badSize
+      else if(e <= 0)
+        badElements
+      else
         new BloomFilter {
           val size = s
           val expectedElements = e
         }
-      else
-        invariants
 }

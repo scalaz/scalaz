@@ -335,4 +335,12 @@ trait Zippers {
       _ map f
   }
 
+  implicit def ZipperCoPointed: CoPointed[Zipper] = new CoPointed[Zipper] {
+    def coPoint[A] = a => a.focus
+  }
+
+  implicit def ZipperCoJoin: CoJoin[Zipper] = new CoJoin[Zipper] {
+    def coJoin[A] = a => a.positions
+  }
+
 }
