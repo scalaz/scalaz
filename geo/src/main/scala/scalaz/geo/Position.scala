@@ -18,7 +18,7 @@ object Position {
   import Show._
   import Equal._
   import Order._
-  import data.*->*->*._
+  import *->*->*._
 
   implicit def PositionShow: Show[Position] = showBy(((_: Position).coord) &&& ((_: Position).elevation))
 

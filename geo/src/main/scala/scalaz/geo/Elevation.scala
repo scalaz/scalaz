@@ -16,7 +16,7 @@ object Elevation {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def ElevationShow: Show[Elevation] = shows(_.value.shows + "m")
 

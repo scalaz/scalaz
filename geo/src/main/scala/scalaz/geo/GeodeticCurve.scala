@@ -20,7 +20,7 @@ object GeodeticCurve {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def GeodeticCurveShow: Show[GeodeticCurve] = shows(c => "[" + c.ellipsoidalDistance.shows + " " + c.azi.shows + " " + c.reverseAzi.shows + "]")
 

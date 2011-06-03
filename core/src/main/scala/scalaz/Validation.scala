@@ -145,24 +145,56 @@ object FailProjection {
   implicit def FailProjectionOrder[E: Order, A: Order]: Order[FailProjection[E, A]] =
     Order.orderBy(_.validation)
 
-  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[X, α]})#λ] =
-    implicitly[Functor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
+      def fmap[A, B](f: A => B) =
+        r => (r.validation match {
+          case Success(a) => Success[B, X](a)
+          case Failure(e) => Failure[B, X](f(e))
+        }).fail
+    }
 
-  implicit def FailProjectionPointed[X]: Pointed[({type λ[α] = FailProjection[X, α]})#λ] = 
-    implicitly[Pointed[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionPointed[X]: Pointed[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Pointed[({type λ[α] = FailProjection[α, X]})#λ] {
+      def point[A](a: => A) =
+        Failure(a).fail
+    }
 
-  implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[X, α]})#λ] =
-    implicitly[PointedFunctor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
-  implicit def FailProjectionApplic[X: Semigroup]: Applic[({type λ[α] = FailProjection[X, α]})#λ] =
-    implicitly[Applic[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionApplic[X]: Applic[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Applic[({type λ[α] = FailProjection[α, X]})#λ] {
+      def applic[A, B](f: FailProjection[A => B, X]) =
+        a =>
+          ((f.validation, a.validation) match {
+            case (Success(x1), Success(_)) => Success[B, X](x1)
+            case (Success(x1), Failure(_)) => Success[B, X](x1)
+            case (Failure(_), Success(x2)) => Success[B, X](x2)
+            case (Failure(f), Failure(e))  => Failure[B, X](f(e))
+          }).fail
+    }
 
-  implicit def FailProjectionApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = FailProjection[X, α]})#λ] =
-    implicitly[ApplicFunctor[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionBind[X]: Bind[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Bind[({type λ[α] = FailProjection[α, X]})#λ] {
+      def bind[A, B](f: A => FailProjection[B, X]) =
+        r => r.validation match {
+          case Success(a) => Success[B, X](a).fail
+          case Failure(e) => f(e)
+        }
+    }
 
-  implicit def FailProjectionApplicative[X: Semigroup]: Applicative[({type λ[α] = FailProjection[X, α]})#λ] =
-    implicitly[Applicative[({type λ[α] = Validation[X, α]})#λ]].deriving[({type λ[α] = FailProjection[X, α]})#λ]
+  implicit def FailProjectionBindFunctor[X]: BindFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    BindFunctor.bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
+  implicit def FailProjectionApplicFunctor[X]: ApplicFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+
+  implicit def FailProjectionApplicative[X]: Applicative[({type λ[α] = FailProjection[α, X]})#λ] =
+    Applicative.applicative[({type λ[α] = FailProjection[α, X]})#λ]
+
+  implicit def FailProjectionMonad[X]: Monad[({type λ[α] = FailProjection[α, X]})#λ] =
+    Monad.monadBP[({type λ[α] = FailProjection[α, X]})#λ]
 }
 
 import ~>._

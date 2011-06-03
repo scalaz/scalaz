@@ -43,18 +43,6 @@ object ExampleState {
         case Branch(left, right) => for {l <- left.numberSM
                                          r <- right.numberSM} yield Branch(l, r)
       }
-
-      /**
-       * As above, but using State as an Applicative Functor rather than as a Monad.
-       * This is possible as the generators in the for comprehension above are independent.
-       * Note the correspondence between `<* modify` and `_ <- modify`.
-       */
-      def numberSA: State[Int, Tree[(A, Int)]] = this match {
-        case Leaf(x) => (get[Int] <* modify((_: Int) + 1)) ∘ {
-          s: Int => Leaf((x, s))
-        }
-        case Branch(left, right) => left.numberSA.<**>(right.numberSA)(Branch.apply)
-      }
     }
 
     final case class Leaf[A](a: A) extends Tree[A]
@@ -66,6 +54,5 @@ object ExampleState {
     val tree = Branch(Leaf("one"), Branch(Leaf("two"), Leaf("three")))
     tree.number(1)._1 assert_=== Branch(Leaf(("one", 1)), Branch(Leaf(("two", 2)), Leaf(("three", 3))))
     tree.numberSM eval 1 assert_=== tree.number(1)._1
-    tree.numberSA eval 1 assert_=== tree.number(1)._1
   }
 }

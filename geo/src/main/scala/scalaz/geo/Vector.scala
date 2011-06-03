@@ -18,7 +18,7 @@ object Vector {
   import Show._
   import Equal._
   import Order._
-  import data.*->*->*._
+  import *->*->*._
 
   implicit def VectorShow: Show[Vector] = showBy(((_: Vector).coord) &&& ((_: Vector).bearing))
 

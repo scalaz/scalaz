@@ -16,7 +16,7 @@ object Bearing {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def BearingShow: Show[Bearing] = shows(_.value.shows + "°")
 

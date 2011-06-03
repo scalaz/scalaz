@@ -16,7 +16,7 @@ object Longitude {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def LongitudeShow: Show[Longitude] = shows(_.value.shows + "°")
 

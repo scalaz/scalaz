@@ -20,7 +20,7 @@ object Latitude {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
 

@@ -16,7 +16,7 @@ object Azimuth {
   import Show._
   import Equal._
   import Order._
-  import data.*._
+  import *._
 
   implicit def AzimuthShow: Show[Azimuth] = shows(_.value.shows + "°")
 

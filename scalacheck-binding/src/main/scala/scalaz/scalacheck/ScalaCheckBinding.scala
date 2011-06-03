@@ -10,7 +10,7 @@ object ScalaCheckBinding extends ScalaCheckBindings
  */
 trait ScalaCheckBindings {
 
-  import data.*._
+  import *._
   import Semigroup._
   import org.scalacheck.{Gen, Arbitrary}
   import Gen.{sized, value}

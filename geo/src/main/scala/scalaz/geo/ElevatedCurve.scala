@@ -24,7 +24,7 @@ object ElevatedCurve {
   import Show._
   import Equal._
   import Order._
-  import data.*->*->*._
+  import *->*->*._
 
   implicit def ElevatedCurveShow: Show[ElevatedCurve] = showBy(((_: ElevatedCurve).curve) &&& ((_: ElevatedCurve).elevation))
 
