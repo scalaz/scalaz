@@ -21,7 +21,7 @@ trait Foldable[F[_]] {
 
 object Foldable extends Foldables
 
-trait Foldables {
+trait Foldables extends FoldablesLow {
   def foldable[F[_]](implicit r: Foldr[F], l: Foldl[F]): Foldable[F] = new Foldable[F] {
     val foldr = r
     val foldl = l
@@ -35,4 +35,9 @@ trait Foldables {
 
   implicit val OptionFoldable: Foldable[Option] =
     foldable[Option]
+}
+
+trait FoldablesLow {
+  implicit def TraversableFoldable[CC[X] <: Traversable[X]]: Foldable[CC] =
+    Foldable.foldable
 }

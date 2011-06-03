@@ -4,6 +4,7 @@ package scalaz
 object ImplicitConversionTest {
 
   import Scalaz._
+  import newtypes._
   import Predef.{implicitly => i}
 
   def Kinds[A, B, C, D, E, F, G, H] {
@@ -143,7 +144,7 @@ object ImplicitConversionTest {
     i[Pointed[Vector]]
   }
 
-  def foldRight[A] {
+  def foldable[A] {
     i[Foldable[Stream]]
     i[Foldable[List]]
     i[Foldable[Set]]
