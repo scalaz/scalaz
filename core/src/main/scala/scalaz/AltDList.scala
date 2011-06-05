@@ -128,7 +128,7 @@ sealed trait AltDList[A] {
 
   def apply(as: List[A]): List[A] = {
     val x = pre.foldLeft(as)((l, f) => f(l))
-    post.foldRight(x)((f, l) => f(l))
+    post.reverse.foldLeft(x)((l, f) => f(l))
   }
 
   def toList: List[A] = apply(Nil)
