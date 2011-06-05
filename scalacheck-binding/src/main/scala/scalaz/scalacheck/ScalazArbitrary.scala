@@ -114,6 +114,10 @@ object ScalazArbitrary {
     Gen.sized(fingerTree[A] _)
   }
 
+  implicit def AltDListArbitrary[A](implicit a: Arbitrary[A]) = Arbitrary {
+    Gen.sized(n => listOfN(n, arbitrary[A]) map (xs => xs.foldLeft(AltDList.empty[A])(_ ::> _)))
+  }
+
   import FingerTree.ft2ftip
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
     FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]) ∘ (rope[A](_))
