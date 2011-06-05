@@ -141,17 +141,17 @@ sealed trait AltDList[A] {
   }
 
   def ::(a: A): AltDList[A] = new AltDList[A] {
-    val pre = AltDList.this.in
+    val pre = AltDList.this.pre
     val post = ((xs: List[A]) => a :: xs) :: AltDList.this.post
   }
 
   def ::>(a: A): AltDList[A] = new AltDList[A] {
-    val pre = ((xs: List[A]) => a :: xs) :: AltDList.this.in
+    val pre = ((xs: List[A]) => a :: xs) :: AltDList.this.pre
     val post = AltDList.this.post
   }
 
   def :::(as: AltDList[A]): AltDList[A] = new AltDList[A] {
-    val pre = (AltDList.this.in ::: AltDList.this.post.reverse) ::: as.in
+    val pre = (AltDList.this.pre ::: AltDList.this.post.reverse) ::: as.pre
     val post = as.post
   }
 
