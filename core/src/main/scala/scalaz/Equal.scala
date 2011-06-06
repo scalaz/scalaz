@@ -20,7 +20,12 @@ trait Equals {
   def equalC[A](f: (A, A) => Boolean): Equal[A] =
     equal(a1 => a2 => f(a1, a2))
 
-  def equalA[A]: Equal[A] = new Equal[A] {
+  private trait NaturalEqual
+
+  /**
+   * Constructs an `Equal` instance for type `A` based on `Any.==`.
+   */
+  def equalA[A]: Equal[A] = new Equal[A] with NaturalEqual {
     val equal = (a1: A) => (a2: A) => a1 == a2
   }
 
@@ -71,7 +76,7 @@ trait Equals {
 
   implicit def NodeSeqEqual: Equal[xml.NodeSeq] = equalA
 
-  implicit def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] =
+  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] =
     equal(a1 => a2 => {
       val i1 = a1.iterator
       val i2 = a2.iterator
@@ -151,24 +156,6 @@ trait Equals {
       case _ => false
     }
 
-  implicit def SetEqual[CC[A] <: collection.Set[A], A: Equal]: Equal[CC[A]] =
-    equalC((a1, a2) => {
-      val i1 = a1.iterator
-      val i2 = a2.iterator
-      var b = false
-
-      while (i1.hasNext && i2.hasNext && !b) {
-        val x1 = i1.next
-        val x2 = i2.next
-
-        if (implicitly[Equal[A]].unequal(x1)(x2)) {
-          b = true
-        }
-      }
-
-      !(b || i1.hasNext || i2.hasNext)
-    })
-
   implicit def MapEqual[CC[K, V] <: collection.Map[K, V], A: Equal, B: Equal]: Equal[CC[A, B]] =
     equalBy(_.toSet)
 
@@ -200,5 +187,25 @@ trait Equals {
 
   implicit def CallableEqual[A: Equal]: Equal[java.util.concurrent.Callable[A]] =
     equalBy(_.call)
+
+  implicit def TraversableEqual[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf, A: Equal]: Equal[CC[A]] = equalC(
+    (a, b) => {
+      implicitly[Equal[A]] match {
+        case eq: NaturalEqual =>
+          // Performance optimisation.
+          a == b
+        case _ =>
+          // This is an inefficient, but general, way to implement equality with respect to the element equality for an unknown
+          // collection type CC with respect to a non-natural equality.
+          implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, A]
+          case class EqualWrap[A: Equal](a: A) {
+            override def equals(other: Any) = other match {
+              case EqualWrap(b) => implicitly[Equal[A]].equal(a)(b.asInstanceOf[A])
+              case _            => false
+            }
+          }
+          a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
+      }
+    })
 
 }
