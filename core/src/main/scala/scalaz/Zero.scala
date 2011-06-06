@@ -83,7 +83,7 @@ trait Zeros extends ZerosLow {
   implicit def ArraySeqZero[A: Manifest]: Zero[ArraySeq[A]] =
     zero(new ArraySeq[A](0))
 
-  implicit def EitherLeftZero[A, B](implicit bz: Zero[B]): Zero[Either.LeftProjection[A, B]] =
+  implicit def EitherLeftZero[A, B: Zero]: Zero[Either.LeftProjection[A, B]] =
     zero(Right(implicitly[Zero[B]].zero).left)
 
   implicit def EitherRightZero[A: Zero, B]: Zero[Either.RightProjection[A, B]] =

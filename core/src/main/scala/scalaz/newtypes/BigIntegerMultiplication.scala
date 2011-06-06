@@ -16,7 +16,7 @@ trait BigIntegerMultiplications {
     })
 
   implicit def BigIntegerMultiplicationZero: Zero[BigIntegerMultiplication] =
-    Zero.zero(implicitly[^*^[BigIntegerMultiplication, BigInteger]].pack(java.math.BigInteger.valueOf(0)))
+    Zero.zero(implicitly[^*^[BigIntegerMultiplication, BigInteger]].pack(java.math.BigInteger.valueOf(1)))
 
   implicit def BigIntegerMultiplicationSemigroup: Semigroup[BigIntegerMultiplication] = new Semigroup[BigIntegerMultiplication] {
     def append(a1: BigIntegerMultiplication, a2: => BigIntegerMultiplication) =

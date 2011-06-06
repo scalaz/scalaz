@@ -70,10 +70,10 @@ trait Monoids extends MonoidsLow {
   implicit val BigIntMonoid: Monoid[BigInt] =
     monoid
 
-  implicit def OptionMonoid[A]: Monoid[Option[A]] = {
-    implicit val s = implicitly[Monoid[Option[A]]].semigroup
-    implicit val z = implicitly[Monoid[Option[A]]].zero
-    monoid[Option[A]]
+  implicit def OptionMonoid[A: Monoid]: Monoid[Option[A]] = {
+    implicit val s = implicitly[Monoid[A]].semigroup
+    implicit val z = implicitly[Monoid[A]].zero
+    monoid
   }
 
   implicit def ArrayMonoid[A: Manifest]: Monoid[Array[A]] =
@@ -82,8 +82,7 @@ trait Monoids extends MonoidsLow {
   implicit def ArraySeqMonoid[A: Manifest]: Monoid[ArraySeq[A]] =
     monoid
 
-  implicit def EitherLeftMonoid[A, B](implicit bz: Monoid[B]): Monoid[Either.LeftProjection[A, B]] = {
-    implicit val z = implicitly[Monoid[B]].zero
+  implicit def EitherLeftMonoid[A, B](implicit bz: Zero[B]): Monoid[Either.LeftProjection[A, B]] = {
     monoid[Either.LeftProjection[A, B]]
   }
 

@@ -130,11 +130,19 @@ trait Equals {
     }
 
 
-  implicit def EitherLeftEqual[A: Equal, B: Equal]: Equal[Either.LeftProjection[A, B]] =
-    implicitly[Equal[Either[A, B]]] contramap (_.e)
+  implicit def EitherLeftEqual[A: Equal, B]: Equal[Either.LeftProjection[A, B]] =
+    equal(a => b =>
+      (a.toOption, b.toOption) match {
+        case (Some(a1), Some(a2)) => implicitly[Equal[A]].equal(a1)(a2)
+        case (a1, a2) => a1.isDefined == a2.isDefined
+      })
 
-  implicit def EitherRightEqual[A: Equal, B: Equal]: Equal[Either.RightProjection[A, B]] =
-    implicitly[Equal[Either[A, B]]] contramap (_.e)
+  implicit def EitherRightEqual[A, B: Equal]: Equal[Either.RightProjection[A, B]] =
+    equal(a => b =>
+      (a.toOption, b.toOption) match {
+        case (Some(a1), Some(a2)) => implicitly[Equal[B]].equal(a1)(a2)
+        case (a1, a2) => a1.isDefined == a2.isDefined
+      })
 
   implicit def EitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] =
     equalC {
