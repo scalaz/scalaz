@@ -1,10 +1,9 @@
 package scalaz
 
 sealed trait BloomFilter {
+  import scala.math._
   val size: Int
   val expectedElements: Int
-
-  import scala.math._
 
   private[this] val bitArray = new BitArray(size)
   private[this] val k = ceil((bitArray.size / expectedElements) * log(2.0)).toInt
@@ -83,7 +82,7 @@ trait BloomFilters {
         badElements
       else
         new BloomFilter {
-          val size = s
-          val expectedElements = e
+          lazy val size = s
+          lazy val expectedElements = e
         }
 }
