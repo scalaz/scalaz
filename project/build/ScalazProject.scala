@@ -159,7 +159,7 @@ import org.scalacheck.Prop._
 
     def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
 
-    val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
+    val sxr = "lib" / "sxr_2.9.0-0.2.7.jar"
 
     override def documentOptions =
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
