@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/LazyTuple.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LazyTuple2[A, B] extends java.lang.Object" id="15110">LazyTuple2</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20681">A</a>,<a title="&gt;: Nothing &lt;: Any" id="20682">B</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="274735">_1</a>: <a href="#20681" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="274736">_2</a>: <a href="#20682" title="B">B</a>
+<span class="delimiter">}</span>
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LazyTuple3[A, B, C] extends java.lang.Object" id="15113">LazyTuple3</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20683">A</a>,<a title="&gt;: Nothing &lt;: Any" id="20684">B</a>,<a title="&gt;: Nothing &lt;: Any" id="20685">C</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="274803">_1</a>: <a href="#20683" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="274804">_2</a>: <a href="#20684" title="B">B</a>
+  <span class="keyword">def</span> <a title="=&gt; C" id="274805">_3</a>: <a href="#20685" title="C">C</a>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait LazyTuple4[A, B, C, D] extends java.lang.Object" id="15116">LazyTuple4</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20686">A</a>,<a title="&gt;: Nothing &lt;: Any" id="20687">B</a>,<a title="&gt;: Nothing &lt;: Any" id="20688">C</a>,<a title="&gt;: Nothing &lt;: Any" id="20689">D</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="274746">_1</a>: <a href="#20686" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="274747">_2</a>: <a href="#20687" title="B">B</a>
+  <span class="keyword">def</span> <a title="=&gt; C" id="274748">_3</a>: <a href="#20688" title="C">C</a>
+  <span class="keyword">def</span> <a title="=&gt; D" id="274749">_4</a>: <a href="#20689" title="D">D</a>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait LazyTuples extends java.lang.Object with ScalaObject" id="15128">LazyTuples</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[A, B]scalaz.LazyTuple2[A,B]" id="38521">:&amp;:</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="38522">A</a>,<a title="&gt;: Nothing &lt;: Any" id="38523">B</a><span class="delimiter">]</span> = <a href="#15110" title="scalaz.LazyTuple2[A,B]">LazyTuple2</a><span class="delimiter">[</span>A,B<span class="delimiter">]</span>
+
+  <span class="keyword">def</span> <a title="[A, B](a: =&gt; A, b: =&gt; B)java.lang.Object with LazyTuples.this.:&amp;:[A,B]" id="38524">lazyTuple</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="38527">A</a>,<a title="&gt;: Nothing &lt;: Any" id="38528">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="274844">a</a>: =&gt; A, <a title="=&gt; B" id="274845">b</a>: =&gt; B<span class="delimiter">)</span> = <a href="#274848" title="java.lang.Object with LazyTuples.this.:&amp;:[A,B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with LazyTuples.this.:&amp;:[A,B]" id="274848" class="delimiter">(</a>A <a href="#15110" title="LazyTuples.this.:&amp;:[A,B]">:&amp;:</a> B<span class="delimiter">)</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="=&gt; A" id="274850">_1</a> = <a href="#274844" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="274851">_2</a> = <a href="#274845" title="=&gt; B">b</a>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="[A, B, C](a: =&gt; A, b: =&gt; B, c: =&gt; C)java.lang.Object with scalaz.LazyTuple3[A,B,C]" id="38529">lazyTuple</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="38533">A</a>,<a title="&gt;: Nothing &lt;: Any" id="38534">B</a>,<a title="&gt;: Nothing &lt;: Any" id="38535">C</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="274797">a</a>: =&gt; A, <a title="=&gt; B" id="274798">b</a>: =&gt; B, <a title="=&gt; C" id="274799">c</a>: =&gt; C<span class="delimiter">)</span> = <a href="#274802" title="java.lang.Object with scalaz.LazyTuple3[A,B,C]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LazyTuple3[A,B,C]" id="274802">LazyTuple3</a><span class="delimiter">[</span>A,B,C<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="=&gt; A" id="274807">_1</a> = <a href="#274797" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="274808">_2</a> = <a href="#274798" title="=&gt; B">b</a>
+    <span class="keyword">def</span> <a title="=&gt; C" id="274809">_3</a> = <a href="#274799" title="=&gt; C">c</a>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="[A, B, C, D](a: =&gt; A, b: =&gt; B, c: =&gt; C, d: =&gt; D)java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" id="38536">lazyTuple</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="38541">A</a>,<a title="&gt;: Nothing &lt;: Any" id="38542">B</a>,<a title="&gt;: Nothing &lt;: Any" id="38543">C</a>,<a title="&gt;: Nothing &lt;: Any" id="38544">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="274739">a</a>: =&gt; A, <a title="=&gt; B" id="274740">b</a>: =&gt; B, <a title="=&gt; C" id="274741">c</a>: =&gt; C, <a title="=&gt; D" id="274742">d</a>: =&gt; D<span class="delimiter">)</span> = <a href="#274745" title="java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" id="274745">LazyTuple4</a><span class="delimiter">[</span>A,B,C,D<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="=&gt; A" id="274751">_1</a> = <a href="#274739" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="274752">_2</a> = <a href="#274740" title="=&gt; B">b</a>
+    <span class="keyword">def</span> <a title="=&gt; C" id="274753">_3</a> = <a href="#274741" title="=&gt; C">c</a>
+    <span class="keyword">def</span> <a title="=&gt; D" id="274754">_4</a> = <a href="#274742" title="=&gt; D">d</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

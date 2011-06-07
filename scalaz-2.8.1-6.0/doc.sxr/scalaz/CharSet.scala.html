@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/CharSet.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait CharSet extends java.lang.Object" id="10163">CharSet</a> <a title="java.lang.Object" id="2744">{</a>
+  <span class="keyword">val</span> <a title="=&gt; String" id="57332">value</a>: <span title="String">String</span>
+}
+
+<span class="keyword">trait</span> <a title="trait CharSets extends java.lang.Object with ScalaObject" id="10169">CharSets</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(v: String)scalaz.CharSet" id="33952">charset</a>(<a title="String" id="107111">v</a>: <span title="String">String</span>): <a href="#10163" title="scalaz.CharSet">CharSet</a> = <a href="#107120" title="java.lang.Object with scalaz.CharSet{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.CharSet" id="107120">CharSet</a> {
+    <span class="keyword">val</span> <a title="String" id="107124">value</a> = <a href="#107111" title="String">v</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.CharSets.CharSetFrom : (charSet: scalaz.CharSet)String" id="33953">CharSetFrom</a>(<a title="scalaz.CharSet" id="56765">charSet</a>:<a href="#10163" title="scalaz.CharSet">CharSet</a>): <span title="String">String</span> = <a href="#56765" title="scalaz.CharSet">charSet</a>.<a href="#57332" title="=&gt; String">value</a>
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33954">USASCII</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;US-ASCII&quot;)" class="string">&quot;US-ASCII&quot;</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33956">ISO8859</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;ISO-8859-1&quot;)" class="string">&quot;ISO-8859-1&quot;</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33958">UTF8</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;UTF-8&quot;)" class="string">&quot;UTF-8&quot;</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33960">UTF16BE</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;UTF-16BE&quot;)" class="string">&quot;UTF-16BE&quot;</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33962">UTF16LE</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;UTF-16LE&quot;)" class="string">&quot;UTF-16LE&quot;</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.CharSet" id="33964">UTF16</a> = <a href="#33952" title="(v: String)scalaz.CharSet">charset</a>(<span title="java.lang.String(&quot;UTF-16&quot;)" class="string">&quot;UTF-16&quot;</span>)
+}
+
+        </pre>
+    </body>
+</html>

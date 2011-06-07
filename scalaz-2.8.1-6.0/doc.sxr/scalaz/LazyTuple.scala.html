@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/LazyTuple.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LazyTuple2[A, B] extends java.lang.Object" id="16142">LazyTuple2</a>[<a title="&gt;: Nothing &lt;: Any" id="21719">A</a>,<a title="&gt;: Nothing &lt;: Any" id="21720">B</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="214124">_1</a>: <a href="#21719" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="214125">_2</a>: <a href="#21720" title="B">B</a>
+}
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LazyTuple3[A, B, C] extends java.lang.Object" id="16145">LazyTuple3</a>[<a title="&gt;: Nothing &lt;: Any" id="21721">A</a>,<a title="&gt;: Nothing &lt;: Any" id="21722">B</a>,<a title="&gt;: Nothing &lt;: Any" id="21723">C</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="214192">_1</a>: <a href="#21721" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="214193">_2</a>: <a href="#21722" title="B">B</a>
+  <span class="keyword">def</span> <a title="=&gt; C" id="214194">_3</a>: <a href="#21723" title="C">C</a>
+}
+
+<span class="keyword">trait</span> <a title="trait LazyTuple4[A, B, C, D] extends java.lang.Object" id="16148">LazyTuple4</a>[<a title="&gt;: Nothing &lt;: Any" id="21724">A</a>,<a title="&gt;: Nothing &lt;: Any" id="21725">B</a>,<a title="&gt;: Nothing &lt;: Any" id="21726">C</a>,<a title="&gt;: Nothing &lt;: Any" id="21727">D</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="=&gt; A" id="214135">_1</a>: <a href="#21724" title="A">A</a>
+  <span class="keyword">def</span> <a title="=&gt; B" id="214136">_2</a>: <a href="#21725" title="B">B</a>
+  <span class="keyword">def</span> <a title="=&gt; C" id="214137">_3</a>: <a href="#21726" title="C">C</a>
+  <span class="keyword">def</span> <a title="=&gt; D" id="214138">_4</a>: <a href="#21727" title="D">D</a>
+}
+
+<span class="keyword">trait</span> <a title="trait LazyTuples extends java.lang.Object with ScalaObject" id="16160">LazyTuples</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">type</span> <a title="[A, B]scalaz.LazyTuple2[A,B]" id="34147">:&amp;:</a>[<a title="&gt;: Nothing &lt;: Any" id="34148">A</a>,<a title="&gt;: Nothing &lt;: Any" id="34149">B</a>] = <a href="#16142" title="scalaz.LazyTuple2[A,B]">LazyTuple2</a>[A,B]
+
+  <span class="keyword">def</span> <a title="[A, B](a: =&gt; A,b: =&gt; B)java.lang.Object with LazyTuples.this.:&amp;:[A,B]" id="34150">lazyTuple</a>[<a title="&gt;: Nothing &lt;: Any" id="34153">A</a>,<a title="&gt;: Nothing &lt;: Any" id="34154">B</a>](<a title="=&gt; A" id="214233">a</a>: =&gt; A, <a title="=&gt; B" id="214234">b</a>: =&gt; B) = <a href="#214237" title="java.lang.Object with LazyTuples.this.:&amp;:[A,B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with LazyTuples.this.:&amp;:[A,B]" id="214237">(</a>A <a href="#16142" title="LazyTuples.this.:&amp;:[A,B]">:&amp;:</a> B) {
+    <span class="keyword">def</span> <a title="=&gt; A" id="214239">_1</a> = <a href="#214233" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="214240">_2</a> = <a href="#214234" title="=&gt; B">b</a>
+  }
+
+  <span class="keyword">def</span> <a title="[A, B, C](a: =&gt; A,b: =&gt; B,c: =&gt; C)java.lang.Object with scalaz.LazyTuple3[A,B,C]" id="34155">lazyTuple</a>[<a title="&gt;: Nothing &lt;: Any" id="34159">A</a>,<a title="&gt;: Nothing &lt;: Any" id="34160">B</a>,<a title="&gt;: Nothing &lt;: Any" id="34161">C</a>](<a title="=&gt; A" id="214186">a</a>: =&gt; A, <a title="=&gt; B" id="214187">b</a>: =&gt; B, <a title="=&gt; C" id="214188">c</a>: =&gt; C) = <a href="#214191" title="java.lang.Object with scalaz.LazyTuple3[A,B,C]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LazyTuple3[A,B,C]" id="214191">LazyTuple3</a>[A,B,C] {
+    <span class="keyword">def</span> <a title="=&gt; A" id="214196">_1</a> = <a href="#214186" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="214197">_2</a> = <a href="#214187" title="=&gt; B">b</a>
+    <span class="keyword">def</span> <a title="=&gt; C" id="214198">_3</a> = <a href="#214188" title="=&gt; C">c</a>
+  }
+
+  <span class="keyword">def</span> <a title="[A, B, C, D](a: =&gt; A,b: =&gt; B,c: =&gt; C,d: =&gt; D)java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" id="34162">lazyTuple</a>[<a title="&gt;: Nothing &lt;: Any" id="34167">A</a>,<a title="&gt;: Nothing &lt;: Any" id="34168">B</a>,<a title="&gt;: Nothing &lt;: Any" id="34169">C</a>,<a title="&gt;: Nothing &lt;: Any" id="34170">D</a>](<a title="=&gt; A" id="214128">a</a>: =&gt; A, <a title="=&gt; B" id="214129">b</a>: =&gt; B, <a title="=&gt; C" id="214130">c</a>: =&gt; C, <a title="=&gt; D" id="214131">d</a>: =&gt; D) = <a href="#214134" title="java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LazyTuple4[A,B,C,D]" id="214134">LazyTuple4</a>[A,B,C,D] {
+    <span class="keyword">def</span> <a title="=&gt; A" id="214140">_1</a> = <a href="#214128" title="=&gt; A">a</a>
+    <span class="keyword">def</span> <a title="=&gt; B" id="214141">_2</a> = <a href="#214129" title="=&gt; B">b</a>
+    <span class="keyword">def</span> <a title="=&gt; C" id="214142">_3</a> = <a href="#214130" title="=&gt; C">c</a>
+    <span class="keyword">def</span> <a title="=&gt; D" id="214143">_4</a> = <a href="#214131" title="=&gt; D">d</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

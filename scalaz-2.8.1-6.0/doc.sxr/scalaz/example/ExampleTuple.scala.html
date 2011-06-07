@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleTuple.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleTuple" id="24612">ExampleTuple</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="762964">main</a>(<a title="Array[String]" id="762969">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#762966" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="762966">run</a> {
+    <span class="keyword">val</span> <a title="(Int, Int, Int)" id="762974">t1</a> = <span title="(_1: Int,_2: Int,_3: Int)(Int, Int, Int)">(</span><span title="Int(1)" class="int">1</span>, <span title="Int(2)" class="int">2</span>, <span title="Int(3)" class="int">3</span>)
+
+    // Folding a TupleN with a FunctionN to a single value
+    <a href="../TupleW.scala.html#182704" title="(f: =&gt; (Int, Int, Int) =&gt; Int)Int">t1</a> <a href="../Identity.scala.html#43004" title="(b: Int)(implicit e: scalaz.Equal[Int],implicit s: scalaz.Show[Int],implicit ev: &lt;:&lt;[Int,Int])Unit">fold</a> (<a href="#763055" title="(x$1: Int)Int">_</a> <span title="(x$1: Int)Int">+</span> <a href="#763056" title="Int">_</a> + <a href="#763057" title="Int">_</a>) <a href="../Equal.scala.html#120131" title="=&gt; scalaz.Equal[Int]">assert_===</a> <span title="Int(6)" class="int">6</span>
+
+    // Map functions over the elements of a tuple to generate a new tuple.
+    //
+    // mapElements accepts as parameters N functions that are applied to respective elements of the TupleN to generate
+    // a new Tuple. The parameters are named identically to the member methods of TupleN, and default to the
+    // identity function.
+    <a href="../TupleW.scala.html#182710" title="(_1: (Int) =&gt; Int,_2: (Int) =&gt; Int,_3: (Int) =&gt; Int)(Int, Int, Int)">t1</a> <a href="../Identity.scala.html#43004" title="(b: (Int, Int, Int))(implicit e: scalaz.Equal[(Int, Int, Int)],implicit s: scalaz.Show[(Int, Int, Int)],implicit ev: &lt;:&lt;[(Int, Int, Int),(Int, Int, Int)])Unit">mapElements</a> (<a href="#763407" title="(x$1: Int)Int">_</a> * <span title="Int(2)" class="int">2</span>, <a href="#763414" title="(x$1: Int)Int">_</a> * <span title="Int(3)" class="int">3</span>, <a href="#763421" title="(x$1: Int)Int">_</a> * <span title="Int(4)" class="int">4</span>) <a href="../Equal.scala.html#120167" title="(_1: Int,_2: Int,_3: Int)(Int, Int, Int)">assert_===</a> (<span title="Int(2)" class="int">2</span>, <span title="Int(6)" class="int">6</span>, <span title="Int(12)" class="int">12</span>)
+    <a href="../TupleW.scala.html#35001" title="scalaz.Scalaz.Tuple3W[Int,Int,Int]" id="764400">t1</a> <a href="../Identity.scala.html#43004" title="(b: (Int, Int, java.lang.String))(implicit e: scalaz.Equal[(Int, Int, String)],implicit s: scalaz.Show[(Int, Int, String)],implicit ev: &lt;:&lt;[(Int, Int, java.lang.String),(Int, Int, String)])Unit">mapElements</a> (_3 = <a title="(n: Int)String" id="9107" class="string">&quot;x&quot;</a> <a title="(Int) =&gt; String" id="764398">*</a> <a href="#764352" title="Int">_</a>) <a href="../Equal.scala.html#120167" title="(_1: Int,_2: Int,_3: java.lang.String)(Int, Int, java.lang.String)">assert_===</a> (<span title="Int(1)" class="int">1</span>, <span title="Int(2)" class="int">2</span>, <span title="java.lang.String(&quot;xxx&quot;)" class="string">&quot;xxx&quot;</span>)
+
+    // Convert a TupleN to an IndexedSeq.
+    <span class="keyword">val</span> <a title="IndexedSeq[Int]" id="762975">t1Seq</a> = <a href="../TupleW.scala.html#35001" title="(t: (Int, Int, Int))scalaz.Scalaz.Tuple3W[Int,Int,Int]">t1</a>.<a href="../TupleW.scala.html#182707" title="(implicit ev: &lt;:&lt;[_1525.value.type,(Int, Int, Int)])IndexedSeq[Int]">toIndexedSeq</a>
+    <a href="../Identity.scala.html#43004" title="(b: IndexedSeq[Int])(implicit e: scalaz.Equal[IndexedSeq[Int]],implicit s: scalaz.Show[IndexedSeq[Int]],implicit ev: &lt;:&lt;[IndexedSeq[Int],IndexedSeq[Int]])Unit">t1Seq</a> <a href="../Equal.scala.html#120278" title="(implicit evidence$52: scalaz.CanBuildAnySelf[IndexedSeq],implicit evidence$53: scalaz.Equal[Int])scalaz.Equal[IndexedSeq[Int]]" id="7745">assert_===</a> <a title="(elems: Int*)IndexedSeq[Int]" id="1675">IndexedSeq</a>(<span title="Int(1)" class="int">1</span>, <span title="Int(2)" class="int">2</span>, <span title="Int(3)" class="int">3</span>)
+
+    // The Least Upper Bound of the tuple elements is preserved as the the static type of the IndexedSeq
+    // unlike Product#productIterator
+    <span class="keyword">val</span> <a title="(Int, Boolean)" id="762976">t2</a> = <a title="(_1: Int,_2: Boolean)(Int, Boolean)" id="634">(</a><span title="Int(1)" class="int">1</span>, <span title="Boolean(false)" class="keyword">false</span>)
+    <span class="keyword">val</span> <a title="(Int, java.lang.String, Boolean)" id="762977">t3</a> = <span title="(_1: Int,_2: java.lang.String,_3: Boolean)(Int, java.lang.String, Boolean)">(</span><span title="Int(1)" class="int">1</span>, <span title="java.lang.String(&quot;two&quot;)" class="string">&quot;two&quot;</span>, <span title="Boolean(false)" class="keyword">false</span>)
+
+    <span class="keyword">val</span> <a title="IndexedSeq[AnyVal]" id="762978">t2Seq</a> = <a href="../TupleW.scala.html#34992" title="(t: (Int, Boolean))scalaz.Scalaz.Tuple2W[Int,Boolean]">t2</a>.<a href="../TupleW.scala.html#86768" title="(implicit ev: &lt;:&lt;[_1526.value.type,(AnyVal, AnyVal)])IndexedSeq[AnyVal]">toIndexedSeq</a>
+    <span class="keyword">val</span> <a title="IndexedSeq[Any]" id="762979">t3Seq</a> = <a href="../TupleW.scala.html#35001" title="(t: (Int, java.lang.String, Boolean))scalaz.Scalaz.Tuple3W[Int,java.lang.String,Boolean]">t3</a>.<a href="../TupleW.scala.html#182707" title="(implicit ev: &lt;:&lt;[_1527.value.type,(Any, Any, Any)])IndexedSeq[Any]">toIndexedSeq</a>
+
+    <span title="[T](implicit e: T)T">implicitly</span><span title="(implicit e: &lt;:&lt;[t1Seq.type,IndexedSeq[Int]])&lt;:&lt;[t1Seq.type,IndexedSeq[Int]]">[</span>t1Seq.<span class="keyword">type</span> <span title="&lt;:&lt;[t1Seq.type,IndexedSeq[Int]]">&lt;:&lt;</span> IndexedSeq[Int]]
+    <span title="[T](implicit e: T)T">implicitly</span><span title="(implicit e: &lt;:&lt;[t2Seq.type,IndexedSeq[AnyVal]])&lt;:&lt;[t2Seq.type,IndexedSeq[AnyVal]]">[</span>t2Seq.<span class="keyword">type</span> <span title="&lt;:&lt;[t2Seq.type,IndexedSeq[AnyVal]]">&lt;:&lt;</span> IndexedSeq[AnyVal]]
+    <span title="[T](implicit e: T)T">implicitly</span><span title="(implicit e: &lt;:&lt;[t3Seq.type,IndexedSeq[Any]])&lt;:&lt;[t3Seq.type,IndexedSeq[Any]]">[</span>t3Seq.<span class="keyword">type</span> <span title="&lt;:&lt;[t3Seq.type,IndexedSeq[Any]]">&lt;:&lt;</span> IndexedSeq[Any]]
+  }
+}
+        </pre>
+    </body>
+</html>

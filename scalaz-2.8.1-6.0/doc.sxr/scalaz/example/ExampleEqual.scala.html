@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleEqual.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+/**
+ * Demonstrates how to write an assertion method that depends on Equal,
+ * how to provide Equal instances for your own types, and the many static
+ * errors you can catch when comparing apples and oranges.
+ */
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleEqual" id="23493">ExampleEqual</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408518">main</a>(<a title="Array[String]" id="600354">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#408520" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408520">run</a> {
+    <span class="keyword">class</span> <a title="class Fruit extends java.lang.Object with ScalaObject" id="600357">Fruit</a>
+    case <span class="keyword">class</span> <a title="class Apple extends Fruit with ScalaObject with Product" id="600842">Apple</a><span title="ScalaObject">(</span>) <span class="keyword">extends</span> <a href="#600357" title="Fruit">Fruit</a>
+    case <span class="keyword">class</span> <a title="class Orange extends Fruit with ScalaObject with Product" id="600837">Orange</a><span title="ScalaObject">(</span>) <span class="keyword">extends</span> <a href="#600357" title="Fruit">Fruit</a>
+
+    <span class="keyword">class</span> <a title="class Vehicle extends java.lang.Object with ScalaObject" id="600364">Vehicle</a>
+
+    <span class="keyword">def</span> <a title="[X](o1: X,o2: X)(implicit evidence$1: scalaz.Equal[X])Boolean" id="600443">checkEqual</a>[<a title="&gt;: Nothing &lt;: Any" id="600367">X</a>: Equal](<a title="X" id="600441">o1</a>: <a href="#600367" title="X">X</a>, <a title="X" id="600442">o2</a>: <a href="#600367" title="X">X</a>): <a title="Boolean" id="3781">Boolean</a> = <a href="../Identity.scala.html#43121" title="(a: X)(implicit e: scalaz.Equal[X])Boolean">o1</a> <a href="#600443" title="scalaz.Equal[X]">≟</a> <a href="#600442" title="X">o2</a>
+
+    // Case class equality is suitable, so expose it as a implicit instance of scalaz.Equal
+    // for Apple and Orange.
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[Apple]" id="600368">dogEqual</a> = <a href="../Equal.scala.html#34021" title="[A]scalaz.Equal[A]">equalA</a><span title="scalaz.Equal[Apple]">[</span><a href="#600842" title="Apple">Apple</a>]
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[Orange]" id="600369">catEqual</a> = <a href="../Equal.scala.html#34021" title="[A]scalaz.Equal[A]">equalA</a><span title="scalaz.Equal[Orange]">[</span><a href="#600837" title="Orange">Orange</a>]
+
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[Vehicle]" id="600370">vehicleToEqual</a> = <a href="../Equal.scala.html#34021" title="[A]scalaz.Equal[A]">equalA</a><span title="scalaz.Equal[Vehicle]">[</span><a href="#600364" title="Vehicle">Vehicle</a>]
+
+    <span title="(assertion: Boolean)Unit">assert</span>(<a href="../Identity.scala.html#43121" title="(a: Apple)(implicit e: scalaz.Equal[Apple])Boolean" class="keyword">new</a> <a href="#600842" title="Apple">Apple</a> <a href="#600368" title="=&gt; scalaz.Equal[Apple]">≟</a> <span title="Apple" class="keyword">new</span> <a href="#600842" title="Apple">Apple</a>)
+    <a href="#600443" title="(o1: Apple,o2: Apple)(implicit evidence$1: scalaz.Equal[Apple])Boolean">checkEqual</a><a href="#600368" title="=&gt; scalaz.Equal[Apple]">(</a><span title="Apple" class="keyword">new</span> <a href="#600842" title="Apple">Apple</a>, <span title="Apple" class="keyword">new</span> <a href="#600842" title="Apple">Apple</a>)
+
+    <span title="(assertion: Boolean)Unit">assert</span>(<a href="../Identity.scala.html#43121" title="(a: Orange)(implicit e: scalaz.Equal[Orange])Boolean" class="keyword">new</a> <a href="#600837" title="Orange">Orange</a> <a href="#600369" title="=&gt; scalaz.Equal[Orange]">≟</a> <span title="Orange" class="keyword">new</span> <a href="#600837" title="Orange">Orange</a>)
+    <a href="#600443" title="(o1: Orange,o2: Orange)(implicit evidence$1: scalaz.Equal[Orange])Boolean">checkEqual</a><a href="#600369" title="=&gt; scalaz.Equal[Orange]">(</a><span title="Orange" class="keyword">new</span> <a href="#600837" title="Orange">Orange</a>, <span title="Orange" class="keyword">new</span> <a href="#600837" title="Orange">Orange</a>)
+
+    //assert(new Fruit ≠ new Orange) // does not compile
+    //checkEqual(new Fruit, new Orange) // does not compile
+
+    //assert(new Orange ≠ new Fruit) // does not compile
+    //checkEqual(new Orange, new Fruit) // does not compile
+
+    //assert(new Apple ≠ new Orange) //does not compile
+    //checkEqual(new Apple, new Orange) //does not compile
+
+    //assert(new Apple ≠ new Vehicle) //does not compile
+    //checkEqual(new Apple, new Vehicle) //does not compile
+
+    //assert(new Fruit ≠ &quot;&quot;) //does not compile
+    //checkEqual(new Fruit, &quot;&quot;) //does not compile
+
+    <span title="(assertion: Boolean)Unit">assert</span>(<span title="(xs: Orange*)List[Orange]">List</span><a href="../Identity.scala.html#43121" title="(a: List[Orange])(implicit e: scalaz.Equal[List[Orange]])Boolean">(</a><span title="Orange" class="keyword">new</span> <a href="#600837" title="Orange">Orange</a>) <a href="../Equal.scala.html#120278" title="(implicit evidence$52: scalaz.CanBuildAnySelf[List],implicit evidence$53: scalaz.Equal[Orange])scalaz.Equal[List[Orange]]" id="32653">≟</a> <span title="(xs: Orange*)List[Orange]">List</span>(<span title="Orange" class="keyword">new</span> <a href="#600837" title="Orange">Orange</a>))
+
+    //assert(List(new Orange) ≟ List(new Apple)) //does not compile  
+  }
+}
+        </pre>
+    </body>
+</html>

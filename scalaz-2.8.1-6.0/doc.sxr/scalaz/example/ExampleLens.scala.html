@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleLens.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> Scalaz._
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleLens" id="23832">ExampleLens</a> <span title="ScalaObject">{</span>
+  case <span class="keyword">class</span> <a title="class Employee extends java.lang.Object with ScalaObject with Product" id="638219">Employee</a><span title="ScalaObject">(</span><a title="=&gt; String" id="637319">name</a>: <span title="String">String</span>, <a title="=&gt; Int" id="637320">salary</a>: <span title="Int">Int</span>)
+  <span class="keyword">val</span> <a title="scalaz.Lens[scalaz.example.ExampleLens.Employee,Int]" id="637287">salary</a>: <a href="../Lens.scala.html#16814" title="scalaz.Lens[scalaz.example.ExampleLens.Employee,Int]">Lens</a>[Employee, Int] = <a href="../Lens.scala.html#231696" title="(get: (scalaz.example.ExampleLens.Employee) =&gt; Int,set: (scalaz.example.ExampleLens.Employee, Int) =&gt; scalaz.example.ExampleLens.Employee)scalaz.Lens[scalaz.example.ExampleLens.Employee,Int]">Lens</a>(<a href="#637994" title="scalaz.example.ExampleLens.Employee">_</a>.<a href="#637320" title="=&gt; Int">salary</a>, (<a title="scalaz.example.ExampleLens.Employee" id="637996">e</a>, <a title="Int" id="637997">s</a><span title="Int">)</span> =&gt; <a href="#637319" title="String" id="638000">e</a> copy (salary = <a href="#637997" title="Int" id="637999">s</a>))
+  <span class="keyword">val</span> <a title="scalaz.Lens[scalaz.example.ExampleLens.Employee,String]" id="637289">name</a>: <a href="../Lens.scala.html#16814" title="scalaz.Lens[scalaz.example.ExampleLens.Employee,String]">Lens</a>[Employee, String] = <a href="../Lens.scala.html#231696" title="(get: (scalaz.example.ExampleLens.Employee) =&gt; String,set: (scalaz.example.ExampleLens.Employee, String) =&gt; scalaz.example.ExampleLens.Employee)scalaz.Lens[scalaz.example.ExampleLens.Employee,String]">Lens</a>(<a href="#638010" title="scalaz.example.ExampleLens.Employee">_</a>.<a href="#637319" title="=&gt; String">name</a>, (<a title="scalaz.example.ExampleLens.Employee" id="638012">e</a>, <a title="String" id="638013">n</a><span title="String">)</span> =&gt; <a href="#638219" title="(name: String,salary: Int)scalaz.example.ExampleLens.Employee">e</a> copy (name = <a href="#638013" title="String">n</a>))
+
+  <span class="keyword">val</span> <a title="(scalaz.example.ExampleLens.Employee) =&gt; scalaz.example.ExampleLens.Employee" id="637291">giveRaise</a>: Employee =&gt; Employee = <a href="../Lens.scala.html#231094" title="(a: scalaz.example.ExampleLens.Employee,f: (Int) =&gt; Int)scalaz.example.ExampleLens.Employee">salary</a> mod (<a href="#638019" title="scalaz.example.ExampleLens.Employee">_</a>, <a href="#638023" title="(x$1: Int)Int">_</a> + <span title="Int(100)" class="int">100</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.example.ExampleLens.Employee" id="637293">tom</a> = <a href="#638219" title="(name: String,salary: Int)scalaz.example.ExampleLens.Employee">Employee</a>(<span title="java.lang.String(&quot;Tom&quot;)" class="string">&quot;Tom&quot;</span>, <span title="Int(4000)" class="int">4000</span>)
+  <span class="keyword">val</span> <a title="scalaz.example.ExampleLens.Employee" id="637295">dick</a> = <a href="#638219" title="(name: String,salary: Int)scalaz.example.ExampleLens.Employee">Employee</a>(<span title="java.lang.String(&quot;Dick&quot;)" class="string">&quot;Dick&quot;</span>, <span title="Int(3000)" class="int">3000</span>)
+  <span class="keyword">val</span> <a title="scalaz.example.ExampleLens.Employee" id="637297">harry</a> = <a href="#638219" title="(name: String,salary: Int)scalaz.example.ExampleLens.Employee">Employee</a>(<span title="java.lang.String(&quot;Harry&quot;)" class="string">&quot;Harry&quot;</span>, <span title="Int(5000)" class="int">5000</span>)
+
+  <span class="keyword">val</span> <a title="scalaz.example.ExampleLens.Employee" id="637299">higherTom</a> = <a href="#637291" title="(v1: scalaz.example.ExampleLens.Employee)scalaz.example.ExampleLens.Employee" id="28871">giveRaise</a>(<a href="#637293" title="=&gt; scalaz.example.ExampleLens.Employee">tom</a>) // Employee(&quot;Tom&quot;, 4100)
+
+  <span class="keyword">val</span> <a title="(scalaz.example.ExampleLens.Employee, scalaz.example.ExampleLens.Employee)" id="637301">modBoth</a> = <a href="../Lens.scala.html#231094" title="(a: (scalaz.example.ExampleLens.Employee, scalaz.example.ExampleLens.Employee),f: ((Int, String)) =&gt; (Int, String))(scalaz.example.ExampleLens.Employee, scalaz.example.ExampleLens.Employee)">(</a><a href="../Lens.scala.html#231113" title="(that: scalaz.Lens[scalaz.example.ExampleLens.Employee,String])scalaz.Lens[(scalaz.example.ExampleLens.Employee, scalaz.example.ExampleLens.Employee),(Int, String)]">salary</a> *** <a href="#637289" title="=&gt; scalaz.Lens[scalaz.example.ExampleLens.Employee,String]">name</a>) mod (<span title="(_1: scalaz.example.ExampleLens.Employee,_2: scalaz.example.ExampleLens.Employee)(scalaz.example.ExampleLens.Employee, scalaz.example.ExampleLens.Employee)">(</span><a href="#637297" title="=&gt; scalaz.example.ExampleLens.Employee">harry</a>, <a href="#637293" title="=&gt; scalaz.example.ExampleLens.Employee">tom</a>), <a href="#637346" title="(Int, String)">{</a>
+    <span title="(Int, java.lang.String)" class="keyword">case</span> <a id="1">(</a><a title="Int" id="637349">s</a>, <a title="String" id="637350">n</a>) =&gt; <span title="(_1: Int,_2: java.lang.String)(Int, java.lang.String)">(</span><a href="#637349" title="(x$1: Int)Int">s</a> + <span title="Int(100)" class="int">100</span>, <a href="#637350" title="(x$1: Any)java.lang.String">n</a> + <span title="java.lang.String(&quot; Jones&quot;)" class="string">&quot; Jones&quot;</span>)
+  }) // (Employee(&quot;Harry&quot;, 5100), Employee(&quot;Tom Jones&quot;, 4000))  
+
+  <span class="keyword">val</span> <a title="scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee]" id="637303">modMonadically</a> = <span class="keyword">for</span> {
+    <a title="Int" id="637879">_</a> &lt;- <a href="../Lens.scala.html#236260" title="(that: Int)scalaz.State[scalaz.example.ExampleLens.Employee,Int]" id="30791">salary</a> <a href="../State.scala.html#42755" title="(f: (Int) =&gt; scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee])scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee]">+=</a> <span title="Int(100)" class="int">100</span>
+    <a title="String" id="637884">n</a> &lt;- <a href="../Lens.scala.html#231133" title="(f: (String) =&gt; scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee])scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee]">name</a>
+    <a title="Unit" id="637892">_</a> &lt;- <a href="../Lens.scala.html#231132" title="(b: String)scalaz.State[scalaz.example.ExampleLens.Employee,Unit]">name</a> <a href="../State.scala.html#42755" title="(f: (Unit) =&gt; scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee])scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee]">:=</a> <a href="#637884" title="(x$1: Any)java.lang.String">n</a> + <span title="java.lang.String(&quot; Jones&quot;)" class="string">&quot; Jones&quot;</span>
+    <a title="scalaz.example.ExampleLens.Employee" id="637898">e</a> &lt;- <a href="../State.scala.html#42752" title="(f: (scalaz.example.ExampleLens.Employee) =&gt; scalaz.example.ExampleLens.Employee)scalaz.State[scalaz.example.ExampleLens.Employee,scalaz.example.ExampleLens.Employee]">init</a>
+  } <span class="keyword">yield</span> <a href="#637898" title="scalaz.example.ExampleLens.Employee">e</a>
+
+  <span class="keyword">val</span> <a title="scalaz.example.ExampleLens.Employee" id="637305">tomJones</a> = <a href="../State.scala.html#42758" title="(s: scalaz.example.ExampleLens.Employee)scalaz.example.ExampleLens.Employee">modMonadically</a> ! <a href="#637293" title="=&gt; scalaz.example.ExampleLens.Employee">tom</a> // Employee(&quot;Tom Jones&quot;, 4100)
+  
+}
+
+        </pre>
+    </body>
+</html>

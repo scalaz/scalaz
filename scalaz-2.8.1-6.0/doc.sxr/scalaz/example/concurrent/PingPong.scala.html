@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/concurrent/PingPong.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> scalaz.concurrent._
+
+<span class="keyword">import</span> java.util.concurrent._
+<span class="keyword">import</span> scalaz.concurrent._
+<span class="keyword">import</span> scalaz.<a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">object</span> <a title="object scalaz.example.concurrent.PingPong" id="25101">PingPong</a> <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="Int" id="807114">actors</a> = <span title="Int(10000)" class="int">10000</span>
+  <span class="keyword">val</span> <a title="Int" id="807116">pings</a> = <span title="Int(3)" class="int">3</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="java.util.concurrent.ExecutorService" id="807118">pool</a> = <a title="object java.util.concurrent.Executors" id="38869">Executors</a>.<a title="(x$1: Int)java.util.concurrent.ExecutorService" id="398625">newFixedThreadPool</a>(<span title="Int(5)" class="int">5</span>)
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy" id="807120">s</a> = <a href="../../concurrent/Strategy.scala.html#22184" title="object scalaz.concurrent.Strategy">Strategy</a>.<a href="../../concurrent/Strategy.scala.html#90061" title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy">Executor</a>
+
+  <span class="keyword">class</span> <a title="class Pong extends java.lang.Object with ScalaObject" id="807122">Pong</a> <span title="ScalaObject">{</span>
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]" id="807398">p</a>: <a href="../../concurrent/Actor.scala.html#22063" title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]">Actor</a>[Ping] = <a href="../../concurrent/Actor.scala.html#33900" title="(e: (scalaz.example.concurrent.PingPong.Ping) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]">actor</a><a href="#807120" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy">(</a>(m: <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping">Ping</a>) =&gt; <a href="#807406" title="scalaz.example.concurrent.PingPong.Ping">m</a>.<a href="../../concurrent/Actor.scala.html#56206" title="(a: scalaz.example.concurrent.PingPong.Pong)() =&gt; Unit">p</a> <span title="Unit">!</span> <a href="#807122" title="scalaz.example.concurrent.PingPong.Pong">Pong</a>.<span class="keyword">this</span>)
+  }
+
+  <span class="keyword">class</span> <a title="class Ping extends java.lang.Object with ScalaObject" id="807123">Ping</a><span title="ScalaObject">(</span><a title="Int" id="807422">pings</a>: <a title="Int" id="4364">Int</a>, <a title="scalaz.example.concurrent.PingPong.Pong" id="807423">pong</a>: <a href="#807122" title="scalaz.example.concurrent.PingPong.Pong">Pong</a>, <a title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]" id="807424">cb</a>: <a href="../../concurrent/Actor.scala.html#22063" title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]">Actor</a>[Ping]) {
+    <span class="keyword">var</span> <a title="Int" id="807156">n</a> = <a href="#807422" title="Int">pings</a>
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Pong]" id="807158">p</a>: <a href="../../concurrent/Actor.scala.html#22063" title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Pong]">Actor</a>[Pong] = <a href="../../concurrent/Actor.scala.html#33900" title="(e: (scalaz.example.concurrent.PingPong.Pong) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Pong]">actor</a> <a href="#807120" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy">{</a>(m: <a href="#807122" title="scalaz.example.concurrent.PingPong.Pong">Pong</a>) =&gt;
+      <a href="#807156" title="(x$1: Int)Unit">n</a> = <a href="#807156" title="(x$1: Int)Int" id="5138">n</a> - <span title="Int(1)" class="int">1</span>
+      <span title="Unit" class="keyword">if</span> (<a href="#807156" title="(x$1: Int)Boolean" id="5132">n</a> &gt; <span title="Int(0)" class="int">0</span>) <a href="#807423" title="scalaz.example.concurrent.PingPong.Pong">pong</a>.<a href="../../concurrent/Actor.scala.html#56206" title="(a: scalaz.example.concurrent.PingPong.Ping)() =&gt; Unit">p</a> <span title="Unit">!</span> <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping">Ping</a>.<span class="keyword">this</span> <span class="keyword">else</span> <a href="../../concurrent/Actor.scala.html#56206" title="(a: scalaz.example.concurrent.PingPong.Ping)() =&gt; Unit">cb</a> <span title="Unit">!</span> <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping">Ping</a>.<span class="keyword">this</span>
+    }
+
+    <span class="keyword">def</span> <a title="=&gt; () =&gt; Unit" id="807160">start</a> = <a href="#807423" title="scalaz.example.concurrent.PingPong.Pong">pong</a>.<a href="../../concurrent/Actor.scala.html#56206" title="(a: scalaz.example.concurrent.PingPong.Ping)() =&gt; Unit">p</a> ! <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping" class="keyword">this</a>
+  }
+
+  @volatile <span class="keyword">var</span> <a title="Int" id="807125">done</a> = <span title="Int(0)" class="int">0</span>
+  <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]" id="807127">callback</a> = <a href="../../concurrent/Actor.scala.html#33900" title="(e: (scalaz.example.concurrent.PingPong.Ping) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]">actor</a> <a href="#807120" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy">{</a>(p: <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping">Ping</a>) =&gt;
+    <a href="#807125" title="(x$1: Int)Unit">done</a> = <a href="#807125" title="(x$1: Int)Int" id="5136">done</a> + <span title="Int(1)" class="int">1</span>
+    <span title="Unit" class="keyword">if</span> (<a href="#807125" title="(x$1: Int)Int">done</a> <span title="(x$1: Int)Boolean">%</span> (<a href="#807114" title="(x$1: Int)Int">actors</a> / <span title="Int(10)" class="int">10</span>) == <span title="Int(0)" class="int">0</span>)
+      <span title="(x: Any)Unit">println</span>(<a href="#807125" title="(x$1: java.lang.String)java.lang.String">done</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot; actors done -- &quot;)" class="string">&quot; actors done -- &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#807116" title="(x$1: Int)Int" id="5140">pings</a> * <a href="#807125" title="=&gt; Int">done</a> + <span title="java.lang.String(&quot; total pongs.&quot;)" class="string">&quot; total pongs.&quot;</span>)
+    <span class="keyword">else</span> <span title="Unit">(</span>)
+    <span title="Unit" class="keyword">if</span> (<a href="#807125" title="(x$1: Int)Boolean" id="5134">done</a> &gt;= <a href="#807114" title="=&gt; Int">actors</a>) {
+      <span title="(x: Any)Unit">println</span>(<span title="java.lang.String(&quot;All done.&quot;)" class="string">&quot;All done.&quot;</span>)
+      <a href="#807118" title="=&gt; java.util.concurrent.ExecutorService">pool</a>.<a title="()Unit" id="394618">shutdown</a>
+    } <span class="keyword">else</span> <span title="Unit">(</span>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="807129">run</a> {
+    (<a title="(end: Int)scala.collection.immutable.Range.Inclusive with scala.collection.immutable.Range.ByOne" id="9013" class="int">1</a> to <a href="#807114" title="=&gt; Int">actors</a>).<a title="(f: (Int) =&gt; Unit)Unit" id="469523">foreach</a> {<a title="Int" id="807662">i</a> =&gt;
+      <span class="keyword">val</span> <a title="scalaz.example.concurrent.PingPong.Pong" id="807663">pong</a> = <span title="scalaz.example.concurrent.PingPong.Pong" class="keyword">new</span> <a href="#807122" title="scalaz.example.concurrent.PingPong.Pong">Pong</a>
+      (<span title="scalaz.example.concurrent.PingPong.Ping" class="keyword">new</span> <a href="#807123" title="scalaz.example.concurrent.PingPong.Ping">Ping</a>(<a href="#807116" title="=&gt; Int">pings</a>, <a href="#807663" title="scalaz.example.concurrent.PingPong.Pong">pong</a>, <a href="#807127" title="=&gt; scalaz.concurrent.Actor[scalaz.example.concurrent.PingPong.Ping]">callback</a>)).<a href="#807160" title="=&gt; () =&gt; Unit">start</a>
+      <span title="Unit" class="keyword">if</span> (<a href="#807662" title="(x$1: Int)Int">i</a> <span title="(x$1: Int)Boolean">%</span> (<a href="#807114" title="(x$1: Int)Int">actors</a> / <span title="Int(10)" class="int">10</span>) == <span title="Int(0)" class="int">0</span>)
+        <span title="(x: Any)Unit">println</span>(<a href="#807662" title="(x$1: java.lang.String)java.lang.String">i</a> + <span title="java.lang.String(&quot; actors started.&quot;)" class="string">&quot; actors started.&quot;</span>)
+      <span class="keyword">else</span> <span title="Unit">(</span>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

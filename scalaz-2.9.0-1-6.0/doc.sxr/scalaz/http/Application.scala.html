@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/Application.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> response.<span class="delimiter">{</span>Body, Response, OK<span class="delimiter">}</span>
+<span class="keyword">import</span> request.Request
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="comment">/**
+ * A web application that transforms a request to a response.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">trait</span> <a title="trait Application[IN[_], OUT[_]] extends java.lang.Object with ScalaObject" id="25272">Application</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="25560">IN</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1135569">_</a><span class="delimiter">]</span>, <a title="[_]&gt;: Nothing &lt;: Any" id="25561">OUT</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1135570">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Transform the given request to a response.
+   */</span>
+  <span class="keyword">def</span> <a title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="1103130">apply</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.request.Request[IN]" id="1135573">req</a>: <a href="request/Request.scala.html#26142" title="scalaz.http.request.Request[IN]">Request</a><span class="delimiter">[</span>IN<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="response/Response.scala.html#26626" title="scalaz.http.response.Response[OUT]">Response</a><span class="delimiter">[</span>OUT<span class="delimiter">]</span>
+
+  <span class="keyword">import</span> <a href="#25273" title="object scalaz.http.Application">Application</a>.application
+
+  <span class="keyword">def</span> <a title="(x: String)(implicit b: scalaz.http.response.Body[OUT,String], implicit s: scalaz.Semigroup[OUT[Byte]])scalaz.http.Application[IN,OUT]" id="1103132">^*^</a><span class="delimiter">(</span><a title="String" id="1135583">x</a>: <span title="String">String</span><span class="delimiter">)</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.response.Body[OUT,String]" id="1135584">b</a>: <a href="response/Body.scala.html#26323" title="scalaz.http.response.Body[OUT,String]">Body</a><span class="delimiter">[</span>OUT, String<span class="delimiter">]</span>, <a title="scalaz.Semigroup[OUT[Byte]]" id="1135585">s</a>: <a href="../Semigroup.scala.html#18284" title="scalaz.Semigroup[OUT[Byte]]">Semigroup</a><span class="delimiter">[</span>OUT<span class="delimiter">[</span>Byte<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#25272" title="scalaz.http.Application[IN,OUT]">Application</a><span class="delimiter">[</span>IN, OUT<span class="delimiter">]</span> = <a href="#1135576" title="[IN[_], OUT[_]](f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]">application</a><span title="(f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]" class="delimiter">[</span><a href="#25560" title="IN">IN</a>, <a href="#25561" title="OUT">OUT</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="scalaz.http.request.Request[IN]" id="1135620">req</a> =&gt; <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="scalaz.http.response.Response[OUT]" id="1135621">res</a> = <a href="#1103130" title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">Application</a>.<span class="keyword">this</span><span class="delimiter">(</span><a href="#1135620" title="scalaz.http.request.Request[IN]">req</a><span class="delimiter">)</span>
+    <span title="scalaz.http.response.Response[OUT]" class="keyword">if</span><span class="delimiter">(</span><a href="response/Response.scala.html#1104431" title="(h: scalaz.http.response.ResponseHeader)Option[scalaz.NonEmptyList[Char]]">res</a><span class="delimiter">(</span><a href="response/ResponseHeader.scala.html#1103022" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a><span class="delimiter">)</span>.<span title="=&gt; Boolean">isDefined</span><span class="delimiter">)</span> <a href="#1135621" title="scalaz.http.response.Response[OUT]">res</a>
+    <span class="keyword">else</span> <span title="scalaz.http.response.Response[OUT]" class="keyword">if</span><span class="delimiter">(</span><a href="#1135620" title="scalaz.http.request.Request[IN]">req</a>.<a href="request/Request.scala.html#1103222" title="=&gt; Boolean">isInternetExplorer</a><span class="delimiter">)</span>
+      <span title="java.lang.String(&quot;&lt;?xml-stylesheet type=\&quot;text/xsl\&quot; href=\&quot;&quot;)" class="string">&quot;&lt;?xml-stylesheet type=\&quot;text/xsl\&quot; href=\&quot;&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#1135583" title="String">x</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot;\&quot;?&gt;\012\012&quot;)" class="string">&quot;\&quot;?&gt;\n\n&quot;</span> <a href="response/Response.scala.html#1104438" title="(a: java.lang.String)(implicit b: scalaz.http.response.Body[OUT,java.lang.String], implicit s: scalaz.Semigroup[OUT[Byte]])java.lang.Object with scalaz.http.response.Response[OUT]">&lt;&lt;:</a> <a href="response/Response.scala.html#1104429" title="(h: scalaz.http.response.ResponseHeader, s: String)scalaz.http.response.Response[OUT]">res</a><span class="delimiter">(</span><a href="response/ResponseHeader.scala.html#1103022" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>, <span title="java.lang.String(&quot;application/xml&quot;)" class="string">&quot;application/xml&quot;</span><span class="delimiter">)</span>
+    <span class="keyword">else</span>
+      <a href="response/Response.scala.html#1104429" title="(h: scalaz.http.response.ResponseHeader, s: String)scalaz.http.response.Response[OUT]">res</a><span class="delimiter">(</span><a href="response/ResponseHeader.scala.html#1103022" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>, <span title="java.lang.String(&quot;application/xhtml+xml&quot;)" class="string">&quot;application/xhtml+xml&quot;</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * Functions over web applications that transforms a request to a response.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.Application" id="25273">Application</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Create a web application from the given function.
+   */</span>
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]" id="1135576">application</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="1135579">IN</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1135591">_</a><span class="delimiter">]</span>, <a title="[_]&gt;: Nothing &lt;: Any" id="1135580">OUT</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1135592">_</a><span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">(</span><a title="(scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT]" id="1135587">f</a>: Request<span class="delimiter">[</span>IN<span class="delimiter">]</span> =&gt; Response<span class="delimiter">[</span>OUT<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#1135590" title="java.lang.Object with scalaz.http.Application[IN,OUT]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.Application[IN,OUT]" id="1135590">Application</a><span class="delimiter">[</span>IN, OUT<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="1135594">apply</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.request.Request[IN]" id="1135595">req</a>: <a href="request/Request.scala.html#26142" title="scalaz.http.request.Request[IN]">Request</a><span class="delimiter">[</span>IN<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#1135587" title="(v1: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">f</a><span class="delimiter">(</span><a href="#1135595" title="scalaz.http.request.Request[IN]">req</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * XSL for a blank XHTML page to use. This is used when working around Internet Explorer for XHTML.
+   */</span>
+  <span class="keyword">val</span> <a title="scala.xml.Elem" id="1135581">blankXsl</a> =
+&lt;<a title="scala.xml.NamespaceBinding" id="1137443">stylesheet</a> version=<span title="scala.xml.Text" class="string">&quot;1.0&quot;</span> xmlns=<span title="java.lang.String(&quot;http://www.w3.org/1999/XSL/Transform&quot;)" class="string">&quot;http://www.w3.org/1999/XSL/Transform&quot;</span>&gt;
+  &lt;<a title="scala.xml.MetaData" id="1137454">template</a> <span class="keyword">match</span>=<span title="scala.xml.Text" class="string">&quot;/&quot;</span>&gt;
+    &lt;<a title="scala.xml.MetaData" id="1137458">copy</a>-of select=<span title="scala.xml.Text" class="string">&quot;.&quot;</span>/&gt;
+  &lt;/template&gt;
+&lt;/stylesheet&gt;
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

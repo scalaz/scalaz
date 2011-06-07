@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Alpha.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Alpha extends java.lang.Object with ScalaObject" id="9239">Alpha</a> <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; Char" id="28027">toChar</a>: <span title="Char">Char</span>
+
+  <span class="keyword">def</span> <a title="=&gt; Char" id="28028">toUpperChar</a>: <span title="Char">Char</span> = <a href="#28027" title="implicit scala.Predef.charWrapper : (c: Char)scala.runtime.RichChar" id="1489">toChar</a>.<a title="=&gt; Char" id="32575">toUpper</a>
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="(o: Any)Boolean" id="28029">equals</a>(<a title="Any" id="33147">o</a>: <a title="Any" id="32">Any</a>): <a title="Boolean" id="3781">Boolean</a> = <a href="#33147" title="(x$1: Any)Boolean" id="5788">o</a> <span title="(x$1: Boolean)Boolean">!=</span> <span title="Null(null)" class="keyword">null</span> <span title="(x$1: Boolean)Boolean">&amp;&amp;</span> <a href="#33147" title="Any">o</a>.<a title="[T0]Boolean" id="5795">isInstanceOf</a><span title="Boolean">[</span><a href="#9239" title="scalaz.Alpha">Alpha</a>] &amp;&amp; <a href="#33147" title="Any">o</a>.<a title="[T0]T0" id="5798">asInstanceOf</a><span title="scalaz.Alpha">[</span><a href="#9239" title="scalaz.Alpha">Alpha</a>].<a href="#28027" title="(x$1: Char)Boolean" id="4888">toChar</a> == <a href="#28027" title="=&gt; Char">toChar</a>
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()Int" id="28030">hashCode</a>: <a title="Int" id="4364">Int</a> = <a href="#28027" title="=&gt; Char">toChar</a>.<a title="()Int" id="5792">hashCode</a>
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()String" id="28031">toString</a>: <a title="String" id="2716">String</a> = <a href="#28027" title="=&gt; Char">toChar</a>.<span title="()java.lang.String">toString</span>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Alpha" id="9240">Alpha</a> <span title="ScalaObject">{</span>
+  case <span class="keyword">object</span> <a href="#33261" title="object scalaz.Alpha.A" id="33290">A</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33254">toChar</a> = <span title="Char('a')" class="char">'a'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33299" title="object scalaz.Alpha.B" id="33307">B</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33292">toChar</a> = <span title="Char('b')" class="char">'b'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33316" title="object scalaz.Alpha.C" id="33324">C</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33309">toChar</a> = <span title="Char('c')" class="char">'c'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33333" title="object scalaz.Alpha.D" id="33341">D</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33326">toChar</a> = <span title="Char('d')" class="char">'d'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33350" title="object scalaz.Alpha.E" id="33358">E</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33343">toChar</a> = <span title="Char('e')" class="char">'e'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33367" title="object scalaz.Alpha.F" id="33375">F</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33360">toChar</a> = <span title="Char('f')" class="char">'f'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33384" title="object scalaz.Alpha.G" id="33392">G</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33377">toChar</a> = <span title="Char('g')" class="char">'g'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33401" title="object scalaz.Alpha.H" id="33409">H</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33394">toChar</a> = <span title="Char('h')" class="char">'h'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33418" title="object scalaz.Alpha.I" id="33426">I</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33411">toChar</a> = <span title="Char('i')" class="char">'i'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33435" title="object scalaz.Alpha.J" id="33443">J</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33428">toChar</a> = <span title="Char('j')" class="char">'j'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33452" title="object scalaz.Alpha.K" id="33460">K</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33445">toChar</a> = <span title="Char('k')" class="char">'k'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33469" title="object scalaz.Alpha.L" id="33477">L</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33462">toChar</a> = <span title="Char('l')" class="char">'l'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33486" title="object scalaz.Alpha.M" id="33494">M</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33479">toChar</a> = <span title="Char('m')" class="char">'m'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33503" title="object scalaz.Alpha.N" id="33511">N</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33496">toChar</a> = <span title="Char('n')" class="char">'n'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33520" title="object scalaz.Alpha.O" id="33528">O</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33513">toChar</a> = <span title="Char('o')" class="char">'o'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33537" title="object scalaz.Alpha.P" id="33545">P</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33530">toChar</a> = <span title="Char('p')" class="char">'p'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33554" title="object scalaz.Alpha.Q" id="33562">Q</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33547">toChar</a> = <span title="Char('q')" class="char">'q'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33571" title="object scalaz.Alpha.R" id="33579">R</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33564">toChar</a> = <span title="Char('r')" class="char">'r'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33588" title="object scalaz.Alpha.S" id="33596">S</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33581">toChar</a> = <span title="Char('s')" class="char">'s'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33605" title="object scalaz.Alpha.T" id="33613">T</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33598">toChar</a> = <span title="Char('t')" class="char">'t'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33622" title="object scalaz.Alpha.U" id="33630">U</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33615">toChar</a> = <span title="Char('u')" class="char">'u'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33639" title="object scalaz.Alpha.V" id="33647">V</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33632">toChar</a> = <span title="Char('v')" class="char">'v'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33656" title="object scalaz.Alpha.W" id="33664">W</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33649">toChar</a> = <span title="Char('w')" class="char">'w'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33673" title="object scalaz.Alpha.X" id="33681">X</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33666">toChar</a> = <span title="Char('x')" class="char">'x'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33690" title="object scalaz.Alpha.Y" id="33698">Y</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33683">toChar</a> = <span title="Char('y')" class="char">'y'</span>
+  }
+  case <span class="keyword">object</span> <a href="#33707" title="object scalaz.Alpha.Z" id="33715">Z</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#9239" title="scalaz.Alpha">Alpha</a> {
+    <span class="keyword">val</span> <a title="Char" id="33700">toChar</a> = <span title="Char('z')" class="char">'z'</span>
+  }
+}
+
+<span class="keyword">trait</span> <a title="trait Alphas extends java.lang.Object with ScalaObject" id="9242">Alphas</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="#9240" title="object scalaz.Alpha">Alpha</a>._
+  
+  <span class="keyword">val</span> <a title="List[scalaz.Alpha]" id="33718">alphas</a>: <a title="List[scalaz.Alpha]" id="29298">List</a>[Alpha] = <a title="(xs: Product with scalaz.Alpha*)List[Product with scalaz.Alpha]" id="29299">List</a>(<a href="#33290" title="object scalaz.Alpha.A">A</a>, <a href="#33307" title="object scalaz.Alpha.B">B</a>, <a href="#33324" title="object scalaz.Alpha.C">C</a>, <a href="#33341" title="object scalaz.Alpha.D">D</a>, <a href="#33358" title="object scalaz.Alpha.E">E</a>, <a href="#33375" title="object scalaz.Alpha.F">F</a>, <a href="#33392" title="object scalaz.Alpha.G">G</a>, <a href="#33409" title="object scalaz.Alpha.H">H</a>, <a href="#33426" title="object scalaz.Alpha.I">I</a>, <a href="#33443" title="object scalaz.Alpha.J">J</a>, <a href="#33460" title="object scalaz.Alpha.K">K</a>, <a href="#33477" title="object scalaz.Alpha.L">L</a>, <a href="#33494" title="object scalaz.Alpha.M">M</a>, <a href="#33511" title="object scalaz.Alpha.N">N</a>, <a href="#33528" title="object scalaz.Alpha.O">O</a>, <a href="#33545" title="object scalaz.Alpha.P">P</a>, <a href="#33562" title="object scalaz.Alpha.Q">Q</a>, <a href="#33579" title="object scalaz.Alpha.R">R</a>, <a href="#33596" title="object scalaz.Alpha.S">S</a>, <a href="#33613" title="object scalaz.Alpha.T">T</a>, <a href="#33630" title="object scalaz.Alpha.U">U</a>, <a href="#33647" title="object scalaz.Alpha.V">V</a>, <a href="#33664" title="object scalaz.Alpha.W">W</a>, <a href="#33681" title="object scalaz.Alpha.X">X</a>, <a href="#33698" title="object scalaz.Alpha.Y">Y</a>, <a href="#33715" title="object scalaz.Alpha.Z">Z</a>)
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.Alphas.AlphaChar : (a: scalaz.Alpha)Char" id="33720">AlphaChar</a>(<a title="scalaz.Alpha" id="33741">a</a>: <a href="#9239" title="scalaz.Alpha">Alpha</a>): <span title="Char">Char</span> = <a href="#33741" title="scalaz.Alpha">a</a>.<a href="#28027" title="=&gt; Char">toChar</a>
+}
+
+        </pre>
+    </body>
+</html>

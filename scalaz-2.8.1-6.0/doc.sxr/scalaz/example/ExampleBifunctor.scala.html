@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleBifunctor.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleBifunctor" id="23202">ExampleBifunctor</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408455">main</a>(<a title="Array[String]" id="547711">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#408457" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408457">run</a> {
+    <span class="keyword">val</span> <a title="Either[Int,String]" id="547714">x</a>: <span title="Either[Int,String]">Either</span>[Int, String] = <span title="(a: Int)Left[Int,Nothing]">Left</span>(<span title="Int(7)" class="int">7</span>)
+    <span class="keyword">val</span> <a title="(Int, java.lang.String)" id="547715">y</a> = <span title="(_1: Int,_2: java.lang.String)(Int, java.lang.String)">(</span><span title="Int(8)" class="int">8</span>, <span title="java.lang.String(&quot;abc&quot;)" class="string">&quot;abc&quot;</span>)
+    <span class="keyword">val</span> <a title="Either[Int,String]" id="547716">z</a>: <span title="Either[Int,String]">Either</span>[Int, String] = <span title="(b: java.lang.String)Right[Nothing,java.lang.String]">Right</span>(<span title="java.lang.String(&quot;def&quot;)" class="string">&quot;def&quot;</span>)
+
+    <span class="keyword">val</span> <a title="(String) =&gt; String" id="547717">fr</a> = (<a href="#547737" title="String">_</a>: <a title="String" id="2716">String</a>).<a title="=&gt; String" id="30486">reverse</a>
+    <span class="keyword">val</span> <a title="(Int) =&gt; Int" id="547718">fl</a> = <a title="(x$1: Int)Int" id="5136">(</a><a href="#547786" title="Int">_</a>: <a title="Int" id="4364">Int</a>) + <span title="Int(1)" class="int">1</span>
+
+    // Map reverse across the right of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Left[Int,Nothing])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Left[Int,Nothing],Either[Int,String]])Unit">(</a><a href="../MAB.scala.html#55244" title="(g: (String) =&gt; String)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">x</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(a: Int)Left[Int,Nothing]">Left</span>(<span title="Int(7)" class="int">7</span>)
+
+    // Map (+1) across the left of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Left[Int,Nothing])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Left[Int,Nothing],Either[Int,String]])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">&lt;-:</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">x</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(a: Int)Left[Int,Nothing]">Left</span>(<span title="Int(8)" class="int">8</span>)
+
+    // Map reverse across the right and (+1) across the left of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Left[Int,Nothing])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Left[Int,Nothing],Either[Int,String]])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">&lt;-:</a> <a href="../MAB.scala.html#55244" title="(g: (String) =&gt; String)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">x</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(a: Int)Left[Int,Nothing]">Left</span>(<span title="Int(8)" class="int">8</span>)
+
+    // Map reverse across the right of the Tuple2 (pair) binary functor
+    <a href="../Identity.scala.html#43004" title="(b: (Int, java.lang.String))(implicit e: scalaz.Equal[(Int, String)],implicit s: scalaz.Show[(Int, String)],implicit ev: &lt;:&lt;[(Int, java.lang.String),(Int, String)])Unit">(</a><a href="../MAB.scala.html#55244" title="(g: (java.lang.String) =&gt; String)(implicit b: scalaz.Bifunctor[Tuple2])(Int, String)">y</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; (Int, String))scalaz.Identity[(Int, String)]">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120162" title="(_1: Int,_2: java.lang.String)(Int, java.lang.String)">assert_===</a> (<span title="Int(8)" class="int">8</span>, <span title="java.lang.String(&quot;cba&quot;)" class="string">&quot;cba&quot;</span>)
+
+    // Map (+1) across the left of the Tuple2 (pair) binary functor
+    <a href="../Identity.scala.html#43004" title="(b: (Int, java.lang.String))(implicit e: scalaz.Equal[(Int, java.lang.String)],implicit s: scalaz.Show[(Int, java.lang.String)],implicit ev: &lt;:&lt;[(Int, java.lang.String),(Int, java.lang.String)])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; (Int, java.lang.String))scalaz.Identity[(Int, java.lang.String)]">&lt;-:</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Tuple2])(Int, java.lang.String)">y</a>) <a href="../Equal.scala.html#120162" title="(_1: Int,_2: java.lang.String)(Int, java.lang.String)">assert_===</a> (<span title="Int(9)" class="int">9</span>, <span title="java.lang.String(&quot;abc&quot;)" class="string">&quot;abc&quot;</span>)
+
+    // Map reverse across the right and (+1) across the left of the Tuple2 (pair) binary functor
+    <a href="../Identity.scala.html#43004" title="(b: (Int, java.lang.String))(implicit e: scalaz.Equal[(Int, String)],implicit s: scalaz.Show[(Int, String)],implicit ev: &lt;:&lt;[(Int, java.lang.String),(Int, String)])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; (Int, String))scalaz.Identity[(Int, String)]">&lt;-:</a> <a href="../MAB.scala.html#55244" title="(g: (java.lang.String) =&gt; String)(implicit b: scalaz.Bifunctor[Tuple2])(Int, String)">y</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Tuple2])(Int, String)">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120162" title="(_1: Int,_2: java.lang.String)(Int, java.lang.String)">assert_===</a> (<span title="Int(9)" class="int">9</span>, <span title="java.lang.String(&quot;cba&quot;)" class="string">&quot;cba&quot;</span>)
+
+    // Map reverse across the right of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Right[Nothing,java.lang.String])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Right[Nothing,java.lang.String],Either[Int,String]])Unit">(</a><a href="../MAB.scala.html#55244" title="(g: (String) =&gt; String)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">z</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(b: java.lang.String)Right[Nothing,java.lang.String]">Right</span>(<span title="java.lang.String(&quot;fed&quot;)" class="string">&quot;fed&quot;</span>)
+
+    // Map (+1) across the left of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Right[Nothing,java.lang.String])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Right[Nothing,java.lang.String],Either[Int,String]])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">&lt;-:</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">z</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(b: java.lang.String)Right[Nothing,java.lang.String]">Right</span>(<span title="java.lang.String(&quot;def&quot;)" class="string">&quot;def&quot;</span>)
+
+    // Map reverse across the right and (+1) across the left of the Either binary functor
+    <a href="../Identity.scala.html#43004" title="(b: Right[Nothing,java.lang.String])(implicit e: scalaz.Equal[Either[Int,String]],implicit s: scalaz.Show[Either[Int,String]],implicit ev: &lt;:&lt;[Right[Nothing,java.lang.String],Either[Int,String]])Unit">(</a><a href="#547718" title="(Int) =&gt; Int">fl</a> <a href="../Identity.scala.html#34126" title="(x: =&gt; Either[Int,String])scalaz.Identity[Either[Int,String]]">&lt;-:</a> <a href="../MAB.scala.html#55244" title="(g: (String) =&gt; String)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">z</a> <a href="../MAB.scala.html#55247" title="(f: (Int) =&gt; Int)(implicit b: scalaz.Bifunctor[Either])Either[Int,String]">:-&gt;</a> <a href="#547717" title="(String) =&gt; String">fr</a>) <a href="../Equal.scala.html#120243" title="(implicit evidence$41: scalaz.Equal[Int],implicit evidence$42: scalaz.Equal[String])scalaz.Equal[Either[Int,String]]">assert_===</a> <span title="(b: java.lang.String)Right[Nothing,java.lang.String]">Right</span>(<span title="java.lang.String(&quot;fed&quot;)" class="string">&quot;fed&quot;</span>)
+  }
+}
+        </pre>
+    </body>
+</html>

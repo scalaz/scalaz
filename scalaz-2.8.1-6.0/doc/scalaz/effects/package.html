@@ -1,0 +1,801 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.effects</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a></p>
+
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <h1>effects</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">package</span>
+      <span class="symbol">
+        <span class="name">effects</span>
+        
+        
+        
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          
+          
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="true" name="scalaz.effects.IO">
+      <a id="IO:IO[A]"></a>
+      <h4 class="signature"><a href="IO.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">IO</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: sealed 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.effects.IORef">
+      <a id="IORef:IORef[A]"></a>
+      <h4 class="signature"><a href="IORef.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">IORef</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result"> extends NewType[STRef[RealWorld, A]]</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">A mutable reference in the IO monad.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.effects.RealWorld">
+      <a id="RealWorld:RealWorld"></a>
+      <h4 class="signature"><a href="RealWorld.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">RealWorld</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: sealed 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="scalaz.effects.ST">
+      <a id="ST:ST[S, A]"></a>
+      <h4 class="signature"><a href="ST.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">ST</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Purely functional mutable state threads.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.effects.STArray">
+      <a id="STArray:STArray[S, A]"></a>
+      <h4 class="signature"><a href="STArray.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">STArray</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Mutable array in state thread S containing values of type A.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.effects.STRef">
+      <a id="STRef:STRef[S, A]"></a>
+      <h4 class="signature"><a href="STRef.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">STRef</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Mutable variable in state thread S containing a value of type A.</p>
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scalaz.effects.IO">
+      <a id="IO:IO"></a>
+      <h4 class="signature"><a href="IO$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IO</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.effects.ST">
+      <a id="ST:ST"></a>
+      <h4 class="signature"><a href="ST$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">ST</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="_root_#accumArray">
+      <a id="accumArray[F, A, B](Int,(A, B) ⇒ A,A,F[(Int, B)])(Foldable[F],Manifest[A]):ImmutableArray[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">accumArray</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="size">size: <span class="extype" name="scala.Int">Int</span></span>, <span name="f">f: (A, B) ⇒ A</span>, <span name="z">z: A</span>, <span name="ivs">ivs: F[(<span class="extype" name="scala.Int">Int</span>, B)]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[F]</span>, <span name="arg1">arg1: Manifest[A]</span>)</span>
+        <span class="result">: <a href="../ImmutableArray.html" class="extype" name="scalaz.ImmutableArray">ImmutableArray</a>[A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Accumulates an integer-associated list into an immutable array.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Accumulates an integer-associated list into an immutable array.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#bufferFile">
+      <a id="bufferFile(File):IO[BufferedReader]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">bufferFile</span>
+        
+        <span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="java.io.BufferedReader">BufferedReader</span>]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#closeReader">
+      <a id="closeReader(Reader):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">closeReader</span>
+        
+        <span class="params">(<span name="r">r: <span class="extype" name="java.io.Reader">Reader</span></span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#enumerateBy">
+      <a id="enumerateBy[A](IO[A]):EnumeratorM[IO, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">enumerateBy</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="action">action: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]</span>)</span>
+        <span class="result">: EnumeratorM[<a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Repeatedly apply the given action, enumerating the results.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Repeatedly apply the given action, enumerating the results.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#fixST">
+      <a id="fixST[S, A]((⇒ A) ⇒ ST[S, A]):ST[S, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">fixST</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="k">k: (⇒ A) ⇒ <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]</span>)</span>
+        <span class="result">: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allows the result of a state transformer computation to be used lazily inside the computation.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allows the result of a state transformer computation to be used lazily inside the computation.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#getChar">
+      <a id="getChar:IO[Char]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getChar</span>
+        
+        
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Char">Char</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Get the next character from standard input</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Get the next character from standard input</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#getFileLines">
+      <a id="getFileLines(File):EnumeratorM[IO, String]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getFileLines</span>
+        
+        <span class="params">(<span name="f">f: <span class="extype" name="java.io.File">File</span></span>)</span>
+        <span class="result">: EnumeratorM[<a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>, String]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#getLines">
+      <a id="getLines:EnumeratorM[IO, String]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol">
+        <span class="name">getLines</span>
+        
+        
+        <span class="result">: EnumeratorM[<a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>, String]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enumerate the lines on standard input as Strings</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enumerate the lines on standard input as Strings</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#getReaderLines">
+      <a id="getReaderLines(⇒ BufferedReader):EnumeratorM[IO, String]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getReaderLines</span>
+        
+        <span class="params">(<span name="r">r: ⇒ <span class="extype" name="java.io.BufferedReader">BufferedReader</span></span>)</span>
+        <span class="result">: EnumeratorM[<a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>, String]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enumerate the lines from a BufferedReader</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enumerate the lines from a BufferedReader</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#io">
+      <a id="io[A](⇒ A):IO[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">io</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: ⇒ A</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Perform the given side-effect in an IO action</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Perform the given side-effect in an IO action</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#ioMonoid">
+      <a id="ioMonoid[A](Monoid[A]):Monoid[IO[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">ioMonoid</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[A]</span>)</span>
+        <span class="result">: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#ioToST">
+      <a id="ioToST[A](IO[A]):ST[RealWorld, A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">ioToST</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="io">io: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]</span>)</span>
+        <span class="result">: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[<a href="RealWorld.html" class="extype" name="scalaz.effects.RealWorld">RealWorld</a>, A]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#newArr">
+      <a id="newArr[S, A](Int,A)(Manifest[A]):ST[S, STArray[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">newArr</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="size">size: <span class="extype" name="scala.Int">Int</span></span>, <span name="z">z: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
+        <span class="result">: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, <a href="STArray.html" class="extype" name="scalaz.effects.STArray">STArray</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allocates a fresh mutable array.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allocates a fresh mutable array.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#newIORef">
+      <a id="newIORef[A](⇒ A):IO[IORef[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">newIORef</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: ⇒ A</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<a href="IORef.html" class="extype" name="scalaz.effects.IORef">IORef</a>[A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#newVar">
+      <a id="newVar[S, A](A):ST[S, STRef[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">newVar</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: A</span>)</span>
+        <span class="result">: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, <a href="STRef.html" class="extype" name="scalaz.effects.STRef">STRef</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allocates a fresh mutable reference.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allocates a fresh mutable reference.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#putChar">
+      <a id="putChar(Char):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">putChar</span>
+        
+        <span class="params">(<span name="c">c: <span class="extype" name="scala.Char">Char</span></span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Write a character to standard output</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Write a character to standard output</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#putOut">
+      <a id="putOut[A](A):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">putOut</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: A</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Print the given object to standard output</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Print the given object to standard output</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#putStr">
+      <a id="putStr(String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">putStr</span>
+        
+        <span class="params">(<span name="s">s: String</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Write a String to standard output</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Write a String to standard output</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#putStrLn">
+      <a id="putStrLn(String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">putStrLn</span>
+        
+        <span class="params">(<span name="s">s: String</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Write a String to standard output, followed by a newline</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Write a String to standard output, followed by a newline</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#rReadLn">
+      <a id="rReadLn(BufferedReader):IO[Option[String]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">rReadLn</span>
+        
+        <span class="params">(<span name="r">r: <span class="extype" name="java.io.BufferedReader">BufferedReader</span></span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Option">Option</span>[String]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Read a line from a buffered reader</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Read a line from a buffered reader</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#readLn">
+      <a id="readLn:IO[String]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">readLn</span>
+        
+        
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[String]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Read the next line from standard input</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Read the next line from standard input</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#returnST">
+      <a id="returnST[S, A](⇒ A):ST[S, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">returnST</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: ⇒ A</span>)</span>
+        <span class="result">: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Put a value in a state thread</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Put a value in a state thread</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#runST">
+      <a id="runST[A](Forall[[S]ST[S, A]]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">runST</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="f">f: <a href="../Forall.html" class="extype" name="scalaz.Forall">Forall</a>[[S]<a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Run a state thread</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Run a state thread</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#stApplicative">
+      <a id="stApplicative[S]:Applicative[[A]ST[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stApplicative</span>
+        <span class="tparams">[<span name="S">S</span>]</span>
+        
+        <span class="result">: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[[A]<a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#stMonad">
+      <a id="stMonad[S]:Monad[[A]ST[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stMonad</span>
+        <span class="tparams">[<span name="S">S</span>]</span>
+        
+        <span class="result">: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[[A]<a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#stMonoid">
+      <a id="stMonoid[S, A](Monoid[A]):Monoid[ST[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stMonoid</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[A]</span>)</span>
+        <span class="result">: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#stRefEqual">
+      <a id="stRefEqual[S, A]:Equal[STRef[S, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stRefEqual</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="../Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<a href="STRef.html" class="extype" name="scalaz.effects.STRef">STRef</a>[S, A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Equality for STRefs is reference equality</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Equality for STRefs is reference equality</p></div><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#stToIO">
+      <a id="stToIO[A](ST[RealWorld, A]):IO[A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stToIO</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="st">st: <a href="ST.html" class="extype" name="scalaz.effects.ST">ST</a>[<a href="RealWorld.html" class="extype" name="scalaz.effects.RealWorld">RealWorld</a>, A]</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#throwIO">
+      <a id="throwIO[A](Throwable):IO[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">throwIO</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="e">e: Throwable</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Throw the given error in the IO monad.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Throw the given error in the IO monad.</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#wPutStr">
+      <a id="wPutStr(PrintWriter,String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wPutStr</span>
+        
+        <span class="params">(<span name="w">w: <span class="extype" name="java.io.PrintWriter">PrintWriter</span></span>, <span name="s">s: String</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Write a string to a PrintWriter</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Write a string to a PrintWriter</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="_root_#wPutStrLn">
+      <a id="wPutStrLn(PrintWriter,String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wPutStrLn</span>
+        
+        <span class="params">(<span name="w">w: <span class="extype" name="java.io.PrintWriter">PrintWriter</span></span>, <span name="s">s: String</span>)</span>
+        <span class="result">: <a href="IO.html" class="extype" name="scalaz.effects.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Write a String to a PrintWriter, followed by a newline</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Write a String to a PrintWriter, followed by a newline</p></div><div class="block">
+          definition classes: <a href="../../package.html" class="extype" name="_root_">root</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li></ol>
+            </div>
+
+        
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

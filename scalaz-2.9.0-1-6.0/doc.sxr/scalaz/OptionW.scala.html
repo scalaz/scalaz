@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/OptionW.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait OptionW[A] extends java.lang.Object with scalaz.PimpedType[Option[A]] with ScalaObject" id="17171">OptionW</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20801">A</a><span class="delimiter">]</span> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#17495" title="scalaz.PimpedType[Option[A]]">PimpedType</a><span class="delimiter">[</span>Option<span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">]</span> <span class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="comment">/**
+   * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
+   * if it is defined, otherwise, the provided value `none`.
+   */</span>
+  <span class="keyword">def</span> <a title="[X](some: (A) =&gt; X, none: =&gt; X)X" id="42401">cata</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42403">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(A) =&gt; X" id="201483">some</a>: A =&gt; X, <a title="=&gt; X" id="201484">none</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42403" title="X">X</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="X" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="X">None</span> =&gt; <a href="#201484" title="=&gt; X">none</a>
+    <span class="keyword">case</span> <span title="X">Some</span><span class="delimiter">(</span><a title="A" id="370212">a</a><span class="delimiter">)</span> =&gt; <a href="#201483" title="(v1: A)X">some</a><span class="delimiter">(</span><a href="#370212" title="A">a</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/** Alias for `cata` */</span>
+  <span class="keyword">def</span> <a title="[X](some: (A) =&gt; X, none: =&gt; X)X" id="42404">fold</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42406">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(A) =&gt; X" id="370216">some</a>: A =&gt; X, <a title="=&gt; X" id="370217">none</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42406" title="X">X</a> = <a href="#42401" title="(some: (A) =&gt; X, none: =&gt; X)X">cata</a><span class="delimiter">(</span><a href="#370216" title="(A) =&gt; X">some</a>, <a href="#370217" title="=&gt; X">none</a><span class="delimiter">)</span>
+
+  <span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Fold[X] extends java.lang.Object" id="42407">Fold</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42408">X</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(s: =&gt; X)X" id="370227">none</a><span class="delimiter">(</span><a title="=&gt; X" id="370229">s</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42408" title="X">X</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Returns the provided function `s` applied to item contained in the Option if it is defined,
+   * otherwise, the provided value `n`.
+   * &lt;p/&gt;
+   * This is a syntactic alternative to  { @link scalaz.OptionW # cata }
+   * &lt;p/&gt;
+   * Example:
+   * &lt;code&gt;
+   * option.some(_ * 2).none(0)
+   * &lt;/code&gt;
+   */</span>
+  <span class="keyword">def</span> <a title="[X](s: (A) =&gt; X)OptionW.this.Fold[X]" id="42409">some</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42411">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(A) =&gt; X" id="370230">s</a>: A =&gt; X<span class="delimiter">)</span>: <a href="#42407" title="OptionW.this.Fold[X]">Fold</a><span class="delimiter">[</span>X<span class="delimiter">]</span> = <a href="#370233" title="java.lang.Object with OptionW.this.Fold[X]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with OptionW.this.Fold[X]" id="370233">Fold</a><span class="delimiter">[</span>X<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(n: =&gt; X)X" id="370237">none</a><span class="delimiter">(</span><a title="=&gt; X" id="370238">n</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42411" title="X">X</a> = <a href="#42401" title="(some: (A) =&gt; X, none: =&gt; X)X">cata</a><span class="delimiter">(</span><a href="#370230" title="(A) =&gt; X">s</a>, <a href="#370238" title="=&gt; X">n</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Conditional[X] extends java.lang.Object" id="42412">Conditional</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42413">X</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(n: =&gt; X)X" id="370251">|</a><span class="delimiter">(</span><a title="=&gt; X" id="370253">n</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42413" title="X">X</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Ternary operator. Note that the arguments s and n are call-by-name.
+   * &lt;p/&gt;
+   * Example
+   * &lt;code&gt;
+   * option ? &quot;defined&quot; | &quot;undefined&quot;
+   * &lt;/code&gt;
+   */</span>
+  <span class="keyword">def</span> <a title="[X](s: =&gt; X)OptionW.this.Conditional[X]" id="42414">?</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42416">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; X" id="370254">s</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42412" title="OptionW.this.Conditional[X]">Conditional</a><span class="delimiter">[</span>X<span class="delimiter">]</span> = <a href="#370257" title="java.lang.Object with OptionW.this.Conditional[X]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with OptionW.this.Conditional[X]" id="370257">Conditional</a><span class="delimiter">[</span>X<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(n: =&gt; X)X" id="370261">|</a><span class="delimiter">(</span><a title="=&gt; X" id="370262">n</a>: =&gt; X<span class="delimiter">)</span>: <a href="#42416" title="X">X</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="X" class="keyword">match</span> <span class="delimiter">{</span>
+      <span class="keyword">case</span> <span title="X">None</span> =&gt; <a href="#370262" title="=&gt; X">n</a>
+      <span class="keyword">case</span> <span title="X">Some</span><span class="delimiter">(</span>_<span class="delimiter">)</span> =&gt; <a href="#370254" title="=&gt; X">s</a>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Executes the provided side effect if the Option if it is undefined.
+   */</span>
+  <span class="keyword">def</span> <a title="(n: =&gt; Unit)Unit" id="42417">ifNone</a><span class="delimiter">(</span><a title="=&gt; Unit" id="370271">n</a>: =&gt; Unit<span class="delimiter">)</span>: <span title="Unit">Unit</span> = <span title="Unit" class="keyword">if</span> <span class="delimiter">(</span><a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a>.<span title="=&gt; Boolean">isEmpty</span><span class="delimiter">)</span> <a href="#370271" title="=&gt; Unit">n</a>
+
+  <span class="comment">/**
+   * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
+   */</span>
+  <span class="keyword">def</span> <a title="(message: =&gt; String)A" id="42418">err</a><span class="delimiter">(</span><a title="=&gt; String" id="370273">message</a>: =&gt; String<span class="delimiter">)</span>: <a href="#20801" title="A">A</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="(default: =&gt; A)A">getOrElse</span> <span class="delimiter">(</span><span title="object scala.sys.package">sys</span>.<span title="(message: String)Nothing">error</span><span class="delimiter">(</span><a href="#370273" title="=&gt; String">message</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
+   */</span>
+  <span class="keyword">def</span> <a title="(a: =&gt; A)A" id="42419">|</a><span class="delimiter">(</span><a title="=&gt; A" id="370282">a</a>: =&gt; A<span class="delimiter">)</span>: <a href="#20801" title="A">A</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="(default: =&gt; A)A">getOrElse</span> <a href="#370282" title="=&gt; A">a</a>
+
+  <span class="comment">/**
+   * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
+   * &lt;p/&gt;
+   * For example:
+   * &lt;pre&gt;
+   * val o: Option = None
+   * val a: List[String] = ~o
+   * &lt;/pre&gt;
+   */</span>
+  <span class="keyword">def</span> <a title="(implicit z: scalaz.Zero[A])A" id="42420">unary_~</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Zero[A]" id="274121">z</a>: <a href="Zero.scala.html#20237" title="scalaz.Zero[A]">Zero</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#20801" title="A">A</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="(default: =&gt; A)A">getOrElse</span> <a href="#274121" title="scalaz.Zero[A]">z</a>.<a href="Zero.scala.html#40349" title="=&gt; A">zero</a>
+
+  <span class="keyword">def</span> <a title="(implicit z: scalaz.Zero[A])A" id="42421">orZero</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Zero[A]" id="370292">z</a>: <a href="Zero.scala.html#20237" title="scalaz.Zero[A]">Zero</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#20801" title="A">A</a> = <a href="#42420" title="(implicit z: scalaz.Zero[A])A">~</a><a href="#17171" title="OptionW.this.type" class="keyword">this</a>
+
+  <span class="keyword">def</span> <a title="[E](e: =&gt; E)scalaz.Validation[E,A]" id="42422">toSuccess</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42424">E</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; E" id="230807">e</a>: =&gt; E<span class="delimiter">)</span>: <a href="Validation.scala.html#19982" title="scalaz.Validation[E,A]">Validation</a><span class="delimiter">[</span>E, A<span class="delimiter">]</span> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="scalaz.Validation[E,A]" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="scalaz.Success[Nothing,A]">Some</span><span class="delimiter">(</span><a title="A" id="370298">a</a><span class="delimiter">)</span> =&gt; <a href="Validation.scala.html#86323" title="(a: A)scalaz.Success[Nothing,A]">Success</a><span class="delimiter">(</span><a href="#370298" title="A">a</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="scalaz.Failure[E,Nothing]">None</span> =&gt; <a href="Validation.scala.html#86417" title="(e: E)scalaz.Failure[E,Nothing]">Failure</a><span class="delimiter">(</span><a href="#230807" title="=&gt; E">e</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="[B](b: =&gt; B)scalaz.Validation[A,B]" id="42425">toFailure</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42427">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; B" id="370310">b</a>: =&gt; B<span class="delimiter">)</span>: <a href="Validation.scala.html#19982" title="scalaz.Validation[A,B]">Validation</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="scalaz.Validation[A,B]" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="scalaz.Failure[A,Nothing]">Some</span><span class="delimiter">(</span><a title="A" id="370314">e</a><span class="delimiter">)</span> =&gt; <a href="Validation.scala.html#86417" title="(e: A)scalaz.Failure[A,Nothing]">Failure</a><span class="delimiter">(</span><a href="#370314" title="A">e</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="scalaz.Success[Nothing,B]">None</span> =&gt; <a href="Validation.scala.html#86323" title="(a: B)scalaz.Success[Nothing,B]">Success</a><span class="delimiter">(</span><a href="#370310" title="=&gt; B">b</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.FirstOption[A]" id="42428">fst</a>: <a href="FirstOption.scala.html#12959" title="scalaz.FirstOption[A]">FirstOption</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="FirstOption.scala.html#38422" title="(a: Option[A])scalaz.FirstOption[A]">value</a>
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.LastOption[A]" id="42429">lst</a>: <a href="LastOption.scala.html#15026" title="scalaz.LastOption[A]">LastOption</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="LastOption.scala.html#38513" title="(a: Option[A])scalaz.LastOption[A]">value</a>
+
+  <span class="comment">/**
+   * Returns the item contained in the Option wrapped in type M if the Option is defined,
+   * otherwise, the empty value for type M.
+   */</span>
+  <span class="keyword">def</span> <a title="[M[_]](implicit evidence$1: scalaz.Pure[M], implicit evidence$2: scalaz.Empty[M])M[A]" id="370387">orEmpty</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="42432">M</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="370388">_</a><span class="delimiter">]</span> : Pure : Empty<span class="delimiter">]</span>: <a href="#42432" title="M[A]">M</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="M[A]" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="M[A]">Some</span><span class="delimiter">(</span><a title="A" id="370393">a</a><span class="delimiter">)</span> =&gt; <a href="Identity.scala.html#38500" title="(x: =&gt; A)scalaz.Identity[A]">a</a> <a href="Identity.scala.html#47094" title="(implicit p: scalaz.Pure[M])M[A]">η</a>
+    <span class="keyword">case</span> <span title="M[A]">None</span> =&gt; <a href="Empty.scala.html#38370" title="(implicit e: scalaz.Empty[M])M[A]">&lt;∅&gt;</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
+   */</span>
+  <span class="keyword">def</span> <a title="[F[_], B](b: =&gt; B, k: (F[A]) =&gt; B)(implicit p: scalaz.Pure[F])B" id="42433">foldLift</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="42436">F</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="370671">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="42437">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; B" id="370667">b</a>: =&gt; B, <a title="(F[A]) =&gt; B" id="370668">k</a>: F<span class="delimiter">[</span>A<span class="delimiter">]</span> =&gt; B<span class="delimiter">)</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Pure[F]" id="370669">p</a>: <a href="Pure.scala.html#17801" title="scalaz.Pure[F]">Pure</a><span class="delimiter">[</span>F<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#42437" title="B">B</a> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="B" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="B">None</span>    =&gt; <a href="#370667" title="=&gt; B">b</a>
+    <span class="keyword">case</span> <span title="B">Some</span><span class="delimiter">(</span><a title="A" id="370676">a</a><span class="delimiter">)</span> =&gt; <a href="#370668" title="(v1: F[A])B">k</a><span class="delimiter">(</span><a href="Identity.scala.html#38500" title="(x: =&gt; A)scalaz.Identity[A]">a</a>.<a href="Identity.scala.html#47094" title="[F[_]](implicit p: scalaz.Pure[F])F[A]">η</a><a href="#370669" title="(implicit p: scalaz.Pure[F])F[A]" class="delimiter">[</a><a href="#42436" title="F">F</a><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Returns the given value if None, otherwise lifts the Some value to Option and passes it to the given function.
+   */</span>
+  <span class="keyword">def</span> <a title="[B](b: =&gt; B, k: (Option[A]) =&gt; B)B" id="42438">foldLiftOpt</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42440">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; B" id="370937">b</a>: =&gt; B, <a title="(Option[A]) =&gt; B" id="370938">k</a>: Option<span class="delimiter">[</span>A<span class="delimiter">]</span> =&gt; B<span class="delimiter">)</span>: <a href="#42440" title="B">B</a> = <a href="#42433" title="[F[_], B](b: =&gt; B, k: (F[A]) =&gt; B)(implicit p: scalaz.Pure[F])B">foldLift</a><span title="(b: =&gt; B, k: (Option[A]) =&gt; B)(implicit p: scalaz.Pure[Option])B" class="delimiter">[</span><span title="Option">Option</span>, <a href="#42440" title="B">B</a><span class="delimiter">]</span><a href="Pure.scala.html#40051" title="=&gt; scalaz.Pure[Option]" class="delimiter">(</a><a href="#370937" title="=&gt; B">b</a>, <a href="#370938" title="(Option[A]) =&gt; B">k</a><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
+   */</span>
+  <span class="keyword">def</span> <a title="[B](b: =&gt; B, f: (A) =&gt; scalaz.IterV[A,B])scalaz.IterV[A,B]" id="42441">iterDoneOr</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="42443">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; B" id="288874">b</a>: =&gt; B, <a title="(A) =&gt; scalaz.IterV[A,B]" id="288875">f</a>: A =&gt; IterV<span class="delimiter">[</span>A, B<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="Iteratee.scala.html#14957" title="scalaz.IterV[A,B]">IterV</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span> = <a href="PimpedType.scala.html#42151" title="=&gt; Option[A]">value</a> <span title="scalaz.IterV[A,B]" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="scalaz.IterV[A,B]">None</span>    =&gt; <a href="Iteratee.scala.html#14958" title="object scalaz.IterV">IterV</a>.<a href="Iteratee.scala.html#45971" title="(a: =&gt; B, i: =&gt; scalaz.Input[A])scalaz.IterV[A,B]">Done</a><span class="delimiter">(</span><a href="#288874" title="=&gt; B">b</a>, <a href="Iteratee.scala.html#14958" title="object scalaz.IterV">IterV</a>.<a href="Iteratee.scala.html#45962" title="object scalaz.IterV.EOF">EOF</a>.<a href="Iteratee.scala.html#286103" title="scalaz.Input[A]">apply</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="scalaz.IterV[A,B]">Some</span><span class="delimiter">(</span><a title="A" id="371188">a</a><span class="delimiter">)</span> =&gt; <a href="#288875" title="(v1: A)scalaz.IterV[A,B]">f</a><span class="delimiter">(</span><a href="#371188" title="A">a</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Options extends java.lang.Object with ScalaObject" id="17081">Options</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](o: Option[A])scalaz.OptionW[A]" id="39180">OptionTo</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39182">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="Option[A]" id="42330">o</a>: <span title="Option[A]">Option</span><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#17171" title="scalaz.OptionW[A]">OptionW</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="#371194" title="java.lang.Object with scalaz.OptionW[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.OptionW[A]" id="371194">OptionW</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="Option[A]" id="371198">value</a> = <a href="#42330" title="Option[A]">o</a>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="[A](a: A)Option[A]" id="39183">some</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39185">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A" id="217852">a</a>: <a href="#39185" title="A">A</a><span class="delimiter">)</span>: <span title="Option[A]">Option</span><span class="delimiter">[</span>A<span class="delimiter">]</span> = <span title="(x: A)Some[A]">Some</span><span class="delimiter">(</span><a href="#217852" title="A">a</a><span class="delimiter">)</span>
+
+  <span class="keyword">def</span> <a title="[A]=&gt; Option[A]" id="39186">none</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39188">A</a><span class="delimiter">]</span>: <span title="Option[A]">Option</span><span class="delimiter">[</span>A<span class="delimiter">]</span> = <span title="object None">None</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

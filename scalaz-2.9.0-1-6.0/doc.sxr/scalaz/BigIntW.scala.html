@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/BigIntW.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait BigIntW extends java.lang.Object with scalaz.PimpedType[BigInt] with ScalaObject" id="8468">BigIntW</a> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#17495" title="scalaz.PimpedType[BigInt]">PimpedType</a><span class="delimiter">[</span>BigInt<span class="delimiter">]</span> <span class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+  
+  <span class="keyword">def</span> <a title="=&gt; scalaz.BigIntMultiplication" id="99834">∏</a> : <a href="Multiplications.scala.html#8459" title="scalaz.BigIntMultiplication">BigIntMultiplication</a> = <a href="Multiplications.scala.html#38882" title="(n: BigInt)scalaz.BigIntMultiplication">multiplication</a><span class="delimiter">(</span><a href="PimpedType.scala.html#42151" title="=&gt; BigInt">value</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait BigInts extends java.lang.Object with ScalaObject" id="8465">BigInts</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.BigInts.BigIntTo : (n: BigInt)scalaz.BigIntW" id="38311">BigIntTo</a><span class="delimiter">(</span><a title="BigInt" id="64817">n</a>: <span title="BigInt">BigInt</span><span class="delimiter">)</span>: <a href="#8468" title="scalaz.BigIntW">BigIntW</a> = <a href="#100167" title="java.lang.Object with scalaz.BigIntW{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.BigIntW" id="100167">BigIntW</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="BigInt" id="100171">value</a> = <a href="#64817" title="BigInt">n</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

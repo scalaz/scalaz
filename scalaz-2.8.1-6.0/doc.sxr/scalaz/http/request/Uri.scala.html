@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/request/Uri.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> request
+
+<span class="keyword">import</span> <a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#808993" title="object scalaz.http.Util.Nel">Nel</a>._
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+/**
+ * HTTP request URI.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2&quot;&gt;RFC 2616 Section 5.1.2 Request-URI&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Uri extends java.lang.Object with ScalaObject" id="27278">Uri</a> <span title="ScalaObject">{</span>
+  /**
+   * The path of this request URI.
+   */
+  <span class="keyword">val</span> <a title="=&gt; scalaz.NonEmptyList[Char]" id="834451">path</a>: <a href="../../NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char]
+
+  /**
+   * The query string of this request URI.
+   */
+  <span class="keyword">val</span> <a title="=&gt; Option[List[Char]]" id="834452">queryString</a>: <span title="Option[List[Char]]">Option</span>[List[Char]]
+
+  <span class="keyword">import</span> <a href="#27279" title="object scalaz.http.request.Uri">Uri</a>.uri
+
+  /**
+   * Returns a request URI with the given path and this query string.
+   */
+  <span class="keyword">def</span> <a title="(p: scalaz.NonEmptyList[Char])java.lang.Object with scalaz.http.request.Uri" id="834454">apply</a>(<a title="scalaz.NonEmptyList[Char]" id="855370">p</a>: <a href="../../NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char]) = <a href="#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#855370" title="scalaz.NonEmptyList[Char]">p</a>, <a href="#834452" title="=&gt; Option[List[Char]]">queryString</a>)
+
+  /**
+   * Returns a request URI with the given potential query string and this path.
+   */
+  <span class="keyword">def</span> <a title="(q: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri" id="834455">apply</a>(<a title="Option[List[Char]]" id="855374">q</a>: <span title="Option[List[Char]]">Option</span>[List[Char]]) = <a href="#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#834451" title="=&gt; scalaz.NonEmptyList[Char]">path</a>, <a href="#855374" title="Option[List[Char]]">q</a>)
+
+  /**
+   * Returns a request URI after applying the given transformation to the path.
+   */
+  <span class="keyword">def</span> <a title="(f: (scalaz.NonEmptyList[Char]) =&gt; scalaz.NonEmptyList[Char])java.lang.Object with scalaz.http.request.Uri" id="834456">+++</a>(<a title="(scalaz.NonEmptyList[Char]) =&gt; scalaz.NonEmptyList[Char]" id="855378">f</a>: NonEmptyList[Char] =&gt; NonEmptyList[Char]) = <a href="#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#855378" title="(v1: scalaz.NonEmptyList[Char])scalaz.NonEmptyList[Char]">f</a>(<a href="#27278" title="Uri.this.type" class="keyword">this</a>.<a href="#834451" title="=&gt; scalaz.NonEmptyList[Char]">path</a>), <a href="#834452" title="=&gt; Option[List[Char]]">queryString</a>)
+
+  /**
+   * Returns a request URI after applying the given transformation to the query string.
+   */
+  <span class="keyword">def</span> <a title="(f: (Option[List[Char]]) =&gt; Option[List[Char]])java.lang.Object with scalaz.http.request.Uri" id="834457">++++</a>(<a title="(Option[List[Char]]) =&gt; Option[List[Char]]" id="855384">f</a>: Option[List[Char]] =&gt; Option[List[Char]]) = <a href="#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#834451" title="=&gt; scalaz.NonEmptyList[Char]">path</a>, <a href="#855384" title="(v1: Option[List[Char]])Option[List[Char]]">f</a>(<a href="#27278" title="Uri.this.type" class="keyword">this</a>.<a href="#834452" title="=&gt; Option[List[Char]]">queryString</a>))
+
+  /**
+   * Returns the path extension - characters after the last dot (.) in the path.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="String" id="834459">pathExtension</a> = <a href="../Util.scala.html#809001" title="(xs: scalaz.NonEmptyList[Char])List[Char]">path</a>.<a title="(p: (Char) =&gt; Boolean)List[Char]" id="32632">dropWhile</a>(<a href="#851737" title="(x$1: Char)Boolean">_</a> != <span title="Char('.')" class="char">'.'</span>).<span title="=&gt; List[Char]">reverse</span>.<a title="(p: (Char) =&gt; Boolean)List[Char]" id="32630">takeWhile</a>(<a href="#851752" title="(x$1: Char)Boolean">_</a> != <span title="Char('.')" class="char">'.'</span>).<span title="=&gt; List[Char]">reverse</span>.<span title="=&gt; String">mkString</span>
+  
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="List[String]" id="834461">parts</a> : <span title="List[String]">List</span>[String] = {
+    <a href="#834451" title="=&gt; scalaz.NonEmptyList[Char]">path</a>.<a href="../../NonEmptyList.scala.html#42813" title="=&gt; List[Char]">list</a>.<span title="=&gt; List[Char]">reverse</span>.<a title="(z: List[List[Char]])(f: (List[List[Char]], Char) =&gt; List[List[Char]])List[List[Char]]" id="41638">foldLeft</a>(<a title="[A](xs: A*)List[A]" id="32659">List</a><span title="(xs: List[Char]*)List[List[Char]]">[</span><span title="List[Char]">List</span>[Char]](<span title="object Nil">Nil</span>))((<a title="List[List[Char]]" id="855411">rs</a>, <a title="Char" id="855412">ch</a><a title="Char" id="4357">)</a> =&gt; {
+      <span title="List[List[Char]]" class="keyword">if</span> (<a href="#855412" title="(x$1: Char)Boolean">ch</a> == <span title="Char('/')" class="char">'/'</span>) { <span title="object Nil">Nil</span> <a href="#855418" title="scala.collection.immutable.Nil.type">::</a> <a href="#855411" title="(x: List[Char])List[List[Char]]">rs</a> } <span class="keyword">else</span> { (<a href="#855412" title="Char">ch</a> <a href="#855426" title="Char">::</a> <a href="#855411" title="List[List[Char]]">rs</a>.<a title="(x: Char)List[Char]" id="28917">head</a>)  <a href="#855425" title="List[Char]">::</a> <a href="#855411" title="List[List[Char]]">rs</a>.<a title="(x: List[Char])List[List[Char]]" id="29040">tail</a> }
+    }).<a title="(p: (List[Char]) =&gt; Boolean)List[List[Char]]" id="29006">filter</a>(<a title="=&gt; Boolean" id="4328">!</a><a href="#855442" title="List[Char]">_</a>.<a title="=&gt; Boolean" id="28908">isEmpty</a>).<a title="(f: (List[Char]) =&gt; String)(implicit bf: scala.collection.generic.CanBuildFrom[List[List[Char]],String,List[String]])List[String]" id="28996">map</a><a title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,String,List[String]]" id="32653">(</a><a href="#855459" title="List[Char]">_</a>.<span title="=&gt; String">mkString</span>)
+  }
+
+  <span class="keyword">import</span> <a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.{asHashMap, mapHeads}
+
+  /**
+   * Returns the query string split into values by &lt;code&gt;'='&lt;/code&gt;.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Option[List[(List[Char], List[Char])]]" id="834464">parameters</a> = <a href="../../MA.scala.html#57127" title="(f: (List[Char]) =&gt; List[(List[Char], List[Char])])(implicit t: scalaz.Functor[Option])Option[List[(List[Char], List[Char])]]">queryString</a> <a href="../../Functor.scala.html#58566" title="=&gt; scalaz.Functor[Option]">∘</a> (<a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#808968" title="(p: List[Char])List[(List[Char], List[Char])]">parameters</a>(<a href="#843105" title="List[Char]">_</a>))
+
+  /**
+   * Returns the query string split into values by &lt;code&gt;'='&lt;/code&gt; backed with a hash map.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Option[scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]]" id="834466">parametersMap</a> = <a href="../../MA.scala.html#57127" title="(f: (List[(List[Char], List[Char])]) =&gt; scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]])(implicit t: scalaz.Functor[Option])Option[scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]]">parameters</a> <a href="../../Functor.scala.html#58566" title="=&gt; scalaz.Functor[Option]">∘</a> (<a href="../Util.scala.html#808979" title="&lt;refinement&gt;[T[_], SM[_]] extends java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]">asHashMap</a><a href="../Util.scala.html#811544" title="(kvs: List[(List[Char], List[Char])])(implicit f: scalaz.Foldable[List],implicit s: scalaz.Semigroup[scalaz.NonEmptyList[List[Char]]],implicit md: scalaz.Monad[scalaz.NonEmptyList])scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">[</a><span title="List">List</span>, <a href="../../NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList">NonEmptyList</a>]<a href="../../Foldable.scala.html#91310" title="=&gt; scalaz.Foldable[List]">(</a><a href="#843496" title="List[(List[Char], List[Char])]">_</a>))
+
+  /**
+   * Returns the query string split into values by &lt;code&gt;'='&lt;/code&gt; (removing duplicate values for a given key) backed
+   * with a hash map.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Option[scala.collection.immutable.Map[List[Char],List[Char]]]" id="834468">parametersMapHeads</a> = <a href="../../MA.scala.html#57127" title="(f: (scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]) =&gt; scala.collection.immutable.Map[List[Char],List[Char]])(implicit t: scalaz.Functor[Option])Option[scala.collection.immutable.Map[List[Char],List[Char]]]">parametersMap</a> <a href="../../Functor.scala.html#58566" title="=&gt; scalaz.Functor[Option]">∘</a> (<a href="../Util.scala.html#808971" title="(p: scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]])scala.collection.immutable.Map[List[Char],List[Char]]">mapHeads</a>(<a href="#844665" title="scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">_</a>))
+}
+
+<span class="keyword">trait</span> <a title="trait Uris extends java.lang.Object with ScalaObject" id="27284">Uris</a> <span title="ScalaObject">{</span>
+  /**
+   * Takes the given string and splits it into a URI and query string by &lt;code&gt;'?'&lt;/code&gt; character.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.request.Uris.ListUri : (cs: List[Char])Option[scalaz.http.request.Uri]" id="808760">ListUri</a>(<a title="List[Char]" id="809848">cs</a>: <span title="List[Char]">List</span>[Char]): <span title="Option[scalaz.http.request.Uri]">Option</span>[Uri] = <a href="#809848" title="List[Char]">cs</a> <span title="Option[scalaz.http.request.Uri]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="object Nil">Nil</span> =&gt; <span title="object None">None</span>
+    <span title="None.type" class="keyword">case</span> <a title="Char" id="855493">x</a> :: _ <span class="keyword">if</span> <a href="#855493" title="(x$1: Char)Boolean">x</a> == <span title="Char('?')" class="char">'?'</span> =&gt; <span title="object None">None</span>
+    <span title="Some[java.lang.Object with scalaz.http.request.Uri]" class="keyword">case</span> <a title="Char" id="855504">h</a> :: <a title="List[Char]" id="855505">t</a> =&gt; {
+      <span class="keyword">val</span> <a title="(List[Char], List[Char])" id="855507">z</a> = <a href="#855505" title="List[Char]">t</a>.<a title="(p: (Char) =&gt; Boolean)(List[Char], List[Char])" id="32634">span</a>(<a href="#855512" title="(x$1: Char)Boolean">_</a> != <span title="Char('?')" class="char">'?'</span>)
+      <span title="(x: java.lang.Object with scalaz.http.request.Uri)Some[java.lang.Object with scalaz.http.request.Uri]">Some</span>(<a href="#27279" title="object scalaz.http.request.Uri">Uri</a>.<a href="#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="../../NonEmptyList.scala.html#34802" title="(h: Char,t: List[Char])scalaz.NonEmptyList[Char]">nel</a>(<a href="#855504" title="Char">h</a>, <a href="#855507" title="(List[Char], List[Char])">z</a>.<a title="=&gt; List[Char]" id="36143">_1</a>), <a href="#855507" title="(List[Char], List[Char])">z</a>.<a title="=&gt; List[Char]" id="36145">_2</a> <span title="Option[List[Char]]" class="keyword">match</span> {
+        <span title="None.type" class="keyword">case</span> <span title="object Nil">Nil</span> =&gt; <span title="object None">None</span>
+        <span title="None.type" class="keyword">case</span> _ :: <span title="object Nil">Nil</span> =&gt; <span title="object None">None</span>
+        <span title="Some[List[Char]]" class="keyword">case</span> _ :: <a title="List[Char]" id="855569">k</a> =&gt; <span title="(x: List[Char])Some[List[Char]]">Some</span>(<a href="#855569" title="List[Char]">k</a>)
+      }))
+    }
+  }
+}
+
+/*
+ * HTTP request URI.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2&quot;&gt;RFC 2616 Section 5.1.2 Request-URI&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.request.Uri" id="27279">Uri</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27284" title="scalaz.http.request.Uris">Uris</a> {
+  /**
+   * An extractor that always matches with the URI path and query string.
+   */
+  <span class="keyword">def</span> <a title="(uri: scalaz.http.request.Uri)Option[(scalaz.NonEmptyList[Char], Option[List[Char]])]" id="836408">unapply</a>(<a title="scalaz.http.request.Uri" id="855580">uri</a>: <a href="#27278" title="scalaz.http.request.Uri">Uri</a>): <span title="Option[(scalaz.NonEmptyList[Char], Option[List[Char]])]">Option</span>[(NonEmptyList[Char], Option[List[Char]])] =
+    <span title="(x: (scalaz.NonEmptyList[Char], Option[List[Char]]))Some[(scalaz.NonEmptyList[Char], Option[List[Char]])]">Some</span><a title="(_1: scalaz.NonEmptyList[Char],_2: Option[List[Char]])(scalaz.NonEmptyList[Char], Option[List[Char]])" id="634">(</a><a href="#855580" title="scalaz.http.request.Uri">uri</a>.<a href="#834451" title="=&gt; scalaz.NonEmptyList[Char]">path</a>, <a href="#855580" title="scalaz.http.request.Uri">uri</a>.<a href="#834452" title="=&gt; Option[List[Char]]">queryString</a>)
+
+  /**
+   * Constructs a URI with the given path and query string.
+   */
+  <span class="keyword">def</span> <a title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri" id="836409">uri</a>(<a title="scalaz.NonEmptyList[Char]" id="837541">p</a>: <a href="../../NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char], <a title="Option[List[Char]]" id="837542">s</a>: <span title="Option[List[Char]]">Option</span>[List[Char]]) = <a href="#837545" title="java.lang.Object with scalaz.http.request.Uri{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.request.Uri" id="837545">Uri</a> {
+    <span class="keyword">val</span> <a title="scalaz.NonEmptyList[Char]" id="837547">path</a> = <a href="#837541" title="scalaz.NonEmptyList[Char]">p</a>
+    <span class="keyword">val</span> <a title="Option[List[Char]]" id="837549">queryString</a> = <a href="#837542" title="Option[List[Char]]">s</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

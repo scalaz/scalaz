@@ -1,0 +1,574 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.http.request</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="../../package.html" class="extype" name="scalaz">scalaz</a>.<a href="../package.html" class="extype" name="scalaz.http">http</a></p>
+
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <h1>request</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">package</span>
+      <span class="symbol">
+        <span class="name">request</span>
+        
+        
+        
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          
+          
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="true" name="scalaz.http.request.CaseMethod">
+      <a id="CaseMethod:CaseMethod"></a>
+      <h4 class="signature"><a href="CaseMethod.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">CaseMethod</span>
+        
+        
+        <span class="result"> extends Method</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">A HTTP method whose name comes from toString().</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Line">
+      <a id="Line:Line"></a>
+      <h4 class="signature"><a href="Line.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Line</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">A request line.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Lines">
+      <a id="Lines:Lines"></a>
+      <h4 class="signature"><a href="Lines.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Lines</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Method">
+      <a id="Method:Method"></a>
+      <h4 class="signature"><a href="Method.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Method</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request method.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Methods">
+      <a id="Methods:Methods"></a>
+      <h4 class="signature"><a href="Methods.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Methods</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Request">
+      <a id="Request:Request[IN]"></a>
+      <h4 class="signature"><a href="Request.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Request</span>
+        <span class="tparams">[<span name="IN">IN<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.RequestHeader">
+      <a id="RequestHeader:RequestHeader"></a>
+      <h4 class="signature"><a href="RequestHeader.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">RequestHeader</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request headers.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.RequestHeaders">
+      <a id="RequestHeaders:RequestHeaders"></a>
+      <h4 class="signature"><a href="RequestHeaders.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">RequestHeaders</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Uri">
+      <a id="Uri:Uri"></a>
+      <h4 class="signature"><a href="Uri.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Uri</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request URI.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.http.request.Uris">
+      <a id="Uris:Uris"></a>
+      <h4 class="signature"><a href="Uris.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Uris</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scalaz.http.request.Accept">
+      <a id="Accept:Accept"></a>
+      <h4 class="signature"><a href="Accept$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Accept</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.AcceptCharset">
+      <a id="AcceptCharset:AcceptCharset"></a>
+      <h4 class="signature"><a href="AcceptCharset$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">AcceptCharset</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.2">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.AcceptEncoding">
+      <a id="AcceptEncoding:AcceptEncoding"></a>
+      <h4 class="signature"><a href="AcceptEncoding$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">AcceptEncoding</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.AcceptLanguage">
+      <a id="AcceptLanguage:AcceptLanguage"></a>
+      <h4 class="signature"><a href="AcceptLanguage$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">AcceptLanguage</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Authorization">
+      <a id="Authorization:Authorization"></a>
+      <h4 class="signature"><a href="Authorization$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Authorization</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.8">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.CONNECT">
+      <a id="CONNECT:CONNECT"></a>
+      <h4 class="signature"><a href="CONNECT$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">CONNECT</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.9">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.DELETE">
+      <a id="DELETE:DELETE"></a>
+      <h4 class="signature"><a href="DELETE$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">DELETE</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.7">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Expect">
+      <a id="Expect:Expect"></a>
+      <h4 class="signature"><a href="Expect$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Expect</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.20">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.From">
+      <a id="From:From"></a>
+      <h4 class="signature"><a href="From$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">From</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.22">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.GET">
+      <a id="GET:GET"></a>
+      <h4 class="signature"><a href="GET$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">GET</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.HEAD">
+      <a id="HEAD:HEAD"></a>
+      <h4 class="signature"><a href="HEAD$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">HEAD</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Host">
+      <a id="Host:Host"></a>
+      <h4 class="signature"><a href="Host$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Host</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.IfMatch">
+      <a id="IfMatch:IfMatch"></a>
+      <h4 class="signature"><a href="IfMatch$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IfMatch</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.IfModifiedSince">
+      <a id="IfModifiedSince:IfModifiedSince"></a>
+      <h4 class="signature"><a href="IfModifiedSince$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IfModifiedSince</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.IfNoneMatch">
+      <a id="IfNoneMatch:IfNoneMatch"></a>
+      <h4 class="signature"><a href="IfNoneMatch$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IfNoneMatch</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.IfRange">
+      <a id="IfRange:IfRange"></a>
+      <h4 class="signature"><a href="IfRange$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IfRange</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.27">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.IfUnmodifiedSince">
+      <a id="IfUnmodifiedSince:IfUnmodifiedSince"></a>
+      <h4 class="signature"><a href="IfUnmodifiedSince$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IfUnmodifiedSince</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.28">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Line">
+      <a id="Line:Line"></a>
+      <h4 class="signature"><a href="Line$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Line</span>
+        
+        
+        <span class="result"> extends Lines</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">A request line.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.MaxForwards">
+      <a id="MaxForwards:MaxForwards"></a>
+      <h4 class="signature"><a href="MaxForwards$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">MaxForwards</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.31">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Method">
+      <a id="Method:Method"></a>
+      <h4 class="signature"><a href="Method$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Method</span>
+        
+        
+        <span class="result"> extends Methods</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request method.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.OPTIONS">
+      <a id="OPTIONS:OPTIONS"></a>
+      <h4 class="signature"><a href="OPTIONS$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">OPTIONS</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.POST">
+      <a id="POST:POST"></a>
+      <h4 class="signature"><a href="POST$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">POST</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.PUT">
+      <a id="PUT:PUT"></a>
+      <h4 class="signature"><a href="PUT$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">PUT</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.6">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.ProxyAuthorization">
+      <a id="ProxyAuthorization:ProxyAuthorization"></a>
+      <h4 class="signature"><a href="ProxyAuthorization$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">ProxyAuthorization</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.34">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Range">
+      <a id="Range:Range"></a>
+      <h4 class="signature"><a href="Range$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Range</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Referer">
+      <a id="Referer:Referer"></a>
+      <h4 class="signature"><a href="Referer$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Referer</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Request">
+      <a id="Request:Request"></a>
+      <h4 class="signature"><a href="Request$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Request</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.RequestHeader">
+      <a id="RequestHeader:RequestHeader"></a>
+      <h4 class="signature"><a href="RequestHeader$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">RequestHeader</span>
+        
+        
+        <span class="result"> extends RequestHeaders</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">HTTP request headers.</p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.TE">
+      <a id="TE:TE"></a>
+      <h4 class="signature"><a href="TE$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">TE</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.39">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.TRACE">
+      <a id="TRACE:TRACE"></a>
+      <h4 class="signature"><a href="TRACE$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">TRACE</span>
+        
+        
+        <span class="result"> extends CaseMethod with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.8">§</a></p>
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.Uri">
+      <a id="Uri:Uri"></a>
+      <h4 class="signature"><a href="Uri$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Uri</span>
+        
+        
+        <span class="result"> extends Uris</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.http.request.UserAgent">
+      <a id="UserAgent:UserAgent"></a>
+      <h4 class="signature"><a href="UserAgent$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">UserAgent</span>
+        
+        
+        <span class="result"> extends RequestHeader with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt"><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43">§</a></p>
+    </li></ol>
+            </div>
+
+        
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

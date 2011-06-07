@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/FirstOption.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait FirstOption[A] extends java.lang.Object with scalaz.NewType[Option[A]]" id="13991">FirstOption</a>[<a title="&gt;: Nothing &lt;: Any" id="21599">A</a>] <span class="keyword">extends</span> <a href="NewType.scala.html#17963" title="scalaz.NewType[Option[A]]">NewType</a>[Option[A]]
+
+<span class="keyword">trait</span> <a title="trait FirstOptions extends java.lang.Object with ScalaObject" id="13997">FirstOptions</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](a: Option[A])scalaz.FirstOption[A]" id="34048">FirstOptionTo</a>[<a title="&gt;: Nothing &lt;: Any" id="34050">A</a>](<a title="Option[A]" id="56721">a</a>: <a title="Option[A]" id="1263">Option</a>[A]): <a href="#13991" title="scalaz.FirstOption[A]">FirstOption</a>[A] = <a href="#177223" title="java.lang.Object with scalaz.FirstOption[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.FirstOption[A]" id="177223">FirstOption</a>[A] {
+    <span class="keyword">val</span> <a title="Option[A]" id="177227">value</a> = <a href="#56721" title="Option[A]">a</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

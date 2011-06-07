@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/http/ExampleApplication.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> Scalaz._
+<span class="keyword">import</span> scalaz.http._
+<span class="keyword">import</span> response._
+<span class="keyword">import</span> request._
+<span class="keyword">import</span> Slinky._
+<span class="keyword">import</span> servlet._
+<span class="keyword">import</span> HttpServlet.resource
+
+<span class="keyword">final</span> <span class="keyword">class</span> <a title="class ExampleApplication extends java.lang.Object with scalaz.http.servlet.StreamStreamServletApplication with ScalaObject" id="25155">ExampleApplication</a> <a title="ScalaObject" id="1446" class="keyword">extends</a> <a href="../../http/servlet/StreamStreamServletApplication.scala.html#26814" title="scalaz.http.servlet.StreamStreamServletApplication">StreamStreamServletApplication</a> {
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.CharSet" id="808810">charset</a> = <a href="../../CharSet.scala.html#33958" title="=&gt; scalaz.CharSet">UTF8</a>
+
+  <span class="keyword">import</span> Request._
+
+  <span class="keyword">def</span> <a title="(s: String)(implicit request: scalaz.http.request.Request[Stream])java.lang.Object with scalaz.http.response.Response[Stream]" id="808813">ok</a>(<a title="String" id="813103">s</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.http.request.Request[Stream]" id="813104">request</a>: <a href="../../http/request/Request.scala.html#27182" title="scalaz.http.request.Request[Stream]">Request</a>[Stream]) = <a href="../../http/response/Response.scala.html#810236" title="(h: scalaz.http.response.ResponseHeader,s: String)scalaz.http.response.Response[Stream]">OK</a><a href="../../http/response/Response.scala.html#810242" title="(a: scalaz.http.response.xhtml.Doctype)(implicit b: scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype],implicit s: scalaz.Semigroup[Stream[Byte]])java.lang.Object with scalaz.http.response.Response[Stream]">(</a><a href="../../http/response/ResponseHeader.scala.html#808755" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>, <span title="java.lang.String(&quot;text/html&quot;)" class="string">&quot;text/html&quot;</span>) <a href="../../http/response/Response.scala.html#810242" title="(a: scala.xml.Elem)(implicit b: scalaz.http.response.Body[Stream,scala.xml.Elem],implicit s: scalaz.Semigroup[Stream[Byte]])java.lang.Object with scalaz.http.response.Response[Stream]">&lt;&lt;</a> <a href="../../http/response/xhtml/Doctype.scala.html#808791" title="=&gt; scalaz.http.response.xhtml.Doctype">transitional</a> <a href="../../http/response/Body.scala.html#808772" title="implicit scalaz.http.response.Bodys.ElemStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scala.xml.Elem]">&lt;&lt;</a> <a href="#808814" title="(s: String)scala.xml.Elem">say</a>(<a href="#813103" title="String">s</a>)
+
+  <span class="keyword">def</span> <a title="(s: String)scala.xml.Elem" id="808814">say</a>(<a title="String" id="813742">s</a>: <span title="String">String</span>) = {
+    &lt;<a title="scala.xml.Elem" id="813745">html</a>&gt;
+      &lt;<a title="scala.xml.Elem" id="813884">body</a>&gt;
+        &lt;<a title="scala.xml.Elem" id="813888">p</a>&gt;
+          {<a href="#813742" title="String">s</a>}
+        &lt;/p&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  }
+
+  <span class="keyword">def</span> <a title="(implicit request: scalaz.http.request.Request[Stream],implicit servletRequest: scalaz.http.servlet.HttpServletRequest)Option[scalaz.http.response.Response[Stream]]" id="808815">handle</a>(<span class="keyword">implicit</span> <a title="scalaz.http.request.Request[Stream]" id="808878">request</a>: <a href="../../http/request/Request.scala.html#27182" title="scalaz.http.request.Request[Stream]">Request</a>[Stream], <a title="scalaz.http.servlet.HttpServletRequest" id="808879">servletRequest</a>: <a href="../../http/servlet/HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>): <a title="Option[scalaz.http.response.Response[Stream]]" id="1263">Option</a>[Response[Stream]] = {
+    <a href="#808878" title="scalaz.http.request.Request[Stream]">request</a> <span title="Option[scalaz.http.response.Response[Stream]]" class="keyword">match</span> {
+      <span title="Some[java.lang.Object with scalaz.http.response.Response[Stream]]" class="keyword">case</span> <a href="../../http/request/Request.scala.html#814200" title="(r: scalaz.http.request.Request[Stream])Option[(scalaz.http.request.Method, List[String])]">MethodParts</a>(<a href="../../http/request/Method.scala.html#26931" title="object scalaz.http.request.GET">GET</a>, <span title="object Nil">Nil</span>) =&gt; <span title="(x: java.lang.Object with scalaz.http.response.Response[Stream])Some[java.lang.Object with scalaz.http.response.Response[Stream]]">Some</span>(<a href="#808813" title="(s: String)(implicit request: scalaz.http.request.Request[Stream])java.lang.Object with scalaz.http.response.Response[Stream]">ok</a><a href="#808878" title="scalaz.http.request.Request[Stream]">(</a><span title="java.lang.String(&quot;Hello World&quot;)" class="string">&quot;Hello World&quot;</span>))
+      <span title="Some[java.lang.Object with scalaz.http.response.Response[Stream]]" class="keyword">case</span> <a href="../../http/request/Request.scala.html#814200" title="(r: scalaz.http.request.Request[Stream])Option[(scalaz.http.request.Method, List[String])]">MethodParts</a>(<a href="../../http/request/Method.scala.html#26931" title="object scalaz.http.request.GET">GET</a>, <span title="java.lang.String(&quot;hello&quot;)" class="string">&quot;hello&quot;</span> :: <a title="String" id="814259">name</a> :: <span title="object Nil">Nil</span>) =&gt; <span title="(x: java.lang.Object with scalaz.http.response.Response[Stream])Some[java.lang.Object with scalaz.http.response.Response[Stream]]">Some</span>(<a href="#808813" title="(s: String)(implicit request: scalaz.http.request.Request[Stream])java.lang.Object with scalaz.http.response.Response[Stream]">ok</a><a href="#808878" title="scalaz.http.request.Request[Stream]">(</a><a title="(args: Any*)String" id="1489" class="string">&quot;Hello, %s&quot;</a> format (<a href="#814259" title="String">name</a>)))
+      <span title="None.type" class="keyword">case</span> _ =&gt; <a title="object None" id="1843">None</a>
+    }
+  }
+
+  <span class="keyword">val</span> <a title="scalaz.http.servlet.ServletApplication[Stream,Stream]" id="808816">application</a> = <a href="#808819" title="scalaz.http.servlet.ServletApplication[Stream,Stream]" class="keyword">new</a> <a href="../../http/InputStreamer.scala.html#813044" title="anonymous class $anon extends scalaz.http.servlet.ServletApplication[Stream,Stream]" id="808819">ServletApplication</a>[Stream, Stream] {
+    <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest,implicit request: scalaz.http.request.Request[Stream])scalaz.http.response.Response[Stream]" id="808855">application</a>(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="808857">servlet</a>: <a href="../../http/servlet/HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="808858">servletRequest</a>: <a href="../../http/servlet/HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[Stream]" id="808859">request</a>: <a href="../../http/request/Request.scala.html#27182" title="scalaz.http.request.Request[Stream]">Request</a>[Stream]) = {
+      <a href="../../OptionW.scala.html#38452" title="(a: =&gt; scalaz.http.response.Response[Stream])scalaz.http.response.Response[Stream]">handle</a> | <a href="../../http/servlet/HttpServlet.scala.html#808801" title="(found: (Iterator[Byte]) =&gt; scalaz.http.response.Response[Stream],notFound: =&gt; scalaz.http.response.Response[Stream])(implicit s: scalaz.http.servlet.HttpServlet,implicit request: scalaz.http.request.Request[Stream])scalaz.http.response.Response[Stream]">resource</a><a href="#808857" title="scalaz.http.servlet.HttpServlet">(</a><a title="Iterator[Byte]" id="810488">x</a> =&gt; <a href="../../http/response/Response.scala.html#810242" title="(a: Stream[Byte])(implicit b: scalaz.http.response.Body[Stream,Stream[Byte]],implicit s: scalaz.Semigroup[Stream[Byte]])java.lang.Object with scalaz.http.response.Response[Stream]">OK</a> <a href="../../http/response/Body.scala.html#808765" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.http.response.Body[Stream,Stream[Byte]]">&lt;&lt;</a> <a href="#810488" title="Iterator[Byte]">x</a>.<a title="=&gt; Stream[Byte]" id="78233">toStream</a>, <a href="../../http/StreamStreamApplication.scala.html#808762" title="implicit scalaz.http.StreamStreamApplications.responseFromStatus : (s: scalaz.http.response.Status)(implicit req: scalaz.http.request.Request[Stream])scalaz.http.response.Response[Stream]">NotFound</a>.<a href="../../http/response/Response.scala.html#810264" title="=&gt; scalaz.http.response.Response[Stream]">xhtml</a>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

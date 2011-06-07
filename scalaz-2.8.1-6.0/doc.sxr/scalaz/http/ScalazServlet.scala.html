@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/ScalazServlet.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> javax.servlet.{ServletException, ServletConfig}
+<span class="keyword">import</span> Class.forName
+<span class="keyword">import</span> <a href="servlet/HttpServletRequest.scala.html#26701" title="object scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>._
+<span class="keyword">import</span> <a href="servlet/HttpServletResponse.scala.html#26722" title="object scalaz.http.servlet.HttpServletResponse">HttpServletResponse</a>._
+
+/**
+ * A servlet that can run scalaz applications. It is intended that subclasses apply one or more type arguments until a
+ * concrete class.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class ScalazServlet[IN[_], OUT[_], A &lt;: AnyRef{def application: scalaz.http.servlet.ServletApplication[IN,OUT]}] extends javax.servlet.http.HttpServlet with ScalaObject" id="26763">ScalazServlet</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="26821">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="836008">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="26822">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="836009">_</a>], <a title="&gt;: Nothing &lt;: AnyRef{def application: scalaz.http.servlet.ServletApplication[IN,OUT]}" id="26823">A</a> &lt;: { <span class="keyword">def</span> application: ServletApplication[IN, OUT] }]<a title="ScalaObject" id="1446">(</a><a title="Class[A]" id="836019">cl</a>: <a title="Class[A]" id="2434">Class</a>[A])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="836020">in</a>: <a href="InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="836021">e</a>: <a href="../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) <span class="keyword">extends</span> javax.servlet.http.<a title="javax.servlet.http.HttpServlet" id="809159">HttpServlet</a> {
+  /**
+   * A servlet application from request to response.
+   */
+  <span class="keyword">type</span> <a title="&lt;refinement&gt; extends AnyRef" id="836000">App</a> = <a href="#836016" title="&lt;refinement&gt; extends AnyRef">{</a> <span class="keyword">def</span> application: ServletApplication[IN, OUT] }
+
+  <span class="keyword">private</span>[servlet] <span class="keyword">var</span> <a title="ScalazServlet.this.App" id="836002">application</a>: <a href="#836016" title="ScalazServlet.this.App">App</a> = _
+
+  /**
+   * The &lt;code&gt;init-param&lt;/code&gt; to specify in &lt;code&gt;web.xml&lt;/code&gt; that denotes the class that is assignable to the
+   * class given in the constructor. It is the application that takes a request to a response.
+   */
+  <span class="keyword">val</span> <a title="java.lang.String" id="836004">applicationInitParam</a> = <span title="java.lang.String(&quot;application&quot;)" class="string">&quot;application&quot;</span>
+
+  /**
+   * Checks for the existence of the application init-param, that it is of a correct type and instantiates it.
+   */
+  <span class="keyword">override</span> <span class="keyword">final</span> <span class="keyword">def</span> <a title="(config: javax.servlet.ServletConfig)Unit" id="836006">init</a>(<a title="javax.servlet.ServletConfig" id="836023">config</a>: <a title="javax.servlet.ServletConfig" id="809044">ServletConfig</a>) {
+    <span class="keyword">super</span>.<a title="(x$1: javax.servlet.ServletConfig)Unit" id="810116">init</a>(<a href="#836023" title="javax.servlet.ServletConfig">config</a>)
+    <span class="keyword">val</span> <a title="java.lang.String" id="836026">p</a> = <a href="#836023" title="javax.servlet.ServletConfig">config</a>.<a title="(x$1: java.lang.String)java.lang.String" id="810139">getInitParameter</a>(<a href="#836004" title="=&gt; java.lang.String">applicationInitParam</a>)
+
+    <span title="Unit" class="keyword">if</span>(<a href="#836026" title="(x$1: AnyRef)Boolean" id="5819">p</a> == <span title="Null(null)" class="keyword">null</span>)
+      <span title="Nothing" class="keyword">throw</span> <span title="(x$1: java.lang.String)javax.servlet.ServletException" class="keyword">new</span> <span title="javax.servlet.ServletException">ServletException</span>(<span title="(x$1: Any)java.lang.String" class="string">&quot;Specify the &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#836004" title="=&gt; java.lang.String">applicationInitParam</a> + <span title="java.lang.String(&quot; init parameter&quot;)" class="string">&quot; init parameter&quot;</span>)
+    <span class="keyword">else</span> {
+      <span class="keyword">val</span> <a title="java.lang.Class[_]" id="836053">c</a> = <a title="(x$1: java.lang.String)java.lang.Class[_]" id="2435">forName</a>(<a href="#836026" title="java.lang.String">p</a>)
+
+      <span title="Unit" class="keyword">if</span>(<a href="#836019" title="(x$1: java.lang.Class[_])Boolean" id="217054">cl</a> isAssignableFrom <a href="#836053" title="java.lang.Class[_]">c</a>) {
+        <a href="#836002" title="(x$1: ScalazServlet.this.App)Unit">application</a> = <a href="#836053" title="java.lang.Class[_]">c</a>.<a title="()Any" id="217051">newInstance</a>.<a title="[T0]T0" id="5798">asInstanceOf</a><span title="ScalazServlet.this.App">[</span><a href="#836016" title="ScalazServlet.this.App">App</a>]
+      } <span class="keyword">else</span>
+        <span title="Nothing" class="keyword">throw</span> <span title="(x$1: java.lang.String)javax.servlet.ServletException" class="keyword">new</span> <span title="javax.servlet.ServletException">ServletException</span>(<a href="#836053" title="(other: String)java.lang.String" id="1489">c</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot; must be assignable to &quot;)" class="string">&quot; must be assignable to &quot;</span> + <a href="#836019" title="Class[A]">cl</a>)
+    }
+  }
+
+  /**
+   * Applies the given request to the underlying web application and sends the resulting response to the given response.
+   */
+  <span class="keyword">override</span> <span class="keyword">final</span> <span class="keyword">def</span> <a title="(request: javax.servlet.http.HttpServletRequest,response: javax.servlet.http.HttpServletResponse)Unit" id="836007">service</a>(<a title="javax.servlet.http.HttpServletRequest" id="836389">request</a>: javax.servlet.http.<a title="javax.servlet.http.HttpServletRequest" id="809129">HttpServletRequest</a>, <a title="javax.servlet.http.HttpServletResponse" id="836390">response</a>: javax.servlet.http.<a title="javax.servlet.http.HttpServletResponse" id="809153">HttpServletResponse</a>) {
+    <a href="servlet/HttpServletRequest.scala.html#808782" title="implicit scalaz.http.servlet.HttpServletRequests.HttpServletRequestRequest : (r: javax.servlet.http.HttpServletRequest)scalaz.http.servlet.HttpServletRequest">request</a>.<a href="servlet/HttpServletRequest.scala.html#809018" title="[I[_]](implicit in: scalaz.http.InputStreamer[I])Option[java.lang.Object with scalaz.http.request.Request[I]]">asRequest</a><a href="#836020" title="(implicit in: scalaz.http.InputStreamer[IN])Option[java.lang.Object with scalaz.http.request.Request[IN]]">[</a><a href="#26821" title="IN">IN</a>].<a title="(f: (java.lang.Object with scalaz.http.request.Request[IN]) =&gt; Unit)Unit" id="38410">foreach</a>(<a title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.request.Request[IN]" id="838308">r</a> =&gt; {
+      <span class="keyword">val</span> <a title="scalaz.http.response.Response[OUT]" id="838309">res</a> = <a href="#836002" title="=&gt; ScalazServlet.this.App">application</a>.<a href="servlet/ServletApplication.scala.html#808847" title="(servlet: scalaz.http.servlet.HttpServlet,servletRequest: scalaz.http.servlet.HttpServletRequest,req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">application</a>(<a href="servlet/HttpServlet.scala.html#808785" title="implicit scalaz.http.servlet.HttpServlets.HttpServletServlet : (s: javax.servlet.http.HttpServlet)scalaz.http.servlet.HttpServlet" class="keyword">this</a>, <a href="servlet/HttpServletRequest.scala.html#808782" title="implicit scalaz.http.servlet.HttpServletRequests.HttpServletRequestRequest : (r: javax.servlet.http.HttpServletRequest)scalaz.http.servlet.HttpServletRequest">request</a>, <a href="#838308" title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.request.Request[IN]">r</a>)
+      <a href="servlet/HttpServletResponse.scala.html#808779" title="implicit scalaz.http.servlet.HttpServletResponses.HttpServletResponseResponse : (r: javax.servlet.http.HttpServletResponse)scalaz.http.servlet.HttpServletResponse">response</a>.<a href="servlet/HttpServletResponse.scala.html#809252" title="[OUT[_]](res: scalaz.http.response.Response[OUT])(implicit e: scalaz.Each[OUT])Unit">respond</a><span title="(res: scalaz.http.response.Response[OUT])(implicit e: scalaz.Each[OUT])Unit">[</span><a href="#26822" title="OUT">OUT</a>]<a href="#836021" title="scalaz.Each[OUT]">(</a><a href="#838309" title="scalaz.http.response.Response[OUT]">res</a>)
+    })
+  }
+}
+
+        </pre>
+    </body>
+</html>

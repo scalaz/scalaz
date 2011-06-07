@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/response/ResponseHeader.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> response
+
+/**
+ * HTTP response headers.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14&quot;&gt;RFC 2616 Section 14 Header Field Definitions&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait ResponseHeader extends java.lang.Object with ScalaObject" id="27678">ResponseHeader</a> <span title="ScalaObject">{</span>
+  /**
+   * A string representation of this request header.
+   */
+  <span class="keyword">val</span> <a title="=&gt; String" id="809856">asString</a>: <span title="String">String</span>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this header is an &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;entity header&lt;/a&gt;,
+   * &lt;code&gt;false&lt;/code&gt; otherwise.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="809858">isEntity</a> = <a href="#27678" title="scalaz.http.response.ResponseHeader" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> {
+    <span title="Boolean(true)" class="keyword">case</span> Entity(_) =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span title="Boolean(false)" class="keyword">case</span> _ =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this header is a &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;general header&lt;/a&gt;,
+   * &lt;code&gt;false&lt;/code&gt; otherwise.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="809860">isGeneral</a> = <a href="#27678" title="scalaz.http.response.ResponseHeader" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> {
+    <span title="Boolean(true)" class="keyword">case</span> General(_) =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span title="Boolean(false)" class="keyword">case</span> _ =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+  /**
+   * Returns the result of the given function to this header if it is an
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;entity header&lt;/a&gt;, otherwise returns the given value.
+   */
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.http.EntityHeader) =&gt; X,x: =&gt; X)X" id="809861">entity</a>[<a title="&gt;: Nothing &lt;: Any" id="809863">X</a>](<a title="(scalaz.http.EntityHeader) =&gt; X" id="869515">f</a>: EntityHeader =&gt; X, <a title="=&gt; X" id="869516">x</a>: =&gt; X) = <a href="#27678" title="scalaz.http.response.ResponseHeader" class="keyword">this</a> <span title="X" class="keyword">match</span> {
+    <span title="X" class="keyword">case</span> Entity(<a title="scalaz.http.EntityHeader" id="869519">h</a>) =&gt; <a href="#869515" title="(v1: scalaz.http.EntityHeader)X">f</a>(<a href="#869519" title="scalaz.http.EntityHeader">h</a>)
+    <span title="X" class="keyword">case</span> _ =&gt; <a href="#869516" title="=&gt; X">x</a>
+  }
+
+  /**
+   * Returns the result of the given function to this header if it is a
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;general header&lt;/a&gt;, otherwise returns the given value.
+   */
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.http.GeneralHeader) =&gt; X,x: =&gt; X)X" id="809864">general</a>[<a title="&gt;: Nothing &lt;: Any" id="809866">X</a>](<a title="(scalaz.http.GeneralHeader) =&gt; X" id="869525">f</a>: GeneralHeader =&gt; X, <a title="=&gt; X" id="869526">x</a>: =&gt; X) = <a href="#27678" title="scalaz.http.response.ResponseHeader" class="keyword">this</a> <span title="X" class="keyword">match</span> {
+    <span title="X" class="keyword">case</span> General(<a title="scalaz.http.GeneralHeader" id="869529">h</a>) =&gt; <a href="#869525" title="(v1: scalaz.http.GeneralHeader)X">f</a>(<a href="#869529" title="scalaz.http.GeneralHeader">h</a>)
+    <span title="X" class="keyword">case</span> _ =&gt; <a href="#869526" title="=&gt; X">x</a>
+  }
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.5&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869544" title="object scalaz.http.response.AcceptRanges" id="869552">AcceptRanges</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869536">asString</a> = <span title="java.lang.String(&quot;Accept-Ranges&quot;)" class="string">&quot;Accept-Ranges&quot;</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.6&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869563" title="object scalaz.http.response.Age" id="869571">Age</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869554">asString</a> = <span title="()java.lang.String">toString</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.19&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869582" title="object scalaz.http.response.ETag" id="869590">ETag</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869573">asString</a> = <span title="()java.lang.String">toString</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.30&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869598" title="object scalaz.http.response.Location" id="869606">Location</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="838717">asString</a> = <span title="()java.lang.String">toString</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.33&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869616" title="object scalaz.http.response.ProxyAuthenticate" id="869624">ProxyAuthenticate</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869608">asString</a> = <span title="java.lang.String(&quot;Proxy-Authenticate&quot;)" class="string">&quot;Proxy-Authenticate&quot;</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.37&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869634" title="object scalaz.http.response.RetryAfter" id="869642">RetryAfter</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869626">asString</a> = <span title="java.lang.String(&quot;Retry-After&quot;)" class="string">&quot;Retry-After&quot;</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869653" title="object scalaz.http.response.Server" id="869661">Server</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869644">asString</a> = <span title="()java.lang.String">toString</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869672" title="object scalaz.http.response.Vary" id="869680">Vary</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869663">asString</a> = <span title="()java.lang.String">toString</span>
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.47&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#869690" title="object scalaz.http.response.WWWAuthenticate" id="869698">WWWAuthenticate</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="869682">asString</a> = <span title="java.lang.String(&quot;WWW-Authenticate&quot;)" class="string">&quot;WWW-Authenticate&quot;</span>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class Entity extends java.lang.Object with scalaz.http.response.ResponseHeader with ScalaObject with Product" id="870812">Entity</a><span title="ScalaObject">(</span><a title="=&gt; scalaz.http.EntityHeader" id="869775">eh</a>: <a href="../EntityHeader.scala.html#26378" title="scalaz.http.EntityHeader">EntityHeader</a>) <span class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="String" id="869458">asString</a> = <a href="#869775" title="=&gt; scalaz.http.EntityHeader">eh</a>.<a href="../EntityHeader.scala.html#810098" title="=&gt; String">asString</a>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class General extends java.lang.Object with scalaz.http.response.ResponseHeader with ScalaObject with Product" id="870808">General</a><span title="ScalaObject">(</span><a title="=&gt; scalaz.http.GeneralHeader" id="869780">gh</a>: <a href="../GeneralHeader.scala.html#26405" title="scalaz.http.GeneralHeader">GeneralHeader</a>) <span class="keyword">extends</span> <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="String" id="869489">asString</a> = <a href="#869780" title="=&gt; scalaz.http.GeneralHeader">gh</a>.<a href="../GeneralHeader.scala.html#809992" title="=&gt; String">asString</a>
+}
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">trait</span> <a title="trait ResponseHeaders extends java.lang.Object with ScalaObject" id="27699">ResponseHeaders</a> <span title="ScalaObject">{</span>
+    /**
+   * Converts the given entity header into a response header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader" id="808755">entityToResponse</a>(<a title="scalaz.http.EntityHeader" id="809869">eh</a>: <a href="../EntityHeader.scala.html#26378" title="scalaz.http.EntityHeader">EntityHeader</a>): <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> = scalaz.http.response.<a href="#870812" title="(eh: scalaz.http.EntityHeader)scalaz.http.response.Entity">Entity</a>(<a href="#809869" title="scalaz.http.EntityHeader">eh</a>)
+
+  /**
+   * Converts the given general header into a response header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.ResponseHeaders.generalToResponse : (gh: scalaz.http.GeneralHeader)scalaz.http.response.ResponseHeader" id="808756">generalToResponse</a>(<a title="scalaz.http.GeneralHeader" id="809867">gh</a>: <a href="../GeneralHeader.scala.html#26405" title="scalaz.http.GeneralHeader">GeneralHeader</a>): <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a> = scalaz.http.response.<a href="#870808" title="(gh: scalaz.http.GeneralHeader)scalaz.http.response.General">General</a>(<a href="#809867" title="scalaz.http.GeneralHeader">gh</a>)
+
+  /**
+   * Converts the given response header into a string.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.ResponseHeaders.ResponseHeaderString : (rh: scalaz.http.response.ResponseHeader)String" id="808757">ResponseHeaderString</a>(<a title="scalaz.http.response.ResponseHeader" id="809852">rh</a>: <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a>) = <a href="#809852" title="scalaz.http.response.ResponseHeader">rh</a>.<a href="#809856" title="=&gt; String">asString</a>
+
+  /**
+   * Converts the given string into a response header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.ResponseHeaders.StringResponseHeader : (s: String)Option[scalaz.http.response.ResponseHeader]" id="808758">StringResponseHeader</a>(<a title="String" id="809850">s</a>: <span title="String">String</span>): <span title="Option[scalaz.http.response.ResponseHeader]">Option</span>[ResponseHeader] =
+    <a href="#27679" title="object scalaz.http.response.ResponseHeader">ResponseHeader</a>.<a href="#812566" title="(p: ((java.lang.String, Product with scalaz.http.response.ResponseHeader)) =&gt; Boolean)Option[(java.lang.String, Product with scalaz.http.response.ResponseHeader)]" id="41636">headers</a> <a title="(f: ((java.lang.String, Product with scalaz.http.response.ResponseHeader)) =&gt; Product with scalaz.http.response.ResponseHeader)Option[Product with scalaz.http.response.ResponseHeader]" id="38383">find</a> <a href="#869892" title="Boolean">{</a> <span title="Boolean" class="keyword">case</span> (<a title="java.lang.String" id="869895">n</a>, <a title="&lt;refinement&gt; extends Product with scalaz.http.response.ResponseHeader" id="869896">h</a>) =&gt; <a href="#869895" title="(x$1: AnyRef)Boolean">n</a> == <a href="#809850" title="String">s</a> } <span title="(alternative: =&gt; Option[Product with scalaz.http.response.ResponseHeader])Option[Product with scalaz.http.response.ResponseHeader]">map</span> (<a href="#869908" title="(java.lang.String, Product with scalaz.http.response.ResponseHeader)">_</a>.<a title="=&gt; &lt;refinement&gt; extends Product with scalaz.http.response.ResponseHeader" id="36145">_2</a>) <span title="(alternative: =&gt; Option[Product with scalaz.http.response.ResponseHeader])Option[Product with scalaz.http.response.ResponseHeader]">orElse</span>
+    <a href="../../MA.scala.html#57127" title="(f: (scalaz.http.GeneralHeader) =&gt; scalaz.http.response.General)(implicit t: scalaz.Functor[Option])Option[scalaz.http.response.General]">(</a><a href="../GeneralHeader.scala.html#808735" title="implicit scalaz.http.GeneralHeaders.StringGeneralHeader : (s: String)Option[Product with scalaz.http.GeneralHeader]">s</a>: <span title="Option[scalaz.http.GeneralHeader]">Option</span>[GeneralHeader]) <a href="../../Functor.scala.html#58566" title="=&gt; scalaz.Functor[Option]">∘</a> (scalaz.http.response.<a href="#870808" title="(gh: scalaz.http.GeneralHeader)scalaz.http.response.General">General</a>(<a href="#870097" title="scalaz.http.GeneralHeader">_</a>)) orElse
+    <a href="../../MA.scala.html#57127" title="(f: (scalaz.http.EntityHeader) =&gt; scalaz.http.response.Entity)(implicit t: scalaz.Functor[Option])Option[scalaz.http.response.Entity]">(</a><a href="../EntityHeader.scala.html#808730" title="implicit scalaz.http.EntityHeaders.StringEntityHeader : (s: String)Option[scalaz.http.EntityHeader]">s</a>: <span title="Option[scalaz.http.EntityHeader]">Option</span>[EntityHeader]) <a href="../../Functor.scala.html#58566" title="=&gt; scalaz.Functor[Option]">∘</a> (scalaz.http.response.<a href="#870812" title="(eh: scalaz.http.EntityHeader)scalaz.http.response.Entity">Entity</a>(<a href="#870516" title="scalaz.http.EntityHeader">_</a>))
+}
+
+/**
+ * HTTP response headers.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14&quot;&gt;RFC 2616 Section 14 Header Field Definitions&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.response.ResponseHeader" id="27679">ResponseHeader</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27699" title="scalaz.http.response.ResponseHeaders">ResponseHeaders</a> {
+  /**
+   * For deconstructing response headers into entity headers.
+   */
+  <span class="keyword">object</span> <a title="object scalaz.http.response.ResponseHeader.Entity" id="812562">Entity</a> <span title="ScalaObject">{</span>
+    /**
+     * Matches if the given response header is an entity header.
+     */
+    <span class="keyword">def</span> <a title="(h: scalaz.http.response.ResponseHeader)Option[scalaz.http.EntityHeader]" id="870758">unapply</a>(<a title="scalaz.http.response.ResponseHeader" id="870761">h</a>: <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a>) = <a href="#870761" title="scalaz.http.response.ResponseHeader">h</a> <span title="Option[scalaz.http.EntityHeader]" class="keyword">match</span> {
+      <span title="Some[scalaz.http.EntityHeader]" class="keyword">case</span> scalaz.http.response.Entity(<a title="scalaz.http.EntityHeader" id="870764">x</a>) =&gt; <span title="(x: scalaz.http.EntityHeader)Some[scalaz.http.EntityHeader]">Some</span>(<a href="#870764" title="scalaz.http.EntityHeader">x</a>)
+      <span title="None.type" class="keyword">case</span> _ =&gt; <span title="object None">None</span>
+    }
+  }
+
+  /**
+   * For deconstructing response headers into general headers.
+   */
+  <span class="keyword">object</span> <a title="object scalaz.http.response.ResponseHeader.General" id="812564">General</a> <span title="ScalaObject">{</span>
+    /**
+     * Matches if the given response header is a general header.
+     */
+    <span class="keyword">def</span> <a title="(h: scalaz.http.response.ResponseHeader)Option[scalaz.http.GeneralHeader]" id="870782">unapply</a>(<a title="scalaz.http.response.ResponseHeader" id="870785">h</a>: <a href="#27678" title="scalaz.http.response.ResponseHeader">ResponseHeader</a>) = <a href="#870785" title="scalaz.http.response.ResponseHeader">h</a> <span title="Option[scalaz.http.GeneralHeader]" class="keyword">match</span> {
+      <span title="Some[scalaz.http.GeneralHeader]" class="keyword">case</span> scalaz.http.response.General(<a title="scalaz.http.GeneralHeader" id="870788">x</a>) =&gt; <span title="(x: scalaz.http.GeneralHeader)Some[scalaz.http.GeneralHeader]">Some</span>(<a href="#870788" title="scalaz.http.GeneralHeader">x</a>)
+      <span title="None.type" class="keyword">case</span> _ =&gt; <span title="object None">None</span>
+    }
+  }
+
+  /**
+   * A list of known response headers.
+   */
+  <span class="keyword">val</span> <a title="List[(java.lang.String, Product with scalaz.http.response.ResponseHeader)]" id="812566">headers</a> = <a title="(xs: (java.lang.String, Product with scalaz.http.response.ResponseHeader)*)List[(java.lang.String, Product with scalaz.http.response.ResponseHeader)]" id="29299">List</a>(<span title="(_1: java.lang.String,_2: object scalaz.http.response.AcceptRanges)(java.lang.String, object scalaz.http.response.AcceptRanges)">(</span><span title="java.lang.String(&quot;accept-ranges&quot;)" class="string">&quot;accept-ranges&quot;</span>, <a href="#869552" title="object scalaz.http.response.AcceptRanges">AcceptRanges</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.Age)(java.lang.String, object scalaz.http.response.Age)">(</span><span title="java.lang.String(&quot;age&quot;)" class="string">&quot;age&quot;</span>, <a href="#869571" title="object scalaz.http.response.Age">Age</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.ETag)(java.lang.String, object scalaz.http.response.ETag)">(</span><span title="java.lang.String(&quot;etag&quot;)" class="string">&quot;etag&quot;</span>, <a href="#869590" title="object scalaz.http.response.ETag">ETag</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.Location)(java.lang.String, object scalaz.http.response.Location)">(</span><span title="java.lang.String(&quot;location&quot;)" class="string">&quot;location&quot;</span>, <a href="#869606" title="object scalaz.http.response.Location">Location</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.ProxyAuthenticate)(java.lang.String, object scalaz.http.response.ProxyAuthenticate)">(</span><span title="java.lang.String(&quot;proxy-authenticate&quot;)" class="string">&quot;proxy-authenticate&quot;</span>, <a href="#869624" title="object scalaz.http.response.ProxyAuthenticate">ProxyAuthenticate</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.RetryAfter)(java.lang.String, object scalaz.http.response.RetryAfter)">(</span><span title="java.lang.String(&quot;retry-after&quot;)" class="string">&quot;retry-after&quot;</span>, <a href="#869642" title="object scalaz.http.response.RetryAfter">RetryAfter</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.Server)(java.lang.String, object scalaz.http.response.Server)">(</span><span title="java.lang.String(&quot;server&quot;)" class="string">&quot;server&quot;</span>, <a href="#869661" title="object scalaz.http.response.Server">Server</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.Vary)(java.lang.String, object scalaz.http.response.Vary)">(</span><span title="java.lang.String(&quot;vary&quot;)" class="string">&quot;vary&quot;</span>, <a href="#869680" title="object scalaz.http.response.Vary">Vary</a>),
+                     <span title="(_1: java.lang.String,_2: object scalaz.http.response.WWWAuthenticate)(java.lang.String, object scalaz.http.response.WWWAuthenticate)">(</span><span title="java.lang.String(&quot;www-authenticate&quot;)" class="string">&quot;www-authenticate&quot;</span>, <a href="#869698" title="object scalaz.http.response.WWWAuthenticate">WWWAuthenticate</a>))
+
+}
+
+        </pre>
+    </body>
+</html>

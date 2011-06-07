@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/NonEmptyList.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait NonEmptyList[+A] extends java.lang.Object with ScalaObject" id="18068">NonEmptyList</a>[+<a title="&gt;: Nothing &lt;: Any" id="21830">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; A" id="42794">head</a>: <a href="#21830" title="A">A</a>
+  <span class="keyword">val</span> <a title="=&gt; List[A]" id="42795">tail</a>: <span title="List[A]">List</span>[A]
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="[B &gt;: A](b: B)scalaz.NonEmptyList[B]" id="42797">&lt;::</a>[<a title="&gt;: A &lt;: Any" id="42799">B</a> &gt;: A](<a title="B" id="281655">b</a>: <a href="#42799" title="B">B</a>): <a href="#18068" title="scalaz.NonEmptyList[B]">NonEmptyList</a>[B] = <a href="#34802" title="(h: B,t: List[B])scalaz.NonEmptyList[B]">nel</a>(<a href="#281655" title="B">b</a>, <a href="#42794" title="=&gt; A">head</a> <a href="#281668" title="A">::</a> <a href="#42795" title="(x: A)List[A]">tail</a>)
+
+  <span class="keyword">import</span> collection.mutable.ListBuffer
+
+  <span class="keyword">def</span> <a title="[B &gt;: A](bs: List[B])scalaz.NonEmptyList[B]" id="42801">&lt;:::</a>[<a title="&gt;: A &lt;: Any" id="42803">B</a> &gt;: A](<a title="List[B]" id="281702">bs</a>: <span title="List[B]">List</span>[B]): <a href="#18068" title="scalaz.NonEmptyList[B]">NonEmptyList</a>[B] = {
+    <span class="keyword">val</span> <a title="scala.collection.mutable.ListBuffer[B]" id="281705">b</a> = <span title="scala.collection.mutable.ListBuffer[B]" class="keyword">new</span> <span title="scala.collection.mutable.ListBuffer[B]">ListBuffer</span>[B]
+    <a href="#281705" title="(xs: scala.collection.TraversableOnce[B])b.type">b</a> ++= <a href="#281702" title="List[B]">bs</a>
+    <a href="#281705" title="(x: B)b.type">b</a> += <a href="#42794" title="=&gt; A">head</a>
+    <a href="#281705" title="(xs: scala.collection.TraversableOnce[B])b.type">b</a> ++= <a href="#42795" title="=&gt; List[A]">tail</a>
+    <span class="keyword">val</span> <a title="List[B]" id="281706">bb</a> = <a href="#281705" title="scala.collection.mutable.ListBuffer[B]">b</a>.<span title="=&gt; List[B]">toList</span>
+    <a href="#34802" title="(h: B,t: List[B])scalaz.NonEmptyList[B]">nel</a>(<a href="#281706" title="List[B]">bb</a>.<span title="=&gt; B">head</span>, <a href="#281706" title="List[B]">bb</a>.<span title="=&gt; List[B]">tail</span>)
+  }
+
+  <span class="keyword">def</span> <a title="[B &gt;: A](bs: List[B])scalaz.NonEmptyList[B]" id="42804">:::&gt;</a>[<a title="&gt;: A &lt;: Any" id="42806">B</a> &gt;: A](<a title="List[B]" id="281765">bs</a>: <span title="List[B]">List</span>[B]): <a href="#18068" title="scalaz.NonEmptyList[B]">NonEmptyList</a>[B] = <a href="#34802" title="(h: B,t: List[B])scalaz.NonEmptyList[B]">nel</a>(<a href="#42794" title="=&gt; A">head</a>, <a href="#42795" title="=&gt; List[A]">tail</a> <a href="#281778" title="List[A]">:::</a> <a href="#281765" title="(prefix: List[B])List[B]" id="32599">bs</a>)
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; B)scalaz.NonEmptyList[B]" id="42807">map</a>[<a title="&gt;: Nothing &lt;: Any" id="42809">B</a>](<a title="(A) =&gt; B" id="59189">f</a>: A =&gt; B): <a href="#18068" title="scalaz.NonEmptyList[B]">NonEmptyList</a>[B] = <a href="#34802" title="(h: B,t: List[B])scalaz.NonEmptyList[B]">nel</a>(<a href="#59189" title="(v1: A)B">f</a>(<a href="#42794" title="=&gt; A">head</a>), <a href="#42795" title="=&gt; List[A]">tail</a>.<a title="(f: (A) =&gt; B)(implicit bf: scala.collection.generic.CanBuildFrom[List[A],B,List[B]])List[B]" id="28996">map</a><a title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,B,List[B]]" id="29299">(</a><a href="#59189" title="(A) =&gt; B">f</a>))
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; scalaz.NonEmptyList[B])scalaz.NonEmptyList[B]" id="42810">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="42812">B</a>](<a title="(A) =&gt; scalaz.NonEmptyList[B]" id="87396">f</a>: A =&gt; NonEmptyList[B]): <a href="#18068" title="scalaz.NonEmptyList[B]">NonEmptyList</a>[B] = {
+    <span class="keyword">val</span> <a title="scala.collection.mutable.ListBuffer[B]" id="282105">b</a> = <span title="scala.collection.mutable.ListBuffer[B]" class="keyword">new</span> <span title="scala.collection.mutable.ListBuffer[B]">ListBuffer</span>[B]
+    <span class="keyword">val</span> <a title="scalaz.NonEmptyList[B]" id="282106">p</a> = <a href="#87396" title="(v1: A)scalaz.NonEmptyList[B]">f</a>(<a href="#42794" title="=&gt; A">head</a>)
+    <a href="#282105" title="(x: B)b.type">b</a> += <a href="#282106" title="scalaz.NonEmptyList[B]">p</a>.<a href="#42794" title="=&gt; B">head</a>
+    <a href="#282105" title="(xs: scala.collection.TraversableOnce[B])b.type">b</a> ++= <a href="#282106" title="scalaz.NonEmptyList[B]">p</a>.<a href="#42795" title="=&gt; List[B]">tail</a>
+    <a href="#42795" title="=&gt; List[A]">tail</a>.<a title="(f: (A) =&gt; scala.collection.mutable.ListBuffer[B])Unit" id="41627">foreach</a>(<a title="A" id="282143">a</a> =&gt; {
+      <span class="keyword">val</span> <a title="scalaz.NonEmptyList[B]" id="282144">p</a> = <a href="#87396" title="(v1: A)scalaz.NonEmptyList[B]">f</a>(<a href="#282143" title="A">a</a>)
+      <a href="#282105" title="(x: B)b.type">b</a> += <a href="#282144" title="scalaz.NonEmptyList[B]">p</a>.<a href="#42794" title="=&gt; B">head</a>
+      <a href="#282105" title="(xs: scala.collection.TraversableOnce[B])b.type">b</a> ++= <a href="#282144" title="scalaz.NonEmptyList[B]">p</a>.<a href="#42795" title="=&gt; List[B]">tail</a>
+    })
+    <span class="keyword">val</span> <a title="List[B]" id="282107">bb</a> = <a href="#282105" title="scala.collection.mutable.ListBuffer[B]">b</a>.<span title="=&gt; List[B]">toList</span>
+    <a href="#34802" title="(h: B,t: List[B])scalaz.NonEmptyList[B]">nel</a>(<a href="#282107" title="List[B]">bb</a>.<span title="=&gt; B">head</span>, <a href="#282107" title="List[B]">bb</a>.<span title="=&gt; List[B]">tail</span>)
+  }
+
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="List[A]" id="42814">list</a>: <span title="List[A]">List</span>[A] = <a href="#42794" title="=&gt; A">head</a> <a href="#282191" title="A">::</a> <a href="#42795" title="(x: A)List[A]">tail</a>
+
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Stream[A]" id="42816">stream</a>: <a title="Stream[A]" id="29790">Stream</a>[A] = <a href="#42794" title="=&gt; A">head</a> <a href="#282196" title="A">#::</a> <a href="#42795" title="=&gt; List[A]">tail</a>.<a title="(hd: A)scala.collection.immutable.Stream[A]" id="29791">toStream</a>
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="42817">toZipper</a>: <a href="Zipper.scala.html#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <a href="Zipper.scala.html#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<a title="object Stream.Empty" id="36394">Empty</a>, <a href="#42794" title="=&gt; A">head</a>, <a href="#42795" title="=&gt; List[A]">tail</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">toStream</span>)
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="42818">zipperEnd</a>: <a href="Zipper.scala.html#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = {
+    <span class="keyword">import</span> Stream._
+    <a href="#42795" title="=&gt; List[A]">tail</a> <span title="=&gt; List[A]">reverse</span> <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <span title="object Nil">Nil</span> =&gt; <a href="Zipper.scala.html#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="scala.collection.immutable.Stream[Nothing]">empty</span>, <a href="#42794" title="=&gt; A">head</a>, <span title="scala.collection.immutable.Stream[Nothing]">empty</span>)
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <a title="A" id="282326">t</a> :: <a title="List[A]" id="282327">ts</a> =&gt; <a href="Zipper.scala.html#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#282327" title="List[A]">ts</a>.<a title="(elem: A)(implicit bf: scala.collection.generic.CanBuildFrom[collection.immutable.Stream[A],A,Stream[A]])Stream[A]" id="28829">toStream</a> <a title="scala.collection.generic.CanBuildFrom[Stream.Coll,A,scala.collection.immutable.Stream[A]]" id="36385">:+</a> <a href="#42794" title="=&gt; A">head</a>, <a href="#282326" title="A">t</a>, <span title="scala.collection.immutable.Stream[Nothing]">empty</span>)
+    }
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.NonEmptyList[scalaz.NonEmptyList[A]]" id="42819">tails</a>: <a href="#18068" title="scalaz.NonEmptyList[scalaz.NonEmptyList[A]]">NonEmptyList</a>[NonEmptyList[A]] = <a href="#34802" title="(h: scalaz.NonEmptyList[A],t: List[scalaz.NonEmptyList[A]])scalaz.NonEmptyList[scalaz.NonEmptyList[A]]">nel</a>(<a href="#18068" title="scalaz.NonEmptyList[A]" class="keyword">this</a>, <a href="ListW.scala.html#34172" title="(as: List[A])scalaz.ListW[A]">tail</a>.<a href="ListW.scala.html#56563" title="=&gt; Option[scalaz.NonEmptyList[A]]">toNel</a> <span title="List[scalaz.NonEmptyList[A]]" class="keyword">match</span> {
+    <span title="scala.collection.immutable.Nil.type" class="keyword">case</span> <a title="object None" id="1843">None</a> =&gt; <span title="object Nil">Nil</span>
+    <span title="List[scalaz.NonEmptyList[A]]" class="keyword">case</span> Some(<a title="scalaz.NonEmptyList[A]" id="282427">t</a>) =&gt; <a href="#282427" title="scalaz.NonEmptyList[A]">t</a>.<a href="#42819" title="=&gt; scalaz.NonEmptyList[scalaz.NonEmptyList[A]]">tails</a>.<a href="#42813" title="=&gt; List[scalaz.NonEmptyList[A]]">list</a>
+  })
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.NonEmptyList[A]" id="42820">reverse</a>: <a href="#18068" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A] = (<a href="#42813" title="=&gt; List[A]">list</a>.<span title="=&gt; List[A]">reverse</span>: @<span title="List[A] @unchecked">unchecked</span>) <span title="scalaz.NonEmptyList[A]" class="keyword">match</span> {
+    <span title="scalaz.NonEmptyList[A]" class="keyword">case</span> <a title="A" id="282460">x</a> :: <a title="List[A]" id="282461">xs</a> =&gt; <a href="#34802" title="(h: A,t: List[A])scalaz.NonEmptyList[A]">nel</a>(<a href="#282460" title="A">x</a>, <a href="#282461" title="List[A]">xs</a>) 
+  }
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()String" id="42821">toString</a>: <a title="String" id="2716">String</a> = <a title="(x$1: Any)java.lang.String" id="5830" class="string">&quot;NonEmpty&quot;</a> + (<a href="#42794" title="=&gt; A">head</a> <a href="#282504" title="A">::</a> <a href="#42795" title="(x: A)List[A]">tail</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait NonEmptyLists extends java.lang.Object with ScalaObject" id="18077">NonEmptyLists</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](h: A,t: A*)scalaz.NonEmptyList[A]" id="34799">nel</a>[<a title="&gt;: Nothing &lt;: Any" id="34801">A</a>](<a title="A" id="213710">h</a>: <a href="#34801" title="A">A</a>, <a title="A*" id="213711">t</a>: <span title="A*">A</span>*): <a href="#18068" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A] = <a href="#282512" title="java.lang.Object with scalaz.NonEmptyList[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.NonEmptyList[A]" id="282512">NonEmptyList</a>[A] {
+    <span class="keyword">val</span> <a title="A" id="282516">head</a> = <a href="#213710" title="A">h</a>
+    <span class="keyword">val</span> <a title="List[A]" id="282518">tail</a> = <a href="#213711" title="A*">t</a>.<a title="=&gt; List[A]" id="29194">toList</a>
+  }
+
+  <span class="keyword">def</span> <a title="[A](h: A,t: List[A])scalaz.NonEmptyList[A]" id="34802">nel</a>[<a title="&gt;: Nothing &lt;: Any" id="34804">A</a>](<a title="A" id="213702">h</a>: <a href="#34804" title="A">A</a>, <a title="List[A]" id="213703">t</a>: <span title="List[A]">List</span>[A]): <a href="#18068" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A] = <a href="#282524" title="java.lang.Object with scalaz.NonEmptyList[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.NonEmptyList[A]" id="282524">NonEmptyList</a>[A] {
+    <span class="keyword">val</span> <a title="A" id="282528">head</a> = <a href="#213702" title="A">h</a>
+    <span class="keyword">val</span> <a title="List[A]" id="282530">tail</a> = <a href="#213703" title="List[A]">t</a>.<a title="=&gt; List[A]" id="32618">toList</a>
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.NonEmptyList" id="18069">NonEmptyList</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#18077" title="scalaz.NonEmptyLists">NonEmptyLists</a> {
+  <span class="keyword">def</span> <a title="[A](h: A,t: A*)scalaz.NonEmptyList[A]" id="51311">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="51313">A</a>](<a title="A" id="282540">h</a>: <a href="#51313" title="A">A</a>, <a title="A*" id="282541">t</a>: <span title="A*">A</span>*): <a href="#18068" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A] = <a href="#34799" title="(h: A,t: A*)scalaz.NonEmptyList[A]">nel</a>(<a href="#282540" title="A">h</a>, <a href="#282541" title="A*">t</a>: _*)
+}
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,1351 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.Lens</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+
+      <div id="definition">
+        <img src="../lib/object_big.png" />
+        <h1>Lens</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Lens</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"><div class="block">
+            go to: <a href="Lens.html">companion</a>
+          </div><div class="block">
+            linear super types: AnyRef, <span class="extype" name="scala.Any">Any</span>
+          </div></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in">Alphabetic</li><li class="inherit out">By inheritance</li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
+                <ol id="linearization"><li class="in" name="scalaz.Lens">Lens</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="true" name="scalaz.Lens.AddableLens">
+      <a id="AddableLens:AddableLens[S, A, Repr]"></a>
+      <h4 class="signature"><a href="Lens$$AddableLens.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">AddableLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: Addable[A, Repr]</span>]</span>
+        
+        <span class="result"> extends WrappedLens[S, Repr]</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.ArrayLens">
+      <a id="ArrayLens:ArrayLens[S, A]"></a>
+      <h4 class="signature"><a href="Lens$$ArrayLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">ArrayLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, Array[A]]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.FractionalLens">
+      <a id="FractionalLens:FractionalLens[S, F]"></a>
+      <h4 class="signature"><a href="Lens$$FractionalLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">FractionalLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="F">F</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, F]</span>, <span name="frac">frac: Fractional[F]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.IntegralLens">
+      <a id="IntegralLens:IntegralLens[S, I]"></a>
+      <h4 class="signature"><a href="Lens$$IntegralLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">IntegralLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="I">I</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, I]</span>, <span name="int">int: Integral[I]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.MapLens">
+      <a id="MapLens:MapLens[S, K, V]"></a>
+      <h4 class="signature"><a href="Lens$$MapLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MapLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="K">K</span>, <span name="V">V</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, Map[K, V]]</span>)</span>
+        <span class="result"> extends SubtractableLens[S, K, Map[K, V]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.NumericLens">
+      <a id="NumericLens:NumericLens[S, N]"></a>
+      <h4 class="signature"><a href="Lens$$NumericLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">NumericLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="N">N</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, N]</span>, <span name="num">num: Numeric[N]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.QueueLens">
+      <a id="QueueLens:QueueLens[S, A]"></a>
+      <h4 class="signature"><a href="Lens$$QueueLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">QueueLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, Queue[A]]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.SeqLikeLens">
+      <a id="SeqLikeLens:SeqLikeLens[S, A, Repr]"></a>
+      <h4 class="signature"><a href="Lens$$SeqLikeLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">SeqLikeLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: SeqLike[A, Repr]</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, Repr]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.Lens.SetLikeLens">
+      <a id="SetLikeLens:SetLikeLens[S, K, Repr]"></a>
+      <h4 class="signature"><a href="Lens$$SetLikeLens.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">SetLikeLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="K">K</span>, <span name="Repr">Repr &lt;: SetLike[K, Repr] with Set[K]</span>]</span>
+        
+        <span class="result"> extends AddableLens[S, K, Repr] with SubtractableLens[S, K, Repr]</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens.StackLens">
+      <a id="StackLens:StackLens[S, A]"></a>
+      <h4 class="signature"><a href="Lens$$StackLens.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">StackLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="lens">lens: Lens[S, Stack[A]]</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.Lens.SubtractableLens">
+      <a id="SubtractableLens:SubtractableLens[S, A, Repr]"></a>
+      <h4 class="signature"><a href="Lens$$SubtractableLens.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">SubtractableLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: Subtractable[A, Repr]</span>]</span>
+        
+        <span class="result"> extends WrappedLens[S, Repr]</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.Lens.WrappedLens">
+      <a id="WrappedLens:WrappedLens[S, A]"></a>
+      <h4 class="signature"><a href="Lens$$WrappedLens.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">WrappedLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scala.AnyRef#!=">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#!=">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the receiver object is equivalent to the argument; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef###">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">##</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef → Any
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$asInstanceOf">
+      <a id="$asInstanceOf[T0]():T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$isInstanceOf">
+      <a id="$isInstanceOf[T0]():Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#==">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#==">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#addableLens">
+      <a id="addableLens[S, A, Repr&lt;:Addable[A, Repr]](Lens[S, Repr]):AddableLens[S, A, Repr]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">addableLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.generic.Addable">Addable</span>[A, Repr]</span>]</span>
+        <span class="params">(<span name="l">l: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, Repr]</span>)</span>
+        <span class="result">: <a href="Lens$$AddableLens.html" class="extype" name="scalaz.Lens.AddableLens">AddableLens</a>[S, A, Repr]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">A lens that views an Addable type can provide the appearance of in place mutation</p>
+            <div class="fullcomment"><div class="comment cmt"><p>A lens that views an Addable type can provide the appearance of in place mutation</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#arrayLens">
+      <a id="arrayLens[S, A]:(Lens[S, Array[Array[A]]]) ⇒ ArrayLens[S, Array[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">arrayLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Array">Array</span>[A]]]) ⇒ <a href="Lens$$ArrayLens.html" class="extype" name="scalaz.Lens.ArrayLens">ArrayLens</a>[S, <span class="extype" name="scala.Array">Array</span>[A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Provide an imperative-seeming API for arrays viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Provide an imperative-seeming API for arrays viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to cast the receiver object to be of type <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to cast the receiver object to be of type <code>T0</code>.</p><p>Note that the success of a cast at runtime is modulo Scala's erasure semantics.  Therefore the expression<code>1.asInstanceOf[String]</code> will throw a <code>ClassCastException</code> at runtime, while the expression<code>List(1).asInstanceOf[List[String]]</code> will not.  In the latter example, because the type argument is erased as
+part of compilation it is not possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#asState">
+      <a id="asState[A, B](Lens[A, B]):State[A, B]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">asState</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[A, B]</span>)</span>
+        <span class="result">: <a href="State.html" class="extype" name="scalaz.State">State</a>[A, B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Lenses may be used implicitly as State monadic actions that get the viewed portion of the state</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Lenses may be used implicitly as State monadic actions that get the viewed portion of the state</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#category">
+      <a id="category:Category[Lens]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">category</span>
+        
+        
+        <span class="result">: <a href="Category.html" class="extype" name="scalaz.Category">Category</a>[<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Lenses form a category</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Lenses form a category</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">clone</span>
+        
+        <span class="params">()</span>
+        <span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method creates and returns a copy of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method creates and returns a copy of the receiver object.</p><p>The default implementation of the <code>clone</code> method is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a copy of the receiver object.</p></dd></dl><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#codiag">
+      <a id="codiag[A]:Lens[Either[A, A], A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">codiag</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[<span class="extype" name="scala.Either">Either</span>[A, A], A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">A lens that discards the choice of Right or Left from Either</p>
+            <div class="fullcomment"><div class="comment cmt"><p>A lens that discards the choice of Right or Left from Either</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p><p>The <code>eq</code> method implements an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence relation] on
+non-null instances of <code>AnyRef</code>:
+ * It is reflexive: for any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(x)</code> returns <code>true</code>.
+ * It is symmetric: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, <code>x.eq(y)</code> returns <code>true</code> if and
+   only if <code>y.eq(x)</code> returns <code>true</code>.
+ * It is transitive: for any non-null instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.eq(y)</code> returns <code>true</code>   and <code>y.eq(z)</code> returns <code>true</code>, then <code>x.eq(z)</code> returns <code>true</code>.</p><p>Additionally, the <code>eq</code> method has three other properties.
+ * It is consistent: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, multiple invocations of
+   <code>x.eq(y)</code> consistently returns <code>true</code> or consistently returns <code>false</code>.
+ * For any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(null)</code> and <code>null.eq(x)</code> returns <code>false</code>.
+ * <code>null.eq(null)</code> returns <code>true</code>.</p><p>When overriding the <code>equals</code> or <code>hashCode</code> methods, it is important to ensure that their behavior is
+consistent with reference equality.  Therefore, if two objects are references to each other (<code>o1 eq o2</code>), they
+should be equal to each other (<code>o1 == o2</code>) and they should hash to the same value (<code>o1.hashCode == o2.hashCode</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the argument is a reference to the receiver object; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#equals">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p><p>The default implementations of this method is an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence
+relation]:
+ * It is reflexive: for any instance <code>x</code> of type <code>Any</code>, <code>x.equals(x)</code> should return <code>true</code>.
+ * It is symmetric: for any instances <code>x</code> and <code>y</code> of type <code>Any</code>, <code>x.equals(y)</code> should return <code>true</code> if and
+   only if <code>y.equals(x)</code> returns <code>true</code>.
+ * It is transitive: for any instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.equals(y)</code> returns <code>true</code> and
+   <code>y.equals(z)</code> returns <code>true</code>, then <code>x.equals(z)</code> should return <code>true</code>.</p><p>If you override this method, you should verify that your implementation remains an equivalence relation.
+Additionally, when overriding this method it is often necessary to override <code>hashCode</code> to ensure that objects
+that are &quot;equal&quot; (<code>o1.equals(o2)</code> returns <code>true</code>) hash to the same 
+scala.Int
+(<code>o1.hashCode.equals(o2.hashCode)</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#finalize">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p><p>The details of when and if the <code>finalize</code> method are invoked, as well as the interaction between <code>finalize</code>and non-local returns and exceptions, are all platform dependent.</p></div><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#fractionalLens">
+      <a id="fractionalLens[S, F](Lens[S, F])(Fractional[F]):FractionalLens[S, F]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">fractionalLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="F">F</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, F]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Fractional[F]</span>)</span>
+        <span class="result">: <a href="Lens$$FractionalLens.html" class="extype" name="scalaz.Lens.FractionalLens">FractionalLens</a>[S, F]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allow the illusion of imperative updates to numbers viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#fst">
+      <a id="fst[A, B]:Lens[(A, B), A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">fst</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        
+        <span class="result">: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[(A, B), A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Access the first field of a tuple</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Access the first field of a tuple</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#generalizedFunctor">
+      <a id="generalizedFunctor[A]:GeneralizedFunctor[Lens, Function1, Id]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">generalizedFunctor</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="Category$$GeneralizedFunctor.html" class="extype" name="scalaz.Category.GeneralizedFunctor">GeneralizedFunctor</a>[<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>, <span class="extype" name="scala.Function1">Function1</span>, Id]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">There exists a generalized functor from Lenses to Function1, which just forgets how to set the value</p>
+            <div class="fullcomment"><div class="comment cmt"><p>There exists a generalized functor from Lenses to Function1, which just forgets how to set the value</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#getClass">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span>
+        <span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a representation that corresponds to the dynamic class of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a representation that corresponds to the dynamic class of the receiver object.</p><p>The nature of the representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a representation that corresponds to the dynamic class of the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a hash code value for the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a hash code value for the object.</p><p>The default hashing algorithm is platform dependent.</p><p>Note that it is allowed for two objects to have identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>) yet
+not be equal (<code>o1.equals(o2)</code> returns <code>false</code>).  A degenerate implementation could always return <code>0</code>.
+However, it is required that if two objects are equal (<code>o1.equals(o2)</code> returns <code>true</code>) that they have
+identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>).  Therefore, when overriding this method, be sure
+to verify that the behavior is consistent with the <code>equals</code> method.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the hash code value for the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#integralLens">
+      <a id="integralLens[S, I](Lens[S, I])(Integral[I]):IntegralLens[S, I]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">integralLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="I">I</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, I]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Integral[I]</span>)</span>
+        <span class="result">: <a href="Lens$$IntegralLens.html" class="extype" name="scalaz.Lens.IntegralLens">IntegralLens</a>[S, I]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allow the illusion of imperative updates to numbers viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#invariantFunctor">
+      <a id="invariantFunctor[A]:InvariantFunctor[[α]Lens[A, α]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">invariantFunctor</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="InvariantFunctor.html" class="extype" name="scalaz.InvariantFunctor">InvariantFunctor</a>[[α]<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[A, α]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Lenses are an invariant functor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Lenses are an invariant functor. xmap can be used to transform a view into an isomorphic form</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#isInstanceOf">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p><p>Note that the test result of the test is modulo Scala's erasure semantics.  Therefore the expression<code>1.isInstanceOf[String]</code> will return <code>false</code>, while the expression <code>List(1).isInstanceOf[List[String]]</code> will
+return <code>true</code>.  In the latter example, because the type argument is erased as part of compilation it is not
+possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is an instance of erasure of type <code>T0</code>; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#mapLens">
+      <a id="mapLens[S, K, V]:(Lens[S, Map[K, V]]) ⇒ MapLens[S, K, V]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">mapLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="K">K</span>, <span name="V">V</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.collection.immutable.Map">Map</span>[K, V]]) ⇒ <a href="Lens$$MapLens.html" class="extype" name="scalaz.Lens.MapLens">MapLens</a>[S, K, V]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">A lens that views an immutable Map type can provide a mutable.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>A lens that views an immutable Map type can provide a mutable.Map-like API via State</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the argument is not a reference to the receiver object; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notify">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notify</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up a single thread that is waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up a single thread that is waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notifyAll">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up all threads that are waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up all threads that are waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#numericLens">
+      <a id="numericLens[S, N](Lens[S, N])(Numeric[N]):NumericLens[S, N]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">numericLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="N">N</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, N]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Numeric[N]</span>)</span>
+        <span class="result">: <a href="Lens$$NumericLens.html" class="extype" name="scalaz.Lens.NumericLens">NumericLens</a>[S, N]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Allow the illusion of imperative updates to numbers viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#queueLens">
+      <a id="queueLens[S, A]:(Lens[S, Queue[A]]) ⇒ QueueLens[S, A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">queueLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.collection.immutable.Queue">Queue</span>[A]]) ⇒ <a href="Lens$$QueueLens.html" class="extype" name="scalaz.Lens.QueueLens">QueueLens</a>[S, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Provide an imperative-seeming API for queues viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Provide an imperative-seeming API for queues viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="prt" data-isabs="false" name="scalaz.Lens#readResolve">
+      <a id="readResolve():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">readResolve</span>
+        
+        <span class="params">()</span>
+        <span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: protected 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#self">
+      <a id="self[A]:Lens[A, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">self</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[A, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">The identity lens for a given object</p>
+            <div class="fullcomment"><div class="comment cmt"><p>The identity lens for a given object</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#seqLens">
+      <a id="seqLens[S, A]:(Lens[S, Seq[A]]) ⇒ SeqLikeLens[S, A, Seq[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">seqLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.collection.immutable.Seq">Seq</span>[A]]) ⇒ <a href="Lens$$SeqLikeLens.html" class="extype" name="scalaz.Lens.SeqLikeLens">SeqLikeLens</a>[S, A, <span class="extype" name="scala.collection.immutable.Seq">Seq</span>[A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#seqLikeLens">
+      <a id="seqLikeLens[S, A, Repr&lt;:SeqLike[A, Repr]]:(Lens[S, Repr]) ⇒ SeqLikeLens[S, A, Repr]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">seqLikeLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.SeqLike">SeqLike</span>[A, Repr]</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, Repr]) ⇒ <a href="Lens$$SeqLikeLens.html" class="extype" name="scalaz.Lens.SeqLikeLens">SeqLikeLens</a>[S, A, Repr]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Provide the appearance of a mutable-like API for sorting sequences through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Provide the appearance of a mutable-like API for sorting sequences through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#setLens">
+      <a id="setLens[S, K]:(Lens[S, Set[K]]) ⇒ SetLikeLens[S, K, Set[K]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">setLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="K">K</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.collection.immutable.Set">Set</span>[K]]) ⇒ <a href="Lens$$SetLikeLens.html" class="extype" name="scalaz.Lens.SetLikeLens">SetLikeLens</a>[S, K, <span class="extype" name="scala.collection.immutable.Set">Set</span>[K]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#setLikeLens">
+      <a id="setLikeLens[S, K, Repr&lt;:SetLike[K, Repr] with Set[K]](Lens[S, Repr]):SetLikeLens[S, K, Repr]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">setLikeLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="K">K</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.SetLike">SetLike</span>[K, Repr] with <span class="extype" name="scala.collection.immutable.Set">Set</span>[K]</span>]</span>
+        <span class="params">(<span name="l">l: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, Repr]</span>)</span>
+        <span class="result">: <a href="Lens$$SetLikeLens.html" class="extype" name="scalaz.Lens.SetLikeLens">SetLikeLens</a>[S, K, Repr]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">A lens that views an SetLike type can provide the appearance of in place mutation</p>
+            <div class="fullcomment"><div class="comment cmt"><p>A lens that views an SetLike type can provide the appearance of in place mutation</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#snd">
+      <a id="snd[A, B]:Lens[(A, B), B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">snd</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        
+        <span class="result">: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[(A, B), B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Access the second field of a tuple</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Access the second field of a tuple</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#stackLens">
+      <a id="stackLens[S, A]:(Lens[S, Stack[A]]) ⇒ StackLens[S, A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">stackLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, <span class="extype" name="scala.collection.immutable.Stack">Stack</span>[A]]) ⇒ <a href="Lens$$StackLens.html" class="extype" name="scalaz.Lens.StackLens">StackLens</a>[S, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Provide an imperative-seeming API for stacks viewed through a lens</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Provide an imperative-seeming API for stacks viewed through a lens</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#subtractableLens">
+      <a id="subtractableLens[S, A, Repr&lt;:Subtractable[A, Repr]](Lens[S, Repr]):SubtractableLens[S, A, Repr]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">subtractableLens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.generic.Subtractable">Subtractable</span>[A, Repr]</span>]</span>
+        <span class="params">(<span name="l">l: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, Repr]</span>)</span>
+        <span class="result">: <a href="Lens$$SubtractableLens.html" class="extype" name="scalaz.Lens.SubtractableLens">SubtractableLens</a>[S, A, Repr]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">A lens that views a Subtractable type can provide the appearance of in place mutation</p>
+            <div class="fullcomment"><div class="comment cmt"><p>A lens that views a Subtractable type can provide the appearance of in place mutation</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
+      <a id="synchronized[T0](T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: T0</span>)</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#toString">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">toString</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a string representation of the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a string representation of the object.</p><p>The default representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a string representation of the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#trivial">
+      <a id="trivial[A]:Lens[A, Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">trivial</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result">: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[A, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">The trivial lens that can retrieve Unit from anything</p>
+            <div class="fullcomment"><div class="comment cmt"><p>The trivial lens that can retrieve Unit from anything</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple2Lens">
+      <a id="tuple2Lens[S, A, B](Lens[S, (A, B)]):(Lens[S, A], Lens[S, B])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple2Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple3Lens">
+      <a id="tuple3Lens[S, A, B, C](Lens[S, (A, B, C)]):(Lens[S, A], Lens[S, B], Lens[S, C])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple3Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B, C)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, C])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple4Lens">
+      <a id="tuple4Lens[S, A, B, C, D](Lens[S, (A, B, C, D)]):(Lens[S, A], Lens[S, B], Lens[S, C], Lens[S, D])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple4Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B, C, D)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, C], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, D])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple5Lens">
+      <a id="tuple5Lens[S, A, B, C, D, E](Lens[S, (A, B, C, D, E)]):(Lens[S, A], Lens[S, B], Lens[S, C], Lens[S, D], Lens[S, E])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple5Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B, C, D, E)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, C], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, D], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, E])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple6Lens">
+      <a id="tuple6Lens[S, A, B, C, D, E, F](Lens[S, (A, B, C, D, E, F)]):(Lens[S, A], Lens[S, B], Lens[S, C], Lens[S, D], Lens[S, E], Lens[S, F])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple6Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B, C, D, E, F)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, C], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, D], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, E], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, F])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.Lens#tuple7Lens">
+      <a id="tuple7Lens[S, A, B, C, D, E, F, G](Lens[S, (A, B, C, D, E, F, G)]):(Lens[S, A], Lens[S, B], Lens[S, C], Lens[S, D], Lens[S, E], Lens[S, F], Lens[S, G])"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol">
+        <span class="name">tuple7Lens</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span>
+        <span class="params">(<span name="lens">lens: <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, (A, B, C, D, E, F, G)]</span>)</span>
+        <span class="result">: (<a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, A], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, B], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, C], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, D], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, E], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, F], <a href="Lens.html" class="extype" name="scalaz.Lens">Lens</a>[S, G])</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Enriches lenses that view tuples with field accessors</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Enriches lenses that view tuples with field accessors</p></div><div class="block">
+          attributes: implicit 
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li></ol>
+            </div>
+
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from AnyRef</h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

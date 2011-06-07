@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/ReaderT.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+/** Reader monad transformer
+  * Can be used to add environment reading capabilities to other monads
+  * Note: ReaderT[M,R,A] is isomorphic to Kleisli[M,R,A].
+  */
+case <span class="keyword">class</span> <a title="class ReaderT[M[_], R, A] extends java.lang.Object with scalaz.NewType[(R) =&gt; M[A]] with ScalaObject with Product" id="305959">ReaderT</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="305963">M</a>[<a title="&gt;: Nothing &lt;: Any" id="306040">_</a>], <a title="&gt;: Nothing &lt;: Any" id="305964">R</a>, <a title="&gt;: Nothing &lt;: Any" id="305965">A</a>]<span title="ScalaObject">(</span><a title="[M[_], R, A](R) =&gt; M[A]" id="306039">value</a>: R =&gt; M[A]) <span class="keyword">extends</span> <a href="NewType.scala.html#17963" title="scalaz.NewType[(R) =&gt; M[A]]">NewType</a>[R =&gt; M[A]]
+
+<span class="keyword">object</span> <a title="object scalaz.ReaderT" id="306420">ReaderT</a> <span title="ScalaObject">{</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[M[_], R](implicit m: scalaz.Pure[M])java.lang.Object with scalaz.Pure[[α]scalaz.ReaderT[M,R,α]]" id="305949">readerTPure</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="305952">M</a>[<a title="&gt;: Nothing &lt;: Any" id="306024">_</a>], <a title="&gt;: Nothing &lt;: Any" id="305953">R</a>](<span class="keyword">implicit</span> <a title="scalaz.Pure[M]" id="306017">m</a>: <a href="Pure.scala.html#18839" title="scalaz.Pure[M]">Pure</a>[M]) =
+    <a href="#306020" title="java.lang.Object with scalaz.Pure[[α]scalaz.ReaderT[M,R,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Pure[[α]scalaz.ReaderT[M,R,α]]" id="306020">Pure</a>[({<span class="keyword">type</span> λ[α]=ReaderT[M, R, α]})#λ] {
+      <span class="keyword">def</span> <a title="[A](a: =&gt; A)scalaz.ReaderT[M,R,A]" id="306028">pure</a>[<a title="&gt;: Nothing &lt;: Any" id="306030">A</a>](<a title="=&gt; A" id="306031">a</a>: =&gt; A) = <a href="#305959" title="(value: (R) =&gt; M[A])scalaz.ReaderT[M,R,A]">ReaderT</a>((r: <a href="#305953" title="R">R</a>) =&gt; <a href="#306017" title="scalaz.Pure[M]">m</a>.<a href="Pure.scala.html#35343" title="(a: =&gt; A)M[A]">pure</a>(<a href="#306031" title="=&gt; A">a</a>))
+    }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[M[_], R](implicit evidence$1: scalaz.Bind[M])java.lang.Object with scalaz.Bind[[α]scalaz.ReaderT[M,R,α]]" id="306086">readerTBind</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="305957">M</a>[<a title="&gt;: Nothing &lt;: Any" id="306093">_</a>]:Bind, <a title="&gt;: Nothing &lt;: Any" id="305958">R</a>] =
+    <a href="#306089" title="java.lang.Object with scalaz.Bind[[α]scalaz.ReaderT[M,R,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bind[[α]scalaz.ReaderT[M,R,α]]" id="306089">Bind</a>[({<span class="keyword">type</span> λ[α]=ReaderT[M, R, α]})#λ] {
+      <span class="keyword">def</span> <a title="[A, B](m: scalaz.ReaderT[M,R,A],k: (A) =&gt; scalaz.ReaderT[M,R,B])scalaz.ReaderT[M,R,B]" id="306097">bind</a>[<a title="&gt;: Nothing &lt;: Any" id="306100">A</a>,<a title="&gt;: Nothing &lt;: Any" id="306101">B</a>](<a title="scalaz.ReaderT[M,R,A]" id="306102">m</a>: <a href="#305959" title="scalaz.ReaderT[M,R,A]">ReaderT</a>[M, R, A], <a title="(A) =&gt; scalaz.ReaderT[M,R,B]" id="306103">k</a>: A =&gt; ReaderT[M, R, B]) =
+        <a href="#305959" title="(value: (R) =&gt; M[B])scalaz.ReaderT[M,R,B]">ReaderT</a>((r: <a href="#305958" title="R">R</a>) =&gt; <a href="#306102" title="scalaz.ReaderT[M,R,A]">m</a>.<a href="#306039" title="(v1: R)M[A]">value</a><a href="MA.scala.html#55435" title="(f: (A) =&gt; M[B])(implicit b: scalaz.Bind[M])M[B]">(</a><a href="#306126" title="R">r</a>) <a href="#306086" title="scalaz.Bind[M]">&gt;&gt;=</a> (<a title="A" id="306359">a</a> =&gt; <a href="#306103" title="(v1: A)scalaz.ReaderT[M,R,B]">k</a>(<a href="#306359" title="A">a</a>).<a href="#306039" title="(v1: R)M[B]">value</a>(<a href="#306126" title="R">r</a>)))
+    }
+
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleKleisli.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleKleisli" id="23787">ExampleKleisli</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408524">main</a>(<a title="Array[String]" id="634962">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#408526" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408526">run</a> {
+    <span class="keyword">val</span> <a title="scalaz.Kleisli[Option,Int,java.lang.String]" id="634965">f</a> = <a href="../Kleisli.scala.html#34096" title="(f: (Int) =&gt; Option[java.lang.String])scalaz.Kleisli[Option,Int,java.lang.String]">☆</a>((n: <a title="Int" id="4364">Int</a>) =&gt; <span title="Option[java.lang.String]" class="keyword">if</span> (<a href="#634973" title="(x$1: Int)Int" id="5144">n</a> <span title="(x$1: Int)Boolean">%</span> <span title="Int(2)" class="int">2</span> == <span title="Int(0)" class="int">0</span>) <span title="object None">None</span> <span class="keyword">else</span> <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>((<a href="#634973" title="(x$1: Int)Int" id="5136">n</a> + <span title="Int(1)" class="int">1</span>).<a title="()java.lang.String" id="5793">toString</a>))
+    <span class="keyword">val</span> <a title="scalaz.Kleisli[Option,String,java.lang.String]" id="634966">g</a> = <a href="../Kleisli.scala.html#34096" title="(f: (String) =&gt; Option[java.lang.String])scalaz.Kleisli[Option,String,java.lang.String]">☆</a>((s: <a title="String" id="2716">String</a>) =&gt; <span title="Option[java.lang.String]" class="keyword">if</span> (<span title="(xs: Int*)List[Int]">List</span><a href="../MA.scala.html#57154" title="(p: (Int) =&gt; Boolean)(implicit r: scalaz.Foldable[List])Boolean">(</a><span title="Int(5)" class="int">5</span>, <span title="Int(7)" class="int">7</span>) <a href="../Foldable.scala.html#91310" title="=&gt; scalaz.Foldable[List]">∃</a> (<a href="#635271" title="(x$1: Int)Boolean">_</a> == <a href="#635014" title="String">s</a>.<a title="()Int" id="7409">length</a>)) <span title="object None">None</span> <span class="keyword">else</span> <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="(x$1: Any)java.lang.String" class="string">&quot;[&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#635014" title="String">s</a> + <span title="java.lang.String(&quot;]&quot;)" class="string">&quot;]&quot;</span>))
+
+    // Kleisli composition 
+    <a href="../Identity.scala.html#43004" title="(b: List[Option[java.lang.String]])(implicit e: scalaz.Equal[List[Option[java.lang.String]]],implicit s: scalaz.Show[List[Option[java.lang.String]]],implicit ev: &lt;:&lt;[List[Option[java.lang.String]],List[Option[java.lang.String]]])Unit">(</a><span title="(xs: Int*)List[Int]">List</span><a title="(f: (Int) =&gt; Option[java.lang.String])(implicit bf: scala.collection.generic.CanBuildFrom[List[Int],Option[java.lang.String],List[Option[java.lang.String]]])List[Option[java.lang.String]]" id="28996">(</a><span title="Int(7)" class="int">7</span>, <span title="Int(78)" class="int">78</span>, <span title="Int(98)" class="int">98</span>, <span title="Int(99)" class="int">99</span>, <span title="Int(100)" class="int">100</span>, <span title="Int(102)" class="int">102</span>, <span title="Int(998)" class="int">998</span>, <span title="Int(999)" class="int">999</span>, <span title="Int(10000)" class="int">10000</span>) <a href="../Identity.scala.html#34126" title="(x: =&gt; List[Option[java.lang.String]])scalaz.Identity[List[Option[java.lang.String]]]">map</a> (<a href="../Kleisli.scala.html#57094" title="(k: scalaz.Kleisli[Option,java.lang.String,java.lang.String])(implicit b: scalaz.Bind[Option])scalaz.Kleisli[Option,Int,java.lang.String]">f</a> <a href="../Kleisli.scala.html#57092" title="(a: Int)Option[java.lang.String]">&gt;=&gt;</a> <a href="#634966" title="scalaz.Kleisli[Option,String,java.lang.String]">g</a> apply <a href="#635364" title="Int">_</a>)) <a href="../Equal.scala.html#120278" title="(implicit evidence$52: scalaz.CanBuildAnySelf[List],implicit evidence$53: scalaz.Equal[Option[java.lang.String]])scalaz.Equal[List[Option[java.lang.String]]]" id="1489">assert_===</a> <span title="(xs: Option[java.lang.String]*)List[Option[java.lang.String]]">List</span>(<span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;[8]&quot;)" class="string">&quot;[8]&quot;</span>), <span title="object None">None</span>, <span title="object None">None</span>, <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;[100]&quot;)" class="string">&quot;[100]&quot;</span>), <span title="object None">None</span>, <span title="object None">None</span>, <span title="object None">None</span>, <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;[1000]&quot;)" class="string">&quot;[1000]&quot;</span>), <span title="object None">None</span>)
+  }
+}
+
+        </pre>
+    </body>
+</html>

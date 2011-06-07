@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Bifunctor.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/**
+ * Binary covariant functor.
+ *
+ * &lt;p&gt;
+ * All binary functor instances must satisfy 2 laws:
+ * &lt;ol&gt;
+ * &lt;li&gt;&lt;strong&gt;identity&lt;/strong&gt;&lt;br/&gt;&lt;code&gt;forall a. a == bimap(a, identity, identity)&lt;/code&gt;&lt;/li&gt;
+ * &lt;li&gt;&lt;strong&gt;composition&lt;/strong&gt;&lt;br/&gt;&lt;code&gt;forall a f g h i. bimap(a, f compose g, h compose i) == bimap(bimap(a, g, i), f, h)&lt;/code&gt;&lt;/li&gt;
+ * &lt;/ol&gt;
+ * &lt;/p&gt;
+ */</span>
+<span class="keyword">trait</span> <a title="trait Bifunctor[F[_,_]] extends java.lang.Object" id="8444">Bifunctor</a><span class="delimiter">[</span><a title="[_, _]&gt;: Nothing &lt;: Any" id="20385">F</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99194">_</a>, <a title="&gt;: Nothing &lt;: Any" id="99195">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A, B, C, D](k: F[A,B], f: (A) =&gt; C, g: (B) =&gt; D)F[C,D]" id="99185">bimap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99190">A</a>, <a title="&gt;: Nothing &lt;: Any" id="99191">B</a>, <a title="&gt;: Nothing &lt;: Any" id="99192">C</a>, <a title="&gt;: Nothing &lt;: Any" id="99193">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="F[A,B]" id="99197">k</a>: <a href="#20385" title="F[A,B]">F</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span>, <a title="(A) =&gt; C" id="99198">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="99199">g</a>: B =&gt; D<span class="delimiter">)</span>: <a href="#20385" title="F[C,D]">F</a><span class="delimiter">[</span>C, D<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.Bifunctor" id="8445">Bifunctor</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+  
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Bifunctor[Tuple2]" id="99205">Tuple2Bifunctor</a>: <a href="#8444" title="scalaz.Bifunctor[Tuple2]">Bifunctor</a><span class="delimiter">[</span>Tuple2<span class="delimiter">]</span> = <a href="#99215" title="java.lang.Object with scalaz.Bifunctor[Tuple2]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bifunctor[Tuple2]" id="99215">Bifunctor</a><span class="delimiter">[</span>Tuple2<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A, B, C, D](k: (A, B), f: (A) =&gt; C, g: (B) =&gt; D)(C, D)" id="99219">bimap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99224">A</a>, <a title="&gt;: Nothing &lt;: Any" id="99225">B</a>, <a title="&gt;: Nothing &lt;: Any" id="99226">C</a>, <a title="&gt;: Nothing &lt;: Any" id="99227">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(A, B)" id="99228">k</a>: <span title="(A, B)" class="delimiter">(</span>A, B<span class="delimiter">)</span>, <a title="(A) =&gt; C" id="99229">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="99230">g</a>: B =&gt; D<span class="delimiter">)</span> =
+      <span title="(_1: C, _2: D)(C, D)" class="delimiter">(</span><a href="#99229" title="(v1: A)C">f</a><span class="delimiter">(</span><a href="#99228" title="(A, B)">k</a>.<span title="=&gt; A">_1</span><span class="delimiter">)</span>, <a href="#99230" title="(v1: B)D">g</a><span class="delimiter">(</span><a href="#99228" title="(A, B)">k</a>.<span title="=&gt; B">_2</span><span class="delimiter">)</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Bifunctor[Either]" id="99206">EitherBifunctor</a>: <a href="#8444" title="scalaz.Bifunctor[Either]">Bifunctor</a><span class="delimiter">[</span>Either<span class="delimiter">]</span> = <a href="#99280" title="java.lang.Object with scalaz.Bifunctor[Either]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bifunctor[Either]" id="99280">Bifunctor</a><span class="delimiter">[</span>Either<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A, B, C, D](k: Either[A,B], f: (A) =&gt; C, g: (B) =&gt; D)Either[C,D]" id="99284">bimap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99289">A</a>, <a title="&gt;: Nothing &lt;: Any" id="99290">B</a>, <a title="&gt;: Nothing &lt;: Any" id="99291">C</a>, <a title="&gt;: Nothing &lt;: Any" id="99292">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="Either[A,B]" id="99293">k</a>: <span title="Either[A,B]">Either</span><span class="delimiter">[</span>A, B<span class="delimiter">]</span>, <a title="(A) =&gt; C" id="99294">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="99295">g</a>: B =&gt; D<span class="delimiter">)</span> =
+      <a href="#99293" title="Either[A,B]">k</a> <span title="Either[C,D]" class="keyword">match</span> <span class="delimiter">{</span>
+        <span class="keyword">case</span> <span title="Left[C,Nothing]">Left</span><span class="delimiter">(</span><a title="A" id="99353">a</a><span class="delimiter">)</span> =&gt; <span title="(a: C)Left[C,Nothing]">Left</span><span class="delimiter">(</span><a href="#99294" title="(v1: A)C">f</a><span class="delimiter">(</span><a href="#99353" title="A">a</a><span class="delimiter">)</span><span class="delimiter">)</span>
+        <span class="keyword">case</span> <span title="Right[Nothing,D]">Right</span><span class="delimiter">(</span><a title="B" id="99399">b</a><span class="delimiter">)</span> =&gt; <span title="(b: D)Right[Nothing,D]">Right</span><span class="delimiter">(</span><a href="#99295" title="(v1: B)D">g</a><span class="delimiter">(</span><a href="#99399" title="B">b</a><span class="delimiter">)</span><span class="delimiter">)</span>
+      <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Bifunctor[scalaz.Validation]" id="99207">ValidationBifunctor</a>: <a href="#8444" title="scalaz.Bifunctor[scalaz.Validation]">Bifunctor</a><span class="delimiter">[</span>Validation<span class="delimiter">]</span> = <a href="#99426" title="java.lang.Object with scalaz.Bifunctor[scalaz.Validation]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bifunctor[scalaz.Validation]" id="99426">Bifunctor</a><span class="delimiter">[</span>Validation<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A, B, C, D](k: scalaz.Validation[A,B], f: (A) =&gt; C, g: (B) =&gt; D)scalaz.Validation[C,D]" id="99430">bimap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99435">A</a>, <a title="&gt;: Nothing &lt;: Any" id="99436">B</a>, <a title="&gt;: Nothing &lt;: Any" id="99437">C</a>, <a title="&gt;: Nothing &lt;: Any" id="99438">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="scalaz.Validation[A,B]" id="99439">k</a>: <a href="Validation.scala.html#19982" title="scalaz.Validation[A,B]">Validation</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span>, <a title="(A) =&gt; C" id="99440">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="99441">g</a>: B =&gt; D<span class="delimiter">)</span> =
+      <a href="#99439" title="scalaz.Validation[A,B]">k</a> <span title="scalaz.Validation[C,D]" class="keyword">match</span> <span class="delimiter">{</span>
+        <span class="keyword">case</span> <span title="scalaz.Validation[C,Nothing]">Failure</span><span class="delimiter">(</span><a title="A" id="99463">a</a><span class="delimiter">)</span> =&gt; <a href="Validation.scala.html#39646" title="(e: C)scalaz.Validation[C,Nothing]">failure</a><span class="delimiter">(</span><a href="#99440" title="(v1: A)C">f</a><span class="delimiter">(</span><a href="#99463" title="A">a</a><span class="delimiter">)</span><span class="delimiter">)</span>
+        <span class="keyword">case</span> <span title="scalaz.Validation[Nothing,D]">Success</span><span class="delimiter">(</span><a title="B" id="99473">b</a><span class="delimiter">)</span> =&gt; <a href="Validation.scala.html#39641" title="(a: D)scalaz.Validation[Nothing,D]">success</a><span class="delimiter">(</span><a href="#99441" title="(v1: B)D">g</a><span class="delimiter">(</span><a href="#99473" title="B">b</a><span class="delimiter">)</span><span class="delimiter">)</span>
+      <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">import</span> java.util.<span title="object java.util.Map">Map</span>.Entry
+  <span class="keyword">import</span> java.util.<span title="object java.util.AbstractMap">AbstractMap</span>.SimpleImmutableEntry
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Bifunctor[java.util.Map.Entry]" id="99210">MapEntryBifunctor</a>: <a href="#8444" title="scalaz.Bifunctor[java.util.Map.Entry]">Bifunctor</a><span class="delimiter">[</span>Entry<span class="delimiter">]</span> = <a href="#99500" title="java.lang.Object with scalaz.Bifunctor[java.util.Map.Entry]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bifunctor[java.util.Map.Entry]" id="99500">Bifunctor</a><span class="delimiter">[</span>Entry<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A, B, C, D](k: java.util.Map.Entry[A,B], f: (A) =&gt; C, g: (B) =&gt; D)java.util.AbstractMap.SimpleImmutableEntry[C,D]" id="99504">bimap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="99509">A</a>, <a title="&gt;: Nothing &lt;: Any" id="99510">B</a>, <a title="&gt;: Nothing &lt;: Any" id="99511">C</a>, <a title="&gt;: Nothing &lt;: Any" id="99512">D</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="java.util.Map.Entry[A,B]" id="99513">k</a>: <span title="java.util.Map.Entry[A,B]">Entry</span><span class="delimiter">[</span>A, B<span class="delimiter">]</span>, <a title="(A) =&gt; C" id="99514">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="99515">g</a>: B =&gt; D<span class="delimiter">)</span> = <span title="java.util.AbstractMap.SimpleImmutableEntry[C,D]" class="keyword">new</span> <span title="java.util.AbstractMap.SimpleImmutableEntry[C,D]">SimpleImmutableEntry</span><span class="delimiter">(</span><a href="#99514" title="(v1: A)C">f</a><span class="delimiter">(</span><a href="#99513" title="java.util.Map.Entry[A,B]">k</a>.<span title="()A">getKey</span><span class="delimiter">)</span>, <a href="#99515" title="(v1: B)D">g</a><span class="delimiter">(</span><a href="#99513" title="java.util.Map.Entry[A,B]">k</a>.<span title="()B">getValue</span><span class="delimiter">)</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

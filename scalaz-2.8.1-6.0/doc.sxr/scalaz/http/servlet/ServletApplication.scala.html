@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/ServletApplication.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> response.Response
+<span class="keyword">import</span> request.Request
+
+/**
+ * A HTTP servlet application.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class ServletApplication[IN[_], OUT[_]] extends java.lang.Object with ScalaObject" id="26787">ServletApplication</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="27906">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="808852">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="27907">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="808853">_</a>]]<span title="ScalaObject">(</span><span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="813033">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="813034">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) {
+  /**
+   * Returns a response for the given application parts.
+   */
+  <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest,implicit request: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="808845">application</a>(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="808870">servlet</a>: <a href="HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="808871">servletRequest</a>: <a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[IN]" id="808872">request</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) : <a href="../response/Response.scala.html#27666" title="scalaz.http.response.Response[OUT]">Response</a>[OUT]
+
+  /**
+   * Returns a web application for the given servlet application parts.
+   */
+  <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest)scalaz.http.Application[IN,OUT]" id="808846">application</a>(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="808861">servlet</a>: <a href="HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="808862">servletRequest</a>: <a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>) : <a href="../Application.scala.html#26312" title="scalaz.http.Application[IN,OUT]">Application</a>[IN, OUT] = <a href="#877185" title="java.lang.Object with scalaz.http.Application[IN,OUT]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.Application[IN,OUT]" id="877185">Application</a>[IN, OUT] {
+    <span class="keyword">def</span> <a title="(implicit request: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="877189">apply</a>(<span class="keyword">implicit</span> <a title="scalaz.http.request.Request[IN]" id="877190">request</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) = <a href="#808845" title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest,implicit request: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">application</a>(<a href="#808861" title="scalaz.http.servlet.HttpServlet">servlet</a>, <a href="#808862" title="scalaz.http.servlet.HttpServletRequest">servletRequest</a>, <a href="#877190" title="scalaz.http.request.Request[IN]">request</a>)
+  }
+
+  /**
+   * Returns a response for the given application parts.
+   */
+  <span class="keyword">def</span> <a title="(servlet: scalaz.http.servlet.HttpServlet,servletRequest: scalaz.http.servlet.HttpServletRequest,req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="808847">apply</a>(<a title="scalaz.http.servlet.HttpServlet" id="838310">servlet</a>: <a href="HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="838311">servletRequest</a>: <a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[IN]" id="838312">req</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) = <a href="#808846" title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest)scalaz.http.Application[IN,OUT]">application</a><a href="../Application.scala.html#808865" title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">(</a><a href="#838310" title="scalaz.http.servlet.HttpServlet">servlet</a>, <a href="#838311" title="scalaz.http.servlet.HttpServletRequest">servletRequest</a>)(<a href="#838312" title="scalaz.http.request.Request[IN]">req</a>)
+
+  /**
+   * The input-streamer for the contents of the request body.
+   */
+  <span class="keyword">val</span> <a title="scalaz.http.InputStreamer[IN]" id="808848">inputStreamer</a> = <a href="#813033" title="scalaz.http.InputStreamer[IN]">i</a>
+
+  /**
+   * The each for the contents of the response body.
+   */
+  <span class="keyword">val</span> <a title="scalaz.Each[OUT]" id="808850">each</a> = <a href="#813034" title="scalaz.Each[OUT]">e</a>   
+}
+
+/**
+ * A HTTP servlet application.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.ServletApplication" id="26788">ServletApplication</a> <span title="ScalaObject">{</span>
+  /**
+   * Construct a servlet application from the given function.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest, scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]" id="877203">servletApplication</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="877206">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="877236">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="877207">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="877237">_</a>]](<a title="(scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest, scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT]" id="877230">f</a>: (HttpServlet, HttpServletRequest, Request[IN]) =&gt; Response[OUT])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="877231">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="877232">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) =
+    <a href="#877235" title="scalaz.http.servlet.ServletApplication[IN,OUT]" class="keyword">new</a> <a href="#877231" title="anonymous class $anon extends scalaz.http.servlet.ServletApplication[IN,OUT]" id="877235">ServletApplication</a>[IN, OUT] {
+      <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest,implicit request: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="877239">application</a>(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="877241">servlet</a>: <a href="HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="877242">servletRequest</a>: <a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[IN]" id="877243">request</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) = <a href="#877230" title="(v1: scalaz.http.servlet.HttpServlet,v2: scalaz.http.servlet.HttpServletRequest,v3: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="42490">f</a>(<a href="#877241" title="scalaz.http.servlet.HttpServlet">servlet</a>, <a href="#877242" title="scalaz.http.servlet.HttpServletRequest">servletRequest</a>, <a href="#877243" title="scalaz.http.request.Request[IN]">request</a>)
+    }
+
+  /**
+   * Construct a servlet application from the given function.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]" id="877208">servletApplication_</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="877211">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="877290">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="877212">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="877291">_</a>]](<a title="(scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT]" id="877284">f</a>: (HttpServlet, HttpServletRequest) =&gt; Application[IN, OUT])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="877285">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="877286">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) =
+    <a href="#877289" title="scalaz.http.servlet.ServletApplication[IN,OUT]" class="keyword">new</a> <a href="#877285" title="anonymous class $anon extends scalaz.http.servlet.ServletApplication[IN,OUT]" id="877289">ServletApplication</a>[IN, OUT] {
+      <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet,implicit servletRequest: scalaz.http.servlet.HttpServletRequest,implicit request: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="877293">application</a>(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="877295">servlet</a>: <a href="HttpServlet.scala.html#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="877296">servletRequest</a>: <a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[IN]" id="877297">request</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) = <a href="#877284" title="(v1: scalaz.http.servlet.HttpServlet,v2: scalaz.http.servlet.HttpServletRequest)scalaz.http.Application[IN,OUT]" id="35418">f</a><a href="../Application.scala.html#808865" title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">(</a><a href="#877295" title="scalaz.http.servlet.HttpServlet">servlet</a>, <a href="#877296" title="scalaz.http.servlet.HttpServletRequest">servletRequest</a>)(<a href="#877297" title="scalaz.http.request.Request[IN]">request</a>)
+    }
+
+  /**
+   * Construct a servlet application from the given function.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]" id="877213">servletApplication__</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="877216">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="877343">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="877217">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="877344">_</a>]](<a title="(scalaz.http.servlet.HttpServlet) =&gt; scalaz.http.Application[IN,OUT]" id="877338">f</a>: (HttpServlet) =&gt; Application[IN, OUT])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="877339">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="877340">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) =
+    <a href="#877208" title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">servletApplication_</a><span title="(f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">[</span><a href="#877216" title="IN">IN</a>, <a href="#877217" title="OUT">OUT</a>]<a href="#877339" title="scalaz.http.InputStreamer[IN]">(</a>(<a title="scalaz.http.servlet.HttpServlet" id="877349">s</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="877350">r</a><a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">)</a> =&gt; <a href="#877338" title="(v1: scalaz.http.servlet.HttpServlet)scalaz.http.Application[IN,OUT]">f</a>(<a href="#877349" title="scalaz.http.servlet.HttpServlet">s</a>))
+
+  /**
+   * Construct a servlet application from the given function.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]" id="877218">servletApplication___</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="877221">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="877363">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="877222">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="877364">_</a>]](<a title="(scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT]" id="877358">f</a>: (HttpServletRequest) =&gt; Application[IN, OUT])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="877359">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="877360">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) =
+    <a href="#877208" title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">servletApplication_</a><span title="(f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">[</span><a href="#877221" title="IN">IN</a>, <a href="#877222" title="OUT">OUT</a>]<a href="#877359" title="scalaz.http.InputStreamer[IN]">(</a>(<a title="scalaz.http.servlet.HttpServlet" id="877369">s</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="877370">r</a><a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">)</a> =&gt; <a href="#877358" title="(v1: scalaz.http.servlet.HttpServletRequest)scalaz.http.Application[IN,OUT]">f</a>(<a href="#877370" title="scalaz.http.servlet.HttpServletRequest">r</a>))
+
+  /**
+   * Construct a servlet application from the given constant value.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](a: scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]" id="877223">application</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="877226">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="877383">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="877227">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="877384">_</a>]](<a title="scalaz.http.Application[IN,OUT]" id="877378">a</a>: <a href="../Application.scala.html#26312" title="scalaz.http.Application[IN,OUT]">Application</a>[IN, OUT])(<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[IN]" id="877379">i</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[IN]">InputStreamer</a>[IN], <a title="scalaz.Each[OUT]" id="877380">e</a>: <a href="../../Each.scala.html#10694" title="scalaz.Each[OUT]">Each</a>[OUT]) =
+    <a href="#877208" title="[IN[_], OUT[_]](f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">servletApplication_</a><span title="(f: (scalaz.http.servlet.HttpServlet, scalaz.http.servlet.HttpServletRequest) =&gt; scalaz.http.Application[IN,OUT])(implicit i: scalaz.http.InputStreamer[IN],implicit e: scalaz.Each[OUT])scalaz.http.servlet.ServletApplication[IN,OUT]">[</span><a href="#877226" title="IN">IN</a>, <a href="#877227" title="OUT">OUT</a>]<a href="#877379" title="scalaz.http.InputStreamer[IN]">(</a>(<a title="scalaz.http.servlet.HttpServlet" id="877389">s</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="877390">r</a><a href="HttpServletRequest.scala.html#26700" title="scalaz.http.servlet.HttpServletRequest">)</a> =&gt; <a href="#877378" title="scalaz.http.Application[IN,OUT]">a</a>)
+}
+
+        </pre>
+    </body>
+</html>

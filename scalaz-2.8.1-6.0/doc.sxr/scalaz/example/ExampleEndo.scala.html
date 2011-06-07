@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleEndo.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleEndo" id="23457">ExampleEndo</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408500">main</a>(<a title="Array[String]" id="597570">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#408502" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408502">run</a> {
+    // An Endofunction is a function from of type (A =&gt; A).
+    <span class="keyword">val</span> <a title="scalaz.Endo[Int]" id="597573">inc</a>: <a href="../Endo.scala.html#10766" title="scalaz.Endo[Int]">Endo</a>[Int] = ((i: <span title="Int">Int</span>) =&gt; <a href="#597579" title="(x$1: Int)Int" id="5136">i</a> + <span title="Int(1)" class="int">1</span>).<a href="../Function1W.scala.html#56704" title="(implicit ev: =:=[Int,Int])scalaz.Endo[Int]">endo</a>
+
+    // Two endofunctions can be combined through the Endo Monoid
+    // This is equivalent to inc andThen inc.
+    // The zero element of the Endo monoid is the identity function
+    <span class="keyword">val</span> <a title="scalaz.Endo[Int]" id="597574">inc2</a>: <a href="../Endo.scala.html#10766" title="scalaz.Endo[Int]">Endo</a>[Int] = <a href="../Identity.scala.html#43120" title="(a: =&gt; scalaz.Endo[Int])(implicit s: scalaz.Semigroup[scalaz.Endo[Int]])scalaz.Endo[Int]">inc</a> <a href="../Semigroup.scala.html#88295" title="scalaz.Semigroup[scalaz.Endo[Int]]">⊹</a> <a href="#597573" title="scalaz.Endo[Int]">inc</a>
+    <a href="../Endo.scala.html#41262" title="(a: Int)Int">inc2</a><a href="../Identity.scala.html#43004" title="(b: Int)(implicit e: scalaz.Equal[Int],implicit s: scalaz.Show[Int],implicit ev: &lt;:&lt;[Int,Int])Unit">(</a><span title="Int(0)" class="int">0</span>) <a href="../Equal.scala.html#120131" title="=&gt; scalaz.Equal[Int]">assert_===</a> (<span title="Int(2)" class="int">2</span>)
+    <span class="keyword">val</span> <a title="scalaz.Endo[Int]" id="597575">f</a> = <a href="../Zero.scala.html#35286" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="../Zero.scala.html#88446" title="(implicit z: scalaz.Zero[scalaz.Endo[Int]])scalaz.Endo[Int]">[</a><a href="../Endo.scala.html#10766" title="scalaz.Endo[Int]">Endo</a>[Int]]
+    <a href="../Endo.scala.html#41262" title="(a: Int)Int">f</a><a href="../Identity.scala.html#43004" title="(b: Int)(implicit e: scalaz.Equal[Int],implicit s: scalaz.Show[Int],implicit ev: &lt;:&lt;[Int,Int])Unit">(</a><span title="Int(1)" class="int">1</span>) <a href="../Equal.scala.html#120131" title="=&gt; scalaz.Equal[Int]">assert_===</a> <span title="Int(1)" class="int">1</span>
+
+    <span class="keyword">import</span> scala.math._
+    <span class="keyword">val</span> <a title="scalaz.Endo[Int]" id="597577">capAndFloor</a>: <a href="../Endo.scala.html#10766" title="scalaz.Endo[Int]">Endo</a>[Int] = <span title="(elems: (Int) =&gt; Int*)Seq[(Int) =&gt; Int]">Seq</span><a href="../MA.scala.html#34379" title="(l: Seq[(Int) =&gt; Int])scalaz.MA[Seq,(Int) =&gt; Int]">(</a><a title="(x: Int,y: Int)Int" id="30879">max</a>(<span title="Int(2)" class="int">2</span>, <a href="#598469" title="Int">_</a>: <span title="Int">Int</span>),  <a title="(x: Int,y: Int)Int" id="30891">min</a>(<span title="Int(4)" class="int">4</span>, <a href="#598480" title="Int">_</a>: <span title="Int">Int</span>)).<a href="../MA.scala.html#55481" title="(f: ((Int) =&gt; Int) =&gt; scalaz.Endo[Int])(implicit r: scalaz.Foldable[Seq],implicit m: scalaz.Monoid[scalaz.Endo[Int]])scalaz.Endo[Int]">foldMap</a><a href="../Foldable.scala.html#91300" title="scalaz.Foldable[Seq]">(</a><a href="../Function1W.scala.html#34063" title="(f: (Int) =&gt; Int)scalaz.Function1W[Int,Int]">_</a>.<a href="../Function1W.scala.html#56704" title="(implicit ev: =:=[Int,Int])scalaz.Endo[Int]">endo</a>)
+    <a href="../MA.scala.html#57127" title="(f: (Int) =&gt; Int)(implicit t: scalaz.Functor[Seq])Seq[Int]">(</a><a title="(end: Int)scala.collection.immutable.Range.Inclusive with scala.collection.immutable.Range.ByOne" id="9013" class="int">0</a> to <span title="Int(5)" class="int">5</span> <a href="../MA.scala.html#34379" title="(l: Seq[Int])scalaz.MA[Seq,Int]" id="28853">toSeq</a>) <a href="../Identity.scala.html#43004" title="(b: Seq[Int])(implicit e: scalaz.Equal[Seq[Int]],implicit s: scalaz.Show[Seq[Int]],implicit ev: &lt;:&lt;[Seq[Int],Seq[Int]])Unit">∘</a> <a href="../NewType.scala.html#43741" title="(n: scalaz.NewType[(Int) =&gt; Int])(Int) =&gt; Int">capAndFloor</a> <a href="../Equal.scala.html#120278" title="(implicit evidence$52: scalaz.CanBuildAnySelf[Seq],implicit evidence$53: scalaz.Equal[Int])scalaz.Equal[Seq[Int]]">assert_===</a> <span title="(elems: Int*)Seq[Int]">Seq</span>(<span title="Int(2)" class="int">2</span>, <span title="Int(2)" class="int">2</span>, <span title="Int(2)" class="int">2</span>, <span title="Int(3)" class="int">3</span>, <span title="Int(4)" class="int">4</span>, <span title="Int(4)" class="int">4</span>)
+  }
+}
+        </pre>
+    </body>
+</html>

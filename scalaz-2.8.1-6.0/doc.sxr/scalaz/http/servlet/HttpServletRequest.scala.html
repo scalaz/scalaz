@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/HttpServletRequest.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> request.Request
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> request.{Method, RequestHeader}
+<span class="keyword">import</span> request.<a href="../request/Line.scala.html#26988" title="object scalaz.http.request.Line">Line</a>.line
+<span class="keyword">import</span> request.<a href="../request/Uri.scala.html#27279" title="object scalaz.http.request.Uri">Uri</a>.uri
+<span class="keyword">import</span> <a href="HttpSession.scala.html#26752" title="object scalaz.http.servlet.HttpSession">HttpSession</a>.HttpSessionSession
+<span class="keyword">import</span> <a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#808993" title="object scalaz.http.Util.Nel">Nel</a>._
+
+/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpServletRequest&lt;/code&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait HttpServletRequest extends java.lang.Object with ScalaObject" id="26700">HttpServletRequest</a> <span title="ScalaObject">{</span>
+  /**
+   * The wrapped HTTP servlet request.
+   */
+  <span class="keyword">val</span> <a title="=&gt; javax.servlet.http.HttpServletRequest" id="809008">request</a>: javax.servlet.http.<span title="javax.servlet.http.HttpServletRequest">HttpServletRequest</span>
+
+  /**
+   * Returns the request parameter value for the given argument.
+   */
+  <span class="keyword">def</span> <a title="(param: String)Option[java.lang.String]" id="809009">apply</a>(<a title="String" id="875420">param</a>: <span title="String">String</span>) = <span title="(x: java.lang.String)Option[java.lang.String]">Option</span>(<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<span title="(x$1: java.lang.String)java.lang.String">getParameter</span>(<a href="#875420" title="String">param</a>))
+
+  /**
+   * Returns the request parameter value for the given argument.
+   * &lt;strong&gt;This function fails if the request has no such parameter&lt;/strong&gt;.
+   */
+  <span class="keyword">def</span> <a title="(param: String)java.lang.String" id="809010">!</a>(<a title="String" id="875428">param</a>: <span title="String">String</span>) = <span title="(x: java.lang.String)Option[java.lang.String]">Option</span><a href="../../OptionW.scala.html#38451" title="(message: =&gt; String)java.lang.String">(</a><a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<span title="(x$1: java.lang.String)java.lang.String">getParameter</span>(<a href="#875428" title="String">param</a>)) err (<span title="(x$1: Any)java.lang.String" class="string">&quot;Missing request parameter: &quot;</span> + <a href="#875428" title="String">param</a>)
+
+  /**
+   * Removes the given request attribute.
+   */
+  <span class="keyword">def</span> <a title="(attr: String)Unit" id="809011">-=</a>(<a title="String" id="875489">attr</a>: <span title="String">String</span>) = <a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="(x$1: java.lang.String)Unit" id="810172">removeAttribute</a>(<a href="#875489" title="String">attr</a>)
+
+  /**
+   * Sets the given request attribute with the given value.
+   */
+  <span class="keyword">def</span> <a title="[A](attr: String,value: A)Unit" id="809012">update</a>[<a title="&gt;: Nothing &lt;: Any" id="809014">A</a>](<a title="String" id="875125">attr</a>: <span title="String">String</span>, <a title="A" id="875126">value</a>: <a href="#809014" title="A">A</a>) = <a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="(x$1: java.lang.String,x$2: Any)Unit" id="810169">setAttribute</a>(<a href="#875125" title="String">attr</a>, <a href="#875126" title="A">value</a>)
+
+  /**
+   * Gets the given request attribute value.
+   */
+  <span class="keyword">def</span> <a title="(attr: String)Option[java.lang.Object]" id="809015">attr</a>(<a title="String" id="875187">attr</a>: <span title="String">String</span>) = <span title="(x: java.lang.Object)Option[java.lang.Object]">Option</span>(<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="(x$1: java.lang.String)java.lang.Object" id="810143">getAttribute</a>(<a href="#875187" title="String">attr</a>))
+
+  /**
+   * Returns the HTTP session associated with this request.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.http.servlet.HttpSession" id="809016">session</a> = <a href="HttpSession.scala.html#808776" title="implicit scalaz.http.servlet.HttpSessions.HttpSessionSession : (s: javax.servlet.http.HttpSession)scalaz.http.servlet.HttpSession">HttpSessionSession</a>(<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="()javax.servlet.http.HttpSession" id="809233">getSession</a>)
+
+  /**
+   * Returns the HTTP session associated with this request.
+   */
+  <span class="keyword">def</span> <a title="(create: Boolean)scalaz.http.servlet.HttpSession" id="809017">session</a>(<a title="Boolean" id="875084">create</a>: <a title="Boolean" id="3781">Boolean</a>) = <a href="HttpSession.scala.html#808776" title="implicit scalaz.http.servlet.HttpSessions.HttpSessionSession : (s: javax.servlet.http.HttpSession)scalaz.http.servlet.HttpSession">HttpSessionSession</a>(<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="(x$1: Boolean)javax.servlet.http.HttpSession" id="809231">getSession</a>(<a href="#875084" title="Boolean">create</a>))
+
+  /**
+   * Converts this request into a scalaz request.
+   */
+  <span class="keyword">def</span> <a title="[I[_]](implicit in: scalaz.http.InputStreamer[I])Option[java.lang.Object with scalaz.http.request.Request[I]]" id="809018">asRequest</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="809020">I</a>[<a title="&gt;: Nothing &lt;: Any" id="836415">_</a>]](<span class="keyword">implicit</span> <a title="scalaz.http.InputStreamer[I]" id="836396">in</a>: <a href="../InputStreamer.scala.html#26429" title="scalaz.http.InputStreamer[I]">InputStreamer</a>[I]) = {
+      <span class="keyword">val</span> <a title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="836399">headers</a>: <a title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="29298">List</a>[(RequestHeader, NonEmptyList[Char])] = <a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a href="../../EnumerationW.scala.html#34012" title="(v: java.util.Enumeration[?0])scalaz.EnumerationW[?0]" id="809214">getHeaderNames</a>.<a href="../../EnumerationW.scala.html#56735" title="=&gt; &lt;refinement&gt; extends java.lang.Object with Iterator[?0]">elements</a>.<span title="(f: (?0) =&gt; String)Iterator[String]">map</span>(<a href="#836471" title="?0">_</a>.<span title="[T0]T0">asInstanceOf</span><span title="String">[</span><span title="String">String</span>]).<a href="../../MA.scala.html#57137" title="(f: (String) =&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])])(implicit b: scalaz.Bind[List])List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">toList</a> <a href="../../Bind.scala.html#59496" title="(implicit evidence$2: scalaz.CanBuildAnySelf[List])scalaz.Bind[List]" id="29299">∗</a>
+              (<a title="String" id="836722">h</a> =&gt; <a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="(x$1: java.lang.String)java.util.Enumeration[_]" id="809211">getHeaders</a><a href="../../EnumerationW.scala.html#34012" title="(v: java.util.Enumeration[?0])scalaz.EnumerationW[?0]">(</a><a href="#836722" title="String">h</a>).<a href="../../EnumerationW.scala.html#56735" title="=&gt; &lt;refinement&gt; extends java.lang.Object with Iterator[?0]">elements</a>.<span title="(f: (?0) =&gt; String)Iterator[String]">map</span>(<a href="#836782" title="?0">_</a>.<span title="[T0]T0">asInstanceOf</span><span title="String">[</span><span title="String">String</span>]).<a title="(p: (String) =&gt; Boolean)Iterator[String]" id="78131">filter</a>(<a href="#836787" title="String">_</a>.<a title="(x$1: Int)Boolean" id="5132">length</a> &gt; <span title="Int(0)" class="int">0</span>).<span title="(f: (String) =&gt; (scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char]))Iterator[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">map</span>
+                        (<a title="String" id="836799">v</a> =&gt; <span title="(_1: scalaz.http.request.RequestHeader,_2: scalaz.NonEmptyList[Char])(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])">(</span>(<a href="../request/RequestHeader.scala.html#808752" title="implicit scalaz.http.request.RequestHeaders.StringRequestHeader : (s: String)Option[scalaz.http.request.RequestHeader]">h</a>: <span title="Option[scalaz.http.request.RequestHeader]">Option</span>[RequestHeader]).<span title="=&gt; scalaz.http.request.RequestHeader">get</span>, <a href="#836799" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">v</a>.<a href="../../ListW.scala.html#34172" title="(as: List[Char])scalaz.ListW[Char]">toList</a>.<a href="../../ListW.scala.html#56563" title="=&gt; Option[scalaz.NonEmptyList[Char]]">toNel</a>.<span title="=&gt; scalaz.NonEmptyList[Char]">get</span>)).<span title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">toList</span>)
+
+      <span class="keyword">val</span> <a title="Option[scalaz.http.request.Line]" id="836400">rline</a> = <a href="../../MA.scala.html#55435" title="(f: (scalaz.http.request.Method) =&gt; Option[scalaz.http.request.Line])(implicit b: scalaz.Bind[Option])Option[scalaz.http.request.Line]">(</a><a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="809218">getMethod</a>.<a href="../request/Method.scala.html#808746" title="(v1: List[Char])Option[scalaz.http.request.Method]" id="28871">toList</a>: <span title="Option[scalaz.http.request.Method]">Option</span>[Method]) <a href="../../Bind.scala.html#59598" title="=&gt; scalaz.Bind[Option]">&gt;&gt;=</a> (<a title="scalaz.http.request.Method" id="837443">m</a> =&gt;
+        <a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="809228">getRequestURI</a>.<a href="../../ListW.scala.html#34172" title="(as: List[Char])scalaz.ListW[Char]">toList</a>.<a href="../../ListW.scala.html#56563" title="(f: (scalaz.NonEmptyList[Char]) =&gt; java.lang.Object with scalaz.http.request.Uri)Option[java.lang.Object with scalaz.http.request.Uri]">toNel</a> <a href="../../MA.scala.html#55435" title="(f: (java.lang.Object with scalaz.http.request.Uri) =&gt; Option[scalaz.http.request.Line])(implicit b: scalaz.Bind[Option])Option[scalaz.http.request.Line]">map</a>
+                (<a title="scalaz.NonEmptyList[Char]" id="837540">p</a> =&gt; <a href="../request/Uri.scala.html#836409" title="(p: scalaz.NonEmptyList[Char],s: Option[List[Char]])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#837540" title="scalaz.NonEmptyList[Char]">p</a>, <span title="(x: java.lang.String)Option[java.lang.String]">Option</span><span title="(f: (java.lang.String) =&gt; List[Char])Option[List[Char]]">(</span><a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="()java.lang.String" id="809222">getQueryString</a>) map (<a href="#837572" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">_</a>.<span title="=&gt; List[Char]">toList</span>))) <a href="../../Bind.scala.html#59598" title="=&gt; scalaz.Bind[Option]">&gt;&gt;=</a>
+                (<a title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.request.Uri" id="837773">u</a> =&gt; <span title="(f: (scalaz.http.Version) =&gt; scalaz.http.request.Line)Option[scalaz.http.request.Line]">(</span><a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a href="../Version.scala.html#808739" title="implicit scalaz.http.Versions.StringVersion : (s: String)Option[scalaz.http.Version]" id="810162">getProtocol</a>: <span title="Option[scalaz.http.Version]">Option</span>[Version]) map
+                        (<a title="scalaz.http.Version" id="837805">v</a> =&gt; <a href="../request/Line.scala.html#836412" title="(m: scalaz.http.request.Method,u: scalaz.http.request.Uri,v: scalaz.http.Version)scalaz.http.request.Line">line</a>(<a href="#837443" title="scalaz.http.request.Method">m</a>, <a href="#837773" title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.request.Uri">u</a>, <a href="#837805" title="scalaz.http.Version">v</a>))))
+
+      <a href="#836400" title="(f: (scalaz.http.request.Line) =&gt; java.lang.Object with scalaz.http.request.Request[I])Option[java.lang.Object with scalaz.http.request.Request[I]]">rline</a> map (<a href="../request/Request.scala.html#27183" title="object scalaz.http.request.Request">Request</a>.<a href="../request/Request.scala.html#808821" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: I[Byte])java.lang.Object with scalaz.http.request.Request[I]">[</span><a href="#809020" title="I">I</a>](<a href="#838279" title="scalaz.http.request.Line">_</a>, <a href="#836399" title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>, <a href="../InputStreamer.scala.html#813038" title="(in: java.io.InputStream)I[Byte]">in</a>(<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>.<a title="()javax.servlet.ServletInputStream" id="810152">getInputStream</a>)))
+    }
+}
+
+<span class="keyword">trait</span> <a title="trait HttpServletRequests extends java.lang.Object with ScalaObject" id="26706">HttpServletRequests</a> <span title="ScalaObject">{</span>
+  /**
+   * Wraps the given Java Servlet HTTP request.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpServletRequests.HttpServletRequestRequest : (r: javax.servlet.http.HttpServletRequest)scalaz.http.servlet.HttpServletRequest" id="808782">HttpServletRequestRequest</a>(<a title="javax.servlet.http.HttpServletRequest" id="809238">r</a>: javax.servlet.http.<span title="javax.servlet.http.HttpServletRequest">HttpServletRequest</span>): <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a> = <a href="#875495" title="java.lang.Object with scalaz.http.servlet.HttpServletRequest{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.servlet.HttpServletRequest" id="875495">HttpServletRequest</a> {
+    <span class="keyword">val</span> <a title="javax.servlet.http.HttpServletRequest" id="875499">request</a> = <a href="#809238" title="javax.servlet.http.HttpServletRequest">r</a>
+  }
+
+  /**
+   * Unwraps the given HTTP request into a servlet HTTP request.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpServletRequests.RequestHttpServletRequest : (request: scalaz.http.servlet.HttpServletRequest)javax.servlet.http.HttpServletRequest" id="808783">RequestHttpServletRequest</a>(<a title="scalaz.http.servlet.HttpServletRequest" id="809198">request</a>: <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>) = <a href="#809198" title="scalaz.http.servlet.HttpServletRequest">request</a>.<a href="#809008" title="=&gt; javax.servlet.http.HttpServletRequest">request</a>
+}
+
+/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpServletRequest&lt;/code&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.HttpServletRequest" id="26701">HttpServletRequest</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#26706" title="scalaz.http.servlet.HttpServletRequests">HttpServletRequests</a> {
+  /**
+   * Prepends the context path of the given HTTP servlet request to the given argument. This is useful for creating
+   * anchor tags in HTML documents.
+   */
+  <span class="keyword">def</span> <a title="(s: String)(implicit request: scalaz.http.servlet.HttpServletRequest)java.lang.String" id="835984">link</a>(<a title="String" id="875507">s</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="875508">request</a>: <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>) =
+    <a href="#808783" title="implicit scalaz.http.servlet.HttpServletRequests.RequestHttpServletRequest : (request: scalaz.http.servlet.HttpServletRequest)javax.servlet.http.HttpServletRequest">request</a>.<span title="(x$1: Any)java.lang.String">getContextPath</span> <span title="(x$1: Any)java.lang.String">+</span> <span title="Char('/')" class="char">'/'</span> + <a href="#875507" title="String">s</a>
+
+  /**
+   * Removes the length of the context path of the given servlet request unless it is empty.
+   */
+  <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])(implicit request: scalaz.http.servlet.HttpServletRequest)scalaz.http.request.Request[IN]" id="835985">c</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="835987">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="875557">_</a>]](<a title="scalaz.http.request.Request[IN]" id="875552">r</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN])(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="875553">request</a>: <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>) = {
+    <span class="keyword">val</span> <a title="Option[scalaz.NonEmptyList[Char]]" id="875556">k</a>: <span title="Option[scalaz.NonEmptyList[Char]]">Option</span>[NonEmptyList[Char]] = (<a href="#875552" title="scalaz.http.request.Request[IN]">r</a>.<a href="../Util.scala.html#809001" title="(n: Int)List[Char]" id="32621">path</a> <a href="../../ListW.scala.html#34172" title="(as: List[Char])scalaz.ListW[Char]">drop</a> <a href="#808783" title="implicit scalaz.http.servlet.HttpServletRequests.RequestHttpServletRequest : (request: scalaz.http.servlet.HttpServletRequest)javax.servlet.http.HttpServletRequest">request</a>.<span title="()java.lang.String">getContextPath</span>.<span title="()Int">length</span>).<a href="../../ListW.scala.html#56563" title="=&gt; Option[scalaz.NonEmptyList[Char]]">toNel</a>
+    <a href="../../MA.scala.html#57127" title="(f: (scalaz.NonEmptyList[Char]) =&gt; scalaz.http.request.Request[IN])(implicit t: scalaz.Functor[Option])Option[scalaz.http.request.Request[IN]]">k</a> <a href="../../OptionW.scala.html#38452" title="(a: =&gt; scalaz.http.request.Request[IN])scalaz.http.request.Request[IN]">∘</a> (<a title="scalaz.NonEmptyList[Char]" id="875880">p</a> =&gt; <a href="../request/Request.scala.html#808897" title="(u: scalaz.http.request.Uri)scalaz.http.request.Request[IN]">r</a>(<a href="#875552" title="scalaz.http.request.Request[IN]">r</a>.<a href="../request/Uri.scala.html#834454" title="(p: scalaz.NonEmptyList[Char])java.lang.Object with scalaz.http.request.Uri">uri</a>(<a href="#875880" title="scalaz.NonEmptyList[Char]">p</a>))) | <a href="#875552" title="scalaz.http.request.Request[IN]">r</a>
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.servlet.HttpServletRequest.MethodPath" id="835988">MethodPath</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])(implicit hsr: scalaz.http.servlet.HttpServletRequest)Option[(scalaz.http.request.Method, String)]" id="876195">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="876197">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="876203">_</a>]](<a title="scalaz.http.request.Request[IN]" id="876200">r</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN])(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="876201">hsr</a>: <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>): <span title="Option[(scalaz.http.request.Method, String)]">Option</span>[(Method, String)] =
+      scalaz.http.request.<a href="../request/Request.scala.html#27183" title="object scalaz.http.request.Request">Request</a>.<a href="../request/Request.scala.html#808824" title="object scalaz.http.request.Request.MethodPath">MethodPath</a>.<a href="../request/Request.scala.html#853085" title="(r: scalaz.http.request.Request[IN])Option[(scalaz.http.request.Method, String)]">unapply</a><span title="(f: ((scalaz.http.request.Method, String)) =&gt; (scalaz.http.request.Method, String))Option[(scalaz.http.request.Method, String)]">(</span><a href="#876200" title="scalaz.http.request.Request[IN]">r</a>) map (<a title="(scalaz.http.request.Method, String)" id="876216">ms</a> =&gt; <span title="(_1: scalaz.http.request.Method,_2: String)(scalaz.http.request.Method, String)">(</span><a href="#876216" title="(scalaz.http.request.Method, String)">ms</a>.<a title="=&gt; scalaz.http.request.Method" id="36143">_1</a>, <a href="#876216" title="(scalaz.http.request.Method, String)">ms</a>.<a title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="36145">_2</a>.<span title="(n: Int)String">drop</span>((<a href="#808783" title="implicit scalaz.http.servlet.HttpServletRequests.RequestHttpServletRequest : (request: scalaz.http.servlet.HttpServletRequest)javax.servlet.http.HttpServletRequest">hsr</a>.<span title="(x$1: Any)java.lang.String">getContextPath</span> + <span title="java.lang.String(&quot;/&quot;)" class="string">&quot;/&quot;</span>).<span title="()Int">length</span>)))
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.servlet.HttpServletRequest.Path" id="835990">Path</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])(implicit hsr: scalaz.http.servlet.HttpServletRequest)Option[String]" id="876318">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="876320">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="876326">_</a>]](<a title="scalaz.http.request.Request[IN]" id="876323">r</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN])(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="876324">hsr</a>: <a href="#26700" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>): <span title="Option[String]">Option</span>[String] =
+      scalaz.http.request.<a href="../request/Request.scala.html#27183" title="object scalaz.http.request.Request">Request</a>.<a href="../request/Request.scala.html#808828" title="object scalaz.http.request.Request.Path">Path</a>.<a href="../request/Request.scala.html#853129" title="(r: scalaz.http.request.Request[IN])Option[String]">unapply</a><span title="(f: (String) =&gt; String)Option[String]">(</span><a href="#876323" title="scalaz.http.request.Request[IN]">r</a>) map (<a href="#876339" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">_</a>.<span title="(n: Int)String">drop</span>((<a href="#808783" title="implicit scalaz.http.servlet.HttpServletRequests.RequestHttpServletRequest : (request: scalaz.http.servlet.HttpServletRequest)javax.servlet.http.HttpServletRequest">hsr</a>.<span title="(x$1: Any)java.lang.String">getContextPath</span> + <span title="java.lang.String(&quot;/&quot;)" class="string">&quot;/&quot;</span>).<span title="()Int">length</span>))
+  }
+}
+
+        </pre>
+    </body>
+</html>

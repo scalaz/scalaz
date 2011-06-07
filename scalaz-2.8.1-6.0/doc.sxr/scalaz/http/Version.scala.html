@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/Version.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> java.lang.<span title="object java.lang.Character">Character</span>.isDigit
+
+/**
+ * HTTP version.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.1&quot;&gt;RFC 2616 Section 3.1 HTTP Version&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Version extends java.lang.Object with ScalaObject" id="26558">Version</a> <span title="ScalaObject">{</span>
+  /**
+   * HTTP Version major number.
+   */
+  <span class="keyword">val</span> <a title="=&gt; scalaz.Digit" id="809907">major</a>: <a href="../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>
+
+  /**
+   * HTTP Version major number.
+   */
+  <span class="keyword">val</span> <a title="=&gt; scalaz.Digit" id="809908">minor</a>: <a href="../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>
+
+  /**
+   * A string representation of this version
+   */
+  <span class="keyword">def</span> <a title="=&gt; java.lang.String" id="809909">asString</a> = <span title="(x$1: Any)java.lang.String" class="string">&quot;HTTP/&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#809907" title="=&gt; scalaz.Digit">major</a>.<a href="../Digit.scala.html#57326" title="=&gt; Int">toInt</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot;.&quot;)" class="string">&quot;.&quot;</span> + <a href="#809908" title="=&gt; scalaz.Digit">minor</a>.<a href="../Digit.scala.html#57326" title="=&gt; Int">toInt</a>
+}
+
+<span class="keyword">trait</span> <a title="trait Versions extends java.lang.Object with ScalaObject" id="26576">Versions</a> <span title="ScalaObject">{</span>
+  /**
+   * Returns a string representation for the given version.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.Versions.VersionString : (v: scalaz.http.Version)java.lang.String" id="808737">VersionString</a>(<a title="scalaz.http.Version" id="809903">v</a>: <a href="#26558" title="scalaz.http.Version">Version</a>) = <a href="#809903" title="scalaz.http.Version">v</a>.<a href="#809909" title="=&gt; java.lang.String">asString</a>
+
+  /**
+   * Returns a string representation for the given version.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; (List[Char]) =&gt; Option[scalaz.http.Version]" id="808738">ListVersion</a>: (List[Char] =&gt; Option[Version]) = <a href="#808739" title="implicit scalaz.http.Versions.StringVersion : (s: String)Option[scalaz.http.Version]">StringVersion</a> <a title="(g: (List[Char]) =&gt; String)(List[Char]) =&gt; Option[scalaz.http.Version]" id="28876">_</a> compose (<a href="#841368" title="List[Char]">_</a>.<a title="=&gt; String" id="29213">mkString</a>)
+
+  /**
+   * Returns a potential version for the given string of the form &lt;code&gt;HTTP/major/minor&lt;/code&gt;.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.Versions.StringVersion : (s: String)Option[scalaz.http.Version]" id="808739">StringVersion</a>(<a title="String" id="809899">s</a>: <a title="String" id="2716">String</a>): <span title="Option[scalaz.http.Version]">Option</span>[Version] =
+    <span title="Option[scalaz.http.Version]" class="keyword">if</span> (<a href="#809899" title="String">s</a>.<a title="(x$1: Int)Boolean" id="7409">length</a> &lt; <span title="Int(8)" class="int">8</span>)
+      <a title="object None" id="1843">None</a>
+    <span class="keyword">else</span> {
+      <span class="keyword">val</span> <a title="Char" id="841379">major</a> = <a href="#809899" title="(x$1: Int)Char">s</a> charAt <span title="Int(5)" class="int">5</span>
+      <span class="keyword">val</span> <a title="Char" id="841380">minor</a> = <a href="#809899" title="(x$1: Int)Char">s</a> charAt <span title="Int(7)" class="int">7</span>
+
+      <a title="(xs: Char*)List[Char]" id="32659">List</a><a href="../MA.scala.html#57146" title="(f: (Char) =&gt; Option[Long])(implicit a: scalaz.Applicative[Option],implicit t: scalaz.Traverse[List])Option[List[Long]]">(</a><a href="#841379" title="Char">major</a>, <a href="#841380" title="Char">minor</a>) <a href="../Applicative.scala.html#35476" title="(f: (List[Long]) =&gt; scalaz.http.Version)Option[scalaz.http.Version]" id="32653">↦</a> ((c: <a title="Char" id="4357">Char</a>) =&gt; <a title="(x$1: Char)Boolean" id="31427">isDigit</a><a href="../BooleanW.scala.html#33943" title="implicit scalaz.Booleans.BooleanTo : (b: Boolean)scalaz.BooleanW">(</a><a href="#841668" title="Char">c</a>).<a href="../BooleanW.scala.html#57356" title="(a: =&gt; Long)Option[Long]">option</a>(<a href="#841668" title="Char">c</a>.<a title="(x$1: Long)Long" id="4812">toLong</a> - <span title="Long(48L)" class="long">48L</span>)) map <a href="#842830" title="scalaz.http.Version">{</a><span title="scalaz.http.Version" class="keyword">case</span> <a href="#842832" title="(x: List[Long])Some[List[Long]]" id="32747">List</a>(<a title="Long" id="842846">maj</a>, <a title="Long" id="842847">min</a>) =&gt; <a href="#26559" title="object scalaz.http.Version">Version</a>.<a href="#812644" title="(maj: scalaz.Digit,min: scalaz.Digit)scalaz.http.Version">version</a>(<a href="../Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">maj</a>, <a href="../Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">min</a>)}
+    }
+}
+
+/**
+ * HTTP version.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.1&quot;&gt;RFC 2616 Section 3.1 HTTP Version&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.Version" id="26559">Version</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#26576" title="scalaz.http.Versions">Versions</a> {
+  /**
+   * Extracts the major and minor numbers of the given version.
+   */
+  <span class="keyword">def</span> <a title="(v: scalaz.http.Version)Option[(scalaz.Digit, scalaz.Digit)]" id="812643">unapply</a>(<a title="scalaz.http.Version" id="842905">v</a>: <a href="#26558" title="scalaz.http.Version">Version</a>): <span title="Option[(scalaz.Digit, scalaz.Digit)]">Option</span>[(Digit, Digit)] =
+    <a title="(x: (scalaz.Digit, scalaz.Digit))Some[(scalaz.Digit, scalaz.Digit)]" id="1006">Some</a><a title="(_1: scalaz.Digit,_2: scalaz.Digit)(scalaz.Digit, scalaz.Digit)" id="634">(</a><a href="#842905" title="scalaz.http.Version">v</a>.<a href="#809907" title="=&gt; scalaz.Digit">major</a>, <a href="#842905" title="scalaz.http.Version">v</a>.<a href="#809908" title="=&gt; scalaz.Digit">minor</a>)
+
+  /**
+   * Constructs a version with the given major and minor numbers.
+   */
+  <span class="keyword">def</span> <a title="(maj: scalaz.Digit,min: scalaz.Digit)scalaz.http.Version" id="812644">version</a>(<a title="scalaz.Digit" id="812749">maj</a>: <a href="../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>, <a title="scalaz.Digit" id="812750">min</a>: <a href="../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>): <a href="#26558" title="scalaz.http.Version">Version</a> = <a href="#842918" title="java.lang.Object with scalaz.http.Version{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.Version" id="842918">Version</a> {
+    <span class="keyword">val</span> <a title="scalaz.Digit" id="842922">major</a> = <a href="#812749" title="scalaz.Digit">maj</a>
+    <span class="keyword">val</span> <a title="scalaz.Digit" id="842924">minor</a> = <a href="#812750" title="scalaz.Digit">min</a>
+  }
+
+  /**
+   * A version for HTTP/1.0.
+   */
+  <span class="keyword">import</span> <a href="../Digit.scala.html#10596" title="object scalaz.Digit">Digit</a>._
+
+  <span class="keyword">val</span> <a title="scalaz.http.Version" id="812646">version10</a> = <a href="#812644" title="(maj: scalaz.Digit,min: scalaz.Digit)scalaz.http.Version">version</a>(<a href="../Digit.scala.html#56744" title="object scalaz.Digit._1">_1</a>, <a href="../Digit.scala.html#56742" title="object scalaz.Digit._0">_0</a>)
+
+  /**
+   * A version for HTTP/1.1.
+   */
+  <span class="keyword">val</span> <a title="scalaz.http.Version" id="812648">version11</a> = <a href="#812644" title="(maj: scalaz.Digit,min: scalaz.Digit)scalaz.http.Version">version</a>(<a href="../Digit.scala.html#56744" title="object scalaz.Digit._1">_1</a>, <a href="../Digit.scala.html#56744" title="object scalaz.Digit._1">_1</a>)
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Resource.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> java.io.<span class="delimiter">{</span>OutputStream, InputStream<span class="delimiter">}</span>
+<span class="keyword">import</span> java.sql.<span class="delimiter">{</span>PreparedStatement, ResultSet, Statement, Connection<span class="delimiter">}</span>
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Resource[T] extends java.lang.Object" id="17945">Resource</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20909">T</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(t: T)Unit" id="413529">close</a><span class="delimiter">(</span><a title="T" id="413531">t</a>: <a href="#20909" title="T">T</a><span class="delimiter">)</span>: <span title="Unit">Unit</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.Resource" id="17946">Resource</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Contravariant[scalaz.Resource]" id="413533">ResourceContravariant</a>: <a href="Contravariant.scala.html#9464" title="scalaz.Contravariant[scalaz.Resource]">Contravariant</a><span class="delimiter">[</span>Resource<span class="delimiter">]</span> = <a href="#414378" title="java.lang.Object with scalaz.Contravariant[scalaz.Resource]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Contravariant[scalaz.Resource]" id="414378">Contravariant</a><span class="delimiter">[</span>Resource<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A, B](r: scalaz.Resource[A], f: (B) =&gt; A)java.lang.Object with scalaz.Resource[B]" id="414391">contramap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="414394">A</a>, <a title="&gt;: Nothing &lt;: Any" id="414395">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="scalaz.Resource[A]" id="414396">r</a>: <a href="#17945" title="scalaz.Resource[A]">Resource</a><span class="delimiter">[</span>A<span class="delimiter">]</span>, <a title="(B) =&gt; A" id="414397">f</a>: B =&gt; A<span class="delimiter">)</span> = <a href="#414412" title="java.lang.Object with scalaz.Resource[B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[B]" id="414412">Resource</a><span class="delimiter">[</span>B<span class="delimiter">]</span> <span class="delimiter">{</span>
+      <span class="keyword">def</span> <a title="(b: B)Unit" id="414416">close</a><span class="delimiter">(</span><a title="B" id="414417">b</a>: <a href="#414395" title="B">B</a><span class="delimiter">)</span> = <a href="#414396" title="scalaz.Resource[A]">r</a> <a href="#413529" title="(t: A)Unit">close</a> <span class="delimiter">(</span><a href="#414397" title="(v1: B)A">f</a><span class="delimiter">(</span><a href="#414417" title="B">b</a><span class="delimiter">)</span><span class="delimiter">)</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.io.InputStream]" id="413535">InputStreamResource</a>: <a href="#17945" title="scalaz.Resource[java.io.InputStream]">Resource</a><span class="delimiter">[</span>InputStream<span class="delimiter">]</span> = <a href="#414453" title="java.lang.Object with scalaz.Resource[java.io.InputStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.io.InputStream]" id="414453">Resource</a><span class="delimiter">[</span>InputStream<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.io.InputStream)Unit" id="414457">close</a><span class="delimiter">(</span><a title="java.io.InputStream" id="414458">c</a>: <span title="java.io.InputStream">InputStream</span><span class="delimiter">)</span> = <a href="#414458" title="java.io.InputStream">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.io.OutputStream]" id="413537">OutputStreamResource</a>: <a href="#17945" title="scalaz.Resource[java.io.OutputStream]">Resource</a><span class="delimiter">[</span>OutputStream<span class="delimiter">]</span> = <a href="#414467" title="java.lang.Object with scalaz.Resource[java.io.OutputStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.io.OutputStream]" id="414467">Resource</a><span class="delimiter">[</span>OutputStream<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.io.OutputStream)Unit" id="414471">close</a><span class="delimiter">(</span><a title="java.io.OutputStream" id="414472">c</a>: <span title="java.io.OutputStream">OutputStream</span><span class="delimiter">)</span> = <a href="#414472" title="java.io.OutputStream">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.sql.Connection]" id="413539">SQLConnectionResource</a>: <a href="#17945" title="scalaz.Resource[java.sql.Connection]">Resource</a><span class="delimiter">[</span>Connection<span class="delimiter">]</span> = <a href="#414482" title="java.lang.Object with scalaz.Resource[java.sql.Connection]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.sql.Connection]" id="414482">Resource</a><span class="delimiter">[</span>Connection<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.sql.Connection)Unit" id="414486">close</a><span class="delimiter">(</span><a title="java.sql.Connection" id="414487">c</a>: <span title="java.sql.Connection">Connection</span><span class="delimiter">)</span> = <a href="#414487" title="java.sql.Connection">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.sql.Statement]" id="413541">SQLStatementResource</a>: <a href="#17945" title="scalaz.Resource[java.sql.Statement]">Resource</a><span class="delimiter">[</span>Statement<span class="delimiter">]</span> = <a href="#414506" title="java.lang.Object with scalaz.Resource[java.sql.Statement]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.sql.Statement]" id="414506">Resource</a><span class="delimiter">[</span>Statement<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.sql.Statement)Unit" id="414510">close</a><span class="delimiter">(</span><a title="java.sql.Statement" id="414511">c</a>: <span title="java.sql.Statement">Statement</span><span class="delimiter">)</span> = <a href="#414511" title="java.sql.Statement">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.sql.PreparedStatement]" id="413543">SQLPreparedStatementResource</a>: <a href="#17945" title="scalaz.Resource[java.sql.PreparedStatement]">Resource</a><span class="delimiter">[</span>PreparedStatement<span class="delimiter">]</span> = <a href="#414520" title="java.lang.Object with scalaz.Resource[java.sql.PreparedStatement]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.sql.PreparedStatement]" id="414520">Resource</a><span class="delimiter">[</span>PreparedStatement<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.sql.PreparedStatement)Unit" id="414524">close</a><span class="delimiter">(</span><a title="java.sql.PreparedStatement" id="414525">c</a>: <span title="java.sql.PreparedStatement">PreparedStatement</span><span class="delimiter">)</span> = <a href="#414525" title="java.sql.PreparedStatement">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Resource[java.sql.ResultSet]" id="413545">SQLResultSetResource</a>: <a href="#17945" title="scalaz.Resource[java.sql.ResultSet]">Resource</a><span class="delimiter">[</span>ResultSet<span class="delimiter">]</span> = <a href="#414534" title="java.lang.Object with scalaz.Resource[java.sql.ResultSet]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[java.sql.ResultSet]" id="414534">Resource</a><span class="delimiter">[</span>ResultSet<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(c: java.sql.ResultSet)Unit" id="414538">close</a><span class="delimiter">(</span><a title="java.sql.ResultSet" id="414539">c</a>: <span title="java.sql.ResultSet">ResultSet</span><span class="delimiter">)</span> = <a href="#414539" title="java.sql.ResultSet">c</a>.<span title="()Unit">close</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Resources extends java.lang.Object with ScalaObject" id="17963">Resources</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[T](cl: (T) =&gt; Unit)scalaz.Resource[T]" id="39261">resource</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39263">T</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(T) =&gt; Unit" id="414550">cl</a>: T =&gt; Unit<span class="delimiter">)</span>: <a href="#17945" title="scalaz.Resource[T]">Resource</a><span class="delimiter">[</span>T<span class="delimiter">]</span> = <a href="#414553" title="java.lang.Object with scalaz.Resource[T]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Resource[T]" id="414553">Resource</a><span class="delimiter">[</span>T<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(t: T)Unit" id="414557">close</a><span class="delimiter">(</span><a title="T" id="414558">t</a>: <a href="#39263" title="T">T</a><span class="delimiter">)</span> = <a href="#414550" title="(v1: T)Unit">cl</a><span class="delimiter">(</span><a href="#414558" title="T">t</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">def</span> <a title="[T, R](value: =&gt; T, evaluate: (T) =&gt; R, whenComputing: (Throwable) =&gt; R, whenClosing: (Throwable) =&gt; Unit)(implicit r: scalaz.Resource[T])R" id="39264">withResource</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="414577">T</a>, <a title="&gt;: Nothing &lt;: Any" id="414578">R</a><span class="delimiter">]</span><span class="delimiter">(</span>
+                          <a title="=&gt; T" id="414568">value</a>: =&gt; T
+                        , <a title="(T) =&gt; R" id="414569">evaluate</a>: T =&gt; R
+                        , <a title="(Throwable) =&gt; R" id="414574">whenComputing</a>: Throwable =&gt; R = <span class="delimiter">(</span>t: <span title="Throwable">Throwable</span><span class="delimiter">)</span> =&gt; <span title="Nothing" class="keyword">throw</span> <a href="#414590" title="Throwable">t</a>
+                        , <a title="(Throwable) =&gt; Unit" id="414579">whenClosing</a>: Throwable =&gt; Unit = <a title="Throwable" id="414607">_</a> =&gt; <span title="Unit" class="delimiter">(</span><span class="delimiter">)</span>
+                        <span class="delimiter">)</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Resource[T]" id="414572">r</a>: <a href="#17945" title="scalaz.Resource[T]">Resource</a><span class="delimiter">[</span>T<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#414578" title="R">R</a> =
+    <span class="keyword">try</span> <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="T" id="414593">u</a> = <a href="#414568" title="=&gt; T">value</a>
+      <span class="keyword">try</span> <span class="delimiter">{</span>
+        <a href="#414569" title="(v1: T)R">evaluate</a><span class="delimiter">(</span><a href="#414593" title="T">u</a><span class="delimiter">)</span>
+      <span class="delimiter">}</span> <span class="keyword">finally</span> <span class="delimiter">{</span>
+        <span class="keyword">try</span> <span class="delimiter">{</span>
+          <a href="#414572" title="scalaz.Resource[T]">r</a> <a href="#413529" title="(t: T)Unit">close</a> <a href="#414593" title="T">u</a>
+        <span class="delimiter">}</span> <span class="keyword">catch</span> <span class="delimiter">{</span>
+          <span class="keyword">case</span> <a title="Unit" id="414598">ex</a> =&gt; <a href="#414579" title="(v1: Throwable)Unit">whenClosing</a><span class="delimiter">(</span><a href="#414598" title="java.lang.Throwable">ex</a><span class="delimiter">)</span>
+        <span class="delimiter">}</span>
+      <span class="delimiter">}</span>
+    <span class="delimiter">}</span> <span class="keyword">catch</span> <span class="delimiter">{</span>
+      <span class="keyword">case</span> <a title="R" id="414601">ex</a> =&gt; <a href="#414574" title="(v1: Throwable)R">whenComputing</a><span class="delimiter">(</span><a href="#414601" title="java.lang.Throwable">ex</a><span class="delimiter">)</span>
+    <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

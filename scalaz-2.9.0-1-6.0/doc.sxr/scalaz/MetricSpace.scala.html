@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/MetricSpace.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/**
+ * &lt;ol&gt;
+ * &lt;li&gt;(distance(a, b) == 0) == (a == b)&lt;/li&gt;
+ * &lt;li&gt;Commutativity: distance(a, b) == distance(b, a)&lt;/li&gt;
+ * &lt;li&gt;Triangle Equality: distance(a, b) + distance(b, c) &gt;= distance(a, c)&lt;/li&gt;
+ * &lt;/ol&gt;
+ */</span>
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait MetricSpace[-A] extends java.lang.Object" id="16628">MetricSpace</a><span class="delimiter">[</span>-<a title="&gt;: Nothing &lt;: Any" id="20764">A</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(a1: A, a2: A)Int" id="62925">distance</a><span class="delimiter">(</span><a title="A" id="133854">a1</a>: <a href="#20764" title="A">A</a>, <a title="A" id="133855">a2</a>: <a href="#20764" title="A">A</a><span class="delimiter">)</span>: <span title="Int">Int</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait MetricSpaces extends java.lang.Object with ScalaObject" id="16640">MetricSpaces</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A](f: (A, A) =&gt; Int)scalaz.MetricSpace[A]" id="38821">metricSpace</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="38823">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(A, A) =&gt; Int" id="133847">f</a>: <span class="delimiter">(</span>A, A<span class="delimiter">)</span> =&gt; Int<span class="delimiter">)</span>: <a href="#16628" title="scalaz.MetricSpace[A]">MetricSpace</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="#363624" title="java.lang.Object with scalaz.MetricSpace[A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.MetricSpace[A]" id="363624">MetricSpace</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(a1: A, a2: A)Int" id="363628">distance</a><span class="delimiter">(</span><a title="A" id="363629">a1</a>: <a href="#38823" title="A">A</a>, <a title="A" id="363630">a2</a>: <a href="#38823" title="A">A</a><span class="delimiter">)</span> = <a href="#133847" title="(v1: A, v2: A)Int">f</a><span class="delimiter">(</span><a href="#363629" title="A">a1</a>, <a href="#363630" title="A">a2</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="[M[_], A](implicit l: scalaz.Length[M], implicit i: scalaz.Index[M], implicit e: scalaz.Equal[A])scalaz.MetricSpace[M[A]]" id="38825">levenshtein</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="38828">M</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="363645">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="38829">A</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Length[M]" id="363642">l</a>: <a href="Length.scala.html#15209" title="scalaz.Length[M]">Length</a><span class="delimiter">[</span>M<span class="delimiter">]</span>, <a title="scalaz.Index[M]" id="363643">i</a>: <a href="Index.scala.html#14417" title="scalaz.Index[M]">Index</a><span class="delimiter">[</span>M<span class="delimiter">]</span>, <a title="scalaz.Equal[A]" id="363644">e</a>: <a href="Equal.scala.html#10133" title="scalaz.Equal[A]">Equal</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#16628" title="scalaz.MetricSpace[M[A]]">MetricSpace</a><span class="delimiter">[</span>M<span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#38821" title="[A](f: (A, A) =&gt; Int)scalaz.MetricSpace[A]">metricSpace</a><span title="(f: (M[A], M[A]) =&gt; Int)scalaz.MetricSpace[M[A]]" class="delimiter">[</span><a href="#38828" title="M[A]">M</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="MA.scala.html#38560" title="(a: M[A])scalaz.MA[M,A]">_</a> <a href="MA.scala.html#63264" title="(w: M[A])(implicit l: scalaz.Length[M], implicit ind: scalaz.Index[M], implicit equ: scalaz.Equal[A])Int">&lt;---&gt;</a> <a href="#363653" title="M[A]">_</a><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.MetricSpace[String]" id="38830">levenshteins</a>: <a href="#16628" title="scalaz.MetricSpace[String]">MetricSpace</a><span class="delimiter">[</span>String<span class="delimiter">]</span> = <a href="#38825" title="[M[_], A](implicit l: scalaz.Length[M], implicit i: scalaz.Index[M], implicit e: scalaz.Equal[A])scalaz.MetricSpace[M[A]]">levenshtein</a><a href="MA.scala.html#38565" title="(a: scalaz.MetricSpace[List[Char]])scalaz.MAContravariant[scalaz.MetricSpace,List[Char]]" class="delimiter">[</a><span title="List">List</span>, <span title="Char">Char</span><span class="delimiter">]</span> <a href="MA.scala.html#65287" title="(f: (String) =&gt; List[Char])(implicit t: scalaz.Contravariant[scalaz.MetricSpace])scalaz.MetricSpace[String]">∙</a> <span class="delimiter">(</span><span class="delimiter">(</span>s: <span title="String">String</span><span class="delimiter">)</span> =&gt; <a href="#364201" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">s</a>.<span title="=&gt; List[Char]">toList</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

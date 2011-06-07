@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Comp.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">object</span> <a title="object scalaz.Comp" id="10425">Comp</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[M[_], N[_]](implicit evidence$1: scalaz.Functor[M],implicit evidence$2: scalaz.Functor[N])scalaz.Functor[[α]M[N[α]]]" id="111686">CompFunctor</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="111676">M</a>[<a title="&gt;: Nothing &lt;: Any" id="111690">_</a>] : Functor, <a title="[_]&gt;: Nothing &lt;: Any" id="111677">N</a>[<a title="&gt;: Nothing &lt;: Any" id="111691">_</a>] : Functor]: <a href="Functor.scala.html#14663" title="scalaz.Functor[[α]M[N[α]]]">Functor</a>[({<span class="keyword">type</span> λ[α]=M[N[α]]})#λ] = <a href="#111701" title="java.lang.Object with scalaz.Functor[[α]M[N[α]]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Functor[[α]M[N[α]]]" id="111701">Functor</a>[({<span class="keyword">type</span> λ[α]=M[N[α]]})#λ] {
+    <span class="keyword">def</span> <a title="[A, B](r: M[N[A]],f: (A) =&gt; B)M[N[B]]" id="111719">fmap</a>[<a title="&gt;: Nothing &lt;: Any" id="111722">A</a>, <a title="&gt;: Nothing &lt;: Any" id="111723">B</a>](<a title="M[N[A]]" id="111724">r</a>: <a href="#111676" title="M[N[A]]">M</a>[N[A]], <a title="(A) =&gt; B" id="111725">f</a>: A =&gt; B) = <a href="MA.scala.html#57130" title="(f: (A) =&gt; B)(implicit m: &lt;:&lt;[N[A],N[A]],implicit f1: scalaz.Functor[M],implicit f2: scalaz.Functor[N])M[N[B]]">r</a> <a href="#111686" title="&lt;:&lt;[N[A],N[A]]" id="1489">∘∘</a> <a href="#111725" title="(A) =&gt; B">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[M[_], N[_]](implicit ma: scalaz.Applicative[M],implicit na: scalaz.Applicative[N])scalaz.Applicative[[α]M[N[α]]]" id="111678">CompApplicative</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="111681">M</a>[<a title="&gt;: Nothing &lt;: Any" id="111984">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="111682">N</a>[<a title="&gt;: Nothing &lt;: Any" id="111985">_</a>]](<span class="keyword">implicit</span> <a title="scalaz.Applicative[M]" id="111979">ma</a>: <a href="Applicative.scala.html#9254" title="scalaz.Applicative[M]">Applicative</a>[M], <a title="scalaz.Applicative[N]" id="111980">na</a>: <a href="Applicative.scala.html#9254" title="scalaz.Applicative[N]">Applicative</a>[N]): <a href="Applicative.scala.html#9254" title="scalaz.Applicative[[α]M[N[α]]]">Applicative</a>[({<span class="keyword">type</span> λ[α]=M[N[α]]})#λ] = <a href="#112098" title="java.lang.Object with scalaz.Applicative[[α]M[N[α]]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Applicative[[α]M[N[α]]]" id="112098">Applicative</a>[({<span class="keyword">type</span> λ[α]=M[N[α]]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)M[N[A]]" id="112128">pure</a>[<a title="&gt;: Nothing &lt;: Any" id="112130">A</a>](<a title="=&gt; A" id="112136">a</a>: =&gt; A): <a href="#111681" title="M[N[A]]">M</a>[N[A]] = <a href="Identity.scala.html#34126" title="(x: =&gt; A)scalaz.Identity[A]">a</a>.<a href="Identity.scala.html#43116" title="[F[_]](implicit p: scalaz.Pure[F])F[A]">η</a><a href="Identity.scala.html#34126" title="(x: =&gt; N[A])scalaz.Identity[N[A]]">[</a><a href="#111682" title="N">N</a>].<a href="Identity.scala.html#43116" title="[F[_]](implicit p: scalaz.Pure[F])F[N[A]]">η</a><a href="#111979" title="(implicit p: scalaz.Pure[M])M[N[A]]">[</a><a href="#111681" title="M">M</a>]
+
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[A, B](f: M[N[(A) =&gt; B]],a: M[N[A]])M[N[B]]" id="112131">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="112134">A</a>, <a title="&gt;: Nothing &lt;: Any" id="112135">B</a>](<a title="M[N[(A) =&gt; B]]" id="112142">f</a>: <a href="#111681" title="M[N[(A) =&gt; B]]">M</a>[N[A =&gt; B]], <a title="M[N[A]]" id="112143">a</a>: <a href="#111681" title="M[N[A]]">M</a>[N[A]]): <a href="#111681" title="M[N[B]]">M</a>[N[B]] = (<a href="MA.scala.html#55360" title="(b: M[N[(A) =&gt; B]])(z: (N[A], N[(A) =&gt; B]) =&gt; N[B])(implicit t: scalaz.Functor[M],implicit a: scalaz.Apply[M])M[N[B]]">a</a> &lt;**&gt; <a href="#112142" title="M[N[(A) =&gt; B]]">f</a>)<a href="#111979" title="scalaz.Applicative[M]">(</a><a href="MA.scala.html#55357" title="(f: N[(A) =&gt; B])(implicit a: scalaz.Apply[N])N[B]">_</a> <a href="#111980" title="scalaz.Applicative[N]">&lt;*&gt;</a> <a href="#112786" title="N[(A) =&gt; B]">_</a>)
+  }
+}
+
+        </pre>
+    </body>
+</html>

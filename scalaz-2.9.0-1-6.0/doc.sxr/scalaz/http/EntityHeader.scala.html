@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/EntityHeader.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> http.<a href="Util.scala.html#25510" title="object scalaz.http.Util">Util</a>.<a href="Util.scala.html#1103275" title="object scalaz.http.Util.Nel">Nel</a>._
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#17982" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="comment">/**
+ * HTTP entity header fields.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;RFC 2616 Section 7.1 Entity Header Fields&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait EntityHeader extends java.lang.Object with ScalaObject" id="25338">EntityHeader</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Returns a string representation of this entity header.
+   */</span>
+  <span class="keyword">val</span> <a title="=&gt; String" id="1104226">asString</a>: <span title="String">String</span>
+
+  <span class="comment">/**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this entity header is an extension header.
+   */</span>
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="1104228">isExtension</a> = <a href="#25338" title="scalaz.http.EntityHeader" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="Boolean(true)">ExtensionHeader</span><span class="delimiter">(</span>_<span class="delimiter">)</span> =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">case</span> <span title="Boolean(false)">_</span> =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Returns the result of the given function to this header if it is an extension header, otherwise returns the given
+   * value.
+   */</span>
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.NonEmptyList[Char]) =&gt; X, x: =&gt; X)X" id="1104229">extension</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1104231">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="(scalaz.NonEmptyList[Char]) =&gt; X" id="1137512">f</a>: NonEmptyList<span class="delimiter">[</span>Char<span class="delimiter">]</span> =&gt; X, <a title="=&gt; X" id="1137513">x</a>: =&gt; X<span class="delimiter">)</span> = <a href="#25338" title="scalaz.http.EntityHeader" class="keyword">this</a> <span title="X" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="X">ExtensionHeader</span><span class="delimiter">(</span><a title="scalaz.NonEmptyList[Char]" id="1137516">h</a><span class="delimiter">)</span> =&gt; <a href="#1137512" title="(v1: scalaz.NonEmptyList[Char])X">f</a><span class="delimiter">(</span><a href="#1137516" title="scalaz.NonEmptyList[Char]">h</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="X">_</span> =&gt; <a href="#1137513" title="=&gt; X">x</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137532" title="object scalaz.http.Allow" id="1137540">Allow</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137523">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137550" title="object scalaz.http.ContentEncoding" id="1137558">ContentEncoding</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137542">asString</a> = <span title="java.lang.String(&quot;Content-Encoding&quot;)" class="string">&quot;Content-Encoding&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.12&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137568" title="object scalaz.http.ContentLanguage" id="1137576">ContentLanguage</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137560">asString</a> = <span title="java.lang.String(&quot;Content-Language&quot;)" class="string">&quot;Content-Language&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137586" title="object scalaz.http.ContentLength" id="1137594">ContentLength</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137578">asString</a> = <span title="java.lang.String(&quot;Content-Length&quot;)" class="string">&quot;Content-Length&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.14&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137604" title="object scalaz.http.ContentLocation" id="1137612">ContentLocation</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137596">asString</a> = <span title="java.lang.String(&quot;Content-Location&quot;)" class="string">&quot;Content-Location&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.15&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137622" title="object scalaz.http.ContentMD5" id="1137630">ContentMD5</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137614">asString</a> = <span title="java.lang.String(&quot;Content-MD5&quot;)" class="string">&quot;Content-MD5&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137640" title="object scalaz.http.ContentRange" id="1137648">ContentRange</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137632">asString</a> = <span title="java.lang.String(&quot;Content-Range&quot;)" class="string">&quot;Content-Range&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137655" title="object scalaz.http.ContentType" id="1137663">ContentType</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107585">asString</a> = <span title="java.lang.String(&quot;Content-Type&quot;)" class="string">&quot;Content-Type&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137674" title="object scalaz.http.Expires" id="1137682">Expires</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137665">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.29&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1137692" title="object scalaz.http.LastModified" id="1137700">LastModified</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this entity header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1137684">asString</a> = <span title="java.lang.String(&quot;Last-Modified&quot;)" class="string">&quot;Last-Modified&quot;</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class ExtensionHeader extends java.lang.Object with scalaz.http.EntityHeader with ScalaObject with Product with Serializable" id="1137974">ExtensionHeader</a><a href="#1137974" title="ScalaObject" class="delimiter">(</a><a title="scalaz.NonEmptyList[Char]" id="1137811">name</a>: <a href="../NonEmptyList.scala.html#17030" title="scalaz.NonEmptyList[Char]">NonEmptyList</a><span class="delimiter">[</span>Char<span class="delimiter">]</span><span class="delimiter">)</span> <span class="keyword">extends</span> <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a> <span class="delimiter">{</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="String" id="1137486">asString</a> = <a href="#1137811" title="=&gt; scalaz.NonEmptyList[Char]">name</a>.<a href="../NonEmptyList.scala.html#46802" title="=&gt; List[Char]">list</a>.<span title="=&gt; String">mkString</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait EntityHeaders extends java.lang.Object with ScalaObject" id="25347">EntityHeaders</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Returns a string representation for the given entity header.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.EntityHeaders.EntityHeaderString : (h: scalaz.http.EntityHeader)String" id="1102995">EntityHeaderString</a><span class="delimiter">(</span><a title="scalaz.http.EntityHeader" id="1104222">h</a>: <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a><span class="delimiter">)</span> = <a href="#1104222" title="scalaz.http.EntityHeader">h</a>.<a href="#1104226" title="=&gt; String">asString</a>
+
+  <span class="comment">/**
+   * Returns a potential entity header for the given list of characters; &lt;code&gt;None&lt;/code&gt; iff the given list is empty.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; (List[Char]) =&gt; Option[scalaz.http.EntityHeader]" id="1102996">ListEntityHeader</a>: <span class="delimiter">(</span>List<span class="delimiter">[</span>Char<span class="delimiter">]</span> =&gt; Option<span class="delimiter">[</span>EntityHeader<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#1102997" title="implicit scalaz.http.EntityHeaders.StringEntityHeader : (s: String)Option[scalaz.http.EntityHeader]">StringEntityHeader</a> _ <span title="(g: (List[Char]) =&gt; String)(List[Char]) =&gt; Option[scalaz.http.EntityHeader]">compose</span> <span class="delimiter">(</span><a href="#1137762" title="List[Char]">_</a>.<span title="=&gt; String">mkString</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Returns a potential entity header for the given string; &lt;code&gt;None&lt;/code&gt; iff the given string is empty.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.EntityHeaders.StringEntityHeader : (s: String)Option[scalaz.http.EntityHeader]" id="1102997">StringEntityHeader</a><span class="delimiter">(</span><a title="String" id="1104218">s</a>: <span title="String">String</span><span class="delimiter">)</span>: <span title="Option[scalaz.http.EntityHeader]">Option</span><span class="delimiter">[</span>EntityHeader<span class="delimiter">]</span> = <span title="Option[scalaz.http.EntityHeader]" class="keyword">if</span> <span class="delimiter">(</span><a href="#1104218" title="String">s</a>.<span title="()Int">length</span> <span title="(x: Int)Boolean">==</span> <span title="Int(0)" class="int">0</span><span class="delimiter">)</span> <span title="object None">None</span> <span class="keyword">else</span> <span title="(x: scalaz.http.EntityHeader)Some[scalaz.http.EntityHeader]">Some</span><span class="delimiter">(</span><a href="#1104218" title="String">s</a>.<span title="()java.lang.String">toLowerCase</span> <span title="scalaz.http.EntityHeader" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="scalaz.http.Allow.type" class="string">&quot;allow&quot;</span> =&gt; <a href="#1137540" title="object scalaz.http.Allow">Allow</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentEncoding.type" class="string">&quot;content-encoding&quot;</span> =&gt; <a href="#1137558" title="object scalaz.http.ContentEncoding">ContentEncoding</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentLanguage.type" class="string">&quot;content-language&quot;</span> =&gt; <a href="#1137576" title="object scalaz.http.ContentLanguage">ContentLanguage</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentLength.type" class="string">&quot;content-length&quot;</span> =&gt; <a href="#1137594" title="object scalaz.http.ContentLength">ContentLength</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentLocation.type" class="string">&quot;content-location&quot;</span> =&gt; <a href="#1137612" title="object scalaz.http.ContentLocation">ContentLocation</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentMD5.type" class="string">&quot;content-md5&quot;</span> =&gt; <a href="#1137630" title="object scalaz.http.ContentMD5">ContentMD5</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentRange.type" class="string">&quot;content-range&quot;</span> =&gt; <a href="#1137648" title="object scalaz.http.ContentRange">ContentRange</a>
+    <span class="keyword">case</span> <span title="scalaz.http.ContentType.type" class="string">&quot;content-type&quot;</span> =&gt; <a href="#1137663" title="object scalaz.http.ContentType">ContentType</a>
+    <span class="keyword">case</span> <span title="scalaz.http.Expires.type" class="string">&quot;expires&quot;</span> =&gt; <a href="#1137682" title="object scalaz.http.Expires">Expires</a>
+    <span class="keyword">case</span> <span title="scalaz.http.LastModified.type" class="string">&quot;last-modified&quot;</span> =&gt; <a href="#1137700" title="object scalaz.http.LastModified">LastModified</a>
+    <span class="keyword">case</span> <a title="scalaz.http.ExtensionHeader" id="1137779">h</a> =&gt; <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="List[Char]" id="1137780">t</a>: <span title="List[Char]">List</span><span class="delimiter">[</span>Char<span class="delimiter">]</span> = <span class="delimiter">(</span><a href="#1104218" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">s</a>: scala.collection.immutable.<span title="scala.collection.immutable.StringOps">StringOps</span><span class="delimiter">)</span>.<span title="=&gt; List[Char]">toList</span>
+      <a href="#1137974" title="(name: scalaz.NonEmptyList[Char])scalaz.http.ExtensionHeader">ExtensionHeader</a><span class="delimiter">(</span><a href="../NonEmptyList.scala.html#39176" title="(h: Char, t: List[Char])scalaz.NonEmptyList[Char]">nel</a><span class="delimiter">(</span><a href="#1137780" title="List[Char]">t</a>.<span title="=&gt; Char">head</span>, <a href="#1137780" title="List[Char]">t</a>.<span title="=&gt; List[Char]">tail</span><span class="delimiter">)</span><span class="delimiter">)</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * HTTP entity header fields.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;RFC 2616 Section 7.1 Entity Header Fields&lt;/a&gt;.
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.EntityHeader" id="25339">EntityHeader</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25347" title="scalaz.http.EntityHeaders">EntityHeaders</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A list of all non-extension entity headers.
+   */</span>
+  <span class="keyword">val</span> <a title="List[Product with Serializable with scalaz.http.EntityHeader]" id="1107620">entityHeaders</a> = <span title="(xs: Product with Serializable with scalaz.http.EntityHeader*)List[Product with Serializable with scalaz.http.EntityHeader]">List</span><span class="delimiter">(</span><a href="#1137540" title="object scalaz.http.Allow">Allow</a>, <a href="#1137558" title="object scalaz.http.ContentEncoding">ContentEncoding</a>, <a href="#1137576" title="object scalaz.http.ContentLanguage">ContentLanguage</a>, <a href="#1137594" title="object scalaz.http.ContentLength">ContentLength</a>, <a href="#1137612" title="object scalaz.http.ContentLocation">ContentLocation</a>,
+    <a href="#1137630" title="object scalaz.http.ContentMD5">ContentMD5</a>, <a href="#1137648" title="object scalaz.http.ContentRange">ContentRange</a>, <a href="#1137663" title="object scalaz.http.ContentType">ContentType</a>, <a href="#1137682" title="object scalaz.http.Expires">Expires</a>, <a href="#1137700" title="object scalaz.http.LastModified">LastModified</a><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Extracts the given entity header into a string representation.
+   */</span>
+  <span class="keyword">def</span> <a title="(h: scalaz.http.EntityHeader)Some[String]" id="1107622">unapply</a><span class="delimiter">(</span><a title="scalaz.http.EntityHeader" id="1137920">h</a>: <a href="#25338" title="scalaz.http.EntityHeader">EntityHeader</a><span class="delimiter">)</span> = <span title="(x: String)Some[String]">Some</span><span class="delimiter">(</span><a href="#1137920" title="scalaz.http.EntityHeader">h</a>.<a href="#1104226" title="=&gt; String">asString</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Memo.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Memo[K, V] extends java.lang.Object" id="17597">Memo</a>[@specialized(Int) <a title="&gt;: Nothing &lt;: Any" id="21797">K</a>, @specialized(Int, Long, Double) <a title="&gt;: Nothing &lt;: Any" id="21798">V</a>] <a title="java.lang.Object" id="2744">{</a>
+  <span class="keyword">def</span> <a title="(z: (K) =&gt; V)(K) =&gt; V" id="57160">apply</a>(<a title="(K) =&gt; V" id="181962">z</a>: K =&gt; V): K =&gt; V
+}
+
+<span class="keyword">trait</span> <a title="trait Memos extends java.lang.Object with ScalaObject" id="17663">Memos</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[K, V](f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]" id="34458">memo</a>[@specialized(Int) <a title="&gt;: Nothing &lt;: Any" id="34461">K</a>, @specialized(Int, Long, Double) <a title="&gt;: Nothing &lt;: Any" id="34462">V</a>](<a title="((K) =&gt; V) =&gt; (K) =&gt; V" id="224012">f</a>: (K =&gt; V) =&gt; K =&gt; V): <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = <a href="#278104" title="java.lang.Object with scalaz.Memo[K,V]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Memo[K,V]" id="278104">Memo</a>[K, V] {
+    <span class="keyword">def</span> <a title="(z: (K) =&gt; V)(K) =&gt; V" id="278108">apply</a>(<a title="(K) =&gt; V" id="278109">z</a>: K =&gt; V) = <a href="#224012" title="(v1: (K) =&gt; V)(K) =&gt; V">f</a>(<a href="#278109" title="(K) =&gt; V">z</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[K, V]scalaz.Memo[K,V]" id="34463">nilMemo</a>[@specialized(Int) <a title="&gt;: Nothing &lt;: Any" id="34466">K</a>, @specialized(Int, Long, Double) <a title="&gt;: Nothing &lt;: Any" id="34467">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = <a href="#34458" title="[K, V](f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">memo</a><span title="(f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">[</span><a href="#34466" title="K">K</a>, <a href="#34467" title="V">V</a>](<a title="(K) =&gt; V" id="278143">z</a> =&gt; <a href="#278143" title="(K) =&gt; V">z</a>)
+
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class ArrayMemo[V &gt;: Null] extends java.lang.Object with scalaz.Memo[Int,V] with ScalaObject" id="34468">ArrayMemo</a>[<a title="&gt;: Null &lt;: Any" id="34469">V</a> &gt;: Null: ClassManifest](<a title="Int" id="278154">n</a>: <span title="Int">Int</span>) <span class="keyword">extends</span> <a href="#17597" title="scalaz.Memo[Int,V]">Memo</a>[Int, V] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="(f: (Int) =&gt; V)(Int) =&gt; V" id="278150">apply</a>(<a title="(Int) =&gt; V" id="278157">f</a>: (Int) =&gt; V) = {
+      <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Array[V]" id="278162">a</a> = <a href="#278148" title="(len: Int)Array[V]" id="38228" class="keyword">new</a> Array[V](<a href="#278154" title="Int">n</a>)
+      <a title="Int" id="278169">k</a> =&gt; {
+        <span class="keyword">val</span> <a title="V" id="278170">t</a> = <a href="#278161" title="(i: Int)V">a</a>(<a href="#278169" title="Int">k</a>)
+        <span title="V" class="keyword">if</span> (<a href="#278170" title="(x$1: Any)Boolean">t</a> == <span title="Null(null)" class="keyword">null</span>) {
+          <span class="keyword">val</span> <a title="V" id="278173">v</a> = <a href="#278157" title="(v1: Int)V">f</a>(<a href="#278169" title="Int">k</a>)
+          <a href="#278161" title="(i: Int,x: V)Unit">a</a>(<a href="#278169" title="Int">k</a>) = <a href="#278173" title="V">v</a>
+          <a href="#278173" title="V">v</a>
+        } <span class="keyword">else</span> <a href="#278170" title="V">t</a>
+      }
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class DoubleArrayMemo extends java.lang.Object with scalaz.Memo[Int,Double] with ScalaObject" id="34470">DoubleArrayMemo</a><span title="ScalaObject">(</span><a title="Int" id="278188">n</a>: <span title="Int">Int</span>, <a title="Double" id="278189">sentinel</a>: <span title="Double">Double</span>) <span class="keyword">extends</span> <a href="#17597" title="scalaz.Memo[Int,Double]">Memo</a>[Int, Double] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="(f: (Int) =&gt; Double)(Int) =&gt; Double" id="278184">apply</a>(<a title="(Int) =&gt; Double" id="278191">f</a>: (Int) =&gt; Double) = {
+      <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Array[Double]" id="278196">a</a> = {
+        <span title="Array[Double]" class="keyword">if</span> (<a href="#278189" title="(x$1: Double)Boolean">sentinel</a> == <span title="Double(0.0)" class="double">0d</span>) {
+          <span title="Array[Double]" class="keyword">new</span> <a title="Array[Double]" id="2028">Array</a>[Double](<a href="#278188" title="Int">n</a>)
+        } <span class="keyword">else</span> {
+          <a title="object Array" id="2029">Array</a>.<a title="(n: Int)(elem: =&gt; Double)(implicit evidence$9: scala.reflect.ClassManifest[Double])Array[Double]" id="28261">fill</a>(<a href="#278188" title="Int">n</a>)<a title="=&gt; scala.reflect.AnyValManifest[Double]" id="3028">(</a><a href="#278189" title="Double">sentinel</a>)
+        }
+      }
+      <a title="Int" id="278243">k</a> =&gt; {
+        <span class="keyword">val</span> <a title="Double" id="278244">t</a> = <a href="#278195" title="(i: Int)Double">a</a>(<a href="#278243" title="Int">k</a>)
+        <span title="Double" class="keyword">if</span> (<a href="#278244" title="(x$1: Double)Boolean">t</a> == <a href="#278189" title="Double">sentinel</a>) {
+          <span class="keyword">val</span> <a title="Double" id="278251">v</a> = <a href="#278191" title="(v1: Int)Double">f</a>(<a href="#278243" title="Int">k</a>)
+          <a href="#278195" title="(i: Int,x: Double)Unit">a</a>(<a href="#278243" title="Int">k</a>) = <a href="#278251" title="Double">v</a>
+          <a href="#278251" title="Double">v</a>
+        } <span class="keyword">else</span> <a href="#278244" title="Double">t</a>
+      }
+    }
+  }
+
+  <span class="keyword">def</span> <a title="[V &gt;: Null](n: Int)(implicit evidence$2: ClassManifest[V])scalaz.Memo[Int,V]" id="278258">arrayMemo</a>[<a title="&gt;: Null &lt;: Any" id="34473">V</a> &gt;: Null : ClassManifest](<a title="Int" id="278257">n</a>: <span title="Int">Int</span>): <a href="#17597" title="scalaz.Memo[Int,V]">Memo</a>[Int, V] = <a href="#278258" title="Memos.this.ArrayMemo[V]" class="keyword">new</a> <a href="#34468" title="Memos.this.ArrayMemo[V]">ArrayMemo</a>(<a href="#278257" title="Int">n</a>)
+  <span class="keyword">def</span> <a title="(n: Int,sentinel: Double)scalaz.Memo[Int,Double]" id="34474">doubleArrayMemo</a>(<a title="Int" id="278269">n</a>: <span title="Int">Int</span>, <a title="=&gt; Double" id="278270">sentinel</a>: <span title="Double">Double</span> = <span title="Double(0.0)" class="double">0d</span>): <a href="#17597" title="scalaz.Memo[Int,Double]">Memo</a>[Int, Double] = <span title="Memos.this.DoubleArrayMemo" class="keyword">new</span> <a href="#34470" title="Memos.this.DoubleArrayMemo">DoubleArrayMemo</a>(<a href="#278269" title="Int">n</a>, <a href="#278270" title="Double">sentinel</a>)
+
+  <span class="keyword">def</span> <a title="[K, V]scalaz.Memo[K,V]" id="34475">mutableHashMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34478">K</a>, <a title="&gt;: Nothing &lt;: Any" id="34479">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = {
+    <span class="keyword">val</span> <a title="scala.collection.mutable.HashMap[K,V]" id="278274">a</a> = <span title="scala.collection.mutable.HashMap[K,V]" class="keyword">new</span> <a title="scala.collection.mutable.HashMap[K,V]" id="32138">collection</a>.mutable.HashMap[K, V]
+
+    <a href="#34458" title="[K, V](f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">memo</a><span title="(f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">[</span><a href="#34478" title="K">K</a>, <a href="#34479" title="V">V</a>](<a title="(K) =&gt; V" id="278479">f</a> =&gt;
+      <a title="K" id="278481">k</a> =&gt;
+        <a href="#278274" title="(key: K)Option[V]" id="278282">a</a> <span title="(default: =&gt; V)V">get</span> <a href="#278481" title="K">k</a> getOrElse {
+          <span class="keyword">val</span> <a title="V" id="278489">v</a> = <a href="#278479" title="(v1: K)V">f</a>(<a href="#278481" title="K">k</a>)
+          <a href="#278274" title="(key: K,value: V)Unit" id="278287">a</a> update (<a href="#278481" title="K">k</a>, <a href="#278489" title="V">v</a>)
+          <a href="#278489" title="V">v</a>
+        })
+  }
+
+  <span class="keyword">def</span> <a title="[K, V]scalaz.Memo[K,V]" id="34480">weakHashMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34483">K</a>, <a title="&gt;: Nothing &lt;: Any" id="34484">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = {
+    <span class="keyword">val</span> <a title="java.util.WeakHashMap[K,V]" id="278502">a</a> = <a title="()java.util.WeakHashMap[K,V]" id="89393" class="keyword">new</a> <a title="java.util.WeakHashMap[K,V]" id="6743">java</a>.util.WeakHashMap[K, V]
+
+    <a href="#34458" title="[K, V](f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">memo</a><span title="(f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">[</span><a href="#34483" title="K">K</a>, <a href="#34484" title="V">V</a>](<a title="(K) =&gt; V" id="278545">f</a> =&gt;
+      <a title="K" id="278547">k</a> =&gt; {
+        <span class="keyword">val</span> <a title="V" id="278548">v</a> = <a href="#278502" title="(x$1: Any)V" id="89409">a</a> get <a href="#278547" title="K">k</a>
+        <span title="V" class="keyword">if</span> (<a href="#278548" title="(x$1: Any)Boolean">v</a> == <span title="Null(null)" class="keyword">null</span>) {
+          <span class="keyword">val</span> <a title="V" id="278551">nv</a> = <a href="#278545" title="(v1: K)V">f</a>(<a href="#278547" title="K">k</a>)
+          <a href="#278502" title="(x$1: K,x$2: V)V" id="89417">a</a> put (<a href="#278547" title="K">k</a>, <a href="#278551" title="V">nv</a>)
+          <a href="#278551" title="V">nv</a>
+        } <span class="keyword">else</span> {
+          <a href="#278548" title="V">v</a>
+        }
+      })
+  }
+
+  <span class="keyword">private</span> <span class="keyword">def</span> <a title="[K, V](m: Map[K,V])scalaz.Memo[K,V]" id="34485">immutableMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34488">K</a>, <a title="&gt;: Nothing &lt;: Any" id="34489">V</a>](<a title="Map[K,V]" id="278562">m</a>: <a title="Map[K,V]" id="29433">Map</a>[K, V]): <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = {
+    <span class="keyword">var</span> <a title="Map[K,V]" id="278565">a</a> = <a href="#278562" title="Map[K,V]">m</a>
+
+    <a href="#34458" title="[K, V](f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">memo</a><span title="(f: ((K) =&gt; V) =&gt; (K) =&gt; V)scalaz.Memo[K,V]">[</span><a href="#34488" title="K">K</a>, <a href="#34489" title="V">V</a>](<a title="(K) =&gt; V" id="278568">f</a> =&gt;
+      <a title="K" id="278570">k</a> =&gt; {
+        <a href="#278565" title="(key: K)Option[V]" id="83379">a</a> <span title="(default: =&gt; V)V">get</span> <a href="#278570" title="K">k</a> getOrElse {
+          <span class="keyword">val</span> <a title="V" id="278577">v</a> = <a href="#278568" title="(v1: K)V">f</a>(<a href="#278570" title="K">k</a>)
+          <a href="#278565" title="Map[K,V]">a</a> = <a href="#278565" title="(key: K,value: V)scala.collection.immutable.Map[K,V]" id="83339">a</a> updated (<a href="#278570" title="K">k</a>, <a href="#278577" title="V">v</a>)
+          <a href="#278577" title="V">v</a>
+        }
+      })
+  }
+
+  <span class="keyword">import</span> collection.immutable.{HashMap, ListMap, TreeMap}
+
+  <span class="keyword">def</span> <a title="[K, V]scalaz.Memo[K,V]" id="34491">immutableHashMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34494">K</a>, <a title="&gt;: Nothing &lt;: Any" id="34495">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = <a href="#34485" title="(m: Map[K,V])scalaz.Memo[K,V]">immutableMapMemo</a>(<span title="scala.collection.immutable.HashMap[K,V]" class="keyword">new</span> <a title="scala.collection.immutable.HashMap[K,V]" id="29868">HashMap</a>[K, V])
+
+  <span class="keyword">def</span> <a title="[K, V]scalaz.Memo[K,V]" id="34496">immutableListMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34499">K</a>, <a title="&gt;: Nothing &lt;: Any" id="34500">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = <a href="#34485" title="(m: Map[K,V])scalaz.Memo[K,V]">immutableMapMemo</a>(<span title="scala.collection.immutable.ListMap[K,V]" class="keyword">new</span> <a title="scala.collection.immutable.ListMap[K,V]" id="29877">ListMap</a>[K, V])
+
+  <span class="keyword">def</span> <a title="[K, V](implicit evidence$3: Ordering[K])scalaz.Memo[K,V]" id="278935">immutableTreeMapMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="34504">K</a>: scala.Ordering, <a title="&gt;: Nothing &lt;: Any" id="34505">V</a>]: <a href="#17597" title="scalaz.Memo[K,V]">Memo</a>[K, V] = <a href="#34485" title="(m: Map[K,V])scalaz.Memo[K,V]">immutableMapMemo</a>(<a href="#278935" title="()(implicit ordering: Ordering[K])scala.collection.immutable.TreeMap[K,V]" id="278956" class="keyword">new</a> <a title="scala.collection.immutable.TreeMap[K,V]" id="29448">TreeMap</a>[K, V])
+}
+
+        </pre>
+    </body>
+</html>

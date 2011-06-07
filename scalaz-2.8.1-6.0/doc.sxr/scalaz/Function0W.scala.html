@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Function0W.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Function0W[T] extends java.lang.Object with ScalaObject" id="14384">Function0W</a>[<a title="&gt;: Nothing &lt;: Any" id="21616">T</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; () =&gt; T" id="56714">k</a>: () =&gt; T
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[Throwable,T]" id="56716">throws</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[Throwable,T]">Validation</a>[Throwable, T] = <span class="keyword">try</span> {<a href="Validation.scala.html#35267" title="(a: T)scalaz.Validation[Nothing,T]">success</a>(<a href="#56714" title="()T" id="41122">k</a>())} <span class="keyword">catch</span> {<span title="scalaz.Validation[java.lang.Throwable,Nothing]" class="keyword">case</span> <a title="java.lang.Throwable" id="181888">e</a> =&gt; <a href="Validation.scala.html#35272" title="(e: java.lang.Throwable)scalaz.Validation[java.lang.Throwable,Nothing]">failure</a>(<a href="#181888" title="java.lang.Throwable">e</a>)}
+}
+
+<span class="keyword">trait</span> <a title="trait Function0s extends java.lang.Object with ScalaObject" id="14381">Function0s</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[T](f: () =&gt; T)scalaz.Function0W[T]" id="34056">Function0To</a>[<a title="&gt;: Nothing &lt;: Any" id="34058">T</a>](<a title="() =&gt; T" id="56711">f</a>: () =&gt; T): <a href="#14384" title="scalaz.Function0W[T]">Function0W</a>[T] = <a href="#181896" title="java.lang.Object with scalaz.Function0W[T]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Function0W[T]" id="181896">Function0W</a>[T] {
+    <span class="keyword">val</span> <a title="() =&gt; T" id="181900">k</a> = <a href="#56711" title="() =&gt; T">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[T](f: scalaz.Function0W[T])() =&gt; T" id="34059">Function0From</a>[<a title="&gt;: Nothing &lt;: Any" id="34061">T</a>](<a title="scalaz.Function0W[T]" id="56708">f</a>: <a href="#14384" title="scalaz.Function0W[T]">Function0W</a>[T]): () =&gt; T = <a href="#56708" title="scalaz.Function0W[T]">f</a>.<a href="#56714" title="=&gt; () =&gt; T">k</a>
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/concurrent/Promise.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">import</span> java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+
+<span class="keyword">sealed</span> <span class="keyword">class</span> <a title="class Promise[A] extends java.lang.Object with () =&gt; A with ScalaObject" id="22171">Promise</a>[<a title="&gt;: Nothing &lt;: Any" id="22247">A</a>]<span title="ScalaObject">(</span><span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="97959">strategy</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>) <span class="keyword">extends</span> <a title="() =&gt; A" id="42">Function0</a>[A] {
+  <span class="keyword">import</span> <a href="#22172" title="object scalaz.concurrent.Promise">Promise</a>._
+
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="java.util.concurrent.CountDownLatch" id="41130">latch</a> = <span title="java.util.concurrent.CountDownLatch" class="keyword">new</span> <a title="java.util.concurrent.CountDownLatch" id="38487">CountDownLatch</a>(<span title="Int(1)" class="int">1</span>)
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[(A) =&gt; Unit]" id="41132">waiting</a> = <span title="java.util.concurrent.ConcurrentLinkedQueue[(A) =&gt; Unit]" class="keyword">new</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[(A) =&gt; Unit]" id="38769">ConcurrentLinkedQueue</a>[A =&gt; Unit]
+  @volatile <span class="keyword">private</span> <span class="keyword">var</span> <a title="scalaz.concurrent.Promise.State[A]" id="41135">v</a>: <a href="#52314" title="scalaz.concurrent.Promise.State[A]">Promise</a>.State[A] = <a href="#22172" title="object scalaz.concurrent.Promise">Promise</a>.<a href="#52319" title="object scalaz.concurrent.Promise.Unfulfilled">Unfulfilled</a>
+  @volatile <span class="keyword">private</span> <span class="keyword">var</span> <a title="Boolean" id="41138">borked</a>: <span title="Boolean">Boolean</span> = <span title="Boolean(false)" class="keyword">false</span>
+  <span class="keyword">protected</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[scalaz.concurrent.Promise.Signal[A]]" id="41140">e</a> = <a href="Actor.scala.html#33900" title="[A](e: (A) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[A]">actor</a><a href="Actor.scala.html#113664" title="(e: (scalaz.concurrent.Promise.Signal[A]) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[scalaz.concurrent.Promise.Signal[A]]">[</a><a href="#52322" title="scalaz.concurrent.Promise.Signal[A]">Signal</a>[A]]<a href="#97959" title="=&gt; scalaz.concurrent.Strategy">(</a><a href="#393963" title="scalaz.concurrent.Promise.Signal[A]">_</a>.<a href="#393959" title="=&gt; Unit">eval</a>)
+
+  <span class="keyword">def</span> <a title="=&gt; A" id="41142">get</a> = {
+    <a href="#41130" title="=&gt; java.util.concurrent.CountDownLatch">latch</a>.<a title="()Unit" id="114651">await</a>
+    <a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114718" title="=&gt; A">get</a>
+  }
+
+  <span class="keyword">def</span> <a title="(k: (A) =&gt; Unit)Unit" id="41143">to</a>(<a title="(A) =&gt; Unit" id="97964">k</a>: A =&gt; Unit): <span title="Unit">Unit</span> = <a href="Actor.scala.html#56206" title="(a: scalaz.concurrent.Promise.Signal[A])() =&gt; Unit">e</a> <span title="Unit">!</span> <span title="scalaz.concurrent.Promise.Cont[A]" class="keyword">new</span> <a href="#52326" title="scalaz.concurrent.Promise.Cont[A]">Cont</a>(<a href="#97964" title="(A) =&gt; Unit">k</a>, <a href="#22171" title="scalaz.concurrent.Promise[A]" class="keyword">this</a>)
+  <span class="keyword">def</span> <a title="(a: =&gt; A)Unit" id="41144">fulfill</a>(<a title="=&gt; A" id="97978">a</a>: =&gt; A): <span title="Unit">Unit</span> = <a href="Actor.scala.html#56206" title="(a: scalaz.concurrent.Promise.Signal[A])() =&gt; Unit">e</a> <span title="Unit">!</span> <span title="scalaz.concurrent.Promise.Done[A]" class="keyword">new</span> <a href="#52324" title="scalaz.concurrent.Promise.Done[A]">Done</a>(<a href="#97978" title="=&gt; A">a</a>, <a href="#22171" title="scalaz.concurrent.Promise[A]" class="keyword">this</a>)
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="41145">fulfilled</a>: <span title="Boolean">Boolean</span> = <a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114722" title="=&gt; Boolean">fulfilled</a>
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="41146">threw</a>: <span title="Boolean">Boolean</span> = <a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114723" title="=&gt; Boolean">threw</a>
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="41147">broken</a> = <a href="#41138" title="=&gt; Boolean">borked</a>
+
+  // out of band signal
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="41148">break</a> { 
+    <a href="#41138" title="(x$1: Boolean)Unit">borked</a> = <span title="Boolean(true)" class="keyword">true</span> 
+    <a href="Actor.scala.html#56206" title="(a: scalaz.concurrent.Promise.Signal[A])() =&gt; Unit">e</a> <span title="Unit">!</span> <span title="scalaz.concurrent.Promise.Break" class="keyword">new</span> <a href="#52328" title="scalaz.concurrent.Promise.Break">Break</a>(<a href="#22171" title="scalaz.concurrent.Promise[A]" class="keyword">this</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; B)scalaz.concurrent.Promise[B]" id="41149">map</a>[<a title="&gt;: Nothing &lt;: Any" id="41151">B</a>](<a title="(A) =&gt; B" id="191680">f</a>: A =&gt; B) = <a href="#41152" title="(f: (A) =&gt; scalaz.concurrent.Promise[B])scalaz.concurrent.Promise[B]">flatMap</a>(<a title="A" id="191686">a</a> =&gt; <a href="#52311" title="(a: =&gt; B)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[B]">Promise</a><a href="#97959" title="=&gt; scalaz.concurrent.Strategy">(</a><a href="#191680" title="(v1: A)B">f</a>(<a href="#191686" title="A">a</a>)))
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; scalaz.concurrent.Promise[B])scalaz.concurrent.Promise[B]" id="41152">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="41154">B</a>](<a title="(A) =&gt; scalaz.concurrent.Promise[B]" id="97955">f</a>: A =&gt; Promise[B]) = {
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Promise[B]" id="97958">r</a> = <a href="#97959" title="scalaz.concurrent.Promise[B]" class="keyword">new</a> <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B]()
+    <a href="#41143" title="(k: (A) =&gt; Unit)Unit">to</a>(<a title="A" id="97967">a</a> =&gt; <a href="#97955" title="(v1: A)scalaz.concurrent.Promise[B]">f</a><a href="#41143" title="(k: (B) =&gt; Unit)Unit">(</a><a href="#97967" title="A">a</a>) to <a href="Effect.scala.html#33992" title="[A](c: (A) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[A]">effect</a><span title="(c: (B) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[B]">[</span><a href="#41154" title="B">B</a>]<a href="Effect.scala.html#98008" title="(e: scalaz.concurrent.Effect[B])(B) =&gt; Unit">(</a><a title="B" id="97977">b</a> =&gt; <a href="#41144" title="(a: =&gt; B)Unit">r</a> fulfill <a href="#97977" title="B">b</a>))
+    <a href="#97958" title="scalaz.concurrent.Promise[B]">r</a>
+  }
+  <span class="keyword">def</span> <a title="(p: (A) =&gt; Boolean)scalaz.concurrent.Promise[A]" id="41155">filter</a>(<a title="(A) =&gt; Boolean" id="394030">p</a>: A =&gt; Boolean): <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A] = {
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Promise[A]" id="394032">r</a> = <a href="#97959" title="scalaz.concurrent.Promise[A]" class="keyword">new</a> <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A]()
+    <a href="#41143" title="(k: (A) =&gt; Unit)Unit">to</a>(<a title="A" id="394038">a</a> =&gt; <a href="#34831" title="(a: =&gt; Boolean)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[Boolean]">promise</a><a href="#41143" title="(k: (Boolean) =&gt; Unit)Unit">(</a><a href="#394030" title="(v1: A)Boolean">p</a>(<a href="#394038" title="A">a</a>)) to <a href="Effect.scala.html#33992" title="[A](c: (A) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[A]">effect</a><span title="(c: (Boolean) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[Boolean]">[</span><span title="Boolean">Boolean</span>]<a href="Effect.scala.html#98008" title="(e: scalaz.concurrent.Effect[Boolean])(Boolean) =&gt; Unit">(</a><a title="Boolean" id="394049">b</a> =&gt; <span title="Unit" class="keyword">if</span> (<a href="#394049" title="Boolean">b</a>) <a href="#41144" title="(a: =&gt; A)Unit">r</a> fulfill <a href="#394038" title="A">a</a>))
+    <a href="#394032" title="scalaz.concurrent.Promise[A]">r</a>
+  }
+
+  <span class="keyword">def</span> <a title="()A" id="41156">apply</a> = <a href="#41142" title="=&gt; A">get</a>
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()java.lang.String" id="41157">toString</a> = <span title="java.lang.String(&quot;&lt;promise&gt;&quot;)" class="string">&quot;&lt;promise&gt;&quot;</span>
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; B,actual: scalaz.concurrent.Promise[A])(implicit equality: scalaz.Equal[A])scalaz.concurrent.Promise[B]" id="41158">spec</a>[<a title="&gt;: Nothing &lt;: Any" id="41160">B</a>](<a title="(A) =&gt; B" id="394091">f</a>: A =&gt; B, <a title="scalaz.concurrent.Promise[A]" id="394092">actual</a>: <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A])(<span class="keyword">implicit</span> <a title="scalaz.Equal[A]" id="394093">equality</a>: <a href="../Equal.scala.html#11192" title="scalaz.Equal[A]">Equal</a>[A]): <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B] = {
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Promise[B]" id="394097">speculation</a> = <a href="#41149" title="(f: (A) =&gt; B)scalaz.concurrent.Promise[B]" class="keyword">this</a> map <a href="#394091" title="(A) =&gt; B">f</a>
+    <a href="#41152" title="(f: (A) =&gt; scalaz.concurrent.Promise[B])scalaz.concurrent.Promise[B]">actual</a> flatMap (<a title="A" id="394105">a</a> =&gt; <a href="#41152" title="(f: (A) =&gt; scalaz.concurrent.Promise[B])scalaz.concurrent.Promise[B]" class="keyword">this</a> flatMap (<a title="A" id="394109">g</a> =&gt; <span title="scalaz.concurrent.Promise[B]" class="keyword">if</span> (<a href="../Identity.scala.html#43001" title="(a: A)(implicit e: scalaz.Equal[A])Boolean">a</a> <a href="#394093" title="scalaz.Equal[A]">===</a> <a href="#394109" title="A">g</a>) <a href="#394097" title="scalaz.concurrent.Promise[B]">speculation</a> <span class="keyword">else</span> {
+      <a href="#394097" title="scalaz.concurrent.Promise[B]">speculation</a>.<a href="#41148" title="=&gt; Unit">break</a>
+      <a href="#34831" title="(a: =&gt; B)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[B]">promise</a><a href="#97959" title="=&gt; scalaz.concurrent.Strategy">(</a><a href="#394091" title="(v1: A)B">f</a>(<a href="#394105" title="A">a</a>))
+    }))
+  }
+}
+
+<span class="keyword">trait</span> <a title="trait Promises extends java.lang.Object with ScalaObject" id="22174">Promises</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](a: =&gt; A)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[A]" id="34831">promise</a>[<a title="&gt;: Nothing &lt;: Any" id="34833">A</a>](<a title="=&gt; A" id="110774">a</a>: =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.concurrent.Strategy" id="110775">s</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>): <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A] = <a href="#52311" title="(a: =&gt; A)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[A]">Promise</a><a href="#110775" title="scalaz.concurrent.Strategy">(</a><a href="#110774" title="=&gt; A">a</a>) 
+}
+
+<span class="keyword">object</span> <a title="object scalaz.concurrent.Promise" id="22172">Promise</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](a: =&gt; A)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[A]" id="52311">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="52313">A</a>](<a title="=&gt; A" id="191687">a</a>: =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.concurrent.Strategy" id="191688">s</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>): <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A] = { 
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Promise[A]" id="394295">p</a> = <span title="scalaz.concurrent.Promise[A]" class="keyword">new</span> <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A]()(<a href="#191688" title="scalaz.concurrent.Strategy">s</a>)
+    <a href="#394295" title="scalaz.concurrent.Promise[A]">p</a>.<a href="Actor.scala.html#56206" title="(a: scalaz.concurrent.Promise.Signal[A])() =&gt; Unit">e</a> ! <span title="scalaz.concurrent.Promise.Done[A]" class="keyword">new</span> <a href="#52324" title="scalaz.concurrent.Promise.Done[A]">Done</a>(<a href="#191687" title="=&gt; A">a</a>, <a href="#394295" title="scalaz.concurrent.Promise[A]">p</a>)
+    <a href="#394295" title="scalaz.concurrent.Promise[A]">p</a>
+  }
+
+  <span class="keyword">private</span> <span class="keyword">sealed</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class State[+A] extends java.lang.Object with ScalaObject" id="52314">State</a>[+<a title="&gt;: Nothing &lt;: Any" id="52315">A</a>] <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="=&gt; A" id="114718">get</a>: <a href="#52315" title="A">A</a>
+    <span class="keyword">def</span> <a title="[B &gt;: A](a: =&gt; B,promise: scalaz.concurrent.Promise[B])Unit" id="114719">fulfill</a>[<a title="&gt;: A &lt;: Any" id="114721">B</a>&gt;:A](<a title="=&gt; B" id="394308">a</a>: =&gt; B, <a title="scalaz.concurrent.Promise[B]" id="394309">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B]): <span title="Unit">Unit</span>
+    <span class="keyword">val</span> <a title="=&gt; Boolean" id="114722">fulfilled</a>: <span title="Boolean">Boolean</span>
+    <span class="keyword">val</span> <a title="=&gt; Boolean" id="114723">threw</a>: <span title="Boolean">Boolean</span>
+    <span class="keyword">def</span> <a title="(promise: scalaz.concurrent.Promise[_])Unit" id="114724">break</a>(<a title="scalaz.concurrent.Promise[_]" id="394313">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[_]">Promise</a>[_]): <span title="Unit">Unit</span>
+  }
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Thrown extends scalaz.concurrent.Promise.State[Nothing] with ScalaObject" id="52316">Thrown</a><span title="ScalaObject">(</span><a title="Throwable" id="394332">e</a>: <span title="Throwable">Throwable</span>) <span class="keyword">extends</span> <a href="#52314" title="scalaz.concurrent.Promise.State[Nothing]">State</a>[Nothing] {
+    <span class="keyword">def</span> <a title="=&gt; Nothing" id="394321">get</a>: <span title="Nothing">Nothing</span> = <span title="Nothing" class="keyword">throw</span> <a href="#394332" title="Throwable">e</a>
+    <span class="keyword">def</span> <a title="[B](a: =&gt; B,promise: scalaz.concurrent.Promise[B])Unit" id="394322">fulfill</a>[<a title="&gt;: Nothing &lt;: Any" id="394324">B</a>](<a title="=&gt; B" id="394336">a</a>: =&gt; B, <a title="scalaz.concurrent.Promise[B]" id="394337">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B]) <span title="Unit">{</span>
+      // we could allow users to manually fulfill a thrown promise, 
+      // but this would violate referential transparency. DENIED
+      // Unfulfilled.fulfill(a, promise)
+    }
+    <span class="keyword">val</span> <a title="Boolean" id="394325">fulfilled</a> = <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">val</span> <a title="Boolean" id="394327">threw</a> = <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">def</span> <a title="(promise: scalaz.concurrent.Promise[_])Unit" id="394329">break</a>(<a title="scalaz.concurrent.Promise[_]" id="394348">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[_]">Promise</a>[_]) <span title="Unit">{</span>}
+  }
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Fulfilled[A] extends scalaz.concurrent.Promise.State[A] with ScalaObject" id="52317">Fulfilled</a>[<a title="&gt;: Nothing &lt;: Any" id="52318">A</a>]<span title="ScalaObject">(</span><span class="keyword">val</span> <a title="A" id="394367">get</a>: <a href="#52318" title="A">A</a>) <span class="keyword">extends</span> <a href="#52314" title="scalaz.concurrent.Promise.State[A]">State</a>[A] {
+    <span class="keyword">def</span> <a title="[B &gt;: A](a: =&gt; B,promise: scalaz.concurrent.Promise[B])Unit" id="394357">fulfill</a>[<a title="&gt;: A &lt;: Any" id="394359">B</a>&gt;:A](<a title="=&gt; B" id="394369">a</a>: =&gt; B, <a title="scalaz.concurrent.Promise[B]" id="394370">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B]) <span title="Unit">{</span>}
+    <span class="keyword">val</span> <a title="Boolean" id="394360">fulfilled</a> = <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">val</span> <a title="Boolean" id="394362">threw</a> = <span title="Boolean(false)" class="keyword">false</span>
+    <span class="keyword">def</span> <a title="(promise: scalaz.concurrent.Promise[_])Unit" id="394364">break</a>(<a title="scalaz.concurrent.Promise[_]" id="394381">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[_]">Promise</a>[_]) <span title="Unit">{</span>}
+  }
+  <span class="keyword">private</span> <span class="keyword">object</span> <a title="object scalaz.concurrent.Promise.Unfulfilled" id="52319">Unfulfilled</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#52314" title="scalaz.concurrent.Promise.State[Nothing]">State</a>[Nothing] {
+    // the only way get gets here is if the promise is broken
+    <span class="keyword">def</span> <a title="=&gt; Nothing" id="393970">get</a>: <span title="Nothing">Nothing</span> = <span title="Nothing" class="keyword">throw</span> <span title="scalaz.concurrent.Promise.BrokenException" class="keyword">new</span> <a href="#52321" title="scalaz.concurrent.Promise.BrokenException">BrokenException</a>
+
+    <span class="keyword">def</span> <a title="[B](a: =&gt; B,promise: scalaz.concurrent.Promise[B])Unit" id="393971">fulfill</a>[<a title="&gt;: Nothing &lt;: Any" id="393973">B</a>](<a title="=&gt; B" id="394392">a</a>: =&gt; B, <a title="scalaz.concurrent.Promise[B]" id="394393">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[B]">Promise</a>[B]) {
+      <span title="Unit" class="keyword">if</span> (<span title="=&gt; Boolean">!</span><a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41138" title="=&gt; Boolean">borked</a>) {
+        <span class="keyword">try</span> { 
+          <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41135" title="(x$1: scalaz.concurrent.Promise.State[B])Unit">v</a> = <span title="scalaz.concurrent.Promise.Fulfilled[B]" class="keyword">new</span> <a href="#52317" title="scalaz.concurrent.Promise.Fulfilled[B]">Fulfilled</a>(<a href="#394392" title="=&gt; B">a</a>)
+          <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41130" title="=&gt; java.util.concurrent.CountDownLatch">latch</a>.<span title="()Unit">countDown</span>
+          <span class="keyword">val</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[(B) =&gt; Unit]" id="394404">as</a> = <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41132" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[(B) =&gt; Unit]">waiting</a>
+          <span title="Unit" class="keyword">while</span> (<span title="=&gt; Boolean">!</span><a href="#394404" title="java.util.concurrent.ConcurrentLinkedQueue[(B) =&gt; Unit]">as</a>.<a title="()Boolean" id="39769">isEmpty</a>) <a href="#394404" title="java.util.concurrent.ConcurrentLinkedQueue[(B) =&gt; Unit]">as</a>.<a title="()(B) =&gt; Unit" id="39146">remove</a><span title="(v1: B)Unit">(</span>)(<a href="#394392" title="=&gt; B">a</a>)
+        } <span class="keyword">catch</span> { 
+          <span title="Unit" class="keyword">case</span> <a title="java.lang.Throwable" id="394421">e</a> : <span title="Throwable">Throwable</span> =&gt; {
+            <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41135" title="(x$1: scalaz.concurrent.Promise.State[B])Unit">v</a> = <span title="scalaz.concurrent.Promise.Thrown" class="keyword">new</span> <a href="#52316" title="scalaz.concurrent.Promise.Thrown">Thrown</a>(<a href="#394421" title="java.lang.Throwable">e</a>)
+            <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41130" title="=&gt; java.util.concurrent.CountDownLatch">latch</a>.<span title="()Unit">countDown</span>
+            <a href="#394393" title="scalaz.concurrent.Promise[B]">promise</a>.<a href="#41132" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[(B) =&gt; Unit]">waiting</a>.<a title="()Unit" id="39148">clear</a> // kill teh hordes
+          }
+        }
+      }
+    }
+    <span class="keyword">val</span> <a title="Boolean" id="393974">fulfilled</a> = <span title="Boolean(false)" class="keyword">false</span>
+    <span class="keyword">val</span> <a title="Boolean" id="393976">threw</a> = <span title="Boolean(false)" class="keyword">false</span>
+    <span class="keyword">def</span> <a title="(promise: scalaz.concurrent.Promise[_])Unit" id="393978">break</a>(<a title="scalaz.concurrent.Promise[_]" id="394426">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[_]">Promise</a>[_]) {
+      <a href="#394426" title="scalaz.concurrent.Promise[_]">promise</a>.<a href="#41130" title="=&gt; java.util.concurrent.CountDownLatch">latch</a>.<span title="()Unit">countDown</span> // free the hordes
+    }
+  }
+  
+  <span class="keyword">sealed</span> <span class="keyword">class</span> <a title="class BrokenException extends java.lang.Exception with ScalaObject" id="52321">BrokenException</a> <span title="ScalaObject" class="keyword">extends</span> <a title="java.lang.Exception" id="1675">Exception</a> 
+
+  <span class="keyword">private</span> <span class="keyword">abstract</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <a title="class Signal[+A] extends java.lang.Object with ScalaObject" id="52322">Signal</a>[+<a title="&gt;: Nothing &lt;: Any" id="52323">A</a>] <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="=&gt; Unit" id="393959">eval</a>: <span title="Unit">Unit</span>
+  }
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Done[+A] extends scalaz.concurrent.Promise.Signal[A] with ScalaObject" id="52324">Done</a>[+<a title="&gt;: Nothing &lt;: Any" id="52325">A</a>]<span title="ScalaObject">(</span><a title="=&gt; A" id="394002">a</a>: =&gt; A, <a title="scalaz.concurrent.Promise[A]" id="394003">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A]) <span class="keyword">extends</span> <a href="#52322" title="scalaz.concurrent.Promise.Signal[A]">Signal</a>[A] {
+    <span class="keyword">def</span> <a title="=&gt; Unit" id="394000">eval</a> {
+      <a href="#394003" title="scalaz.concurrent.Promise[A]">promise</a>.<a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114719" title="(a: =&gt; A,promise: scalaz.concurrent.Promise[A])Unit">fulfill</a>(<a href="#394002" title="=&gt; A">a</a>, <a href="#394003" title="scalaz.concurrent.Promise[A]">promise</a>)
+    }
+  }
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Cont[+A] extends scalaz.concurrent.Promise.Signal[A] with ScalaObject" id="52326">Cont</a>[+<a title="&gt;: Nothing &lt;: Any" id="52327">A</a>]<span title="ScalaObject">(</span><a title="(A) =&gt; Unit" id="393987">k</a>: A =&gt; Unit, <a title="scalaz.concurrent.Promise[A]" id="393988">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[A]">Promise</a>[A]) <span class="keyword">extends</span> <a href="#52322" title="scalaz.concurrent.Promise.Signal[A]">Signal</a>[A] {
+    <span class="keyword">def</span> <a title="=&gt; Unit" id="393985">eval</a> {
+      <span title="Unit" class="keyword">if</span> (<a href="#393988" title="scalaz.concurrent.Promise[A]">promise</a>.<a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114722" title="=&gt; Boolean">fulfilled</a>) <a href="#393987" title="(v1: A)Unit">k</a>(<a href="#393988" title="scalaz.concurrent.Promise[A]">promise</a>.<a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[A]">v</a>.<a href="#114718" title="=&gt; A">get</a>)
+      <span class="keyword">else</span> <a href="#393988" title="scalaz.concurrent.Promise[A]">promise</a>.<a href="#41132" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[(A) =&gt; Unit]">waiting</a>.<a title="(x$1: (A) =&gt; Unit)Boolean" id="39763">offer</a><span title="Unit">(</span><a href="#393987" title="(A) =&gt; Unit">k</a>)
+    }
+  }
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Break extends scalaz.concurrent.Promise.Signal[Nothing] with ScalaObject" id="52328">Break</a><span title="ScalaObject">(</span><a title="scalaz.concurrent.Promise[_]" id="394024">promise</a>: <a href="#22171" title="scalaz.concurrent.Promise[_]">Promise</a>[_]) <span class="keyword">extends</span> <a href="#52322" title="scalaz.concurrent.Promise.Signal[Nothing]">Signal</a>[Nothing] {
+    <span class="keyword">def</span> <a title="=&gt; Unit" id="394023">eval</a> {
+      <a href="#394024" title="scalaz.concurrent.Promise[_]">promise</a>.<a href="#41135" title="=&gt; scalaz.concurrent.Promise.State[Any]">v</a>.<a href="#114724" title="(promise: scalaz.concurrent.Promise[_])Unit">break</a>(<a href="#394024" title="scalaz.concurrent.Promise[_]">promise</a>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

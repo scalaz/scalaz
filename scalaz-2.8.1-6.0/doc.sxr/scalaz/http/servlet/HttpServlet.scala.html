@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/HttpServlet.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> <a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#808993" title="object scalaz.http.Util.Nel">Nel</a>._
+
+/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpServlet&lt;/code&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait HttpServlet extends java.lang.Object with ScalaObject" id="26640">HttpServlet</a> <span title="ScalaObject">{</span>
+  /**
+   * The wrapped HTTP servlet.
+   */
+  <span class="keyword">val</span> <a title="=&gt; javax.servlet.http.HttpServlet" id="808886">servlet</a>: javax.servlet.http.<span title="javax.servlet.http.HttpServlet">HttpServlet</span>
+
+  /**
+   * Returns a potential resource loaded with using the servlet container. 
+   */
+  <span class="keyword">def</span> <a title="(path: String)Option[java.io.InputStream]" id="808887">resource</a>(<a title="String" id="810342">path</a>: <span title="String">String</span>) = <a title="(x: java.io.InputStream)Option[java.io.InputStream]" id="1264">Option</a><span title="(f: (java.io.InputStream) =&gt; java.io.InputStream)Option[java.io.InputStream]">(</span><a href="#808886" title="=&gt; javax.servlet.http.HttpServlet">servlet</a>.<a title="()javax.servlet.ServletContext" id="810114">getServletContext</a>.<a title="(x$1: java.lang.String)java.io.InputStream" id="810359">getResourceAsStream</a>(<a href="#810342" title="String">path</a>)) map (<a title="java.io.InputStream" id="810404">x</a> =&gt; <a href="#810404" title="java.io.InputStream">x</a>)
+}
+
+<span class="keyword">import</span> request.Request
+
+<span class="keyword">trait</span> <a title="trait HttpServlets extends java.lang.Object with ScalaObject" id="26739">HttpServlets</a> <span title="ScalaObject">{</span>
+  /**
+   * Wraps the given Java Servlet.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpServlets.HttpServletServlet : (s: javax.servlet.http.HttpServlet)scalaz.http.servlet.HttpServlet" id="808785">HttpServletServlet</a>(<a title="javax.servlet.http.HttpServlet" id="809196">s</a>: javax.servlet.http.<span title="javax.servlet.http.HttpServlet">HttpServlet</span>): <a href="#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a> = <a href="#875210" title="java.lang.Object with scalaz.http.servlet.HttpServlet{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.servlet.HttpServlet" id="875210">HttpServlet</a> {
+    <span class="keyword">val</span> <a title="javax.servlet.http.HttpServlet" id="875214">servlet</a> = <a href="#809196" title="javax.servlet.http.HttpServlet">s</a>
+  }
+
+  /**
+   * Unwraps the given HTTP servlet into a servlet.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpServlets.ServletHttpServlet : (s: scalaz.http.servlet.HttpServlet)javax.servlet.http.HttpServlet" id="808786">ServletHttpServlet</a>(<a title="scalaz.http.servlet.HttpServlet" id="809032">s</a>: <a href="#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>) = <a href="#809032" title="scalaz.http.servlet.HttpServlet">s</a>.<a href="#808886" title="=&gt; javax.servlet.http.HttpServlet">servlet</a>
+
+
+  /**
+   * Loads a resource at the given path. If that resource is found, return the result of applying the given function,
+   * otherwise return the given value.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpServlets.Resource : (path: scalaz.NonEmptyList[Char])AnyRef{def ?[A](found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet): A}" id="808787">Resource</a>(<a title="scalaz.NonEmptyList[Char]" id="809021">path</a>: <a href="../../NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char]): <a href="#809022" title="&lt;refinement&gt; extends AnyRef">{</a> <span class="keyword">def</span> ?[A](found: Iterator[Byte] =&gt; A, notFound: =&gt; A)(<span class="keyword">implicit</span> s: HttpServlet): A } = <a href="#2744" title="java.lang.Object{def ?[A](found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet): A}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object" id="2744">{</a>
+    <span class="keyword">def</span> <a title="[A](found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet)A" id="875223">?</a>[<a title="&gt;: Nothing &lt;: Any" id="875225">A</a>](<a title="(Iterator[Byte]) =&gt; A" id="875226">found</a>: Iterator[Byte] =&gt; A, <a title="=&gt; A" id="875227">notFound</a>: =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="875228">s</a>: <a href="#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>) =
+      <a href="#875228" title="scalaz.http.servlet.HttpServlet">s</a>.<a href="#808887" title="(path: String)Option[java.io.InputStream]">resource</a><span title="(f: (java.io.InputStream) =&gt; A)Option[A]">(</span><a href="../Util.scala.html#809004" title="(xs: scalaz.NonEmptyList[Char])String">path</a>) <span title="(default: =&gt; A)A">map</span> (<a title="java.io.InputStream" id="875264">z</a> =&gt; <a href="#875226" title="(v1: Iterator[Byte])A">found</a>(<a href="../../InputStreamW.scala.html#34135" title="implicit scalaz.InputStreams.InputStreamTo : (v: java.io.InputStream)scalaz.InputStreamW">z</a>.<a href="../../InputStreamW.scala.html#182754" title="=&gt; Iterator[Byte]">elements</a>)) getOrElse <a href="#875227" title="=&gt; A">notFound</a>
+  }
+}
+/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpServlet&lt;/code&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.HttpServlet" id="26641">HttpServlet</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#26739" title="scalaz.http.servlet.HttpServlets">HttpServlets</a> {
+  /**
+   * Loads a resource at the given path. If that resource is found, return the result of applying the given function,
+   * otherwise return the given value.
+   */
+  <span class="keyword">def</span> <a title="[A](path: String,found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet)A" id="808798">resource</a>[<a title="&gt;: Nothing &lt;: Any" id="808800">A</a>](<a title="String" id="810336">path</a>: <span title="String">String</span>, <a title="(Iterator[Byte]) =&gt; A" id="810337">found</a>: Iterator[Byte] =&gt; A, <a title="=&gt; A" id="810338">notFound</a>: =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="810339">s</a>: <a href="#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>) =
+    <a href="#810339" title="scalaz.http.servlet.HttpServlet">s</a>.<a href="#808887" title="(path: String)Option[java.io.InputStream]">resource</a><span title="(f: (java.io.InputStream) =&gt; A)Option[A]">(</span><a href="#810336" title="String">path</a>) <span title="(default: =&gt; A)A">map</span> (<a title="java.io.InputStream" id="810411">z</a> =&gt; <a href="#810337" title="(v1: Iterator[Byte])A">found</a>(<a href="../../InputStreamW.scala.html#34135" title="implicit scalaz.InputStreams.InputStreamTo : (v: java.io.InputStream)scalaz.InputStreamW">z</a>.<a href="../../InputStreamW.scala.html#182754" title="=&gt; Iterator[Byte]">elements</a>)) getOrElse <a href="#810338" title="=&gt; A">notFound</a>
+
+  /**
+   * Loads a resource at the path of the given request. If that resource is found, return the result of applying the
+   * given function, otherwise return the given value.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], A](found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet,implicit request: scalaz.http.request.Request[IN])A" id="808801">resource</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="808804">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="810320">_</a>], <a title="&gt;: Nothing &lt;: Any" id="808805">A</a>](<a title="(Iterator[Byte]) =&gt; A" id="810315">found</a>: Iterator[Byte] =&gt; A, <a title="=&gt; A" id="810316">notFound</a>: =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="810317">s</a>: <a href="#26640" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.request.Request[IN]" id="810318">request</a>: <a href="../request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <a href="#808805" title="A">A</a> =
+    <a href="#808798" title="(path: String,found: (Iterator[Byte]) =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet)A">resource</a><a href="#810317" title="scalaz.http.servlet.HttpServlet">(</a><a href="#810318" title="scalaz.http.request.Request[IN]">request</a>.<a href="../Util.scala.html#809001" title="(xs: scalaz.NonEmptyList[Char])List[Char]">path</a>.<a title="=&gt; String" id="29213">mkString</a>, <a href="#810315" title="(Iterator[Byte]) =&gt; A">found</a>, <a href="#810316" title="=&gt; A">notFound</a>)
+
+}
+
+        </pre>
+    </body>
+</html>

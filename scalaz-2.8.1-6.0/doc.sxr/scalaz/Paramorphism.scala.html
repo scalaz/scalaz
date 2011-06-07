@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Paramorphism.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait Paramorphism[P[_]] extends java.lang.Object" id="18497">Paramorphism</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21850">P</a>[<a title="&gt;: Nothing &lt;: Any" id="268685">_</a>]] <a title="java.lang.Object" id="2744">{</a>
+  <span class="keyword">def</span> <a title="[A, B](fa: P[A],b: B,f: (=&gt; A, =&gt; P[A], B) =&gt; B)B" id="268680">para</a>[<a title="&gt;: Nothing &lt;: Any" id="268683">A</a>, <a title="&gt;: Nothing &lt;: Any" id="268684">B</a>](<a title="P[A]" id="268686">fa</a>: <a href="#21850" title="P[A]">P</a>[A], <a title="B" id="268687">b</a>: <a href="#268684" title="B">B</a>, <a title="(=&gt; A, =&gt; P[A], B) =&gt; B" id="268688">f</a>: (=&gt; A, =&gt; P[A], B) =&gt; B): <a href="#268684" title="B">B</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Paramorphism" id="18498">Paramorphism</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Paramorphism[List]" id="297442">ListParamorphism</a> = <a href="#297450" title="java.lang.Object with scalaz.Paramorphism[List]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Paramorphism[List]" id="297450">Paramorphism</a>[List] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[A, B](as: List[A],b: B,f: (=&gt; A, =&gt; List[A], B) =&gt; B)B" id="297452">para</a>[<a title="&gt;: Nothing &lt;: Any" id="297455">A</a>, <a title="&gt;: Nothing &lt;: Any" id="297456">B</a>](<a title="List[A]" id="297457">as</a>: <a title="List[A]" id="29298">List</a>[A], <a title="B" id="297458">b</a>: <a href="#297456" title="B">B</a>, <a title="(=&gt; A, =&gt; List[A], B) =&gt; B" id="297459">f</a>: ((=&gt; A, =&gt; List[A], B) =&gt; B)): <a href="#297456" title="B">B</a> = <a href="#297457" title="List[A]">as</a> <span title="B" class="keyword">match</span> {
+      <span title="B" class="keyword">case</span> <a title="object Nil" id="29464">Nil</a> =&gt; <a href="#297458" title="B">b</a>
+      <span title="B" class="keyword">case</span> <a title="A" id="297488">a</a> :: <a title="List[A]" id="297489">as</a> =&gt; <a href="#297459" title="(v1: =&gt; A,v2: =&gt; List[A],v3: B)B">f</a>(<a href="#297488" title="A">a</a>, <a href="#297489" title="List[A]">as</a>, <a href="#297452" title="(as: List[A],b: B,f: (=&gt; A, =&gt; List[A], B) =&gt; B)B">para</a>(<a href="#297489" title="List[A]">as</a>, <a href="#297458" title="B">b</a>, <a href="#297459" title="(=&gt; A, =&gt; List[A], B) =&gt; B">f</a>))
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Paramorphism[Stream]" id="297443">StreamParamorphism</a> = <a href="#297552" title="java.lang.Object with scalaz.Paramorphism[Stream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Paramorphism[Stream]" id="297552">Paramorphism</a>[Stream] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[A, B](as: Stream[A],b: B,f: (=&gt; A, =&gt; Stream[A], B) =&gt; B)B" id="297554">para</a>[<a title="&gt;: Nothing &lt;: Any" id="297557">A</a>, <a title="&gt;: Nothing &lt;: Any" id="297558">B</a>](<a title="Stream[A]" id="297559">as</a>: <a title="Stream[A]" id="29790">Stream</a>[A], <a title="B" id="297560">b</a>: <a href="#297558" title="B">B</a>, <a title="(=&gt; A, =&gt; Stream[A], B) =&gt; B" id="297561">f</a>: ((=&gt; A, =&gt; Stream[A], B) =&gt; B)): <a href="#297558" title="B">B</a> =
+      <span title="B" class="keyword">if</span>(<a href="#297559" title="Stream[A]">as</a>.<a title="=&gt; Boolean" id="28908">isEmpty</a>)
+        <a href="#297560" title="B">b</a>
+      <span class="keyword">else</span>
+        <a href="#297561" title="(v1: =&gt; A,v2: =&gt; Stream[A],v3: B)B">f</a>(<a href="#297559" title="Stream[A]">as</a>.<a title="=&gt; A" id="28917">head</a>, <a href="#297559" title="Stream[A]">as</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>, <a href="#297554" title="(as: Stream[A],b: B,f: (=&gt; A, =&gt; Stream[A], B) =&gt; B)B">para</a>(<a href="#297559" title="Stream[A]">as</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>, <a href="#297560" title="B">b</a>, <a href="#297561" title="(=&gt; A, =&gt; Stream[A], B) =&gt; B">f</a>))
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Paramorphism[Option]" id="297444">OptionParamorphism</a> = <a href="#297643" title="java.lang.Object with scalaz.Paramorphism[Option]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Paramorphism[Option]" id="297643">Paramorphism</a>[Option] {
+    <span class="keyword">def</span> <a title="[A, B](as: Option[A],b: B,f: (=&gt; A, =&gt; Option[A], B) =&gt; B)B" id="297645">para</a>[<a title="&gt;: Nothing &lt;: Any" id="297648">A</a>, <a title="&gt;: Nothing &lt;: Any" id="297649">B</a>](<a title="Option[A]" id="297650">as</a>: <a title="Option[A]" id="1263">Option</a>[A], <a title="B" id="297651">b</a>: <a href="#297649" title="B">B</a>, <a title="(=&gt; A, =&gt; Option[A], B) =&gt; B" id="297652">f</a>: ((=&gt; A, =&gt; Option[A], B) =&gt; B)): <a href="#297649" title="B">B</a> = <a href="#297650" title="Option[A]">as</a> <span title="B" class="keyword">match</span> {
+      <span title="B" class="keyword">case</span> <span title="object None">None</span> =&gt; <a href="#297651" title="B">b</a>
+      <span title="B" class="keyword">case</span> Some(<a title="A" id="297676">a</a>) =&gt; <a href="#297652" title="(v1: =&gt; A,v2: =&gt; Option[A],v3: B)B">f</a>(<a href="#297676" title="A">a</a>, <span title="object None">None</span>, <a href="#297651" title="B">b</a>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/response/Status.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> response
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> <a href="../Util.scala.html#26550" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#808995" title="object scalaz.http.Util.Digits">Digits</a>.{digitsLong, longDigits}
+
+/**
+ * HTTP response status codes.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10&quot;&gt;RFC 2616 Section 10 Status Code Definitions&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Status extends java.lang.Object with ScalaObject" id="27735">Status</a> <span title="ScalaObject">{</span>
+  /**
+   * An integer representation of the response status.
+   */
+  <span class="keyword">val</span> <a title="=&gt; Int" id="810207">toInt</a>: <span title="Int">Int</span>
+
+  /**
+   * A three-digit representation of the response status.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="(scalaz.Digit, scalaz.Digit, scalaz.Digit)" id="810209">digits</a>: <a title="(scalaz.Digit, scalaz.Digit, scalaz.Digit)" id="1533">(</a>Digit, Digit, Digit) = {
+    <span class="keyword">val</span> <a title="List[scalaz.Digit]" id="870869">x</a> = <a href="../Util.scala.html#840518" title="[T[_]](n: Long)(implicit f: scalaz.Foldable[T],implicit p: scalaz.Pure[T],implicit e: scalaz.Empty[T],implicit plus: scalaz.Plus[T],implicit m: scalaz.Monoid[T[scalaz.Digit]])T[scalaz.Digit]">longDigits</a><span title="(n: Long)(implicit f: scalaz.Foldable[List],implicit p: scalaz.Pure[List],implicit e: scalaz.Empty[List],implicit plus: scalaz.Plus[List],implicit m: scalaz.Monoid[List[scalaz.Digit]])List[scalaz.Digit]">[</span><span title="List">List</span>]<a href="../../Foldable.scala.html#91310" title="=&gt; scalaz.Foldable[List]">(</a><a href="#810207" title="=&gt; Long">toInt</a>)
+    <span title="(_1: scalaz.Digit,_2: scalaz.Digit,_3: scalaz.Digit)(scalaz.Digit, scalaz.Digit, scalaz.Digit)">(</span><a href="#870869" title="(n: Int)scalaz.Digit">x</a>(<span title="Int(0)" class="int">0</span>), <a href="#870869" title="(n: Int)scalaz.Digit">x</a>(<span title="Int(1)" class="int">1</span>), <a href="#870869" title="(n: Int)scalaz.Digit">x</a>(<span title="Int(2)" class="int">2</span>))
+  }
+
+  /**
+   * A &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1&quot;&gt;reason phrase&lt;/a&gt; associated with the
+   * response status (if there is one).
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[String]" id="810210">reasonPhraseS</a>: <span title="Option[String]">Option</span>[String]
+
+  /**
+   * A &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1&quot;&gt;reason phrase&lt;/a&gt; associated with the
+   * response status (if there is one).
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[List[Char]]" id="810211">reasonPhrase</a> = <a href="#810210" title="(f: (String) =&gt; List[Char])Option[List[Char]]" id="38383">reasonPhraseS</a> map (<a href="#871953" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="1489">_</a>.<a title="=&gt; List[Char]" id="29194">toList</a>)
+
+  /**
+   * &lt;code&gt;true&lt;/code&gt; if this status code is an extension-code, &lt;code&gt;false&lt;/code&gt; otherwise.
+   */
+  <span class="keyword">val</span> <a title="Boolean" id="810212">isExtension</a> = <a href="#27735" title="scalaz.http.response.Status" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> {
+    <span title="Boolean(true)" class="keyword">case</span> ExtensionCode(_, _, _) =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span title="Boolean(false)" class="keyword">case</span> _ =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+  /**
+   * Executes the given function if this is an extension-code, otherwise returns the given value.
+   */
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.Digit, scalaz.Digit, scalaz.Digit) =&gt; X,x: =&gt; X)X" id="810214">extension</a>[<a title="&gt;: Nothing &lt;: Any" id="810216">X</a>](<a title="(scalaz.Digit, scalaz.Digit, scalaz.Digit) =&gt; X" id="871998">f</a>: (Digit, Digit, Digit) =&gt; X, <a title="=&gt; X" id="871999">x</a>: =&gt; X) = <a href="#27735" title="scalaz.http.response.Status" class="keyword">this</a> <span title="X" class="keyword">match</span> {
+    <span title="X" class="keyword">case</span> ExtensionCode(<a title="scalaz.Digit" id="872002">a</a>, <a title="scalaz.Digit" id="872003">b</a>, <a title="scalaz.Digit" id="872004">c</a>) =&gt; <a href="#871998" title="(v1: scalaz.Digit,v2: scalaz.Digit,v3: scalaz.Digit)X" id="42490">f</a>(<a href="#872002" title="scalaz.Digit">a</a>, <a href="#872003" title="scalaz.Digit">b</a>, <a href="#872004" title="scalaz.Digit">c</a>)
+    <span title="X" class="keyword">case</span> _ =&gt; <a href="#871999" title="=&gt; X">x</a>
+  }
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.1.1&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872027" title="object scalaz.http.response.Continue" id="872035">Continue</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872013">toInt</a> = <span title="Int(100)" class="int">100</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872015">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Continue&quot;)" class="string">&quot;Continue&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.1.2&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872051" title="object scalaz.http.response.SwitchingProtocols" id="872059">SwitchingProtocols</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872037">toInt</a> = <span title="Int(101)" class="int">101</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872039">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Switching Protocols&quot;)" class="string">&quot;Switching Protocols&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872070" title="object scalaz.http.response.OK" id="872078">OK</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="810490">toInt</a> = <span title="Int(200)" class="int">200</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="810492">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;OK&quot;)" class="string">&quot;OK&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872094" title="object scalaz.http.response.Created" id="872102">Created</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872080">toInt</a> = <span title="Int(201)" class="int">201</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872082">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Created&quot;)" class="string">&quot;Created&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.3&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872118" title="object scalaz.http.response.Accepted" id="872126">Accepted</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872104">toInt</a> = <span title="Int(202)" class="int">202</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872106">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Accepted&quot;)" class="string">&quot;Accepted&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.4&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872142" title="object scalaz.http.response.NonAuthoritativeInformation" id="872150">NonAuthoritativeInformation</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872128">toInt</a> = <span title="Int(203)" class="int">203</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872130">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Non-Authoritative Information&quot;)" class="string">&quot;Non-Authoritative Information&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872166" title="object scalaz.http.response.NoContent" id="872174">NoContent</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872152">toInt</a> = <span title="Int(204)" class="int">204</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872154">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;No Content&quot;)" class="string">&quot;No Content&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.6&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872190" title="object scalaz.http.response.ResetContent" id="872198">ResetContent</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872176">toInt</a> = <span title="Int(205)" class="int">205</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872178">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Reset Content&quot;)" class="string">&quot;Reset Content&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.7&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872214" title="object scalaz.http.response.PartialContent" id="872222">PartialContent</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872200">toInt</a> = <span title="Int(206)" class="int">206</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872202">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Partial Content&quot;)" class="string">&quot;Partial Content&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872238" title="object scalaz.http.response.MultipleChoices" id="872246">MultipleChoices</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872224">toInt</a> = <span title="Int(300)" class="int">300</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872226">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Multiple Choices&quot;)" class="string">&quot;Multiple Choices&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872257" title="object scalaz.http.response.MovedPermanently" id="872265">MovedPermanently</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="838700">toInt</a> = <span title="Int(301)" class="int">301</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="838702">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Moved Permanently&quot;)" class="string">&quot;Moved Permanently&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.3&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872281" title="object scalaz.http.response.Found" id="872289">Found</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872267">toInt</a> = <span title="Int(302)" class="int">302</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872269">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Found&quot;)" class="string">&quot;Found&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.4&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872305" title="object scalaz.http.response.SeeOther" id="872313">SeeOther</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872291">toInt</a> = <span title="Int(303)" class="int">303</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872293">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;See Other&quot;)" class="string">&quot;See Other&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872329" title="object scalaz.http.response.NotModified" id="872337">NotModified</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872315">toInt</a> = <span title="Int(304)" class="int">304</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872317">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Not Modified&quot;)" class="string">&quot;Not Modified&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.6&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872353" title="object scalaz.http.response.UseProxy" id="872361">UseProxy</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872339">toInt</a> = <span title="Int(305)" class="int">305</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872341">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Use Proxy&quot;)" class="string">&quot;Use Proxy&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.8&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872377" title="object scalaz.http.response.TemporaryRedirect" id="872385">TemporaryRedirect</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872363">toInt</a> = <span title="Int(307)" class="int">307</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872365">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Temporary Redirect&quot;)" class="string">&quot;Temporary Redirect&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872396" title="object scalaz.http.response.BadRequest" id="872404">BadRequest</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="867055">toInt</a> = <span title="Int(400)" class="int">400</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="867057">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Bad Request&quot;)" class="string">&quot;Bad Request&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872420" title="object scalaz.http.response.Unauthorized" id="872428">Unauthorized</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872406">toInt</a> = <span title="Int(401)" class="int">401</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872408">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Unauthorized&quot;)" class="string">&quot;Unauthorized&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.3&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872444" title="object scalaz.http.response.PaymentRequired" id="872452">PaymentRequired</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872430">toInt</a> = <span title="Int(402)" class="int">402</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872432">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Payment Required&quot;)" class="string">&quot;Payment Required&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872468" title="object scalaz.http.response.Forbidden" id="872476">Forbidden</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872454">toInt</a> = <span title="Int(403)" class="int">403</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872456">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Forbidden&quot;)" class="string">&quot;Forbidden&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872487" title="object scalaz.http.response.NotFound" id="872495">NotFound</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="811001">toInt</a> = <span title="Int(404)" class="int">404</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="811003">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Not Found&quot;)" class="string">&quot;Not Found&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872511" title="object scalaz.http.response.MethodNotAllowed" id="872519">MethodNotAllowed</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872497">toInt</a> = <span title="Int(405)" class="int">405</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872499">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Method Not Allowed&quot;)" class="string">&quot;Method Not Allowed&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872535" title="object scalaz.http.response.NotAcceptable" id="872543">NotAcceptable</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872521">toInt</a> = <span title="Int(406)" class="int">406</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872523">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Not Acceptable&quot;)" class="string">&quot;Not Acceptable&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.8&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872559" title="object scalaz.http.response.ProxyAuthenticationRequired" id="872567">ProxyAuthenticationRequired</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872545">toInt</a> = <span title="Int(407)" class="int">407</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872547">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Proxy Authentication Required&quot;)" class="string">&quot;Proxy Authentication Required&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.9&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872583" title="object scalaz.http.response.RequestTimeout" id="872591">RequestTimeout</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872569">toInt</a> = <span title="Int(408)" class="int">408</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872571">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Request Time-out&quot;)" class="string">&quot;Request Time-out&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872607" title="object scalaz.http.response.Conflict" id="872615">Conflict</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872593">toInt</a> = <span title="Int(409)" class="int">409</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872595">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Conflict&quot;)" class="string">&quot;Conflict&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.11&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872631" title="object scalaz.http.response.Gone" id="872639">Gone</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872617">toInt</a> = <span title="Int(410)" class="int">410</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872619">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Gone&quot;)" class="string">&quot;Gone&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.12&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872655" title="object scalaz.http.response.LengthRequired" id="872663">LengthRequired</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872641">toInt</a> = <span title="Int(411)" class="int">411</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872643">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Length Required&quot;)" class="string">&quot;Length Required&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.13&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872679" title="object scalaz.http.response.PreconditionFailed" id="872687">PreconditionFailed</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872665">toInt</a> = <span title="Int(412)" class="int">412</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872667">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Precondition Failed&quot;)" class="string">&quot;Precondition Failed&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.14&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872703" title="object scalaz.http.response.RequestEntityTooLarge" id="872711">RequestEntityTooLarge</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872689">toInt</a> = <span title="Int(413)" class="int">413</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872691">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Request Entity Too Large&quot;)" class="string">&quot;Request Entity Too Large&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.15&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872727" title="object scalaz.http.response.RequestURITooLong" id="872735">RequestURITooLong</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872713">toInt</a> = <span title="Int(414)" class="int">414</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872715">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Request-URI Too Large&quot;)" class="string">&quot;Request-URI Too Large&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872751" title="object scalaz.http.response.UnsupportedMediaType" id="872759">UnsupportedMediaType</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872737">toInt</a> = <span title="Int(415)" class="int">415</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872739">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Unsupported Media Type&quot;)" class="string">&quot;Unsupported Media Type&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.17&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872775" title="object scalaz.http.response.RequestedRangeNotSatisfiable" id="872783">RequestedRangeNotSatisfiable</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872761">toInt</a> = <span title="Int(416)" class="int">416</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872763">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Requested range not satisfiable&quot;)" class="string">&quot;Requested range not satisfiable&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.18&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872799" title="object scalaz.http.response.ExpectationFailed" id="872807">ExpectationFailed</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872785">toInt</a> = <span title="Int(417)" class="int">417</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872787">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Expectation Failed&quot;)" class="string">&quot;Expectation Failed&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872823" title="object scalaz.http.response.InternalServerError" id="872831">InternalServerError</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872809">toInt</a> = <span title="Int(500)" class="int">500</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872811">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Internal Server Error&quot;)" class="string">&quot;Internal Server Error&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872847" title="object scalaz.http.response.NotImplemented" id="872855">NotImplemented</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872833">toInt</a> = <span title="Int(501)" class="int">501</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872835">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Not Implemented&quot;)" class="string">&quot;Not Implemented&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.3&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872871" title="object scalaz.http.response.BadGateway" id="872879">BadGateway</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872857">toInt</a> = <span title="Int(502)" class="int">502</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872859">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Bad Gateway&quot;)" class="string">&quot;Bad Gateway&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872895" title="object scalaz.http.response.ServiceUnavailable" id="872903">ServiceUnavailable</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872881">toInt</a> = <span title="Int(503)" class="int">503</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872883">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Service Unavailable&quot;)" class="string">&quot;Service Unavailable&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.5&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872919" title="object scalaz.http.response.GatewayTimeout" id="872927">GatewayTimeout</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872905">toInt</a> = <span title="Int(504)" class="int">504</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872907">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;Gateway Time-out&quot;)" class="string">&quot;Gateway Time-out&quot;</span>)
+}
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.6&quot;&gt;§&lt;/a&gt;
+ */
+case <span class="keyword">object</span> <a href="#872943" title="object scalaz.http.response.HTTPVersionNotSupported" id="872951">HTTPVersionNotSupported</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="872929">toInt</a> = <span title="Int(505)" class="int">505</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Some[java.lang.String]" id="872931">reasonPhraseS</a> = <span title="(x: java.lang.String)Some[java.lang.String]">Some</span>(<span title="java.lang.String(&quot;HTTP Version not supported&quot;)" class="string">&quot;HTTP Version not supported&quot;</span>)
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class ExtensionCode extends java.lang.Object with scalaz.http.response.Status with ScalaObject with Product" id="874128">ExtensionCode</a><span title="ScalaObject">(</span><a title="=&gt; scalaz.Digit" id="873381">a</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>, <a title="=&gt; scalaz.Digit" id="873382">b</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>, <a title="=&gt; scalaz.Digit" id="873383">c</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>) <span class="keyword">extends</span> <a href="#27735" title="scalaz.http.response.Status">Status</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="Int" id="870829">toInt</a> = <a href="../Util.scala.html#840521" title="[T[_]](ds: T[scalaz.Digit])(implicit f: scalaz.Foldable[T])Long">digitsLong</a><span title="(ds: List[scalaz.Digit])(implicit f: scalaz.Foldable[List])Long">[</span><span title="List">List</span>]<a href="../../Foldable.scala.html#91310" title="=&gt; scalaz.Foldable[List]">(</a><span title="(xs: scalaz.Digit*)List[scalaz.Digit]">List</span>(<a href="#873381" title="=&gt; scalaz.Digit">a</a>, <a href="#873382" title="=&gt; scalaz.Digit">b</a>, <a href="#873383" title="=&gt; scalaz.Digit">c</a>)).<span title="=&gt; Int">toInt</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="None.type" id="870831">reasonPhraseS</a> = <span title="object None">None</span>
+}
+
+/**
+ * HTTP response status codes.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10&quot;&gt;RFC 2616 Section 10 Status Code Definitions&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.response.Status" id="27736">Status</a> <span title="ScalaObject">{</span>
+  /**
+   * Construct a request status code with the given three digits.
+   */
+  <span class="keyword">def</span> <a title="(d1: scalaz.Digit,d2: scalaz.Digit,d3: scalaz.Digit)scalaz.http.response.Status" id="812686">status</a>(<a title="scalaz.Digit" id="873083">d1</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>, <a title="scalaz.Digit" id="873084">d2</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>, <a title="scalaz.Digit" id="873085">d3</a>: <a href="../../Digit.scala.html#10595" title="scalaz.Digit">Digit</a>): <a href="#27735" title="scalaz.http.response.Status">Status</a> =
+    <a href="../Util.scala.html#840521" title="[T[_]](ds: T[scalaz.Digit])(implicit f: scalaz.Foldable[T])Long">digitsLong</a><span title="(ds: List[scalaz.Digit])(implicit f: scalaz.Foldable[List])Long">[</span><span title="List">List</span>]<a href="../../Foldable.scala.html#91310" title="=&gt; scalaz.Foldable[List]">(</a><span title="(xs: scalaz.Digit*)List[scalaz.Digit]">List</span>(<a href="#873083" title="scalaz.Digit">d1</a>, <a href="#873084" title="scalaz.Digit">d2</a>, <a href="#873085" title="scalaz.Digit">d3</a>)).<a href="#812690" title="implicit scalaz.http.response.Status.IntStatus : (n: Int)Option[scalaz.http.response.Status]">toInt</a>.<a title="=&gt; scalaz.http.response.Status" id="38376">get</a>
+
+  /**
+   * An integer representation of the given status code.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Status.StatusInt : (s: scalaz.http.response.Status)Int" id="812687">StatusInt</a>(<a title="scalaz.http.response.Status" id="812694">s</a>: <a href="#27735" title="scalaz.http.response.Status">Status</a>): <span title="Int">Int</span> = <a href="#812694" title="scalaz.http.response.Status">s</a>.<a href="#810207" title="=&gt; Int">toInt</a>
+
+  /**
+   * List of known statuses.
+   */
+  <span class="keyword">val</span> <a title="List[Product with scalaz.http.response.Status{def reasonPhraseS: Some[java.lang.String]}]" id="812688">statuses</a> =
+      <span title="(xs: Product with scalaz.http.response.Status{def reasonPhraseS: Some[java.lang.String]}*)List[Product with scalaz.http.response.Status{def reasonPhraseS: Some[java.lang.String]}]">List</span>(<a href="#872035" title="object scalaz.http.response.Continue">Continue</a>, <a href="#872059" title="object scalaz.http.response.SwitchingProtocols">SwitchingProtocols</a>, <a href="#872078" title="object scalaz.http.response.OK">OK</a>, <a href="#872102" title="object scalaz.http.response.Created">Created</a>, <a href="#872126" title="object scalaz.http.response.Accepted">Accepted</a>, <a href="#872150" title="object scalaz.http.response.NonAuthoritativeInformation">NonAuthoritativeInformation</a>,
+          <a href="#872174" title="object scalaz.http.response.NoContent">NoContent</a>, <a href="#872198" title="object scalaz.http.response.ResetContent">ResetContent</a>, <a href="#872222" title="object scalaz.http.response.PartialContent">PartialContent</a>, <a href="#872246" title="object scalaz.http.response.MultipleChoices">MultipleChoices</a>, <a href="#872265" title="object scalaz.http.response.MovedPermanently">MovedPermanently</a>, <a href="#872289" title="object scalaz.http.response.Found">Found</a>, <a href="#872313" title="object scalaz.http.response.SeeOther">SeeOther</a>,
+          <a href="#872337" title="object scalaz.http.response.NotModified">NotModified</a>, <a href="#872361" title="object scalaz.http.response.UseProxy">UseProxy</a>, <a href="#872385" title="object scalaz.http.response.TemporaryRedirect">TemporaryRedirect</a>, <a href="#872404" title="object scalaz.http.response.BadRequest">BadRequest</a>, <a href="#872428" title="object scalaz.http.response.Unauthorized">Unauthorized</a>, <a href="#872452" title="object scalaz.http.response.PaymentRequired">PaymentRequired</a>, <a href="#872476" title="object scalaz.http.response.Forbidden">Forbidden</a>,
+          <a href="#872495" title="object scalaz.http.response.NotFound">NotFound</a>, <a href="#872519" title="object scalaz.http.response.MethodNotAllowed">MethodNotAllowed</a>, <a href="#872543" title="object scalaz.http.response.NotAcceptable">NotAcceptable</a>, <a href="#872567" title="object scalaz.http.response.ProxyAuthenticationRequired">ProxyAuthenticationRequired</a>, <a href="#872591" title="object scalaz.http.response.RequestTimeout">RequestTimeout</a>,
+          <a href="#872615" title="object scalaz.http.response.Conflict">Conflict</a>, <a href="#872639" title="object scalaz.http.response.Gone">Gone</a>, <a href="#872663" title="object scalaz.http.response.LengthRequired">LengthRequired</a>, <a href="#872687" title="object scalaz.http.response.PreconditionFailed">PreconditionFailed</a>, <a href="#872711" title="object scalaz.http.response.RequestEntityTooLarge">RequestEntityTooLarge</a>, <a href="#872735" title="object scalaz.http.response.RequestURITooLong">RequestURITooLong</a>,
+          <a href="#872759" title="object scalaz.http.response.UnsupportedMediaType">UnsupportedMediaType</a>, <a href="#872783" title="object scalaz.http.response.RequestedRangeNotSatisfiable">RequestedRangeNotSatisfiable</a>, <a href="#872807" title="object scalaz.http.response.ExpectationFailed">ExpectationFailed</a>, <a href="#872831" title="object scalaz.http.response.InternalServerError">InternalServerError</a>,
+          <a href="#872855" title="object scalaz.http.response.NotImplemented">NotImplemented</a>, <a href="#872879" title="object scalaz.http.response.BadGateway">BadGateway</a>, <a href="#872903" title="object scalaz.http.response.ServiceUnavailable">ServiceUnavailable</a>, <a href="#872927" title="object scalaz.http.response.GatewayTimeout">GatewayTimeout</a>, <a href="#872951" title="object scalaz.http.response.HTTPVersionNotSupported">HTTPVersionNotSupported</a>)
+
+  /**
+   * Returns a status code for integer values between 100 and 999 inclusive.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Status.IntStatus : (n: Int)Option[scalaz.http.response.Status]" id="812690">IntStatus</a>(<a title="Int" id="812692">n</a>: <span title="Int">Int</span>): <span title="Option[scalaz.http.response.Status]">Option</span>[Status] = <a href="#812692" title="Int">n</a> <span title="Option[scalaz.http.response.Status]" class="keyword">match</span> {
+    <span title="Some[object scalaz.http.response.Continue]" class="keyword">case</span> <span title="Int(100)" class="int">100</span> =&gt; <span title="(x: object scalaz.http.response.Continue)Some[object scalaz.http.response.Continue]">Some</span>(<a href="#872035" title="object scalaz.http.response.Continue">Continue</a>)
+    <span title="Some[object scalaz.http.response.SwitchingProtocols]" class="keyword">case</span> <span title="Int(101)" class="int">101</span> =&gt; <span title="(x: object scalaz.http.response.SwitchingProtocols)Some[object scalaz.http.response.SwitchingProtocols]">Some</span>(<a href="#872059" title="object scalaz.http.response.SwitchingProtocols">SwitchingProtocols</a>)
+    <span title="Some[object scalaz.http.response.OK]" class="keyword">case</span> <span title="Int(200)" class="int">200</span> =&gt; <span title="(x: object scalaz.http.response.OK)Some[object scalaz.http.response.OK]">Some</span>(<a href="#872078" title="object scalaz.http.response.OK">OK</a>)
+    <span title="Some[object scalaz.http.response.Created]" class="keyword">case</span> <span title="Int(201)" class="int">201</span> =&gt; <span title="(x: object scalaz.http.response.Created)Some[object scalaz.http.response.Created]">Some</span>(<a href="#872102" title="object scalaz.http.response.Created">Created</a>)
+    <span title="Some[object scalaz.http.response.Accepted]" class="keyword">case</span> <span title="Int(202)" class="int">202</span> =&gt; <span title="(x: object scalaz.http.response.Accepted)Some[object scalaz.http.response.Accepted]">Some</span>(<a href="#872126" title="object scalaz.http.response.Accepted">Accepted</a>)
+    <span title="Some[object scalaz.http.response.NonAuthoritativeInformation]" class="keyword">case</span> <span title="Int(203)" class="int">203</span> =&gt; <span title="(x: object scalaz.http.response.NonAuthoritativeInformation)Some[object scalaz.http.response.NonAuthoritativeInformation]">Some</span>(<a href="#872150" title="object scalaz.http.response.NonAuthoritativeInformation">NonAuthoritativeInformation</a>)
+    <span title="Some[object scalaz.http.response.NoContent]" class="keyword">case</span> <span title="Int(204)" class="int">204</span> =&gt; <span title="(x: object scalaz.http.response.NoContent)Some[object scalaz.http.response.NoContent]">Some</span>(<a href="#872174" title="object scalaz.http.response.NoContent">NoContent</a>)
+    <span title="Some[object scalaz.http.response.ResetContent]" class="keyword">case</span> <span title="Int(205)" class="int">205</span> =&gt; <span title="(x: object scalaz.http.response.ResetContent)Some[object scalaz.http.response.ResetContent]">Some</span>(<a href="#872198" title="object scalaz.http.response.ResetContent">ResetContent</a>)
+    <span title="Some[object scalaz.http.response.PartialContent]" class="keyword">case</span> <span title="Int(206)" class="int">206</span> =&gt; <span title="(x: object scalaz.http.response.PartialContent)Some[object scalaz.http.response.PartialContent]">Some</span>(<a href="#872222" title="object scalaz.http.response.PartialContent">PartialContent</a>)
+    <span title="Some[object scalaz.http.response.MultipleChoices]" class="keyword">case</span> <span title="Int(300)" class="int">300</span> =&gt; <span title="(x: object scalaz.http.response.MultipleChoices)Some[object scalaz.http.response.MultipleChoices]">Some</span>(<a href="#872246" title="object scalaz.http.response.MultipleChoices">MultipleChoices</a>)
+    <span title="Some[object scalaz.http.response.MovedPermanently]" class="keyword">case</span> <span title="Int(301)" class="int">301</span> =&gt; <span title="(x: object scalaz.http.response.MovedPermanently)Some[object scalaz.http.response.MovedPermanently]">Some</span>(<a href="#872265" title="object scalaz.http.response.MovedPermanently">MovedPermanently</a>)
+    <span title="Some[object scalaz.http.response.Found]" class="keyword">case</span> <span title="Int(302)" class="int">302</span> =&gt; <span title="(x: object scalaz.http.response.Found)Some[object scalaz.http.response.Found]">Some</span>(<a href="#872289" title="object scalaz.http.response.Found">Found</a>)
+    <span title="Some[object scalaz.http.response.SeeOther]" class="keyword">case</span> <span title="Int(303)" class="int">303</span> =&gt; <span title="(x: object scalaz.http.response.SeeOther)Some[object scalaz.http.response.SeeOther]">Some</span>(<a href="#872313" title="object scalaz.http.response.SeeOther">SeeOther</a>)
+    <span title="Some[object scalaz.http.response.NotModified]" class="keyword">case</span> <span title="Int(304)" class="int">304</span> =&gt; <span title="(x: object scalaz.http.response.NotModified)Some[object scalaz.http.response.NotModified]">Some</span>(<a href="#872337" title="object scalaz.http.response.NotModified">NotModified</a>)
+    <span title="Some[object scalaz.http.response.UseProxy]" class="keyword">case</span> <span title="Int(305)" class="int">305</span> =&gt; <span title="(x: object scalaz.http.response.UseProxy)Some[object scalaz.http.response.UseProxy]">Some</span>(<a href="#872361" title="object scalaz.http.response.UseProxy">UseProxy</a>)
+    <span title="Some[object scalaz.http.response.TemporaryRedirect]" class="keyword">case</span> <span title="Int(307)" class="int">307</span> =&gt; <span title="(x: object scalaz.http.response.TemporaryRedirect)Some[object scalaz.http.response.TemporaryRedirect]">Some</span>(<a href="#872385" title="object scalaz.http.response.TemporaryRedirect">TemporaryRedirect</a>)
+    <span title="Some[object scalaz.http.response.BadRequest]" class="keyword">case</span> <span title="Int(400)" class="int">400</span> =&gt; <span title="(x: object scalaz.http.response.BadRequest)Some[object scalaz.http.response.BadRequest]">Some</span>(<a href="#872404" title="object scalaz.http.response.BadRequest">BadRequest</a>)
+    <span title="Some[object scalaz.http.response.Unauthorized]" class="keyword">case</span> <span title="Int(401)" class="int">401</span> =&gt; <span title="(x: object scalaz.http.response.Unauthorized)Some[object scalaz.http.response.Unauthorized]">Some</span>(<a href="#872428" title="object scalaz.http.response.Unauthorized">Unauthorized</a>)
+    <span title="Some[object scalaz.http.response.PaymentRequired]" class="keyword">case</span> <span title="Int(402)" class="int">402</span> =&gt; <span title="(x: object scalaz.http.response.PaymentRequired)Some[object scalaz.http.response.PaymentRequired]">Some</span>(<a href="#872452" title="object scalaz.http.response.PaymentRequired">PaymentRequired</a>)
+    <span title="Some[object scalaz.http.response.Forbidden]" class="keyword">case</span> <span title="Int(403)" class="int">403</span> =&gt; <span title="(x: object scalaz.http.response.Forbidden)Some[object scalaz.http.response.Forbidden]">Some</span>(<a href="#872476" title="object scalaz.http.response.Forbidden">Forbidden</a>)
+    <span title="Some[object scalaz.http.response.NotFound]" class="keyword">case</span> <span title="Int(404)" class="int">404</span> =&gt; <span title="(x: object scalaz.http.response.NotFound)Some[object scalaz.http.response.NotFound]">Some</span>(<a href="#872495" title="object scalaz.http.response.NotFound">NotFound</a>)
+    <span title="Some[object scalaz.http.response.MethodNotAllowed]" class="keyword">case</span> <span title="Int(405)" class="int">405</span> =&gt; <span title="(x: object scalaz.http.response.MethodNotAllowed)Some[object scalaz.http.response.MethodNotAllowed]">Some</span>(<a href="#872519" title="object scalaz.http.response.MethodNotAllowed">MethodNotAllowed</a>)
+    <span title="Some[object scalaz.http.response.NotAcceptable]" class="keyword">case</span> <span title="Int(406)" class="int">406</span> =&gt; <span title="(x: object scalaz.http.response.NotAcceptable)Some[object scalaz.http.response.NotAcceptable]">Some</span>(<a href="#872543" title="object scalaz.http.response.NotAcceptable">NotAcceptable</a>)
+    <span title="Some[object scalaz.http.response.ProxyAuthenticationRequired]" class="keyword">case</span> <span title="Int(407)" class="int">407</span> =&gt; <span title="(x: object scalaz.http.response.ProxyAuthenticationRequired)Some[object scalaz.http.response.ProxyAuthenticationRequired]">Some</span>(<a href="#872567" title="object scalaz.http.response.ProxyAuthenticationRequired">ProxyAuthenticationRequired</a>)
+    <span title="Some[object scalaz.http.response.RequestTimeout]" class="keyword">case</span> <span title="Int(408)" class="int">408</span> =&gt; <span title="(x: object scalaz.http.response.RequestTimeout)Some[object scalaz.http.response.RequestTimeout]">Some</span>(<a href="#872591" title="object scalaz.http.response.RequestTimeout">RequestTimeout</a>)
+    <span title="Some[object scalaz.http.response.Conflict]" class="keyword">case</span> <span title="Int(409)" class="int">409</span> =&gt; <span title="(x: object scalaz.http.response.Conflict)Some[object scalaz.http.response.Conflict]">Some</span>(<a href="#872615" title="object scalaz.http.response.Conflict">Conflict</a>)
+    <span title="Some[object scalaz.http.response.Gone]" class="keyword">case</span> <span title="Int(410)" class="int">410</span> =&gt; <span title="(x: object scalaz.http.response.Gone)Some[object scalaz.http.response.Gone]">Some</span>(<a href="#872639" title="object scalaz.http.response.Gone">Gone</a>)
+    <span title="Some[object scalaz.http.response.LengthRequired]" class="keyword">case</span> <span title="Int(411)" class="int">411</span> =&gt; <span title="(x: object scalaz.http.response.LengthRequired)Some[object scalaz.http.response.LengthRequired]">Some</span>(<a href="#872663" title="object scalaz.http.response.LengthRequired">LengthRequired</a>)
+    <span title="Some[object scalaz.http.response.PreconditionFailed]" class="keyword">case</span> <span title="Int(412)" class="int">412</span> =&gt; <span title="(x: object scalaz.http.response.PreconditionFailed)Some[object scalaz.http.response.PreconditionFailed]">Some</span>(<a href="#872687" title="object scalaz.http.response.PreconditionFailed">PreconditionFailed</a>)
+    <span title="Some[object scalaz.http.response.RequestEntityTooLarge]" class="keyword">case</span> <span title="Int(413)" class="int">413</span> =&gt; <span title="(x: object scalaz.http.response.RequestEntityTooLarge)Some[object scalaz.http.response.RequestEntityTooLarge]">Some</span>(<a href="#872711" title="object scalaz.http.response.RequestEntityTooLarge">RequestEntityTooLarge</a>)
+    <span title="Some[object scalaz.http.response.RequestURITooLong]" class="keyword">case</span> <span title="Int(414)" class="int">414</span> =&gt; <span title="(x: object scalaz.http.response.RequestURITooLong)Some[object scalaz.http.response.RequestURITooLong]">Some</span>(<a href="#872735" title="object scalaz.http.response.RequestURITooLong">RequestURITooLong</a>)
+    <span title="Some[object scalaz.http.response.UnsupportedMediaType]" class="keyword">case</span> <span title="Int(415)" class="int">415</span> =&gt; <span title="(x: object scalaz.http.response.UnsupportedMediaType)Some[object scalaz.http.response.UnsupportedMediaType]">Some</span>(<a href="#872759" title="object scalaz.http.response.UnsupportedMediaType">UnsupportedMediaType</a>)
+    <span title="Some[object scalaz.http.response.RequestedRangeNotSatisfiable]" class="keyword">case</span> <span title="Int(416)" class="int">416</span> =&gt; <span title="(x: object scalaz.http.response.RequestedRangeNotSatisfiable)Some[object scalaz.http.response.RequestedRangeNotSatisfiable]">Some</span>(<a href="#872783" title="object scalaz.http.response.RequestedRangeNotSatisfiable">RequestedRangeNotSatisfiable</a>)
+    <span title="Some[object scalaz.http.response.ExpectationFailed]" class="keyword">case</span> <span title="Int(417)" class="int">417</span> =&gt; <span title="(x: object scalaz.http.response.ExpectationFailed)Some[object scalaz.http.response.ExpectationFailed]">Some</span>(<a href="#872807" title="object scalaz.http.response.ExpectationFailed">ExpectationFailed</a>)
+    <span title="Some[object scalaz.http.response.InternalServerError]" class="keyword">case</span> <span title="Int(500)" class="int">500</span> =&gt; <span title="(x: object scalaz.http.response.InternalServerError)Some[object scalaz.http.response.InternalServerError]">Some</span>(<a href="#872831" title="object scalaz.http.response.InternalServerError">InternalServerError</a>)
+    <span title="Some[object scalaz.http.response.NotImplemented]" class="keyword">case</span> <span title="Int(501)" class="int">501</span> =&gt; <span title="(x: object scalaz.http.response.NotImplemented)Some[object scalaz.http.response.NotImplemented]">Some</span>(<a href="#872855" title="object scalaz.http.response.NotImplemented">NotImplemented</a>)
+    <span title="Some[object scalaz.http.response.BadGateway]" class="keyword">case</span> <span title="Int(502)" class="int">502</span> =&gt; <span title="(x: object scalaz.http.response.BadGateway)Some[object scalaz.http.response.BadGateway]">Some</span>(<a href="#872879" title="object scalaz.http.response.BadGateway">BadGateway</a>)
+    <span title="Some[object scalaz.http.response.ServiceUnavailable]" class="keyword">case</span> <span title="Int(503)" class="int">503</span> =&gt; <span title="(x: object scalaz.http.response.ServiceUnavailable)Some[object scalaz.http.response.ServiceUnavailable]">Some</span>(<a href="#872903" title="object scalaz.http.response.ServiceUnavailable">ServiceUnavailable</a>)
+    <span title="Some[object scalaz.http.response.GatewayTimeout]" class="keyword">case</span> <span title="Int(504)" class="int">504</span> =&gt; <span title="(x: object scalaz.http.response.GatewayTimeout)Some[object scalaz.http.response.GatewayTimeout]">Some</span>(<a href="#872927" title="object scalaz.http.response.GatewayTimeout">GatewayTimeout</a>)
+    <span title="Some[object scalaz.http.response.HTTPVersionNotSupported]" class="keyword">case</span> <span title="Int(505)" class="int">505</span> =&gt; <span title="(x: object scalaz.http.response.HTTPVersionNotSupported)Some[object scalaz.http.response.HTTPVersionNotSupported]">Some</span>(<a href="#872951" title="object scalaz.http.response.HTTPVersionNotSupported">HTTPVersionNotSupported</a>)
+    <span title="Option[scalaz.http.response.ExtensionCode]" class="keyword">case</span> _ =&gt; (<a href="#812692" title="(x$1: Int)Boolean" id="5134">n</a> <span title="(x$1: Boolean)Boolean">&gt;=</span> <span title="Int(0)" class="int">0</span> <a href="../../BooleanW.scala.html#33943" title="implicit scalaz.Booleans.BooleanTo : (b: Boolean)scalaz.BooleanW">&amp;&amp;</a> <a href="#812692" title="(x$1: Int)Boolean" id="5130">n</a> &lt;= <span title="Int(999)" class="int">999</span>).<a href="../../BooleanW.scala.html#57356" title="(a: =&gt; scalaz.http.response.ExtensionCode)Option[scalaz.http.response.ExtensionCode]">option</a>(<a href="#874128" title="(a: scalaz.Digit,b: scalaz.Digit,c: scalaz.Digit)scalaz.http.response.ExtensionCode">ExtensionCode</a>(<a href="#812692" title="(x$1: Int)Int">n</a> <a href="../../Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">/</a> <span title="Int(100)" class="int">100</span>, <a href="#812692" title="(x$1: Int)Int">n</a> <span title="(x$1: Int)Int">%</span> <span title="Int(100)" class="int">100</span> <a href="../../Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">/</a> <span title="Int(10)" class="int">10</span>, <a href="#812692" title="(x$1: Int)Int">n</a> <a href="../../Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">%</a> <span title="Int(10)" class="int">10</span>))
+  }
+}
+
+        </pre>
+    </body>
+</html>

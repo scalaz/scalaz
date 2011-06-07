@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/concurrent/Actor.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">import</span> java.util.concurrent.atomic.AtomicBoolean
+<span class="keyword">import</span> java.util.concurrent.ConcurrentLinkedQueue
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+                  
+<span class="keyword">sealed</span> case <span class="keyword">class</span> <a title="class Actor[A] extends java.lang.Object with ScalaObject with Product" id="393810">Actor</a>[<a title="&gt;: Nothing &lt;: Any" id="393434">A</a>]<span title="ScalaObject">(</span><span class="keyword">val</span> <a title="(A) =&gt; Unit" id="393773">e</a>: A =&gt; Unit, <span class="keyword">val</span> <a title="(Throwable) =&gt; Unit" id="393774">onError</a>: Throwable =&gt; Unit = <span title="Nothing" class="keyword">throw</span>(<a href="#393442" title="Throwable">_</a>))(<span class="keyword">implicit</span> <span class="keyword">val</span> <a title="[A](e: (A) =&gt; Unit,onError: (Throwable) =&gt; Unit)scalaz.concurrent.Strategy" id="393775">strategy</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>) { 
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="java.util.concurrent.atomic.AtomicBoolean" id="56199">suspended</a> = <span title="java.util.concurrent.atomic.AtomicBoolean" class="keyword">new</span> <a title="java.util.concurrent.atomic.AtomicBoolean" id="113735">AtomicBoolean</a>(<span title="Boolean(true)" class="keyword">true</span>)
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[A]" id="56201">mbox</a> = <span title="java.util.concurrent.ConcurrentLinkedQueue[A]" class="keyword">new</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[A]" id="38769">ConcurrentLinkedQueue</a>[A]
+
+  <span class="keyword">private</span> <span class="keyword">def</span> <a title="=&gt; () =&gt; Unit" id="56203">work</a> = {
+    <span class="keyword">val</span> <a title="Boolean" id="113847">mt</a> = <a href="#56201" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[A]">mbox</a>.<a title="()Boolean" id="39769">isEmpty</a>
+    <span title="() =&gt; Unit" class="keyword">if</span> (<a href="#113847" title="Boolean">mt</a>) () =&gt; <span title="Unit">(</span>)
+    <span class="keyword">else</span> <span title="() =&gt; Unit" class="keyword">if</span> (<a href="#56199" title="=&gt; java.util.concurrent.atomic.AtomicBoolean">suspended</a>.<a title="(x$1: Boolean,x$2: Boolean)Boolean" id="113854">compareAndSet</a>(<a title="=&gt; Boolean" id="4328">!</a><a href="#113847" title="Boolean">mt</a>, <span title="Boolean(false)" class="keyword">false</span>)) <a href="Effect.scala.html#56185" title="(a: Unit)() =&gt; Unit">act</a> ! (<span title="Unit">(</span>))
+    <span class="keyword">else</span> () =&gt; <span title="Unit">(</span>)
+  }
+
+  <span class="keyword">val</span> <a title="scalaz.concurrent.Effect[A]" id="56204">toEffect</a>: <a href="Effect.scala.html#22087" title="scalaz.concurrent.Effect[A]">Effect</a>[A] = <a href="Effect.scala.html#33992" title="[A](c: (A) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[A]">effect</a><span title="(c: (A) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[A]">[</span><a href="#393434" title="A">A</a>]<a href="#393775" title="=&gt; scalaz.concurrent.Strategy">(</a>(<a title="A" id="393446">a</a><a href="#393434" title="A">)</a> =&gt; <a href="#56206" title="(a: A)() =&gt; Unit" class="keyword">this</a> <span title="Unit">!</span> <a href="#393446" title="A">a</a>)
+
+  <span class="keyword">def</span> <a title="(a: A)() =&gt; Unit" id="56206">!</a>(<a title="A" id="113673">a</a>: <a href="#393434" title="A">A</a>) = <span title="() =&gt; Unit" class="keyword">if</span> (<a href="#56201" title="(x$1: A)Boolean" id="39763">mbox</a> offer <a href="#113673" title="A">a</a>) <a href="#56203" title="=&gt; () =&gt; Unit">work</a> <span class="keyword">else</span> <a href="Effect.scala.html#56185" title="(a: A)() =&gt; Unit">toEffect</a> ! <a href="#113673" title="A">a</a>
+
+  <span class="keyword">def</span> <a title="(a: A)() =&gt; Unit" id="56207">apply</a>(<a title="A" id="393452">a</a>: <a href="#393434" title="A">A</a>) = <a href="#56206" title="(a: A)() =&gt; Unit" class="keyword">this</a> ! <a href="#393452" title="A">a</a>
+  
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Effect[Unit]" id="56208">act</a>: <a href="Effect.scala.html#22087" title="scalaz.concurrent.Effect[Unit]">Effect</a>[Unit] = <a href="Effect.scala.html#33992" title="(c: (Unit) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[Unit]">effect</a><a href="#393775" title="=&gt; scalaz.concurrent.Strategy">(</a>(u: <a title="Unit" id="3780">Unit</a>) =&gt; {
+    <span class="keyword">var</span> <a title="Boolean" id="393460">go</a> = <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">var</span> <a title="Int" id="393461">i</a> = <span title="Int(0)" class="int">0</span> 
+    <span title="Unit" class="keyword">while</span> (<a href="#393460" title="(x$1: Boolean)Boolean">go</a> &amp;&amp; <a href="#393461" title="(x$1: Int)Boolean" id="5128">i</a> &lt; <span title="Int(1000)" class="int">1000</span>) {
+      <span class="keyword">val</span> <a title="A" id="393469">m</a> = <a href="#56201" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[A]">mbox</a>.<a title="()A" id="39766">poll</a>
+      <span title="Unit" class="keyword">if</span> (<a href="#393469" title="(x$1: Any)Boolean">m</a> != <span title="Null(null)" class="keyword">null</span>) <span class="keyword">try</span> {
+        <a href="#393773" title="(v1: A)Unit">e</a>(<a href="#393469" title="A">m</a>)
+        <a href="#393461" title="Int">i</a> = <a href="#393461" title="(x$1: Int)Int" id="5136">i</a> + <span title="Int(1)" class="int">1</span>
+      } <span class="keyword">catch</span> { <span title="Unit" class="keyword">case</span> <a title="java.lang.Throwable" id="393663">e</a> =&gt; <a href="#393774" title="(v1: Throwable)Unit">onError</a>(<a href="#393663" title="java.lang.Throwable">e</a>) }
+      <span class="keyword">else</span> {
+        <a href="#56199" title="=&gt; java.util.concurrent.atomic.AtomicBoolean">suspended</a>.<a title="(x$1: Boolean)Unit" id="113860">set</a>(<span title="Boolean(true)" class="keyword">true</span>)
+        <a href="#56203" title="=&gt; () =&gt; Unit">work</a>
+        <a href="#393460" title="Boolean">go</a> = <span title="Boolean(false)" class="keyword">false</span>
+      }
+    }
+    <span title="Unit" class="keyword">if</span> (<a href="#56201" title="=&gt; java.util.concurrent.ConcurrentLinkedQueue[A]">mbox</a>.<a title="(x$1: Any)Boolean" id="39767">peek</a> != <span title="Null(null)" class="keyword">null</span>) <a href="Effect.scala.html#56185" title="(a: Unit)() =&gt; Unit">act</a> <span title="Unit">!</span> <a href="#393459" title="Unit">u</a> <span class="keyword">else</span> <span title="Unit">(</span>)
+  })
+}
+
+<span class="keyword">trait</span> <a title="trait Actors extends java.lang.Object with ScalaObject" id="22075">Actors</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](e: (A) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[A]" id="33900">actor</a>[<a title="&gt;: Nothing &lt;: Any" id="33902">A</a>](<a title="(A) =&gt; Unit" id="113660">e</a>: A =&gt; Unit, <a title="[A](Throwable) =&gt; Unit" id="113661">err</a>: Throwable =&gt; Unit = <span title="Nothing" class="keyword">throw</span>(<a href="#393793" title="Throwable">_</a>))(<span class="keyword">implicit</span> <a title="scalaz.concurrent.Strategy" id="113662">s</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>): <a href="#393810" title="scalaz.concurrent.Actor[A]">Actor</a>[A] = <a href="#393810" title="[A](e: (A) =&gt; Unit,onError: (Throwable) =&gt; Unit)(implicit strategy: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[A]">Actor</a><span title="(e: (A) =&gt; Unit,onError: (Throwable) =&gt; Unit)(implicit strategy: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[A]">[</span><a href="#33902" title="A">A</a>]<a href="#113662" title="scalaz.concurrent.Strategy">(</a><a href="#113660" title="(A) =&gt; Unit">e</a>,<a href="#113661" title="(Throwable) =&gt; Unit">err</a>)
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](a: scalaz.concurrent.Actor[A])(A) =&gt; Unit" id="33903">ActorFrom</a>[<a title="&gt;: Nothing &lt;: Any" id="33905">A</a>](<a title="scalaz.concurrent.Actor[A]" id="56993">a</a>: <a href="#393810" title="scalaz.concurrent.Actor[A]">Actor</a>[A]): A =&gt; Unit = <a href="#56206" title="(a: A)() =&gt; Unit">a</a> <span title="Unit">!</span> <a href="#393787" title="A">_</a> 
+}
+
+        </pre>
+    </body>
+</html>

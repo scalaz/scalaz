@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Radians.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Radians[A] extends java.lang.Object with ScalaObject" id="26211">Radians</a>[<a title="&gt;: Nothing &lt;: Any" id="26290">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="Geo.scala.html#26053" title="object scalaz.geo.Geo">Geo</a>._
+  
+  <span class="keyword">val</span> <a title="=&gt; (A) =&gt; Double" id="823259">toRadians</a>: A =&gt; Double
+  <span class="keyword">val</span> <a title="=&gt; (Double) =&gt; A" id="823260">fromRadians</a>: Double =&gt; A
+
+  <span class="keyword">def</span> <a title="[B](f: (B) =&gt; A,g: (A) =&gt; B)java.lang.Object with scalaz.geo.Radians[B]" id="823261">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="823263">B</a>](<a title="(B) =&gt; A" id="832171">f</a>: B =&gt; A, <a title="(A) =&gt; B" id="832172">g</a>: A =&gt; B) = <a href="#832175" title="java.lang.Object with scalaz.geo.Radians[B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Radians[B]" id="832175">Radians</a>[B] {
+    <span class="keyword">val</span> <a title="(B) =&gt; Double" id="832177">toRadians</a> = <a href="#832171" title="(g: (A) =&gt; Double)(B) =&gt; Double">f</a> andThen <a href="#26211" title="Radians.this.type">Radians</a>.<span class="keyword">this</span>.<a href="#823259" title="=&gt; (A) =&gt; Double">toRadians</a>
+    <span class="keyword">val</span> <a title="(Double) =&gt; B" id="832179">fromRadians</a> = <a href="#26211" title="Radians.this.type">Radians</a>.<span class="keyword">this</span>.<a href="#823260" title="(g: (A) =&gt; B)(Double) =&gt; B">fromRadians</a> andThen <a href="#832172" title="(A) =&gt; B">g</a>
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Radians" id="26212">Radians</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+  <span class="keyword">import</span> <a href="Geo.scala.html#26053" title="object scalaz.geo.Geo">Geo</a>._  
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[Double]" id="823267">DoubleRadians</a>: <a href="#26211" title="scalaz.geo.Radians[Double]">Radians</a>[Double] = <a href="#807766" title="(to: (Double) =&gt; Double,from: (Double) =&gt; Double)java.lang.Object with scalaz.geo.Radians[Double]">radians</a>(<a href="#832239" title="(x$1: Double)Double" id="5756">_</a> <a title="(x$1: Int)Double" id="5692">*</a> <a href="../Scalaz.scala.html#33912" title="=&gt; Double">π</a> / <span title="Int(180)" class="int">180</span>, <a href="#832251" title="(x$1: Int)Double" id="5690">_</a> <a title="(x$1: Double)Double" id="5758">*</a> <span title="Int(180)" class="int">180</span> / <a href="../Scalaz.scala.html#33912" title="=&gt; Double">π</a>)
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Latitude]" id="823269">LatitudeRadians</a>: <a href="#26211" title="scalaz.geo.Radians[scalaz.geo.Latitude]">Radians</a>[Latitude] = <a href="#823261" title="(f: (java.lang.Object with scalaz.geo.Latitude) =&gt; Double,g: (Double) =&gt; java.lang.Object with scalaz.geo.Latitude)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Latitude]">DoubleRadians</a> xmap (<a href="#832275" title="scalaz.geo.Latitude">_</a>.<a href="Latitude.scala.html#807816" title="=&gt; Double">value</a>, <a href="Latitude.scala.html#807754" title="(d: Double)java.lang.Object with scalaz.geo.Latitude">latitude</a>(<a href="#832277" title="Double">_</a>))
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Longitude]" id="823271">LongitudeRadians</a>: <a href="#26211" title="scalaz.geo.Radians[scalaz.geo.Longitude]">Radians</a>[Longitude] = <a href="#823261" title="(f: (java.lang.Object with scalaz.geo.Longitude) =&gt; Double,g: (Double) =&gt; java.lang.Object with scalaz.geo.Longitude)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Longitude]">DoubleRadians</a> xmap (<a href="#832290" title="scalaz.geo.Longitude">_</a>.<a href="Longitude.scala.html#807873" title="=&gt; Double">value</a>, <a href="Longitude.scala.html#807762" title="(d: Double)java.lang.Object with scalaz.geo.Longitude">longitude</a>(<a href="#832292" title="Double">_</a>))
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Bearing]" id="823273">BearingRadians</a>: <a href="#26211" title="scalaz.geo.Radians[scalaz.geo.Bearing]">Radians</a>[Bearing] = <a href="#823261" title="(f: (java.lang.Object with scalaz.geo.Bearing) =&gt; Double,g: (Double) =&gt; java.lang.Object with scalaz.geo.Bearing)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Bearing]">DoubleRadians</a> xmap (<a href="#832305" title="scalaz.geo.Bearing">_</a>.<a href="Bearing.scala.html#808009" title="=&gt; Double">value</a>, <a href="Bearing.scala.html#807708" title="(d: Double)java.lang.Object with scalaz.geo.Bearing">bearing</a>(<a href="#832307" title="Double">_</a>))
+}
+
+<span class="keyword">trait</span> <a title="trait Radianss extends java.lang.Object with ScalaObject" id="26217">Radianss</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](to: (A) =&gt; Double,from: (Double) =&gt; A)java.lang.Object with scalaz.geo.Radians[A]" id="807766">radians</a>[<a title="&gt;: Nothing &lt;: Any" id="807768">A</a>](<a title="(A) =&gt; Double" id="832208">to</a>: A =&gt; Double, <a title="(Double) =&gt; A" id="832209">from</a>: Double =&gt; A) = <a href="#832212" title="java.lang.Object with scalaz.geo.Radians[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Radians[A]" id="832212">Radians</a>[A] {
+    <span class="keyword">val</span> <a title="(A) =&gt; Double" id="832214">toRadians</a> = <a href="#832208" title="(A) =&gt; Double">to</a>
+    <span class="keyword">val</span> <a title="(Double) =&gt; A" id="832216">fromRadians</a> = <a href="#832209" title="(Double) =&gt; A">from</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

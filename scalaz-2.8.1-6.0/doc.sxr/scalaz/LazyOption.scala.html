@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/LazyOption.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LazyOption[+A] extends java.lang.Object with ScalaObject" id="16139">LazyOption</a>[+<a title="&gt;: Nothing &lt;: Any" id="21715">A</a>] <span title="ScalaObject">{</span>
+  self =&gt;
+  <span class="keyword">def</span> <a title="[B](ifSome: (=&gt; A) =&gt; B,ifNone: =&gt; B)B" id="42347">fold</a>[<a title="&gt;: Nothing &lt;: Any" id="42349">B</a>](<a title="[B](=&gt; A) =&gt; A" id="130947">ifSome</a>: ((=&gt; A) =&gt; B) = (<a title="=&gt; A" id="229060">a</a> =&gt; <a href="#229060" title="=&gt; A">a</a>): ((=&gt; A) =&gt; A), <a title="[B]scalaz.LazyOption[B]" id="130948">ifNone</a>: =&gt; B = <a href="#16140" title="object scalaz.LazyOption">LazyOption</a>.<a href="#51968" title="[A]scalaz.LazyOption[A]">none</a><span title="scalaz.LazyOption[B]">[</span><a href="#42349" title="B">B</a>]): <a href="#42349" title="B">B</a>
+
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="42350">isDefined</a>: <span title="Boolean">Boolean</span>
+
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="42351">isEmpty</a>: <span title="Boolean">Boolean</span> = <a title="=&gt; Boolean" id="4328">!</a><a href="#42350" title="=&gt; Boolean">isDefined</a>
+
+  <span class="keyword">def</span> <a title="[B &gt;: A](default: =&gt; B)B" id="42352">orSome</a>[<a title="&gt;: A &lt;: Any" id="42354">B</a> &gt;: A](<a title="=&gt; B" id="229065">default</a>: =&gt; B): <a href="#42354" title="B">B</a> = <a href="#16139" title="LazyOption.this.type">fold</a><a href="#130947" title="(=&gt; A) =&gt; A" id="229077">[</a><a href="#42354" title="B">B</a>](ifNone = <a href="#229065" title="() =&gt; B" id="41122">default</a>)
+
+  /** An alias for `orSome` */
+  <span class="keyword">def</span> <a title="[B &gt;: A](default: =&gt; B)B" id="42355">getOrElse</a>[<a title="&gt;: A &lt;: Any" id="42357">B</a> &gt;: A](<a title="=&gt; B" id="229081">default</a>: =&gt; B): <a href="#42357" title="B">B</a> = <a href="#42352" title="(default: =&gt; B)B">orSome</a>(<a href="#229081" title="=&gt; B">default</a>)
+
+  <span class="keyword">def</span> <a title="=&gt; A" id="42358">get</a>: <a href="#21715" title="A">A</a> = <a href="#42355" title="(default: =&gt; A)A">getOrElse</a>(<span title="Nothing" class="keyword">throw</span> <span title="java.util.NoSuchElementException" class="keyword">new</span> <a title="java.util.NoSuchElementException" id="1675">NoSuchElementException</a>())
+
+  <span class="keyword">def</span> <a title="[A1 &gt;: A](implicit ev: &lt;:&lt;[Null,A1])A1" id="42359">orNull</a>[<a title="&gt;: A &lt;: Any" id="42361">A1</a> &gt;: A](<span class="keyword">implicit</span> <a title="&lt;:&lt;[Null,A1]" id="229148">ev</a>: Null <a title="&lt;:&lt;[Null,A1]" id="9116">&lt;:&lt;</a> A1): <a href="#42361" title="A1">A1</a> = <a href="#42355" title="(default: =&gt; A1)A1" class="keyword">this</a> getOrElse <a href="#229148" title="(v1: Null)A1" class="keyword">null</a>
+
+  <span class="keyword">def</span> <a title="[B](f: (=&gt; A) =&gt; B)scalaz.LazyOption[B]" id="42362">map</a>[<a title="&gt;: Nothing &lt;: Any" id="42364">B</a>](<a title="(=&gt; A) =&gt; B" id="187529">f</a>: (=&gt; A) =&gt; B): <a href="#16139" title="scalaz.LazyOption[B]">LazyOption</a>[B] = <a href="#42347" title="(ifSome: (=&gt; A) =&gt; scalaz.LazyOption[B],ifNone: =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]">fold</a>(<a title="=&gt; A" id="229283">a</a> =&gt; <a href="#16140" title="object scalaz.LazyOption">LazyOption</a>.<a href="#51962" title="(a: =&gt; B)scalaz.LazyOption[B]">some</a>(<a href="#187529" title="(v1: =&gt; A)B">f</a>(<a href="#229283" title="=&gt; A">a</a>)))
+
+  <span class="keyword">def</span> <a title="[B](f: (=&gt; A) =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]" id="42365">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="42367">B</a>](<a title="(=&gt; A) =&gt; scalaz.LazyOption[B]" id="96827">f</a>: (=&gt; A) =&gt; LazyOption[B]): <a href="#16139" title="scalaz.LazyOption[B]">LazyOption</a>[B] = <a href="#42347" title="(ifSome: (=&gt; A) =&gt; scalaz.LazyOption[B],ifNone: =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]">fold</a>(<a href="#96827" title="(=&gt; A) =&gt; scalaz.LazyOption[B]">f</a>)
+
+  <span class="keyword">def</span> <a title="(f: (=&gt; A) =&gt; Boolean)scalaz.LazyOption[A]" id="42368">filter</a>(<a title="(=&gt; A) =&gt; Boolean" id="229304">f</a>: ((=&gt; A) =&gt; Boolean)): <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] = <a href="#229306" title="java.lang.Object with scalaz.LazyOption[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LazyOption[A]" id="229306">LazyOption</a>[A] {
+    <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="229311">isDefined</a> = <a href="#16139" title="LazyOption.this.type">self</a>.<a href="#42347" title="(ifSome: (=&gt; A) =&gt; Boolean,ifNone: =&gt; Boolean)Boolean">fold</a>(<a href="#229304" title="(=&gt; A) =&gt; Boolean">f</a>, <span title="Boolean(false)" class="keyword">false</span>)
+    <span class="keyword">def</span> <a title="[B](ifSome: (=&gt; A) =&gt; B,ifNone: =&gt; B)B" id="229312">fold</a>[<a title="&gt;: Nothing &lt;: Any" id="229314">B</a>](<a title="(=&gt; A) =&gt; B" id="229321">ifSome</a>: (=&gt; A) =&gt; B, <a title="=&gt; B" id="229322">ifNone</a>: =&gt; B) = <span title="B" class="keyword">if</span> (<a href="#229310" title="=&gt; Boolean">isDefined</a>) <a href="#16139" title="LazyOption.this.type">self</a>.<a href="#42347" title="(ifSome: (=&gt; A) =&gt; B,ifNone: =&gt; B)B">fold</a>(<a href="#229321" title="(=&gt; A) =&gt; B">ifSome</a>, <a href="#229322" title="=&gt; B">ifNone</a>) <span class="keyword">else</span> <a href="#229322" title="=&gt; B">ifNone</a>
+  }
+
+  <span class="keyword">def</span> <a title="[U](f: (=&gt; A) =&gt; U)Unit" id="42369">foreach</a>[<a title="&gt;: Nothing &lt;: Any" id="42371">U</a>](<a title="(=&gt; A) =&gt; U" id="116051">f</a>: (=&gt; A) =&gt; U) {
+    <a href="#42347" title="(ifSome: (=&gt; A) =&gt; Any,ifNone: =&gt; Any)Any">fold</a><span title="Unit">(</span><a href="#116051" title="(=&gt; A) =&gt; U">f</a>)
+  }
+
+  <span class="keyword">def</span> <a title="(p: (=&gt; A) =&gt; Boolean)LazyOption.this.WithFilter" id="42372">withFilter</a>(<a title="(=&gt; A) =&gt; Boolean" id="229429">p</a>: (=&gt; A) =&gt; Boolean): <a href="#42394" title="LazyOption.this.WithFilter">WithFilter</a> = <span title="LazyOption.this.WithFilter" class="keyword">new</span> <a href="#42394" title="LazyOption.this.WithFilter">WithFilter</a>(<a href="#229429" title="(=&gt; A) =&gt; Boolean">p</a>)
+
+  <span class="keyword">def</span> <a title="(p: (=&gt; A) =&gt; Boolean)Boolean" id="42373">exists</a>(<a title="(=&gt; A) =&gt; Boolean" id="229446">p</a>: (=&gt; A) =&gt; Boolean): <span title="Boolean">Boolean</span> = <a href="#42347" title="(ifSome: (=&gt; A) =&gt; Boolean,ifNone: =&gt; Boolean)Boolean">fold</a>(<a href="#229446" title="(=&gt; A) =&gt; Boolean">p</a>, <span title="Boolean(false)" class="keyword">false</span>)
+
+  <span class="keyword">def</span> <a title="(p: (=&gt; A) =&gt; Boolean)Boolean" id="42374">forall</a>(<a title="(=&gt; A) =&gt; Boolean" id="229454">p</a>: (=&gt; A) =&gt; Boolean): <span title="Boolean">Boolean</span> = <a href="#42347" title="(ifSome: (=&gt; A) =&gt; Boolean,ifNone: =&gt; Boolean)Boolean">fold</a>(<a href="#229454" title="(=&gt; A) =&gt; Boolean">p</a>, <span title="Boolean(true)" class="keyword">true</span>)
+
+  <span class="keyword">def</span> <a title="[B &gt;: A](alternative: =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]" id="42375">orElse</a>[<a title="&gt;: A &lt;: Any" id="42377">B</a> &gt;: A](<a title="=&gt; scalaz.LazyOption[B]" id="229462">alternative</a>: =&gt; LazyOption[B]): <a href="#16139" title="scalaz.LazyOption[B]">LazyOption</a>[B] =
+    <span title="scalaz.LazyOption[B]" class="keyword">if</span> (<a href="#42351" title="=&gt; Boolean">isEmpty</a>) <a href="#229462" title="=&gt; scalaz.LazyOption[B]">alternative</a> <span class="keyword">else</span> <a href="#16139" title="scalaz.LazyOption[A]" class="keyword">this</a>
+
+  /** Forces evaluation of the contents of this `LazyOption` */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.LazyOption[A]" id="42378">force</a>: <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] = <a href="#16139" title="scalaz.LazyOption[A]" class="keyword">this</a>
+
+  <span class="keyword">def</span> <a title="[AA &gt;: A]Option[A]" id="42379">toOption</a>[<a title="&gt;: A &lt;: Any" id="42381">AA</a> &gt;: A]: <a title="Option[A]" id="1263">Option</a>[A] = <a href="#42347" title="(ifSome: (=&gt; A) =&gt; Option[A],ifNone: =&gt; Option[A])Option[A]">fold</a>(<a title="(x: A)Some[A]" id="1006">Some</a>(<a href="#229473" title="=&gt; A">_</a>), <a title="object None" id="1843">None</a>)
+
+  <span class="keyword">def</span> <a title="[X](left: =&gt; X)Product with Either[X,A]" id="42382">toRight</a>[<a title="&gt;: Nothing &lt;: Any" id="42384">X</a>](<a title="=&gt; X" id="229492">left</a>: =&gt; X) = <span title="&lt;refinement&gt; extends Product with Either[X,A]" class="keyword">if</span> (<a href="#42351" title="=&gt; Boolean">isEmpty</a>) <span title="(a: X)Left[X,Nothing]">Left</span>(<a href="#229492" title="=&gt; X">left</a>) <span class="keyword">else</span> <span title="(b: A)Right[Nothing,A]">Right</span>(<a href="#42358" title="=&gt; A">get</a>)
+
+  <span class="keyword">def</span> <a title="[X](right: =&gt; X)Product with Either[A,X]" id="42385">toLeft</a>[<a title="&gt;: Nothing &lt;: Any" id="42387">X</a>](<a title="=&gt; X" id="229519">right</a>: =&gt; X) = <span title="&lt;refinement&gt; extends Product with Either[A,X]" class="keyword">if</span> (<a href="#42351" title="=&gt; Boolean">isEmpty</a>) <span title="(b: X)Right[Nothing,X]">Right</span>(<a href="#229519" title="=&gt; X">right</a>) <span class="keyword">else</span> <span title="(a: A)Left[A,Nothing]">Left</span>(<a href="#42358" title="=&gt; A">get</a>)
+
+  <span class="keyword">def</span> <a title="[AA &gt;: A]scalaz.FirstLazyOption[AA]" id="42388">fst</a>[<a title="&gt;: A &lt;: Any" id="42390">AA</a> &gt;: A]: <a href="FirstLazyOption.scala.html#13982" title="scalaz.FirstLazyOption[AA]">FirstLazyOption</a>[AA] = <a href="FirstLazyOption.scala.html#34052" title="(a: scalaz.LazyOption[AA])scalaz.FirstLazyOption[AA]" class="keyword">this</a>
+
+  <span class="keyword">def</span> <a title="[AA &gt;: A]scalaz.LastLazyOption[AA]" id="42391">lst</a>[<a title="&gt;: A &lt;: Any" id="42393">AA</a> &gt;: A]: <a href="LastLazyOption.scala.html#16049" title="scalaz.LastLazyOption[AA]">LastLazyOption</a>[AA] = <a href="LastLazyOption.scala.html#34143" title="(a: scalaz.LazyOption[AA])scalaz.LastLazyOption[AA]" class="keyword">this</a>
+
+  <span class="keyword">class</span> <a title="class WithFilter extends java.lang.Object with ScalaObject" id="42394">WithFilter</a><span title="ScalaObject">(</span><a title="(=&gt; A) =&gt; Boolean" id="229444">p</a>: (=&gt; A) =&gt; Boolean) {
+    <span class="keyword">def</span> <a title="[B](f: (=&gt; A) =&gt; B)scalaz.LazyOption[B]" id="229434">map</a>[<a title="&gt;: Nothing &lt;: Any" id="229436">B</a>](<a title="(=&gt; A) =&gt; B" id="229609">f</a>: (=&gt; A) =&gt; B): <a href="#16139" title="scalaz.LazyOption[B]">LazyOption</a>[B] = <a href="#42368" title="(f: (=&gt; A) =&gt; Boolean)scalaz.LazyOption[A]">self</a> <a href="#42362" title="(f: (=&gt; A) =&gt; B)scalaz.LazyOption[B]">filter</a> <a href="#229444" title="(=&gt; A) =&gt; Boolean">p</a> map <a href="#229609" title="(=&gt; A) =&gt; B">f</a>
+
+    <span class="keyword">def</span> <a title="[B](f: (=&gt; A) =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]" id="229437">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="229439">B</a>](<a title="(=&gt; A) =&gt; scalaz.LazyOption[B]" id="229617">f</a>: (=&gt; A) =&gt; LazyOption[B]): <a href="#16139" title="scalaz.LazyOption[B]">LazyOption</a>[B] = <a href="#42368" title="(f: (=&gt; A) =&gt; Boolean)scalaz.LazyOption[A]">self</a> <a href="#42365" title="(f: (=&gt; A) =&gt; scalaz.LazyOption[B])scalaz.LazyOption[B]">filter</a> <a href="#229444" title="(=&gt; A) =&gt; Boolean">p</a> flatMap <a href="#229617" title="(=&gt; A) =&gt; scalaz.LazyOption[B]">f</a>
+
+    <span class="keyword">def</span> <a title="[U](f: (=&gt; A) =&gt; U)Unit" id="229440">foreach</a>[<a title="&gt;: Nothing &lt;: Any" id="229442">U</a>](<a title="(=&gt; A) =&gt; U" id="229625">f</a>: (=&gt; A) =&gt; U) {
+      <a href="#42368" title="(f: (=&gt; A) =&gt; Boolean)scalaz.LazyOption[A]">self</a> <a href="#42369" title="(f: (=&gt; A) =&gt; U)Unit">filter</a> <a href="#229444" title="(=&gt; A) =&gt; Boolean">p</a> foreach <a href="#229625" title="(=&gt; A) =&gt; U">f</a>
+    }
+
+    <span class="keyword">def</span> <a title="(q: (=&gt; A) =&gt; Boolean)LazyOption.this.WithFilter" id="229443">withFilter</a>(<a title="(=&gt; A) =&gt; Boolean" id="229633">q</a>: (=&gt; A) =&gt; Boolean): <a href="#42394" title="LazyOption.this.WithFilter">WithFilter</a> = <span title="LazyOption.this.WithFilter" class="keyword">new</span> <a href="#42394" title="LazyOption.this.WithFilter">WithFilter</a>(<a title="=&gt; A" id="229636">x</a> =&gt; <a href="#229444" title="(v1: =&gt; A)Boolean">p</a><a title="(x$1: Boolean)Boolean" id="4335">(</a><a href="#229636" title="=&gt; A">x</a>) &amp;&amp; <a href="#229633" title="(v1: =&gt; A)Boolean">q</a>(<a href="#229636" title="=&gt; A">x</a>))
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.LazyOption" id="16140">LazyOption</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](a: =&gt; A)scalaz.LazyOption[A]" id="51962">some</a>[<a title="&gt;: Nothing &lt;: Any" id="51964">A</a>](<a title="=&gt; A" id="229284">a</a>: =&gt; A): <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] = <span title="scalaz.LazyOption.Some[A]" class="keyword">new</span> <a href="#51971" title="scalaz.LazyOption.Some[A]">Some</a>(<a href="#229284" title="=&gt; A">a</a>)
+  <span class="keyword">def</span> <a title="[A](a: A)scalaz.LazyOption[A]" id="51965">strictSome</a>[<a title="&gt;: Nothing &lt;: Any" id="51967">A</a>](<a title="A" id="229660">a</a>: <a href="#51967" title="A">A</a>): <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] = <span title="scalaz.LazyOption.StrictSome[A]" class="keyword">new</span> <a href="#51973" title="scalaz.LazyOption.StrictSome[A]">StrictSome</a>(<a href="#229660" title="A">a</a>)
+
+  <span class="keyword">def</span> <a title="[A]scalaz.LazyOption[A]" id="51968">none</a>[<a title="&gt;: Nothing &lt;: Any" id="51970">A</a>]: <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] = <a href="#51975" title="object scalaz.LazyOption.None">None</a>
+
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class Some[+A] extends java.lang.Object with scalaz.LazyOption[A] with ScalaObject" id="51971">Some</a>[+<a title="&gt;: Nothing &lt;: Any" id="51972">A</a>]<span title="ScalaObject">(</span><a title="=&gt; A" id="229656">a</a>: =&gt; A) <span class="keyword">extends</span> <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] {
+    <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="A" id="229649">aa</a> = <a href="#229656" title="=&gt; A">a</a>
+
+    <span class="keyword">def</span> <a title="[B](ifSome: (=&gt; A) =&gt; B,ifNone: =&gt; B)B" id="229650">fold</a>[<a title="&gt;: Nothing &lt;: Any" id="229652">B</a>](<a title="(=&gt; A) =&gt; B" id="229683">ifSome</a>: ((=&gt; A) =&gt; B), <a title="=&gt; B" id="229684">ifNone</a>: =&gt; B): <a href="#229652" title="B">B</a> = <a href="#229683" title="(v1: =&gt; A)B">ifSome</a>(<a href="#229648" title="=&gt; A">aa</a>)
+
+    <span class="keyword">def</span> <a title="=&gt; Boolean" id="229653">isDefined</a> = <span title="Boolean(true)" class="keyword">true</span>
+
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="=&gt; scalaz.LazyOption.StrictSome[A]" id="229654">force</a> = <span title="scalaz.LazyOption.StrictSome[A]" class="keyword">new</span> <a href="#51973" title="scalaz.LazyOption.StrictSome[A]">StrictSome</a>(<a href="#229656" title="=&gt; A">a</a>)
+  }
+
+  <span class="keyword">private</span> <span class="keyword">class</span> <a title="class StrictSome[+A] extends java.lang.Object with scalaz.LazyOption[A] with ScalaObject" id="51973">StrictSome</a>[+<a title="&gt;: Nothing &lt;: Any" id="51974">A</a>]<span title="ScalaObject">(</span><a title="A" id="229671">a</a>: <a href="#51974" title="A">A</a>) <span class="keyword">extends</span> <a href="#16139" title="scalaz.LazyOption[A]">LazyOption</a>[A] {
+    <span class="keyword">def</span> <a title="[B](ifSome: (=&gt; A) =&gt; B,ifNone: =&gt; B)B" id="229666">fold</a>[<a title="&gt;: Nothing &lt;: Any" id="229668">B</a>](<a title="(=&gt; A) =&gt; B" id="229709">ifSome</a>: ((=&gt; A) =&gt; B), <a title="=&gt; B" id="229710">ifNone</a>: =&gt; B): <a href="#229668" title="B">B</a> = <a href="#229709" title="(v1: =&gt; A)B">ifSome</a>(<a href="#229671" title="A">a</a>)
+
+    <span class="keyword">def</span> <a title="=&gt; Boolean" id="229669">isDefined</a> = <span title="Boolean(true)" class="keyword">true</span>
+  }
+
+  <span class="keyword">private</span> <span class="keyword">object</span> <a title="object scalaz.LazyOption.None" id="51975">None</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#16139" title="scalaz.LazyOption[Nothing]">LazyOption</a>[Nothing] {
+    <span class="keyword">def</span> <a title="[B](ifSome: (=&gt; Nothing) =&gt; B,ifNone: =&gt; B)B" id="229676">fold</a>[<a title="&gt;: Nothing &lt;: Any" id="229678">B</a>](<a title="(=&gt; Nothing) =&gt; B" id="229727">ifSome</a>: ((=&gt; Nothing) =&gt; B), <a title="=&gt; B" id="229728">ifNone</a>: =&gt; B): <a href="#229678" title="B">B</a> = <a href="#229728" title="=&gt; B">ifNone</a>
+
+    <span class="keyword">def</span> <a title="=&gt; Boolean" id="229679">isDefined</a> = <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+}
+
+
+        </pre>
+    </body>
+</html>

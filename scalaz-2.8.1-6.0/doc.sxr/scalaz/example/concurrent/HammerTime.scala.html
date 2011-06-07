@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/concurrent/HammerTime.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example.concurrent
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> Scalaz._
+
+<span class="keyword">import</span> concurrent._
+<span class="keyword">import</span> java.util.concurrent.<span title="object java.util.concurrent.Executors">Executors</span>._
+<span class="keyword">import</span> java.util.concurrent.ExecutorService
+
+<span class="keyword">object</span> <a title="object scalaz.example.concurrent.HammerTime" id="25077">HammerTime</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408608">main</a>(<a title="Array[String]" id="806786">args</a>: <a title="Array[String]" id="2028">Array</a>[String]): <span title="Unit">Unit</span> = <a href="#408609" title="=&gt; Unit">run</a>
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408609">run</a> {
+    <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="java.util.concurrent.ExecutorService" id="806788">pool</a> = <a title="()java.util.concurrent.ExecutorService" id="398633">newCachedThreadPool</a>
+    <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy" id="806789">strategy</a> = <a href="../../concurrent/Strategy.scala.html#22184" title="object scalaz.concurrent.Strategy">Strategy</a>.<a href="../../concurrent/Strategy.scala.html#90061" title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy">Executor</a>
+
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[Unit]" id="806790">done</a> = <a href="../../concurrent/Actor.scala.html#33900" title="(e: (Unit) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[Unit]">actor</a><a href="#806789" title="&lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy">(</a>(u: <span title="Unit">Unit</span>) =&gt; {
+      <a title="(x: Any)Unit" id="1489">println</a>(<span title="java.lang.String(&quot;TEST SUCCEEDED&quot;)" class="string">&quot;TEST SUCCEEDED&quot;</span>)
+      <a href="#806788" title="java.util.concurrent.ExecutorService">pool</a>.<span title="()Unit">shutdown</span>
+    })
+
+    <span class="keyword">val</span> <a title="(Throwable) =&gt; Unit" id="806791">fail</a> = (e: <a title="Throwable" id="2356">Throwable</a>) =&gt; {
+      <a href="#806819" title="Throwable">e</a>.<a title="()Unit" id="32466">printStackTrace</a>
+      <a href="#806788" title="java.util.concurrent.ExecutorService">pool</a>.<span title="()Unit">shutdown</span>
+    }
+
+    <span class="keyword">def</span> <a title="(other: =&gt; scalaz.concurrent.Actor[Int])scalaz.concurrent.Actor[Int]" id="806792">hammer</a>(<a title="=&gt; scalaz.concurrent.Actor[Int]" id="806944">other</a>: =&gt; Actor[Int]) = <a href="../../concurrent/Actor.scala.html#33900" title="(e: (Int) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[Int]">actor</a><a href="#806789" title="&lt;refinement&gt; extends java.lang.Object with scalaz.concurrent.Strategy">(</a>((i: <a title="Int" id="4364">Int</a>) =&gt;
+      <span title="Unit" class="keyword">if</span> (<a href="#806949" title="(x$1: Int)Boolean" id="5124">i</a> == <span title="Int(0)" class="int">0</span>) <a href="../../concurrent/Actor.scala.html#56206" title="(a: Unit)() =&gt; Unit">done</a> <span title="Unit">!</span> ()
+      <span class="keyword">else</span> <a href="../../concurrent/Actor.scala.html#56206" title="(a: Int)() =&gt; Unit">other</a> <span title="Unit">!</span> (<a href="#806949" title="(x$1: Int)Int" id="5138">i</a> - <span title="Int(1)" class="int">1</span>)
+    ), <a href="#806791" title="(Throwable) =&gt; Unit">fail</a>)
+
+    <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[Int]" id="806794">hammer1</a>: <a href="../../concurrent/Actor.scala.html#22063" title="scalaz.concurrent.Actor[Int]">Actor</a>[Int] = <a href="#806792" title="(other: =&gt; scalaz.concurrent.Actor[Int])scalaz.concurrent.Actor[Int]">hammer</a>(<a href="#806792" title="(other: =&gt; scalaz.concurrent.Actor[Int])scalaz.concurrent.Actor[Int]">hammer</a>(<a href="#806793" title="=&gt; scalaz.concurrent.Actor[Int]">hammer1</a>))
+    <a href="../../concurrent/Actor.scala.html#56206" title="(a: Int)() =&gt; Unit">hammer1</a> <span title="Unit">!</span> <span title="Int(1000000)" class="int">1000000</span>
+  }
+}
+
+        </pre>
+    </body>
+</html>

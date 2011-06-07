@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/LongW.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait LongW extends java.lang.Object with scalaz.PimpedType[Long] with ScalaObject" id="17261">LongW</a> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#18533" title="scalaz.PimpedType[Long]">PimpedType</a>[Long] {
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.LongMultiplication" id="84061">∏</a> : <a href="Multiplications.scala.html#17252" title="scalaz.LongMultiplication">LongMultiplication</a> = <a href="Multiplications.scala.html#34512" title="(n: Long)scalaz.LongMultiplication">multiplication</a>(<a href="PimpedType.scala.html#38133" title="=&gt; Long">value</a>)
+
+  <span class="keyword">def</span> <a title="=&gt; List[scalaz.Digit]" id="84062">digits</a>: <a title="List[scalaz.Digit]" id="29298">List</a>[Digit] =
+    <span title="List[scalaz.Digit]" class="keyword">if</span> (<a href="PimpedType.scala.html#38133" title="(x$1: Int)Boolean" id="5332">value</a> == <span title="Int(0)" class="int">0</span>) <span title="(xs: scalaz.Digit*)List[scalaz.Digit]">List</span>(<a href="Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit" class="long">0L</a>)
+    <span class="keyword">else</span> <span title="List[scalaz.Digit]" class="keyword">if</span> (<a href="PimpedType.scala.html#38133" title="(x$1: Int)Boolean" id="5336">value</a> &lt; <span title="Int(10)" class="int">10</span>) <span title="(xs: scalaz.Digit*)List[scalaz.Digit]">List</span>(<a href="Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">value</a>)
+    <span class="keyword">else</span> <a href="PimpedType.scala.html#38133" title="(x$1: Long)Long" id="5380">value</a> % <span title="Long(10L)" class="long">10L</span> <a href="Digit.scala.html#33986" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">::</a> <a title="(x: scalaz.Digit)List[scalaz.Digit]" id="32596">(</a><a href="PimpedType.scala.html#38133" title="(x$1: Long)Long" id="5378">value</a> <a href="#34184" title="implicit scalaz.Longs.LongTo : (n: Long)scalaz.LongW">/</a> <span title="Long(10L)" class="long">10L</span> <a href="#84062" title="=&gt; List[scalaz.Digit]">digits</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait Longs extends java.lang.Object with ScalaObject" id="17258">Longs</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.Longs.LongTo : (n: Long)scalaz.LongW" id="34184">LongTo</a>(<a title="Long" id="56554">n</a>: <a title="Long" id="4371">Long</a>): <a href="#17261" title="scalaz.LongW">LongW</a> = <a href="#261992" title="java.lang.Object with scalaz.LongW{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LongW" id="261992">LongW</a> {
+    <span class="keyword">val</span> <a title="Long" id="261996">value</a> = <a href="#56554" title="Long">n</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

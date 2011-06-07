@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/geo/ExampleVincenty.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example.geo
+
+<span class="keyword">object</span> <a title="object scalaz.example.geo.ExampleVincenty" id="25138">ExampleVincenty</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="408594">main</a>(<a title="Array[String]" id="807697">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#408598" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> scalaz.<a href="../../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+  <span class="keyword">import</span> scalaz.geo._
+  <span class="keyword">import</span> Geo._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="408598">run</a> {
+    // Mount Barney, Queensland, Australia
+    <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.geo.Coord" id="807703">mountBarney</a> = <a href="../../geo/GeoDoubleW.scala.html#807805" title="(lon: Double)java.lang.Object with scalaz.geo.Coord">-</a><span title="Double(28.2807)" class="double">28.2807</span> |-| <span title="Double(152.698)" class="double">152.698</span>
+
+    // N'ga Peak, Isle of Pines, New Caledonia
+    <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.geo.Coord" id="807704">ngaPeak</a> = <a href="../../geo/GeoDoubleW.scala.html#807805" title="(lon: Double)java.lang.Object with scalaz.geo.Coord">-</a><span title="Double(22.6528)" class="double">22.6528</span> |-| <span title="Double(167.4619)" class="double">167.4619</span>
+
+    // Travelling at 11.5 degrees for a little over 150km from Mount Barney places you at the given vector.
+    <a href="#807703" title="&lt;refinement&gt; extends java.lang.Object with scalaz.geo.Coord">mountBarney</a>.<a href="../../geo/Coord.scala.html#807864" title="(bear: scalaz.geo.Bearing,dist: Double,convergence: Double,ellipsoid: scalaz.geo.Ellipsoid)scalaz.geo.Vector">direct</a><a href="../../Identity.scala.html#43004" title="(b: java.lang.Object with scalaz.geo.Vector)(implicit e: scalaz.Equal[scalaz.geo.Vector],implicit s: scalaz.Show[scalaz.geo.Vector],implicit ev: &lt;:&lt;[java.lang.Object with scalaz.geo.Vector,scalaz.geo.Vector])Unit">(</a><a href="../../geo/Bearing.scala.html#807708" title="(d: Double)java.lang.Object with scalaz.geo.Bearing">bearing</a>(<span title="Double(11.5)" class="double">11.5D</span>), <span title="Double(150435.0)" class="double">150435D</span>) <a href="../../geo/Vector.scala.html#808071" title="=&gt; scalaz.Order[scalaz.geo.Vector]">assert_===</a> <a href="../../geo/Vector.scala.html#807770" title="(c: scalaz.geo.Coord,b: scalaz.geo.Bearing)java.lang.Object with scalaz.geo.Vector">vector</a>(<a href="../../geo/GeoDoubleW.scala.html#807805" title="(lon: Double)java.lang.Object with scalaz.geo.Coord">-</a><span title="Double(26.950066610300084)" class="double">26.950066610300084D</span> |-| <span title="Double(153.0000106566432)" class="double">153.0000106566432D</span>, <a href="../../geo/Bearing.scala.html#807708" title="(d: Double)java.lang.Object with scalaz.geo.Bearing">bearing</a>(<span title="Double(11.359998078380356)" class="double">11.359998078380356D</span>))
+
+    // Mount Barney to N'ga Peak is 1608.695km
+    <a href="../../Identity.scala.html#43004" title="(b: java.lang.Object with scalaz.geo.GeodeticCurve)(implicit e: scalaz.Equal[scalaz.geo.GeodeticCurve],implicit s: scalaz.Show[scalaz.geo.GeodeticCurve],implicit ev: &lt;:&lt;[java.lang.Object with scalaz.geo.GeodeticCurve,scalaz.geo.GeodeticCurve])Unit">(</a><a href="../../geo/Coord.scala.html#807865" title="(end: scalaz.geo.Coord,convergence: Double,ellipsoid: scalaz.geo.Ellipsoid)scalaz.geo.GeodeticCurve">mountBarney</a> <a href="../../Identity.scala.html#34126" title="(x: =&gt; scalaz.geo.GeodeticCurve)scalaz.Identity[scalaz.geo.GeodeticCurve]">inverse</a> <a href="#807704" title="&lt;refinement&gt; extends java.lang.Object with scalaz.geo.Coord">ngaPeak</a>) <a href="../../geo/GeodeticCurve.scala.html#808425" title="=&gt; scalaz.Order[scalaz.geo.GeodeticCurve]">assert_===</a> <a href="../../geo/GeodeticCurve.scala.html#807752" title="(d: Double,a: scalaz.geo.Azimuth,ra: scalaz.geo.Azimuth)java.lang.Object with scalaz.geo.GeodeticCurve">curve</a>(<span title="Double(1608695.5945547633)" class="double">1608695.5945547633</span>, <a href="../../geo/Azimuth.scala.html#807701" title="(d: Double)java.lang.Object with scalaz.geo.Azimuth">azimuth</a>(<span title="Double(0.0)" class="double">0D</span>), <a href="../../geo/Azimuth.scala.html#807701" title="(d: Double)java.lang.Object with scalaz.geo.Azimuth">azimuth</a>(<span title="Double(180.0)" class="double">180D</span>))
+  }
+}
+
+        </pre>
+    </body>
+</html>

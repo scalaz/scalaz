@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Zipper.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> annotation.tailrec
+
+/**
+ * Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
+ * position in a stream. Focus can be moved forward and backwards through the stream, elements can be inserted
+ * before or after the focused position, and the focused item can be deleted.
+ * &lt;p/&gt;
+ * Based on the pointedlist library by Jeff Wheeler.
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Zipper[+A] extends java.lang.Object with ScalaObject" id="21362">Zipper</a>[+<a title="&gt;: Nothing &lt;: Any" id="22032">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; A" id="38904">focus</a>: <a href="#22032" title="A">A</a>
+  <span class="keyword">val</span> <a title="=&gt; Stream[A]" id="38905">lefts</a>: <span title="Stream[A]">Stream</span>[A]
+  <span class="keyword">val</span> <a title="=&gt; Stream[A]" id="38906">rights</a>: <span title="Stream[A]">Stream</span>[A]
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  /**
+   * Get the Stream representation of this Zipper. This fully traverses `lefts`. `rights` is
+   * not evaluated.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Stream[A]" id="38908">toStream</a>: <span title="Stream[A]">Stream</span>[A] =
+    <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<a title="(that: scala.collection.TraversableOnce[A])(implicit bf: scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream[A],A,Stream[A]])Stream[A]" id="36279">reverse</a> <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream.Coll,A,scala.collection.immutable.Stream[A]]">++</span> <a href="#38904" title="=&gt; A">focus</a> <a href="#389150" title="A">#::</a> <a href="#38906" title="(hd: A)scala.collection.immutable.Stream[A]">rights</a>
+
+  /**
+   * Possibly moves to next element to the right of focus.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38909">next</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38906" title="=&gt; Stream[A]">rights</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> <a title="A" id="389337">r</a> <a href="#389326" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389338">rs</a> =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="(hd: A,tl: =&gt; scala.collection.immutable.Stream[A])Stream.Cons[A]">cons</span>(<a href="#38904" title="=&gt; A">focus</a>, <a href="#38905" title="=&gt; Stream[A]">lefts</a>), <a href="#389337" title="A">r</a>, <a href="#389338" title="scala.collection.immutable.Stream[A]">rs</a>))
+  }
+
+  /**
+   * Moves to the next element to the right of focus, or error if there is no element on the right.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="38910">tryNext</a>: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <a href="OptionW.scala.html#38451" title="(message: =&gt; String)scalaz.Zipper[A]">next</a> err <span title="java.lang.String(&quot;cannot move to next element&quot;)" class="string">&quot;cannot move to next element&quot;</span>
+
+  /**
+   * Possibly moves to the previous element to the left of focus.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38911">previous</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38905" title="=&gt; Stream[A]">lefts</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> <a title="A" id="389429">l</a> <a href="#389418" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389430">ls</a> =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#389430" title="scala.collection.immutable.Stream[A]">ls</a>, <a href="#389429" title="A">l</a>, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="(hd: A,tl: =&gt; scala.collection.immutable.Stream[A])Stream.Cons[A]">cons</span>(<a href="#38904" title="=&gt; A">focus</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>)))
+  }
+
+  /**
+   * Moves to the previous element to the left of focus, or error if there is no element on the left.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="38912">tryPrevious</a>: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <a href="OptionW.scala.html#38451" title="(message: =&gt; String)scalaz.Zipper[A]">previous</a> err <span title="java.lang.String(&quot;cannot move to previous element&quot;)" class="string">&quot;cannot move to previous element&quot;</span>
+
+  /**
+   * An alias for insertRight
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](AA) =&gt; scalaz.Zipper[AA]" id="38913">insert</a>[<a title="&gt;: A &lt;: Any" id="38915">AA</a> &gt;: A]: (AA =&gt; Zipper[AA]) = <a href="#38919" title="(y: AA)scalaz.Zipper[AA]">insertRight</a>(<a href="#389507" title="AA">_</a>: <a href="#38915" title="AA">AA</a>)
+
+  /**
+   * Inserts an element to the left of focus and focuses on the new element.
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](y: AA)scalaz.Zipper[AA]" id="38916">insertLeft</a>[<a title="&gt;: A &lt;: Any" id="38918">AA</a> &gt;: A](<a title="AA" id="389515">y</a>: <a href="#38918" title="AA">AA</a>): <a href="#21362" title="scalaz.Zipper[AA]">Zipper</a>[AA] = <a href="#35293" title="(ls: Stream[AA],a: AA,rs: Stream[AA])scalaz.Zipper[AA]">zipper</a>(<a href="#38905" title="=&gt; Stream[A]">lefts</a>, <a href="#389515" title="AA">y</a>, <a href="#38904" title="=&gt; A">focus</a> <a href="#389522" title="A">#::</a> <a href="#38906" title="(hd: A)scala.collection.immutable.Stream[A]">rights</a>)
+
+  /**
+   * Inserts an element to the right of focus and focuses on the new element.
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](y: AA)scalaz.Zipper[AA]" id="38919">insertRight</a>[<a title="&gt;: A &lt;: Any" id="38921">AA</a> &gt;: A](<a title="AA" id="389508">y</a>: <a href="#38921" title="AA">AA</a>): <a href="#21362" title="scalaz.Zipper[AA]">Zipper</a>[AA] = <a href="#35293" title="(ls: Stream[AA],a: AA,rs: Stream[AA])scalaz.Zipper[AA]">zipper</a>(<a href="#38904" title="=&gt; A">focus</a> <a href="#389622" title="A">#::</a> <a href="#38905" title="(hd: A)scala.collection.immutable.Stream[A]">lefts</a>, <a href="#389508" title="AA">y</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>)
+
+  /**
+   * An alias for deleteRight
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38922">delete</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38924" title="=&gt; Option[scalaz.Zipper[A]]">deleteRight</a>
+
+  /**
+   * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
+   * focus is moved to the right.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38923">deleteLeft</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38906" title="=&gt; Stream[A]">rights</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> <a title="A" id="389735">r</a> <a href="#389724" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389736">rs</a> =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#38905" title="=&gt; Stream[A]">lefts</a> <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <a href="#389735" title="A">r</a>, <a href="#389736" title="scala.collection.immutable.Stream[A]">rs</a>)
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <a title="A" id="389758">l</a> <a href="#389747" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389759">ls</a> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#389759" title="scala.collection.immutable.Stream[A]">ls</a>, <a href="#389758" title="A">l</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>)
+    })
+  }
+
+  /**
+   * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
+   * focus is moved to the left.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38924">deleteRight</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38906" title="=&gt; Stream[A]">rights</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> <a title="A" id="389781">r</a> <a href="#389770" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389782">rs</a> =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#38905" title="=&gt; Stream[A]">lefts</a> <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <a href="#389781" title="A">r</a>, <a href="#389782" title="scala.collection.immutable.Stream[A]">rs</a>)
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <a title="A" id="389804">l</a> <a href="#389793" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="389805">ls</a> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#389805" title="scala.collection.immutable.Stream[A]">ls</a>, <a href="#389804" title="A">l</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>)
+    })
+  }
+
+  /**
+   * Deletes all elements except the focused element.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="38925">deleteOthers</a>: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <a href="#38904" title="=&gt; A">focus</a>, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>)
+
+  <span class="keyword">def</span> <a title="=&gt; Int" id="38926">length</a>: <span title="Int">Int</span> = <a href="MA.scala.html#34186" title="(a: scalaz.Zipper[A])scalaz.MA[scalaz.Zipper,A]" class="keyword">this</a>.<a href="MA.scala.html#55476" title="(b: Int)(f: (A, =&gt; Int) =&gt; Int)(implicit r: scalaz.Foldable[scalaz.Zipper])Int">foldr</a>(<span title="Int(0)" class="int">0</span>)<a href="Foldable.scala.html#91323" title="=&gt; scalaz.Foldable[scalaz.Zipper]">(</a>((a: <a title="Any" id="32">Any</a>, b: <span title="Int">Int</span>) =&gt; <a href="#389989" title="(x$1: Int)Int">b</a> + <span title="Int(1)" class="int">1</span>)(<a href="#389985" title="A">_</a>, <a href="#389986" title="=&gt; Int">_</a>))
+
+  /**
+   * Whether the focus is on the first element in the zipper.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="38927">atStart</a>: <span title="Boolean">Boolean</span> = <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<span title="=&gt; Boolean">isEmpty</span>
+
+  /**
+   * Whether the focus is on the last element in the zipper.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="38928">atEnd</a>: <span title="Boolean">Boolean</span> = <a href="#38906" title="=&gt; Stream[A]">rights</a>.<span title="=&gt; Boolean">isEmpty</span>
+
+  /**
+   * Pairs each element with a boolean indicating whether that element has focus.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[(A, Boolean)]" id="38929">withFocus</a>: <a href="#21362" title="scalaz.Zipper[(A, Boolean)]">Zipper</a>[(A, Boolean)] = <a href="#35293" title="(ls: Stream[(A, Boolean)],a: (A, Boolean),rs: Stream[(A, Boolean)])scalaz.Zipper[(A, Boolean)]">zipper</a>(<a href="#38905" title="=&gt; Stream[A]">lefts</a>.<span title="(that: Iterable[Boolean])(implicit bf: scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream[A],(A, Boolean),Stream[(A, Boolean)]])Stream[(A, Boolean)]">zip</span><span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream.Coll,(A, Boolean),scala.collection.immutable.Stream[(A, Boolean)]]">(</span><span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="(elem: =&gt; Boolean)scala.collection.immutable.Stream[Boolean]">continually</span>(<span title="Boolean(false)" class="keyword">false</span>)), <span title="(_1: A,_2: Boolean)(A, Boolean)">(</span><a href="#38904" title="=&gt; A">focus</a>, <span title="Boolean(true)" class="keyword">true</span>), <a href="#38906" title="=&gt; Stream[A]">rights</a>.<span title="(that: Iterable[Boolean])(implicit bf: scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream[A],(A, Boolean),Stream[(A, Boolean)]])Stream[(A, Boolean)]">zip</span><span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream.Coll,(A, Boolean),scala.collection.immutable.Stream[(A, Boolean)]]">(</span><span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="(elem: =&gt; Boolean)scala.collection.immutable.Stream[Boolean]">continually</span>(<span title="Boolean(false)" class="keyword">false</span>)))
+
+  /**
+   * Moves focus to the nth element of the zipper, or None if there is no such element.
+   */
+  <span class="keyword">def</span> <a title="(n: Int)Option[scalaz.Zipper[A]]" id="38930">move</a>(<a title="Int" id="390151">n</a>: <span title="Int">Int</span>): <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = {
+    @tailrec
+    <span class="keyword">def</span> <a title="(z: Option[scalaz.Zipper[A]],n: Int)Option[scalaz.Zipper[A]]" id="390153">move0</a>(<a title="Option[scalaz.Zipper[A]]" id="390154">z</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]], <a title="Int" id="390155">n</a>: <span title="Int">Int</span>): <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] =
+      <span title="Option[scalaz.Zipper[A]]" class="keyword">if</span> (<a href="#390155" title="(x$1: Int)Boolean">n</a> <span title="(x$1: Boolean)Boolean">&gt;</span> <span title="Int(0)" class="int">0</span> <a title="(x$1: Boolean)Boolean" id="4333">&amp;&amp;</a> <a href="#38906" title="=&gt; Stream[A]">rights</a>.<span title="=&gt; Boolean">isEmpty</span> || <a href="#390155" title="(x$1: Int)Boolean" id="5128">n</a> <span title="(x$1: Boolean)Boolean">&lt;</span> <span title="Int(0)" class="int">0</span> &amp;&amp; <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<span title="=&gt; Boolean">isEmpty</span>) <span title="object None">None</span>
+      <span class="keyword">else</span> {
+        <span title="Option[scalaz.Zipper[A]]" class="keyword">if</span> (<a href="#390155" title="(x$1: Int)Boolean" id="5124">n</a> == <span title="Int(0)" class="int">0</span>) <a href="#390154" title="Option[scalaz.Zipper[A]]">z</a>
+        <span class="keyword">else</span> <span title="Option[scalaz.Zipper[A]]" class="keyword">if</span> (<a href="#390155" title="(x$1: Int)Boolean">n</a> &gt; <span title="Int(0)" class="int">0</span>) <a href="#390153" title="(z: Option[scalaz.Zipper[A]],n: Int)Option[scalaz.Zipper[A]]">move0</a>(<a href="MA.scala.html#55435" title="(f: (scalaz.Zipper[A]) =&gt; Option[scalaz.Zipper[A]])(implicit b: scalaz.Bind[Option])Option[scalaz.Zipper[A]]">z</a> <a href="Bind.scala.html#59598" title="=&gt; scalaz.Bind[Option]">&gt;&gt;=</a> ((<a href="#390334" title="scalaz.Zipper[A]">_</a>:<a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]).<a href="#38909" title="=&gt; Option[scalaz.Zipper[A]]">next</a>), <a href="#390155" title="(x$1: Int)Int" id="5138">n</a> - <span title="Int(1)" class="int">1</span>)
+        <span class="keyword">else</span> <a href="#390153" title="(z: Option[scalaz.Zipper[A]],n: Int)Option[scalaz.Zipper[A]]">move0</a>(<a href="MA.scala.html#55435" title="(f: (scalaz.Zipper[A]) =&gt; Option[scalaz.Zipper[A]])(implicit b: scalaz.Bind[Option])Option[scalaz.Zipper[A]]">z</a> <a href="Bind.scala.html#59598" title="=&gt; scalaz.Bind[Option]">&gt;&gt;=</a> ((<a href="#390860" title="scalaz.Zipper[A]">_</a>:<a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]).<a href="#38911" title="=&gt; Option[scalaz.Zipper[A]]">previous</a>), <a href="#390155" title="(x$1: Int)Int">n</a> + <span title="Int(1)" class="int">1</span>)
+      }
+    <a href="#390153" title="(z: Option[scalaz.Zipper[A]],n: Int)Option[scalaz.Zipper[A]]">move0</a>(<span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>), <a href="#390151" title="Int">n</a>)
+  }
+
+  /**
+   * Moves focus to the nearest element matching the given predicate, preferring the left,
+   * or None if no element matches.
+   */
+  <span class="keyword">def</span> <a title="(p: (A) =&gt; Boolean)Option[scalaz.Zipper[A]]" id="38931">findZ</a>(<a title="(A) =&gt; Boolean" id="391285">p</a>: A =&gt; Boolean): <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] =
+    <span title="Option[scalaz.Zipper[A]]" class="keyword">if</span> (<a href="#391285" title="(v1: A)Boolean">p</a>(<a href="#38904" title="=&gt; A">focus</a>)) <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>)
+    <span class="keyword">else</span> {
+      <span class="keyword">val</span> <a title="scalaz.Zipper[scalaz.Zipper[A]]" id="391293">c</a> = <a href="#21362" title="Zipper.this.type" class="keyword">this</a>.<a href="#38941" title="=&gt; scalaz.Zipper[scalaz.Zipper[A]]">positions</a>
+      <a href="#391293" title="scalaz.Zipper[scalaz.Zipper[A]]">c</a>.<a href="StreamW.scala.html#34974" title="(as: Stream[scalaz.Zipper[A]])scalaz.StreamW[scalaz.Zipper[A]]">lefts</a>.<a href="StreamW.scala.html#38137" title="(s: Stream[scalaz.Zipper[A]])Stream[scalaz.Zipper[A]]">merge</a>(<a href="#391293" title="scalaz.Zipper[scalaz.Zipper[A]]">c</a>.<a href="#38906" title="=&gt; Stream[scalaz.Zipper[A]]">rights</a>).<a title="(p: (scalaz.Zipper[A]) =&gt; Boolean)Option[scalaz.Zipper[A]]" id="41636">find</a>((<a title="scalaz.Zipper[A]" id="391362">x</a> =&gt; <a href="#391285" title="(v1: A)Boolean">p</a>(<a href="#391362" title="scalaz.Zipper[A]">x</a>.<a href="#38904" title="=&gt; A">focus</a>)))
+    }
+
+  /**
+   * Given a traversal function, find the first element along the traversal that matches a given predicate.
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](f: (scalaz.Zipper[AA]) =&gt; Option[scalaz.Zipper[AA]])(p: (AA) =&gt; Boolean)Option[scalaz.Zipper[AA]]" id="38932">findBy</a>[<a title="&gt;: A &lt;: Any" id="38934">AA</a> &gt;: A](<a title="(scalaz.Zipper[AA]) =&gt; Option[scalaz.Zipper[AA]]" id="391365">f</a>: Zipper[AA] =&gt; Option[Zipper[AA]])(<a title="(AA) =&gt; Boolean" id="391366">p</a>: AA =&gt; Boolean): <span title="Option[scalaz.Zipper[AA]]">Option</span>[Zipper[AA]] = {
+    <a href="#391365" title="(v1: scalaz.Zipper[AA])Option[scalaz.Zipper[AA]]">f</a><a href="MA.scala.html#57137" title="(f: (scalaz.Zipper[AA]) =&gt; Option[scalaz.Zipper[AA]])(implicit b: scalaz.Bind[Option])Option[scalaz.Zipper[AA]]">(</a><a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>) <a href="Bind.scala.html#59598" title="=&gt; scalaz.Bind[Option]">∗</a> (<a title="scalaz.Zipper[AA]" id="391526">x</a> =&gt; <span title="Option[scalaz.Zipper[AA]]" class="keyword">if</span> (<a href="#391366" title="(v1: AA)Boolean">p</a>(<a href="#391526" title="scalaz.Zipper[AA]">x</a>.<a href="#38904" title="=&gt; AA">focus</a>)) <span title="(x: scalaz.Zipper[AA])Some[scalaz.Zipper[AA]]">Some</span>(<a href="#391526" title="scalaz.Zipper[AA]">x</a>) <span class="keyword">else</span> <a href="#391526" title="scalaz.Zipper[AA]">x</a>.<a href="#38932" title="(f: (scalaz.Zipper[AA]) =&gt; Option[scalaz.Zipper[AA]])(p: (AA) =&gt; Boolean)Option[scalaz.Zipper[AA]]">findBy</a>(<a href="#391365" title="(scalaz.Zipper[AA]) =&gt; Option[scalaz.Zipper[AA]]">f</a>)(<a href="#391366" title="(AA) =&gt; Boolean">p</a>))
+  }
+
+  /**
+   * Moves focus to the nearest element on the right that matches the given predicate,
+   * or None if there is no such element.
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](p: (AA) =&gt; Boolean)Option[scalaz.Zipper[AA]]" id="38935">findNext</a>[<a title="&gt;: A &lt;: Any" id="38937">AA</a> &gt;: A](<a title="(AA) =&gt; Boolean" id="391774">p</a>: AA =&gt; Boolean): <span title="Option[scalaz.Zipper[AA]]">Option</span>[Zipper[AA]]= <a href="#38932" title="(f: (scalaz.Zipper[A]) =&gt; Option[scalaz.Zipper[A]])(p: (A) =&gt; Boolean)Option[scalaz.Zipper[A]]">findBy</a>((z: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]) =&gt; <a href="#391782" title="scalaz.Zipper[A]">z</a>.<a href="#38909" title="=&gt; Option[scalaz.Zipper[A]]">next</a>)(<a href="#391774" title="(AA) =&gt; Boolean">p</a>)
+
+  /**
+   * Moves focus to the previous element on the left that matches the given predicate,
+   * or None if there is no such element.
+   */
+  <span class="keyword">def</span> <a title="[AA &gt;: A](p: (AA) =&gt; Boolean)Option[scalaz.Zipper[AA]]" id="38938">findPrevious</a>[<a title="&gt;: A &lt;: Any" id="38940">AA</a> &gt;: A](<a title="(AA) =&gt; Boolean" id="391788">p</a>: AA =&gt; Boolean): <span title="Option[scalaz.Zipper[AA]]">Option</span>[Zipper[AA]]= <a href="#38932" title="(f: (scalaz.Zipper[A]) =&gt; Option[scalaz.Zipper[A]])(p: (A) =&gt; Boolean)Option[scalaz.Zipper[A]]">findBy</a>((z: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]) =&gt; <a href="#391796" title="scalaz.Zipper[A]">z</a>.<a href="#38911" title="=&gt; Option[scalaz.Zipper[A]]">previous</a>)(<a href="#391788" title="(AA) =&gt; Boolean">p</a>)
+
+  /**
+   * A zipper of all positions of the zipper, with focus on the current position.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[scalaz.Zipper[A]]" id="38941">positions</a>: <a href="#21362" title="scalaz.Zipper[scalaz.Zipper[A]]">Zipper</a>[Zipper[A]] = {
+    <span class="keyword">val</span> <a title="Stream[scalaz.Zipper[A]]" id="391802">left</a> = <a href="Identity.scala.html#34126" title="(x: =&gt; scalaz.Zipper[A])scalaz.Identity[scalaz.Zipper[A]]" class="keyword">this</a>.<a href="Identity.scala.html#43034" title="[M[_], B](f: (scalaz.Zipper[A]) =&gt; Option[(B, scalaz.Zipper[A])])(implicit p: scalaz.Pure[M],implicit m: scalaz.Monoid[M[B]])M[B]">unfold</a><span title="(f: (scalaz.Zipper[A]) =&gt; Option[(scalaz.Zipper[A], scalaz.Zipper[A])])(implicit p: scalaz.Pure[Stream],implicit m: scalaz.Monoid[Stream[scalaz.Zipper[A]]])Stream[scalaz.Zipper[A]]">[</span><span title="Stream">Stream</span>, <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]]<a href="Pure.scala.html#35771" title="(implicit evidence$2: scalaz.CanBuildAnySelf[Stream])scalaz.Pure[Stream]">(</a>(p: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]) =&gt; <a href="#391892" title="scalaz.Zipper[A]">p</a>.<a href="#38911" title="=&gt; Option[scalaz.Zipper[A]]">previous</a>.<span title="(f: (scalaz.Zipper[A]) =&gt; (scalaz.Zipper[A], scalaz.Zipper[A]))Option[(scalaz.Zipper[A], scalaz.Zipper[A])]">map</span>(<a title="scalaz.Zipper[A]" id="391897">x</a> =&gt; <span title="(_1: scalaz.Zipper[A],_2: scalaz.Zipper[A])(scalaz.Zipper[A], scalaz.Zipper[A])">(</span><a href="#391897" title="scalaz.Zipper[A]">x</a>, <a href="#391897" title="scalaz.Zipper[A]">x</a>)))
+    <span class="keyword">val</span> <a title="Stream[scalaz.Zipper[A]]" id="391803">right</a> = <a href="Identity.scala.html#34126" title="(x: =&gt; scalaz.Zipper[A])scalaz.Identity[scalaz.Zipper[A]]" class="keyword">this</a>.<a href="Identity.scala.html#43034" title="[M[_], B](f: (scalaz.Zipper[A]) =&gt; Option[(B, scalaz.Zipper[A])])(implicit p: scalaz.Pure[M],implicit m: scalaz.Monoid[M[B]])M[B]">unfold</a><span title="(f: (scalaz.Zipper[A]) =&gt; Option[(scalaz.Zipper[A], scalaz.Zipper[A])])(implicit p: scalaz.Pure[Stream],implicit m: scalaz.Monoid[Stream[scalaz.Zipper[A]]])Stream[scalaz.Zipper[A]]">[</span><span title="Stream">Stream</span>, <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]]<a href="Pure.scala.html#35771" title="(implicit evidence$2: scalaz.CanBuildAnySelf[Stream])scalaz.Pure[Stream]">(</a>(p: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A]) =&gt; <a href="#392626" title="scalaz.Zipper[A]">p</a>.<a href="#38909" title="=&gt; Option[scalaz.Zipper[A]]">next</a>.<span title="(f: (scalaz.Zipper[A]) =&gt; (scalaz.Zipper[A], scalaz.Zipper[A]))Option[(scalaz.Zipper[A], scalaz.Zipper[A])]">map</span>(<a title="scalaz.Zipper[A]" id="392630">x</a> =&gt; <span title="(_1: scalaz.Zipper[A],_2: scalaz.Zipper[A])(scalaz.Zipper[A], scalaz.Zipper[A])">(</span><a href="#392630" title="scalaz.Zipper[A]">x</a>, <a href="#392630" title="scalaz.Zipper[A]">x</a>)))
+
+    <a href="#35293" title="(ls: Stream[scalaz.Zipper[A]],a: scalaz.Zipper[A],rs: Stream[scalaz.Zipper[A]])scalaz.Zipper[scalaz.Zipper[A]]">zipper</a>(<a href="#391802" title="Stream[scalaz.Zipper[A]]">left</a>, <a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>, <a href="#391803" title="Stream[scalaz.Zipper[A]]">right</a>)
+  }
+
+  /**
+   * The index of the focus.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Int" id="38942">index</a>: <span title="Int">Int</span> = <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<a title="=&gt; Int" id="36270">length</a>
+
+  /**
+   * Moves focus to the next element. If the last element is currently focused, loop to the first element.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="38943">nextC</a>: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <span title="(_1: Stream[A],_2: Stream[A])(Stream[A], Stream[A])">(</span><a href="#38905" title="=&gt; Stream[A]">lefts</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>) <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>) =&gt; <a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (_, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>) =&gt; {
+      <span class="keyword">val</span> <a title="scala.collection.immutable.Stream[A]" id="393240">xs</a> = <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">reverse</span>
+      <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#38906" title="=&gt; Stream[A]">rights</a>, <a href="#393240" title="scala.collection.immutable.Stream[A]">xs</a>.<span title="=&gt; A">head</span>, <a href="#393240" title="scala.collection.immutable.Stream[A]">xs</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>.<span title="(rest: =&gt; Traversable[A])scala.collection.immutable.Stream[A]">append</span>(<span title="(xs: A*)scala.collection.immutable.Stream[A]">Stream</span>(<a href="#38904" title="=&gt; A">focus</a>)))
+    }
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (_, _) =&gt; <a href="#38910" title="=&gt; scalaz.Zipper[A]">tryNext</a>
+  }
+
+  /**
+   * Moves focus to the previous element. If the first element is currently focused, loop to the last element.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Zipper[A]" id="38944">previousC</a>: <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <span title="(_1: Stream[A],_2: Stream[A])(Stream[A], Stream[A])">(</span><a href="#38905" title="=&gt; Stream[A]">lefts</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>) <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>) =&gt; <a href="#21362" title="scalaz.Zipper[A]" class="keyword">this</a>
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, _) =&gt; {
+      <span class="keyword">val</span> <a title="scala.collection.immutable.Stream[A]" id="393281">xs</a> = <a href="#38906" title="=&gt; Stream[A]">rights</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">reverse</span>
+      <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#393281" title="scala.collection.immutable.Stream[A]">xs</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>.<span title="(rest: =&gt; Traversable[A])scala.collection.immutable.Stream[A]">append</span>(<span title="(xs: A*)scala.collection.immutable.Stream[A]">Stream</span>(<a href="#38904" title="=&gt; A">focus</a>)), <a href="#393281" title="scala.collection.immutable.Stream[A]">xs</a>.<span title="=&gt; A">head</span>, <a href="#38905" title="=&gt; Stream[A]">lefts</a>)
+    }
+    <span title="scalaz.Zipper[A]" class="keyword">case</span> (_, _) =&gt; <a href="#38912" title="=&gt; scalaz.Zipper[A]">tryPrevious</a>
+  }
+
+  /**
+   * Deletes the focused element and moves focus to the left. If the focus was on the first element,
+   * focus is moved to the last element.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38945">deleteLeftC</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38906" title="=&gt; Stream[A]">rights</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> _ <a href="#393307" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> _ =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#38905" title="=&gt; Stream[A]">lefts</a> <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <a title="A" id="393331">l</a> <a href="#393320" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="393332">ls</a> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#393332" title="scala.collection.immutable.Stream[A]">ls</a>, <a href="#393331" title="A">l</a>, <a href="#38906" title="=&gt; Stream[A]">rights</a>)
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; {
+        <span class="keyword">val</span> <a title="scala.collection.immutable.Stream[A]" id="393341">r</a> = <a href="#38906" title="=&gt; Stream[A]">rights</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">reverse</span>
+        <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#393341" title="scala.collection.immutable.Stream[A]">r</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>, <a href="#393341" title="scala.collection.immutable.Stream[A]">r</a>.<span title="=&gt; A">head</span>, <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>)
+      }
+    })
+  }
+
+  /**
+   * Deletes the focused element and moves focus to the right. If the focus was on the last element,
+   * focus is moved to the first element.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38946">deleteRightC</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38905" title="=&gt; Stream[A]">lefts</a> <span title="Option[scalaz.Zipper[A]]" class="keyword">match</span> {
+    <span title="None.type" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; <span title="object None">None</span>
+    <span title="Some[scalaz.Zipper[A]]" class="keyword">case</span> _ <a href="#393354" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> _ =&gt; <span title="(x: scalaz.Zipper[A])Some[scalaz.Zipper[A]]">Some</span>(<a href="#38906" title="=&gt; Stream[A]">rights</a> <span title="scalaz.Zipper[A]" class="keyword">match</span> {
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <a title="A" id="393378">r</a> <a href="#393367" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]">#::</a> <a title="scala.collection.immutable.Stream[A]" id="393379">rs</a> =&gt; <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<a href="#38905" title="=&gt; Stream[A]">lefts</a>, <a href="#393378" title="A">r</a>, <a href="#393379" title="scala.collection.immutable.Stream[A]">rs</a>)
+      <span title="scalaz.Zipper[A]" class="keyword">case</span> <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span> =&gt; {
+        <span class="keyword">val</span> <a title="scala.collection.immutable.Stream[A]" id="393388">l</a> = <a href="#38905" title="=&gt; Stream[A]">lefts</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">reverse</span>
+        <a href="#35293" title="(ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]">zipper</a>(<span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="object Stream.Empty">Empty</span>, <a href="#393388" title="scala.collection.immutable.Stream[A]">l</a>.<span title="=&gt; A">head</span>, <a href="#393388" title="scala.collection.immutable.Stream[A]">l</a>.<span title="=&gt; scala.collection.immutable.Stream[A]">tail</span>)
+      }
+    })
+  }
+
+  /**
+   * An alias for deleteRightC
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.Zipper[A]]" id="38947">deleteC</a>: <span title="Option[scalaz.Zipper[A]]">Option</span>[Zipper[A]] = <a href="#38946" title="=&gt; Option[scalaz.Zipper[A]]">deleteRightC</a>
+}
+
+<span class="keyword">trait</span> <a title="trait Zippers extends java.lang.Object with ScalaObject" id="21368">Zippers</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](ls: Stream[A],a: A,rs: Stream[A])scalaz.Zipper[A]" id="35293">zipper</a>[<a title="&gt;: Nothing &lt;: Any" id="35295">A</a>](<a title="Stream[A]" id="75317">ls</a>: <span title="Stream[A]">Stream</span>[A], <a title="A" id="75318">a</a>: <a href="#35295" title="A">A</a>, <a title="Stream[A]" id="75319">rs</a>: <span title="Stream[A]">Stream</span>[A]): <a href="#21362" title="scalaz.Zipper[A]">Zipper</a>[A] = <a href="#393403" title="java.lang.Object with scalaz.Zipper[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Zipper[A]" id="393403">Zipper</a>[A] {
+    <span class="keyword">val</span> <a title="A" id="393407">focus</a> = <a href="#75318" title="A">a</a>
+    <span class="keyword">val</span> <a title="Stream[A]" id="393409">lefts</a> = <a href="#75317" title="Stream[A]">ls</a>
+    <span class="keyword">val</span> <a title="Stream[A]" id="393411">rights</a> = <a href="#75319" title="Stream[A]">rs</a>
+
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="()java.lang.String" id="393413">toString</a> = <span title="java.lang.String(&quot;&lt;zipper&gt;&quot;)" class="string">&quot;&lt;zipper&gt;&quot;</span>
+  }
+}
+
+        </pre>
+    </body>
+</html>

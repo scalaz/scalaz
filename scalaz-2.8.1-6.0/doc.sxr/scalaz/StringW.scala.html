@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/StringW.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait StringW extends java.lang.Object with scalaz.PimpedType[String] with ScalaObject" id="19898">StringW</a> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#18533" title="scalaz.PimpedType[String]">PimpedType</a>[String] {
+  /**
+   * The value of this string.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="String" id="84088">s</a>: <span title="String">String</span> = <a href="PimpedType.scala.html#38133" title="=&gt; String">value</a>
+
+  /**
+   * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an &quot;s&quot; unless
+   * this String ends with &quot;y&quot; and not one of [&quot;ay&quot;, &quot;ey&quot;, &quot;iy&quot;, &quot;oy&quot;, &quot;uy&quot;] in which case the 'y' character is chopped and &quot;ies&quot;
+   * is appended.
+   */
+  <span class="keyword">def</span> <a title="(n: Long)String" id="84089">plural</a>(<a title="Long" id="355272">n</a>: <a title="Long" id="4371">Long</a>): <span title="String">String</span> = <span title="String" class="keyword">if</span>(<a href="#355272" title="(x$1: Long)Boolean" id="5360">n</a> == <span title="Long(1L)" class="long">1L</span>) <a href="#84087" title="=&gt; String">s</a> <span class="keyword">else</span>
+                       <span title="String" class="keyword">if</span>(<a title="(x$1: Boolean)Boolean" id="4335">(</a><a href="#84087" title="(x$1: java.lang.String)Boolean">s</a> endsWith <span title="java.lang.String(&quot;y&quot;)" class="string">&quot;y&quot;</span>) &amp;&amp; (<span title="(xs: java.lang.String*)List[java.lang.String]">List</span><a title="(p: (java.lang.String) =&gt; Boolean)Boolean" id="41630">(</a><span title="java.lang.String(&quot;ay&quot;)" class="string">&quot;ay&quot;</span>, <span title="java.lang.String(&quot;ey&quot;)" class="string">&quot;ey&quot;</span>,<span title="java.lang.String(&quot;iy&quot;)" class="string">&quot;iy&quot;</span>, <span title="java.lang.String(&quot;oy&quot;)" class="string">&quot;oy&quot;</span>, <span title="java.lang.String(&quot;uy&quot;)" class="string">&quot;uy&quot;</span>) forall (<a title="=&gt; Boolean" id="4328">!</a><a href="#84087" title="=&gt; String">s</a>.<span title="(x$1: java.lang.String)Boolean">endsWith</span>(<a href="#355299" title="java.lang.String">_</a>)))) <a href="#84087" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">s</a>.<a title="(n: Int)String" id="30449">take</a><span title="(x$1: Any)java.lang.String">(</span><a href="#84087" title="=&gt; String">s</a>.<a title="(x$1: Int)Int" id="7409">length</a> - <span title="Int(1)" class="int">1</span>) + <span title="java.lang.String(&quot;ies&quot;)" class="string">&quot;ies&quot;</span>
+                       <span class="keyword">else</span> <a href="#84087" title="(x$1: Any)java.lang.String">s</a> + <span title="java.lang.String(&quot;s&quot;)" class="string">&quot;s&quot;</span>
+
+  <span class="keyword">import</span> xml._
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  <span class="keyword">def</span> <a title="[A](prefix: String,attributes: scala.xml.MetaData,scope: scala.xml.NamespaceBinding,a: Option[A])(implicit evidence$1: scalaz.Show[A])scala.xml.Node" id="355333">node</a>[<a title="&gt;: Nothing &lt;: Any" id="84094">A</a>: Show](<a title="String" id="355329">prefix</a>: <span title="String">String</span>, <a title="scala.xml.MetaData" id="355330">attributes</a>: <a title="scala.xml.MetaData" id="89053">MetaData</a>, <a title="scala.xml.NamespaceBinding" id="355331">scope</a>: <a title="scala.xml.NamespaceBinding" id="89104">NamespaceBinding</a>, <a title="Option[A]" id="355332">a</a>: <span title="Option[A]">Option</span>[A]): <span title="scala.xml.Node">Node</span> =
+    <a href="#355332" title="Option[A]">a</a> <span title="scala.xml.Node" class="keyword">match</span> {
+      <span title="scala.xml.Elem" class="keyword">case</span> Some(<a title="A" id="355466">t</a>) =&gt; <a title="(prefix: String,label: String,attributes: scala.xml.MetaData,scope: scala.xml.NamespaceBinding,child: scala.xml.Node*)scala.xml.Elem" id="89024">Elem</a>(<a href="#355329" title="String">prefix</a>, <a href="#84087" title="=&gt; String">s</a>, <span title="object scala.xml.Null">Null</span>, <span title="object scala.xml.TopScope">TopScope</span>, <a href="Identity.scala.html#34126" title="(x: =&gt; A)scalaz.Identity[A]">t</a>.<a href="Identity.scala.html#43026" title="(implicit s: scalaz.Show[A])scala.xml.Text">text</a>)
+      <span title="scala.xml.Text" class="keyword">case</span> <a title="object None" id="1843">None</a> =&gt; <a title="(_data: String)scala.xml.Text" id="88928">Text</a>(<span title="java.lang.String(&quot;&quot;)" class="string">&quot;&quot;</span>)
+    }
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  <span class="keyword">def</span> <a title="[A](prefix: String,a: Option[A])(implicit evidence$2: scalaz.Show[A])scala.xml.Node" id="355831">node</a>[<a title="&gt;: Nothing &lt;: Any" id="84097">A</a>: Show](<a title="String" id="355829">prefix</a>: <span title="String">String</span>, <a title="Option[A]" id="355830">a</a>: <span title="Option[A]">Option</span>[A]): <span title="scala.xml.Node">Node</span> =
+    <a href="#355333" title="(prefix: String,attributes: scala.xml.MetaData,scope: scala.xml.NamespaceBinding,a: Option[A])(implicit evidence$1: scalaz.Show[A])scala.xml.Node">node</a><a href="#355831" title="scalaz.Show[A]">(</a><a href="#355829" title="String">prefix</a>, <span title="object scala.xml.Null">Null</span>, <span title="object scala.xml.TopScope">TopScope</span>, <a href="#355830" title="Option[A]">a</a>)
+
+  /**
+   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
+   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
+   */
+  <span class="keyword">def</span> <a title="[A](a: Option[A])(implicit evidence$3: scalaz.Show[A])scala.xml.Node" id="355867">|:|</a>[<a title="&gt;: Nothing &lt;: Any" id="84100">A</a>: Show](<a title="Option[A]" id="355866">a</a>: <span title="Option[A]">Option</span>[A]): <span title="scala.xml.Node">Node</span> =
+    <a href="#355831" title="(prefix: String,a: Option[A])(implicit evidence$2: scalaz.Show[A])scala.xml.Node">node</a><a href="#355867" title="scalaz.Show[A]">(</a><span title="Null(null)" class="keyword">null</span>, <a href="#355866" title="Option[A]">a</a>)
+
+  <span class="keyword">def</span> <a title="(implicit c: scalaz.CharSet)Array[Byte]" id="84101">encode</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="355897">c</a>: <a href="CharSet.scala.html#10163" title="scalaz.CharSet">CharSet</a>): <a title="Array[Byte]" id="2028">Array</a>[Byte] = <a href="#84087" title="(x$1: java.lang.String)Array[Byte]" id="7436">s</a> getBytes <a href="#355897" title="scalaz.CharSet">c</a>.<a href="CharSet.scala.html#57332" title="=&gt; String">value</a>
+
+  /**
+   * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.NonEmptyList[Char]]" id="84102">charsNel</a> : <span title="Option[scalaz.NonEmptyList[Char]]">Option</span>[NonEmptyList[Char]] = <a href="#84087" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">s</a>.<a href="ListW.scala.html#34172" title="(as: List[Char])scalaz.ListW[Char]" id="29194">toList</a>.<a href="ListW.scala.html#56563" title="=&gt; Option[scalaz.NonEmptyList[Char]]">toNel</a>
+
+  /**
+   * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
+   */
+  <span class="keyword">def</span> <a title="(e: =&gt; scalaz.NonEmptyList[Char])scalaz.NonEmptyList[Char]" id="84103">charsNel</a>(<a title="=&gt; scalaz.NonEmptyList[Char]" id="355997">e</a>: =&gt; NonEmptyList[Char]) : <a href="NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char] = <a href="#19898" title="StringW.this.type" class="keyword">this</a>.<a href="#84102" title="(default: =&gt; scalaz.NonEmptyList[Char])scalaz.NonEmptyList[Char]" id="38377">charsNel</a> getOrElse <a href="#355997" title="=&gt; scalaz.NonEmptyList[Char]">e</a>
+
+  <span class="keyword">def</span> <a title="(message: =&gt; String)scalaz.NonEmptyList[Char]" id="84104">charsNelErr</a>(<a title="=&gt; String" id="356007">message</a>: =&gt; String): <a href="NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char] = <a href="#84103" title="(e: =&gt; scalaz.NonEmptyList[Char])scalaz.NonEmptyList[Char]">charsNel</a>(<a title="(message: String)Nothing" id="8868">error</a>(<a href="#356007" title="=&gt; String">message</a>))
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.NonEmptyList[Char]" id="84105">unsafeCharsNel</a> : <a href="NonEmptyList.scala.html#18068" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char] = <a href="#84104" title="(message: =&gt; String)scalaz.NonEmptyList[Char]">charsNelErr</a>(<span title="java.lang.String(&quot;cannot turn empty string into NonEmptyList&quot;)" class="string">&quot;cannot turn empty string into NonEmptyList&quot;</span>)
+
+  <span class="keyword">import</span> java.io.FileInputStream
+
+  <span class="keyword">def</span> <a title="[X](x: X,f: (X, Byte) =&gt; X)X" id="84107">readFile</a>[<a title="&gt;: Nothing &lt;: Any" id="84109">X</a>](<a title="X" id="356017">x</a>: <a href="#84109" title="X">X</a>, <a title="(X, Byte) =&gt; X" id="356018">f</a>: (X, Byte) =&gt; X): <a href="#84109" title="X">X</a> = {
+    <span class="keyword">val</span> <a title="java.io.FileInputStream" id="356022">in</a> = <span title="java.io.FileInputStream" class="keyword">new</span> <span title="java.io.FileInputStream">FileInputStream</span>(<a href="#84087" title="=&gt; String">s</a>)
+
+    <span class="keyword">try</span> {
+      <a href="InputStreamW.scala.html#34135" title="implicit scalaz.InputStreams.InputStreamTo : (v: java.io.InputStream)scalaz.InputStreamW">in</a>.<a href="InputStreamW.scala.html#182754" title="=&gt; Iterator[Byte]">elements</a>.<a title="(z: X)(op: (X, Byte) =&gt; X)X" id="29149">foldLeft</a>(<a href="#356017" title="X">x</a>)(<a href="#356018" title="(X, Byte) =&gt; X">f</a>)
+    } <span class="keyword">finally</span> {
+      <a href="#356022" title="java.io.FileInputStream">in</a>.<span title="()Unit">close</span>
+    }
+  }
+
+  <span class="keyword">def</span> <a title="(f: (Byte) =&gt; Unit)Unit" id="84110">fileEach</a>(<a title="(Byte) =&gt; Unit" id="356322">f</a>: Byte =&gt; Unit) {
+    <span class="keyword">val</span> <a title="java.io.FileInputStream" id="356324">in</a> = <span title="java.io.FileInputStream" class="keyword">new</span> <span title="java.io.FileInputStream">FileInputStream</span>(<a href="#84087" title="=&gt; String">s</a>)
+
+    <span class="keyword">try</span> {
+      <a href="InputStreamW.scala.html#34135" title="implicit scalaz.InputStreams.InputStreamTo : (v: java.io.InputStream)scalaz.InputStreamW">in</a>.<a href="InputStreamW.scala.html#182754" title="=&gt; Iterator[Byte]">elements</a>.<a title="(f: (Byte) =&gt; Unit)Unit" id="78165">foreach</a>(<a href="#356322" title="(Byte) =&gt; Unit">f</a>)
+    } <span class="keyword">finally</span> {
+      <a href="#356324" title="java.io.FileInputStream">in</a>.<span title="()Unit">close</span>
+    }
+  }
+
+  <span class="keyword">def</span> <a title="[X, Y](x: X,f: (X, Char) =&gt; X,y: Y,g: (Y, X) =&gt; Y)Unit" id="84111">readLines</a>[<a title="&gt;: Nothing &lt;: Any" id="84114">X</a>, <a title="&gt;: Nothing &lt;: Any" id="84115">Y</a>](<a title="X" id="356377">x</a>: <a href="#84114" title="X">X</a>, <a title="(X, Char) =&gt; X" id="356378">f</a>: (X, Char) =&gt; X, <a title="Y" id="356379">y</a>: <a href="#84115" title="Y">Y</a>, <a title="(Y, X) =&gt; Y" id="356380">g</a>: (Y, X) =&gt; Y) {
+    <span class="keyword">val</span> <a title="java.io.FileInputStream" id="356386">in</a> = <span title="java.io.FileInputStream" class="keyword">new</span> <span title="java.io.FileInputStream">FileInputStream</span>(<a href="#84087" title="=&gt; String">s</a>)
+
+    <span class="keyword">try</span> {
+      <span class="keyword">var</span> <a title="X" id="356392">t</a> = <a href="#356377" title="X">x</a>
+      <span class="keyword">var</span> <a title="Y" id="356393">u</a> = <a href="#356379" title="Y">y</a>
+      <span class="keyword">val</span> <a title="Iterator[Byte]" id="356394">i</a> = <a href="InputStreamW.scala.html#34135" title="implicit scalaz.InputStreams.InputStreamTo : (v: java.io.InputStream)scalaz.InputStreamW">in</a>.<a href="InputStreamW.scala.html#182754" title="=&gt; Iterator[Byte]">elements</a>
+      <span class="keyword">val</span> <a title="List[Byte]" id="356395">lineSeparators</a> = <span title="(xs: Byte*)List[Byte]">List</span>(<span title="Char('\015')" class="char">'\r'</span>.<span title="=&gt; Byte">toByte</span>, <span title="Char('\012')" class="char">'\n'</span>.<span title="=&gt; Byte">toByte</span>)
+
+      <span title="Unit" class="keyword">while</span>(<a href="#356394" title="Iterator[Byte]">i</a>.<a title="=&gt; Boolean" id="78110">hasNext</a>) {
+        <span class="keyword">val</span> <a title="Char" id="356442">c</a> = <a href="#356394" title="Iterator[Byte]">i</a>.<a title="()Byte" id="78111">next</a>.<a title="=&gt; Char" id="4380">toChar</a>
+
+        <span title="Unit" class="keyword">if</span>(<a href="#356395" title="List[Byte]">lineSeparators</a>.<a title="(elem: Any)Boolean" id="28794">contains</a>(<a href="#356442" title="Char">c</a>)) {
+          <a href="#356393" title="Y">u</a> = <a href="#356380" title="(v1: Y,v2: X)Y">g</a>(<a href="#356393" title="Y">u</a>, <a href="#356392" title="X">t</a>)
+          <a href="#356392" title="X">t</a> = <a href="#356377" title="X">x</a>
+        } <span class="keyword">else</span>
+          <a href="#356392" title="X">t</a> = <a href="#356378" title="(v1: X,v2: Char)X">f</a>(<a href="#356392" title="X">t</a>, <a href="#356442" title="Char">c</a>)
+      }
+
+      <a href="#356393" title="Y">u</a>
+    } <span class="keyword">finally</span> {
+      <a href="#356386" title="java.io.FileInputStream">in</a>.<span title="()Unit">close</span>
+    }
+  }
+
+  // Parsing functions.
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Boolean]" id="84116">parseBoolean</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Boolean]">Validation</a>[NumberFormatException, Boolean] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Boolean)scalaz.Validation[Nothing,Boolean]">success</a>(<a href="#84087" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">s</a>.<a title="=&gt; Boolean" id="30377">toBoolean</a>)
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356514">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356514" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Byte]" id="84117">parseByte</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Byte]">Validation</a>[NumberFormatException, Byte] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Byte)scalaz.Validation[Nothing,Byte]">success</a>(java.lang.<a title="object java.lang.Byte" id="2612">Byte</a>.<a title="(x$1: java.lang.String)Byte" id="56782">parseByte</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356530">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356530" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Short]" id="84118">parseShort</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Short]">Validation</a>[NumberFormatException, Short] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Short)scalaz.Validation[Nothing,Short]">success</a>(java.lang.<a title="object java.lang.Short" id="2468">Short</a>.<a title="(x$1: java.lang.String)Short" id="38167">parseShort</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356546">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356546" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Int]" id="84119">parseInt</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Int]">Validation</a>[NumberFormatException, Int] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Int)scalaz.Validation[Nothing,Int]">success</a>(java.lang.<a title="object java.lang.Integer" id="2336">Integer</a>.<a title="(x$1: java.lang.String)Int" id="31184">parseInt</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356562">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356562" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Long]" id="84120">parseLong</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Long]">Validation</a>[NumberFormatException, Long] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Long)scalaz.Validation[Nothing,Long]">success</a>(java.lang.<a title="object java.lang.Long" id="2444">Long</a>.<a title="(x$1: java.lang.String)Long" id="31093">parseLong</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356578">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356578" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Float]" id="84121">parseFloat</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Float]">Validation</a>[NumberFormatException, Float] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Float)scalaz.Validation[Nothing,Float]">success</a>(java.lang.<a title="object java.lang.Float" id="2705">Float</a>.<a title="(x$1: java.lang.String)Float" id="31028">parseFloat</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356592">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356592" title="NumberFormatException">e</a>)
+  }
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Validation[NumberFormatException,Double]" id="84122">parseDouble</a>: <a href="Validation.scala.html#21020" title="scalaz.Validation[NumberFormatException,Double]">Validation</a>[NumberFormatException, Double] = <span class="keyword">try</span> {
+    <a href="Validation.scala.html#35267" title="(a: Double)scalaz.Validation[Nothing,Double]">success</a>(java.lang.<a title="object java.lang.Double" id="2510">Double</a>.<a title="(x$1: java.lang.String)Double" id="30967">parseDouble</a>(<a href="#84087" title="=&gt; String">s</a>))
+  } <span class="keyword">catch</span> {
+    <span title="scalaz.Validation[NumberFormatException,Nothing]" class="keyword">case</span> <a title="NumberFormatException" id="356606">e</a>: <span title="NumberFormatException">NumberFormatException</span> =&gt; <a href="Validation.scala.html#35272" title="(e: NumberFormatException)scalaz.Validation[NumberFormatException,Nothing]">failure</a>(<a href="#356606" title="NumberFormatException">e</a>)
+  }
+}
+
+<span class="keyword">trait</span> <a title="trait Strings extends java.lang.Object with ScalaObject" id="19883">Strings</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.Strings.StringTo : (ss: String)scalaz.StringW" id="34978">StringTo</a>(<a title="String" id="38129">ss</a>: <span title="String">String</span>): <a href="#19898" title="scalaz.StringW">StringW</a> = <a href="#356619" title="java.lang.Object with scalaz.StringW{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.StringW" id="356619">StringW</a> {
+    <span class="keyword">val</span> <a title="String" id="356623">value</a> = <a href="#38129" title="String">ss</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/Application.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> response.{Body, Response, OK}
+<span class="keyword">import</span> request.Request
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19020" title="object scalaz.Scalaz">Scalaz</a>._
+
+/**
+ * A web application that transforms a request to a response.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">trait</span> <a title="trait Application[IN[_], OUT[_]] extends java.lang.Object with ScalaObject" id="26312">Application</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="26600">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="808868">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="26601">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="808869">_</a>]] <span title="ScalaObject">{</span>
+  /**
+   * Transform the given request to a response.
+   */
+  <span class="keyword">def</span> <a title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="808865">apply</a>(<span class="keyword">implicit</span> <a title="scalaz.http.request.Request[IN]" id="833377">req</a>: <a href="request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <a href="response/Response.scala.html#27666" title="scalaz.http.response.Response[OUT]">Response</a>[OUT]
+
+  <span class="keyword">import</span> <a href="#26313" title="object scalaz.http.Application">Application</a>.application
+
+  <span class="keyword">def</span> <a title="(x: String)(implicit b: scalaz.http.response.Body[OUT,String],implicit s: scalaz.Semigroup[OUT[Byte]])scalaz.http.Application[IN,OUT]" id="808867">^*^</a>(<a title="String" id="833387">x</a>: <a title="String" id="2716">String</a>)(<span class="keyword">implicit</span> <a title="scalaz.http.response.Body[OUT,String]" id="833388">b</a>: <a href="response/Body.scala.html#27363" title="scalaz.http.response.Body[OUT,String]">Body</a>[OUT, String], <a title="scalaz.Semigroup[OUT[Byte]]" id="833389">s</a>: <a href="../Semigroup.scala.html#19322" title="scalaz.Semigroup[OUT[Byte]]">Semigroup</a>[OUT[Byte]]): <a href="#26312" title="scalaz.http.Application[IN,OUT]">Application</a>[IN, OUT] = <a href="#833380" title="[IN[_], OUT[_]](f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]">application</a><span title="(f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]">[</span><a href="#26600" title="IN">IN</a>, <a href="#26601" title="OUT">OUT</a>](<a title="scalaz.http.request.Request[IN]" id="833424">req</a> =&gt; {
+    <span class="keyword">val</span> <a title="scalaz.http.response.Response[OUT]" id="833425">res</a> = <a href="#808865" title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]">Application</a>.<span class="keyword">this</span>(<a href="#833424" title="scalaz.http.request.Request[IN]">req</a>)
+    <span title="scalaz.http.response.Response[OUT]" class="keyword">if</span>(<a href="response/Response.scala.html#810238" title="(h: scalaz.http.response.ResponseHeader)Option[scalaz.NonEmptyList[Char]]">res</a>(<a href="response/ResponseHeader.scala.html#808755" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>).<a title="=&gt; Boolean" id="38375">isDefined</a>) <a href="#833425" title="scalaz.http.response.Response[OUT]">res</a>
+    <span class="keyword">else</span> <span title="scalaz.http.response.Response[OUT]" class="keyword">if</span>(<a href="#833424" title="scalaz.http.request.Request[IN]">req</a>.<a href="request/Request.scala.html#808959" title="=&gt; Boolean">isInternetExplorer</a>)
+      <span title="(x$1: Any)java.lang.String" class="string">&quot;&lt;?xml-stylesheet type=\&quot;text/xsl\&quot; href=\&quot;&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#833387" title="String">x</a> + <span title="java.lang.String(&quot;&quot;?&gt;\012\012&quot;)" class="string">&quot;\&quot;?&gt;\n\n&quot;</span> <a href="#834548" title="java.lang.String">&lt;&lt;:</a> <a href="response/Response.scala.html#810236" title="(h: scalaz.http.response.ResponseHeader,s: String)scalaz.http.response.Response[OUT]">res</a><a href="response/Response.scala.html#810245" title="(a: java.lang.String)(implicit b: scalaz.http.response.Body[OUT,java.lang.String],implicit s: scalaz.Semigroup[OUT[Byte]])java.lang.Object with scalaz.http.response.Response[OUT]">(</a><a href="response/ResponseHeader.scala.html#808755" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>, <span title="java.lang.String(&quot;application/xml&quot;)" class="string">&quot;application/xml&quot;</span>)
+    <span class="keyword">else</span>
+      <a href="response/Response.scala.html#810236" title="(h: scalaz.http.response.ResponseHeader,s: String)scalaz.http.response.Response[OUT]">res</a>(<a href="response/ResponseHeader.scala.html#808755" title="implicit scalaz.http.response.ResponseHeaders.entityToResponse : (eh: scalaz.http.EntityHeader)scalaz.http.response.ResponseHeader">ContentType</a>, <span title="java.lang.String(&quot;application/xhtml+xml&quot;)" class="string">&quot;application/xhtml+xml&quot;</span>)
+  })
+}
+
+/**
+ * Functions over web applications that transforms a request to a response.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.Application" id="26313">Application</a> <span title="ScalaObject">{</span>
+  /**
+   * Create a web application from the given function.
+   */
+  <span class="keyword">def</span> <a title="[IN[_], OUT[_]](f: (scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT])java.lang.Object with scalaz.http.Application[IN,OUT]" id="833380">application</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="833383">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="833395">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="833384">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="833396">_</a>]](<a title="(scalaz.http.request.Request[IN]) =&gt; scalaz.http.response.Response[OUT]" id="833391">f</a>: Request[IN] =&gt; Response[OUT]) = <a href="#833394" title="java.lang.Object with scalaz.http.Application[IN,OUT]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.Application[IN,OUT]" id="833394">Application</a>[IN, OUT] {
+    <span class="keyword">def</span> <a title="(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="833398">apply</a>(<span class="keyword">implicit</span> <a title="scalaz.http.request.Request[IN]" id="833399">req</a>: <a href="request/Request.scala.html#27182" title="scalaz.http.request.Request[IN]">Request</a>[IN]) = <a href="#833391" title="(v1: scalaz.http.request.Request[IN])scalaz.http.response.Response[OUT]" id="28871">f</a>(<a href="#833399" title="scalaz.http.request.Request[IN]">req</a>)
+  }
+
+  /**
+   * XSL for a blank XHTML page to use. This is used when working around Internet Explorer for XHTML.
+   */
+  <span class="keyword">val</span> <a title="scala.xml.Elem" id="833385">blankXsl</a> =
+&lt;<a title="scala.xml.NamespaceBinding" id="835178">stylesheet</a> version=<span title="scala.xml.Text" class="string">&quot;1.0&quot;</span> xmlns=<span title="java.lang.String(&quot;http://www.w3.org/1999/XSL/Transform&quot;)" class="string">&quot;http://www.w3.org/1999/XSL/Transform&quot;</span>&gt;
+  &lt;<a title="scala.xml.MetaData" id="835189">template</a> <span class="keyword">match</span>=<span title="scala.xml.Text" class="string">&quot;/&quot;</span>&gt;
+    &lt;<a title="scala.xml.MetaData" id="835193">copy</a>-of select=<span title="scala.xml.Text" class="string">&quot;.&quot;</span>/&gt;
+  &lt;/template&gt;
+&lt;/stylesheet&gt;
+}
+
+        </pre>
+    </body>
+</html>

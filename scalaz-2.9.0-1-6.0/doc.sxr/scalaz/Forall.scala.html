@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Forall.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/** A universally quantified value */</span>
+<span class="keyword">trait</span> <a title="trait Forall[P[_]] extends java.lang.Object" id="13205">Forall</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="20570">P</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229618">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A]=&gt; P[A]" id="229615">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229617">A</a><span class="delimiter">]</span>: <a href="#20570" title="P[A]">P</a><span class="delimiter">[</span>A<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait ForallK[K, P[_]] extends java.lang.Object" id="13208">ForallK</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="20571">K</a>, <a title="[_]&gt;: Nothing &lt;: Any" id="20572">P</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229623">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A](implicit k: K)P[A]" id="229620">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229622">A</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="K" id="229625">k</a>: <a href="#20571" title="K">K</a><span class="delimiter">)</span>: <a href="#20572" title="P[A]">P</a><span class="delimiter">[</span>A<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait ForallM[K[_[_]], P[_[_]]] extends java.lang.Object" id="13211">ForallM</a><span class="delimiter">[</span><a title="[_[_]]&gt;: Nothing &lt;: Any" id="20573">K</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229629">_</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229630">_</a><span class="delimiter">]</span><span class="delimiter">]</span>, <a title="[_[_]]&gt;: Nothing &lt;: Any" id="20574">P</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229631">_</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229632">_</a><span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[M[_]](implicit evidence$1: K[M])P[M]" id="229634">apply</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229628">M</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229635">_</a><span class="delimiter">]</span>:K<span class="delimiter">]</span>: <a href="#20574" title="P[M]">P</a><span class="delimiter">[</span>M<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.Forall" id="13206">Forall</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/** Universal quantification by doubly negating an existential. */</span>
+  <span class="keyword">type</span> <a title="[A](A) =&gt; Nothing" id="229638">Not</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229639">A</a><span class="delimiter">]</span> = A =&gt; Nothing
+  <span class="keyword">type</span> <a title="[P[_]](P[A]) =&gt; Nothing forSome { type A }" id="229640">DNE</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229641">P</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229651">_</a><span class="delimiter">]</span><span class="delimiter">]</span> = Not<span class="delimiter">[</span>P<span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">]</span> <span title="(P[A]) =&gt; Nothing forSome { type A }" class="keyword">forSome</span> <span class="delimiter">{</span> <span class="keyword">type</span> A <span class="delimiter">}</span>
+  <span class="keyword">type</span> <a title="[P[_]](scalaz.Forall.DNE[P]) =&gt; Nothing" id="229642">CPS</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229643">P</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229653">_</a><span class="delimiter">]</span><span class="delimiter">]</span> = <span title="(scalaz.Forall.DNE[P]) =&gt; Nothing">Not</span><span class="delimiter">[</span>DNE<span class="delimiter">[</span>P<span class="delimiter">]</span><span class="delimiter">]</span>
+
+  <span class="comment">/** Construct a universal quantifier by continuation-passing. */</span>
+  <span class="keyword">def</span> <a title="[P[_]](p: (scalaz.Forall.DNE[P]) =&gt; Nothing)scalaz.Forall[P]" id="229644">apply</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="229646">P</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229655">_</a><span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">(</span><a title="(scalaz.Forall.DNE[P]) =&gt; Nothing" id="229654">p</a>: <span title="(scalaz.Forall.DNE[P]) =&gt; Nothing">CPS</span><span class="delimiter">[</span>P<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#13205" title="scalaz.Forall[P]">Forall</a><span class="delimiter">[</span>P<span class="delimiter">]</span> = <a href="#229658" title="java.lang.Object with scalaz.Forall[P]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Forall[P]" id="229658">Forall</a><span class="delimiter">[</span>P<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A]=&gt; P[A]" id="229662">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="229664">A</a><span class="delimiter">]</span>: <a href="#229646" title="P[A]">P</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <span class="delimiter">{</span>
+      case <span class="keyword">class</span> <a title="class Control extends java.lang.Throwable with ScalaObject with Product with Serializable" id="229705">Control</a><a href="#229705" title="ScalaObject" class="delimiter">(</a><a title="P[A]" id="229754">arg</a> : <a href="#229646" title="P[A]">P</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span> <span class="keyword">extends</span> <span title="java.lang.Throwable">Throwable</span>
+      <span class="keyword">val</span> <a title="P[A]" id="229673">res</a> = <span class="keyword">try</span> <span class="delimiter">{</span>
+        <a href="#229654" title="(v1: scalaz.Forall.DNE[P])Nothing">p</a><span class="delimiter">(</span><span class="delimiter">(</span>arg:<a href="#229646" title="P[A]">P</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span> =&gt; <span title="Nothing" class="keyword">throw</span> <span title="Control" class="keyword">new</span> <a href="#229705" title="Control">Control</a><span class="delimiter">(</span><a href="#229743" title="P[A]">arg</a><span class="delimiter">)</span><span class="delimiter">)</span>
+      <span class="delimiter">}</span> <span class="keyword">catch</span> <span class="delimiter">{</span>
+        <span class="keyword">case</span> <span title="P[A]">Control</span><span class="delimiter">(</span><a title="P[A]" id="229747">arg</a><span class="delimiter">)</span> =&gt; <a href="#229747" title="P[A]">arg</a>
+        <span class="keyword">case</span> <a title="Nothing" id="229749">e</a> =&gt; <span title="Nothing" class="keyword">throw</span> <a href="#229749" title="java.lang.Throwable">e</a>
+      <span class="delimiter">}</span>
+      <a href="#229673" title="P[A]">res</a>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

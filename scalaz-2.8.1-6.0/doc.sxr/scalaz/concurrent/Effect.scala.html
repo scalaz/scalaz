@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/concurrent/Effect.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Effect[-A] extends java.lang.Object with ScalaObject" id="22087">Effect</a>[-<a title="&gt;: Nothing &lt;: Any" id="22241">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; (A) =&gt; Unit" id="56183">e</a>: A =&gt; Unit
+  <span class="keyword">val</span> <a title="=&gt; scalaz.concurrent.Strategy" id="56184">strategy</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>
+
+  <span class="keyword">def</span> <a title="(a: A)() =&gt; Unit" id="56185">!</a>(<a title="A" id="113872">a</a>: <a href="#22241" title="A">A</a>) = <a href="Strategy.scala.html#52222" title="(a: =&gt; Unit)() =&gt; Unit">strategy</a>(<a href="#56183" title="(v1: A)Unit">e</a>(<a href="#113872" title="A">a</a>))
+}
+
+<span class="keyword">trait</span> <a title="trait Effects extends java.lang.Object with ScalaObject" id="22096">Effects</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](c: (A) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Effect[A]" id="33992">effect</a>[<a title="&gt;: Nothing &lt;: Any" id="33994">A</a>](<a title="(A) =&gt; Unit" id="97971">c</a>: A =&gt; Unit)(<span class="keyword">implicit</span> <a title="scalaz.concurrent.Strategy" id="97972">s</a>: <a href="Strategy.scala.html#22183" title="scalaz.concurrent.Strategy">Strategy</a>): <a href="#22087" title="scalaz.concurrent.Effect[A]">Effect</a>[A] = <a href="#393818" title="java.lang.Object with scalaz.concurrent.Effect[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Effect[A]" id="393818">Effect</a>[A] {
+    <span class="keyword">val</span> <a title="(A) =&gt; Unit" id="393822">e</a> = (a: <a href="#33994" title="A">A</a>) =&gt; <a href="#97971" title="(v1: A)Unit">c</a>(<a href="#393827" title="A">a</a>)
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="393824">strategy</a> = <a href="#97972" title="scalaz.concurrent.Strategy">s</a>
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.concurrent.Effect" id="22088">Effect</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](e: scalaz.concurrent.Effect[A])(A) =&gt; Unit" id="98008">EffectFrom</a>[<a title="&gt;: Nothing &lt;: Any" id="98010">A</a>](<a title="scalaz.concurrent.Effect[A]" id="98011">e</a>: <a href="#22087" title="scalaz.concurrent.Effect[A]">Effect</a>[A]): A =&gt; Unit = <a href="#56185" title="(a: A)() =&gt; Unit">e</a> <span title="Unit">!</span> <a href="#393837" title="A">_</a>
+}
+
+        </pre>
+    </body>
+</html>

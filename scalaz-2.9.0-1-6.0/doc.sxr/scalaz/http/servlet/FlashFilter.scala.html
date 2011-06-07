@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/FlashFilter.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> javax.servlet.<span class="delimiter">{</span>ServletRequest, ServletResponse, Filter, FilterChain, FilterConfig<span class="delimiter">}</span>
+<span class="keyword">import</span> <a href="HttpServletRequest.scala.html#25661" title="object scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>._
+
+<span class="comment">/**
+ * A filter that will keep a session variable until the next request where its value is placed in a request attribute.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> <span class="keyword">class</span> <a title="class FlashFilter extends java.lang.Object with javax.servlet.Filter with ScalaObject" id="25588">FlashFilter</a> <a href="#25588" title="ScalaObject" class="keyword">extends</a> <span title="javax.servlet.Filter">Filter</span> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * No-op.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="(config: javax.servlet.FilterConfig)Unit" id="1220333">init</a><span class="delimiter">(</span><a title="javax.servlet.FilterConfig" id="1220339">config</a> : <span title="javax.servlet.FilterConfig">FilterConfig</span><span class="delimiter">)</span> = <span title="Unit" class="delimiter">{</span><span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * No-op.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()Unit" id="1220334">destroy</a> = <span title="Unit" class="delimiter">{</span><span class="delimiter">}</span>
+
+  <span class="keyword">import</span> <a href="#25589" title="object scalaz.http.servlet.FlashFilter">FlashFilter</a>.flashParameter
+
+  <span class="comment">/**
+   * If there is a session parameter set then unset it and put its value in a request attribute.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="(request: javax.servlet.ServletRequest, response: javax.servlet.ServletResponse, chain: javax.servlet.FilterChain)Unit" id="1220336">doFilter</a><span class="delimiter">(</span><a title="javax.servlet.ServletRequest" id="1220360">request</a> : <span title="javax.servlet.ServletRequest">ServletRequest</span>, <a title="javax.servlet.ServletResponse" id="1220361">response</a> : <span title="javax.servlet.ServletResponse">ServletResponse</span>, <a title="javax.servlet.FilterChain" id="1220362">chain</a> : <span title="javax.servlet.FilterChain">FilterChain</span><span class="delimiter">)</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="javax.servlet.http.HttpServletRequest" id="1220367">r</a> = <a href="#1220360" title="javax.servlet.ServletRequest">request</a>.<span title="[T0]=&gt; T0">asInstanceOf</span><span title="javax.servlet.http.HttpServletRequest" class="delimiter">[</span>javax.servlet.http.<span title="javax.servlet.http.HttpServletRequest">HttpServletRequest</span><span class="delimiter">]</span>
+
+    <a href="HttpServletRequest.scala.html#1103049" title="implicit scalaz.http.servlet.HttpServletRequests.HttpServletRequestRequest : (r: javax.servlet.http.HttpServletRequest)scalaz.http.servlet.HttpServletRequest">r</a>.<a href="HttpSession.scala.html#1103607" title="(attr: String)Option[java.lang.Object]">session</a><span class="delimiter">(</span><a href="#1220352" title="=&gt; java.lang.String">flashParameter</a><span class="delimiter">)</span> <span title="(f: (java.lang.Object) =&gt; Unit)Unit">foreach</span> <span class="delimiter">(</span><a title="java.lang.Object" id="1220467">flash</a> =&gt; <span class="delimiter">{</span>
+      <a href="HttpServletRequest.scala.html#1103234" title="(attr: String, value: java.lang.Object)Unit">r</a><span class="delimiter">(</span><a href="#1220352" title="=&gt; java.lang.String">flashParameter</a><span class="delimiter">)</span> = <a href="#1220467" title="java.lang.Object">flash</a>
+      <a href="HttpServletRequest.scala.html#1103049" title="implicit scalaz.http.servlet.HttpServletRequests.HttpServletRequestRequest : (r: javax.servlet.http.HttpServletRequest)scalaz.http.servlet.HttpServletRequest">r</a>.<a href="HttpServletRequest.scala.html#1103238" title="=&gt; scalaz.http.servlet.HttpSession">session</a> <a href="HttpSession.scala.html#1103611" title="(attr: String)Unit">-=</a> <span class="delimiter">(</span><a href="#1220352" title="=&gt; java.lang.String">flashParameter</a><span class="delimiter">)</span>
+    <span class="delimiter">}</span><span class="delimiter">)</span>
+
+    <a href="#1220362" title="javax.servlet.FilterChain">chain</a>.<span title="(x$1: javax.servlet.ServletRequest, x$2: javax.servlet.ServletResponse)Unit">doFilter</span><span class="delimiter">(</span><a href="#1220360" title="javax.servlet.ServletRequest">request</a>, <a href="#1220361" title="javax.servlet.ServletResponse">response</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * A filter that will keep a session variable until the next request where its value is placed in a request attribute.
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.FlashFilter" id="25589">FlashFilter</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * The session and request attribute used for associating a value.
+   */</span>
+  <span class="keyword">val</span> <a title="java.lang.String" id="1220352">flashParameter</a> = <span title="java.lang.String(&quot;scalaz.http.servlet.FlashFilter.flashParameter&quot;)" class="string">&quot;scalaz.http.servlet.FlashFilter.flashParameter&quot;</span>
+
+  <span class="comment">/**
+   * Sets the value to be used in the next request using the session.
+   */</span>
+  <span class="keyword">def</span> <a title="[A](v: A)(implicit r: scalaz.http.servlet.HttpServletRequest)Unit" id="1220354">flashSet</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1220356">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A" id="1220621">v</a>: <a href="#1220356" title="A">A</a><span class="delimiter">)</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="1220622">r</a>: <a href="HttpServletRequest.scala.html#25660" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a><span class="delimiter">)</span> <span class="delimiter">{</span>
+    <a href="#1220622" title="scalaz.http.servlet.HttpServletRequest">r</a>.<a href="HttpSession.scala.html#1103612" title="(attr: String, value: A)Unit">session</a><span class="delimiter">(</span><a href="#1220352" title="=&gt; java.lang.String">flashParameter</a><span class="delimiter">)</span> = <a href="#1220621" title="A">v</a> 
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Gets the value from the request that was previously set if there is one. 
+   */</span>
+  <span class="keyword">def</span> <a title="[A](implicit r: scalaz.http.servlet.HttpServletRequest)Option[A]" id="1220357">flashGet</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1220359">A</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServletRequest" id="1220640">r</a>: <a href="HttpServletRequest.scala.html#25660" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a><span class="delimiter">)</span> = <a href="#1220640" title="scalaz.http.servlet.HttpServletRequest">r</a> <a href="HttpServletRequest.scala.html#1103237" title="(attr: String)Option[java.lang.Object]">attr</a> <a href="#1220352" title="=&gt; java.lang.String">flashParameter</a> <span title="(f: (java.lang.Object) =&gt; A)Option[A]">map</span> <span class="delimiter">(</span><a href="#1220656" title="java.lang.Object">_</a>.<span title="[T0]=&gt; T0">asInstanceOf</span><span title="A" class="delimiter">[</span><a href="#1220359" title="A">A</a><span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>
