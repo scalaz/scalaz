@@ -5,7 +5,17 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   /**
    * Use this to force implicit conversion of M[A] to MA[M, A]. Useful when the original
-   * type contains a member with the same name as MA, for example: List(1,2,3) map f
+   * type contains a member with the same name as MA, for example:
+   *
+   * scala> List(1, 2, 3).min
+   * res0: Int = 1
+   * scala> List(1, 2, 3).asMA.min
+   * res1: Option[Int] = Some(1)
+   *
+   * This is less noisy than the alternative:
+   *
+   * scala> (List(1, 2, 3): MA[List, Int]).min
+   * res2: Option[Int] = Some(1)
    */
   def asMA: MA[M, A] = this
 
@@ -104,10 +114,10 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def len(implicit l: Length[M]): Int = l len value
 
-  def maximum(implicit r: Foldable[M], ord: Order[A]): Option[A] =
+  def max(implicit r: Foldable[M], ord: Order[A]): Option[A] =
     foldl1((x: A, y: A) => if (x gt y) x else y)
 
-  def minimum(implicit r: Foldable[M], ord: Order[A]): Option[A] =
+  def min(implicit r: Foldable[M], ord: Order[A]): Option[A] =
     foldl1((x: A, y: A) => if (x lt y) x else y)
 
   def longDigits(implicit d: A <:< Digit, t: Foldable[M]): Long =
@@ -143,7 +153,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def !(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
 
-  def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (error("Index " + n + " out of bounds"))
+  def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (sys.error("Index " + n + " out of bounds"))
 
   def any(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(false)(p(_) || _)
 

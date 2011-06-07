@@ -15,7 +15,7 @@ sealed trait IterV[E, A] {
   def run: A = {
     def runCont(i: IterV[E, A]) = i.fold(done = (x, _) => Some(x), cont = _ => None)
     fold(done = (x, _) => x,
-          cont = k => runCont(k(EOF[E])).getOrElse(error("Diverging iteratee!")))
+          cont = k => runCont(k(EOF[E])).getOrElse(sys.error("Diverging iteratee!")))
   }
   def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
 }
