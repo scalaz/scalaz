@@ -371,6 +371,8 @@ trait MAs extends MAsLow {
 
   import java.util.Map.Entry
 
+  implicit def MapMA[K, V](m: Map[K, V]): MA[({type λ[α] = Map[α, V]})#λ, K] = ma[({type λ[α] = Map[α, V]})#λ, K](m)
+
   implicit def MapEntryMA[X, A](e: Entry[X, A]) = ma[({type λ[α]=Entry[X, α]})#λ, A](e)
 
   // Seq[A] implements Function1[Int, A]. Without this, Function1ApplyMA would be used.
