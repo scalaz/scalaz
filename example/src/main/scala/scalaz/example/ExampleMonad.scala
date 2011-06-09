@@ -48,7 +48,7 @@ object ExampleMonad {
     Stream(1, 2).foldlM(0)(b => a => some(a + b)) assert_=== some(3)
 
     // Folding right on a Stream through the List monad
-    Stream(1, 2).foldrM(0)(b => a => List(10, 20, a, b)) assert_=== List(10, 20, 1, 10, 10, 20, 1, 20, 10, 20, 1, 2, 10, 20, 1, 0)
+    Stream(1, 2).foldrM(0)(b => a => List(10, 20, a, b)) assert_=== List(10, 20, 10, 1, 10, 20, 20, 1, 10, 20, 0, 1, 10, 20, 2, 1)
 
     // Folding right on a List through the Option monad
     List(1, 2).foldrM(0)(b => a => some(a + b)) assert_=== some(3)
