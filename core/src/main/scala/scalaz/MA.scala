@@ -249,8 +249,8 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def foldLeftM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
     foldl[N[B]](b η)((b, a) => b ∗ ((z: B) => f(z, a)))
 
-  def foldRightM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
-    foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(z, a)))
+  def foldRightM[N[_], B](b: B)(f: (A, B) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
+    foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(a, z)))
 
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
     if (n <= 0) ∅[N[A]].η[M]
