@@ -4,7 +4,7 @@ trait Foldr[F[_]] {
   def foldr[A, B]: (A => (=> B) => B) => B => F[A] => B
 
   def foldr1[A]: (A => (=> A) => A) => F[A] => Option[A] =
-    f => foldr[A, Option[A]](a => o => o.map(f(a)(_)))(None: Option[A])
+    f => foldr[A, Option[A]](a => o => o.map(f(a)(_)) orElse Some(a))(None: Option[A])
 
   def foldMap[A, M](f: A => M)(implicit m: Monoid[M]): F[A] => M =
     foldr[A, M](a => b => m.append(f(a), b))(m.z)

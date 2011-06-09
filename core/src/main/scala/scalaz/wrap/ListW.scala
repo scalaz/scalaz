@@ -54,7 +54,7 @@ sealed trait ListW[A] {
   def takeWhileM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = value match {
     case Nil => implicitly[Monad[M]].point(nil[A])
     case h :: t => implicitly[Monad[M]].bd((b: Boolean) =>
-      if (b) t takeWhileM p else implicitly[Monad[M]].point(nil[A]))(p(h))
+      if (b) implicitly[Monad[M]].fmap((tt: List[A]) => h :: tt)(t takeWhileM p) else implicitly[Monad[M]].point(nil[A]))(p(h))
   }
 
   def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] =
