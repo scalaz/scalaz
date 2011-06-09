@@ -167,7 +167,7 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
 
 object Identity { 
   def apply[A](a: => A) = new Identity[A] {
-    def value = a
+    lazy val value = a
   }
   def unapply[A](v: Identity[A]): Option[A] = Some(v.value)
 }
