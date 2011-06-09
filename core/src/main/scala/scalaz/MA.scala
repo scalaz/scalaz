@@ -249,8 +249,8 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def foldLeftM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
     foldl[N[B]](b η)((b, a) => b ∗ ((z: B) => f(z, a)))
 
-  def foldRightM[N[_], B](b: B)(f: (B, A) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
-    foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(z, a)))
+  def foldRightM[N[_], B](b: B)(f: (A, B) => N[B])(implicit fr: Foldable[M], m: Monad[N]): N[B] =
+    foldr[N[B]](b η)((a, b) => b ∗ ((z: B) => f(a, z)))
 
   def replicateM[N[_]](n: Int)(implicit m: Monad[M], p: Pure[N], d: Monoid[N[A]]): M[N[A]] =
     if (n <= 0) ∅[N[A]].η[M]
@@ -370,6 +370,8 @@ trait MAs extends MAsLow {
   implicit def IterVMA[A, E](v: IterV[E, A]) = ma[({type λ[α]=IterV[E, α]})#λ, A](v)
 
   import java.util.Map.Entry
+
+  implicit def MapMA[K, V](m: Map[K, V]): MA[({type λ[α] = Map[α, V]})#λ, K] = ma[({type λ[α] = Map[α, V]})#λ, K](m)
 
   implicit def MapEntryMA[X, A](e: Entry[X, A]) = ma[({type λ[α]=Entry[X, α]})#λ, A](e)
 

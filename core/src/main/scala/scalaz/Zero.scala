@@ -123,6 +123,8 @@ object Zero {
 
   implicit def EitherZero[A: Zero, B]: Zero[Either[A, B]] = zero(Left(∅[A]))
 
+  implicit def MapZero[K, V: Zero]: Zero[Map[K, V]] = zero(Map.empty[K, V])
+
   implicit def IndSeqZero[A]: Zero[IndSeq[A]] = zero(IndSeq.apply[A]())
 
   implicit def Tuple2Zero[A, B](implicit az: Zero[A], bz: Zero[B]): Zero[(A, B)] =

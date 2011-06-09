@@ -160,7 +160,11 @@ object IterV {
           (a, _) => Cont(step(acc |+| a.η[F])),
           k => k(El(e)).fold(
             (a, _) => Cont(step(acc |+| a.η[F])),
-            (k2) => Cont(step(acc))
+            (k2) => Cont((in: Input[E]) => for {
+                h <- k2(in)
+                t <- repeat(iter)
+              } yield acc |+| h.pure[F] |+| t
+            )
           )),
         empty = Cont(step(acc)),
         eof = Done(acc, EOF.apply))

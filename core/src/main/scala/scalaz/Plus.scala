@@ -86,6 +86,10 @@ object Plus extends PlusLow {
     }
   }
 
+  implicit def MapPlus[V: Semigroup]: Plus[({type λ[α] = Map[α, V]})#λ] = new Plus[({type λ[α] = Map[α, V]})#λ] {
+    override def plus[K](m1: Map[K, V], m2: => Map[K, V]) = Semigroup.MapSemigroup[K, V].append(m1, m2)
+  }
+
   import java.util._
   import java.util.concurrent._
 

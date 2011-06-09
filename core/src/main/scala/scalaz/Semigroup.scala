@@ -145,6 +145,21 @@ object Semigroup extends SemigroupLow {
 
   implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
 
+  implicit def MapSemigroup[K, V](implicit ss: Semigroup[V]): Semigroup[Map[K, V]] = semigroup {
+    (m1, m2) => {
+      // semigroups are not commutative, so order may matter. 
+      val (from, to, semigroup) = {
+        if (m1.size > m2.size) (m2, m1, ss.append(_: V, _: V))
+        else (m1, m2, (ss.append(_: V, _: V)).flip)
+      }
+
+      from.foldLeft(to) {
+        case (to, (k, v)) => to + (k -> to.get(k).map(semigroup(_, v)).getOrElse(v))
+      }
+    }
+  }
+
+
   import concurrent.Strategy
   
   implicit def StrategySemigroup: Semigroup[Strategy] =
