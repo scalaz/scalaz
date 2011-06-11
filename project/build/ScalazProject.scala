@@ -73,8 +73,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
       Credentials(Path.userHome / ".ivy2" / ".credentials", log)
   }
 
-  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
-  override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
+  // This lets you use a local copy of scala.
+  override def localScala = defineScala("2.10.0.local", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
 
   private def noAction = task {None}
 
