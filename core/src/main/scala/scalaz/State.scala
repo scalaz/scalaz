@@ -22,7 +22,7 @@ sealed trait State[S, +A] {
 
 /**
  * State monad transformer
- **/
+ */
 sealed trait StateT[M[_], S, A] {
   def apply(s: S): M[(S, A)]
 

@@ -12,7 +12,7 @@ import Scalaz._
  * Minimal definition: 'unit' or 'snoc'
  * 
  * Based on a Haskell library by Edward Kmett
- **/
+ */
 abstract class Reducer[C, M](implicit mm: Monoid[M]) {
   val monoid = mm
   def unit(c: C): M = snoc(mzero, c)
@@ -33,7 +33,7 @@ trait Reducers {
   import Scalaz._
   implicit def ReducerMonoid[C, M](r: Reducer[C, M]) = r.monoid
 
-  /** Construct a Reducer with the given unit function and monoid **/
+  /** Construct a Reducer with the given unit function and monoid */
   def Reducer[C, M: Monoid](unit: C => M) = {
     val u = unit
     new Reducer[C, M] {
