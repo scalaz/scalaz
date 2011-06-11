@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/concurrent/Fibs.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">object</span> <a title="object scalaz.example.concurrent.Fibs" id="24070">Fibs</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> java.util.concurrent._
+  <span class="keyword">import</span> scalaz.concurrent._
+  <span class="keyword">import</span> scalaz.<a href="../../Scalaz.scala.html#18009" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">val</span> <a title="Int" id="1097733">cutoff</a> = <span title="Int(30)" class="int">30</span>
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="1097735">run</a> <span class="delimiter">{</span>
+    <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="java.util.concurrent.ExecutorService" id="1097740">pool</a> = <span title="object java.util.concurrent.Executors">Executors</span>.<span title="(x$1: Int)java.util.concurrent.ExecutorService">newFixedThreadPool</span><span class="delimiter">(</span><span title="Int(5)" class="int">5</span><span class="delimiter">)</span>
+    <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="Executor extends java.lang.Object with scalaz.concurrent.Strategy" id="1097741">s</a> = <a href="../../concurrent/Strategy.scala.html#21198" title="object scalaz.concurrent.Strategy">Strategy</a>.<a href="../../concurrent/Strategy.scala.html#103121" title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy">Executor</a>
+
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[Stream[Int]]" id="1097742">out</a> = <a href="../../concurrent/Actor.scala.html#38325" title="(e: (Stream[Int]) =&gt; Unit, err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[Stream[Int]]">actor</a> <a href="#1097741" title="Executor extends java.lang.Object with scalaz.concurrent.Strategy" class="delimiter">{</a><span class="delimiter">(</span>xs: <span title="Stream[Int]">Stream</span><span class="delimiter">[</span>Int<span class="delimiter">]</span><span class="delimiter">)</span> =&gt;
+      <a href="#1097758" title="Stream[Int]">xs</a>.<span title="(implicit bf: scala.collection.generic.CanBuildFrom[scala.collection.immutable.Stream[Int],(Int, Int),scala.collection.immutable.Stream[(Int, Int)]])scala.collection.immutable.Stream[(Int, Int)]">zipWithIndex</span>.<span title="(f: ((Int, Int)) =&gt; Unit)Unit">foreach</span><span class="delimiter">(</span><a title="(Int, Int)" id="1097826">p</a> =&gt; <span title="(x: Any)Unit">println</span><span class="delimiter">(</span><span title="java.lang.String(&quot;n=&quot;)" class="string">&quot;n=&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <span class="delimiter">(</span><a href="#1097826" title="(Int, Int)">p</a>.<span title="=&gt; Int">_2</span> <span title="(x: Int)Int">+</span> <span title="Int(1)" class="int">1</span><span class="delimiter">)</span> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot; =&gt; &quot;)" class="string">&quot; =&gt; &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#1097826" title="(Int, Int)">p</a>.<span title="=&gt; Int">_1</span><span class="delimiter">)</span><span class="delimiter">)</span>
+      <a href="#1097740" title="java.util.concurrent.ExecutorService">pool</a>.<span title="()Unit">shutdown</span>
+    <span class="delimiter">}</span>
+
+    <span class="keyword">def</span> <a title="(n: Int)Int" id="1097743">seqFib</a><span class="delimiter">(</span><a title="Int" id="1097846">n</a>: <span title="Int">Int</span><span class="delimiter">)</span>: <span title="Int">Int</span> = <span title="Int" class="keyword">if</span> <span class="delimiter">(</span><a href="#1097846" title="Int">n</a> <span title="(x: Int)Boolean">&lt;</span> <span title="Int(2)" class="int">2</span><span class="delimiter">)</span> <a href="#1097846" title="Int">n</a> <span class="keyword">else</span> <a href="#1097743" title="(n: Int)Int">seqFib</a><span class="delimiter">(</span><a href="#1097846" title="Int">n</a> <span title="(x: Int)Int">-</span> <span title="Int(1)" class="int">1</span><span class="delimiter">)</span> <span title="(x: Int)Int">+</span> <a href="#1097743" title="(n: Int)Int">seqFib</a><span class="delimiter">(</span><a href="#1097846" title="Int">n</a> <span title="(x: Int)Int">-</span> <span title="Int(2)" class="int">2</span><span class="delimiter">)</span>
+
+    <span class="keyword">def</span> <a title="(n: Int)scalaz.concurrent.Promise[Int]" id="1097744">fib</a><span class="delimiter">(</span><a title="Int" id="1098329">n</a>: <span title="Int">Int</span><span class="delimiter">)</span>: <a href="../../concurrent/Promise.scala.html#21185" title="scalaz.concurrent.Promise[Int]">Promise</a><span class="delimiter">[</span>Int<span class="delimiter">]</span> =
+      <span title="scalaz.concurrent.Promise[Int]" class="keyword">if</span> <span class="delimiter">(</span><a href="#1098329" title="Int">n</a> <span title="(x: Int)Boolean">&lt;</span> <a href="#1097733" title="=&gt; Int">cutoff</a><span class="delimiter">)</span>
+        <a href="../../concurrent/Promise.scala.html#39261" title="(a: =&gt; Int)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Promise[Int]">promise</a><a href="#1097741" title="Executor extends java.lang.Object with scalaz.concurrent.Strategy" class="delimiter">(</a><a href="#1097743" title="(n: Int)Int">seqFib</a><span class="delimiter">(</span><a href="#1098329" title="Int">n</a><span class="delimiter">)</span><span class="delimiter">)</span>
+      <span class="keyword">else</span>
+        <a href="#1097744" title="(n: Int)scalaz.concurrent.Promise[Int]">fib</a><a href="../../MA.scala.html#38611" title="(a: scalaz.concurrent.Promise[Int])scalaz.MA[scalaz.concurrent.Promise,Int]" class="delimiter">(</a><a href="#1098329" title="Int">n</a> <span title="(x: Int)Int">-</span> <span title="Int(1)" class="int">1</span><span class="delimiter">)</span>.<a href="../../MA.scala.html#63169" title="(b: scalaz.concurrent.Promise[Int])(z: (Int, Int) =&gt; Int)(implicit t: scalaz.Functor[scalaz.concurrent.Promise], implicit a: scalaz.Apply[scalaz.concurrent.Promise])scalaz.concurrent.Promise[Int]">&lt;**&gt;</a><span class="delimiter">(</span><a href="#1097744" title="(n: Int)scalaz.concurrent.Promise[Int]">fib</a><span class="delimiter">(</span><a href="#1098329" title="Int">n</a> <span title="(x: Int)Int">-</span> <span title="Int(2)" class="int">2</span><span class="delimiter">)</span><span class="delimiter">)</span><a href="../../Functor.scala.html#67324" title="=&gt; scalaz.Functor[scalaz.concurrent.Promise]" class="delimiter">(</a><a href="#1098853" title="Int">_</a> <span title="(x: Int)Int">+</span> <a href="#1098854" title="Int">_</a><span class="delimiter">)</span>
+
+    <span title="=&gt; collection.immutable.Stream.type">Stream</span>.<span title="(start: Int, end: Int)(implicit evidence$1: Integral[Int])scala.collection.immutable.Stream[Int]">range</span><a href="../../MA.scala.html#38809" title="(l: scala.collection.immutable.Stream[Int])scalaz.MA[scala.collection.immutable.Stream,Int]" class="delimiter">(</a><span title="Int(1)" class="int">1</span>, <span title="Int(41)" class="int">41</span><span class="delimiter">)</span>.<a href="../../MA.scala.html#63234" title="(f: (Int) =&gt; scalaz.concurrent.Promise[Int])(implicit a: scalaz.Applicative[scalaz.concurrent.Promise], implicit t: scalaz.Traverse[scala.collection.immutable.Stream])scalaz.concurrent.Promise[scala.collection.immutable.Stream[Int]]">traverse</a><a href="../../Applicative.scala.html#38145" title="(implicit p: scalaz.Pure[scalaz.concurrent.Promise], implicit a: scalaz.Apply[scalaz.concurrent.Promise])scalaz.Applicative[scalaz.concurrent.Promise]" class="delimiter">(</a><a href="#1097744" title="(n: Int)scalaz.concurrent.Promise[Int]">fib</a><span class="delimiter">)</span> <a href="../../concurrent/Promise.scala.html#45166" title="(k: (scala.collection.immutable.Stream[Int]) =&gt; Unit)Unit">to</a> <a href="../../concurrent/Actor.scala.html#38328" title="(a: scalaz.concurrent.Actor[Stream[Int]])(Stream[Int]) =&gt; Unit">out</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

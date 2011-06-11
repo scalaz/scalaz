@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/GeneralHeader.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="comment">/**
+ * HTTP general header fields.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;RFC 2616 Section 4.5 General Header Fields&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait GeneralHeader extends java.lang.Object" id="25416">GeneralHeader</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="comment">/**
+   * Returns a string representation of this entity header.
+   */</span>
+  <span class="keyword">val</span> <a title="=&gt; String" id="1107523">asString</a>: <span title="String">String</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141392" title="object scalaz.http.CacheControl" id="1141400">CacheControl</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107525">asString</a> = <span title="java.lang.String(&quot;Cache-Control&quot;)" class="string">&quot;Cache-Control&quot;</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.10&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141408" title="object scalaz.http.Connection" id="1141416">Connection</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107532">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141424" title="object scalaz.http.Date" id="1141432">Date</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107539">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.32&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141440" title="object scalaz.http.Pragma" id="1141448">Pragma</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107546">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.40&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141456" title="object scalaz.http.Trailer" id="1141464">Trailer</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107553">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.41&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141471" title="object scalaz.http.TransferEncoding" id="1141479">TransferEncoding</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107560">asString</a> = <span title="java.lang.String(&quot;Transfer-Encoding&quot;)" class="string">&quot;Transfer-Encoding&quot;</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.42&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141487" title="object scalaz.http.Upgrade" id="1141495">Upgrade</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107567">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.45&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141503" title="object scalaz.http.Via" id="1141511">Via</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107574">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.46&quot;&gt;§&lt;/a&gt;
+ */</span>
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#1141519" title="object scalaz.http.Warning" id="1141527">Warning</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A string representation of this general header.
+   */</span>
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="1107581">asString</a> = <span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait GeneralHeaders extends java.lang.Object with ScalaObject" id="25425">GeneralHeaders</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Returns a general header for the given list of characters.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; (List[Char]) =&gt; Option[scalaz.http.GeneralHeader]" id="1106403">ListGeneralHeader</a> : <span class="delimiter">(</span>List<span class="delimiter">[</span>Char<span class="delimiter">]</span> =&gt; Option<span class="delimiter">[</span>GeneralHeader<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#1106405" title="implicit scalaz.http.GeneralHeaders.StringGeneralHeader : (s: String)Option[Product with Serializable with scalaz.http.GeneralHeader]">StringGeneralHeader</a> _ <span title="(g: (List[Char]) =&gt; String)(List[Char]) =&gt; Option[Product with Serializable with scalaz.http.GeneralHeader]">compose</span> <span class="delimiter">(</span><a href="#1141537" title="List[Char]">_</a>.<span title="=&gt; String">mkString</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Returns a string representation for the given general header.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.GeneralHeaders.GeneralHeaderString : (h: scalaz.http.GeneralHeader)String" id="1106404">GeneralHeaderString</a><span class="delimiter">(</span><a title="scalaz.http.GeneralHeader" id="1107616">h</a>: <a href="#25416" title="scalaz.http.GeneralHeader">GeneralHeader</a><span class="delimiter">)</span> = <a href="#1107616" title="scalaz.http.GeneralHeader">h</a>.<a href="#1107523" title="=&gt; String">asString</a>
+
+  <span class="comment">/**
+   * Returns a general header for the given string.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.GeneralHeaders.StringGeneralHeader : (s: String)Option[Product with Serializable with scalaz.http.GeneralHeader]" id="1106405">StringGeneralHeader</a><span class="delimiter">(</span><a title="String" id="1107447">s</a>: <span title="String">String</span><span class="delimiter">)</span> = <a href="#1107447" title="String">s</a>.<span title="()java.lang.String">toLowerCase</span> <span title="Option[Product with Serializable with scalaz.http.GeneralHeader]" class="keyword">match</span> <span class="delimiter">{</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.CacheControl.type]" class="string">&quot;cache-control&quot;</span> =&gt; <span title="(x: scalaz.http.CacheControl.type)Some[scalaz.http.CacheControl.type]">Some</span><span class="delimiter">(</span><a href="#1141400" title="object scalaz.http.CacheControl">CacheControl</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Connection.type]" class="string">&quot;connection&quot;</span> =&gt; <span title="(x: scalaz.http.Connection.type)Some[scalaz.http.Connection.type]">Some</span><span class="delimiter">(</span><a href="#1141416" title="object scalaz.http.Connection">Connection</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Date.type]" class="string">&quot;date&quot;</span> =&gt; <span title="(x: scalaz.http.Date.type)Some[scalaz.http.Date.type]">Some</span><span class="delimiter">(</span><a href="#1141432" title="object scalaz.http.Date">Date</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Pragma.type]" class="string">&quot;pragma&quot;</span> =&gt; <span title="(x: scalaz.http.Pragma.type)Some[scalaz.http.Pragma.type]">Some</span><span class="delimiter">(</span><a href="#1141448" title="object scalaz.http.Pragma">Pragma</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Trailer.type]" class="string">&quot;trailer&quot;</span> =&gt; <span title="(x: scalaz.http.Trailer.type)Some[scalaz.http.Trailer.type]">Some</span><span class="delimiter">(</span><a href="#1141464" title="object scalaz.http.Trailer">Trailer</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.TransferEncoding.type]" class="string">&quot;transfer-encoding&quot;</span> =&gt; <span title="(x: scalaz.http.TransferEncoding.type)Some[scalaz.http.TransferEncoding.type]">Some</span><span class="delimiter">(</span><a href="#1141479" title="object scalaz.http.TransferEncoding">TransferEncoding</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Upgrade.type]" class="string">&quot;upgrade&quot;</span> =&gt; <span title="(x: scalaz.http.Upgrade.type)Some[scalaz.http.Upgrade.type]">Some</span><span class="delimiter">(</span><a href="#1141495" title="object scalaz.http.Upgrade">Upgrade</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Via.type]" class="string">&quot;via&quot;</span> =&gt; <span title="(x: scalaz.http.Via.type)Some[scalaz.http.Via.type]">Some</span><span class="delimiter">(</span><a href="#1141511" title="object scalaz.http.Via">Via</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="Some[scalaz.http.Warning.type]" class="string">&quot;warning&quot;</span> =&gt; <span title="(x: scalaz.http.Warning.type)Some[scalaz.http.Warning.type]">Some</span><span class="delimiter">(</span><a href="#1141527" title="object scalaz.http.Warning">Warning</a><span class="delimiter">)</span>
+    <span class="keyword">case</span> <span title="None.type">_</span> =&gt; <span title="object None">None</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * HTTP general header fields.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;RFC 2616 Section 4.5 General Header Fields&lt;/a&gt;.
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.GeneralHeader" id="25417">GeneralHeader</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25425" title="scalaz.http.GeneralHeaders">GeneralHeaders</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * A list of all general entity headers.
+   */</span>
+  <span class="keyword">val</span> <a title="List[Product with Serializable with scalaz.http.GeneralHeader]" id="1141543">generalHeaders</a> = <span title="(xs: Product with Serializable with scalaz.http.GeneralHeader*)List[Product with Serializable with scalaz.http.GeneralHeader]">List</span><span class="delimiter">(</span><a href="#1141400" title="object scalaz.http.CacheControl">CacheControl</a>, <a href="#1141416" title="object scalaz.http.Connection">Connection</a>, <a href="#1141432" title="object scalaz.http.Date">Date</a>, <a href="#1141448" title="object scalaz.http.Pragma">Pragma</a>, <a href="#1141464" title="object scalaz.http.Trailer">Trailer</a>, <a href="#1141479" title="object scalaz.http.TransferEncoding">TransferEncoding</a>,
+      <a href="#1141495" title="object scalaz.http.Upgrade">Upgrade</a>, <a href="#1141511" title="object scalaz.http.Via">Via</a>, <a href="#1141527" title="object scalaz.http.Warning">Warning</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>
