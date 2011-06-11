@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Ordering.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Ordering extends java.lang.Object" id="18480">Ordering</a> <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">val</span> <a title="=&gt; Int" id="90904">toInt</a>: <a title="Int" id="4366">Int</a>
+}
+case <span class="keyword">object</span> <a href="#299011" title="object scalaz.LT" id="299019">LT</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#18480" title="scalaz.Ordering">Ordering</a> {
+  <span class="keyword">val</span> <a title="Int" id="210646">toInt</a> = <span title="Int(-1)">-</span><span class="int">1</span>
+}
+case <span class="keyword">object</span> <a href="#299026" title="object scalaz.EQ" id="299034">EQ</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#18480" title="scalaz.Ordering">Ordering</a> {
+  <span class="keyword">val</span> <a title="Int" id="210811">toInt</a> = <span title="Int(0)" class="int">0</span>
+}
+case <span class="keyword">object</span> <a href="#299041" title="object scalaz.GT" id="299049">GT</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#18480" title="scalaz.Ordering">Ordering</a> {
+  <span class="keyword">val</span> <a title="Int" id="210836">toInt</a> = <span title="Int(1)" class="int">1</span>
+}
+
+        </pre>
+    </body>
+</html>

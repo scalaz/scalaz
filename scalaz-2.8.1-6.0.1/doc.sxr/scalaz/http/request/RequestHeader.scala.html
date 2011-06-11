@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/request/RequestHeader.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> request
+
+/**
+ * HTTP request headers.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14&quot;&gt;RFC 2616 Section 14 Header Field Definitions&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait RequestHeader extends java.lang.Object with ScalaObject" id="27261">RequestHeader</a> <span title="ScalaObject">{</span>
+  /**
+   * A string representation of this request header.
+   */
+  <span class="keyword">val</span> <a title="=&gt; String" id="815694">asString</a>: <span title="String">String</span>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this header is an &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;entity header&lt;/a&gt;,
+   * &lt;code&gt;false&lt;/code&gt; otherwise.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="815696">isEntity</a> = <a href="#27261" title="scalaz.http.request.RequestHeader" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> {
+    <span title="Boolean(true)" class="keyword">case</span> Entity(_) =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span title="Boolean(false)" class="keyword">case</span> _ =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this header is a &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;general header&lt;/a&gt;,
+   * &lt;code&gt;false&lt;/code&gt; otherwise.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Boolean" id="815698">isGeneral</a> = <a href="#27261" title="scalaz.http.request.RequestHeader" class="keyword">this</a> <span title="Boolean" class="keyword">match</span> {
+    <span title="Boolean(true)" class="keyword">case</span> General(_) =&gt; <span title="Boolean(true)" class="keyword">true</span>
+    <span title="Boolean(false)" class="keyword">case</span> _ =&gt; <span title="Boolean(false)" class="keyword">false</span>
+  }
+
+  /**
+   * Returns the result of the given function to this header if it is an
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7.1&quot;&gt;entity header&lt;/a&gt;, otherwise returns the given value.
+   */
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.http.EntityHeader) =&gt; X,x: =&gt; X)X" id="815699">entity</a>[<a title="&gt;: Nothing &lt;: Any" id="815701">X</a>](<a title="(scalaz.http.EntityHeader) =&gt; X" id="855707">f</a>: EntityHeader =&gt; X, <a title="=&gt; X" id="855708">x</a>: =&gt; X) = <a href="#27261" title="scalaz.http.request.RequestHeader" class="keyword">this</a> <span title="X" class="keyword">match</span> {
+    <span title="X" class="keyword">case</span> Entity(<a title="scalaz.http.EntityHeader" id="855711">h</a>) =&gt; <a href="#855707" title="(v1: scalaz.http.EntityHeader)X">f</a>(<a href="#855711" title="scalaz.http.EntityHeader">h</a>)
+    <span title="X" class="keyword">case</span> _ =&gt; <a href="#855708" title="=&gt; X">x</a>
+  }
+
+  /**
+   * Returns the result of the given function to this header if it is a
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.5&quot;&gt;general header&lt;/a&gt;, otherwise returns the given value.
+   */
+  <span class="keyword">def</span> <a title="[X](f: (scalaz.http.GeneralHeader) =&gt; X,x: =&gt; X)X" id="815702">general</a>[<a title="&gt;: Nothing &lt;: Any" id="815704">X</a>](<a title="(scalaz.http.GeneralHeader) =&gt; X" id="855717">f</a>: GeneralHeader =&gt; X, <a title="=&gt; X" id="855718">x</a>: =&gt; X) = <a href="#27261" title="scalaz.http.request.RequestHeader" class="keyword">this</a> <span title="X" class="keyword">match</span> {
+    <span title="X" class="keyword">case</span> General(<a title="scalaz.http.GeneralHeader" id="855721">h</a>) =&gt; <a href="#855717" title="(v1: scalaz.http.GeneralHeader)X">f</a>(<a href="#855721" title="scalaz.http.GeneralHeader">h</a>)
+    <span title="X" class="keyword">case</span> _ =&gt; <a href="#855718" title="=&gt; X">x</a>
+  }
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855737" title="object scalaz.http.request.Accept" id="855745">Accept</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855728">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.2&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855755" title="object scalaz.http.request.AcceptCharset" id="855763">AcceptCharset</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855747">asString</a> = <span title="java.lang.String(&quot;Accept-Charset&quot;)" class="string">&quot;Accept-Charset&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855773" title="object scalaz.http.request.AcceptEncoding" id="855781">AcceptEncoding</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855765">asString</a> = <span title="java.lang.String(&quot;Accept-Encoding&quot;)" class="string">&quot;Accept-Encoding&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855791" title="object scalaz.http.request.AcceptLanguage" id="855799">AcceptLanguage</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855783">asString</a> = <span title="java.lang.String(&quot;Accept-Language&quot;)" class="string">&quot;Accept-Language&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.8&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855810" title="object scalaz.http.request.Authorization" id="855818">Authorization</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855801">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.20&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855829" title="object scalaz.http.request.Expect" id="855837">Expect</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855820">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.22&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855848" title="object scalaz.http.request.From" id="855856">From</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855839">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855867" title="object scalaz.http.request.Host" id="855875">Host</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855858">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855885" title="object scalaz.http.request.IfMatch" id="855893">IfMatch</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855877">asString</a> = <span title="java.lang.String(&quot;If-Match&quot;)" class="string">&quot;If-Match&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855903" title="object scalaz.http.request.IfModifiedSince" id="855911">IfModifiedSince</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855895">asString</a> = <span title="java.lang.String(&quot;If-Modified-Since&quot;)" class="string">&quot;If-Modified-Since&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855921" title="object scalaz.http.request.IfNoneMatch" id="855929">IfNoneMatch</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855913">asString</a> = <span title="java.lang.String(&quot;If-None-Match&quot;)" class="string">&quot;If-None-Match&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.27&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855939" title="object scalaz.http.request.IfRange" id="855947">IfRange</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855931">asString</a> = <span title="java.lang.String(&quot;If-Range&quot;)" class="string">&quot;If-Range&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.28&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855957" title="object scalaz.http.request.IfUnmodifiedSince" id="855965">IfUnmodifiedSince</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855949">asString</a> = <span title="java.lang.String(&quot;If-Unmodified-Since&quot;)" class="string">&quot;If-Unmodified-Since&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.31&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855975" title="object scalaz.http.request.MaxForwards" id="855983">MaxForwards</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855967">asString</a> = <span title="java.lang.String(&quot;Max-Forwards&quot;)" class="string">&quot;Max-Forwards&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.34&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#855993" title="object scalaz.http.request.ProxyAuthorization" id="856001">ProxyAuthorization</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="855985">asString</a> = <span title="java.lang.String(&quot;Proxy-Authorization&quot;)" class="string">&quot;Proxy-Authorization&quot;</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#856012" title="object scalaz.http.request.Range" id="856020">Range</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="856003">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#856031" title="object scalaz.http.request.Referer" id="856039">Referer</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="856022">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.39&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#856050" title="object scalaz.http.request.TE" id="856058">TE</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="856041">asString</a> = <span title="()java.lang.String">toString</span>
+}
+
+/**
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43&quot;&gt;§&lt;/a&gt;
+ */
+<span class="keyword">final</span> case <span class="keyword">object</span> <a href="#856065" title="object scalaz.http.request.UserAgent" id="856073">UserAgent</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="java.lang.String" id="836881">asString</a> = <span title="java.lang.String(&quot;User-Agent&quot;)" class="string">&quot;User-Agent&quot;</span>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class Entity extends java.lang.Object with scalaz.http.request.RequestHeader with ScalaObject with Product" id="857791">Entity</a><span title="ScalaObject">(</span><a title="=&gt; scalaz.http.EntityHeader" id="856152">eh</a>: <a href="../EntityHeader.scala.html#26433" title="scalaz.http.EntityHeader">EntityHeader</a>) <span class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="String" id="855650">asString</a> = <a href="#856152" title="=&gt; scalaz.http.EntityHeader">eh</a>.<a href="../EntityHeader.scala.html#812521" title="=&gt; String">asString</a>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">class</span> <a title="class General extends java.lang.Object with scalaz.http.request.RequestHeader with ScalaObject with Product" id="857787">General</a><span title="ScalaObject">(</span><a title="=&gt; scalaz.http.GeneralHeader" id="856157">gh</a>: <a href="../GeneralHeader.scala.html#26460" title="scalaz.http.GeneralHeader">GeneralHeader</a>) <span class="keyword">extends</span> <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> {
+  <span class="keyword">override</span> <span class="keyword">val</span> <a title="String" id="855681">asString</a> = <a href="#856157" title="=&gt; scalaz.http.GeneralHeader">gh</a>.<a href="../GeneralHeader.scala.html#812415" title="=&gt; String">asString</a>
+}
+
+<span class="keyword">import</span> Character.isWhitespace
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> <a href="../Util.scala.html#26605" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#811416" title="object scalaz.http.Util.Nel">Nel</a>._
+
+<span class="keyword">trait</span> <a title="trait RequestHeaders extends java.lang.Object with ScalaObject" id="27288">RequestHeaders</a> <span title="ScalaObject">{</span>
+  /**
+   * Converts the given entity header into a request header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.request.RequestHeaders.entityToRequest : (eh: scalaz.http.EntityHeader)scalaz.http.request.RequestHeader" id="811173">entityToRequest</a>(<a title="scalaz.http.EntityHeader" id="812300">eh</a>: <a href="../EntityHeader.scala.html#26433" title="scalaz.http.EntityHeader">EntityHeader</a>): <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> = scalaz.http.request.<a href="#857791" title="(eh: scalaz.http.EntityHeader)scalaz.http.request.Entity">Entity</a>(<a href="#812300" title="scalaz.http.EntityHeader">eh</a>)
+
+  /**
+   * Converts the given general header into a request header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.request.RequestHeaders.generalToRequest : (gh: scalaz.http.GeneralHeader)scalaz.http.request.RequestHeader" id="811174">generalToRequest</a>(<a title="scalaz.http.GeneralHeader" id="812298">gh</a>: <a href="../GeneralHeader.scala.html#26460" title="scalaz.http.GeneralHeader">GeneralHeader</a>): <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a> = scalaz.http.request.<a href="#857787" title="(gh: scalaz.http.GeneralHeader)scalaz.http.request.General">General</a>(<a href="#812298" title="scalaz.http.GeneralHeader">gh</a>)
+
+  /**
+   * Converts the given string to a request header. If the string is a known request header, then it is used. If not,
+   * then it if it is a known general header, then it is used. If not then it is an entity header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.request.RequestHeaders.StringRequestHeader : (s: String)Option[scalaz.http.request.RequestHeader]" id="811175">StringRequestHeader</a>(<a title="String" id="812296">s</a>: <span title="String">String</span>): <span title="Option[scalaz.http.request.RequestHeader]">Option</span>[RequestHeader] =
+    <a href="#27262" title="object scalaz.http.request.RequestHeader">RequestHeader</a>.<a href="#839243" title="(p: ((java.lang.String, Product with scalaz.http.request.RequestHeader)) =&gt; Boolean)Option[(java.lang.String, Product with scalaz.http.request.RequestHeader)]" id="41696">headers</a> <span title="(f: ((java.lang.String, Product with scalaz.http.request.RequestHeader)) =&gt; Product with scalaz.http.request.RequestHeader)Option[Product with scalaz.http.request.RequestHeader]">find</span> <a href="#856341" title="Boolean">{</a><span title="Boolean" class="keyword">case</span> (<a title="java.lang.String" id="856344">n</a>, <a title="&lt;refinement&gt; extends Product with scalaz.http.request.RequestHeader" id="856345">h</a>) =&gt; <a href="#856344" title="java.lang.String">n</a>.<a title="(x$1: java.lang.String)Boolean" id="7449">equalsIgnoreCase</a>(<a href="#812296" title="String">s</a>) } <span title="(alternative: =&gt; Option[Product with scalaz.http.request.RequestHeader])Option[Product with scalaz.http.request.RequestHeader]">map</span> (<a href="#856353" title="(java.lang.String, Product with scalaz.http.request.RequestHeader)">_</a>.<a title="=&gt; &lt;refinement&gt; extends Product with scalaz.http.request.RequestHeader" id="36205">_2</a>) <span title="(alternative: =&gt; Option[Product with scalaz.http.request.RequestHeader])Option[Product with scalaz.http.request.RequestHeader]">orElse</span>
+            <a href="../../MA.scala.html#57399" title="(f: (scalaz.http.GeneralHeader) =&gt; scalaz.http.request.General)(implicit t: scalaz.Functor[Option])Option[scalaz.http.request.General]">(</a><a href="../GeneralHeader.scala.html#811158" title="implicit scalaz.http.GeneralHeaders.StringGeneralHeader : (s: String)Option[Product with scalaz.http.GeneralHeader]">s</a>: <span title="Option[scalaz.http.GeneralHeader]">Option</span>[GeneralHeader]) <a href="../../Functor.scala.html#58994" title="=&gt; scalaz.Functor[Option]">∘</a> (scalaz.http.request.<a href="#857787" title="(gh: scalaz.http.GeneralHeader)scalaz.http.request.General">General</a>(<a href="#856546" title="scalaz.http.GeneralHeader">_</a>)) orElse
+            <a href="../../MA.scala.html#57399" title="(f: (scalaz.http.EntityHeader) =&gt; scalaz.http.request.Entity)(implicit t: scalaz.Functor[Option])Option[scalaz.http.request.Entity]">(</a><a href="../EntityHeader.scala.html#811153" title="implicit scalaz.http.EntityHeaders.StringEntityHeader : (s: String)Option[scalaz.http.EntityHeader]">s</a>: <span title="Option[scalaz.http.EntityHeader]">Option</span>[EntityHeader]) <a href="../../Functor.scala.html#58994" title="=&gt; scalaz.Functor[Option]">∘</a> (scalaz.http.request.<a href="#857791" title="(eh: scalaz.http.EntityHeader)scalaz.http.request.Entity">Entity</a>(<a href="#856968" title="scalaz.http.EntityHeader">_</a>))
+
+  /**
+   * Converts the given list of characters to a request header. If the string is a known request header, then it is
+   * used. If not, then it if it is a known general header, then it is used. If not then it is an entity header.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; (List[Char]) =&gt; Option[scalaz.http.request.RequestHeader]" id="811176">ListRequestHeader</a>: (List[Char] =&gt; Option[RequestHeader]) = <a href="#811175" title="implicit scalaz.http.request.RequestHeaders.StringRequestHeader : (s: String)Option[scalaz.http.request.RequestHeader]">StringRequestHeader</a> <a title="(g: (List[Char]) =&gt; String)(List[Char]) =&gt; Option[scalaz.http.request.RequestHeader]" id="28931">_</a> compose (<a href="#857216" title="List[Char]">_</a>.<a title="=&gt; String" id="29268">mkString</a>)
+}
+
+/**
+ * HTTP request headers.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14&quot;&gt;RFC 2616 Section 14 Header Field Definitions&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.request.RequestHeader" id="27262">RequestHeader</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27288" title="scalaz.http.request.RequestHeaders">RequestHeaders</a> {
+  /**
+   * For deconstructing request headers into entity headers.
+   */
+  <span class="keyword">object</span> <a title="object scalaz.http.request.RequestHeader.Entity" id="839237">Entity</a> <span title="ScalaObject">{</span>
+    /**
+     * Matches if the given request header is an entity header.
+     */
+    <span class="keyword">def</span> <a title="(h: scalaz.http.request.RequestHeader)Option[scalaz.http.EntityHeader]" id="857224">unapply</a>(<a title="scalaz.http.request.RequestHeader" id="857227">h</a>: <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a>) = <a href="#857227" title="scalaz.http.request.RequestHeader">h</a> <span title="Option[scalaz.http.EntityHeader]" class="keyword">match</span> {
+      <span title="Some[scalaz.http.EntityHeader]" class="keyword">case</span> scalaz.http.request.Entity(<a title="scalaz.http.EntityHeader" id="857230">x</a>) =&gt; <span title="(x: scalaz.http.EntityHeader)Some[scalaz.http.EntityHeader]">Some</span>(<a href="#857230" title="scalaz.http.EntityHeader">x</a>)
+      <span title="None.type" class="keyword">case</span> _ =&gt; <span title="object None">None</span>
+    }
+  }
+
+  /**
+   * For deconstructing request headers into general headers.
+   */
+  <span class="keyword">object</span> <a title="object scalaz.http.request.RequestHeader.General" id="839239">General</a> <span title="ScalaObject">{</span>
+    /**
+     * Matches if the given request header is a general header.
+     */
+    <span class="keyword">def</span> <a title="(h: scalaz.http.request.RequestHeader)Option[scalaz.http.GeneralHeader]" id="857248">unapply</a>(<a title="scalaz.http.request.RequestHeader" id="857251">h</a>: <a href="#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a>) = <a href="#857251" title="scalaz.http.request.RequestHeader">h</a> <span title="Option[scalaz.http.GeneralHeader]" class="keyword">match</span> {
+      <span title="Some[scalaz.http.GeneralHeader]" class="keyword">case</span> scalaz.http.request.General(<a title="scalaz.http.GeneralHeader" id="857254">x</a>) =&gt; <span title="(x: scalaz.http.GeneralHeader)Some[scalaz.http.GeneralHeader]">Some</span>(<a href="#857254" title="scalaz.http.GeneralHeader">x</a>)
+      <span title="None.type" class="keyword">case</span> _ =&gt; <span title="object None">None</span>
+    }
+  }
+
+  <span class="keyword">import</span> <a href="../GeneralHeader.scala.html#26461" title="object scalaz.http.GeneralHeader">GeneralHeader</a>.StringGeneralHeader
+  <span class="keyword">import</span> <a href="../EntityHeader.scala.html#26434" title="object scalaz.http.EntityHeader">EntityHeader</a>.StringEntityHeader
+
+  /**
+   * A list of known headers.
+   */
+  <span class="keyword">val</span> <a title="List[(java.lang.String, Product with scalaz.http.request.RequestHeader)]" id="839243">headers</a> = <a title="(xs: (java.lang.String, Product with scalaz.http.request.RequestHeader)*)List[(java.lang.String, Product with scalaz.http.request.RequestHeader)]" id="29354">List</a>(<span title="(_1: java.lang.String,_2: object scalaz.http.request.Accept)(java.lang.String, object scalaz.http.request.Accept)">(</span><span title="java.lang.String(&quot;accept&quot;)" class="string">&quot;accept&quot;</span>, <a href="#855745" title="object scalaz.http.request.Accept">Accept</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.AcceptCharset)(java.lang.String, object scalaz.http.request.AcceptCharset)">(</span><span title="java.lang.String(&quot;accept-charset&quot;)" class="string">&quot;accept-charset&quot;</span>, <a href="#855763" title="object scalaz.http.request.AcceptCharset">AcceptCharset</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.AcceptEncoding)(java.lang.String, object scalaz.http.request.AcceptEncoding)">(</span><span title="java.lang.String(&quot;accept-encoding&quot;)" class="string">&quot;accept-encoding&quot;</span>, <a href="#855781" title="object scalaz.http.request.AcceptEncoding">AcceptEncoding</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.AcceptLanguage)(java.lang.String, object scalaz.http.request.AcceptLanguage)">(</span><span title="java.lang.String(&quot;accept-language&quot;)" class="string">&quot;accept-language&quot;</span>, <a href="#855799" title="object scalaz.http.request.AcceptLanguage">AcceptLanguage</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.Authorization)(java.lang.String, object scalaz.http.request.Authorization)">(</span><span title="java.lang.String(&quot;authorization&quot;)" class="string">&quot;authorization&quot;</span>, <a href="#855818" title="object scalaz.http.request.Authorization">Authorization</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.From)(java.lang.String, object scalaz.http.request.From)">(</span><span title="java.lang.String(&quot;from&quot;)" class="string">&quot;from&quot;</span>, <a href="#855856" title="object scalaz.http.request.From">From</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.Host)(java.lang.String, object scalaz.http.request.Host)">(</span><span title="java.lang.String(&quot;host&quot;)" class="string">&quot;host&quot;</span>, <a href="#855875" title="object scalaz.http.request.Host">Host</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.IfMatch)(java.lang.String, object scalaz.http.request.IfMatch)">(</span><span title="java.lang.String(&quot;if-match&quot;)" class="string">&quot;if-match&quot;</span>, <a href="#855893" title="object scalaz.http.request.IfMatch">IfMatch</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.IfModifiedSince)(java.lang.String, object scalaz.http.request.IfModifiedSince)">(</span><span title="java.lang.String(&quot;if-modified-since&quot;)" class="string">&quot;if-modified-since&quot;</span>, <a href="#855911" title="object scalaz.http.request.IfModifiedSince">IfModifiedSince</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.IfNoneMatch)(java.lang.String, object scalaz.http.request.IfNoneMatch)">(</span><span title="java.lang.String(&quot;if-none-match&quot;)" class="string">&quot;if-none-match&quot;</span>, <a href="#855929" title="object scalaz.http.request.IfNoneMatch">IfNoneMatch</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.IfRange)(java.lang.String, object scalaz.http.request.IfRange)">(</span><span title="java.lang.String(&quot;if-range&quot;)" class="string">&quot;if-range&quot;</span>, <a href="#855947" title="object scalaz.http.request.IfRange">IfRange</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.IfUnmodifiedSince)(java.lang.String, object scalaz.http.request.IfUnmodifiedSince)">(</span><span title="java.lang.String(&quot;if-unmodified-since&quot;)" class="string">&quot;if-unmodified-since&quot;</span>, <a href="#855965" title="object scalaz.http.request.IfUnmodifiedSince">IfUnmodifiedSince</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.MaxForwards)(java.lang.String, object scalaz.http.request.MaxForwards)">(</span><span title="java.lang.String(&quot;max-forwards&quot;)" class="string">&quot;max-forwards&quot;</span>, <a href="#855983" title="object scalaz.http.request.MaxForwards">MaxForwards</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.ProxyAuthorization)(java.lang.String, object scalaz.http.request.ProxyAuthorization)">(</span><span title="java.lang.String(&quot;proxy-authorization&quot;)" class="string">&quot;proxy-authorization&quot;</span>, <a href="#856001" title="object scalaz.http.request.ProxyAuthorization">ProxyAuthorization</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.Range)(java.lang.String, object scalaz.http.request.Range)">(</span><span title="java.lang.String(&quot;range&quot;)" class="string">&quot;range&quot;</span>, <a href="#856020" title="object scalaz.http.request.Range">Range</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.Referer)(java.lang.String, object scalaz.http.request.Referer)">(</span><span title="java.lang.String(&quot;referer&quot;)" class="string">&quot;referer&quot;</span>, <a href="#856039" title="object scalaz.http.request.Referer">Referer</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.TE)(java.lang.String, object scalaz.http.request.TE)">(</span><span title="java.lang.String(&quot;te&quot;)" class="string">&quot;te&quot;</span>, <a href="#856058" title="object scalaz.http.request.TE">TE</a>),
+    <span title="(_1: java.lang.String,_2: object scalaz.http.request.UserAgent)(java.lang.String, object scalaz.http.request.UserAgent)">(</span><span title="java.lang.String(&quot;user-agent&quot;)" class="string">&quot;user-agent&quot;</span>, <a href="#856073" title="object scalaz.http.request.UserAgent">UserAgent</a>))
+
+  /**
+   * Converts a list of characters of the form &quot;abc:def&quot; into a potential request header and non-empty value split at
+   * the colon (:).
+   */
+  <span class="keyword">def</span> <a title="(cs: List[Char])Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="839245">requestHeaderValue</a>(<a title="List[Char]" id="857271">cs</a>: <a title="List[Char]" id="29353">List</a>[Char]): <span title="Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">Option</span>[(RequestHeader, NonEmptyList[Char])] =
+    <a href="#857271" title="(p: (Char) =&gt; Boolean)(List[Char], List[Char])" id="32689">cs</a> span (<a href="#857277" title="(x$1: Char)Boolean" id="4892">_</a> != <span title="Char(':')" class="char">':'</span>) <span title="Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" class="keyword">match</span> {
+      <span title="Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" class="keyword">case</span> (<a title="List[Char]" id="857286">n</a>, <a title="List[Char]" id="857287">v</a>) =&gt; {
+        <a href="../../MA.scala.html#57409" title="(f: (scalaz.http.request.RequestHeader) =&gt; Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])])(implicit b: scalaz.Bind[Option])Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">(</a><a href="#811176" title="(v1: List[Char])Option[scalaz.http.request.RequestHeader]">n</a>: <span title="Option[scalaz.http.request.RequestHeader]">Option</span>[RequestHeader]) <a href="../../Bind.scala.html#60026" title="=&gt; scalaz.Bind[Option]">∗</a> (<a title="scalaz.http.request.RequestHeader" id="857471">h</a> =&gt;
+          (<a href="#857287" title="List[Char]">v</a>.<a title="(p: (Char) =&gt; Boolean)List[Char]" id="32687">dropWhile</a><a href="../../ListW.scala.html#34227" title="(as: List[Char])scalaz.ListW[Char]">(</a><a title="Char" id="857475">x</a> =&gt; <a href="#857475" title="(x$1: Char)Boolean" id="4890">x</a> <span title="(x$1: Boolean)Boolean">==</span> <span title="Char(':')" class="char">':'</span> || <a title="(x$1: Char)Boolean" id="2626">isWhitespace</a>(<a href="#857475" title="Char">x</a>))).<a href="../../ListW.scala.html#56835" title="(f: (scalaz.NonEmptyList[Char]) =&gt; (scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char]))Option[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">toNel</a> map (<a title="scalaz.NonEmptyList[Char]" id="857543">v</a> =&gt; <span title="(_1: scalaz.http.request.RequestHeader,_2: scalaz.NonEmptyList[Char])(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])">(</span><a href="#857471" title="scalaz.http.request.RequestHeader">h</a>, <a href="#857543" title="scalaz.NonEmptyList[Char]">v</a>)))
+      }
+    }
+}
+
+        </pre>
+    </body>
+</html>

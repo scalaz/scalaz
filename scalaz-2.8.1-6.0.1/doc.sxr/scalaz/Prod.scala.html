@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Prod.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">object</span> <a title="object scalaz.Prod" id="18661">Prod</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="[M[_], N[_]](implicit evidence$1: scalaz.Applicative[M],implicit evidence$2: scalaz.Applicative[N])scalaz.Applicative[[α](M[α], N[α])]" id="301230">ProdApplicative</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="301225">M</a>[<a title="&gt;: Nothing &lt;: Any" id="301234">_</a>] : Applicative, <a title="[_]&gt;: Nothing &lt;: Any" id="301226">N</a>[<a title="&gt;: Nothing &lt;: Any" id="301235">_</a>] : Applicative]: <a href="Applicative.scala.html#9258" title="scalaz.Applicative[[α](M[α], N[α])]">Applicative</a>[({<span class="keyword">type</span> λ[α]=(M[α], N[α])})#λ] = <a href="#301245" title="java.lang.Object with scalaz.Applicative[[α](M[α], N[α])]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Applicative[[α](M[α], N[α])]" id="301245">Applicative</a>[({<span class="keyword">type</span> λ[α]=(M[α], N[α])})#λ] {
+    <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)(M[A], N[A])" id="301276">pure</a>[<a title="&gt;: Nothing &lt;: Any" id="301278">A</a>](<a title="=&gt; A" id="301284">a</a>: =&gt; A) = <span title="(_1: M[A],_2: N[A])(M[A], N[A])">(</span><a href="Identity.scala.html#34181" title="(x: =&gt; A)scalaz.Identity[A]">a</a>.<a href="Identity.scala.html#43176" title="[F[_]](implicit p: scalaz.Pure[F])F[A]">η</a><a href="#301230" title="(implicit p: scalaz.Pure[M])M[A]">[</a><a href="#301225" title="M">M</a>], <a href="Identity.scala.html#34181" title="(x: =&gt; A)scalaz.Identity[A]">a</a>.<a href="Identity.scala.html#43176" title="[F[_]](implicit p: scalaz.Pure[F])F[A]">η</a><a href="#301230" title="(implicit p: scalaz.Pure[N])N[A]">[</a><a href="#301226" title="N">N</a>])
+
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[A, B](f: (M[(A) =&gt; B], N[(A) =&gt; B]),a: (M[A], N[A]))(M[B], N[B])" id="301279">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="301282">A</a>, <a title="&gt;: Nothing &lt;: Any" id="301283">B</a>](<a title="(M[(A) =&gt; B], N[(A) =&gt; B])" id="301617">f</a>: <span title="(M[(A) =&gt; B], N[(A) =&gt; B])">(</span>M[A =&gt; B], N[A =&gt; B]), <a title="(M[A], N[A])" id="301618">a</a>: <span title="(M[A], N[A])">(</span>M[A], N[A])) = {
+      <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="(M[(A) =&gt; B], N[(A) =&gt; B])" id="301648">fv</a> = <a href="#301617" title="(M[(A) =&gt; B], N[(A) =&gt; B])">f</a>
+      <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="(M[A], N[A])" id="301650">av</a> = <a href="#301618" title="(M[A], N[A])">a</a>
+      <span title="(_1: M[B],_2: N[B])(M[B], N[B])">(</span><a href="#301649" title="=&gt; (M[A], N[A])">av</a>.<a href="MA.scala.html#55417" title="(f: M[(A) =&gt; B])(implicit a: scalaz.Apply[M])M[B]">_1</a> <a href="#301230" title="scalaz.Applicative[M]">&lt;*&gt;</a> <a href="#301647" title="=&gt; (M[(A) =&gt; B], N[(A) =&gt; B])">fv</a>.<span title="=&gt; M[(A) =&gt; B]">_1</span>, <a href="#301649" title="=&gt; (M[A], N[A])">av</a>.<a href="MA.scala.html#55417" title="(f: N[(A) =&gt; B])(implicit a: scalaz.Apply[N])N[B]">_2</a> <a href="#301230" title="scalaz.Applicative[N]">&lt;*&gt;</a> <a href="#301647" title="=&gt; (M[(A) =&gt; B], N[(A) =&gt; B])">fv</a>.<span title="=&gt; N[(A) =&gt; B]">_2</span>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

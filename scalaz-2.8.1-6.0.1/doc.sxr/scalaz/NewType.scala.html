@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/NewType.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+/**
+ * Sub class to create a wrapper type for `X` as documentation that the sub class is a wrapper type
+ * used in type class instances.
+ * &lt;p/&gt;
+ * The companion object provides an implicit conversion to unwrap `value`.
+ *
+ * @see scalaz.BooleanConjunction
+ */
+<span class="keyword">trait</span> <a title="trait NewType[X] extends java.lang.Object with ScalaObject" id="17991">NewType</a>[<a title="&gt;: Nothing &lt;: Any" id="21881">X</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; X" id="41319">value</a>: <a href="#21881" title="X">X</a>
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()java.lang.String" id="41320">toString</a> =
+    <a href="#41319" title="=&gt; X">value</a>.<a title="()java.lang.String" id="5795">toString</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.NewType" id="17992">NewType</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X](n: scalaz.NewType[X])X" id="43801">UnwrapNewType</a>[<a title="&gt;: Nothing &lt;: Any" id="43803">X</a>](<a title="scalaz.NewType[X]" id="43972">n</a>: <a href="#17991" title="scalaz.NewType[X]">NewType</a>[X]): <a href="#43803" title="X">X</a> = <a href="#43972" title="scalaz.NewType[X]">n</a>.<a href="#41319" title="=&gt; X">value</a>
+}
+
+        </pre>
+    </body>
+</html>

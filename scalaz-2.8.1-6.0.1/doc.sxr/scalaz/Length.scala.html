@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Length.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait Length[-L[_]] extends java.lang.Object" id="16269">Length</a>[-<a title="[_]&gt;: Nothing &lt;: Any" id="21794">L</a>[<a title="&gt;: Nothing &lt;: Any" id="231522">_</a>]] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">def</span> <a title="[A](a: L[A])Int" id="231519">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231521">A</a>](<a title="L[A]" id="231524">a</a>: <a href="#21794" title="L[A]">L</a>[A]): <a title="Int" id="4366">Int</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Length" id="16270">Length</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[scalaz.Identity]" id="231528">IdentityLength</a>: <a href="#16269" title="scalaz.Length[scalaz.Identity]">Length</a>[Identity] = <a href="#231561" title="java.lang.Object with scalaz.Length[scalaz.Identity]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.Identity]" id="231561">Length</a>[Identity] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Identity[A])Int" id="231565">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231567">A</a>](<a title="scalaz.Identity[A]" id="231568">a</a>: <a href="Identity.scala.html#15276" title="scalaz.Identity[A]">Identity</a>[A]) = <span title="Int(1)" class="int">1</span>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A]scalaz.Length[scalaz.NonEmptyList]" id="231529">NonEmptyListLength</a>[<a title="&gt;: Nothing &lt;: Any" id="231531">A</a>]: <a href="#16269" title="scalaz.Length[scalaz.NonEmptyList]">Length</a>[NonEmptyList] = <a href="#231587" title="java.lang.Object with scalaz.Length[scalaz.NonEmptyList]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.NonEmptyList]" id="231587">Length</a>[NonEmptyList] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.NonEmptyList[A])Int" id="231591">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231593">A</a>](<a title="scalaz.NonEmptyList[A]" id="231594">a</a>: <a href="NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A]) = <a href="#231594" title="scalaz.NonEmptyList[A]">a</a>.<a href="NonEmptyList.scala.html#42873" title="=&gt; List[A]">list</a>.<a title="=&gt; Int" id="41684">length</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[scalaz.ZipStream]" id="231532">ZipStreamLength</a>: <a href="#16269" title="scalaz.Length[scalaz.ZipStream]">Length</a>[ZipStream] = <a href="#231613" title="java.lang.Object with scalaz.Length[scalaz.ZipStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.ZipStream]" id="231613">Length</a>[ZipStream] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.ZipStream[A])Int" id="231617">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231619">A</a>](<a title="scalaz.ZipStream[A]" id="231620">a</a>: <a href="ZipStream.scala.html#21426" title="scalaz.ZipStream[A]">ZipStream</a>[A]) = <a href="#231620" title="scalaz.ZipStream[A]">a</a>.<a href="ZipStream.scala.html#39199" title="=&gt; Stream[A]">value</a>.<a title="=&gt; Int" id="36330">length</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[Tuple1]" id="231533">Tuple1Length</a>: <a href="#16269" title="scalaz.Length[Tuple1]">Length</a>[Tuple1] = <a href="#231639" title="java.lang.Object with scalaz.Length[Tuple1]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[Tuple1]" id="231639">Length</a>[Tuple1] {
+    <span class="keyword">def</span> <a title="[A](a: (A,))Int" id="231643">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231645">A</a>](<a title="(A,)" id="231646">a</a>: <a title="(A,)" id="1527">Tuple1</a>[A]) = <span title="Int(1)" class="int">1</span>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[Function0]" id="231534">Function0Length</a>: <a href="#16269" title="scalaz.Length[Function0]">Length</a>[Function0] = <a href="#231665" title="java.lang.Object with scalaz.Length[Function0]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[Function0]" id="231665">Length</a>[Function0] {
+    <span class="keyword">def</span> <a title="[A](a: () =&gt; A)Int" id="231669">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231671">A</a>](<a title="() =&gt; A" id="231672">a</a>: () =&gt; A) = <span title="Int(1)" class="int">1</span>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[Option]" id="231535">OptionLength</a>: <a href="#16269" title="scalaz.Length[Option]">Length</a>[Option] = <a href="#231691" title="java.lang.Object with scalaz.Length[Option]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[Option]" id="231691">Length</a>[Option] {
+    <span class="keyword">def</span> <a title="[A](a: Option[A])Int" id="231695">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231697">A</a>](<a title="Option[A]" id="231698">a</a>: <a title="Option[A]" id="1263">Option</a>[A]) = <a href="#231698" title="(f: (A) =&gt; Int)Option[Int]" id="38443">a</a> <a title="(default: =&gt; Int)Int" id="38437">map</a> (<a title="A" id="231711">_</a> =&gt; <span title="Int(1)" class="int">1</span>) getOrElse <span title="Int(0)" class="int">0</span>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Length[[α]Either.LeftProjection[α,X]]" id="231536">EitherLeftLength</a>[<a title="&gt;: Nothing &lt;: Any" id="231538">X</a>]: <a href="#16269" title="scalaz.Length[[α]Either.LeftProjection[α,X]]">Length</a>[({<span class="keyword">type</span> λ[α]=Either.LeftProjection[α, X]})#λ] = <a href="#231739" title="java.lang.Object with scalaz.Length[[α]Either.LeftProjection[α,X]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[[α]Either.LeftProjection[α,X]]" id="231739">Length</a>[({<span class="keyword">type</span> λ[α]=Either.LeftProjection[α, X]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: Either.LeftProjection[A,X])Int" id="231748">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231750">A</a>](<a title="Either.LeftProjection[A,X]" id="231751">a</a>: <a title="Either.LeftProjection[A,X]" id="42217">Either</a>.LeftProjection[A, X]) = <a href="#231751" title="Either.LeftProjection[A,X]">a</a>.<a title="=&gt; Either[A,X]" id="42218">e</a> <span title="Int" class="keyword">match</span> {
+      <span title="Int(0)" class="keyword">case</span> Right(_) =&gt; <span title="Int(0)" class="int">0</span>
+      <span title="Int(1)" class="keyword">case</span> Left(_) =&gt; <span title="Int(1)" class="int">1</span>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Length[[α]Either.RightProjection[X,α]]" id="231539">EitherRightLength</a>[<a title="&gt;: Nothing &lt;: Any" id="231541">X</a>]: <a href="#16269" title="scalaz.Length[[α]Either.RightProjection[X,α]]">Length</a>[({<span class="keyword">type</span> λ[α]=Either.RightProjection[X, α]})#λ] = <a href="#231787" title="java.lang.Object with scalaz.Length[[α]Either.RightProjection[X,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[[α]Either.RightProjection[X,α]]" id="231787">Length</a>[({<span class="keyword">type</span> λ[α]=Either.RightProjection[X, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: Either.RightProjection[X,A])Int" id="231796">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231798">A</a>](<a title="Either.RightProjection[X,A]" id="231799">a</a>: <a title="Either.RightProjection[X,A]" id="42276">Either</a>.RightProjection[X, A]) = <a href="#231799" title="Either.RightProjection[X,A]">a</a>.<a title="=&gt; Either[X,A]" id="42277">e</a> <span title="Int" class="keyword">match</span> {
+      <span title="Int(1)" class="keyword">case</span> Right(_) =&gt; <span title="Int(1)" class="int">1</span>
+      <span title="Int(0)" class="keyword">case</span> Left(_) =&gt; <span title="Int(0)" class="int">0</span>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Length[[α]scalaz.Validation[X,α]]" id="231542">ValidationLength</a>[<a title="&gt;: Nothing &lt;: Any" id="231544">X</a>]: <a href="#16269" title="scalaz.Length[[α]scalaz.Validation[X,α]]">Length</a>[({<span class="keyword">type</span> λ[α]=Validation[X, α]})#λ] = <a href="#231835" title="java.lang.Object with scalaz.Length[[α]scalaz.Validation[X,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[[α]scalaz.Validation[X,α]]" id="231835">Length</a>[({<span class="keyword">type</span> λ[α]=Validation[X, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Validation[X,A])Int" id="231844">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231846">A</a>](<a title="scalaz.Validation[X,A]" id="231847">a</a>: <a href="Validation.scala.html#21075" title="scalaz.Validation[X,A]">Validation</a>[X, A]) = <a href="#231847" title="scalaz.Validation[X,A]">a</a> <span title="Int" class="keyword">match</span> {
+      <span title="Int(1)" class="keyword">case</span> Success(_) =&gt; <span title="Int(1)" class="int">1</span>
+      <span title="Int(0)" class="keyword">case</span> Failure(_) =&gt; <span title="Int(0)" class="int">0</span>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Length[[α]scalaz.FailProjection[α,X]]" id="231545">ValidationFailureLength</a>[<a title="&gt;: Nothing &lt;: Any" id="231547">X</a>]: <a href="#16269" title="scalaz.Length[[α]scalaz.FailProjection[α,X]]">Length</a>[({<span class="keyword">type</span> λ[α]=FailProjection[α, X]})#λ] = <a href="#231883" title="java.lang.Object with scalaz.Length[[α]scalaz.FailProjection[α,X]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[[α]scalaz.FailProjection[α,X]]" id="231883">Length</a>[({<span class="keyword">type</span> λ[α]=FailProjection[α, X]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.FailProjection[A,X])Int" id="231892">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231894">A</a>](<a title="scalaz.FailProjection[A,X]" id="231895">a</a>: <a href="Validation.scala.html#11232" title="scalaz.FailProjection[A,X]">FailProjection</a>[A, X]) = <a href="#231895" title="scalaz.FailProjection[A,X]">a</a>.<a href="Validation.scala.html#42102" title="=&gt; scalaz.Validation[A,X]">validation</a> <span title="Int" class="keyword">match</span> {
+      <span title="Int(0)" class="keyword">case</span> Success(_) =&gt; <span title="Int(0)" class="int">0</span>
+      <span title="Int(1)" class="keyword">case</span> Failure(_) =&gt; <span title="Int(1)" class="int">1</span>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[scalaz.Scalaz.ArraySeq]" id="231548">ArraySeqLength</a>: <a href="#16269" title="scalaz.Length[scalaz.Scalaz.ArraySeq]">Length</a>[ArraySeq] = <a href="#231922" title="java.lang.Object with scalaz.Length[scalaz.Scalaz.ArraySeq]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.Scalaz.ArraySeq]" id="231922">Length</a>[ArraySeq] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Scalaz.ArraySeq[A])Int" id="231926">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231928">A</a>](<a title="scalaz.Scalaz.ArraySeq[A]" id="231929">a</a>: <a title="scalaz.Scalaz.ArraySeq[A]" id="31623">ArraySeq</a>[A]) = <a href="#231929" title="scalaz.Scalaz.ArraySeq[A]">a</a>.<a title="=&gt; Int" id="81311">length</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[Array]" id="231549">ArrayLength</a>: <a href="#16269" title="scalaz.Length[Array]">Length</a>[Array] = <a href="#231948" title="java.lang.Object with scalaz.Length[Array]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[Array]" id="231948">Length</a>[Array] {
+    <span class="keyword">def</span> <a title="[A](a: Array[A])Int" id="231952">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231954">A</a>](<a title="Array[A]" id="231955">a</a>: <a title="Array[A]" id="2028">Array</a>[A]) = <a href="#231955" title="Array[A]">a</a>.<a title="=&gt; Int" id="28223">length</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[scalaz.ImmutableArray]" id="231550">ImmutableArrayLength</a>: <a href="#16269" title="scalaz.Length[scalaz.ImmutableArray]">Length</a>[ImmutableArray] = <a href="#231974" title="java.lang.Object with scalaz.Length[scalaz.ImmutableArray]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.ImmutableArray]" id="231974">Length</a>[ImmutableArray] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.ImmutableArray[A])Int" id="231978">len</a>[<a title="&gt;: Nothing &lt;: Any" id="231980">A</a>](<a title="scalaz.ImmutableArray[A]" id="231981">a</a>: <a href="ImmutableArray.scala.html#15390" title="scalaz.ImmutableArray[A]">ImmutableArray</a>[A]) = <a href="#231981" title="scalaz.ImmutableArray[A]">a</a>.<a href="ImmutableArray.scala.html#171389" title="=&gt; Int">length</a>
+  }
+
+  <span class="keyword">import</span> <a href="FingerTree.scala.html#13984" title="object scalaz.FingerTree">FingerTree</a>.ftip2ft
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[scalaz.Scalaz.Rope]" id="231552">RopeLength</a>: <a href="#16269" title="scalaz.Length[scalaz.Scalaz.Rope]">Length</a>[Rope] = <a href="#232000" title="java.lang.Object with scalaz.Length[scalaz.Scalaz.Rope]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[scalaz.Scalaz.Rope]" id="232000">Length</a>[Rope] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Scalaz.Rope[A])Int" id="232004">len</a>[<a title="&gt;: Nothing &lt;: Any" id="232006">A</a>](<a title="scalaz.Scalaz.Rope[A]" id="232007">a</a>: <a href="FingerTree.scala.html#34969" title="scalaz.Scalaz.Rope[A]">Rope</a>[A]) = <a href="#232007" title="scalaz.Scalaz.Rope[A]">a</a>.<a href="FingerTree.scala.html#33944" title="(ft: scalaz.FingerTreeIntPlus[scalaz.ImmutableArray[A]])scalaz.FingerTree[Int,scalaz.ImmutableArray[A]]">value</a>.<a href="FingerTree.scala.html#57484" title="=&gt; Int">measure</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[Iterable]" id="231553">IterableLength</a>: <a href="#16269" title="scalaz.Length[Iterable]">Length</a>[Iterable] = <a href="#232081" title="java.lang.Object with scalaz.Length[Iterable]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[Iterable]" id="232081">Length</a>[Iterable] {
+    <span class="keyword">def</span> <a title="[A](a: Iterable[A])Int" id="232085">len</a>[<a title="&gt;: Nothing &lt;: Any" id="232087">A</a>](<a title="Iterable[A]" id="232088">a</a>: <a title="Iterable[A]" id="8016">Iterable</a>[A]) = {
+      <span class="keyword">var</span> <a title="Int" id="232097">n</a> = <span title="Int(0)" class="int">0</span>
+      <span class="keyword">val</span> <a title="Iterator[A]" id="232098">i</a> = <a href="#232088" title="Iterable[A]">a</a>.<a title="=&gt; Iterator[A]" id="28953">iterator</a>
+      <span title="Unit" class="keyword">while</span>(<a href="#232098" title="Iterator[A]">i</a>.<a title="=&gt; Boolean" id="78539">hasNext</a>) {
+        <a href="#232097" title="Int">n</a> = <a href="#232097" title="(x$1: Int)Int">n</a> + <span title="Int(1)" class="int">1</span>
+        <a href="#232098" title="Iterator[A]">i</a>.<a title="()A" id="78540">next</a>
+      }
+
+      <a href="#232097" title="Int">n</a>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[java.lang.Iterable]" id="231554">JavaIterableLength</a>: <a href="#16269" title="scalaz.Length[java.lang.Iterable]">Length</a>[java.lang.Iterable] = <a href="#232299" title="java.lang.Object with scalaz.Length[java.lang.Iterable]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[java.lang.Iterable]" id="232299">Length</a>[java.lang.Iterable] {
+    <span class="keyword">def</span> <a title="[A](a: java.lang.Iterable[A])Int" id="232303">len</a>[<a title="&gt;: Nothing &lt;: Any" id="232305">A</a>](<a title="java.lang.Iterable[A]" id="232306">a</a>: <a title="java.lang.Iterable[A]" id="2472">java</a>.lang.Iterable[A]) = {
+      <span class="keyword">var</span> <a title="Int" id="232315">n</a> = <span title="Int(0)" class="int">0</span>
+      <span class="keyword">val</span> <a title="java.util.Iterator[A]" id="232316">i</a> = <a href="#232306" title="java.lang.Iterable[A]">a</a>.<a title="()java.util.Iterator[A]" id="39342">iterator</a>
+      <span title="Unit" class="keyword">while</span>(<a href="#232316" title="java.util.Iterator[A]">i</a>.<a title="()Boolean" id="98498">hasNext</a>) {
+        <a href="#232315" title="Int">n</a> = <a href="#232315" title="(x$1: Int)Int">n</a> + <span title="Int(1)" class="int">1</span>
+        <a href="#232316" title="java.util.Iterator[A]">i</a>.<a title="()A" id="98499">next</a>
+      }
+
+      <a href="#232315" title="Int">n</a>
+    }
+  }
+
+  <span class="keyword">import</span> java.util.concurrent.Callable
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Length[java.util.concurrent.Callable]" id="231556">CallableLength</a>: <a href="#16269" title="scalaz.Length[java.util.concurrent.Callable]">Length</a>[Callable] = <a href="#232519" title="java.lang.Object with scalaz.Length[java.util.concurrent.Callable]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Length[java.util.concurrent.Callable]" id="232519">Length</a>[Callable] {
+    <span class="keyword">def</span> <a title="[A](a: java.util.concurrent.Callable[A])Int" id="232523">len</a>[<a title="&gt;: Nothing &lt;: Any" id="232525">A</a>](<a title="java.util.concurrent.Callable[A]" id="232526">a</a>: <a title="java.util.concurrent.Callable[A]" id="38613">Callable</a>[A]) = <span title="Int(1)" class="int">1</span>
+  }
+}
+
+        </pre>
+    </body>
+</html>

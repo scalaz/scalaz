@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Copointed.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait Copointed[C[_]] extends java.lang.Object with scalaz.Functor[C] with scalaz.Copure[C]" id="10515">Copointed</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21558">C</a>[<a title="&gt;: Nothing &lt;: Any" id="82791">_</a>]] <span class="keyword">extends</span> <a href="Functor.scala.html#14670" title="scalaz.Functor[C]">Functor</a>[C] <span class="keyword">with</span> <a href="Copure.scala.html#10563" title="scalaz.Copure[C]">Copure</a>[C]
+
+<span class="keyword">trait</span> <a title="trait CopointedLow extends java.lang.Object with ScalaObject" id="10521">CopointedLow</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[C[_]](implicit t: scalaz.Functor[C],implicit c: scalaz.Copure[C])scalaz.Copointed[C]" id="111670">copointed</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="111672">C</a>[<a title="&gt;: Nothing &lt;: Any" id="111703">_</a>]](<span class="keyword">implicit</span> <a title="scalaz.Functor[C]" id="111701">t</a>: <a href="Functor.scala.html#14670" title="scalaz.Functor[C]">Functor</a>[C], <a title="scalaz.Copure[C]" id="111702">c</a>: <a href="Copure.scala.html#10563" title="scalaz.Copure[C]">Copure</a>[C]): <a href="#10515" title="scalaz.Copointed[C]">Copointed</a>[C] = <a href="#114263" title="java.lang.Object with scalaz.Copointed[C]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copointed[C]" id="114263">Copointed</a>[C] {
+    <span class="keyword">def</span> <a title="[A, B](a: C[A],f: (A) =&gt; B)C[B]" id="114276">fmap</a>[<a title="&gt;: Nothing &lt;: Any" id="114279">A</a>, <a title="&gt;: Nothing &lt;: Any" id="114280">B</a>](<a title="C[A]" id="114284">a</a>: <a href="#111672" title="C[A]">C</a>[A], <a title="(A) =&gt; B" id="114285">f</a>: A =&gt; B) = <a href="#111701" title="scalaz.Functor[C]">t</a>.<a href="Functor.scala.html#35365" title="(r: C[A],f: (A) =&gt; B)C[B]">fmap</a>(<a href="#114284" title="C[A]">a</a>, <a href="#114285" title="(A) =&gt; B">f</a>)
+
+    <span class="keyword">def</span> <a title="[A](a: C[A])A" id="114281">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114283">A</a>](<a title="C[A]" id="114315">a</a>: <a href="#111672" title="C[A]">C</a>[A]): <a href="#114283" title="A">A</a> = <a href="#111702" title="scalaz.Copure[C]">c</a>.<a href="Copure.scala.html#82844" title="(p: C[A])A">copure</a>(<a href="#114315" title="C[A]">a</a>)
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Copointed" id="10516">Copointed</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#10521" title="scalaz.CopointedLow">CopointedLow</a> {
+  <span class="keyword">import</span> <a href="Functor.scala.html#14671" title="object scalaz.Functor">Functor</a>._
+  <span class="keyword">import</span> <a href="Copure.scala.html#10564" title="object scalaz.Copure">Copure</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A]scalaz.Copointed[[α](A, α)]" id="111676">Tuple2Copointed</a>[<a title="&gt;: Nothing &lt;: Any" id="111678">A</a>] = <a href="#111670" title="[C[_]](implicit t: scalaz.Functor[C],implicit c: scalaz.Copure[C])scalaz.Copointed[C]">copointed</a><span title="(implicit t: scalaz.Functor[[α](A, α)],implicit c: scalaz.Copure[[α](A, α)])scalaz.Copointed[[α](A, α)]">[</span>({<span class="keyword">type</span> λ[α]=(A, α)})#<a title="[α](A, α)" id="633">λ</a>](<a href="Functor.scala.html#58897" title="scalaz.Functor[[α](A, α)]">Tuple2Functor</a>, <a href="Copure.scala.html#111716" title="scalaz.Copure[[α](Any, α)]">Tuple2Copure</a>)
+
+  <span class="keyword">import</span> java.util.<a title="object java.util.Map" id="6431">Map</a>.Entry
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Copointed[[α]java.util.Map.Entry[X,α]]" id="111680">MapEntryCopointed</a>[<a title="&gt;: Nothing &lt;: Any" id="111682">X</a>] = <a href="#111670" title="[C[_]](implicit t: scalaz.Functor[C],implicit c: scalaz.Copure[C])scalaz.Copointed[C]">copointed</a><span title="(implicit t: scalaz.Functor[[α]java.util.Map.Entry[X,α]],implicit c: scalaz.Copure[[α]java.util.Map.Entry[X,α]])scalaz.Copointed[[α]java.util.Map.Entry[X,α]]">[</span>({<span class="keyword">type</span> λ[α]=Entry[X, α]})#<a title="[α]java.util.Map.Entry[X,α]" id="39061">λ</a>](<a href="Functor.scala.html#59022" title="scalaz.Functor[[α]java.util.Map.Entry[X,α]]">MapEntryFunctor</a>, <a href="Copure.scala.html#111723" title="scalaz.Copure[[α]java.util.Map.Entry[X,α]]">MapEntryCopure</a>)
+}
+
+        </pre>
+    </body>
+</html>

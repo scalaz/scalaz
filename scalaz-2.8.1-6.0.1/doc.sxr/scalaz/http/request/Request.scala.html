@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/request/Request.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> request
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> <a href="../Util.scala.html#26605" title="object scalaz.http.Util">Util</a>.{asHashMap, mapHeads, parameters}
+<span class="keyword">import</span> <a href="../Util.scala.html#26605" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#811416" title="object scalaz.http.Util.Nel">Nel</a>._
+
+/**
+ * HTTP request.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5&quot;&gt;RFC 2616 Section 5 Request&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Request[IN[_]] extends java.lang.Object with ScalaObject" id="27237">Request</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="27361">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="811389">_</a>]] <span title="ScalaObject">{</span>
+  /**
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1&quot;&gt;§&lt;/a&gt;
+   */
+  <span class="keyword">val</span> <a title="=&gt; scalaz.http.request.Line" id="811312">line</a>: <a href="Line.scala.html#27042" title="scalaz.http.request.Line">Line</a>
+
+  /**
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.3&quot;&gt;§&lt;/a&gt;
+   */
+  <span class="keyword">val</span> <a title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="811313">headers</a>: <span title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">List</span>[(RequestHeader, NonEmptyList[Char])]
+
+  /**
+   * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3&quot;&gt;§&lt;/a&gt;
+   */
+  <span class="keyword">val</span> <a title="=&gt; IN[Byte]" id="811314">body</a>: <a href="#27361" title="IN[Byte]">IN</a>[Byte]
+
+  <span class="keyword">import</span> <a href="#27238" title="object scalaz.http.request.Request">Request</a>.request
+
+  /**
+   * Adds the given request header and value to a request.
+   */
+  <span class="keyword">def</span> <a title="(h: scalaz.http.request.RequestHeader,v: scalaz.NonEmptyList[Char])java.lang.Object with scalaz.http.request.Request[IN]" id="811316">apply</a>(<a title="scalaz.http.request.RequestHeader" id="836782">h</a>: <a href="RequestHeader.scala.html#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a>, <a title="scalaz.NonEmptyList[Char]" id="836783">v</a>: <a href="../../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char]) = <a href="#811244" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">[</span><a href="#27361" title="IN">IN</a>](<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>, <span title="(_1: scalaz.http.request.RequestHeader,_2: scalaz.NonEmptyList[Char])(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])">(</span><a href="#836782" title="scalaz.http.request.RequestHeader">h</a>, <a href="#836783" title="scalaz.NonEmptyList[Char]">v</a>) <a href="#836840" title="(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])">::</a> <a href="#811313" title="(x: (scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char]))List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="32651">headers</a>, <a href="#811314" title="=&gt; IN[Byte]">body</a>)
+
+  /**
+   * Sets the status line of a request.
+   */
+  <span class="keyword">def</span> <a title="(l: scalaz.http.request.Line)scalaz.http.request.Request[IN]" id="811317">apply</a>(<a title="scalaz.http.request.Line" id="836780">l</a>: <a href="Line.scala.html#27042" title="scalaz.http.request.Line">Line</a>): <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN] = <a href="#811244" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">[</span><a href="#27361" title="IN">IN</a>](<a href="#836780" title="scalaz.http.request.Line">l</a>, <a href="#811313" title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>, <a href="#811314" title="=&gt; IN[Byte]">body</a>)
+
+  /**
+   * Returns the first value that corresponds to the given request header.
+   */
+  <span class="keyword">def</span> <a title="(h: scalaz.http.request.RequestHeader)Option[scalaz.NonEmptyList[Char]]" id="811318">apply</a>(<a title="scalaz.http.request.RequestHeader" id="835981">h</a>: <a href="RequestHeader.scala.html#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a>) = <a href="#811328" title="=&gt; scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[Char]]">headersMapHeads</a>.<span title="(key: scalaz.http.request.RequestHeader)Option[scalaz.NonEmptyList[Char]]">get</span>(<a href="#835981" title="scalaz.http.request.RequestHeader">h</a>)
+
+  /**
+   * Sets the request method of the status line of a request.
+   */
+  <span class="keyword">def</span> <a title="(m: scalaz.http.request.Method)scalaz.http.request.Request[IN]" id="811319">apply</a>(<a title="scalaz.http.request.Method" id="835979">m</a>: <a href="Method.scala.html#27078" title="scalaz.http.request.Method">Method</a>): <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN] = <a href="#811317" title="(l: scalaz.http.request.Line)scalaz.http.request.Request[IN]">apply</a>(<a href="Line.scala.html#836807" title="(m: scalaz.http.request.Method)scalaz.http.request.Line">line</a>(<a href="#835979" title="scalaz.http.request.Method">m</a>))
+
+  /**
+   * Sets the request URI of the status line of a request.
+   */
+  <span class="keyword">def</span> <a title="(u: scalaz.http.request.Uri)scalaz.http.request.Request[IN]" id="811320">apply</a>(<a title="scalaz.http.request.Uri" id="835977">u</a>: <a href="Uri.scala.html#27333" title="scalaz.http.request.Uri">Uri</a>): <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN] = <a href="#811317" title="(l: scalaz.http.request.Line)scalaz.http.request.Request[IN]">apply</a>(<a href="Line.scala.html#836808" title="(u: scalaz.http.request.Uri)scalaz.http.request.Line">line</a>(<a href="#835977" title="scalaz.http.request.Uri">u</a>))
+
+  /**
+   * Sets the request version of the status line of a request.
+   */
+  <span class="keyword">def</span> <a title="(v: scalaz.http.Version)scalaz.http.request.Request[IN]" id="811321">apply</a>(<a title="scalaz.http.Version" id="835975">v</a>: <a href="../Version.scala.html#26613" title="scalaz.http.Version">Version</a>): <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN] = <a href="#811317" title="(l: scalaz.http.request.Line)scalaz.http.request.Request[IN]">apply</a>(<a href="Line.scala.html#836809" title="(v: scalaz.http.Version)scalaz.http.request.Line">line</a>(<a href="#835975" title="scalaz.http.Version">v</a>))
+
+  /**
+   * Sets the body of a request.
+   */
+  <span class="keyword">def</span> <a title="(b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]" id="811322">&gt;&gt;</a>(<a title="IN[Byte]" id="849902">b</a>: <a href="#27361" title="IN[Byte]">IN</a>[Byte]) = <a href="#811244" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">[</span><a href="#27361" title="IN">IN</a>](<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>, <a href="#811313" title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>, <a href="#849902" title="IN[Byte]">b</a>)
+
+  /**
+   * Appends the given value to the body of a request.
+   */
+  <span class="keyword">def</span> <a title="(b: IN[Byte])(implicit s: scalaz.Semigroup[IN[Byte]])java.lang.Object with scalaz.http.request.Request[IN]" id="811323">|+|</a>(<a title="IN[Byte]" id="849910">b</a>: <a href="#27361" title="IN[Byte]">IN</a>[Byte])(<span class="keyword">implicit</span> <a title="scalaz.Semigroup[IN[Byte]]" id="849911">s</a>: <a href="../../Semigroup.scala.html#19377" title="scalaz.Semigroup[IN[Byte]]">Semigroup</a>[IN[Byte]]) = <a href="#811244" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">[</span><a href="#27361" title="IN">IN</a>](<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>, <a href="#811313" title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>, <a href="#849911" title="scalaz.Semigroup[IN[Byte]]">s</a>.<a href="../../Semigroup.scala.html#36314" title="(s1: IN[Byte],s2: =&gt; IN[Byte])IN[Byte]">append</a>(<a href="#811314" title="=&gt; IN[Byte]">body</a>, <a href="#849910" title="IN[Byte]">b</a>))
+
+  /**
+   * Deletes all headers of the given value from a request.
+   */
+  <span class="keyword">def</span> <a title="(h: scalaz.http.request.RequestHeader)java.lang.Object with scalaz.http.request.Request[IN]" id="811324">-</a>(<a title="scalaz.http.request.RequestHeader" id="849922">h</a>: <a href="RequestHeader.scala.html#27261" title="scalaz.http.request.RequestHeader">RequestHeader</a>) = <a href="#811244" title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">request</a><span title="(l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]">[</span><a href="#27361" title="IN">IN</a>](<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>, <a href="#811313" title="(p: ((scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])) =&gt; Boolean)List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="29061">headers</a> filter <a href="#849931" title="Boolean">{</a> <span title="Boolean" class="keyword">case</span> (<a title="scalaz.http.request.RequestHeader" id="849934">k</a>, _) =&gt; <a href="#849922" title="(x$1: AnyRef)Boolean" id="5823">h</a> != <a href="#849934" title="scalaz.http.request.RequestHeader">k</a> }, <a href="#811314" title="=&gt; IN[Byte]">body</a>)
+
+  /**
+   * The user-agent request header value.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scalaz.NonEmptyList[Char]]" id="811325">userAgent</a> = <a href="#811318" title="(h: scalaz.http.request.RequestHeader)Option[scalaz.NonEmptyList[Char]]" class="keyword">this</a>(<a href="RequestHeader.scala.html#27346" title="object scalaz.http.request.UserAgent">UserAgent</a>)
+  
+  /**
+   * A map of request header values offering optimal seek time.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[scalaz.NonEmptyList[Char]]]" id="811327">headersMap</a> = <a href="../Util.scala.html#811402" title="&lt;refinement&gt;[T[_], SM[_]] extends java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]">asHashMap</a><a href="../Util.scala.html#813948" title="(kvs: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])])(implicit f: scalaz.Foldable[List],implicit s: scalaz.Semigroup[scalaz.NonEmptyList[scalaz.NonEmptyList[Char]]],implicit md: scalaz.Monad[scalaz.NonEmptyList])scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[scalaz.NonEmptyList[Char]]]">[</a><span title="List">List</span>, <a href="../../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList">NonEmptyList</a>]<a href="../../Foldable.scala.html#91411" title="=&gt; scalaz.Foldable[List]">(</a><a href="#811313" title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>)
+  
+  /**
+   * A map of the first request header values offering optimal seek time.
+   */
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[Char]]" id="811329">headersMapHeads</a> = <a href="../Util.scala.html#811394" title="(p: scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[scalaz.NonEmptyList[Char]]])scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[Char]]">mapHeads</a>(<a href="#811326" title="=&gt; scala.collection.immutable.Map[scalaz.http.request.RequestHeader,scalaz.NonEmptyList[scalaz.NonEmptyList[Char]]]">headersMap</a>)
+
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="scalaz.Memo[scalaz.Foldable[IN],List[(List[Char], List[Char])]]" id="811330">m</a> = <a href="../../Memo.scala.html#34551" title="[K, V]scalaz.Memo[K,V]">immutableHashMapMemo</a><span title="scalaz.Memo[scalaz.Foldable[IN],List[(List[Char], List[Char])]]">[</span><a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN], <span title="List[(List[Char], List[Char])]">List</span>[(List[Char], List[Char])]]
+
+  /**
+   * Provides look up for POST request parameters in the request body. Only the first invocation uses the given
+   * fold-left and subsequent invocations look-up using a memoisation table (scoped to each request).
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])java.lang.Object{val parameters: List[(List[Char], List[Char])]; lazy val parametersMap: scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]; lazy val parametersMapHeads: scala.collection.immutable.Map[List[Char],List[Char]]; def |(p: String): Option[List[Char]]; def ||(p: String): List[List[Char]]}" id="811332">post</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="849955">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#849958" title="java.lang.Object{val parameters: List[(List[Char], List[Char])]; lazy val parametersMap: scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]; lazy val parametersMapHeads: scala.collection.immutable.Map[List[Char],List[Char]]; def |(p: String): Option[List[Char]]; def ||(p: String): List[List[Char]]}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object" id="849958">{</a>
+    <span class="keyword">val</span> <a title="List[(List[Char], List[Char])]" id="849960">parameters</a> = <a href="../../Memo.scala.html#57432" title="(z: (scalaz.Foldable[IN]) =&gt; List[(List[Char], List[Char])])(scalaz.Foldable[IN]) =&gt; List[(List[Char], List[Char])]">m</a><span title="(v1: scalaz.Foldable[IN])List[(List[Char], List[Char])]">(</span><a title="scalaz.Foldable[IN]" id="849970">f</a> =&gt; <a href="../Util.scala.html#26605" title="object scalaz.http.Util">Util</a>.<a href="../Util.scala.html#811391" title="(p: List[Char])List[(List[Char], List[Char])]">parameters</a>(<a href="../../MA.scala.html#34252" title="(a: IN[Byte])scalaz.MA[IN,Byte]">ma</a>(<a href="#811314" title="=&gt; IN[Byte]">body</a>).<a href="../../MA.scala.html#55522" title="(implicit r: scalaz.Foldable[IN])List[Byte]">listl</a><span title="(f: (Byte) =&gt; Char)(implicit bf: scala.collection.generic.CanBuildFrom[List[Byte],Char,List[Char]])List[Char]">(</span><a href="#849970" title="scalaz.Foldable[IN]">f</a>) <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,Char,List[Char]]">map</span> (<a href="#849998" title="Byte">_</a>.<a title="=&gt; Char" id="4382">toChar</a>)))(<a href="#849955" title="scalaz.Foldable[IN]">f</a>)
+    <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]" id="849963">parametersMap</a> = <a href="../Util.scala.html#811402" title="&lt;refinement&gt;[T[_], SM[_]] extends java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]">asHashMap</a><a href="../Util.scala.html#813948" title="(kvs: List[(List[Char], List[Char])])(implicit f: scalaz.Foldable[List],implicit s: scalaz.Semigroup[scalaz.NonEmptyList[List[Char]]],implicit md: scalaz.Monad[scalaz.NonEmptyList])scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">[</a><span title="List">List</span>, <a href="../../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList">NonEmptyList</a>]<a href="../../Foldable.scala.html#91411" title="=&gt; scalaz.Foldable[List]">(</a><a href="#849960" title="=&gt; List[(List[Char], List[Char])]">parameters</a>)
+    <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scala.collection.immutable.Map[List[Char],List[Char]]" id="849965">parametersMapHeads</a> = <a href="../Util.scala.html#811394" title="(p: scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]])scala.collection.immutable.Map[List[Char],List[Char]]">mapHeads</a>(<a href="#849962" title="=&gt; scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">parametersMap</a>)
+    <span class="keyword">def</span> <a title="(p: String)Option[List[Char]]" id="849966">|</a>(<a title="String" id="850820">p</a>: <span title="String">String</span>) = <a href="#849964" title="=&gt; scala.collection.immutable.Map[List[Char],List[Char]]">parametersMapHeads</a>.<span title="(key: List[Char])Option[List[Char]]">get</span>(<a href="#850820" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">p</a>.<span title="=&gt; List[Char]">toList</span>)
+    <span class="keyword">def</span> <a title="(p: String)List[List[Char]]" id="849967">||</a>(<a title="String" id="850863">p</a>: <span title="String">String</span>): <span title="List[List[Char]]">List</span>[List[Char]] = <a href="#849962" title="=&gt; scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">parametersMap</a>.<span title="(key: List[Char])Option[scalaz.NonEmptyList[List[Char]]]">get</span><a href="../Util.scala.html#811421" title="(as: Option[scalaz.NonEmptyList[List[Char]]])List[List[Char]]">(</a><a href="#850863" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">p</a>.<span title="=&gt; List[Char]">toList</span>)
+  }
+
+  /**
+   * The request URI parameters.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]]" id="811333">parametersMap</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836874" title="=&gt; Option[scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]]">parametersMap</a>
+
+  /**
+   * The request URI parameters with only the first occurring value.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[scala.collection.immutable.Map[List[Char],List[Char]]]" id="811334">parametersMapHeads</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836876" title="=&gt; Option[scala.collection.immutable.Map[List[Char],List[Char]]]">parametersMapHeads</a>
+
+  /**
+   *  Returns the first occurrence of the given request parameter in the request URI.
+   */
+  <span class="keyword">def</span> <a title="(p: String)Option[List[Char]]" id="811335">!</a>(<a title="String" id="850970">p</a>: <span title="String">String</span>) = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="../../MA.scala.html#57409" title="(f: (scala.collection.immutable.Map[List[Char],List[Char]]) =&gt; Option[List[Char]])(implicit b: scalaz.Bind[Option])Option[List[Char]]">parametersMapHeads</a> <a href="../../Bind.scala.html#60026" title="=&gt; scalaz.Bind[Option]">∗</a> (<a href="#851128" title="scala.collection.immutable.Map[List[Char],List[Char]]">_</a>.<span title="(key: List[Char])Option[List[Char]]">get</span>(<a href="#850970" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">p</a>.<span title="=&gt; List[Char]">toList</span>))
+
+  /**
+   *  Returns the first occurrence of a given request parameter in the request URI.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Kleisli[Option,String,List[Char]]" id="811336">^!^</a> : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,List[Char]]">Kleisli</a>[Option, String, List[Char]] = <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[List[Char]])scalaz.Kleisli[Option,String,List[Char]]">kleisli</a>(<a href="#811335" title="(p: String)Option[List[Char]]" class="keyword">this</a> ! (<a href="#851410" title="String">_</a>: <span title="String">String</span>))
+
+  /**
+   * Returns the first occurrence of the given request parameter in the request URI or the given error value.
+   */
+  <span class="keyword">def</span> <a title="[E](p: String,e: =&gt; E)scalaz.Validation[E,List[Char]]" id="811337">!</a>[<a title="&gt;: Nothing &lt;: Any" id="811339">E</a>](<a title="String" id="851413">p</a>: <span title="String">String</span>, <a title="=&gt; E" id="851414">e</a>: =&gt; E): <a href="../../Validation.scala.html#21075" title="scalaz.Validation[E,List[Char]]">Validation</a>[E, List[Char]] = <a href="#811335" title="(p: String)Option[List[Char]]" class="keyword">this</a> <a href="../../OptionW.scala.html#38515" title="(e: =&gt; E)scalaz.Validation[E,List[Char]]">!</a> <a href="#851413" title="String">p</a> toSuccess <a href="#851414" title="=&gt; E">e</a>
+
+  /**
+   * Returns all occurrences of the given request parameter in the request URI.
+   */
+  <span class="keyword">def</span> <a title="(p: String)List[List[Char]]" id="811340">!!</a>(<a title="String" id="851487">p</a>: <span title="String">String</span>) : <span title="List[List[Char]]">List</span>[List[Char]] = <a href="../Util.scala.html#811421" title="(as: Option[scalaz.NonEmptyList[List[Char]]])List[List[Char]]">OptionNonEmptyListList</a>(<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="../../MA.scala.html#57409" title="(f: (scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]) =&gt; Option[scalaz.NonEmptyList[List[Char]]])(implicit b: scalaz.Bind[Option])Option[scalaz.NonEmptyList[List[Char]]]">parametersMap</a> <a href="../../Bind.scala.html#60026" title="=&gt; scalaz.Bind[Option]">∗</a> (<a href="#851646" title="scala.collection.immutable.Map[List[Char],scalaz.NonEmptyList[List[Char]]]">_</a>.<span title="(key: List[Char])Option[scalaz.NonEmptyList[List[Char]]]">get</span>(<a href="#851487" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">p</a>.<span title="=&gt; List[Char]">toList</span>)))
+
+  /**
+   * Returns all occurrences of a given request parameter in the request URI.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]" id="811341">^!!^</a> : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">Kleisli</a>[Option, String, NonEmptyList[List[Char]]] = <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[scalaz.NonEmptyList[List[Char]]])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">kleisli</a>((p : <span title="String">String</span>) =&gt; {(<a href="#811340" title="(p: String)List[List[Char]]" class="keyword">this</a> <a href="../../ListW.scala.html#34227" title="(as: List[List[Char]])scalaz.ListW[List[Char]]">!!</a> <a href="#851930" title="String">p</a>).<a href="../../ListW.scala.html#56835" title="=&gt; Option[scalaz.NonEmptyList[List[Char]]]">toNel</a> })
+
+  /**
+   * Returns all occurrences of the given request parameter in the request URI or the given error value.
+   */
+  <span class="keyword">def</span> <a title="[E](p: String,e: =&gt; E)scalaz.Validation[E,scalaz.NonEmptyList[List[Char]]]" id="811342">!!</a>[<a title="&gt;: Nothing &lt;: Any" id="811344">E</a>](<a title="String" id="851933">p</a>: <span title="String">String</span>, <a title="=&gt; E" id="851934">e</a>: =&gt; E): <a href="../../Validation.scala.html#21075" title="scalaz.Validation[E,scalaz.NonEmptyList[List[Char]]]">Validation</a>[E, NonEmptyList[List[Char]]] = (<a href="#811340" title="(p: String)List[List[Char]]" class="keyword">this</a> <a href="../../ListW.scala.html#34227" title="(as: List[List[Char]])scalaz.ListW[List[Char]]">!!</a> <a href="#851933" title="String">p</a>).<a href="../../OptionW.scala.html#38515" title="(e: =&gt; E)scalaz.Validation[E,scalaz.NonEmptyList[List[Char]]]">toNel</a> toSuccess <a href="#851934" title="=&gt; E">e</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the given request parameter occurs in the request URI.
+   */
+  <span class="keyword">def</span> <a title="(p: String)Boolean" id="811345">!?</a>(<a title="String" id="852109">p</a>: <span title="String">String</span>) = <a href="#811335" title="(p: String)Option[List[Char]]" class="keyword">this</a> ! <a href="#852109" title="String">p</a> <span title="=&gt; Boolean">isDefined</span>
+
+  /**
+   * Returns &lt;code&gt;false&lt;/code&gt; if the given request parameter occurs in the request URI.
+   */
+  <span class="keyword">def</span> <a title="(p: String)Boolean" id="811346">~!?</a>(<a title="String" id="852118">p</a>: <span title="String">String</span>) = <a href="#811335" title="(p: String)Option[List[Char]]" class="keyword">this</a> ! <a href="#852118" title="String">p</a> <span title="=&gt; Boolean">isEmpty</span>
+
+  /**
+   * Returns the first occurrence of the given request parameter in the request body.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" id="811347">|</a>(<a title="String" id="852127">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852128">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#850960" title="(p: String)Option[List[Char]]">post</a> | <a href="#852127" title="String">p</a>
+
+  /**
+   *  Returns the first occurrence of a given request parameter in the request body.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,List[Char]]" id="811348">^|^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852133">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,List[Char]]">Kleisli</a>[Option, String, List[Char]] = <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[List[Char]])scalaz.Kleisli[Option,String,List[Char]]">kleisli</a>(<a href="#811347" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" class="keyword">this</a> <a href="#852133" title="scalaz.Foldable[IN]">|</a> (<a href="#852143" title="String">_</a>: <span title="String">String</span>))
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the given request parameter occurs in the request body.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])Boolean" id="811349">|?</a>(<a title="String" id="852150">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852151">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#811347" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" class="keyword">this</a> <a href="#852151" title="scalaz.Foldable[IN]">|</a> <a href="#852150" title="String">p</a> <span title="=&gt; Boolean">isDefined</span>
+
+  /**
+   * Returns &lt;code&gt;false&lt;/code&gt; if the given request parameter occurs in the request body.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])Boolean" id="811350">~|?</a>(<a title="String" id="852156">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852157">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#811347" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" class="keyword">this</a> <a href="#852157" title="scalaz.Foldable[IN]">|</a> <a href="#852156" title="String">p</a> <span title="=&gt; Boolean">isEmpty</span>
+
+  /**
+   * Returns all occurrences of the given request parameter in the request body.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" id="811351">||</a>(<a title="String" id="852162">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852163">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <span title="List[List[Char]]">List</span>[List[Char]] = <a href="#850962" title="(p: String)List[List[Char]]">post</a> || <a href="#852162" title="String">p</a>
+
+  /**
+   *  Returns all occurrences of a given request parameter in the request body.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]" id="811352">^||^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852167">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">Kleisli</a>[Option, String, NonEmptyList[List[Char]]] =
+    <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[scalaz.NonEmptyList[List[Char]]])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">kleisli</a>((p : <span title="String">String</span>) =&gt; {(<a href="#811351" title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" class="keyword">this</a> <a href="../../ListW.scala.html#34227" title="(as: List[List[Char]])scalaz.ListW[List[Char]]">||</a> <a href="#852177" title="String">p</a>).<a href="../../ListW.scala.html#56835" title="=&gt; Option[scalaz.NonEmptyList[List[Char]]]">toNel</a> })
+
+  /**
+   * Returns the first occurrence of the given request parameter in the request URI if it exists or in the request body
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" id="811353">!|</a>(<a title="String" id="852235">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852236">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#27237" title="Request.this.type" class="keyword">this</a>.<a href="#811335" title="(p: String)Option[List[Char]]">!</a><a href="../../MA.scala.html#55513" title="(z: =&gt; Option[List[Char]])(implicit p: scalaz.Plus[Option])Option[List[Char]]">(</a><a href="#852235" title="String">p</a>) <a href="../../Plus.scala.html#299496" title="=&gt; scalaz.Plus[Option]">&lt;+&gt;</a> <a href="#811347" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]">|</a><a href="#852236" title="scalaz.Foldable[IN]">(</a><a href="#852235" title="String">p</a>)
+
+  /**
+   *  Returns the first occurrence of a given request parameter in the request URI if it exists or in the request body
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,List[Char]]" id="811354">^!|^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852580">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,List[Char]]">Kleisli</a>[Option, String, List[Char]] =
+    <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[List[Char]])scalaz.Kleisli[Option,String,List[Char]]">kleisli</a>((<a href="#811353" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" class="keyword">this</a> <a href="#852580" title="scalaz.Foldable[IN]">!|</a> (<a href="#852590" title="String">_</a>: <span title="String">String</span>)))
+
+  /**
+   * Returns the first occurrence of the given request parameter in the request body if it exists or in the request URI
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" id="811355">|!</a>(<a title="String" id="852597">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852598">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#811347" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]">|</a><a href="../../MA.scala.html#55513" title="(z: =&gt; Option[List[Char]])(implicit p: scalaz.Plus[Option])Option[List[Char]]">(</a><a href="#852597" title="String">p</a>) <a href="../../Plus.scala.html#299496" title="=&gt; scalaz.Plus[Option]">&lt;+&gt;</a> <a href="#27237" title="Request.this.type" class="keyword">this</a>.<a href="#811335" title="(p: String)Option[List[Char]]">!</a>(<a href="#852597" title="String">p</a>)
+
+  /**
+   * Returns the first occurrence of a given request parameter in the request body if it exists or in the request URI
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,List[Char]]" id="811356">^|!^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852940">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,List[Char]]">Kleisli</a>[Option, String, List[Char]] = <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[List[Char]])scalaz.Kleisli[Option,String,List[Char]]">kleisli</a>(<a href="#811355" title="(p: String)(implicit f: scalaz.Foldable[IN])Option[List[Char]]" class="keyword">this</a> <a href="#852940" title="scalaz.Foldable[IN]">|!</a> (<a href="#852950" title="String">_</a>: <span title="String">String</span>))
+
+  /**
+   * Returns all occurrences of the given request parameter in the request URI if it exists or in the request body
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" id="811357">!!||</a>(<a title="String" id="852957">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="852958">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#27237" title="Request.this.type" class="keyword">this</a>.<a href="#811340" title="(p: String)List[List[Char]]">!!</a><a href="../../MA.scala.html#55513" title="(z: =&gt; List[List[Char]])(implicit p: scalaz.Plus[List])List[List[Char]]">(</a><a href="#852957" title="String">p</a>) <a href="../../Plus.scala.html#299432" title="(implicit evidence$1: scalaz.CanBuildAnySelf[List])scalaz.Plus[List]">&lt;+&gt;</a> <a href="#811351" title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]">||</a><a href="#852958" title="scalaz.Foldable[IN]">(</a><a href="#852957" title="String">p</a>)
+
+  /**
+   * Returns all occurrences of a given request parameter in the request URI if it exists or in the request body
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]" id="811358">^!!||^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="853441">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">Kleisli</a>[Option, String, NonEmptyList[List[Char]]] =
+    <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[scalaz.NonEmptyList[List[Char]]])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">kleisli</a>((p : <span title="String">String</span>) =&gt; {(<a href="#811357" title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" class="keyword">this</a> <a href="../../ListW.scala.html#34227" title="(as: List[List[Char]])scalaz.ListW[List[Char]]">!!||</a> <a href="#853451" title="String">p</a>).<a href="../../ListW.scala.html#56835" title="=&gt; Option[scalaz.NonEmptyList[List[Char]]]">toNel</a> })
+
+  /**
+   * Returns all occurrences of the given request parameter in the request body if it exists or in the request URI
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" id="811359">||!!</a>(<a title="String" id="853509">p</a>: <span title="String">String</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="853510">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) = <a href="#27237" title="Request.this.type" class="keyword">this</a>.<a href="#811351" title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]">||</a><a href="../../MA.scala.html#55513" title="(z: =&gt; List[List[Char]])(implicit p: scalaz.Plus[List])List[List[Char]]">(</a><a href="#853509" title="String">p</a>) <a href="../../Plus.scala.html#299432" title="(implicit evidence$1: scalaz.CanBuildAnySelf[List])scalaz.Plus[List]">&lt;+&gt;</a> <a href="#811340" title="(p: String)List[List[Char]]">!!</a>(<a href="#853509" title="String">p</a>)
+
+  /**
+   * Returns all occurrences of a given request parameter in the request body if it exists or in the request URI
+   * otherwise.
+   */
+  <span class="keyword">def</span> <a title="(implicit f: scalaz.Foldable[IN])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]" id="811360">^||!!^</a>(<span class="keyword">implicit</span> <a title="scalaz.Foldable[IN]" id="853992">f</a>: <a href="../../Foldable.scala.html#14211" title="scalaz.Foldable[IN]">Foldable</a>[IN]) : <a href="../../Kleisli.scala.html#16044" title="scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">Kleisli</a>[Option, String, NonEmptyList[List[Char]]] =
+    <a href="../../Kleisli.scala.html#34144" title="(f: (String) =&gt; Option[scalaz.NonEmptyList[List[Char]]])scalaz.Kleisli[Option,String,scalaz.NonEmptyList[List[Char]]]">kleisli</a>((p : <span title="String">String</span>) =&gt; {(<a href="#811359" title="(p: String)(implicit f: scalaz.Foldable[IN])List[List[Char]]" class="keyword">this</a> <a href="../../ListW.scala.html#34227" title="(as: List[List[Char]])scalaz.ListW[List[Char]]">||!!</a> <a href="#854002" title="String">p</a>).<a href="../../ListW.scala.html#56835" title="=&gt; Option[scalaz.NonEmptyList[List[Char]]]">toNel</a> })
+
+  /**
+   * The request method of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.http.request.Method" id="811361">method</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="=&gt; scalaz.http.request.Method">method</a>
+
+  /**
+   * The request URI of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.http.request.Uri" id="811362">uri</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>
+
+  /**
+   * The request version of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.http.Version" id="811363">version</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836805" title="=&gt; scalaz.http.Version">version</a>
+
+  /**
+   * The request path of the request URI of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.NonEmptyList[Char]" id="811364">path</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836860" title="=&gt; scalaz.NonEmptyList[Char]">path</a>
+
+  /**
+   * Returns the path extension - characters after the last dot (.) in the path.
+   */
+  <span class="keyword">def</span> <a title="=&gt; String" id="811365">pathExtension</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836867" title="=&gt; String">pathExtension</a>
+  
+  /**
+   * Returns the components of the path split by '/', stripped of empty components
+   */
+  <span class="keyword">def</span> <a title="=&gt; List[String]" id="811366">parts</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836869" title="=&gt; List[String]">parts</a>
+
+  /**
+   * The query string of the request URI of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Option[List[Char]]" id="811367">queryString</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836861" title="=&gt; Option[List[Char]]">queryString</a>
+
+  /**
+   * The request version major of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Digit" id="811368">versionMajor</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836805" title="=&gt; scalaz.http.Version">version</a>.<a href="../Version.scala.html#812330" title="=&gt; scalaz.Digit">major</a>
+
+  /**
+   * The request version minor of the status line.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Digit" id="811369">versionMinor</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836805" title="=&gt; scalaz.http.Version">version</a>.<a href="../Version.scala.html#812331" title="=&gt; scalaz.Digit">minor</a>
+
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the request path of the request URI satisfies the given condition.
+   */
+  <span class="keyword">def</span> <a title="(f: (scalaz.NonEmptyList[Char]) =&gt; Boolean)Boolean" id="811370">path</a>(<a title="(scalaz.NonEmptyList[Char]) =&gt; Boolean" id="854201">f</a>: NonEmptyList[Char] =&gt; Boolean) = <a href="#854201" title="(v1: scalaz.NonEmptyList[Char])Boolean">f</a>(<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836860" title="=&gt; scalaz.NonEmptyList[Char]">path</a>)
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the query string of the request URI satisfies the given condition.
+   */
+  <span class="keyword">def</span> <a title="(f: (List[Char]) =&gt; Boolean)Boolean" id="811371">queryString</a>(<a title="(List[Char]) =&gt; Boolean" id="854206">f</a>: List[Char] =&gt; Boolean) = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836861" title="(p: (List[Char]) =&gt; Boolean)Boolean" id="38468">queryString</a> exists <a href="#854206" title="(List[Char]) =&gt; Boolean">f</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the request path of the request URI equals the given value.
+   */
+  <span class="keyword">def</span> <a title="(s: String)Boolean" id="811372">pathEquals</a>(<a title="String" id="854211">s</a>: <span title="String">String</span>) = <a href="#811370" title="(f: (scalaz.NonEmptyList[Char]) =&gt; Boolean)Boolean">path</a>(<a href="../Util.scala.html#811424" title="(xs: scalaz.NonEmptyList[Char])List[Char]">_</a>.<span title="(x$1: AnyRef)Boolean">mkString</span> == <a href="#854211" title="String">s</a>)
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the request path starts with the given value.
+   */
+  <span class="keyword">def</span> <a title="(s: String)Boolean" id="811373">pathStartsWith</a>(<a title="String" id="854288">s</a>: <span title="String">String</span>) = <a href="../Util.scala.html#811424" title="(xs: scalaz.NonEmptyList[Char])List[Char]">path</a>.<a title="(x$1: java.lang.String)Boolean" id="7469">mkString</a> startsWith <a href="#854288" title="String">s</a> 
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if the query string of the request URI equals the given value. 
+   */
+  <span class="keyword">def</span> <a title="(s: String)Boolean" id="811374">queryStringEquals</a>(<a title="String" id="854359">s</a>: <span title="String">String</span>) = <a href="#811371" title="(f: (List[Char]) =&gt; Boolean)Boolean">queryString</a>(<a href="#854366" title="List[Char]">_</a>.<span title="(x$1: AnyRef)Boolean">mkString</span> == <a href="#854359" title="String">s</a>)
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is OPTIONS.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811375">isOptions</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#27094" title="object scalaz.http.request.OPTIONS">OPTIONS</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is GET.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811376">isGet</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#26986" title="object scalaz.http.request.GET">GET</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is HEAD.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811377">isHead</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#26992" title="object scalaz.http.request.HEAD">HEAD</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is POST.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811378">isPost</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#27100" title="object scalaz.http.request.POST">POST</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is PUT.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811379">isPut</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#27112" title="object scalaz.http.request.PUT">PUT</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is DELETE.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811380">isDelete</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#26950" title="object scalaz.http.request.DELETE">DELETE</a>
+
+  /**
+   * Returns &lt;code&gt;true&lt;/code&gt; if this request method is TRACE.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811381">isTrace</a> = <a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="(x$1: AnyRef)Boolean">method</a> == <a href="Method.scala.html#27301" title="object scalaz.http.request.TRACE">TRACE</a>
+
+  /**
+   * Inspects the user-agent header to determine if the request was made by Microsoft Internet Explorer.
+   */
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="811382">isInternetExplorer</a> = <a href="#811318" title="(h: scalaz.http.request.RequestHeader)Option[scalaz.NonEmptyList[Char]]" class="keyword">this</a><a href="../Util.scala.html#811421" title="(as: Option[scalaz.NonEmptyList[Char]])List[Char]">(</a><a href="RequestHeader.scala.html#27346" title="object scalaz.http.request.UserAgent">UserAgent</a>).<span title="=&gt; String">mkString</span>.<a title="(x$1: java.lang.CharSequence)Boolean" id="7543">toLowerCase</a> contains <span title="java.lang.String(&quot;msie&quot;)" class="string">&quot;msie&quot;</span> 
+
+  <span class="keyword">import</span> response._
+
+  <span class="keyword">trait</span> <a title="trait Debug[OUT[_]] extends java.lang.Object" id="811384">Debug</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811385">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="854435">_</a>]] <span title="java.lang.Object">{</span>
+    <span class="keyword">def</span> <a title="[A](f: (IN[Byte]) =&gt; A)(implicit e: scalaz.Empty[OUT],implicit b: scalaz.http.response.Body[OUT,scala.xml.Elem],implicit s: scalaz.Semigroup[OUT[Byte]])scalaz.http.response.Response[OUT]" id="854432">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="854434">A</a>](<a title="(IN[Byte]) =&gt; A" id="854437">f</a>: IN[Byte] =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.Empty[OUT]" id="854438">e</a>: <a href="../../Empty.scala.html#10767" title="scalaz.Empty[OUT]">Empty</a>[OUT], <a title="scalaz.http.response.Body[OUT,scala.xml.Elem]" id="854439">b</a>: <a href="../response/Body.scala.html#27418" title="scalaz.http.response.Body[OUT,scala.xml.Elem]">Body</a>[OUT, xml.Elem], <a title="scalaz.Semigroup[OUT[Byte]]" id="854440">s</a>: <a href="../../Semigroup.scala.html#19377" title="scalaz.Semigroup[OUT[Byte]]">Semigroup</a>[OUT[Byte]]): <a href="../response/Response.scala.html#27721" title="scalaz.http.response.Response[OUT]">Response</a>[OUT]
+  }
+
+  /**
+   * Create a response that details the parts of the request in a XHTML document. 
+   */
+  <span class="keyword">def</span> <a title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object with Request.this.Debug[OUT]" id="811386">debug</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811388">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="854446">_</a>]] = <a href="#854445" title="java.lang.Object with Request.this.Debug[OUT]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with Request.this.Debug[OUT]" id="854445">Debug</a>[OUT] {
+    <span class="keyword">def</span> <a title="[A](f: (IN[Byte]) =&gt; A)(implicit e: scalaz.Empty[OUT],implicit b: scalaz.http.response.Body[OUT,scala.xml.Elem],implicit s: scalaz.Semigroup[OUT[Byte]])java.lang.Object with scalaz.http.response.Response[OUT]" id="854448">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="854450">A</a>](<a title="(IN[Byte]) =&gt; A" id="854451">f</a>: IN[Byte] =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.Empty[OUT]" id="854452">e</a>: <a href="../../Empty.scala.html#10767" title="scalaz.Empty[OUT]">Empty</a>[OUT], <a title="scalaz.http.response.Body[OUT,scala.xml.Elem]" id="854453">b</a>: <a href="../response/Body.scala.html#27418" title="scalaz.http.response.Body[OUT,scala.xml.Elem]">Body</a>[OUT, xml.Elem], <a title="scalaz.Semigroup[OUT[Byte]]" id="854454">s</a>: <a href="../../Semigroup.scala.html#19377" title="scalaz.Semigroup[OUT[Byte]]">Semigroup</a>[OUT[Byte]]) = {
+      <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.http.request.Request[IN]" id="854465">request</a> = <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>.<span class="keyword">this</span>
+      <a href="../response/Response.scala.html#27722" title="object scalaz.http.response.Response">Response</a>.<a href="../response/Response.scala.html#812935" title="[OUT[_]](l: scalaz.http.response.StatusLine)(implicit e: scalaz.Empty[OUT])java.lang.Object with scalaz.http.response.Response[OUT]">emptyHeadersBodyResponse</a><span title="(l: scalaz.http.response.StatusLine)(implicit e: scalaz.Empty[OUT])java.lang.Object with scalaz.http.response.Response[OUT]">[</span><a href="#811388" title="OUT">OUT</a>]<a href="#854452" title="scalaz.Empty[OUT]">(</a><a href="../response/StatusLine.scala.html#27803" title="object scalaz.http.response.StatusLine">StatusLine</a>.<a href="../response/StatusLine.scala.html#815023" title="[IN[_]](status: scalaz.http.response.Status)(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.StatusLine">statusLine</a><span title="(status: scalaz.http.response.Status)(implicit req: scalaz.http.request.Request[IN])scalaz.http.response.StatusLine">[</span><a href="#27361" title="IN">IN</a>]<a href="#854465" title="scalaz.http.request.Request[IN]">(</a><a href="../response/Status.scala.html#27620" title="object scalaz.http.response.OK">OK</a>)).<a href="../response/Response.scala.html#812665" title="(a: scala.xml.Elem)(implicit b: scalaz.http.response.Body[OUT,scala.xml.Elem],implicit s: scalaz.Semigroup[OUT[Byte]])java.lang.Object with scalaz.http.response.Response[OUT]">xhtml</a> <a href="#854453" title="scalaz.http.response.Body[OUT,scala.xml.Elem]">&lt;&lt;</a>
+        &lt;<a title="scala.xml.NamespaceBinding" id="854512">html</a> xmlns=<span title="java.lang.String(&quot;http://www.w3.org/1999/xhtml&quot;)" class="string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;
+          &lt;<a href="#854512" title="scala.xml.Elem" id="854516">head</a>&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem" id="854520">title</a>&gt;<span title="scala.xml.Text">Request</span> Details&lt;/title&gt;
+          &lt;/head&gt;
+          &lt;<a href="#854512" title="scala.xml.Elem" id="854532">body</a>&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem" id="854536">div</a>&gt;
+              {
+                <a title="(xs: (java.lang.String, Any)*)List[(java.lang.String, Any)]" id="32714">List</a><span title="(f: ((java.lang.String, Any)) =&gt; scala.xml.NodeBuffer)(implicit bf: scala.collection.generic.CanBuildFrom[List[(java.lang.String, Any)],scala.xml.NodeBuffer,Any])Any">(</span><span title="(_1: java.lang.String,_2: scalaz.http.request.Method)(java.lang.String, scalaz.http.request.Method)">(</span><span title="java.lang.String(&quot;Method&quot;)" class="string">&quot;Method&quot;</span>, <a href="#811361" title="=&gt; scalaz.http.request.Method">method</a>),
+                     <span title="(_1: java.lang.String,_2: String)(java.lang.String, String)">(</span><span title="java.lang.String(&quot;URI Path&quot;)" class="string">&quot;URI Path&quot;</span>, <a href="#811362" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="../Util.scala.html#811424" title="(xs: scalaz.NonEmptyList[Char])List[Char]">path</a>.<span title="=&gt; String">mkString</span>),
+                     <span title="(_1: java.lang.String,_2: java.lang.Object)(java.lang.String, java.lang.Object)">(</span><span title="java.lang.String(&quot;URI Query String&quot;)" class="string">&quot;URI Query String&quot;</span>, <a href="#811362" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836861" title="(f: (List[Char]) =&gt; String)Option[String]" id="38443">queryString</a> <a title="(default: =&gt; java.lang.Object)java.lang.Object" id="38437">map</a> (<a href="#854630" title="List[Char]">_</a>.<span title="=&gt; String">mkString</span>) getOrElse &lt;<a href="#854512" title="scala.xml.Elem" id="854639">i</a>&gt;<span title="scala.xml.Text">N</span>/A&lt;/i&gt;),
+                     <span title="(_1: java.lang.String,_2: Long)(java.lang.String, Long)">(</span><span title="java.lang.String(&quot;Version (major)&quot;)" class="string">&quot;Version (major)&quot;</span>, <a href="#811368" title="=&gt; scalaz.Digit">versionMajor</a>.<a href="../../Digit.scala.html#57754" title="=&gt; Long">toLong</a>),
+                     <span title="(_1: java.lang.String,_2: Long)(java.lang.String, Long)">(</span><span title="java.lang.String(&quot;Version (minor)&quot;)" class="string">&quot;Version (minor)&quot;</span>, <a href="#811369" title="=&gt; scalaz.Digit">versionMinor</a>.<a href="../../Digit.scala.html#57754" title="=&gt; Long">toLong</a>)) <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,scala.xml.NodeBuffer,List[scala.xml.NodeBuffer]]">map</span> <a href="#854716" title="scala.xml.NodeBuffer">{</a>
+                  <span title="scala.xml.NodeBuffer" class="keyword">case</span> (<a title="java.lang.String" id="854719">k</a>, <a title="Any" id="854720">v</a>) =&gt;
+                    &lt;<a title="scala.xml.NodeBuffer" id="854724">div</a>&gt;{ <a href="#854719" title="java.lang.String">k</a> }&lt;/div&gt;
+                    &lt;<a href="#854512" title="scala.xml.Elem" id="854729">h4</a>&gt;{ <a href="#854720" title="Any">v</a> }&lt;/h4&gt;
+                }
+              }
+            &lt;/div&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem">hr</a>/&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem" id="855090">div</a>&gt;
+              {
+                <span title="Any" class="keyword">if</span>(<a href="#811313" title="=&gt; List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">headers</a>.<a title="=&gt; Boolean" id="28963">isEmpty</a>)
+                  &lt;<a href="#854512" title="scala.xml.Elem" id="855094">i</a>&gt;<span title="scala.xml.Text">N</span>/A&lt;/i&gt;
+                <span class="keyword">else</span>
+                  &lt;<a href="#854512" title="scala.xml.Elem" id="855099">ul</a>&gt;
+                  {
+                    <a href="#811313" title="(f: ((scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])) =&gt; scala.xml.Elem)(implicit bf: scala.collection.generic.CanBuildFrom[List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],scala.xml.Elem,Any])Any">headers</a> <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,scala.xml.Elem,List[scala.xml.Elem]]">map</span> <a href="#855115" title="scala.xml.Elem">{</a>
+                      <span title="scala.xml.Elem" class="keyword">case</span> (<a title="scalaz.http.request.RequestHeader" id="855118">h</a>, <a title="scalaz.NonEmptyList[Char]" id="855119">v</a>) =&gt; &lt;<a href="#854512" title="scala.xml.Elem" id="855121">li</a>&gt;&lt;<a href="#854512" title="scala.xml.Elem" id="855123">div</a>&gt;&lt;<a href="#854512" title="scala.xml.Elem" id="855125">strong</a>&gt;{ <a href="#855118" title="scalaz.http.request.RequestHeader">h</a>.<a href="RequestHeader.scala.html#815694" title="=&gt; String">asString</a> }&lt;/strong&gt;&lt;<a href="#854512" title="scala.xml.Elem">br</a>/&gt;{ <a href="../Util.scala.html#811424" title="(xs: scalaz.NonEmptyList[Char])List[Char]">v</a>.<span title="=&gt; String">mkString</span> }&lt;/div&gt;&lt;/li&gt;
+                    }
+                  }
+                  &lt;/ul&gt;
+              }
+            &lt;/div&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem">hr</a>/&gt;
+            &lt;<a href="#854512" title="scala.xml.Elem" id="855449">div</a>&gt;
+            {
+              <a href="#854451" title="(v1: IN[Byte])A">f</a>(<a href="#811314" title="=&gt; IN[Byte]">body</a>)
+            }
+            &lt;/div&gt;
+          &lt;/body&gt;
+        &lt;/html&gt;      
+    }
+  }
+}
+
+/**
+ * HTTP request.
+ * &lt;a href=&quot;http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5&quot;&gt;RFC 2616 Section 5 Request&lt;/a&gt;.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.request.Request" id="27238">Request</a> <span title="ScalaObject">{</span>
+  /**
+   * Construct a request with the given status line, headers and body.
+   */
+  <span class="keyword">def</span> <a title="[IN[_]](l: scalaz.http.request.Line,h: List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])],b: IN[Byte])java.lang.Object with scalaz.http.request.Request[IN]" id="811244">request</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811246">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="836792">_</a>]](<a title="scalaz.http.request.Line" id="836786">l</a>: <a href="Line.scala.html#27042" title="scalaz.http.request.Line">Line</a>, <a title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="836787">h</a>: <span title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">List</span>[(RequestHeader, NonEmptyList[Char])], <a title="IN[Byte]" id="836788">b</a>: <a href="#811246" title="IN[Byte]">IN</a>[Byte]) = <a href="#836791" title="java.lang.Object with scalaz.http.request.Request[IN]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.request.Request[IN]" id="836791">Request</a>[IN] {
+    <span class="keyword">val</span> <a title="scalaz.http.request.Line" id="836794">line</a> = <a href="#836786" title="scalaz.http.request.Line">l</a>
+    <span class="keyword">val</span> <a title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]" id="836796">headers</a> = <a href="#836787" title="List[(scalaz.http.request.RequestHeader, scalaz.NonEmptyList[Char])]">h</a>
+    <span class="keyword">val</span> <a title="IN[Byte]" id="836798">body</a> = <a href="#836788" title="IN[Byte]">b</a>
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.MethodPath" id="811247">MethodPath</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[(scalaz.http.request.Method, String)]" id="855512">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855514">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855519">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855517">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[(scalaz.http.request.Method, String)]">Option</span>[(Method, String)] =
+      <span title="(x: (scalaz.http.request.Method, String))Some[(scalaz.http.request.Method, String)]">Some</span><span title="(_1: scalaz.http.request.Method,_2: String)(scalaz.http.request.Method, String)">(</span><a href="#855517" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="=&gt; scalaz.http.request.Method">method</a>, <a href="#855517" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836860" title="=&gt; scalaz.NonEmptyList[Char]">path</a>.<a href="../../NonEmptyList.scala.html#42873" title="=&gt; List[Char]">list</a>.<span title="=&gt; String">mkString</span>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.MethodUri" id="811249">MethodUri</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[(scalaz.http.request.Method, scalaz.http.request.Uri)]" id="855535">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855537">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855542">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855540">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[(scalaz.http.request.Method, scalaz.http.request.Uri)]">Option</span>[(Method, Uri)] =
+      <span title="(x: (scalaz.http.request.Method, scalaz.http.request.Uri))Some[(scalaz.http.request.Method, scalaz.http.request.Uri)]">Some</span><span title="(_1: scalaz.http.request.Method,_2: scalaz.http.request.Uri)(scalaz.http.request.Method, scalaz.http.request.Uri)">(</span><a href="#855540" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="=&gt; scalaz.http.request.Method">method</a>, <a href="#855540" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.Path" id="811251">Path</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[String]" id="855556">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855558">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855563">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855561">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[String]">Option</span>[(String)] =
+      <span title="(x: String)Some[String]">Some</span>(<a href="#855561" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>.<a href="Uri.scala.html#836860" title="=&gt; scalaz.NonEmptyList[Char]">path</a>.<a href="../../NonEmptyList.scala.html#42873" title="=&gt; List[Char]">list</a>.<span title="=&gt; String">mkString</span>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.Uri" id="811253">Uri</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[scalaz.http.request.Uri]" id="855572">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855574">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855579">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855577">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[scalaz.http.request.Uri]">Option</span>[Uri] =
+      <span title="(x: scalaz.http.request.Uri)Some[scalaz.http.request.Uri]">Some</span>(<a href="#855577" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836804" title="=&gt; scalaz.http.request.Uri">uri</a>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.Method" id="811255">Method</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[scalaz.http.request.Method]" id="855586">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855588">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855593">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855591">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[scalaz.http.request.Method]">Option</span>[Method] =
+      <span title="(x: scalaz.http.request.Method)Some[scalaz.http.request.Method]">Some</span>(<a href="#855591" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836803" title="=&gt; scalaz.http.request.Method">method</a>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.Version" id="811257">Version</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[scalaz.http.Version]" id="855600">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855602">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855607">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855605">r</a>: <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]): <span title="Option[scalaz.http.Version]">Option</span>[Version] =
+      <span title="(x: scalaz.http.Version)Some[scalaz.http.Version]">Some</span>(<a href="#855605" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811312" title="=&gt; scalaz.http.request.Line">line</a>.<a href="Line.scala.html#836805" title="=&gt; scalaz.http.Version">version</a>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.Parts" id="811259">Parts</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[List[String]]" id="855614">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="855616">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="855621">_</a>]](<a title="scalaz.http.request.Request[IN]" id="855619">r</a> : <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]) : <span title="Option[List[String]]">Option</span>[List[String]] = {
+      <span title="(x: List[String])Some[List[String]]">Some</span>(<a href="#855619" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811366" title="=&gt; List[String]">parts</a>)
+    }
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.request.Request.MethodParts" id="811261">MethodParts</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[IN[_]](r: scalaz.http.request.Request[IN])Option[(scalaz.http.request.Method, List[String])]" id="816607">unapply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="816609">IN</a>[<a title="&gt;: Nothing &lt;: Any" id="816612">_</a>]](<a title="scalaz.http.request.Request[IN]" id="816610">r</a> : <a href="#27237" title="scalaz.http.request.Request[IN]">Request</a>[IN]) : <span title="Option[(scalaz.http.request.Method, List[String])]">Option</span>[(Method, List[String])] = {
+      <span title="(x: (scalaz.http.request.Method, List[String]))Some[(scalaz.http.request.Method, List[String])]">Some</span><span title="(_1: scalaz.http.request.Method,_2: List[String])(scalaz.http.request.Method, List[String])">(</span><a href="#816610" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811361" title="=&gt; scalaz.http.request.Method">method</a>, <a href="#816610" title="scalaz.http.request.Request[IN]">r</a>.<a href="#811366" title="=&gt; List[String]">parts</a>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

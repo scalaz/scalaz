@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/ShortW.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait ShortW extends java.lang.Object with scalaz.PimpedType[Short] with ScalaObject" id="19401">ShortW</a> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#18561" title="scalaz.PimpedType[Short]">PimpedType</a>[Short] {
+  <span class="keyword">val</span> <a title="=&gt; Short" id="183066">value</a>: <span title="Short">Short</span>
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.ShortMultiplication" id="183068">∏</a> : <a href="Multiplications.scala.html#19392" title="scalaz.ShortMultiplication">ShortMultiplication</a> = <a href="Multiplications.scala.html#34573" title="(n: Short)scalaz.ShortMultiplication">multiplication</a>(<a href="#183066" title="=&gt; Short">value</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait Shorts extends java.lang.Object with ScalaObject" id="19398">Shorts</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.Shorts.ShortTo : (n: Short)scalaz.ShortW" id="34989">ShortTo</a>(<a title="Short" id="38216">n</a>: <span title="Short">Short</span>): <a href="#19401" title="scalaz.ShortW">ShortW</a> = <a href="#328128" title="java.lang.Object with scalaz.ShortW{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.ShortW" id="328128">ShortW</a> {
+    <span class="keyword">val</span> <a title="Short" id="328132">value</a> = <a href="#38216" title="Short">n</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

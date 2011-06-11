@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Generator.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+/** A Generator[C] is a container of elements, and which knows how to efficiently apply a Reducer to extract an answer by combining elements. A Reducer may supply efficient left-to-right and right-to-left reduction strategies that a Generator may avail itself of. */
+<span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class Generator[C[_]] extends java.lang.Object with ScalaObject" id="14706">Generator</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21691">C</a>[<a title="&gt;: Nothing &lt;: Any" id="196106">_</a>]] <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],c: C[E])M" id="196091">reduce</a>[<a title="&gt;: Nothing &lt;: Any" id="196094">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196095">M</a>](<a title="scalaz.Reducer[E,M]" id="196109">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="C[E]" id="196110">c</a>: <a href="#21691" title="C[E]">C</a>[E]): <a href="#196095" title="M">M</a> = <a href="#196096" title="(r: scalaz.Reducer[E,M],m: M,c: C[E])M">to</a>(<a href="#196109" title="scalaz.Reducer[E,M]">r</a>, <a href="#196109" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38417" title="=&gt; scalaz.Monoid[M]">monoid</a>.<a href="Zero.scala.html#36313" title="=&gt; M">zero</a>, <a href="#196110" title="C[E]">c</a>)
+  <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],m: M,c: C[E])M" id="196096">to</a>[<a title="&gt;: Nothing &lt;: Any" id="196099">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196100">M</a>](<a title="scalaz.Reducer[E,M]" id="196114">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="M" id="196115">m</a>: <a href="#196100" title="M">M</a>, <a title="C[E]" id="196116">c</a>: <a href="#21691" title="C[E]">C</a>[E]): <a href="#196100" title="M">M</a> = <a href="Reducer.scala.html#34896" title="(r: scalaz.Reducer[E,M])scalaz.Monoid[M]">r</a>.<a href="Semigroup.scala.html#36314" title="(s1: M,s2: =&gt; M)M">append</a>(<a href="#196115" title="M">m</a>, <a href="#196091" title="(r: scalaz.Reducer[E,M],c: C[E])M">reduce</a>(<a href="#196114" title="scalaz.Reducer[E,M]">r</a>, <a href="#196116" title="C[E]">c</a>))
+  <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],c: C[E],m: M)M" id="196101">from</a>[<a title="&gt;: Nothing &lt;: Any" id="196104">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196105">M</a>](<a title="scalaz.Reducer[E,M]" id="196199">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="C[E]" id="196200">c</a>: <a href="#21691" title="C[E]">C</a>[E], <a title="M" id="196201">m</a>: <a href="#196105" title="M">M</a>): <a href="#196105" title="M">M</a> = <a href="Reducer.scala.html#34896" title="(r: scalaz.Reducer[E,M])scalaz.Monoid[M]">r</a>.<a href="Semigroup.scala.html#36314" title="(s1: M,s2: =&gt; M)M">append</a>(<a href="#196091" title="(r: scalaz.Reducer[E,M],c: C[E])M">reduce</a>(<a href="#196199" title="scalaz.Reducer[E,M]">r</a>, <a href="#196200" title="C[E]">c</a>), <a href="#196201" title="M">m</a>)
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Generator" id="14707">Generator</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[F[_]](implicit evidence$1: scalaz.Foldable[F])scalaz.Generator[F]" id="196285">FoldrGenerator</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="196276">F</a>[<a title="&gt;: Nothing &lt;: Any" id="196289">_</a>]: Foldable] = <a href="#196288" title="scalaz.Generator[F]" class="keyword">new</a> <a title="anonymous class $anon extends scalaz.Generator[F]" id="196288">Generator</a>[F] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],c: F[E])M" id="196291">reduce</a>[<a title="&gt;: Nothing &lt;: Any" id="196294">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196295">M</a>](<a title="scalaz.Reducer[E,M]" id="196296">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="F[E]" id="196297">c</a>: <a href="#196276" title="F[E]">F</a>[E]): <a href="#196295" title="M">M</a> =
+      <a href="MA.scala.html#34241" title="(a: F[E])scalaz.MA[F,E]">c</a>.<a href="MA.scala.html#55536" title="(b: M)(f: (E, =&gt; M) =&gt; M)(implicit r: scalaz.Foldable[F])M">foldr</a>(<a href="#196296" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38417" title="=&gt; scalaz.Monoid[M]">monoid</a>.<a href="Zero.scala.html#36313" title="=&gt; M">zero</a>)<a href="#196285" title="scalaz.Foldable[F]">(</a>(<a title="E" id="196546">a</a>, <a title="=&gt; M" id="196547">b</a><a title="=&gt; M" id="8820">)</a> =&gt; <a href="#196296" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38421" title="(c: E,m: M)M">cons</a>(<a href="#196546" title="E">a</a>, <a href="#196547" title="=&gt; M">b</a>))
+  }
+
+  <span class="keyword">def</span> <a title="[F[_]](implicit evidence$2: scalaz.Foldable[F])scalaz.Generator[F]" id="196582">FoldlGenerator</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="196279">F</a>[<a title="&gt;: Nothing &lt;: Any" id="196586">_</a>]: Foldable] = <a href="#196585" title="scalaz.Generator[F]" class="keyword">new</a> <a title="anonymous class $anon extends scalaz.Generator[F]" id="196585">Generator</a>[F] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],c: F[E])M" id="196588">reduce</a>[<a title="&gt;: Nothing &lt;: Any" id="196591">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196592">M</a>](<a title="scalaz.Reducer[E,M]" id="196593">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="F[E]" id="196594">c</a>: <a href="#196279" title="F[E]">F</a>[E]): <a href="#196592" title="M">M</a> =
+      <a href="MA.scala.html#34241" title="(a: F[E])scalaz.MA[F,E]">c</a>.<a href="MA.scala.html#55518" title="(b: M)(f: (M, E) =&gt; M)(implicit r: scalaz.Foldable[F])M">foldl</a>(<a href="#196593" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38417" title="=&gt; scalaz.Monoid[M]">monoid</a>.<a href="Zero.scala.html#36313" title="=&gt; M">zero</a>)<a href="#196582" title="scalaz.Foldable[F]">(</a><a href="#196593" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38420" title="(m: M,c: E)M">snoc</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[F[_]](implicit evidence$3: scalaz.Foldable[F])scalaz.Generator[F]" id="196880">FoldMapGenerator</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="196282">F</a>[<a title="&gt;: Nothing &lt;: Any" id="196884">_</a>]: Foldable] = <a href="#196883" title="scalaz.Generator[F]" class="keyword">new</a> <a title="anonymous class $anon extends scalaz.Generator[F]" id="196883">Generator</a>[F] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[E, M](r: scalaz.Reducer[E,M],c: F[E])M" id="196886">reduce</a>[<a title="&gt;: Nothing &lt;: Any" id="196889">E</a>, <a title="&gt;: Nothing &lt;: Any" id="196890">M</a>](<a title="scalaz.Reducer[E,M]" id="196891">r</a>: <a href="Reducer.scala.html#18915" title="scalaz.Reducer[E,M]">Reducer</a>[E, M], <a title="F[E]" id="196892">c</a>: <a href="#196282" title="F[E]">F</a>[E]): <a href="#196890" title="M">M</a> = {
+      <a href="MA.scala.html#34241" title="(a: F[E])scalaz.MA[F,E]">c</a>.<a href="MA.scala.html#55541" title="(f: (E) =&gt; M)(implicit r: scalaz.Foldable[F],implicit m: scalaz.Monoid[M])M">foldMap</a>(<a href="#196891" title="scalaz.Reducer[E,M]">r</a>.<a href="Reducer.scala.html#38419" title="(c: E)M">unit</a>)(<a title="[T](implicit e: T)T" id="1489">implicitly</a><a href="#196880" title="(implicit e: scalaz.Foldable[F])scalaz.Foldable[F]">[</a><a href="Foldable.scala.html#14211" title="scalaz.Foldable[F]">Foldable</a>[F]], <a href="Reducer.scala.html#34896" title="(r: scalaz.Reducer[E,M])scalaz.Monoid[M]">r</a>)
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

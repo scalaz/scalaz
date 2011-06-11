@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Function2W.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Function2W[T1, T2, R] extends java.lang.Object with ScalaObject" id="14457">Function2W</a>[<a title="&gt;: Nothing &lt;: Any" id="21680">T1</a>, <a title="&gt;: Nothing &lt;: Any" id="21681">T2</a>, <a title="&gt;: Nothing &lt;: Any" id="21682">R</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="=&gt; (T1, T2) =&gt; R" id="56931">k</a>: (T1, T2) =&gt; R
+
+  <span class="keyword">def</span> <a title="=&gt; (T2, T1) =&gt; R" id="56932">flip</a> : (T2, T1) =&gt; R = (v2: <a href="#21681" title="T2">T2</a>, v1: <a href="#21680" title="T1">T1</a>) =&gt; <a href="#56931" title="(v1: T1,v2: T2)R">k</a>(<a href="#183707" title="T1">v1</a>, <a href="#183706" title="T2">v2</a>)
+
+  <span class="keyword">def</span> <a title="[X](f: (R, R) =&gt; X,t1: (T1, T1),t2: (T2, T2))X" id="56933">on</a>[<a title="&gt;: Nothing &lt;: Any" id="56935">X</a>](<a title="(R, R) =&gt; X" id="183711">f</a>: (R, R) =&gt; X, <a title="(T1, T1)" id="183712">t1</a>: <span title="(T1, T1)">(</span>T1, T1), <a title="(T2, T2)" id="183713">t2</a>: <span title="(T2, T2)">(</span>T2, T2)): <a href="#56935" title="X">X</a> = <a href="#183711" title="(v1: R,v2: R)X">f</a>(<a href="#56931" title="(v1: T1,v2: T2)R">k</a>(<a href="#183712" title="(T1, T1)">t1</a>.<span title="=&gt; T1">_1</span>, <a href="#183713" title="(T2, T2)">t2</a>.<span title="=&gt; T2">_1</span>), <a href="#56931" title="(v1: T1,v2: T2)R">k</a>(<a href="#183712" title="(T1, T1)">t1</a>.<span title="=&gt; T1">_2</span>, <a href="#183713" title="(T2, T2)">t2</a>.<span title="=&gt; T2">_2</span>))
+
+  <span class="keyword">import</span> concurrent.Strategy
+  <span class="keyword">import</span> concurrent.Promise
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="(implicit s: scalaz.concurrent.Strategy)(T1, T2) =&gt; scalaz.concurrent.Promise[R]" id="56939">promise</a>(<span class="keyword">implicit</span> <a title="scalaz.concurrent.Strategy" id="183725">s</a>: <a href="concurrent/Strategy.scala.html#22238" title="scalaz.concurrent.Strategy">Strategy</a>): (T1, T2) =&gt; Promise[R] = (x: <a href="#21680" title="T1">T1</a>, y: <a href="#21681" title="T2">T2</a>) =&gt; <a href="Identity.scala.html#34181" title="(x: =&gt; T1)scalaz.Identity[T1]">x</a>.<a href="Identity.scala.html#43056" title="[F[_]](implicit p: scalaz.Pure[F])F[T1]">pure</a><a href="MA.scala.html#34241" title="(a: scalaz.concurrent.Promise[T1])scalaz.MA[scalaz.concurrent.Promise,T1]">[</a><a href="concurrent/Promise.scala.html#22226" title="scalaz.concurrent.Promise">Promise</a>].<a href="MA.scala.html#55420" title="(b: scalaz.concurrent.Promise[T2])(z: (T1, T2) =&gt; R)(implicit t: scalaz.Functor[scalaz.concurrent.Promise],implicit a: scalaz.Apply[scalaz.concurrent.Promise])scalaz.concurrent.Promise[R]">&lt;**&gt;</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; T2)scalaz.Identity[T2]">y</a>.<a href="Identity.scala.html#43056" title="[F[_]](implicit p: scalaz.Pure[F])F[T2]">pure</a><a href="Pure.scala.html#35978" title="(implicit p: scalaz.Pure[scalaz.concurrent.Promise])scalaz.concurrent.Promise[T2]">[</a><a href="concurrent/Promise.scala.html#22226" title="scalaz.concurrent.Promise">Promise</a>])<a href="Functor.scala.html#59042" title="=&gt; scalaz.Functor[scalaz.concurrent.Promise]">(</a><a href="#56931" title="=&gt; (T1, T2) =&gt; R">k</a>)
+
+  <span class="keyword">def</span> <a title="[TT](f: (TT) =&gt; T1)(implicit ev: =:=[T1,T2])(TT, TT) =&gt; R" id="56940">contramap</a>[<a title="&gt;: Nothing &lt;: Any" id="56942">TT</a>](<a title="(TT) =&gt; T1" id="185494">f</a>: TT =&gt; T1)(<span class="keyword">implicit</span> <a title="=:=[T1,T2]" id="185495">ev</a>: T1 <a title="=:=[T1,T2]" id="9127">=:=</a> T2): (TT, TT) =&gt; R = (<a title="TT" id="185499">t1</a>, <a title="TT" id="185500">t2</a><a href="#56942" title="TT">)</a> =&gt; <a href="#56931" title="(v1: T1,v2: T2)R">k</a>(<a href="#185494" title="(v1: TT)T1">f</a>(<a href="#185499" title="TT">t1</a>), <a href="#185495" title="(v1: T1)T2">ev</a>(<a href="#185494" title="(v1: TT)T1">f</a>(<a href="#185500" title="TT">t2</a>)))
+
+  <span class="keyword">def</span> <a title="[F[_]](implicit f: scalaz.Applicative[F])(F[T1], F[T2]) =&gt; F[R]" id="56943">lift</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="56945">F</a>[<a title="&gt;: Nothing &lt;: Any" id="185509">_</a>]](<span class="keyword">implicit</span> <a title="scalaz.Applicative[F]" id="185508">f</a>: <a href="Applicative.scala.html#9258" title="scalaz.Applicative[F]">Applicative</a>[F]): (F[T1], F[T2]) =&gt; F[R] = (a: <a href="#56945" title="F[T1]">F</a>[T1], b: <a href="#56945" title="F[T2]">F</a>[T2]) =&gt; (<a href="MA.scala.html#55420" title="(b: F[T2])(z: (T1, T2) =&gt; R)(implicit t: scalaz.Functor[F],implicit a: scalaz.Apply[F])F[R]">a</a> &lt;**&gt; <a href="#185514" title="F[T2]">b</a>)<a href="#185508" title="scalaz.Applicative[F]">(</a><a href="#34136" title="(f: scalaz.Function2W[T1,T2,R])(T1, T2) =&gt; R" class="keyword">this</a>)
+
+  <span class="keyword">def</span> <a title="=&gt; (=&gt; T1, =&gt; T2) =&gt; R" id="56946">byName</a>: (=&gt; T1, =&gt; T2) =&gt; R = (<a title="=&gt; T1" id="185814">t1</a>, <a title="=&gt; T2" id="185815">t2</a><a title="=&gt; T2" id="8820">)</a> =&gt; <a href="#56931" title="(v1: T1,v2: T2)R">k</a>(<a href="#185814" title="=&gt; T1">t1</a>, <a href="#185815" title="=&gt; T2">t2</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait Function2s extends java.lang.Object with ScalaObject" id="14433">Function2s</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[T1, T2, R](f: (T1, T2) =&gt; R)scalaz.Function2W[T1,T2,R]" id="34129">Function2To</a>[<a title="&gt;: Nothing &lt;: Any" id="34133">T1</a>, <a title="&gt;: Nothing &lt;: Any" id="34134">T2</a>, <a title="&gt;: Nothing &lt;: Any" id="34135">R</a>](<a title="(T1, T2) =&gt; R" id="56928">f</a>: (T1, T2) =&gt; R): <a href="#14457" title="scalaz.Function2W[T1,T2,R]">Function2W</a>[T1, T2, R] = <a href="#185819" title="java.lang.Object with scalaz.Function2W[T1,T2,R]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Function2W[T1,T2,R]" id="185819">Function2W</a>[T1, T2, R] {
+    <span class="keyword">val</span> <a title="(T1, T2) =&gt; R" id="185823">k</a> = <a href="#56928" title="(T1, T2) =&gt; R">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[T1, T2, R](f: scalaz.Function2W[T1,T2,R])(T1, T2) =&gt; R" id="34136">Function2From</a>[<a title="&gt;: Nothing &lt;: Any" id="34140">T1</a>, <a title="&gt;: Nothing &lt;: Any" id="34141">T2</a>, <a title="&gt;: Nothing &lt;: Any" id="34142">R</a>](<a title="scalaz.Function2W[T1,T2,R]" id="56925">f</a>: <a href="#14457" title="scalaz.Function2W[T1,T2,R]">Function2W</a>[T1, T2, R]): (T1, T2) =&gt; R = <a href="#56925" title="scalaz.Function2W[T1,T2,R]">f</a>.<a href="#56931" title="=&gt; (T1, T2) =&gt; R">k</a>
+}
+
+        </pre>
+    </body>
+</html>

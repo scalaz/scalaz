@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Endo.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Endo[A] extends java.lang.Object with scalaz.NewType[(A) =&gt; A] with ScalaObject" id="10773">Endo</a>[<a title="&gt;: Nothing &lt;: Any" id="21582">A</a>] <span title="ScalaObject" class="keyword">extends</span> <a href="NewType.scala.html#17991" title="scalaz.NewType[(A) =&gt; A]">NewType</a>[A =&gt; A] {
+  <span class="keyword">def</span> <a title="(a: A)A" id="41322">apply</a>(<a title="A" id="119054">a</a>: <a href="#21582" title="A">A</a>): <a href="#21582" title="A">A</a> = <a href="NewType.scala.html#41319" title="(v1: A)A" id="28926">value</a>(<a href="#119054" title="A">a</a>)
+
+  <span class="keyword">def</span> <a title="=&gt; A" id="41323">fix</a>: <a href="#21582" title="A">A</a> = <a href="#41322" title="(a: A)A">apply</a>(<a href="#41323" title="=&gt; A">fix</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait Endos extends java.lang.Object with ScalaObject" id="10785">Endos</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[A](f: (A) =&gt; A)scalaz.Endo[A]" id="34057">EndoTo</a>[<a title="&gt;: Nothing &lt;: Any" id="34059">A</a>](<a title="(A) =&gt; A" id="119063">f</a>: A =&gt; A): <a href="#10773" title="scalaz.Endo[A]">Endo</a>[A] = <a href="#119066" title="java.lang.Object with scalaz.Endo[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Endo[A]" id="119066">Endo</a>[A] {
+    <span class="keyword">val</span> <a title="(A) =&gt; A" id="119070">value</a> = <a href="#119063" title="(A) =&gt; A">f</a>
+  }
+
+  <span class="keyword">def</span> <a title="[A](a: =&gt; A)scalaz.Endo[A]" id="34060">constantEndo</a>[<a title="&gt;: Nothing &lt;: Any" id="34062">A</a>](<a title="=&gt; A" id="119076">a</a>: =&gt; A): <a href="#10773" title="scalaz.Endo[A]">Endo</a>[A] = <a href="#34057" title="[A](f: (A) =&gt; A)scalaz.Endo[A]">EndoTo</a><span title="(f: (A) =&gt; A)scalaz.Endo[A]">[</span><a href="#34062" title="A">A</a>](<a title="A" id="119081">_</a> =&gt; <a href="#119076" title="=&gt; A">a</a>)
+
+  <span class="keyword">def</span> <a title="[A]scalaz.Endo[A]" id="34063">idEndo</a>[<a title="&gt;: Nothing &lt;: Any" id="34065">A</a>]: <a href="#10773" title="scalaz.Endo[A]">Endo</a>[A] = <a href="#34057" title="[A](f: (A) =&gt; A)scalaz.Endo[A]">EndoTo</a><span title="(f: (A) =&gt; A)scalaz.Endo[A]">[</span><a href="#34065" title="A">A</a>](<a title="A" id="119087">a</a> =&gt; <a href="#119087" title="A">a</a>)
+}
+
+        </pre>
+    </body>
+</html>

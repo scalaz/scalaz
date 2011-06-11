@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Logger.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">trait</span> <a title="trait Logger[L, A] extends java.lang.Object with scalaz.NewType[scalaz.Writer[scalaz.Scalaz.IndSeq[L],A]] with ScalaObject" id="17268">Logger</a>[<a title="&gt;: Nothing &lt;: Any" id="21824">L</a>, <a title="&gt;: Nothing &lt;: Any" id="21825">A</a>] <span title="ScalaObject" class="keyword">extends</span> <a href="NewType.scala.html#17991" title="scalaz.NewType[scalaz.Writer[scalaz.Scalaz.IndSeq[L],A]]">NewType</a>[Writer[IndSeq[L], A]] {
+  <span class="keyword">import</span> <a href="#17269" title="object scalaz.Logger">Logger</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Logger.LOG[L]" id="214894">log</a>: <a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]
+  <span class="keyword">def</span> <a title="=&gt; A" id="214895">over</a>: <a href="#21825" title="A">A</a>
+
+  <span class="keyword">val</span> <a title="scalaz.Writer[scalaz.Logger.LOG[L],A]" id="214896">value</a> = <a href="Writer.scala.html#35310" title="(w: scalaz.Logger.LOG[L],a: A)scalaz.Writer[scalaz.Logger.LOG[L],A]">writer</a>(<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>, <a href="#214895" title="=&gt; A">over</a>)
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; B)scalaz.Logger[L,B]" id="214898">map</a>[<a title="&gt;: Nothing &lt;: Any" id="214900">B</a>](<a title="(A) =&gt; B" id="253391">f</a>: A =&gt; B): <a href="#17268" title="scalaz.Logger[L,B]">Logger</a>[L, B] = <a href="#253394" title="java.lang.Object with scalaz.Logger[L,B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,B]" id="253394">Logger</a>[L, B] {
+    <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="253398">log</a> = <a href="#17268" title="Logger.this.type">Logger</a>.<span class="keyword">this</span>.<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>
+    <span class="keyword">val</span> <a title="B" id="253400">over</a> = <a href="#253391" title="(v1: A)B">f</a>(<a href="#17268" title="Logger.this.type">Logger</a>.<span class="keyword">this</span>.<a href="#214895" title="=&gt; A">over</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; scalaz.Logger[L,B])scalaz.Logger[L,B]" id="214901">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="214903">B</a>](<a title="(A) =&gt; scalaz.Logger[L,B]" id="253408">f</a>: A =&gt; Logger[L, B]): <a href="#17268" title="scalaz.Logger[L,B]">Logger</a>[L, B] = {
+    <span class="keyword">val</span> <a title="scalaz.Logger[L,B]" id="253411">l</a> = <a href="#253408" title="(v1: A)scalaz.Logger[L,B]">f</a>(<a href="#214895" title="=&gt; A">over</a>)
+    <a href="#253414" title="java.lang.Object with scalaz.Logger[L,B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,B]" id="253414">Logger</a>[L, B] {
+      <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="253418">log</a> = <a href="#17268" title="Logger.this.type">Logger</a>.<span class="keyword">this</span>.<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">log</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#253411" title="scalaz.Logger[L,B]">l</a>.<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>
+      <span class="keyword">val</span> <a title="B" id="253420">over</a> = <a href="#253411" title="scalaz.Logger[L,B]">l</a>.<a href="#214895" title="=&gt; B">over</a>
+    }
+  }
+
+  <span class="keyword">def</span> <a title="(f: (A) =&gt; Unit)Unit" id="214904">foreach</a>(<a title="(A) =&gt; Unit" id="253954">f</a>: A =&gt; Unit) =
+    <a href="#253954" title="(v1: A)Unit">f</a>(<a href="#214895" title="=&gt; A">over</a>)
+
+  /**
+   * Transform the log by the given function.
+   */
+  <span class="keyword">def</span> <a title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214905">withLog</a>(<a title="(scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L]" id="253959">k</a>: LOG[L] =&gt; LOG[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] = <a href="#253961" title="java.lang.Object with scalaz.Logger[L,A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,A]" id="253961">Logger</a>[L, A] {
+    <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="253965">log</a> = <a href="#253959" title="(v1: scalaz.Logger.LOG[L])scalaz.Logger.LOG[L]">k</a>(<a href="#17268" title="Logger.this.type">Logger</a>.<span class="keyword">this</span>.<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>)
+    <span class="keyword">val</span> <a title="A" id="253967">over</a> = <a href="#17268" title="Logger.this.type">Logger</a>.<span class="keyword">this</span>.<a href="#214895" title="=&gt; A">over</a>
+  }
+
+  /**
+   * Transform each log value by the given function.
+   */
+  <span class="keyword">def</span> <a title="(k: (L) =&gt; L)scalaz.Logger[L,A]" id="214906">withEachLog</a>(<a title="(L) =&gt; L" id="253975">k</a>: L =&gt; L): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="MA.scala.html#57399" title="(f: (L) =&gt; L)(implicit t: scalaz.Functor[scalaz.Logger.LOG])scalaz.Logger.LOG[L]">_</a> <a href="Functor.scala.html#58895" title="=&gt; scalaz.Functor[scalaz.Scalaz.IndSeq]">∘</a> <a href="#253975" title="(L) =&gt; L">k</a>)
+
+  /**
+   * Set the log to the given value, losing any previous value.
+   */
+  <span class="keyword">def</span> <a title="(l: scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214907">setLog</a>(<a title="scalaz.Logger.LOG[L]" id="254588">l</a>: <a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a title="scalaz.Logger.LOG[L]" id="254591">_</a> =&gt; <a href="#254588" title="scalaz.Logger.LOG[L]">l</a>)
+
+  /**
+   * Append the given value to the current log.
+   */
+  <span class="keyword">def</span> <a title="(e: L)scalaz.Logger[L,A]" id="214908">:+-&gt;</a>(<a title="L" id="254593">e</a>: <a href="#21824" title="L">L</a>): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">_</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="Identity.scala.html#34181" title="(x: =&gt; L)scalaz.Identity[L]">e</a>.<a href="Identity.scala.html#43176" title="[F[_]](implicit p: scalaz.Pure[F])F[L]">η</a><a href="Pure.scala.html#35830" title="(implicit p: scalaz.Pure[scalaz.Logger.LOG])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG">LOG</a>])
+
+  /**
+   * Append the given value to the current log by applying to the underlying value.
+   */
+  <span class="keyword">def</span> <a title="(e: (A) =&gt; L)scalaz.Logger[L,A]" id="214909">:-&gt;&gt;</a>(<a title="(A) =&gt; L" id="255725">e</a>: A =&gt; L): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214908" title="(e: L)scalaz.Logger[L,A]">:+-&gt;</a>(<a href="#255725" title="(v1: A)L">e</a>(<a href="#214895" title="=&gt; A">over</a>))
+
+  /**
+   * Prepend the given value to the current log.
+   */
+  <span class="keyword">def</span> <a title="(e: L)scalaz.Logger[L,A]" id="214910">&lt;-+:</a>(<a title="L" id="255730">e</a>: <a href="#21824" title="L">L</a>): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; L)scalaz.Identity[L]">e</a>.<a href="Identity.scala.html#43176" title="[F[_]](implicit p: scalaz.Pure[F])F[L]">η</a><a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG">LOG</a>] <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#255733" title="scalaz.Logger.LOG[L]">_</a>)
+
+  /**
+   * Prepend the given value to the current log by applying to the underlying value.
+   */
+  <span class="keyword">def</span> <a title="(e: (A) =&gt; L)scalaz.Logger[L,A]" id="214911">&lt;&lt;-:</a>(<a title="(A) =&gt; L" id="256859">e</a>: A =&gt; L): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214910" title="(e: L)scalaz.Logger[L,A]">&lt;-+:</a>(<a href="#256859" title="(v1: A)L">e</a>(<a href="#214895" title="=&gt; A">over</a>))
+
+  /**
+   * Append the given value to the current log.
+   */
+  <span class="keyword">def</span> <a title="(e: scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214912">:++-&gt;</a>(<a title="scalaz.Logger.LOG[L]" id="256864">e</a>: <a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">_</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#256864" title="scalaz.Logger.LOG[L]">e</a>)
+
+  /**
+   * Append the given value to the current log by applying to the underlying value.
+   */
+  <span class="keyword">def</span> <a title="(e: (A) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214913">:+-&gt;&gt;</a>(<a title="(A) =&gt; scalaz.Logger.LOG[L]" id="257381">e</a>: A =&gt; LOG[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">_</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#257381" title="(v1: A)scalaz.Logger.LOG[L]">e</a>(<a href="#214895" title="=&gt; A">over</a>))
+
+  /**
+   * Prepend the given value to the current log.
+   */
+  <span class="keyword">def</span> <a title="(e: scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214914">&lt;-++:</a>(<a title="scalaz.Logger.LOG[L]" id="257900">e</a>: <a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">e</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#257903" title="scalaz.Logger.LOG[L]">_</a>)
+
+  /**
+   * Prepend the given value to the current log by applying to the underlying value.
+   */
+  <span class="keyword">def</span> <a title="(e: (A) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]" id="214915">&lt;&lt;-+:</a>(<a title="(A) =&gt; scalaz.Logger.LOG[L]" id="258417">e</a>: A =&gt; LOG[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214914" title="(e: scalaz.Logger.LOG[L])scalaz.Logger[L,A]">&lt;-++:</a>(<a href="#258417" title="(v1: A)scalaz.Logger.LOG[L]">e</a>(<a href="#214895" title="=&gt; A">over</a>))
+
+  /**
+   * Set the log to be empty.
+   */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.Logger[L,A]" id="214916">resetLog</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214905" title="(k: (scalaz.Logger.LOG[L]) =&gt; scalaz.Logger.LOG[L])scalaz.Logger[L,A]">withLog</a>(<a title="scalaz.Logger.LOG[L]" id="258425">_</a> =&gt; <a href="Zero.scala.html#35346" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="Zero.scala.html#88508" title="(implicit z: scalaz.Zero[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]])
+
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]" id="214917">effectLog</a>(<a title="(scalaz.Logger.LOG[L]) =&gt; Unit" id="258471">k</a>: LOG[L] =&gt; Unit): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] = {
+    <a href="#258471" title="(v1: scalaz.Logger.LOG[L])Unit">k</a>(<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>)
+    <a href="#17268" title="scalaz.Logger[L,A]" class="keyword">this</a>
+  }
+
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(k: (L) =&gt; Unit)scalaz.Logger[L,A]" id="214918">effectEachLog</a>(<a title="(L) =&gt; Unit" id="258475">k</a>: L =&gt; Unit): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214917" title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]">effectLog</a>(<a href="MA.scala.html#55516" title="(f: (L) =&gt; Unit)(implicit e: scalaz.Each[scalaz.Logger.LOG])Unit">_</a> <a href="Each.scala.html#115161" title="scalaz.Each[scalaz.Scalaz.IndSeq]">foreach</a> <a href="#258475" title="(L) =&gt; Unit">k</a>)
+
+  /**
+   * Runs the given side-effect on the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]" id="214919">flushLog</a>(<a title="(scalaz.Logger.LOG[L]) =&gt; Unit" id="258669">k</a>: LOG[L] =&gt; Unit): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] = {
+    <a href="#214917" title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]">effectLog</a>(<a href="#258669" title="(scalaz.Logger.LOG[L]) =&gt; Unit">k</a>)
+    <a href="#214916" title="=&gt; scalaz.Logger[L,A]">resetLog</a>
+  }
+
+  /**
+   * Runs the given side-effect on each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(k: (L) =&gt; Unit)scalaz.Logger[L,A]" id="214920">flushEachLog</a>(<a title="(L) =&gt; Unit" id="258672">k</a>: L =&gt; Unit): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] = {
+    <a href="#214917" title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]">effectLog</a>(<a href="MA.scala.html#55516" title="(f: (L) =&gt; Unit)(implicit e: scalaz.Each[scalaz.Logger.LOG])Unit">_</a> <a href="Each.scala.html#115161" title="scalaz.Each[scalaz.Scalaz.IndSeq]">foreach</a> <a href="#258672" title="(L) =&gt; Unit">k</a>)
+    <a href="#214916" title="=&gt; scalaz.Logger[L,A]">resetLog</a>
+  }
+
+  /**
+   * Prints the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(implicit s: scalaz.Show[L])scalaz.Logger[L,A]" id="214921">printLog</a>(<span class="keyword">implicit</span> <a title="scalaz.Show[L]" id="258857">s</a>: <a href="Show.scala.html#19644" title="scalaz.Show[L]">Show</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214917" title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]">effectLog</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; scalaz.Logger.LOG[L])scalaz.Identity[scalaz.Logger.LOG[L]]">_</a>.<a href="Identity.scala.html#43077" title="(implicit s: scalaz.Show[scalaz.Logger.LOG[L]])Unit">println</a>)
+
+  /**
+   * Prints each element of the log, then returns this underlying value. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(implicit s: scalaz.Show[L])scalaz.Logger[L,A]" id="214922">printEachLog</a>(<span class="keyword">implicit</span> <a title="scalaz.Show[L]" id="259091">s</a>: <a href="Show.scala.html#19644" title="scalaz.Show[L]">Show</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214918" title="(k: (L) =&gt; Unit)scalaz.Logger[L,A]">effectEachLog</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; L)scalaz.Identity[L]">_</a>.<a href="Identity.scala.html#43077" title="(implicit s: scalaz.Show[L])Unit">println</a>)
+
+  /**
+   * Prints the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(implicit s: scalaz.Show[L])scalaz.Logger[L,A]" id="214923">printFlushLog</a>(<span class="keyword">implicit</span> <a title="scalaz.Show[L]" id="259258">s</a>: <a href="Show.scala.html#19644" title="scalaz.Show[L]">Show</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214919" title="(k: (scalaz.Logger.LOG[L]) =&gt; Unit)scalaz.Logger[L,A]">flushLog</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; scalaz.Logger.LOG[L])scalaz.Identity[scalaz.Logger.LOG[L]]">_</a>.<a href="Identity.scala.html#43077" title="(implicit s: scalaz.Show[scalaz.Logger.LOG[L]])Unit">println</a>)
+
+  /**
+   * Prints each element of the log, then returns this underlying value with an empty log. '''CAUTION: side-effect'''
+   */
+  <span class="keyword">def</span> <a title="(implicit s: scalaz.Show[L])scalaz.Logger[L,A]" id="214924">printFlushEachLog</a>(<span class="keyword">implicit</span> <a title="scalaz.Show[L]" id="259489">s</a>: <a href="Show.scala.html#19644" title="scalaz.Show[L]">Show</a>[L]): <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A] =
+    <a href="#214920" title="(k: (L) =&gt; Unit)scalaz.Logger[L,A]">flushEachLog</a>(<a href="Identity.scala.html#34181" title="(x: =&gt; L)scalaz.Identity[L]">_</a>.<a href="Identity.scala.html#43077" title="(implicit s: scalaz.Show[L])Unit">println</a>)
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Logger" id="17269">Logger</a> <span title="ScalaObject">{</span>
+  <span class="keyword">type</span> <a title="[C]scalaz.Scalaz.IndSeq[C]" id="214930">LOG</a>[<a title="&gt;: Nothing &lt;: Any" id="214931">C</a>] = <a href="FingerTree.scala.html#34960" title="scalaz.Scalaz.IndSeq[C]">IndSeq</a>[C]
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Injective[[α]scalaz.Logger[L,α]]" id="214932">LoggerInjective</a>[<a title="&gt;: Nothing &lt;: Any" id="214934">L</a>] = <a href="Injectivity.scala.html#215119" title="[T[_]]()scalaz.Injective[T]">Injective</a><span title="()scalaz.Injective[[α]scalaz.Logger[L,α]]">[</span>({<span class="keyword">type</span> λ[α]= Logger[L, α]})#<a href="#17268" title="[α]scalaz.Logger[L,α]">λ</a>]
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Bifunctor[scalaz.Logger]" id="214935">LoggerBifunctor</a>: <a href="Bifunctor.scala.html#9492" title="scalaz.Bifunctor[scalaz.Logger]">Bifunctor</a>[Logger] = <a href="#259658" title="java.lang.Object with scalaz.Bifunctor[scalaz.Logger]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bifunctor[scalaz.Logger]" id="259658">Bifunctor</a>[Logger] {
+    <span class="keyword">def</span> <a title="[A, B, C, D](k: scalaz.Logger[A,B],f: (A) =&gt; C,g: (B) =&gt; D)scalaz.Logger[C,D]" id="259662">bimap</a>[<a title="&gt;: Nothing &lt;: Any" id="259667">A</a>, <a title="&gt;: Nothing &lt;: Any" id="259668">B</a>, <a title="&gt;: Nothing &lt;: Any" id="259669">C</a>, <a title="&gt;: Nothing &lt;: Any" id="259670">D</a>](<a title="scalaz.Logger[A,B]" id="259671">k</a>: <a href="#17268" title="scalaz.Logger[A,B]">Logger</a>[A, B], <a title="(A) =&gt; C" id="259672">f</a>: A =&gt; C, <a title="(B) =&gt; D" id="259673">g</a>: B =&gt; D): <a href="#17268" title="scalaz.Logger[C,D]">Logger</a>[C, D] =
+      <a href="Extras.scala.html#57745" title="(f: scalaz.Scalaz.Id[D])scalaz.Logger[C,D]">mkLogger</a><a href="#214907" title="(l: scalaz.Logger.LOG[C])scalaz.Logger[C,D]">(</a><a href="#259673" title="(v1: B)D">g</a>(<a href="#259671" title="scalaz.Logger[A,B]">k</a>.<a href="#214895" title="=&gt; B">over</a>)) setLog (<a href="#259671" title="scalaz.Logger[A,B]">k</a>.<a href="FingerTree.scala.html#42844" title="(f: (A) =&gt; C)java.lang.Object with scalaz.Scalaz.IndSeq[C]">log</a> map <a href="#259672" title="(A) =&gt; C">f</a>)
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Pure[[α]scalaz.Logger[L,α]]" id="214937">LoggerPure</a>[<a title="&gt;: Nothing &lt;: Any" id="214939">L</a>]: <a href="Pure.scala.html#18870" title="scalaz.Pure[[α]scalaz.Logger[L,α]]">Pure</a>[({<span class="keyword">type</span> λ[α]= Logger[L, α]})#λ] = <a href="#259725" title="java.lang.Object with scalaz.Pure[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Pure[[α]scalaz.Logger[L,α]]" id="259725">Pure</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)java.lang.Object with scalaz.Logger[L,A]" id="259734">pure</a>[<a title="&gt;: Nothing &lt;: Any" id="259736">A</a>](<a title="=&gt; A" id="259737">a</a>: =&gt; A) = <a href="#259745" title="java.lang.Object with scalaz.Logger[L,A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,A]" id="259745">Logger</a>[L, A] {
+      <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="259749">log</a> = <a href="Zero.scala.html#35346" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="Zero.scala.html#88508" title="(implicit z: scalaz.Zero[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]]
+      <span class="keyword">val</span> <a title="A" id="259751">over</a> = <a href="#259737" title="=&gt; A">a</a>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Functor[[α]scalaz.Logger[L,α]]" id="214940">LoggerFunctor</a>[<a title="&gt;: Nothing &lt;: Any" id="214942">L</a>]: <a href="Functor.scala.html#14670" title="scalaz.Functor[[α]scalaz.Logger[L,α]]">Functor</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#259827" title="java.lang.Object with scalaz.Functor[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Functor[[α]scalaz.Logger[L,α]]" id="259827">Functor</a>[({<span class="keyword">type</span> λ[α]= Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A, B](x: scalaz.Logger[L,A],f: (A) =&gt; B)scalaz.Logger[L,B]" id="259845">fmap</a>[<a title="&gt;: Nothing &lt;: Any" id="259848">A</a>, <a title="&gt;: Nothing &lt;: Any" id="259849">B</a>](<a title="scalaz.Logger[L,A]" id="259850">x</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="(A) =&gt; B" id="259851">f</a>: A =&gt; B) =
+      <a href="#214898" title="(f: (A) =&gt; B)scalaz.Logger[L,B]">x</a> map <a href="#259851" title="(A) =&gt; B">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Apply[[α]scalaz.Logger[L,α]]" id="214943">LoggerApply</a>[<a title="&gt;: Nothing &lt;: Any" id="214945">L</a>]: <a href="Apply.scala.html#9378" title="scalaz.Apply[[α]scalaz.Logger[L,α]]">Apply</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#259891" title="java.lang.Object with scalaz.Apply[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Apply[[α]scalaz.Logger[L,α]]" id="259891">Apply</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A, B](f: scalaz.Logger[L,(A) =&gt; B],a: scalaz.Logger[L,A])scalaz.Logger[L,B]" id="259900">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="259903">A</a>, <a title="&gt;: Nothing &lt;: Any" id="259904">B</a>](<a title="scalaz.Logger[L,(A) =&gt; B]" id="259905">f</a>: <a href="#17268" title="scalaz.Logger[L,(A) =&gt; B]">Logger</a>[L, A =&gt; B], <a title="scalaz.Logger[L,A]" id="259906">a</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A]): <a href="#17268" title="scalaz.Logger[L,B]">Logger</a>[L, B] = {
+      <span class="keyword">val</span> <a title="scalaz.Writer[scalaz.Logger.LOG[L],(A) =&gt; B]" id="259925">w1</a> = <a href="#259905" title="scalaz.Logger[L,(A) =&gt; B]">f</a>.<a href="#214896" title="=&gt; scalaz.Writer[scalaz.Logger.LOG[L],(A) =&gt; B]">value</a>
+      <span class="keyword">val</span> <a title="scalaz.Writer[scalaz.Logger.LOG[L],A]" id="259926">w2</a> = <a href="#259906" title="scalaz.Logger[L,A]">a</a>.<a href="#214896" title="=&gt; scalaz.Writer[scalaz.Logger.LOG[L],A]">value</a>
+
+      <a href="#259927" title="java.lang.Object with scalaz.Logger[L,B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,B]" id="259927">Logger</a>[L, B] {
+        <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="259931">log</a> = <a href="#259925" title="scalaz.Writer[scalaz.Logger.LOG[L],(A) =&gt; B]">w1</a>.<a href="Identity.scala.html#43060" title="(a: =&gt; scalaz.Logger.LOG[L])(implicit s: scalaz.Semigroup[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">written</a> <a href="Semigroup.scala.html#88347" title="scalaz.Semigroup[scalaz.Scalaz.IndSeq[L]]">|+|</a> <a href="#259926" title="scalaz.Writer[scalaz.Logger.LOG[L],A]">w2</a>.<a href="Writer.scala.html#214871" title="=&gt; scalaz.Logger.LOG[L]">written</a>
+        <span class="keyword">val</span> <a title="B" id="259933">over</a> = <a href="#259925" title="scalaz.Writer[scalaz.Logger.LOG[L],(A) =&gt; B]">w1</a>.<a href="Writer.scala.html#214872" title="(v1: A)B">over</a>(<a href="#259926" title="scalaz.Writer[scalaz.Logger.LOG[L],A]">w2</a>.<a href="Writer.scala.html#214872" title="=&gt; A">over</a>)
+      }
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Bind[[α]scalaz.Logger[L,α]]" id="214946">LoggerBind</a>[<a title="&gt;: Nothing &lt;: Any" id="214948">L</a>]: <a href="Bind.scala.html#9858" title="scalaz.Bind[[α]scalaz.Logger[L,α]]">Bind</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#260473" title="java.lang.Object with scalaz.Bind[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bind[[α]scalaz.Logger[L,α]]" id="260473">Bind</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A, B](a: scalaz.Logger[L,A],f: (A) =&gt; scalaz.Logger[L,B])scalaz.Logger[L,B]" id="260482">bind</a>[<a title="&gt;: Nothing &lt;: Any" id="260485">A</a>, <a title="&gt;: Nothing &lt;: Any" id="260486">B</a>](<a title="scalaz.Logger[L,A]" id="260487">a</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="(A) =&gt; scalaz.Logger[L,B]" id="260488">f</a>: A =&gt; Logger[L, B]) =
+      <a href="#214901" title="(f: (A) =&gt; scalaz.Logger[L,B])scalaz.Logger[L,B]">a</a> flatMap <a href="#260488" title="(A) =&gt; scalaz.Logger[L,B]">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Each[[α]scalaz.Logger[L,α]]" id="214949">LoggerEach</a>[<a title="&gt;: Nothing &lt;: Any" id="214951">L</a>]: <a href="Each.scala.html#10698" title="scalaz.Each[[α]scalaz.Logger[L,α]]">Each</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#260528" title="java.lang.Object with scalaz.Each[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Each[[α]scalaz.Logger[L,α]]" id="260528">Each</a>[({<span class="keyword">type</span> λ[α]= Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](x: scalaz.Logger[L,A],f: (A) =&gt; Unit)Unit" id="260537">each</a>[<a title="&gt;: Nothing &lt;: Any" id="260539">A</a>](<a title="scalaz.Logger[L,A]" id="260540">x</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="(A) =&gt; Unit" id="260541">f</a>: A =&gt; Unit) =
+      <a href="#214904" title="(f: (A) =&gt; Unit)Unit">x</a> foreach <a href="#260541" title="(A) =&gt; Unit">f</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Index[[α]scalaz.Logger[L,α]]" id="214952">LoggerIndex</a>[<a title="&gt;: Nothing &lt;: Any" id="214954">L</a>]: <a href="Index.scala.html#15456" title="scalaz.Index[[α]scalaz.Logger[L,α]]">Index</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#260576" title="java.lang.Object with scalaz.Index[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Index[[α]scalaz.Logger[L,α]]" id="260576">Index</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Logger[L,A],n: Int)Option[A]" id="260585">index</a>[<a title="&gt;: Nothing &lt;: Any" id="260587">A</a>](<a title="scalaz.Logger[L,A]" id="260588">a</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="Int" id="260589">n</a>: <a title="Int" id="4366">Int</a>) =
+      <span title="Option[A]" class="keyword">if</span>(<a href="#260589" title="(x$1: Int)Boolean" id="5126">n</a> == <span title="Int(0)" class="int">0</span>) <a title="(x: A)Some[A]" id="1006">Some</a>(<a href="#260588" title="scalaz.Logger[L,A]">a</a>.<a href="#214895" title="=&gt; A">over</a>) <span class="keyword">else</span> <a title="object None" id="1843">None</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Foldable[[α]scalaz.Logger[L,α]]" id="214955">LoggerFoldable</a>[<a title="&gt;: Nothing &lt;: Any" id="214957">L</a>]: <a href="Foldable.scala.html#14211" title="scalaz.Foldable[[α]scalaz.Logger[L,α]]">Foldable</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#260631" title="java.lang.Object with scalaz.Foldable[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Foldable[[α]scalaz.Logger[L,α]]" id="260631">Foldable</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">override</span> <span class="keyword">def</span> <a title="[A, B](t: scalaz.Logger[L,A],b: =&gt; B,f: (A, =&gt; B) =&gt; B)B" id="260640">foldRight</a>[<a title="&gt;: Nothing &lt;: Any" id="260643">A</a>, <a title="&gt;: Nothing &lt;: Any" id="260644">B</a>](<a title="scalaz.Logger[L,A]" id="260645">t</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="=&gt; B" id="260646">b</a>: =&gt; B, <a title="(A, =&gt; B) =&gt; B" id="260647">f</a>: (A, =&gt; B) =&gt; B) =
+      <a href="#260647" title="(v1: A,v2: =&gt; B)B" id="35478">f</a>(<a href="#260645" title="scalaz.Logger[L,A]">t</a>.<a href="#214895" title="=&gt; A">over</a>, <a href="#260646" title="=&gt; B">b</a>)
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L]scalaz.Traverse[[α]scalaz.Logger[L,α]]" id="214958">LoggerTraverse</a>[<a title="&gt;: Nothing &lt;: Any" id="214960">L</a>]: <a href="Traverse.scala.html#20241" title="scalaz.Traverse[[α]scalaz.Logger[L,α]]">Traverse</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] = <a href="#260695" title="java.lang.Object with scalaz.Traverse[[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Traverse[[α]scalaz.Logger[L,α]]" id="260695">Traverse</a>[({<span class="keyword">type</span> λ[α]=Logger[L, α]})#λ] {
+    <span class="keyword">def</span> <a title="[F[_], A, B](f: (A) =&gt; F[B],t: scalaz.Logger[L,A])(implicit evidence$1: scalaz.Applicative[F])F[java.lang.Object with scalaz.Logger[L,B]]" id="261722">traverse</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="261717">F</a>[<a title="&gt;: Nothing &lt;: Any" id="261726">_</a>] : Applicative, <a title="&gt;: Nothing &lt;: Any" id="261718">A</a>, <a title="&gt;: Nothing &lt;: Any" id="261719">B</a>](<a title="(A) =&gt; F[B]" id="261720">f</a>: A =&gt; F[B], <a title="scalaz.Logger[L,A]" id="261721">t</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A]) =
+      <a href="#261720" title="(v1: A)F[B]">f</a><a href="MA.scala.html#57399" title="(f: (B) =&gt; java.lang.Object with scalaz.Logger[L,B])(implicit t: scalaz.Functor[F])F[java.lang.Object with scalaz.Logger[L,B]]">(</a><a href="#261721" title="scalaz.Logger[L,A]">t</a>.<a href="#214895" title="=&gt; A">over</a>) <a href="#261722" title="scalaz.Applicative[F]">∘</a> (<a title="B" id="261971">b</a> =&gt; <a href="#261972" title="java.lang.Object with scalaz.Logger[L,B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,B]" id="261972">Logger</a>[L, B] {
+        <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="261976">log</a> = <a href="#261721" title="scalaz.Logger[L,A]">t</a>.<a href="#214894" title="=&gt; scalaz.Logger.LOG[L]">log</a>
+        <span class="keyword">val</span> <a title="B" id="261978">over</a> = <a href="#261971" title="B">b</a>
+      })
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L, A](implicit evidence$2: scalaz.Show[L],implicit evidence$3: scalaz.Show[A])scalaz.Show[scalaz.Logger[L,A]]" id="215035">LoggerShow</a>[<a title="&gt;: Nothing &lt;: Any" id="214964">L</a> : Show, <a title="&gt;: Nothing &lt;: Any" id="214965">A</a> : Show]: <a href="Show.scala.html#19644" title="scalaz.Show[scalaz.Logger[L,A]]">Show</a>[Logger[L, A]] = <a href="#262020" title="java.lang.Object with scalaz.Show[scalaz.Logger[L,A]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Show[scalaz.Logger[L,A]]" id="262020">Show</a>[Logger[L, A]] {
+    <span class="keyword">def</span> <a title="(a: scalaz.Logger[L,A])List[Char]" id="262024">show</a>(<a title="scalaz.Logger[L,A]" id="262025">a</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A]) =
+      (<span title="(x$1: Any)java.lang.String" class="string">&quot;Logger(&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#262025" title="scalaz.Logger[L,A]">a</a>.<a href="Identity.scala.html#34181" title="(x: =&gt; scalaz.Logger.LOG[L])scalaz.Identity[scalaz.Logger.LOG[L]]">log</a>.<a href="Identity.scala.html#43075" title="(implicit s: scalaz.Show[scalaz.Logger.LOG[L]])String">shows</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot;,&quot;)" class="string">&quot;,&quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#262025" title="scalaz.Logger[L,A]">a</a>.<a href="Identity.scala.html#34181" title="(x: =&gt; A)scalaz.Identity[A]">over</a>.<a href="Identity.scala.html#43075" title="(implicit s: scalaz.Show[A])String">shows</a> <a title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="1489">+</a> <span title="java.lang.String(&quot;)&quot;)" class="string">&quot;)&quot;</span>).<a title="=&gt; List[Char]" id="29249">toList</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L, A](implicit evidence$4: scalaz.Equal[A])scalaz.Equal[scalaz.Logger[L,A]]" id="215031">LoggerEqual</a>[<a title="&gt;: Nothing &lt;: Any" id="214969">L</a>, <a title="&gt;: Nothing &lt;: Any" id="214970">A</a>: Equal]: <a href="Equal.scala.html#11199" title="scalaz.Equal[scalaz.Logger[L,A]]">Equal</a>[Logger[L, A]] = <a href="#262468" title="java.lang.Object with scalaz.Equal[scalaz.Logger[L,A]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Equal[scalaz.Logger[L,A]]" id="262468">Equal</a>[Logger[L, A]] {
+    <span class="keyword">def</span> <a title="(a1: scalaz.Logger[L,A],a2: scalaz.Logger[L,A])Boolean" id="262472">equal</a>(<a title="scalaz.Logger[L,A]" id="262473">a1</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="scalaz.Logger[L,A]" id="262474">a2</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A]) =
+      <a href="#262473" title="scalaz.Logger[L,A]">a1</a>.<a href="Identity.scala.html#43061" title="(a: A)(implicit e: scalaz.Equal[A])Boolean">over</a> <a href="#215031" title="scalaz.Equal[A]">===</a> <a href="#262474" title="scalaz.Logger[L,A]">a2</a>.<a href="#214895" title="=&gt; A">over</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L, A](implicit evidence$5: scalaz.Order[A])scalaz.Order[scalaz.Logger[L,A]]" id="215028">LoggerOrder</a>[<a title="&gt;: Nothing &lt;: Any" id="214974">L</a>, <a title="&gt;: Nothing &lt;: Any" id="214975">A</a>: Order]: <a href="Order.scala.html#18477" title="scalaz.Order[scalaz.Logger[L,A]]">Order</a>[Logger[L, A]] = <a href="#262651" title="java.lang.Object with scalaz.Order[scalaz.Logger[L,A]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Order[scalaz.Logger[L,A]]" id="262651">Order</a>[Logger[L, A]] {
+    <span class="keyword">def</span> <a title="(a1: scalaz.Logger[L,A],a2: scalaz.Logger[L,A])scalaz.Ordering" id="262664">order</a>(<a title="scalaz.Logger[L,A]" id="262665">a1</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A], <a title="scalaz.Logger[L,A]" id="262666">a2</a>: <a href="#17268" title="scalaz.Logger[L,A]">Logger</a>[L, A]) =
+      <a href="#262665" title="scalaz.Logger[L,A]">a1</a>.<a href="Identity.scala.html#43067" title="(a: A)(implicit o: scalaz.Order[A])scalaz.Ordering">over</a> <a href="#215028" title="scalaz.Order[A]">?|?</a> <a href="#262666" title="scalaz.Logger[L,A]">a2</a>.<a href="#214895" title="=&gt; A">over</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L, A](implicit evidence$6: scalaz.Zero[A])scalaz.Zero[scalaz.Logger[L,A]]" id="215024">LoggerZero</a>[<a title="&gt;: Nothing &lt;: Any" id="214979">L</a>, <a title="&gt;: Nothing &lt;: Any" id="214980">A</a>: Zero]: <a href="Zero.scala.html#21330" title="scalaz.Zero[scalaz.Logger[L,A]]">Zero</a>[Logger[L, A]] = <a href="#262842" title="java.lang.Object with scalaz.Zero[scalaz.Logger[L,A]]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Zero[scalaz.Logger[L,A]]" id="262842">Zero</a>[Logger[L, A]] {
+    <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.Logger[L,A]" id="262846">zero</a> = <a href="#262848" title="java.lang.Object with scalaz.Logger[L,A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,A]" id="262848">Logger</a>[L, A] {
+      <span class="keyword">val</span> <a title="scalaz.Logger.LOG[L]" id="262850">log</a> = <a href="Zero.scala.html#35346" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="Zero.scala.html#88508" title="(implicit z: scalaz.Zero[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]]
+      <span class="keyword">val</span> <a title="A" id="262852">over</a> = <a href="Zero.scala.html#35346" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="#215024" title="(implicit z: scalaz.Zero[A])A">[</a><a href="#214980" title="A">A</a>]
+    }
+  }
+}
+
+<span class="keyword">trait</span> <a title="trait Loggers extends java.lang.Object with ScalaObject" id="17277">Loggers</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="#17269" title="object scalaz.Logger">Logger</a>._
+
+  <span class="keyword">def</span> <a title="&lt;refinement&gt;[L] extends java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,[α]scalaz.Logger[L,α]]" id="34235">mkLogger</a>[<a title="&gt;: Nothing &lt;: Any" id="34237">L</a>] = <a href="#214928" title="java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,[α]scalaz.Logger[L,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,[α]scalaz.Logger[L,α]]" id="214928">(</a>Id <a href="Extras.scala.html#9156" title="scalaz.~&gt;[scalaz.Scalaz.Id,[α]scalaz.Logger[L,α]]">~&gt;</a> (({<span class="keyword">type</span> λ[α]= Logger[L, α]})#λ)) {
+    <span class="keyword">def</span> <a title="[A](a: A)java.lang.Object with scalaz.Logger[L,A]" id="214987">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="214989">A</a>](<a title="A" id="214990">a</a>: <a href="#214989" title="A">A</a>) = <a href="#214999" title="java.lang.Object with scalaz.Logger[L,A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Logger[L,A]" id="214999">Logger</a>[L, A] {
+      <span class="keyword">def</span> <a title="=&gt; scalaz.Logger.LOG[L]" id="215015">log</a> = <a href="Zero.scala.html#35346" title="[Z](implicit z: scalaz.Zero[Z])Z">∅</a><a href="Zero.scala.html#88508" title="(implicit z: scalaz.Zero[scalaz.Logger.LOG[L]])scalaz.Logger.LOG[L]">[</a><a href="FingerTree.scala.html#34960" title="scalaz.Logger.LOG[L]">LOG</a>[L]]
+      <span class="keyword">def</span> <a title="=&gt; A" id="215016">over</a> = <a href="#214990" title="A">a</a>
+    }
+  }
+}
+        </pre>
+    </body>
+</html>

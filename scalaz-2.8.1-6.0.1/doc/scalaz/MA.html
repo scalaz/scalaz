@@ -1,0 +1,1983 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.MA</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="type" onload="windowTitle();">
+
+      <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+
+      <div id="definition">
+        <img src="../lib/trait_big.png" />
+        <h1>MA</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">MA</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        
+        <span class="result"> extends <a href="PimpedType.html" class="extype" name="scalaz.PimpedType">PimpedType</a>[M[A]] with <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>[M, A]</span>
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"><div class="block">
+            linear super types: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>[M, A], <a href="PimpedType.html" class="extype" name="scalaz.PimpedType">PimpedType</a>[M[A]], AnyRef, <span class="extype" name="scala.Any">Any</span>
+          </div><div class="block">
+            known subclasses: <a href="MAB.html" class="extype" name="scalaz.MAB">MAB</a>
+          </div></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in">Alphabetic</li><li class="inherit out">By inheritance</li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
+                <ol id="linearization"><li class="in" name="scalaz.MA">MA</li><li class="in" name="scalaz.MASugar">MASugar</li><li class="in" name="scalaz.PimpedType">PimpedType</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scalaz.MA#!">
+      <a id="!(Int)(Index[M]):Option[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!</span>
+        
+        <span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="i">i: <a href="Index.html" class="extype" name="scalaz.Index">Index</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#!!">
+      <a id="!!(Int)(Foldable[M]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!!</span>
+        
+        <span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#!=">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#!=">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the receiver object is equivalent to the argument; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef###">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">##</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef → Any
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$asInstanceOf">
+      <a id="$asInstanceOf[T0]():T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$isInstanceOf">
+      <a id="$isInstanceOf[T0]():Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&amp;:">
+      <a id="&amp;:(A):ViewL[M, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&amp;:</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span>
+        <span class="result">: <a href="ViewL.html" class="extype" name="scalaz.ViewL">ViewL</a>[M, A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#*&gt;">
+      <a id="*&gt;[B](M[B])(Functor[M],Apply[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">*&gt;</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#+&gt;:">
+      <a id="+&gt;:(A)(Semigroup[M[A]],Pure[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">+&gt;:</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="s">s: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[M[A]]</span>, <span name="q">q: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[M]</span>)</span>
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#-!-">
+      <a id="-!-(Int)(Index[M]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">-!-</span>
+        
+        <span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="i">i: <a href="Index.html" class="extype" name="scalaz.Index">Index</a>[M]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#:&amp;">
+      <a id=":&amp;(A):ViewR[M, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">:&amp;</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span>
+        <span class="result">: <a href="ViewR.html" class="extype" name="scalaz.ViewR">ViewR</a>[M, A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;*">
+      <a id="&lt;*[B](M[B])(Functor[M],Apply[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;*</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;*****&gt;">
+      <a id="&lt;*****&gt;[B, C, D, E, F](M[B],M[C],M[D],M[E])((A, B, C, D, E) ⇒ F)(Functor[M],Apply[M]):M[F]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;*****&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>, <span name="d">d: M[D]</span>, <span name="e">e: M[E]</span>)</span><span class="params">(<span name="z">z: (A, B, C, D, E) ⇒ F</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[F]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;****&gt;">
+      <a id="&lt;****&gt;[B, C, D, E](M[B],M[C],M[D])((A, B, C, D) ⇒ E)(Functor[M],Apply[M]):M[E]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;****&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>, <span name="d">d: M[D]</span>)</span><span class="params">(<span name="z">z: (A, B, C, D) ⇒ E</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[E]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;***&gt;">
+      <a id="&lt;***&gt;[B, C, D](M[B],M[C])((A, B, C) ⇒ D)(Functor[M],Apply[M]):M[D]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;***&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>)</span><span class="params">(<span name="z">z: (A, B, C) ⇒ D</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[D]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;**&gt;">
+      <a id="&lt;**&gt;[B, C](M[B])((A, B) ⇒ C)(Functor[M],Apply[M]):M[C]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;**&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span><span class="params">(<span name="z">z: (A, B) ⇒ C</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[C]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;*&gt;">
+      <a id="&lt;*&gt;[B](M[(A) ⇒ B])(Apply[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;*&gt;</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: M[(A) ⇒ B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;+&gt;">
+      <a id="&lt;+&gt;(⇒ M[A])(Plus[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;+&gt;</span>
+        
+        <span class="params">(<span name="z">z: ⇒ M[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="p">p: <a href="Plus.html" class="extype" name="scalaz.Plus">Plus</a>[M]</span>)</span>
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;+&gt;:">
+      <a id="&lt;+&gt;:(A)(Plus[M],Pure[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;+&gt;:</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="p">p: <a href="Plus.html" class="extype" name="scalaz.Plus">Plus</a>[M]</span>, <span name="q">q: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[M]</span>)</span>
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;---&gt;">
+      <a id="&lt;---&gt;(M[A])(Length[M],Index[M],Equal[A]):Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;---&gt;</span>
+        
+        <span class="params">(<span name="w">w: M[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="l">l: <a href="Length.html" class="extype" name="scalaz.Length">Length</a>[M]</span>, <span name="ind">ind: <a href="Index.html" class="extype" name="scalaz.Index">Index</a>[M]</span>, <span name="equ">equ: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;|****|&gt;">
+      <a id="&lt;|****|&gt;[B, C, D, E](M[B],M[C],M[D],M[E])(Functor[M],Apply[M]):M[(A, B, C, D, E)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;|****|&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>, <span name="d">d: M[D]</span>, <span name="e">e: M[E]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[(A, B, C, D, E)]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;|***|&gt;">
+      <a id="&lt;|***|&gt;[B, C, D](M[B],M[C],M[D])(Functor[M],Apply[M]):M[(A, B, C, D)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;|***|&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>, <span name="d">d: M[D]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;|**|&gt;">
+      <a id="&lt;|**|&gt;[B, C](M[B],M[C])(Functor[M],Apply[M]):M[(A, B, C)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;|**|&gt;</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>, <span name="c">c: M[C]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[(A, B, C)]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&lt;|*|&gt;">
+      <a id="&lt;|*|&gt;[B](M[B])(Functor[M],Apply[M]):M[(A, B)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&lt;|*|&gt;</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="a">a: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[M]</span>)</span>
+        <span class="result">: M[(A, B)]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#==">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#==">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#=&gt;&gt;">
+      <a id="=&gt;&gt;[B]((M[A]) ⇒ B)(Comonad[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">=&gt;&gt;</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (M[A]) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="w">w: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&gt;&gt;=">
+      <a id="&gt;&gt;=[B]((A) ⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&gt;&gt;=</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&gt;&gt;=|">
+      <a id="&gt;&gt;=|[B](⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&gt;&gt;=|</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&gt;|">
+      <a id="&gt;|[B](⇒ B)(Functor[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&gt;|</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#&gt;|&gt;">
+      <a id="&gt;|&gt;[B](⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">&gt;|&gt;</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for &gt;&gt;=|</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for &gt;&gt;=|</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#all">
+      <a id="all((A) ⇒ Boolean)(Foldable[M]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">all</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#any">
+      <a id="any((A) ⇒ Boolean)(Foldable[M]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">any</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to cast the receiver object to be of type <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to cast the receiver object to be of type <code>T0</code>.</p><p>Note that the success of a cast at runtime is modulo Scala's erasure semantics.  Therefore the expression<code>1.asInstanceOf[String]</code> will throw a <code>ClassCastException</code> at runtime, while the expression<code>List(1).asInstanceOf[List[String]]</code> will not.  In the latter example, because the type argument is erased as
+part of compilation it is not possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#asMA">
+      <a id="asMA:MA[M, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asMA</span>
+        
+        
+        <span class="result">: <a href="" class="extype" name="scalaz.MA">MA</a>[M, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Use this to force implicit conversion of M[A] to MA[M, A].</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Use this to force implicit conversion of M[A] to MA[M, A]. Useful when the original
+type contains a member with the same name as MA, for example: List(1,2,3) map f
+</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#asStream">
+      <a id="asStream[B]((Stream[A]) ⇒ Stream[B])(Foldable[M],Monoid[M[B]],Pure[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asStream</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (Stream[A]) ⇒ Stream[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[M[B]]</span>, <span name="p">p: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#bktree">
+      <a id="bktree(Foldable[M],MetricSpace[A]):BKTree[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">bktree</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="MetricSpace.html" class="extype" name="scalaz.MetricSpace">MetricSpace</a>[A]</span>)</span>
+        <span class="result">: <a href="BKTree.html" class="extype" name="scalaz.BKTree">BKTree</a>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">clone</span>
+        
+        <span class="params">()</span>
+        <span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method creates and returns a copy of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method creates and returns a copy of the receiver object.</p><p>The default implementation of the <code>clone</code> method is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a copy of the receiver object.</p></dd></dl><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#cojoin">
+      <a id="cojoin(Cojoin[M]):M[M[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">cojoin</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="j">j: <a href="Cojoin.html" class="extype" name="scalaz.Cojoin">Cojoin</a>[M]</span>)</span>
+        <span class="result">: M[M[A]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#collapse">
+      <a id="collapse(Traverse[M],Monoid[A]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">collapse</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[A]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#comp">
+      <a id="comp[N, B](&lt;:&lt;[A, N[B]],Functor[M]):MA[[α]M[N[α]], B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">comp</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="n">n: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, N[B]]</span>, <span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: <a href="" class="extype" name="scalaz.MA">MA</a>[[α]M[N[α]], B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a MA with the type parameter <code>M</code> equal to [A] M[N[A]], given that type <code>A</code> is constructed from type constructor <code>N</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a MA with the type parameter <code>M</code> equal to [A] M[N[A]], given that type <code>A</code> is constructed from type constructor <code>N</code>.
+This allows composition of type classes for <code>M</code> and <code>N</code>. For example:<code>(List(List(1)).comp.map {2 +}) assert_=== List(List(3))</code></p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#copure">
+      <a id="copure(Copure[M]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">copure</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="p">p: <a href="Copure.html" class="extype" name="scalaz.Copure">Copure</a>[M]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#count">
+      <a id="count(Foldable[M]):Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">count</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#digits">
+      <a id="digits(&lt;:&lt;[A, Char],Functor[M]):M[Option[Digit]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">digits</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="c">c: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, <span class="extype" name="scala.Char">Char</span>]</span>, <span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: M[<span class="extype" name="scala.Option">Option</span>[<a href="Digit.html" class="extype" name="scalaz.Digit">Digit</a>]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#element">
+      <a id="element(A)(Foldable[M],Equal[A]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">element</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="eq">eq: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#empty">
+      <a id="empty(Foldable[M]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">empty</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p><p>The <code>eq</code> method implements an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence relation] on
+non-null instances of <code>AnyRef</code>:
+ * It is reflexive: for any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(x)</code> returns <code>true</code>.
+ * It is symmetric: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, <code>x.eq(y)</code> returns <code>true</code> if and
+   only if <code>y.eq(x)</code> returns <code>true</code>.
+ * It is transitive: for any non-null instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.eq(y)</code> returns <code>true</code>   and <code>y.eq(z)</code> returns <code>true</code>, then <code>x.eq(z)</code> returns <code>true</code>.</p><p>Additionally, the <code>eq</code> method has three other properties.
+ * It is consistent: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, multiple invocations of
+   <code>x.eq(y)</code> consistently returns <code>true</code> or consistently returns <code>false</code>.
+ * For any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(null)</code> and <code>null.eq(x)</code> returns <code>false</code>.
+ * <code>null.eq(null)</code> returns <code>true</code>.</p><p>When overriding the <code>equals</code> or <code>hashCode</code> methods, it is important to ensure that their behavior is
+consistent with reference equality.  Therefore, if two objects are references to each other (<code>o1 eq o2</code>), they
+should be equal to each other (<code>o1 == o2</code>) and they should hash to the same value (<code>o1.hashCode == o2.hashCode</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the argument is a reference to the receiver object; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#equals">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p><p>The default implementations of this method is an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence
+relation]:
+ * It is reflexive: for any instance <code>x</code> of type <code>Any</code>, <code>x.equals(x)</code> should return <code>true</code>.
+ * It is symmetric: for any instances <code>x</code> and <code>y</code> of type <code>Any</code>, <code>x.equals(y)</code> should return <code>true</code> if and
+   only if <code>y.equals(x)</code> returns <code>true</code>.
+ * It is transitive: for any instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.equals(y)</code> returns <code>true</code> and
+   <code>y.equals(z)</code> returns <code>true</code>, then <code>x.equals(z)</code> should return <code>true</code>.</p><p>If you override this method, you should verify that your implementation remains an equivalence relation.
+Additionally, when overriding this method it is often necessary to override <code>hashCode</code> to ensure that objects
+that are &quot;equal&quot; (<code>o1.equals(o2)</code> returns <code>true</code>) hash to the same 
+scala.Int
+(<code>o1.hashCode.equals(o2.hashCode)</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#finalize">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p><p>The details of when and if the <code>finalize</code> method are invoked, as well as the interaction between <code>finalize</code>and non-local returns and exceptions, are all platform dependent.</p></div><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#flatMap">
+      <a id="flatMap[B]((A) ⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">flatMap</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldLeftM">
+      <a id="foldLeftM[N, B](B)((B, A) ⇒ N[B])(Foldable[M],Monad[N]):N[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldLeftM</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: B</span>)</span><span class="params">(<span name="f">f: (B, A) ⇒ N[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="fr">fr: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[N]</span>)</span>
+        <span class="result">: N[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldMap">
+      <a id="foldMap[B]((A) ⇒ B)(Foldable[M],Monoid[B]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldMap</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[B]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldMapDefault">
+      <a id="foldMapDefault[B]((A) ⇒ B)(Traverse[M],Monoid[B]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldMapDefault</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[B]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldReduce">
+      <a id="foldReduce[B](Foldable[M],Reducer[A, B]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldReduce</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="r">r: <a href="Reducer.html" class="extype" name="scalaz.Reducer">Reducer</a>[A, B]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldRightM">
+      <a id="foldRightM[N, B](B)((A, B) ⇒ N[B])(Foldable[M],Monad[N]):N[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldRightM</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: B</span>)</span><span class="params">(<span name="f">f: (A, B) ⇒ N[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="fr">fr: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[N]</span>)</span>
+        <span class="result">: N[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldl">
+      <a id="foldl[B](B)((B, A) ⇒ B)(Foldable[M]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldl</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: B</span>)</span><span class="params">(<span name="f">f: (B, A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldl1">
+      <a id="foldl1((A, A) ⇒ A)(Foldable[M]):Option[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldl1</span>
+        
+        <span class="params">(<span name="f">f: (A, A) ⇒ A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldr">
+      <a id="foldr[B](B)((A, ⇒ B) ⇒ B)(Foldable[M]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldr</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: B</span>)</span><span class="params">(<span name="f">f: (A, ⇒ B) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foldr1">
+      <a id="foldr1((A, ⇒ A) ⇒ A)(Foldable[M]):Option[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foldr1</span>
+        
+        <span class="params">(<span name="f">f: (A, ⇒ A) ⇒ A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#foreach">
+      <a id="foreach((A) ⇒ Unit)(Each[M]):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">foreach</span>
+        
+        <span class="params">(<span name="f">f: (A) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="e">e: <a href="Each.html" class="extype" name="scalaz.Each">Each</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#forever">
+      <a id="forever[B](Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">forever</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#fpair">
+      <a id="fpair(Functor[M]):M[(A, A)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">fpair</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: M[(A, A)]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#fpure">
+      <a id="fpure[N](Functor[M],Pure[N]):M[N[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">fpure</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="p">p: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[N]</span>)</span>
+        <span class="result">: M[N[A]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#getClass">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span>
+        <span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a representation that corresponds to the dynamic class of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a representation that corresponds to the dynamic class of the receiver object.</p><p>The nature of the representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a representation that corresponds to the dynamic class of the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#getOrElseM">
+      <a id="getOrElseM(M[Option[A]])(Monad[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getOrElseM</span>
+        
+        <span class="params">(<span name="a">a: M[<span class="extype" name="scala.Option">Option</span>[A]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[M]</span>)</span>
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a hash code value for the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a hash code value for the object.</p><p>The default hashing algorithm is platform dependent.</p><p>Note that it is allowed for two objects to have identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>) yet
+not be equal (<code>o1.equals(o2)</code> returns <code>false</code>).  A degenerate implementation could always return <code>0</code>.
+However, it is required that if two objects are equal (<code>o1.equals(o2)</code> returns <code>true</code>) that they have
+identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>).  Therefore, when overriding this method, be sure
+to verify that the behavior is consistent with the <code>equals</code> method.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the hash code value for the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#ifM">
+      <a id="ifM[B](⇒ M[B],⇒ M[B])(Monad[M],&lt;:&lt;[A, Boolean]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">ifM</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="t">t: ⇒ M[B]</span>, <span name="f">f: ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[M]</span>, <span name="b">b: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, <span class="extype" name="scala.Boolean">Boolean</span>]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#isInstanceOf">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p><p>Note that the test result of the test is modulo Scala's erasure semantics.  Therefore the expression<code>1.isInstanceOf[String]</code> will return <code>false</code>, while the expression <code>List(1).isInstanceOf[List[String]]</code> will
+return <code>true</code>.  In the latter example, because the type argument is erased as part of compilation it is not
+possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is an instance of erasure of type <code>T0</code>; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#join">
+      <a id="join[B](&lt;:&lt;[A, M[B]],Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">join</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="m">m: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, M[B]]</span>, <span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#len">
+      <a id="len(Length[M]):Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">len</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="l">l: <a href="Length.html" class="extype" name="scalaz.Length">Length</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#liftw">
+      <a id="liftw[F](Functor[M],Pure[F]):~&gt;[Id, [α]WriterT[M, F[α], A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">liftw</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="p">p: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[F]</span>)</span>
+        <span class="result">: <a href="$tilde$greater.html" class="extype" name="scalaz.~&gt;">~&gt;</a>[Id, [α]<a href="WriterT.html" class="extype" name="scalaz.WriterT">WriterT</a>[M, F[α], A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Puts the given write value into a writer transformer, lifted into a pointed functor, and associates with this M[A] value</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Puts the given write value into a writer transformer, lifted into a pointed functor, and associates with this M[A] value</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#liftwWith">
+      <a id="liftwWith[F](Functor[M],Pure[F]):~&gt;[[α](A) ⇒ α, [α]WriterT[M, F[α], A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">liftwWith</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="p">p: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[F]</span>)</span>
+        <span class="result">: <a href="$tilde$greater.html" class="extype" name="scalaz.~&gt;">~&gt;</a>[[α](A) ⇒ α, [α]<a href="WriterT.html" class="extype" name="scalaz.WriterT">WriterT</a>[M, F[α], A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Puts the given write value that is produced by applying the given function into a writer transformer, lifted into a pointed functor, and associates with this M[A] value</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Puts the given write value that is produced by applying the given function into a writer transformer, lifted into a pointed functor, and associates with this M[A] value</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#listl">
+      <a id="listl(Foldable[M]):List[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">listl</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: List[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#listr">
+      <a id="listr(Foldable[M]):List[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">listr</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: List[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#longDigits">
+      <a id="longDigits(&lt;:&lt;[A, Digit],Foldable[M]):Long"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">longDigits</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="d">d: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, <a href="Digit.html" class="extype" name="scalaz.Digit">Digit</a>]</span>, <span name="t">t: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Long">Long</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#map">
+      <a id="map[B]((A) ⇒ B)(Functor[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">map</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#map2">
+      <a id="map2[N, B, C]((B) ⇒ C)(&lt;:&lt;[A, N[B]],Functor[M],Functor[N]):M[N[C]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">map2</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="f">f: (B) ⇒ C</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, N[B]]</span>, <span name="f1">f1: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="f2">f2: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[N]</span>)</span>
+        <span class="result">: M[N[C]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#maximum">
+      <a id="maximum(Foldable[M],Order[A]):Option[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">maximum</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="ord">ord: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#minimum">
+      <a id="minimum(Foldable[M],Order[A]):Option[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">minimum</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="ord">ord: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the argument is not a reference to the receiver object; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notify">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notify</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up a single thread that is waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up a single thread that is waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notifyAll">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up all threads that are waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up all threads that are waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#parBind">
+      <a id="parBind[B]((A) ⇒ M[B])(Monad[M],Strategy,Traverse[M]):Promise[M[B]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">parBind</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[M]</span>, <span name="s">s: <a href="concurrent/Strategy.html" class="extype" name="scalaz.concurrent.Strategy">Strategy</a></span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: <a href="concurrent/Promise.html" class="extype" name="scalaz.concurrent.Promise">Promise</a>[M[B]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#parMap">
+      <a id="parMap[B]((A) ⇒ B)(Strategy,Traverse[M]):Promise[M[B]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">parMap</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="s">s: <a href="concurrent/Strategy.html" class="extype" name="scalaz.concurrent.Strategy">Strategy</a></span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: <a href="concurrent/Promise.html" class="extype" name="scalaz.concurrent.Promise">Promise</a>[M[B]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#parZipWith">
+      <a id="parZipWith[B, C](M[B])((A, B) ⇒ C)(Applicative[M],Strategy,Traverse[M]):Promise[M[C]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">parZipWith</span>
+        <span class="tparams">[<span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="bs">bs: M[B]</span>)</span><span class="params">(<span name="f">f: (A, B) ⇒ C</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="z">z: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[M]</span>, <span name="s">s: <a href="concurrent/Strategy.html" class="extype" name="scalaz.concurrent.Strategy">Strategy</a></span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: <a href="concurrent/Promise.html" class="extype" name="scalaz.concurrent.Promise">Promise</a>[M[C]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#para">
+      <a id="para[B](B,(⇒ A, ⇒ M[A], B) ⇒ B)(Paramorphism[M]):B"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">para</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: B</span>, <span name="f">f: (⇒ A, ⇒ M[A], B) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="p">p: <a href="Paramorphism.html" class="extype" name="scalaz.Paramorphism">Paramorphism</a>[M]</span>)</span>
+        <span class="result">: B</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#put">
+      <a id="put[W](W)(Functor[M]):WriterT[M, W, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">put</span>
+        <span class="tparams">[<span name="W">W</span>]</span>
+        <span class="params">(<span name="w">w: W</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: <a href="WriterT.html" class="extype" name="scalaz.WriterT">WriterT</a>[M, W, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Puts the given write value into a writer transformer and associates with this M[A] value</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Puts the given write value into a writer transformer and associates with this M[A] value</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#putWith">
+      <a id="putWith[W]((A) ⇒ W)(Functor[M]):WriterT[M, W, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">putWith</span>
+        <span class="tparams">[<span name="W">W</span>]</span>
+        <span class="params">(<span name="w">w: (A) ⇒ W</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="f">f: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: <a href="WriterT.html" class="extype" name="scalaz.WriterT">WriterT</a>[M, W, A]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Puts the write value that is produced by applying the given function into a writer transformer and associates with this M[A] value</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Puts the write value that is produced by applying the given function into a writer transformer and associates with this M[A] value</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#replicateM">
+      <a id="replicateM[N](Int)(Monad[M],Pure[N],Monoid[N[A]]):M[N[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">replicateM</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[M]</span>, <span name="p">p: <a href="Pure.html" class="extype" name="scalaz.Pure">Pure</a>[N]</span>, <span name="d">d: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[N[A]]</span>)</span>
+        <span class="result">: M[N[A]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#replicateM_">
+      <a id="replicateM_(Int)(Monad[M]):M[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">replicateM_</span>
+        
+        <span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[M]</span>)</span>
+        <span class="result">: M[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#selectSplit">
+      <a id="selectSplit((A) ⇒ Boolean)(Foldable[M]):List[List[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">selectSplit</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: List[List[A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Selects groups of elements that satisfy p and discards others.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Selects groups of elements that satisfy p and discards others.
+</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#sequence">
+      <a id="sequence[N, B](&lt;:&lt;[A, N[B]],Traverse[M],Applicative[N]):N[M[B]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">sequence</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="a">a: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, N[B]]</span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>, <span name="n">n: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[N]</span>)</span>
+        <span class="result">: N[M[B]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#splitWith">
+      <a id="splitWith((A) ⇒ Boolean)(Foldable[M]):List[List[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">splitWith</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: List[List[A]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
+</p></div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#stream">
+      <a id="stream(Foldable[M]):Stream[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">stream</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: Stream[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#sum">
+      <a id="sum(Foldable[M],Monoid[A]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">sum</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[A]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#sumr">
+      <a id="sumr(Foldable[M],Monoid[A]):A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">sumr</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="m">m: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[A]</span>)</span>
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
+      <a id="synchronized[T0](T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: T0</span>)</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#toString">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">toString</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a string representation of the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a string representation of the object.</p><p>The default representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a string representation of the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#traverse">
+      <a id="traverse[F, B]((A) ⇒ F[B])(Applicative[F],Traverse[M]):F[M[B]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">traverse</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ F[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[F]</span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: F[M[B]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#traverseDigits">
+      <a id="traverseDigits(&lt;:&lt;[A, Char],Traverse[M]):Option[M[Digit]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">traverseDigits</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="c">c: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, <span class="extype" name="scala.Char">Char</span>]</span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[M[<a href="Digit.html" class="extype" name="scalaz.Digit">Digit</a>]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#traverse_">
+      <a id="traverse_[F, B]((A) ⇒ F[B])(Applicative[F],Foldable[M]):F[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">traverse_</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ F[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[F]</span>, <span name="t">t: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: F[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.PimpedType#value">
+      <a id="value:M[A]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol">
+        <span class="name">value</span>
+        
+        
+        <span class="result">: M[A]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: abstract 
+        </div><div class="block">
+          definition classes: <a href="PimpedType.html" class="extype" name="scalaz.PimpedType">PimpedType</a>
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#xmap">
+      <a id="xmap[B]((A) ⇒ B)((B) ⇒ A)(InvariantFunctor[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">xmap</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span name="g">g: (B) ⇒ A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="xf">xf: <a href="InvariantFunctor.html" class="extype" name="scalaz.InvariantFunctor">InvariantFunctor</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#zipWithA">
+      <a id="zipWithA[F, B, C](M[B])((A, B) ⇒ F[C])(Applicative[M],Traverse[M],Applicative[F]):F[M[C]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">zipWithA</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span><span class="params">(<span name="f">f: (A, B) ⇒ F[C]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[M]</span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>, <span name="z">z: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[F]</span>)</span>
+        <span class="result">: F[M[C]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#|&gt;|">
+      <a id="|&gt;|((A) ⇒ Unit)(Each[M]):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">|&gt;|</span>
+        
+        <span class="params">(<span name="f">f: (A) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="e">e: <a href="Each.html" class="extype" name="scalaz.Each">Each</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MA#|@|">
+      <a id="|@|[B](M[B]):ApplicativeBuilder[M, A, B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">|@|</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span>
+        <span class="result">: <a href="ApplicativeBuilder.html" class="extype" name="scalaz.ApplicativeBuilder">ApplicativeBuilder</a>[M, A, B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Accumulates values MA[A] and MA[B], and returns an ApplicativeBuilder that can accumulate
+further such values.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Accumulates values MA[A] and MA[B], and returns an ApplicativeBuilder that can accumulate
+further such values. These values can be then applied to a provided function through the Applicative Functor for M.</p><p>Example:</p><p> (1.some ⊛ 2.some) apply { (a, b, c) =&gt; a + b + c) } === Some(3)
+ (1.some ⊛ 2.some ⊛ 3.some) tupled === Some((1, 2, 3))
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>An ApplicativeBuilder that has accumulated <code>value: M[A]</code> and <code>b: M[B]</code>.
+</p></dd></dl>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#μ">
+      <a id="μ[B](&lt;:&lt;[A, M[B]],Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">μ</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="m">m: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, M[B]]</span>, <span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for join</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for join</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#↦">
+      <a id="↦[F, B]((A) ⇒ F[B])(Applicative[F],Traverse[M]):F[M[B]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">↦</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ F[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="a">a: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[F]</span>, <span name="t">t: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[M]</span>)</span>
+        <span class="result">: F[M[B]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for traverse</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for traverse</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∀">
+      <a id="∀((A) ⇒ Boolean)(Foldable[M]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∀</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for all</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for all</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∃">
+      <a id="∃((A) ⇒ Boolean)(Foldable[M]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∃</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for any</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for any</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∈:">
+      <a id="∈:(A)(Foldable[M],Equal[A]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∈:</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="eq">eq: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Right associative alias for element</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Right associative alias for element</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∋">
+      <a id="∋(A)(Foldable[M],Equal[A]):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∋</span>
+        
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[M]</span>, <span name="eq">eq: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[A]</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for element</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for element</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∗">
+      <a id="∗[B]((A) ⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∗</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for &gt;&gt;= and flatMap</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for &gt;&gt;= and flatMap</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∗|">
+      <a id="∗|[B](⇒ M[B])(Bind[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∗|</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: ⇒ M[B]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for &gt;&gt;=|</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for &gt;&gt;=|</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∘">
+      <a id="∘[B]((A) ⇒ B)(Functor[M]):M[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∘</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="t">t: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>)</span>
+        <span class="result">: M[B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for map</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for map</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#∘∘">
+      <a id="∘∘[N, B, C]((B) ⇒ C)(&lt;:&lt;[A, N[B]],Functor[M],Functor[N]):M[N[C]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">∘∘</span>
+        <span class="tparams">[<span name="N">N<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span name="f">f: (B) ⇒ C</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[A, N[B]]</span>, <span name="f1">f1: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[M]</span>, <span name="f2">f2: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[N]</span>)</span>
+        <span class="result">: M[N[C]]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for map2</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for map2</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scalaz.MASugar#⊛">
+      <a id="⊛[B](M[B]):ApplicativeBuilder[M, A, B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">⊛</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span name="b">b: M[B]</span>)</span>
+        <span class="result">: <a href="ApplicativeBuilder.html" class="extype" name="scalaz.ApplicativeBuilder">ApplicativeBuilder</a>[M, A, B]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Alias for |@|</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Alias for |@|</p></div><div class="block">
+          definition classes: <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>
+        </div>
+            
+            
+            
+          </div>
+          
+    </li></ol>
+            </div>
+
+        <div class="parent" name="scalaz.MASugar">
+              <h3>Inherited from <a href="MASugar.html" class="extype" name="scalaz.MASugar">MASugar</a>[M, A]</h3>
+            </div><div class="parent" name="scalaz.PimpedType">
+              <h3>Inherited from <a href="PimpedType.html" class="extype" name="scalaz.PimpedType">PimpedType</a>[M[A]]</h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from AnyRef</h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

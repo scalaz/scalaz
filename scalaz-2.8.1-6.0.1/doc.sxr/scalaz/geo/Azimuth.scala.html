@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Azimuth.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Azimuth extends java.lang.Object" id="25915">Azimuth</a> <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">val</span> <a title="=&gt; Double" id="810951">value</a>: <span title="Double">Double</span>
+}
+
+<span class="keyword">trait</span> <a title="trait Azimuths extends java.lang.Object with ScalaObject" id="25921">Azimuths</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="(d: Double)java.lang.Object with scalaz.geo.Azimuth" id="810124">azimuth</a>(<a title="Double" id="810964">d</a>: <span title="Double">Double</span>) = <a href="#810967" title="java.lang.Object with scalaz.geo.Azimuth{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Azimuth" id="810967">Azimuth</a> {
+    <span class="keyword">val</span> <a title="Double" id="810969">value</a> = <a href="#810964" title="(x$1: Int)Double" id="5696">d</a> % <span title="Int(360)" class="int">360</span>
+  }
+}
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Azimuth" id="25916">Azimuth</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Show[scalaz.geo.Azimuth]" id="824675">AzimuthShow</a>: <a href="../Show.scala.html#19644" title="scalaz.Show[scalaz.geo.Azimuth]">Show</a>[Azimuth] = <a href="../Show.scala.html#34995" title="(f: (scalaz.geo.Azimuth) =&gt; String)scalaz.Show[scalaz.geo.Azimuth]">shows</a>(<a href="#824685" title="scalaz.geo.Azimuth">_</a>.<a href="../Identity.scala.html#34181" title="(x: =&gt; Double)scalaz.Identity[Double]">value</a>.<a href="../Identity.scala.html#43075" title="(x$1: Any)java.lang.String" id="5832">shows</a> + <span title="java.lang.String(&quot;°&quot;)" class="string">&quot;°&quot;</span>)
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[scalaz.geo.Azimuth]" id="824676">AzimuthEqual</a>: <a href="../Equal.scala.html#11199" title="scalaz.Equal[scalaz.geo.Azimuth]">Equal</a>[Azimuth] = <a href="../Equal.scala.html#34079" title="(f: (scalaz.geo.Azimuth) =&gt; Double)(implicit evidence$1: scalaz.Equal[Double])scalaz.Equal[scalaz.geo.Azimuth]">equalBy</a><a href="../Equal.scala.html#120352" title="=&gt; scalaz.Equal[Double]">(</a><a href="#824863" title="scalaz.geo.Azimuth">_</a>.<a href="#810951" title="=&gt; Double">value</a>)
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Order[scalaz.geo.Azimuth]" id="824677">AzimuthOrder</a>: <a href="../Order.scala.html#18477" title="scalaz.Order[scalaz.geo.Azimuth]">Order</a>[Azimuth] = <a href="../Order.scala.html#34885" title="(f: (scalaz.geo.Azimuth) =&gt; Double)(implicit evidence$1: scalaz.Order[Double])scalaz.Order[scalaz.geo.Azimuth]">orderBy</a><a href="../Order.scala.html#176653" title="=&gt; scalaz.Order[Double]">(</a><a href="#824947" title="scalaz.geo.Azimuth">_</a>.<a href="#810951" title="=&gt; Double">value</a>)
+
+}
+        </pre>
+    </body>
+</html>

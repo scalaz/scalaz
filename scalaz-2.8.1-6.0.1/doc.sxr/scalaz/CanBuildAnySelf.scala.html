@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/CanBuildAnySelf.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> collection._
+<span class="keyword">import</span> collection.generic._
+<span class="keyword">import</span> scala.collection.mutable.Builder
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+
+<span class="keyword">trait</span> <a title="trait CanBuildAnySelf[CC[_]] extends java.lang.Object with ScalaObject" id="9972">CanBuildAnySelf</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21509">CC</a>[<a title="&gt;: Nothing &lt;: Any" id="43294">_</a>]] <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="#9973" title="object scalaz.CanBuildAnySelf">CanBuildAnySelf</a>._
+
+  <span class="keyword">def</span> <a title="[A, B]scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]" id="43279">builder</a>[<a title="&gt;: Nothing &lt;: Any" id="43282">A</a>, <a title="&gt;: Nothing &lt;: Any" id="43283">B</a>]: <span title="scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">CanBuildSelf</span>[CC, A, B]
+
+  <span class="keyword">final</span> <span class="keyword">def</span> <a title="[A, B]()scala.collection.mutable.Builder[B,CC[B]]" id="43284">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="43287">A</a>, <a title="&gt;: Nothing &lt;: Any" id="43288">B</a>](): <span title="scala.collection.mutable.Builder[B,CC[B]]">Builder</span>[B, CC[B]] = <a href="#43279" title="[A, B]scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">builder</a><span title="scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">[</span><a href="#43287" title="A">A</a>, <a href="#43288" title="B">B</a>].<a title="()scala.collection.mutable.Builder[B,CC[B]]" id="29313">apply</a>
+
+  <span class="keyword">final</span> <span class="keyword">def</span> <a title="[A, B](f: CC[A])scala.collection.mutable.Builder[B,CC[B]]" id="43289">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="43292">A</a>, <a title="&gt;: Nothing &lt;: Any" id="43293">B</a>](<a title="CC[A]" id="101719">f</a>: <a href="#21509" title="CC[A]">CC</a>[A]): <span title="scala.collection.mutable.Builder[B,CC[B]]">Builder</span>[B, CC[B]] = <a href="#43279" title="[A, B]scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">builder</a><span title="scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">[</span><a href="#43292" title="A">A</a>, <a href="#43293" title="B">B</a>].<a title="(from: CC[A])scala.collection.mutable.Builder[B,CC[B]]" id="29308">apply</a>(<a href="#101719" title="CC[A]">f</a>)
+}
+
+<span class="keyword">object</span> <a title="object scalaz.CanBuildAnySelf" id="9973">CanBuildAnySelf</a> <span title="ScalaObject">{</span>
+  <span class="keyword">type</span> <a title="[CC[_], A, B]scala.collection.generic.CanBuildFrom[CC[A],B,CC[B]]" id="43306">CanBuildSelf</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="43307">CC</a>[<a title="&gt;: Nothing &lt;: Any" id="87992">_</a>], <a title="&gt;: Nothing &lt;: Any" id="43308">A</a>, <a title="&gt;: Nothing &lt;: Any" id="43309">B</a>] = <span title="scala.collection.generic.CanBuildFrom[CC[A],B,CC[B]]">CanBuildFrom</span>[CC[A], B, CC[B]]
+
+  <span class="keyword">type</span> <a title="[CC[_]]scala.collection.generic.CanBuildFrom[CC[A],B,CC[B]] forSome { type A; type B }" id="43310">CanBuildSelfExistential</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="43311">CC</a>[<a title="&gt;: Nothing &lt;: Any" id="43322">_</a>]] = CanBuildFrom[CC[A], B, CC[B]] <span title="scala.collection.generic.CanBuildFrom[CC[A],B,CC[B]] forSome { type A; type B }" class="keyword">forSome</span> {<span class="keyword">type</span> A; <span class="keyword">type</span> B}
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[CC[_]](implicit evidence$1: scalaz.CanBuildAnySelf.CanBuildSelfExistential[CC])scalaz.CanBuildAnySelf[CC]" id="43315">GenericCanBuildSelf</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="43314">CC</a>[<a title="&gt;: Nothing &lt;: Any" id="43316">_</a>] : CanBuildSelfExistential]: <a href="#9972" title="scalaz.CanBuildAnySelf[CC]">CanBuildAnySelf</a>[CC] = <a href="#101730" title="java.lang.Object with scalaz.CanBuildAnySelf[CC]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.CanBuildAnySelf[CC]" id="101730">CanBuildAnySelf</a>[CC] {
+    // TODO: Is this ever unsafe?
+    <span class="keyword">def</span> <a title="[A, B]scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]" id="101734">builder</a>[<a title="&gt;: Nothing &lt;: Any" id="101737">A</a>, <a title="&gt;: Nothing &lt;: Any" id="101738">B</a>] = <a title="[T](implicit e: T)T" id="1489">implicitly</a><a href="#43315" title="(implicit e: scalaz.CanBuildAnySelf.CanBuildSelfExistential[CC])scalaz.CanBuildAnySelf.CanBuildSelfExistential[CC]">[</a><span title="scalaz.CanBuildAnySelf.CanBuildSelfExistential[CC]">CanBuildSelfExistential</span>[CC]].<a title="[T0]T0" id="5800">asInstanceOf</a><span title="scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">[</span><span title="scalaz.CanBuildAnySelf.CanBuildSelf[CC,A,B]">CanBuildSelf</span>[CC, A, B]]
+  }
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/Util.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+
+<span class="keyword">import</span> collection.immutable.{Map, HashMap}
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> java.net.<span title="object java.net.URLDecoder">URLDecoder</span>.decode
+<span class="keyword">import</span> io.Codec
+
+/**
+ * Utility functions not specific to any particular context within HTTP.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.Util" id="26605">Util</a> <span title="ScalaObject">{</span>
+  /**
+   * Splits the given argument by ampersand (&lt;code&gt;&amp;&lt;/code&gt;) then each list again by the equals sign (&lt;code&gt;=&lt;/code&gt;).
+   * e.g. &lt;code&gt;parameters(&quot;a=b&amp;c=d&amp;e=f&quot;) == [(&quot;a&quot;, &quot;b&quot;), (&quot;c&quot;, &quot;d&quot;), (&quot;e&quot;, &quot;f&quot;)]&lt;/code&gt; 
+   */
+  <span class="keyword">def</span> <a title="(p: List[Char])List[(List[Char], List[Char])]" id="811391">parameters</a>(<a title="List[Char]" id="841457">p</a>: <span title="List[Char]">List</span>[Char]): <span title="List[(List[Char], List[Char])]">List</span>[(List[Char], List[Char])] = {
+    <span class="keyword">val</span> <a title="List[List[Char]]" id="841459">x</a> = <a href="../MA.scala.html#34439" title="(l: List[Char])scalaz.MA[List,Char]">p</a>.<a href="../MA.scala.html#55558" title="(p: (Char) =&gt; Boolean)(implicit r: scalaz.Foldable[List])List[List[Char]]">selectSplit</a><a href="../Foldable.scala.html#91411" title="=&gt; scalaz.Foldable[List]">(</a><a href="#841709" title="(x$1: Char)Boolean">_</a> != <span title="Char('&amp;')" class="char">'&amp;'</span>)
+    // TODO Get !- back in scalaz and use that
+    //    x map (_ !- (_ == '=') match {
+    //      case (a, b) =&gt; {
+    //        (a, decode(b.mkString).drop(1).toList)
+    //      }
+    //    })
+
+    <a href="#841459" title="(f: (List[Char]) =&gt; (List[Char], List[Char]))(implicit bf: scala.collection.generic.CanBuildFrom[List[List[Char]],(List[Char], List[Char]),List[(List[Char], List[Char])]])List[(List[Char], List[Char])]">x</a> <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,(List[Char], List[Char]),List[(List[Char], List[Char])]]">map</span> (<a title="List[Char]" id="841763">chars</a> =&gt; {
+      <span class="keyword">val</span> <a title="List[Char]" id="841764">pre</a> = <a href="#841763" title="(p: (Char) =&gt; Boolean)List[Char]" id="32685">chars</a> takeWhile (<a href="#841771" title="(x$1: Char)Boolean">_</a> != <span title="Char('=')" class="char">'='</span>)
+      <span class="keyword">val</span> <a title="List[Char]" id="841765">post</a> = <a href="#841763" title="(p: (Char) =&gt; Boolean)List[Char]" id="32687">chars</a> dropWhile (<a href="#841781" title="(x$1: Char)Boolean">_</a> != <span title="Char('=')" class="char">'='</span>)
+      <span title="(_1: List[Char],_2: List[Char])(List[Char], List[Char])">(</span><a href="#841764" title="List[Char]">pre</a>, <a title="(x$1: java.lang.String,x$2: java.lang.String)java.lang.String" id="813723">decode</a><span title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">(</span><a href="#841765" title="List[Char]">post</a>.<span title="=&gt; String">mkString</span>, <a title="object scala.io.Codec" id="813471">Codec</a>.<a title="=&gt; java.nio.charset.Charset" id="841876">UTF8</a>.<a title="()java.lang.String" id="81106">name</a>).<a title="(n: Int)String" id="30506">drop</a><span title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">(</span><span title="Int(1)" class="int">1</span>).<span title="=&gt; List[Char]">toList</span>)
+    })
+  }
+
+  /**
+   * Encodes the given parameters by inserting an ampersand (&lt;code&gt;&amp;&lt;/code&gt;) between each pair and an equals sign
+   * (&lt;code&gt;=&lt;/code&gt;) with each pair.
+   */
+  <span class="keyword">def</span> <a title="(p: (List[Char], List[Char])*)String" id="811392">encodeParameters</a>(<a title="(List[Char], List[Char])*" id="842067">p</a>: <span title="(List[Char], List[Char])*">(</span>List[Char], List[Char])*): <span title="String">String</span> =
+    <a href="#842067" title="(List[Char], List[Char])*">p</a>.<span title="(f: ((List[Char], List[Char])) =&gt; List[Char])(implicit bf: scala.collection.generic.CanBuildFrom[List[(List[Char], List[Char])],List[Char],List[List[Char]]])List[List[Char]]">toList</span> <a href="../ListW.scala.html#56833" title="(a: List[Char])List[List[Char]]">map</a> <a href="#842088" title="List[Char]">{</a><span title="List[Char]" class="keyword">case</span> (<a title="List[Char]" id="842091">k</a>, <a title="List[Char]" id="842092">v</a>) =&gt; <a href="#842091" title="List[Char]">k</a> <a href="#842094" title="List[Char]">:::</a> <span title="Char('=')" class="char">'='</span> <a href="#842095" title="(prefix: List[Char])List[Char]" id="32654">::</a> <a href="#842092" title="(x: Char)List[Char]">v</a>} <a title="(f: (List[Char]) =&gt; Traversable[Char])(implicit bf: scala.collection.generic.CanBuildFrom[List[List[Char]],Char,List[Char]])List[Char]" id="29056">intersperse</a> <a title="(xs: Char*)List[Char]" id="32714">List</a>(<span title="Char('&amp;')" class="char">'&amp;'</span>) <span title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.List.Coll,Char,List[Char]]">flatMap</span> (<a title="List[Char]" id="842428">x</a> =&gt; <a href="#842428" title="List[Char]">x</a>) <span title="=&gt; String">mkString</span>
+
+  /**
+   * Encodes the given parameters by inserting an ampersand (&lt;code&gt;&amp;&lt;/code&gt;) between each pair and an equals sign
+   * (&lt;code&gt;=&lt;/code&gt;) with each pair.
+   */
+  <span class="keyword">def</span> <a title="(p: (String, String)*)String" id="811393">encode</a>(<a title="(String, String)*" id="841143">p</a>: <span title="(String, String)*">(</span>String, String)*): <span title="String">String</span> = <a href="#811392" title="(p: (List[Char], List[Char])*)String">encodeParameters</a>(<a href="#841143" title="(f: ((String, String)) =&gt; (List[Char], List[Char]))(implicit bf: scala.collection.generic.CanBuildFrom[Seq[(String, String)],(List[Char], List[Char]),Seq[(List[Char], List[Char])]])Seq[(List[Char], List[Char])]">p</a> <a title="scala.collection.generic.CanBuildFrom[scala.collection.Seq.Coll,(List[Char], List[Char]),Seq[(List[Char], List[Char])]]" id="8755">map</a> <a href="#842677" title="(List[Char], List[Char])">{</a><span title="(List[Char], List[Char])" class="keyword">case</span> (<a title="String" id="842680">k</a>, <a title="String" id="842681">v</a>) =&gt; <span title="(_1: List[Char],_2: List[Char])(List[Char], List[Char])">(</span><a href="#842680" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">k</a>.<span title="=&gt; List[Char]">toList</span>, <a href="#842681" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">v</a>.<span title="=&gt; List[Char]">toList</span>)}: _*)
+
+  /**
+   * Returns a map of key/value pairs where only the first value for the given key is available.
+   */
+  <span class="keyword">def</span> <a title="[K, C](p: scala.collection.immutable.Map[K,scalaz.NonEmptyList[C]])scala.collection.immutable.Map[K,C]" id="811394">mapHeads</a>[<a title="&gt;: Nothing &lt;: Any" id="811397">K</a>, <a title="&gt;: Nothing &lt;: Any" id="811398">C</a>](<a title="scala.collection.immutable.Map[K,scalaz.NonEmptyList[C]]" id="813440">p</a>: <span title="scala.collection.immutable.Map[K,scalaz.NonEmptyList[C]]">Map</span>[K, NonEmptyList[C]]) = <a href="#813440" title="scala.collection.immutable.Map[K,scalaz.NonEmptyList[C]]">p</a>.<a title="(f: (K, scalaz.NonEmptyList[C]) =&gt; C)(implicit bf: scala.collection.generic.CanBuildFrom[scala.collection.immutable.Map[K,scalaz.NonEmptyList[C]],(K, C),scala.collection.immutable.Map[K,C]])scala.collection.immutable.Map[K,C]" id="57573">transform</a><a title="scala.collection.generic.CanBuildFrom[scala.collection.immutable.Map.Coll,(K, C),scala.collection.immutable.Map[K,C]]" id="29489">(</a>(<a title="K" id="813451">h</a>, <a title="scalaz.NonEmptyList[C]" id="813452">v</a><a href="../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[C]">)</a> =&gt; <a href="#813452" title="scalaz.NonEmptyList[C]">v</a>.<a href="../NonEmptyList.scala.html#42854" title="=&gt; C">head</a>)
+
+  <span class="keyword">trait</span> <a title="trait AsHashMap[T[_], SM[_]] extends java.lang.Object" id="811399">AsHashMap</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811400">T</a>[<a title="&gt;: Nothing &lt;: Any" id="813953">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="811401">SM</a>[<a title="&gt;: Nothing &lt;: Any" id="813954">_</a>]] <a title="java.lang.Object" id="2746">{</a>
+    <span class="keyword">def</span> <a title="[K, V](kvs: T[(K, V)])(implicit f: scalaz.Foldable[T],implicit s: scalaz.Semigroup[SM[V]],implicit md: scalaz.Monad[SM])scala.collection.immutable.Map[K,SM[V]]" id="813948">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="813951">K</a>, <a title="&gt;: Nothing &lt;: Any" id="813952">V</a>](<a title="T[(K, V)]" id="813966">kvs</a>: <a href="#811400" title="T[(K, V)]">T</a>[(K, V)])(<span class="keyword">implicit</span> <a title="scalaz.Foldable[T]" id="813967">f</a>: <a href="../Foldable.scala.html#14211" title="scalaz.Foldable[T]">Foldable</a>[T], <a title="scalaz.Semigroup[SM[V]]" id="813968">s</a>: <a href="../Semigroup.scala.html#19377" title="scalaz.Semigroup[SM[V]]">Semigroup</a>[SM[V]], <a title="scalaz.Monad[SM]" id="813969">md</a>: <a href="../Monad.scala.html#17724" title="scalaz.Monad[SM]">Monad</a>[SM]): <span title="scala.collection.immutable.Map[K,SM[V]]">Map</span>[K, SM[V]]
+  }
+
+  /**
+   * Indexes the given sequence of key/value pairs using an empty hash-map. The key/value pair type constructor must
+   * support fold-left and the index is created in constant space.
+   */
+  <span class="keyword">def</span> <a title="&lt;refinement&gt;[T[_], SM[_]] extends java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]" id="811402">asHashMap</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811405">T</a>[<a title="&gt;: Nothing &lt;: Any" id="813946">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="811406">SM</a>[<a title="&gt;: Nothing &lt;: Any" id="813947">_</a>]] = <a href="#813945" title="java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.Util.AsHashMap[T,SM]" id="813945">AsHashMap</a>[T, SM] {
+    <span class="keyword">def</span> <a title="[K, V](kvs: T[(K, V)])(implicit f: scalaz.Foldable[T],implicit s: scalaz.Semigroup[SM[V]],implicit md: scalaz.Monad[SM])scala.collection.immutable.Map[K,SM[V]]" id="813956">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="813959">K</a>, <a title="&gt;: Nothing &lt;: Any" id="813960">V</a>](<a title="T[(K, V)]" id="813961">kvs</a>: <a href="#811405" title="T[(K, V)]">T</a>[(K, V)])(<span class="keyword">implicit</span> <a title="scalaz.Foldable[T]" id="813962">f</a>: <a href="../Foldable.scala.html#14211" title="scalaz.Foldable[T]">Foldable</a>[T], <a title="scalaz.Semigroup[SM[V]]" id="813963">s</a>: <a href="../Semigroup.scala.html#19377" title="scalaz.Semigroup[SM[V]]">Semigroup</a>[SM[V]], <a title="scalaz.Monad[SM]" id="813964">md</a>: <a href="../Monad.scala.html#17724" title="scalaz.Monad[SM]">Monad</a>[SM]) =
+      <a href="#811407" title="(e: scala.collection.immutable.Map[K,SM[V]],kvs: T[(K, V)])(implicit f: scalaz.Foldable[T],implicit s: scalaz.Semigroup[SM[V]],implicit md: scalaz.Monad[SM])scala.collection.immutable.Map[K,SM[V]]">asMap</a><a href="#813962" title="scalaz.Foldable[T]">(</a><span title="scala.collection.immutable.HashMap[K,SM[V]]" class="keyword">new</span> <a title="scala.collection.immutable.HashMap[K,SM[V]]" id="29923">HashMap</a>[K, SM[V]], <a href="#813961" title="T[(K, V)]">kvs</a>)
+  }
+
+  /**
+   * Indexes the given sequence of key/value pairs using the given map. The key/value pair type constructor must support
+   * fold-left and the index is created in constant space.
+   */
+  <span class="keyword">def</span> <a title="[T[_], SM[_], K, V](e: scala.collection.immutable.Map[K,SM[V]],kvs: T[(K, V)])(implicit f: scalaz.Foldable[T],implicit s: scalaz.Semigroup[SM[V]],implicit md: scalaz.Monad[SM])scala.collection.immutable.Map[K,SM[V]]" id="811407">asMap</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811412">T</a>[<a title="&gt;: Nothing &lt;: Any" id="814006">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="811413">SM</a>[<a title="&gt;: Nothing &lt;: Any" id="814004">_</a>], <a title="&gt;: Nothing &lt;: Any" id="811414">K</a>, <a title="&gt;: Nothing &lt;: Any" id="811415">V</a>](<a title="scala.collection.immutable.Map[K,SM[V]]" id="813999">e</a>: <span title="scala.collection.immutable.Map[K,SM[V]]">Map</span>[K, SM[V]], <a title="T[(K, V)]" id="814000">kvs</a>: <a href="#811412" title="T[(K, V)]">T</a>[(K, V)])
+                   (<span class="keyword">implicit</span> <a title="scalaz.Foldable[T]" id="814001">f</a>: <a href="../Foldable.scala.html#14211" title="scalaz.Foldable[T]">Foldable</a>[T], <a title="scalaz.Semigroup[SM[V]]" id="814002">s</a>: <a href="../Semigroup.scala.html#19377" title="scalaz.Semigroup[SM[V]]">Semigroup</a>[SM[V]], <a title="scalaz.Monad[SM]" id="814003">md</a>: <a href="../Monad.scala.html#17724" title="scalaz.Monad[SM]">Monad</a>[SM]): <span title="scala.collection.immutable.Map[K,SM[V]]">Map</span>[K, SM[V]] =
+      <a href="#814001" title="scalaz.Foldable[T]">f</a>.<a href="../Foldable.scala.html#70998" title="[A, B](t: T[A],z: B,f: (B, A) =&gt; B)B">foldLeft</a><span title="(t: T[(K, V)],z: scala.collection.immutable.Map[K,SM[V]],f: (scala.collection.immutable.Map[K,SM[V]], (K, V)) =&gt; scala.collection.immutable.Map[K,SM[V]])scala.collection.immutable.Map[K,SM[V]]">[</span><span title="(K, V)">(</span>K, V), <span title="scala.collection.immutable.Map[K,SM[V]]">Map</span>[K, SM[V]]](<a href="#814000" title="T[(K, V)]">kvs</a>, <a href="#813999" title="scala.collection.immutable.Map[K,SM[V]]">e</a>, (<a title="scala.collection.immutable.Map[K,SM[V]]" id="842841">m</a>, <a title="(K, V)" id="842842">kv</a><span title="(K, V)">)</span> =&gt; <a href="#842841" title="(kv: (K, SM[V]))scala.collection.immutable.Map[K,SM[V]]" id="55940">m</a> + (<span title="(_1: K,_2: SM[V])(K, SM[V])">(</span><a href="#842842" title="(K, V)">kv</a>.<span title="=&gt; K">_1</span>, <a href="#842841" title="scala.collection.immutable.Map[K,SM[V]]">m</a>.<a title="(key: K)Option[SM[V]]" id="57593">get</a>(<a href="#842842" title="(K, V)">kv</a>.<span title="=&gt; K">_1</span>) <span title="SM[V]" class="keyword">match</span> {
+        <span title="SM[V]" class="keyword">case</span> <span title="object None">None</span> =&gt; <a href="#814003" title="scalaz.Monad[SM]">md</a>.<a href="../Pure.scala.html#35403" title="(a: =&gt; V)SM[V]">pure</a>(<a href="#842842" title="(K, V)">kv</a>.<span title="=&gt; V">_2</span>)
+        <span title="SM[V]" class="keyword">case</span> Some(<a title="SM[V]" id="842905">vv</a>) =&gt; <a href="#814002" title="scalaz.Semigroup[SM[V]]">s</a>.<a href="../Semigroup.scala.html#36314" title="(s1: SM[V],s2: =&gt; SM[V])SM[V]">append</a>(<a href="#814003" title="scalaz.Monad[SM]">md</a>.<a href="../Pure.scala.html#35403" title="(a: =&gt; V)SM[V]">pure</a>(<a href="#842842" title="(K, V)">kv</a>.<span title="=&gt; V">_2</span>), <a href="#842905" title="SM[V]">vv</a>)
+      })))
+
+  <span class="keyword">object</span> <a title="object scalaz.http.Util.Nel" id="811416">Nel</a> <span title="ScalaObject">{</span>
+    /**
+     * Creates a list from a potential non-empty list.
+     */
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](as: Option[scalaz.NonEmptyList[A]])List[A]" id="811421">OptionNonEmptyListList</a>[<a title="&gt;: Nothing &lt;: Any" id="811423">A</a>](<a title="Option[scalaz.NonEmptyList[A]]" id="812847">as</a>: <a title="Option[scalaz.NonEmptyList[A]]" id="1263">Option</a>[NonEmptyList[A]]): <span title="List[A]">List</span>[A] = <a href="#812847" title="Option[scalaz.NonEmptyList[A]]">as</a> <span title="List[A]" class="keyword">match</span> {
+      <span title="scala.collection.immutable.Nil.type" class="keyword">case</span> <span title="object None">None</span> =&gt; <a title="object Nil" id="29519">Nil</a>
+      <span title="List[A]" class="keyword">case</span> Some(<a title="scalaz.NonEmptyList[A]" id="842923">x</a>) =&gt; <a href="#842923" title="scalaz.NonEmptyList[A]">x</a>.<a href="../NonEmptyList.scala.html#42854" title="=&gt; A">head</a> <a href="#842925" title="A">::</a> <a href="#842923" title="scalaz.NonEmptyList[A]">x</a>.<a href="../NonEmptyList.scala.html#42855" title="(x: A)List[A]">tail</a>
+    }
+
+    /**
+     * Creates a list from the given non-empty list.
+     */
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](xs: scalaz.NonEmptyList[A])List[A]" id="811424">NonEmptyListList</a>[<a title="&gt;: Nothing &lt;: Any" id="811426">A</a>](<a title="scalaz.NonEmptyList[A]" id="812844">xs</a>: <a href="../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A]): <span title="List[A]">List</span>[A] = <a href="#812844" title="scalaz.NonEmptyList[A]">xs</a>.<a href="../NonEmptyList.scala.html#42873" title="=&gt; List[A]">list</a>
+
+    /**
+     * Creates a string from the given non-empty list.
+     */
+    <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](xs: scalaz.NonEmptyList[Char])String" id="811427">NonEmptyListString</a>[<a title="&gt;: Nothing &lt;: Any" id="811429">A</a>](<a title="scalaz.NonEmptyList[Char]" id="812842">xs</a>: <a href="../NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[Char]">NonEmptyList</a>[Char]): <span title="String">String</span> = <a href="#812842" title="scalaz.NonEmptyList[Char]">xs</a>.<a href="../NonEmptyList.scala.html#42873" title="=&gt; List[Char]">list</a>.<span title="=&gt; String">mkString</span>
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.http.Util.Digits" id="811418">Digits</a> <span title="ScalaObject">{</span>
+    /**
+     * Converts the given long value to a sequence of digits.
+     */
+    <span class="keyword">def</span> <a title="[T[_]](n: Long)(implicit f: scalaz.Foldable[T],implicit p: scalaz.Pure[T],implicit e: scalaz.Empty[T],implicit plus: scalaz.Plus[T],implicit m: scalaz.Monoid[T[scalaz.Digit]])T[scalaz.Digit]" id="842935">longDigits</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="842937">T</a>[<a title="&gt;: Nothing &lt;: Any" id="842949">_</a>]](<a title="Long" id="842943">n</a>: <span title="Long">Long</span>)(<span class="keyword">implicit</span> <a title="scalaz.Foldable[T]" id="842944">f</a>: <a href="../Foldable.scala.html#14211" title="scalaz.Foldable[T]">Foldable</a>[T], <a title="scalaz.Pure[T]" id="842945">p</a>: <a href="../Pure.scala.html#18870" title="scalaz.Pure[T]">Pure</a>[T], <a title="scalaz.Empty[T]" id="842946">e</a> : <a href="../Empty.scala.html#10767" title="scalaz.Empty[T]">Empty</a>[T], <a title="scalaz.Plus[T]" id="842947">plus</a> : <a href="../Plus.scala.html#18633" title="scalaz.Plus[T]">Plus</a>[T], <a title="scalaz.Monoid[T[scalaz.Digit]]" id="842948">m</a> : <a href="../Monoid.scala.html#17748" title="scalaz.Monoid[T[scalaz.Digit]]">Monoid</a>[T[Digit]]): <a href="#842937" title="T[scalaz.Digit]">T</a>[Digit] = {
+      <span class="keyword">val</span> <a title="T[scalaz.Digit]" id="842956">xxx</a> = <a href="../Identity.scala.html#34181" title="(x: =&gt; Long)scalaz.Identity[Long]">n</a>.<a href="../Identity.scala.html#43094" title="(f: (Long) =&gt; Option[(scalaz.Digit, Long)])(implicit p: scalaz.Pure[T],implicit m: scalaz.Monoid[T[scalaz.Digit]])T[scalaz.Digit]">unfold</a><a href="#842945" title="scalaz.Pure[T]">(</a>(b: <span title="Long">Long</span>) =&gt; <span title="Option[(scalaz.Digit, Long)]" class="keyword">if</span> (<a href="#843050" title="(x$1: Int)Boolean">b</a> == <span title="Int(0)" class="int">0</span>) <span title="object None">None</span> <span class="keyword">else</span> <a title="(x: (scalaz.Digit, Long))Some[(scalaz.Digit, Long)]" id="1006">Some</a><span title="(_1: scalaz.Digit,_2: Long)(scalaz.Digit, Long)">(</span><a href="#843050" title="(x$1: Long)Long" id="5382">b</a> <a href="../Digit.scala.html#34041" title="implicit scalaz.Digits.LongDigit : (n: Long)scalaz.Digit">%</a> <span title="Long(10L)" class="long">10L</span>: <a href="../Digit.scala.html#10599" title="scalaz.Digit">Digit</a>, <a href="#843050" title="(x$1: Long)Long" id="5380">b</a> / <span title="Long(10L)" class="long">10L</span>))
+      // TODO this is just a reverse, which should get into scalaz4
+      <span title="T[scalaz.Digit]" class="keyword">if</span> (<a href="#842943" title="(x$1: Int)Boolean">n</a> == <span title="Int(0)" class="int">0</span>) <a href="#842945" title="scalaz.Pure[T]">p</a>.<a href="../Pure.scala.html#35403" title="(a: =&gt; scalaz.Digit)T[scalaz.Digit]">pure</a>(<a href="../Digit.scala.html#10600" title="object scalaz.Digit">Digit</a>.<a href="../Digit.scala.html#57014" title="object scalaz.Digit._0">_0</a>) <span class="keyword">else</span> <a href="#842944" title="scalaz.Foldable[T]">f</a>.<a href="../Foldable.scala.html#70998" title="[A, B](t: T[A],z: B,f: (B, A) =&gt; B)B">foldLeft</a><span title="(t: T[scalaz.Digit],z: T[scalaz.Digit],f: (T[scalaz.Digit], scalaz.Digit) =&gt; T[scalaz.Digit])T[scalaz.Digit]">[</span><a href="../Digit.scala.html#10599" title="scalaz.Digit">Digit</a>, <a href="#842937" title="T[scalaz.Digit]">T</a>[Digit]](<a href="#842956" title="T[scalaz.Digit]">xxx</a>, <a href="#842946" title="scalaz.Empty[T]">e</a>.<a href="../Empty.scala.html#100896" title="[A]T[A]">empty</a><span title="T[scalaz.Digit]">[</span><a href="../Digit.scala.html#10599" title="scalaz.Digit">Digit</a>], (<a title="T[scalaz.Digit]" id="843356">b</a>, <a title="scalaz.Digit" id="843357">a</a><a href="../Digit.scala.html#10599" title="scalaz.Digit">)</a> =&gt; <a href="#842947" title="scalaz.Plus[T]">plus</a>.<a href="../Plus.scala.html#265621" title="(a1: T[scalaz.Digit],a2: =&gt; T[scalaz.Digit])T[scalaz.Digit]">plus</a>(<a href="#842945" title="scalaz.Pure[T]">p</a>.<a href="../Pure.scala.html#35403" title="(a: =&gt; scalaz.Digit)T[scalaz.Digit]">pure</a>(<a href="#843357" title="scalaz.Digit">a</a>), <a href="#843356" title="T[scalaz.Digit]">b</a>))
+    }
+
+    /**
+     * Converts the given sequence of digits to a long value.
+     */
+    <span class="keyword">def</span> <a title="[T[_]](ds: T[scalaz.Digit])(implicit f: scalaz.Foldable[T])Long" id="842938">digitsLong</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="842940">T</a>[<a title="&gt;: Nothing &lt;: Any" id="843375">_</a>]](<a title="T[scalaz.Digit]" id="843371">ds</a>: <a href="#842940" title="T[scalaz.Digit]">T</a>[Digit])(<span class="keyword">implicit</span> <a title="scalaz.Foldable[T]" id="843372">f</a>: <a href="../Foldable.scala.html#14211" title="scalaz.Foldable[T]">Foldable</a>[T]) =
+      <a href="#843372" title="scalaz.Foldable[T]">f</a>.<a href="../Foldable.scala.html#70998" title="[A, B](t: T[A],z: B,f: (B, A) =&gt; B)B">foldLeft</a><span title="(t: T[scalaz.Digit],z: Long,f: (Long, scalaz.Digit) =&gt; Long)Long">[</span><a href="../Digit.scala.html#10599" title="scalaz.Digit">Digit</a>, <span title="Long">Long</span>](<a href="#843371" title="T[scalaz.Digit]">ds</a>, <span title="Long(0L)" class="long">0L</span>, (<a title="Long" id="843383">a</a>, <a title="scalaz.Digit" id="843384">b</a><a href="../Digit.scala.html#10599" title="scalaz.Digit">)</a> =&gt; <a href="#843383" title="(x$1: Long)Long" id="5378">a</a> <a title="(x$1: Long)Long" id="5374">*</a> <span title="Long(10L)" class="long">10L</span> + <a href="../Digit.scala.html#34040" title="implicit scalaz.Digits.DigitLong : (d: scalaz.Digit)Long">b</a>)
+  }
+}
+
+        </pre>
+    </body>
+</html>

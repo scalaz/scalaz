@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/concurrent/ExampleActor.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> scalaz.concurrent._
+
+<span class="keyword">import</span> java.util.concurrent.{TimeUnit, Executors}
+
+<span class="keyword">object</span> <a title="object scalaz.example.concurrent.ExampleActor" id="25090">ExampleActor</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="410862">main</a>(<a title="Array[String]" id="804559">args</a>: <a title="Array[String]" id="2028">Array</a>[String]) = <a href="#410864" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> Scalaz._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="410864">run</a> {
+    <span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Event extends java.lang.Object" id="804562">Event</a>
+    case <span class="keyword">class</span> <a title="class Login extends java.lang.Object with Event with ScalaObject with Product" id="805534">Login</a><span title="ScalaObject">(</span><a title="=&gt; String" id="805304">user</a>: <span title="String">String</span>) <span class="keyword">extends</span> <a href="#804562" title="Event">Event</a>
+    case <span class="keyword">class</span> <a title="class Logout extends java.lang.Object with Event with ScalaObject with Product" id="805530">Logout</a><span title="ScalaObject">(</span><a title="=&gt; String" id="805513">user</a>: <span title="String">String</span>) <span class="keyword">extends</span> <a href="#804562" title="Event">Event</a>
+    case <span class="keyword">class</span> <a title="class ChatMessage extends java.lang.Object with Event with ScalaObject with Product" id="805526">ChatMessage</a><span title="ScalaObject">(</span><a title="=&gt; String" id="805387">from</a>: <span title="String">String</span>, <a title="=&gt; String" id="805388">message</a>: <span title="String">String</span>) <span class="keyword">extends</span> <a href="#804562" title="Event">Event</a>
+
+    <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="java.util.concurrent.ExecutorService" id="804572">executor</a> = <a title="object java.util.concurrent.Executors" id="38929">Executors</a>.<a title="(x$1: Int)java.util.concurrent.ExecutorService" id="400880">newFixedThreadPool</a>(<span title="Int(5)" class="int">5</span>)
+    <span class="keyword">import</span> Strategy.Executor
+    
+    <span class="keyword">val</span> <a title="scalaz.concurrent.Actor[Event]" id="804574">chatServer</a> = <a href="../../concurrent/Actor.scala.html#33955" title="[A](e: (A) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[A]">actor</a><a href="../../concurrent/Actor.scala.html#113809" title="(e: (Event) =&gt; Unit,err: (Throwable) =&gt; Unit)(implicit s: scalaz.concurrent.Strategy)scalaz.concurrent.Actor[Event]">[</a><a href="#804562" title="Event">Event</a>] <a href="../../concurrent/Strategy.scala.html#90157" title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy">{</a>
+      (e: <a href="#804562" title="Event">Event</a>) =&gt; <a href="#804802" title="Event">e</a> <span title="Unit" class="keyword">match</span> {
+        <span title="Unit" class="keyword">case</span> Login(<a title="String" id="804803">user</a>) =&gt; (<span title="(x$1: Any)java.lang.String" class="string">&quot;user: &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#804803" title="String">user</a> <a href="../../Identity.scala.html#34181" title="(x: =&gt; java.lang.String)scalaz.Identity[java.lang.String]">+</a> <span title="java.lang.String(&quot; logged in.&quot;)" class="string">&quot; logged in.&quot;</span>).<a href="../../Identity.scala.html#43077" title="(implicit s: scalaz.Show[java.lang.String])Unit">println</a>
+        <span title="Unit" class="keyword">case</span> Logout(<a title="String" id="804970">user</a>) =&gt; (<span title="(x$1: Any)java.lang.String" class="string">&quot;user: &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#804970" title="String">user</a> <a href="../../Identity.scala.html#34181" title="(x: =&gt; java.lang.String)scalaz.Identity[java.lang.String]">+</a> <span title="java.lang.String(&quot; logged out.&quot;)" class="string">&quot; logged out.&quot;</span>).<a href="../../Identity.scala.html#43077" title="(implicit s: scalaz.Show[java.lang.String])Unit">println</a>
+        <span title="Unit" class="keyword">case</span> ChatMessage(<a title="String" id="805134">from</a>, <a title="String" id="805135">message</a>) =&gt; (<span title="(x$1: Any)java.lang.String" class="string">&quot;user: &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#805134" title="String">from</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot; sent message: &quot;)" class="string">&quot; sent message: &quot;</span> <a href="../../Identity.scala.html#34181" title="(x: =&gt; java.lang.String)scalaz.Identity[java.lang.String]">+</a> <a href="#805135" title="String">message</a>).<a href="../../Identity.scala.html#43077" title="(implicit s: scalaz.Show[java.lang.String])Unit">println</a>
+        <span title="Unit" class="keyword">case</span> _ =&gt;
+      }
+    }
+
+    <span class="keyword">val</span> <a title="java.lang.String" id="804575">user</a> = <span title="java.lang.String(&quot;bob&quot;)" class="string">&quot;bob&quot;</span>
+    <a href="../../concurrent/Actor.scala.html#56478" title="(a: Event)() =&gt; Unit">chatServer</a> ! <a href="#805534" title="(user: String)Login">Login</a>(<a href="#804575" title="java.lang.String">user</a>)
+    <span class="keyword">for</span> (<a title="Int" id="805386">i</a> &lt;- <a title="(end: Int)scala.collection.immutable.Range.Inclusive with scala.collection.immutable.Range.ByOne" id="1489" class="int">1</a> <a title="(f: (Int) =&gt; () =&gt; Unit)Unit" id="471800">to</a> <span title="Int(10)" class="int">10</span>) {
+      <a href="../../concurrent/Actor.scala.html#56478" title="(a: Event)() =&gt; Unit">chatServer</a> ! <a href="#805526" title="(from: String,message: String)ChatMessage">ChatMessage</a>(<a href="#804575" title="java.lang.String">user</a>, <a href="../../Identity.scala.html#43180" title="(a: =&gt; java.lang.String)(implicit s: scalaz.Semigroup[java.lang.String])java.lang.String" class="string">&quot;SPAM: &quot;</a> <a href="../../Semigroup.scala.html#88284" title="=&gt; scalaz.Semigroup[String]">⊹</a> <a href="#805386" title="Int">i</a>.<span title="()java.lang.String">toString</span>)
+    }
+    <a href="../../concurrent/Actor.scala.html#56478" title="(a: Event)() =&gt; Unit">chatServer</a> ! <a href="#805530" title="(user: String)Logout">Logout</a>(<a href="#804575" title="java.lang.String">user</a>)
+
+    <a title="object java.lang.Thread" id="2641">Thread</a>.<a title="(x$1: Long)Unit" id="401335">sleep</a>(<span title="Long(1000L)" class="int">1000</span>)
+    <a href="#804572" title="java.util.concurrent.ExecutorService">executor</a>.<a title="()Unit" id="396873">shutdown</a>()
+    <a href="#804572" title="java.util.concurrent.ExecutorService">executor</a>.<a title="(x$1: Long,x$2: java.util.concurrent.TimeUnit)Boolean" id="396878">awaitTermination</a><span title="Unit">(</span><span title="Long(60L)" class="long">60L</span>, <a title="object java.util.concurrent.TimeUnit" id="38884">TimeUnit</a>.<a title="java.util.concurrent.TimeUnit(value SECONDS)" id="114810">SECONDS</a>)
+  }
+}
+
+        </pre>
+    </body>
+</html>

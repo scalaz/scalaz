@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Empty.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> collection.TraversableLike
+
+<span class="keyword">trait</span> <a title="trait Empty[E[_]] extends java.lang.Object" id="10767">Empty</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21578">E</a>[<a title="&gt;: Nothing &lt;: Any" id="100899">_</a>]] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">def</span> <a title="[A]E[A]" id="100896">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="100898">A</a>]: <a href="#21578" title="E[A]">E</a>[A]
+}
+
+<span class="keyword">trait</span> <a title="trait Emptys extends java.lang.Object with ScalaObject" id="10770">Emptys</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[E[_], A](implicit e: scalaz.Empty[E])E[A]" id="34051">&lt;∅&gt;</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="34054">E</a>[<a title="&gt;: Nothing &lt;: Any" id="101086">_</a>], <a title="&gt;: Nothing &lt;: Any" id="34055">A</a>](<span class="keyword">implicit</span> <a title="scalaz.Empty[E]" id="101085">e</a>: <a href="#10767" title="scalaz.Empty[E]">Empty</a>[E]): <a href="#34054" title="E[A]">E</a>[A] = <a href="#101085" title="scalaz.Empty[E]">e</a>.<a href="#100896" title="E[A]">empty</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Empty" id="10768">Empty</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[scalaz.ZipStream]" id="116590">ZipStreamEmpty</a>: <a href="#10767" title="scalaz.Empty[scalaz.ZipStream]">Empty</a>[ZipStream] = <a href="#116625" title="java.lang.Object with scalaz.Empty[scalaz.ZipStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[scalaz.ZipStream]" id="116625">Empty</a>[ZipStream] {
+    <span class="keyword">def</span> <a title="[A]scalaz.ZipStream[Nothing]" id="116629">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116631">A</a>] = <a href="ZipStream.scala.html#35360" title="=&gt; scalaz.ZipStream[Nothing]">emptyZipStream</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[Option]" id="116591">OptionEmpty</a>: <a href="#10767" title="scalaz.Empty[Option]">Empty</a>[Option] = <a href="#116643" title="java.lang.Object with scalaz.Empty[Option]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[Option]" id="116643">Empty</a>[Option] {
+    <span class="keyword">def</span> <a title="[A]object None" id="116647">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116649">A</a>] = <a title="object None" id="1843">None</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[scalaz.LazyOption]" id="116592">LazyOptionEmpty</a>: <a href="#10767" title="scalaz.Empty[scalaz.LazyOption]">Empty</a>[LazyOption] = <a href="#116659" title="java.lang.Object with scalaz.Empty[scalaz.LazyOption]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[scalaz.LazyOption]" id="116659">Empty</a>[LazyOption] {
+    <span class="keyword">def</span> <a title="[A]scalaz.LazyOption[A]" id="116663">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116665">A</a>] = <a href="LazyOption.scala.html#16168" title="object scalaz.LazyOption">LazyOption</a>.<a href="LazyOption.scala.html#52028" title="[A]scalaz.LazyOption[A]">none</a><span title="scalaz.LazyOption[A]">[</span><a href="#116665" title="A">A</a>]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X](implicit evidence$1: scalaz.Zero[X])scalaz.Empty[[α]Either.LeftProjection[α,X]]" id="116675">EitherLeftEmpty</a>[<a title="&gt;: Nothing &lt;: Any" id="116595">X</a>: Zero]: <a href="#10767" title="scalaz.Empty[[α]Either.LeftProjection[α,X]]">Empty</a>[({<span class="keyword">type</span> λ[α]=Either.LeftProjection[α, X]})#λ] = <a href="#116687" title="java.lang.Object with scalaz.Empty[[α]Either.LeftProjection[α,X]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[[α]Either.LeftProjection[α,X]]" id="116687">Empty</a>[({<span class="keyword">type</span> λ[α]=Either.LeftProjection[α, X]})#λ] {
+    <span class="keyword">def</span> <a title="[A]Either.LeftProjection[Nothing,X]" id="116696">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116698">A</a>] = <a title="(b: X)Right[Nothing,X]" id="685">Right</a>(<a href="Zero.scala.html#35346" title="(implicit z: scalaz.Zero[X])X">∅</a>).<a title="=&gt; Either.LeftProjection[Nothing,X]" id="42206">left</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X](implicit evidence$2: scalaz.Zero[X])scalaz.Empty[[α]Either.RightProjection[X,α]]" id="116756">EitherRightEmpty</a>[<a title="&gt;: Nothing &lt;: Any" id="116598">X</a>: Zero]: <a href="#10767" title="scalaz.Empty[[α]Either.RightProjection[X,α]]">Empty</a>[({<span class="keyword">type</span> λ[α]=Either.RightProjection[X, α]})#λ] = <a href="#116782" title="java.lang.Object with scalaz.Empty[[α]Either.RightProjection[X,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[[α]Either.RightProjection[X,α]]" id="116782">Empty</a>[({<span class="keyword">type</span> λ[α]=Either.RightProjection[X, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A]Either.RightProjection[X,Nothing]" id="116791">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116793">A</a>] = <a title="(a: X)Left[X,Nothing]" id="859">Left</a>(<a href="Zero.scala.html#35346" title="(implicit z: scalaz.Zero[X])X">∅</a>).<a title="=&gt; Either.RightProjection[X,Nothing]" id="42352">right</a>
+  }
+  
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[CC[X] &lt;: scala.collection.TraversableLike[X,CC[X]]](implicit evidence$3: scalaz.CanBuildAnySelf[CC])scalaz.Empty[CC]" id="116752">TraversableEmpty</a>[<a title="[X]&gt;: Nothing &lt;: scala.collection.TraversableLike[X,CC[X]]" id="116601">CC</a>[<a title="&gt;: Nothing &lt;: Any" id="116753">X</a>] &lt;: TraversableLike[X, CC[X]] : CanBuildAnySelf]: <a href="#10767" title="scalaz.Empty[CC]">Empty</a>[CC] = <a href="#116817" title="java.lang.Object with scalaz.Empty[CC]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[CC]" id="116817">Empty</a>[CC] {
+    <span class="keyword">def</span> <a title="[A]CC[A]" id="116821">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116823">A</a>] = {
+      <span class="keyword">val</span> <a title="scala.collection.mutable.Builder[A,CC[A]]" id="116827">builder</a> = <a title="[T](implicit e: T)T" id="8856">implicitly</a><a href="#116752" title="(implicit e: scalaz.CanBuildAnySelf[CC])scalaz.CanBuildAnySelf[CC]">[</a><a href="CanBuildAnySelf.scala.html#9972" title="scalaz.CanBuildAnySelf[CC]">CanBuildAnySelf</a>[CC]].<a href="CanBuildAnySelf.scala.html#43284" title="[A, B]()scala.collection.mutable.Builder[B,CC[B]]">apply</a><span title="()scala.collection.mutable.Builder[A,CC[A]]">[</span><a title="scalaz.Scalaz.⊥" id="5799">⊥</a>, <a href="#116823" title="A">A</a>]
+      <a href="#116827" title="scala.collection.mutable.Builder[A,CC[A]]">builder</a>.<a title="()CC[A]" id="78786">result</a>
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[V](implicit evidence$4: scalaz.Semigroup[V])scalaz.Empty[[α]scala.collection.immutable.Map[α,V]]" id="116742">MapEmpty</a>[<a title="&gt;: Nothing &lt;: Any" id="116604">V</a>: Semigroup]: <a href="#10767" title="scalaz.Empty[[α]scala.collection.immutable.Map[α,V]]">Empty</a>[({<span class="keyword">type</span> λ[α] = Map[α, V]})#λ] = <a href="#116846" title="java.lang.Object with scalaz.Empty[[α]scala.collection.immutable.Map[α,V]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[[α]scala.collection.immutable.Map[α,V]]" id="116846">Empty</a>[({<span class="keyword">type</span> λ[α] = Map[α, V]})#λ] {
+    <span class="keyword">def</span> <a title="[K]scala.collection.immutable.Map[K,V]" id="116855">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116857">K</a>] = <a title="=&gt; collection.immutable.Map.type" id="8848">Map</a>.<a title="[A, B]scala.collection.immutable.Map[A,B]" id="55953">empty</a><span title="scala.collection.immutable.Map[K,V]">[</span><a href="#116857" title="K">K</a>, <a href="#116604" title="V">V</a>]
+  }
+
+  <span class="keyword">import</span> java.util._
+  <span class="keyword">import</span> java.util.concurrent._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.ArrayList]" id="116607">JavaArrayListEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.ArrayList]">Empty</a>[ArrayList] = <a href="#116899" title="java.lang.Object with scalaz.Empty[java.util.ArrayList]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.ArrayList]" id="116899">Empty</a>[ArrayList] {
+    <span class="keyword">def</span> <a title="[A]java.util.ArrayList[A]" id="116903">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="116905">A</a>] = <a title="()java.util.ArrayList[A]" id="41114" class="keyword">new</a> <a title="java.util.ArrayList[A]" id="6889">ArrayList</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.HashSet]" id="116608">JavaHashSetEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.HashSet]">Empty</a>[HashSet] = <a href="#117068" title="java.lang.Object with scalaz.Empty[java.util.HashSet]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.HashSet]" id="117068">Empty</a>[HashSet] {
+    <span class="keyword">def</span> <a title="[A]java.util.HashSet[A]" id="117072">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117074">A</a>] = <span title="java.util.HashSet[A]" class="keyword">new</span> <a title="java.util.HashSet[A]" id="6853">HashSet</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.LinkedHashSet]" id="116609">JavaLinkedHashSetEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.LinkedHashSet]">Empty</a>[LinkedHashSet] = <a href="#117237" title="java.lang.Object with scalaz.Empty[java.util.LinkedHashSet]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.LinkedHashSet]" id="117237">Empty</a>[LinkedHashSet] {
+    <span class="keyword">def</span> <a title="[A]java.util.LinkedHashSet[A]" id="117241">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117243">A</a>] = <a title="()java.util.LinkedHashSet[A]" id="41069" class="keyword">new</a> <a title="java.util.LinkedHashSet[A]" id="6550">LinkedHashSet</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.LinkedList]" id="116610">JavaLinkedListEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.LinkedList]">Empty</a>[LinkedList] = <a href="#117406" title="java.lang.Object with scalaz.Empty[java.util.LinkedList]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.LinkedList]" id="117406">Empty</a>[LinkedList] {
+    <span class="keyword">def</span> <a title="[A]java.util.LinkedList[A]" id="117410">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117412">A</a>] = <span title="java.util.LinkedList[A]" class="keyword">new</span> <a title="java.util.LinkedList[A]" id="6568">LinkedList</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.PriorityQueue]" id="116611">JavaPriorityQueueEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.PriorityQueue]">Empty</a>[PriorityQueue] = <a href="#117529" title="java.lang.Object with scalaz.Empty[java.util.PriorityQueue]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.PriorityQueue]" id="117529">Empty</a>[PriorityQueue] {
+    <span class="keyword">def</span> <a title="[A]java.util.PriorityQueue[A]" id="117533">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117535">A</a>] = <span title="java.util.PriorityQueue[A]" class="keyword">new</span> <a title="java.util.PriorityQueue[A]" id="6574">PriorityQueue</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.Stack]" id="116612">JavaStackEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.Stack]">Empty</a>[Stack] = <a href="#117915" title="java.lang.Object with scalaz.Empty[java.util.Stack]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.Stack]" id="117915">Empty</a>[Stack] {
+    <span class="keyword">def</span> <a title="[A]java.util.Stack[A]" id="117919">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117921">A</a>] = <span title="java.util.Stack[A]" class="keyword">new</span> <a title="java.util.Stack[A]" id="6376">Stack</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.TreeSet]" id="116613">JavaTreeSetEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.TreeSet]">Empty</a>[TreeSet] = <a href="#117930" title="java.lang.Object with scalaz.Empty[java.util.TreeSet]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.TreeSet]" id="117930">Empty</a>[TreeSet] {
+    <span class="keyword">def</span> <a title="[A]java.util.TreeSet[A]" id="117934">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="117936">A</a>] = <a title="()java.util.TreeSet[A]" id="40626" class="keyword">new</a> <a title="java.util.TreeSet[A]" id="6880">TreeSet</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.Vector]" id="116614">JavaVectorEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.Vector]">Empty</a>[Vector] = <a href="#118206" title="java.lang.Object with scalaz.Empty[java.util.Vector]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.Vector]" id="118206">Empty</a>[Vector] {
+    <span class="keyword">def</span> <a title="[A]java.util.Vector[A]" id="118210">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118212">A</a>] = <a title="()java.util.Vector[A]" id="40440" class="keyword">new</a> <a title="java.util.Vector[A]" id="6694">Vector</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.ArrayBlockingQueue]" id="116615">JavaArrayBlockingQueueEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.ArrayBlockingQueue]">Empty</a>[ArrayBlockingQueue] = <a href="#118375" title="java.lang.Object with scalaz.Empty[java.util.concurrent.ArrayBlockingQueue]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.ArrayBlockingQueue]" id="118375">Empty</a>[ArrayBlockingQueue] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.ArrayBlockingQueue[A]" id="118379">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118381">A</a>] = <span title="java.util.concurrent.ArrayBlockingQueue[A]" class="keyword">new</span> <a title="java.util.concurrent.ArrayBlockingQueue[A]" id="38598">ArrayBlockingQueue</a>[A](<span title="Int(0)" class="int">0</span>)
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.ConcurrentLinkedQueue]" id="116616">JavaConcurrentLinkedQueueEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.ConcurrentLinkedQueue]">Empty</a>[ConcurrentLinkedQueue] = <a href="#118398" title="java.lang.Object with scalaz.Empty[java.util.concurrent.ConcurrentLinkedQueue]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.ConcurrentLinkedQueue]" id="118398">Empty</a>[ConcurrentLinkedQueue] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.ConcurrentLinkedQueue[A]" id="118402">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118404">A</a>] = <span title="java.util.concurrent.ConcurrentLinkedQueue[A]" class="keyword">new</span> <a title="java.util.concurrent.ConcurrentLinkedQueue[A]" id="38829">ConcurrentLinkedQueue</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.CopyOnWriteArrayList]" id="116617">JavaCopyOnWriteArrayListEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.CopyOnWriteArrayList]">Empty</a>[CopyOnWriteArrayList] = <a href="#118521" title="java.lang.Object with scalaz.Empty[java.util.concurrent.CopyOnWriteArrayList]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.CopyOnWriteArrayList]" id="118521">Empty</a>[CopyOnWriteArrayList] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.CopyOnWriteArrayList[A]" id="118525">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118527">A</a>] = <span title="java.util.concurrent.CopyOnWriteArrayList[A]" class="keyword">new</span> <a title="java.util.concurrent.CopyOnWriteArrayList[A]" id="38586">CopyOnWriteArrayList</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.CopyOnWriteArraySet]" id="116618">JavaCopyOnWriteArraySetEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.CopyOnWriteArraySet]">Empty</a>[CopyOnWriteArraySet] = <a href="#118693" title="java.lang.Object with scalaz.Empty[java.util.concurrent.CopyOnWriteArraySet]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.CopyOnWriteArraySet]" id="118693">Empty</a>[CopyOnWriteArraySet] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.CopyOnWriteArraySet[A]" id="118697">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118699">A</a>] = <span title="java.util.concurrent.CopyOnWriteArraySet[A]" class="keyword">new</span> <a title="java.util.concurrent.CopyOnWriteArraySet[A]" id="38895">CopyOnWriteArraySet</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.LinkedBlockingQueue]" id="116619">JavaLinkedBlockingQueueEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.LinkedBlockingQueue]">Empty</a>[LinkedBlockingQueue] = <a href="#118816" title="java.lang.Object with scalaz.Empty[java.util.concurrent.LinkedBlockingQueue]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.LinkedBlockingQueue]" id="118816">Empty</a>[LinkedBlockingQueue] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.LinkedBlockingQueue[A]" id="118820">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118822">A</a>] = <span title="java.util.concurrent.LinkedBlockingQueue[A]" class="keyword">new</span> <a title="java.util.concurrent.LinkedBlockingQueue[A]" id="38592">LinkedBlockingQueue</a>[A]
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Empty[java.util.concurrent.SynchronousQueue]" id="116620">JavaSynchronousQueueEmpty</a>: <a href="#10767" title="scalaz.Empty[java.util.concurrent.SynchronousQueue]">Empty</a>[SynchronousQueue] = <a href="#118985" title="java.lang.Object with scalaz.Empty[java.util.concurrent.SynchronousQueue]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Empty[java.util.concurrent.SynchronousQueue]" id="118985">Empty</a>[SynchronousQueue] {
+    <span class="keyword">def</span> <a title="[A]java.util.concurrent.SynchronousQueue[A]" id="118989">empty</a>[<a title="&gt;: Nothing &lt;: Any" id="118991">A</a>] = <span title="java.util.concurrent.SynchronousQueue[A]" class="keyword">new</span> <a title="java.util.concurrent.SynchronousQueue[A]" id="38757">SynchronousQueue</a>[A]
+  }
+}
+
+        </pre>
+    </body>
+</html>

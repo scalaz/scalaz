@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/LastLazyOption.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait LastLazyOption[A] extends java.lang.Object with scalaz.NewType[scalaz.LazyOption[A]]" id="16077">LastLazyOption</a>[<a title="&gt;: Nothing &lt;: Any" id="21761">A</a>] <span class="keyword">extends</span> <a href="NewType.scala.html#17991" title="scalaz.NewType[scalaz.LazyOption[A]]">NewType</a>[LazyOption[A]]
+
+<span class="keyword">trait</span> <a title="trait LastLazyOptions extends java.lang.Object with ScalaObject" id="16083">LastLazyOptions</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](a: scalaz.LazyOption[A])scalaz.LastLazyOption[A]" id="34198">LastLazyOptionTo</a>[<a title="&gt;: Nothing &lt;: Any" id="34200">A</a>](<a title="scalaz.LazyOption[A]" id="56878">a</a>: <a href="LazyOption.scala.html#16167" title="scalaz.LazyOption[A]">LazyOption</a>[A]): <a href="#16077" title="scalaz.LastLazyOption[A]">LastLazyOption</a>[A] = <a href="#230487" title="java.lang.Object with scalaz.LastLazyOption[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.LastLazyOption[A]" id="230487">LastLazyOption</a>[A] {
+    <span class="keyword">val</span> <a title="scalaz.LazyOption[A]" id="230491">value</a> = <a href="#56878" title="scalaz.LazyOption[A]">a</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

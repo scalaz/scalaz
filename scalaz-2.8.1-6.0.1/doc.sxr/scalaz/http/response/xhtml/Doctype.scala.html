@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/response/xhtml/Doctype.scala</title>
+        <script type="text/javascript" src="../../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> response
+<span class="keyword">package</span> xhtml
+
+/**
+ * XHTML doctypes.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Doctype extends java.lang.Object" id="27900">Doctype</a> <a title="java.lang.Object" id="2746">{</a>
+  /**
+   * A string representation of the doctype, suitable for use in the header of an XHTML page.
+   */
+  <span class="keyword">val</span> <a title="=&gt; String" id="813090">asString</a>: <a title="String" id="2718">String</a>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">object</span> <a href="#877420" title="object scalaz.http.response.xhtml.Transitional" id="877428">Transitional</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> {
+  <span class="keyword">val</span> <a title="java.lang.String" id="877412">asString</a> = <span title="java.lang.String(&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;&quot;)" class="string">&quot;&quot;&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;&quot;&quot;&quot;</span>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">object</span> <a href="#877438" title="object scalaz.http.response.xhtml.Strict" id="877446">Strict</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> {
+  <span class="keyword">val</span> <a title="java.lang.String" id="877430">asString</a> = <span title="java.lang.String(&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;&quot;)" class="string">&quot;&quot;&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;&quot;&quot;&quot;</span>
+}
+<span class="keyword">private</span> <span class="keyword">final</span> case <span class="keyword">object</span> <a href="#877456" title="object scalaz.http.response.xhtml.Frameset" id="877464">Frameset</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> {
+  <span class="keyword">val</span> <a title="java.lang.String" id="877448">asString</a> = <span title="java.lang.String(&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Frameset//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd&quot;&gt;&quot;)" class="string">&quot;&quot;&quot;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Frameset//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd&quot;&gt;&quot;&quot;&quot;</span>
+}
+
+/**
+ * XHTML doctypes.
+ */
+<span class="keyword">trait</span> <a title="trait Doctypes extends java.lang.Object with ScalaObject" id="27903">Doctypes</a> <span title="ScalaObject">{</span>
+  /**
+   * All XHTML doctypes.
+   */
+  <span class="keyword">val</span> <a title="List[scalaz.http.response.xhtml.Doctype]" id="811212">doctypes</a> = <a title="(xs: scalaz.http.response.xhtml.Doctype*)List[scalaz.http.response.xhtml.Doctype]" id="29354">List</a>(<a href="#811214" title="=&gt; scalaz.http.response.xhtml.Doctype">transitional</a>, <a href="#811216" title="=&gt; scalaz.http.response.xhtml.Doctype">strict</a>, <a href="#811218" title="=&gt; scalaz.http.response.xhtml.Doctype">frameset</a>)
+
+  /**
+   * The XHTML Transitional doctype.
+   */
+  <span class="keyword">val</span> <a title="scalaz.http.response.xhtml.Doctype" id="811214">transitional</a>: <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> = <a href="#877428" title="object scalaz.http.response.xhtml.Transitional">Transitional</a>
+
+  /**
+   * The XHTML Strict doctype.
+   */
+  <span class="keyword">val</span> <a title="scalaz.http.response.xhtml.Doctype" id="811216">strict</a>: <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> = <a href="#877446" title="object scalaz.http.response.xhtml.Strict">Strict</a>
+
+  /**
+   * The XHTML Frameset doctype.
+   */
+  <span class="keyword">val</span> <a title="scalaz.http.response.xhtml.Doctype" id="811218">frameset</a>: <a href="#27900" title="scalaz.http.response.xhtml.Doctype">Doctype</a> = <a href="#877464" title="object scalaz.http.response.xhtml.Frameset">Frameset</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.http.response.xhtml.Doctype" id="27901">Doctype</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27903" title="scalaz.http.response.xhtml.Doctypes">Doctype</a>s
+        </pre>
+    </body>
+</html>

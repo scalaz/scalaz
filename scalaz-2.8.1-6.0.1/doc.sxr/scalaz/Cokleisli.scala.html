@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Cokleisli.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait Cokleisli[W[_], A, B] extends java.lang.Object with ScalaObject" id="10392">Cokleisli</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21529">W</a>[<a title="&gt;: Nothing &lt;: Any" id="57361">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21530">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21531">B</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="(a: W[A])B" id="57346">apply</a>(<a title="W[A]" id="83270">a</a>: <a href="#21529" title="W[A]">W</a>[A]): <a href="#21531" title="B">B</a>
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="(a: W[A])(implicit w: scalaz.Comonad[W])W[B]" id="57348">&lt;&lt;=</a>(<a title="W[A]" id="110934">a</a>: <a href="#21529" title="W[A]">W</a>[A])(<span class="keyword">implicit</span> <a title="scalaz.Comonad[W]" id="110935">w</a>: <a href="Comonad.scala.html#10404" title="scalaz.Comonad[W]">Comonad</a>[W]): <a href="#21529" title="W[B]">W</a>[B] = <a href="MA.scala.html#55566" title="(f: (W[A]) =&gt; B)(implicit w: scalaz.Comonad[W])W[B]">a</a> <a href="#110935" title="scalaz.Comonad[W]">=&gt;&gt;</a> <a href="#57346" title="(a: W[A])B">apply</a>
+
+  <span class="keyword">def</span> <a title="[C](c: scalaz.Cokleisli[W,B,C])(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,A,C]" id="57349">=&gt;=</a>[<a title="&gt;: Nothing &lt;: Any" id="57351">C</a>](<a title="scalaz.Cokleisli[W,B,C]" id="111174">c</a>: <a href="#10392" title="scalaz.Cokleisli[W,B,C]">Cokleisli</a>[W, B, C])(<span class="keyword">implicit</span> <a title="scalaz.Comonad[W]" id="111175">b</a>: <a href="Comonad.scala.html#10404" title="scalaz.Comonad[W]">Comonad</a>[W]): <a href="#10392" title="scalaz.Cokleisli[W,A,C]">Cokleisli</a>[W, A, C] = <a href="#34022" title="(f: (W[A]) =&gt; C)scalaz.Cokleisli[W,A,C]">★</a>(<a title="W[A]" id="111186">e</a> =&gt; <a href="#57346" title="(a: W[B])C">c</a>(<a href="MA.scala.html#55566" title="(f: (W[A]) =&gt; B)(implicit w: scalaz.Comonad[W])W[B]">e</a> <a href="#111175" title="scalaz.Comonad[W]">=&gt;&gt;</a> (<a href="#57346" title="(a: W[A])B">Cokleisli</a>.<span class="keyword">this</span>(<a href="#111412" title="W[A]">_</a>))))
+
+  <span class="keyword">def</span> <a title="[C](c: (W[B]) =&gt; C)(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,A,C]" id="57352">=&gt;=</a>[<a title="&gt;: Nothing &lt;: Any" id="57354">C</a>](<a title="(W[B]) =&gt; C" id="111422">c</a>: W[B] =&gt; C)(<span class="keyword">implicit</span> <a title="scalaz.Comonad[W]" id="111423">b</a>: <a href="Comonad.scala.html#10404" title="scalaz.Comonad[W]">Comonad</a>[W]): <a href="#10392" title="scalaz.Cokleisli[W,A,C]">Cokleisli</a>[W, A, C] = <a href="#57349" title="(c: scalaz.Cokleisli[W,B,C])(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,A,C]">=&gt;=</a><a href="#111423" title="scalaz.Comonad[W]">(</a><a href="#34022" title="(f: (W[B]) =&gt; C)scalaz.Cokleisli[W,B,C]">★</a>(<a href="#111422" title="(W[B]) =&gt; C">c</a>))
+
+  <span class="keyword">def</span> <a title="[C](c: scalaz.Cokleisli[W,C,A])(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,C,B]" id="57355">=&lt;=</a>[<a title="&gt;: Nothing &lt;: Any" id="57357">C</a>](<a title="scalaz.Cokleisli[W,C,A]" id="106554">c</a>: <a href="#10392" title="scalaz.Cokleisli[W,C,A]">Cokleisli</a>[W, C, A])(<span class="keyword">implicit</span> <a title="scalaz.Comonad[W]" id="106555">b</a>: <a href="Comonad.scala.html#10404" title="scalaz.Comonad[W]">Comonad</a>[W]): <a href="#10392" title="scalaz.Cokleisli[W,C,B]">Cokleisli</a>[W, C, B] = <a href="#57349" title="(c: scalaz.Cokleisli[W,A,B])(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,C,B]">c</a> <a href="#106555" title="scalaz.Comonad[W]">=&gt;=</a> <a href="#10392" title="scalaz.Cokleisli[W,A,B]" class="keyword">this</a>
+
+  <span class="keyword">def</span> <a title="[C](c: (W[C]) =&gt; A)(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,C,B]" id="57358">=&lt;=</a>[<a title="&gt;: Nothing &lt;: Any" id="57360">C</a>](<a title="(W[C]) =&gt; A" id="106546">c</a>: W[C] =&gt; A)(<span class="keyword">implicit</span> <a title="scalaz.Comonad[W]" id="106547">b</a>: <a href="Comonad.scala.html#10404" title="scalaz.Comonad[W]">Comonad</a>[W]): <a href="#10392" title="scalaz.Cokleisli[W,C,B]">Cokleisli</a>[W, C, B] = <a href="#34022" title="(f: (W[C]) =&gt; A)scalaz.Cokleisli[W,C,A]">★</a><a href="#57349" title="(c: scalaz.Cokleisli[W,A,B])(implicit b: scalaz.Comonad[W])scalaz.Cokleisli[W,C,B]">(</a><a href="#106546" title="(W[C]) =&gt; A">c</a>) <a href="#106547" title="scalaz.Comonad[W]">=&gt;=</a> <a href="#10392" title="scalaz.Cokleisli[W,A,B]" class="keyword">this</a>
+}
+
+<span class="keyword">trait</span> <a title="trait Cokleislis extends java.lang.Object with ScalaObject" id="10398">Cokleislis</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[W[_], A, B](f: (W[A]) =&gt; B)scalaz.Cokleisli[W,A,B]" id="34022">★</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="34026">W</a>[<a title="&gt;: Nothing &lt;: Any" id="82863">_</a>], <a title="&gt;: Nothing &lt;: Any" id="34027">A</a>, <a title="&gt;: Nothing &lt;: Any" id="34028">B</a>](<a title="(W[A]) =&gt; B" id="82862">f</a>: W[A] =&gt; B): <a href="#10392" title="scalaz.Cokleisli[W,A,B]">Cokleisli</a>[W, A, B] = <a href="#111500" title="java.lang.Object with scalaz.Cokleisli[W,A,B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Cokleisli[W,A,B]" id="111500">Cokleisli</a>[W, A, B] {
+    <span class="keyword">def</span> <a title="(a: W[A])B" id="111504">apply</a>(<a title="W[A]" id="111505">a</a>: <a href="#34026" title="W[A]">W</a>[A]) = <a href="#82862" title="(v1: W[A])B" id="28926">f</a>(<a href="#111505" title="W[A]">a</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[W[_], A, B](f: (W[A]) =&gt; B)scalaz.Cokleisli[W,A,B]" id="34029">cokleisli</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="34033">W</a>[<a title="&gt;: Nothing &lt;: Any" id="111516">_</a>], <a title="&gt;: Nothing &lt;: Any" id="34034">A</a>, <a title="&gt;: Nothing &lt;: Any" id="34035">B</a>](<a title="(W[A]) =&gt; B" id="111515">f</a>: W[A] =&gt; B): <a href="#10392" title="scalaz.Cokleisli[W,A,B]">Cokleisli</a>[W, A, B] = <a href="#34022" title="(f: (W[A]) =&gt; B)scalaz.Cokleisli[W,A,B]">★</a>(<a href="#111515" title="(W[A]) =&gt; B">f</a>)
+}
+
+        </pre>
+    </body>
+</html>

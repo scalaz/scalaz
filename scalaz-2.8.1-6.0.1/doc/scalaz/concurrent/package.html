@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.concurrent</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a></p>
+
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <h1>concurrent</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">package</span>
+      <span class="symbol">
+        <span class="name">concurrent</span>
+        
+        
+        
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          
+          
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scalaz.concurrent.Actor">
+      <a id="Actor:Actor[A]"></a>
+      <h4 class="signature"><a href="Actor.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">Actor</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="e">e: (A) ⇒ Unit</span>, <span name="onError">onError: (Throwable) ⇒ Unit</span>, <span name="strategy">strategy: Strategy</span>)</span>
+        <span class="result"> extends Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: sealed 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.Actors">
+      <a id="Actors:Actors"></a>
+      <h4 class="signature"><a href="Actors.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Actors</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.Effect">
+      <a id="Effect:Effect[A]"></a>
+      <h4 class="signature"><a href="Effect.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Effect</span>
+        <span class="tparams">[<span name="A">-A</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: sealed 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.Effects">
+      <a id="Effects:Effects"></a>
+      <h4 class="signature"><a href="Effects.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Effects</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.concurrent.Promise">
+      <a id="Promise:Promise[A]"></a>
+      <h4 class="signature"><a href="Promise.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">Promise</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result"> extends () ⇒ A</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: sealed 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.Promises">
+      <a id="Promises:Promises"></a>
+      <h4 class="signature"><a href="Promises.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Promises</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.Strategy">
+      <a id="Strategy:Strategy"></a>
+      <h4 class="signature"><a href="Strategy.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">Strategy</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Evaluate an expression in some specific manner.</p>
+    </li><li visbl="pub" data-isabs="true" name="scalaz.concurrent.StrategyLow">
+      <a id="StrategyLow:StrategyLow"></a>
+      <h4 class="signature"><a href="StrategyLow.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">StrategyLow</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: abstract 
+        </div></div>
+          
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scalaz.concurrent.Effect">
+      <a id="Effect:Effect"></a>
+      <h4 class="signature"><a href="Effect$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Effect</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.concurrent.Promise">
+      <a id="Promise:Promise"></a>
+      <h4 class="signature"><a href="Promise$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Promise</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scalaz.concurrent.Strategy">
+      <a id="Strategy:Strategy"></a>
+      <h4 class="signature"><a href="Strategy$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Strategy</span>
+        
+        
+        <span class="result"> extends StrategyLow</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

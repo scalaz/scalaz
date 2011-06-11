@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Forall.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+/** A universally quantified value */
+<span class="keyword">trait</span> <a title="trait Forall[P[_]] extends java.lang.Object" id="14244">Forall</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21663">P</a>[<a title="&gt;: Nothing &lt;: Any" id="182083">_</a>]] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="[A]P[A]" id="182080">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="182082">A</a>]: <a href="#21663" title="P[A]">P</a>[A]
+}
+
+<span class="keyword">trait</span> <a title="trait ForallK[K, P[_]] extends java.lang.Object" id="14247">ForallK</a>[<a title="&gt;: Nothing &lt;: Any" id="21664">K</a>, <a title="[_]&gt;: Nothing &lt;: Any" id="21665">P</a>[<a title="&gt;: Nothing &lt;: Any" id="182088">_</a>]] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="[A](implicit k: K)P[A]" id="182085">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="182087">A</a>](<span class="keyword">implicit</span> <a title="K" id="182090">k</a>: <a href="#21664" title="K">K</a>): <a href="#21665" title="P[A]">P</a>[A]
+}
+
+<span class="keyword">trait</span> <a title="trait ForallM[K[_[_]], P[_[_]]] extends java.lang.Object" id="14250">ForallM</a>[<a title="[_[_]]&gt;: Nothing &lt;: Any" id="21666">K</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182094">_</a>[<a title="&gt;: Nothing &lt;: Any" id="182095">_</a>]], <a title="[_[_]]&gt;: Nothing &lt;: Any" id="21667">P</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182096">_</a>[<a title="&gt;: Nothing &lt;: Any" id="182097">_</a>]]] <span title="java.lang.Object">{</span>
+  <span class="keyword">def</span> <a title="[M[_]](implicit evidence$1: K[M])P[M]" id="182099">apply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182093">M</a>[<a title="&gt;: Nothing &lt;: Any" id="182100">_</a>]:K]: <a href="#21667" title="P[M]">P</a>[M]
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Forall" id="14245">Forall</a> <span title="ScalaObject">{</span>
+  /** Universal quantification by doubly negating an existential. */
+  <span class="keyword">type</span> <a title="[A](A) =&gt; Nothing" id="182103">Not</a>[<a title="&gt;: Nothing &lt;: Any" id="182104">A</a>] = A =&gt; Nothing
+  <span class="keyword">type</span> <a title="[P[_]](P[A]) =&gt; Nothing forSome { type A }" id="182105">DNE</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182106">P</a>[<a title="&gt;: Nothing &lt;: Any" id="182116">_</a>]] = Not[P[A]] <span title="(P[A]) =&gt; Nothing forSome { type A }" class="keyword">forSome</span> { <span class="keyword">type</span> A }
+  <span class="keyword">type</span> <a title="[P[_]](scalaz.Forall.DNE[P]) =&gt; Nothing" id="182107">CPS</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182108">P</a>[<a title="&gt;: Nothing &lt;: Any" id="182118">_</a>]] = <span title="(scalaz.Forall.DNE[P]) =&gt; Nothing">Not</span>[DNE[P]]
+
+  /** Construct a universal quantifier by continuation-passing. */
+  <span class="keyword">def</span> <a title="[P[_]](p: (scalaz.Forall.DNE[P]) =&gt; Nothing)scalaz.Forall[P]" id="182109">apply</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="182111">P</a>[<a title="&gt;: Nothing &lt;: Any" id="182120">_</a>]](<a title="(scalaz.Forall.DNE[P]) =&gt; Nothing" id="182119">p</a>: <span title="(scalaz.Forall.DNE[P]) =&gt; Nothing">CPS</span>[P]): <a href="#14244" title="scalaz.Forall[P]">Forall</a>[P] = <a href="#182123" title="java.lang.Object with scalaz.Forall[P]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Forall[P]" id="182123">Forall</a>[P] {
+    <span class="keyword">def</span> <a title="[A]P[A]" id="182127">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="182129">A</a>]: <a href="#182111" title="P[A]">P</a>[A] = {
+      case <span class="keyword">class</span> <a title="class Control extends java.lang.Throwable with ScalaObject with Product" id="182220">Control</a><span title="ScalaObject">(</span><a title="=&gt; P[A]" id="182216">arg</a> : <a href="#182111" title="P[A]">P</a>[A]) <span class="keyword">extends</span> <a title="java.lang.Throwable" id="1675">Throwable</a>
+      <span class="keyword">val</span> <a title="P[A]" id="182138">res</a> = <span class="keyword">try</span> {
+        <a href="#182119" title="(v1: scalaz.Forall.DNE[P])Nothing" id="28926">p</a>((arg:<a href="#182111" title="P[A]">P</a>[A]) =&gt; <span title="Nothing" class="keyword">throw</span> <span title="Control" class="keyword">new</span> <a href="#182220" title="Control">Control</a>(<a href="#182207" title="P[A]">arg</a>))
+      } <span class="keyword">catch</span> {
+        <span title="P[A]" class="keyword">case</span> Control(<a title="P[A]" id="182211">arg</a>) =&gt; <a href="#182211" title="P[A]">arg</a>
+        <span title="Nothing" class="keyword">case</span> <a title="java.lang.Throwable" id="182213">e</a> =&gt; <span title="Nothing" class="keyword">throw</span> <a href="#182213" title="java.lang.Throwable">e</a>
+      }
+      <a href="#182138" title="P[A]">res</a>
+    }
+  }
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Copure.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait Copure[-C[_]] extends java.lang.Object" id="10563">Copure</a>[-<a title="[_]&gt;: Nothing &lt;: Any" id="21562">C</a>[<a title="&gt;: Nothing &lt;: Any" id="82847">_</a>]] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">def</span> <a title="[A](p: C[A])A" id="82844">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="82846">A</a>](<a title="C[A]" id="111620">p</a>: <a href="#21562" title="C[A]">C</a>[A]): <a href="#82846" title="A">A</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.Copure" id="10564">Copure</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+  
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.Identity]" id="111712">IdentityCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.Identity]">Copure</a>[Identity] = <a href="#114351" title="java.lang.Object with scalaz.Copure[scalaz.Identity]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.Identity]" id="114351">Copure</a>[Identity] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Identity[A])A" id="114355">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114357">A</a>](<a title="scalaz.Identity[A]" id="114358">a</a>: <a href="Identity.scala.html#15276" title="scalaz.Identity[A]">Identity</a>[A]) = <a href="Identity.scala.html#34184" title="(x: scalaz.Identity[A])A">a</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.NonEmptyList]" id="111713">NonEmptyListCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.NonEmptyList]">Copure</a>[NonEmptyList] = <a href="#114508" title="java.lang.Object with scalaz.Copure[scalaz.NonEmptyList]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.NonEmptyList]" id="114508">Copure</a>[NonEmptyList] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.NonEmptyList[A])A" id="114512">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114514">A</a>](<a title="scalaz.NonEmptyList[A]" id="114515">a</a>: <a href="NonEmptyList.scala.html#18096" title="scalaz.NonEmptyList[A]">NonEmptyList</a>[A]) = <a href="#114515" title="scalaz.NonEmptyList[A]">a</a>.<a href="NonEmptyList.scala.html#42854" title="=&gt; A">head</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.Zero]" id="111714">ZeroCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.Zero]">Copure</a>[Zero] = <a href="#114532" title="java.lang.Object with scalaz.Copure[scalaz.Zero]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.Zero]" id="114532">Copure</a>[Zero] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Zero[A])A" id="114536">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114538">A</a>](<a title="scalaz.Zero[A]" id="114539">a</a>: <a href="Zero.scala.html#21330" title="scalaz.Zero[A]">Zero</a>[A]) = <a href="#114539" title="scalaz.Zero[A]">a</a>.<a href="Zero.scala.html#36313" title="=&gt; A">zero</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[Tuple1]" id="111715">Tuple1Copure</a>: <a href="#10563" title="scalaz.Copure[Tuple1]">Copure</a>[Tuple1] = <a href="#114556" title="java.lang.Object with scalaz.Copure[Tuple1]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[Tuple1]" id="114556">Copure</a>[Tuple1] {
+    <span class="keyword">def</span> <a title="[A](a: (A,))A" id="114560">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114562">A</a>](<a title="(A,)" id="114563">a</a>: <a title="(A,)" id="1527">Tuple1</a>[A]) = <a href="#114563" title="(A,)">a</a>.<a title="=&gt; A" id="42704">_1</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[R]scalaz.Copure[[α](R, α)]" id="111716">Tuple2Copure</a>[<a title="&gt;: Nothing &lt;: Any" id="111718">R</a>]: <a href="#10563" title="scalaz.Copure[[α](R, α)]">Copure</a>[({<span class="keyword">type</span> λ[α]=(R, α)})#λ] = <a href="#114582" title="java.lang.Object with scalaz.Copure[[α](R, α)]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[[α](R, α)]" id="114582">Copure</a>[({<span class="keyword">type</span> λ[α]=(R, α)})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: (R, A))A" id="114591">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114593">A</a>](<a title="(R, A)" id="114594">a</a>: <a title="(R, A)" id="633">(</a>R, A)) = <a href="#114594" title="(R, A)">a</a>.<a title="=&gt; A" id="36205">_2</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[Function0]" id="111719">Function0Copure</a>: <a href="#10563" title="scalaz.Copure[Function0]">Copure</a>[Function0] = <a href="#114615" title="java.lang.Object with scalaz.Copure[Function0]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[Function0]" id="114615">Copure</a>[Function0] {
+    <span class="keyword">def</span> <a title="[A](a: () =&gt; A)A" id="114619">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114621">A</a>](<a title="() =&gt; A" id="114622">a</a>: () =&gt; A) = <a href="#114622" title="() =&gt; A">a</a>.<a title="()A" id="41182">apply</a>
+  }
+
+  <span class="keyword">import</span> java.util.concurrent.Callable
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[java.util.concurrent.Callable]" id="111721">CallableCopure</a>: <a href="#10563" title="scalaz.Copure[java.util.concurrent.Callable]">Copure</a>[Callable] = <a href="#114640" title="java.lang.Object with scalaz.Copure[java.util.concurrent.Callable]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[java.util.concurrent.Callable]" id="114640">Copure</a>[Callable] {
+    <span class="keyword">def</span> <a title="[A](a: java.util.concurrent.Callable[A])A" id="114644">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114646">A</a>](<a title="java.util.concurrent.Callable[A]" id="114647">a</a>: <a title="java.util.concurrent.Callable[A]" id="38613">Callable</a>[A]) = <a href="#114647" title="java.util.concurrent.Callable[A]">a</a>.<a title="()A" id="42160">call</a>
+  }
+
+  <span class="keyword">import</span> java.util.<a title="object java.util.Map" id="6431">Map</a>.Entry
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X]scalaz.Copure[[α]java.util.Map.Entry[X,α]]" id="111723">MapEntryCopure</a>[<a title="&gt;: Nothing &lt;: Any" id="111725">X</a>]: <a href="#10563" title="scalaz.Copure[[α]java.util.Map.Entry[X,α]]">Copure</a>[({<span class="keyword">type</span> λ[α]=Entry[X, α]})#λ] = <a href="#114667" title="java.lang.Object with scalaz.Copure[[α]java.util.Map.Entry[X,α]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[[α]java.util.Map.Entry[X,α]]" id="114667">Copure</a>[({<span class="keyword">type</span> λ[α]=Entry[X, α]})#λ] {
+    <span class="keyword">def</span> <a title="[A](a: java.util.Map.Entry[X,A])A" id="114676">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114678">A</a>](<a title="java.util.Map.Entry[X,A]" id="114679">a</a>: <a title="java.util.Map.Entry[X,A]" id="39061">Entry</a>[X, A]) = <a href="#114679" title="java.util.Map.Entry[X,A]">a</a>.<a title="()A" id="42144">getValue</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.Zipper]" id="111726">ZipperCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.Zipper]">Copure</a>[Zipper] = <a href="#114701" title="java.lang.Object with scalaz.Copure[scalaz.Zipper]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.Zipper]" id="114701">Copure</a>[Zipper] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Zipper[A])A" id="114705">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114707">A</a>](<a title="scalaz.Zipper[A]" id="114708">a</a>: <a href="Zipper.scala.html#21417" title="scalaz.Zipper[A]">Zipper</a>[A]) = <a href="#114708" title="scalaz.Zipper[A]">a</a>.<a href="Zipper.scala.html#38964" title="=&gt; A">focus</a>
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.Tree]" id="111727">TreeCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.Tree]">Copure</a>[Tree] = <a href="#114725" title="java.lang.Object with scalaz.Copure[scalaz.Tree]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.Tree]" id="114725">Copure</a>[Tree] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.Tree[A])A" id="114729">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114731">A</a>](<a title="scalaz.Tree[A]" id="114732">a</a>: <a href="Tree.scala.html#20346" title="scalaz.Tree[A]">Tree</a>[A]) = <a href="#114732" title="scalaz.Tree[A]">a</a>.<a href="Tree.scala.html#41286" title="=&gt; A">rootLabel</a>
+  }
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.TreeLoc]" id="111728">TreeLocCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.TreeLoc]">Copure</a>[TreeLoc] = <a href="#114749" title="java.lang.Object with scalaz.Copure[scalaz.TreeLoc]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.TreeLoc]" id="114749">Copure</a>[TreeLoc] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.TreeLoc[A])A" id="114753">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114755">A</a>](<a title="scalaz.TreeLoc[A]" id="114756">a</a>: <a href="TreeLoc.scala.html#20430" title="scalaz.TreeLoc[A]">TreeLoc</a>[A]) = <a href="#114756" title="scalaz.TreeLoc[A]">a</a>.<a href="TreeLoc.scala.html#41225" title="=&gt; scalaz.Tree[A]">tree</a>.<a href="Tree.scala.html#41286" title="=&gt; A">rootLabel</a>
+  }
+
+  <span class="keyword">import</span> concurrent.Promise
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Copure[scalaz.concurrent.Promise]" id="111730">PromiseCopure</a>: <a href="#10563" title="scalaz.Copure[scalaz.concurrent.Promise]">Copure</a>[Promise] = <a href="#114773" title="java.lang.Object with scalaz.Copure[scalaz.concurrent.Promise]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Copure[scalaz.concurrent.Promise]" id="114773">Copure</a>[Promise] {
+    <span class="keyword">def</span> <a title="[A](a: scalaz.concurrent.Promise[A])A" id="114777">copure</a>[<a title="&gt;: Nothing &lt;: Any" id="114779">A</a>](<a title="scalaz.concurrent.Promise[A]" id="114780">a</a>: <a href="concurrent/Promise.scala.html#22226" title="scalaz.concurrent.Promise[A]">Promise</a>[A]) = <a href="#114780" title="scalaz.concurrent.Promise[A]">a</a>.<a href="concurrent/Promise.scala.html#41202" title="=&gt; A">get</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

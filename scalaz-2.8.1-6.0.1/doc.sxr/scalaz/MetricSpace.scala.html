@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/MetricSpace.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+/**
+ * &lt;ol&gt;
+ * &lt;li&gt;(distance(a, b) == 0) == (a == b)&lt;/li&gt;
+ * &lt;li&gt;Commutativity: distance(a, b) == distance(b, a)&lt;/li&gt;
+ * &lt;li&gt;Triangle Equality: distance(a, b) + distance(b, c) &gt;= distance(a, c)&lt;/li&gt;
+ * &lt;/ol&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait MetricSpace[-A] extends java.lang.Object" id="17694">MetricSpace</a>[-<a title="&gt;: Nothing &lt;: Any" id="21857">A</a>] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">def</span> <a title="(a1: A,a2: A)Int" id="55289">distance</a>(<a title="A" id="113748">a1</a>: <a href="#21857" title="A">A</a>, <a title="A" id="113749">a2</a>: <a href="#21857" title="A">A</a>): <a title="Int" id="4366">Int</a>
+}
+
+<span class="keyword">trait</span> <a title="trait MetricSpaces extends java.lang.Object with ScalaObject" id="17706">MetricSpaces</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">def</span> <a title="[A](f: (A, A) =&gt; Int)scalaz.MetricSpace[A]" id="34507">metricSpace</a>[<a title="&gt;: Nothing &lt;: Any" id="34509">A</a>](<a title="(A, A) =&gt; Int" id="113741">f</a>: (A, A) =&gt; Int): <a href="#17694" title="scalaz.MetricSpace[A]">MetricSpace</a>[A] = <a href="#280983" title="java.lang.Object with scalaz.MetricSpace[A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.MetricSpace[A]" id="280983">MetricSpace</a>[A] {
+    <span class="keyword">def</span> <a title="(a1: A,a2: A)Int" id="280987">distance</a>(<a title="A" id="280988">a1</a>: <a href="#34509" title="A">A</a>, <a title="A" id="280989">a2</a>: <a href="#34509" title="A">A</a>) = <a href="#113741" title="(v1: A,v2: A)Int" id="35478">f</a>(<a href="#280988" title="A">a1</a>, <a href="#280989" title="A">a2</a>)
+  }
+
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="[M[_], A](implicit l: scalaz.Length[M],implicit i: scalaz.Index[M],implicit e: scalaz.Equal[A])scalaz.MetricSpace[M[A]]" id="34511">levenshtein</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="34514">M</a>[<a title="&gt;: Nothing &lt;: Any" id="281004">_</a>], <a title="&gt;: Nothing &lt;: Any" id="34515">A</a>](<span class="keyword">implicit</span> <a title="scalaz.Length[M]" id="281001">l</a>: <a href="Length.scala.html#16269" title="scalaz.Length[M]">Length</a>[M], <a title="scalaz.Index[M]" id="281002">i</a>: <a href="Index.scala.html#15456" title="scalaz.Index[M]">Index</a>[M], <a title="scalaz.Equal[A]" id="281003">e</a>: <a href="Equal.scala.html#11199" title="scalaz.Equal[A]">Equal</a>[A]): <a href="#17694" title="scalaz.MetricSpace[M[A]]">MetricSpace</a>[M[A]] = <a href="#34507" title="[A](f: (A, A) =&gt; Int)scalaz.MetricSpace[A]">metricSpace</a><span title="(f: (M[A], M[A]) =&gt; Int)scalaz.MetricSpace[M[A]]">[</span><a href="#34514" title="M[A]">M</a>[A]](<a href="MA.scala.html#55571" title="(w: M[A])(implicit l: scalaz.Length[M],implicit ind: scalaz.Index[M],implicit equ: scalaz.Equal[A])Int">_</a> <a href="#281001" title="scalaz.Length[M]">&lt;---&gt;</a> <a href="#281012" title="M[A]">_</a>)
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.MetricSpace[String]" id="34516">levenshteins</a>: <a href="#17694" title="scalaz.MetricSpace[String]">MetricSpace</a>[String] = <a href="#34511" title="[M[_], A](implicit l: scalaz.Length[M],implicit i: scalaz.Index[M],implicit e: scalaz.Equal[A])scalaz.MetricSpace[M[A]]">levenshtein</a><a href="MA.scala.html#57724" title="(f: (String) =&gt; List[Char])(implicit t: scalaz.Contravariant[scalaz.MetricSpace])scalaz.MetricSpace[String]">[</a><a title="List" id="29353">List</a>, <a title="Char" id="4359">Char</a>] <a href="Contravariant.scala.html#56419" title="=&gt; scalaz.Contravariant[scalaz.MetricSpace]">∙</a> ((s: <a title="String" id="2718">String</a>) =&gt; <a href="#281451" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" id="1489">s</a>.<a title="=&gt; List[Char]" id="29249">toList</a>)
+}
+
+        </pre>
+    </body>
+</html>

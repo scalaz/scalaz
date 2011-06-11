@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleST.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+// Purely functional typed mutable state threads
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleST" id="24373">ExampleST</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">import</span> scalaz._
+  <span class="keyword">import</span> Scalaz._
+  <span class="keyword">import</span> effects._
+
+  // Creates a new mutable reference and mutates it
+  <span class="keyword">def</span> <a title="[A]scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]" id="723890">e1</a>[<a title="&gt;: Nothing &lt;: Any" id="723892">A</a>] = <span class="keyword">for</span> {
+    <a title="scalaz.effects.STRef[A,Int]" id="723934">r</a> &lt;- <a href="../effects/package.scala.html#28000" title="[S, A](a: A)scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">newVar</a><span title="(a: Int)scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">[</span><a href="#723892" title="A">A</a>, <span title="Int">Int</span>]<a href="../effects/ST.scala.html#57704" title="(g: (scalaz.effects.STRef[A,Int]) =&gt; scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]])scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">(</a><span title="Int(0)" class="int">0</span>)
+    <a title="scalaz.effects.STRef[A,Int]" id="724136">x</a> &lt;- <a href="#723934" title="scalaz.effects.STRef[A,Int]">r</a>.<a href="../effects/ST.scala.html#401659" title="(f: (Int) =&gt; Int)scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">mod</a><a href="../effects/ST.scala.html#57707" title="(g: (scalaz.effects.STRef[A,Int]) =&gt; scalaz.effects.STRef[A,Int])scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">(</a><a href="#723938" title="(x$1: Int)Int" id="5138">_</a> + <span title="Int(1)" class="int">1</span>)
+  } <span class="keyword">yield</span> <a href="#724136" title="scalaz.effects.STRef[A,Int]">x</a>
+
+  // Creates a new mutable reference, mutates it, and reads its value.
+  <span class="keyword">def</span> <a title="[A]scalaz.effects.ST[A,Int]" id="723893">e2</a>[<a title="&gt;: Nothing &lt;: Any" id="723895">A</a>] = <a href="#723890" title="[A]scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">e1</a><span title="scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">[</span><a href="#723895" title="A">A</a>].<a href="../effects/ST.scala.html#57704" title="(g: (scalaz.effects.STRef[A,Int]) =&gt; scalaz.effects.ST[A,Int])scalaz.effects.ST[A,Int]">flatMap</a>(<a href="#724145" title="scalaz.effects.STRef[A,Int]">_</a>.<a href="../effects/ST.scala.html#401658" title="=&gt; scalaz.effects.ST[A,Int]">read</a>)
+
+  // Run e2, returning the final value of the mutable reference.
+  <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,Int]]" id="723896">test</a> = <a href="#723909" title="java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,Int]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,Int]]" id="723909">Forall</a>[({<span class="keyword">type</span> λ[S] = ST[S, Int]})#λ] {
+    <span class="keyword">def</span> <a title="[A]scalaz.effects.ST[A,Int]" id="723916">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="723918">A</a>] = <a href="#723893" title="scalaz.effects.ST[A,Int]">e2</a>
+  }
+
+  // Run e1, returning a mutable reference to the outside world.
+  // The type system ensures that this can never be run.
+  <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,scalaz.effects.STRef[S,Int]]]" id="723897">test2</a> = <a href="#724175" title="java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,scalaz.effects.STRef[S,Int]]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,scalaz.effects.STRef[S,Int]]]" id="724175">Forall</a>[({<span class="keyword">type</span> λ[S] = ST[S, STRef[S, Int]]})#λ] {
+    <span class="keyword">def</span> <a title="[A]scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]" id="724182">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="724184">A</a>] = <a href="#723890" title="scalaz.effects.ST[A,scalaz.effects.STRef[A,Int]]">e1</a>
+  }
+
+  <span class="keyword">val</span> <a title="Int" id="723898">compiles</a> = <a href="../effects/package.scala.html#27997" title="(f: scalaz.Forall[[S]scalaz.effects.ST[S,Int]])Int">runST</a>(<a href="#723896" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.Forall[[S]scalaz.effects.ST[S,Int]]">test</a>)
+
+  // Does not compile because it would expose a mutable reference.
+  // val doesNotCompile = runST(test2)
+
+  // Bin-sort a list into an immutable array.
+  // Uses a non-observable mutable array in the background.
+  <span class="keyword">def</span> <a title="[A](size: Int,key: (A) =&gt; Int,as: List[A])(implicit evidence$1: Manifest[A])scalaz.ImmutableArray[List[A]]" id="724206">binSort</a>[<a title="&gt;: Nothing &lt;: Any" id="723902">A</a>: Manifest](<a title="Int" id="724203">size</a>: <span title="Int">Int</span>, <a title="(A) =&gt; Int" id="724204">key</a>: A =&gt; Int, <a title="List[A]" id="724205">as</a>: <span title="List[A]">List</span>[A]): <a href="../ImmutableArray.scala.html#15390" title="scalaz.ImmutableArray[List[A]]">ImmutableArray</a>[List[A]] =   
+    <a href="../effects/package.scala.html#28015" title="(size: Int,f: (List[A], A) =&gt; List[A],z: List[A],ivs: List[(Int, A)])(implicit evidence$2: scalaz.Foldable[List],implicit evidence$3: Manifest[List[A]])scalaz.ImmutableArray[List[A]]">accumArray</a><a href="../Foldable.scala.html#91411" title="=&gt; scalaz.Foldable[List]" id="3030">(</a><a href="#724203" title="Int">size</a>, (vs: <span title="List[A]">List</span>[A], v: <a href="#723902" title="A">A</a>) =&gt; <a href="#724226" title="A">v</a> <a href="#724227" title="A">::</a> <a href="#724225" title="(x: A)List[A]" id="32651">vs</a>, <a title="(xs: Nothing*)List[Nothing]" id="29354">List</a>(), <span class="keyword">for</span> { <a title="A" id="724254">a</a> &lt;- <a href="#724205" title="(f: (A) =&gt; (Int, A))(implicit bf: scala.collection.generic.CanBuildFrom[List[A],(Int, A),List[(Int, A)]])List[(Int, A)]" id="29051">as</a> } <span class="keyword">yield</span> <a title="(_1: Int,_2: A)(Int, A)" id="634">(</a><a href="#724204" title="(v1: A)Int" id="28926">key</a>(<a href="#724254" title="A">a</a>), <a href="#724254" title="A">a</a>))
+}
+
+
+        </pre>
+    </body>
+</html>

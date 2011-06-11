@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Leibniz.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>.{⊥, ⊤}
+
+/** 
+ * Leibnizian equality: A better =:= 
+ *
+ * This technique was first used in 
+ * &lt;a href=&quot;http://portal.acm.org/citation.cfm?id=583852.581494&quot;&gt;Typing Dynamic Typing&lt;/a&gt; (Baars and Swierstra, ICFP 2002).
+ *
+ * It is generalized here to handle subtyping so that it can be used with constrained type constructors.
+ *
+ * Leibniz[L,H,A,B] says that A = B, and that both of its types are between L and H. Subtyping lets you
+ * loosen the bounds on L and H.
+ * 
+ * If you just need a witness that A = B, then you can use A===B which is a supertype of any Leibniz[L,H,A,B]
+ *
+ * The more refined types are useful if you need to be able to substitute into restricted contexts. 
+ */
+<span class="keyword">trait</span> <a title="trait Leibniz[-L, +H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H] extends java.lang.Object with ScalaObject" id="16206">Leibniz</a>[-<a title="&gt;: Nothing &lt;: Any" id="21787">L</a>, +<a title="&gt;: L &lt;: Any" id="21788">H</a> &gt;: L, <a title="&gt;: L &lt;: H" id="21789">A</a> &gt;: L &lt;: H, <a title="&gt;: L &lt;: H" id="21790">B</a> &gt;: L &lt;: H] <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[F[_ &gt;: L &lt;: H]](p: F[A])F[B]" id="103581">subst</a>[<a title="[_ &gt;: L &lt;: H]&gt;: Nothing &lt;: Any" id="103583">F</a>[<a title="&gt;: L &lt;: H" id="231215">_</a> &gt;: L &lt;: H]](<a title="F[A]" id="231214">p</a>: <a href="#103583" title="F[A]">F</a>[A]): <a href="#103583" title="F[B]">F</a>[B]
+  <span class="keyword">def</span> <a title="[L2 &lt;: L, H2 &gt;: H, C &gt;: L2 &lt;: H2](that: scalaz.Leibniz[L2,H2,C,A])scalaz.Leibniz[L2,H2,C,B]" id="103584">compose</a>[<a title="&gt;: Nothing &lt;: L" id="103588">L2</a> &lt;: L, <a title="&gt;: H &lt;: Any" id="103589">H2</a> &gt;: H, <a title="&gt;: L2 &lt;: H2" id="103590">C</a> &gt;: L2 &lt;: H2](<a title="scalaz.Leibniz[L2,H2,C,A]" id="231218">that</a>: <a href="#16206" title="scalaz.Leibniz[L2,H2,C,A]">Leibniz</a>[L2, H2, C, A]): <a href="#16206" title="scalaz.Leibniz[L2,H2,C,B]">Leibniz</a>[L2, H2, C, B] =
+    <a href="#16207" title="object scalaz.Leibniz">Leibniz</a>.<a href="#81640" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H, C &gt;: L &lt;: H](f: scalaz.Leibniz[L,H,B,C],g: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,A,C]">trans</a><span title="(f: scalaz.Leibniz[L2,H2,A,B],g: scalaz.Leibniz[L2,H2,C,A])scalaz.Leibniz[L2,H2,C,B]">[</span><a href="#103588" title="L2">L2</a>, <a href="#103589" title="H2">H2</a>, <a href="#103590" title="C">C</a>, <a href="#21789" title="A">A</a>, <a href="#21790" title="B">B</a>](<a href="#16206" title="scalaz.Leibniz[L,H,A,B]" class="keyword">this</a>, <a href="#231218" title="scalaz.Leibniz[L2,H2,C,A]">that</a>)
+  <span class="keyword">def</span> <a title="[L2 &lt;: L, H2 &gt;: H, C &gt;: L2 &lt;: H2](that: scalaz.Leibniz[L2,H2,B,C])scalaz.Leibniz[L2,H2,A,C]" id="103591">andThen</a>[<a title="&gt;: Nothing &lt;: L" id="103595">L2</a> &lt;: L, <a title="&gt;: H &lt;: Any" id="103596">H2</a> &gt;: H, <a title="&gt;: L2 &lt;: H2" id="103597">C</a> &gt;: L2 &lt;: H2](<a title="scalaz.Leibniz[L2,H2,B,C]" id="231229">that</a>: <a href="#16206" title="scalaz.Leibniz[L2,H2,B,C]">Leibniz</a>[L2, H2, B, C]): <a href="#16206" title="scalaz.Leibniz[L2,H2,A,C]">Leibniz</a>[L2, H2, A, C] =
+    <a href="#16207" title="object scalaz.Leibniz">Leibniz</a>.<a href="#81640" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H, C &gt;: L &lt;: H](f: scalaz.Leibniz[L,H,B,C],g: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,A,C]">trans</a><span title="(f: scalaz.Leibniz[L2,H2,B,C],g: scalaz.Leibniz[L2,H2,A,B])scalaz.Leibniz[L2,H2,A,C]">[</span><a href="#103595" title="L2">L2</a>, <a href="#103596" title="H2">H2</a>, <a href="#21789" title="A">A</a>, <a href="#21790" title="B">B</a>, <a href="#103597" title="C">C</a>](<a href="#231229" title="scalaz.Leibniz[L2,H2,B,C]">that</a>, <a href="#16206" title="scalaz.Leibniz[L,H,A,B]" class="keyword">this</a>)
+}
+
+
+<span class="keyword">object</span> <a title="object scalaz.Leibniz" id="16207">Leibniz</a> <span title="ScalaObject">{</span>
+
+  /** (A === B) is a supertype of Leibniz[L,H,A,B] */
+  <span class="keyword">type</span> <a title="[A, B]scalaz.Leibniz[scalaz.Scalaz.⊥,scalaz.Scalaz.⊤,A,B]" id="81629">===</a>[<a title="&gt;: Nothing &lt;: Any" id="81630">A</a>,<a title="&gt;: Nothing &lt;: Any" id="81631">B</a>] = <a href="#16206" title="scalaz.Leibniz[scalaz.Scalaz.⊥,scalaz.Scalaz.⊤,A,B]">Leibniz</a>[⊥, ⊤, A, B]
+
+  /** Equality is reflexive -- we rely on subtyping to expand this type */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A]scalaz.Leibniz[A,A,A,A]" id="81632">refl</a>[<a title="&gt;: Nothing &lt;: Any" id="81634">A</a>]: <a href="#16206" title="scalaz.Leibniz[A,A,A,A]">Leibniz</a>[A, A, A, A] = <a href="#231237" title="java.lang.Object with scalaz.Leibniz[A,A,A,A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Leibniz[A,A,A,A]" id="231237">Leibniz</a>[A, A, A, A] {
+    <span class="keyword">def</span> <a title="[F[_ &gt;: A &lt;: A]](p: F[A])F[A]" id="231241">subst</a>[<a title="[_ &gt;: A &lt;: A]&gt;: Nothing &lt;: Any" id="231243">F</a>[<a title="&gt;: A &lt;: A" id="231245">_</a> &gt;: A &lt;: A]](<a title="F[A]" id="231244">p</a>: <a href="#231243" title="F[A]">F</a>[A]): <a href="#231243" title="F[A]">F</a>[A] = <a href="#231244" title="F[A]">p</a>
+  }
+
+  /** We can witness equality by using it to convert between types 
+   * We rely on subtyping to enable this to work for any Leibniz arrow 
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A, B](f: scalaz.Leibniz.===[A,B])(A) =&gt; B" id="81635">witness</a>[<a title="&gt;: Nothing &lt;: Any" id="81638">A</a>, <a title="&gt;: Nothing &lt;: Any" id="81639">B</a>](<a title="scalaz.Leibniz.===[A,B]" id="103574">f</a>: A <a href="#16206" title="scalaz.Leibniz.===[A,B]">===</a> B): A =&gt; B =
+    <a href="#103574" title="scalaz.Leibniz.===[A,B]">f</a>.<a href="#103581" title="[F[_]](p: F[A])F[B]">subst</a><span title="(p: (A) =&gt; A)(A) =&gt; B">[</span>({<span class="keyword">type</span> λ[X] = A =&gt; X})#<a title="[X](A) =&gt; X" id="1281">λ</a>](<a href="#231280" title="(x: A)A" id="1489">identity</a>)
+
+  /** Equality is transitive */
+  <span class="keyword">def</span> <a title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H, C &gt;: L &lt;: H](f: scalaz.Leibniz[L,H,B,C],g: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,A,C]" id="81640">trans</a>[<a title="&gt;: Nothing &lt;: Any" id="81646">L</a>, <a title="&gt;: L &lt;: Any" id="81647">H</a> &gt;: L, <a title="&gt;: L &lt;: H" id="81648">A</a> &gt;: L &lt;: H, <a title="&gt;: L &lt;: H" id="81649">B</a> &gt;: L &lt;: H, <a title="&gt;: L &lt;: H" id="81650">C</a> &gt;: L &lt;: H](
+    <a title="scalaz.Leibniz[L,H,B,C]" id="231221">f</a>: <a href="#16206" title="scalaz.Leibniz[L,H,B,C]">Leibniz</a>[L, H, B, C],
+    <a title="scalaz.Leibniz[L,H,A,B]" id="231222">g</a>: <a href="#16206" title="scalaz.Leibniz[L,H,A,B]">Leibniz</a>[L, H, A, B]
+  ): <a href="#16206" title="scalaz.Leibniz[L,H,A,C]">Leibniz</a>[L, H, A, C] =
+    <a href="#231221" title="scalaz.Leibniz[L,H,B,C]">f</a>.<a href="#103581" title="[F[_ &gt;: L &lt;: H]](p: F[B])F[C]">subst</a><span title="(p: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,A,C]">[</span>({<span class="keyword">type</span> λ[X &gt;: L &lt;: H] = Leibniz[L, H, A, X]})#<a href="#16206" title="[X &gt;: L &lt;: H]scalaz.Leibniz[L,H,A,X]">λ</a>](<a href="#231222" title="scalaz.Leibniz[L,H,A,B]">g</a>)
+
+  /** Equality is symmetric */
+  <span class="keyword">def</span> <a title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H](f: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,B,A]" id="81651">symm</a>[<a title="&gt;: Nothing &lt;: Any" id="81656">L</a>, <a title="&gt;: L &lt;: Any" id="81657">H</a> &gt;: L, <a title="&gt;: L &lt;: H" id="81658">A</a> &gt;: L &lt;: H, <a title="&gt;: L &lt;: H" id="81659">B</a> &gt;: L &lt;: H](
+    <a title="scalaz.Leibniz[L,H,A,B]" id="231297">f</a>: <a href="#16206" title="scalaz.Leibniz[L,H,A,B]">Leibniz</a>[L, H, A, B]
+  )  : <a href="#16206" title="scalaz.Leibniz[L,H,B,A]">Leibniz</a>[L, H, B, A] =
+    <a href="#231297" title="scalaz.Leibniz[L,H,A,B]">f</a>.<a href="#103581" title="[F[_ &gt;: L &lt;: H]](p: F[A])F[B]">subst</a><span title="(p: scalaz.Leibniz[L,H,A,A])scalaz.Leibniz[L,H,B,A]">[</span>({<span class="keyword">type</span> λ[X&gt;:L&lt;:H]=Leibniz[L, H, X, A]})#<a href="#16206" title="[X &gt;: L &lt;: H]scalaz.Leibniz[L,H,X,A]">λ</a>](<a href="#81632" title="scalaz.Leibniz[A,A,A,A]">refl</a>)
+
+  <span class="keyword">sealed</span> <span class="keyword">class</span> <a title="class LeibnizGroupoid[L_, H_ &gt;: L_] extends java.lang.Object with scalaz.GeneralizedGroupoid with scalaz.Hom with ScalaObject" id="81660">LeibnizGroupoid</a>[<a title="&gt;: Nothing &lt;: Any" id="81661">L_</a>, <a title="&gt;: L_ &lt;: Any" id="81662">H_</a> &gt;: L_] <span title="ScalaObject" class="keyword">extends</span> <a href="Category.scala.html#14676" title="scalaz.GeneralizedGroupoid">GeneralizedGroupoid</a> <span class="keyword">with</span> <a href="Category.scala.html#15159" title="scalaz.Hom">Hom</a> {
+    <span class="keyword">type</span> <a title="L_" id="103553">L</a> = <a href="#81661" title="L_">L_</a>
+    <span class="keyword">type</span> <a title="H_" id="103554">H</a> = <a href="#81662" title="H_">H_</a>
+    <span class="keyword">type</span> <a title="[A &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H, B &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H]scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]" id="103555">C</a>[<a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103556">A</a> &gt;: L &lt;: H, <a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103557">B</a> &gt;: L &lt;: H] = <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]">Leibniz</a>[L, H, A, B]
+    <span class="keyword">type</span> <a title="scalaz.Leibniz.LeibnizGroupoid[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H]" id="103558">U</a> = <a href="#81660" title="scalaz.Leibniz.LeibnizGroupoid[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H]">LeibnizGroupoid</a>[L, H]
+
+    <span class="keyword">def</span> <a title="[A &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H]scalaz.Leibniz[A,A,A,A]" id="103559">id</a>[<a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103561">A</a> &gt;: L &lt;: H]: <a href="#16206" title="scalaz.Leibniz[A,A,A,A]">Leibniz</a>[A, A, A, A] = <a href="#81632" title="[A]scalaz.Leibniz[A,A,A,A]">refl</a><span title="scalaz.Leibniz[A,A,A,A]">[</span><a href="#103561" title="A">A</a>]
+
+    <span class="keyword">def</span> <a title="[A &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H, B &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H, C &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H](bc: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,C],ab: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B])scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,C]" id="103562">compose</a>[<a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103566">A</a> &gt;: L &lt;: H, <a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103567">B</a> &gt;: L &lt;: H, <a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103568">C</a> &gt;: L &lt;: H](
+      <a title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,C]" id="231319">bc</a>: <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,C]">Leibniz</a>[L, H, B, C],
+      <a title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]" id="231320">ab</a>: <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]">Leibniz</a>[L, H, A, B]
+    ): <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,C]">Leibniz</a>[L, H, A, C] = <a href="#81640" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H, C &gt;: L &lt;: H](f: scalaz.Leibniz[L,H,B,C],g: scalaz.Leibniz[L,H,A,B])scalaz.Leibniz[L,H,A,C]">trans</a><span title="(f: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,C],g: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B])scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,C]">[</span><a href="#81661" title="LeibnizGroupoid.this.L">L</a>, <a href="#81662" title="LeibnizGroupoid.this.H">H</a>, <a href="#103566" title="A">A</a>, <a href="#103567" title="B">B</a>, <a href="#103568" title="C">C</a>](<a href="#231319" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,C]">bc</a>, <a href="#231320" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]">ab</a>)
+
+    <span class="keyword">def</span> <a title="[A &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H, B &gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H](ab: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B])scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,A]" id="103569">invert</a>[<a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103572">A</a> &gt;: L &lt;: H, <a title="&gt;: LeibnizGroupoid.this.L &lt;: LeibnizGroupoid.this.H" id="103573">B</a> &gt;: L &lt;: H](
+      <a title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]" id="231342">ab</a>: <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]">Leibniz</a>[L, H, A, B]
+    ): <a href="#16206" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,A]">Leibniz</a>[L, H, B, A] = <a href="#81651" title="(f: scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B])scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,B,A]">symm</a>(<a href="#231342" title="scalaz.Leibniz[LeibnizGroupoid.this.L,LeibnizGroupoid.this.H,A,B]">ab</a>)
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[L, H &gt;: L]scalaz.Leibniz.LeibnizGroupoid[L,H]" id="81663">leibnizGroupoid</a>[<a title="&gt;: Nothing &lt;: Any" id="81666">L</a>, <a title="&gt;: L &lt;: Any" id="81667">H</a> &gt;: L]: <a href="#81660" title="scalaz.Leibniz.LeibnizGroupoid[L,H]">LeibnizGroupoid</a>[L, H] = <span title="scalaz.Leibniz.LeibnizGroupoid[L,H]" class="keyword">new</span> <a href="#81660" title="scalaz.Leibniz.LeibnizGroupoid[L,H]">LeibnizGroupoid</a>[L, H]
+
+  /** We can lift equality into any type constructor */
+  <span class="keyword">def</span> <a title="[LA, LT, HA &gt;: LA, HT &gt;: LT, T[_ &gt;: LA &lt;: HA] &gt;: LT &lt;: HT, A &gt;: LA &lt;: HA, A2 &gt;: LA &lt;: HA](a: scalaz.Leibniz[LA,HA,A,A2])scalaz.Leibniz[LT,HT,T[A],T[A2]]" id="81668">lift</a>[
+    <a title="&gt;: Nothing &lt;: Any" id="81676">LA</a>, <a title="&gt;: Nothing &lt;: Any" id="81677">LT</a>,
+    <a title="&gt;: LA &lt;: Any" id="81678">HA</a> &gt;: LA, <a title="&gt;: LT &lt;: Any" id="81679">HT</a> &gt;: LT,
+    <a title="[_ &gt;: LA &lt;: HA]&gt;: LT &lt;: HT" id="81680">T</a>[<a title="&gt;: LA &lt;: HA" id="231362">_</a> &gt;: LA &lt;: HA] &gt;: LT &lt;: HT,
+    <a title="&gt;: LA &lt;: HA" id="81681">A</a> &gt;: LA &lt;: HA, <a title="&gt;: LA &lt;: HA" id="81682">A2</a> &gt;: LA &lt;: HA
+  ](
+    <a title="scalaz.Leibniz[LA,HA,A,A2]" id="231361">a</a>: <a href="#16206" title="scalaz.Leibniz[LA,HA,A,A2]">Leibniz</a>[LA, HA, A, A2]
+  ): <a href="#16206" title="scalaz.Leibniz[LT,HT,T[A],T[A2]]">Leibniz</a>[LT, HT, T[A], T[A2]] =
+    <a href="#231361" title="scalaz.Leibniz[LA,HA,A,A2]">a</a>.<a href="#103581" title="[F[_ &gt;: LA &lt;: HA]](p: F[A])F[A2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A],T[A]])scalaz.Leibniz[LT,HT,T[A],T[A2]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LA &lt;: HA] = Leibniz[LT, HT, T[A], T[X]]})#<a href="#16206" title="[X &gt;: LA &lt;: HA]scalaz.Leibniz[LT,HT,T[A],T[X]]">λ</a>](<a href="#81632" title="scalaz.Leibniz[T[A],T[A],T[A],T[A]]">refl</a>)
+
+  /** We can lift equality into any type constructor */
+  <span class="keyword">def</span> <a title="[LA, LB, LT, HA &gt;: LA, HB &gt;: LB, HT &gt;: LT, T[_ &gt;: LA &lt;: HA,_ &gt;: LB &lt;: HB] &gt;: LT &lt;: HT, A &gt;: LA &lt;: HA, A2 &gt;: LA &lt;: HA, B &gt;: LB &lt;: HB, B2 &gt;: LB &lt;: HB](a: scalaz.Leibniz[LA,HA,A,A2],b: scalaz.Leibniz[LB,HB,B,B2])scalaz.Leibniz[LT,HT,T[A,B],T[A2,B2]]" id="81683">lift2</a>[
+    <a title="&gt;: Nothing &lt;: Any" id="81695">LA</a>, <a title="&gt;: Nothing &lt;: Any" id="81696">LB</a>, <a title="&gt;: Nothing &lt;: Any" id="81697">LT</a>,
+    <a title="&gt;: LA &lt;: Any" id="81698">HA</a> &gt;: LA, <a title="&gt;: LB &lt;: Any" id="81699">HB</a> &gt;: LB, <a title="&gt;: LT &lt;: Any" id="81700">HT</a> &gt;: LT,
+    <a title="[_ &gt;: LA &lt;: HA, _ &gt;: LB &lt;: HB]&gt;: LT &lt;: HT" id="81701">T</a>[<a title="&gt;: LA &lt;: HA" id="231382">_</a> &gt;: LA &lt;: HA, <a title="&gt;: LB &lt;: HB" id="231383">_</a> &gt;: LB &lt;: HB] &gt;: LT &lt;: HT,
+    <a title="&gt;: LA &lt;: HA" id="81702">A</a> &gt;: LA &lt;: HA, <a title="&gt;: LA &lt;: HA" id="81703">A2</a> &gt;: LA &lt;: HA,
+    <a title="&gt;: LB &lt;: HB" id="81704">B</a> &gt;: LB &lt;: HB, <a title="&gt;: LB &lt;: HB" id="81705">B2</a> &gt;: LB &lt;: HB
+  ](
+    <a title="scalaz.Leibniz[LA,HA,A,A2]" id="231380">a</a>: <a href="#16206" title="scalaz.Leibniz[LA,HA,A,A2]">Leibniz</a>[LA, HA, A, A2],
+    <a title="scalaz.Leibniz[LB,HB,B,B2]" id="231381">b</a>: <a href="#16206" title="scalaz.Leibniz[LB,HB,B,B2]">Leibniz</a>[LB, HB, B, B2]
+  ) : <a href="#16206" title="scalaz.Leibniz[LT,HT,T[A,B],T[A2,B2]]">Leibniz</a>[LT, HT, T[A, B], T[A2, B2]] =
+    <a href="#231381" title="scalaz.Leibniz[LB,HB,B,B2]">b</a>.<a href="#103581" title="[F[_ &gt;: LB &lt;: HB]](p: F[B])F[B2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A,B],T[A2,B]])scalaz.Leibniz[LT,HT,T[A,B],T[A2,B2]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LB &lt;: HB] = Leibniz[LT, HT, T[A, B], T[A2, X]]})#<a href="#16206" title="[X &gt;: LB &lt;: HB]scalaz.Leibniz[LT,HT,T[A,B],T[A2,X]]">λ</a>](
+      <a href="#231380" title="scalaz.Leibniz[LA,HA,A,A2]">a</a>.<a href="#103581" title="[F[_ &gt;: LA &lt;: HA]](p: F[A])F[A2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A,B],T[A,B]])scalaz.Leibniz[LT,HT,T[A,B],T[A2,B]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LA &lt;: HA] = Leibniz[LT, HT, T[A, B], T[X, B]]})#<a href="#16206" title="[X &gt;: LA &lt;: HA]scalaz.Leibniz[LT,HT,T[A,B],T[X,B]]">λ</a>](
+        <a href="#81632" title="scalaz.Leibniz[T[A,B],T[A,B],T[A,B],T[A,B]]">refl</a>))
+
+  /** We can lift equality into any type constructor */
+  <span class="keyword">def</span> <a title="[LA, LB, LC, LT, HA &gt;: LA, HB &gt;: LB, HC &gt;: LC, HT &gt;: LT, T[_ &gt;: LA &lt;: HA,_ &gt;: LB &lt;: HB,_ &gt;: LC &lt;: HC] &gt;: LT &lt;: HT, A &gt;: LA &lt;: HA, A2 &gt;: LA &lt;: HA, B &gt;: LB &lt;: HB, B2 &gt;: LB &lt;: HB, C &gt;: LC &lt;: HC, C2 &gt;: LC &lt;: HC](a: scalaz.Leibniz[LA,HA,A,A2],b: scalaz.Leibniz[LB,HB,B,B2],c: scalaz.Leibniz[LC,HC,C,C2])scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,C2]]" id="81706">lift3</a>[
+    <a title="&gt;: Nothing &lt;: Any" id="81722">LA</a>, <a title="&gt;: Nothing &lt;: Any" id="81723">LB</a>, <a title="&gt;: Nothing &lt;: Any" id="81724">LC</a>, <a title="&gt;: Nothing &lt;: Any" id="81725">LT</a>,
+    <a title="&gt;: LA &lt;: Any" id="81726">HA</a> &gt;: LA, <a title="&gt;: LB &lt;: Any" id="81727">HB</a> &gt;: LB, <a title="&gt;: LC &lt;: Any" id="81728">HC</a> &gt;: LC, <a title="&gt;: LT &lt;: Any" id="81729">HT</a> &gt;: LT,
+    <a title="[_ &gt;: LA &lt;: HA, _ &gt;: LB &lt;: HB, _ &gt;: LC &lt;: HC]&gt;: LT &lt;: HT" id="81730">T</a>[<a title="&gt;: LA &lt;: HA" id="231419">_</a> &gt;: LA &lt;: HA, <a title="&gt;: LB &lt;: HB" id="231420">_</a> &gt;: LB &lt;: HB, <a title="&gt;: LC &lt;: HC" id="231421">_</a> &gt;: LC &lt;: HC] &gt;: LT &lt;: HT,
+    <a title="&gt;: LA &lt;: HA" id="81731">A</a> &gt;: LA &lt;: HA, <a title="&gt;: LA &lt;: HA" id="81732">A2</a> &gt;: LA &lt;: HA,
+    <a title="&gt;: LB &lt;: HB" id="81733">B</a> &gt;: LB &lt;: HB, <a title="&gt;: LB &lt;: HB" id="81734">B2</a> &gt;: LB &lt;: HB,
+    <a title="&gt;: LC &lt;: HC" id="81735">C</a> &gt;: LC &lt;: HC, <a title="&gt;: LC &lt;: HC" id="81736">C2</a> &gt;: LC &lt;: HC
+  ](
+    <a title="scalaz.Leibniz[LA,HA,A,A2]" id="231416">a</a>: <a href="#16206" title="scalaz.Leibniz[LA,HA,A,A2]">Leibniz</a>[LA, HA, A, A2],
+    <a title="scalaz.Leibniz[LB,HB,B,B2]" id="231417">b</a>: <a href="#16206" title="scalaz.Leibniz[LB,HB,B,B2]">Leibniz</a>[LB, HB, B, B2],
+    <a title="scalaz.Leibniz[LC,HC,C,C2]" id="231418">c</a>: <a href="#16206" title="scalaz.Leibniz[LC,HC,C,C2]">Leibniz</a>[LC, HC, C, C2]
+  ): <a href="#16206" title="scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,C2]]">Leibniz</a>[LT, HT, T[A, B, C], T[A2, B2, C2]] =
+    <a href="#231418" title="scalaz.Leibniz[LC,HC,C,C2]">c</a>.<a href="#103581" title="[F[_ &gt;: LC &lt;: HC]](p: F[C])F[C2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,C]])scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,C2]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LC &lt;: HC] = Leibniz[LT, HT, T[A, B, C], T[A2, B2, X]]})#<a href="#16206" title="[X &gt;: LC &lt;: HC]scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,X]]">λ</a>](
+      <a href="#231417" title="scalaz.Leibniz[LB,HB,B,B2]">b</a>.<a href="#103581" title="[F[_ &gt;: LB &lt;: HB]](p: F[B])F[B2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B,C]])scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B2,C]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LB &lt;: HB] = Leibniz[LT, HT, T[A, B, C], T[A2, X, C]]})#<a href="#16206" title="[X &gt;: LB &lt;: HB]scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,X,C]]">λ</a>](
+        <a href="#231416" title="scalaz.Leibniz[LA,HA,A,A2]">a</a>.<a href="#103581" title="[F[_ &gt;: LA &lt;: HA]](p: F[A])F[A2]">subst</a><span title="(p: scalaz.Leibniz[LT,HT,T[A,B,C],T[A,B,C]])scalaz.Leibniz[LT,HT,T[A,B,C],T[A2,B,C]]">[</span>({<span class="keyword">type</span> λ[X &gt;: LA &lt;: HA] = Leibniz[LT, HT, T[A, B, C], T[X, B, C]]})#<a href="#16206" title="[X &gt;: LA &lt;: HA]scalaz.Leibniz[LT,HT,T[A,B,C],T[X,B,C]]">λ</a>](
+          <a href="#81632" title="scalaz.Leibniz[T[A,B,C],T[A,B,C],T[A,B,C],T[A,B,C]]">refl</a>)))
+
+  /** 
+   * Unsafe coercion between types. force abuses asInstanceOf to explicitly coerce types. 
+   * It is unsafe, but needed where Leibnizian equality isn't sufficient 
+   */
+  <span class="keyword">def</span> <a title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H]scalaz.Leibniz[L,H,A,B]" id="81737">force</a>[<a title="&gt;: Nothing &lt;: Any" id="81742">L</a>, <a title="&gt;: L &lt;: Any" id="81743">H</a> &gt;: L, <a title="&gt;: L &lt;: H" id="81744">A</a> &gt;: L &lt;: H, <a title="&gt;: L &lt;: H" id="81745">B</a> &gt;: L &lt;: H]: <a href="#16206" title="scalaz.Leibniz[L,H,A,B]">Leibniz</a>[L, H, A, B] = <a href="#231471" title="java.lang.Object with scalaz.Leibniz[L,H,A,B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Leibniz[L,H,A,B]" id="231471">Leibniz</a>[L, H, A, B] {
+    <span class="keyword">def</span> <a title="[F[_ &gt;: L &lt;: H]](fa: F[A])F[B]" id="231475">subst</a>[<a title="[_ &gt;: L &lt;: H]&gt;: Nothing &lt;: Any" id="231477">F</a>[<a title="&gt;: L &lt;: H" id="231479">_</a> &gt;: L &lt;: H]](<a title="F[A]" id="231478">fa</a>: <a href="#231477" title="F[A]">F</a>[A]): <a href="#231477" title="F[B]">F</a>[B] = <a href="#231478" title="F[A]">fa</a>.<a title="[T0]T0" id="5800">asInstanceOf</a><span title="F[B]">[</span><a href="#231477" title="F[B]">F</a>[B]]
+  }
+
+  /**
+   * Emir Pasalic's PhD thesis mentions that it is unknown whether or not &lt;code&gt;((A,B) === (C,D)) =&gt; (A === C)&lt;/code&gt; is inhabited.
+   * &lt;p&gt;
+   * Haskell can work around this issue by abusing type families as noted in
+   * &lt;a href=&quot;http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html&quot;&gt;Leibniz equality can be injective&lt;/a&gt; (Oleg Kiselyov, Haskell Cafe Mailing List 2010)
+   * but we instead turn to force.
+   * &lt;/p&gt;
+   *
+   */
+
+  // import Injectivity._
+
+  <span class="keyword">def</span> <a title="[LA, HA &gt;: LA, T[_ &gt;: LA &lt;: HA], A &gt;: LA &lt;: HA, A2 &gt;: LA &lt;: HA](t: scalaz.Leibniz.===[T[A],T[A2]])scalaz.Leibniz[LA,HA,A,A2]" id="81746">lower</a>[
+    <a title="&gt;: Nothing &lt;: Any" id="81752">LA</a>, <a title="&gt;: LA &lt;: Any" id="81753">HA</a> &gt;: LA,
+    <a title="[_ &gt;: LA &lt;: HA]&gt;: Nothing &lt;: Any" id="81754">T</a>[<a title="&gt;: LA &lt;: HA" id="231499">_</a> &gt;: LA &lt;: HA], //:Injective,
+    <a title="&gt;: LA &lt;: HA" id="81755">A</a> &gt;: LA &lt;: HA, <a title="&gt;: LA &lt;: HA" id="81756">A2</a> &gt;: LA &lt;: HA
+  ](
+    <a title="scalaz.Leibniz.===[T[A],T[A2]]" id="231497">t</a>: T[A] <a href="#16206" title="scalaz.Leibniz.===[T[A],T[A2]]">===</a> T[A2]
+  ): <a href="#16206" title="scalaz.Leibniz[LA,HA,A,A2]">Leibniz</a>[LA, HA, A, A2] = <a href="#81737" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H]scalaz.Leibniz[L,H,A,B]">force</a><span title="scalaz.Leibniz[LA,HA,A,A2]">[</span><a href="#81752" title="LA">LA</a>, <a href="#81753" title="HA">HA</a>, <a href="#81755" title="A">A</a>, <a href="#81756" title="A2">A2</a>]
+
+  <span class="keyword">def</span> <a title="[LA, HA &gt;: LA, LB, HB &gt;: LB, T[_ &gt;: LA &lt;: HA,_ &gt;: LB &lt;: HB], A &gt;: LA &lt;: HA, A2 &gt;: LA &lt;: HA, B &gt;: LB &lt;: HB, B2 &gt;: LB &lt;: HB](t: scalaz.Leibniz.===[T[A,B],T[A2,B2]])(scalaz.Leibniz[LA,HA,A,A2], scalaz.Leibniz[LB,HB,B,B2])" id="81757">lower2</a>[
+    <a title="&gt;: Nothing &lt;: Any" id="81767">LA</a>, <a title="&gt;: LA &lt;: Any" id="81768">HA</a> &gt;: LA,
+    <a title="&gt;: Nothing &lt;: Any" id="81769">LB</a>, <a title="&gt;: LB &lt;: Any" id="81770">HB</a> &gt;: LB,
+    <a title="[_ &gt;: LA &lt;: HA, _ &gt;: LB &lt;: HB]&gt;: Nothing &lt;: Any" id="81771">T</a>[<a title="&gt;: LA &lt;: HA" id="231504">_</a> &gt;: LA &lt;: HA, <a title="&gt;: LB &lt;: HB" id="231505">_</a> &gt;: LB &lt;: HB], // :Injective2,
+    <a title="&gt;: LA &lt;: HA" id="81772">A</a> &gt;: LA &lt;: HA, <a title="&gt;: LA &lt;: HA" id="81773">A2</a> &gt;: LA &lt;: HA,
+    <a title="&gt;: LB &lt;: HB" id="81774">B</a> &gt;: LB &lt;: HB, <a title="&gt;: LB &lt;: HB" id="81775">B2</a> &gt;: LB &lt;: HB
+  ](
+   <a title="scalaz.Leibniz.===[T[A,B],T[A2,B2]]" id="231502">t</a>: T[A, B] <a href="#16206" title="scalaz.Leibniz.===[T[A,B],T[A2,B2]]">===</a> T[A2, B2]
+  ): <a title="(scalaz.Leibniz[LA,HA,A,A2], scalaz.Leibniz[LB,HB,B,B2])" id="633">(</a>Leibniz[LA, HA, A, A2], Leibniz[LB, HB, B, B2]) = <a title="(_1: scalaz.Leibniz[LA,HA,A,A2],_2: scalaz.Leibniz[LB,HB,B,B2])(scalaz.Leibniz[LA,HA,A,A2], scalaz.Leibniz[LB,HB,B,B2])" id="634">(</a><a href="#81737" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H]scalaz.Leibniz[L,H,A,B]">force</a><span title="scalaz.Leibniz[LA,HA,A,A2]">[</span><a href="#81767" title="LA">LA</a>, <a href="#81768" title="HA">HA</a>, <a href="#81772" title="A">A</a>, <a href="#81773" title="A2">A2</a>], <a href="#81737" title="[L, H &gt;: L, A &gt;: L &lt;: H, B &gt;: L &lt;: H]scalaz.Leibniz[L,H,A,B]">force</a><span title="scalaz.Leibniz[LB,HB,B,B2]">[</span><a href="#81769" title="LB">LB</a>, <a href="#81770" title="HB">HB</a>, <a href="#81774" title="B">B</a>, <a href="#81775" title="B2">B2</a>])
+}
+
+        </pre>
+    </body>
+</html>

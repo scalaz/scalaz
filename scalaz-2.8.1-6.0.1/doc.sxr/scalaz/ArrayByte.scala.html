@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/ArrayByte.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait ArrayByte extends java.lang.Object with scalaz.PimpedType[Array[Byte]] with ScalaObject" id="9396">ArrayByte</a> <span title="ScalaObject" class="keyword">extends</span> <a href="PimpedType.scala.html#18561" title="scalaz.PimpedType[Array[Byte]]">PimpedType</a>[Array[Byte]] {
+  <span class="keyword">def</span> <a title="(implicit c: scalaz.CharSet)String" id="80635">decode</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="80638">c</a>: <a href="CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a title="String" id="2718">String</a> = <a title="(x$1: Array[Byte],x$2: java.lang.String)java.lang.String" id="7391" class="keyword">new</a> <a title="java.lang.String" id="1489">String</a>(<a href="PimpedType.scala.html#38193" title="=&gt; Array[Byte]">value</a>, <a href="#80638" title="scalaz.CharSet">c</a>.<a href="CharSet.scala.html#57759" title="=&gt; String">value</a>)
+}
+
+<span class="keyword">trait</span> <a title="trait ArrayBytes extends java.lang.Object with ScalaObject" id="9402">ArrayBytes</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.ArrayBytes.ArrayByteTo : (bs: Array[Byte])scalaz.ArrayByte" id="33988">ArrayByteTo</a>(<a title="Array[Byte]" id="57263">bs</a>: <a title="Array[Byte]" id="2028">Array</a>[Byte]): <a href="#9396" title="scalaz.ArrayByte">ArrayByte</a> = <a href="#81341" title="java.lang.Object with scalaz.ArrayByte{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.ArrayByte" id="81341">ArrayByte</a> {
+    <span class="keyword">val</span> <a title="Array[Byte]" id="81345">value</a> = <a href="#57263" title="Array[Byte]">bs</a>
+  }
+}
+
+        </pre>
+    </body>
+</html>

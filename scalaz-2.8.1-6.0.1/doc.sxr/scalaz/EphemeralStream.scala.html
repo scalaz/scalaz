@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/EphemeralStream.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> java.lang.ref.WeakReference
+
+<span class="keyword">object</span> <a title="object scalaz.EphemeralStream" id="10930">EphemeralStream</a> <span title="ScalaObject">{</span>
+  <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]" id="44098">empty</a> = <a href="#119188" title="java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]" id="119188">EphemeralStream</a>[⊥] {
+    <span class="keyword">def</span> <a title="=&gt; Boolean" id="119190">isEmpty</a> = <span title="Boolean(true)" class="keyword">true</span>
+    <span class="keyword">def</span> <a title="=&gt; () =&gt; scalaz.Scalaz.⊥" id="119191">head</a>: () =&gt; ⊥ = () =&gt; <span title="(message: String)Nothing">error</span>(<span title="java.lang.String(&quot;head of empty stream&quot;)" class="string">&quot;head of empty stream&quot;</span>)
+    <span class="keyword">def</span> <a title="=&gt; () =&gt; scalaz.Scalaz.⊥" id="119192">tail</a>: () =&gt; ⊥ = () =&gt; <span title="(message: String)Nothing">error</span>(<span title="java.lang.String(&quot;tail of empty stream&quot;)" class="string">&quot;tail of empty stream&quot;</span>)
+  }
+
+  <span class="keyword">object</span> <a title="object scalaz.EphemeralStream.cons" id="44100">cons</a> <span title="ScalaObject">{</span>
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A,as: =&gt; scalaz.EphemeralStream[A])java.lang.Object with scalaz.EphemeralStream[A]" id="119227">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="119229">A</a>](<a title="=&gt; A" id="119232">a</a>: =&gt; A, <a title="=&gt; scalaz.EphemeralStream[A]" id="119233">as</a>: =&gt; EphemeralStream[A]) = <a href="#119236" title="java.lang.Object with scalaz.EphemeralStream[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.EphemeralStream[A]" id="119236">EphemeralStream</a>[A] {
+      <span class="keyword">def</span> <a title="=&gt; Boolean" id="119238">isEmpty</a> = <span title="Boolean(false)" class="keyword">false</span>
+      <span class="keyword">val</span> <a title="() =&gt; A" id="119239">head</a> = <a href="#44124" title="(f: =&gt; A)() =&gt; A">weakMemo</a>(<a href="#119232" title="=&gt; A">a</a>)
+      <span class="keyword">val</span> <a title="() =&gt; scalaz.EphemeralStream[A]" id="119241">tail</a> = <a href="#44124" title="(f: =&gt; scalaz.EphemeralStream[A])() =&gt; scalaz.EphemeralStream[A]">weakMemo</a>(<a href="#119233" title="=&gt; scalaz.EphemeralStream[A]">as</a>)
+    }
+  }
+
+  <span class="keyword">def</span> <a title="[A](as: A*)scalaz.EphemeralStream[A]" id="44102">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="44104">A</a>](<a title="A*" id="119274">as</a>: <a title="A*" id="7597">A</a>*): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] =
+    <a href="#44109" title="(b: =&gt; Int,f: (Int) =&gt; Option[(A, Int)])scalaz.EphemeralStream[A]">unfold</a>(<span title="Int(0)" class="int">0</span>, (b: <span title="Int">Int</span>) =&gt;
+      <span title="Option[(A, Int)]" class="keyword">if</span> (<a href="#119287" title="(x$1: Int)Boolean" id="5130">b</a> &lt; <a href="#119274" title="A*">as</a>.<a title="=&gt; Int" id="28780">size</a>) <span title="(x: (A, Int))Some[(A, Int)]">Some</span>(<span title="(_1: A,_2: Int)(A, Int)">(</span><a href="#119274" title="(idx: Int)A" id="28776">as</a>(<a href="#119287" title="Int">b</a>), <a href="#119287" title="(x$1: Int)Int">b</a> + <span title="Int(1)" class="int">1</span>))
+      <span class="keyword">else</span> <span title="object None">None</span>)
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Pure[scalaz.EphemeralStream]" id="44105">ephemeralStreamPure</a>: <a href="Pure.scala.html#18870" title="scalaz.Pure[scalaz.EphemeralStream]">Pure</a>[EphemeralStream] = <a href="#119341" title="java.lang.Object with scalaz.Pure[scalaz.EphemeralStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Pure[scalaz.EphemeralStream]" id="119341">Pure</a>[EphemeralStream] {
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)scalaz.EphemeralStream[A]" id="119345">pure</a>[<a title="&gt;: Nothing &lt;: Any" id="119347">A</a>](<a title="=&gt; A" id="119348">a</a>: =&gt; A) = <a href="#44102" title="(as: A*)scalaz.EphemeralStream[A]">EphemeralStream</a>(<a href="#119348" title="=&gt; A">a</a>)
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.Bind[scalaz.EphemeralStream]" id="44107">ephemeralStreamBind</a>: <a href="Bind.scala.html#9858" title="scalaz.Bind[scalaz.EphemeralStream]">Bind</a>[EphemeralStream] = <a href="#119368" title="java.lang.Object with scalaz.Bind[scalaz.EphemeralStream]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Bind[scalaz.EphemeralStream]" id="119368">Bind</a>[EphemeralStream] {
+    <span class="keyword">def</span> <a title="[A, B](a: scalaz.EphemeralStream[A],f: (A) =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]" id="119372">bind</a>[<a title="&gt;: Nothing &lt;: Any" id="119375">A</a>, <a title="&gt;: Nothing &lt;: Any" id="119376">B</a>](<a title="scalaz.EphemeralStream[A]" id="119377">a</a>: <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A], <a title="(A) =&gt; scalaz.EphemeralStream[B]" id="119378">f</a>: A =&gt; EphemeralStream[B]) =
+      <a href="#119377" title="scalaz.EphemeralStream[A]">a</a>.<a href="#44007" title="(f: (A) =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]">flatMap</a>(<a href="#119378" title="(A) =&gt; scalaz.EphemeralStream[B]">f</a>)
+  }
+
+  <span class="keyword">def</span> <a title="[A, B](b: =&gt; B,f: (B) =&gt; Option[(A, B)])scalaz.EphemeralStream[A]" id="44109">unfold</a>[<a title="&gt;: Nothing &lt;: Any" id="44112">A</a>, <a title="&gt;: Nothing &lt;: Any" id="44113">B</a>](<a title="=&gt; B" id="119277">b</a>: =&gt; B, <a title="(B) =&gt; Option[(A, B)]" id="119278">f</a>: B =&gt; Option[(A, B)]): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] =
+    <a href="#119278" title="(v1: B)Option[(A, B)]">f</a>(<a href="#119277" title="=&gt; B">b</a>) <span title="scalaz.EphemeralStream[A]" class="keyword">match</span> {
+      <span title="&lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]" class="keyword">case</span> <span title="object None">None</span> =&gt; <a href="#44098" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]">empty</a>
+      <span title="&lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[A]" class="keyword">case</span> Some((<a title="A" id="119418">a</a>, <a title="B" id="119419">r</a>)) =&gt; <a href="#119227" title="(a: =&gt; A,as: =&gt; scalaz.EphemeralStream[A])java.lang.Object with scalaz.EphemeralStream[A]">cons</a>(<a href="#119418" title="A">a</a>, <a href="#44109" title="(b: =&gt; B,f: (B) =&gt; Option[(A, B)])scalaz.EphemeralStream[A]">unfold</a>(<a href="#119419" title="B">r</a>, <a href="#119278" title="(B) =&gt; Option[(A, B)]">f</a>))
+    }
+
+  <span class="keyword">def</span> <a title="[A](start: A)(f: (A) =&gt; A)scalaz.EphemeralStream[A]" id="44114">iterate</a>[<a title="&gt;: Nothing &lt;: Any" id="44116">A</a>](<a title="A" id="119439">start</a>: <a href="#44116" title="A">A</a>)(<a title="(A) =&gt; A" id="119440">f</a>: A =&gt; A): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] =
+    <a href="#44109" title="(b: =&gt; A,f: (A) =&gt; Option[(A, A)])scalaz.EphemeralStream[A]">unfold</a>(<a href="#119439" title="A">start</a>, (a: <a href="#44116" title="A">A</a>) =&gt; {
+      <span class="keyword">val</span> <a title="A" id="119450">fa</a> = <a href="#119440" title="(v1: A)A">f</a>(<a href="#119449" title="A">a</a>)
+      <span title="(x: (A, A))Some[(A, A)]">Some</span>(<span title="(_1: A,_2: A)(A, A)">(</span><a href="#119450" title="A">fa</a>, <a href="#119450" title="A">fa</a>))
+    })
+
+  <span class="keyword">def</span> <a title="(lower: Int,upper: Int)scalaz.EphemeralStream[Int]" id="44117">range</a>(<a title="Int" id="119467">lower</a>: <span title="Int">Int</span>, <a title="Int" id="119468">upper</a>: <span title="Int">Int</span>): <a href="#10929" title="scalaz.EphemeralStream[Int]">EphemeralStream</a>[Int] =
+    <span title="scalaz.EphemeralStream[Int]" class="keyword">if</span> (<a href="#119467" title="(x$1: Int)Boolean" id="5136">lower</a> &gt;= <a href="#119468" title="Int">upper</a>) <a href="#44098" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]">empty</a> <span class="keyword">else</span> <a href="#119227" title="(a: =&gt; Int,as: =&gt; scalaz.EphemeralStream[Int])java.lang.Object with scalaz.EphemeralStream[Int]">cons</a>(<a href="#119467" title="Int">lower</a>, <a href="#44117" title="(lower: Int,upper: Int)scalaz.EphemeralStream[Int]">range</a>(<a href="#119467" title="(x$1: Int)Int">lower</a> + <span title="Int(1)" class="int">1</span>, <a href="#119468" title="Int">upper</a>))
+
+  <span class="keyword">def</span> <a title="[A](s: =&gt; Stream[A])scalaz.EphemeralStream[A]" id="44118">fromStream</a>[<a title="&gt;: Nothing &lt;: Any" id="44120">A</a>](<a title="=&gt; Stream[A]" id="119678">s</a>: =&gt; Stream[A]): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] = <a href="#119678" title="=&gt; Stream[A]">s</a> <span title="scalaz.EphemeralStream[A]" class="keyword">match</span> {
+    <span title="&lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]" class="keyword">case</span> <a href="#119683" title="(x: scala.collection.immutable.Stream[A])Some[scala.collection.immutable.Stream[A]]" id="3196">Stream</a>() =&gt; <a href="#44098" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]">empty</a>
+    <span title="&lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[A]" class="keyword">case</span> <a title="A" id="119710">h</a> <a href="#119697" title="(xs: scala.collection.immutable.Stream[A])Option[(A, scala.collection.immutable.Stream[A])]" id="3198">#::</a> <a title="scala.collection.immutable.Stream[A]" id="119711">t</a> =&gt; <a href="#119227" title="(a: =&gt; A,as: =&gt; scalaz.EphemeralStream[A])java.lang.Object with scalaz.EphemeralStream[A]">cons</a>(<a href="#119710" title="A">h</a>, <a href="#44118" title="(s: =&gt; Stream[A])scalaz.EphemeralStream[A]">fromStream</a>(<a href="#119711" title="scala.collection.immutable.Stream[A]">t</a>))
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](e: scalaz.EphemeralStream[A])Iterable[A]" id="44121">toIterable</a>[<a title="&gt;: Nothing &lt;: Any" id="44123">A</a>](<a title="scalaz.EphemeralStream[A]" id="44298">e</a>: <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A]): <a title="Iterable[A]" id="8016">Iterable</a>[A] = <a href="#119729" title="java.lang.Object with Iterable[A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with Iterable[A]" id="119729">Iterable</a>[A] {
+    <span class="keyword">def</span> <a title="=&gt; &lt;refinement&gt; extends java.lang.Object with Iterator[A]" id="119836">iterator</a> = <a href="#119852" title="java.lang.Object with Iterator[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with Iterator[A]" id="119852">Iterator</a>[A] {
+      <span class="keyword">var</span> <a title="scalaz.EphemeralStream[A]" id="119891">cur</a> = <a href="#44298" title="scalaz.EphemeralStream[A]">e</a>
+      <span class="keyword">def</span> <a title="()A" id="119893">next</a> = {
+        <span class="keyword">val</span> <a title="A" id="119898">t</a> = <a href="#119891" title="=&gt; scalaz.EphemeralStream[A]">cur</a>.<a href="#43993" title="()A">head</a>()
+        <a href="#119891" title="(x$1: scalaz.EphemeralStream[A])Unit">cur</a> = <a href="#119891" title="=&gt; scalaz.EphemeralStream[A]">cur</a>.<a href="#43994" title="()scalaz.EphemeralStream[A]">tail</a>()
+        <a href="#119898" title="A">t</a>
+      }
+      <span class="keyword">def</span> <a title="=&gt; Boolean" id="119894">hasNext</a> = <span title="=&gt; Boolean">!</span><a href="#119891" title="=&gt; scalaz.EphemeralStream[A]">cur</a>.<a href="#43992" title="=&gt; Boolean">isEmpty</a>
+    }
+  }
+
+  <span class="keyword">def</span> <a title="[V](f: =&gt; V)() =&gt; V" id="44124">weakMemo</a>[<a title="&gt;: Nothing &lt;: Any" id="44126">V</a>](<a title="=&gt; V" id="119246">f</a>: =&gt; V): () =&gt; V = {
+    <span class="keyword">val</span> <a title="java.lang.Object" id="119922">latch</a> = <span title="java.lang.Object" class="keyword">new</span> <a title="java.lang.Object" id="2451">Object</a>
+    @volatile <span class="keyword">var</span> <a title="Option[java.lang.ref.WeakReference[V]]" id="119923">v</a>: <a title="Option[java.lang.ref.WeakReference[V]]" id="1263">Option</a>[WeakReference[V]] = <span title="object None">None</span>
+    () =&gt; {
+      <span class="keyword">val</span> <a title="Option[V]" id="119970">a</a> = <a href="#119923" title="Option[java.lang.ref.WeakReference[V]]">v</a>.<a title="(f: (java.lang.ref.WeakReference[V]) =&gt; V)Option[V]" id="38443">map</a>(<a title="java.lang.ref.WeakReference[V]" id="119975">x</a> =&gt; <a href="#119975" title="java.lang.ref.WeakReference[V]">x</a>.<a title="()V" id="119948">get</a>)
+      <span title="V" class="keyword">if</span> (<a href="#119970" title="Option[V]">a</a>.<a title="(x$1: Boolean)Boolean" id="38435">isDefined</a> &amp;&amp; <a href="#119970" title="Option[V]">a</a>.<a title="(x$1: Any)Boolean" id="5790">get</a> != <span title="Null(null)" class="keyword">null</span>) <a href="#119970" title="Option[V]">a</a>.<span title="=&gt; V">get</span> <span class="keyword">else</span> <a href="#119922" title="java.lang.Object">latch</a>.<a title="(x$1: V)V" id="5829">synchronized</a> {
+        <span class="keyword">val</span> <a title="V" id="119983">x</a> = <a href="#119246" title="=&gt; V">f</a>
+        <a href="#119923" title="Option[java.lang.ref.WeakReference[V]]">v</a> = <span title="(x: java.lang.ref.WeakReference[V])Some[java.lang.ref.WeakReference[V]]">Some</span>(<span title="java.lang.ref.WeakReference[V]" class="keyword">new</span> <a title="java.lang.ref.WeakReference[V]" id="119175">WeakReference</a>(<a href="#119983" title="V">x</a>))
+        <a href="#119983" title="V">x</a>
+      }
+    }
+  }
+
+}
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait EphemeralStream[+A] extends java.lang.Object with ScalaObject" id="10929">EphemeralStream</a>[+<a title="&gt;: Nothing &lt;: Any" id="21593">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="#10930" title="object scalaz.EphemeralStream">EphemeralStream</a>._
+  <span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; Boolean" id="43992">isEmpty</a>: <a title="Boolean" id="3783">Boolean</a>
+  <span class="keyword">def</span> <a title="=&gt; () =&gt; A" id="43993">head</a>: () =&gt; A
+  <span class="keyword">def</span> <a title="=&gt; () =&gt; scalaz.EphemeralStream[A]" id="43994">tail</a>: () =&gt; EphemeralStream[A]
+  <span class="keyword">def</span> <a title="=&gt; List[A]" id="43995">toList</a>: <a title="List[A]" id="29353">List</a>[A] = {
+    <span class="keyword">def</span> <a title="(xs: =&gt; List[A])(x: =&gt; A)List[A]" id="120033">lcons</a>(<a title="=&gt; List[A]" id="120034">xs</a>: =&gt; List[A])(<a title="=&gt; A" id="120035">x</a>: =&gt; A) = <a href="#120035" title="=&gt; A">x</a> <a href="#120036" title="A">::</a> <a href="#120034" title="(x: A)List[A]" id="32651">xs</a>
+    <a href="#43999" title="(z: =&gt; List[A])(f: (=&gt; List[A]) =&gt; (=&gt; A) =&gt; List[A])List[A]">foldLeft</a>(<a href="ListW.scala.html#34230" title="[A]List[A]">nil</a><span title="List[A]">[</span><a href="#21593" title="A">A</a>])(<a href="#120033" title="(xs: =&gt; List[A])(x: =&gt; A)List[A]">lcons</a> _).<a title="=&gt; List[A]" id="32691">reverse</a>
+  }
+
+  <span class="keyword">def</span> <a title="[B](z: =&gt; B)(f: (=&gt; A) =&gt; (=&gt; B) =&gt; B)B" id="43996">foldRight</a>[<a title="&gt;: Nothing &lt;: Any" id="43998">B</a>](<a title="=&gt; B" id="120072">z</a>: =&gt; B)(<a title="(=&gt; A) =&gt; (=&gt; B) =&gt; B" id="120073">f</a>: (=&gt; A) =&gt; (=&gt; B) =&gt; B): <a href="#43998" title="B">B</a> =
+    <span title="B" class="keyword">if</span> (<a href="#43992" title="=&gt; Boolean">isEmpty</a>) <a href="#120072" title="=&gt; B">z</a> <span class="keyword">else</span> <a href="#120073" title="(v1: =&gt; A)(=&gt; B) =&gt; B">f</a><span title="(v1: =&gt; B)B">(</span><a href="#43993" title="()A">head</a>())(<a href="#43994" title="()scalaz.EphemeralStream[A]">tail</a>().<a href="#43996" title="(z: =&gt; B)(f: (=&gt; A) =&gt; (=&gt; B) =&gt; B)B">foldRight</a>(<a href="#120072" title="=&gt; B">z</a>)(<a href="#120073" title="(=&gt; A) =&gt; (=&gt; B) =&gt; B">f</a>))
+
+  <span class="keyword">def</span> <a title="[B](z: =&gt; B)(f: (=&gt; B) =&gt; (=&gt; A) =&gt; B)B" id="43999">foldLeft</a>[<a title="&gt;: Nothing &lt;: Any" id="44001">B</a>](<a title="=&gt; B" id="120043">z</a>: =&gt; B)(<a title="(=&gt; B) =&gt; (=&gt; A) =&gt; B" id="120044">f</a>: (=&gt; B) =&gt; (=&gt; A) =&gt; B): <a href="#44001" title="B">B</a> = {
+    <span class="keyword">var</span> <a title="scalaz.EphemeralStream[A]" id="120092">t</a> = <a href="#10929" title="scalaz.EphemeralStream[A]" class="keyword">this</a>
+    <span class="keyword">var</span> <a title="B" id="120093">acc</a> = <a href="#120043" title="=&gt; B">z</a>
+    <span title="Unit" class="keyword">while</span> (<span title="=&gt; Boolean">!</span><a href="#120092" title="scalaz.EphemeralStream[A]">t</a>.<a href="#43992" title="=&gt; Boolean">isEmpty</a>) {
+      <a href="#120093" title="B">acc</a> = <a href="#120044" title="(v1: =&gt; B)(=&gt; A) =&gt; B">f</a><span title="(v1: =&gt; A)B">(</span><a href="#120093" title="B">acc</a>)(<a href="#120092" title="scalaz.EphemeralStream[A]">t</a>.<a href="#43993" title="()A">head</a>())
+      <a href="#120092" title="scalaz.EphemeralStream[A]">t</a> = <a href="#120092" title="scalaz.EphemeralStream[A]">t</a>.<a href="#43994" title="()scalaz.EphemeralStream[A]">tail</a>()
+    }
+    <a href="#120093" title="B">acc</a>
+  }
+
+  <span class="keyword">def</span> <a title="(p: (A) =&gt; Boolean)scalaz.EphemeralStream[A]" id="44002">filter</a>(<a title="(A) =&gt; Boolean" id="120102">p</a>: A =&gt; Boolean): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] = {
+    <span class="keyword">var</span> <a title="scalaz.EphemeralStream[A]" id="120104">rest</a> = <a href="#44003" title="(p: (A) =&gt; Boolean)scalaz.EphemeralStream[A]" class="keyword">this</a> dropWhile (<span title="=&gt; Boolean">!</span><a href="#120102" title="(v1: A)Boolean">p</a>(<a href="#120108" title="A">_</a>))
+    <span title="scalaz.EphemeralStream[A]" class="keyword">if</span> (<a href="#120104" title="scalaz.EphemeralStream[A]">rest</a>.<a href="#43992" title="=&gt; Boolean">isEmpty</a>) <a href="#44098" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]">empty</a>
+    <span class="keyword">else</span> <a href="#119227" title="(a: =&gt; A,as: =&gt; scalaz.EphemeralStream[A])java.lang.Object with scalaz.EphemeralStream[A]">cons</a>(<a href="#120104" title="scalaz.EphemeralStream[A]">rest</a>.<a href="#43993" title="()A">head</a>(), <a href="#120104" title="scalaz.EphemeralStream[A]">rest</a>.<a href="#43994" title="()scalaz.EphemeralStream[A]">tail</a><a href="#44002" title="(p: (A) =&gt; Boolean)scalaz.EphemeralStream[A]">(</a>) filter <a href="#120102" title="(A) =&gt; Boolean">p</a>)
+  }
+
+  <span class="keyword">def</span> <a title="(p: (A) =&gt; Boolean)scalaz.EphemeralStream[A]" id="44003">dropWhile</a>(<a title="(A) =&gt; Boolean" id="120105">p</a>: A =&gt; Boolean): <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] = {
+    <span class="keyword">var</span> <a title="scalaz.EphemeralStream[A]" id="120125">these</a>: <a href="#10929" title="scalaz.EphemeralStream[A]">EphemeralStream</a>[A] = <a href="#10929" title="scalaz.EphemeralStream[A]" class="keyword">this</a>
+    <span title="Unit" class="keyword">while</span> (<span title="(x$1: Boolean)Boolean">!</span><a href="#120125" title="scalaz.EphemeralStream[A]">these</a>.<a href="#43992" title="=&gt; Boolean">isEmpty</a> &amp;&amp; <a href="#120105" title="(v1: A)Boolean">p</a>(<a href="#120125" title="scalaz.EphemeralStream[A]">these</a>.<a href="#43993" title="()A">head</a>())) <a href="#120125" title="scalaz.EphemeralStream[A]">these</a> = <a href="#120125" title="scalaz.EphemeralStream[A]">these</a>.<a href="#43994" title="()scalaz.EphemeralStream[A]">tail</a>()
+    <a href="#120125" title="scalaz.EphemeralStream[A]">these</a>
+  }
+
+  <span class="keyword">def</span> <a title="[BB &gt;: A](e: =&gt; scalaz.EphemeralStream[BB])scalaz.EphemeralStream[BB]" id="44004">++</a>[<a title="&gt;: A &lt;: Any" id="44006">BB</a> &gt;: A](<a title="=&gt; scalaz.EphemeralStream[BB]" id="120133">e</a>: =&gt; EphemeralStream[BB]): <a href="#10929" title="scalaz.EphemeralStream[BB]">EphemeralStream</a>[BB] =
+    <a href="#43996" title="[B](z: =&gt; B)(f: (=&gt; A) =&gt; (=&gt; B) =&gt; B)B">foldRight</a><span title="(z: =&gt; scalaz.EphemeralStream[BB])(f: (=&gt; A) =&gt; (=&gt; scalaz.EphemeralStream[BB]) =&gt; scalaz.EphemeralStream[BB])scalaz.EphemeralStream[BB]">[</span><a href="#10929" title="scalaz.EphemeralStream[BB]">EphemeralStream</a>[BB]](<a href="#120133" title="=&gt; scalaz.EphemeralStream[BB]">e</a>)((<a href="#119227" title="[A](a: =&gt; A,as: =&gt; scalaz.EphemeralStream[A])java.lang.Object with scalaz.EphemeralStream[A]">cons</a><span title="(a: =&gt; BB,as: =&gt; scalaz.EphemeralStream[BB])java.lang.Object with scalaz.EphemeralStream[BB]">[</span><a href="#44006" title="BB">BB</a>](<a href="#120143" title="=&gt; BB">_</a>, <a href="#120144" title="=&gt; scalaz.EphemeralStream[BB]">_</a>)).<a title="=&gt; (=&gt; BB) =&gt; (=&gt; scalaz.EphemeralStream[BB]) =&gt; java.lang.Object with scalaz.EphemeralStream[BB]" id="35485">curried</a>)
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]" id="44007">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="44009">B</a>](<a title="(A) =&gt; scalaz.EphemeralStream[B]" id="119393">f</a>: A =&gt; EphemeralStream[B]): <a href="#10929" title="scalaz.EphemeralStream[B]">EphemeralStream</a>[B] =
+    <a href="#43996" title="[B](z: =&gt; B)(f: (=&gt; A) =&gt; (=&gt; B) =&gt; B)B">foldRight</a><span title="(z: =&gt; scalaz.EphemeralStream[B])(f: (=&gt; A) =&gt; (=&gt; scalaz.EphemeralStream[B]) =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]">[</span><a href="#10929" title="scalaz.EphemeralStream[B]">EphemeralStream</a>[B]](<a href="#44098" title="=&gt; &lt;refinement&gt; extends java.lang.Object with scalaz.EphemeralStream[scalaz.Scalaz.⊥]">empty</a>)(<a title="=&gt; A" id="120154">h</a> =&gt; <a title="=&gt; scalaz.EphemeralStream[B]" id="120156">t</a> =&gt; <a href="#119393" title="(v1: A)scalaz.EphemeralStream[B]">f</a><a href="#44004" title="(e: =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]">(</a><a href="#120154" title="=&gt; A">h</a>) ++ <a href="#120156" title="=&gt; scalaz.EphemeralStream[B]">t</a>)
+
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; B)scalaz.EphemeralStream[B]" id="44010">map</a>[<a title="&gt;: Nothing &lt;: Any" id="44012">B</a>](<a title="(A) =&gt; B" id="120166">f</a>: A =&gt; B): <a href="#10929" title="scalaz.EphemeralStream[B]">EphemeralStream</a>[B] =
+    <a href="#44007" title="(f: (A) =&gt; scalaz.EphemeralStream[B])scalaz.EphemeralStream[B]">flatMap</a>(<a title="A" id="120172">x</a> =&gt; <a href="#44102" title="(as: B*)scalaz.EphemeralStream[B]">EphemeralStream</a>(<a href="#120166" title="(v1: A)B">f</a>(<a href="#120172" title="A">x</a>)))
+
+  <span class="keyword">def</span> <a title="=&gt; Int" id="44013">length</a> = {
+    <span class="keyword">def</span> <a title="(c: =&gt; Int)(a: =&gt; A)Int" id="120184">addOne</a>(<a title="=&gt; Int" id="120185">c</a>: =&gt; Int)(<a title="=&gt; A" id="120186">a</a>: =&gt; A) = <span title="(x$1: Int)Int" class="int">1</span> + <a href="#120185" title="=&gt; Int">c</a>
+    <a href="#43999" title="(z: =&gt; Int)(f: (=&gt; Int) =&gt; (=&gt; A) =&gt; Int)Int">foldLeft</a>(<span title="Int(0)" class="int">0</span>)(<a href="#120184" title="(c: =&gt; Int)(a: =&gt; A)Int">addOne</a> _)
+  }
+}
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/PartialApplys.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+/**
+ * Scala doesn't currently have a way to directly express a
+ * type function, such as `[A]Either[A, Int]`. Instead, we must
+ * pass type constructor and fixed types as arguments to one
+ * of the traits below. For example, the type function mentioned
+ * above is expressed as `PartialApply1Of2[Either, Int]#Flip`
+ *
+ * This can also be expressed as `({type λ[α]=Either[α, Int]})#λ`.
+*/
+<span class="keyword">trait</span> <a title="trait PartialApply1Of2[T[_,_], A] extends java.lang.Object" id="18528">PartialApply1Of2</a>[<a title="[_, _]&gt;: Nothing &lt;: Any" id="21909">T</a>[<a title="&gt;: Nothing &lt;: Any" id="43497">_</a>, <a title="&gt;: Nothing &lt;: Any" id="43498">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21910">A</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[B]T[A,B]" id="43493">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="43494">B</a>] = <a href="#21909" title="T[A,B]">T</a>[A, B]
+
+  <span class="keyword">type</span> <a title="[B]T[B,A]" id="43495">Flip</a>[<a title="&gt;: Nothing &lt;: Any" id="43496">B</a>] = <a href="#21909" title="T[B,A]">T</a>[B, A]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply1Of3[T[_,_,_], A] extends java.lang.Object" id="18531">PartialApply1Of3</a>[<a title="[_, _, _]&gt;: Nothing &lt;: Any" id="21911">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299340">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299341">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299342">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21912">A</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[B, C]T[A,B,C]" id="299337">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299338">B</a>,<a title="&gt;: Nothing &lt;: Any" id="299339">C</a>] = <a href="#21911" title="T[A,B,C]">T</a>[A, B, C]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply2Of3[T[_,_,_], A, B] extends java.lang.Object" id="18534">PartialApply2Of3</a>[<a title="[_, _, _]&gt;: Nothing &lt;: Any" id="21913">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299350">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299351">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299352">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21914">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21915">B</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[C]T[A,B,C]" id="299344">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299345">C</a>] = <a href="#21913" title="T[A,B,C]">T</a>[A, B, C]
+
+  <span class="keyword">type</span> <a title="[C]T[A,C,B]" id="299346">ApplyB</a>[<a title="&gt;: Nothing &lt;: Any" id="299347">C</a>] = <a href="#21913" title="T[A,C,B]">T</a>[A, C, B]
+
+  <span class="keyword">type</span> <a title="[C]T[C,A,B]" id="299348">ApplyA</a>[<a title="&gt;: Nothing &lt;: Any" id="299349">C</a>] = <a href="#21913" title="T[C,A,B]">T</a>[C, A, B]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply3Of4[T[_,_,_,_], A, B, C] extends java.lang.Object" id="18537">PartialApply3Of4</a>[<a title="[_, _, _, _]&gt;: Nothing &lt;: Any" id="21916">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299356">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299357">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299358">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299359">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21917">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21918">B</a>, <a title="&gt;: Nothing &lt;: Any" id="21919">C</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[D]T[A,B,C,D]" id="299354">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299355">D</a>] = <a href="#21916" title="T[A,B,C,D]">T</a>[A, B, C, D]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply4Of5[T[_,_,_,_,_], A, B, C, D] extends java.lang.Object" id="18540">PartialApply4Of5</a>[<a title="[_, _, _, _, _]&gt;: Nothing &lt;: Any" id="21920">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299363">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299364">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299365">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299366">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299367">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21921">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21922">B</a>, <a title="&gt;: Nothing &lt;: Any" id="21923">C</a>, <a title="&gt;: Nothing &lt;: Any" id="21924">D</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[E]T[A,B,C,D,E]" id="299361">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299362">E</a>] = <a href="#21920" title="T[A,B,C,D,E]">T</a>[A, B, C, D, E]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply5Of6[T[_,_,_,_,_,_], A, B, C, D, E] extends java.lang.Object" id="18543">PartialApply5Of6</a>[<a title="[_, _, _, _, _, _]&gt;: Nothing &lt;: Any" id="21925">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299371">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299372">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299373">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299374">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299375">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299376">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21926">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21927">B</a>, <a title="&gt;: Nothing &lt;: Any" id="21928">C</a>, <a title="&gt;: Nothing &lt;: Any" id="21929">D</a>, <a title="&gt;: Nothing &lt;: Any" id="21930">E</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[F]T[A,B,C,D,E,F]" id="299369">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299370">F</a>] = <a href="#21925" title="T[A,B,C,D,E,F]">T</a>[A, B, C, D, E, F]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApply6Of7[T[_,_,_,_,_,_,_], A, B, C, D, E, F] extends java.lang.Object" id="18546">PartialApply6Of7</a>[<a title="[_, _, _, _, _, _, _]&gt;: Nothing &lt;: Any" id="21931">T</a>[<a title="&gt;: Nothing &lt;: Any" id="299380">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299381">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299382">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299383">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299384">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299385">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299386">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21932">A</a>, <a title="&gt;: Nothing &lt;: Any" id="21933">B</a>, <a title="&gt;: Nothing &lt;: Any" id="21934">C</a>, <a title="&gt;: Nothing &lt;: Any" id="21935">D</a>, <a title="&gt;: Nothing &lt;: Any" id="21936">E</a>, <a title="&gt;: Nothing &lt;: Any" id="21937">F</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[G]T[A,B,C,D,E,F,G]" id="299378">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299379">G</a>] = <a href="#21931" title="T[A,B,C,D,E,F,G]">T</a>[A, B, C, D, E, F, G]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApplyK[T[_[_],_,_], M[_]] extends java.lang.Object" id="18549">PartialApplyK</a>[<a title="[_[_], _, _]&gt;: Nothing &lt;: Any" id="21938">T</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="299391">_</a>[<a title="&gt;: Nothing &lt;: Any" id="299394">_</a>], <a title="&gt;: Nothing &lt;: Any" id="299392">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299393">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="21939">M</a>[<a title="&gt;: Nothing &lt;: Any" id="299395">_</a>]] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[A, B]T[M,A,B]" id="299388">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299389">A</a>, <a title="&gt;: Nothing &lt;: Any" id="299390">B</a>] = <a href="#21938" title="T[M,A,B]">T</a>[M, A, B]
+}
+
+<span class="keyword">trait</span> <a title="trait PartialApplyKA[T[_[_],_,_], M[_], A] extends java.lang.Object" id="18552">PartialApplyKA</a>[<a title="[_[_], _, _]&gt;: Nothing &lt;: Any" id="21940">T</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="299401">_</a>[<a title="&gt;: Nothing &lt;: Any" id="299404">_</a>], <a title="&gt;: Nothing &lt;: Any" id="299402">_</a>, <a title="&gt;: Nothing &lt;: Any" id="299403">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="21941">M</a>[<a title="&gt;: Nothing &lt;: Any" id="299405">_</a>], <a title="&gt;: Nothing &lt;: Any" id="21942">A</a>] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[B]T[M,A,B]" id="299397">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299398">B</a>] = <a href="#21940" title="T[M,A,B]">T</a>[M, A, B]
+
+  <span class="keyword">type</span> <a title="[B]T[M,B,A]" id="299399">Flip</a>[<a title="&gt;: Nothing &lt;: Any" id="299400">B</a>] = <a href="#21940" title="T[M,B,A]">T</a>[M, B, A]
+}
+
+/**
+ * Applies one type argument of two where one of the type arguments has a kind * -&gt; *.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">trait</span> <a title="trait PartialType2[T[_[_],_], A[_]] extends java.lang.Object" id="18555">PartialType2</a>[<a title="[_[_], _]&gt;: Nothing &lt;: Any" id="21943">T</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="299409">_</a>[<a title="&gt;: Nothing &lt;: Any" id="299411">_</a>], <a title="&gt;: Nothing &lt;: Any" id="299410">_</a>], <a title="[_]&gt;: Nothing &lt;: Any" id="21944">A</a>[<a title="&gt;: Nothing &lt;: Any" id="299412">_</a>]] <span title="java.lang.Object">{</span>
+  <span class="keyword">type</span> <a title="[B]T[A,B]" id="299407">Apply</a>[<a title="&gt;: Nothing &lt;: Any" id="299408">B</a>] = <a href="#21943" title="T[A,B]">T</a>[A, B]
+}
+
+        </pre>
+    </body>
+</html>

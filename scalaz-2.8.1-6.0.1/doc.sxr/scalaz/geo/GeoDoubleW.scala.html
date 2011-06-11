@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/GeoDoubleW.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait GeoDoubleW extends java.lang.Object with scalaz.PimpedType[Double] with ScalaObject" id="26140">GeoDoubleW</a> <span title="ScalaObject" class="keyword">extends</span> <a href="../PimpedType.scala.html#18561" title="scalaz.PimpedType[Double]">PimpedType</a>[Double] {
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+  <span class="keyword">import</span> <a href="Geo.scala.html#26108" title="object scalaz.geo.Geo">Geo</a>._  
+
+  <span class="keyword">def</span> <a title="[A](implicit r: scalaz.geo.Radians[A])A" id="810225">fromRadians</a>[<a title="&gt;: Nothing &lt;: Any" id="810227">A</a><a id="1">]</a>(<span class="keyword">implicit</span> <a title="scalaz.geo.Radians[A]" id="826369">r</a>: <a href="Radians.scala.html#26266" title="scalaz.geo.Radians[A]">Radians</a>[A]) = <a href="#826369" title="scalaz.geo.Radians[A]">r</a>.<a href="Radians.scala.html#825668" title="(v1: Double)A" id="28926">fromRadians</a>(<a href="../PimpedType.scala.html#38193" title="=&gt; Double">value</a>)
+
+  <span class="keyword">def</span> <a title="(lon: Double)java.lang.Object with scalaz.geo.Coord" id="810228">|-|</a>(<a title="Double" id="810231">lon</a>: <span title="Double">Double</span>) = <a href="Latitude.scala.html#810177" title="(d: Double)java.lang.Object with scalaz.geo.Latitude">latitude</a><a href="Latitude.scala.html#810241" title="(lon: scalaz.geo.Longitude)java.lang.Object with scalaz.geo.Coord">(</a><a href="../PimpedType.scala.html#38193" title="=&gt; Double">value</a>) |:| <a href="Longitude.scala.html#810185" title="(d: Double)java.lang.Object with scalaz.geo.Longitude">longitude</a>(<a href="#810231" title="Double">lon</a>)
+
+  <span class="keyword">def</span> <a title="(lon: Double)java.lang.Object with scalaz.geo.Coord" id="810229">rad</a>(<a title="Double" id="831730">lon</a>: <span title="Double">Double</span>) = <a href="#810179" title="implicit scalaz.geo.GeoDoubleWs.GeoDoubleTo : (n: Double)scalaz.geo.GeoDoubleW">value</a>.<a href="#810225" title="[A](implicit r: scalaz.geo.Radians[A])A">fromRadians</a><a href="Latitude.scala.html#810241" title="(lon: scalaz.geo.Longitude)java.lang.Object with scalaz.geo.Coord">[</a><a href="Latitude.scala.html#26173" title="scalaz.geo.Latitude">Latitude</a>] |:| <a href="#810179" title="implicit scalaz.geo.GeoDoubleWs.GeoDoubleTo : (n: Double)scalaz.geo.GeoDoubleW">lon</a>.<a href="#810225" title="[A](implicit r: scalaz.geo.Radians[A])A">fromRadians</a><a href="Radians.scala.html#825679" title="(implicit r: scalaz.geo.Radians[scalaz.geo.Longitude])scalaz.geo.Longitude">[</a><a href="Longitude.scala.html#26197" title="scalaz.geo.Longitude">Longitude</a>]
+}
+
+
+<span class="keyword">trait</span> <a title="trait GeoDoubleWs extends java.lang.Object with ScalaObject" id="26146">GeoDoubleWs</a> <span title="ScalaObject">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.geo.GeoDoubleWs.GeoDoubleTo : (n: Double)scalaz.geo.GeoDoubleW" id="810179">GeoDoubleTo</a>(<a title="Double" id="810220">n</a>: <span title="Double">Double</span>): <a href="#26140" title="scalaz.geo.GeoDoubleW">GeoDoubleW</a> = <a href="#831821" title="java.lang.Object with scalaz.geo.GeoDoubleW{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.GeoDoubleW" id="831821">GeoDoubleW</a> {
+    <span class="keyword">val</span> <a title="Double" id="831825">value</a> = <a href="#810220" title="Double">n</a>
+  }
+}
+        </pre>
+    </body>
+</html>

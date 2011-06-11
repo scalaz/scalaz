@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/PimpedType.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+/**
+ * Sub class to create a wrapper type for `X` as documentation that the sub class follows the
+ * 'pimp my library' pattern. http://www.artima.com/weblogs/viewpost.jsp?thread=179766
+ * &lt;p/&gt;
+ * The companion object provides an implicit conversion to unwrap `value`.
+ *
+ * @see scalaz.BooleanW
+ */
+<span class="keyword">trait</span> <a title="trait PimpedType[X] extends java.lang.Object" id="18561">PimpedType</a>[<a title="&gt;: Nothing &lt;: Any" id="21948">X</a>] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">val</span> <a title="=&gt; X" id="38193">value</a>: <a href="#21948" title="X">X</a>
+}
+
+<span class="keyword">object</span> <a title="object scalaz.PimpedType" id="18562">PimpedType</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X](p: scalaz.PimpedType[X])X" id="299419">UnwrapPimpedType</a>[<a title="&gt;: Nothing &lt;: Any" id="299421">X</a>](<a title="scalaz.PimpedType[X]" id="299424">p</a>: <a href="#18561" title="scalaz.PimpedType[X]">PimpedType</a>[X]): <a href="#299421" title="X">X</a> = <a href="#299424" title="scalaz.PimpedType[X]">p</a>.<a href="#38193" title="=&gt; X">value</a>
+}
+        </pre>
+    </body>
+</html>

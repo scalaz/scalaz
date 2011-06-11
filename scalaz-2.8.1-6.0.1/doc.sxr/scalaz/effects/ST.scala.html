@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/effects/ST.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> effects
+
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">private</span>[effects] case <span class="keyword">class</span> <a title="class World[A] extends java.lang.Object with ScalaObject with Product" id="404041">World</a>[<a title="&gt;: Nothing &lt;: Any" id="401479">A</a>]<span title="ScalaObject">(</span>)
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait RealWorld extends java.lang.Object" id="22575">RealWorld</a>
+
+/** Mutable variable in state thread S containing a value of type A. */
+<span class="keyword">class</span> <a title="class STRef[S, A] extends java.lang.Object with ScalaObject" id="22650">STRef</a>[<a title="&gt;: Nothing &lt;: Any" id="22775">S</a>, <a title="&gt;: Nothing &lt;: Any" id="22776">A</a>]<span title="ScalaObject">(</span><a title="A" id="403671">a</a>: <a href="#22776" title="A">A</a>) {
+  <span class="keyword">private</span> <span class="keyword">var</span> <a title="A" id="401656">value</a>: <a href="#22776" title="A">A</a> = <a href="#403671" title="A">a</a>
+
+  /** Reads the value pointed at by this reference. */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.effects.ST[S,A]" id="401658">read</a>: <a href="#22590" title="scalaz.effects.ST[S,A]">ST</a>[S, A] = <a href="package.scala.html#27992" title="(a: =&gt; A)scalaz.effects.ST[S,A]">returnST</a>(<a href="#401656" title="=&gt; A">value</a>)
+
+  /** Modifies the value at this reference with the given function. */
+  <span class="keyword">def</span> <a title="[B](f: (A) =&gt; A)scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]" id="401659">mod</a>[<a title="&gt;: Nothing &lt;: Any" id="401661">B</a>](<a title="(A) =&gt; A" id="403302">f</a>: A =&gt; A): <a href="#22590" title="scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">ST</a>[S, STRef[S, A]] = <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], scalaz.effects.STRef[S,A]))java.lang.Object with scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">ST</a>((s: <a href="#404041" title="scalaz.effects.World[S]">World</a>[S]) =&gt; {<a href="#401656" title="(x$1: A)Unit">value</a> = <a href="#403302" title="(v1: A)A">f</a>(<a href="#401656" title="=&gt; A">value</a>); <span title="(_1: scalaz.effects.World[S],_2: scalaz.effects.STRef[S,A])(scalaz.effects.World[S], scalaz.effects.STRef[S,A])">(</span><a href="#403717" title="scalaz.effects.World[S]">s</a>, <a href="#22650" title="scalaz.effects.STRef[S,A]" class="keyword">this</a>)})
+
+  /** Associates this reference with the given value. */
+  <span class="keyword">def</span> <a title="(a: =&gt; A)scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]" id="401662">write</a>(<a title="=&gt; A" id="403282">a</a>: =&gt; A): <a href="#22590" title="scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">ST</a>[S, STRef[S, A]] = <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], scalaz.effects.STRef[S,A]))java.lang.Object with scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">ST</a>((s: <a href="#404041" title="scalaz.effects.World[S]">World</a>[S]) =&gt; {<a href="#401656" title="(x$1: A)Unit">value</a> = <a href="#403282" title="=&gt; A">a</a>; <span title="(_1: scalaz.effects.World[S],_2: scalaz.effects.STRef[S,A])(scalaz.effects.World[S], scalaz.effects.STRef[S,A])">(</span><a href="#403738" title="scalaz.effects.World[S]">s</a>, <a href="#22650" title="scalaz.effects.STRef[S,A]" class="keyword">this</a>)})
+
+  /** Swap the value at this reference with the value at another. */
+  <span class="keyword">def</span> <a title="(that: scalaz.effects.STRef[S,A])scalaz.effects.ST[S,Unit]" id="401663">swap</a>(<a title="scalaz.effects.STRef[S,A]" id="403751">that</a>: <a href="#22650" title="scalaz.effects.STRef[S,A]">STRef</a>[S, A]): <a href="#22590" title="scalaz.effects.ST[S,Unit]">ST</a>[S, Unit] = <span class="keyword">for</span> {
+    <a title="A" id="403760">v1</a> &lt;- <a href="#22650" title="STRef.this.type" class="keyword">this</a>.<a href="#57704" title="(g: (A) =&gt; scalaz.effects.ST[S,Unit])scalaz.effects.ST[S,Unit]">read</a>
+    <a title="A" id="403764">v2</a> &lt;- <a href="#403751" title="scalaz.effects.STRef[S,A]">that</a>.<a href="#57704" title="(g: (A) =&gt; scalaz.effects.ST[S,Unit])scalaz.effects.ST[S,Unit]">read</a>
+    <a title="scalaz.effects.STRef[S,A]" id="403770">_</a> &lt;- <a href="#401662" title="(a: =&gt; A)scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]" class="keyword">this</a> <a href="#57704" title="(g: (scalaz.effects.STRef[S,A]) =&gt; scalaz.effects.ST[S,Unit])scalaz.effects.ST[S,Unit]">write</a> <a href="#403764" title="A">v2</a>
+    <a title="scalaz.effects.STRef[S,A]" id="403776">_</a> &lt;- <a href="#401662" title="(a: =&gt; A)scalaz.effects.ST[S,scalaz.effects.STRef[S,A]]">that</a> <a href="#57707" title="(g: (scalaz.effects.STRef[S,A]) =&gt; Unit)scalaz.effects.ST[S,Unit]">write</a> <a href="#403760" title="A">v1</a>
+  } <span class="keyword">yield</span> <span title="Unit">(</span>)
+}
+
+/** Mutable array in state thread S containing values of type A. */
+<span class="keyword">class</span> <a title="class STArray[S, A] extends java.lang.Object with ScalaObject" id="22620">STArray</a>[<a title="&gt;: Nothing &lt;: Any" id="22777">S</a>, <a title="&gt;: Nothing &lt;: Any" id="22778">A</a>:Manifest](<span class="keyword">val</span> <a title="Int" id="403808">size</a>: <span title="Int">Int</span>, <a title="A" id="403809">z</a>: <a href="#22778" title="A">A</a>) {
+  <span class="keyword">private</span> <span class="keyword">val</span> <a title="Array[A]" id="403793">value</a>: <a title="Array[A]" id="2028">Array</a>[A] = <a title="object Array" id="2029">Array</a>.<a title="(n: Int)(elem: =&gt; A)(implicit evidence$9: scala.reflect.ClassManifest[A])Array[A]" id="28316">fill</a>(<a href="#403808" title="=&gt; Int">size</a>)<a href="#403791" title="Manifest[A]">(</a><a href="#403809" title="A">z</a>)
+
+  /** Reads the value at the given index. */
+  <span class="keyword">def</span> <a title="(i: Int)scalaz.effects.ST[S,A]" id="403795">read</a>(<a title="Int" id="403852">i</a>: <span title="Int">Int</span>): <a href="#22590" title="scalaz.effects.ST[S,A]">ST</a>[S, A] = <a href="package.scala.html#27992" title="(a: =&gt; A)scalaz.effects.ST[S,A]">returnST</a>(<a href="#403793" title="(i: Int)A" id="28224">value</a>(<a href="#403852" title="Int">i</a>))
+
+  /** Writes the given value to the array, at the given offset. */
+  <span class="keyword">def</span> <a title="(i: Int,a: A)scalaz.effects.ST[S,scalaz.effects.STArray[S,A]]" id="403796">write</a>(<a title="Int" id="403860">i</a>: <span title="Int">Int</span>, <a title="A" id="403861">a</a>: <a href="#22778" title="A">A</a>): <a href="#22590" title="scalaz.effects.ST[S,scalaz.effects.STArray[S,A]]">ST</a>[S, STArray[S, A]] = <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], scalaz.effects.STArray[S,A]))java.lang.Object with scalaz.effects.ST[S,scalaz.effects.STArray[S,A]]">ST</a>(<a title="scalaz.effects.World[S]" id="403869">s</a> =&gt; {<a href="#403793" title="(i: Int,x: A)Unit" id="28226">value</a>(<a href="#403860" title="Int">i</a>) = <a href="#403861" title="A">a</a>; <span title="(_1: scalaz.effects.World[S],_2: scalaz.effects.STArray[S,A])(scalaz.effects.World[S], scalaz.effects.STArray[S,A])">(</span><a href="#403869" title="scalaz.effects.World[S]">s</a>, <a href="#22620" title="scalaz.effects.STArray[S,A]" class="keyword">this</a>)})
+
+  /** Turns a mutable array into an immutable one which is safe to return. */
+  <span class="keyword">def</span> <a title="=&gt; scalaz.effects.ST[S,scalaz.ImmutableArray[A]]" id="403797">freeze</a>: <a href="#22590" title="scalaz.effects.ST[S,scalaz.ImmutableArray[A]]">ST</a>[S, ImmutableArray[A]] = <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], scalaz.ImmutableArray[A]))java.lang.Object with scalaz.effects.ST[S,scalaz.ImmutableArray[A]]">ST</a>(<a title="scalaz.effects.World[S]" id="403892">s</a> =&gt; <span title="(_1: scalaz.effects.World[S],_2: scalaz.ImmutableArray[A])(scalaz.effects.World[S], scalaz.ImmutableArray[A])">(</span><a href="#403892" title="scalaz.effects.World[S]">s</a>, <a href="../ImmutableArray.scala.html#15391" title="object scalaz.ImmutableArray">ImmutableArray</a>.<a href="../ImmutableArray.scala.html#172801" title="(x: Array[A])scalaz.ImmutableArray[A]">fromArray</a>(<a href="#403793" title="=&gt; Array[A]">value</a>)))
+
+  /** Fill this array from the given association list. */
+  <span class="keyword">def</span> <a title="[B](f: (A, B) =&gt; A,xs: Traversable[(Int, B)])scalaz.effects.ST[S,Unit]" id="403798">fill</a>[<a title="&gt;: Nothing &lt;: Any" id="403800">B</a>](<a title="(A, B) =&gt; A" id="403908">f</a>: (A, B) =&gt; A, <a title="Traversable[(Int, B)]" id="403909">xs</a>: <a title="Traversable[(Int, B)]" id="8310">Traversable</a>[(Int, B)]): <a href="#22590" title="scalaz.effects.ST[S,Unit]">ST</a>[S, Unit] = <a href="#403909" title="Traversable[(Int, B)]">xs</a> <span title="scalaz.effects.ST[S,Unit]" class="keyword">match</span> {
+    <span title="scalaz.effects.ST[S,Unit]" class="keyword">case</span> <a title="object Nil" id="29519">Nil</a> =&gt; <a href="package.scala.html#27992" title="(a: =&gt; Unit)scalaz.effects.ST[S,Unit]">returnST</a>(<span title="Unit">(</span>))
+    <span title="scalaz.effects.ST[S,Unit]" class="keyword">case</span> ((<a title="Int" id="403924">i</a>, <a title="B" id="403925">v</a>) :: <a title="List[(Int, B)]" id="403927">ivs</a>) =&gt; <span class="keyword">for</span> {
+      <a title="Unit" id="403968">_</a> &lt;- <a href="#403801" title="(f: (A, B) =&gt; A,i: Int,v: B)scalaz.effects.ST[S,Unit]">update</a><a href="#57704" title="(g: (Unit) =&gt; scalaz.effects.ST[S,Unit])scalaz.effects.ST[S,Unit]">(</a><a href="#403908" title="(A, B) =&gt; A">f</a>, <a href="#403924" title="Int">i</a>, <a href="#403925" title="B">v</a>)
+      <a title="Unit" id="403983">_</a> &lt;- <a href="#403798" title="(f: (A, B) =&gt; A,xs: Traversable[(Int, B)])scalaz.effects.ST[S,Unit]">fill</a><a href="#57707" title="(g: (Unit) =&gt; Unit)scalaz.effects.ST[S,Unit]">(</a><a href="#403908" title="(A, B) =&gt; A">f</a>, <a href="#403927" title="List[(Int, B)]">ivs</a>)
+    } <span class="keyword">yield</span> <span title="Unit">(</span>)
+  }
+
+  /** Combine the given value with the value at the given index, using the given function. */
+  <span class="keyword">def</span> <a title="[B](f: (A, B) =&gt; A,i: Int,v: B)scalaz.effects.ST[S,Unit]" id="403801">update</a>[<a title="&gt;: Nothing &lt;: Any" id="403803">B</a>](<a title="(A, B) =&gt; A" id="403929">f</a>: (A, B) =&gt; A, <a title="Int" id="403930">i</a>: <span title="Int">Int</span>, <a title="B" id="403931">v</a>: <a href="#403803" title="B">B</a>) = <span class="keyword">for</span> {
+    <a title="A" id="403939">x</a> &lt;- <a href="#403795" title="(i: Int)scalaz.effects.ST[S,A]">read</a><a href="#57704" title="(g: (A) =&gt; scalaz.effects.ST[S,Unit])scalaz.effects.ST[S,Unit]">(</a><a href="#403930" title="Int">i</a>)
+    <a title="scalaz.effects.STArray[S,A]" id="403948">_</a> &lt;- <a href="#403796" title="(i: Int,a: A)scalaz.effects.ST[S,scalaz.effects.STArray[S,A]]">write</a><a href="#57707" title="(g: (scalaz.effects.STArray[S,A]) =&gt; Unit)scalaz.effects.ST[S,Unit]">(</a><a href="#403930" title="Int">i</a>, <a href="#403929" title="(v1: A,v2: B)A" id="35478">f</a>(<a href="#403939" title="A">x</a>, <a href="#403931" title="B">v</a>))
+  } <span class="keyword">yield</span> <span title="Unit">(</span>)
+}
+
+/** 
+ * Purely functional mutable state threads.
+ * Based on JL and SPJ's paper &quot;Lazy Functional State Threads&quot;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait ST[S, A] extends java.lang.Object with ScalaObject" id="22590">ST</a>[<a title="&gt;: Nothing &lt;: Any" id="22779">S</a>, <a title="&gt;: Nothing &lt;: Any" id="22780">A</a>] <span title="ScalaObject">{</span>
+  <span class="keyword">private</span>[effects] <span class="keyword">def</span> <a title="(s: scalaz.effects.World[S])(scalaz.effects.World[S], A)" id="57703">apply</a>(<a title="scalaz.effects.World[S]" id="403695">s</a>: <a href="#404041" title="scalaz.effects.World[S]">World</a>[S]): <a title="(scalaz.effects.World[S], A)" id="633">(</a>World[S], A)
+  <span class="keyword">def</span> <a title="[B](g: (A) =&gt; scalaz.effects.ST[S,B])scalaz.effects.ST[S,B]" id="57704">flatMap</a>[<a title="&gt;: Nothing &lt;: Any" id="57706">B</a>](<a title="(A) =&gt; scalaz.effects.ST[S,B]" id="403753">g</a>: A =&gt; ST[S, B]): <a href="#22590" title="scalaz.effects.ST[S,B]">ST</a>[S, B] =
+    <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], B))java.lang.Object with scalaz.effects.ST[S,B]">ST</a>(<a title="scalaz.effects.World[S]" id="403996">s</a> =&gt; <a href="#57703" title="(s: scalaz.effects.World[S])(scalaz.effects.World[S], A)">apply</a>(<a href="#403996" title="scalaz.effects.World[S]">s</a>) <span title="(scalaz.effects.World[S], B)" class="keyword">match</span> { <span title="(scalaz.effects.World[S], B)" class="keyword">case</span> (<a title="scalaz.effects.World[S]" id="404000">ns</a>, <a title="A" id="404001">a</a>) =&gt; <a href="#403753" title="(v1: A)scalaz.effects.ST[S,B]">g</a><a href="#57703" title="(s: scalaz.effects.World[S])(scalaz.effects.World[S], B)">(</a><a href="#404001" title="A">a</a>)(<a href="#404000" title="scalaz.effects.World[S]">ns</a>) })
+  <span class="keyword">def</span> <a title="[B](g: (A) =&gt; B)scalaz.effects.ST[S,B]" id="57707">map</a>[<a title="&gt;: Nothing &lt;: Any" id="57709">B</a>](<a title="(A) =&gt; B" id="403286">g</a>: A =&gt; B): <a href="#22590" title="scalaz.effects.ST[S,B]">ST</a>[S, B] =
+    <a href="#403682" title="(f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], B))java.lang.Object with scalaz.effects.ST[S,B]">ST</a>(<a title="scalaz.effects.World[S]" id="404016">s</a> =&gt; <a href="#57703" title="(s: scalaz.effects.World[S])(scalaz.effects.World[S], A)">apply</a>(<a href="#404016" title="scalaz.effects.World[S]">s</a>) <span title="(scalaz.effects.World[S], B)" class="keyword">match</span> { <span title="(scalaz.effects.World[S], B)" class="keyword">case</span> (<a title="scalaz.effects.World[S]" id="404020">ns</a>, <a title="A" id="404021">a</a>) =&gt; <span title="(_1: scalaz.effects.World[S],_2: B)(scalaz.effects.World[S], B)">(</span><a href="#404020" title="scalaz.effects.World[S]">ns</a>, <a href="#403286" title="(v1: A)B">g</a>(<a href="#404021" title="A">a</a>)) })
+}
+
+<span class="keyword">object</span> <a title="object scalaz.effects.ST" id="22591">ST</a> <span title="ScalaObject">{</span>
+  <span class="keyword">def</span> <a title="[S, A](f: (scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], A))java.lang.Object with scalaz.effects.ST[S,A]" id="403682">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="403685">S</a>, <a title="&gt;: Nothing &lt;: Any" id="403686">A</a>](<a title="(scalaz.effects.World[S]) =&gt; (scalaz.effects.World[S], A)" id="403687">f</a>: World[S] =&gt; (World[S], A)) = <a href="#403690" title="java.lang.Object with scalaz.effects.ST[S,A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.effects.ST[S,A]" id="403690">ST</a>[S, A] {
+    <span class="keyword">private</span>[effects] <span class="keyword">def</span> <a title="(s: scalaz.effects.World[S])(scalaz.effects.World[S], A)" id="403692">apply</a>(<a title="scalaz.effects.World[S]" id="403693">s</a>: <a href="#404041" title="scalaz.effects.World[S]">World</a>[S]) = <a href="#403687" title="(v1: scalaz.effects.World[S])(scalaz.effects.World[S], A)">f</a>(<a href="#403693" title="scalaz.effects.World[S]">s</a>)
+  }
+
+}
+
+
+        </pre>
+    </body>
+</html>

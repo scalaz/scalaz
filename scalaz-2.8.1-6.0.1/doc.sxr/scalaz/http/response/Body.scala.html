@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/response/Body.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> response
+
+/**
+ * Type constructors that can be used in request and response bodies.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Body[OUT[_], A] extends java.lang.Object" id="27418">Body</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="27855">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="811818">_</a>], <a title="&gt;: Nothing &lt;: Any" id="27856">A</a>] <span title="java.lang.Object">{</span>
+  /**
+   * Take the given value to a request/response body value.
+   */
+  <span class="keyword">def</span> <a title="(a: A)OUT[Byte]" id="811817">apply</a>(<a title="A" id="811845">a</a>: <a href="#27856" title="A">A</a>): <a href="#27855" title="OUT[Byte]">OUT</a>[Byte]
+}
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> scala.xml.{Elem, NodeSeq}
+
+<span class="keyword">trait</span> <a title="trait Bodys extends java.lang.Object with ScalaObject" id="27442">Bodys</a> <span title="ScalaObject">{</span>
+  <span class="keyword">import</span> <a href="#27419" title="object scalaz.http.response.Body">Body</a>._
+  /**
+   * The body implementation for stream identity.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.response.Body[Stream,Stream[Byte]]" id="811188">StreamIdentityBody</a> = <a href="#811810" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]">identityBody</a><span title="&lt;refinement&gt; extends java.lang.Object with scalaz.http.response.Body[Stream,Stream[Byte]]">[</span><span title="Stream">Stream</span>]
+
+  /**
+   * The body implementation for a stream of characters to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.CharStreamBody : (implicit c: scalaz.CharSet)java.lang.Object with scalaz.http.response.Body[Stream,Stream[Char]]" id="811190">CharStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811827">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>) = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#811927" title="(f: (Stream[Char]) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,Stream[Char]]">[</a><span title="Stream">Stream</span>]((<a href="#811937" title="Stream[Char]">_</a>: <span title="Stream[Char]">Stream</span>[Char]).<a title="=&gt; String" id="36413">mkString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811827" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+  /**
+   * The body implementation for a list to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.http.response.Body[Stream,List[Byte]]" id="811191">ByteListStreamBody</a>: <a href="#27418" title="scalaz.http.response.Body[Stream,List[Byte]]">Body</a>[Stream, List[Byte]] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#858036" title="(f: (List[Byte]) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,List[Byte]]">[</a><span title="Stream">Stream</span>](<a href="#858046" title="List[Byte]">_</a>.<a title="=&gt; scala.collection.immutable.Stream[Byte]" id="32693">toStream</a>)
+
+  /**
+   * The body implementation for a list of characters to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.CharListStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,List[Char]]" id="811193">CharListStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811825">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a href="#27418" title="scalaz.http.response.Body[Stream,List[Char]]">Body</a>[Stream, List[Char]] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#858061" title="(f: (List[Char]) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,List[Char]]">[</a><span title="Stream">Stream</span>](<a href="#858071" title="List[Char]">_</a>.<a title="=&gt; String" id="29268">mkString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811825" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+  /**
+   * The body implementation for a list of characters to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.StringStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,String]" id="811194">StringStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811823">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a href="#27418" title="scalaz.http.response.Body[Stream,String]">Body</a>[Stream, String] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#858356" title="(f: (String) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,String]">[</a><span title="Stream">Stream</span>](<a href="#858366" title="String">_</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811823" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+  /**
+   * The body implementation for an XML element to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.ElemStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scala.xml.Elem]" id="811195">ElemStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811821">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a href="#27418" title="scalaz.http.response.Body[Stream,scala.xml.Elem]">Body</a>[Stream, Elem] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#858645" title="(f: (scala.xml.Elem) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scala.xml.Elem]">[</a><span title="Stream">Stream</span>](<a href="#858655" title="scala.xml.Elem">_</a>.<a title="()String" id="322689">toString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811821" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+  /**
+   * The body implementation for an XML element to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.NodeSeqStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scala.xml.NodeSeq]" id="811196">NodeSeqStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811819">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a href="#27418" title="scalaz.http.response.Body[Stream,scala.xml.NodeSeq]">Body</a>[Stream, NodeSeq] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#858935" title="(f: (scala.xml.NodeSeq) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scala.xml.NodeSeq]">[</a><span title="Stream">Stream</span>](<a href="#858945" title="scala.xml.NodeSeq">_</a>.<a title="()String" id="89260">toString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811819" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+
+  /**
+   * The body implementation for an XHTML doctype to a stream.
+   */
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.XhtmlDoctypeStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]" id="811197">XhtmlDoctypeStreamBody</a>(<span class="keyword">implicit</span> <a title="scalaz.CharSet" id="811805">c</a>: <a href="../../CharSet.scala.html#10167" title="scalaz.CharSet">CharSet</a>): <a href="#27418" title="scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]">Body</a>[Stream, xhtml.Doctype] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#859225" title="(f: (scalaz.http.response.xhtml.Doctype) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]">[</a><span title="Stream">Stream</span>](<a href="#859235" title="scalaz.http.response.xhtml.Doctype">_</a>.<a href="xhtml/Doctype.scala.html#813090" title="=&gt; String">asString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]">(</span><a href="#811805" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#57759" title="=&gt; String">value</a>).<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span>)
+
+  
+//  /**
+//   * The contravariant implementation for a body.
+//   */
+//  def bodyContravariant[OUT[_]]: Contravariant[PartialType2[Body, OUT]#Apply] = new Contravariant[PartialType2[Body, OUT]#Apply] {
+//    def contramap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B =&gt; A): Body[OUT, B] = new Body[OUT, B] {
+//      def apply(b: B) = body(f(b))
+//    }
+//  }
+
+  /**
+   * The contravariant wrapper implementation for a body.
+   */
+  //def bodyContravariantW[OUT[_], A](c: PartialType2[Body, OUT]#Apply[A]): scalaz.ContravariantW[PartialType2[Body, OUT]#Apply, A] = contravariant[PartialType2[Body, OUT]#Apply](c)(bodyContravariant[OUT])
+
+  /**
+   * The contravariant implementation for a stream body.
+   */
+//  implicit val StreamBodyContravariant = bodyContravariant[Stream]
+
+  /**
+   * The contravariant wrapper implementation for a stream body.
+   */
+  //implicit def StreamBodyContravariantW[A](c: PartialType2[Body, Stream]#Apply[A]) = bodyContravariantW[Stream, A](c)
+}
+/**
+ * Type constructors that can be used in request and response bodies.
+ */
+<span class="keyword">object</span> <a title="object scalaz.http.response.Body" id="27419">Body</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27442" title="scalaz.http.response.Bodys">Bodys</a> {
+  /**
+   * Construct a body implementation from the given function.
+   */
+  <span class="keyword">def</span> <a title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object" id="811807">body</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811809">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="811840">_</a>]] = <a href="#811833" title="java.lang.Object{def apply[A](f: (A) =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object" id="811833">{</a>
+    <span class="keyword">def</span> <a title="[A](f: (A) =&gt; OUT[Byte])java.lang.Object with scalaz.http.response.Body[OUT,A]" id="811835">apply</a>[<a title="&gt;: Nothing &lt;: Any" id="811837">A</a>](<a title="(A) =&gt; OUT[Byte]" id="811838">f</a>: A =&gt; OUT[Byte]) = <a href="#811839" title="java.lang.Object with scalaz.http.response.Body[OUT,A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.response.Body[OUT,A]" id="811839">Body</a>[OUT, A] {
+      <span class="keyword">def</span> <a title="(a: A)OUT[Byte]" id="811842">apply</a>(<a title="A" id="811843">a</a>: <a href="#811837" title="A">A</a>) = <a href="#811838" title="(v1: A)OUT[Byte]" id="28926">f</a>(<a href="#811843" title="A">a</a>)
+    }
+  }
+
+  /**
+   * The body implementation for identity.
+   */
+  <span class="keyword">def</span> <a title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]" id="811810">identityBody</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="811812">OUT</a>[<a title="&gt;: Nothing &lt;: Any" id="811957">_</a>]] = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#811968" title="(f: (OUT[Byte]) =&gt; OUT[Byte])java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]">[</a><a href="#811812" title="OUT">OUT</a>](<a title="[A](x: A)A" id="8865">identity</a><a href="#811979" title="(x: OUT[Byte])OUT[Byte]">[</a><a href="#811812" title="OUT[Byte]">OUT</a>[Byte]])
+
+  /**
+   * The body implementation for stream.
+   */
+  <span class="keyword">def</span> <a title="[A](f: (A) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,A]" id="811813">streamBody</a>[<a title="&gt;: Nothing &lt;: Any" id="811815">A</a>](<a title="(A) =&gt; Stream[Byte]" id="859506">f</a>: A =&gt; Stream[Byte]) = <a href="#811807" title="&lt;refinement&gt;[OUT[_]] extends java.lang.Object">body</a><a href="#859519" title="(f: (A) =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,A]">[</a><span title="Stream">Stream</span>](<a href="#859506" title="(A) =&gt; Stream[Byte]">f</a>)
+}
+
+        </pre>
+    </body>
+</html>

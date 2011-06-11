@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/InvariantFunctor.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> scalaz._
+<span class="keyword">import</span> <a href="Scalaz.scala.html#19051" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="keyword">trait</span> <a title="trait InvariantFunctor[F[_]] extends java.lang.Object" id="15567">InvariantFunctor</a>[<a title="[_]&gt;: Nothing &lt;: Any" id="21737">F</a>[<a title="&gt;: Nothing &lt;: Any" id="33806">_</a>]] <a title="java.lang.Object" id="2746">{</a>
+  <span class="keyword">def</span> <a title="[A, B](ma: F[A],f: (A) =&gt; B,g: (B) =&gt; A)F[B]" id="33801">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="33804">A</a>, <a title="&gt;: Nothing &lt;: Any" id="33805">B</a>](<a title="F[A]" id="35565">ma</a>: <a href="#21737" title="F[A]">F</a>[A], <a title="(A) =&gt; B" id="35566">f</a>: A =&gt; B, <a title="(B) =&gt; A" id="35567">g</a>: B =&gt; A): <a href="#21737" title="F[B]">F</a>[B]
+}
+
+<span class="keyword">object</span> <a title="object scalaz.InvariantFunctor" id="15568">InvariantFunctor</a> <a title="ScalaObject" id="1446">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.InvariantFunctor[scalaz.Monoid]" id="56428">MonoidInvariantFunctor</a>: <a href="#15567" title="scalaz.InvariantFunctor[scalaz.Monoid]">InvariantFunctor</a>[Monoid] = <a href="#224189" title="java.lang.Object with scalaz.InvariantFunctor[scalaz.Monoid]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.InvariantFunctor[scalaz.Monoid]" id="224189">InvariantFunctor</a>[Monoid] {
+    <span class="keyword">def</span> <a title="[A, B](ma: scalaz.Monoid[A],f: (A) =&gt; B,g: (B) =&gt; A)scalaz.Monoid[B]" id="224193">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="224196">A</a>, <a title="&gt;: Nothing &lt;: Any" id="224197">B</a>](<a title="scalaz.Monoid[A]" id="224198">ma</a>: <a href="Monoid.scala.html#17748" title="scalaz.Monoid[A]">Monoid</a>[A], <a title="(A) =&gt; B" id="224199">f</a>: A =&gt; B, <a title="(B) =&gt; A" id="224200">g</a>: B =&gt; A): <a href="Monoid.scala.html#17748" title="scalaz.Monoid[B]">Monoid</a>[B] = <a href="#224223" title="java.lang.Object with scalaz.Monoid[B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Monoid[B]" id="224223">Monoid</a>[B] {
+      <span class="keyword">def</span> <a title="(b1: B,b2: =&gt; B)B" id="224227">append</a>(<a title="B" id="224230">b1</a>: <a href="#224197" title="B">B</a>, <a title="=&gt; B" id="224231">b2</a>: =&gt; B) = <a href="#224199" title="(v1: A)B">f</a>(<a href="Semigroup.scala.html#36314" title="(s1: A,s2: =&gt; A)A">ma</a> append (<a href="#224200" title="(v1: B)A">g</a>(<a href="#224230" title="B">b1</a>), <a href="#224200" title="(v1: B)A">g</a>(<a href="#224231" title="=&gt; B">b2</a>)))
+
+      <span class="keyword">val</span> <a title="B" id="224228">zero</a> = <a href="#224199" title="(v1: A)B">f</a>(<a href="#224198" title="scalaz.Monoid[A]">ma</a>.<a href="Zero.scala.html#36313" title="=&gt; A">zero</a>)
+    }
+  }
+
+  // The type ascription ': InvariantFunctor[Endo]' works around the following spurious compiler error in March 2010 vintage
+  // compiler builds: &quot;not found: type $anon&quot;
+  //
+  // Reported: https://lampsvn.epfl.ch/trac/scala/ticket/3177
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.InvariantFunctor[scalaz.Endo]" id="56430">EndoInvariantFunctor</a>: <a href="#15567" title="scalaz.InvariantFunctor[scalaz.Endo]">InvariantFunctor</a>[Endo] = <a href="#224256" title="java.lang.Object with scalaz.InvariantFunctor[scalaz.Endo]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.InvariantFunctor[scalaz.Endo]" id="224256">InvariantFunctor</a>[Endo] { //
+    <span class="keyword">def</span> <a title="[A, B](ma: scalaz.Endo[A],f: (A) =&gt; B,g: (B) =&gt; A)scalaz.Endo[B]" id="224260">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="224263">A</a>, <a title="&gt;: Nothing &lt;: Any" id="224264">B</a>](<a title="scalaz.Endo[A]" id="224265">ma</a>: <a href="Endo.scala.html#10773" title="scalaz.Endo[A]">Endo</a>[A], <a title="(A) =&gt; B" id="224266">f</a>: A =&gt; B, <a title="(B) =&gt; A" id="224267">g</a>: B =&gt; A): <a href="Endo.scala.html#10773" title="scalaz.Endo[B]">Endo</a>[B] = <a href="Endo.scala.html#34057" title="(f: (B) =&gt; B)scalaz.Endo[B]">EndoTo</a>((b: <a href="#224264" title="B">B</a>) =&gt; <a href="#224266" title="(v1: A)B">f</a>(<a href="Endo.scala.html#41322" title="(a: A)A">ma</a>(<a href="#224267" title="(v1: B)A">g</a>(<a href="#224293" title="B">b</a>))))
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.InvariantFunctor[scalaz.Semigroup]" id="56432">SemigroupInvariantFunctor</a>: <a href="#15567" title="scalaz.InvariantFunctor[scalaz.Semigroup]">InvariantFunctor</a>[Semigroup] = <a href="#224306" title="java.lang.Object with scalaz.InvariantFunctor[scalaz.Semigroup]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.InvariantFunctor[scalaz.Semigroup]" id="224306">InvariantFunctor</a>[Semigroup] {
+    <span class="keyword">def</span> <a title="[A, B](ma: scalaz.Semigroup[A],f: (A) =&gt; B,g: (B) =&gt; A)scalaz.Semigroup[B]" id="224310">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="224313">A</a>, <a title="&gt;: Nothing &lt;: Any" id="224314">B</a>](<a title="scalaz.Semigroup[A]" id="224315">ma</a>: <a href="Semigroup.scala.html#19377" title="scalaz.Semigroup[A]">Semigroup</a>[A], <a title="(A) =&gt; B" id="224316">f</a>: A =&gt; B, <a title="(B) =&gt; A" id="224317">g</a>: B =&gt; A): <a href="Semigroup.scala.html#19377" title="scalaz.Semigroup[B]">Semigroup</a>[B] = <a href="#224340" title="java.lang.Object with scalaz.Semigroup[B]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Semigroup[B]" id="224340">Semigroup</a>[B] {
+      <span class="keyword">def</span> <a title="(b1: B,b2: =&gt; B)B" id="224344">append</a>(<a title="B" id="224345">b1</a>: <a href="#224314" title="B">B</a>, <a title="=&gt; B" id="224346">b2</a>: =&gt; B): <a href="#224314" title="B">B</a> = <a href="#224316" title="(v1: A)B">f</a>(<a href="Semigroup.scala.html#36314" title="(s1: A,s2: =&gt; A)A">ma</a> append (<a href="#224317" title="(v1: B)A">g</a>(<a href="#224345" title="B">b1</a>), <a href="#224317" title="(v1: B)A">g</a>(<a href="#224346" title="=&gt; B">b2</a>)))
+    }
+  }
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[V]scalaz.InvariantFunctor[[α]scalaz.Memo[α,V]]" id="56434">MemoInvariantFunctor</a>[<a title="&gt;: Nothing &lt;: Any" id="56436">V</a>]: <a href="#15567" title="scalaz.InvariantFunctor[[α]scalaz.Memo[α,V]]">InvariantFunctor</a>[({<span class="keyword">type</span> λ[α]=Memo[α, V]})#λ] = <a href="#224370" title="java.lang.Object with scalaz.InvariantFunctor[[α]scalaz.Memo[α,V]]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.InvariantFunctor[[α]scalaz.Memo[α,V]]" id="224370">InvariantFunctor</a>[({<span class="keyword">type</span> λ[α]=Memo[α, V]})#λ] {
+    <span class="keyword">def</span> <a title="[A, B](ma: scalaz.Memo[A,V],f: (A) =&gt; B,g: (B) =&gt; A)scalaz.Memo[B,V]" id="224379">xmap</a>[<a title="&gt;: Nothing &lt;: Any" id="224382">A</a>, <a title="&gt;: Nothing &lt;: Any" id="224383">B</a>](<a title="scalaz.Memo[A,V]" id="224384">ma</a>: <a href="Memo.scala.html#17625" title="scalaz.Memo[A,V]">Memo</a>[A, V], <a title="(A) =&gt; B" id="224385">f</a>: A =&gt; B, <a title="(B) =&gt; A" id="224386">g</a>: B =&gt; A): <a href="Memo.scala.html#17625" title="scalaz.Memo[B,V]">Memo</a>[B, V] = {
+      <a href="Memo.scala.html#34518" title="(f: ((B) =&gt; V) =&gt; (B) =&gt; V)scalaz.Memo[B,V]">memo</a> {
+        (h: B =&gt; V) =&gt;
+          <span class="keyword">val</span> <a title="(A) =&gt; V" id="224433">m</a> = <a href="Memo.scala.html#57432" title="(z: (A) =&gt; V)(A) =&gt; V">ma</a> { <a href="MA.scala.html#57724" title="(f: (A) =&gt; B)(implicit t: scalaz.Contravariant[[α](α) =&gt; V])(A) =&gt; V">h</a> <a href="Contravariant.scala.html#56412" title="scalaz.Contravariant[[α](α) =&gt; V]">∙</a> <a href="#224385" title="(A) =&gt; B">f</a> }
+          (b: <a href="#224383" title="B">B</a>) =&gt; <a href="#224433" title="(v1: A)V">m</a>(<a href="#224386" title="(v1: B)A">g</a>(<a href="#224549" title="B">b</a>))
+      }
+    }
+  }
+
+}
+
+        </pre>
+    </body>
+</html>
