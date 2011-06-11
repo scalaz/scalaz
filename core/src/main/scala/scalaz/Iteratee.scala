@@ -2,12 +2,12 @@ package scalaz
 
 import Scalaz._
 
-/** The input to an iteratee. **/
+/** The input to an iteratee. */
 sealed trait Input[E] {
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
 }
 
-/** A pure iteratee computation which is either done or needs more input **/
+/** A pure iteratee computation which is either done or needs more input */
 sealed trait IterV[E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterV[E, A]) => Z): Z
@@ -20,7 +20,7 @@ sealed trait IterV[E, A] {
   def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
 }
 
-/** Monadic Iteratees **/
+/** Monadic Iteratees */
 sealed trait IterVM[M[_], E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
@@ -28,17 +28,17 @@ sealed trait IterVM[M[_], E, A] {
 
 case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[IterVM[M, E, A]]]
 
-/** An Enumerator[F] feeds data from an F to an iteratee **/
+/** An Enumerator[F] feeds data from an F to an iteratee */
 trait Enumerator[F[_]] {
   def apply[E, A](f: F[E], i: IterV[E, A]): IterV[E, A]
 }
 
 
 object IterV {
-  /** An EnumeratorM[M, _, _] feeds data in a monad M to an iteratee **/
+  /** An EnumeratorM[M, _, _] feeds data in a monad M to an iteratee */
   type EnumeratorM[M[_], E] = ({type λ[α] = IterV[E, α]})#λ ~> ({type λ[α] = M[IterV[E, α]]})#λ
 
-  /** A computation that has finished **/
+  /** A computation that has finished */
   object Done {
     def apply[E, A](a: => A, i: => Input[E]): IterV[E, A] = new IterV[E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
@@ -50,7 +50,7 @@ object IterV {
         cont = f => None)
   }
 
-  /** A computation that takes an element from an input to yield a new computation **/
+  /** A computation that takes an element from an input to yield a new computation */
   object Cont {
     def apply[E, A](f: Input[E] => IterV[E, A]): IterV[E, A] = new IterV[E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
@@ -62,7 +62,7 @@ object IterV {
         cont = Some(_))
   }
 
-  /** A monadic computation that has finished **/
+  /** A monadic computation that has finished */
   object DoneM {
     def apply[M[_], E, A](a: => A, i: => Input[E]): IterVM[M, E, A] = new IterVM[M, E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
@@ -85,7 +85,7 @@ object IterV {
         cont = f => Some(f))
   }
 
-  /** An iteratee that consumes the head of the input **/
+  /** An iteratee that consumes the head of the input */
   def head[E] : IterV[E, Option[E]] = {
     def step(s: Input[E]): IterV[E, Option[E]] =
       s(el = e => Done(Some(e), Empty[E]),
@@ -94,7 +94,7 @@ object IterV {
     Cont(step)
   }
 
-  /** An iteratee that returns the first element of the input **/
+  /** An iteratee that returns the first element of the input */
   def peek[E] : IterV[E, Option[E]] = {
     def step(s: Input[E]): IterV[E, Option[E]]
       = s(el = e => Done(Some(e), s),
@@ -103,11 +103,11 @@ object IterV {
     Cont(step)
   }
 
-  /** Peeks and returns either a Done iteratee with the given value or runs the given function with the peeked value **/
+  /** Peeks and returns either a Done iteratee with the given value or runs the given function with the peeked value */
   def peekDoneOr[A, B](b: => B, f: A => IterV[A, B]): IterV[A, B] =
     peek[A] >>= (_.iterDoneOr(b, f))
 
-  /** An iteratee that skips the first n elements of the input **/
+  /** An iteratee that skips the first n elements of the input */
   def drop[E](n: Int): IterV[E, Unit] = {
     def step(s: Input[E]): IterV[E, Unit] =
       s(el = _ => drop(n - 1),
@@ -117,7 +117,7 @@ object IterV {
     else Cont(step)
   }
 
-  /** An iteratee that counts and consumes the elements of the input **/
+  /** An iteratee that counts and consumes the elements of the input */
   def length[E] : IterV[E, Int] = {
     def step(acc: Int)(s: Input[E]): IterV[E, Int] =
       s(el = _ => Cont(step(acc + 1)),
@@ -195,7 +195,7 @@ object IterV {
     Cont(step(r.monoid.zero))
   }
 
-  /** Input that has a value available **/
+  /** Input that has a value available */
   object Empty {
     def apply[E] : Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = empty
@@ -207,7 +207,7 @@ object IterV {
           eof = Left(EOF[E])).fold(x => false, x => x)
   }
 
-  /** Input that has no values available  **/
+  /** Input that has no values available  */
   object El {
     def apply[E](e0: => E): Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = el(e0)
@@ -219,7 +219,7 @@ object IterV {
         eof = Left(EOF[E])).right.toOption
   }
 
-  /** Input that is exhausted **/
+  /** Input that is exhausted */
   object EOF {
     def apply[E] : Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = eof

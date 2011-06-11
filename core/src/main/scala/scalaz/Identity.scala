@@ -133,19 +133,19 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
   final def whileDo(f: A => A, p: A => Boolean): A =
     if (p(value)) f(value).whileDo(f, p) else value
 
-  /** A pair lazy in its right value, with this value on the left and the given value on the right. **/
+  /** A pair lazy in its right value, with this value on the left and the given value on the right. */
   def <&>[B](b: => B): (A :&: B) = lazyTuple(value, b)
 
-  /** Convert the value into a monoid **/
+  /** Convert the value into a monoid */
   def unit[M](implicit r: Reducer[A,M]): M = r.unit(value)
 
-  /** Convert the value into a monoid in a pointed functor **/
+  /** Convert the value into a monoid in a pointed functor */
   def pureUnit[M[_], N](implicit m: Pure[M], r: Reducer[A,N]): M[N] = unit[N].pure
 
-  /** Append the value to a monoid for use in left-to-right reduction **/
+  /** Append the value to a monoid for use in left-to-right reduction */
   def snoc[C](c: C)(implicit r: Reducer[C,A]): A = r.snoc(value, c)
 
-  /** Prepend the value to a monoid for use in right-to-left reduction **/
+  /** Prepend the value to a monoid for use in right-to-left reduction */
   def cons[M](m: M)(implicit r: Reducer[A,M]): M = r.cons(value, m)
 
   /** Constructs a writer with the given value for writing */
@@ -166,7 +166,7 @@ sealed trait Identity[A] extends Equals with IdentitySugar[A] {
 }
 
 object Identity { 
-  def apply[A](a: => A) = new Identity[A] {
+  def apply[A](a: => A): Identity[A] = new Identity[A] {
     lazy val value = a
   }
   def unapply[A](v: Identity[A]): Option[A] = Some(v.value)

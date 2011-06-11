@@ -17,7 +17,7 @@ import collection.immutable.StringLike
  * Random access to an element at n is O(lg min(n, l - n)), where
  *   l is the size of the tree.
  * Constructing a tree with n copies of a value is O(lg n).
- **/
+ */
 
 sealed abstract class ViewL[S[_], A] {
   def fold[B](b: => B, f: (=> A, => S[A]) => B): B

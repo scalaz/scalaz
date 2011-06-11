@@ -93,7 +93,7 @@ object Category {
   }
   implicit def monoidCategory[M:Monoid] : MonoidCategory[M] = new MonoidCategory[M]
   
-  /** The <b>Set</b> category **/
+  /** The <b>Set</b> category */
   implicit val Function1Category: Category[Function1] = new Category[Function1] {
     def id[A] = a => a
     def compose[X, Y, Z](f: Y => Z, g: X => Y) = f compose g   
@@ -281,7 +281,7 @@ object Category {
 
   case class Discrete[X, A, B](value: X => X) extends NewType[X => X]
 
-  /** Discrete categories, whose only morphism is the identity function. **/
+  /** Discrete categories, whose only morphism is the identity function. */
   implicit def DiscreteCategory[X] = new Category[({type λ[α, β]=Discrete[X, α, β]})#λ] {
     def id[A] = Discrete(x => x)
     def compose[A,B,C](f: Discrete[X, B, C], g: Discrete[X, A, B]) = Discrete(f.value compose g.value)
@@ -291,7 +291,7 @@ object Category {
     def compare(a: X, b: X) = a lte b
   }
 
-  /** Every partial order gives rise to a category **/
+  /** Every partial order gives rise to a category */
   implicit def PosetCategory[X: Order]: Category[({type λ[α, β]=Ord2[X, α, β]})#λ] = new Category[({type λ[α, β]=Ord2[X, α, β]})#λ] {
     def id[A] = new Ord2[X, A, A]
     def compose[A, B, C](f: Ord2[X, B, C], g: Ord2[X, A, B]) = new Ord2[X, A, C] {
