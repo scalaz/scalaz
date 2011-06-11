@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/HttpSession.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#18009" title="object scalaz.Scalaz">Scalaz</a>._
+
+<span class="comment">/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpSession&lt;/code&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait HttpSession extends java.lang.Object with ScalaObject" id="25762">HttpSession</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * The wrapped HTTP session.
+   */</span>
+  <span class="keyword">val</span> <a title="=&gt; javax.servlet.http.HttpSession" id="1107009">session</a>: javax.servlet.http.<span title="javax.servlet.http.HttpSession">HttpSession</span>
+
+  <span class="comment">/**
+   * Returns the attribute associated with the given value.
+   */</span>
+  <span class="keyword">def</span> <a title="(attr: String)Option[java.lang.Object]" id="1107010">apply</a><span class="delimiter">(</span><a title="String" id="1224118">attr</a>: <span title="String">String</span><span class="delimiter">)</span> = <span title="(x: java.lang.Object)Option[java.lang.Object]">Option</span><span class="delimiter">(</span><a href="#1107009" title="=&gt; javax.servlet.http.HttpSession">session</a>.<span title="(x$1: java.lang.String)java.lang.Object">getAttribute</span><span class="delimiter">(</span><a href="#1224118" title="String">attr</a><span class="delimiter">)</span><span class="delimiter">)</span>
+  
+  <span class="comment">/**
+   * Returns the attribute associated with the given value. If no attribute is
+   * associated with the value, a new association is made with the given 
+   * &lt;tt&gt;default&lt;/tt&gt; value, and that value is returned.
+   * 
+   * @throws ClassCastException if the attribute exists and is not an instance 
+   *         of &lt;tt&gt;A&lt;/tt&gt;.
+   */</span>
+  <span class="keyword">def</span> <a title="[A](attr: String, default: =&gt; A)A" id="1107011">getOrAdd</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1107013">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="String" id="1227296">attr</a>: <span title="String">String</span>, <a title="=&gt; A" id="1227297">default</a>: =&gt;A<span class="delimiter">)</span> = 
+    <span class="delimiter">(</span><a href="#1107010" title="(attr: String)Option[java.lang.Object]">apply</a><a href="../../MA.scala.html#38611" title="(a: Option[java.lang.Object])scalaz.MA[Option,java.lang.Object]" class="delimiter">(</a><a href="#1227296" title="String">attr</a><span class="delimiter">)</span> <a href="../../OptionW.scala.html#39236" title="(o: Option[A])scalaz.OptionW[A]">∘</a> <span class="delimiter">(</span><span class="delimiter">(</span>v : <span title="java.lang.Object">Object</span><span class="delimiter">)</span> =&gt; <a href="#1227494" title="java.lang.Object">v</a>.<span title="[T0]=&gt; T0">asInstanceOf</span><span title="A" class="delimiter">[</span><a href="#1107013" title="A">A</a><span class="delimiter">]</span><span class="delimiter">)</span><span class="delimiter">)</span> <a href="../../OptionW.scala.html#42475" title="(a: =&gt; A)A">|</a> <span class="delimiter">{</span>
+      <a href="#1107015" title="(attr: String, value: A)Unit">update</a><span class="delimiter">(</span><a href="#1227296" title="String">attr</a>, <a href="#1227297" title="=&gt; A">default</a><span class="delimiter">)</span>
+      <a href="#1227297" title="=&gt; A">default</a>
+    <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Deletes the attribute associated with the given value.
+   */</span>
+  <span class="keyword">def</span> <a title="(attr: String)Unit" id="1107014">-=</a><span class="delimiter">(</span><a title="String" id="1224277">attr</a>: <span title="String">String</span><span class="delimiter">)</span> = <a href="#1107009" title="=&gt; javax.servlet.http.HttpSession">session</a>.<span title="(x$1: java.lang.String)Unit">removeAttribute</span><span class="delimiter">(</span><a href="#1224277" title="String">attr</a><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * Sets the given attribute name to the given value.
+   */</span>
+  <span class="keyword">def</span> <a title="[A](attr: String, value: A)Unit" id="1107015">update</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="1107017">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="String" id="1224293">attr</a>: <span title="String">String</span>, <a title="A" id="1224294">value</a>: <a href="#1107017" title="A">A</a><span class="delimiter">)</span> = <a href="#1107009" title="=&gt; javax.servlet.http.HttpSession">session</a>.<span title="(x$1: java.lang.String, x$2: Any)Unit">setAttribute</span><span class="delimiter">(</span><a href="#1224293" title="String">attr</a>, <a href="#1224294" title="A">value</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * A wrapper around Java Servlet &lt;code&gt;HttpSession&lt;/code&gt;.
+ */</span>
+<span class="keyword">trait</span> <a title="trait HttpSessions extends java.lang.Object with ScalaObject" id="25768">HttpSessions</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Wraps the given HTTP session.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpSessions.HttpSessionSession : (s: javax.servlet.http.HttpSession)scalaz.http.servlet.HttpSession" id="1106446">HttpSessionSession</a><span class="delimiter">(</span><a title="javax.servlet.http.HttpSession" id="1107045">s</a>: javax.servlet.http.<span title="javax.servlet.http.HttpSession">HttpSession</span><span class="delimiter">)</span>: <a href="#25762" title="scalaz.http.servlet.HttpSession">HttpSession</a> = <a href="#1227825" title="java.lang.Object with scalaz.http.servlet.HttpSession{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.servlet.HttpSession" id="1227825">HttpSession</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="javax.servlet.http.HttpSession" id="1227829">session</a> = <a href="#1107045" title="javax.servlet.http.HttpSession">s</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Unwraps the given HTTP session into a servlet session.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.HttpSessions.SessionHttpSession : (session: scalaz.http.servlet.HttpSession)javax.servlet.http.HttpSession" id="1106447">SessionHttpSession</a><span class="delimiter">(</span><a title="scalaz.http.servlet.HttpSession" id="1107005">session</a>: <a href="#25762" title="scalaz.http.servlet.HttpSession">HttpSession</a><span class="delimiter">)</span> = <a href="#1107005" title="scalaz.http.servlet.HttpSession">session</a>.<a href="#1107009" title="=&gt; javax.servlet.http.HttpSession">session</a>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.HttpSession" id="25763">HttpSession</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#25768" title="scalaz.http.servlet.HttpSessions">HttpSessions</a>
+
+        </pre>
+    </body>
+</html>

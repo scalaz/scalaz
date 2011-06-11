@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Longitude.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Longitude extends java.lang.Object" id="25153">Longitude</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">val</span> <a title="=&gt; Double" id="1105427">value</a>: <span title="Double">Double</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Longitudes extends java.lang.Object with ScalaObject" id="25159">Longitudes</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(d: Double)java.lang.Object with scalaz.geo.Longitude" id="1105316">longitude</a><span class="delimiter">(</span><a title="Double" id="1105439">d</a>: <span title="Double">Double</span><span class="delimiter">)</span> = <a href="#1105442" title="java.lang.Object with scalaz.geo.Longitude{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Longitude" id="1105442">Longitude</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="Double" id="1105444">value</a> = <span class="delimiter">(</span><a href="#1105439" title="Double">d</a> <span title="(x: Int)Double">+</span> <span title="Int(180)" class="int">180</span><span class="delimiter">)</span> <span title="(x: Int)Double">%</span> <span title="Int(360)" class="int">360</span> <span title="(x: Int)Double">-</span> <span title="Int(180)" class="int">180</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Longitude" id="25154">Longitude</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <span title="object Predef">Predef</span>.<span class="delimiter">{</span>implicitly =&gt; i<span class="delimiter">}</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#18009" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Show[scalaz.geo.Longitude]" id="1126195">LongitudeShow</a>: <a href="../Show.scala.html#18602" title="scalaz.Show[scalaz.geo.Longitude]">Show</a><span class="delimiter">[</span>Longitude<span class="delimiter">]</span> = <a href="../Show.scala.html#39365" title="(f: (scalaz.geo.Longitude) =&gt; String)scalaz.Show[scalaz.geo.Longitude]">shows</a><span class="delimiter">(</span><a href="#1135789" title="scalaz.geo.Longitude">_</a>.<a href="../Identity.scala.html#38551" title="(x: =&gt; Double)scalaz.Identity[Double]">value</a>.<a href="../Identity.scala.html#47049" title="(implicit s: scalaz.Show[Double])String">shows</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot;°&quot;)" class="string">&quot;°&quot;</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[scalaz.geo.Longitude]" id="1126196">LongitudeEqual</a>: <a href="../Equal.scala.html#10136" title="scalaz.Equal[scalaz.geo.Longitude]">Equal</a><span class="delimiter">[</span>Longitude<span class="delimiter">]</span> = <a href="../Equal.scala.html#38449" title="(f: (scalaz.geo.Longitude) =&gt; Double)(implicit evidence$1: scalaz.Equal[Double])scalaz.Equal[scalaz.geo.Longitude]">equalBy</a><a href="../Equal.scala.html#142361" title="=&gt; scalaz.Equal[Double]" class="delimiter">(</a><a href="#1136129" title="scalaz.geo.Longitude">_</a>.<a href="#1105427" title="=&gt; Double">value</a><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Order[scalaz.geo.Longitude]" id="1126197">LongitudeOrder</a>: <a href="../Order.scala.html#17435" title="scalaz.Order[scalaz.geo.Longitude]">Order</a><span class="delimiter">[</span>Longitude<span class="delimiter">]</span> = <a href="../Order.scala.html#39255" title="(f: (scalaz.geo.Longitude) =&gt; Double)(implicit evidence$1: scalaz.Order[Double])scalaz.Order[scalaz.geo.Longitude]">orderBy</a><a href="../Order.scala.html#218281" title="=&gt; scalaz.Order[Double]" class="delimiter">(</a><a href="#1136232" title="scalaz.geo.Longitude">_</a>.<a href="#1105427" title="=&gt; Double">value</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+        </pre>
+    </body>
+</html>

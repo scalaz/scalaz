@@ -1,0 +1,539 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.StreamT</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../lib/template.css" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a title="Go to companion" href="StreamT.html"><img src="../lib/object_to_class_big.png" /></a>
+        <p id="owner"><a name="scalaz" class="extype" href="package.html">scalaz</a></p>
+        <h1><a title="Go to companion" href="StreamT.html">StreamT</a></h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <span class="name">StreamT</span>
+        
+        <span class="result"> extends <a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.StreamT" class="in"><span>StreamT</span></li><li name="scalaz.Extras" class="in"><span>Extras</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" name="scalaz.Extras#-&gt;" data-isabs="false">
+      <a id="-&gt;:$minus$greater[A, B]"></a>
+      <h4 class="signature">
+      <span class="kind">type</span>
+      <span class="symbol"> 
+        <span class="name">-&gt;</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="result"> = <a name="scalaz.~&gt;" class="extype" href="$tilde$greater.html">~&gt;</a>[[B]A, [B]B]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A function type encoded as a natural transformation</p><div class="fullcomment"><div class="comment cmt"><p>A function type encoded as a natural transformation</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Extras#Id" data-isabs="false">
+      <a id="Id:Id[A]"></a>
+      <h4 class="signature">
+      <span class="kind">type</span>
+      <span class="symbol"> 
+        <span class="name">Id</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result"> = A</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Extras.Konst" data-isabs="true">
+      <a id="Konst:Konst[A]"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="Extras$Konst.html"><span class="name">Konst</span></a>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.StreamT.Skip" data-isabs="false">
+      <a id="Skip:Skip[S]"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="StreamT$$Skip.html"><span class="name">Skip</span></a>
+        <span class="tparams">[<span name="S">+S</span>]</span>
+        <span class="params">(<span name="s">s: S</span>)</span><span class="result"> extends Step[Nothing, S] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.StreamT.Step" data-isabs="true">
+      <a id="Step:Step[A, S]"></a>
+      <h4 class="signature">
+      <span class="kind">class</span>
+      <span class="symbol"> 
+        <a href="StreamT$$Step.html"><span class="name">Step</span></a>
+        <span class="tparams">[<span name="A">+A</span>, <span name="S">+S</span>]</span>
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Extras#Thunk" data-isabs="false">
+      <a id="Thunk:Thunk[A]"></a>
+      <h4 class="signature">
+      <span class="kind">type</span>
+      <span class="symbol"> 
+        <span class="name">Thunk</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result"> = () ⇒ A</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT.Yield" data-isabs="false">
+      <a id="Yield:Yield[A, S]"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="StreamT$$Yield.html"><span class="name">Yield</span></a>
+        <span class="tparams">[<span name="A">+A</span>, <span name="S">+S</span>]</span>
+        <span class="params">(<span name="a">a: A</span>, <span name="s">s: S</span>)</span><span class="result"> extends Step[A, S] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+        
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT.Done" data-isabs="false">
+      <a id="Done:Done"></a>
+      <h4 class="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <a href="StreamT$$Done$.html"><span class="name">Done</span></a>
+        
+        <span class="result"> extends Step[Nothing, Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.StreamT#apply" data-isabs="false">
+      <a id="apply[M, A](⇒ M[Step[A, StreamT[M, A]]]):StreamT[M, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="step">step: ⇒ M[<a name="scalaz.StreamT.Step" class="extype" href="StreamT$$Step.html">Step</a>[A, <a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, A]]]</span>)</span><span class="result">: <a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#empty" data-isabs="false">
+      <a id="empty[M, A](Pure[M]):StreamT[M, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">empty</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="M">M: <a name="scalaz.Pure" class="extype" href="Pure.html">Pure</a>[M]</span>)</span><span class="result">: <a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Extras#id" data-isabs="false">
+      <a id="id:~&gt;[Id, Id]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">id</span>
+        
+        <span class="result">: <a name="scalaz.~&gt;" class="extype" href="$tilde$greater.html">~&gt;</a>[Id, Id]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A universally quantified identity function</p><div class="fullcomment"><div class="comment cmt"><p>A universally quantified identity function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Extras#natToFunction" data-isabs="false">
+      <a id="natToFunction[F, G, A](~&gt;[F, G]):(F[A]) ⇒ G[A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">natToFunction</span>
+        <span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="f">f: <a name="scalaz.~&gt;" class="extype" href="$tilde$greater.html">~&gt;</a>[F, G]</span>)</span><span class="result">: (F[A]) ⇒ G[A]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#runStreamT" data-isabs="false">
+      <a id="runStreamT[S, A](StreamT[[X]State[S, X], A],S):StreamT[Id, A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">runStreamT</span>
+        <span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span name="stream">stream: <a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[[X]<a name="scalaz.State" class="extype" href="State.html">State</a>[S, X], A]</span>, <span name="s0">s0: S</span>)</span><span class="result">: <a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[Id, A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.StreamT#streamTBind" data-isabs="false">
+      <a id="streamTBind[M](Functor[M]):Bind[[X]StreamT[M, X]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTBind</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Functor" class="extype" href="Functor.html">Functor</a>[M]</span>)</span><span class="result">: <a name="scalaz.Bind" class="extype" href="Bind.html">Bind</a>[[X]<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, X]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#streamTEmpty" data-isabs="false">
+      <a id="streamTEmpty[M](Pure[M]):Empty[[X]StreamT[M, X]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTEmpty</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Pure" class="extype" href="Pure.html">Pure</a>[M]</span>)</span><span class="result">: <a name="scalaz.Empty" class="extype" href="Empty.html">Empty</a>[[X]<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, X]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#streamTFunctor" data-isabs="false">
+      <a id="streamTFunctor[M](Functor[M]):Functor[[X]StreamT[M, X]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTFunctor</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Functor" class="extype" href="Functor.html">Functor</a>[M]</span>)</span><span class="result">: <a name="scalaz.Functor" class="extype" href="Functor.html">Functor</a>[[X]<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, X]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#streamTPure" data-isabs="false">
+      <a id="streamTPure[M](Pure[M]):Pure[[X]StreamT[M, X]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTPure</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Pure" class="extype" href="Pure.html">Pure</a>[M]</span>)</span><span class="result">: <a name="scalaz.Pure" class="extype" href="Pure.html">Pure</a>[[X]<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, X]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#streamTSemigroup" data-isabs="false">
+      <a id="streamTSemigroup[M, A](Functor[M]):Semigroup[StreamT[M, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTSemigroup</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Functor" class="extype" href="Functor.html">Functor</a>[M]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.StreamT#streamTZero" data-isabs="false">
+      <a id="streamTZero[M, A](Pure[M]):Zero[StreamT[M, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">streamTZero</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Pure" class="extype" href="Pure.html">Pure</a>[M]</span>)</span><span class="result">: <a name="scalaz.Zero" class="extype" href="Zero.html">Zero</a>[<a name="scalaz.StreamT" class="extype" href="StreamT.html">StreamT</a>[M, A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div name="scalaz.Extras" class="parent">
+              <h3>Inherited from <a name="scalaz.Extras" class="extype" href="Extras.html">Extras</a></h3>
+            </div><div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

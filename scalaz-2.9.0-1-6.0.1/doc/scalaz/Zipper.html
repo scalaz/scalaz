@@ -1,0 +1,690 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.Zipper</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../lib/template.css" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../lib/trait_big.png" />
+        <p id="owner"><a name="scalaz" class="extype" href="package.html">scalaz</a></p>
+        <h1>Zipper</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <span class="name">Zipper</span>
+        <span class="tparams">[<span name="A">+A</span>]</span>
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
+position in a stream. Focus can be moved forward and backwards through the stream, elements can be inserted
+before or after the focused position, and the focused item can be deleted.</p><p>Based on the pointedlist library by Jeff Wheeler.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.Zipper" class="in"><span>Zipper</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        
+
+        
+        
+        <div class="values members" id="values">
+              <h3>Abstract Value Members</h3>
+              <ol><li visbl="pub" name="scalaz.Zipper#focus" data-isabs="true">
+      <a id="focus:A"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">focus</span>
+        
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#lefts" data-isabs="true">
+      <a id="lefts:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">lefts</span>
+        
+        <span class="result">: Stream[A]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#rights" data-isabs="true">
+      <a id="rights:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">rights</span>
+        
+        <span class="result">: Stream[A]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Concrete Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#atEnd" data-isabs="false">
+      <a id="atEnd:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">atEnd</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Whether the focus is on the last element in the zipper.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#atStart" data-isabs="false">
+      <a id="atStart:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">atStart</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Whether the focus is on the first element in the zipper.</p>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#delete" data-isabs="false">
+      <a id="delete:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">delete</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An alias for deleteRight
+</p>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteC" data-isabs="false">
+      <a id="deleteC:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteC</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An alias for deleteRightC
+</p>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteLeft" data-isabs="false">
+      <a id="deleteLeft:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteLeft</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Deletes the element at focus and moves the focus to the left.</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the element at focus and moves the focus to the left. If there is no element on the left,
+focus is moved to the right.
+</p></div></div>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteLeftC" data-isabs="false">
+      <a id="deleteLeftC:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteLeftC</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Deletes the focused element and moves focus to the left.</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the focused element and moves focus to the left. If the focus was on the first element,
+focus is moved to the last element.
+</p></div></div>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteOthers" data-isabs="false">
+      <a id="deleteOthers:Zipper[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteOthers</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Deletes all elements except the focused element.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteRight" data-isabs="false">
+      <a id="deleteRight:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteRight</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Deletes the element at focus and moves the focus to the right.</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the element at focus and moves the focus to the right. If there is no element on the right,
+focus is moved to the left.
+</p></div></div>
+    </li><li visbl="pub" name="scalaz.Zipper#deleteRightC" data-isabs="false">
+      <a id="deleteRightC:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">deleteRightC</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Deletes the focused element and moves focus to the right.</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the focused element and moves focus to the right. If the focus was on the last element,
+focus is moved to the first element.
+</p></div></div>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#findBy" data-isabs="false">
+      <a id="findBy[AA&gt;:A]((Zipper[AA]) ⇒ Option[Zipper[AA]])((AA) ⇒ Boolean):Option[Zipper[AA]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">findBy</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="f">f: (<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]) ⇒ <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]]</span>)</span><span class="params">(<span name="p">p: (AA) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Given a traversal function, find the first element along the traversal that matches a given predicate.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#findNext" data-isabs="false">
+      <a id="findNext[AA&gt;:A]((AA) ⇒ Boolean):Option[Zipper[AA]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">findNext</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="p">p: (AA) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the nearest element on the right that matches the given predicate,
+or None if there is no such element.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#findPrevious" data-isabs="false">
+      <a id="findPrevious[AA&gt;:A]((AA) ⇒ Boolean):Option[Zipper[AA]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">findPrevious</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="p">p: (AA) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the previous element on the left that matches the given predicate,
+or None if there is no such element.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#findZ" data-isabs="false">
+      <a id="findZ((A) ⇒ Boolean):Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">findZ</span>
+        
+        <span class="params">(<span name="p">p: (A) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the nearest element matching the given predicate, preferring the left,
+or None if no element matches.</p>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#index" data-isabs="false">
+      <a id="index:Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">index</span>
+        
+        <span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The index of the focus.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#insert" data-isabs="false">
+      <a id="insert[AA&gt;:A]:(AA) ⇒ Zipper[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insert</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="result">: (AA) ⇒ <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An alias for insertRight
+</p>
+    </li><li visbl="pub" name="scalaz.Zipper#insertLeft" data-isabs="false">
+      <a id="insertLeft[AA&gt;:A](AA):Zipper[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertLeft</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="y">y: AA</span>)</span><span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Inserts an element to the left of focus and focuses on the new element.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#insertRight" data-isabs="false">
+      <a id="insertRight[AA&gt;:A](AA):Zipper[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertRight</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="y">y: AA</span>)</span><span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Inserts an element to the right of focus and focuses on the new element.</p>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#length" data-isabs="false">
+      <a id="length:Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">length</span>
+        
+        <span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.Zipper#move" data-isabs="false">
+      <a id="move(Int):Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">move</span>
+        
+        <span class="params">(<span name="n">n: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the nth element of the zipper, or None if there is no such element.</p>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#next" data-isabs="false">
+      <a id="next:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">next</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Possibly moves to next element to the right of focus.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#nextC" data-isabs="false">
+      <a id="nextC:Zipper[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">nextC</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the next element.</p><div class="fullcomment"><div class="comment cmt"><p>Moves focus to the next element. If the last element is currently focused, loop to the first element.
+</p></div></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#positions" data-isabs="false">
+      <a id="positions:Zipper[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">positions</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A zipper of all positions of the zipper, with focus on the current position.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#previous" data-isabs="false">
+      <a id="previous:Option[Zipper[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">previous</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Possibly moves to the previous element to the left of focus.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#previousC" data-isabs="false">
+      <a id="previousC:Zipper[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">previousC</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves focus to the previous element.</p><div class="fullcomment"><div class="comment cmt"><p>Moves focus to the previous element. If the first element is currently focused, loop to the last element.
+</p></div></div>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#toStream" data-isabs="false">
+      <a id="toStream:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toStream</span>
+        
+        <span class="result">: Stream[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Get the Stream representation of this Zipper.</p><div class="fullcomment"><div class="comment cmt"><p>Get the Stream representation of this Zipper. This fully traverses <code>lefts</code>. <code>rights</code> is
+not evaluated.
+</p></div></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#tryNext" data-isabs="false">
+      <a id="tryNext:Zipper[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">tryNext</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves to the next element to the right of focus, or error if there is no element on the right.</p>
+    </li><li visbl="pub" name="scalaz.Zipper#tryPrevious" data-isabs="false">
+      <a id="tryPrevious:Zipper[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">tryPrevious</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Moves to the previous element to the left of focus, or error if there is no element on the left.</p>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Zipper#withFocus" data-isabs="false">
+      <a id="withFocus:Zipper[(A, Boolean)]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">withFocus</span>
+        
+        <span class="result">: <a name="scalaz.Zipper" class="extype" href="">Zipper</a>[(A, <span name="scala.Boolean" class="extype">Boolean</span>)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Pairs each element with a boolean indicating whether that element has focus.</p>
+    </li></ol>
+            </div>
+
+        <div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>
