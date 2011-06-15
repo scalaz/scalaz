@@ -9,8 +9,6 @@ sealed trait BKTree[A] {
   def isEmpty: Boolean =
     this == BKTreeEmpty
 
-  // private case class BKTreeNode[A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
-
   def map[B](f: A => B): BKTree[B] =
     this match {
       case BKTreeEmpty() => BKTreeEmpty()

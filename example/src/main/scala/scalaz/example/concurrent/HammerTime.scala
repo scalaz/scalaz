@@ -29,6 +29,6 @@ object HammerTime {
         ), fail)
 
     lazy val hammer1: Actor[Int] = hammer(hammer(hammer1))
-    hammer1 ! 1000000
+    // hammer1 ! 1000000
   }
 }
