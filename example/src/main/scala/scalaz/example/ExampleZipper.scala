@@ -1,8 +1,6 @@
 package scalaz.example
-package data
 
-import scalaz._, data._
-import Scalaz._
+import scalaz._, Scalaz._
 
 object ExampleZipper {
   def main(args: Array[String]) = run

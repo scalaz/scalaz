@@ -1,7 +1,6 @@
 package scalaz.example
-package data
 
-import scalaz._, data._
+import scalaz._
 
 import collection.immutable.Stream
 

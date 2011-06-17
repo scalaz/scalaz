@@ -1,7 +1,6 @@
 package scalaz.example
-package data
 
-import scalaz._, data._
+import scalaz._
 
 object ExampleEndo {
   def main(args: Array[String]) = run
