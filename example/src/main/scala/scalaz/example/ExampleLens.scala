@@ -1,33 +1,44 @@
 package scalaz.example
-  /* todo
-import scalaz._
-import Scalaz._
+
+import scalaz._, Scalaz._
 
 object ExampleLens {
-  case class Employee(name: String, salary: Int)
-  val salary: Lens[Employee, Int] = Lens(_.salary, (e, s) => e copy (salary = s))
-  val name: Lens[Employee, String] = Lens(_.name, (e, n) => e copy (name = n))
+  def main(args: Array[String]) = run
 
-  val giveRaise: Employee => Employee = salary mod (_, _ + 100)
+  def run {
+    case class Employee(name: String, salary: Int)
+    implicit val EmployeeEqual = Equal.equalA[Employee]
+    implicit val EmployeeShow = Show.showA[Employee]
 
-  val tom = Employee("Tom", 4000)
-  val dick = Employee("Dick", 3000)
-  val harry = Employee("Harry", 5000)
+    val salary: Lens[Employee, Int] = lensG(_.salary, e => s => e copy (salary = s))
+    val name: Lens[Employee, String] = lensG(_.name, e => n => e copy (name = n))
 
-  val higherTom = giveRaise(tom) // Employee("Tom", 4100)
+    val giveRaise: Employee => Employee = salary mod (_ + 100)
 
-  val modBoth = (salary *** name) mod ((harry, tom), {
-    case (s, n) => (s + 100, n + " Jones")
-  }) // (Employee("Harry", 5100), Employee("Tom Jones", 4000))  
+    val tom = Employee("Tom", 4000)
+    val dick = Employee("Dick", 3000)
+    val harry = Employee("Harry", 5000)
 
-  val modMonadically = for {
-    _ <- salary += 100
-    n <- name
-    _ <- name := n + " Jones"
-    e <- init
-  } yield e
+    val higherTom = giveRaise(tom)
+    higherTom assert_=== Employee("Tom", 4100)
+/*
+    val modBoth = (salary *** name) mod ((harry, tom), {
+      case (s, n) => (s + 100, n + " Jones")
+    })
+*/
+    val modBoth = ((salary *** name) mod {
+      case (s, n) => (s + 100, n + " Jones")
+    })(harry, tom)
+    modBoth assert_===(Employee("Harry", 5100), Employee("Tom Jones", 4000))
 
-  val tomJones = modMonadically ! tom // Employee("Tom Jones", 4100)
-  
+    val modMonadically = for {
+      _ <- salary += 100
+      n <- name
+      _ <- name := n + " Jones"
+      e <- init
+    } yield e
+
+    val tomJones = modMonadically ! tom
+    tomJones assert_=== Employee("Tom Jones", 4100)
+  }
 }
-             */

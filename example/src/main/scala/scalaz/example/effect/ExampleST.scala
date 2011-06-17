@@ -7,7 +7,6 @@ object ExampleST {
   import scalaz._
   import Scalaz._
   import effect._
-  import data._
 
   // Creates a new mutable reference and mutates it
   def e1[A] = for {
