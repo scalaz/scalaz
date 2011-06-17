@@ -159,6 +159,8 @@ trait Equals {
   implicit def MapEqual[CC[K, V] <: collection.Map[K, V], A: Equal, B: Equal]: Equal[CC[A, B]] =
     equalBy(_.toSet)
 
+  import java.{lang => jl, util => ju}
+
   implicit def JavaIterableEqual[CC[X] <: jl.Iterable[X], A: Equal]: Equal[CC[A]] =
     equalC((a1, a2) => {
       val i1 = a1.iterator

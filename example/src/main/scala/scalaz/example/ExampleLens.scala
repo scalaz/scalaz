@@ -1,5 +1,5 @@
 package scalaz.example
-
+  /* todo
 import scalaz._
 import Scalaz._
 
@@ -30,3 +30,4 @@ object ExampleLens {
   val tomJones = modMonadically ! tom // Employee("Tom Jones", 4100)
   
 }
+             */
