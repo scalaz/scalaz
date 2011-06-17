@@ -190,4 +190,97 @@ trait ImmutableArrays {
       }
   }
 
+  implicit def wrapArray[A](immArray: ImmutableArray[A]): WrappedImmutableArray[A] = {
+    import ImmutableArray.{WrappedImmutableArray => IAO}
+    immArray match {
+      case a: StringArray => new IAO.ofStringArray(a)
+      case a: ofRef[_] => new IAO.ofRef(a)
+      case a: ofByte => new IAO.ofByte(a)
+      case a: ofShort => new IAO.ofShort(a)
+      case a: ofChar => new IAO.ofChar(a)
+      case a: ofInt => new IAO.ofInt(a)
+      case a: ofLong => new IAO.ofLong(a)
+      case a: ofFloat => new IAO.ofFloat(a)
+      case a: ofDouble => new IAO.ofDouble(a)
+      case a: ofBoolean => new IAO.ofBoolean(a)
+      case a: ofUnit => new IAO.ofUnit(a)
+    }
+  }
+
+  implicit def unwrapArray[A](immArrayOps: WrappedImmutableArray[A]): ImmutableArray[A] = immArrayOps.value
+
+  class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
+          IndexedSeq[A] with IndexedSeqOptimized[A, WrappedImmutableArray[A]] {
+    def apply(index: Int) = value(index)
+    def length = value.length
+
+    override def stringPrefix = "ImmutableArray"
+
+    protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]] =
+      error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+    override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
+  }
+
+  object WrappedImmutableArray {
+    import scalaz.{ImmutableArray => IA}
+    class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
+      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(new StringArray(_))
+    }
+
+    abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
+      protected[this] def elemManifest: ClassManifest[A]
+
+      override protected[this] def arrayBuilder = ImmutableArray.newBuilder[A](elemManifest)
+    }
+
+    final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
+      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+    }
+
+    final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
+      protected[this] def elemManifest = ClassManifest.Byte
+    }
+
+    final class ofShort(array: IA.ofShort) extends ofImmutableArray1[Short](array) {
+      protected[this] def elemManifest = ClassManifest.Short
+    }
+
+    final class ofChar(array: IA.ofChar) extends ofImmutableArray1[Char](array) {
+      protected[this] def elemManifest = ClassManifest.Char
+    }
+
+    final class ofInt(array: IA.ofInt) extends ofImmutableArray1[Int](array) {
+      protected[this] def elemManifest = ClassManifest.Int
+    }
+
+    final class ofLong(array: IA.ofLong) extends ofImmutableArray1[Long](array) {
+      protected[this] def elemManifest = ClassManifest.Long
+    }
+
+    final class ofFloat(array: IA.ofFloat) extends ofImmutableArray1[Float](array) {
+      protected[this] def elemManifest = ClassManifest.Float
+    }
+
+    final class ofDouble(array: IA.ofDouble) extends ofImmutableArray1[Double](array) {
+      protected[this] def elemManifest = ClassManifest.Double
+    }
+
+    final class ofBoolean(array: IA.ofBoolean) extends ofImmutableArray1[Boolean](array) {
+      protected[this] def elemManifest = ClassManifest.Boolean
+    }
+
+    final class ofUnit(array: IA.ofUnit) extends ofImmutableArray1[Unit](array) {
+      protected[this] def elemManifest = ClassManifest.Unit
+    }
+  }
+
+  sealed class ImmutableArrayCharW(val value: ImmutableArray[Char]) extends PimpedType[ImmutableArray[Char]] {
+    def asString = value match {
+      case a: StringArray => a.str
+      case a: ofChar => wrapArray(a).mkString
+      case _ => error("Unknown subtype of ImmutableArray[Char]")
+    }
+  }
+
+  implicit def wrapRopeChar(array: ImmutableArray[Char]): ImmutableArrayCharW = new ImmutableArrayCharW(array)
 }

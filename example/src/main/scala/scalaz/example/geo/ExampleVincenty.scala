@@ -18,7 +18,6 @@ object ExampleVincenty {
     mountBarney.direct(bearing(11.5D), 150435D) assert_=== vector(-26.950066610300084D |-| 153.0000106566432D, bearing(11.359998078380356D))
 
     // Mount Barney to N'ga Peak is 1608.695km
-    // TODO failing with Scala 2.9.0.RC3
-    //    (mountBarney inverse ngaPeak) assert_=== curve(1608695.5945547633, azimuth(0D), azimuth(180D))
+    (mountBarney inverse ngaPeak) assert_=== curve(1608695.5945547633, azimuth(0D), azimuth(180D))
   }
 }

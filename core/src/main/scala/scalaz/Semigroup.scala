@@ -4,6 +4,18 @@ import java.math.BigInteger
 import xml.NodeSeq
 import collection.mutable.ArraySeq
 
+/**
+ * A Semigroup in type S must satisfy two laws:
+ * <ol>
+ * <li>
+ * Closure: ∀ a, b in S, append(a, b) is also in S. This is enforced by the type system.
+ * </li>
+ * <li>
+ * Associativity: ∀ a, b and c in S, the equation append(append(a, b), c) = append(a, append(b , c)) holds.
+ * </li>
+ * </ol>
+ * @see scalaz.Identity#⊹
+ */
 trait Semigroup[A] {
   def append(a1: A, a2: => A): A
 
