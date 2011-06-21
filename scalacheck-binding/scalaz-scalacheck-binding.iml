@@ -5,7 +5,9 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
+        <option name="deprecationWarnings" value="true" />
         <option name="maximumHeapSize" value="1024" />
+        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>

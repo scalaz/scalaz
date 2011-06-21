@@ -5,7 +5,9 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
+        <option name="deprecationWarnings" value="true" />
         <option name="maximumHeapSize" value="1024" />
+        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>
@@ -22,6 +24,7 @@
     <orderEntry type="library" name="buildScala" level="project" />
     <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module" module-name="scalaz-geo" />
+    <orderEntry type="module" module-name="scalaz-scalacheck-binding" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -31,7 +34,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="scalaz-scalacheck-binding" />
   </component>
 </module>
 

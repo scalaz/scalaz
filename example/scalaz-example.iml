@@ -5,7 +5,9 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
+        <option name="deprecationWarnings" value="true" />
         <option name="maximumHeapSize" value="1024" />
+        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>
@@ -23,7 +25,7 @@
     <orderEntry type="library" name="buildScala" level="project" />
     <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module" module-name="scalaz-geo" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0/test/jar/specs_2.8.1-1.6.7.2.jar!/" />
