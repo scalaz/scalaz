@@ -2,14 +2,14 @@ import sbt._
 import java.util.jar.Attributes.Name._
 
 abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) with OverridableVersion
-with AutoCompilerPlugins {
+        with AutoCompilerPlugins {
   val scalaToolsSnapshots = "Scala Tools Snapshots" at "http://scala-tools.org/repo-snapshots/"
 
   private val encodingUtf8 = List("-encoding", "UTF-8")
 
   override def compileOptions =
     encodingUtf8.map(CompileOption(_)) :::
-        target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
+            target(Target.Java1_5) :: Unchecked :: super.compileOptions.toList
 
   override def packageOptions = ManifestAttributes((IMPLEMENTATION_TITLE, "Scalaz"), (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"), (IMPLEMENTATION_VENDOR, "The Scalaz Project"), (SEALED, "true")) :: Nil
 
@@ -25,21 +25,17 @@ with AutoCompilerPlugins {
 
   lazy val sourceArtifact = Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
 
-  def specsDependency = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.7.2" % "test" withSources
-
-  def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
-
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil
 
-  //    override def consoleInit =
-  //"""
-  //import scalaz._
-  //import Scalaz._
-  //
-  //"""
+//    override def consoleInit =
+//"""
+//import scalaz._
+//import Scalaz._
+//
+//"""
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
@@ -87,9 +83,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
 
   override def publishLocalAction = noAction
 
-  override def publishAction = task {
-    None
-  }
+  override def publishAction = task {None}
 
   val parentPath = path _
 
@@ -106,32 +100,31 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = scalacheckDependency
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
     override def consoleInit = super.consoleInit +
-        """
-        import org.scalacheck._
-        import org.scalacheck.Prop._
-        """
+"""
+import org.scalacheck._
+import org.scalacheck.Prop._
+"""
 
   }
 
   class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
-    override val scalacheck = scalacheckDependency
-
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
     override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = specsDependency
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Example") :: super.documentOptions
   }
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = specsDependency
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Tests") :: super.documentOptions
   }
@@ -170,7 +163,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
       case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)
     }
 
-    val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
+    val sxr = "lib" / "sxr_2.9.0-0.2.7.jar"
 
     override def documentOptions =
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
@@ -179,4 +172,3 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
 }
-
