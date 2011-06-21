@@ -2,6 +2,7 @@ package scalaz
 
 import CoStateT._
 import collection.immutable.Stack
+import collection.SeqLike
 
 /**
  * Lenses are required to satisfy the following two laws and to be side-effect free.
@@ -107,153 +108,6 @@ sealed trait Lens[A, B] {
       ac => (get(ac._1), that.get(ac._2)),
       (ac, bd) => (set(ac._1)(bd._1), that.set(ac._2)(bd._2))
     )
-
-  def tuple2[C, D](implicit i: B =:= (C, D), j: (C, D) =:= B): (A @@ C, A @@ D) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        )
-
-  def tuple3[C, D, E](implicit i: B =:= (C, D, E), j: (C, D, E) =:= B): (A @@ C, A @@ D, A @@ E) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
-        )
-
-  def tuple4[C, D, E, F](implicit i: B =:= (C, D, E, F), j: (C, D, E, F) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
-        , lensG(a => get(a)._4, a => b => mod(t => t copy (_4 = b))(a))
-        )
-
-  def tuple5[C, D, E, F, G](implicit i: B =:= (C, D, E, F, G), j: (C, D, E, F, G) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
-        , lensG(a => get(a)._4, a => b => mod(t => t copy (_4 = b))(a))
-        , lensG(a => get(a)._5, a => b => mod(t => t copy (_5 = b))(a))
-        )
-
-  def tuple6[C, D, E, F, G, H](implicit i: B =:= (C, D, E, F, G, H), j: (C, D, E, F, G, H) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G, A @@ H) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
-        , lensG(a => get(a)._4, a => b => mod(t => t copy (_4 = b))(a))
-        , lensG(a => get(a)._5, a => b => mod(t => t copy (_5 = b))(a))
-        , lensG(a => get(a)._6, a => b => mod(t => t copy (_6 = b))(a))
-        )
-
-  def tuple7[C, D, E, F, G, H, I](implicit i: B =:= (C, D, E, F, G, H, I), j: (C, D, E, F, G, H, I) =:= B): (A @@ C, A @@ D, A @@ E, A @@ F, A @@ G, A @@ H, A @@ I) =
-    (
-        lensG(a => get(a)._1, a => b => mod(t => t copy (_1 = b))(a))
-        , lensG(a => get(a)._2, a => b => mod(t => t copy (_2 = b))(a))
-        , lensG(a => get(a)._3, a => b => mod(t => t copy (_3 = b))(a))
-        , lensG(a => get(a)._4, a => b => mod(t => t copy (_4 = b))(a))
-        , lensG(a => get(a)._5, a => b => mod(t => t copy (_5 = b))(a))
-        , lensG(a => get(a)._6, a => b => mod(t => t copy (_6 = b))(a))
-        , lensG(a => get(a)._7, a => b => mod(t => t copy (_7 = b))(a))
-        )
-
-  /**Provide an imperative-seeming API for stacks viewed through a lens */
-  case class StackLens[C](implicit i: B =:= Stack[C], j: Stack[C] =:= B) {
-    def push(elem1: C, elem2: C, elems: C*): State[A, Unit] =
-      %==(b => j(i(b) push elem1 push elem2 pushAll elems))
-
-    def pop: State[A, Unit] =
-      %==(b => j(i(b).pop))
-
-    def pop2: State[A, C] =
-      %%=(state(b => {
-        val (c, s) = i(b).pop2
-        (c, j(s))
-      }))
-
-    def top: State[A, C] =
-      >-(i(_).top)
-
-    def length: State[A, Int] =
-      >-(i(_).length)
-  }
-
-  def stack[C](implicit i: B =:= Stack[C], j: Stack[C] =:= B) =
-    StackLens[C]
-
-  import collection.immutable.Queue
-
-  /**Provide an imperative-seeming API for queues viewed through a lens */
-  case class QueueLens[C](implicit i: B =:= Queue[C], j: Queue[C] =:= B) {
-    def enqueue(elem: C): State[A, Unit] =
-      %==(b => j(i(b).enqueue(elem)))
-
-    def dequeue: State[A, C] =
-      %%=(state(b => {
-        val (c, _) = i(b).dequeue
-        (c, j(b))
-      }))
-
-    def length: State[A, Int] =
-      >-(i(_).length)
-  }
-
-  def queue[C](implicit i: B =:= Queue[C], j: Queue[C] =:= B) =
-    QueueLens[C]
-
-  /**Provide an imperative-seeming API for arrays viewed through a lens */
-  case class ArrayLens[C](implicit i: B =:= Array[C], j: Array[C] =:= B) {
-    def at(n: Int): (A @@ C) =
-      lensG[A, C](
-        a => i(get(a))(n),
-        a => v => mod(array => {
-          val copy = array.clone()
-          copy.update(n, v)
-          copy
-        })(a)
-      )
-
-    def length: State[A, Int] =
-      >-(i(_).length)
-  }
-
-  def array[C](implicit i: B =:= Array[C], j: Array[C] =:= B) =
-    ArrayLens[C]
-
-  /**Allow the illusion of imperative updates to numbers viewed through a lens */
-  case class NumericLens(implicit num: Numeric[B]) {
-    def +=(that: B): State[A, B] =
-      %=(n => num.minus(n, that))
-
-    def -=(that: B): State[A, B] =
-      %=(n => num.minus(n, that))
-
-    def *=(that: B): State[A, B] =
-      %=(n => num.times(n, that))
-  }
-
-  def numeric(implicit num: Numeric[B]) =
-    NumericLens
-
-  /**Allow the illusion of imperative updates to numbers viewed through a lens */
-  case class FractionalLens(implicit frac: Fractional[B]) {
-    def /=(that: B): State[A, B] =
-      %=(n => frac.div(n, that))
-  }
-
-  def fractional(implicit frac: Fractional[B]) =
-    FractionalLens
-
-  /**Allow the illusion of imperative updates to numbers viewed through a lens */
-  case class IntegralLens(implicit ig: Integral[B]) {
-    def %=(that: B): State[A, B] =
-      Lens.this.%=(n => ig.quot(n, that))
-  }
-
-  def integral(implicit ig: Integral[B]) =
-    IntegralLens
 }
 
 object Lens extends Lenss {
@@ -262,6 +116,8 @@ object Lens extends Lenss {
 }
 
 trait Lenss {
+  import StateT._
+
   type @@[A, B] =
   Lens[A, B]
 
@@ -306,4 +162,242 @@ trait Lenss {
 
   implicit def LensCategory: Category[Lens] =
     Category.category
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s))
+  )
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple3Lens[S,A,B,C](lens: Lens[S,(A,B,C)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s)),
+    lensG[S,C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a))(s))
+  )
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple4Lens[S,A,B,C,D](lens: Lens[S,(A,B,C,D)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s)),
+    lensG[S,C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a))(s)),
+    lensG[S,D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a))(s))
+  )
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple5Lens[S,A,B,C,D,E](lens: Lens[S,(A,B,C,D,E)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s)),
+    lensG[S,C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a))(s)),
+    lensG[S,D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a))(s)),
+    lensG[S,E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a))(s))
+  )
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple6Lens[S,A,B,C,D,E,F](lens: Lens[S,(A,B,C,D,E,F)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s)),
+    lensG[S,C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a))(s)),
+    lensG[S,D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a))(s)),
+    lensG[S,E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a))(s)),
+    lensG[S,F](s => lens.get(s)._6, s => a => lens.mod(t => t copy (_6 = a))(s))
+  )
+
+  /** Enriches lenses that view tuples with field accessors */
+  implicit def tuple7Lens[S,A,B,C,D,E,F,G](lens: Lens[S,(A,B,C,D,E,F,G)]) = (
+    lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),
+    lensG[S,B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a))(s)),
+    lensG[S,C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a))(s)),
+    lensG[S,D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a))(s)),
+    lensG[S,E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a))(s)),
+    lensG[S,F](s => lens.get(s)._6, s => a => lens.mod(t => t copy (_6 = a))(s)),
+    lensG[S,G](s => lens.get(s)._7, s => a => lens.mod(t => t copy (_7 = a))(s))
+  )
+
+  /** A lens that views a Set can provide the appearance of in place mutation */
+  implicit def setLens[S, K](lens: S @@ Set[K]) =
+    SetLens[S, K](lens)
+
+  case class SetLens[S, K](lens: S @@ Set[K]) {
+    /** Setting the value of this lens will change whether or not it is present in the set */
+    def contains(key: K) = lensG[S, Boolean](
+      s => lens.get(s).contains(key),
+      s => b => lens.mod(m => if (b) m + key else m - key)(s)
+    )
+
+    def &=(that: Set[K]): State[S, Set[K]] =
+      lens %= (_ & that)
+
+    def &~=(that: Set[K]): State[S, Set[K]] =
+      lens %= (_ &~ that)
+
+    def |=(that: Set[K]): State[S, Set[K]] =
+      lens %= (_ | that)
+
+    def += (elem: K) =
+      lens %= (_ + elem)
+
+    def += (elem1: K, elem2: K, elems: K*) =
+      lens %= (_ + elem1 + elem2 ++ elems)
+
+    def ++= (xs: TraversableOnce[K]) =
+      lens %= (_ ++ xs)
+
+    def -=(elem: K): State[S, Set[K]]
+      = lens %= (_ - elem)
+
+    def -=(elem1: K, elem2: K, elems: K*): State[S, Set[K]] =
+      lens %= (_ - elem1 - elem2 -- elems)
+
+    def --=(xs: TraversableOnce[K]): State[S, Set[K]] =
+      lens %= (_ -- xs)
+  }
+
+  /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */
+  case class MapLens[S, K, V](lens: S @@ Map[K, V]) {
+    /** Allows both viewing and setting the value of a member of the map */
+    def member(k: K): (S @@ Option[V]) = lensG[S, Option[V]](
+        s => lens.get(s).get(k),
+        s => opt => lens.mod(m => opt match {
+          case Some(v) => m + (k -> v)
+          case None    => m - k
+        })(s))
+
+    /** This lens has undefined behavior when accessing an element not present in the map! */
+    def at(k: K): (S @@ V) =
+      lensG[S, V](lens.get(_)(k), s => v => lens.mod(_ + (k -> v))(s))
+
+    def +=(elem1: (K, V), elem2: (K, V), elems: (K, V)*): State[S, Map[K, V]] =
+      lens %= (_ + elem1 + elem2 ++ elems)
+
+    def +=(elem: (K, V)): State[S, Map[K, V]] =
+      lens %= (_ + elem)
+
+    def ++=(xs: TraversableOnce[(K, V)]): State[S, Map[K, V]] =
+      lens %= (_ ++ xs)
+
+    def update(key: K, value: V): State[S, Unit] =
+      lens %== (_.updated(key, value))
+
+    def -=(elem: K): State[S, Map[K, V]]
+      = lens %= (_ - elem)
+
+    def -=(elem1: K, elem2: K, elems: K*): State[S, Map[K, V]] =
+      lens %= (_ - elem1 - elem2 -- elems)
+
+    def --=(xs: TraversableOnce[K]): State[S, Map[K, V]] =
+      lens %= (_ -- xs)
+  }
+
+  implicit def mapLens[S, K, V](lens: S @@ Map[K, V]) = MapLens[S, K, V](lens)
+
+  /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
+  case class SeqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: S @@ Repr) {
+    def sortWith(lt: (A,A) => Boolean): State[S, Unit]
+      = lens %== (_ sortWith lt)
+    def sortBy[B:math.Ordering](f:A => B): State[S, Unit]
+      = lens %== (_ sortBy f)
+    def sort[B >: A](implicit ord: math.Ordering[B]) =
+      lens %== (_.sorted[B]): State[S, Unit]
+  }
+
+  implicit def seqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: S @@ Repr) =
+    SeqLikeLens[S, A, Repr](lens)
+
+  implicit def seqLens[S, A](lens: Lens[S, scala.collection.immutable.Seq[A]]) =
+    seqLikeLens[S, A, scala.collection.immutable.Seq[A]](lens)
+
+  /**Provide an imperative-seeming API for stacks viewed through a lens */
+  case class StackLens[S, A](lens: S @@ Stack[A]) {
+    def push(elem1: A, elem2: A, elems: A*): State[S, Unit] =
+      lens %== (_ push elem1 push elem2 pushAll elems)
+
+    def push1(elem: A): State[S, Unit] =
+      lens %== (_ push elem)
+
+    def pop: State[S, Unit] =
+      lens %== (_ pop)
+
+    def pop2: State[S, A] =
+      lens %%= (state(_.pop2))
+
+    def top: State[S, A] =
+      lens >- (_.top)
+
+    def length: State[S, Int] =
+      lens >- (_.length)
+  }
+
+  implicit def stackLens[S, A](lens: S @@ Stack[A]) =
+    StackLens[S, A](lens)
+
+
+  import collection.immutable.Queue
+
+  /**Provide an imperative-seeming API for queues viewed through a lens */
+  case class QueueLens[S, A](lens: S @@ Queue[A]) {
+    def enqueue(elem: A): State[S, Unit] =
+      lens %== (_ enqueue elem)
+
+    def dequeue: State[S, A] =
+      lens %%= (state(_.dequeue))
+
+    def length: State[S, Int] =
+      lens >- (_.length)
+  }
+
+  implicit def queueLens[S, A](lens: S @@ Queue[A]) =
+    QueueLens[S, A](lens)
+
+  /**Provide an imperative-seeming API for arrays viewed through a lens */
+  case class ArrayLens[S, A](lens: S @@ Array[A]) {
+    def at(n: Int): (S @@ A) =
+      lensG[S, A](
+        s => lens.get(s)(n),
+        s => v => lens.mod(array => {
+          val copy = array.clone()
+          copy.update(n, v)
+          copy
+        })(s)
+      )
+
+    def length: State[S, Int] =
+      lens >- (_.length)
+  }
+
+  implicit def arrayLens[S, A](lens: S @@ Array[A]) =
+    ArrayLens[S, A](lens)
+
+  /**Allow the illusion of imperative updates to numbers viewed through a lens */
+  case class NumericLens[S, N:Numeric](lens: S @@ N, num : Numeric[N]) {
+    def +=(that: N): State[S, N] =
+      lens %= (num.minus(_, that))
+
+    def -=(that: N): State[S, N] =
+      lens %= (num.minus(_, that))
+
+    def *=(that: N): State[S, N] =
+      lens %= (num.times(_, that))
+  }
+
+  implicit def numericLens[S, N:Numeric](lens: S @@ N) =
+    NumericLens[S, N](lens, implicitly[Numeric[N]])
+
+  /**Allow the illusion of imperative updates to numbers viewed through a lens */
+  case class FractionalLens[S, F](lens: S @@ F, frac: Fractional[F]) {
+    def /=(that: F): State[S, F] =
+      lens %= (frac.div(_, that))
+  }
+
+  implicit def fractionalLens[S, F:Fractional](lens: S @@ F) =
+    FractionalLens[S, F](lens, implicitly[Fractional[F]])
+
+  /**Allow the illusion of imperative updates to numbers viewed through a lens */
+  case class IntegralLens[S, I](lens: S @@ I, ig: Integral[I]) {
+    def %=(that: I): State[S, I] =
+      lens %= (ig.quot(_, that))
+  }
+
+  implicit def integralLens[S, I:Integral](lens: S @@ I) =
+    IntegralLens[S,I](lens, implicitly[Integral[I]])
 }
