@@ -75,9 +75,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
   override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
 
-  private def noAction = task {
-    None
-  }
+  private def noAction = task {None}
 
   override def deliverLocalAction = noAction
 
@@ -88,9 +86,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   val parentPath = path _
 
   class Core(info: ProjectInfo) extends ScalazDefaults(info) with Boilerplate {
-    override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala ##
-
-    override def compileAction = super.compileAction dependsOn (generateTupleW)
+    override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala##
+    override def compileAction = super.compileAction dependsOn(generateTupleW)
 
     override def documentOptions = documentTitle("Scalaz Core") :: super.documentOptions
   }
@@ -142,26 +139,18 @@ import org.scalacheck.Prop._
         sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
         None
       }
-      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip")) dependsOn (copy)
-    } describedAs ("Zip all artifacts")
+      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
+    } describedAs("Zip all artifacts")
 
-    private def noAction = task {
-      None
-    }
+    private def noAction = task {None}
 
     override def publishLocalAction = noAction dependsOn packageFullAction
 
     override def publishAction = noAction dependsOn packageFullAction
 
-    def deepSources = Path.finder {
-      topologicalSort.flatMap {
-        case p: ScalaPaths => p.mainSources.getFiles
-      }
-    }
+    def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
 
-    def allSourceRoots = topologicalSort.flatMap {
-      case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)
-    }
+    def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
 
     val sxr = "lib" / "sxr_2.9.0-0.2.7.jar"
 
@@ -169,6 +158,8 @@ import org.scalacheck.Prop._
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
       SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
       super.documentOptions
-  }
 
+    lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
+
+  }
 }
