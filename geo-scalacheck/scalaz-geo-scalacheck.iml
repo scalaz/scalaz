@@ -28,7 +28,16 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0/compile/jar/scalacheck_2.8.1-1.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0-1/compile/jar/test-interface-0.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0-1/compile/jar/scalacheck_2.8.1-1.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

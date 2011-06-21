@@ -26,6 +26,15 @@
     <orderEntry type="module" module-name="scalaz-core" />
     <orderEntry type="module" module-name="scalaz-geo" />
     <orderEntry type="module" module-name="scalaz-geo-scalacheck" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0-1/test/jar/specs_2.8.1-1.6.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
