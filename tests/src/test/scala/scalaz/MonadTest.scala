@@ -33,7 +33,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
 
     implicit def StateEqual = implicitly[Equal[(Int, Unit)]] ∙ {
       s: State[Int, Unit] => {
-        val (i, j) = s.run.apply(0)
+        val (i, j) = s.run(0)
         (j, i)
       }
     }

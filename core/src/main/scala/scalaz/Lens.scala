@@ -45,8 +45,8 @@ sealed trait Lens[A, B] {
     a =>
       ftr.fmap((b: B) => set(a)(b))(f(get(a)))
 
-  def access: State[A, B] =
-    %=(z => z)
+  def st: State[A, B] =
+    state(s => (get(s), s))
 
   def :=(b: => B): State[A, B] =
     %=(_ => b)
@@ -64,8 +64,7 @@ sealed trait Lens[A, B] {
 
   def %%=[C](s: State[B, C]): State[A, C] =
     state[A, C](a => {
-      val r = s.run
-      val (c, b) = r(get(a))
+      val (c, b) = s.run(get(a))
       (c, set(a)(b))
     })
 
@@ -73,10 +72,10 @@ sealed trait Lens[A, B] {
     state[A, C](a => (f(get(a)), a))
 
   def >>-[C](f: B => State[A, C]): State[A, C] =
-    state[A, C](a => {
-      val r = f(get(a)).run
-      r(a)
-    })
+    state[A, C](a => f(get(a)).run(a))
+
+  def ->>-[C](f: => State[A, C]): State[A, C] =
+    >>-(_ => f)
 
   /**Lenses can be composed */
   def >=>[C](that: C @@ A): (C @@ B) =
@@ -150,6 +149,10 @@ trait Lenss {
   /**Access the second field of a tuple */
   def secondLens[A, B]: ((A, B) @@ B) =
     lensG[(A, B), B](_._2, ab => b => (ab._1, b))
+
+  /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
+  implicit def LensState[A,B](lens: Lens[A, B]): State[A, B] =
+    lens.st
 
   implicit def LensId: Id[Lens] = new Id[Lens] {
     def id[A] = lensId

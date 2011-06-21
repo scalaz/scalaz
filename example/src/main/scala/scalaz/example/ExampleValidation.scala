@@ -52,10 +52,8 @@ object ExampleValidation {
     }
     k4.fail.toOption assert_=== some(nels("error", "error"))
 
-    /* todo
     person
     parseNumbers
-    */
   }
 
   /**

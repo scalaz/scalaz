@@ -17,14 +17,12 @@ sealed trait StepStreamT[F[_], A] {
   private def stepMap[B](k: Step[A, StepStreamT[F, A]] => B)(implicit m: Functor[F]): F[B] =
     m.fmap(k)(step)
 
-  def runStream[S](s: S)(implicit i: F[Step[A, StepStreamT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepStreamT[PartialApplyState[S]#Apply, A]]]): StepStream[A] = {
-    val r = step.run
-    streamT(ident(r(s) match {
+  def runStream[S](s: S)(implicit i: F[Step[A, StepStreamT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepStreamT[PartialApplyState[S]#Apply, A]]]): StepStream[A] =
+    streamT(ident(step.run(s) match {
       case (Yield(a, as), s1) => Yield[A, StepStream[A]](a, as runStream s1)
       case (Skip(as), s1) => Skip(as runStream s1)
       case (Done(), _) => Done()
     }))
-  }
 
   def uncons(implicit m: Monad[F]): F[Option[(A, StepStreamT[F, A])]] =
     stepFlatMap {

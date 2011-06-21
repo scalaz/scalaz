@@ -21,24 +21,20 @@ object ExampleLens {
 
     val higherTom = giveRaise(tom)
     higherTom assert_=== Employee("Tom", 4100)
-/*
-    val modBoth = (salary *** name) mod ((harry, tom), {
-      case (s, n) => (s + 100, n + " Jones")
-    })
-*/
+
     val modBoth = ((salary *** name) mod {
       case (s, n) => (s + 100, n + " Jones")
     })(harry, tom)
     modBoth assert_===(Employee("Harry", 5100), Employee("Tom Jones", 4000))
 
-    val modMonadically = for {
-      _ <- salary += 100
-      n <- name
-      _ <- name := n + " Jones"
-      e <- init
-    } yield e
-
-    val tomJones = modMonadically ! tom
+    val modMonadically =
+      for {
+        _ <- salary += 100
+        n <- name
+        _ <- name := n + " Jones"
+        e <- get
+      } yield e
+    val tomJones = modMonadically eval tom
     tomJones assert_=== Employee("Tom Jones", 4100)
   }
 }

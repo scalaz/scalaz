@@ -17,14 +17,12 @@ sealed trait StepListT[F[_], A] {
   private def stepMap[B](k: Step[A, StepListT[F, A]] => B)(implicit m: Functor[F]): F[B] =
     m.fmap(k)(step)
 
-  def runList[S](s: S)(implicit i: F[Step[A, StepListT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepListT[PartialApplyState[S]#Apply, A]]]): StepList[A] = {
-    val r = step.run
-    listT(ident(r(s) match {
+  def runList[S](s: S)(implicit i: F[Step[A, StepListT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepListT[PartialApplyState[S]#Apply, A]]]): StepList[A] =
+    listT(ident(step.run(s) match {
       case (Yield(a, as), s1) => Yield[A, StepList[A]](a, as runList s1)
       case (Skip(as), s1) => Skip(as runList s1)
       case (Done(), _) => Done()
     }))
-  }
 
   def uncons(implicit m: Monad[F]): F[Option[(A, StepListT[F, A])]] =
     stepFlatMap {

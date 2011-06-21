@@ -21,7 +21,24 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="buildScala" level="project" />
     <orderEntry type="module" module-name="scalaz-core" />
-    <orderEntry type="library" exported="" name="testScala" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0/compile/jar/test-interface-0.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0/compile/jar/scalacheck_2.8.1-1.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
