@@ -21,7 +21,7 @@ object Issue25 extends Specification with Sugar with ScalaCheck with PendingUnti
   }
 
   "function1 semigroup 2" in {
-    val f2 = List(f, f).asMA.sum
+    val f2 = List(f, f).suml
     f2(7) must be_==(16)
   }
 

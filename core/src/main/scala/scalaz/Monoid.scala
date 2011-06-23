@@ -120,6 +120,9 @@ trait Monoids extends MonoidsLow {
     monoid[A => B]
   }
 
+  implicit def MapMonoid[K, V](implicit ss: Semigroup[V]): Monoid[Map[K, V]] =
+    monoid[Map[K, V]]
+
   /**A monoid for sequencing Applicative effects. */
   def liftMonoid[F[_], M](implicit m: Monoid[M], a: Applicative[F]): Monoid[F[M]] = new Monoid[F[M]] {
     val zero = new Zero[F[M]] {

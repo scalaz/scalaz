@@ -21,6 +21,7 @@ trait Foldable[F[_]] {
   def deriving[G[_]](implicit n: ^**^[G, F]): Foldable[G] = {
     implicit val r: Foldr[G] = foldr.deriving[G]
     implicit val l: Foldl[G] = foldl.deriving[G]
+    foldable[G]
   }
 }
 

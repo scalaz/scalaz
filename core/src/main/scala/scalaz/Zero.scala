@@ -122,6 +122,9 @@ trait Zeros extends ZerosLow {
   implicit def Function1Zero[A, B](implicit zb: Zero[B]): Zero[A => B] =
     zero((_: A) => zb.zero)
 
+  implicit def MapZero[K, V]: Zero[Map[K, V]] =
+    zero(Map.empty[K, V])
+
   import java.util._
   import java.util.concurrent._
 

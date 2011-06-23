@@ -91,4 +91,7 @@ trait Scalazs extends {
 
   def ∅[Z](implicit z: Zero[Z]): Z =
     z.zero
+
+  def mzero[Z](implicit z: Zero[Z]): Z =
+    z.zero
 }
