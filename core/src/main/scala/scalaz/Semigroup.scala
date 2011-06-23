@@ -200,6 +200,16 @@ trait Semigroups extends SemigroupsLow {
   implicit def DigitSemigroup: Semigroup[Digit] =
     Semigroup.semigroup(a => b => Digit.mod10Digit(a.toInt + b.toInt))
 
+  implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = new Semigroup[Endo[A]] {
+    def append(a1: Endo[A], a2: => Endo[A]) =
+      a1 compose a2
+  }
+
+  implicit def HeapSemigroup[A]: Semigroup[Heap[A]] = new Semigroup[Heap[A]] {
+    def append(m1: Heap[A], m2: => Heap[A]) =
+      m1 union m2
+  }
+
 }
 
 trait SemigroupsLow {

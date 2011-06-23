@@ -377,19 +377,6 @@ trait Heaps {
   def unapply[A](h: Heap[A]): Option[(Int, (A, A) => Boolean, Tree[Ranked[A]])] =
     h.fold(None, (sz, leq, t) => Some((sz, leq, t)))
 
-  implicit def HeapZero[A]: Zero[Heap[A]] = new Zero[Heap[A]] {
-    val zero: Heap[A] =
-      Empty[A]
-  }
-
-  implicit def HeapSemigroup[A]: Semigroup[Heap[A]] = new Semigroup[Heap[A]] {
-    def append(m1: Heap[A], m2: => Heap[A]) =
-      m1 union m2
-  }
-
-  implicit def HeapMonoid[A]: Monoid[Heap[A]] =
-    Monoid.monoid
-
   implicit val HeapFoldMap: FoldMap[Heap] = new FoldMap[Heap] {
     def foldMap[A, M: Monoid](f: A => M) =
       as => {

@@ -28,20 +28,4 @@ trait Endos {
 
   implicit def EndoTo[A](e: Endo[A]): (=> A) => A =
     a => e.apply(a)
-
-  implicit def EndoNewtype[A]: ^*^[Endo[A], (=> A) => A] =
-    ^*^.^*^(e => e(_), b => new Endo[A] {
-      def apply(a: => A) = b(a)
-    })
-
-  implicit def EndoZero[A]: Zero[Endo[A]] =
-    Zero.zero(endo(x => x))
-
-  implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = new Semigroup[Endo[A]] {
-    def append(a1: Endo[A], a2: => Endo[A]) =
-      a1 compose a2
-  }
-
-  implicit def EndoMonoid[A]: Monoid[Endo[A]] =
-    Monoid.monoid
 }

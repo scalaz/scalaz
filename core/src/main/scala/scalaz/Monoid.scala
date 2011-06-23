@@ -137,6 +137,13 @@ trait Monoids extends MonoidsLow {
         a.liftA2[M, M, M](m1 => m2 => m.append(m1, m2))(x)(y)
     }
   }
+
+  implicit def EndoMonoid[A]: Monoid[Endo[A]] =
+    Monoid.monoid
+
+  implicit def HeapMonoid[A]: Monoid[Heap[A]] =
+    Monoid.monoid
+
 }
 
 trait MonoidsLow {

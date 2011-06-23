@@ -194,6 +194,14 @@ trait Zeros extends ZerosLow {
   implicit def DigitZero: Zero[Digit] =
     Zero.zero(Digit.Digit._0)
 
+  implicit def EndoZero[A]: Zero[Endo[A]] =
+    Zero.zero(Endo.endo(x => x))
+
+  implicit def HeapZero[A]: Zero[Heap[A]] = new Zero[Heap[A]] {
+    val zero: Heap[A] =
+      Heap.Empty[A]
+  }
+
 }
 
 trait ZerosLow {

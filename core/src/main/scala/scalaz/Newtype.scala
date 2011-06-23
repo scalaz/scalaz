@@ -19,6 +19,9 @@ trait ^^*^^ {
 
   def <-^*^[T, R](t: T)(implicit u: ^*^[T, R]): R =
     u.unpack(t)
+
+  implicit def EndoNewtype[A]: ^*^[Endo[A], (=> A) => A] =
+    ^*^(e => e(_), Endo.endo(_))
 }
 
 trait ^**^[F[_], G[_]] {
