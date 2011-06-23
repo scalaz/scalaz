@@ -263,4 +263,7 @@ trait Shows {
   implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
 
+  implicit def ShowOptionT[F[_], A](implicit e: Show[F[Option[A]]]): Show[OptionT[F, A]] =
+    Show.showBy(_.runT)
+
 }

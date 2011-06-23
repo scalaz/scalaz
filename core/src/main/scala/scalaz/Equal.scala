@@ -217,4 +217,7 @@ trait Equals {
   implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] =
     implicitly[Equal[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
 
+  implicit def EqualOptionT[F[_], A](implicit e: Equal[F[Option[A]]]): Equal[OptionT[F, A]] =
+    Equal.equalBy(_.runT)
+
 }

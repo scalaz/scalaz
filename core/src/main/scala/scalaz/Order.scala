@@ -269,4 +269,7 @@ trait Orders {
   implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     implicitly[Order[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
 
+  implicit def OrderOptionT[F[_], A](implicit e: Order[F[Option[A]]]): Order[OptionT[F, A]] =
+    Order.orderBy(_.runT)
+
 }

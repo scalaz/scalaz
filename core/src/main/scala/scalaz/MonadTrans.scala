@@ -15,7 +15,7 @@ trait MonadTranss {
 
   implicit val OptionTMonadTrans: MonadTrans[OptionT] = new MonadTrans[OptionT] {
     def lift[G[_] : Monad, A](a: G[A]): OptionT[G, A] =
-      optionT(implicitly[Monad[G]].fmap((a: A) => Some(a): Option[A])(a))
+      OptionT.optionT(implicitly[Monad[G]].fmap((a: A) => Some(a): Option[A])(a))
   }
 
   implicit def KleisliMonadTrans[T]: MonadTrans[({type λ[α[_], β] = Kleisli[T, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = Kleisli[T, α, β]})#λ] {

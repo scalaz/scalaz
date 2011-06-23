@@ -10,10 +10,11 @@ object ExampleLens {
     implicit val EmployeeEqual = Equal.equalA[Employee]
     implicit val EmployeeShow = Show.showA[Employee]
 
-    val salary: Lens[Employee, Int] = lensG(_.salary, e => s => e copy (salary = s))
-    val name: Lens[Employee, String] = lensG(_.name, e => n => e copy (name = n))
+    val salary: (Employee @@ Int) = lensG(_.salary, e => s => e copy (salary = s))
+    val name: (Employee @@ String) = lensG(_.name, e => n => e copy (name = n))
 
-    val giveRaise: Employee => Employee = salary mod (_ + 100)
+
+    val giveRaise: Employee => Employee = salary mod (100+)
 
     val tom = Employee("Tom", 4000)
     val dick = Employee("Dick", 3000)

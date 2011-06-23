@@ -81,13 +81,4 @@ trait OptionTs {
 
   def noneT[F[_], A](implicit p: Pointed[F]): OptionT[F, A] =
     optionT(p.point(None))
-
-  implicit def EqualOptionT[F[_], A](implicit e: Equal[F[Option[A]]]): Equal[OptionT[F, A]] =
-    Equal.equalBy(_.runT)
-
-  implicit def OrderOptionT[F[_], A](implicit e: Order[F[Option[A]]]): Order[OptionT[F, A]] =
-    Order.orderBy(_.runT)
-
-  implicit def ShowOptionT[F[_], A](implicit e: Show[F[Option[A]]]): Show[OptionT[F, A]] =
-    Show.showBy(_.runT)
 }
