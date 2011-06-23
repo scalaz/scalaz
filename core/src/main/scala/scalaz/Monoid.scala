@@ -115,8 +115,8 @@ trait Monoids extends MonoidsLow {
   }
 
   implicit def Function1Monoid[A, B](implicit mb: Monoid[B]): Monoid[A => B] = {
-    implicit val sb = implicitly[Monoid[A => B]].semigroup
-    implicit val zb = implicitly[Monoid[A => B]].zero
+    implicit val sb = mb.semigroup
+    implicit val zb = mb.zero
     monoid[A => B]
   }
 

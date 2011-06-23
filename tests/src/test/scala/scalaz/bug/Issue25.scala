@@ -31,10 +31,7 @@ object Issue25 extends Specification with Sugar with ScalaCheck with PendingUnti
   }
 
   "function1 semigroup 4" in {
-    // TODO Something is awry with ListFoldable#foldRight
-    pendingUntilFixed {
-      val f2 = List(f, f).sumr
-      f2(7) must be_==(16)
-    }
+    val f2 = List(f, f).sumr
+    f2(7) must be_==(16)
   }
 }
