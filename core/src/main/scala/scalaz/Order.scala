@@ -263,4 +263,7 @@ trait Orders {
   implicit def IdentityOrder[A: Order]: Order[Identity[A]] =
     Order.orderBy(_.value)
 
+  implicit def DigitOrder: Order[Digit] =
+    Order.orderBy(_.toInt)
+
 }

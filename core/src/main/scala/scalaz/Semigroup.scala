@@ -197,6 +197,9 @@ trait Semigroups extends SemigroupsLow {
     k
   })
 
+  implicit def DigitSemigroup: Semigroup[Digit] =
+    Semigroup.semigroup(a => b => Digit.mod10Digit(a.toInt + b.toInt))
+
 }
 
 trait SemigroupsLow {

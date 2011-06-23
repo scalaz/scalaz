@@ -211,4 +211,7 @@ trait Equals {
   implicit def IdentityEqual[A: Equal]: Equal[Identity[A]] =
     Equal.equalBy(_.value)
 
+  implicit def DigitEqual: Equal[Digit] =
+    Equal.equalBy(_.toInt)
+
 }

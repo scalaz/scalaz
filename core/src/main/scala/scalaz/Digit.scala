@@ -41,23 +41,6 @@ trait Digits {
       case 9 => _9
       case _ => mod10Digit(scala.math.abs(i) % 10)
     }
-  implicit def DigitShow: Show[Digit] =
-    Show.showBy(_.toInt)
-
-  implicit def DigitEqual: Equal[Digit] =
-    Equal.equalBy(_.toInt)
-
-  implicit def DigitOrder: Order[Digit] =
-    Order.orderBy(_.toInt)
-
-  implicit def DigitZero: Zero[Digit] =
-    Zero.zero(Digit._0)
-
-  implicit def DigitSemigroup: Semigroup[Digit] =
-    Semigroup.semigroup(a => b => mod10Digit(a.toInt + b.toInt))
-
-  implicit def DigitMonoid: Monoid[Digit] =
-    Monoid.monoid
 
   object Digit {
 

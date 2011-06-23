@@ -191,6 +191,9 @@ trait Zeros extends ZerosLow {
   implicit def JavaSynchronousQueueZero[A]: Zero[SynchronousQueue[A]] =
     zero(new SynchronousQueue[A])
 
+  implicit def DigitZero: Zero[Digit] =
+    Zero.zero(Digit.Digit._0)
+
 }
 
 trait ZerosLow {

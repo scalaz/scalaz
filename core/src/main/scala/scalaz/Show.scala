@@ -257,4 +257,7 @@ trait Shows {
   implicit def IdentityShow[A: Show]: Show[Identity[A]] =
     Show.showBy(_.value)
 
+  implicit def DigitShow: Show[Digit] =
+    Show.showBy(_.toInt)
+
 }
