@@ -37,4 +37,9 @@ trait Composes {
       f <=< g
   }
 
+  implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
+    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]) =
+      f >=> g
+  }
+
 }

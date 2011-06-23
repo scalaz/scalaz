@@ -30,4 +30,8 @@ trait Ids {
     def id[A] = Kleisli.kleisli(p.point(_))
   }
 
+  implicit def LensId: Id[Lens] = new Id[Lens] {
+    def id[A] = Lens.lensId
+  }
+
 }

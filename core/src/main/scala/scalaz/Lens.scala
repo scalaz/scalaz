@@ -154,18 +154,6 @@ trait Lenss {
   implicit def LensState[A,B](lens: Lens[A, B]): State[A, B] =
     lens.st
 
-  implicit def LensId: Id[Lens] = new Id[Lens] {
-    def id[A] = lensId
-  }
-
-  implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
-    def compose[A, B, C](f: (B @@ C), g: (A @@ B)) =
-      f >=> g
-  }
-
-  implicit def LensCategory: Category[Lens] =
-    Category.category
-
   /** Enriches lenses that view tuples with field accessors */
   implicit def tuple2Lens[S,A,B](lens: Lens[S,(A,B)]) = (
     lensG[S,A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a))(s)),

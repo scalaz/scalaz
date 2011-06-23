@@ -37,5 +37,8 @@ trait Categorys {
     Category.category[({type λ[α, β] = Kleisli[α, F, β]})#λ]
   }
 
+  implicit def LensCategory: Category[Lens] =
+    Category.category
+
 }
 
