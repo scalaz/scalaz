@@ -128,7 +128,6 @@ trait StateTs {
   implicit def StateTApplicative[A, F[_]](implicit m: Monad[F]): Applicative[({type λ[α] = StateT[A, F, α]})#λ] = {
     implicit val a = m.applic
     implicit val p = m.pointedFunctor
-    implicit val f = m.functor
     Applicative.applicative[({type λ[α] = StateT[A, F, α]})#λ]
   }
 

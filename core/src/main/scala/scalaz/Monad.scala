@@ -28,6 +28,11 @@ trait Monad[F[_]] {
     val applic = Monad.this.applic
   }
 
+  def bindFunctor: BindFunctor[F] = new BindFunctor[F] {
+    val bind = Monad.this.bind
+    val functor = Monad.this.functor
+  }
+
   def fmap[A, B](f: A => B): F[A] => F[B] =
     functor.fmap(f)
 
