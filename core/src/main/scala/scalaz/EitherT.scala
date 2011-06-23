@@ -169,9 +169,4 @@ trait EitherTs {
 
   def rightT[A, F[_], B](implicit p: Pointed[F]): B => EitherT[A, F, B] =
     b => eitherT(p.point(Right(b): Either[A, B]))
-
-  implicit def EitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = EitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = EitherT[Z, α, β]})#λ] {
-    def lift[G[_] : Monad, A](a: G[A]): EitherT[Z, G, A] =
-      eitherT(implicitly[Monad[G]].fmap((a: A) => Right(a): Either[Z, A])(a))
-  }
 }
