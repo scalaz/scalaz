@@ -38,4 +38,9 @@ trait CoJoins {
     def coJoin[A] = a => Identity.id(a)
   }
 
+  implicit def CoStateCoJoin[A, F[_] : CoBind]: CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def coJoin[X] =
+      _.duplicateT
+  }
+
 }

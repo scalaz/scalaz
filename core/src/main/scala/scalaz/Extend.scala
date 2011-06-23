@@ -29,4 +29,11 @@ trait Extends {
 
   implicit def MapEntryExtend[X]: Extend[({type λ[α] = Entry[X, α]})#λ] =
     extend[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def CoStateExtend[A, F[_] : Extend]: Extend[({type λ[α] = CoStateT[A, F, α]})#λ] = new Extend[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[Extend[F]].functor
+    implicit val cb = implicitly[Extend[F]].coBind
+    val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
+    val coJoin = implicitly[CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ]]
+  }
 }

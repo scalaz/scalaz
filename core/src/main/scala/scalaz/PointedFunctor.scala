@@ -117,4 +117,11 @@ trait PointedFunctors {
   implicit val IdentityPointedFunctor: PointedFunctor[Identity] =
     PointedFunctor.pointedFunctor[Identity]
 
+  implicit def CoStatePointedFunctor[A: Zero, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[PointedFunctor[F]].functor
+    implicit val pt = implicitly[PointedFunctor[F]].pointed
+    val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
+    val pointed = implicitly[Pointed[({type λ[α] = CoStateT[A, F, α]})#λ]]
+  }
+
 }

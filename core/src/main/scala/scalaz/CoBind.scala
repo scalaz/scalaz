@@ -22,4 +22,9 @@ trait CoBinds {
 
   implicit def MapEntryCoBind[X]: CoBind[({type λ[α] = Entry[X, α]})#λ] =
     coBind[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def CoStateCoBind[A, F[_] : CoBind]: CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def coBind[X, Y](f: CoStateT[A, F, X] => Y) =
+      _ cobindT f
+  }
 }

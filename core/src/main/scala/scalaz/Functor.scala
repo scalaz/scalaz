@@ -175,6 +175,11 @@ trait Functors extends FunctorsLow {
   implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
     def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
   }
+
+  implicit def CoStateFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
 }
 
 trait FunctorsLow {

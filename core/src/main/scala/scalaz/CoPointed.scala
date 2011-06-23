@@ -43,4 +43,9 @@ trait CoPointeds {
     def coPoint[A] = a => a.value
   }
 
+  implicit def CoStateCoPointed[A, F[_] : CoPointed]: CoPointed[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoPointed[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def coPoint[X] =
+      _.copointT
+  }
+
 }

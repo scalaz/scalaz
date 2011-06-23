@@ -77,4 +77,14 @@ trait CoMonads {
   implicit def Tuple2CoMonad[X]: CoMonad[({type λ[α] = Tuple2[X, α]})#λ] =
     coMonadJP[({type λ[α] = Tuple2[X, α]})#λ]
 
+  implicit def CoStateCoMonad[A, F[_] : CoMonad]: CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    implicit val cb = implicitly[CoMonad[F]].coBind
+    implicit val cp = implicitly[CoMonad[F]].coPointed
+    implicit val ftr = implicitly[CoMonad[F]].functor
+    val coBind = implicitly[CoBind[({type λ[α] = CoStateT[A, F, α]})#λ]]
+    val coPointed = implicitly[CoPointed[({type λ[α] = CoStateT[A, F, α]})#λ]]
+    val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
+    val coJoin = implicitly[CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ]]
+  }
+
 }

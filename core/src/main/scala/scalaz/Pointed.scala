@@ -122,7 +122,12 @@ trait Pointeds extends PointedsLow {
   implicit val IdentityPointed: Pointed[Identity] = new Pointed[Identity] {
     def point[A](a: => A) = Identity.id(a)
   }
-  
+
+  implicit def CoStatePointed[A: Zero, F[_] : Pointed]: Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] = new Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def point[Z](z: => Z) =
+      CoStateT.coStateT[A, F, Z]((implicitly[Pointed[F]].point(_ => z), implicitly[Zero[A]].zero))
+  }
+
 }
 
 trait PointedsLow {
