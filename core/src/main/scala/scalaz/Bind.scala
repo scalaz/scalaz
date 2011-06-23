@@ -238,6 +238,11 @@ trait Binds extends BindsLow {
     def bind[A, B](f: A => Identity[B]) = a => Identity.id(f(a.value).value)
   }
 
+  implicit def KleisliBind[F[_], R](implicit bd: Bind[F]): Bind[({type λ[α] = Kleisli[R, F, α]})#λ] = new Bind[({type λ[α] = Kleisli[R, F, α]})#λ] {
+    def bind[A, B](f: A => Kleisli[R, F, B]) =
+      _ flatMap f
+  }
+
 }
 
 trait BindsLow {

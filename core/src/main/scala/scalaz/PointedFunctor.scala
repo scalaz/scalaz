@@ -124,4 +124,10 @@ trait PointedFunctors {
     val pointed = implicitly[Pointed[({type λ[α] = CoStateT[A, F, α]})#λ]]
   }
 
+  implicit def KleisliPointedFunctor[F[_], R](implicit pt: PointedFunctor[F]): PointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ] = {
+    implicit val p = pt.pointed
+    implicit val f = pt.functor
+    PointedFunctor.pointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
+  }
+
 }

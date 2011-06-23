@@ -167,4 +167,10 @@ trait ApplicFunctors {
 
   implicit val IdentityApplicFunctor: ApplicFunctor[Identity] = implicitly[Monad[Identity]].applicFunctor
 
+  implicit def KleisliApplicFunctor[F[_], R](implicit ap: ApplicFunctor[F]): ApplicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ] = {
+    implicit val a = ap.applic
+    implicit val f = ap.functor
+    ApplicFunctor.applicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
+  }
+
 }

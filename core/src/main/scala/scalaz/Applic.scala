@@ -143,4 +143,10 @@ trait Applics {
 
   implicit val IdentityApplic: Applic[Identity] = implicitly[Monad[Identity]].applic
 
+  implicit def KleisliApplic[F[_], R](implicit ap: Applic[F]): Applic[({type λ[α] = Kleisli[R, F, α]})#λ] = new Applic[({type λ[α] = Kleisli[R, F, α]})#λ] {
+    def applic[A, B](f: Kleisli[R, F, A => B]) =
+      a => Kleisli.kleisli(r =>
+        ap.applic(f.run(r))(a.run(r)))
+  }
+
 }

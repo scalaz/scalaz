@@ -128,6 +128,12 @@ trait Pointeds extends PointedsLow {
       CoStateT.coStateT[A, F, Z]((implicitly[Pointed[F]].point(_ => z), implicitly[Zero[A]].zero))
   }
 
+  implicit def KleisliPointed[F[_], R](implicit p: Pointed[F]): Pointed[({type λ[α] = Kleisli[R, F, α]})#λ] =
+    new Pointed[({type λ[α] = Kleisli[R, F, α]})#λ] {
+      def point[A](a: => A) =
+        Kleisli.kleisli(_ => p.point(a))
+    }
+
 }
 
 trait PointedsLow {

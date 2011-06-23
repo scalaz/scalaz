@@ -18,4 +18,9 @@ trait Arrs {
     }
   }
 
+  implicit def KleisliArr[F[_]](implicit p: Pointed[F]): Arr[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new Arr[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
+    def arr[A, B](f: A => B) =
+      Kleisli.kleisli(a => p.point(f(a)))
+  }
+
 }

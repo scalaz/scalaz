@@ -17,4 +17,12 @@ trait Firsts {
       case (a, c) if f isDefinedAt a => (f(a), c)
     }
   }
+
+  implicit def KleisliFirst[F[_]](implicit ftr: Functor[F]): First[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new First[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
+    def first[A, B, C](f: Kleisli[A, F, B]) =
+      Kleisli.kleisli[(A, C), F, (B, C)] {
+        case (a, c) => ftr.fmap((b: B) => (b, c))(f.run(a))
+      }
+  }
+
 }

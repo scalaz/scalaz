@@ -31,4 +31,10 @@ trait Composes {
     def compose[A, B, C](f: =:=[B, C], g: =:=[A, B]) =
       f.asInstanceOf[A =:= C]
   }
+
+  implicit def KleisliCompose[F[_]](implicit bd: Bind[F]): Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
+    def compose[A, B, C](f: Kleisli[B, F, C], g: Kleisli[A, F, B]) =
+      f <=< g
+  }
+
 }

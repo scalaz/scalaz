@@ -214,9 +214,4 @@ trait LazyOptionTs {
 
   def lazyNoneT[F[_], A](implicit p: Pointed[F]): LazyOptionT[F, A] =
     lazyOptionT(p.point(lazyNone[A]))
-
-  implicit val LazyOptionTMonadTrans: MonadTrans[LazyOptionT] = new MonadTrans[LazyOptionT] {
-    def lift[G[_] : Monad, A](a: G[A]): LazyOptionT[G, A] =
-      lazyOptionT(implicitly[Monad[G]].fmap((a: A) => lazySome(a))(a))
-  }
 }

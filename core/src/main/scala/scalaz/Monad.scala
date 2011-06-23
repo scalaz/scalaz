@@ -211,4 +211,10 @@ trait Monads {
   implicit val IdentityMonad: Monad[Identity] =
     Monad.monadBP[Identity]
 
+  implicit def KleisliMonad[F[_], R](implicit m: Monad[F]): Monad[({type λ[α] = Kleisli[R, F, α]})#λ] = {
+    implicit val b = m.bind
+    implicit val p = m.pointed
+    Monad.monadBP[({type λ[α] = Kleisli[R, F, α]})#λ]
+  }
+
 }

@@ -26,4 +26,8 @@ trait Ids {
     def id[A] = implicitly[A =:= A]
   }
 
+  implicit def KleisliId[F[_]](implicit p: Pointed[F]): Id[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new Id[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
+    def id[A] = Kleisli.kleisli(p.point(_))
+  }
+
 }

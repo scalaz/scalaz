@@ -180,6 +180,13 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) =
       _ map f
   }
+
+  implicit def KleisliFunctor[F[_], R](implicit ftr: Functor[F]): Functor[({type λ[α] = Kleisli[R, F, α]})#λ] =
+    new Functor[({type λ[α] = Kleisli[R, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
 }
 
 trait FunctorsLow {

@@ -24,4 +24,9 @@ trait Joins {
 
   implicit val IdentityJoin: Join[Identity] = implicitly[Monad[Identity]].join
 
+  implicit def KleisliJoin[F[_], R](implicit bd: Bind[F]): Join[({type λ[α] = Kleisli[R, F, α]})#λ] = new Join[({type λ[α] = Kleisli[R, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }

@@ -61,4 +61,11 @@ trait Arrows {
 
   implicit val PartialFunctionArrow: Arrow[PartialFunction] =
     arrow[PartialFunction]
+
+  implicit def KleisliArrow[F[_]](implicit md: Monad[F]): Arrow[({type λ[α, β] = Kleisli[α, F, β]})#λ] = {
+    implicit val p = md.pointed
+    implicit val f = md.functor
+    Arrow.arrow[({type λ[α, β] = Kleisli[α, F, β]})#λ]
+  }
+
 }

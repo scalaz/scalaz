@@ -194,4 +194,11 @@ trait Applicatives {
 
   implicit val IdentityApplicative: Applicative[Identity] = implicitly[Monad[Identity]].applicative
 
+  implicit def KleisliApplicative[F[_], R](implicit ap: Applicative[F]): Applicative[({type λ[α] = Kleisli[R, F, α]})#λ] = {
+    implicit val a = ap.applic
+    implicit val p = ap.pointedFunctor
+    implicit val f = ap.functor
+    Applicative.applicative[({type λ[α] = Kleisli[R, F, α]})#λ]
+  }
+
 }

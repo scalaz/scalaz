@@ -30,5 +30,12 @@ trait Categorys {
 
   implicit val `=:=_Category` : Category[=:=] =
     category[=:=]
+
+  implicit def KleisliCategory[F[_]](implicit md: Monad[F]): Category[({type λ[α, β] = Kleisli[α, F, β]})#λ] = {
+    implicit val p = md.pointed
+    implicit val b = md.bind
+    Category.category[({type λ[α, β] = Kleisli[α, F, β]})#λ]
+  }
+
 }
 
