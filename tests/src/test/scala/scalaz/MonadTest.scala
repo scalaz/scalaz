@@ -25,7 +25,7 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
     type Z = Int
 
 
-    checkMonadLaws[Ident, A]("Identity")
+    checkMonadLaws[Identity, A]("Identity")
     checkMonadLaws[List, A]("List")
     // todo fix arbitrary instance for Stream
     //    checkMonadLaws[Stream, A]

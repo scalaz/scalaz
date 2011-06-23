@@ -14,7 +14,7 @@ object ScalazArbitrary extends ScalazArbitrarys
  */
 trait ScalazArbitrarys {
 
-  import *._, *->*._, Ident._, Alpha._
+  import *._, *->*._, Identity._, Alpha._
   import newtypes._
   import wrap._
   import BooleanW._
@@ -39,8 +39,8 @@ trait ScalazArbitrarys {
   implicit def ImmutableArrayArbitrary[A: Arbitrary : ClassManifest] =
     arbArray[A] ∘ (ImmutableArray.fromArray[A](_))
 
-  implicit def IdentArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Ident[A]] =
-    a ∘ ((x: A) => ident(x))
+  implicit def IdentArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Identity[A]] =
+    a ∘ ((x: A) => id(x))
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 

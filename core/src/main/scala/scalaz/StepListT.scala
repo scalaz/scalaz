@@ -4,7 +4,7 @@ sealed trait StepListT[F[_], A] {
 
   import StepListT._
   import StateT._
-  import Ident._
+  import Identity._
 
   protected def step: F[Step[A, StepListT[F, A]]]
 
@@ -18,7 +18,7 @@ sealed trait StepListT[F[_], A] {
     m.fmap(k)(step)
 
   def runList[S](s: S)(implicit i: F[Step[A, StepListT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepListT[PartialApplyState[S]#Apply, A]]]): StepList[A] =
-    listT(ident(step.run(s) match {
+    listT(id(step.run(s) match {
       case (Yield(a, as), s1) => Yield[A, StepList[A]](a, as runList s1)
       case (Skip(as), s1) => Skip(as runList s1)
       case (Done(), _) => Done()
@@ -160,14 +160,14 @@ object StepListT extends StepListTs {
 }
 
 trait StepListTs {
-  type StepList[A] = StepListT[Ident, A]
+  type StepList[A] = StepListT[Identity, A]
 
   def stepListT[F[_], A](implicit p: Pointed[F]): StepListT[F, A] = new StepListT[F, A] {
     def step = p.point(StepListT.Done[A, StepListT[F, A]]: StepListT.Step[A, StepListT[F, A]])
   }
 
   def stepList[A]: StepList[A] =
-    stepListT[Ident, A]
+    stepListT[Identity, A]
 
   implicit def StepListTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepListT[F, X]})#λ] = new Functor[({type λ[X] = StepListT[F, X]})#λ] {
     def fmap[A, B](f: A => B) =

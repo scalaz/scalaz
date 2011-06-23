@@ -18,13 +18,13 @@ sealed trait Kleisli[A, F[_], B] {
   def contramapRead[C](f: C => A): Kleisli[C, F, B] =
     kleisli[C, F, B](run compose f)
 
-  def reader(implicit i: F[B] =:= Ident[B]): A => B =
+  def reader(implicit i: F[B] =:= Identity[B]): A => B =
     a => run(a).value
 
   def toStateT(implicit ftr: Functor[F]): StateT[A, F, B] =
     stateT(a => ftr.fmap((b: B) => (b, a))(run(a)))
 
-  def toState(implicit i: F[B] =:= Ident[B]): State[A, B] =
+  def toState(implicit i: F[B] =:= Identity[B]): State[A, B] =
     state(a => (run(a).value, a))
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): Kleisli[A, F, C] =
@@ -51,14 +51,14 @@ object Kleisli extends Kleislis {
 
 trait Kleislis {
   type ReaderT[A, F[_], B] = Kleisli[A, F, B]
-  type Reader[A, B] = Kleisli[A, Ident, B]
+  type Reader[A, B] = Kleisli[A, Identity, B]
 
   def kleisli[A, F[_], B](r: A => F[B]): Kleisli[A, F, B] = new Kleisli[A, F, B] {
     val run = r
   }
 
   def reader[A, B](r: A => B): Reader[A, B] =
-    kleisli[A, Ident, B](a => Ident.ident(r(a)))
+    kleisli[A, Identity, B](a => Identity.id(r(a)))
 
   def ask[F[_] : Pointed, A]: Kleisli[A, F, A] = kleisli(a => implicitly[Pointed[F]].point(a))
 

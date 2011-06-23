@@ -1,13 +1,13 @@
 package scalaz
 
-import Ident._
+import Identity._
 
 trait Traverse[T[_]] {
   def traverse[F[_] : Applicative, A, B](f: A => F[B]): T[A] => F[T[B]]
 
   def functor: Functor[T] = new Functor[T] {
     def fmap[A, B](f: A => B) = t => {
-      val k = traverse[Ident, A, B](a => ident(f(a)))
+      val k = traverse[Identity, A, B](a => id(f(a)))
       k(t).value
     }
   }

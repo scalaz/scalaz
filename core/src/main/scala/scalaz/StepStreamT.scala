@@ -4,7 +4,7 @@ sealed trait StepStreamT[F[_], A] {
 
   import StepStreamT._
   import StateT._
-  import Ident._
+  import Identity._
 
   protected def step: F[Step[A, StepStreamT[F, A]]]
 
@@ -18,7 +18,7 @@ sealed trait StepStreamT[F[_], A] {
     m.fmap(k)(step)
 
   def runStream[S](s: S)(implicit i: F[Step[A, StepStreamT[F, A]]] =:= PartialApplyState[S]#Apply[Step[A, StepStreamT[PartialApplyState[S]#Apply, A]]]): StepStream[A] =
-    streamT(ident(step.run(s) match {
+    streamT(id(step.run(s) match {
       case (Yield(a, as), s1) => Yield[A, StepStream[A]](a, as runStream s1)
       case (Skip(as), s1) => Skip(as runStream s1)
       case (Done(), _) => Done()
@@ -160,14 +160,14 @@ object StepStreamT extends StepStreamTs {
 }
 
 trait StepStreamTs {
-  type StepStream[A] = StepStreamT[Ident, A]
+  type StepStream[A] = StepStreamT[Identity, A]
 
   def stepStreamT[F[_], A](implicit p: Pointed[F]): StepStreamT[F, A] = new StepStreamT[F, A] {
     def step = p.point(StepStreamT.Done[A, StepStreamT[F, A]]: StepStreamT.Step[A, StepStreamT[F, A]])
   }
 
   def stepStream[A]: StepStream[A] =
-    stepStreamT[Ident, A]
+    stepStreamT[Identity, A]
 
   implicit def StepStreamTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepStreamT[F, X]})#λ] = new Functor[({type λ[X] = StepStreamT[F, X]})#λ] {
     def fmap[A, B](f: A => B) =

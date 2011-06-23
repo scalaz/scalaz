@@ -3,7 +3,7 @@ package iteratee
 
 import IterVT._
 import Input._
-import Ident._
+import Identity._
 
 sealed trait IterateeT[E, F[_], A] {
   val iterate: Input[E] => FIterVT[E, F, A]
@@ -36,7 +36,7 @@ sealed trait IterateeT[E, F[_], A] {
     mnd.bd((r: IterVT[E, F, A]) => r.runT)(iterate(eofInput[E]))
   }
 
-  def run(implicit i: F[IterVT[E, F, A]] =:= Ident[IterVT[E, Ident, A]]): A =
+  def run(implicit i: F[IterVT[E, F, A]] =:= Identity[IterVT[E, Identity, A]]): A =
     iterate(eofInput[E]).value.run
 }
 
@@ -47,12 +47,12 @@ object IterateeT extends IterateeTs {
 
 trait IterateeTs {
   type Iteratee[E, A] =
-  IterateeT[E, Ident, A]
+  IterateeT[E, Identity, A]
 
   def iterateeT[E, F[_], A](k: Input[E] => FIterVT[E, F, A]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
     val iterate = k
   }
 
   def iteratee[E, A](k: Input[E] => IterV[E, A]): Iteratee[E, A] =
-    iterateeT[E, Ident, A](i => ident(k(i)))
+    iterateeT[E, Identity, A](i => id(k(i)))
 }

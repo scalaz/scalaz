@@ -24,7 +24,7 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     type M = Int
     type P = Int
 
-    checkFunctorLaws[Ident, A]
+    checkFunctorLaws[Identity, A]
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]

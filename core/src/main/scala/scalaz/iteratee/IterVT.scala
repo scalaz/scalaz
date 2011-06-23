@@ -2,7 +2,7 @@ package scalaz
 package iteratee
 
 import Input._
-import Ident._
+import Identity._
 
 sealed trait IterVT[E, F[_], A] {
 
@@ -17,7 +17,7 @@ sealed trait IterVT[E, F[_], A] {
 
   def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => FIterVT[E, F, A]) => Z): Z
 
-  def fold[Z](done: (=> A, Input[E]) => Z, cont: (Input[E] => IterV[E, A]) => Z)(implicit i: F[IterVT[E, F, A]] =:= Ident[IterVT[E, Ident, A]]): Z =
+  def fold[Z](done: (=> A, Input[E]) => Z, cont: (Input[E] => IterV[E, A]) => Z)(implicit i: F[IterVT[E, F, A]] =:= Identity[IterVT[E, Identity, A]]): Z =
     foldT(
       (a, i) => done(a, i)
       , k => cont(g => i(k(g)).value)
@@ -33,7 +33,7 @@ sealed trait IterVT[E, F[_], A] {
         ))(k(eofInput[E]))
     )
 
-  def run(implicit i: F[IterVT[E, F, A]] =:= Ident[IterVT[E, Ident, A]]): A =
+  def run(implicit i: F[IterVT[E, F, A]] =:= Identity[IterVT[E, Identity, A]]): A =
     fold(
       done = (x, _) => x
       , cont = k =>
@@ -55,10 +55,10 @@ sealed trait IterVT[E, F[_], A] {
   def contOrT(d: => Input[E] => FIterVT[E, F, A]): Input[E] => FIterVT[E, F, A] =
     foldT((_, _) => d, z => z)
 
-  def contOr(d: => Input[E] => IterV[E, A])(implicit i: F[IterVT[E, F, A]] =:= Ident[IterVT[E, Ident, A]]): Input[E] => IterV[E, A] =
+  def contOr(d: => Input[E] => IterV[E, A])(implicit i: F[IterVT[E, F, A]] =:= Identity[IterVT[E, Identity, A]]): Input[E] => IterV[E, A] =
     fold((_, _) => d, z => z)
 
-  def inputOr(d: => Input[E])(implicit i: F[IterVT[E, F, A]] =:= Ident[IterVT[E, Ident, A]]): Input[E] =
+  def inputOr(d: => Input[E])(implicit i: F[IterVT[E, F, A]] =:= Identity[IterVT[E, Identity, A]]): Input[E] =
     fold((_, i) => i, _ => d)
 
   def liftIter(implicit s: Semigroup[E], p: Pointed[F]): IterateeT[E, F, A] =
@@ -81,7 +81,7 @@ object IterVT extends IterVTs {
 
 trait IterVTs {
   type IterV[E, A] =
-  IterVT[E, Ident, A]
+  IterVT[E, Identity, A]
 
   type FIterVT[E, F[_], A] =
   F[IterVT[E, F, A]]
@@ -92,7 +92,7 @@ trait IterVTs {
   }
 
   def done[E, A](a: => A, i: => Input[E]): IterV[E, A] =
-    doneT[E, Ident, A](a, i)
+    doneT[E, Identity, A](a, i)
 
   def continueT[E, F[_], A](f: Input[E] => FIterVT[E, F, A]): IterVT[E, F, A] = new IterVT[E, F, A] {
     def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => FIterVT[E, F, A]) => Z) =
@@ -100,5 +100,5 @@ trait IterVTs {
   }
 
   def continue[E, A](f: Input[E] => IterV[E, A]): IterV[E, A] =
-    continueT(i => ident(f(i)))
+    continueT(i => id(f(i)))
 }

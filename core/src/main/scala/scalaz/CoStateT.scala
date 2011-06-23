@@ -16,12 +16,12 @@ sealed trait CoStateT[A, F[_], B] {
   private def mapRunT[C](f: (A => B) => C)(implicit ftr: Functor[F]): (F[C], A) =
     (ftr.fmap((z: A => B) => f(z))(runT._1), runT._2)
 
-  private def mapRun[C](f: (A => B) => C)(implicit i: F[A => B] =:= Ident[A => B]): (C, A) = {
+  private def mapRun[C](f: (A => B) => C)(implicit i: F[A => B] =:= Identity[A => B]): (C, A) = {
     val (k, a) = run
     (f(k), a)
   }
 
-  def run(implicit i: F[A => B] =:= Ident[A => B]): (A => B, A) = {
+  def run(implicit i: F[A => B] =:= Identity[A => B]): (A => B, A) = {
     val (k, a) = runT
     (k.value, a)
   }
@@ -29,7 +29,7 @@ sealed trait CoStateT[A, F[_], B] {
   def putT(implicit ftr: Functor[F]): A => F[B] =
     a => ftr.fmap((k: A => B) => k(a))(runT._1)
 
-  def put(implicit i: F[A => B] =:= Ident[A => B]): A => B =
+  def put(implicit i: F[A => B] =:= Identity[A => B]): A => B =
     run._1
 
   def pos: A =
@@ -38,7 +38,7 @@ sealed trait CoStateT[A, F[_], B] {
   def copointT(implicit p: CoPointed[F]): B =
     p.coPoint(runT._1)(runT._2)
 
-  def copoint(implicit i: F[A => B] =:= Ident[A => B]): B =
+  def copoint(implicit i: F[A => B] =:= Identity[A => B]): B =
     run._1(run._2)
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[A, F, C] =
@@ -49,7 +49,7 @@ sealed trait CoStateT[A, F[_], B] {
         p.coBind((ff: F[A => B]) => (a: A) => coStateT[A, F, B]((ff, a)))(runT._1)
         , pos))
 
-  def duplicate(implicit i: F[A => B] =:= Ident[A => B]): CoState[A, CoState[A, B]] =
+  def duplicate(implicit i: F[A => B] =:= Identity[A => B]): CoState[A, CoState[A, B]] =
     coState[A, CoState[A, B]](
       mapRun[A => CoState[A, B]](k => a =>
         coState[A, B]((k, run._2))))
@@ -62,7 +62,7 @@ sealed trait CoStateT[A, F[_], B] {
         , pos
         ))
 
-  def cobind[C](f: CoState[A, B] => C)(implicit i: F[A => B] =:= Ident[A => B]): CoState[A, C] =
+  def cobind[C](f: CoState[A, B] => C)(implicit i: F[A => B] =:= Identity[A => B]): CoState[A, C] =
     coState[A, C]((
         (a: A) => f(coState[A, B]((run._1, a)))
         , pos
@@ -75,7 +75,7 @@ object CoStateT extends CoStateTs {
 }
 
 trait CoStateTs {
-  type CoState[A, B] = CoStateT[A, Ident, B]
+  type CoState[A, B] = CoStateT[A, Identity, B]
 
   type PartialApplyCoState[A] =
   PartialApply1Of2[CoState, A]
@@ -85,7 +85,7 @@ trait CoStateTs {
   }
 
   def coState[A, B](r: (A => B, A)): CoState[A, B] =
-    coStateT[A, Ident, B](Ident.ident(r._1), r._2)
+    coStateT[A, Identity, B](Identity.id(r._1), r._2)
 
   implicit def CoStateTCoMonadTrans[S]: CoMonadTrans[({type λ[α[_], β] = CoStateT[S, α, β]})#λ] = new CoMonadTrans[({type λ[α[_], β] = CoStateT[S, α, β]})#λ] {
     def lower[G[_] : Extend, A](a: CoStateT[S, G, A]) =

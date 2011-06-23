@@ -40,7 +40,7 @@ object ImplicitConversionTest {
   }
 
   def applic[A, B, R, S, T, U, V, W, X] {
-    i[Applic[Ident]]
+    i[Applic[Identity]]
     i[Applic[List]]
     i[Applic[Function0]]
     i[Applic[Option]]
@@ -60,7 +60,7 @@ object ImplicitConversionTest {
   }
 
   def applicative[A, B, R, S, T, U, V, W, X] {
-    i[Applicative[Ident]]
+    i[Applicative[Identity]]
     i[Applicative[List]]
     i[Applicative[Function0]]
     i[Applicative[Option]]
@@ -80,7 +80,7 @@ object ImplicitConversionTest {
   }
 
   def pointed[A, B, R, S, T, U, V, W, X] {
-    i[Pointed[Ident]]
+    i[Pointed[Identity]]
     i[Pointed[List]]
     i[Pointed[Function0]]
     i[Pointed[Option]]

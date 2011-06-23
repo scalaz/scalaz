@@ -21,7 +21,7 @@ Foldables with
 Foldls with
 Functors with
 Heaps with
-Idents with
+Identitys with
 ImmutableArrays with
 Joins with
 Kleislis with

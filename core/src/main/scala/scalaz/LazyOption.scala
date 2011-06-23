@@ -105,79 +105,79 @@ sealed trait LazyOptionT[F[_], A] {
   def *->* : (({type λ[α] = LazyOptionT[F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = LazyOptionT[F, α]})#λ, A](this)
 
-  def run(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): LazyOption[A] =
+  def run(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): LazyOption[A] =
     runT.value
 
   def ?[X](some: => X, none: => X)(implicit ftr: Functor[F]): F[X] =
     ftr.fmap((_: LazyOption[A]).?(some, none))(runT)
 
-  def -?-[X](some: => X, none: => X)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): X =
+  def -?-[X](some: => X, none: => X)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): X =
     run ? (some, none)
 
   def isDefinedT(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: LazyOption[A]).isDefined)(runT)
 
-  def isDefined(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Boolean =
+  def isDefined(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Boolean =
     run.isDefined
 
   def isEmptyT(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: LazyOption[A]).isEmpty)(runT)
 
-  def isEmpty(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Boolean =
+  def isEmpty(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Boolean =
     run.isEmpty
 
   def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
     ftr.fmap((_: LazyOption[A]).getOrElse(default))(runT)
 
-  def getOrElse(default: => A)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): A =
+  def getOrElse(default: => A)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): A =
     run.getOrElse(default)
 
   def existsT(f: (=> A) => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: LazyOption[A]).exists(f))(runT)
 
-  def exists(f: (=> A) => Boolean)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Boolean =
+  def exists(f: (=> A) => Boolean)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Boolean =
     run.exists(f)
 
   def forallT(f: (=> A) => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: LazyOption[A]).forall(f))(runT)
 
-  def forall(f: (=> A) => Boolean)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Boolean =
+  def forall(f: (=> A) => Boolean)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Boolean =
     run.forall(f)
 
   def toOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
     OptionT.optionT(ftr.fmap((_: LazyOption[A]).toOption)(runT))
 
-  def toOption(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Option[A] =
+  def toOption(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Option[A] =
     run.toOption
 
   def toLazyRightT[X](left: => X)(implicit ftr: Functor[F]): LazyEitherT[X, F, A] =
     lazyEitherT(ftr.fmap((_: LazyOption[A]).toLazyRight(left))(runT))
 
-  def toLazyRight[X](left: => X)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): LazyEither[X, A] =
+  def toLazyRight[X](left: => X)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): LazyEither[X, A] =
     run.toLazyRight(left)
 
   def toLazyLeftT[X](right: => X)(implicit ftr: Functor[F]): LazyEitherT[A, F, X] =
     lazyEitherT(ftr.fmap((_: LazyOption[A]).toLazyLeft(right))(runT))
 
-  def toLazyLeft[X](right: => X)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): LazyEither[A, X] =
+  def toLazyLeft[X](right: => X)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): LazyEither[A, X] =
     run.toLazyLeft(right)
 
   def toRightT[X](left: => X)(implicit ftr: Functor[F]): EitherT[X, F, A] =
     eitherT(ftr.fmap((_: LazyOption[A]).toRight(left))(runT))
 
-  def toRight[X](left: => X)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Either[X, A] =
+  def toRight[X](left: => X)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Either[X, A] =
     run.toRight(left)
 
   def toLeftT[X](right: => X)(implicit ftr: Functor[F]): EitherT[A, F, X] =
     eitherT(ftr.fmap((_: LazyOption[A]).toLeft(right))(runT))
 
-  def toLeft[X](right: => X)(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): Either[A, X] =
+  def toLeft[X](right: => X)(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): Either[A, X] =
     run.toLeft(right)
 
   def orElseT(a: => LazyOption[A])(implicit ftr: Functor[F]): LazyOptionT[F, A] =
     lazyOptionT(ftr.fmap((_: LazyOption[A]).orElse(a))(LazyOptionT.this.runT))
 
-  def orElse(a: => LazyOption[A])(implicit i: F[LazyOption[A]] =:= Ident[LazyOption[A]]): LazyOption[A] =
+  def orElse(a: => LazyOption[A])(implicit i: F[LazyOption[A]] =:= Identity[LazyOption[A]]): LazyOption[A] =
     run.orElse(a)
 
   def map[B](f: (=> A) => B)(implicit ftr: Functor[F]): LazyOptionT[F, B] =

@@ -19,7 +19,7 @@ sealed trait RegionT[S, P[_], A] {
   def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =
     value.run(r)
 
-  def run(r: IORef[List[RefCountedFinalizer]])(implicit i: P[A] =:= Ident[A]): A =
+  def run(r: IORef[List[RefCountedFinalizer]])(implicit i: P[A] =:= Identity[A]): A =
     runT(r).value
 }
 
@@ -27,7 +27,7 @@ object RegionT extends RegionTs
 
 trait RegionTs {
   type Region[S, A] =
-  RegionT[S, Ident, A]
+  RegionT[S, Identity, A]
 
   def regionT[S, P[_], A](k: Kleisli[IORef[List[RefCountedFinalizer]], P, A]): RegionT[S, P, A] = new RegionT[S, P, A] {
     val value = k

@@ -40,6 +40,6 @@ class ListWTest extends Specification with Sugar with ScalaCheck {
 
   "groupByM joined (in Identity) produces the same list" verifies {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupByM[Ident]((a, b) => p(a, b).η[Ident]).value.join === a
+      a.groupByM[Identity]((a, b) => p(a, b).η[Identity]).value.join === a
   }
 }
