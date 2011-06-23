@@ -43,4 +43,8 @@ trait CoJoins {
       _.duplicateT
   }
 
+  implicit def NonEmptyListCoJoin: CoJoin[NonEmptyList] = new CoJoin[NonEmptyList] {
+    def coJoin[A] = a => a.tails
+  }
+
 }

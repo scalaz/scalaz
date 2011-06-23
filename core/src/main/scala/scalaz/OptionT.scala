@@ -90,9 +90,4 @@ trait OptionTs {
 
   implicit def ShowOptionT[F[_], A](implicit e: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     Show.showBy(_.runT)
-
-  implicit val OptionTMonadTrans: MonadTrans[OptionT] = new MonadTrans[OptionT] {
-    def lift[G[_] : Monad, A](a: G[A]): OptionT[G, A] =
-      optionT(implicitly[Monad[G]].fmap((a: A) => Some(a): Option[A])(a))
-  }
 }

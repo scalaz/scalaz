@@ -173,4 +173,7 @@ trait ApplicFunctors {
     ApplicFunctor.applicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
+  implicit val NonEmptyListApplicFunctor: ApplicFunctor[NonEmptyList] =
+    ApplicFunctor.applicFunctor
+
 }

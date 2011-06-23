@@ -217,4 +217,7 @@ trait Monads {
     Monad.monadBP[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
+  implicit val NonEmptyListMonad: Monad[NonEmptyList] =
+    Monad.monadBP
+
 }

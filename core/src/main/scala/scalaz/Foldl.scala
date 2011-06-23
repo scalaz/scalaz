@@ -31,6 +31,11 @@ trait Foldls extends FoldlsLow {
   implicit val StreamFoldl: Foldl[Stream] = new Foldl[Stream] {
     def foldl[A, B] = k => b => _.foldLeft(b)((b, a) => k(b)(a))
   }
+
+  implicit val NonEmptyListFoldl: Foldl[NonEmptyList] = new Foldl[NonEmptyList] {
+    def foldl[A, B] = k => b => _.list.foldLeft(b)((b, a) => k(b)(a))
+  }
+
 }
 
 

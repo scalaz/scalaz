@@ -187,6 +187,11 @@ trait Functors extends FunctorsLow {
         _ map f
     }
 
+  implicit val NonEmptyListFunctor: Functor[NonEmptyList] = new Functor[NonEmptyList] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

@@ -29,4 +29,9 @@ trait Joins {
       _ flatMap (z => z)
   }
 
+  implicit val NonEmptyListJoin: Join[NonEmptyList] = new Join[NonEmptyList] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }

@@ -100,4 +100,7 @@ trait BindFunctors {
   implicit def Function6BindFunctor[R, S, T, U, V, W]: BindFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
     bindFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
+  implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
+    BindFunctor.bindFunctor
+
 }

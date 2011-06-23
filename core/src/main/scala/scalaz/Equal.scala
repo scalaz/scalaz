@@ -214,4 +214,7 @@ trait Equals {
   implicit def DigitEqual: Equal[Digit] =
     Equal.equalBy(_.toInt)
 
+  implicit def NonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] =
+    implicitly[Equal[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
+
 }

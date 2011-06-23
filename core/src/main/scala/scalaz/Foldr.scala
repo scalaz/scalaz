@@ -49,6 +49,11 @@ trait Foldrs extends FoldrsLow {
       else
         k(s.head)(foldr(k)(b)(s.tail))
   }
+
+  implicit val NonEmptyListFoldr: Foldr[NonEmptyList] = new Foldr[NonEmptyList] {
+    def foldr[A, B] = k => b => _.list.foldRight(b)((b, a) => k(b)(a))
+  }
+
 }
 
 trait FoldrsLow {

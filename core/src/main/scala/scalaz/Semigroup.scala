@@ -210,6 +210,9 @@ trait Semigroups extends SemigroupsLow {
       m1 union m2
   }
 
+  implicit def NonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
+    Semigroup.semigroup(a1 => a1.list <::: _)
+
 }
 
 trait SemigroupsLow {

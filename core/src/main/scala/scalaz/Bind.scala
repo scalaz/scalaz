@@ -243,6 +243,11 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit val NonEmptyListBind: Bind[NonEmptyList] = new Bind[NonEmptyList] {
+    def bind[A, B](f: A => NonEmptyList[B]) =
+      _ flatMap f
+  }
+
 }
 
 trait BindsLow {

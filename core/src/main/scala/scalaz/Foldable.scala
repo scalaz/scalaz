@@ -41,6 +41,10 @@ trait Foldables extends FoldablesLow {
 
   implicit val OptionFoldable: Foldable[Option] =
     foldable[Option]
+
+  implicit val NonEmptyListFoldable: Foldable[NonEmptyList] =
+    Foldable.foldable[NonEmptyList]
+
 }
 
 trait FoldablesLow {

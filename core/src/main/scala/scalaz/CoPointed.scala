@@ -48,4 +48,8 @@ trait CoPointeds {
       _.copointT
   }
 
+  implicit def NonEmptyListCoPointed: CoPointed[NonEmptyList] = new CoPointed[NonEmptyList] {
+    def coPoint[A] = a => a.head
+  }
+
 }

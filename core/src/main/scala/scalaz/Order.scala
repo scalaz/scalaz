@@ -266,4 +266,7 @@ trait Orders {
   implicit def DigitOrder: Order[Digit] =
     Order.orderBy(_.toInt)
 
+  implicit def NonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
+    implicitly[Order[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
+
 }

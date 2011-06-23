@@ -260,4 +260,7 @@ trait Shows {
   implicit def DigitShow: Show[Digit] =
     Show.showBy(_.toInt)
 
+  implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
+    implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
+
 }

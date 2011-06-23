@@ -149,4 +149,13 @@ trait Applics {
         ap.applic(f.run(r))(a.run(r)))
   }
 
+  implicit val NonEmptyListApplic: Applic[NonEmptyList] = new Applic[NonEmptyList] {
+    def applic[A, B](f: NonEmptyList[A => B]) =
+      r =>
+        for {
+          ff <- f
+          rr <- r
+        } yield ff(rr)
+  }
+
 }

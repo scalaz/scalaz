@@ -201,4 +201,7 @@ trait Applicatives {
     Applicative.applicative[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
+  implicit val NonEmptyListApplicative: Applicative[NonEmptyList] =
+    Applicative.applicative
+
 }

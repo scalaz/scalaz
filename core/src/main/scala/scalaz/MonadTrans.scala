@@ -13,6 +13,11 @@ trait MonadTranss {
       EitherT.eitherT(implicitly[Monad[G]].fmap((a: A) => Right(a): Either[Z, A])(a))
   }
 
+  implicit val OptionTMonadTrans: MonadTrans[OptionT] = new MonadTrans[OptionT] {
+    def lift[G[_] : Monad, A](a: G[A]): OptionT[G, A] =
+      optionT(implicitly[Monad[G]].fmap((a: A) => Some(a): Option[A])(a))
+  }
+
   implicit def KleisliMonadTrans[T]: MonadTrans[({type λ[α[_], β] = Kleisli[T, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = Kleisli[T, α, β]})#λ] {
     def lift[G[_] : Monad, A](a: G[A]): Kleisli[T, G, A] =
       Kleisli.kleisli(_ => a)

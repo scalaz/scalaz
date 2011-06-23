@@ -130,4 +130,7 @@ trait PointedFunctors {
     PointedFunctor.pointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
+  implicit val NonEmptyListPointedFunctor: PointedFunctor[NonEmptyList] =
+    PointedFunctor.pointedFunctor
+
 }

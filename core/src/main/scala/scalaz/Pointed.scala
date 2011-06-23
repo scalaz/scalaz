@@ -134,6 +134,11 @@ trait Pointeds extends PointedsLow {
         Kleisli.kleisli(_ => p.point(a))
     }
 
+  implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
+    def point[A](a: => A) =
+      NonEmptyList.nels(a)
+  }
+
 }
 
 trait PointedsLow {
