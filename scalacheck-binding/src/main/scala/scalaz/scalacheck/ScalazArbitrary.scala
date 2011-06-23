@@ -134,7 +134,7 @@ trait ScalazArbitrarys {
         // Because java.util.Random is side-effectful, it cannot be shared.
         // Furthermore, the only way to copy one is through serialization.
         def cloneParams = params.copy(rng = Serialization.clone(rng))
-        def a: Option[A] = aa.arbitrary(cloneParams)
+        val a: Option[A] = aa.arbitrary(cloneParams)
         (a <|*|> a) ∘ (as => new Duplicate[A] {
           def pair = as
         })
