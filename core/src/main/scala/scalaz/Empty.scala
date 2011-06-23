@@ -27,6 +27,10 @@ trait Emptys extends EmptysLow {
     def empty[A] = Stream.empty
   }
 
+  implicit def MapEmpty[V: Semigroup]: Empty[({type λ[α] = Map[α, V]})#λ] = new Empty[({type λ[α] = Map[α, V]})#λ] {
+    def empty[K] = Map.empty[K, V]
+  }
+
   import java.util._
   import java.util.concurrent._
 

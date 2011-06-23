@@ -45,6 +45,7 @@ class MonoidTest extends Specification with Sugar with ScalaCheck {
     checkMonoidLaws[ArraySeq[A]]
     checkMonoidLaws[Either.LeftProjection[A, B]]
     checkMonoidLaws[Either.RightProjection[B, A]]
+    checkMonoidLaws[Map[A, B]]
     // todo more types
   }
 

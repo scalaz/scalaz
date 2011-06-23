@@ -1,5 +1,11 @@
 package scalaz
 
+import Scalaz._
+
+/**
+ * Data structures that can be folded.
+ * Minimal complete definition: 'foldMap' or 'foldRight'.
+ */
 trait Foldable[F[_]] {
   val foldr: Foldr[F]
   val foldl: Foldl[F]
@@ -15,7 +21,6 @@ trait Foldable[F[_]] {
   def deriving[G[_]](implicit n: ^**^[G, F]): Foldable[G] = {
     implicit val r: Foldr[G] = foldr.deriving[G]
     implicit val l: Foldl[G] = foldl.deriving[G]
-    foldable[G]
   }
 }
 

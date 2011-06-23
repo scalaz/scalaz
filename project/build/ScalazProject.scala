@@ -29,7 +29,7 @@ abstract class ScalazDefaults(info: ProjectInfo) extends DefaultProject(info) wi
 
   def scalacheckDependency = "org.scala-tools.testing" % "scalacheck_2.9.0.RC3" % "1.8"
 
-  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc, packageTestSrc)
+  override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageDocs, packageSrc, packageTestSrc)
 
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil
@@ -161,5 +161,8 @@ import org.scalacheck.Prop._
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
       SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
       super.documentOptions
+
+    lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
+
   }
 }

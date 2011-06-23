@@ -30,4 +30,5 @@ trait Categorys {
 
   implicit val `=:=_Category` : Category[=:=] =
     category[=:=]
-    }
+}
+

@@ -1,5 +1,17 @@
 package scalaz
 
+/**
+ * A Reducer[C,M] is a Monoid[M] that maps
+ * values of type C through `unit` to values of type M. A C-Reducer may also
+ * supply operations which tack on another C to an existing 'Monoid' M on the left
+ * or right. These specialized reductions may be more efficient in some scenarios
+ * and are used when appropriate by a 'Generator'. The names 'cons' and 'snoc' work
+ * by analogy to the synonymous operations in the list monoid.
+ *
+ * Minimal definition: 'unit' or 'snoc'
+ *
+ * Based on a Haskell library by Edward Kmett
+ */
 sealed trait Reducer[C, M] {
   val monoid: Monoid[M]
 
