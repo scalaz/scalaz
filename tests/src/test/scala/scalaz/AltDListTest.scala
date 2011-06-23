@@ -6,7 +6,7 @@ import org.scalacheck._
 import Arbitrary._
 import Scalaz._
 
-class AltDListTest extends Specification with Sugar with ScalaCheck {            6
+class AltDListTest extends Specification with Sugar with ScalaCheck {
   "appending one element works correctly" verifies {(xs: AltDList[Int], x: Int) =>
     (xs ::> x).toList ≟ (xs.toList ::: x :: Nil)
   }

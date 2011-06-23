@@ -5,6 +5,7 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
+        <option name="maximumHeapSize" value="1024" />
       </configuration>
     </facet>
   </component>

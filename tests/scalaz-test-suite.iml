@@ -5,6 +5,7 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
+        <option name="maximumHeapSize" value="1024" />
       </configuration>
     </facet>
   </component>
@@ -23,15 +24,13 @@
     <orderEntry type="module" module-name="scalaz-geo" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" />
     <orderEntry type="module" module-name="scalaz-geo-scalacheck" />
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/jar/specs_2.8.1-1.6.7.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.9.0-1/test/jar/specs_2.9.0-1.6.8.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib_managed/scala_2.8.1/test/src/specs_2.8.1-1.6.7.2-sources.jar!/" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>
