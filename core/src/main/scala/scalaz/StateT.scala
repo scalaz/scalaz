@@ -120,6 +120,24 @@ trait StateTs {
     val pointed = implicitly[Pointed[({type λ[α] = StateT[A, F, α]})#λ]]
   }
 
+  implicit def StateTApplic[A, F[_] : Monad]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
+    def applic[X, Y](f: StateT[A, F, X => Y]) =
+      implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].liftM2[X => Y, X, Y](identity)(f)
+  }
+
+  implicit def StateTApplicative[A, F[_]](implicit m: Monad[F]): Applicative[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val a = m.applic
+    implicit val p = m.pointedFunctor
+    implicit val f = m.functor
+    Applicative.applicative[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
+  implicit def StateTApplicFunctor[A, F[_]](implicit m: Monad[F]): ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val a = m.applic
+    implicit val f = m.functor
+    ApplicFunctor.applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
   implicit def StateTBindFunctor[A, F[_] : BindFunctor]: BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[BindFunctor[F]].functor
     implicit val b = implicitly[BindFunctor[F]].bind

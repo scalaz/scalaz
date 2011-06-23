@@ -93,6 +93,12 @@ trait Kleislis {
     Applicative.applicative[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
+  implicit def KleisliApplicFunctor[F[_], R](implicit ap: ApplicFunctor[F]): ApplicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ] = {
+    implicit val a = ap.applic
+    implicit val f = ap.functor
+    ApplicFunctor.applicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
+  }
+
   implicit def KleisliBind[F[_], R](implicit bd: Bind[F]): Bind[({type λ[α] = Kleisli[R, F, α]})#λ] = new Bind[({type λ[α] = Kleisli[R, F, α]})#λ] {
     def bind[A, B](f: A => Kleisli[R, F, B]) =
       _ flatMap f
