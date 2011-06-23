@@ -6,7 +6,6 @@ Applics with
 Applicatives with
 Binds with
 BKTrees with
-BloomFilters with
 Categorys with
 CoKleislis with
 Comps with
