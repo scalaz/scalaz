@@ -234,6 +234,10 @@ trait Binds extends BindsLow {
     }
   }
 
+  implicit val IdentityBind: Bind[Identity] = new Bind[Identity] {
+    def bind[A, B](f: A => Identity[B]) = a => Identity.id(f(a.value).value)
+  }
+
 }
 
 trait BindsLow {

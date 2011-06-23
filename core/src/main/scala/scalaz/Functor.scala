@@ -172,6 +172,9 @@ trait Functors extends FunctorsLow {
 
   implicit def JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = JavaCollectionFunctor
 
+  implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
+    def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
+  }
 }
 
 trait FunctorsLow {

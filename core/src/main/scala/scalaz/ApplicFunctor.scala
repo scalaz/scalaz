@@ -165,4 +165,6 @@ trait ApplicFunctors {
   implicit def Function6ApplicFunctor[R, S, T, U, V, W]: ApplicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
     applicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
+  implicit val IdentityApplicFunctor: ApplicFunctor[Identity] = implicitly[Monad[Identity]].applicFunctor
+
 }

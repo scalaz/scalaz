@@ -113,5 +113,8 @@ trait PointedFunctors {
 
   implicit def Function6PointedFunctor[R, S, T, U, V, W]: PointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
     pointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
-    
+
+  implicit val IdentityPointedFunctor: PointedFunctor[Identity] =
+    PointedFunctor.pointedFunctor[Identity]
+
 }

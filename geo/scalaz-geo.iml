@@ -5,15 +5,12 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="buildScala" />
-        <option name="deprecationWarnings" value="true" />
-        <option name="maximumHeapSize" value="1024" />
-        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/scala_2.9.0/classes" />
-    <output-test url="file://$MODULE_DIR$/target/scala_2.9.0/test-classes" />
+    <output url="file://$MODULE_DIR$/target/scala_2.8.1/classes" />
+    <output-test url="file://$MODULE_DIR$/target/scala_2.8.1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />

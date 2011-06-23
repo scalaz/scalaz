@@ -21,4 +21,7 @@ trait Joins {
     def join[A] =
       _ flatMap identity
   }
+
+  implicit val IdentityJoin: Join[Identity] = implicitly[Monad[Identity]].join
+
 }

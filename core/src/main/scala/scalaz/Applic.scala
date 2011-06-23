@@ -141,4 +141,6 @@ trait Applics {
       a => (r, s, t, u, v, w) => f(r, s, t, u, v, w)(a(r, s, t, u, v, w))
   }
 
+  implicit val IdentityApplic: Applic[Identity] = implicitly[Monad[Identity]].applic
+
 }

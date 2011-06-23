@@ -34,4 +34,8 @@ trait CoJoins {
     def coJoin[A] = a => new SimpleImmutableEntry(a.getKey, a)
   }
 
+  implicit def IdentityCoJoin: CoJoin[Identity] = new CoJoin[Identity] {
+    def coJoin[A] = a => Identity.id(a)
+  }
+
 }

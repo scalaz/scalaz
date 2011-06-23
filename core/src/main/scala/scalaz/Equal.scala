@@ -208,4 +208,7 @@ trait Equals {
       }
     })
 
+  implicit def IdentityEqual[A: Equal]: Equal[Identity[A]] =
+    Equal.equalBy(_.value)
+
 }

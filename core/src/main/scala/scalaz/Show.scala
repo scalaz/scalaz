@@ -253,4 +253,8 @@ trait Shows {
 
   implicit def CallableShow[A: Show]: Show[java.util.concurrent.Callable[A]] =
     showBy(_.call)
+
+  implicit def IdentityShow[A: Show]: Show[Identity[A]] =
+    Show.showBy(_.value)
+
 }

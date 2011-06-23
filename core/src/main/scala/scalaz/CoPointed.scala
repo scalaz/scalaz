@@ -39,4 +39,8 @@ trait CoPointeds {
     def coPoint[A] = a => a.tree.rootLabel
   }
 
+  implicit def IdentityCoPointed: CoPointed[Identity] = new CoPointed[Identity] {
+    def coPoint[A] = a => a.value
+  }
+
 }

@@ -118,7 +118,10 @@ trait Pointeds extends PointedsLow {
   implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
-  
+
+  implicit val IdentityPointed: Pointed[Identity] = new Pointed[Identity] {
+    def point[A](a: => A) = Identity.id(a)
+  }
   
 }
 

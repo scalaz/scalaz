@@ -192,4 +192,6 @@ trait Applicatives {
   implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
     applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
+  implicit val IdentityApplicative: Applicative[Identity] = implicitly[Monad[Identity]].applicative
+
 }

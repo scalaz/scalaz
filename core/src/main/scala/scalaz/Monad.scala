@@ -208,4 +208,7 @@ trait Monads {
   implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
     monadBP[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
 
+  implicit val IdentityMonad: Monad[Identity] =
+    Monad.monadBP[Identity]
+
 }
