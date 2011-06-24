@@ -240,4 +240,7 @@ trait Equals {
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
     Equal.equalBy(_.either)
 
+  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] =
+    Equal.equalBy(_.toStream)
+
 }

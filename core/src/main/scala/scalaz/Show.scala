@@ -283,4 +283,8 @@ trait Shows {
       , "Failure(" + implicitly[Show[A]].shows(_) + ")"
     ))
 
+  implicit def ZipperShow[A: Show]: Show[Zipper[A]] =
+    Show.show((z: Zipper[A]) =>
+      implicitly[Show[Stream[A]]].show(z.lefts.reverse) ++ " " ++ implicitly[Show[A]].show(z.focus) ++ " " ++ implicitly[Show[Stream[A]]].show(z.rights.reverse))
+
 }

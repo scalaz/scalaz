@@ -73,4 +73,8 @@ trait CoJoins {
       }
   }
 
+  implicit def ZipperCoJoin: CoJoin[Zipper] = new CoJoin[Zipper] {
+    def coJoin[A] = a => a.positions
+  }
+
 }

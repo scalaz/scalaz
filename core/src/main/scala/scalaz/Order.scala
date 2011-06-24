@@ -278,4 +278,7 @@ trait Orders {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
     Order.orderBy(_.either)
 
+  implicit def ZipperOrder[A: Order]: Order[Zipper[A]] =
+    Order.orderBy(_.toStream)
+
 }

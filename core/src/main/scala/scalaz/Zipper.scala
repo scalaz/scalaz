@@ -320,27 +320,4 @@ trait Zippers {
     val rights = rs
   }
 
-  implicit def ZipperShow[A: Show]: Show[Zipper[A]] =
-    Show.show((z: Zipper[A]) =>
-      implicitly[Show[Stream[A]]].show(z.lefts.reverse) ++ " " ++ implicitly[Show[A]].show(z.focus) ++ " " ++ implicitly[Show[Stream[A]]].show(z.rights.reverse))
-
-  implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] =
-    Equal.equalBy(_.toStream)
-
-  implicit def ZipperOrder[A: Order]: Order[Zipper[A]] =
-    Order.orderBy(_.toStream)
-
-  implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
-  implicit def ZipperCoPointed: CoPointed[Zipper] = new CoPointed[Zipper] {
-    def coPoint[A] = a => a.focus
-  }
-
-  implicit def ZipperCoJoin: CoJoin[Zipper] = new CoJoin[Zipper] {
-    def coJoin[A] = a => a.positions
-  }
-
 }

@@ -231,6 +231,11 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

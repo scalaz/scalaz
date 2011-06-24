@@ -56,4 +56,8 @@ trait CoPointeds {
     def coPoint[A] = a => a.rootLabel
   }
 
+  implicit def ZipperCoPointed: CoPointed[Zipper] = new CoPointed[Zipper] {
+    def coPoint[A] = a => a.focus
+  }
+
 }
