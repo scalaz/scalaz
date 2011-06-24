@@ -169,84 +169,12 @@ trait StepStreamTs {
   def stepStream[A]: StepStream[A] =
     stepStreamT[Identity, A]
 
-  implicit def StepStreamTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepStreamT[F, X]})#λ] = new Functor[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
-  implicit def StepStreamTPointed[F[_] : Pointed]
-  : Pointed[({type λ[X] = StepStreamT[F, X]})#λ] = new Pointed[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def point[A](a: => A) =
-      a :: stepStreamT[F, A]
-  }
-
-  implicit def StepStreamTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ] = {
-    implicit val p = pf.pointed
-    implicit val ftr = pf.functor
-    PointedFunctor.pointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ]
-  }
-
-  implicit def StepStreamTApplic[F[_] : Functor]: Applic[({type λ[X] = StepStreamT[F, X]})#λ] = new Applic[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def applic[A, B](f: StepStreamT[F, A => B]) =
-      a =>
-        for {
-          ff <- f
-          aa <- a
-        } yield ff(aa)
-  }
-
-  implicit def StepStreamTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepStreamT[F, X]})#λ] = {
-    implicit val p = ap.pointedFunctor
-    implicit val ftr = p.functor
-    implicit val appl: Applic[F] = ap.applic
-    Applicative.applicative[({type λ[X] = StepStreamT[F, X]})#λ]
-  }
-
-  implicit def StepStreamTBind[F[_] : Functor]: Bind[({type λ[X] = StepStreamT[F, X]})#λ] = new Bind[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def bind[A, B](f: A => StepStreamT[F, B]) =
-      _ flatMap f
-  }
-
-  implicit def StepStreamTJoin[F[_] : Functor]: Join[({type λ[X] = StepStreamT[F, X]})#λ] = new Join[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def join[A] =
-      _ flatMap (z => z)
-  }
-
-  implicit def StepStreamTMonad[F[_]](implicit m: Monad[F]): Monad[({type λ[X] = StepStreamT[F, X]})#λ] = {
-    implicit val ftr = m.functor
-    implicit val pt = m.pointed
-    Monad.monadBP[({type λ[X] = StepStreamT[F, X]})#λ]
-  }
-
-  implicit def StepStreamTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepStreamT[F, X]})#λ] = new Empty[({type λ[X] = StepStreamT[F, X]})#λ] {
-    def empty[A] =
-      stepStreamT[F, A]
-  }
-
-  implicit def StepStreamTSemigroup[F[_] : Functor, A]: Semigroup[StepStreamT[F, A]] = new Semigroup[StepStreamT[F, A]] {
-    def append(a1: StepStreamT[F, A], a2: => StepStreamT[F, A]) =
-      a1 ++ a2
-  }
-
-  implicit def StepStreamTSemigroupZero[F[_] : Pointed, A]: Zero[StepStreamT[F, A]] = new Zero[StepStreamT[F, A]] {
-    val zero =
-      stepStreamT[F, A]
-  }
-
-  implicit def StepStreamTMonoid[F[_], A](implicit p: PointedFunctor[F]): Monoid[StepStreamT[F, A]] = {
-    implicit val ftr = p.functor
-    implicit val pt = p.pointed
-    Monoid.monoid
-  }
-
-  implicit val StepStreamTMonadTrans: MonadTrans[StepStreamT] = new MonadTrans[StepStreamT] {
-    def lift[G[_] : Monad, A](a: G[A]): StepStreamT[G, A] = new StepStreamT[G, A] {
-      def step = {
-        implicit val p = implicitly[Monad[G]].pointed
-        implicitly[Monad[G]].fmap((a: A) =>
-          StepStreamT.Yield(a, stepStreamT[G, A]): StepStreamT.Step[A, StepStreamT[G, A]]
-        )(a)
-      }
+  def liftStepStreamT[G[_] : Monad, A](a: G[A]): StepStreamT[G, A] = new StepStreamT[G, A] {
+    def step = {
+      implicit val p = implicitly[Monad[G]].pointed
+      implicitly[Monad[G]].fmap((a: A) =>
+        StepStreamT.Yield(a, StepStreamT.stepStreamT[G, A]): StepStreamT.Step[A, StepStreamT[G, A]]
+      )(a)
     }
   }
 

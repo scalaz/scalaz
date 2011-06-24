@@ -226,4 +226,16 @@ trait Monads {
     Monad.monadBP[({type λ[α] = StateT[A, F, α]})#λ]
   }
 
+  implicit def StepListTMonad[F[_]](implicit m: Monad[F]): Monad[({type λ[X] = StepListT[F, X]})#λ] = {
+    implicit val ftr = m.functor
+    implicit val pt = m.pointed
+    Monad.monadBP[({type λ[X] = StepListT[F, X]})#λ]
+  }
+
+  implicit def StepStreamTMonad[F[_]](implicit m: Monad[F]): Monad[({type λ[X] = StepStreamT[F, X]})#λ] = {
+    implicit val ftr = m.functor
+    implicit val pt = m.pointed
+    Monad.monadBP[({type λ[X] = StepStreamT[F, X]})#λ]
+  }
+
 }

@@ -210,4 +210,18 @@ trait Applicatives {
     Applicative.applicative[({type λ[α] = StateT[A, F, α]})#λ]
   }
 
+  implicit def StepListTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepListT[F, X]})#λ] = {
+    implicit val p = ap.pointedFunctor
+    implicit val ftr = p.functor
+    implicit val appl: Applic[F] = ap.applic
+    Applicative.applicative[({type λ[X] = StepListT[F, X]})#λ]
+  }
+
+  implicit def StepStreamTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepStreamT[F, X]})#λ] = {
+    implicit val p = ap.pointedFunctor
+    implicit val ftr = p.functor
+    implicit val appl: Applic[F] = ap.applic
+    Applicative.applicative[({type λ[X] = StepStreamT[F, X]})#λ]
+  }
+
 }

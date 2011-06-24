@@ -89,6 +89,17 @@ trait Emptys extends EmptysLow {
   implicit def JavaSynchronousQueueEmpty: Empty[SynchronousQueue] = new Empty[SynchronousQueue] {
     def empty[A] = new SynchronousQueue[A]
   }
+
+  implicit def StepListTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepListT[F, X]})#λ] = new Empty[({type λ[X] = StepListT[F, X]})#λ] {
+    def empty[A] =
+      stepListT[F, A]
+  }
+
+  implicit def StepStreamTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepStreamT[F, X]})#λ] = new Empty[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def empty[A] =
+      stepStreamT[F, A]
+  }
+
 }
 
 trait EmptysLow {

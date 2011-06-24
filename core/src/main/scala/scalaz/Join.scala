@@ -39,4 +39,14 @@ trait Joins {
       _ flatMap (z => z)
   }
 
+  implicit def StepListTJoin[F[_] : Functor]: Join[({type λ[X] = StepListT[F, X]})#λ] = new Join[({type λ[X] = StepListT[F, X]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def StepStreamTJoin[F[_] : Functor]: Join[({type λ[X] = StepStreamT[F, X]})#λ] = new Join[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }

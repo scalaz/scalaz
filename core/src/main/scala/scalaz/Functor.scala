@@ -197,6 +197,16 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def StepListTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepListT[F, X]})#λ] = new Functor[({type λ[X] = StepListT[F, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def StepStreamTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepStreamT[F, X]})#λ] = new Functor[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

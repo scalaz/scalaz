@@ -213,6 +213,16 @@ trait Semigroups extends SemigroupsLow {
   implicit def NonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
     Semigroup.semigroup(a1 => a1.list <::: _)
 
+  implicit def StepListTSemigroup[F[_] : Functor, A]: Semigroup[StepListT[F, A]] = new Semigroup[StepListT[F, A]] {
+    def append(a1: StepListT[F, A], a2: => StepListT[F, A]) =
+      a1 ++ a2
+  }
+
+  implicit def StepStreamTSemigroup[F[_] : Functor, A]: Semigroup[StepStreamT[F, A]] = new Semigroup[StepStreamT[F, A]] {
+    def append(a1: StepStreamT[F, A], a2: => StepStreamT[F, A]) =
+      a1 ++ a2
+  }
+
 }
 
 trait SemigroupsLow {

@@ -140,4 +140,16 @@ trait PointedFunctors {
     val pointed = implicitly[Pointed[({type λ[α] = StateT[A, F, α]})#λ]]
   }
 
+  implicit def StepListTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepListT[F, X]})#λ] = {
+    implicit val p = pf.pointed
+    implicit val ftr = pf.functor
+    PointedFunctor.pointedFunctor[({type λ[X] = StepListT[F, X]})#λ]
+  }
+
+  implicit def StepStreamTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ] = {
+    implicit val p = pf.pointed
+    implicit val ftr = pf.functor
+    PointedFunctor.pointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ]
+  }
+
 }

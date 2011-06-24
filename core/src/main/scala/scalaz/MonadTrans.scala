@@ -33,4 +33,14 @@ trait MonadTranss {
       StateT.stateT(s => implicitly[Monad[G]].fmap((a: A) => (a, s))(a))
   }
 
+  implicit val StepListTMonadTrans: MonadTrans[StepListT] = new MonadTrans[StepListT] {
+    def lift[G[_] : Monad, A](a: G[A]) =
+      StepListT.liftStepListT(a)
+  }
+
+  implicit val StepStreamTMonadTrans: MonadTrans[StepStreamT] = new MonadTrans[StepStreamT] {
+    def lift[G[_] : Monad, A](a: G[A]) =
+      StepStreamT.liftStepStreamT(a)
+  }
+
 }

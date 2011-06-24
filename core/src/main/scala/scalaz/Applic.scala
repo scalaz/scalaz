@@ -163,4 +163,22 @@ trait Applics {
       implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].liftM2[X => Y, X, Y](identity)(f)
   }
 
+  implicit def StepListTApplic[F[_] : Functor]: Applic[({type λ[X] = StepListT[F, X]})#λ] = new Applic[({type λ[X] = StepListT[F, X]})#λ] {
+    def applic[A, B](f: StepListT[F, A => B]) =
+      a =>
+        for {
+          ff <- f
+          aa <- a
+        } yield ff(aa)
+  }
+
+  implicit def StepStreamTApplic[F[_] : Functor]: Applic[({type λ[X] = StepStreamT[F, X]})#λ] = new Applic[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def applic[A, B](f: StepStreamT[F, A => B]) =
+      a =>
+        for {
+          ff <- f
+          aa <- a
+        } yield ff(aa)
+  }
+
 }

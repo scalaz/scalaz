@@ -253,6 +253,16 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit def StepListTBind[F[_] : Functor]: Bind[({type λ[X] = StepListT[F, X]})#λ] = new Bind[({type λ[X] = StepListT[F, X]})#λ] {
+    def bind[A, B](f: A => StepListT[F, B]) =
+      _ flatMap f
+  }
+
+  implicit def StepStreamTBind[F[_] : Functor]: Bind[({type λ[X] = StepStreamT[F, X]})#λ] = new Bind[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def bind[A, B](f: A => StepStreamT[F, B]) =
+      _ flatMap f
+  }
+
 }
 
 trait BindsLow {

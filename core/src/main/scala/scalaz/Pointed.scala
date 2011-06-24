@@ -145,6 +145,18 @@ trait Pointeds extends PointedsLow {
         StateT.stateT(s => implicitly[Pointed[F]].point((a, s)))
     }
 
+  implicit def StepListTPointed[F[_] : Pointed]
+  : Pointed[({type λ[X] = StepListT[F, X]})#λ] = new Pointed[({type λ[X] = StepListT[F, X]})#λ] {
+    def point[A](a: => A) =
+      a :: StepListT.stepListT[F, A]
+  }
+
+  implicit def StepStreamTPointed[F[_] : Pointed]
+  : Pointed[({type λ[X] = StepStreamT[F, X]})#λ] = new Pointed[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def point[A](a: => A) =
+      a :: StepStreamT.stepStreamT[F, A]
+  }
+
 }
 
 trait PointedsLow {

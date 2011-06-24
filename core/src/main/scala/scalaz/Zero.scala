@@ -202,6 +202,16 @@ trait Zeros extends ZerosLow {
       Heap.Empty[A]
   }
 
+  implicit def StepListTZero[F[_] : Pointed, A]: Zero[StepListT[F, A]] = new Zero[StepListT[F, A]] {
+    val zero =
+      StepListT.stepListT[F, A]
+  }
+
+  implicit def StepStreamTZero[F[_] : Pointed, A]: Zero[StepStreamT[F, A]] = new Zero[StepStreamT[F, A]] {
+    val zero =
+      StepStreamT.stepStreamT[F, A]
+  }
+
 }
 
 trait ZerosLow {

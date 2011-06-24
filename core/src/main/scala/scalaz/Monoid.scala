@@ -144,6 +144,18 @@ trait Monoids extends MonoidsLow {
   implicit def HeapMonoid[A]: Monoid[Heap[A]] =
     Monoid.monoid
 
+  implicit def StepListTMonoid[F[_], A](implicit p: PointedFunctor[F]): Monoid[StepListT[F, A]] = {
+    implicit val ftr = p.functor
+    implicit val pt = p.pointed
+    Monoid.monoid
+  }
+
+  implicit def StepStreamTMonoid[F[_], A](implicit p: PointedFunctor[F]): Monoid[StepStreamT[F, A]] = {
+    implicit val ftr = p.functor
+    implicit val pt = p.pointed
+    Monoid.monoid
+  }
+
 }
 
 trait MonoidsLow {

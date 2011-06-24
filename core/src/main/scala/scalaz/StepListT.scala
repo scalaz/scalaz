@@ -169,85 +169,14 @@ trait StepListTs {
   def stepList[A]: StepList[A] =
     stepListT[Identity, A]
 
-  implicit def StepListTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepListT[F, X]})#λ] = new Functor[({type λ[X] = StepListT[F, X]})#λ] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
-  implicit def StepListTPointed[F[_] : Pointed]
-  : Pointed[({type λ[X] = StepListT[F, X]})#λ] = new Pointed[({type λ[X] = StepListT[F, X]})#λ] {
-    def point[A](a: => A) =
-      a :: stepListT[F, A]
-  }
-
-  implicit def StepListTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepListT[F, X]})#λ] = {
-    implicit val p = pf.pointed
-    implicit val ftr = pf.functor
-    PointedFunctor.pointedFunctor[({type λ[X] = StepListT[F, X]})#λ]
-  }
-
-  implicit def StepListTApplic[F[_] : Functor]: Applic[({type λ[X] = StepListT[F, X]})#λ] = new Applic[({type λ[X] = StepListT[F, X]})#λ] {
-    def applic[A, B](f: StepListT[F, A => B]) =
-      a =>
-        for {
-          ff <- f
-          aa <- a
-        } yield ff(aa)
-  }
-
-  implicit def StepListTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepListT[F, X]})#λ] = {
-    implicit val p = ap.pointedFunctor
-    implicit val ftr = p.functor
-    implicit val appl: Applic[F] = ap.applic
-    Applicative.applicative[({type λ[X] = StepListT[F, X]})#λ]
-  }
-
-  implicit def StepListTBind[F[_] : Functor]: Bind[({type λ[X] = StepListT[F, X]})#λ] = new Bind[({type λ[X] = StepListT[F, X]})#λ] {
-    def bind[A, B](f: A => StepListT[F, B]) =
-      _ flatMap f
-  }
-
-  implicit def StepListTJoin[F[_] : Functor]: Join[({type λ[X] = StepListT[F, X]})#λ] = new Join[({type λ[X] = StepListT[F, X]})#λ] {
-    def join[A] =
-      _ flatMap (z => z)
-  }
-
-  implicit def StepListTMonad[F[_]](implicit m: Monad[F]): Monad[({type λ[X] = StepListT[F, X]})#λ] = {
-    implicit val ftr = m.functor
-    implicit val pt = m.pointed
-    Monad.monadBP[({type λ[X] = StepListT[F, X]})#λ]
-  }
-
-  implicit def StepListTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepListT[F, X]})#λ] = new Empty[({type λ[X] = StepListT[F, X]})#λ] {
-    def empty[A] =
-      stepListT[F, A]
-  }
-
-  implicit def StepListTSemigroup[F[_] : Functor, A]: Semigroup[StepListT[F, A]] = new Semigroup[StepListT[F, A]] {
-    def append(a1: StepListT[F, A], a2: => StepListT[F, A]) =
-      a1 ++ a2
-  }
-
-  implicit def StepListTSemigroupZero[F[_] : Pointed, A]: Zero[StepListT[F, A]] = new Zero[StepListT[F, A]] {
-    val zero =
-      stepListT[F, A]
-  }
-
-  implicit def StepListTMonoid[F[_], A](implicit p: PointedFunctor[F]): Monoid[StepListT[F, A]] = {
-    implicit val ftr = p.functor
-    implicit val pt = p.pointed
-    Monoid.monoid
-  }
-
-  implicit val StepListTMonadTrans: MonadTrans[StepListT] = new MonadTrans[StepListT] {
-    def lift[G[_] : Monad, A](a: G[A]): StepListT[G, A] = new StepListT[G, A] {
-      def step = {
-        implicit val p = implicitly[Monad[G]].pointed
-        implicitly[Monad[G]].fmap((a: A) =>
-          StepListT.Yield(a, stepListT[G, A]): StepListT.Step[A, StepListT[G, A]]
-        )(a)
-      }
+  def liftStepListT[G[_] : Monad, A](a: G[A]): StepListT[G, A] = new StepListT[G, A] {
+    def step = {
+      implicit val p = implicitly[Monad[G]].pointed
+      implicitly[Monad[G]].fmap((a: A) =>
+        StepListT.Yield(a, StepListT.stepListT[G, A]): StepListT.Step[A, StepListT[G, A]]
+      )(a)
     }
   }
+
 }
 
