@@ -132,25 +132,31 @@ sealed trait AltDList[A] {
     post.reverse.foldLeft(x)((l, f) => f(l))
   }
 
+  /** O(n) **/
   def toList: List[A] = apply(Nil)
 
+  /** O(n) **/
   def head: Option[A] = toList.headOption
 
+  /** O(n) **/
   def tail: Option[List[A]] = toList match {
     case Nil => None
     case _ :: t => Some(t)
   }
 
+  /** O(1) **/
   def ::(a: A): AltDList[A] = new AltDList[A] {
     val pre = AltDList.this.pre
     val post = ((xs: List[A]) => a :: xs) :: AltDList.this.post
   }
 
+  /** O(1) **/
   def ::>(a: A): AltDList[A] = new AltDList[A] {
     val pre = ((xs: List[A]) => a :: xs) :: AltDList.this.pre
     val post = AltDList.this.post
   }
 
+  /** O(n) **/
   def :::(as: AltDList[A]): AltDList[A] = new AltDList[A] {
     val pre = (AltDList.this.pre ::: AltDList.this.post.reverse) ::: as.pre
     val post = as.post
