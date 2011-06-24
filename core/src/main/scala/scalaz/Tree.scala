@@ -111,9 +111,6 @@ trait Trees {
     override def toString = "<tree>"
   }
 
-  import newtypes._
-  import wrap.StreamW._
-
   /**Construct a tree node with no children. */
   def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
 
@@ -124,68 +121,5 @@ trait Trees {
     f(v) match {
       case (a, bs) => node(a, unfoldForest(bs.apply, f))
     }
-
-  implicit def TreeShow[A: Show]: Show[Tree[A]] =
-    Show.show((t: Tree[A]) =>
-      '{' :: implicitly[Show[A]].show(t.rootLabel) ++ " " ++ implicitly[Show[Stream[Tree[A]]]].show(t.subForest) ++ "}")
-
-  implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
-    Equal.equalC[Tree[A]]((a1, a2) =>
-      implicitly[Equal[A]].equal(a1.rootLabel)(a2.rootLabel)
-          && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest)(a2.subForest))
-
-  implicit val TreePointed: Pointed[Tree] = new Pointed[Tree] {
-    def point[A](a: => A) = leaf(a)
-  }
-
-  implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
-  implicit val TreePointedFunctor: PointedFunctor[Tree] =
-    PointedFunctor.pointedFunctor[Tree]
-
-  implicit val TreeApplic: Applic[Tree] = new Applic[Tree] {
-    def applic[A, B](f: Tree[A => B]) =
-      a =>
-        node((f.rootLabel)(a.rootLabel), implicitly[Applic[ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
-  }
-
-  implicit val TreeApplicFunctor: ApplicFunctor[Tree] =
-    ApplicFunctor.applicFunctor[Tree]
-
-  implicit val TreeApplicative: Applicative[Tree] =
-    Applicative.applicative[Tree]
-
-  implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
-    def bind[A, B](f: A => Tree[B]) =
-      t => {
-        val r = f(t.rootLabel)
-        node(r.rootLabel, r.subForest #::: t.subForest.map(bind(f): Tree[A] => Tree[B]) )
-      }
-  }
-
-  implicit val TreeBindFunctor: BindFunctor[Tree] =
-    BindFunctor.bindFunctor[Tree]
-
-  implicit val TreeMonad: Monad[Tree] =
-    Monad.monadBP[Tree]
-
-  implicit val TreeTraverse: Traverse[Tree] = new Traverse[Tree] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      ta => {
-        val a = implicitly[Applicative[F]]
-        a.apply(a.fmap((x: B) => (xs: Stream[Tree[B]]) => node(x, xs))(f(ta.rootLabel)))(implicitly[Traverse[Stream]].traverse[F, Tree[A], Tree[B]](traverse[F, A, B](f).apply(_: Tree[A])).apply(ta.subForest))
-      }
-  }
-
-  implicit def TreeCoPointed: CoPointed[Tree] = new CoPointed[Tree] {
-    def coPoint[A] = a => a.rootLabel
-  }
-
-  implicit def TreeCoJoin: CoJoin[Tree] = new CoJoin[Tree] {
-    def coJoin[A] = a => a.cobind(identity(_))
-  }
 
 }

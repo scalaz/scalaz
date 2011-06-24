@@ -263,6 +263,14 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit def TreeBind: Bind[Tree] = new Bind[Tree] {
+    def bind[A, B](f: A => Tree[B]) =
+      t => {
+        val r = f(t.rootLabel)
+        Tree.node(r.rootLabel, r.subForest #::: t.subForest.map(bind(f): Tree[A] => Tree[B]) )
+      }
+  }
+
 }
 
 trait BindsLow {

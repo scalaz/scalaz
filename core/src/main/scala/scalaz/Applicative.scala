@@ -224,4 +224,7 @@ trait Applicatives {
     Applicative.applicative[({type λ[X] = StepStreamT[F, X]})#λ]
   }
 
+  implicit val TreeApplicative: Applicative[Tree] =
+    Applicative.applicative[Tree]
+
 }

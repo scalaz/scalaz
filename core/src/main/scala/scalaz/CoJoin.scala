@@ -47,4 +47,8 @@ trait CoJoins {
     def coJoin[A] = a => a.tails
   }
 
+  implicit def TreeCoJoin: CoJoin[Tree] = new CoJoin[Tree] {
+    def coJoin[A] = a => a.cobind(identity(_))
+  }
+
 }

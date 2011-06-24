@@ -238,4 +238,7 @@ trait Monads {
     Monad.monadBP[({type λ[X] = StepStreamT[F, X]})#λ]
   }
 
+  implicit val TreeMonad: Monad[Tree] =
+    Monad.monadBP[Tree]
+
 }

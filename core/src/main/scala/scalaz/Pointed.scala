@@ -157,6 +157,10 @@ trait Pointeds extends PointedsLow {
       a :: StepStreamT.stepStreamT[F, A]
   }
 
+  implicit val TreePointed: Pointed[Tree] = new Pointed[Tree] {
+    def point[A](a: => A) = Tree.leaf(a)
+  }
+
 }
 
 trait PointedsLow {

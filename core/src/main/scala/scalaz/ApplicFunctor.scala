@@ -182,4 +182,7 @@ trait ApplicFunctors {
     ApplicFunctor.applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]
   }
 
+  implicit val TreeApplicFunctor: ApplicFunctor[Tree] =
+    ApplicFunctor.applicFunctor[Tree]
+
 }

@@ -266,4 +266,8 @@ trait Shows {
   implicit def ShowOptionT[F[_], A](implicit e: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     Show.showBy(_.runT)
 
+  implicit def TreeShow[A: Show]: Show[Tree[A]] =
+    Show.show((t: Tree[A]) =>
+      '{' :: implicitly[Show[A]].show(t.rootLabel) ++ " " ++ implicitly[Show[Stream[Tree[A]]]].show(t.subForest) ++ "}")
+
 }

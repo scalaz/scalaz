@@ -110,4 +110,7 @@ trait BindFunctors {
     val bind = implicitly[Bind[({type λ[α] = StateT[A, F, α]})#λ]]
   }
 
+  implicit val TreeBindFunctor: BindFunctor[Tree] =
+    BindFunctor.bindFunctor[Tree]
+
 }

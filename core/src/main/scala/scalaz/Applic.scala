@@ -181,4 +181,11 @@ trait Applics {
         } yield ff(aa)
   }
 
+  implicit val TreeApplic: Applic[Tree] = new Applic[Tree] {
+    import wrap.StreamW._
+    def applic[A, B](f: Tree[A => B]) =
+      a =>
+        Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
+  }
+
 }

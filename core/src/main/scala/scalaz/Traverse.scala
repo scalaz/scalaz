@@ -50,6 +50,14 @@ trait Traverses extends TraversesLow {
     }
   }
 
+  implicit val TreeTraverse: Traverse[Tree] = new Traverse[Tree] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      ta => {
+        val a = implicitly[Applicative[F]]
+        a.apply(a.fmap((x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, xs))(f(ta.rootLabel)))(implicitly[Traverse[Stream]].traverse[F, Tree[A], Tree[B]](traverse[F, A, B](f).apply(_: Tree[A])).apply(ta.subForest))
+      }
+  }
+
 }
 
 trait TraversesLow {

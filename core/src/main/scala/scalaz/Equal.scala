@@ -220,4 +220,9 @@ trait Equals {
   implicit def EqualOptionT[F[_], A](implicit e: Equal[F[Option[A]]]): Equal[OptionT[F, A]] =
     Equal.equalBy(_.runT)
 
+  implicit def TreeEqual[A: Equal]: Equal[Tree[A]] =
+    Equal.equalC[Tree[A]]((a1, a2) =>
+      implicitly[Equal[A]].equal(a1.rootLabel)(a2.rootLabel)
+          && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest)(a2.subForest))
+
 }

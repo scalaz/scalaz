@@ -152,4 +152,7 @@ trait PointedFunctors {
     PointedFunctor.pointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ]
   }
 
+  implicit val TreePointedFunctor: PointedFunctor[Tree] =
+    PointedFunctor.pointedFunctor[Tree]
+
 }

@@ -207,6 +207,11 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {
