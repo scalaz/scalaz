@@ -105,6 +105,10 @@ trait ScalazArbitrarys {
 
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
+  implicit def AltDListArbitrary[A](implicit a: Arbitrary[A]) = Arbitrary {
+    Gen.sized(n => listOfN(n, arbitrary[A]) map (xs => xs.foldLeft(AltDList.empty[A])(_ ::> _)))
+  }
+
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = arb[A] ∘ ((x: A) => x.η[Callable])
 
   import concurrent.Promise
