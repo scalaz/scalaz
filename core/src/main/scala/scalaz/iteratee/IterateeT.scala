@@ -233,4 +233,11 @@ trait IterateeTs {
 
   def continue[E, A](f: Input[E] => Iteratee[E, A]): Iteratee[E, A] =
     continueT(i => id(f(i)))
+
+  implicit def IterateeTMonadTrans[E]: MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): IterateeT[E, G, A] =
+      continueT(i =>
+        implicitly[Monad[G]].fmap((aa: A) => doneT[G](aa, emptyInput[E]))(a))
+  }
+
 }
