@@ -4,7 +4,6 @@ object Scalaz extends
 Alphas with
 Applics with
 Applicatives with
-AltDLists with
 Binds with
 BKTrees with
 Categorys with
@@ -12,6 +11,7 @@ CoKleislis with
 Comps with
 Consts with
 CoStateTs with
+Dequeues with
 Digits with
 EitherTs with
 Endos with

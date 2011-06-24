@@ -30,7 +30,7 @@ package scalaz
  * applied - referred to as 'pre' operations, an example of which is snoc.
  *
  * This structure does have a cost over and above that of a standard DList for prepending another
- * AltDList. This structure requires 2 ':::' list prepend operations, where DList only requires a
+ * Dequeue. This structure requires 2 ':::' list prepend operations, where DList only requires a
  * single ':::'. This does not significantly add to the algorithmic complexity, but it is still
  * less then desirable. There is a possible solution by modifying the core structure to be a list of
  * pre/post pairs, i.e.  List[(List[A] => List[A], List[A] => List[A])], this would allow nesting
@@ -41,7 +41,7 @@ package scalaz
  *
  *
  *
- *  Operations                |    DList                   |    ConsList                                       |    AltDList
+ *  Operations                |    DList                   |    ConsList                                       |    Dequeue
  *  j = emptyDList            |    j = xs => xs            |    Nil                                            |    j = post = Nil,                                        pre = Nil
  *  k = a :: j                |    k = xs => a :: j(xs)    |    a :: Nil                                       |    k = post = {xs => a :: xs} :: Nil,                     pre = Nil
  *  l = k ::> b               |    l = xs => k(b :: xs)    |    a :: b :: Nil                                  |    l = post = {xs => a :: xs} :: Nil,                     pre = {xs => b :: xs} :: Nil
@@ -80,7 +80,7 @@ package scalaz
  *
  *
  *
- *  AltDList evaluation of n.toList -
+ *  Dequeue evaluation of n.toList -
  *
  *  > n = post = {xs => c :: xs} :: {xs => a :: xs} :: Nil,                    pre = {xs => d :: xs} :: {xs => b :: xs} :: Nil
  *  > n = difference = {xs => d :: xs} :: {xs => b :: xs} :: {xs => a :: xs} :: {xs => c :: xs} :: Nil
@@ -89,7 +89,7 @@ package scalaz
  *  > n'''  = {a :: n''}    = {a :: b :: d :: Nil}
  *  > n'''' = {c :: n'''}   = {c :: a :: b :: d :: Nil}
  *
- *  AltDList evaluation of s.toList -
+ *  Dequeue evaluation of s.toList -
  *
  *  > s = post = {xs => h :: xs} :: {xs => f :: xs} :: Nil,                    pre = {xs => g :: xs} :: {xs => e :: xs} :: Nil
  *  > s = difference = {xs => g :: xs} :: {xs => e :: xs :: {xs => f :: xs} :: {xs => h :: xs} :: Nil
@@ -98,7 +98,7 @@ package scalaz
  *  > s'''  = {f :: n''}    = {f :: e :: g :: Nil}
  *  > s'''' = {c :: n'''}   = {c :: f :: e :: g :: Nil}
  *
- *  AltDList evaluation of t.toList -
+ *  Dequeue evaluation of t.toList -
  *
  *  > t = post = {xs => h :: xs} :: {xs => f :: xs} :: Nil,                    pre = {xs => d :: xs} :: {xs => b :: xs} :: {xs => a :: xs} :: {xs => c :: xs} :: {xs => g :: xs} :: {xs => e :: xs} :: Nil
  *  > t = difference = {xs => d :: xs} :: {xs => b :: xs} :: {xs => a :: xs} :: {xs => c :: xs} :: {xs => g :: xs} :: {xs => e :: xs} :: {xs => f :: xs} :: {xs => h :: xs} :: Nil
@@ -120,9 +120,9 @@ package scalaz
  *  store a single list of differences and implement the fold of the final list of changes with
  *  a delay queue, so each 'difference' can say, execute now or delay until later.
  */
-sealed trait AltDList[A] {
+sealed trait Dequeue[A] {
 
-  import AltDList._
+  import Dequeue._
 
   val pre: List[List[A] => List[A]]
   val post: List[List[A] => List[A]]
@@ -145,41 +145,41 @@ sealed trait AltDList[A] {
   }
 
   /** O(1) **/
-  def ::(a: A): AltDList[A] = new AltDList[A] {
-    val pre = AltDList.this.pre
-    val post = ((xs: List[A]) => a :: xs) :: AltDList.this.post
+  def ::(a: A): Dequeue[A] = new Dequeue[A] {
+    val pre = Dequeue.this.pre
+    val post = ((xs: List[A]) => a :: xs) :: Dequeue.this.post
   }
 
   /** O(1) **/
-  def ::>(a: A): AltDList[A] = new AltDList[A] {
-    val pre = ((xs: List[A]) => a :: xs) :: AltDList.this.pre
-    val post = AltDList.this.post
+  def ::>(a: A): Dequeue[A] = new Dequeue[A] {
+    val pre = ((xs: List[A]) => a :: xs) :: Dequeue.this.pre
+    val post = Dequeue.this.post
   }
 
   /** O(n) **/
-  def :::(as: AltDList[A]): AltDList[A] = new AltDList[A] {
-    val pre = (AltDList.this.pre ::: AltDList.this.post.reverse) ::: as.pre
+  def :::(as: Dequeue[A]): Dequeue[A] = new Dequeue[A] {
+    val pre = (Dequeue.this.pre ::: Dequeue.this.post.reverse) ::: as.pre
     val post = as.post
   }
 
   def foldRight[B](b: B, f: (A, B) => B): B = toList.foldRight(b)(f)
 
-  def map[B](f: A => B): AltDList[B] = foldRight[AltDList[B]](empty[B], f(_) :: _)
+  def map[B](f: A => B): Dequeue[B] = foldRight[Dequeue[B]](empty[B], f(_) :: _)
 
-  def flatMap[B](f: A => AltDList[B]): AltDList[B] = foldRight[AltDList[B]](empty[B], f(_) ::: _)
+  def flatMap[B](f: A => Dequeue[B]): Dequeue[B] = foldRight[Dequeue[B]](empty[B], f(_) ::: _)
 
   def foreach(f: A => Unit): Unit = toList foreach f
 
   override def toString = 'D' + toList.toString
 }
 
-trait AltDLists {
-  def dlist[A](f: List[A] => List[A]): AltDList[A] = new AltDList[A] {
+trait Dequeues {
+  def dequeue[A](f: List[A] => List[A]): Dequeue[A] = new Dequeue[A] {
     val pre = List(f)
     val post = Nil
   }
 
-  def empty[A]: AltDList[A] = dlist(identity(_: List[A]))
+  def empty[A]: Dequeue[A] = dequeue(identity(_: List[A]))
 }
 
-object AltDList extends AltDLists
+object Dequeue extends Dequeues
