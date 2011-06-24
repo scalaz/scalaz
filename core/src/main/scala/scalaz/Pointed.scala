@@ -128,22 +128,30 @@ trait Pointeds extends PointedsLow {
       CoStateT.coStateT[A, F, Z]((implicitly[Pointed[F]].point(_ => z), implicitly[Zero[A]].zero))
   }
 
+  implicit def StateTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] =
+    new Pointed[({type λ[α] = StateT[A, F, α]})#λ] {
+      def point[A](a: => A) =
+        StateT.stateT(s => implicitly[Pointed[F]].point((a, s)))
+    }
+
   implicit def KleisliPointed[F[_], R](implicit p: Pointed[F]): Pointed[({type λ[α] = Kleisli[R, F, α]})#λ] =
     new Pointed[({type λ[α] = Kleisli[R, F, α]})#λ] {
       def point[A](a: => A) =
         Kleisli.kleisli(_ => p.point(a))
     }
 
+  import iteratee._, IterateeT._, Input._
+
+  implicit def IterateeTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] =
+    new Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] {
+      def point[A](a: => A) =
+        doneT(a, emptyInput)
+    }
+
   implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
     def point[A](a: => A) =
       NonEmptyList.nels(a)
   }
-
-  implicit def StateTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] =
-    new Pointed[({type λ[α] = StateT[A, F, α]})#λ] {
-      def point[A](a: => A) =
-        StateT.stateT(s => implicitly[Pointed[F]].point((a, s)))
-    }
 
   implicit def StepListTPointed[F[_] : Pointed]
   : Pointed[({type λ[X] = StepListT[F, X]})#λ] = new Pointed[({type λ[X] = StepListT[F, X]})#λ] {
