@@ -142,66 +142,6 @@ trait FailProjections {
         val validation = b
       }
     }
-
-  implicit def FailProjectionShow[E: Show, A: Show]: Show[FailProjection[E, A]] =
-    Show.showBy(_.validation)
-
-  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] =
-    Equal.equalBy(_.validation)
-
-  implicit def FailProjectionOrder[E: Order, A: Order]: Order[FailProjection[E, A]] =
-    Order.orderBy(_.validation)
-
-  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
-    new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
-      def fmap[A, B](f: A => B) =
-        r => (r.validation match {
-          case Success(a) => Success[B, X](a)
-          case Failure(e) => Failure[B, X](f(e))
-        }).fail
-    }
-
-  implicit def FailProjectionPointed[X]: Pointed[({type λ[α] = FailProjection[α, X]})#λ] =
-    new Pointed[({type λ[α] = FailProjection[α, X]})#λ] {
-      def point[A](a: => A) =
-        Failure(a).fail
-    }
-
-  implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = FailProjection[α, X]})#λ]
-
-  implicit def FailProjectionApplic[X]: Applic[({type λ[α] = FailProjection[α, X]})#λ] =
-    new Applic[({type λ[α] = FailProjection[α, X]})#λ] {
-      def applic[A, B](f: FailProjection[A => B, X]) =
-        a =>
-          ((f.validation, a.validation) match {
-            case (Success(x1), Success(_)) => Success[B, X](x1)
-            case (Success(x1), Failure(_)) => Success[B, X](x1)
-            case (Failure(_), Success(x2)) => Success[B, X](x2)
-            case (Failure(f), Failure(e))  => Failure[B, X](f(e))
-          }).fail
-    }
-
-  implicit def FailProjectionBind[X]: Bind[({type λ[α] = FailProjection[α, X]})#λ] =
-    new Bind[({type λ[α] = FailProjection[α, X]})#λ] {
-      def bind[A, B](f: A => FailProjection[B, X]) =
-        r => r.validation match {
-          case Success(a) => Success[B, X](a).fail
-          case Failure(e) => f(e)
-        }
-    }
-
-  implicit def FailProjectionBindFunctor[X]: BindFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    BindFunctor.bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
-
-  implicit def FailProjectionApplicFunctor[X]: ApplicFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = FailProjection[α, X]})#λ]
-
-  implicit def FailProjectionApplicative[X]: Applicative[({type λ[α] = FailProjection[α, X]})#λ] =
-    Applicative.applicative[({type λ[α] = FailProjection[α, X]})#λ]
-
-  implicit def FailProjectionMonad[X]: Monad[({type λ[α] = FailProjection[α, X]})#λ] =
-    Monad.monadBP[({type λ[α] = FailProjection[α, X]})#λ]
 }
 
 object Validation extends Validations {
@@ -224,46 +164,5 @@ trait Validations {
 
   def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
     e.fold(e => failure[A].apply[E](e), a => success[E].apply[A](a))
-
-  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
-    Show.shows(_.fold(
-      "Success(" + implicitly[Show[E]].shows(_) + ")"
-      , "Failure(" + implicitly[Show[A]].shows(_) + ")"
-    ))
-
-  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
-    Equal.equalBy(_.either)
-
-  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
-    Order.orderBy(_.either)
-
-  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
-  implicit def ValidationPointed[X]: Pointed[({type λ[α] = Validation[X, α]})#λ] = new Pointed[({type λ[α] = Validation[X, α]})#λ] {
-    def point[A](a: => A) =
-      Success(a)
-  }
-
-  implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α] = Validation[X, α]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
-
-  implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α] = Validation[X, α]})#λ] = new Applic[({type λ[α] = Validation[X, α]})#λ] {
-    def applic[A, B](f: Validation[X, A => B]) =
-      a => (f, a) match {
-        case (Success(f), Success(a)) => success(f(a))
-        case (Success(_), Failure(e)) => failure(e)
-        case (Failure(e), Success(_)) => failure(e)
-        case (Failure(e1), Failure(e2)) => failure(implicitly[Semigroup[X]].append(e1, e2))
-      }
-  }
-
-  implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Validation[X, α]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = Validation[X, α]})#λ]
-
-  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
-    Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
 
 }

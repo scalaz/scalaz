@@ -188,4 +188,26 @@ trait Applics {
         Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
   }
 
+  implicit def FailProjectionApplic[X]: Applic[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Applic[({type λ[α] = FailProjection[α, X]})#λ] {
+      def applic[A, B](f: FailProjection[A => B, X]) =
+        a =>
+          ((f.validation, a.validation) match {
+            case (Success(x1), Success(_)) => Success[B, X](x1)
+            case (Success(x1), Failure(_)) => Success[B, X](x1)
+            case (Failure(_), Success(x2)) => Success[B, X](x2)
+            case (Failure(f), Failure(e))  => Failure[B, X](f(e))
+          }).fail
+    }
+
+  implicit def ValidationApplic[X: Semigroup]: Applic[({type λ[α] = Validation[X, α]})#λ] = new Applic[({type λ[α] = Validation[X, α]})#λ] {
+    def applic[A, B](f: Validation[X, A => B]) =
+      a => (f, a) match {
+        case (Success(f), Success(a)) => Validation.success(f(a))
+        case (Success(_), Failure(e)) => Validation.failure(e)
+        case (Failure(e), Success(_)) => Validation.failure(e)
+        case (Failure(e1), Failure(e2)) => Validation.failure(implicitly[Semigroup[X]].append(e1, e2))
+      }
+  }
+
 }

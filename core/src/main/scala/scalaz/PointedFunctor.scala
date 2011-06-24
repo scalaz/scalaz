@@ -155,4 +155,10 @@ trait PointedFunctors {
   implicit val TreePointedFunctor: PointedFunctor[Tree] =
     PointedFunctor.pointedFunctor[Tree]
 
+  implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+
+  implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α] = Validation[X, α]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
+
 }

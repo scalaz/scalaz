@@ -161,6 +161,17 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = Tree.leaf(a)
   }
 
+  implicit def FailProjectionPointed[X]: Pointed[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Pointed[({type λ[α] = FailProjection[α, X]})#λ] {
+      def point[A](a: => A) =
+        Failure(a).fail
+    }
+
+  implicit def ValidationPointed[X]: Pointed[({type λ[α] = Validation[X, α]})#λ] = new Pointed[({type λ[α] = Validation[X, α]})#λ] {
+    def point[A](a: => A) =
+      Success(a)
+  }
+
 }
 
 trait PointedsLow {

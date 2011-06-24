@@ -272,4 +272,10 @@ trait Orders {
   implicit def OrderOptionT[F[_], A](implicit e: Order[F[Option[A]]]): Order[OptionT[F, A]] =
     Order.orderBy(_.runT)
 
+  implicit def FailProjectionOrder[E: Order, A: Order]: Order[FailProjection[E, A]] =
+    Order.orderBy(_.validation)
+
+  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
+    Order.orderBy(_.either)
+
 }

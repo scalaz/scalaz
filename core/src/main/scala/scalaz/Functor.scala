@@ -212,6 +212,20 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
+      def fmap[A, B](f: A => B) =
+        r => (r.validation match {
+          case Success(a) => Success[B, X](a)
+          case Failure(e) => Failure[B, X](f(e))
+        }).fail
+    }
+
+  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

@@ -241,4 +241,7 @@ trait Monads {
   implicit val TreeMonad: Monad[Tree] =
     Monad.monadBP[Tree]
 
+  implicit def FailProjectionMonad[X]: Monad[({type λ[α] = FailProjection[α, X]})#λ] =
+    Monad.monadBP[({type λ[α] = FailProjection[α, X]})#λ]
+
 }

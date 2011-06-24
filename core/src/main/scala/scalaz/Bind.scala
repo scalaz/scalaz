@@ -271,6 +271,15 @@ trait Binds extends BindsLow {
       }
   }
 
+  implicit def FailProjectionBind[X]: Bind[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Bind[({type λ[α] = FailProjection[α, X]})#λ] {
+      def bind[A, B](f: A => FailProjection[B, X]) =
+        r => r.validation match {
+          case Success(a) => Success[B, X](a).fail
+          case Failure(e) => f(e)
+        }
+    }
+
 }
 
 trait BindsLow {

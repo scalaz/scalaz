@@ -227,4 +227,10 @@ trait Applicatives {
   implicit val TreeApplicative: Applicative[Tree] =
     Applicative.applicative[Tree]
 
+  implicit def FailProjectionApplicative[X]: Applicative[({type λ[α] = FailProjection[α, X]})#λ] =
+    Applicative.applicative[({type λ[α] = FailProjection[α, X]})#λ]
+
+  implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
+    Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
+
 }

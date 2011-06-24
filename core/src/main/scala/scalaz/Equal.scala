@@ -234,4 +234,10 @@ trait Equals {
     )
   }
 
+  implicit def FailProjectionEqual[E: Equal, A: Equal]: Equal[FailProjection[E, A]] =
+    Equal.equalBy(_.validation)
+
+  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
+    Equal.equalBy(_.either)
+
 }

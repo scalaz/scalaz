@@ -185,4 +185,10 @@ trait ApplicFunctors {
   implicit val TreeApplicFunctor: ApplicFunctor[Tree] =
     ApplicFunctor.applicFunctor[Tree]
 
+  implicit def FailProjectionApplicFunctor[X]: ApplicFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+
+  implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Validation[X, α]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α] = Validation[X, α]})#λ]
+
 }

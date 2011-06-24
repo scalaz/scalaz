@@ -113,4 +113,7 @@ trait BindFunctors {
   implicit val TreeBindFunctor: BindFunctor[Tree] =
     BindFunctor.bindFunctor[Tree]
 
+  implicit def FailProjectionBindFunctor[X]: BindFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
+    BindFunctor.bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+
 }

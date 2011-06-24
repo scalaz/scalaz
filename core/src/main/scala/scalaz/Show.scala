@@ -274,4 +274,13 @@ trait Shows {
     Show.show((t: TreeLoc[A]) =>
       implicitly[Show[Tree[A]]].show(t.toTree) ++ "@" ++ implicitly[Show[Stream[Int]]].show(t.parents.map(_._1.length).reverse))
 
+  implicit def FailProjectionShow[E: Show, A: Show]: Show[FailProjection[E, A]] =
+    Show.showBy(_.validation)
+
+  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
+    Show.shows(_.fold(
+      "Success(" + implicitly[Show[E]].shows(_) + ")"
+      , "Failure(" + implicitly[Show[A]].shows(_) + ")"
+    ))
+
 }
