@@ -8,7 +8,7 @@ object ExampleIteratee {
   /*
   import scalaz._, iteratee._
   import Scalaz._
-  import IterVT._
+  import IterateeT._
 
   implicit val StreamEnumerator = new Enumerator[Stream] {
     def apply[E, A](e: Stream[E], i: IterV[E, A]): IterV[E, A] = e match {

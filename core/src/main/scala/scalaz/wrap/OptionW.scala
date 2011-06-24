@@ -7,7 +7,7 @@ sealed trait OptionW[A] {
   import *._
   import Validation._
   import newtypes.{FirstOption, LastOption}
-  import iteratee.IterVT, IterVT._
+  import iteratee.IterateeT, IterateeT._
   import iteratee.Input._
 
   /**
@@ -127,7 +127,7 @@ sealed trait OptionW[A] {
   /**
    * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
    */
-  def doneOr[F[_], B](b: => B, f: A => IterVT[A, F, B]): IterVT[A, F, B] = value match {
+  def doneOr[F[_], B](b: => B, f: A => IterateeT[A, F, B]): IterateeT[A, F, B] = value match {
     case None => doneT(b, eofInput)
     case Some(a) => f(a)
   }

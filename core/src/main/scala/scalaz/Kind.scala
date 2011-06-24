@@ -804,7 +804,7 @@ trait **->** extends **->**~ {
 
   implicit def ValidationFailure_*->*[A, E](f: FailProjection[E, A]) = *->*[({type λ[α] = FailProjection[α, A]})#λ, E](f)
 
-  implicit def IterVT_*->*[E, F[_], A](v: IterVT[E, F, A]) = *->*[({type λ[α] = IterVT[E, F, α]})#λ, A](v)
+  implicit def IterateeT_*->*[E, F[_], A](v: IterateeT[E, F, A]) = *->*[({type λ[α] = IterateeT[E, F, α]})#λ, A](v)
 
   import java.util.Map.Entry
 
