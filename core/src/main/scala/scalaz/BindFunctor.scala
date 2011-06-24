@@ -103,4 +103,11 @@ trait BindFunctors {
   implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
     BindFunctor.bindFunctor
 
+  implicit def StateTBindFunctor[A, F[_] : BindFunctor]: BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[BindFunctor[F]].functor
+    implicit val b = implicitly[BindFunctor[F]].bind
+    val functor = implicitly[Functor[({type λ[α] = StateT[A, F, α]})#λ]]
+    val bind = implicitly[Bind[({type λ[α] = StateT[A, F, α]})#λ]]
+  }
+
 }

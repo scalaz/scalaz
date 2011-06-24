@@ -133,4 +133,11 @@ trait PointedFunctors {
   implicit val NonEmptyListPointedFunctor: PointedFunctor[NonEmptyList] =
     PointedFunctor.pointedFunctor
 
+  implicit def StateTPointedFunctor[A, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[PointedFunctor[F]].functor
+    implicit val pt = implicitly[PointedFunctor[F]].pointed
+    val functor = implicitly[Functor[({type λ[α] = StateT[A, F, α]})#λ]]
+    val pointed = implicitly[Pointed[({type λ[α] = StateT[A, F, α]})#λ]]
+  }
+
 }

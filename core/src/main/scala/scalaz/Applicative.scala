@@ -204,4 +204,10 @@ trait Applicatives {
   implicit val NonEmptyListApplicative: Applicative[NonEmptyList] =
     Applicative.applicative
 
+  implicit def StateTApplicative[A, F[_]](implicit m: Monad[F]): Applicative[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val a = m.applic
+    implicit val p = m.pointedFunctor
+    Applicative.applicative[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
 }

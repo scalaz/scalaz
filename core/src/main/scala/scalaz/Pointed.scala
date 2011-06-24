@@ -139,6 +139,12 @@ trait Pointeds extends PointedsLow {
       NonEmptyList.nels(a)
   }
 
+  implicit def StateTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = StateT[A, F, α]})#λ] =
+    new Pointed[({type λ[α] = StateT[A, F, α]})#λ] {
+      def point[A](a: => A) =
+        StateT.stateT(s => implicitly[Pointed[F]].point((a, s)))
+    }
+
 }
 
 trait PointedsLow {

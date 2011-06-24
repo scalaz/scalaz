@@ -158,4 +158,9 @@ trait Applics {
         } yield ff(rr)
   }
 
+  implicit def StateTApplic[A, F[_] : Monad]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
+    def applic[X, Y](f: StateT[A, F, X => Y]) =
+      implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].liftM2[X => Y, X, Y](identity)(f)
+  }
+
 }

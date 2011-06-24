@@ -220,4 +220,10 @@ trait Monads {
   implicit val NonEmptyListMonad: Monad[NonEmptyList] =
     Monad.monadBP
 
+  implicit def StateTMonad[A, F[_] : Monad]: Monad[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val bind = implicitly[Monad[F]].bind
+    implicit val pointed = implicitly[Monad[F]].pointed
+    Monad.monadBP[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
 }

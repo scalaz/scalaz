@@ -176,4 +176,10 @@ trait ApplicFunctors {
   implicit val NonEmptyListApplicFunctor: ApplicFunctor[NonEmptyList] =
     ApplicFunctor.applicFunctor
 
+  implicit def StateTApplicFunctor[A, F[_]](implicit m: Monad[F]): ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val a = m.applic
+    implicit val f = m.functor
+    ApplicFunctor.applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]
+  }
+
 }

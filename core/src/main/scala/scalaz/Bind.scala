@@ -248,6 +248,11 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit def StateTBind[A, F[_] : Bind]: Bind[({type λ[α] = StateT[A, F, α]})#λ] = new Bind[({type λ[α] = StateT[A, F, α]})#λ] {
+    def bind[X, Y](f: X => StateT[A, F, Y]) =
+      _ flatMap f
+  }
+
 }
 
 trait BindsLow {

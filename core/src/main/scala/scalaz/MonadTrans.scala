@@ -28,4 +28,9 @@ trait MonadTranss {
       LazyOptionT.lazyOptionT(implicitly[Monad[G]].fmap((a: A) => LazyOption.lazySome(a))(a))
   }
 
+  implicit def StateTMonadTrans[S]: MonadTrans[({type λ[α[_], β] = StateT[S, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = StateT[S, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): StateT[S, G, A] =
+      StateT.stateT(s => implicitly[Monad[G]].fmap((a: A) => (a, s))(a))
+  }
+
 }

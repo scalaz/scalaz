@@ -34,4 +34,9 @@ trait Joins {
       _ flatMap (z => z)
   }
 
+  implicit def StateTJoin[A, F[_] : Bind]: Join[({type λ[α] = StateT[A, F, α]})#λ] = new Join[({type λ[α] = StateT[A, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }
