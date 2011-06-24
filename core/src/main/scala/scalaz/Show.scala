@@ -270,4 +270,8 @@ trait Shows {
     Show.show((t: Tree[A]) =>
       '{' :: implicitly[Show[A]].show(t.rootLabel) ++ " " ++ implicitly[Show[Stream[Tree[A]]]].show(t.subForest) ++ "}")
 
+  implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] =
+    Show.show((t: TreeLoc[A]) =>
+      implicitly[Show[Tree[A]]].show(t.toTree) ++ "@" ++ implicitly[Show[Stream[Int]]].show(t.parents.map(_._1.length).reverse))
+
 }

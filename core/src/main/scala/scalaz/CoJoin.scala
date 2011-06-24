@@ -51,4 +51,26 @@ trait CoJoins {
     def coJoin[A] = a => a.cobind(identity(_))
   }
 
+  implicit def TreeLocCojoin: CoJoin[TreeLoc] = new CoJoin[TreeLoc] {
+
+    import *._
+
+    private def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => Stream[TreeLoc[A]]) =
+      (tz, () => tz.firstChild.unfold[Stream, TreeLoc[A]]((o: Option[TreeLoc[A]]) =>
+        for (c <- o) yield (c, c.right)))
+
+    private def uf[A](a: TreeLoc[A], f: TreeLoc[A] => Option[TreeLoc[A]]): Stream[Tree[TreeLoc[A]]] =
+      f(a).unfold[Stream, Tree[TreeLoc[A]]]((o: Option[TreeLoc[A]]) =>
+        for (c <- o) yield (c.unfoldTree(dwn[A](_: TreeLoc[A])), f(c)))
+
+    def coJoin[A] =
+      a => {
+        val lft = (_: TreeLoc[A]).left
+        val rgt = (_: TreeLoc[A]).right
+        val p = a.parent.unfold[Stream, (Stream[Tree[TreeLoc[A]]], TreeLoc[A], Stream[Tree[TreeLoc[A]]])]((o: Option[TreeLoc[A]]) =>
+          for (z <- o) yield ((uf(z, lft), z, uf(z, rgt)), z.parent))
+        TreeLoc.loc(a.unfoldTree(dwn[A](_: TreeLoc[A])), uf(a, lft), uf(a, rgt), p)
+      }
+  }
+
 }

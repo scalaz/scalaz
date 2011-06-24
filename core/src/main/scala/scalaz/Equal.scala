@@ -225,4 +225,13 @@ trait Equals {
       implicitly[Equal[A]].equal(a1.rootLabel)(a2.rootLabel)
           && implicitly[Equal[Iterable[Tree[A]]]].equal(a1.subForest)(a2.subForest))
 
+  implicit def TreeLocEqual[A: Equal]: Equal[TreeLoc[A]] = {
+    Equal.equalC[TreeLoc[A]]((a1, a2) =>
+      implicitly[Equal[Tree[A]]].equal(a1.tree)(a2.tree)
+          && implicitly[Equal[Stream[Tree[A]]]].equal(a1.lefts)(a2.lefts)
+          && implicitly[Equal[Stream[Tree[A]]]].equal(a1.rights)(a2.rights)
+          && implicitly[Equal[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]].equal(a1.parents)(a2.parents)
+    )
+  }
+
 }
