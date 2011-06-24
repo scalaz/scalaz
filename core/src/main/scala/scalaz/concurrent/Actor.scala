@@ -4,8 +4,8 @@ package concurrent
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
 import Scalaz._
-                  
-sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = throw(_))(implicit val strategy: Strategy) { 
+
+sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = throw (_))(implicit val strategy: Strategy) {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
@@ -21,16 +21,18 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
   def !(a: A) = if (mbox offer a) work else toRun ! a
 
   def apply(a: A) = this ! a
-  
+
   private val act: Run[Unit] = run((u: Unit) => {
     var go = true
-    var i = 0 
+    var i = 0
     while (go && i < 1000) {
       val m = mbox.poll
       if (m != null) try {
         e(m)
         i = i + 1
-      } catch { case e => onError(e) }
+      } catch {
+        case e => onError(e)
+      }
       else {
         suspended.set(true)
         work
@@ -44,8 +46,8 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
 object Actor extends Actors
 
 trait Actors {
-  def actor[A](e: A => Unit, err: Throwable => Unit = throw(_))(implicit s: Strategy): Actor[A] =
-    Actor[A](e,err)
+  def actor[A](e: A => Unit, err: Throwable => Unit = throw (_))(implicit s: Strategy): Actor[A] =
+    Actor[A](e, err)
 
   implicit def ActorContravariant: Contravariant[Actor] =
     new Contravariant[Actor] {

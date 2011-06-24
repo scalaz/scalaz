@@ -14,7 +14,7 @@ object ExampleLens {
     val name: (Employee @@ String) = lensG(_.name, e => n => e copy (name = n))
 
 
-    val giveRaise: Employee => Employee = salary mod (100+)
+    val giveRaise: Employee => Employee = salary mod (100 +)
 
     val tom = Employee("Tom", 4000)
     val dick = Employee("Dick", 3000)
@@ -26,7 +26,7 @@ object ExampleLens {
     val modBoth = ((salary *** name) mod {
       case (s, n) => (s + 100, n + " Jones")
     })(harry, tom)
-    modBoth assert_===(Employee("Harry", 5100), Employee("Tom Jones", 4000))
+    modBoth assert_=== (Employee("Harry", 5100), Employee("Tom Jones", 4000))
 
     val modMonadically =
       for {

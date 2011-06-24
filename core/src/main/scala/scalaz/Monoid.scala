@@ -101,7 +101,7 @@ trait Monoids extends MonoidsLow {
 
   implicit def ListMonoid[A]: Monoid[List[A]] =
     monoid
-  
+
   implicit def Tuple2Monoid[A, B](implicit ma: Monoid[A], mb: Monoid[B]): Monoid[(A, B)] = {
     implicit val sa = implicitly[Monoid[(A, B)]].semigroup
     implicit val za = implicitly[Monoid[(A, B)]].zero

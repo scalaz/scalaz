@@ -41,22 +41,22 @@ trait Pointeds extends PointedsLow {
     }
   }
 
-  implicit def EitherLeftPointed[X]: Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Pointed[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+  implicit def EitherLeftPointed[X]: Pointed[({type λ[α] = Either.LeftProjection[α, X]})#λ] = new Pointed[({type λ[α] = Either.LeftProjection[α, X]})#λ] {
     def point[A](a: => A) = Left(a).left
   }
 
-  implicit def EitherRightPointed[X]: Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Pointed[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+  implicit def EitherRightPointed[X]: Pointed[({type λ[α] = Either.RightProjection[X, α]})#λ] = new Pointed[({type λ[α] = Either.RightProjection[X, α]})#λ] {
     def point[A](a: => A) = Right(a).right
   }
 
-  implicit def EitherPointed[X]: Pointed[({type λ[α]=Either[X, α]})#λ] = new Pointed[({type λ[α]=Either[X, α]})#λ] {
+  implicit def EitherPointed[X]: Pointed[({type λ[α] = Either[X, α]})#λ] = new Pointed[({type λ[α] = Either[X, α]})#λ] {
     def point[A](a: => A) = Right(a)
   }
 
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryPointed[X: Zero]: Pointed[({type λ[α]=Entry[X, α]})#λ] = new Pointed[({type λ[α]=Entry[X, α]})#λ] {
+  implicit def MapEntryPointed[X: Zero]: Pointed[({type λ[α] = Entry[X, α]})#λ] = new Pointed[({type λ[α] = Entry[X, α]})#λ] {
     def point[A](a: => A) =
       new SimpleImmutableEntry(implicitly[Zero[X]].zero, a)
   }
@@ -65,27 +65,27 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = Tuple1(a)
   }
 
-  implicit def Tuple2Pointed[R: Zero]: Pointed[({type λ[α]=(R, α)})#λ] = new Pointed[({type λ[α]=(R, α)})#λ] {
+  implicit def Tuple2Pointed[R: Zero]: Pointed[({type λ[α] = (R, α)})#λ] = new Pointed[({type λ[α] = (R, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, a)
   }
 
-  implicit def Tuple3Pointed[R: Zero, S: Zero]: Pointed[({type λ[α]=(R, S, α)})#λ] = new Pointed[({type λ[α]=(R, S, α)})#λ] {
+  implicit def Tuple3Pointed[R: Zero, S: Zero]: Pointed[({type λ[α] = (R, S, α)})#λ] = new Pointed[({type λ[α] = (R, S, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, a)
   }
 
-  implicit def Tuple4Pointed[R: Zero, S: Zero, T: Zero]: Pointed[({type λ[α]=(R, S, T, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, α)})#λ] {
+  implicit def Tuple4Pointed[R: Zero, S: Zero, T: Zero]: Pointed[({type λ[α] = (R, S, T, α)})#λ] = new Pointed[({type λ[α] = (R, S, T, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, a)
   }
 
-  implicit def Tuple5Pointed[R: Zero, S: Zero, T: Zero, U: Zero]: Pointed[({type λ[α]=(R, S, T, U, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, α)})#λ] {
+  implicit def Tuple5Pointed[R: Zero, S: Zero, T: Zero, U: Zero]: Pointed[({type λ[α] = (R, S, T, U, α)})#λ] = new Pointed[({type λ[α] = (R, S, T, U, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, a)
   }
 
-  implicit def Tuple6Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pointed[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, α)})#λ] {
+  implicit def Tuple6Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero]: Pointed[({type λ[α] = (R, S, T, U, V, α)})#λ] = new Pointed[({type λ[α] = (R, S, T, U, V, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, implicitly[Zero[V]].zero, a)
   }
 
-  implicit def Tuple7Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
+  implicit def Tuple7Pointed[R: Zero, S: Zero, T: Zero, U: Zero, V: Zero, W: Zero]: Pointed[({type λ[α] = (R, S, T, U, V, W, α)})#λ] = new Pointed[({type λ[α] = (R, S, T, U, V, W, α)})#λ] {
     def point[A](a: => A) = (implicitly[Zero[R]].zero, implicitly[Zero[S]].zero, implicitly[Zero[T]].zero, implicitly[Zero[U]].zero, implicitly[Zero[V]].zero, implicitly[Zero[W]].zero, a)
   }
 
@@ -95,27 +95,27 @@ trait Pointeds extends PointedsLow {
     }
   }
 
-  implicit def Function1Pointed[R]: Pointed[({type λ[α]=(R) => α})#λ] = new Pointed[({type λ[α]=(R) => α})#λ] {
+  implicit def Function1Pointed[R]: Pointed[({type λ[α] = (R) => α})#λ] = new Pointed[({type λ[α] = (R) => α})#λ] {
     def point[A](a: => A) = (_: R) => a
   }
 
-  implicit def Function2Pointed[R, S]: Pointed[({type λ[α]=(R, S) => α})#λ] = new Pointed[({type λ[α]=(R, S) => α})#λ] {
+  implicit def Function2Pointed[R, S]: Pointed[({type λ[α] = (R, S) => α})#λ] = new Pointed[({type λ[α] = (R, S) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S) => a
   }
 
-  implicit def Function3Pointed[R, S, T]: Pointed[({type λ[α]=(R, S, T) => α})#λ] = new Pointed[({type λ[α]=(R, S, T) => α})#λ] {
+  implicit def Function3Pointed[R, S, T]: Pointed[({type λ[α] = (R, S, T) => α})#λ] = new Pointed[({type λ[α] = (R, S, T) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S, _: T) => a
   }
 
-  implicit def Function4Pointed[R, S, T, U]: Pointed[({type λ[α]=(R, S, T, U) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U) => α})#λ] {
+  implicit def Function4Pointed[R, S, T, U]: Pointed[({type λ[α] = (R, S, T, U) => α})#λ] = new Pointed[({type λ[α] = (R, S, T, U) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S, _: T, _: U) => a
   }
 
-  implicit def Function5Pointed[R, S, T, U, V]: Pointed[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V) => α})#λ] {
+  implicit def Function5Pointed[R, S, T, U, V]: Pointed[({type λ[α] = (R, S, T, U, V) => α})#λ] = new Pointed[({type λ[α] = (R, S, T, U, V) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S, _: T, _: U, _: V) => a
   }
 
-  implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Pointed[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
+  implicit def Function6Pointed[R, S, T, U, V, W]: Pointed[({type λ[α] = (R, S, T, U, V, W) => α})#λ] = new Pointed[({type λ[α] = (R, S, T, U, V, W) => α})#λ] {
     def point[A](a: => A) = (_: R, _: S, _: T, _: U, _: V, _: W) => a
   }
 

@@ -33,16 +33,16 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = _ map f
   }
 
-  implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+  implicit def EitherLeftFunctor[X]: Functor[({type λ[α] = Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α] = Either.LeftProjection[α, X]})#λ] {
     def fmap[A, B](f: A => B) =
       _.map(f).left
   }
 
-  implicit def EitherRightFunctor[X]: Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+  implicit def EitherRightFunctor[X]: Functor[({type λ[α] = Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α] = Either.RightProjection[X, α]})#λ] {
     def fmap[A, B](f: A => B) = _.map(f).right
   }
 
-  implicit def EitherFunctor[X]: Functor[({type λ[α]=Either[X, α]})#λ] = new Functor[({type λ[α]=Either[X, α]})#λ] {
+  implicit def EitherFunctor[X]: Functor[({type λ[α] = Either[X, α]})#λ] = new Functor[({type λ[α] = Either[X, α]})#λ] {
     def fmap[A, B](f: A => B) = {
       case Left(a) => Left(a)
       case Right(a) => Right(f(a))
@@ -75,32 +75,32 @@ trait Functors extends FunctorsLow {
       r => Tuple1(f(r._1))
   }
 
-  implicit def Tuple2Functor[R]: Functor[({type λ[α]=(R, α)})#λ] = new Functor[({type λ[α]=(R, α)})#λ] {
+  implicit def Tuple2Functor[R]: Functor[({type λ[α] = (R, α)})#λ] = new Functor[({type λ[α] = (R, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, f(r._2))
   }
 
-  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=(R, S, α)})#λ] = new Functor[({type λ[α]=(R, S, α)})#λ] {
+  implicit def Tuple3Functor[R, S]: Functor[({type λ[α] = (R, S, α)})#λ] = new Functor[({type λ[α] = (R, S, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, f(r._3))
   }
 
-  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=(R, S, T, α)})#λ] = new Functor[({type λ[α]=(R, S, T, α)})#λ] {
+  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α] = (R, S, T, α)})#λ] = new Functor[({type λ[α] = (R, S, T, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, r._3, f(r._4))
   }
 
-  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, α)})#λ] {
+  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α] = (R, S, T, U, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, r._3, r._4, f(r._5))
   }
 
-  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] {
+  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α] = (R, S, T, U, V, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, r._3, r._4, r._5, f(r._6))
   }
 
-  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α] = (R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, W, α)})#λ] {
     def fmap[A, B](f: A => B) =
       r => (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
   }
@@ -111,27 +111,27 @@ trait Functors extends FunctorsLow {
     }
   }
 
-  implicit def Function1Functor[R]: Functor[({type λ[α]=(R) => α})#λ] = new Functor[({type λ[α]=(R) => α})#λ] {
+  implicit def Function1Functor[R]: Functor[({type λ[α] = (R) => α})#λ] = new Functor[({type λ[α] = (R) => α})#λ] {
     def fmap[A, B](f: A => B) = _ andThen f
   }
 
-  implicit def Function2Functor[R, S]: Functor[({type λ[α]=(R, S) => α})#λ] = new Functor[({type λ[α]=(R, S) => α})#λ] {
+  implicit def Function2Functor[R, S]: Functor[({type λ[α] = (R, S) => α})#λ] = new Functor[({type λ[α] = (R, S) => α})#λ] {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S) => f(r(t1, t2))
   }
 
-  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=(R, S, T) => α})#λ] = new Functor[({type λ[α]=(R, S, T) => α})#λ] {
+  implicit def Function3Functor[R, S, T]: Functor[({type λ[α] = (R, S, T) => α})#λ] = new Functor[({type λ[α] = (R, S, T) => α})#λ] {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
   }
 
-  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U) => α})#λ] {
+  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α] = (R, S, T, U) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U) => α})#λ] {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
   }
 
-  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] {
+  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α] = (R, S, T, U, V) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U, V) => α})#λ] {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
   }
 
-  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
@@ -140,13 +140,13 @@ trait Functors extends FunctorsLow {
   /*implicit*/
   def JavaCollectionFunctor[S[X] <: java.util.Collection[X] : Empty]: Functor[S] = new Functor[S] {
     def fmap[A, B](f: A => B) =
-    r => {
-      val a: S[B] = implicitly[Empty[S]].empty
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
+      r => {
+        val a: S[B] = implicitly[Empty[S]].empty
+        val i = r.iterator
+        while (i.hasNext)
+          a.add(f(i.next))
+        a
+      }
   }
 
   import java.util._

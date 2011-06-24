@@ -101,20 +101,20 @@ trait Monads {
     monadBP
 
   implicit def EitherLeftMonad[X] =
-    monadBP[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+    monadBP[({type λ[α] = Either.LeftProjection[α, X]})#λ]
 
   implicit def EitherRightMonad[X] =
-    monadBP[({type λ[α]=Either.RightProjection[X, α]})#λ]
+    monadBP[({type λ[α] = Either.RightProjection[X, α]})#λ]
 
   implicit def EitherMonad[X] =
-    monadBP[({type λ[α]=Either[X, α]})#λ]
+    monadBP[({type λ[α] = Either[X, α]})#λ]
 
   import java.util.Map.Entry
 
   implicit def MapEntryMonad[X: Monoid] = {
     implicit val z = implicitly[Monoid[X]].zero
     implicit val s = implicitly[Monoid[X]].semigroup
-    monadBP[({type λ[α]=Entry[X, α]})#λ]
+    monadBP[({type λ[α] = Entry[X, α]})#λ]
   }
 
   implicit def Tuple1Monad = {
@@ -190,23 +190,23 @@ trait Monads {
   implicit def Function0Monad: Monad[Function0] =
     monadBP[Function0]
 
-  implicit def Function1Monad[R]: Monad[({type λ[α]=(R) => α})#λ] =
-    monadBP[({type λ[α]=(R) => α})#λ]
+  implicit def Function1Monad[R]: Monad[({type λ[α] = (R) => α})#λ] =
+    monadBP[({type λ[α] = (R) => α})#λ]
 
-  implicit def Function2Monad[R, S]: Monad[({type λ[α]=(R, S) => α})#λ] =
-    monadBP[({type λ[α]=(R, S) => α})#λ]
+  implicit def Function2Monad[R, S]: Monad[({type λ[α] = (R, S) => α})#λ] =
+    monadBP[({type λ[α] = (R, S) => α})#λ]
 
-  implicit def Function3Monad[R, S, T]: Monad[({type λ[α]=(R, S, T) => α})#λ] =
-    monadBP[({type λ[α]=(R, S, T) => α})#λ]
+  implicit def Function3Monad[R, S, T]: Monad[({type λ[α] = (R, S, T) => α})#λ] =
+    monadBP[({type λ[α] = (R, S, T) => α})#λ]
 
-  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α]=(R, S, T, U) => α})#λ] =
-    monadBP[({type λ[α]=(R, S, T, U) => α})#λ]
+  implicit def Function4Monad[R, S, T, U]: Monad[({type λ[α] = (R, S, T, U) => α})#λ] =
+    monadBP[({type λ[α] = (R, S, T, U) => α})#λ]
 
-  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α]=(R, S, T, U, V) => α})#λ] =
-    monadBP[({type λ[α]=(R, S, T, U, V) => α})#λ]
+  implicit def Function5Monad[R, S, T, U, V]: Monad[({type λ[α] = (R, S, T, U, V) => α})#λ] =
+    monadBP[({type λ[α] = (R, S, T, U, V) => α})#λ]
 
-  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
-    monadBP[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+  implicit def Function6Monad[R, S, T, U, V, W]: Monad[({type λ[α] = (R, S, T, U, V, W) => α})#λ] =
+    monadBP[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit val IdentityMonad: Monad[Identity] =
     Monad.monadBP[Identity]

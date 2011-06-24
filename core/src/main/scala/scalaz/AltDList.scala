@@ -121,7 +121,8 @@ package scalaz
  *  a delay queue, so each 'difference' can say, execute now or delay until later.
  */
 sealed trait AltDList[A] {
- import AltDList._
+
+  import AltDList._
 
   val pre: List[List[A] => List[A]]
   val post: List[List[A] => List[A]]

@@ -108,7 +108,7 @@ trait ScalaCheckBindings {
   implicit def ArbitraryNewtype[A]: ^*^[Arbitrary[A], Gen[A]] =
     ^*^.^*^(
       (_: Arbitrary[A]).arbitrary
-    , (b: Gen[A]) => Arbitrary(b)
+      , (b: Gen[A]) => Arbitrary(b)
     )
 
 }

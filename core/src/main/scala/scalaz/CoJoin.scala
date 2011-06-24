@@ -11,7 +11,7 @@ trait CoJoins {
     def coJoin[A] = a => Tuple1(a)
   }
 
-  implicit def Tuple2CoJoin[R]: CoJoin[({type λ[α]=(R, α)})#λ] = new CoJoin[({type λ[α]=(R, α)})#λ] {
+  implicit def Tuple2CoJoin[R]: CoJoin[({type λ[α] = (R, α)})#λ] = new CoJoin[({type λ[α] = (R, α)})#λ] {
     def coJoin[A] = a => (a._1, a)
   }
 
@@ -30,7 +30,7 @@ trait CoJoins {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryCoJoin[X]: CoJoin[({type λ[α]=Entry[X, α]})#λ] = new CoJoin[({type λ[α]=Entry[X, α]})#λ] {
+  implicit def MapEntryCoJoin[X]: CoJoin[({type λ[α] = Entry[X, α]})#λ] = new CoJoin[({type λ[α] = Entry[X, α]})#λ] {
     def coJoin[A] = a => new SimpleImmutableEntry(a.getKey, a)
   }
 

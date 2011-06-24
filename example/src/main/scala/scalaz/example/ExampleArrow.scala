@@ -12,9 +12,9 @@ object ExampleArrow {
     val times2 = (_: Int) * 2
     val rev = (_: String) reverse
 
-    // Function1 arrow {
-    // Applying first on the Function1 arrow.
-    plus1.first apply (7, "abc") assert_=== (8, "abc")
+        // Function1 arrow {
+        // Applying first on the Function1 arrow.
+        plus1.first apply (7, "abc") assert_=== (8, "abc")
 
     // Applying second on the Function1 arrow.
     plus1.second apply ("def", 14) assert_=== ("def", 15)

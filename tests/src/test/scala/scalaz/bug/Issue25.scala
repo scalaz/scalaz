@@ -5,7 +5,7 @@ import scalaz._
 import Scalaz._
 import org.specs.specification.PendingUntilFixed
 
-/** https://github.com/scalaz/scalaz/issues/25 */
+/**https://github.com/scalaz/scalaz/issues/25 */
 object Issue25 extends Specification with Sugar with ScalaCheck with PendingUntilFixed {
 
   val f = 1 + (_: Int)

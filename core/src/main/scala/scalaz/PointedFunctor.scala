@@ -56,20 +56,20 @@ trait PointedFunctors {
     pointedFunctor
 
   implicit def EitherLeftPointedFunctor[X] =
-    pointedFunctor[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+    pointedFunctor[({type λ[α] = Either.LeftProjection[α, X]})#λ]
 
   implicit def EitherRightPointedFunctor[X] =
-    pointedFunctor[({type λ[α]=Either.RightProjection[X, α]})#λ]
+    pointedFunctor[({type λ[α] = Either.RightProjection[X, α]})#λ]
 
   implicit def EitherPointedFunctor[X] =
-    pointedFunctor[({type λ[α]=Either[X, α]})#λ]
+    pointedFunctor[({type λ[α] = Either[X, α]})#λ]
 
   import java.util.Map.Entry
 
   implicit def MapEntryPointedFunctor[X: Monoid] = {
     implicit val z = implicitly[Monoid[X]].zero
     implicit val s = implicitly[Monoid[X]].semigroup
-    pointedFunctor[({type λ[α]=Entry[X, α]})#λ]
+    pointedFunctor[({type λ[α] = Entry[X, α]})#λ]
   }
 
   implicit def Tuple1PointedFunctor =
@@ -96,23 +96,23 @@ trait PointedFunctors {
   implicit def Function0PointedFunctor: PointedFunctor[Function0] =
     pointedFunctor[Function0]
 
-  implicit def Function1PointedFunctor[R]: PointedFunctor[({type λ[α]=(R) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R) => α})#λ]
+  implicit def Function1PointedFunctor[R]: PointedFunctor[({type λ[α] = (R) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R) => α})#λ]
 
-  implicit def Function2PointedFunctor[R, S]: PointedFunctor[({type λ[α]=(R, S) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R, S) => α})#λ]
+  implicit def Function2PointedFunctor[R, S]: PointedFunctor[({type λ[α] = (R, S) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R, S) => α})#λ]
 
-  implicit def Function3PointedFunctor[R, S, T]: PointedFunctor[({type λ[α]=(R, S, T) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R, S, T) => α})#λ]
+  implicit def Function3PointedFunctor[R, S, T]: PointedFunctor[({type λ[α] = (R, S, T) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R, S, T) => α})#λ]
 
-  implicit def Function4PointedFunctor[R, S, T, U]: PointedFunctor[({type λ[α]=(R, S, T, U) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R, S, T, U) => α})#λ]
+  implicit def Function4PointedFunctor[R, S, T, U]: PointedFunctor[({type λ[α] = (R, S, T, U) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R, S, T, U) => α})#λ]
 
-  implicit def Function5PointedFunctor[R, S, T, U, V]: PointedFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ]
+  implicit def Function5PointedFunctor[R, S, T, U, V]: PointedFunctor[({type λ[α] = (R, S, T, U, V) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R, S, T, U, V) => α})#λ]
 
-  implicit def Function6PointedFunctor[R, S, T, U, V, W]: PointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
-    pointedFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+  implicit def Function6PointedFunctor[R, S, T, U, V, W]: PointedFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] =
+    pointedFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit val IdentityPointedFunctor: PointedFunctor[Identity] =
     PointedFunctor.pointedFunctor[Identity]

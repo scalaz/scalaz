@@ -88,18 +88,18 @@ trait Applicatives {
     applicative[Stream]
 
   implicit def EitherLeftApplicative[X] =
-    applicative[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+    applicative[({type λ[α] = Either.LeftProjection[α, X]})#λ]
 
   implicit def EitherRightApplicative[X] =
-    applicative[({type λ[α]=Either.RightProjection[X, α]})#λ]
+    applicative[({type λ[α] = Either.RightProjection[X, α]})#λ]
 
   implicit def EitherApplicative[X] =
-    applicative[({type λ[α]=Either[X, α]})#λ]
+    applicative[({type λ[α] = Either[X, α]})#λ]
 
   implicit def MapEntryApplicative[X: Monoid] = {
     implicit val z = implicitly[Monoid[X]].zero
     implicit val s = implicitly[Monoid[X]].semigroup
-    applicative[({type λ[α]=Entry[X, α]})#λ]
+    applicative[({type λ[α] = Entry[X, α]})#λ]
   }
 
   implicit def Tuple1Applicative: Applicative[Tuple1] =
@@ -174,23 +174,23 @@ trait Applicatives {
   implicit def Function0Applicative: Applicative[Function0] =
     applicative[Function0]
 
-  implicit def Function1Applicative[R]: Applicative[({type λ[α]=(R) => α})#λ] =
-    applicative[({type λ[α]=(R) => α})#λ]
+  implicit def Function1Applicative[R]: Applicative[({type λ[α] = (R) => α})#λ] =
+    applicative[({type λ[α] = (R) => α})#λ]
 
-  implicit def Function2Applicative[R, S]: Applicative[({type λ[α]=(R, S) => α})#λ] =
-    applicative[({type λ[α]=(R, S) => α})#λ]
+  implicit def Function2Applicative[R, S]: Applicative[({type λ[α] = (R, S) => α})#λ] =
+    applicative[({type λ[α] = (R, S) => α})#λ]
 
-  implicit def Function3Applicative[R, S, T]: Applicative[({type λ[α]=(R, S, T) => α})#λ] =
-    applicative[({type λ[α]=(R, S, T) => α})#λ]
+  implicit def Function3Applicative[R, S, T]: Applicative[({type λ[α] = (R, S, T) => α})#λ] =
+    applicative[({type λ[α] = (R, S, T) => α})#λ]
 
-  implicit def Function4Applicative[R, S, T, U]: Applicative[({type λ[α]=(R, S, T, U) => α})#λ] =
-    applicative[({type λ[α]=(R, S, T, U) => α})#λ]
+  implicit def Function4Applicative[R, S, T, U]: Applicative[({type λ[α] = (R, S, T, U) => α})#λ] =
+    applicative[({type λ[α] = (R, S, T, U) => α})#λ]
 
-  implicit def Function5Applicative[R, S, T, U, V]: Applicative[({type λ[α]=(R, S, T, U, V) => α})#λ] =
-    applicative[({type λ[α]=(R, S, T, U, V) => α})#λ]
+  implicit def Function5Applicative[R, S, T, U, V]: Applicative[({type λ[α] = (R, S, T, U, V) => α})#λ] =
+    applicative[({type λ[α] = (R, S, T, U, V) => α})#λ]
 
-  implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
-    applicative[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+  implicit def Function6Applicative[R, S, T, U, V, W]: Applicative[({type λ[α] = (R, S, T, U, V, W) => α})#λ] =
+    applicative[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit val IdentityApplicative: Applicative[Identity] = implicitly[Monad[Identity]].applicative
 

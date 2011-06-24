@@ -15,7 +15,7 @@ trait CoPointeds {
     def coPoint[A] = a => a._1
   }
 
-  implicit def Tuple2CoPointed[R]: CoPointed[({type λ[α]=(R, α)})#λ] = new CoPointed[({type λ[α]=(R, α)})#λ] {
+  implicit def Tuple2CoPointed[R]: CoPointed[({type λ[α] = (R, α)})#λ] = new CoPointed[({type λ[α] = (R, α)})#λ] {
     def coPoint[A] = a => a._2
   }
 
@@ -31,7 +31,7 @@ trait CoPointeds {
 
   import java.util.Map.Entry
 
-  implicit def MapEntryCoPointed[X]: CoPointed[({type λ[α]=Entry[X, α]})#λ] = new CoPointed[({type λ[α]=Entry[X, α]})#λ] {
+  implicit def MapEntryCoPointed[X]: CoPointed[({type λ[α] = Entry[X, α]})#λ] = new CoPointed[({type λ[α] = Entry[X, α]})#λ] {
     def coPoint[A] = a => a.getValue
   }
 

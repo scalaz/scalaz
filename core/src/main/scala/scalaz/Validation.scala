@@ -134,7 +134,7 @@ trait FailProjections {
     })
 
 
-  implicit def FailProjection_^**^[E] : (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) =
+  implicit def FailProjection_^**^[E]: (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) =
     new (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) {
       def unpack[A] = _.validation
 

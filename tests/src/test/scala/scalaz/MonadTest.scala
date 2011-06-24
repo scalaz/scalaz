@@ -74,11 +74,11 @@ class MonadTest extends Specification with Sugar with ScalaCheck {
   }
 
   def checkMonadLaws[M[_], A](n: String)(implicit mm: Monad[M],
-                                          ea: Equal[A],
-                                          ema: Equal[M[A]],
-                                          arbma: Arbitrary[M[A]],
-                                          arba: Arbitrary[A]
-                                        ): Unit =
+                                         ea: Equal[A],
+                                         ema: Equal[M[A]],
+                                         arbma: Arbitrary[M[A]],
+                                         arba: Arbitrary[A]
+      ): Unit =
     n in {
       import ScalazProperty.Monad._
       leftIdentity[M, A, A] must pass

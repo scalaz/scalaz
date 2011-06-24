@@ -62,18 +62,18 @@ trait ApplicFunctors {
     applicFunctor
 
   implicit def EitherLeftApplicFunctor[X] =
-    applicFunctor[({type λ[α]=Either.LeftProjection[α, X]})#λ]
+    applicFunctor[({type λ[α] = Either.LeftProjection[α, X]})#λ]
 
   implicit def EitherRightApplicFunctor[X] =
-    applicFunctor[({type λ[α]=Either.RightProjection[X, α]})#λ]
+    applicFunctor[({type λ[α] = Either.RightProjection[X, α]})#λ]
 
   implicit def EitherApplicFunctor[X] =
-    applicFunctor[({type λ[α]=Either[X, α]})#λ]
+    applicFunctor[({type λ[α] = Either[X, α]})#λ]
 
   import java.util.Map.Entry
 
   implicit def MapEntryApplicFunctor[X: Semigroup] =
-    applicFunctor[({type λ[α]=Entry[X, α]})#λ]
+    applicFunctor[({type λ[α] = Entry[X, α]})#λ]
 
   implicit def Tuple1ApplicFunctor =
     applicFunctor[Tuple1]
@@ -147,23 +147,23 @@ trait ApplicFunctors {
   implicit def Function0ApplicFunctor: ApplicFunctor[Function0] =
     applicFunctor[Function0]
 
-  implicit def Function1ApplicFunctor[R]: ApplicFunctor[({type λ[α]=(R) => α})#λ] =
-    applicFunctor[({type λ[α]=(R) => α})#λ]
+  implicit def Function1ApplicFunctor[R]: ApplicFunctor[({type λ[α] = (R) => α})#λ] =
+    applicFunctor[({type λ[α] = (R) => α})#λ]
 
-  implicit def Function2ApplicFunctor[R, S]: ApplicFunctor[({type λ[α]=(R, S) => α})#λ] =
-    applicFunctor[({type λ[α]=(R, S) => α})#λ]
+  implicit def Function2ApplicFunctor[R, S]: ApplicFunctor[({type λ[α] = (R, S) => α})#λ] =
+    applicFunctor[({type λ[α] = (R, S) => α})#λ]
 
-  implicit def Function3ApplicFunctor[R, S, T]: ApplicFunctor[({type λ[α]=(R, S, T) => α})#λ] =
-    applicFunctor[({type λ[α]=(R, S, T) => α})#λ]
+  implicit def Function3ApplicFunctor[R, S, T]: ApplicFunctor[({type λ[α] = (R, S, T) => α})#λ] =
+    applicFunctor[({type λ[α] = (R, S, T) => α})#λ]
 
-  implicit def Function4ApplicFunctor[R, S, T, U]: ApplicFunctor[({type λ[α]=(R, S, T, U) => α})#λ] =
-    applicFunctor[({type λ[α]=(R, S, T, U) => α})#λ]
+  implicit def Function4ApplicFunctor[R, S, T, U]: ApplicFunctor[({type λ[α] = (R, S, T, U) => α})#λ] =
+    applicFunctor[({type λ[α] = (R, S, T, U) => α})#λ]
 
-  implicit def Function5ApplicFunctor[R, S, T, U, V]: ApplicFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ] =
-    applicFunctor[({type λ[α]=(R, S, T, U, V) => α})#λ]
+  implicit def Function5ApplicFunctor[R, S, T, U, V]: ApplicFunctor[({type λ[α] = (R, S, T, U, V) => α})#λ] =
+    applicFunctor[({type λ[α] = (R, S, T, U, V) => α})#λ]
 
-  implicit def Function6ApplicFunctor[R, S, T, U, V, W]: ApplicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] =
-    applicFunctor[({type λ[α]=(R, S, T, U, V, W) => α})#λ]
+  implicit def Function6ApplicFunctor[R, S, T, U, V, W]: ApplicFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] =
+    applicFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit val IdentityApplicFunctor: ApplicFunctor[Identity] = implicitly[Monad[Identity]].applicFunctor
 

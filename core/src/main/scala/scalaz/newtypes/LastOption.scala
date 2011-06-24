@@ -44,7 +44,7 @@ trait LastOptions {
 
   implicit def LastOptionOrder[A: Order]: Order[LastOption[A]] =
     implicitly[Order[Option[A]]] contramap ((_: LastOption[A]).value)
- 
+
   implicit def LastOptionPointed: Pointed[LastOption] =
     implicitly[Pointed[Option]].deriving[LastOption]
 

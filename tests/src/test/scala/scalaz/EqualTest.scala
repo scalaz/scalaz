@@ -122,7 +122,7 @@ class EqualTest extends Specification with Sugar with ScalaCheck {
 
   def checkEqualsNotBasedOnObjectIdentity[A: Equal : Manifest : Arbitrary]: Unit = {
     Prop.forAll((as: Duplicate[A]) => as.pair match {
-      case (a1, a2) =>  a1 ≟ a2
+      case (a1, a2) => a1 ≟ a2
     }).label("checkEqualsNotBasedOnObjectIdentity") must pass
   }
 }

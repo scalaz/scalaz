@@ -201,7 +201,7 @@ trait Equals {
           case class EqualWrap[A: Equal](a: A) {
             override def equals(other: Any) = other match {
               case EqualWrap(b) => implicitly[Equal[A]].equal(a)(b.asInstanceOf[A])
-              case _            => false
+              case _ => false
             }
           }
           a.map(new EqualWrap(_)) == b.map(new EqualWrap(_))
