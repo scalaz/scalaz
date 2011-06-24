@@ -244,4 +244,12 @@ trait Monads {
   implicit def FailProjectionMonad[X]: Monad[({type λ[α] = FailProjection[α, X]})#λ] =
     Monad.monadBP[({type λ[α] = FailProjection[α, X]})#λ]
 
+  implicit def WriterTMonad[A, F[_]](implicit m: Monad[F], n: Monoid[A]): Monad[({type λ[α] = WriterT[A, F, α]})#λ] = {
+    implicit val bindF = implicitly[Monad[F]].bindFunctor
+    implicit val pointed = implicitly[Monad[F]].pointed
+    implicit val s = n.semigroup
+    implicit val z = n.zero
+    Monad.monadBP[({type λ[α] = WriterT[A, F, α]})#λ]
+  }
+
 }

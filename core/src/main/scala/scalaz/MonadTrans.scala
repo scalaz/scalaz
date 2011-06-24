@@ -43,4 +43,8 @@ trait MonadTranss {
       StepStreamT.liftStepStreamT(a)
   }
 
+  implicit def WriterTMonadTrans[W: Zero]: MonadTrans[({type λ[α[_], β] = WriterT[W, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = WriterT[W, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): WriterT[W, G, A] =
+      WriterT.writerT(implicitly[Monad[G]].fmap((a: A) => (implicitly[Zero[W]].zero, a))(a))
+  }
 }

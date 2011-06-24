@@ -226,6 +226,11 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def WriterTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = WriterT[A, F, α]})#λ] = new Functor[({type λ[α] = WriterT[A, F, α]})#λ] {
+    def fmap[X, Y](f: X => Y) =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

@@ -210,4 +210,10 @@ trait Applics {
       }
   }
 
+  implicit def WriterTApplic[A: Semigroup, F[_] : ApplicFunctor]: Applic[({type λ[α] = WriterT[A, F, α]})#λ] = new Applic[({type λ[α] = WriterT[A, F, α]})#λ] {
+    def applic[X, Y](f: WriterT[A, F, X => Y]) =
+      a =>
+        WriterT.writerT(implicitly[ApplicFunctor[F]].liftA2((ff: (A, X => Y)) => (xx: (A, X)) => (implicitly[Semigroup[A]].append(ff._1, xx._1), ff._2(xx._2)))(f.runT)(a.runT))
+  }
+
 }

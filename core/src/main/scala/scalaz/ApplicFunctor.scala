@@ -191,4 +191,10 @@ trait ApplicFunctors {
   implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Validation[X, α]})#λ] =
     ApplicFunctor.applicFunctor[({type λ[α] = Validation[X, α]})#λ]
 
+  implicit def WriterTApplicFunctor[A, F[_]](implicit ap: ApplicFunctor[F], n: Semigroup[A]): ApplicFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = {
+    implicit val a = ap.applic
+    implicit val f = ap.functor
+    ApplicFunctor.applicFunctor[({type λ[α] = WriterT[A, F, α]})#λ]
+  }
+
 }

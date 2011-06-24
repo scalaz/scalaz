@@ -49,4 +49,9 @@ trait Joins {
       _ flatMap (z => z)
   }
 
+  implicit def WriterTJoin[A: Semigroup, F[_] : BindFunctor]: Join[({type λ[α] = WriterT[A, F, α]})#λ] = new Join[({type λ[α] = WriterT[A, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }

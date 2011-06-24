@@ -116,4 +116,10 @@ trait BindFunctors {
   implicit def FailProjectionBindFunctor[X]: BindFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
     BindFunctor.bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
+  implicit def WriterTBindFunctor[A: Semigroup, F[_] : BindFunctor]: BindFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = WriterT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[BindFunctor[F]].functor
+    val functor = implicitly[Functor[({type λ[α] = WriterT[A, F, α]})#λ]]
+    val bind = implicitly[Bind[({type λ[α] = WriterT[A, F, α]})#λ]]
+  }
+
 }

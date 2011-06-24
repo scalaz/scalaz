@@ -280,6 +280,11 @@ trait Binds extends BindsLow {
         }
     }
 
+  implicit def WriterTBind[A: Semigroup, F[_] : BindFunctor]: Bind[({type λ[α] = WriterT[A, F, α]})#λ] = new Bind[({type λ[α] = WriterT[A, F, α]})#λ] {
+    def bind[X, Y](f: X => WriterT[A, F, Y]) =
+      _ flatMap f
+  }
+
 }
 
 trait BindsLow {

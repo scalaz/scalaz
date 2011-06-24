@@ -233,4 +233,13 @@ trait Applicatives {
   implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
     Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
 
+  implicit def WriterTApplicative[A, F[_]](implicit ap: Applicative[F], n: Monoid[A]): Applicative[({type λ[α] = WriterT[A, F, α]})#λ] = {
+    implicit val a = ap.applic
+    implicit val p = ap.pointedFunctor
+    implicit val f = ap.applicFunctor
+    implicit val s = n.semigroup
+    implicit val z = n.zero
+    Applicative.applicative[({type λ[α] = WriterT[A, F, α]})#λ]
+  }
+
 }

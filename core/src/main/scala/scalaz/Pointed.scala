@@ -172,6 +172,12 @@ trait Pointeds extends PointedsLow {
       Success(a)
   }
 
+  implicit def WriterTPointed[A: Zero, F[_] : Pointed]: Pointed[({type λ[α] = WriterT[A, F, α]})#λ] =
+    new Pointed[({type λ[α] = WriterT[A, F, α]})#λ] {
+      def point[X](a: => X) =
+        WriterT.writerT(implicitly[Pointed[F]].point((implicitly[Zero[A]].zero, a)))
+    }
+
 }
 
 trait PointedsLow {

@@ -161,4 +161,11 @@ trait PointedFunctors {
   implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α] = Validation[X, α]})#λ] =
     PointedFunctor.pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
 
+  implicit def WriterTPointedFunctor[A: Zero, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = WriterT[A, F, α]})#λ] {
+    implicit val ftr = implicitly[PointedFunctor[F]].functor
+    implicit val pt = implicitly[PointedFunctor[F]].pointed
+    val functor = implicitly[Functor[({type λ[α] = WriterT[A, F, α]})#λ]]
+    val pointed = implicitly[Pointed[({type λ[α] = WriterT[A, F, α]})#λ]]
+  }
+
 }
