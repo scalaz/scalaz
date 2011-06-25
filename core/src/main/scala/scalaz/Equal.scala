@@ -200,7 +200,6 @@ object Equal extends EqualLow {
   import concurrent.Promise
   implicit def PromiseEqual[A: Equal]: Equal[Promise[A]] =
     equal[Promise[A]]((a1, a2) => a1.get ≟ a2.get)
-
   def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = equal((a1, a2) => {
     val i1 = a1.iterator
     val i2 = a2.iterator
