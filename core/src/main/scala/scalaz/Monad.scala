@@ -38,7 +38,7 @@ object Monad extends MonadLow {
   implicit def StateMonad[A] =
     monad[({type λ[α] = State[A, α]})#λ](StateBind, StatePure)
 
-  implicit def KleisiliMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) =
+  implicit def KleisliMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) =
     monad[({type λ[α] = Kleisli[M, A, α]})#λ](kleisliBind(b), kleisliPure(p))
 
   implicit def StateTMonad[M[_], A](implicit b: Bind[M], p: Pure[M]) =

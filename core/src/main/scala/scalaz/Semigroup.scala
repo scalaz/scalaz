@@ -133,7 +133,16 @@ object Semigroup extends SemigroupLow {
   implicit def Tuple4Semigroup[A, B, C, D](implicit as: Semigroup[A], bs: Semigroup[B], cs: Semigroup[C], ds: Semigroup[D]): Semigroup[(A, B, C, D)] =
     semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2, a._3 |+| b._3, a._4 |+| b._4))
 
-  implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
+  // Uglified to help diagnose https://github.com/scalaz/scalaz/issues/25
+  // was: semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
+  implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup {
+    val S = implicitly[Semigroup[B]]
+    (a1, a2) => {a =>
+      val b1 = a1(a)
+      lazy val b2 = a2.apply(a)
+      S.append(b1, b2)
+    }
+  }
 
   implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => (EndoTo(x compose y)))
 
