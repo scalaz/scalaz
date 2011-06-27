@@ -208,6 +208,9 @@ trait Equals extends EqualsLow {
   implicit def IdentityEqual[A: Equal]: Equal[Identity[A]] =
     Equal.equalBy(_.value)
 
+  implicit def ConstEqual[B: Equal, A]: Equal[Const[B, A]] =
+    Equal.UnpackEqual[Const[B, A], B]
+
   implicit def DigitEqual: Equal[Digit] =
     Equal.equalBy(_.toInt)
 

@@ -194,6 +194,12 @@ trait Applicatives {
 
   implicit val IdentityApplicative: Applicative[Identity] = implicitly[Monad[Identity]].applicative
 
+  implicit def ConstApplicative[A: Monoid] = {
+    implicit val z = implicitly[Monoid[A]].zero
+    implicit val s = implicitly[Monoid[A]].semigroup
+    Applicative.applicative[({type λ[α] = Const[A, α]})#λ]
+  }
+
   implicit def KleisliApplicative[F[_], R](implicit ap: Applicative[F]): Applicative[({type λ[α] = Kleisli[R, F, α]})#λ] = {
     implicit val a = ap.applic
     implicit val p = ap.pointedFunctor

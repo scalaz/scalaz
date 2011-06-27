@@ -131,6 +131,11 @@ trait Binds extends BindsLow {
     def bind[A, B](f: A => (R, S, T, U, V, W) => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 
+  implicit def ResponderBind: Bind[Responder] = new Bind[Responder] {
+    def bind[A, B](f: A => Responder[B]) =
+      _ flatMap f
+  }
+
   import java.util._
   import java.util.concurrent._
 

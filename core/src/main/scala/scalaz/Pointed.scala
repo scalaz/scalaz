@@ -140,13 +140,9 @@ trait Pointeds extends PointedsLow {
         Kleisli.kleisli(_ => p.point(a))
     }
 
-  import iteratee._, IterateeT._, Input._
-
-  implicit def IterateeTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] =
-    new Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] {
-      def point[A](a: => A) =
-        doneT(a, emptyInput)
-    }
+  implicit def ConstPointed[A: Zero]: Pointed[({type λ[α] = Const[A, α]})#λ] = new Pointed[({type λ[α] = Const[A, α]})#λ] {
+    def point[B](a: => B) = Const.const[B](implicitly[Zero[A]].zero)
+  }
 
   implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
     def point[A](a: => A) =

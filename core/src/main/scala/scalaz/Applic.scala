@@ -141,6 +141,12 @@ trait Applics {
       a => (r, s, t, u, v, w) => f(r, s, t, u, v, w)(a(r, s, t, u, v, w))
   }
 
+  implicit def ConstApplic[B: Semigroup]: Applic[({type λ[α] = Const[B, α]})#λ] = new Applic[({type λ[α] = Const[B, α]})#λ] {
+    def applic[A, X](f: Const[B, A => X]) =
+      fa =>
+        Const.const[X](implicitly[Semigroup[B]].append(f.value, fa.value))
+  }
+
   implicit val IdentityApplic: Applic[Identity] = implicitly[Monad[Identity]].applic
 
   implicit def KleisliApplic[F[_], R](implicit ap: Applic[F]): Applic[({type λ[α] = Kleisli[R, F, α]})#λ] = new Applic[({type λ[α] = Kleisli[R, F, α]})#λ] {
@@ -218,4 +224,42 @@ trait Applics {
         WriterT.writerT(implicitly[ApplicFunctor[F]].liftA2((ff: (A, X => Y)) => (xx: (A, X)) => (implicitly[Semigroup[A]].append(ff._1, xx._1), ff._2(xx._2)))(f.runT)(a.runT))
   }
 
+  implicit def ZipperApplic: Applic[Zipper] = new Applic[Zipper] {
+    def applic[A, B](f: Zipper[A => B]) =
+      a =>
+        Zipper.zipper(a.lefts.zip(f.lefts) map { case (aa, ff) => ff(aa) },
+          (f.focus)(a.focus),
+          a.rights.zip(f.rights) map { case (aa, ff) => ff(aa) })
+  }
+
+  implicit val ResponderApplic =
+    implicitly[Functor[Responder]].applicBind
+
+/*
+  import concurrent.Promise
+  implicit val PromiseApply = FunctorBindApply[Promise]
+
+  import java.util._
+  import java.util.concurrent._
+
+  implicit val JavaArrayListApply = FunctorBindApply[ArrayList]
+
+  implicit val JavaLinkedListApply = FunctorBindApply[LinkedList]
+
+  implicit val JavaPriorityQueueApply = FunctorBindApply[PriorityQueue]
+
+  implicit val JavaStackApply = FunctorBindApply[Stack]
+
+  implicit val JavaVectorApply = FunctorBindApply[Vector]
+
+  implicit val JavaArrayBlockingQueueApply = FunctorBindApply[ArrayBlockingQueue]
+
+  implicit val JavaConcurrentLinkedQueueApply = FunctorBindApply[ConcurrentLinkedQueue]
+
+  implicit val JavaCopyOnWriteArrayListApply = FunctorBindApply[CopyOnWriteArrayList]
+
+  implicit val JavaLinkedBlockingQueueApply = FunctorBindApply[LinkedBlockingQueue]
+
+  implicit val JavaSynchronousQueueApply = FunctorBindApply[SynchronousQueue]
+  */
 }

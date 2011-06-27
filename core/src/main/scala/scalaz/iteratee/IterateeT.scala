@@ -240,4 +240,10 @@ trait IterateeTs {
         implicitly[Monad[G]].fmap((aa: A) => doneT[G](aa, emptyInput[E]))(a))
   }
 
+  implicit def IterateeTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] =
+    new Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] {
+      def point[A](a: => A) =
+        doneT(a, emptyInput)
+    }
+
 }

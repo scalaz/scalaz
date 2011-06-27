@@ -11,6 +11,11 @@ trait Functor[F[_]] {
       Functor.this.fmap(gtr.fmap(f))
   }
 
+  def applicBind(implicit b: Bind[F]): Applic[F] = new Applic[F] {
+    def applic[A, B](f: F[A => B]) =
+      a => b.bind((ff: A => B) => fmap((aa: A) => ff(aa))(a))(f)
+  }
+
   def **[G[_] : Functor]: Functor[({type λ[α] = (F[α], G[α])})#λ] =
     new Functor[({type λ[α] = (F[α], G[α])})#λ] {
       def fmap[A, B](f: A => B) = {
@@ -135,6 +140,11 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
+  implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
   // http://lampsvn.epfl.ch/trac/scala/ticket/2782
   /*implicit*/
@@ -174,6 +184,11 @@ trait Functors extends FunctorsLow {
 
   implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
     def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
+  }
+
+  implicit def ConstFunctor[B]: Functor[({type λ[α] = Const[B, α]})#λ] = new Functor[({type λ[α] = Const[B, α]})#λ] {
+    def fmap[A, X](f: A => X) =
+      _ map f
   }
 
   implicit def CoStateFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
