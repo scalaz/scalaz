@@ -49,36 +49,4 @@ trait CoKleislis {
 
   def ksa[F[_] : CoPointed, A]: CoKleisli[A, F, A] =
     coKleisli(a => implicitly[CoPointed[F]].coPoint(a))
-
-  implicit def CoKleisliId[F[_]](implicit p: CoPointed[F]): Id[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Id[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
-    def id[A] = coKleisli(p.coPoint(_))
-  }
-
-  implicit def CoKleisliCompose[F[_]](implicit ex: Extend[F]): Compose[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
-    def compose[A, B, C](f: CoKleisli[B, F, C], g: CoKleisli[A, F, B]) =
-      f =<= g
-  }
-
-  implicit def CoKleisliCategory[F[_]](implicit cm: CoMonad[F]): Category[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = {
-    implicit val e = cm.extend
-    implicit val p = cm.coPointed
-    Category.category[({type λ[α, β] = CoKleisli[α, F, β]})#λ]
-  }
-
-  implicit def CoKleisliArr[F[_]](implicit p: CoPointed[F]): Arr[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Arr[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
-    def arr[A, B](f: A => B) =
-      coKleisli(a => f(p.coPoint(a)))
-  }
-
-  implicit def CoKleisliFirst[F[_]](implicit ftr: CoPointedFunctor[F]): First[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new First[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
-    def first[A, B, C](f: CoKleisli[A, F, B]) =
-      coKleisli[(A, C), F, (B, C)](w =>
-        (f.run(ftr.fmap((ac: (A, C)) => ac._1)(w)), ftr.coPoint(w)._2))
-  }
-
-  implicit def CoKleisliArrow[F[_]](implicit cm: CoMonad[F]): Arrow[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = {
-    implicit val f = cm.coPointedFunctor
-    implicit val p = cm.coPointed
-    Arrow.arrow[({type λ[α, β] = CoKleisli[α, F, β]})#λ]
-  }
 }

@@ -23,4 +23,9 @@ trait Arrs {
       Kleisli.kleisli(a => p.point(f(a)))
   }
 
+  implicit def CoKleisliArr[F[_]](implicit p: CoPointed[F]): Arr[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Arr[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
+    def arr[A, B](f: A => B) =
+      CoKleisli.coKleisli(a => f(p.coPoint(a)))
+  }
+
 }

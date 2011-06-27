@@ -25,4 +25,9 @@ trait Firsts {
       }
   }
 
+  implicit def CoKleisliFirst[F[_]](implicit ftr: CoPointedFunctor[F]): First[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new First[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
+    def first[A, B, C](f: CoKleisli[A, F, B]) =
+      CoKleisli.coKleisli[(A, C), F, (B, C)](w =>
+        (f.run(ftr.fmap((ac: (A, C)) => ac._1)(w)), ftr.coPoint(w)._2))
+  }
 }
