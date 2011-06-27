@@ -1,5 +1,18 @@
 package scalaz
 
+/**
+ * A type safe alternative to   { @scala.Any.== }.
+ * <p/>
+ * For example:
+ * <pre>
+ *   (1 ≟ 0) ≟ false 
+ *   (List("1") ≟ List("1")) ≟ true
+ *   (1 ≟ "1") // compile error
+ *   (1 ≟ 0L) // compile error
+ * </pre>
+ * @see scalaz.Identity # ≟
+ * @see scalaz.Identity # ≠
+ */
 sealed trait Equal[A] {
   val equal: A => A => Boolean
 
@@ -44,6 +57,8 @@ trait Equals extends EqualsLow {
   import Predef.{implicitly => i}
 
   implicit def ThrowableEqual: Equal[Throwable] = equalA
+
+  implicit def OrderingEqual: Equal[Ordering] = equalA
 
   implicit def StringEqual: Equal[String] = equalA
 
