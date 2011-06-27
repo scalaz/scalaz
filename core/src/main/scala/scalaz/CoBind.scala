@@ -20,8 +20,26 @@ trait CoBinds {
       e.functor.fmap(f) compose e.coJoin.coJoin
   }
 
+  implicit val ListCoBind: CoBind[List] =
+    coBind[List]
+
+  implicit val OptionCoBind: CoBind[Option] =
+    coBind[Option]
+
+  implicit def EitherLeftCoBind[X]: CoBind[({type λ[α] = Either.LeftProjection[α, X]})#λ] =
+    coBind[({type λ[α] = Either.LeftProjection[α, X]})#λ]
+
+  implicit def EitherRightCoBind[X]: CoBind[({type λ[α] = Either.RightProjection[X, α]})#λ] =
+    coBind[({type λ[α] = Either.RightProjection[X, α]})#λ]
+
+  implicit def EitherCoBind[X]: CoBind[({type λ[α] = Either[X, α]})#λ] =
+    coBind[({type λ[α] = Either[X, α]})#λ]
+
   implicit def MapEntryCoBind[X]: CoBind[({type λ[α] = Entry[X, α]})#λ] =
     coBind[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def Function1CoBind[R: Semigroup]: CoBind[({type λ[α] = (R => α)})#λ] =
+    coBind[({type λ[α] = (R => α)})#λ]
 
   implicit def CoStateCoBind[A, F[_] : CoBind]: CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def coBind[X, Y](f: CoStateT[A, F, X] => Y) =
