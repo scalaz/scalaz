@@ -139,6 +139,11 @@ trait Binds extends BindsLow {
   import java.util._
   import java.util.concurrent._
 
+  implicit def CallableBind: Bind[Callable] = new Bind[Callable] {
+    def bind[A, B](f: A => Callable[B]) =
+      r => f(r.call)
+  }
+
   implicit def JavaArrayListBind: Bind[ArrayList] = new Bind[ArrayList] {
     def bind[A, B](f: A => ArrayList[B]) = r => {
       val a = new ArrayList[B]

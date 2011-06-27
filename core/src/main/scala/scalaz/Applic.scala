@@ -235,31 +235,36 @@ trait Applics {
   implicit val ResponderApplic =
     implicitly[Functor[Responder]].applicBind
 
-/*
-  import concurrent.Promise
-  implicit val PromiseApply = FunctorBindApply[Promise]
-
   import java.util._
   import java.util.concurrent._
 
-  implicit val JavaArrayListApply = FunctorBindApply[ArrayList]
+  implicit val JavaArrayListApplic =
+    implicitly[Functor[ArrayList]].applicBind
 
-  implicit val JavaLinkedListApply = FunctorBindApply[LinkedList]
+  implicit val JavaLinkedListApplic =
+    implicitly[Functor[LinkedList]].applicBind
 
-  implicit val JavaPriorityQueueApply = FunctorBindApply[PriorityQueue]
+  implicit val JavaPriorityQueueApplic =
+    implicitly[Functor[PriorityQueue]].applicBind
 
-  implicit val JavaStackApply = FunctorBindApply[Stack]
+  implicit val JavaStackApplic =
+    implicitly[Functor[Stack]].applicBind
 
-  implicit val JavaVectorApply = FunctorBindApply[Vector]
+  implicit val JavaVectorApplic =
+    implicitly[Functor[Vector]].applicBind
 
-  implicit val JavaArrayBlockingQueueApply = FunctorBindApply[ArrayBlockingQueue]
+  implicit val JavaArrayBlockingQueueApplic =
+    implicitly[Functor[ArrayBlockingQueue]].applicBind
 
-  implicit val JavaConcurrentLinkedQueueApply = FunctorBindApply[ConcurrentLinkedQueue]
+  implicit val JavaConcurrentLinkedQueueApplic =
+    implicitly[Functor[ConcurrentLinkedQueue]].applicBind
 
-  implicit val JavaCopyOnWriteArrayListApply = FunctorBindApply[CopyOnWriteArrayList]
+  implicit val JavaCopyOnWriteArrayListApplic =
+    implicitly[Functor[CopyOnWriteArrayList]].applicBind
 
-  implicit val JavaLinkedBlockingQueueApply = FunctorBindApply[LinkedBlockingQueue]
+  implicit val JavaLinkedBlockingQueueApplic =
+    implicitly[Functor[LinkedBlockingQueue]].applicBind
 
-  implicit val JavaSynchronousQueueApply = FunctorBindApply[SynchronousQueue]
-  */
+  implicit val JavaSynchronousQueueApplic =
+    implicitly[Functor[SynchronousQueue]].applicBind
 }
