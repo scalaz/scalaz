@@ -77,8 +77,24 @@ trait CoMonads {
   implicit def Tuple2CoMonad[X]: CoMonad[({type λ[α] = Tuple2[X, α]})#λ] =
     coMonadJP[({type λ[α] = Tuple2[X, α]})#λ]
 
+  implicit def Function0CoMonad: CoMonad[Function0] =
+    coMonadJP[Function0]
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableCoMonad: CoMonad[Callable] =
+    coMonadJP[Callable]
+
+  import java.util.Map.Entry
+
   implicit def MapEntryCoMonad[X]: CoMonad[({type λ[α] = Entry[X, α]})#λ] =
-  coMonadJP[({type λ[α] = Entry[X, α]})#λ]
+    coMonadJP[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def TreeLocCoMonad: CoMonad[TreeLoc] =
+    coMonadJP[TreeLoc]
+
+  implicit def IdentityCoMonad: CoMonad[Identity] =
+    coMonadJP[Identity]
 
   implicit def CoStateCoMonad[A, F[_] : CoMonad]: CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] {
     implicit val cb = implicitly[CoMonad[F]].coBind
@@ -90,48 +106,12 @@ trait CoMonads {
     val coJoin = implicitly[CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ]]
   }
 
-  /*
+  implicit def NonEmptyListCoMonad: CoMonad[NonEmptyList] =
+    coMonadJP[NonEmptyList]
 
-  implicit def Function0CoPointed: CoPointed[Function0] = new CoPointed[Function0] {
-    def coPoint[A] = a => a.apply
-  }
+  implicit def TreeCoMonad: CoMonad[Tree] =
+    coMonadJP[Tree]
 
-  import java.util.concurrent.Callable
-
-  implicit def CallableCoPointed: CoPointed[Callable] = new CoPointed[Callable] {
-    def coPoint[A] = a => a.call
-  }
-
-  import java.util.Map.Entry
-
-  implicit def MapEntryCoPointed[X]: CoPointed[({type λ[α] = Entry[X, α]})#λ] = new CoPointed[({type λ[α] = Entry[X, α]})#λ] {
-    def coPoint[A] = a => a.getValue
-  }
-
-  implicit def TreeLocCoPointed: CoPointed[TreeLoc] = new CoPointed[TreeLoc] {
-    def coPoint[A] = a => a.tree.rootLabel
-  }
-
-  implicit def IdentityCoPointed: CoPointed[Identity] = new CoPointed[Identity] {
-    def coPoint[A] = a => a.value
-  }
-
-  implicit def CoStateCoPointed[A, F[_] : CoPointed]: CoPointed[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoPointed[({type λ[α] = CoStateT[A, F, α]})#λ] {
-    def coPoint[X] =
-      _.copointT
-  }
-
-  implicit def NonEmptyListCoPointed: CoPointed[NonEmptyList] = new CoPointed[NonEmptyList] {
-    def coPoint[A] = a => a.head
-  }
-
-  implicit def TreeCoPointed: CoPointed[Tree] = new CoPointed[Tree] {
-    def coPoint[A] = a => a.rootLabel
-  }
-
-  implicit def ZipperCoPointed: CoPointed[Zipper] = new CoPointed[Zipper] {
-    def coPoint[A] = a => a.focus
-  }
-
-   */
+  implicit def ZipperCoMonad: CoMonad[Zipper] =
+    coMonadJP[Zipper]
 }
