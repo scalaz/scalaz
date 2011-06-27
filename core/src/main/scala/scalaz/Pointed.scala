@@ -123,6 +123,12 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = Identity.id(a)
   }
 
+  implicit def CoKleisliPointed[F[_], R]: Pointed[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    new Pointed[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+      def point[A](a: => A) =
+        CoKleisli.coKleisli(_ => a)
+    }
+
   implicit def CoStatePointed[A: Zero, F[_] : Pointed]: Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] = new Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def point[Z](z: => Z) =
       CoStateT.coStateT[A, F, Z]((implicitly[Pointed[F]].point(_ => z), implicitly[Zero[A]].zero))

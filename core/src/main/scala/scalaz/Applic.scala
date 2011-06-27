@@ -141,6 +141,11 @@ trait Applics {
       a => (r, s, t, u, v, w) => f(r, s, t, u, v, w)(a(r, s, t, u, v, w))
   }
 
+  implicit def CoKleisliApplic[F[_], R]: Applic[({type λ[α] = CoKleisli[R, F, α]})#λ] = new Applic[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+    def applic[A, B](f: CoKleisli[R, F, A => B]) =
+      a => f flatMap (a map _)
+  }
+
   implicit def ConstApplic[B: Semigroup]: Applic[({type λ[α] = Const[B, α]})#λ] = new Applic[({type λ[α] = Const[B, α]})#λ] {
     def applic[A, X](f: Const[B, A => X]) =
       fa =>

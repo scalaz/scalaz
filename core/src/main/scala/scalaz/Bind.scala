@@ -249,6 +249,11 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit def CoKleisliBind[F[_], R]: Bind[({type λ[α] = CoKleisli[R, F, α]})#λ] = new Bind[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+    def bind[A, B](f: A => CoKleisli[R, F, B]) =
+      _ flatMap f
+  }
+
   implicit def KleisliBind[F[_], R](implicit bd: Bind[F]): Bind[({type λ[α] = Kleisli[R, F, α]})#λ] = new Bind[({type λ[α] = Kleisli[R, F, α]})#λ] {
     def bind[A, B](f: A => Kleisli[R, F, B]) =
       _ flatMap f

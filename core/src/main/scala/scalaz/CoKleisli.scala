@@ -18,6 +18,9 @@ trait CoKleisli[A, W[_], B] {
   def map[C](f: B => C): CoKleisli[A, W, C] =
     coKleisli(f compose run)
 
+  def flatMap[C](f: B => CoKleisli[A, W, C]): CoKleisli[A, W, C] =
+    coKleisli(w => f(run(w)).run(w))
+
   def redaer(implicit i: Identity[A] =:= W[A]): A => B =
     a => run(id(a))
 

@@ -211,6 +211,9 @@ trait Monads {
   implicit val IdentityMonad: Monad[Identity] =
     Monad.monadBP[Identity]
 
+  implicit def CoKleisliMonad[F[_], R]: Monad[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    Monad.monadBP[({type λ[α] = CoKleisli[R, F, α]})#λ]
+
   implicit def KleisliMonad[F[_], R](implicit m: Monad[F]): Monad[({type λ[α] = Kleisli[R, F, α]})#λ] = {
     implicit val b = m.bind
     implicit val p = m.pointed

@@ -139,6 +139,18 @@ trait BindFunctors extends BindFunctorsLow {
   implicit val IdentityBindFunctor: BindFunctor[Identity] =
     BindFunctor.bindFunctor
 
+  implicit def CoKleisliBindFunctor[A, F[_]]: BindFunctor[({type λ[α] = CoKleisli[A, F, α]})#λ] = new BindFunctor[({type λ[α] = CoKleisli[A, F, α]})#λ] {
+    val functor = implicitly[Functor[({type λ[α] = CoKleisli[A, F, α]})#λ]]
+    val bind = implicitly[Bind[({type λ[α] = CoKleisli[A, F, α]})#λ]]
+  }
+
+  implicit def KleisliBindFunctor[A, F[_] : BindFunctor]: BindFunctor[({type λ[α] = Kleisli[A, F, α]})#λ] = new BindFunctor[({type λ[α] = Kleisli[A, F, α]})#λ] {
+    implicit val ftr = implicitly[BindFunctor[F]].functor
+    implicit val b = implicitly[BindFunctor[F]].bind
+    val functor = implicitly[Functor[({type λ[α] = Kleisli[A, F, α]})#λ]]
+    val bind = implicitly[Bind[({type λ[α] = Kleisli[A, F, α]})#λ]]
+  }
+
   implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
     BindFunctor.bindFunctor
 
@@ -148,6 +160,12 @@ trait BindFunctors extends BindFunctorsLow {
     val functor = implicitly[Functor[({type λ[α] = StateT[A, F, α]})#λ]]
     val bind = implicitly[Bind[({type λ[α] = StateT[A, F, α]})#λ]]
   }
+
+  implicit def StepListTBindFunctor[F[_]: Functor]: BindFunctor[({type λ[α] = StepListT[F, α]})#λ] =
+    BindFunctor.bindFunctor[({type λ[α] = StepListT[F, α]})#λ]
+
+  implicit def StepStreamTBindFunctor[F[_]: Functor]: BindFunctor[({type λ[α] = StepStreamT[F, α]})#λ] =
+    BindFunctor.bindFunctor[({type λ[α] = StepStreamT[F, α]})#λ]
 
   implicit val TreeBindFunctor: BindFunctor[Tree] =
     BindFunctor.bindFunctor[Tree]

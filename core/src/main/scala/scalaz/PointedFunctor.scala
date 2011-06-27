@@ -117,6 +117,9 @@ trait PointedFunctors {
   implicit val IdentityPointedFunctor: PointedFunctor[Identity] =
     PointedFunctor.pointedFunctor[Identity]
 
+  implicit def CoKleisliPointedFunctor[F[_], R]: PointedFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    PointedFunctor.pointedFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ]
+
   implicit def ConstPointedFunctor[A: Zero]: PointedFunctor[({type λ[α] = Const[A, α]})#λ] =
     PointedFunctor.pointedFunctor[({type λ[α] = Const[A, α]})#λ]
 

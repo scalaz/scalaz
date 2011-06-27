@@ -186,6 +186,12 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
   }
 
+  implicit def CoKleisliFunctor[F[_], R]: Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    new Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
   implicit def ConstFunctor[A]: Functor[({type λ[α] = Const[A, α]})#λ] = new Functor[({type λ[α] = Const[A, α]})#λ] {
     def fmap[B, X](f: B => X) =
       _ map f
