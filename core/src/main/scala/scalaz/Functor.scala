@@ -186,8 +186,8 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
   }
 
-  implicit def ConstFunctor[B]: Functor[({type λ[α] = Const[B, α]})#λ] = new Functor[({type λ[α] = Const[B, α]})#λ] {
-    def fmap[A, X](f: A => X) =
+  implicit def ConstFunctor[A]: Functor[({type λ[α] = Const[A, α]})#λ] = new Functor[({type λ[α] = Const[A, α]})#λ] {
+    def fmap[B, X](f: B => X) =
       _ map f
   }
 

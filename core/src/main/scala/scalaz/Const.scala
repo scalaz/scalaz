@@ -4,9 +4,7 @@ package scalaz
 sealed trait Const[A, B] {
   val value: A
 
-  import Const._
-
-  def map[X](f: A => X): Const[A, X] =
+  def map[X](f: B => X): Const[A, X] =
     Const.const(value)
 }
 
