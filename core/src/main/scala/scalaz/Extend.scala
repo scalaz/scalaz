@@ -71,4 +71,17 @@ trait Extends {
     val functor = implicitly[Functor[({type λ[α] = CoStateT[A, F, α]})#λ]]
     val coJoin = implicitly[CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ]]
   }
+
+  implicit def NonEmptyListExtend: Extend[NonEmptyList] =
+    extend[NonEmptyList]
+
+  implicit def TreeExtend: Extend[Tree] =
+    extend[Tree]
+
+
+  implicit def TreeLocExtend: Extend[TreeLoc] =
+    extend[TreeLoc]
+
+  implicit def ZipperExtend: Extend[Zipper] =
+    extend[Zipper]
 }
