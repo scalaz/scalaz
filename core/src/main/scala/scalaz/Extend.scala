@@ -1,7 +1,5 @@
 package scalaz
 
-import java.util.Map.Entry
-
 trait Extend[F[_]] {
   val functor: Functor[F]
   val coJoin: CoJoin[F]
@@ -41,6 +39,15 @@ trait Extends {
 
   implicit def EitherExtend[X]: Extend[({type λ[α] = Either[X, α]})#λ] =
     extend[({type λ[α] = Either[X, α]})#λ]
+
+  implicit def Tuple1Extend: Extend[Tuple1] =
+    extend[Tuple1]
+
+  implicit def Tuple2Extend[R]: Extend[({type λ[α] = (R, α)})#λ] =
+    extend[({type λ[α] = (R, α)})#λ]
+
+  implicit def Function0Extend: Extend[Function0] =
+    extend[Function0]
 
   implicit def Function1Extend[R: Semigroup]: Extend[({type λ[α] = (R => α)})#λ] =
     extend[({type λ[α] = (R => α)})#λ]
