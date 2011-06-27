@@ -22,7 +22,7 @@ trait BindFunctor[F[_]] {
 
 object BindFunctor extends BindFunctors
 
-trait BindFunctors {
+trait BindFunctors extends BindFunctorsLow {
   def bindFunctor[F[_]](implicit f: Functor[F], b: Bind[F]): BindFunctor[F] = new BindFunctor[F] {
     val functor = f
     val bind = b
@@ -100,6 +100,45 @@ trait BindFunctors {
   implicit def Function6BindFunctor[R, S, T, U, V, W]: BindFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] =
     bindFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
+  import java.util._
+  import java.util.concurrent._
+
+  implicit def CallableBindFunctor: BindFunctor[Callable] =
+    bindFunctor[Callable]
+
+  implicit def JavaArrayListBindFunctor: BindFunctor[ArrayList] =
+    bindFunctor[ArrayList]
+
+  implicit def JavaLinkedListBindFunctor: BindFunctor[LinkedList] =
+    bindFunctor[LinkedList]
+
+  implicit def JavaPriorityQueueBindFunctor: BindFunctor[PriorityQueue] =
+    bindFunctor[PriorityQueue]
+
+  implicit def JavaStackBindFunctor: BindFunctor[Stack] =
+    bindFunctor[Stack]
+
+  implicit def JavaVectorBindFunctor: BindFunctor[Vector] =
+    bindFunctor[Vector]
+
+  implicit def JavaArrayBlockingQueueBindFunctor: BindFunctor[ArrayBlockingQueue] =
+    bindFunctor[ArrayBlockingQueue]
+
+  implicit def JavaConcurrentLinkedQueueBindFunctor: BindFunctor[ConcurrentLinkedQueue] =
+    bindFunctor[ConcurrentLinkedQueue]
+
+  implicit def JavaCopyOnWriteArrayListBindFunctor: BindFunctor[CopyOnWriteArrayList] =
+    bindFunctor[CopyOnWriteArrayList]
+
+  implicit def JavaLinkedBlockingQueueBindFunctor: BindFunctor[LinkedBlockingQueue] =
+    bindFunctor[LinkedBlockingQueue]
+
+  implicit def JavaSynchronousQueueBindFunctor: BindFunctor[SynchronousQueue] =
+    bindFunctor[SynchronousQueue]
+
+  implicit val IdentityBindFunctor: BindFunctor[Identity] =
+    BindFunctor.bindFunctor
+
   implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
     BindFunctor.bindFunctor
 
@@ -122,4 +161,11 @@ trait BindFunctors {
     val bind = implicitly[Bind[({type λ[α] = WriterT[A, F, α]})#λ]]
   }
 
+}
+
+trait BindFunctorsLow {
+  implicit def TraversableBindFunctor[CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X] : CanBuildAnySelf]: BindFunctor[CC] = new BindFunctor[CC] {
+    val functor = implicitly[Functor[CC]]
+    val bind = implicitly[Bind[CC]]
+  }
 }
