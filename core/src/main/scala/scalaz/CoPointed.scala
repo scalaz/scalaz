@@ -7,9 +7,6 @@ trait CoPointed[F[_]] {
 object CoPointed extends CoPointeds
 
 trait CoPointeds {
-  implicit def ZeroCoPointed: CoPointed[Zero] = new CoPointed[Zero] {
-    def coPoint[A] = a => a.zero
-  }
 
   implicit def Tuple1CoPointed: CoPointed[Tuple1] = new CoPointed[Tuple1] {
     def coPoint[A] = a => a._1
