@@ -35,11 +35,21 @@ trait CoBinds {
   implicit def EitherCoBind[X]: CoBind[({type λ[α] = Either[X, α]})#λ] =
     coBind[({type λ[α] = Either[X, α]})#λ]
 
+  implicit def Function1CoBind[R: Semigroup]: CoBind[({type λ[α] = (R => α)})#λ] =
+    coBind[({type λ[α] = (R => α)})#λ]
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableCoBind: CoBind[Callable] =
+    coBind[Callable]
+
+  import java.util.Map.Entry
+
   implicit def MapEntryCoBind[X]: CoBind[({type λ[α] = Entry[X, α]})#λ] =
     coBind[({type λ[α] = Entry[X, α]})#λ]
 
-  implicit def Function1CoBind[R: Semigroup]: CoBind[({type λ[α] = (R => α)})#λ] =
-    coBind[({type λ[α] = (R => α)})#λ]
+  implicit def IdentityCoBind: CoBind[Identity] =
+    coBind[Identity]
 
   implicit def CoStateCoBind[A, F[_] : CoBind]: CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoBind[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def coBind[X, Y](f: CoStateT[A, F, X] => Y) =

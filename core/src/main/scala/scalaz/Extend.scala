@@ -45,8 +45,18 @@ trait Extends {
   implicit def Function1Extend[R: Semigroup]: Extend[({type λ[α] = (R => α)})#λ] =
     extend[({type λ[α] = (R => α)})#λ]
 
+  import java.util.concurrent.Callable
+
+  implicit def CallableExtend: Extend[Callable] =
+    extend[Callable]
+
+  import java.util.Map.Entry
+
   implicit def MapEntryExtend[X]: Extend[({type λ[α] = Entry[X, α]})#λ] =
     extend[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def IdentityExtend: Extend[Identity] =
+    extend[Identity]
 
   implicit def CoStateExtend[A, F[_] : Extend]: Extend[({type λ[α] = CoStateT[A, F, α]})#λ] = new Extend[({type λ[α] = CoStateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[Extend[F]].functor
