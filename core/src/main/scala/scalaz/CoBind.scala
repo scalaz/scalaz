@@ -1,7 +1,5 @@
 package scalaz
 
-import java.util.Map.Entry
-
 trait CoBind[F[_]] {
   def coBind[A, B](f: F[A] => B): F[A] => F[B]
 
