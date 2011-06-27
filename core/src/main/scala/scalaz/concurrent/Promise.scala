@@ -229,4 +229,9 @@ trait Promises {
   implicit def PromiseCoMonad: CoMonad[Promise] =
     CoMonad.coMonadJP
 
+  implicit def PromiseTraverse: Traverse[Promise] = new Traverse[Promise] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      a => implicitly[Applicative[F]].fmap(promise(_: B)(a.strategy))(f(a.get))
+  }
+
 }
