@@ -227,6 +227,20 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def TreeLocFunctor: Functor[TreeLoc] = new Functor[TreeLoc] {
+    def fmap[A, B](f: A => B) =
+      t => {
+        val ff = (_: Tree[A]).map(f)
+        TreeLoc.loc(t.tree map f, t.lefts map ff, t.rights map ff,
+          t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
+      }
+  }
+
+  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
   implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
     new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
       def fmap[A, B](f: A => B) =
@@ -235,11 +249,6 @@ trait Functors extends FunctorsLow {
           case Failure(e) => Failure[B, X](f(e))
         }).fail
     }
-
-  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
 
   implicit def WriterTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = WriterT[A, F, α]})#λ] = new Functor[({type λ[α] = WriterT[A, F, α]})#λ] {
     def fmap[X, Y](f: X => Y) =
