@@ -89,5 +89,9 @@ trait ZipStreams {
   implicit def ZipStreamLength: Length[ZipStream] =
     implicitly[Length[Stream]].deriving[ZipStream]
 
+  implicit def ZipStreamTraverse: Traverse[ZipStream] = new Traverse[ZipStream] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      za => implicitly[Applicative[F]].fmap((_: Stream[B]) ʐ)(implicitly[Traverse[Stream]].traverse[F, A, B](f) apply (za.value)) // ∘ ((_: Stream[B]) ʐ)
+  }
 
 }
