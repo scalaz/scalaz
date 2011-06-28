@@ -175,7 +175,7 @@ trait Traverses extends TraversesLow {
 
   implicit def MapEntryTraverse[X]: Traverse[({type λ[α]=Entry[X, α]})#λ] = new Traverse[({type λ[α]=Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      as => implicitly[Applicative[F]].fmap((b: B) => new SimpleImmutableEntry(as.getKey, b))(f(as.getValue))
+      as => implicitly[Applicative[F]].fmap[B, Entry[X, B]](new SimpleImmutableEntry(as.getKey, _))(f(as.getValue))
   }
 
 }
