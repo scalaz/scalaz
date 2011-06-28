@@ -200,6 +200,21 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = EitherT.rightT(a)
   }
 
+  implicit def LeftEitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = EitherT.LeftProjectionT[A, F, α]})#λ] = new Pointed[({type λ[α] = EitherT.LeftProjectionT[A, F, α]})#λ] {
+    def point[A](a: => A) = EitherT.leftT(a).left
+  }
+
+  implicit def LazyEitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = LazyEitherT[A, F, α]})#λ] = new Pointed[({type λ[α] = LazyEitherT[A, F, α]})#λ] {
+    def point[A](a: => A) = LazyEitherT.lazyRightT(a)
+  }
+
+  implicit def LeftLazyEitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = EitherT.LazyLeftProjection[A, F, α]})#λ] = new Pointed[({type λ[α] = EitherT.LazyLeftProjection[A, F, α]})#λ] {
+    def point[A](a: => A) = LazyEitherT.lazyLeftT(a).left
+  }
+
+  implicit val LazyOptionPointed: Pointed[LazyOption] = new Pointed[LazyOption] {
+    def point[A](a: => A) = LazyOption.lazySome(a)
+  }
 }
 
 trait PointedsLow {
