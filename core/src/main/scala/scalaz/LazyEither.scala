@@ -257,11 +257,11 @@ trait LazyEitherTs {
 
   import LazyEither._
 
-  def lazyLeftT[A, F[_], B](implicit p: Pointed[F]): (=> A) => LazyEitherT[A, F, B] =
-    a => lazyEitherT(p.point(lazyLeft(a)))
+  def lazyLeftT[A, F[_], B](a: => A)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
+    lazyEitherT(p.point(lazyLeft(a)))
 
-  def lazyRightT[A, F[_], B](implicit p: Pointed[F]): (=> B) => LazyEitherT[A, F, B] =
-    b => lazyEitherT(p.point(lazyRight(b)))
+  def lazyRightT[A, F[_], B](b: => B)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
+    lazyEitherT(p.point(lazyRight(b)))
 
   implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
     def lift[G[_] : Monad, A](a: G[A]): LazyEitherT[Z, G, A] =

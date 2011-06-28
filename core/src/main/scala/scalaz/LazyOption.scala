@@ -78,7 +78,7 @@ private case class LazyNone[A]() extends LazyOption[A]
 object LazyOption extends LazyOptions
 
 trait LazyOptions {
-  def lazySome[A]: (=> A) => LazyOption[A] =
+  def lazySome[A]: (=> A) =>LazyOption[A] =
     a => LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =
@@ -209,8 +209,8 @@ trait LazyOptionTs {
 
   import LazyOption._
 
-  def lazySomeT[F[_], A](implicit p: Pointed[F]): (=> A) => LazyOptionT[F, A] =
-    a => lazyOptionT(p.point(lazySome(a)))
+  def lazySomeT[F[_], A](a: => A)(implicit p: Pointed[F]): LazyOptionT[F, A] =
+    lazyOptionT(p.point(lazySome(a)))
 
   def lazyNoneT[F[_], A](implicit p: Pointed[F]): LazyOptionT[F, A] =
     lazyOptionT(p.point(lazyNone[A]))

@@ -188,6 +188,18 @@ trait Pointeds extends PointedsLow {
         WriterT.writerT(implicitly[Pointed[F]].point((implicitly[Zero[A]].zero, a)))
     }
 
+  implicit def OptionTPointed[F[_]: Pointed]: Pointed[({type λ[α] = OptionT[F, α]})#λ] = new Pointed[({type λ[α] = OptionT[F, α]})#λ] {
+    def point[A](a: => A) = OptionT.someT(a)
+  }
+
+  implicit def LazyOptionTPointed[F[_]: Pointed]: Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] = new Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def point[A](a: => A) = LazyOptionT.lazySomeT(a)
+  }
+
+  implicit def EitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = EitherT[A, F, α]})#λ] = new Pointed[({type λ[α] = EitherT[A, F, α]})#λ] {
+    def point[A](a: => A) = EitherT.rightT(a)
+  }
+
 }
 
 trait PointedsLow {
