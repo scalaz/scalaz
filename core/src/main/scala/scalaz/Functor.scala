@@ -266,6 +266,41 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def OptionTFunctor[F[_]: Functor]: Functor[({type λ[α] = OptionT[F, α]})#λ] = new Functor[({type λ[α] = OptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LazyOptionTPointed[F[_]: Functor]: Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new Functor[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def EitherTFunctor[F[_]: Functor, A]: Functor[({type λ[α] = EitherT[A, F, α]})#λ] = new Functor[({type λ[α] = EitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LeftEitherTFunctor[F[_]: Functor, B]: Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = new Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f left
+  }
+
+  implicit def LazyEitherTFunctor[F[_]: Functor, A]: Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = new Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def LeftLazyEitherTFunctor[F[_]: Functor, B]: Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = new Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_)) left
+  }
+
+  implicit val LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
 }
 
 trait FunctorsLow {
