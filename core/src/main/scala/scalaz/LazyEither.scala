@@ -239,7 +239,7 @@ sealed trait LazyEitherT[A, F[_], B] {
   def flatMap[C](f: (=> B) => LazyEitherT[A, F, C])(implicit m: Monad[F]): LazyEitherT[A, F, C] =
     lazyEitherT(m.bd((_: LazyEither[A, B]).fold(a => m.point(lazyLeft[C](a)), b => f(b).runT))(runT))
 
-  def left = new LeftLazyProjectionT[A, F, B]() {
+  def left = new LazyLeftProjectionT[A, F, B]() {
     val e = LazyEitherT.this
   }
 
@@ -268,7 +268,7 @@ trait LazyEitherTs {
       lazyEitherT(implicitly[Monad[G]].fmap((a: A) => lazyRight(a): LazyEither[Z, A])(a))
   }
 
-  sealed trait LeftLazyProjectionT[A, F[_], B] {
+  sealed trait LazyLeftProjectionT[A, F[_], B] {
     val e: LazyEitherT[A, F, B]
 
     import OptionT._
