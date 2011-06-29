@@ -115,13 +115,13 @@ trait PointedFunctors {
     pointedFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit val IdentityPointedFunctor: PointedFunctor[Identity] =
-    PointedFunctor.pointedFunctor[Identity]
+    pointedFunctor[Identity]
 
   implicit def CoKleisliPointedFunctor[F[_], R]: PointedFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ]
+    pointedFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ]
 
   implicit def ConstPointedFunctor[A: Zero]: PointedFunctor[({type λ[α] = Const[A, α]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = Const[A, α]})#λ]
+    pointedFunctor[({type λ[α] = Const[A, α]})#λ]
 
   implicit def CoStatePointedFunctor[A: Zero, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = CoStateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[PointedFunctor[F]].functor
@@ -133,11 +133,11 @@ trait PointedFunctors {
   implicit def KleisliPointedFunctor[F[_], R](implicit pt: PointedFunctor[F]): PointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ] = {
     implicit val p = pt.pointed
     implicit val f = pt.functor
-    PointedFunctor.pointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
+    pointedFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
   implicit val NonEmptyListPointedFunctor: PointedFunctor[NonEmptyList] =
-    PointedFunctor.pointedFunctor
+    pointedFunctor
 
   implicit def StateTPointedFunctor[A, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[PointedFunctor[F]].functor
@@ -149,23 +149,23 @@ trait PointedFunctors {
   implicit def StepListTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepListT[F, X]})#λ] = {
     implicit val p = pf.pointed
     implicit val ftr = pf.functor
-    PointedFunctor.pointedFunctor[({type λ[X] = StepListT[F, X]})#λ]
+    pointedFunctor[({type λ[X] = StepListT[F, X]})#λ]
   }
 
   implicit def StepStreamTPointedFunctor[F[_]](implicit pf: PointedFunctor[F]): PointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ] = {
     implicit val p = pf.pointed
     implicit val ftr = pf.functor
-    PointedFunctor.pointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ]
+    pointedFunctor[({type λ[X] = StepStreamT[F, X]})#λ]
   }
 
   implicit val TreePointedFunctor: PointedFunctor[Tree] =
-    PointedFunctor.pointedFunctor[Tree]
+    pointedFunctor[Tree]
 
   implicit def FailProjectionPointedFunctor[X]: PointedFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+    pointedFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
   implicit def ValidationPointedFunctor[X]: PointedFunctor[({type λ[α] = Validation[X, α]})#λ] =
-    PointedFunctor.pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
+    pointedFunctor[({type λ[α] = Validation[X, α]})#λ]
 
   implicit def WriterTPointedFunctor[A: Zero, F[_] : PointedFunctor]: PointedFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = new PointedFunctor[({type λ[α] = WriterT[A, F, α]})#λ] {
     implicit val ftr = implicitly[PointedFunctor[F]].functor
@@ -174,4 +174,42 @@ trait PointedFunctors {
     val pointed = implicitly[Pointed[({type λ[α] = WriterT[A, F, α]})#λ]]
   }
 
+  implicit def OptionTPointedFunctor[F[_]: PointedFunctor]: PointedFunctor[({type λ[α] = OptionT[F, α]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = OptionT[F, α]})#λ]
+  }
+
+  implicit def LazyOptionTPointedFunctor[F[_]: PointedFunctor]: PointedFunctor[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = LazyOptionT[F, α]})#λ]
+  }
+
+  implicit def EitherTPointedFunctor[F[_]: PointedFunctor, A]: PointedFunctor[({type λ[α] = EitherT[A, F, α]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = EitherT[A, F, α]})#λ]
+  }
+
+  implicit def LeftEitherTPointedFunctor[F[_]: PointedFunctor, B]: PointedFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit def LazyEitherTPointedFunctor[F[_]: PointedFunctor, A]: PointedFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ]
+  }
+
+  implicit def LeftLazyEitherTPointedFunctor[F[_]: PointedFunctor, B]: PointedFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val f = implicitly[PointedFunctor[F]].functor
+    pointedFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit val LazyOptionPointedFunctor: PointedFunctor[LazyOption] =
+    pointedFunctor[LazyOption]
 }
