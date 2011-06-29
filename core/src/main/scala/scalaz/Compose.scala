@@ -37,6 +37,11 @@ trait Composes {
       f <=< g
   }
 
+  implicit def CoKleisliCompose[F[_]](implicit ex: Extend[F]): Compose[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
+    def compose[A, B, C](f: CoKleisli[B, F, C], g: CoKleisli[A, F, B]) =
+      f =<= g
+  }
+
   implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
     def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]) =
       f >=> g

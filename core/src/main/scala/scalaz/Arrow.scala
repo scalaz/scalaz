@@ -68,4 +68,10 @@ trait Arrows {
     Arrow.arrow[({type λ[α, β] = Kleisli[α, F, β]})#λ]
   }
 
+  implicit def CoKleisliArrow[F[_]](implicit cm: CoMonad[F]): Arrow[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = {
+    implicit val f = cm.coPointedFunctor
+    implicit val p = cm.coPointed
+    Arrow.arrow[({type λ[α, β] = CoKleisli[α, F, β]})#λ]
+  }
+
 }

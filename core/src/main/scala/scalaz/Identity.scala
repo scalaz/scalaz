@@ -6,6 +6,10 @@ sealed trait Identity[A] {
   def map[B](f: A => B): Identity[B] = new Identity[B] {
     def value = f(Identity.this.value)
   }
+
+  def flatMap[B](f: A => Identity[B]): Identity[B] = new Identity[B] {
+    def value = f(Identity.this.value).value
+  }
 }
 
 object Identity extends Identitys {

@@ -36,4 +36,20 @@ object Bifunctor {
       case Right(b) => Right(g(b))
     }
   }
+
+  implicit def ValidationBifunctor: Bifunctor[Validation] = new Bifunctor[Validation] {
+    def bimap[A, B, C, D](f: A => C, g: B => D) = {
+        case Failure(a) => Validation.failure(f(a))
+        case Success(b) => Validation.success(g(b))
+      }
+  }
+
+  import java.util.Map.Entry
+  import java.util.AbstractMap.SimpleImmutableEntry
+
+  implicit def MapEntryBifunctor: Bifunctor[Entry] = new Bifunctor[Entry] {
+    def bimap[A, B, C, D](f: A => C, g: B => D) =
+      k => new SimpleImmutableEntry(f(k.getKey), g(k.getValue))
+  }
+
 }

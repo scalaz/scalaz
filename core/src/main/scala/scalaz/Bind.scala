@@ -131,8 +131,18 @@ trait Binds extends BindsLow {
     def bind[A, B](f: A => (R, S, T, U, V, W) => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
   }
 
+  implicit def ResponderBind: Bind[Responder] = new Bind[Responder] {
+    def bind[A, B](f: A => Responder[B]) =
+      _ flatMap f
+  }
+
   import java.util._
   import java.util.concurrent._
+
+  implicit def CallableBind: Bind[Callable] = new Bind[Callable] {
+    def bind[A, B](f: A => Callable[B]) =
+      r => f(r.call)
+  }
 
   implicit def JavaArrayListBind: Bind[ArrayList] = new Bind[ArrayList] {
     def bind[A, B](f: A => ArrayList[B]) = r => {
@@ -235,7 +245,13 @@ trait Binds extends BindsLow {
   }
 
   implicit val IdentityBind: Bind[Identity] = new Bind[Identity] {
-    def bind[A, B](f: A => Identity[B]) = a => Identity.id(f(a.value).value)
+    def bind[A, B](f: A => Identity[B]) =
+      _ flatMap f
+  }
+
+  implicit def CoKleisliBind[F[_], R]: Bind[({type λ[α] = CoKleisli[R, F, α]})#λ] = new Bind[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+    def bind[A, B](f: A => CoKleisli[R, F, B]) =
+      _ flatMap f
   }
 
   implicit def KleisliBind[F[_], R](implicit bd: Bind[F]): Bind[({type λ[α] = Kleisli[R, F, α]})#λ] = new Bind[({type λ[α] = Kleisli[R, F, α]})#λ] {

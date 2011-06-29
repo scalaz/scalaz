@@ -216,8 +216,22 @@ trait Promises {
     def coPoint[A] = a => a.get
   }
 
+  implicit def PromiseCoPointedFunctor: CoPointedFunctor[Promise] =
+    CoPointedFunctor.coPointedFunctor[Promise]
+
   implicit def PromiseCoJoin: CoJoin[Promise] = new CoJoin[Promise] {
     def coJoin[A] = a => promise(a)(a.strategy)
+  }
+
+  implicit def PromiseExtend: Extend[Promise] =
+    Extend.extend[Promise]
+
+  implicit def PromiseCoMonad: CoMonad[Promise] =
+    CoMonad.coMonadJP
+
+  implicit def PromiseTraverse: Traverse[Promise] = new Traverse[Promise] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      a => implicitly[Applicative[F]].fmap(promise(_: B)(a.strategy))(f(a.get))
   }
 
 }

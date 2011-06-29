@@ -164,9 +164,9 @@ trait EitherTs {
     val runT = a
   }
 
-  def leftT[A, F[_], B](implicit p: Pointed[F]): A => EitherT[A, F, B] =
-    a => eitherT(p.point(Left(a): Either[A, B]))
+  def leftT[A, F[_], B](a: A)(implicit p: Pointed[F]): EitherT[A, F, B] =
+    eitherT(p.point(Left(a): Either[A, B]))
 
-  def rightT[A, F[_], B](implicit p: Pointed[F]): B => EitherT[A, F, B] =
-    b => eitherT(p.point(Right(b): Either[A, B]))
+  def rightT[A, F[_], B](b: B)(implicit p: Pointed[F]): EitherT[A, F, B] =
+    eitherT(p.point(Right(b): Either[A, B]))
 }

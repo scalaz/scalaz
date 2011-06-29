@@ -71,11 +71,30 @@ trait CoMonads {
     val coJoin = j
   }
 
-  implicit def MapEntryCoMonad[X]: CoMonad[({type λ[α] = Entry[X, α]})#λ] =
-    coMonadJP[({type λ[α] = Entry[X, α]})#λ]
+  implicit def Tuple1CoMonad: CoMonad[Tuple1] =
+    coMonadJP[Tuple1]
 
   implicit def Tuple2CoMonad[X]: CoMonad[({type λ[α] = Tuple2[X, α]})#λ] =
     coMonadJP[({type λ[α] = Tuple2[X, α]})#λ]
+
+  implicit def Function0CoMonad: CoMonad[Function0] =
+    coMonadJP[Function0]
+
+  import java.util.concurrent.Callable
+
+  implicit def CallableCoMonad: CoMonad[Callable] =
+    coMonadJP[Callable]
+
+  import java.util.Map.Entry
+
+  implicit def MapEntryCoMonad[X]: CoMonad[({type λ[α] = Entry[X, α]})#λ] =
+    coMonadJP[({type λ[α] = Entry[X, α]})#λ]
+
+  implicit def TreeLocCoMonad: CoMonad[TreeLoc] =
+    coMonadJP[TreeLoc]
+
+  implicit def IdentityCoMonad: CoMonad[Identity] =
+    coMonadJP[Identity]
 
   implicit def CoStateCoMonad[A, F[_] : CoMonad]: CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] = new CoMonad[({type λ[α] = CoStateT[A, F, α]})#λ] {
     implicit val cb = implicitly[CoMonad[F]].coBind
@@ -87,4 +106,12 @@ trait CoMonads {
     val coJoin = implicitly[CoJoin[({type λ[α] = CoStateT[A, F, α]})#λ]]
   }
 
+  implicit def NonEmptyListCoMonad: CoMonad[NonEmptyList] =
+    coMonadJP[NonEmptyList]
+
+  implicit def TreeCoMonad: CoMonad[Tree] =
+    coMonadJP[Tree]
+
+  implicit def ZipperCoMonad: CoMonad[Zipper] =
+    coMonadJP[Zipper]
 }

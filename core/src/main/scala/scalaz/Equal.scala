@@ -1,5 +1,18 @@
 package scalaz
 
+/**
+ * A type safe alternative to   { @scala.Any.== }.
+ * <p/>
+ * For example:
+ * <pre>
+ *   (1 ≟ 0) ≟ false 
+ *   (List("1") ≟ List("1")) ≟ true
+ *   (1 ≟ "1") // compile error
+ *   (1 ≟ 0L) // compile error
+ * </pre>
+ * @see scalaz.Identity # ≟
+ * @see scalaz.Identity # ≠
+ */
 sealed trait Equal[A] {
   val equal: A => A => Boolean
 
@@ -12,7 +25,7 @@ sealed trait Equal[A] {
 
 object Equal extends Equals
 
-trait Equals {
+trait Equals extends EqualsLow {
   def equal[A](f: A => A => Boolean): Equal[A] = new Equal[A] {
     val equal = f
   }
@@ -45,6 +58,8 @@ trait Equals {
 
   implicit def ThrowableEqual: Equal[Throwable] = equalA
 
+  implicit def OrderingEqual: Equal[Ordering] = equalA
+
   implicit def StringEqual: Equal[String] = equalA
 
   implicit def SymbolEqual: Equal[Symbol] = equalA
@@ -75,24 +90,6 @@ trait Equals {
   implicit def BigIntEqual: Equal[BigInt] = equalA
 
   implicit def NodeSeqEqual: Equal[xml.NodeSeq] = equalA
-
-  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] =
-    equal(a1 => a2 => {
-      val i1 = a1.iterator
-      val i2 = a2.iterator
-      var b = false
-
-      while (i1.hasNext && i2.hasNext && !b) {
-        val x1 = i1.next
-        val x2 = i2.next
-
-        if (implicitly[Equal[A]].unequal(x1)(x2)) {
-          b = true
-        }
-      }
-
-      !(b || i1.hasNext || i2.hasNext)
-    })
 
   implicit def Function0Equal[A: Equal]: Equal[Function0[A]] = equalBy(_.apply)
 
@@ -211,6 +208,9 @@ trait Equals {
   implicit def IdentityEqual[A: Equal]: Equal[Identity[A]] =
     Equal.equalBy(_.value)
 
+  implicit def ConstEqual[B: Equal, A]: Equal[Const[B, A]] =
+    Equal.UnpackEqual[Const[B, A], B]
+
   implicit def DigitEqual: Equal[Digit] =
     Equal.equalBy(_.toInt)
 
@@ -243,4 +243,26 @@ trait Equals {
   implicit def ZipperEqual[A: Equal]: Equal[Zipper[A]] =
     Equal.equalBy(_.toStream)
 
+}
+
+trait EqualsLow {
+
+  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+    val equal = (a1: CC[A]) => (a2: CC[A]) => {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = false
+
+      while (i1.hasNext && i2.hasNext && !b) {
+        val x1 = i1.next
+        val x2 = i2.next
+
+        if (implicitly[Equal[A]].unequal(x1)(x2)) {
+          b = true
+        }
+      }
+
+      !(b || i1.hasNext || i2.hasNext)
+    }
+  }
 }

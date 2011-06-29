@@ -260,6 +260,9 @@ trait Orders {
   implicit def CallableOrder[A: Order]: Order[java.util.concurrent.Callable[A]] =
     orderBy(_.call)
 
+  implicit def ConstOrder[B: Order, A]: Order[Const[B, A]] =
+    Order.UnpackOrder[Const[B, A], B]
+
   implicit def IdentityOrder[A: Order]: Order[Identity[A]] =
     Order.orderBy(_.value)
 

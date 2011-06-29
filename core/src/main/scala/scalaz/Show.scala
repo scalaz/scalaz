@@ -254,6 +254,9 @@ trait Shows {
   implicit def CallableShow[A: Show]: Show[java.util.concurrent.Callable[A]] =
     showBy(_.call)
 
+  implicit def ConstShow[B: Show, A]: Show[Const[B, A]] =
+    Show.UnpackShow[Const[B, A], B]
+
   implicit def IdentityShow[A: Show]: Show[Identity[A]] =
     Show.showBy(_.value)
 

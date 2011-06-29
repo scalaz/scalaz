@@ -688,7 +688,7 @@ trait *->*[F[_], A] {
   def fpair(implicit f: Functor[F]): F[(A, A)] =
     map(a => (a, a))
 
-  def lift[G[_[_], _]](implicit m: Monad[F], t: MonadTrans[G]): G[F, A] =
+  def trans[G[_[_], _]](implicit m: Monad[F], t: MonadTrans[G]): G[F, A] =
     t.lift(value)(m)
 
   def fpoint[G[_]](implicit f: Functor[F], p: Pointed[G]): F[G[A]] =
@@ -784,7 +784,7 @@ trait **->** extends **->**~ {
 
   implicit def LazyEitherT_*->*[A, F[_], B](s: LazyEitherT[A, F, B]) = *->*[({type λ[α] = LazyEitherT[A, F, α]})#λ, B](s)
 
-  implicit def LazyEitherTLeft_*->*[A, F[_], B](s: LazyEitherT.LeftLazyProjectionT[A, F, B]) = *->*[({type λ[α] = LazyEitherT.LeftLazyProjectionT[A, F, α]})#λ, B](s)
+  implicit def LazyEitherTLeft_*->*[A, F[_], B](s: LazyEitherT.LazyLeftProjectionT[A, F, B]) = *->*[({type λ[α] = LazyEitherT.LazyLeftProjectionT[A, F, α]})#λ, B](s)
 
   implicit def ST_*->*[S, A](s: ST[S, A]) = *->*[({type λ[α] = ST[S, α]})#λ, A](s)
 

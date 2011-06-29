@@ -72,13 +72,22 @@ object OptionT extends OptionTs {
 }
 
 trait OptionTs {
+  type Maybe[A] =
+    OptionT[Identity, A]
+
   def optionT[F[_], A](r: F[Option[A]]): OptionT[F, A] = new OptionT[F, A] {
     val runT = r
   }
 
-  def someT[F[_], A](implicit p: Pointed[F]): (=> A) => OptionT[F, A] =
-    a => optionT(p.point(Some(a)))
+  def someT[F[_], A](a: A)(implicit p: Pointed[F]): OptionT[F, A] =
+    optionT(p.point(Some(a)))
 
   def noneT[F[_], A](implicit p: Pointed[F]): OptionT[F, A] =
     optionT(p.point(None))
+
+  def just[A]: A => Maybe[A] =
+    someT[Identity, A](_)
+
+  def nothing[A]: Maybe[A] =
+    noneT[Identity, A]
 }

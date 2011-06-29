@@ -30,6 +30,10 @@ trait Ids {
     def id[A] = Kleisli.kleisli(p.point(_))
   }
 
+  implicit def CoKleisliId[F[_]](implicit p: CoPointed[F]): Id[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = new Id[({type λ[α, β] = CoKleisli[α, F, β]})#λ] {
+    def id[A] = CoKleisli.coKleisli(p.coPoint(_))
+  }
+
   implicit def LensId: Id[Lens] = new Id[Lens] {
     def id[A] = Lens.lensId
   }

@@ -7,6 +7,29 @@ trait CoJoin[M[_]] {
 object CoJoin extends CoJoins
 
 trait CoJoins {
+  implicit def ListCoJoin: CoJoin[List] = new CoJoin[List] {
+    def coJoin[A] = a => a.tails.toList
+  }
+
+  implicit def OptionCoJoin: CoJoin[Option] = new CoJoin[Option] {
+    def coJoin[A] = _ map (Some(_))
+  }
+
+  implicit def EitherLeftCoJoin[X]: CoJoin[({type λ[α] = Either.LeftProjection[α, X]})#λ] = new CoJoin[({type λ[α] = Either.LeftProjection[α, X]})#λ] {
+    def coJoin[A] =
+      a => (Left(a): Either[Either.LeftProjection[A, X], X]).left
+  }
+
+  implicit def EitherRightCoJoin[X]: CoJoin[({type λ[α] = Either.RightProjection[X, α]})#λ] = new CoJoin[({type λ[α] = Either.RightProjection[X, α]})#λ] {
+    def coJoin[A] =
+      a => (Right(a): Either[X, Either.RightProjection[X, A]]).right
+  }
+
+  implicit def EitherCoJoin[X]: CoJoin[({type λ[α] = Either[X, α]})#λ] = new CoJoin[({type λ[α] = Either[X, α]})#λ] {
+    def coJoin[A] =
+      a => Right(a): Either[X, Either[X, A]]
+  }
+
   implicit def Tuple1CoJoin: CoJoin[Tuple1] = new CoJoin[Tuple1] {
     def coJoin[A] = a => Tuple1(a)
   }
@@ -17,6 +40,11 @@ trait CoJoins {
 
   implicit def Function0CoJoin: CoJoin[Function0] = new CoJoin[Function0] {
     def coJoin[A] = a => () => a
+  }
+
+  implicit def Function1CoJoin[R: Semigroup]: CoJoin[({type λ[α] = (R => α)})#λ] = new CoJoin[({type λ[α] = (R => α)})#λ] {
+    def coJoin[A] =
+      a => r1 => r2 => a(implicitly[Semigroup[R]].append(r1, r2))
   }
 
   import java.util.concurrent.Callable

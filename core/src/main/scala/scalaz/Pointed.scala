@@ -123,6 +123,12 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = Identity.id(a)
   }
 
+  implicit def CoKleisliPointed[F[_], R]: Pointed[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    new Pointed[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+      def point[A](a: => A) =
+        CoKleisli.coKleisli(_ => a)
+    }
+
   implicit def CoStatePointed[A: Zero, F[_] : Pointed]: Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] = new Pointed[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def point[Z](z: => Z) =
       CoStateT.coStateT[A, F, Z]((implicitly[Pointed[F]].point(_ => z), implicitly[Zero[A]].zero))
@@ -140,13 +146,9 @@ trait Pointeds extends PointedsLow {
         Kleisli.kleisli(_ => p.point(a))
     }
 
-  import iteratee._, IterateeT._, Input._
-
-  implicit def IterateeTPointed[A, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] =
-    new Pointed[({type λ[α] = IterateeT[A, F, α]})#λ] {
-      def point[A](a: => A) =
-        doneT(a, emptyInput)
-    }
+  implicit def ConstPointed[A: Zero]: Pointed[({type λ[α] = Const[A, α]})#λ] = new Pointed[({type λ[α] = Const[A, α]})#λ] {
+    def point[B](a: => B) = Const.const[B](implicitly[Zero[A]].zero)
+  }
 
   implicit val NonEmptyListPointed: Pointed[NonEmptyList] = new Pointed[NonEmptyList] {
     def point[A](a: => A) =
@@ -186,6 +188,33 @@ trait Pointeds extends PointedsLow {
         WriterT.writerT(implicitly[Pointed[F]].point((implicitly[Zero[A]].zero, a)))
     }
 
+  implicit def OptionTPointed[F[_]: Pointed]: Pointed[({type λ[α] = OptionT[F, α]})#λ] = new Pointed[({type λ[α] = OptionT[F, α]})#λ] {
+    def point[A](a: => A) = OptionT.someT(a)
+  }
+
+  implicit def LazyOptionTPointed[F[_]: Pointed]: Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] = new Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def point[A](a: => A) = LazyOptionT.lazySomeT(a)
+  }
+
+  implicit def EitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = EitherT[A, F, α]})#λ] = new Pointed[({type λ[α] = EitherT[A, F, α]})#λ] {
+    def point[A](a: => A) = EitherT.rightT(a)
+  }
+
+  implicit def LeftEitherTPointed[F[_]: Pointed, B]: Pointed[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = new Pointed[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] {
+    def point[A](a: => A) = EitherT.leftT[A, F, B](a).left
+  }
+
+  implicit def LazyEitherTPointed[F[_]: Pointed, A]: Pointed[({type λ[α] = LazyEitherT[A, F, α]})#λ] = new Pointed[({type λ[α] = LazyEitherT[A, F, α]})#λ] {
+    def point[A](a: => A) = LazyEitherT.lazyRightT(a)
+  }
+
+  implicit def LeftLazyEitherTPointed[F[_]: Pointed, B]: Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = new Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] {
+    def point[A](a: => A) = LazyEitherT.lazyLeftT[A, F, B](a).left
+  }
+
+  implicit val LazyOptionPointed: Pointed[LazyOption] = new Pointed[LazyOption] {
+    def point[A](a: => A) = LazyOption.lazySome(a)
+  }
 }
 
 trait PointedsLow {

@@ -37,6 +37,12 @@ trait Categorys {
     Category.category[({type λ[α, β] = Kleisli[α, F, β]})#λ]
   }
 
+  implicit def CoKleisliCategory[F[_]](implicit cm: CoMonad[F]): Category[({type λ[α, β] = CoKleisli[α, F, β]})#λ] = {
+    implicit val e = cm.extend
+    implicit val p = cm.coPointed
+    Category.category[({type λ[α, β] = CoKleisli[α, F, β]})#λ]
+  }
+
   implicit def LensCategory: Category[Lens] =
     Category.category
 

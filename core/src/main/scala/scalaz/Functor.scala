@@ -11,6 +11,11 @@ trait Functor[F[_]] {
       Functor.this.fmap(gtr.fmap(f))
   }
 
+  def applicBind(implicit b: Bind[F]): Applic[F] = new Applic[F] {
+    def applic[A, B](f: F[A => B]) =
+      a => b.bind((ff: A => B) => fmap((aa: A) => ff(aa))(a))(f)
+  }
+
   def **[G[_] : Functor]: Functor[({type λ[α] = (F[α], G[α])})#λ] =
     new Functor[({type λ[α] = (F[α], G[α])})#λ] {
       def fmap[A, B](f: A => B) = {
@@ -135,6 +140,11 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
+  implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
   // http://lampsvn.epfl.ch/trac/scala/ticket/2782
   /*implicit*/
@@ -176,6 +186,17 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
   }
 
+  implicit def CoKleisliFunctor[F[_], R]: Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    new Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
+  implicit def ConstFunctor[A]: Functor[({type λ[α] = Const[A, α]})#λ] = new Functor[({type λ[α] = Const[A, α]})#λ] {
+    def fmap[B, X](f: B => X) =
+      _ map f
+  }
+
   implicit def CoStateFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def fmap[A, B](f: A => B) =
       _ map f
@@ -212,6 +233,20 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
+  implicit def TreeLocFunctor: Functor[TreeLoc] = new Functor[TreeLoc] {
+    def fmap[A, B](f: A => B) =
+      t => {
+        val ff = (_: Tree[A]).map(f)
+        TreeLoc.loc(t.tree map f, t.lefts map ff, t.rights map ff,
+          t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
+      }
+  }
+
+  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
   implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
     new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
       def fmap[A, B](f: A => B) =
@@ -221,11 +256,6 @@ trait Functors extends FunctorsLow {
         }).fail
     }
 
-  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
-    def fmap[A, B](f: A => B) =
-      _ map f
-  }
-
   implicit def WriterTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = WriterT[A, F, α]})#λ] = new Functor[({type λ[α] = WriterT[A, F, α]})#λ] {
     def fmap[X, Y](f: X => Y) =
       _ map f
@@ -234,6 +264,41 @@ trait Functors extends FunctorsLow {
   implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
     def fmap[A, B](f: A => B) =
       _ map f
+  }
+
+  implicit def OptionTFunctor[F[_]: Functor]: Functor[({type λ[α] = OptionT[F, α]})#λ] = new Functor[({type λ[α] = OptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LazyOptionTPointed[F[_]: Functor]: Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new Functor[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def EitherTFunctor[F[_]: Functor, A]: Functor[({type λ[α] = EitherT[A, F, α]})#λ] = new Functor[({type λ[α] = EitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LeftEitherTFunctor[F[_]: Functor, B]: Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = new Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f left
+  }
+
+  implicit def LazyEitherTFunctor[F[_]: Functor, A]: Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = new Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def LeftLazyEitherTFunctor[F[_]: Functor, B]: Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = new Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_)) left
+  }
+
+  implicit val LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
   }
 
 }
