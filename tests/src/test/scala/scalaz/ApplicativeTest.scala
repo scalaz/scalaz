@@ -34,7 +34,7 @@ class ApplicativeTest extends Specification with Sugar with ScalaCheck {
                                     arba: Arbitrary[A]): Unit = {
     val typeName = man.toString
     implicit val p = mm.pointed
-    implicit val arbMAA: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
+    implicit val arbEndo: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
     typeName in {
       import ScalazProperty.Applicative._
       identity[M, A] must pass
