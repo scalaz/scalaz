@@ -301,6 +301,50 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
+  implicit def OptionTBind[F[_]: Monad]: Bind[({type λ[α] = OptionT[F, α]})#λ] = new Bind[({type λ[α] = OptionT[F, α]})#λ] {
+    def bind[A, B](f: A => OptionT[F, B]) =
+      _ flatMap f
+  }
+
+  implicit def LazyOptionTBind[F[_]: Monad]: Bind[({type λ[α] = LazyOptionT[F, α]})#λ] = new Bind[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def bind[A, B](f: A => LazyOptionT[F, B]) =
+      _ flatMap (f(_))
+  }
+
+  implicit def EitherTBind[F[_]: Monad, X]: Bind[({type λ[α] = EitherT[X, F, α]})#λ] = new Bind[({type λ[α] = EitherT[X, F, α]})#λ] {
+    def bind[A, B](f: A => EitherT[X, F, B]) =
+      _ flatMap f
+  }
+
+  implicit def LeftEitherTBind[F[_]: Monad, X]: Bind[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] = new Bind[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] {
+    def bind[A, B](f: A => EitherT.LeftProjectionT[B, F, X]) =
+      _ flatMap (f(_).e) left
+  }
+
+  implicit def LazyEitherTBind[F[_]: Monad, X]: Bind[({type λ[α] = LazyEitherT[X, F, α]})#λ] = new Bind[({type λ[α] = LazyEitherT[X, F, α]})#λ] {
+    def bind[A, B](f: A => LazyEitherT[X, F, B]) =
+      _ flatMap (f(_))
+  }
+
+  implicit def LazyLeftEitherTBind[F[_]: Monad, X]: Bind[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Bind[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+    def bind[A, B](f: A => LazyEitherT.LazyLeftProjectionT[B, F, X]) =
+      _ flatMap (f(_).e) left
+  }
+
+  implicit val LazyOptionBind: Bind[LazyOption] = new Bind[LazyOption] {
+    def bind[A, B](f: A => LazyOption[B]) =
+      _ flatMap (f(_))
+  }
+
+  implicit def LazyEitherBind[X]: Bind[({type λ[α] = LazyEither[X, α]})#λ] = new Bind[({type λ[α] = LazyEither[X, α]})#λ] {
+    def bind[A, B](f: A => LazyEither[X, B]) =
+      _ flatMap (f(_))
+  }
+
+  implicit def LazyLeftEitherBind[X]: Bind[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Bind[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+    def bind[A, B](f: A => LazyEither.LazyLeftProjection[B, X]) =
+      _ flatMap (f(_).e) left
+  }
 }
 
 trait BindsLow {

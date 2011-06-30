@@ -267,7 +267,7 @@ trait Applics {
         LazyEitherT.lazyEitherT[X, F, B](implicitly[ApplicFunctor[F]].liftA2((ff: LazyEither[X, A => B]) => (aa: LazyEither[X, A]) => implicitly[Applic[({type λ[α] = LazyEither[X, α]})#λ]].applic(ff)(aa))(f.runT)(a.runT))
   }
 
-  implicit def LeftLazyEitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+  implicit def LazyLeftEitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
     def applic[A, B](f: LazyEitherT.LazyLeftProjectionT[A => B, F, X]) =
       a =>
         LazyEitherT.lazyEitherT[B, F, X](implicitly[ApplicFunctor[F]].liftA2((ff: LazyEither[A => B, X]) => (aa: LazyEither[A, X]) => implicitly[Applic[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ]].applic(ff.left)(aa.left).e)(f.e.runT)(a.e.runT)).left

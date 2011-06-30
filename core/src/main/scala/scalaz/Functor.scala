@@ -291,7 +291,7 @@ trait Functors extends FunctorsLow {
       _ map (f(_))
   }
 
-  implicit def LeftLazyEitherTFunctor[F[_]: Functor, X]: Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+  implicit def LazyLeftEitherTFunctor[F[_]: Functor, X]: Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
     def fmap[A, B](f: A => B) =
       _ map (f(_)) left
   }
@@ -306,7 +306,7 @@ trait Functors extends FunctorsLow {
       _ map (f(_))
   }
 
-  implicit def LeftLazyEitherFunctor[X]: Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+  implicit def LazyLeftEitherFunctor[X]: Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
     def fmap[A, B](f: A => B) =
       _ map (f(_)) left
   }

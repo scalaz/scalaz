@@ -208,7 +208,7 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = LazyEitherT.lazyRightT(a)
   }
 
-  implicit def LeftLazyEitherTPointed[F[_]: Pointed, B]: Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = new Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] {
+  implicit def LazyLeftEitherTPointed[F[_]: Pointed, B]: Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = new Pointed[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] {
     def point[A](a: => A) = LazyEitherT.lazyLeftT[A, F, B](a).left
   }
 
@@ -220,7 +220,7 @@ trait Pointeds extends PointedsLow {
     def point[A](a: => A) = LazyEither.lazyRight(a)
   }
 
-  implicit def LeftLazyEitherPointed[B]: Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] = new Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] {
+  implicit def LazyLeftEitherPointed[B]: Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] = new Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] {
     def point[A](a: => A) = LazyEither.lazyLeft(a).left
   }
 
