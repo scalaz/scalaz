@@ -166,41 +166,80 @@ trait ApplicFunctors {
     applicFunctor[({type λ[α] = (R, S, T, U, V, W) => α})#λ]
 
   implicit def CoKleisliApplicFunctor[F[_], R]: ApplicFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ]
+    applicFunctor[({type λ[α] = CoKleisli[R, F, α]})#λ]
 
   implicit def ConstApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Const[X, α]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = Const[X, α]})#λ]
+    applicFunctor[({type λ[α] = Const[X, α]})#λ]
 
   implicit val IdentityApplicFunctor: ApplicFunctor[Identity] = implicitly[Monad[Identity]].applicFunctor
 
   implicit def KleisliApplicFunctor[F[_], R](implicit ap: ApplicFunctor[F]): ApplicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ] = {
     implicit val a = ap.applic
     implicit val f = ap.functor
-    ApplicFunctor.applicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
+    applicFunctor[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
   implicit val NonEmptyListApplicFunctor: ApplicFunctor[NonEmptyList] =
-    ApplicFunctor.applicFunctor
+    applicFunctor
 
   implicit def StateTApplicFunctor[A, F[_]](implicit m: Monad[F]): ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = {
     implicit val a = m.applic
     implicit val f = m.functor
-    ApplicFunctor.applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]
+    applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]
   }
 
   implicit val TreeApplicFunctor: ApplicFunctor[Tree] =
-    ApplicFunctor.applicFunctor[Tree]
+    applicFunctor[Tree]
 
   implicit def FailProjectionApplicFunctor[X]: ApplicFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+    applicFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
   implicit def ValidationApplicFunctor[X: Semigroup]: ApplicFunctor[({type λ[α] = Validation[X, α]})#λ] =
-    ApplicFunctor.applicFunctor[({type λ[α] = Validation[X, α]})#λ]
+    applicFunctor[({type λ[α] = Validation[X, α]})#λ]
 
   implicit def WriterTApplicFunctor[A, F[_]](implicit ap: ApplicFunctor[F], n: Semigroup[A]): ApplicFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = {
     implicit val a = ap.applic
     implicit val f = ap.functor
-    ApplicFunctor.applicFunctor[({type λ[α] = WriterT[A, F, α]})#λ]
+    applicFunctor[({type λ[α] = WriterT[A, F, α]})#λ]
   }
+
+  implicit def OptionTApplicFunctor[F[_]: ApplicFunctor]: ApplicFunctor[({type λ[α] = OptionT[F, α]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = OptionT[F, α]})#λ]
+  }
+
+  implicit def LazyOptionTApplicFunctor[F[_]: ApplicFunctor]: ApplicFunctor[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = LazyOptionT[F, α]})#λ]
+  }
+
+  implicit def EitherTApplicFunctor[F[_]: ApplicFunctor, A]: ApplicFunctor[({type λ[α] = EitherT[A, F, α]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = EitherT[A, F, α]})#λ]
+  }
+
+  implicit def LeftEitherTApplicFunctor[F[_]: ApplicFunctor, B]: ApplicFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit def LazyEitherTApplicFunctor[F[_]: ApplicFunctor, A]: ApplicFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ]
+  }
+
+  implicit def LazyLeftEitherTApplicFunctor[F[_]: ApplicFunctor, B]: ApplicFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+    implicit val f = implicitly[ApplicFunctor[F]].functor
+    applicFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit val LazyOptionApplicFunctor: ApplicFunctor[LazyOption] =
+    applicFunctor[LazyOption]
+
+  implicit def LazyEitherApplicFunctor[A]: ApplicFunctor[({type λ[α] = LazyEither[A, α]})#λ] =
+    applicFunctor[({type λ[α] = LazyEither[A, α]})#λ]
+
+  implicit def LazyLeftEitherApplicFunctor[B]: ApplicFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
+    applicFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
 }
