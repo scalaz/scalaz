@@ -237,6 +237,57 @@ trait Applics {
           a.rights.zip(f.rights) map { case (aa, ff) => ff(aa) })
   }
 
+  implicit def OptionTApplic[F[_]: ApplicFunctor]: Applic[({type λ[α] = OptionT[F, α]})#λ] = new Applic[({type λ[α] = OptionT[F, α]})#λ] {
+    def applic[A, B](f: OptionT[F, A => B]) =
+      a =>
+        OptionT.optionT(implicitly[ApplicFunctor[F]].liftA2((ff: Option[A => B]) => (aa: Option[A]) => implicitly[Applic[Option]].applic(ff)(aa))(f.runT)(a.runT))
+  }
+
+  implicit def LazyOptionTApplic[F[_]: ApplicFunctor]: Applic[({type λ[α] = LazyOptionT[F, α]})#λ] = new Applic[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def applic[A, B](f: LazyOptionT[F, A => B]) =
+      a =>
+        LazyOptionT.lazyOptionT(implicitly[ApplicFunctor[F]].liftA2((ff: LazyOption[A => B]) => (aa: LazyOption[A]) => implicitly[Applic[LazyOption]].applic(ff)(aa))(f.runT)(a.runT))
+  }
+
+  implicit def EitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = EitherT[X, F, α]})#λ] = new Applic[({type λ[α] = EitherT[X, F, α]})#λ] {
+    def applic[A, B](f: EitherT[X, F, A => B]) =
+      a =>
+        EitherT.eitherT[X, F, B](implicitly[ApplicFunctor[F]].liftA2((ff: Either[X, A => B]) => (aa: Either[X, A]) => implicitly[Applic[({type λ[α] = Either[X, α]})#λ]].applic(ff)(aa))(f.runT)(a.runT))
+  }
+
+  implicit def LeftEitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] = new Applic[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] {
+    def applic[A, B](f: EitherT.LeftProjectionT[A => B, F, X]) =
+      a =>
+        EitherT.eitherT[B, F, X](implicitly[ApplicFunctor[F]].liftA2((ff: Either[A => B, X]) => (aa: Either[A, X]) => implicitly[Applic[({type λ[α] = Either.LeftProjection[α, X]})#λ]].applic(ff.left)(aa.left).e)(f.e.runT)(a.e.runT)).left
+  }
+
+  implicit def LazyEitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = LazyEitherT[X, F, α]})#λ] = new Applic[({type λ[α] = LazyEitherT[X, F, α]})#λ] {
+    def applic[A, B](f: LazyEitherT[X, F, A => B]) =
+      a =>
+        LazyEitherT.lazyEitherT[X, F, B](implicitly[ApplicFunctor[F]].liftA2((ff: LazyEither[X, A => B]) => (aa: LazyEither[X, A]) => implicitly[Applic[({type λ[α] = LazyEither[X, α]})#λ]].applic(ff)(aa))(f.runT)(a.runT))
+  }
+
+  implicit def LeftLazyEitherTApplic[F[_]: ApplicFunctor, X]: Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Applic[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+    def applic[A, B](f: LazyEitherT.LazyLeftProjectionT[A => B, F, X]) =
+      a =>
+        LazyEitherT.lazyEitherT[B, F, X](implicitly[ApplicFunctor[F]].liftA2((ff: LazyEither[A => B, X]) => (aa: LazyEither[A, X]) => implicitly[Applic[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ]].applic(ff.left)(aa.left).e)(f.e.runT)(a.e.runT)).left
+  }
+
+  implicit val LazyOptionApplic: Applic[LazyOption] = new Applic[LazyOption] {
+    def applic[A, B](f: LazyOption[A => B]) =
+      a => f flatMap (k => a map (k apply _))
+  }
+
+  implicit def LazyEitherApplic[X]: Applic[({type λ[α] = LazyEither[X, α]})#λ] = new Applic[({type λ[α] = LazyEither[X, α]})#λ] {
+    def applic[A, B](f: LazyEither[X, A => B]) =
+      a => f flatMap (k => a map (k apply _))
+  }
+
+  implicit def LazyLeftEitherApplicFunctor[X]: Applic[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Applic[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+    def applic[A, B](f: LazyEither.LazyLeftProjection[A => B, X]) =
+      a => f flatMap (k => a map (k apply _)) left
+  }
+
   implicit val ResponderApplic =
     implicitly[Functor[Responder]].applicBind
 

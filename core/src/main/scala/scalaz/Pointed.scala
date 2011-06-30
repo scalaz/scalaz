@@ -215,6 +215,15 @@ trait Pointeds extends PointedsLow {
   implicit val LazyOptionPointed: Pointed[LazyOption] = new Pointed[LazyOption] {
     def point[A](a: => A) = LazyOption.lazySome(a)
   }
+
+  implicit def LazyEitherPointed[X]: Pointed[({type λ[α] = LazyEither[X, α]})#λ] = new Pointed[({type λ[α] = LazyEither[X, α]})#λ] {
+    def point[A](a: => A) = LazyEither.lazyRight(a)
+  }
+
+  implicit def LeftLazyEitherPointed[B]: Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] = new Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] {
+    def point[A](a: => A) = LazyEither.lazyLeft(a).left
+  }
+
 }
 
 trait PointedsLow {

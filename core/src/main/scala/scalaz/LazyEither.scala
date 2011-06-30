@@ -63,7 +63,7 @@ sealed trait LazyEither[A, B] {
   def flatMap[C](f: (=> B) => LazyEither[A, C]): LazyEither[A, C] =
     fold(lazyLeft(_), f)
 
-  def left = new LeftProjection[A, B]() {
+  def left = new LazyLeftProjection[A, B]() {
     val e = LazyEither.this
   }
 
@@ -93,7 +93,7 @@ trait LazyEithers {
     def apply[B](b: => B) = LazyRight(() => b)
   }
 
-  sealed trait LeftProjection[A, B] {
+  sealed trait LazyLeftProjection[A, B] {
     val e: LazyEither[A, B]
 
     import LazyOption._

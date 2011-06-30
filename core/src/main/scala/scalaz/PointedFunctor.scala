@@ -212,4 +212,11 @@ trait PointedFunctors {
 
   implicit val LazyOptionPointedFunctor: PointedFunctor[LazyOption] =
     pointedFunctor[LazyOption]
+
+  implicit def LazyEitherPointedFunctor[A]: PointedFunctor[({type λ[α] = LazyEither[A, α]})#λ] =
+    pointedFunctor[({type λ[α] = LazyEither[A, α]})#λ]
+
+  implicit def LeftLazyEitherPointedFunctor[B]: PointedFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
+    pointedFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
+
 }
