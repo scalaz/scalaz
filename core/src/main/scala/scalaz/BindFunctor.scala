@@ -152,7 +152,7 @@ trait BindFunctors extends BindFunctorsLow {
   }
 
   implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
-    BindFunctor.bindFunctor
+    bindFunctor
 
   implicit def StateTBindFunctor[A, F[_] : BindFunctor]: BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[BindFunctor[F]].functor
@@ -162,22 +162,67 @@ trait BindFunctors extends BindFunctorsLow {
   }
 
   implicit def StepListTBindFunctor[F[_]: Functor]: BindFunctor[({type λ[α] = StepListT[F, α]})#λ] =
-    BindFunctor.bindFunctor[({type λ[α] = StepListT[F, α]})#λ]
+    bindFunctor[({type λ[α] = StepListT[F, α]})#λ]
 
   implicit def StepStreamTBindFunctor[F[_]: Functor]: BindFunctor[({type λ[α] = StepStreamT[F, α]})#λ] =
-    BindFunctor.bindFunctor[({type λ[α] = StepStreamT[F, α]})#λ]
+    bindFunctor[({type λ[α] = StepStreamT[F, α]})#λ]
 
   implicit val TreeBindFunctor: BindFunctor[Tree] =
-    BindFunctor.bindFunctor[Tree]
+    bindFunctor[Tree]
 
   implicit def FailProjectionBindFunctor[X]: BindFunctor[({type λ[α] = FailProjection[α, X]})#λ] =
-    BindFunctor.bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
+    bindFunctor[({type λ[α] = FailProjection[α, X]})#λ]
 
   implicit def WriterTBindFunctor[A: Semigroup, F[_] : BindFunctor]: BindFunctor[({type λ[α] = WriterT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = WriterT[A, F, α]})#λ] {
     implicit val ftr = implicitly[BindFunctor[F]].functor
     val functor = implicitly[Functor[({type λ[α] = WriterT[A, F, α]})#λ]]
     val bind = implicitly[Bind[({type λ[α] = WriterT[A, F, α]})#λ]]
   }
+
+  implicit def OptionTBindFunctor[F[_]: Monad]: BindFunctor[({type λ[α] = OptionT[F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = OptionT[F, α]})#λ]
+  }
+
+  implicit def LazyOptionTBindFunctor[F[_]: Monad]: BindFunctor[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = LazyOptionT[F, α]})#λ]
+  }
+
+  implicit def EitherTBindFunctor[F[_]: Monad, A]: BindFunctor[({type λ[α] = EitherT[A, F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = EitherT[A, F, α]})#λ]
+  }
+
+  implicit def LeftEitherTBindFunctor[F[_]: Monad, B]: BindFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit def LazyEitherTBindFunctor[F[_]: Monad, A]: BindFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = LazyEitherT[A, F, α]})#λ]
+  }
+
+  implicit def LazyLeftEitherTBindFunctor[F[_]: Monad, B]: BindFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val f = implicitly[Monad[F]].functor
+    bindFunctor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit val LazyOptionBindFunctor: BindFunctor[LazyOption] =
+    bindFunctor[LazyOption]
+
+  implicit def LazyEitherBindFunctor[A]: BindFunctor[({type λ[α] = LazyEither[A, α]})#λ] =
+    bindFunctor[({type λ[α] = LazyEither[A, α]})#λ]
+
+  implicit def LazyLeftEitherBindFunctor[B]: BindFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
+    bindFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
 }
 
