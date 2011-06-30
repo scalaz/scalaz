@@ -251,42 +251,42 @@ trait Applicatives {
     applicative[({type λ[α] = WriterT[A, F, α]})#λ]
   }
 
-  implicit def OptionTApplicative[F[_]: Applicative]: Applicative[({type λ[α] = OptionT[F, α]})#λ] = {
+  implicit def OptionTApplicative[F[_] : Applicative]: Applicative[({type λ[α] = OptionT[F, α]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor
     applicative[({type λ[α] = OptionT[F, α]})#λ]
   }
 
-  implicit def LazyOptionTApplicative[F[_]: Applicative]: Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+  implicit def LazyOptionTApplicative[F[_] : Applicative]: Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor
     applicative[({type λ[α] = LazyOptionT[F, α]})#λ]
   }
 
-  implicit def EitherTApplicative[F[_]: Applicative, A]: Applicative[({type λ[α] = EitherT[A, F, α]})#λ] = {
+  implicit def EitherTApplicative[F[_] : Applicative, A]: Applicative[({type λ[α] = EitherT[A, F, α]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor
     applicative[({type λ[α] = EitherT[A, F, α]})#λ]
   }
 
-  implicit def LeftEitherTApplicative[F[_]: Applicative, B]: Applicative[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+  implicit def LeftEitherTApplicative[F[_] : Applicative, B]: Applicative[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor
     applicative[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
   }
 
-  implicit def LazyEitherTApplicative[F[_]: Applicative, A]: Applicative[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+  implicit def LazyEitherTApplicative[F[_] : Applicative, A]: Applicative[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor
     applicative[({type λ[α] = LazyEitherT[A, F, α]})#λ]
   }
 
-  implicit def LazyLeftEitherTApplicative[F[_]: Applicative, B]: Applicative[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+  implicit def LazyLeftEitherTApplicative[F[_] : Applicative, B]: Applicative[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
     implicit val a = implicitly[Applicative[F]].applic
     implicit val p = implicitly[Applicative[F]].pointedFunctor
     implicit val z = implicitly[Applicative[F]].applicFunctor

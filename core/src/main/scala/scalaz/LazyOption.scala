@@ -78,7 +78,7 @@ private case class LazyNone[A]() extends LazyOption[A]
 object LazyOption extends LazyOptions
 
 trait LazyOptions {
-  def lazySome[A]: (=> A) =>LazyOption[A] =
+  def lazySome[A]: (=> A) => LazyOption[A] =
     a => LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =

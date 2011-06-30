@@ -38,37 +38,37 @@ trait Traverses extends TraversesLow {
       t => implicitly[Applicative[F]].fmap(Tuple1(_: B))(f(t._1))
   }
 
-  implicit def Tuple2Traverse[T]: Traverse[({type λ[α]=(T, α)})#λ] = new Traverse[({type λ[α]=(T, α)})#λ] {
+  implicit def Tuple2Traverse[T]: Traverse[({type λ[α] = (T, α)})#λ] = new Traverse[({type λ[α] = (T, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u) => implicitly[Applicative[F]].fmap((t, _: B))(f(u))
     }
   }
 
-  implicit def Tuple3Traverse[T, U]: Traverse[({type λ[α]=(T, U, α)})#λ] = new Traverse[({type λ[α]=(T, U, α)})#λ] {
+  implicit def Tuple3Traverse[T, U]: Traverse[({type λ[α] = (T, U, α)})#λ] = new Traverse[({type λ[α] = (T, U, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u, v) => implicitly[Applicative[F]].fmap((t, u, _: B))(f(v))
     }
   }
 
-  implicit def Tuple4Traverse[T, U, V]: Traverse[({type λ[α]=(T, U, V, α)})#λ] = new Traverse[({type λ[α]=(T, U, V, α)})#λ] {
+  implicit def Tuple4Traverse[T, U, V]: Traverse[({type λ[α] = (T, U, V, α)})#λ] = new Traverse[({type λ[α] = (T, U, V, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u, v, w) => implicitly[Applicative[F]].fmap((t, u, v, _: B))(f(w))
     }
   }
 
-  implicit def Tuple5Traverse[T, U, V, W]: Traverse[({type λ[α]=(T, U, V, W, α)})#λ] = new Traverse[({type λ[α]=(T, U, V, W, α)})#λ] {
+  implicit def Tuple5Traverse[T, U, V, W]: Traverse[({type λ[α] = (T, U, V, W, α)})#λ] = new Traverse[({type λ[α] = (T, U, V, W, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u, v, w, x) => implicitly[Applicative[F]].fmap((t, u, v, w, _: B))(f(x))
     }
   }
 
-  implicit def Tuple6Traverse[T, U, V, W, X]: Traverse[({type λ[α]=(T, U, V, W, X, α)})#λ] = new Traverse[({type λ[α]=(T, U, V, W, X, α)})#λ] {
+  implicit def Tuple6Traverse[T, U, V, W, X]: Traverse[({type λ[α] = (T, U, V, W, X, α)})#λ] = new Traverse[({type λ[α] = (T, U, V, W, X, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u, v, w, x, y) => implicitly[Applicative[F]].fmap((t, u, v, w, x, _: B))(f(y))
     }
   }
 
-  implicit def Tuple7Traverse[T, U, V, W, X, Y]: Traverse[({type λ[α]=(T, U, V, W, X, Y, α)})#λ] = new Traverse[({type λ[α]=(T, U, V, W, X, Y, α)})#λ] {
+  implicit def Tuple7Traverse[T, U, V, W, X, Y]: Traverse[({type λ[α] = (T, U, V, W, X, Y, α)})#λ] = new Traverse[({type λ[α] = (T, U, V, W, X, Y, α)})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case (t, u, v, w, x, y, z) => implicitly[Applicative[F]].fmap((t, u, v, w, x, y, _: B))(f(z))
     }
@@ -121,7 +121,7 @@ trait Traverses extends TraversesLow {
       }
   }
 
-  implicit def EitherLeftTraverse[X]: Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Traverse[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
+  implicit def EitherLeftTraverse[X]: Traverse[({type λ[α] = Either.LeftProjection[α, X]})#λ] = new Traverse[({type λ[α] = Either.LeftProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       _.e match {
         case Right(x) => implicitly[Applicative[F]].point(Right(x).left: Either.LeftProjection[B, X])
@@ -129,7 +129,7 @@ trait Traverses extends TraversesLow {
       }
   }
 
-  implicit def EitherRightTraverse[X]: Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Traverse[({type λ[α]=Either.RightProjection[X, α]})#λ] {
+  implicit def EitherRightTraverse[X]: Traverse[({type λ[α] = Either.RightProjection[X, α]})#λ] = new Traverse[({type λ[α] = Either.RightProjection[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       _.e match {
         case Left(x) => implicitly[Applicative[F]].point(Left(x).right: Either.RightProjection[X, B])
@@ -137,26 +137,26 @@ trait Traverses extends TraversesLow {
       }
   }
 
-  implicit def EitherTraverse[X]: Traverse[({type λ[α]=Either[X, α]})#λ] = new Traverse[({type λ[α]=Either[X, α]})#λ] {
+  implicit def EitherTraverse[X]: Traverse[({type λ[α] = Either[X, α]})#λ] = new Traverse[({type λ[α] = Either[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) = {
       case Left(x) => implicitly[Applicative[F]].point(Left(x): Either[X, B])
       case Right(x) => implicitly[Applicative[F]].fmap((b: B) => (Right(b): Either[X, B]))(f(x))
     }
   }
 
-  implicit def ValidationFailureTraverse[X]: Traverse[({type λ[α]=FailProjection[α, X]})#λ] = new Traverse[({type λ[α]=FailProjection[α, X]})#λ] {
+  implicit def ValidationFailureTraverse[X]: Traverse[({type λ[α] = FailProjection[α, X]})#λ] = new Traverse[({type λ[α] = FailProjection[α, X]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       _.validation.fold(
         x => implicitly[Applicative[F]].fmap(Validation.failure[X](_: B).fail)(f(x))
-      , x => implicitly[Applicative[F]].point(Validation.success(x).fail)
+        , x => implicitly[Applicative[F]].point(Validation.success(x).fail)
       )
   }
 
-  implicit def ValidationTraverse[X]: Traverse[({type λ[α]=Validation[X, α]})#λ] = new Traverse[({type λ[α]=Validation[X, α]})#λ] {
+  implicit def ValidationTraverse[X]: Traverse[({type λ[α] = Validation[X, α]})#λ] = new Traverse[({type λ[α] = Validation[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       _.fold(
         x => implicitly[Applicative[F]].point(Validation.failure[B](x))
-      , x => implicitly[Applicative[F]].fmap((b: B) => (Validation.success[X](b)))(f(x))
+        , x => implicitly[Applicative[F]].fmap((b: B) => (Validation.success[X](b)))(f(x))
       )
   }
 
@@ -173,7 +173,7 @@ trait Traverses extends TraversesLow {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryTraverse[X]: Traverse[({type λ[α]=Entry[X, α]})#λ] = new Traverse[({type λ[α]=Entry[X, α]})#λ] {
+  implicit def MapEntryTraverse[X]: Traverse[({type λ[α] = Entry[X, α]})#λ] = new Traverse[({type λ[α] = Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       as => implicitly[Applicative[F]].fmap[B, Entry[X, B]](new SimpleImmutableEntry(as.getKey, _))(f(as.getValue))
   }

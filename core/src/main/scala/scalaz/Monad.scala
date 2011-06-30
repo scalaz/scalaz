@@ -255,37 +255,37 @@ trait Monads {
     monadBP[({type λ[α] = WriterT[A, F, α]})#λ]
   }
 
-  implicit def OptionTMonad[F[_]: Monad]: Monad[({type λ[α] = OptionT[F, α]})#λ] = {
+  implicit def OptionTMonad[F[_] : Monad]: Monad[({type λ[α] = OptionT[F, α]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = OptionT[F, α]})#λ]
   }
 
-  implicit def LazyOptionTMonad[F[_]: Monad]: Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+  implicit def LazyOptionTMonad[F[_] : Monad]: Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = LazyOptionT[F, α]})#λ]
   }
 
-  implicit def EitherTMonad[F[_]: Monad, A]: Monad[({type λ[α] = EitherT[A, F, α]})#λ] = {
+  implicit def EitherTMonad[F[_] : Monad, A]: Monad[({type λ[α] = EitherT[A, F, α]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = EitherT[A, F, α]})#λ]
   }
 
-  implicit def LeftEitherTMonad[F[_]: Monad, B]: Monad[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+  implicit def LeftEitherTMonad[F[_] : Monad, B]: Monad[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
   }
 
-  implicit def LazyEitherTMonad[F[_]: Monad, A]: Monad[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+  implicit def LazyEitherTMonad[F[_] : Monad, A]: Monad[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = LazyEitherT[A, F, α]})#λ]
   }
 
-  implicit def LazyLeftEitherTMonad[F[_]: Monad, B]: Monad[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+  implicit def LazyLeftEitherTMonad[F[_] : Monad, B]: Monad[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
     implicit val b = implicitly[Monad[F]].bind
     implicit val p = implicitly[Monad[F]].pointed
     monadBP[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ]

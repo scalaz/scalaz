@@ -39,9 +39,9 @@ object Bifunctor {
 
   implicit def ValidationBifunctor: Bifunctor[Validation] = new Bifunctor[Validation] {
     def bimap[A, B, C, D](f: A => C, g: B => D) = {
-        case Failure(a) => Validation.failure(f(a))
-        case Success(b) => Validation.success(g(b))
-      }
+      case Failure(a) => Validation.failure(f(a))
+      case Success(b) => Validation.success(g(b))
+    }
   }
 
   import java.util.Map.Entry

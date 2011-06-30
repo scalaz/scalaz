@@ -73,7 +73,7 @@ object OptionT extends OptionTs {
 
 trait OptionTs {
   type Maybe[A] =
-    OptionT[Identity, A]
+  OptionT[Identity, A]
 
   def optionT[F[_], A](r: F[Option[A]]): OptionT[F, A] = new OptionT[F, A] {
     val runT = r

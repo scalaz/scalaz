@@ -39,10 +39,10 @@ class ApplicativeTest extends Specification with Sugar with ScalaCheck {
       import ScalazProperty.Applicative._
       identity[M, A] must pass
       composition[M, A, A, A] must pass
-      
+
       // TODO These don't terminate. Investigate.
-//      homomorphism[M, A, A] must pass
-//      interchange[M, A, A] must pass
+      //      homomorphism[M, A, A] must pass
+      //      interchange[M, A, A] must pass
     }
   }
 }

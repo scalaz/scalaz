@@ -6,7 +6,7 @@ import STRef._
 import STArray._
 import ST._
 
-/**Mutable variable in state thread S containing a value of type A. http://research.microsoft.com/en-us/um/people/simonpj/papers/lazy-functional-state-threads.ps.Z */ 
+/**Mutable variable in state thread S containing a value of type A. http://research.microsoft.com/en-us/um/people/simonpj/papers/lazy-functional-state-threads.ps.Z */
 sealed trait STRef[S, A] {
   protected var value: A
 

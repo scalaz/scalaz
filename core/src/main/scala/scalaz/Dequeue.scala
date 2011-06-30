@@ -132,31 +132,31 @@ sealed trait Dequeue[A] {
     post.reverse.foldLeft(x)((l, f) => f(l))
   }
 
-  /** O(n) **/
+  /**O(n) **/
   def toList: List[A] = apply(Nil)
 
-  /** O(n) **/
+  /**O(n) **/
   def head: Option[A] = toList.headOption
 
-  /** O(n) **/
+  /**O(n) **/
   def tail: Option[List[A]] = toList match {
     case Nil => None
     case _ :: t => Some(t)
   }
 
-  /** O(1) **/
+  /**O(1) **/
   def ::(a: A): Dequeue[A] = new Dequeue[A] {
     val pre = Dequeue.this.pre
     val post = ((xs: List[A]) => a :: xs) :: Dequeue.this.post
   }
 
-  /** O(1) **/
+  /**O(1) **/
   def ::>(a: A): Dequeue[A] = new Dequeue[A] {
     val pre = ((xs: List[A]) => a :: xs) :: Dequeue.this.pre
     val post = Dequeue.this.post
   }
 
-  /** O(n) **/
+  /**O(n) **/
   def :::(as: Dequeue[A]): Dequeue[A] = new Dequeue[A] {
     val pre = (Dequeue.this.pre ::: Dequeue.this.post.reverse) ::: as.pre
     val post = as.post
