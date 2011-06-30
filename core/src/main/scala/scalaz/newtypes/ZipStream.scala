@@ -53,7 +53,7 @@ trait ZipStreams {
     }
 
   implicit def ZipStreamPointedFunctor: PointedFunctor[ZipStream] =
-    implicitly[PointedFunctor[Stream]].deriving[ZipStream]
+    PointedFunctor.pointedFunctor
 
   implicit val ZipStreamApplic: Applic[ZipStream] = new Applic[ZipStream] {
     def applic[A, B](f: ZipStream[A => B]) =
@@ -91,7 +91,7 @@ trait ZipStreams {
 
   implicit def ZipStreamTraverse: Traverse[ZipStream] = new Traverse[ZipStream] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      za => implicitly[Applicative[F]].fmap((_: Stream[B]) ʐ)(implicitly[Traverse[Stream]].traverse[F, A, B](f) apply (za.value)) // ∘ ((_: Stream[B]) ʐ)
+      za => implicitly[Applicative[F]].fmap((_: Stream[B]) ʐ)(implicitly[Traverse[Stream]].traverse[F, A, B](f) apply (za.value))
   }
 
 }
