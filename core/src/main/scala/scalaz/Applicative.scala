@@ -195,52 +195,52 @@ trait Applicatives {
   implicit val IdentityApplicative: Applicative[Identity] = implicitly[Monad[Identity]].applicative
 
   implicit def CoKleisliApplicative[F[_], R]: Applicative[({type λ[α] = CoKleisli[R, F, α]})#λ] =
-    Applicative.applicative[({type λ[α] = CoKleisli[R, F, α]})#λ]
+    applicative[({type λ[α] = CoKleisli[R, F, α]})#λ]
 
   implicit def ConstApplicative[A: Monoid] = {
     implicit val z = implicitly[Monoid[A]].zero
     implicit val s = implicitly[Monoid[A]].semigroup
-    Applicative.applicative[({type λ[α] = Const[A, α]})#λ]
+    applicative[({type λ[α] = Const[A, α]})#λ]
   }
 
   implicit def KleisliApplicative[F[_], R](implicit ap: Applicative[F]): Applicative[({type λ[α] = Kleisli[R, F, α]})#λ] = {
     implicit val a = ap.applic
     implicit val p = ap.pointedFunctor
     implicit val f = ap.functor
-    Applicative.applicative[({type λ[α] = Kleisli[R, F, α]})#λ]
+    applicative[({type λ[α] = Kleisli[R, F, α]})#λ]
   }
 
   implicit val NonEmptyListApplicative: Applicative[NonEmptyList] =
-    Applicative.applicative
+    applicative
 
   implicit def StateTApplicative[A, F[_]](implicit m: Monad[F]): Applicative[({type λ[α] = StateT[A, F, α]})#λ] = {
     implicit val a = m.applic
     implicit val p = m.pointedFunctor
-    Applicative.applicative[({type λ[α] = StateT[A, F, α]})#λ]
+    applicative[({type λ[α] = StateT[A, F, α]})#λ]
   }
 
   implicit def StepListTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepListT[F, X]})#λ] = {
     implicit val p = ap.pointedFunctor
     implicit val ftr = p.functor
     implicit val appl: Applic[F] = ap.applic
-    Applicative.applicative[({type λ[X] = StepListT[F, X]})#λ]
+    applicative[({type λ[X] = StepListT[F, X]})#λ]
   }
 
   implicit def StepStreamTApplicative[F[_]](implicit ap: Applicative[F]): Applicative[({type λ[X] = StepStreamT[F, X]})#λ] = {
     implicit val p = ap.pointedFunctor
     implicit val ftr = p.functor
     implicit val appl: Applic[F] = ap.applic
-    Applicative.applicative[({type λ[X] = StepStreamT[F, X]})#λ]
+    applicative[({type λ[X] = StepStreamT[F, X]})#λ]
   }
 
   implicit val TreeApplicative: Applicative[Tree] =
-    Applicative.applicative[Tree]
+    applicative[Tree]
 
   implicit def FailProjectionApplicative[X]: Applicative[({type λ[α] = FailProjection[α, X]})#λ] =
-    Applicative.applicative[({type λ[α] = FailProjection[α, X]})#λ]
+    applicative[({type λ[α] = FailProjection[α, X]})#λ]
 
   implicit def ValidationApplicative[X: Semigroup]: Applicative[({type λ[α] = Validation[X, α]})#λ] =
-    Applicative.applicative[({type λ[α] = Validation[X, α]})#λ]
+    applicative[({type λ[α] = Validation[X, α]})#λ]
 
   implicit def WriterTApplicative[A, F[_]](implicit ap: Applicative[F], n: Monoid[A]): Applicative[({type λ[α] = WriterT[A, F, α]})#λ] = {
     implicit val a = ap.applic
@@ -248,7 +248,58 @@ trait Applicatives {
     implicit val f = ap.applicFunctor
     implicit val s = n.semigroup
     implicit val z = n.zero
-    Applicative.applicative[({type λ[α] = WriterT[A, F, α]})#λ]
+    applicative[({type λ[α] = WriterT[A, F, α]})#λ]
   }
+
+  implicit def OptionTApplicFunctor[F[_]: Applicative]: Applicative[({type λ[α] = OptionT[F, α]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = OptionT[F, α]})#λ]
+  }
+
+  implicit def LazyOptionTApplicFunctor[F[_]: Applicative]: Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = LazyOptionT[F, α]})#λ]
+  }
+
+  implicit def EitherTApplicFunctor[F[_]: Applicative, A]: Applicative[({type λ[α] = EitherT[A, F, α]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = EitherT[A, F, α]})#λ]
+  }
+
+  implicit def LeftEitherTApplicFunctor[F[_]: Applicative, B]: Applicative[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit def LazyEitherTApplicFunctor[F[_]: Applicative, A]: Applicative[({type λ[α] = LazyEitherT[A, F, α]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = LazyEitherT[A, F, α]})#λ]
+  }
+
+  implicit def LazyLeftEitherTApplicFunctor[F[_]: Applicative, B]: Applicative[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ] = {
+    implicit val a = implicitly[Applicative[F]].applic
+    implicit val p = implicitly[Applicative[F]].pointedFunctor
+    implicit val z = implicitly[Applicative[F]].applicFunctor
+    applicative[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, B]})#λ]
+  }
+
+  implicit val LazyOptionApplicFunctor: Applicative[LazyOption] =
+    applicative[LazyOption]
+
+  implicit def LazyEitherApplicFunctor[A]: Applicative[({type λ[α] = LazyEither[A, α]})#λ] =
+    applicative[({type λ[α] = LazyEither[A, α]})#λ]
+
+  implicit def LazyLeftEitherApplicFunctor[B]: Applicative[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
+    applicative[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
 }
