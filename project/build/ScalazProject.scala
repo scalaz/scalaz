@@ -38,6 +38,8 @@ with AutoCompilerPlugins {
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
+  parent =>
+
   // Sub-projects
   lazy val core = project("core", "scalaz-core", new Core(_))
   lazy val geo = project("geo", "scalaz-geo", new Geo(_), core)
@@ -69,8 +71,8 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
       Credentials(Path.userHome / ".ivy2" / ".credentials", log)
   }
 
-  // This lets you use a local copy of scala. Set build.scala.versions=2.8.0-custom in build.properties.
-  override def localScala = defineScala("2.8.0-custom", Path.userHome / "usr" / "scala-2.8.0.r21276-b20100326020422" asFile) :: Nil
+  // This lets you use a local copy of scala.
+  override def localScala = defineScala("2.10.0.local", Path.userHome / "code" / "scala" / "build" / "pack" asFile) :: Nil
 
   private def noAction = task {
     None
@@ -99,7 +101,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class ScalacheckBinding(info: ProjectInfo) extends ScalazDefaults(info) {
-    val scalacheck = scalacheckDependency
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Scalacheck") :: super.documentOptions
 
@@ -112,19 +114,18 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
   }
 
   class GeoScalacheck(info: ProjectInfo) extends ScalacheckBinding(info) {
-    override val scalacheck = scalacheckDependency
-
+    override def unmanagedClasspath: PathFinder = descendents(parent.path("lib"), "scalacheck*.jar") +++ super.unmanagedClasspath
     override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = specsDependency
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Example") :: super.documentOptions
   }
 
   class TestSuite(info: ProjectInfo) extends ScalazDefaults(info) {
-    val specs = specsDependency
+    override protected def testUnmanagedClasspath: PathFinder = descendents(parent.path("lib"), "*.jar") +++ super.testUnmanagedClasspath
 
     override def documentOptions = documentTitle("Scalaz Tests") :: super.documentOptions
   }
@@ -163,7 +164,7 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
       case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)
     }
 
-    val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
+    val sxr = "lib" / "sxr_2.9.0-0.2.7.jar"
 
     override def documentOptions =
       SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
