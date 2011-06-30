@@ -34,7 +34,16 @@ with AutoCompilerPlugins {
   // Workaround for problem described here: http://groups.google.com/group/simple-build-tool/browse_thread/thread/7575ea3c074ee8aa/373a91c25393085c?#373a91c25393085c
   override def deliverScalaDependencies = Nil
 
-  override def consoleInit = "import scalaz._, Scalaz._"
+  override def consoleInit = "" +
+      """
+      import scalaz._
+      import concurrent._
+      import effect._
+      import iteratee._
+      import newtypes._
+      import wrap._
+      import Scalaz._
+      """
 }
 
 final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with OverridableVersion {
@@ -115,6 +124,12 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
     override val scalacheck = scalacheckDependency
 
     override def documentOptions = documentTitle("Scalaz Geo Scalacheck") :: super.documentOptions.tail
+
+    override def consoleInit = super.consoleInit +
+        """
+        import org.scalacheck._
+        import org.scalacheck.Prop._
+        """
   }
 
   class Example(info: ProjectInfo) extends ScalazDefaults(info) {
@@ -171,6 +186,12 @@ final class ScalazProject(info: ProjectInfo) extends ParentProject(info) with Ov
           super.documentOptions
 
     lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
+
+    override def consoleInit = super.consoleInit +
+        """
+        import org.scalacheck._
+        import org.scalacheck.Prop._
+        """
 
   }
 
