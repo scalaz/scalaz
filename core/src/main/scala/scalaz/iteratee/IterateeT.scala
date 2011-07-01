@@ -15,7 +15,7 @@ sealed trait IterateeT[E, F[_], A] {
   def *->*->* : *->*->*[E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A] =
     scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A](this)
 
-  def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterateeTM[E, F, A]) => Z): Z
+  def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterT[E, F, A]) => Z): Z
 
   def fold[Z](done: (=> A, Input[E]) => Z, cont: (Input[E] => Iteratee[E, A]) => Z)(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Z =
     foldT(
@@ -65,7 +65,7 @@ sealed trait IterateeT[E, F[_], A] {
   def ifDoneElseCont[Z](done: => Z, cont: => Z): Z =
     foldT((_, _) => done, _ => cont)
 
-  def contOrT(d: => Input[E] => IterateeTM[E, F, A]): Input[E] => IterateeTM[E, F, A] =
+  def contOrT(d: => Input[E] => IterT[E, F, A]): Input[E] => IterT[E, F, A] =
     foldT((_, _) => d, z => z)
 
   def contOr(d: => Input[E] => Iteratee[E, A])(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Input[E] => Iteratee[E, A] =
@@ -198,7 +198,7 @@ sealed trait IterateeT[E, F[_], A] {
 }
 
 object IterateeT extends IterateeTs {
-  def apply[E, F[_], A](f: Input[E] => IterateeTM[E, F, A]): IterateeT[E, F, A] =
+  def apply[E, F[_], A](f: Input[E] => IterT[E, F, A]): IterateeT[E, F, A] =
     continueT(f)
 }
 
@@ -206,11 +206,20 @@ trait IterateeTs {
   type Iteratee[E, A] =
   IterateeT[E, Identity, A]
 
-  type IterateeTM[E, F[_], A] =
+  type IterT[E, F[_], A] =
   F[IterateeT[E, F, A]]
+
+  type Iter[E, A] =
+  IterT[E, Identity, A]
 
   type >@>[E, A] =
   Iteratee[E, A]
+
+  type EnumerateeT[E, F[_], A] =
+    Iter[E, A] => IterateeT[E, F, A]
+
+  type Enumeratee[E, A] =
+    Iter[E, A] => Iteratee[E, A]
 
   sealed trait DoneT[F[_]] {
     def apply[E, A](a: => A, i: => Input[E]): IterateeT[E, F, A]
@@ -218,7 +227,7 @@ trait IterateeTs {
 
   def doneT[F[_]]: DoneT[F] = new DoneT[F] {
     def apply[E, A](a: => A, i: => Input[E]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
-      def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterateeTM[E, F, A]) => Z) =
+      def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterT[E, F, A]) => Z) =
         done(a, i)
     }
   }
@@ -226,8 +235,8 @@ trait IterateeTs {
   def done[E, A](a: => A, i: => Input[E]): (E >@> A) =
     doneT[Identity](a, i)
 
-  def continueT[E, F[_], A](f: Input[E] => IterateeTM[E, F, A]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
-    def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterateeTM[E, F, A]) => Z) =
+  def continueT[E, F[_], A](f: Input[E] => IterT[E, F, A]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
+    def foldT[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => IterT[E, F, A]) => Z) =
       cont(f)
   }
 

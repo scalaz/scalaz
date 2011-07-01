@@ -6,7 +6,7 @@ import Input._
 import Identity._
 
 sealed trait EnumeratorT[E, F[_], A] {
-  val enumerate: Input[E] => IterateeTM[E, F, A]
+  val enumerate: Input[E] => IterT[E, F, A]
 
   def *->* : (({type λ[α] = EnumeratorT[E, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = EnumeratorT[E, F, α]})#λ, A](this)
@@ -41,7 +41,7 @@ sealed trait EnumeratorT[E, F[_], A] {
 }
 
 object EnumeratorT extends EnumeratorTs {
-  def apply[E, F[_], A](k: Input[E] => IterateeTM[E, F, A]): EnumeratorT[E, F, A] =
+  def apply[E, F[_], A](k: Input[E] => IterT[E, F, A]): EnumeratorT[E, F, A] =
     enumeratorT[E, F, A](k)
 }
 
@@ -49,7 +49,7 @@ trait EnumeratorTs {
   type Enumerator[E, A] =
   EnumeratorT[E, Identity, A]
 
-  def enumeratorT[E, F[_], A](k: Input[E] => IterateeTM[E, F, A]): EnumeratorT[E, F, A] = new EnumeratorT[E, F, A] {
+  def enumeratorT[E, F[_], A](k: Input[E] => IterT[E, F, A]): EnumeratorT[E, F, A] = new EnumeratorT[E, F, A] {
     val enumerate = k
   }
 
