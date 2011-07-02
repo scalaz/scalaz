@@ -50,8 +50,10 @@ object ScalazBuild extends Build {
   lazy val scalacheckGeo = Project(
     id = "scalaz-geo-scalacheck",
     base = file("geo-scalacheck"),
-    dependencies = Seq(core),
-    settings = standardSettings
+    dependencies = Seq(core, geo, scalacheckBinding),
+    settings = standardSettings ++ Seq(
+      libraryDependencies ++= Seq(Dependency.ScalaCheck)
+    )
   )
 
   lazy val example = Project(
@@ -132,8 +134,8 @@ object ScalazBuild extends Build {
 
   object Dependency {
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
-    val ScalaCheck = "org.scala-tools.testing" % "scalacheck_2.8.1" % "1.8"
-    val Specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.7.2" % "test"
+    val ScalaCheck = "org.scala-tools.testing" %% "scalacheck" % "1.8"
+    val Specs = "org.scala-tools.testing" %% "specs" % "1.6.8" % "test"
   }
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
