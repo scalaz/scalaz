@@ -58,56 +58,52 @@ object ScalazBuild extends Build {
   ) dependsOn (core, geo, scalacheckBinding, scalacheckGeo)
 
   lazy val full = {
+    // The projects that are packaged in the full distribution.
+    val projects = Seq(core, scalacheckBinding, geo, scalacheckGeo, http, example)
+
+    // Some intermediate keys to simplify extracting a task or setting from `projects`.
+    val allPackagedArtifacts = TaskKey[Seq[Map[Artifact, File]]]("all-packaged-artifacts")
+    val allSources = TaskKey[Seq[Seq[File]]]("all-sources")
+    val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
+
     Project("scalaz-full",
       file("full"),
       settings = standardSettings ++ Seq(
+        allSources <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
+        allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
+        allPackagedArtifacts <<= projects.map(packagedArtifacts in _).join,
+
         // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
-        (sources in Compile) <<= (
-                sources in core in Compile,
-                sources in scalacheckBinding in Compile,
-                sources in geo in Compile,
-                sources in scalacheckGeo in Compile,
-                sources in http in Compile,
-                sources in example in Compile).map(_ ++ _ ++ _ ++ _ ++ _ ++ _),
+        (sources in Compile) <<= (allSources).map(_.flatten),
+
         // Avoid compiling the sources here; we just are after scaladoc.
         (compile in Compile) := inc.Analysis.Empty,
-        (scaladocOptions in Compile) <++= (baseDirectory,
-                sourceDirectories in core in Compile,
-                sourceDirectories in scalacheckBinding in Compile,
-                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html (and other files from geo) in the root dir?
-                sourceDirectories in scalacheckGeo in Compile,
-                sourceDirectories in http in Compile,
-                sourceDirectories in example in Compile) map {
-          (bd, d0, d1, d2, d3, d4, d5) =>
+
+        // Include SXR in the Scaladoc Build to generated HTML annotated sources.
+        (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories) map {
+          (bd, ds) =>
             val xplugin = "-Xplugin:" + (bd / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
-            val baseDirs = Seq(d0, d2, d2, d3, d4, d5).flatten
+            val baseDirs = ds.flatten
             val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
             Seq(xplugin, sxrBaseDir)
         },
+
+        // Package an archive containing all artifacts, readme, licence, and documentation.
+        // Use `LocalProject("scalaz")` rather than `scalaz` to avoid a circular reference.
         (mappings in packageBin in Compile) <<= (
-                baseDirectory,
-                docDirectory in Compile,
-                packagedArtifacts in core,
-                packagedArtifacts in scalacheckBinding,
-                packagedArtifacts in geo,
-                packagedArtifacts in scalacheckGeo,
-                packagedArtifacts in http,
-                packagedArtifacts in example) map {
-          (bd, fullDocDir, a0, a1, a2, a3, a4, a5) =>
+                baseDirectory in LocalProject("scalaz"), baseDirectory, scalaVersion, version,
+                docDirectory in Compile, allPackagedArtifacts) map {
+          (rootDir, bd, sv, v, fullDocDir, artifacts) =>
             val sxrDocDirectory = new File(fullDocDir.getAbsolutePath + ".sxr")
 
-            // a bit hacky, but we can't access `baseDirectory in scalaz` without a circular reference
-            val rootDir = bd.getParentFile
+            // Include a root folder in the generated archive.
+            val newBase = "scalaz_%s-%s".format(sv, v)
 
-            val jarsAndPomMappings = Seq(a0, a1, a2, a3, a4, a5).flatMap(_.values) x flat
-            val etcMappings = ((rootDir / "etc" ** "*") +++ Seq(rootDir / "README")) x relativeTo(rootDir)
-            val fullDocMappings = (fullDocDir ** "*") x relativeTo(fullDocDir.getParentFile)
-            val sxrDocMappings = (sxrDocDirectory ** "*") x relativeTo(sxrDocDirectory.getParentFile)
-            val allMappings = jarsAndPomMappings ++ etcMappings ++ fullDocMappings ++ sxrDocMappings
-            allMappings.map {
-              case (input, output) =>
-                (input, "scalaz/" + output) // TODO Include Scala and Scalaz versions in this directory name.
-            }
+            val jarsAndPomMappings = artifacts.flatMap(_.values) x flatRebase(newBase)
+            val etcMappings = ((rootDir / "etc" ** "*") +++ Seq(rootDir / "README")) x rebase(rootDir, newBase)
+            val fullDocMappings = (fullDocDir ** "*") x rebase(fullDocDir.getParentFile, newBase)
+            val sxrDocMappings = (sxrDocDirectory ** "*") x rebase(sxrDocDirectory.getParentFile, newBase)
+            jarsAndPomMappings ++ etcMappings ++ fullDocMappings ++ sxrDocMappings
         }
       )
     ) dependsOn (core, scalacheckBinding, http, example, tests)
