@@ -11,3 +11,4 @@ tags
 *~
 build.log
 .history
+.idea/inspectionProfiles/**
