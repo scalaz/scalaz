@@ -64,15 +64,16 @@ object ScalazBuild extends Build {
         // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
         (sources in Compile) <<= (
                 sources in core in Compile,
-                sources in geo in Compile,
                 sources in scalacheckBinding in Compile,
-                sources in example in Compile).map(_ ++ _ ++ _ ++ _),
-        // don't recompile the sources
-        compile := inc.Analysis.Empty,
+                sources in geo in Compile,
+                sources in scalacheckGeo in Compile,
+                sources in http in Compile,
+                sources in example in Compile).map(_ ++ _ ++ _ ++ _ ++ _ ++ _),
+        // TODO Avoid compiling the sources here; we just are after scaladoc. `compile := inc.Analysis.Empty`, doesn't help
         (scaladocOptions in Compile) <++= (baseDirectory,
                 sourceDirectories in core in Compile,
                 sourceDirectories in scalacheckBinding in Compile,
-                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
+                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html (and other files from geo) in the root dir?
                 sourceDirectories in scalacheckGeo in Compile,
                 sourceDirectories in http in Compile,
                 sourceDirectories in example in Compile) map {
@@ -121,10 +122,7 @@ object ScalazBuild extends Build {
     organization := "org.scalaz",
     version := "6.0.2-SNAPSHOT",
     publishSetting,
-    credentials += {
-      // TODO first look up properties "build.publish.{user, password}" for CI build.
-      Credentials(Path.userHome / ".ivy2" / ".credentials")
-    },
+    credentialsSetting,
     scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     packageOptions ++= Seq[PackageOption](ManifestAttributes(
       (IMPLEMENTATION_TITLE, "Scalaz"),
@@ -140,5 +138,14 @@ object ScalazBuild extends Build {
       val isSnapshot = version.trim.endsWith("SNAPSHOT")
       val repoName = if(isSnapshot) "snapshots" else "releases"
       Some(repo(repoName))
+  }
+
+  lazy val credentialsSetting = credentials += {
+    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
+      case Seq(Some(user), Some(pass)) =>
+        Credentials("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", user, pass)
+      case _ =>
+        Credentials(Path.userHome / ".ivy2" / ".credentials")
+    }
   }
 }
