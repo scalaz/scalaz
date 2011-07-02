@@ -64,11 +64,16 @@ object ScalazBuild extends Build {
   lazy val full = Project("scalaz-full",
     file("full"),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq()
-    // TODO https://groups.google.com/d/msg/simple-build-tool/QXFsjLozLyU/0pnoromfIHoJ
-//      sources <<= (sources in core, sources in example) map {
-//        (s1, s2) => s1 ++ s2
-//      }
+      libraryDependencies ++= Seq(),
+      // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
+      (sources in Compile) <<= (
+              sources in core in Compile,
+              sources in geo in Compile,
+              sources in scalacheckBinding in Compile,
+              sources in example in Compile).map(_ ++ _ ++ _ ++ _),
+      // don't recompile the sources
+      compile := inc.Analysis.Empty
+      // TODO SXR.
     )
   ) dependsOn (core, scalacheckBinding, http, example, tests)
 
