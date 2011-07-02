@@ -71,12 +71,15 @@ object ScalazBuild extends Build {
         compile := inc.Analysis.Empty,
         (scaladocOptions in Compile) <++= (baseDirectory,
                 sourceDirectories in core in Compile,
-                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
                 sourceDirectories in scalacheckBinding in Compile,
+                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
+                sourceDirectories in scalacheckGeo in Compile,
+                sourceDirectories in http in Compile,
                 sourceDirectories in example in Compile) map {
-          (bd, d0, d1, d2, d3) =>
+          (bd, d0, d1, d2, d3, d4, d5) =>
             val xplugin = "-Xplugin:" + (bd / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
-            val sxrBaseDir = "-P:sxr:base-directory:" + Seq(d0, d2, d2, d3).flatten.mkString(":")
+            val baseDirs = Seq(d0, d2, d2, d3, d4, d5).flatten
+            val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
             Seq(xplugin, sxrBaseDir)
         },
         (mappings in packageBin in Compile) <<= (
@@ -86,14 +89,15 @@ object ScalazBuild extends Build {
                 packagedArtifacts in scalacheckBinding,
                 packagedArtifacts in geo,
                 packagedArtifacts in scalacheckGeo,
+                packagedArtifacts in http,
                 packagedArtifacts in example) map {
-          (bd, fullDocDir, a0, a1, a2, a3, a4) =>
+          (bd, fullDocDir, a0, a1, a2, a3, a4, a5) =>
             val sxrDocDirectory = new File(fullDocDir.getAbsolutePath + ".sxr")
 
             // a bit hacky, but we can't access `baseDirectory in scalaz` without a circular reference
             val rootDir = bd.getParentFile
 
-            val jarsAndPomMappings = Seq(a0, a1, a2, a3, a4).flatMap(_.values) x flat
+            val jarsAndPomMappings = Seq(a0, a1, a2, a3, a4, a5).flatMap(_.values) x flat
             val etcMappings = ((rootDir / "etc" ** "*") +++ Seq(rootDir / "README")) x relativeTo(rootDir)
             val fullDocMappings = (fullDocDir ** "*") x relativeTo(fullDocDir.getParentFile)
             val sxrDocMappings = (sxrDocDirectory ** "*") x relativeTo(sxrDocDirectory.getParentFile)
