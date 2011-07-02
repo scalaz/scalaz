@@ -25,7 +25,9 @@
     <option name="DEPRECATION" value="false" />
   </component>
   <component name="SbtSettings">
-    <option name="useSbtOutputDirs" value="false" />
+    <option name="sbtLauncherJarPath" value="$PROJECT_DIR$/sbt-launch-0.10.0.jar" />
+    <option name="sbtLauncherVmParameters" value="-server -Xmx2048M -XX:MaxPermSize=256M -Xss128M -Dfile.encoding=UTF-8" />
+    <option name="useApplicationSettings" value="false" />
   </component>
 </project>
 

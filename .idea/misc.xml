@@ -25,23 +25,23 @@
     <option name="OPEN_IN_BROWSER" value="true" />
   </component>
   <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
-    <option name="myDefaultNotNull" value="org.jetbrains.annotations.NotNull" />
+    <option value="org.jetbrains.annotations.Nullable" name="myDefaultNullable" />
+    <option value="org.jetbrains.annotations.NotNull" name="myDefaultNotNull" />
     <option name="myNullables">
       <value>
         <list size="3">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
+          <item itemvalue="org.jetbrains.annotations.Nullable" class="java.lang.String" index="0" />
+          <item itemvalue="javax.annotation.Nullable" class="java.lang.String" index="1" />
+          <item itemvalue="edu.umd.cs.findbugs.annotations.Nullable" class="java.lang.String" index="2" />
         </list>
       </value>
     </option>
     <option name="myNotNulls">
       <value>
         <list size="3">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
+          <item itemvalue="org.jetbrains.annotations.NotNull" class="java.lang.String" index="0" />
+          <item itemvalue="javax.annotation.Nonnull" class="java.lang.String" index="1" />
+          <item itemvalue="edu.umd.cs.findbugs.annotations.NonNull" class="java.lang.String" index="2" />
         </list>
       </value>
     </option>
@@ -55,6 +55,6 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="WebServicesPlugin" addRequiredLibraries="true" />
+  <component addRequiredLibraries="true" name="WebServicesPlugin" />
 </project>
 

@@ -1,4 +1,0 @@
-#! /bin/bash
-
-BASE=`dirname "$0"`
-$BASE/sbt ';warn; project scalaz-example; console'

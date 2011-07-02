@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="org.scala-tools.testing_scalacheck_2.8.1_1.8">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-tools.testing/scalacheck_2.8.1/jars/scalacheck_2.8.1-1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
