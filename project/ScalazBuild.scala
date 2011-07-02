@@ -69,7 +69,8 @@ object ScalazBuild extends Build {
                 sources in scalacheckGeo in Compile,
                 sources in http in Compile,
                 sources in example in Compile).map(_ ++ _ ++ _ ++ _ ++ _ ++ _),
-        // TODO Avoid compiling the sources here; we just are after scaladoc. `compile := inc.Analysis.Empty`, doesn't help
+        // Avoid compiling the sources here; we just are after scaladoc.
+        (compile in Compile) := inc.Analysis.Empty,
         (scaladocOptions in Compile) <++= (baseDirectory,
                 sourceDirectories in core in Compile,
                 sourceDirectories in scalacheckBinding in Compile,
