@@ -21,9 +21,7 @@ object ScalazBuild extends Build {
 
   lazy val geo = Project("scalaz-geo",
     file("geo"),
-    settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq()
-    )
+    settings = standardSettings
   ) dependsOn (core)
 
   lazy val http = Project("scalaz-http",
@@ -42,9 +40,7 @@ object ScalazBuild extends Build {
 
   lazy val scalacheckGeo = Project("scalaz-geo-scalacheck",
     file("geo-scalacheck"),
-    settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq()
-    )
+    settings = standardSettings
   ) dependsOn (geo, scalacheckBinding)
 
   lazy val example = Project("scalaz-example",
@@ -64,7 +60,6 @@ object ScalazBuild extends Build {
   lazy val full = Project("scalaz-full",
     file("full"),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(),
       // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
       (sources in Compile) <<= (
               sources in core in Compile,
