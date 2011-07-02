@@ -65,6 +65,10 @@ object ScalazBuild extends Build {
     file("full"),
     settings = standardSettings ++ Seq(
       libraryDependencies ++= Seq()
+    // TODO https://groups.google.com/d/msg/simple-build-tool/QXFsjLozLyU/0pnoromfIHoJ
+//      sources <<= (sources in core, sources in example) map {
+//        (s1, s2) => s1 ++ s2
+//      }
     )
   ) dependsOn (core, scalacheckBinding, http, example, tests)
 
