@@ -72,8 +72,17 @@ object ScalazBuild extends Build {
               sources in scalacheckBinding in Compile,
               sources in example in Compile).map(_ ++ _ ++ _ ++ _),
       // don't recompile the sources
-      compile := inc.Analysis.Empty
-      // TODO SXR.
+      compile := inc.Analysis.Empty,
+      (scaladocOptions in Compile) <++= (baseDirectory,
+              sourceDirectories in core in Compile,
+              sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
+              sourceDirectories in scalacheckBinding in Compile,
+              sourceDirectories in example in Compile) map {
+        (bd, d0, d1, d2, d3) =>
+          val xplugin = "-Xplugin:" + (bd / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
+          val sxrBaseDir = "-P:sxr:base-directory:" + Seq(d0, d2, d2, d3).flatten.mkString(":")
+          Seq(xplugin, sxrBaseDir)
+      }
     )
   ) dependsOn (core, scalacheckBinding, http, example, tests)
 
@@ -107,12 +116,7 @@ object ScalazBuild extends Build {
   }
 }
 
-/* TODO Generate ScalaDoc and SXR Annotated Sources for all sources in the 'full' sub-project.
-  lazy val allModules = Seq(core, http, geo, example, scalacheckBinding, scalacheckGeo, tests)
-
-  class Full(info: ProjectInfo) extends ScalazDefaults(info) {
-    lazy val packageFullAction = packageFull
-
+/* TODO Generate ZIP of everything
     lazy val packageFull = {
       val allJars = Path.lazyPathFinder(Seq(core, geo, /*example,*/ http).map(_.outputPath)).## ** "*jar"
       val p = parentPath
@@ -125,20 +129,4 @@ object ScalazBuild extends Build {
       }
       zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
     } describedAs("Zip all artifacts")
-
-    def deepSources = Path.finder { topologicalSort.flatMap { case p: ScalaPaths => p.mainSources.getFiles } }
-
-    def allSourceRoots = topologicalSort.flatMap {case p: ScalaPaths => p.mainSourceRoots.getFiles.map(_.getAbsolutePath)}
-
-    val sxr = "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar"
-
-    override def documentOptions =
-      SimpleDocOption("-Xplugin:" + sxr.asFile.getAbsolutePath) ::
-      SimpleDocOption("-P:sxr:base-directory:" + allSourceRoots.mkString(":")) ::
-      super.documentOptions
-
-    lazy val fullDoc = scaladocTask("scalaz", deepSources, docPath, docClasspath, documentOptions)
-  }
-}
-
 */
