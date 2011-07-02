@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="scala" name="Scala">
+      <configuration>
+        <option name="compilerLibraryLevel" value="Project" />
+        <option name="compilerLibraryName" value="scala-2.8.1" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/../project/target/scala_2.8.1" />
+    <output-test url="file://$MODULE_DIR$/../project/target/scala_2.8.1" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../project">
+      <sourceFolder url="file://$MODULE_DIR$/../project" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../project/plugins" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/boot" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/extra-install-files" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/plugins/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/plugins/project" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/plugins/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../project/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="sbt">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../project/boot/scala-2.8.1/org.scala-tools.sbt/sbt/0.10.0" />
+          <root url="file://$MODULE_DIR$/../project/boot/scala-2.8.1/org.scala-tools.sbt/sbt/0.10.0" />
+          <root url="jar://$MODULE_DIR$/../project/boot/scala-2.8.1/org.scala-tools.sbt/sbt/0.10.0/xsbti/interface-0.10.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../project/boot/scala-2.8.1/org.scala-tools.sbt/sbt/0.10.0" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="scala-2.8.1" level="project" />
+    <orderEntry type="module-library">
+      <library name="plugins">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../project/plugins/lib" />
+          <root url="file://$MODULE_DIR$/../project/plugins/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../project/plugins/lib" recursive="false" />
+      </library>
+    </orderEntry>
+  </component>
+</module>
+

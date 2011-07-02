@@ -2,16 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/project/project.iml" filepath="$PROJECT_DIR$/project/project.iml" />
-      <module fileurl="file://$PROJECT_DIR$/scalaz.iml" filepath="$PROJECT_DIR$/scalaz.iml" />
-      <module fileurl="file://$PROJECT_DIR$/core/scalaz-core.iml" filepath="$PROJECT_DIR$/core/scalaz-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/scalaz-example.iml" filepath="$PROJECT_DIR$/example/scalaz-example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/full/scalaz-full.iml" filepath="$PROJECT_DIR$/full/scalaz-full.iml" />
-      <module fileurl="file://$PROJECT_DIR$/geo/scalaz-geo.iml" filepath="$PROJECT_DIR$/geo/scalaz-geo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/geo-scalacheck/scalaz-geo-scalacheck.iml" filepath="$PROJECT_DIR$/geo-scalacheck/scalaz-geo-scalacheck.iml" />
-      <module fileurl="file://$PROJECT_DIR$/http/scalaz-http.iml" filepath="$PROJECT_DIR$/http/scalaz-http.iml" />
-      <module fileurl="file://$PROJECT_DIR$/scalacheck-binding/scalaz-scalacheck-binding.iml" filepath="$PROJECT_DIR$/scalacheck-binding/scalaz-scalacheck-binding.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tests/scalaz-test-suite.iml" filepath="$PROJECT_DIR$/tests/scalaz-test-suite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/project.iml" filepath="$PROJECT_DIR$/.idea_modules/project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-core.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-example.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-full.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-full.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-geo.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-geo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-geo-scalacheck.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-geo-scalacheck.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-http.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-http.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-scalacheck-binding.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-scalacheck-binding.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-test-suite.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-test-suite.iml" />
     </modules>
   </component>
 </project>
