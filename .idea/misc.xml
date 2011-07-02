@@ -43,7 +43,7 @@
     </option>
   </component>
   <component name="ProjectDetails">
-    <option value="scalaz" name="projectName" />
+    <option name="projectName" value="scalaz" />
   </component>
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>

@@ -1,0 +1,10 @@
+<module type="JAVA_MODULE" version="4">
+  <component inherit-compiler-output="true" name="NewModuleRootManager">
+    <exclude-output></exclude-output>
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/target"></excludeFolder>
+    </content>
+    <orderEntry type="inheritedJdk"></orderEntry>
+    <orderEntry type="sourceFolder" forTests="false"></orderEntry>
+  </component>
+</module>
