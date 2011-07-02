@@ -57,29 +57,55 @@ object ScalazBuild extends Build {
     )
   ) dependsOn (core, geo, scalacheckBinding, scalacheckGeo)
 
-  lazy val full = Project("scalaz-full",
-    file("full"),
-    settings = standardSettings ++ Seq(
-      // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
-      (sources in Compile) <<= (
-              sources in core in Compile,
-              sources in geo in Compile,
-              sources in scalacheckBinding in Compile,
-              sources in example in Compile).map(_ ++ _ ++ _ ++ _),
-      // don't recompile the sources
-      compile := inc.Analysis.Empty,
-      (scaladocOptions in Compile) <++= (baseDirectory,
-              sourceDirectories in core in Compile,
-              sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
-              sourceDirectories in scalacheckBinding in Compile,
-              sourceDirectories in example in Compile) map {
-        (bd, d0, d1, d2, d3) =>
-          val xplugin = "-Xplugin:" + (bd / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
-          val sxrBaseDir = "-P:sxr:base-directory:" + Seq(d0, d2, d2, d3).flatten.mkString(":")
-          Seq(xplugin, sxrBaseDir)
-      }
-    )
-  ) dependsOn (core, scalacheckBinding, http, example, tests)
+  lazy val full = {
+    Project("scalaz-full",
+      file("full"),
+      settings = standardSettings ++ Seq(
+        // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
+        (sources in Compile) <<= (
+                sources in core in Compile,
+                sources in geo in Compile,
+                sources in scalacheckBinding in Compile,
+                sources in example in Compile).map(_ ++ _ ++ _ ++ _),
+        // don't recompile the sources
+        compile := inc.Analysis.Empty,
+        (scaladocOptions in Compile) <++= (baseDirectory,
+                sourceDirectories in core in Compile,
+                sourceDirectories in geo in Compile, // TODO why does SXR put Azimuth.html in the root dir?
+                sourceDirectories in scalacheckBinding in Compile,
+                sourceDirectories in example in Compile) map {
+          (bd, d0, d1, d2, d3) =>
+            val xplugin = "-Xplugin:" + (bd / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
+            val sxrBaseDir = "-P:sxr:base-directory:" + Seq(d0, d2, d2, d3).flatten.mkString(":")
+            Seq(xplugin, sxrBaseDir)
+        },
+        (mappings in packageBin in Compile) <<= (
+                baseDirectory,
+                docDirectory in Compile,
+                packagedArtifacts in core,
+                packagedArtifacts in scalacheckBinding,
+                packagedArtifacts in geo,
+                packagedArtifacts in scalacheckGeo,
+                packagedArtifacts in example) map {
+          (bd, fullDocDir, a0, a1, a2, a3, a4) =>
+            val sxrDocDirectory = new File(fullDocDir.getAbsolutePath + ".sxr")
+
+            // a bit hacky, but we can't access `baseDirectory in scalaz` without a circular reference
+            val rootDir = bd.getParentFile
+
+            val jarsAndPomMappings = Seq(a0, a1, a2, a3, a4).flatMap(_.values) x flat
+            val etcMappings = ((rootDir / "etc" ** "*") +++ Seq(rootDir / "README")) x relativeTo(rootDir)
+            val fullDocMappings = (fullDocDir ** "*") x relativeTo(fullDocDir.getParentFile)
+            val sxrDocMappings = (sxrDocDirectory ** "*") x relativeTo(sxrDocDirectory.getParentFile)
+            val allMappings = jarsAndPomMappings ++ etcMappings ++ fullDocMappings ++ sxrDocMappings
+            allMappings.map {
+              case (input, output) =>
+                (input, "scalaz/" + output) // TODO Include Scala and Scalaz versions in this directory name.
+            }
+        }
+      )
+    ) dependsOn (core, scalacheckBinding, http, example, tests)
+  }
 
   object Dependency {
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
@@ -88,6 +114,8 @@ object ScalazBuild extends Build {
   }
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
+    organization := "org.scalaz",
+    version := "6.0.2-SNAPSHOT",
     publishSetting,
     credentials += {
       // TODO first look up properties "build.publish.{user, password}" for CI build.
@@ -110,18 +138,3 @@ object ScalazBuild extends Build {
       Some(repo(repoName))
   }
 }
-
-/* TODO Generate ZIP of everything
-    lazy val packageFull = {
-      val allJars = Path.lazyPathFinder(Seq(core, geo, /*example,*/ http).map(_.outputPath)).## ** "*jar"
-      val p = parentPath
-      val extra = p("README") +++ p("etc").## ** "*"
-      val sourceFiles = allJars +++ extra +++ (((outputPath ##) / "doc") ** "*")
-      val packageName = "scalaz-full_" + buildScalaVersion + "-" + version.toString
-      val copy = task {
-        sbt.FileUtilities.copy(sourceFiles.get, outputPath / packageName, log)
-        None
-      }
-      zipTask((outputPath ##) / packageName ** "*", outputPath / (packageName + ".zip") ) dependsOn (copy)
-    } describedAs("Zip all artifacts")
-*/
