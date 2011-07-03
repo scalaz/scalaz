@@ -134,7 +134,7 @@ object ScalazBuild extends Build {
 
   object Dependency {
     // SBT's built in '%%' is not flexible enough. When we build with a snapshot version of the compiler,
-    // we want to fetch dependencies from the last stable release (hopefully binary compatibile).
+    // we want to fetch dependencies from the last stable release (hopefully binary compatible).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
       case x                 => x
