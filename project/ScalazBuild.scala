@@ -155,7 +155,7 @@ object ScalazBuild extends Build {
       (SEALED, "true"))
     )
   )
-
+  
   lazy val publishSetting = publishTo <<= (version) {
     version: String =>
       def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
@@ -167,7 +167,8 @@ object ScalazBuild extends Build {
   lazy val credentialsSetting = credentials += {
     Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "nexus.scala-tools.org", user, pass)
+        println("user: [%s] pass: [%s]".format(user, pass))
+        Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
       case _ =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
