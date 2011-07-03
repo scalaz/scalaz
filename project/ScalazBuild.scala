@@ -143,6 +143,10 @@ object ScalazBuild extends Build {
     version := "6.0.2-SNAPSHOT",
     scalaVersion := "2.9.0-1",
     publishSetting,
+
+    // TODO remove after updating to SBT 0.10.1, https://github.com/harrah/xsbt/commit/520f74d1146a1ba6244187c52a951eb4d0f9cc8c
+    (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
+
     credentialsSetting,
     scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     packageOptions ++= Seq[PackageOption](ManifestAttributes(
