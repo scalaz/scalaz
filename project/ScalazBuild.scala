@@ -43,7 +43,7 @@ object ScalazBuild extends Build {
     base = file("scalacheck-binding"),
     dependencies = Seq(core),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(Dependency.ScalaCheck)
+      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
     )
   )
 
@@ -52,7 +52,7 @@ object ScalazBuild extends Build {
     base = file("geo-scalacheck"),
     dependencies = Seq(core, geo, scalacheckBinding),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(Dependency.ScalaCheck)
+      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
     )
   )
 
@@ -61,7 +61,7 @@ object ScalazBuild extends Build {
     base = file("example"),
     dependencies = Seq(core, geo, http),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(Dependency.Specs, Dependency.ServletApi)
+      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv), Dependency.ServletApi))
     )
   )
 
@@ -70,7 +70,7 @@ object ScalazBuild extends Build {
     base = file("tests"),
     dependencies = Seq(core, geo, scalacheckBinding, scalacheckGeo),
     settings = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(Dependency.Specs)
+      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv)))
     )
   )
 
@@ -133,15 +133,27 @@ object ScalazBuild extends Build {
   }
 
   object Dependency {
+    // SBT's built in '%%' is not flexible enough. When we build with a snapshot version of the compiler,
+    // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
+    def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
+      case "2.10.0-SNAPSHOT" => "2.9.0-1"
+      case x => x
+    }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
-    val ScalaCheck = "org.scala-tools.testing" %% "scalacheck" % "1.9"
-    val Specs = "org.scala-tools.testing" %% "specs" % "1.6.8" % "test"
+
+    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.9"
+    def Specs(scalaVersion: String) = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test"
   }
+
+  val dependencyScalaVersionTranslator = SettingKey[(String => String)]("dependency-scala-version-translator", "Function to translate the current scala version to the version used for dependency resolution")
+  val dependencyScalaVersion = SettingKey[String]("dependency-scala-version", "The version of scala appended to module id of dependencies")
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
     version := "6.0.2-SNAPSHOT",
     scalaVersion := "2.9.0-1",
+    dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
+    dependencyScalaVersion <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
 
     // TODO remove after updating to SBT 0.10.1, https://github.com/harrah/xsbt/commit/520f74d1146a1ba6244187c52a951eb4d0f9cc8c
