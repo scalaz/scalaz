@@ -122,7 +122,7 @@ object ScalazBuild extends Build {
 
         // Include SXR in the Scaladoc Build to generated HTML annotated sources.
         (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories, scalaVersion) map {
-          (bd, asd, sv) => if (sv.contains("2.10")) Seq() else sxrOptions(bs, asd)
+          (bd, asd, sv) => if (sv.contains("2.10")) Seq() else sxrOptions(bd, asd)
         },
 
         // Package an archive containing all artifacts, readme, licence, and documentation.
