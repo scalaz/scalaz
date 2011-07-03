@@ -99,7 +99,7 @@ object ScalazBuild extends Build {
 
     /** Scalac options for SXR */
     def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
-      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
+      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
       val baseDirs = sourceDirs.flatten
       val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
       Seq(xplugin, sxrBaseDir)
