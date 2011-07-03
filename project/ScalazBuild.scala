@@ -152,6 +152,7 @@ object ScalazBuild extends Build {
     organization := "org.scalaz",
     version := "6.0.2-SNAPSHOT",
     scalaVersion := "2.9.0-1",
+    resolvers += ScalaToolsSnapshots,
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
