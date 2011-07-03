@@ -26,6 +26,7 @@
     <orderEntry type="library" name="org.scala-lang_scala-library_2.8.1" level="project" />
     <orderEntry type="library" name="org.scala-tools.testing_scalacheck_2.8.1_1.8" level="project" />
     <orderEntry type="library" name="org.scala-tools.testing_test-interface_0.5" level="project" />
+    <orderEntry type="module" module-name="scalaz-core" exported="" />
     <orderEntry type="module" module-name="scalaz-geo" exported="" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" exported="" />
   </component>

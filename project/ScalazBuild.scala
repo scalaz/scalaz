@@ -6,15 +6,15 @@ import java.util.jar.Attributes.Name._
 
 object ScalazBuild extends Build {
   lazy val scalaz = Project(
-    id = "scalaz",
-    base = file("."),
-    settings = standardSettings,
+    id        = "scalaz",
+    base      = file("."),
+    settings  = standardSettings,
     aggregate = Seq(core, http, geo, example, scalacheckBinding, scalacheckGeo, tests, full)
   )
 
   lazy val core = Project(
-    id = "scalaz-core",
-    base = file("core"),
+    id       = "scalaz-core",
+    base     = file("core"),
     settings = standardSettings ++ Seq(
       (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
         dir => Seq(Boilerplate.generateTupleW(dir))
@@ -23,53 +23,53 @@ object ScalazBuild extends Build {
   )
 
   lazy val geo = Project(
-    id = "scalaz-geo",
-    base = file("geo"),
+    id           = "scalaz-geo",
+    base         = file("geo"),
     dependencies = Seq(core),
-    settings = standardSettings
+    settings     = standardSettings
   )
 
   lazy val http = Project(
-    id = "scalaz-http",
-    base = file("http"),
+    id           = "scalaz-http",
+    base         = file("http"),
     dependencies = Seq(core),
-    settings = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq(
       libraryDependencies ++= Seq(Dependency.ServletApi)
     )
   )
 
   lazy val scalacheckBinding = Project(
-    id = "scalaz-scalacheck-binding",
-    base = file("scalacheck-binding"),
+    id           = "scalaz-scalacheck-binding",
+    base         = file("scalacheck-binding"),
     dependencies = Seq(core),
-    settings = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
     )
   )
 
   lazy val scalacheckGeo = Project(
-    id = "scalaz-geo-scalacheck",
-    base = file("geo-scalacheck"),
+    id           = "scalaz-geo-scalacheck",
+    base         = file("geo-scalacheck"),
     dependencies = Seq(core, geo, scalacheckBinding),
-    settings = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
     )
   )
 
   lazy val example = Project(
-    id = "scalaz-example",
-    base = file("example"),
+    id           = "scalaz-example",
+    base         = file("example"),
     dependencies = Seq(core, geo, http),
-    settings = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv), Dependency.ServletApi))
     )
   )
 
   lazy val tests = Project(
-    id = "scalaz-test-suite",
-    base = file("tests"),
+    id           = "scalaz-test-suite",
+    base         = file("tests"),
     dependencies = Seq(core, geo, scalacheckBinding, scalacheckGeo),
-    settings = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv)))
     )
   )
@@ -80,7 +80,7 @@ object ScalazBuild extends Build {
 
     // Some intermediate keys to simplify extracting a task or setting from `projects`.
     val allPackagedArtifacts = TaskKey[Seq[Map[Artifact, File]]]("all-packaged-artifacts")
-    val allSources = TaskKey[Seq[Seq[File]]]("all-sources")
+    val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
     val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
 
     def artifactMappings(rootBaseDir: File, baseDir: File, scalaVersion: String, version: String,
@@ -91,26 +91,26 @@ object ScalazBuild extends Build {
       val newBase = "scalaz_%s-%s".format(scalaVersion, version)
 
       val jarsAndPomMappings = artifacts.flatMap(_.values) x flatRebase(newBase)
-      val etcMappings = ((rootBaseDir / "etc" ** "*") +++ Seq(rootBaseDir / "README")) x rebase(rootBaseDir, newBase)
-      val fullDocMappings = (fullDocDir ** "*") x rebase(fullDocDir.getParentFile, newBase)
-      val sxrDocMappings = (sxrDocDirectory ** "*") x rebase(sxrDocDirectory.getParentFile, newBase)
+      val etcMappings        = ((rootBaseDir / "etc" ** "*") +++ Seq(rootBaseDir / "README")) x rebase(rootBaseDir, newBase)
+      val fullDocMappings    = (fullDocDir ** "*") x rebase(fullDocDir.getParentFile, newBase)
+      val sxrDocMappings     = (sxrDocDirectory ** "*") x rebase(sxrDocDirectory.getParentFile, newBase)
       jarsAndPomMappings ++ etcMappings ++ fullDocMappings ++ sxrDocMappings
     }
 
     /** Scalac options for SXR */
     def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
-      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
-      val baseDirs = sourceDirs.flatten
+      val xplugin    = "-Xplugin:" + (baseDir / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
+      val baseDirs   = sourceDirs.flatten
       val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
       Seq(xplugin, sxrBaseDir)
     }
 
     Project(
-      id = "scalaz-full",
-      base = file("full"),
+      id           = "scalaz-full",
+      base         = file("full"),
       dependencies = Seq(core, scalacheckBinding, http, example, tests),
-      settings = standardSettings ++ Seq(
-        allSources <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
+      settings     = standardSettings ++ Seq(
+        allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
         allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
         allPackagedArtifacts <<= projects.map(packagedArtifacts in _).join,
 
@@ -137,12 +137,12 @@ object ScalazBuild extends Build {
     // we want to fetch dependencies from the last stable release (hopefully binary compatibile).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
-      case x => x
+      case x                 => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
 
-    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.8"
-    def Specs(scalaVersion: String) = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test"
+    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.8" withSources()
+    def Specs(scalaVersion: String)      = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test" withSources()
   }
 
   val dependencyScalaVersionTranslator = SettingKey[(String => String)]("dependency-scala-version-translator", "Function to translate the current scala version to the version used for dependency resolution")
@@ -150,21 +150,22 @@ object ScalazBuild extends Build {
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
-    version := "6.0.2-SNAPSHOT",
+    version      := "6.0.2-SNAPSHOT",
     scalaVersion := "2.8.1",
-    resolvers += ScalaToolsSnapshots,  
+    resolvers    += ScalaToolsSnapshots,
+
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
-    dependencyScalaVersion <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
+    dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
 
     // TODO remove after updating to SBT 0.10.1, https://github.com/harrah/xsbt/commit/520f74d1146a1ba6244187c52a951eb4d0f9cc8c
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     credentialsSetting,
-    scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
+    scalacOptions  ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     packageOptions ++= Seq[PackageOption](ManifestAttributes(
-      (IMPLEMENTATION_TITLE, "Scalaz"),
-      (IMPLEMENTATION_URL, "http://code.google.com/p/scalaz"),
+      (IMPLEMENTATION_TITLE,  "Scalaz"),
+      (IMPLEMENTATION_URL,    "http://code.google.com/p/scalaz"),
       (IMPLEMENTATION_VENDOR, "The Scalaz Project"),
       (SEALED, "true"))
     )
@@ -174,7 +175,7 @@ object ScalazBuild extends Build {
     version: String =>
       def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
       val isSnapshot = version.trim.endsWith("SNAPSHOT")
-      val repoName = if(isSnapshot) "snapshots" else "releases"
+      val repoName   = if(isSnapshot) "snapshots" else "releases"
       Some(repo(repoName))
   }
 

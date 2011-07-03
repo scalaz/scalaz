@@ -25,7 +25,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.scala-lang_scala-library_2.8.1" level="project" />
     <orderEntry type="library" name="javax.servlet_servlet-api_2.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="org.scala-tools.testing_specs_2.8.1_1.6.7.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="org.scala-tools.testing_specs_2.8.1_1.6.8" level="project" />
     <orderEntry type="library" scope="TEST" name="org.scala-lang_scala-compiler_2.8.1" level="project" />
     <orderEntry type="module" module-name="scalaz-core" exported="" />
     <orderEntry type="module" module-name="scalaz-geo" exported="" />
