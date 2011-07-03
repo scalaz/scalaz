@@ -166,13 +166,11 @@ object ScalazBuild extends Build {
   }
 
   lazy val credentialsSetting = credentials += {
-    val creds = Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
+    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
         Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
       case _ =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
-    println(creds)
-    creds
   }
 }
