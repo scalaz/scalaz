@@ -8,6 +8,25 @@ trait Arrow[F[_, _]] {
   def id[A]: F[A, A] =
     category.i[A]
 
+  def functor[C]: Functor[({type λ[α] = F[C, α]})#λ] =
+    new Functor[({type λ[α] = F[C, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        <<<(ar(f))(_)
+    }
+
+  def fmap[A, B, C](f: A => B): F[C, A] => F[C, B] =
+    functor.fmap(f)
+
+  def applic[C]: Applic[({type λ[α] = F[C, α]})#λ] =
+    new Applic[({type λ[α] = F[C, α]})#λ] {
+      def applic[A, B](f: F[C, A => B]) =
+        (k: F[C, A]) =>
+          <<<(ar((y: (A => B, A)) => y._1(y._2)))(combine(f)(k))
+    }
+
+  def apply[A, B, C](f: F[C, A => B]): F[C, A] => F[C, B] =
+    applic.applic(f)
+
   def <<<[A, B, C](f: F[B, C]): F[A, B] => F[A, C] =
     g => category.comp(f, g)
 
