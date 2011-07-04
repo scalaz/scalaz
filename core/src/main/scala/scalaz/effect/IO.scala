@@ -19,12 +19,12 @@ sealed trait IO[A] {
    */
   def unsafePerformIO: A = apply(realWorld)._2
 
-  def flatMap[B](f: A => IO[B]): IO[B] = IO(rw => {
+  def flatMap[B](f: A => IO[B]): IO[B] = io(rw => {
     val (nw, a) = apply(rw)
     f(a)(nw)
   })
 
-  def map[B](f: A => B): IO[B] = IO(rw => {
+  def map[B](f: A => B): IO[B] = io(rw => {
     val (nw, a) = apply(rw)
     (nw, f(a))
   })
@@ -34,7 +34,7 @@ sealed trait IO[A] {
 
   /**Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] =
-    IO(rw => try {
+    io(rw => try {
       this(rw)
     } catch {
       case e => handler(e)(rw)
@@ -110,31 +110,34 @@ trait IOs {
   type RunInBase[M[_], Base[_]] =
   Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
 
-  def apply[A](f: World[RealWorld] => (World[RealWorld], A)): IO[A] = new IO[A] {
+  def io[A](f: World[RealWorld] => (World[RealWorld], A)): IO[A] = new IO[A] {
     private[effect] def apply(rw: World[RealWorld]) = f(rw)
   }
 
-  // Standard I/O
-  def getChar: IO[Char] = IO(rw => (rw, readChar))
+  def apply[A](a: => A): IO[A] =
+    io(rw => (rw, a))
 
-  def putChar(c: Char): IO[Unit] = IO(rw => (rw, {
+  // Standard I/O
+  def getChar: IO[Char] = io(rw => (rw, readChar))
+
+  def putChar(c: Char): IO[Unit] = io(rw => (rw, {
     print(c);
     ()
   }))
 
-  def putStr(s: String): IO[Unit] = IO(rw => (rw, {
+  def putStr(s: String): IO[Unit] = io(rw => (rw, {
     print(s);
     ()
   }))
 
-  def putStrLn(s: String): IO[Unit] = IO((rw => (rw, {
+  def putStrLn(s: String): IO[Unit] = io((rw => (rw, {
     println(s);
     ()
   })))
 
-  def readLn: IO[String] = IO(rw => (rw, readLine))
+  def readLn: IO[String] = io(rw => (rw, readLine))
 
-  def putOut[A](a: A): IO[Unit] = IO(rw => (rw, {
+  def putOut[A](a: A): IO[Unit] = io(rw => (rw, {
     print(a);
     ()
   }))
@@ -144,7 +147,7 @@ trait IOs {
     STToIO(newVar(a)) flatMap (v => IO.IOPointed.point(IORef.ioRef(v)))
 
   /**Throw the given error in the IO monad. */
-  def throwIO[A](e: Throwable): IO[A] = IO(rw => (rw, throw e))
+  def throwIO[A](e: Throwable): IO[A] = io(rw => (rw, throw e))
 
   def idLiftControl[M[_], A](f: RunInBase[M, M] => M[A])(implicit m: Monad[M]): M[A] =
     f(new RunInBase[M, M] {
@@ -194,7 +197,7 @@ trait IOs {
     Monoid.liftMonoid
 
   val ioUnit: IO[Unit] =
-    IO(rw => (rw, ()))
+    io(rw => (rw, ()))
 
   implicit val IOFunctor: Functor[IO] = new Functor[IO] {
     def fmap[A, B](f: A => B) =
@@ -202,7 +205,7 @@ trait IOs {
   }
 
   implicit val IOPointed: Pointed[IO] = new Pointed[IO] {
-    def point[A](a: => A) = IO(rw => (rw, a))
+    def point[A](a: => A) = io(rw => (rw, a))
   }
 
   implicit val IOPointedFunctor: PointedFunctor[IO] =

@@ -62,6 +62,12 @@ sealed trait IterateeT[E, F[_], A] {
         ))(k(s)))
     )
 
+  def mapI[G[_]](f: F ~> G)(implicit ftr: Functor[F]): IterateeT[E, G, A] =
+    foldT(
+      done = IterateeT.doneT(_, _)
+    , cont = k => Iteratee.continueT(i => f(ftr.fmap((x: IterateeT[E, F, A]) => x mapI f)(k(i))))
+    )
+
   def ifDoneElseCont[Z](done: => Z, cont: => Z): Z =
     foldT((_, _) => done, _ => cont)
 

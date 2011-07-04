@@ -8,6 +8,7 @@ trait *[A] {
 
   import *._
   import newtypes._
+  import iteratee._
   import StateT._
   import WriterT._
   import LazyTuple._
@@ -271,6 +272,9 @@ trait *[A] {
   def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt value) p(value)
     else implicitly[Pointed[F]].point(value)
+
+  def enum[E, F[_], X](implicit e: iteratee.EnumerableT[A, E, F, X]): EnumerateeT[E, F, X] =
+    e apply value
 
 }
 
