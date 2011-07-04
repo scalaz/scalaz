@@ -692,7 +692,7 @@ trait *->*[F[_], A] {
   def fpair(implicit f: Functor[F]): F[(A, A)] =
     map(a => (a, a))
 
-  def trans[G[_[_], _]](implicit m: Monad[F], t: MonadTrans[G]): G[F, A] =
+  def transLift[G[_[_], _]](implicit m: Monad[F], t: MonadTrans[G]): G[F, A] =
     t.lift(value)(m)
 
   def fpoint[G[_]](implicit f: Functor[F], p: Pointed[G]): F[G[A]] =
@@ -1081,6 +1081,6 @@ trait **->**->** extends **->**->**~ {
 trait |*->*|->*->*[F[_[_], _], G[_], A] {
   val value: F[G, A]
 
-  def lower(implicit e: Extend[G], m: CoMonadTrans[F]): G[A] =
+  def transLower(implicit e: Extend[G], m: CoMonadTrans[F]): G[A] =
     m.lower(value)
 }
