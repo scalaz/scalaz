@@ -5,6 +5,6 @@ object Iteratee extends Iteratees
 
 trait Iteratees extends
 //EnumerableTs with // TODO merge
-EnumeratorTs with
+EnumerateeTs with
 Inputs with
 IterateeTs

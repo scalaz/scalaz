@@ -7,7 +7,7 @@ import Identity._
 sealed trait IterateeT[E, F[_], A] {
 
   import IterateeT._
-  import EnumeratorT._
+  import EnumerateeT._
 
   def *->* : (({type λ[α] = IterateeT[E, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = IterateeT[E, F, α]})#λ, A](this)
@@ -73,18 +73,6 @@ sealed trait IterateeT[E, F[_], A] {
 
   def inputOr(d: => Input[E])(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Input[E] =
     fold((_, i) => i, _ => d)
-
-  def liftIter(implicit s: Semigroup[E], p: Pointed[F]): EnumeratorT[E, F, A] =
-    foldT(
-      done = (a, i) => enumeratorT[E, F, A](i.el.fold(
-        none = _ => p.point(doneT(a, i))
-        , some = e => j => j.el.fold(
-          none = p.point(doneT(a, j))
-          , some = ee => p.point(doneT(a, elInput(s.append(e, ee))))
-        )
-      ))
-      , cont = k => enumeratorT(k)
-    )
 
   /**An iteratee that consumes the head of the input **/
   def head[E]: (E >@> Option[E]) = {
@@ -215,11 +203,8 @@ trait IterateeTs {
   type >@>[E, A] =
   Iteratee[E, A]
 
-  type EnumerateeT[E, F[_], A] =
-    Iter[E, A] => IterateeT[E, F, A]
-
-  type Enumeratee[E, A] =
-    Iter[E, A] => Iteratee[E, A]
+  type >@@>[E, A] =
+  Iter[E, A]
 
   sealed trait DoneT[F[_]] {
     def apply[E, A](a: => A, i: => Input[E]): IterateeT[E, F, A]
