@@ -4,7 +4,7 @@ package iteratee
 import IterateeT._
 import EnumerateeT._
 import Input._
-import effect.IO
+import effect._
 import java.io.{InputStream, BufferedInputStream, Reader, BufferedReader}
 
 sealed trait EnumerableT[X, E, F[_], A] {
@@ -62,90 +62,16 @@ trait EnumerableTs {
     }
 
   implicit def IteratorEnumerable[E, A]: EnumerableT[Iterator[E], E, IO, A] =
-    iteratorLikeEnumerable(_.next, _ == null)
+    iteratorLikeEnumerable(_.next, _ != null)
 
-  implicit def ReaderEnumerable[A]: EnumerableT[Reader, Char, IO, A] =
-    new EnumerableT[Reader, Char, IO, A] {
-      val apply =
-        (x: Reader) => {
-          def loop: Iteratee[Char, A] => IterT[Char, IO, A] =
-            i => {
-              val ii = IO(i mapI (new (Identity ~> IO) {
-                         def apply[A](x: Identity[A]) = IO(x.value)
-                       }))
-              i.fold(
-                done = (_, _) => ii
-              , cont = k => for {
-                  c <- IO(x.read)
-                  a <- if (c == -1) ii else loop(k(elInput(c.toChar)))
-                } yield a
-              )
-            }
-          enumerateeT(loop)
-        }
-    }
+  implicit def ReaderEnumerable[A]: EnumerableT[Reader, IoExceptionOr[Char], IO, A] =
+    iteratorLikeEnumerable(i => IoExceptionOr(i.read.toChar), _ exists (_ != -1))
 
-  implicit def BufferedReaderEnumerable[A]: EnumerableT[BufferedReader, String, IO, A] =
-    new EnumerableT[BufferedReader, String, IO, A] {
-      val apply =
-        (x: BufferedReader) => {
-          def loop: Iteratee[String, A] => IterT[String, IO, A] =
-            i => {
-              val ii = IO(i mapI (new (Identity ~> IO) {
-                         def apply[A](x: Identity[A]) = IO(x.value)
-                       }))
-              i.fold(
-                done = (_, _) => ii
-              , cont = k => for {
-                  s <- IO(x.readLine)
-                  a <- if (s == null) ii else loop(k(elInput(s)))
-                } yield a
-              )
-            }
-          enumerateeT(loop)
-        }
-    }
+  implicit def BufferedReaderEnumerable[A]: EnumerableT[BufferedReader, IoExceptionOr[String], IO, A] =
+    iteratorLikeEnumerable(i => IoExceptionOr(i.readLine), _ exists (_ != null))
 
-  implicit def InputStreamEnumerable[A]: EnumerableT[InputStream, Byte, IO, A] =
-    new EnumerableT[InputStream, Byte, IO, A] {
-      val apply =
-        (x: InputStream) => {
-          def loop: Iteratee[Byte, A] => IterT[Byte, IO, A] =
-            i => {
-              val ii = IO(i mapI (new (Identity ~> IO) {
-                         def apply[A](x: Identity[A]) = IO(x.value)
-                       }))
-              i.fold(
-                done = (_, _) => ii
-              , cont = k => for {
-                  c <- IO(x.read)
-                  a <- if (c == -1) ii else loop(k(elInput(c.toByte)))
-                } yield a
-              )
-            }
-          enumerateeT(loop)
-        }
-    }
+  implicit def InputStreamEnumerable[A]: EnumerableT[InputStream, IoExceptionOr[Byte], IO, A] =
+    iteratorLikeEnumerable(i => IoExceptionOr(i.read.toByte), _ exists (_ != -1))
 
-  implicit def BufferedInputStreamEnumerable[A]: EnumerableT[BufferedInputStream, Byte, IO, A] =
-    new EnumerableT[BufferedInputStream, Byte, IO, A] {
-      val apply =
-        (x: BufferedInputStream) => {
-          def loop: Iteratee[Byte, A] => IterT[Byte, IO, A] =
-            i => {
-              val ii = IO(i mapI (new (Identity ~> IO) {
-                         def apply[A](x: Identity[A]) = IO(x.value)
-                       }))
-              i.fold(
-                done = (_, _) => ii
-              , cont = k => for {
-                  c <- IO(x.read)
-                  a <- if (c == -1) ii else loop(k(elInput(c.toByte)))
-                } yield a
-              )
-            }
-          enumerateeT(loop)
-        }
-    }
 
 }

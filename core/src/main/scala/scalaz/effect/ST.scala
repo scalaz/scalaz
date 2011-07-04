@@ -114,15 +114,15 @@ sealed trait ST[S, A] {
     })
 }
 
-object ST extends STs
+object ST extends STs {
+  def apply[S, A](a: => A): ST[S, A] =
+    returnST(a)
+}
 
 trait STs {
   def st[S, A](f: World[S] => (World[S], A)): ST[S, A] = new ST[S, A] {
     private[effect] def apply(s: World[S]) = f(s)
   }
-
-  def apply[S, A](a: => A): ST[S, A] =
-    returnST(a)
 
   // Implicit conversions between IO and ST
   implicit def STToIO[A](st: ST[RealWorld, A]): IO[A] =

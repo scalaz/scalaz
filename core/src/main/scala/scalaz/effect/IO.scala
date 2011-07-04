@@ -104,7 +104,10 @@ sealed trait IO[A] {
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 
-object IO extends IOs
+object IO extends IOs {
+  def apply[A](a: => A): IO[A] =
+    io(rw => (rw, a))
+}
 
 trait IOs {
   type RunInBase[M[_], Base[_]] =
@@ -113,9 +116,6 @@ trait IOs {
   def io[A](f: World[RealWorld] => (World[RealWorld], A)): IO[A] = new IO[A] {
     private[effect] def apply(rw: World[RealWorld]) = f(rw)
   }
-
-  def apply[A](a: => A): IO[A] =
-    io(rw => (rw, a))
 
   // Standard I/O
   def getChar: IO[Char] = io(rw => (rw, readChar))
