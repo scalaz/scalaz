@@ -40,6 +40,30 @@ trait EnumerableTs {
         })
   }
 
+  def iteratorLikeEnumerable[I, E, A](next: I => E, nextable: E => Boolean): EnumerableT[I, E, IO, A] =
+    new EnumerableT[I, E, IO, A] {
+      val apply =
+        (x: I) => {
+          def loop: Iteratee[E, A] => IterT[E, IO, A] =
+            i => {
+              val ii = IO(i mapI (new (Identity ~> IO) {
+                         def apply[A](x: Identity[A]) = IO(x.value)
+                       }))
+              i.fold(
+                done = (_, _) => ii
+              , cont = k => for {
+                  e <- IO(next(x))
+                  a <- if (nextable(e)) loop(k(elInput(e))) else ii
+                } yield a
+              )
+            }
+          enumerateeT(loop)
+        }
+    }
+
+  implicit def IteratorEnumerable[E, A]: EnumerableT[Iterator[E], E, IO, A] =
+    iteratorLikeEnumerable(_.next, _ == null)
+
   implicit def ReaderEnumerable[A]: EnumerableT[Reader, Char, IO, A] =
     new EnumerableT[Reader, Char, IO, A] {
       val apply =
