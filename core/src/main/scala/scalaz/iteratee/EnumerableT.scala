@@ -40,6 +40,25 @@ trait EnumerableTs {
         })
   }
 
+  implicit def ListEnumerable[E, A]: Enumerable[List[E], E, A] = new Enumerable[List[E], E, A] {
+    val apply: List[E] => Enumeratee[E, A] =
+      x =>
+        enumeratee((i: E >@> A) => x match {
+          case Nil => i
+          case x :: xs => i.fold(done = (_, _) => i, cont = k => apply(xs) enumerate k(elInput(x)) value)
+        })
+  }
+
+  implicit def EphemeralStreamEnumerable[E, A]: Enumerable[EphemeralStream[E], E, A] = new Enumerable[EphemeralStream[E], E, A] {
+    val apply: EphemeralStream[E] => Enumeratee[E, A] =
+      x =>
+        enumeratee((i: E >@> A) =>
+          if(x.isEmpty)
+            i
+          else
+            i.fold(done = (_, _) => i, cont = k => apply(x.tail()) enumerate k(elInput(x.head())) value))
+  }
+
   def iteratorLikeEnumerable[I, E, A](next: I => E, nextable: E => Boolean): EnumerableT[I, E, IO, A] =
     new EnumerableT[I, E, IO, A] {
       val apply =
