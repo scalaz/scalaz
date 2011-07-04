@@ -27,6 +27,12 @@ trait Arrow[F[_, _]] {
   def apply[A, B, C](f: F[C, A => B]): F[C, A] => F[C, B] =
     applic.applic(f)
 
+  def applicFunctor[C]: ApplicFunctor[({type λ[α] = F[C, α]})#λ] =
+    new ApplicFunctor[({type λ[α] = F[C, α]})#λ] {
+      val applic = Arrow.this.applic[C]
+      val functor = Arrow.this.functor[C]
+    }
+
   def <<<[A, B, C](f: F[B, C]): F[A, B] => F[A, C] =
     g => category.comp(f, g)
 
