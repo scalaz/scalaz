@@ -16,7 +16,10 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   def evalT(r: R, s: S)(implicit ftr: Functor[F]): F[(A, W)] =
     ftr.fmap((asw: (A, S, W)) => (asw._1, asw._3))(apply(r)(s))
 
-  def execT(r: R)(implicit ftr: Functor[F]): StateT[S, F, W] =
+  def eval(r: R, s: S)(implicit ftr: Functor[F], i: F[(A, W)] =:= Identity[(A, W)]): (A, W) =
+    evalT(r, s).value
+
+  def exec(r: R)(implicit ftr: Functor[F]): StateT[S, F, W] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._3, asw._2))(apply(r)(s)))
 }
 
