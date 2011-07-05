@@ -29,12 +29,9 @@ object ExampleIteratee {
     (peek[IoExceptionOr[Char]] enumerateUp r map (_ map (_ flatMap (_.toOption))) flatMap (_.runT) unsafePerformIO) assert_=== Some('f')
     (head[IoExceptionOr[Char]] enumerateUp (new StringReader("")) map (_ map (_ flatMap (_.toOption))) flatMap (_.runT) unsafePerformIO) assert_=== None
 
-    /*
-
     // As a monad
     val m1 = head[Int] >>= ((b:Option[Int]) => head[Int] map (b2 => (b <|*|> b2)))
-    m1(Stream(1,2,3)).run assert_=== Some(1 -> 2)
-    */
+    (m1 enumerate Stream(1,2,3) run) assert_=== Some(1 -> 2)
 
   }
 }
