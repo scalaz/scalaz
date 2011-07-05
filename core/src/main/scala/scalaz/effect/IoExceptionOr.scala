@@ -17,6 +17,12 @@ sealed trait IoExceptionOr[A] {
 
   def exists(p: A => Boolean): Boolean =
     fold(_ => false, p)
+
+  def toOption: Option[A] =
+    fold(_ => None, Some(_))
+
+  def valueOr(a: => A): A =
+    fold(_ => a, x => x)
 }
 
 object IoExceptionOr extends IoExceptionOrs {

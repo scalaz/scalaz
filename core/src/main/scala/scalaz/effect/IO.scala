@@ -105,6 +105,7 @@ sealed trait IO[A] {
 }
 
 object IO extends IOs {
+
   def apply[A](a: => A): IO[A] =
     io(rw => (rw, a))
 }

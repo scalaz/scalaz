@@ -273,9 +273,6 @@ trait *[A] {
     if (p isDefinedAt value) p(value)
     else implicitly[Pointed[F]].point(value)
 
-  def enum[E, F[_], X](implicit e: iteratee.EnumerableT[A, E, F, X]): EnumerateeT[E, F, X] =
-    e apply value
-
 }
 
 object * extends **
