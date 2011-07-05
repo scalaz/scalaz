@@ -39,6 +39,7 @@ OptionTs with
 Orders with
 Pointeds with
 PointedFunctors with
+ReaderWriterStateTs with
 Semigroups with
 Shows with
 StateTs with
