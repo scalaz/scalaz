@@ -86,12 +86,11 @@ trait EnumerateeTs {
 
   implicit def ReaderEnumeratee[A](x: Reader): EnumerateeT[IoExceptionOr[Char], IO, A] =
     streamingEnumeratee(x, (i: Reader) => IoExceptionOr(i.read), (_: IoExceptionOr[Int]) map (_.toChar), (_, n: IoExceptionOr[Int]) => n exists (_ != -1))
-                                                                                  /*
+
   implicit def BufferedReaderEnumeratee[A](x: BufferedReader): EnumerateeT[IoExceptionOr[String], IO, A] =
-    streamingEnumeratee(x, (i: BufferedReader) => IoExceptionOr(i.readLine), _ exists (_ != null))
+    streamingEnumeratee(x, (i: BufferedReader) => IoExceptionOr(i.readLine), (z: IoExceptionOr[String]) => z, (_, n: IoExceptionOr[String]) => n exists (_ != null))
 
   implicit def InputStreamEnumeratee[A](x: InputStream): EnumerateeT[IoExceptionOr[Byte], IO, A] =
-    streamingEnumeratee(x, (i: InputStream) => IoExceptionOr(i.read.toByte), _ exists (_ != -1))
-    */
+    streamingEnumeratee(x, (i: InputStream) => IoExceptionOr(i.read), (_: IoExceptionOr[Int]) map (_.toByte), (_, n: IoExceptionOr[Int]) => n exists (_ != -1))
 
 }
