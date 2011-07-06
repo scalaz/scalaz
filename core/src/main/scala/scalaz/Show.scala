@@ -32,12 +32,6 @@ trait Shows {
 
   import Predef.{implicitly => i}
 
-  implicit def ShowContravariant: Contravariant[Show] = new Contravariant[Show] {
-    def contramap[A, B](f: B => A) =
-      r => show[B](b => r show (f(b)))
-  }
-
-
   implicit def ThrowableShow: Show[Throwable] = showA
 
   implicit def StringShow: Show[String] = showA

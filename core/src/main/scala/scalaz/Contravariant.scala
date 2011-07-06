@@ -30,4 +30,29 @@ trait Contravariants {
       }
   }
 
+  implicit def MetricSpaceContravariant: Contravariant[MetricSpace] = new Contravariant[MetricSpace] {
+    def contramap[A, B](f: B => A) =
+      _ contramap f
+  }
+
+  implicit def EqualContravariant: Contravariant[Equal] = new Contravariant[Equal] {
+    def contramap[A, B](f: B => A) =
+      _ contramap f
+  }
+
+  implicit def OrderContravariant: Contravariant[Order] = new Contravariant[Order] {
+    def contramap[A, B](f: B => A) =
+      _ contramap f
+  }
+
+  implicit def ShowContravariant: Contravariant[Show] = new Contravariant[Show] {
+    def contramap[A, B](f: B => A) =
+      _ contramap f
+  }
+
+  implicit def ResourceContravariant: Contravariant[Resource] = new Contravariant[Resource] {
+    def contramap[A, B](f: B => A) =
+      _ contramap f
+  }
+
 }

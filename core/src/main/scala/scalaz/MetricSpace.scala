@@ -21,11 +21,6 @@ trait MetricSpaces {
     val distance = f
   }
 
-  implicit def MetricSpaceContravariant: Contravariant[MetricSpace] = new Contravariant[MetricSpace] {
-    def contramap[A, B](f: B => A) =
-      r => metricSpace[B](b1 => b2 => r.distance(f(b1))(f(b2)))
-  }
-
   import *->*._
 
   def levenshtein[F[_], A](implicit l: Length[F], i: Index[F], e: Equal[A]): MetricSpace[F[A]] =

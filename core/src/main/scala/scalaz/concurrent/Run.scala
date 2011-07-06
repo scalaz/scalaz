@@ -6,6 +6,11 @@ sealed trait Run[A] {
   val strategy: Strategy
 
   def !(a: A) = strategy(e(a))
+
+  import Run._
+
+  def contramap[B](f: B => A): Run[B] =
+    run[B]((b) => this ! f(b))(strategy)
 }
 
 object Run extends Runs
@@ -20,7 +25,7 @@ trait Runs {
 
   implicit def RunContravariant: Contravariant[Run] = new Contravariant[Run] {
     def contramap[A, B](f: B => A) =
-      r => run[B]((b) => r ! f(b))(r.strategy)
+      _ contramap f
   }
 
 }

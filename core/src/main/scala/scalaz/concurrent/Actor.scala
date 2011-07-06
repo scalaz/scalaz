@@ -22,6 +22,11 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
 
   def apply(a: A) = this ! a
 
+  import Actor._
+
+  def contramap[B](f: B => A): Actor[B] =
+    actor[B]((b: B) => (this ! f(b))(), onError)(strategy)
+
   private val act: Run[Unit] = run((u: Unit) => {
     var go = true
     var i = 0
@@ -52,7 +57,7 @@ trait Actors {
   implicit def ActorContravariant: Contravariant[Actor] =
     new Contravariant[Actor] {
       def contramap[A, B](f: B => A) =
-        r => actor[B]((b: B) => (r ! f(b))(), r.onError)(r.strategy)
+        _ contramap f
     }
 
   implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _
