@@ -197,7 +197,7 @@ trait Functors extends FunctorsLow {
       _ map f
   }
 
-  implicit def CoStateFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
+  implicit def CoStateTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
     def fmap[A, B](f: A => B) =
       _ map f
   }
@@ -212,6 +212,12 @@ trait Functors extends FunctorsLow {
     def fmap[A, B](f: A => B) =
       _ map f
   }
+
+  implicit def ReaderWriterStateTFunctor[R, W, S, F[_]](implicit ftr: Functor[F]): Functor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] =
+    new Functor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
 
   implicit def StateTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = StateT[A, F, α]})#λ] = new Functor[({type λ[α] = StateT[A, F, α]})#λ] {
     def fmap[X, Y](f: X => Y) =

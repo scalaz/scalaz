@@ -155,6 +155,12 @@ trait Pointeds extends PointedsLow {
       NonEmptyList.nels(a)
   }
 
+  implicit def ReaderWriterStateTPointed[R, W: Zero, S, F[_] : Pointed]: Pointed[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] =
+    new Pointed[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
+      def point[A](a: => A) =
+        ReaderWriterStateT.readerWriterStateT(_ => s => implicitly[Pointed[F]].point((a, s, implicitly[Zero[W]].zero)))
+    }
+
   implicit def StepListTPointed[F[_] : Pointed]
   : Pointed[({type λ[X] = StepListT[F, X]})#λ] = new Pointed[({type λ[X] = StepListT[F, X]})#λ] {
     def point[A](a: => A) =
