@@ -1,8 +1,5 @@
 package scalaz
 
-import scalaz.Pointed._
-
-
 trait ApplicFunctor[F[_]] {
   val applic: Applic[F]
   val functor: Functor[F]
