@@ -62,7 +62,7 @@ sealed trait WriterT[W, F[_], A] {
     e.each((wa: (W, A)) => f(wa._2))(runT)
 
   def flatMap[B](f: A => WriterT[W, F, B])(implicit b: BindFunctor[F], s: Semigroup[W]): WriterT[W, F, B] =
-    writerT(b.bind((wa: (W, A)) => {
+    writerT(b.bd((wa: (W, A)) => {
       val z = f(wa._2).runT
       b.fmap((wb: (W, B)) => (s.append(wa._1, wb._1), wb._2))(z)
     })(runT))

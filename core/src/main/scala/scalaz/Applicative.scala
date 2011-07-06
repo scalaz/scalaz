@@ -213,7 +213,17 @@ trait Applicatives {
   implicit val NonEmptyListApplicative: Applicative[NonEmptyList] =
     applicative
 
+  implicit def ReaderWriterStateTApplicative[R, W: Monoid, S, F[_] : Monad]: Applicative[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = {
+    implicit val sg = implicitly[Monoid[W]].semigroup
+    implicit val z = implicitly[Monoid[W]].zero
+    implicit val b = implicitly[Monad[F]].bindFunctor
+    implicit val a = implicitly[Monad[F]].applic
+    implicit val p = implicitly[Monad[F]].pointedFunctor
+    applicative[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ]
+  }
+
   implicit def StateTApplicative[A, F[_]](implicit m: Monad[F]): Applicative[({type λ[α] = StateT[A, F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bindFunctor
     implicit val a = m.applic
     implicit val p = m.pointedFunctor
     applicative[({type λ[α] = StateT[A, F, α]})#λ]

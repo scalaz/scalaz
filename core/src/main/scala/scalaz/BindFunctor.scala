@@ -9,8 +9,20 @@ trait BindFunctor[F[_]] {
   def fmap[A, B](f: A => B): F[A] => F[B] =
     functor.fmap(f)
 
-  def bind[A, B](f: A => F[B]): F[A] => F[B] =
+  def bd[A, B](f: A => F[B]): F[A] => F[B] =
     bind.bind(f)
+
+  def applic: Applic[F] = new Applic[F] {
+    def applic[A, B](f: F[A => B]) =
+      a => bd((ff: A => B) => fmap((aa: A) => ff(aa))(a))(f)
+  }
+
+  def apply[A, B](f: F[A => B]): F[A] => F[B] =
+    applic.applic(f)
+
+  def liftA2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
+    a => b =>
+      bd((aa: A) => fmap((bb: B) => f(aa)(bb))(b))(a)
 
   def deriving[G[_]](implicit n: ^**^[G, F]): BindFunctor[G] = {
     implicit val b: Bind[G] = bind.deriving[G]
@@ -153,6 +165,12 @@ trait BindFunctors extends BindFunctorsLow {
 
   implicit val NonEmptyListBindFunctor: BindFunctor[NonEmptyList] =
     bindFunctor
+
+  implicit def ReaderWriterStateTBindFunctor[R, W: Semigroup, S, F[_] : BindFunctor]: BindFunctor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = new BindFunctor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
+    implicit val ftr = implicitly[BindFunctor[F]].functor
+    val functor = implicitly[Functor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ]]
+    val bind = implicitly[Bind[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ]]
+  }
 
   implicit def StateTBindFunctor[A, F[_] : BindFunctor]: BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] = new BindFunctor[({type λ[α] = StateT[A, F, α]})#λ] {
     implicit val ftr = implicitly[BindFunctor[F]].functor

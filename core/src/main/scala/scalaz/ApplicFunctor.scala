@@ -182,7 +182,13 @@ trait ApplicFunctors {
   implicit val NonEmptyListApplicFunctor: ApplicFunctor[NonEmptyList] =
     applicFunctor
 
-  implicit def StateTApplicFunctor[A, F[_]](implicit m: Monad[F]): ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = {
+  implicit def ReaderWriterStateTApplicFunctor[R, W: Semigroup, S, F[_] : BindFunctor]: ApplicFunctor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = {
+    implicit val a = implicitly[BindFunctor[F]].applic
+    implicit val f = implicitly[BindFunctor[F]].functor
+    applicFunctor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ]
+  }
+
+  implicit def StateTApplicFunctor[A, F[_]](implicit m: BindFunctor[F]): ApplicFunctor[({type λ[α] = StateT[A, F, α]})#λ] = {
     implicit val a = m.applic
     implicit val f = m.functor
     applicFunctor[({type λ[α] = StateT[A, F, α]})#λ]

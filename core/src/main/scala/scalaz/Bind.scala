@@ -264,7 +264,7 @@ trait Binds extends BindsLow {
       _ flatMap f
   }
 
-  implicit def ReaderWriterStateTBind[R, W, S, F[_]](implicit m: Monad[F], sg: Semigroup[W]): Bind[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] =
+  implicit def ReaderWriterStateTBind[R, W, S, F[_]](implicit m: BindFunctor[F], sg: Semigroup[W]): Bind[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] =
     new Bind[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
       def bind[A, B](f: A => ReaderWriterStateT[R, W, S, F, B]) =
         _ flatMap f

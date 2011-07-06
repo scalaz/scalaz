@@ -169,9 +169,9 @@ trait Applics {
         } yield ff(rr)
   }
 
-  implicit def ReaderWriterStateTApplic[R, W: Semigroup, S, F[_] : Monad]: Applic[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = new Applic[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
+  implicit def ReaderWriterStateTApplic[R, W: Semigroup, S, F[_] : BindFunctor]: Applic[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = new Applic[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
     def applic[X, Y](f: ReaderWriterStateT[R, W, S, F, X => Y]) = {
-      implicit val ftr = implicitly[Monad[F]].functor
+      implicit val ftr = implicitly[BindFunctor[F]].functor
       r =>
         for {
           ff <- f
@@ -180,9 +180,9 @@ trait Applics {
     }
   }
 
-  implicit def StateTApplic[A, F[_] : Monad]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
+  implicit def StateTApplic[A, F[_] : BindFunctor]: Applic[({type λ[α] = StateT[A, F, α]})#λ] = new Applic[({type λ[α] = StateT[A, F, α]})#λ] {
     def applic[X, Y](f: StateT[A, F, X => Y]) =
-      implicitly[Monad[({type λ[α] = StateT[A, F, α]})#λ]].liftM2[X => Y, X, Y](identity)(f)
+      implicitly[BindFunctor[({type λ[α] = StateT[A, F, α]})#λ]].liftA2[X => Y, X, Y](identity)(f)
   }
 
   implicit def StepListTApplic[F[_] : Functor]: Applic[({type λ[X] = StepListT[F, X]})#λ] = new Applic[({type λ[X] = StepListT[F, X]})#λ] {

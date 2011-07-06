@@ -223,6 +223,15 @@ trait Monads {
   implicit val NonEmptyListMonad: Monad[NonEmptyList] =
     monadBP
 
+  implicit def ReaderWriterStateTMonad[R, W: Monoid, S, F[_] : Monad]: Monad[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] = {
+    implicit val sg = implicitly[Monoid[W]].semigroup
+    implicit val z = implicitly[Monoid[W]].zero
+    implicit val bf = implicitly[Monad[F]].bindFunctor
+    implicit val bind = implicitly[Monad[F]].bind
+    implicit val pointed = implicitly[Monad[F]].pointed
+    monadBP[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ]
+  }
+
   implicit def StateTMonad[A, F[_] : Monad]: Monad[({type λ[α] = StateT[A, F, α]})#λ] = {
     implicit val bind = implicitly[Monad[F]].bind
     implicit val pointed = implicitly[Monad[F]].pointed

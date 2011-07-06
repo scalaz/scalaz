@@ -56,7 +56,7 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   def map[B](f: A => B)(implicit ftr: Functor[F]): ReaderWriterStateT[R, W, S, F, B] =
     readerWriterStateT(r => s => implicitly[Functor[F]].fmap((asw: (A, S, W)) => (f(asw._1), asw._2, asw._3))(apply(r)(s)))
 
-  def flatMap[B](f: A => ReaderWriterStateT[R, W, S, F, B])(implicit m: Monad[F], sg: Semigroup[W]): ReaderWriterStateT[R, W, S, F, B] =
+  def flatMap[B](f: A => ReaderWriterStateT[R, W, S, F, B])(implicit m: BindFunctor[F], sg: Semigroup[W]): ReaderWriterStateT[R, W, S, F, B] =
     readerWriterStateT(r => s => m.bd((asw: (A, S, W)) => m.fmap((bsw: (B, S, W)) => (bsw._1, bsw._2, sg.append(asw._3, bsw._3)))(f(asw._1).apply(r)(asw._2)))(apply(r)(s)))
 }
 
