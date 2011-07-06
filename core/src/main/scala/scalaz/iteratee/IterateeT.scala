@@ -7,7 +7,7 @@ import Identity._
 sealed trait IterateeT[E, F[_], A] {
 
   import IterateeT._
-  import EnumerateeT._
+  import EnumeratorT._
 
   def *->* : (({type λ[α] = IterateeT[E, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = IterateeT[E, F, α]})#λ, A](this)
@@ -62,13 +62,13 @@ sealed trait IterateeT[E, F[_], A] {
         ))(k(s)))
     )
 
-  def enumerateT(e: EnumerateeT[E, F, A]): IterT[E, F, A] =
+  def enumerateT(e: EnumeratorT[E, F, A]): IterT[E, F, A] =
     e enumerateT this
 
-  def enumerate(e: Enumeratee[E, A])(implicit x: IterateeT[E, F, A] =:= IterateeT[E, Identity, A], y: IterT[E, Identity, A] =:= IterT[E, F, A]): Iteratee[E, A] =
+  def enumerate(e: Enumerator[E, A])(implicit x: IterateeT[E, F, A] =:= IterateeT[E, Identity, A], y: IterT[E, Identity, A] =:= IterT[E, F, A]): Iteratee[E, A] =
     e enumerate this
 
-  def enumerateUp[G[_]](e: EnumerateeT[E, G, A])(implicit p: Pointed[G], t: CoPointedFunctor[F]): IterT[E, G, A] =
+  def enumerateUp[G[_]](e: EnumeratorT[E, G, A])(implicit p: Pointed[G], t: CoPointedFunctor[F]): IterT[E, G, A] =
     e enumerateUp this
 
   def mapI[G[_]](f: F ~> G)(implicit ftr: Functor[F]): IterateeT[E, G, A] =
