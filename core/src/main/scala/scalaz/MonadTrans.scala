@@ -47,4 +47,10 @@ trait MonadTranss {
     def lift[G[_] : Monad, A](a: G[A]): WriterT[W, G, A] =
       WriterT.writerT(implicitly[Monad[G]].fmap((a: A) => (implicitly[Zero[W]].zero, a))(a))
   }
+
+  implicit def ReaderWriterStateTMonadTrans[R, W: Monoid, S, A]: MonadTrans[({type λ[α[_], β] = ReaderWriterStateT[R, W, S, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = ReaderWriterStateT[R, W, S, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): ReaderWriterStateT[R, W, S, G, A] =
+      ReaderWriterStateT.readerWriterStateT(_ => s => implicitly[Monad[G]].fmap((z: A) => (z, s, implicitly[Monoid[W]].z))(a))
+  }
+
 }
