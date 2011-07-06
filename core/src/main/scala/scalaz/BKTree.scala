@@ -3,6 +3,8 @@ package scalaz
 import collection.immutable.IntMap
 import annotation.tailrec
 
+import BKTree._
+
 // http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html
 
 sealed trait BKTree[A] {
@@ -12,7 +14,7 @@ sealed trait BKTree[A] {
   def map[B](f: A => B): BKTree[B] =
     this match {
       case BKTreeEmpty() => BKTreeEmpty()
-      case BKTreeNode(a, s, c) => BKTreeNode(f(a), s, c.mapValues(_ map f))
+      case BKTreeNode(a, s, c) => BKTreeNode(f(a), s, c.transform((_: Int, z: BKTree[A]) => z map f))
     }
 
   def size: Int =
@@ -81,24 +83,24 @@ sealed trait BKTree[A] {
       }
     }
 
-  private def subChildren(d: Int, n: Int): Map[Int, BKTree[A]] =
+  private def subChildren(d: Int, n: Int): M[BKTree[A]] =
     this match {
       case BKTreeEmpty() => IntMap.empty
       case BKTreeNode(_, _, c) => subMap(c, d, n)
     }
 
-  private def subMap(m: Map[Int, BKTree[A]], d: Int, n: Int): Map[Int, BKTree[A]] =
+  private def subMap(m: M[BKTree[A]], d: Int, n: Int): M[BKTree[A]] =
     splitMap(splitMap(m, d - n - 1)._2, d + n + 1)._1
 
-  private def splitChildren(k: Int): (Map[Int, BKTree[A]], Map[Int, BKTree[A]]) =
+  private def splitChildren(k: Int): (M[BKTree[A]], M[BKTree[A]]) =
     this match {
       case BKTreeEmpty() => (IntMap.empty, IntMap.empty)
       case BKTreeNode(_, _, c) => splitMap(c, k)
     }
 
-  private def splitMap(m: Map[Int, BKTree[A]], k: Int): (Map[Int, BKTree[A]], Map[Int, BKTree[A]]) = {
-    var m1: Map[Int, BKTree[A]] = IntMap.empty
-    var m2: Map[Int, BKTree[A]] = IntMap.empty
+  private def splitMap(m: M[BKTree[A]], k: Int): (M[BKTree[A]], M[BKTree[A]]) = {
+    var m1: M[BKTree[A]] = IntMap.empty
+    var m2: M[BKTree[A]] = IntMap.empty
     for ((i, v) <- m.iterator) {
       if (i < k)
         m1 = m1 + ((i, v))
@@ -109,7 +111,7 @@ sealed trait BKTree[A] {
   }
 }
 
-private case class BKTreeNode[A](value: A, sz: Int, children: Map[Int, BKTree[A]]) extends BKTree[A]
+private case class BKTreeNode[A](value: A, sz: Int, children: M[BKTree[A]]) extends BKTree[A]
 
 private case class BKTreeEmpty[A]() extends BKTree[A]
 
@@ -119,5 +121,8 @@ object BKTree extends BKTrees {
 }
 
 trait BKTrees {
+  type M[A] =
+  IntMap[A]
+
   def emptyBKTree[A]: BKTree[A] = BKTreeEmpty()
 }
