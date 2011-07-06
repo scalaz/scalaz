@@ -40,6 +40,7 @@ Orders with
 Pointeds with
 PointedFunctors with
 ReaderWriterStateTs with
+Recursion with
 Semigroups with
 Shows with
 StateTs with
