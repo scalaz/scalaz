@@ -44,6 +44,11 @@ sealed trait StateT[S, F[_], A] {
 
   def flatMap[B](f: A => StateT[S, F, B])(implicit m: Bind[F]): StateT[S, F, B] =
     stateT[S, F, B](s => m.bind((as: (A, S)) => f(as._1) runT as._2)(runT(s)))
+
+  def rws[R, W](implicit ftr: Functor[F], z: Zero[W]): ReaderWriterStateT[A, W, S, F, A] =
+    ReaderWriterStateT.readerWriterStateT(r => s =>
+      implicitly[Functor[F]].fmap((as: (A, S)) => (as._1, as._2, z.zero))(runT(s)))
+
 }
 
 object StateT extends StateTs {

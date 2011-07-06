@@ -41,6 +41,10 @@ sealed trait Kleisli[A, F[_], B] {
 
   def <=<[C](c: Kleisli[C, F, A])(implicit b: Bind[F]): Kleisli[C, F, B] =
     c >=> this
+
+  def rws[W, S](implicit ftr: Functor[F], z: Zero[W]): ReaderWriterStateT[A, W, S, F, B] =
+    ReaderWriterStateT.readerWriterStateT(r => s =>
+      implicitly[Functor[F]].fmap((b: B) => (b, s, z.zero))(run(r)))
 }
 
 object Kleisli extends Kleislis {

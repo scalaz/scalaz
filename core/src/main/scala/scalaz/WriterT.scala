@@ -66,6 +66,11 @@ sealed trait WriterT[W, F[_], A] {
       val z = f(wa._2).runT
       b.fmap((wb: (W, B)) => (s.append(wa._1, wb._1), wb._2))(z)
     })(runT))
+
+  def rws[R, S](implicit ftr: Functor[F]): ReaderWriterStateT[A, W, S, F, A] =
+    ReaderWriterStateT.readerWriterStateT(_ => s =>
+      implicitly[Functor[F]].fmap((wa: (W, A)) => (wa._2, s, wa._1))(runT))
+
 }
 
 object WriterT extends WriterTs {
