@@ -39,6 +39,29 @@ sealed trait Function1W[T, R] {
 
   def equaling(implicit e: Equal[R]): (T, T) => Boolean =
     (t1, t2) => e.equal(k(t1))(k(t2))
+
+  import effect._
+
+  def withResource[K](
+                       value: => T
+                     , whenComputing: Throwable => IO[R] = (t: Throwable) => throw t
+                     , whenClosing: Throwable => IO[Unit] = _ => IO.ioUnit
+                     )(implicit r: Resource[T]): IO[R] =
+    try {
+      val u = value
+      try {
+        val r = k(u)
+        IO(r)
+      } finally {
+        try {
+          r close u
+        } catch {
+          case ex => whenClosing(ex)
+        }
+      }
+    } catch {
+      case ex => whenComputing(ex)
+    }
 }
 
 object Function1W extends Function1Ws
