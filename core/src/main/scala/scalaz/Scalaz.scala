@@ -80,7 +80,7 @@ trait Scalazs extends {
 
   val π = java.lang.Math.PI
 
-  val π2 = π * 2
+  val  = π * 2
 
   type ArraySeq[A] = collection.mutable.ArraySeq[A]
 
