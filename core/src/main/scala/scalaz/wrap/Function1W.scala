@@ -43,10 +43,10 @@ sealed trait Function1W[T, R] {
   import effect._
 
   def withResource[K](
-                       value: => T
-                     , whenComputing: Throwable => IO[R] = (t: Throwable) => throw t
-                     , whenClosing: Throwable => IO[Unit] = _ => IO.ioUnit
-                     )(implicit r: Resource[T]): IO[R] =
+                         value: => T
+                         , whenComputing: Throwable => IO[R] = (t: Throwable) => throw t
+                         , whenClosing: Throwable => IO[Unit] = _ => IO.ioUnit
+                         )(implicit r: Resource[T]): IO[R] =
     try {
       val u = value
       try {

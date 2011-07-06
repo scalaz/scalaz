@@ -36,27 +36,27 @@ trait EnumeratorTs {
 
   implicit def StreamEnumerator[E, A](x: Stream[E]): Enumerator[E, A] =
     enumerator((i: E >@> A) => x match {
-        case Stream() => i
-        case x #:: xs => i.fold(done = (_, _) => i, cont = k => StreamEnumerator(xs) enumerateT k(elInput(x)) value)
-      })
+      case Stream() => i
+      case x #:: xs => i.fold(done = (_, _) => i, cont = k => StreamEnumerator(xs) enumerateT k(elInput(x)) value)
+    })
 
   implicit def ListEnumerator[E, A](x: List[E]): Enumerator[E, A] =
     enumerator((i: E >@> A) => x match {
-        case Nil => i
-        case x :: xs => i.fold(done = (_, _) => i, cont = k => ListEnumerator(xs) enumerateT k(elInput(x)) value)
-      })
+      case Nil => i
+      case x :: xs => i.fold(done = (_, _) => i, cont = k => ListEnumerator(xs) enumerateT k(elInput(x)) value)
+    })
 
   implicit def EphemeralStreamEnumerator[E, A](x: EphemeralStream[E]): Enumerator[E, A] =
     enumerator((i: E >@> A) =>
-        if(x.isEmpty) i
-        else i.fold(done = (_, _) => i, cont = k => EphemeralStreamEnumerator(x.tail()) enumerateT k(elInput(x.head())) value))
+      if (x.isEmpty) i
+      else i.fold(done = (_, _) => i, cont = k => EphemeralStreamEnumerator(x.tail()) enumerateT k(elInput(x.head())) value))
 
   def streamingEnumerator[I, E, X, A](x: I, next: I => X, conv: X => E, nextable: (E, X) => Boolean): EnumeratorT[E, IO, A] = {
     def loop: IterateeT[E, IO, A] => IterT[E, IO, A] =
       i => {
         i.foldT(
           done = (_, _) => IO(i)
-        , cont = k => {
+          , cont = k => {
             val z = next(x)
             val c = conv(z)
             if (nextable(c, z)) k(elInput(c)) flatMap (loop(_)) else IO(i)
@@ -72,8 +72,8 @@ trait EnumeratorTs {
       i => {
         i.foldT(
           done = (_, _) => IO(i)
-        , cont = k => {
-            if(x.hasNext) {
+          , cont = k => {
+            if (x.hasNext) {
               val n = x.next
               k(elInput(n)) flatMap (loop(_))
             } else IO(i)

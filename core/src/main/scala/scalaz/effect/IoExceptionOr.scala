@@ -2,6 +2,7 @@ package scalaz.effect
 
 
 sealed trait IoExceptionOr[A] {
+
   import IoExceptionOr._
 
   def fold[X](ioException: IoException => X, or: A => X): X
@@ -42,7 +43,7 @@ trait IoExceptionOrs {
     e => new IoExceptionOr[A] {
       def fold[X](ioException: IoException => X, or: A => X) =
         ioException(e)
-      }
+    }
 
   def ioExceptionOr[A](a: A): IoExceptionOr[A] = new IoExceptionOr[A] {
     def fold[X](ioException: IoException => X, or: A => X) =

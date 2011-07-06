@@ -51,7 +51,7 @@ sealed trait IterateeT[E, F[_], A] {
 
   def flatMap[B](f: A => IterateeT[E, F, B])(implicit m: Monad[F]): IterateeT[E, F, B] =
     foldT(
-        (a, _) => f(a)
+      (a, _) => f(a)
       , k => continueT(s =>
         m.bd((_: IterateeT[E, F, A]).foldT(
           done = (aa, ii) => f(aa).foldT(
@@ -74,7 +74,7 @@ sealed trait IterateeT[E, F[_], A] {
   def mapI[G[_]](f: F ~> G)(implicit ftr: Functor[F]): IterateeT[E, G, A] =
     foldT(
       done = IterateeT.doneT(_, _)
-    , cont = k => Iteratee.continueT(i => f(ftr.fmap((x: IterateeT[E, F, A]) => x mapI f)(k(i))))
+      , cont = k => Iteratee.continueT(i => f(ftr.fmap((x: IterateeT[E, F, A]) => x mapI f)(k(i))))
     )
 
   def up[G[_]](implicit p: Pointed[G], f: CoPointedFunctor[F]): IterateeT[E, G, A] = {
@@ -271,6 +271,7 @@ trait IterateeTs {
   implicit def IterateeTApplic[X, F[_] : Monad]: Applic[({type λ[α] = IterateeT[X, F, α]})#λ] =
     new Applic[({type λ[α] = IterateeT[X, F, α]})#λ] {
       implicit val ftr = implicitly[Monad[F]].functor
+
       def applic[A, B](f: IterateeT[X, F, A => B]) =
         a =>
           for {
