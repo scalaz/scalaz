@@ -188,103 +188,50 @@ object Bind {
   import java.util._
   import java.util.concurrent._
 
+  private[this] def copy[A, B, CC[C] <: Collection[C]](as: CC[A], bs: CC[B], f: (A) => CC[B]): CC[B] = {
+    val i = as.iterator
+    while (i.hasNext)
+      bs.addAll(f(i.next))
+    bs
+  }
+
   implicit def JavaArrayListBind: Bind[ArrayList] = new Bind[ArrayList] {
-    def bind[A, B](r: ArrayList[A], f: A => ArrayList[B]) = {
-      val a = new ArrayList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: ArrayList[A], f: A => ArrayList[B]) = copy(r, new ArrayList[B], f)
   }
 
   implicit def JavaLinkedListBind: Bind[LinkedList] = new Bind[LinkedList] {
-    def bind[A, B](r: LinkedList[A], f: A => LinkedList[B]) = {
-      val a = new LinkedList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: LinkedList[A], f: A => LinkedList[B]) = copy(r, new LinkedList[B], f)
   }
 
   implicit def JavaPriorityQueueBind: Bind[PriorityQueue] = new Bind[PriorityQueue] {
-    def bind[A, B](r: PriorityQueue[A], f: A => PriorityQueue[B]) = {
-      val a = new PriorityQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: PriorityQueue[A], f: A => PriorityQueue[B]) = copy(r, new PriorityQueue[B], f)
   }
 
   implicit def JavaStackBind: Bind[Stack] = new Bind[Stack] {
-    def bind[A, B](r: Stack[A], f: A => Stack[B]) = {
-      val a = new Stack[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: Stack[A], f: A => Stack[B]) = copy(r, new Stack[B], f)
   }
 
   implicit def JavaVectorBind: Bind[Vector] = new Bind[Vector] {
-    def bind[A, B](r: Vector[A], f: A => Vector[B]) = {
-      val a = new Vector[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: Vector[A], f: A => Vector[B]) = copy(r, new Vector[B], f)
   }
 
   implicit def JavaArrayBlockingQueueBind: Bind[ArrayBlockingQueue] = new Bind[ArrayBlockingQueue] {
-    def bind[A, B](r: ArrayBlockingQueue[A], f: A => ArrayBlockingQueue[B]) = {
-      val a = new ArrayBlockingQueue[B](r.remainingCapacity)
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: ArrayBlockingQueue[A], f: A => ArrayBlockingQueue[B]) = copy(r, new ArrayBlockingQueue[B](r.remainingCapacity), f)
   }
 
   implicit def JavaConcurrentLinkedQueueBind: Bind[ConcurrentLinkedQueue] = new Bind[ConcurrentLinkedQueue] {
-    def bind[A, B](r: ConcurrentLinkedQueue[A], f: A => ConcurrentLinkedQueue[B]) = {
-      val a = new ConcurrentLinkedQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: ConcurrentLinkedQueue[A], f: A => ConcurrentLinkedQueue[B]) = copy(r, new ConcurrentLinkedQueue[B], f)
   }
 
   implicit def JavaCopyOnWriteArrayListBind: Bind[CopyOnWriteArrayList] = new Bind[CopyOnWriteArrayList] {
-    def bind[A, B](r: CopyOnWriteArrayList[A], f: A => CopyOnWriteArrayList[B]) = {
-      val a = new CopyOnWriteArrayList[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: CopyOnWriteArrayList[A], f: A => CopyOnWriteArrayList[B]) = copy(r, new CopyOnWriteArrayList[B], f)
   }
 
   implicit def JavaLinkedBlockingQueueBind: Bind[LinkedBlockingQueue] = new Bind[LinkedBlockingQueue] {
-    def bind[A, B](r: LinkedBlockingQueue[A], f: A => LinkedBlockingQueue[B]) = {
-      val a = new LinkedBlockingQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: LinkedBlockingQueue[A], f: A => LinkedBlockingQueue[B]) = copy(r, new LinkedBlockingQueue[B], f)
   }
 
   implicit def JavaSynchronousQueueBind: Bind[SynchronousQueue] = new Bind[SynchronousQueue] {
-    def bind[A, B](r: SynchronousQueue[A], f: A => SynchronousQueue[B]) = {
-      val a = new SynchronousQueue[B]
-      val i = r.iterator
-      while (i.hasNext)
-        a.addAll(f(i.next))
-      a
-    }
+    def bind[A, B](r: SynchronousQueue[A], f: A => SynchronousQueue[B]) = copy(r, new SynchronousQueue[B], f)
   }
 }
