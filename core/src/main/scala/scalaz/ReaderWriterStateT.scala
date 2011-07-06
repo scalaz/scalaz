@@ -8,6 +8,8 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   def *->* : (({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ, A](this)
 
+  import ReaderWriterStateT._
+
   def run(r: R, s: S)(implicit i: F[(A, S, W)] =:= Identity[(A, S, W)]): (A, S, W) =
     apply(r)(s).value
 
@@ -51,6 +53,11 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   def exec(r: R)(implicit ftr: Functor[F]): StateT[S, F, W] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._3, asw._2))(apply(r)(s)))
 
+  def map[B](f: A => B)(implicit ftr: Functor[F]): ReaderWriterStateT[R, W, S, F, B] =
+    readerWriterStateT(r => s => implicitly[Functor[F]].fmap((asw: (A, S, W)) => (f(asw._1), asw._2, asw._3))(apply(r)(s)))
+
+  def flatMap[B](f: A => ReaderWriterStateT[R, W, S, F, B])(implicit m: Monad[F], sg: Semigroup[W]): ReaderWriterStateT[R, W, S, F, B] =
+    readerWriterStateT(r => s => m.bd((asw: (A, S, W)) => m.fmap((bsw: (B, S, W)) => (bsw._1, bsw._2, sg.append(asw._3, bsw._3)))(f(asw._1).apply(r)(asw._2)))(apply(r)(s)))
 }
 
 object ReaderWriterStateT extends ReaderWriterStateTs {
