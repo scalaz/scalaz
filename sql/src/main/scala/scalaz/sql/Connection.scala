@@ -1,4 +1,5 @@
-package scalaz.sql
+package scalaz
+package sql
 
 
 sealed trait Connection {
