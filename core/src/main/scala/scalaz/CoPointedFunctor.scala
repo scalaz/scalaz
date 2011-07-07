@@ -16,6 +16,9 @@ trait CoPointedFunctor[F[_]] {
 object CoPointedFunctor extends CoPointedFunctors
 
 trait CoPointedFunctors {
+  type CopointedFunctor[F[_]] =
+  CoPointedFunctor[F]
+
   implicit def coPointedFunctor[F[_]](implicit t: Functor[F], c: CoPointed[F]): CoPointedFunctor[F] = new CoPointedFunctor[F] {
     val functor = t
     val coPointed = c

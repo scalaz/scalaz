@@ -7,6 +7,8 @@ trait CoMonadTrans[F[_[_], _]] {
 object CoMonadTrans extends CoMonadTranss
 
 trait CoMonadTranss {
+  type ComonadTrans[F[_[_], _]] =
+  CoMonadTrans[F]
 
   implicit def CoStateTCoMonadTrans[S]: CoMonadTrans[({type λ[α[_], β] = CoStateT[S, α, β]})#λ] = new CoMonadTrans[({type λ[α[_], β] = CoStateT[S, α, β]})#λ] {
     def lower[G[_] : Extend, A](a: CoStateT[S, G, A]) =

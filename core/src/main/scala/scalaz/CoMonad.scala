@@ -34,6 +34,9 @@ trait CoMonad[F[_]] {
 object CoMonad extends CoMonads
 
 trait CoMonads {
+  type Comonad[F[_]] =
+  CoMonad[F]
+
   def coMonad[F[_]](implicit b: CoBind[F], j: CoJoin[F], p: CoPointedFunctor[F]): CoMonad[F] = new CoMonad[F] {
     val coBind = b
     val coPointed = p.coPointed

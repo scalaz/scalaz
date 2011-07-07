@@ -7,6 +7,9 @@ trait CoJoin[M[_]] {
 object CoJoin extends CoJoins
 
 trait CoJoins {
+  type Cojoin[F[_]] =
+  CoJoin[F]
+
   implicit def ListCoJoin: CoJoin[List] = new CoJoin[List] {
     def coJoin[A] = a => a.tails.toList
   }

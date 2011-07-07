@@ -75,7 +75,12 @@ object CoStateT extends CoStateTs {
 }
 
 trait CoStateTs {
-  type CoState[A, B] = CoStateT[A, Identity, B]
+  type CoState[A, B] =
+  CoStateT[A, Identity, B]
+  type CostateT[A, F[_], B] =
+  CoStateT[A, F, B]
+  type Costate[A, B] =
+  CoState[A, B]
 
   type PartialApplyCoState[A] =
   PartialApply1Of2[CoState, A]

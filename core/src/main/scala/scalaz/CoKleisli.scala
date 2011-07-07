@@ -40,6 +40,9 @@ object CoKleisli extends CoKleislis {
 }
 
 trait CoKleislis {
+  type Cokleisli[A, W[_], B] =
+  CoKleisli[A, W, B]
+
   type RedaerT[A, F[_], B] = CoKleisli[A, F, B]
   type Redaer[A, B] = CoKleisli[A, Identity, B]
 

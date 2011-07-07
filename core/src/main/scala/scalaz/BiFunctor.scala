@@ -11,7 +11,7 @@ package scalaz
  * </ol>
  * </p>
  */
-trait Bifunctor[F[_, _]] {
+trait BiFunctor[F[_, _]] {
   def bimap[A, B, C, D](f: A => C, g: B => D): F[A, B] => F[C, D]
 
   def leftMap[A, B, C](f: A => C): F[A, B] => F[C, B] =
@@ -24,20 +24,23 @@ trait Bifunctor[F[_, _]] {
     bimap(f, f)
 }
 
-object Bifunctor {
-  implicit def Tuple2Bifunctor: Bifunctor[Tuple2] = new Bifunctor[Tuple2] {
+object BiFunctor {
+  type Bifunctor[F[_, _]]=
+  BiFunctor[F]
+
+  implicit def Tuple2BiFunctor: BiFunctor[Tuple2] = new BiFunctor[Tuple2] {
     def bimap[A, B, C, D](f: A => C, g: B => D) =
       k => (f(k._1), g(k._2))
   }
 
-  implicit def EitherBifunctor: Bifunctor[Either] = new Bifunctor[Either] {
+  implicit def EitherBiFunctor: BiFunctor[Either] = new BiFunctor[Either] {
     def bimap[A, B, C, D](f: A => C, g: B => D) = {
       case Left(a) => Left(f(a))
       case Right(b) => Right(g(b))
     }
   }
 
-  implicit def ValidationBifunctor: Bifunctor[Validation] = new Bifunctor[Validation] {
+  implicit def ValidationBiFunctor: BiFunctor[Validation] = new BiFunctor[Validation] {
     def bimap[A, B, C, D](f: A => C, g: B => D) = {
       case Failure(a) => Validation.failure(f(a))
       case Success(b) => Validation.success(g(b))
@@ -47,7 +50,7 @@ object Bifunctor {
   import java.util.Map.Entry
   import java.util.AbstractMap.SimpleImmutableEntry
 
-  implicit def MapEntryBifunctor: Bifunctor[Entry] = new Bifunctor[Entry] {
+  implicit def MapEntryBiFunctor: BiFunctor[Entry] = new BiFunctor[Entry] {
     def bimap[A, B, C, D](f: A => C, g: B => D) =
       k => new SimpleImmutableEntry(f(k.getKey), g(k.getValue))
   }

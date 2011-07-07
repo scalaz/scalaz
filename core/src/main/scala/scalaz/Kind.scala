@@ -642,6 +642,7 @@ trait *->*[F[_], A] {
         lazy val u = w -!- (j - 1)
         lazy val e = equ.equal(t)(u)
 
+
         val g = m {
           case (a, b) => get(a, b)
         }
@@ -1025,10 +1026,10 @@ trait *->*->*[A, F[_, _], B] {
   def ⋙[C](x: F[B, C])(implicit c: Compose[F]): F[A, C] =
     >>>(x)
 
-  def :->[D](g: B => D)(implicit t: Bifunctor[F]): F[A, D] =
+  def :->[D](g: B => D)(implicit t: BiFunctor[F]): F[A, D] =
     t.rightMap(g)(value)
 
-  def <-:[C](f: A => C)(implicit t: Bifunctor[F]): F[C, B] =
+  def <-:[C](f: A => C)(implicit t: BiFunctor[F]): F[C, B] =
     t.leftMap(f)(value)
 
   def first[C](implicit a: Arrow[F]): F[(A, C), (B, C)] =
@@ -1052,7 +1053,7 @@ trait *->*->*[A, F[_, _], B] {
   def >>^[C](f: B => C)(implicit a: Arrow[F]): F[A, C] =
     a.mapsnd(f)(value)
 
-  def <:>[C](f: A => C)(implicit z: B <:< C, t: Bifunctor[F]): F[C, C] =
+  def <:>[C](f: A => C)(implicit z: B <:< C, t: BiFunctor[F]): F[C, C] =
     t.bimap(f, z)(value)
 }
 

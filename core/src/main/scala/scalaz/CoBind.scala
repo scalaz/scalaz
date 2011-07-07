@@ -13,6 +13,9 @@ trait CoBind[F[_]] {
 object CoBind extends CoBinds
 
 trait CoBinds {
+  type Cobind[F[_]] =
+  CoBind[F]
+
   def coBind[F[_]](implicit e: Extend[F]): CoBind[F] = new CoBind[F] {
     def coBind[A, B](f: F[A] => B) =
       e.functor.fmap(f) compose e.coJoin.coJoin
