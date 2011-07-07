@@ -33,6 +33,7 @@
     <orderEntry type="module" module-name="scalaz-geo" exported="" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" exported="" />
     <orderEntry type="module" module-name="scalaz-geo-scalacheck" exported="" />
+    <orderEntry type="module" module-name="scalaz-sql" />
   </component>
 </module>
 

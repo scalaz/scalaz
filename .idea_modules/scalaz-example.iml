@@ -30,6 +30,7 @@
     <orderEntry type="library" scope="TEST" name="org.scala-lang_scala-compiler_2.9.0-1" level="project" />
     <orderEntry type="module" module-name="scalaz-core" exported="" />
     <orderEntry type="module" module-name="scalaz-geo" exported="" />
+    <orderEntry type="module" module-name="scalaz-sql" />
   </component>
 </module>
 

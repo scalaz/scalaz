@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-geo.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-geo.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-geo-scalacheck.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-geo-scalacheck.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-scalacheck-binding.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-scalacheck-binding.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-sql.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-sql.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea_modules/scalaz-test-suite.iml" filepath="$PROJECT_DIR$/.idea_modules/scalaz-test-suite.iml" />
     </modules>
   </component>

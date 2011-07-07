@@ -9,7 +9,7 @@ object ScalazBuild extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings,
-    aggregate = Seq(core, geo, example, scalacheckBinding, scalacheckGeo, tests, full)
+    aggregate = Seq(core, geo, example, scalacheckBinding, scalacheckGeo, sql, tests, full)
   )
 
   lazy val core = Project(
@@ -55,11 +55,18 @@ object ScalazBuild extends Build {
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
     )
   )
+  
+  lazy val sql = Project(
+    id = "scalaz-sql",
+    base = file("sql"),
+    dependencies = Seq(core),
+    settings = standardSettings
+  )
 
   lazy val example = Project(
     id = "scalaz-example",
     base = file("example"),
-    dependencies = Seq(core, geo, http),
+    dependencies = Seq(core, geo, sql, http),
     settings = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv), Dependency.ServletApi))
     )
@@ -68,7 +75,7 @@ object ScalazBuild extends Build {
   lazy val tests = Project(
     id = "scalaz-test-suite",
     base = file("tests"),
-    dependencies = Seq(core, geo, scalacheckBinding, scalacheckGeo),
+    dependencies = Seq(core, geo, sql, scalacheckBinding, scalacheckGeo),
     settings = standardSettings ++ Seq(
       libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv)))
     )
@@ -76,7 +83,7 @@ object ScalazBuild extends Build {
 
   lazy val full = {
     // The projects that are packaged in the full distribution.
-    val projects = Seq(core, scalacheckBinding, geo, scalacheckGeo, example)
+    val projects = Seq(core, scalacheckBinding, geo, scalacheckGeo, sql, example)
 
     // Some intermediate keys to simplify extracting a task or setting from `projects`.
     val allPackagedArtifacts = TaskKey[Seq[Map[Artifact, File]]]("all-packaged-artifacts")

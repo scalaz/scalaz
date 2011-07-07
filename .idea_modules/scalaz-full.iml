@@ -32,6 +32,7 @@
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" exported="" />
     <orderEntry type="module" module-name="scalaz-example" exported="" />
     <orderEntry type="module" module-name="scalaz-test-suite" exported="" />
+    <orderEntry type="module" module-name="scalaz-sql" />
   </component>
 </module>
 
