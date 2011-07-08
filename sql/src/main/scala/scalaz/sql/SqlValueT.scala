@@ -16,6 +16,10 @@ trait SqlValueTs {
   type SqlValue[A] =
   SqlValueT[Identity, A]
 
+  def eitherSqlValueT[F[_], A](a: EitherT[SqlException, F, A]): SqlValueT[F, A] = new SqlValueT[F, A] {
+    val value = a
+  }
+
   def sqlValueT[F[_], A](a: F[A])(implicit ftr: Functor[F]): SqlValueT[F, A] = new SqlValueT[F, A] {
     val value = EitherT.eitherT(ftr.fmap((a: A) => Right(a): Either[SqlException, A])(a))
   }
@@ -39,6 +43,16 @@ trait SqlValueTs {
     def foldl[A, B] = k => b => s =>
       implicitly[Foldl[({type λ[α] = EitherT[SqlException, F, α]})#λ]].foldl(k)(b)(s.value)
   }
+
+  implicit def SqlValueTTraverse[F[_]: Traverse]: Traverse[({type λ[α] = SqlValueT[F, α]})#λ] =
+    implicitly[Traverse[({type λ[α] = EitherT[SqlException, F, α]})#λ]].xmap[({type λ[α] = SqlValueT[F, α]})#λ](
+      new (({type λ[α] = EitherT[SqlException, F, α]})#λ ~> ({type λ[α] = SqlValueT[F, α]})#λ) {
+        def apply[A](a: EitherT[SqlException, F, A]) = eitherSqlValueT(a)
+      }
+    , new (({type λ[α] = SqlValueT[F, α]})#λ ~> ({type λ[α] = EitherT[SqlException, F, α]})#λ) {
+        def apply[A](a: SqlValueT[F, A]) = a.value
+      }
+    )
 
   implicit val SqlValueTMonadTrans: MonadTrans[SqlValueT] = new MonadTrans[SqlValueT] {
     def lift[G[_] : Monad, A](a: G[A]): SqlValueT[G, A] =
