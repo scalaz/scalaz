@@ -5,6 +5,15 @@ import SqlValueT._
 
 sealed trait SqlValueT[F[_], A] {
   val value: EitherT[SqlException, F, A]
+
+  import SqlValueT._
+
+  def map[B](f: A => B)(implicit ftr: Functor[F]): SqlValueT[F, B] =
+    eitherSqlValueT(value map f)
+
+  def flatMap[B](f: A => SqlValueT[F, B])(implicit m: Monad[F]): SqlValueT[F, B] =
+    eitherSqlValueT(value flatMap (f(_).value))
+
 }
 
 object SqlValueT extends SqlValueTs
