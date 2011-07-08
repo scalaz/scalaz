@@ -30,6 +30,16 @@ trait SqlValueTs {
   def sqlError[A]: SqlException => SqlValue[A] =
     e => sqlErrorT(Identity.id(e))
 
+  implicit def SqlValueTFoldr[F[_]: Foldr]: Foldr[({type λ[α] = SqlValueT[F, α]})#λ] = new Foldr[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def foldr[A, B] = k => b => s =>
+      implicitly[Foldr[({type λ[α] = EitherT[SqlException, F, α]})#λ]].foldr(k)(b)(s.value)
+  }
+
+  implicit def SqlValueTFoldl[F[_]: Foldl]: Foldl[({type λ[α] = SqlValueT[F, α]})#λ] = new Foldl[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def foldl[A, B] = k => b => s =>
+      implicitly[Foldl[({type λ[α] = EitherT[SqlException, F, α]})#λ]].foldl(k)(b)(s.value)
+  }
+
   implicit val SqlValueTMonadTrans: MonadTrans[SqlValueT] = new MonadTrans[SqlValueT] {
     def lift[G[_] : Monad, A](a: G[A]): SqlValueT[G, A] =
       new SqlValueT[G, A] {
