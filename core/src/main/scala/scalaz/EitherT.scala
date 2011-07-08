@@ -90,7 +90,7 @@ sealed trait EitherT[A, F[_], B] {
   def flatMap[C](f: B => EitherT[A, F, C])(implicit m: Monad[F]): EitherT[A, F, C] =
     eitherT(m.bd((_: Either[A, B]).fold(a => m.point(Left(a): Either[A, C]), b => f(b).runT))(runT))
 
-  def left = new LeftProjectionT[A, F, B]() {
+  def left: LeftProjectionT[A, F, B] = new LeftProjectionT[A, F, B]() {
     val e = EitherT.this
   }
 
