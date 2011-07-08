@@ -24,12 +24,4 @@ trait Generators {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
       c.foldl(r.z)(b => a => r.snoc(b, a))
   }
-
-  def FoldMapGenerator[F[_] : FoldMap]: Generator[F] = new Generator[F] {
-    override def reduce[E, M](r: Reducer[E, M], c: F[E]): M = {
-      implicit val mm = r.monoid
-      val y = implicitly[FoldMap[F]].foldMap[E, M](e => r.unit(e))
-      y(c)
-    }
-  }
 }

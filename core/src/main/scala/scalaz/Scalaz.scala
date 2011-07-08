@@ -18,7 +18,6 @@ Endos with
 EphemeralStreams with
 Equals with
 FailProjections with
-Foldables with
 Foldls with
 Functors with
 Heaps with

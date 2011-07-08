@@ -80,9 +80,6 @@ trait ZipStreams {
   implicit def ZipStreamFoldl: Foldl[ZipStream] =
     implicitly[Foldl[Stream]].deriving[ZipStream]
 
-  implicit def ZipStreamFoldable: Foldable[ZipStream] =
-    implicitly[Foldable[Stream]].deriving[ZipStream]
-
   implicit def ZipStreamIndex: Index[ZipStream] =
     implicitly[Index[Stream]].deriving[ZipStream]
 

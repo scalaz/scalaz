@@ -9,6 +9,11 @@ trait Foldr[F[_]] {
   def foldMap[A, M](f: A => M)(implicit m: Monoid[M]): F[A] => M =
     foldr[A, M](a => b => m.append(f(a), b))(m.z)
 
+  def foldU[M](a: F[M])(implicit m: Monoid[M]): M = {
+    val k = foldMap[M, M](z => z)
+    k(a)
+  }
+
   def deriving[G[_]](implicit n: ^**^[G, F]): Foldr[G] =
     new Foldr[G] {
       def foldr[A, B]: (A => (=> B) => B) => B => G[A] => B =
@@ -20,16 +25,6 @@ trait Foldr[F[_]] {
 object Foldr extends Foldrs
 
 trait Foldrs extends FoldrsLow {
-
-  def foldMapFoldr[F[_] : FoldMap]: Foldr[F] = new Foldr[F] {
-    def foldr[A, B]: (A => (=> B) => B) => B => F[A] => B =
-      k => b => as => {
-        val m = implicitly[FoldMap[F]].foldMap((a: A) => Endo.endo[B](k(a)))
-        val e = m(as)
-        e(b)
-      }
-  }
-
   implicit val OptionFoldr: Foldr[Option] = new Foldr[Option] {
     def foldr[A, B] =
       f => z => {
@@ -137,7 +132,6 @@ trait Foldrs extends FoldrsLow {
       , right = _ => z
       )
   }
-
 
 }
 

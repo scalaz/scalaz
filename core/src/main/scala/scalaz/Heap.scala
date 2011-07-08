@@ -377,12 +377,4 @@ trait Heaps {
   def unapply[A](h: Heap[A]): Option[(Int, (A, A) => Boolean, Tree[Ranked[A]])] =
     h.fold(None, (sz, leq, t) => Some((sz, leq, t)))
 
-  implicit val HeapFoldMap: FoldMap[Heap] = new FoldMap[Heap] {
-    def foldMap[A, M: Monoid](f: A => M) =
-      as => {
-        def p = foldMap[A, M](f)
-        as.fold(implicitly[Monoid[M]].z, (_, _, t) => implicitly[Monoid[M]].append(f(t.rootLabel.value), p(as.deleteMin)))
-      }
-  }
-
 }

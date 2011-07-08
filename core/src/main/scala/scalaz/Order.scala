@@ -126,7 +126,7 @@ trait Orders {
   implicit def Tuple2Order[A: Order, B: Order]: Order[(A, B)] =
     orderC {
       case ((a1, b1), (a2, b2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
         ))
@@ -135,7 +135,7 @@ trait Orders {
   implicit def Tuple3Order[A: Order, B: Order, C: Order]: Order[(A, B, C)] =
     orderC {
       case ((a1, b1, c1), (a2, b2, c2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
           , implicitly[Order[C]].order(c1)(c2)
@@ -145,7 +145,7 @@ trait Orders {
   implicit def Tuple4Order[A: Order, B: Order, C: Order, D: Order]: Order[(A, B, C, D)] =
     orderC {
       case ((a1, b1, c1, d1), (a2, b2, c2, d2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
           , implicitly[Order[C]].order(c1)(c2)
@@ -156,7 +156,7 @@ trait Orders {
   implicit def Tuple5Order[A: Order, B: Order, C: Order, D: Order, E: Order]: Order[(A, B, C, D, E)] =
     orderC {
       case ((a1, b1, c1, d1, e1), (a2, b2, c2, d2, e2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
           , implicitly[Order[C]].order(c1)(c2)
@@ -168,7 +168,7 @@ trait Orders {
   implicit def Tuple6Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order]: Order[(A, B, C, D, E, F)] =
     orderC {
       case ((a1, b1, c1, d1, e1, f1), (a2, b2, c2, d2, e2, f2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
           , implicitly[Order[C]].order(c1)(c2)
@@ -181,7 +181,7 @@ trait Orders {
   implicit def Tuple7Order[A: Order, B: Order, C: Order, D: Order, E: Order, F: Order, G: Order]: Order[(A, B, C, D, E, F, G)] =
     orderC {
       case ((a1, b1, c1, d1, e1, f1, g1), (a2, b2, c2, d2, e2, f2, g2)) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[A]].order(a1)(a2)
           , implicitly[Order[B]].order(b1)(b2)
           , implicitly[Order[C]].order(c1)(c2)
@@ -243,7 +243,7 @@ trait Orders {
   implicit def JavaMapEntryOrder[K: Order, V: Order]: Order[java.util.Map.Entry[K, V]] =
     orderC {
       case (a1, a2) =>
-        implicitly[FoldMap[List]].foldU(List(
+        implicitly[Foldr[List]].foldU(List(
           implicitly[Order[K]].order(a1.getKey)(a2.getKey)
           , implicitly[Order[V]].order(a1.getValue)(a2.getValue)
         ))

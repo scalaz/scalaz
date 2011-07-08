@@ -75,9 +75,6 @@ trait FirstOptions {
   implicit def FirstOptionFoldl: Foldl[FirstOption] =
     implicitly[Foldl[Option]].deriving[FirstOption]
 
-  implicit def FirstOptionFoldable: Foldable[FirstOption] =
-    implicitly[Foldable[Option]].deriving[FirstOption]
-
   implicit def FirstOptionIndex: Index[FirstOption] =
     implicitly[Index[Option]].deriving[FirstOption]
 
