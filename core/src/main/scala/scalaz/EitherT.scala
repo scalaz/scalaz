@@ -57,11 +57,13 @@ sealed trait EitherT[A, F[_], B] {
   def forall(f: B => Boolean)(implicit i: F[Either[A, B]] =:= Identity[Either[A, B]]): Boolean =
     run.right forall f
 
-  def orElseT(x: => Either[A, B])(implicit ftr: Functor[F]): EitherT[A, F, B] =
-    eitherT(ftr.fmap((e: Either[A, B]) => e.fold(_ => x, _ => e))(runT))
-
-  def orElse(x: => Either[A, B])(implicit i: F[Either[A, B]] =:= Identity[Either[A, B]]): Either[A, B] =
-    run.fold(_ => x, _ => run)
+  def orElse(x: => EitherT[A, F, B])(implicit m: Bind[F]): EitherT[A, F, B] = {
+    val g = runT
+    EitherT(m.bind((z: Either[A, B]) => z match {
+      case Left(_) => x.runT
+      case Right(_) => g
+    })(g))
+  }
 
   def toOptionT(implicit ftr: Functor[F]): OptionT[F, B] =
     optionT(ftr.fmap((_: Either[A, B]).right toOption)(runT))
@@ -123,11 +125,13 @@ object EitherT extends EitherTs {
     def forall(f: A => Boolean)(implicit i: F[Either[A, B]] =:= Identity[Either[A, B]]): Boolean =
       e.run.left forall f
 
-    def orElseT(x: => Either[A, B])(implicit ftr: Functor[F]): EitherT[A, F, B] =
-      eitherT(ftr.fmap((e: Either[A, B]) => e.fold(_ => e, _ => x))(e.runT))
-
-    def orElse(x: => Either[A, B])(implicit i: F[Either[A, B]] =:= Identity[Either[A, B]]): Either[A, B] =
-      e.run.fold(_ => x, _ => e.run)
+    def orElse(x: => EitherT[A, F, B])(implicit m: Bind[F]): EitherT[A, F, B] = {
+      val g = e.runT
+      EitherT(m.bind((z: Either[A, B]) => z match {
+        case Left(_) => g
+        case Right(_) => x.runT
+      })(g))
+    }
 
     def toOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
       optionT(ftr.fmap((_: Either[A, B]).left toOption)(e.runT))
@@ -164,9 +168,15 @@ trait EitherTs {
     val runT = a
   }
 
+  type \/[A, B] =
+  EitherT[A, Identity, B]
+
   def leftT[A, F[_], B](a: A)(implicit p: Pointed[F]): EitherT[A, F, B] =
     eitherT(p.point(Left(a): Either[A, B]))
 
   def rightT[A, F[_], B](b: B)(implicit p: Pointed[F]): EitherT[A, F, B] =
     eitherT(p.point(Right(b): Either[A, B]))
+
+  def fromEither[A, F[_], B](e: A \/ B)(implicit p: Pointed[F]): EitherT[A, F, B] =
+    eitherT(p.point(e.runT.value))
 }
