@@ -3,6 +3,11 @@ package scalaz
 trait Traverse[T[_]] {
   def traverse[F[_] : Applicative, A, B](f: A => F[B]): T[A] => F[T[B]]
 
+  def trav[F[_] : Applicative, A, B](a: T[A], f: A => F[B]): F[T[B]] = {
+    val z = traverse(f)
+    z(a)
+  }
+
   def functor: Functor[T] = new Functor[T] {
     def fmap[A, B](f: A => B) = t => {
       val k = traverse[Identity, A, B](a => Identity.id(f(a)))
@@ -176,6 +181,66 @@ trait Traverses extends TraversesLow {
   implicit def MapEntryTraverse[X]: Traverse[({type λ[α] = Entry[X, α]})#λ] = new Traverse[({type λ[α] = Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       as => implicitly[Applicative[F]].fmap[B, Entry[X, B]](new SimpleImmutableEntry(as.getKey, _))(f(as.getValue))
+  }
+
+  implicit def OptionTTraverse[F[_]: Traverse]: Traverse[({type λ[α] = OptionT[F, α]})#λ] = new Traverse[({type λ[α] = OptionT[F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[Option[B]]) => OptionT.optionT(o))(implicitly[Traverse[F]].trav(k.runT, (o: Option[A]) => implicitly[Traverse[Option]].trav(o, f)))
+  }
+
+  implicit def LazyOptionTTraverse[F[_]: Traverse]: Traverse[({type λ[α] = LazyOptionT[F, α]})#λ] = new Traverse[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[LazyOption[B]]) => LazyOptionT.lazyOptionT(o))(implicitly[Traverse[F]].trav(k.runT, (o: LazyOption[A]) => implicitly[Traverse[LazyOption]].trav(o, f)))
+  }
+
+  implicit def EitherTTraverse[F[_]: Traverse, X]: Traverse[({type λ[α] = EitherT[X, F, α]})#λ] = new Traverse[({type λ[α] = EitherT[X, F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[Either[X, B]]) => EitherT.eitherT(o))(implicitly[Traverse[F]].trav(k.runT, (o: Either[X, A]) => implicitly[Traverse[({type λ[α] = Either[X, α]})#λ]].trav(o, f)))
+  }
+
+  implicit def LeftEitherTTraverse[F[_]: Traverse, X]: Traverse[({type λ[α] = EitherT.LeftProjectionT[X, F, α]})#λ] = new Traverse[({type λ[α] = EitherT.LeftProjectionT[X, F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[Either[X, B]]) => EitherT.eitherT(o).left)(implicitly[Traverse[F]].trav(k.e.runT, (o: Either[X, A]) => implicitly[Traverse[({type λ[α] = Either[X, α]})#λ]].trav(o, f)))
+  }
+
+  implicit def LazyLeftEitherTTraverse[F[_]: Traverse, X]: Traverse[({type λ[α] = LazyEitherT.LazyLeftProjectionT[X, F, α]})#λ] = new Traverse[({type λ[α] = LazyEitherT.LazyLeftProjectionT[X, F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[LazyEither[X, B]]) => LazyEitherT.lazyEitherT(o).left)(implicitly[Traverse[F]].trav(k.e.runT, (o: LazyEither[X, A]) => implicitly[Traverse[({type λ[α] = LazyEither[X, α]})#λ]].trav(o, f)))
+  }
+
+  implicit def LazyEitherTTraverse[F[_]: Traverse, X]: Traverse[({type λ[α] = LazyEitherT[X, F, α]})#λ] = new Traverse[({type λ[α] = LazyEitherT[X, F, α]})#λ] {
+    def traverse[G[_] : Applicative, A, B](f: A => G[B]) =
+      k =>
+        implicitly[Applicative[G]].fmap((o: F[LazyEither[X, B]]) => LazyEitherT.lazyEitherT(o))(implicitly[Traverse[F]].trav(k.runT, (o: LazyEither[X, A]) => implicitly[Traverse[({type λ[α] = LazyEither[X, α]})#λ]].trav(o, f)))
+  }
+
+  implicit val LazyOptionTraverse: Traverse[LazyOption] = new Traverse[LazyOption] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      _.fold(
+        some = x => implicitly[Applicative[F]].fmap((b: B) => LazyOption.lazySome(b))(f(x))
+      , none = implicitly[Applicative[F]].point(LazyOption.lazyNone[B])
+      )
+  }
+
+  implicit def LazyEitherTraverse[X]: Traverse[({type λ[α] = LazyEither[X, α]})#λ] = new Traverse[({type λ[α] = LazyEither[X, α]})#λ] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      _.fold(
+        left  = x => implicitly[Applicative[F]].point(LazyEither.lazyLeft[B](x))
+      , right = x => implicitly[Applicative[F]].fmap((b: B) => (LazyEither.lazyRight[X](b)))(f(x))
+      )
+  }
+
+  implicit def LazyLeftEitherTraverse[X]: Traverse[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Traverse[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      _.e.fold(
+        left  = x => implicitly[Applicative[F]].fmap((b: B) => (LazyEither.lazyLeft[X](b)).left)(f(x))
+      , right = x => implicitly[Applicative[F]].point(LazyEither.lazyRight[B](x).left)
+      )
   }
 
 }
