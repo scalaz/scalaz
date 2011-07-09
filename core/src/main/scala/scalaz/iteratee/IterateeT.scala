@@ -186,31 +186,6 @@ trait IterateeTs {
   }
 
   /**
-   * Takes while the given predicate holds, appending with the given monoid.
-   */
-  def takeWhile[A, F[_]](pred: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (A >@> F[A]) = {
-    def peekStepDoneOr(z: F[A]) = peekDoneOr(z, step(z, _: A))
-
-    def step(acc: F[A], a: A): (A >@> F[A]) =
-      if (pred(a))
-        drop(1) flatMap (_ => peekStepDoneOr(mon.append(acc, pt.point(a))))
-      else
-        done(acc, eofInput)
-
-    peekStepDoneOr(mon.z)
-  }
-
-  /**
-   * Produces chunked output split by the given predicate.
-   */
-  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (A >@> F[A]) = {
-    peek flatMap {
-      case None => done(mon.z, emptyInput[A])
-      case Some(h) => takeWhile(pred(_, h))
-    }
-  }
-
-  /**
    * Repeats the given iteratee by appending with the given monoid.
    */
   def repeat[E, A, F[_]](iter: E >@> A)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (E >@> F[A]) = {
