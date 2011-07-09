@@ -200,11 +200,13 @@ sealed trait LazyEitherT[A, F[_], B] {
   def forall(f: (=> B) => Boolean)(implicit i: F[LazyEither[A, B]] =:= Identity[LazyEither[A, B]]): Boolean =
     run forall f
 
-  def orElseT(x: => LazyEither[A, B])(implicit ftr: Functor[F]): LazyEitherT[A, F, B] =
-    lazyEitherT(ftr.fmap((_: LazyEither[A, B]) orElse x)(runT))
-
-  def orElse(x: => LazyEither[A, B])(implicit i: F[LazyEither[A, B]] =:= Identity[LazyEither[A, B]]): LazyEither[A, B] =
-    run orElse x
+  def orElse(x: => LazyEitherT[A, F, B])(implicit m: Bind[F]): LazyEitherT[A, F, B] ={
+    val g = runT
+    LazyEitherT(m.bind((z: LazyEither[A, B]) => z.fold(
+      _ => x.runT
+    , _ => g
+    ))(g))
+  }
 
   def toLazyOptionT(implicit ftr: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(ftr.fmap((_: LazyEither[A, B]) toLazyOption)(runT))
@@ -292,11 +294,13 @@ trait LazyEitherTs {
     def forall(f: (=> A) => Boolean)(implicit i: F[LazyEither[A, B]] =:= Identity[LazyEither[A, B]]): Boolean =
       e.run.left forall f
 
-    def orElseT(x: => LazyEither[A, B])(implicit ftr: Functor[F]): LazyEitherT[A, F, B] =
-      lazyEitherT(ftr.fmap((_: LazyEither[A, B]).left orElse x)(e.runT))
-
-    def orElse(x: => LazyEither[A, B])(implicit i: F[LazyEither[A, B]] =:= Identity[LazyEither[A, B]]): LazyEither[A, B] =
-      e.run.left orElse x
+    def orElse(x: => LazyEitherT[A, F, B])(implicit m: Bind[F]): LazyEitherT[A, F, B] = {
+      val g = e.runT
+      LazyEitherT(m.bind((z: LazyEither[A, B]) => z.fold(
+        _ => g
+      , _ => x.runT
+      ))(g))
+    }
 
     def toLazyOptionT(implicit ftr: Functor[F]): LazyOptionT[F, A] =
       lazyOptionT(ftr.fmap((_: LazyEither[A, B]).left toLazyOption)(e.runT))

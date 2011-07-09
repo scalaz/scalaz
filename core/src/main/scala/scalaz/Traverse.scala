@@ -18,6 +18,13 @@ trait Traverse[T[_]] {
   def fmap[A, B](f: A => B): T[A] => T[B] =
     functor.fmap(f)
 
+  def xmap[U[_]](f: T ~> U, g: U ~> T): Traverse[U] =
+    new Traverse[U] {
+      def traverse[F[_] : Applicative, A, B](k: A => F[B]) =
+        a =>
+          implicitly[Applicative[F]].fmap((z: T[B]) => f(z))(Traverse.this.trav[F, A, B](g(a), k))
+    }
+
   def deriving[G[_]](implicit n: ^**^[G, T]): Traverse[G] =
     new Traverse[G] {
       def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
