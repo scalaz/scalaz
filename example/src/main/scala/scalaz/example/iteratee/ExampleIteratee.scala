@@ -33,5 +33,11 @@ object ExampleIteratee {
     val m1 = head[Int] >>= ((b:Option[Int]) => head[Int] map (b2 => (b <|*|> b2)))
     (m1 enumerate Stream(1,2,3) run) assert_=== Some(1 -> 2)
 
+    val coli = takeWhile[Int, Identity, List[Int]]((_:Int) <= 5) apply collect[Int, List]
+    ((coli enumerate (1 to 10).toStream run) run) assert_=== (1 to 5).toList
+    (coli flatMap { i: Iteratee[Int, List[Int]] => length[Int] map (l => i.run :+ l) } enumerate (1 to 17).toStream run) assert_=== (1 to 5).toList :+ 12
+
+    val colc = takeWhile[IoExceptionOr[Char], IO, List[IoExceptionOr[Char]]](_.fold(_ => false, _ != ' ')) apply collect[IoExceptionOr[Char], List].up[IO]
+    (colc enumerateT r map { _ map { _ map { _.map(_.toOption).sequence } } } flatMap { _.runT } flatMap { _.runT } unsafePerformIO) assert_=== Some(List('f', 'i', 'l', 'e'))
   }
 }
