@@ -4,6 +4,7 @@ sealed trait WriterT[W, F[_], A] {
   val runT: F[(W, A)]
 
   import WriterT._
+  import =~~=._
 
   def *->* : (({type λ[α] = WriterT[W, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = WriterT[W, F, α]})#λ, A](this)
@@ -11,8 +12,8 @@ sealed trait WriterT[W, F[_], A] {
   def *->*->* : *->*->*[W, ({type λ[α, β] = WriterT[α, F, β]})#λ, A] =
     scalaz.*->*->*.!**->**->**![W, ({type λ[α, β] = WriterT[α, F, β]})#λ, A](this)
 
-  def run(implicit i: F[(W, A)] =:= Identity[(W, A)]): (W, A) =
-    runT.value
+  def run(implicit i: F =~~= Identity): (W, A) =
+    runT
 
   def mapValue[X, B](f: ((W, A)) => (X, B))(implicit ftr: Functor[F]): WriterT[X, F, B] =
     writerT(ftr.fmap(f)(runT))
@@ -23,19 +24,19 @@ sealed trait WriterT[W, F[_], A] {
   def writtenT(implicit ftr: Functor[F]): F[W] =
     ftr.fmap((_: (W, A))._1)(runT)
 
-  def written(implicit i: F[(W, A)] =:= Identity[(W, A)]): W =
+  def written(implicit i: F =~~= Identity): W =
     run._1
 
   def overT(implicit ftr: Functor[F]): F[A] =
     ftr.fmap((_: (W, A))._2)(runT)
 
-  def over(implicit i: F[(W, A)] =:= Identity[(W, A)]): A =
+  def over(implicit i: F =~~= Identity): A =
     run._2
 
   def swapT(implicit ftr: Functor[F]): WriterT[A, F, W] =
     mapValue(wa => (wa._2, wa._1))
 
-  def swap(implicit i: F[(W, A)] =:= Identity[(W, A)]): Writer[A, W] = {
+  def swap(implicit i: F =~~= Identity): Writer[A, W] = {
     val (w, a) = run
     writer((a, w))
   }
