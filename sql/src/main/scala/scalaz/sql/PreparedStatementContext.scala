@@ -5,48 +5,54 @@ import Scalaz._
 
 sealed trait PreparedStatementContext {
   val preparedStatement: PreparedStatement
-  val parameters: Option[(JdbcType, Int)]
+  val parameter: Option[(JdbcType, Int)]
 
   import PreparedStatementContext._
 
-  def setParameters(t: JdbcType, n: Int) =
+  def setParameter(t: JdbcType, n: Int) =
     preparedStatementContextPS(t, n)(preparedStatement)
 
-  def unsetParameters =
+  def unsetParameter =
     preparedStatementContext(preparedStatement)
 
-  def withParameters(k: (JdbcType, Int) => (JdbcType, Int)) =
-    parameters match {
+  def withParameter(k: (JdbcType, Int) => (JdbcType, Int)) =
+    parameter match {
       case None         => this
-      case Some((p, q)) => k(p, q) match { case (x, y) => setParameters(x, y) }
+      case Some((p, q)) => k(p, q) match { case (x, y) => setParameter(x, y) }
     }
 
-  def parametersOr(o: => (JdbcType, Int)): (JdbcType, Int) =
-    parameters getOrElse o
+  def withType(k: JdbcType => JdbcType) =
+    withParameter { case (t, i) => (k(t), i) }
 
-  def parametersType: Option[JdbcType] =
-    parameters map (_._1)
+  def withIndex(k: Int => Int) =
+    withParameter { case (t, i) => (t, k(i)) }
 
-  def parametersTypeOr(t: => JdbcType): JdbcType =
-    parametersType getOrElse t
+  def parameterOr(o: => (JdbcType, Int)): (JdbcType, Int) =
+    parameter getOrElse o
 
-  def parametersIndex: Option[Int] =
-    parameters map (_._2)
+  def parameterType: Option[JdbcType] =
+    parameter map (_._1)
 
-  def parametersIndexOr(n: => Int): Int =
-    parametersIndex getOrElse n
+  def parameterTypeOr(t: => JdbcType): JdbcType =
+    parameterType getOrElse t
+
+  def parameterIndex: Option[Int] =
+    parameter map (_._2)
+
+  def parameterIndexOr(n: => Int): Int =
+    parameterIndex getOrElse n
 
   def preparedStatementStore: PreparedStatementContext |--> PreparedStatement =
-    store(parameters match {
+    store(parameter match {
       case None => preparedStatementContext
       case Some((t, i)) => preparedStatementContextPS(t, i)
     }, preparedStatement)
 
-  def parametersStore: PreparedStatementContext |--> Option[(JdbcType, Int)] =
+  def parameterStore: PreparedStatementContext |--> Option[(JdbcType, Int)] =
     store((p => (p match {
       case None => preparedStatementContext
       case Some((t, i)) => preparedStatementContextPS(t, i)
-    })(preparedStatement), parameters))
+    })(preparedStatement), parameter))
 
 }
 
@@ -57,19 +63,26 @@ trait PreparedStatementContexts {
   def preparedStatementContext: PreparedStatement => PreparedStatementContext =
     e => new PreparedStatementContext {
       val preparedStatement = e
-      val parameters = None
+      val parameter = None
     }
 
   def preparedStatementContextPS(t: JdbcType, i: Int): PreparedStatement => PreparedStatementContext =
     e => new PreparedStatementContext {
       val preparedStatement = e
-      val parameters = Some(t, i)
+      val parameter = Some(t, i)
     }
 
   val preparedStatement: PreparedStatementContext @@ PreparedStatement =
     Lens(_.preparedStatementStore)
 
-  val parameters: PreparedStatementContext @@ Option[(JdbcType, Int)] =
-    Lens(_.parametersStore)
+  val parameter: PreparedStatementContext @@ Option[(JdbcType, Int)] =
+    Lens(_.parameterStore)
+
+  implicit def PreparedStatementContextShow: Show[PreparedStatementContext] =
+    Show.shows(q => "PreparedStatementContext[ " + q.preparedStatement + " " +
+      (q.parameter match {
+         case None => "<no parameter>"
+         case Some((t, i)) => "with parameter {" + implicitly[Show[JdbcType]].shows(t) + ", " + implicitly[Show[Int]].show(i) +"}"
+      }) + " ]")
 
 }
