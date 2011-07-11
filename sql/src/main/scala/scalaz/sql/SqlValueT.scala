@@ -239,6 +239,9 @@ trait SqlValueTs {
   sealed trait ErrProjectionT[F[_], A] {
     val x: SqlValueT[F, A]
 
+    def foreach(f: Err => Unit)(implicit e: Each[F]): Unit =
+      x.value.left foreach f
+
     def orT(default: => Err)(implicit ftr: Functor[F]): F[Err] =
       x.value.left getOrElseT default
 

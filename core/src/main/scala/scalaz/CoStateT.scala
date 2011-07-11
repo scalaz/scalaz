@@ -81,6 +81,12 @@ trait CoStateTs {
   CoStateT[A, F, B]
   type Costate[A, B] =
   CoState[A, B]
+  // CoState is also known as Store
+  type Store[A, B] =
+  CoState[A, B]
+  // flipped
+  type |-->[A, B] =
+  CoState[B, A]
 
   type PartialApplyCoState[A] =
   PartialApply1Of2[CoState, A]
@@ -91,5 +97,11 @@ trait CoStateTs {
 
   def coState[A, B](r: (A => B, A)): CoState[A, B] =
     coStateT[A, Identity, B](Identity.id(r._1), r._2)
+
+  def costate[A, B](r: (A => B, A)): CoState[A, B] =
+    coState(r)
+
+  def store[A, B](r: (A => B, A)): Store[A, B] =
+    coState(r)
 
 }
