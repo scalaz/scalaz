@@ -27,6 +27,9 @@ sealed trait SqlValueT[F[_], A] {
   def isValue(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
     value isRight
 
+  def fold[X](e: Err => X, a: A => X)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): X =
+    value.run fold (e, a)
+
   def map[B](f: A => B)(implicit ftr: Functor[F]): SqlValueT[F, B] =
     eitherSqlValueT(value map f)
 
@@ -188,6 +191,12 @@ trait SqlValueTs {
     PointedFunctor.pointedFunctor[({type λ[α] = SqlValueT[F, α]})#λ]
   }
 
+  implicit def SqlValueTMonad[F[_]: Monad]: Monad[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val bd = implicitly[Monad[F]].bind
+    implicit val p = implicitly[Monad[F]].pointed
+    Monad.monadBP[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
   implicit def SqlValueTFoldr[F[_]: Foldr]: Foldr[({type λ[α] = SqlValueT[F, α]})#λ] = new Foldr[({type λ[α] = SqlValueT[F, α]})#λ] {
     def foldr[A, B] = k => b => s =>
       implicitly[Foldr[({type λ[α] = EitherT[Err, F, α]})#λ]].foldr(k)(b)(s.value)
@@ -207,6 +216,41 @@ trait SqlValueTs {
         def apply[A](a: SqlValueT[F, A]) = a.value
       }
     )
+
+  implicit def SqlValueTPlus[F[_]](implicit m: ApplicFunctor[F]): Plus[({type λ[α] = SqlValueT[F, α]})#λ] = new Plus[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def plus[A](a1: SqlValueT[F, A], a2: => SqlValueT[F, A]) =
+      eitherSqlValueT(EitherT(m.liftA2((a1: Either[Err, A]) => (a2: Either[Err, A]) => a1 fold (_ => a2 fold (_ => a1, _ => a2), _ => a1))(a1.value.runT)(a2.value.runT)))
+  }
+
+  implicit def SqlValueTEmpty[F[_]](implicit p: Pointed[F]): Empty[({type λ[α] = SqlValueT[F, α]})#λ] = new Empty[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def empty[A] = eitherSqlValueT(EitherT(p.point(Left(new SqlException))))
+  }
+
+  implicit def SqlValueTMonadEmpty[F[_]: Monad]: MonadEmpty[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    MonadEmpty.monadEmpty[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
+  implicit def SqlValueTMonadEmptyPlus[F[_]: Monad]: MonadEmptyPlus[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    implicit val ap = implicitly[Monad[F]].applicFunctor
+    MonadEmptyPlus.monadEmptyPlus[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
+  implicit def SqlValueZero[A]: Zero[SqlValue[A]] =
+    Zero.zero(sqlError(new SqlException))
+
+  implicit def SqlValueSemigroup[A]: Semigroup[SqlValue[A]] =
+    Semigroup.semigroup(a1 => a2 => a1 fold (_ => a2 fold (_ => a1, _ => a2), _ => a1))
+
+  implicit def SqlValueMonoid[A]: Monoid[SqlValue[A]] =
+    Monoid.monoid
+
+  implicit def SqlValueShow[A](implicit s: Show[A]): Show[SqlValue[A]] =
+    Show.shows(_.fold(
+      e => ("sql-error(" + e + ")") // todo call shows on e
+    , a => ("sql-value(" + s.shows(a) + ")")
+    ))
 
   implicit val SqlValueTMonadTrans: MonadTrans[SqlValueT] = new MonadTrans[SqlValueT] {
     def lift[G[_] : Monad, A](a: G[A]): SqlValueT[G, A] =
