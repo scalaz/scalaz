@@ -14,6 +14,10 @@ trait Query {
 
   def bindingsStore: (Query |--> List[JdbcType]) =
     store(b => query(sql, b), bindings)
+
+  def unsetBindings: Query =
+    bindingsStore put Nil
+
 }
 
 object Query extends Querys

@@ -29,8 +29,8 @@ sealed trait CoStateT[A, F[_], B] {
   def putT(implicit ftr: Functor[F]): A => F[B] =
     a => ftr.fmap((k: A => B) => k(a))(runT._1)
 
-  def put(implicit i: F[A => B] =:= Identity[A => B]): A => B =
-    run._1
+  def put(a: A)(implicit i: F[A => B] =:= Identity[A => B]): B =
+    run._1(a)
 
   def pos: A =
     runT._2
