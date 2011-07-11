@@ -16,11 +16,13 @@ import Kleisli._
 sealed trait RegionT[S, P[_], A] {
   val value: Kleisli[IORef[List[RefCountedFinalizer]], P, A]
 
+  import =~~=._
+
   def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =
     value.run(r)
 
-  def run(r: IORef[List[RefCountedFinalizer]])(implicit i: P[A] =:= Identity[A]): A =
-    runT(r).value
+  def run(r: IORef[List[RefCountedFinalizer]])(implicit i: P =~~= Identity): A =
+    runT(r)
 }
 
 object RegionT extends RegionTs
