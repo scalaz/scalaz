@@ -1,6 +1,8 @@
 package scalaz
 package sql
 
+import SqlExceptionContext._
+
 sealed trait SqlValueT[F[_], A] {
   import SqlValueT._
 
@@ -94,7 +96,7 @@ trait SqlValueTs {
   SqlValueT[Identity, A]
 
   type Err =
-    SqlException
+    SqlExceptionContext
 
   def eitherSqlValueT[F[_], A](a: EitherT[Err, F, A]): SqlValueT[F, A] = new SqlValueT[F, A] {
     val value = a
@@ -115,7 +117,7 @@ trait SqlValueTs {
   }
 
   def sqlErrorMessageT[F[_], A](a: F[String])(implicit ftr: Functor[F]): SqlValueT[F, A] =
-    sqlErrorT(implicitly[Functor[F]].fmap((s: String) => new SqlException(s))(a))
+    sqlErrorT(implicitly[Functor[F]].fmap((s: String) => sqlExceptionContext(new SqlException(s)))(a))
 
   def sqlValue[A]: A => SqlValue[A] =
     a => sqlValueT(Identity.id(a))
@@ -200,7 +202,7 @@ trait SqlValueTs {
   }
 
   implicit def SqlValueTEmpty[F[_]](implicit p: Pointed[F]): Empty[({type λ[α] = SqlValueT[F, α]})#λ] = new Empty[({type λ[α] = SqlValueT[F, α]})#λ] {
-    def empty[A] = eitherSqlValueT(EitherT(p.point(Left(new SqlException))))
+    def empty[A] = eitherSqlValueT(EitherT(p.point(Left(sqlExceptionContext(new SqlException)))))
   }
 
   implicit def SqlValueTMonadEmpty[F[_]: Monad]: MonadEmpty[({type λ[α] = SqlValueT[F, α]})#λ] = {
@@ -215,7 +217,7 @@ trait SqlValueTs {
   }
 
   implicit def SqlValueZero[A]: Zero[SqlValue[A]] =
-    Zero.zero(sqlError(new SqlException))
+    Zero.zero(sqlError(sqlExceptionContext(new SqlException)))
 
   implicit def SqlValueSemigroup[A]: Semigroup[SqlValue[A]] =
     Semigroup.semigroup(a1 => a2 => a1 fold (_ => a2 fold (_ => a1, _ => a2), _ => a1))
@@ -225,7 +227,7 @@ trait SqlValueTs {
 
   implicit def SqlValueShow[A](implicit s: Show[A]): Show[SqlValue[A]] =
     Show.shows(_.fold(
-      e => ("sql-error(" + e + ")") // todo call shows on e
+      e => ("sql-error(" + implicitly[Show[Err]].shows(e) + ")")
     , a => ("sql-value(" + s.shows(a) + ")")
     ))
 
