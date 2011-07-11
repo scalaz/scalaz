@@ -6,6 +6,7 @@ sealed trait CoStateT[A, F[_], B] {
   val runT: (F[A => B], A)
 
   import CoStateT._
+  import =~~=._
 
   def *->* : (({type λ[α] = CoStateT[A, F, α]})#λ *->* B) =
     scalaz.*->*.!**->**![({type λ[α] = CoStateT[A, F, α]})#λ, B](this)
@@ -16,20 +17,20 @@ sealed trait CoStateT[A, F[_], B] {
   private def mapRunT[C](f: (A => B) => C)(implicit ftr: Functor[F]): (F[C], A) =
     (ftr.fmap((z: A => B) => f(z))(runT._1), runT._2)
 
-  private def mapRun[C](f: (A => B) => C)(implicit i: F[A => B] =:= Identity[A => B]): (C, A) = {
+  private def mapRun[C](f: (A => B) => C)(implicit i: F =~~= Identity): (C, A) = {
     val (k, a) = run
     (f(k), a)
   }
 
-  def run(implicit i: F[A => B] =:= Identity[A => B]): (A => B, A) = {
+  def run(implicit i: F =~~= Identity): (A => B, A) = {
     val (k, a) = runT
-    (k.value, a)
+    (k, a)
   }
 
   def putT(implicit ftr: Functor[F]): A => F[B] =
     a => ftr.fmap((k: A => B) => k(a))(runT._1)
 
-  def put(a: A)(implicit i: F[A => B] =:= Identity[A => B]): B =
+  def put(a: A)(implicit i: F =~~= Identity): B =
     run._1(a)
 
   def pos: A =
@@ -38,7 +39,7 @@ sealed trait CoStateT[A, F[_], B] {
   def copointT(implicit p: CoPointed[F]): B =
     p.coPoint(runT._1)(runT._2)
 
-  def copoint(implicit i: F[A => B] =:= Identity[A => B]): B =
+  def copoint(implicit i: F =~~= Identity): B =
     run._1(run._2)
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[A, F, C] =
@@ -49,7 +50,7 @@ sealed trait CoStateT[A, F[_], B] {
         p.coBind((ff: F[A => B]) => (a: A) => coStateT[A, F, B]((ff, a)))(runT._1)
         , pos))
 
-  def duplicate(implicit i: F[A => B] =:= Identity[A => B]): CoState[A, CoState[A, B]] =
+  def duplicate(implicit i: F =~~= Identity): CoState[A, CoState[A, B]] =
     coState[A, CoState[A, B]](
       mapRun[A => CoState[A, B]](k => a =>
         coState[A, B]((k, run._2))))
@@ -62,7 +63,7 @@ sealed trait CoStateT[A, F[_], B] {
         , pos
         ))
 
-  def cobind[C](f: CoState[A, B] => C)(implicit i: F[A => B] =:= Identity[A => B]): CoState[A, C] =
+  def cobind[C](f: CoState[A, B] => C)(implicit i: F =~~= Identity): CoState[A, C] =
     coState[A, C]((
         (a: A) => f(coState[A, B]((run._1, a)))
         , pos

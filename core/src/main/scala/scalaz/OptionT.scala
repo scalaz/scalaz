@@ -4,47 +4,48 @@ sealed trait OptionT[F[_], A] {
   val runT: F[Option[A]]
 
   import OptionT._
+  import =~~=._
 
   def *->* : (({type λ[α] = OptionT[F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = OptionT[F, α]})#λ, A](this)
 
-  def run(implicit i: F[Option[A]] =:= Identity[Option[A]]): Option[A] =
-    runT.value
+  def run(implicit i: F =~~= Identity): Option[A] =
+    runT
 
   def isDefinedT(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: Option[A]).isDefined)(runT)
 
-  def isDefined(implicit i: F[Option[A]] =:= Identity[Option[A]]): Boolean =
+  def isDefined(implicit i: F =~~= Identity): Boolean =
     run.isDefined
 
   def isEmptyT(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: Option[A]).isEmpty)(runT)
 
-  def isEmpty(implicit i: F[Option[A]] =:= Identity[Option[A]]): Boolean =
+  def isEmpty(implicit i: F =~~= Identity): Boolean =
     run.isEmpty
 
   def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
     ftr.fmap((_: Option[A]).getOrElse(default))(runT)
 
-  def getOrElse(default: => A)(implicit i: F[Option[A]] =:= Identity[Option[A]]): A =
+  def getOrElse(default: => A)(implicit i: F =~~= Identity): A =
     run.getOrElse(default)
 
   def existsT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: Option[A]).exists(f))(runT)
 
-  def exists(f: A => Boolean)(implicit i: F[Option[A]] =:= Identity[Option[A]]): Boolean =
+  def exists(f: A => Boolean)(implicit i: F =~~= Identity): Boolean =
     run.exists(f)
 
   def forallT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     ftr.fmap((_: Option[A]).forall(f))(runT)
 
-  def forall(f: A => Boolean)(implicit i: F[Option[A]] =:= Identity[Option[A]]): Boolean =
+  def forall(f: A => Boolean)(implicit i: F =~~= Identity): Boolean =
     run.forall(f)
 
   def orElseT(a: => Option[A])(implicit ftr: Functor[F]): OptionT[F, A] =
     optionT(ftr.fmap((_: Option[A]).orElse(a))(OptionT.this.runT))
 
-  def orElse(a: => Option[A])(implicit i: F[Option[A]] =:= Identity[Option[A]]): Option[A] =
+  def orElse(a: => Option[A])(implicit i: F =~~= Identity): Option[A] =
     run.orElse(a)
 
   def map[B](f: A => B)(implicit ftr: Functor[F]): OptionT[F, B] =

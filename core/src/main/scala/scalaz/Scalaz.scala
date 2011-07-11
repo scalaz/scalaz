@@ -63,7 +63,8 @@ Scalazs with
 ~>> with
 ^^*^^ with
 ~** with
-!**
+!** with
+==~~==
 
 object Scalazing extends Scalazs
 
