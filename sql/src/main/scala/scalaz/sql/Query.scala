@@ -9,7 +9,7 @@ trait Query {
 
   import Query._
 
-  def sqlStore: (Query |--> String) =
+  def sqlStore: Query |--> String =
     store(s => query(s, bindings), sql)
 
   def bindingsStore: (Query |--> List[JdbcType]) =
@@ -29,4 +29,7 @@ trait Querys {
 
   val bindings: Query @@ List[JdbcType] =
     Lens(_.bindingsStore)
+
+  implicit def QueryShow: Show[Query] =
+    Show.shows(q => "Query(" + q.sql + ") " + implicitly[Show[List[JdbcType]]].shows(q.bindings))
 }
