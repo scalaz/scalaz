@@ -86,7 +86,10 @@ sealed trait SqlValueT[F[_], A] {
 
 }
 
-object SqlValueT extends SqlValueTs
+object SqlValueT extends SqlValueTs {
+  def apply[F[_], A](a: EitherT[Err, F, A]): SqlValueT[F, A] =
+    eitherSqlValueT(a)
+}
 
 trait SqlValueTs {
   type SqlException =
