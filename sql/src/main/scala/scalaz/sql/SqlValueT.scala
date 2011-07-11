@@ -39,71 +39,48 @@ sealed trait SqlValueT[F[_], A] {
   def flatMap[B](f: A => SqlValueT[F, B])(implicit m: Monad[F]): SqlValueT[F, B] =
     eitherSqlValueT(value flatMap (f(_).value))
 
-  def valueOrT(default: => A)(implicit ftr: Functor[F]): F[A] =
+  def err: ErrProjectionT[F, A] = new ErrProjectionT[F, A] {
+    val x = SqlValueT.this
+  }
+
+  def orT(default: => A)(implicit ftr: Functor[F]): F[A] =
     value getOrElseT default
 
-  def valueOr(default: => A)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): A =
+  def or(default: => A)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): A =
     value getOrElse default
 
-  def errorOrT(default: => Err)(implicit ftr: Functor[F]): F[Err] =
-    value.left getOrElseT default
-
-  def errorOr(default: => Err)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Err =
-    value.left getOrElse default
-
-  def valueExistsT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+  def existsT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     value existsT f
 
-  def valueExists(f: A => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
+  def exists(f: A => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
     value exists f
 
-  def errorExistsT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
-    value.left existsT f
-
-  def errorExists(f: Err => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
-    value.left exists f
-
-  def valueForallT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+  def forallT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     value forallT f
 
-  def valueForall(f: A => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
+  def forall(f: A => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
     value forall f
 
-  def errorForallT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
-    value.left forallT f
-
-  def errorForall(f: Err => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
-    value.left forall f
-
-  def valueOrElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
+  def orElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
     eitherSqlValueT(value orElse x.value)
 
-  def errorOrElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
-    eitherSqlValueT(value.left orElse x.value)
-
-  def valueOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
+  def toOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
     value toOptionT
 
-  def valueToOption(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Option[A] =
+  def toOption(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Option[A] =
     value toOption
 
-  def errorOptionT(implicit ftr: Functor[F]): OptionT[F, Err] =
-    value.left toOptionT
+  def toListT(implicit ftr: Functor[F]): F[List[A]] =
+    value toListT
 
-  def errorToOption(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Option[Err] =
-    value.left toOption
+  def toList(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): List[A] =
+    value toList
 
-  def errorListT(implicit ftr: Functor[F]): F[List[Err]] =
-    value.left toListT
+  def toStreamT(implicit ftr: Functor[F]): F[Stream[A]] =
+    value toStreamT
 
-  def errorToList(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): List[Err] =
-    value.left toList
-
-  def errorStreamT(implicit ftr: Functor[F]): F[Stream[Err]] =
-    value.left toStreamT
-
-  def errorToStream(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Stream[Err] =
-    value.left toStream
+  def toStream(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Stream[A] =
+    value toStream
 
 }
 
@@ -257,6 +234,49 @@ trait SqlValueTs {
       new SqlValueT[G, A] {
         val value = implicitly[MonadTrans[({type λ[α[_], β] = EitherT[Err, α, β]})#λ]].lift(a)
       }
+  }
+
+  sealed trait ErrProjectionT[F[_], A] {
+    val x: SqlValueT[F, A]
+
+    def orT(default: => Err)(implicit ftr: Functor[F]): F[Err] =
+      x.value.left getOrElseT default
+
+    def or(default: => Err)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Err =
+      x.value.left getOrElse default
+
+    def existsT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+      x.value.left existsT f
+
+    def exists(f: Err => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
+      x.value.left exists f
+
+    def forallT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+      x.value.left forallT f
+
+    def forall(f: Err => Boolean)(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Boolean =
+      x.value.left forall f
+
+    def orElse(y: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
+      eitherSqlValueT(x.value.left orElse y.value)
+
+    def optionT(implicit ftr: Functor[F]): OptionT[F, Err] =
+      x.value.left toOptionT
+
+    def option(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Option[Err] =
+      x.value.left toOption
+
+    def toListT(implicit ftr: Functor[F]): F[List[Err]] =
+      x.value.left toListT
+
+    def toList(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): List[Err] =
+      x.value.left toList
+
+    def toStreamT(implicit ftr: Functor[F]): F[Stream[Err]] =
+      x.value.left toStreamT
+
+    def toStream(implicit i: F[Either[Err, A]] =:= Identity[Either[Err, A]]): Stream[Err] =
+      x.value.left toStream
   }
 
 }
