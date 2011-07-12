@@ -13,9 +13,6 @@ sealed trait SqlValueT[F[_], A] {
   def *->* : (({type λ[α] = SqlValueT[F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = SqlValueT[F, α]})#λ, A](this)
 
-  def sqlValue(implicit i: F =~~= Identity): SqlValue[A] =
-    eitherSqlValue(value.runT)
-
   def toRowValue(implicit ftr: Functor[F]): RowValueT[F, A] =
     RowValueT.fromSqlValue(this)
 

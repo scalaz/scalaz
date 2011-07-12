@@ -11,11 +11,6 @@ sealed trait RowValueT[F[_], A] {
   def *->* : (({type λ[α] = RowValueT[F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = RowValueT[F, α]})#λ, A](this)
 
-  def rowValue(implicit i: F =~~= Identity): RowValue[A] = new RowValue[A] {
-    val value =
-      Identity.id((i ~~=> RowValueT.this.value).value)
-  }
-
   def toEither: EitherT[PossiblyNull[NullMsg], F, SqlValue[A]] =
     EitherT.eitherT(value)
 
