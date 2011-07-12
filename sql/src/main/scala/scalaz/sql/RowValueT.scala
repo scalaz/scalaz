@@ -96,4 +96,8 @@ trait RowValueTs {
   def rowNullMsg[A]: NullMsg => RowValue[A] =
     rowNullMsgT(_)
 
+  def fromSqlValue[F[_], A](v: SqlValueT[F, A])(implicit ftr: Functor[F]): RowValueT[F, A] = new RowValueT[F, A] {
+    val value =
+      ftr.fmap((e: Either[Err, A]) => Right(e.fold(sqlError, sqlValue)): Either[PossiblyNull[NullMsg], SqlValue[A]])(v.value.runT)
+  }
 }

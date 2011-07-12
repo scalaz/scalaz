@@ -2,6 +2,7 @@ package scalaz
 package sql
 
 import SqlExceptionContext._
+import RowValueT._
 
 sealed trait SqlValueT[F[_], A] {
   import SqlValueT._
@@ -14,6 +15,9 @@ sealed trait SqlValueT[F[_], A] {
 
   def sqlValue(implicit i: F =~~= Identity): SqlValue[A] =
     eitherSqlValue(value.runT)
+
+  def toRowValue(implicit ftr: Functor[F]): RowValueT[F, A] =
+    RowValueT.fromSqlValue(this)
 
   def toEither(implicit i: F =~~= Identity): Either[Err, A] =
     value.runT
@@ -38,6 +42,9 @@ sealed trait SqlValueT[F[_], A] {
 
   def fold[X](e: Err => X, a: A => X)(implicit i: F =~~= Identity): X =
     value.run fold (e, a)
+
+  def foldT[X](e: Err => X, a: A => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((_: Either[Err, A]).fold(e, a))(value.runT)
 
   def map[B](f: A => B)(implicit ftr: Functor[F]): SqlValueT[F, B] =
     eitherSqlValueT(value map f)
