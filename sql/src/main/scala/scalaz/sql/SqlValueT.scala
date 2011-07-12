@@ -48,6 +48,9 @@ sealed trait SqlValueT[F[_], A] {
   def flatMap[B](f: A => SqlValueT[F, B])(implicit m: Monad[F]): SqlValueT[F, B] =
     eitherSqlValueT(value flatMap (f(_).value))
 
+  def mapErr(k: Err => Err)(implicit ftr: Functor[F]): SqlValueT[F, A] =
+    eitherSqlValueT(value.left.map(k))
+
   def err: ErrProjectionT[F, A] = new ErrProjectionT[F, A] {
     val x = SqlValueT.this
   }
