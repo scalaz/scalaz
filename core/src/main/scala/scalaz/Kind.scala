@@ -719,6 +719,13 @@ trait *->*[F[_], A] {
 
   def mapUnpack[B](implicit ftr: Functor[F], p: ^*^[A, B]): F[B] =
     ftr.fmap(p.unpack(_: A))(value)
+
+  final def whileM[B, C](p: A => Boolean, z: A => F[B], e: A => C)(implicit m: Monad[F]): F[C] = {
+    m.bd(
+      (a: A) => m.bd(
+        (_: B) => m.bd(
+          (b: A) => if(p(b)) whileM(p, z, e) else m.point(e(b)))(value))(z(a)))(value)
+  }
 }
 
 object *->* extends **->**
