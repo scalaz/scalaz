@@ -24,6 +24,18 @@ sealed trait OptionT[F[_], A] {
   def isEmpty(implicit i: F =~~= Identity): Boolean =
     run.isEmpty
 
+  def foldT[X](some: A => X, none: => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((o: Option[A]) => o match {
+      case None => none
+      case Some(a) => some(a)
+    })(runT)
+
+  def fold[X](some: A => X, none: => X)(implicit i: F =~~= Identity): X =
+    run match {
+      case None => none
+      case Some(a) => some(a)
+    }
+
   def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
     ftr.fmap((_: Option[A]).getOrElse(default))(runT)
 
@@ -65,6 +77,9 @@ sealed trait OptionT[F[_], A] {
 
   def mapOption[B](f: Option[A] => Option[B])(implicit ftr: Functor[F]): OptionT[F, B] =
     optionT(ftr.fmap(f)(runT))
+
+  def filterM(f: A => F[Boolean])(implicit m: Monad[F]): OptionT[F, A] =
+    flatMap(a => optionT(m.fmap((b: Boolean) => if(b) Some(a) else None)(f(a))))
 }
 
 object OptionT extends OptionTs {
