@@ -40,6 +40,21 @@ object BiFunctor {
     }
   }
 
+  implicit def LazyEitherBiFunctor: BiFunctor[LazyEither] = new BiFunctor[LazyEither] {
+    def bimap[A, B, C, D](f: A => C, g: B => D) =
+      _.map(x => g(x)).left.map(x => f(x))
+  }
+
+  implicit def EitherTBiFunctor[F[_]: Functor]: BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
+    def bimap[A, B, C, D](f: A => C, g: B => D) =
+      _.map(g).left.map(f)
+  }
+
+  implicit def LazyEitherTBiFunctor[F[_]: Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
+    def bimap[A, B, C, D](f: A => C, g: B => D) =
+      _.map(x => g(x)).left.map(x => f(x))
+  }
+
   implicit def ValidationBiFunctor: BiFunctor[Validation] = new BiFunctor[Validation] {
     def bimap[A, B, C, D](f: A => C, g: B => D) = {
       case Failure(a) => Validation.failure(f(a))

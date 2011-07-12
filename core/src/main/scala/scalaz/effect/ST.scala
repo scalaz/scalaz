@@ -25,6 +25,10 @@ sealed trait STRef[S, A] {
     (s, this)
   })
 
+  /**Synonym for write*/
+  def |=(a: => A): ST[S, STRef[S, A]] =
+    write(a)
+
   /**Swap the value at this reference with the value at another. */
   def swap(that: STRef[S, A]): ST[S, Unit] = for {
     v1 <- this.read
@@ -34,11 +38,19 @@ sealed trait STRef[S, A] {
   } yield ()
 }
 
-object STRef extends STRefs
+object STRef extends STRefs {
+  import ~>._
+  def apply[S]: (I ~> ({type λ[α] = STRef[S, α]})#λ) =
+    stRef[S]
+}
 
 trait STRefs {
-  def stRef[S, A](a: A): STRef[S, A] = new STRef[S, A] {
-    var value = a
+  import ~>._
+
+  def stRef[S]: (I ~> ({type λ[α] = STRef[S, α]})#λ) = new (I ~> ({type λ[α] = STRef[S, α]})#λ) {
+    def apply[A](a: A) = new STRef[S, A] {
+      var value = a
+    }
   }
 
   /**Equality for STRefs is reference equality */
@@ -158,6 +170,9 @@ trait STs {
         } yield ff(aa)
   }
 
+  implicit def STApplicFunctor[S]: ApplicFunctor[({type λ[α] = ST[S, α]})#λ] =
+    ApplicFunctor.applicFunctor[({type λ[α] = ST[S, α]})#λ]
+
   implicit def STApplicative[S]: Applicative[({type λ[α] = ST[S, α]})#λ] =
     Applicative.applicative[({type λ[α] = ST[S, α]})#λ]
 
@@ -177,9 +192,12 @@ trait STs {
   def runST[A](f: Forall[({type λ[S] = ST[S, A]})#λ]): A =
     f.apply.apply(realWorld)._2
 
+  import ~>._
+
   /**Allocates a fresh mutable reference. */
-  def newVar[S, A](a: A): ST[S, STRef[S, A]] =
-    returnST(stRef[S, A](a))
+  def newVar[S]: (I ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) = new (I ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) {
+    def apply[A](a: A) = returnST(stRef[S](a))
+  }
 
   /**Allocates a fresh mutable array. */
   def newArr[S, A: Manifest](size: Int, z: A): ST[S, STArray[S, A]] =

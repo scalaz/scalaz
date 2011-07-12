@@ -5,6 +5,7 @@ sealed trait Kleisli[A, F[_], B] {
 
   import Kleisli._
   import StateT._
+  import =~~=._
 
   def *->* : (({type λ[α] = Kleisli[A, F, α]})#λ *->* B) =
     scalaz.*->*.!**->**![({type λ[α] = Kleisli[A, F, α]})#λ, B](this)
@@ -18,14 +19,14 @@ sealed trait Kleisli[A, F[_], B] {
   def contramapRead[C](f: C => A): Kleisli[C, F, B] =
     kleisli[C, F, B](run compose f)
 
-  def reader(implicit i: F[B] =:= Identity[B]): A => B =
-    a => run(a).value
+  def reader(implicit i: F =~~= Identity): A => B =
+    a => run(a)
 
   def toStateT(implicit ftr: Functor[F]): StateT[A, F, B] =
     stateT(a => ftr.fmap((b: B) => (b, a))(run(a)))
 
-  def toState(implicit i: F[B] =:= Identity[B]): State[A, B] =
-    state(a => (run(a).value, a))
+  def toState(implicit i: F =~~= Identity): State[A, B] =
+    state(a => (run(a), a))
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): Kleisli[A, F, C] =
     kleisli[A, F, C](ftr.fmap(f) compose run)
