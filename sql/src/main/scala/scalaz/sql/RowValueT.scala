@@ -11,6 +11,32 @@ sealed trait RowValueT[F[_], A] {
   def *->* : (({type λ[α] = RowValueT[F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = RowValueT[F, α]})#λ, A](this)
 
+  import =~~=._
+
+  def fold[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit i: F =~~= Identity): X =
+    value.fold(
+      _.fold(
+        m
+      , n
+      )
+    , _.fold(
+        e
+      , a
+      )
+    )
+
+  def foldT[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((_: Either[PossiblyNull[NullMsg], SqlValue[A]]).fold(
+      _.fold(
+        m
+      , n
+      )
+    , _.fold(
+        e
+      , a
+      )
+    ))(value)
+
   def toEither: EitherT[PossiblyNull[NullMsg], F, SqlValue[A]] =
     EitherT.eitherT(value)
 
