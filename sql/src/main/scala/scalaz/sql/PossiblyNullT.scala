@@ -6,6 +6,9 @@ package sql
 sealed trait PossiblyNullT[F[_], A] {
   val toOptionT: OptionT[F, A] = this.asInstanceOf[PossiblyNullT_[F, A]].o
 
+  def *->* : (({type λ[α] = PossiblyNullT[F, α]})#λ *->* A) =
+    scalaz.*->*.!**->**![({type λ[α] = PossiblyNullT[F, α]})#λ, A](this)
+
   import =~~=._
   import OptionT._
   import PossiblyNullT._
@@ -140,4 +143,117 @@ trait PossiblyNullTs {
 
   def fromOptionT[F[_], A](o: OptionT[F, A]): PossiblyNullT[F, A] =
     PossiblyNullT_(o)
+
+  implicit def PossiblyNullTFunctor[F[_]: Functor]: Functor[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Functor[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def PossiblyNullTApplic[F[_]: ApplicFunctor]: Applic[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Applic[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def applic[A, B](f: PossiblyNullT[F, A => B]) =
+      a => fromOptionT(implicitly[Applic[({type λ[α] = OptionT[F, α]})#λ]].applic(f.toOptionT)(a.toOptionT))
+  }
+
+  implicit def PossiblyNullTBind[F[_]: Monad]: Bind[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Bind[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def bind[A, B](f: A => PossiblyNullT[F, B]) =
+      _ flatMap f
+  }
+
+  implicit def PossiblyNullTPointed[F[_]: Pointed]: Pointed[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Pointed[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def point[A](a: => A) =
+      fromOptionT(implicitly[Pointed[({type λ[α] = OptionT[F, α]})#λ]].point(a))
+  }
+
+  implicit def PossiblyNullTApplicFunctor[F[_]: ApplicFunctor]: ApplicFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val ftr = implicitly[ApplicFunctor[F]].functor
+    ApplicFunctor.applicFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTApplicative[F[_]: Applicative]: Applicative[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val ftr = implicitly[Applicative[F]].pointedFunctor
+    implicit val ap = implicitly[Applicative[F]].applicFunctor
+    Applicative.applicative[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTBindFunctor[F[_]: Monad]: BindFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val ftr = implicitly[Monad[F]].functor
+    BindFunctor.bindFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTPointedFunctor[F[_]: PointedFunctor]: PointedFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val p = implicitly[PointedFunctor[F]].pointed
+    implicit val ftr = implicitly[PointedFunctor[F]].functor
+    PointedFunctor.pointedFunctor[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTMonad[F[_]: Monad]: Monad[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val bd = implicitly[Monad[F]].bind
+    implicit val p = implicitly[Monad[F]].pointed
+    Monad.monadBP[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTFoldr[F[_]: Foldr]: Foldr[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Foldr[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def foldr[A, B] = k => b => s =>
+      implicitly[Foldr[({type λ[α] = OptionT[F, α]})#λ]].foldr(k)(b)(s.toOptionT)
+  }
+
+  implicit def PossiblyNullTFoldl[F[_]: Foldl]: Foldl[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Foldl[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def foldl[A, B] = k => b => s =>
+      implicitly[Foldl[({type λ[α] = OptionT[F, α]})#λ]].foldl(k)(b)(s.toOptionT)
+  }
+
+  implicit def PossiblyNullTTraverse[F[_]: Traverse]: Traverse[({type λ[α] = PossiblyNullT[F, α]})#λ] =
+    implicitly[Traverse[({type λ[α] = OptionT[F, α]})#λ]].xmap[({type λ[α] = PossiblyNullT[F, α]})#λ](
+      new (({type λ[α] = OptionT[F, α]})#λ ~> ({type λ[α] = PossiblyNullT[F, α]})#λ) {
+        def apply[A](a: OptionT[F, A]) = fromOptionT(a)
+      }
+    , new (({type λ[α] = PossiblyNullT[F, α]})#λ ~> ({type λ[α] = OptionT[F, α]})#λ) {
+        def apply[A](a: PossiblyNullT[F, A]) = a.toOptionT
+      }
+    )
+
+  implicit def PossiblyNullTPlus[F[_]](implicit m: ApplicFunctor[F]): Plus[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Plus[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def plus[A](a1: PossiblyNullT[F, A], a2: => PossiblyNullT[F, A]) =
+      PossiblyNullT_(OptionT(m.liftA2((a1: Option[A]) => (a2: Option[A]) => a1 orElse a2)(a1.toOptionT.runT)(a2.toOptionT.runT)))
+  }
+
+  implicit def PossiblyNullTEmpty[F[_]](implicit p: Pointed[F]): Empty[({type λ[α] = PossiblyNullT[F, α]})#λ] = new Empty[({type λ[α] = PossiblyNullT[F, α]})#λ] {
+    def empty[A] =
+      PossiblyNullT_(OptionT.noneT[F, A])
+  }
+
+  implicit def PossiblyNullTMonadEmpty[F[_]: Monad]: MonadEmpty[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    MonadEmpty.monadEmpty[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullTMonadEmptyPlus[F[_]: Monad]: MonadEmptyPlus[({type λ[α] = PossiblyNullT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    implicit val ap = implicitly[Monad[F]].applicFunctor
+    MonadEmptyPlus.monadEmptyPlus[({type λ[α] = PossiblyNullT[F, α]})#λ]
+  }
+
+  implicit def PossiblyNullZero[A]: Zero[PossiblyNull[A]] =
+    Zero.zero(isNull)
+
+  implicit def PossiblyNullSemigroup[A]: Semigroup[PossiblyNull[A]] =
+    Semigroup.semigroup(a1 => a2 => a1 fold (_ => a1, a2 fold (_ => a2, a1)))
+
+  implicit def PossiblyNullShow[A](implicit s: Show[A]): Show[PossiblyNull[A]] =
+    Show.shows(_.fold(
+      a => ("not-null(" + s.shows(a) + ")")
+    , "is-null"
+    ))
+
+  implicit def PossiblyNullEqual[A: Equal]: Equal[PossiblyNull[A]] =
+    implicitly[Equal[Option[A]]].contramap(_.toOption)
+
+  implicit def PossiblyNullOrder[A: Order]: Order[PossiblyNull[A]] =
+    implicitly[Order[Option[A]]].contramap(_.toOption)
+
+  implicit val PossiblyNullTMonadTrans: MonadTrans[PossiblyNullT] = new MonadTrans[PossiblyNullT] {
+    def lift[G[_] : Monad, A](a: G[A]): PossiblyNullT[G, A] =
+      PossiblyNullT_(implicitly[MonadTrans[OptionT]].lift(a))
+  }
+
 }

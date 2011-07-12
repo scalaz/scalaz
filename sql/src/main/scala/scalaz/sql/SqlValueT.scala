@@ -9,6 +9,9 @@ sealed trait SqlValueT[F[_], A] {
 
   val value: EitherT[Err, F, A]
 
+  def *->* : (({type λ[α] = SqlValueT[F, α]})#λ *->* A) =
+    scalaz.*->*.!**->**![({type λ[α] = SqlValueT[F, α]})#λ, A](this)
+
   def sqlValue(implicit i: F =~~= Identity): SqlValue[A] =
     eitherSqlValue(value.runT)
 
