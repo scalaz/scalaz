@@ -9,6 +9,9 @@ sealed trait SqlValueT[F[_], A] {
 
   val value: EitherT[Err, F, A]
 
+  def sqlValue(implicit i: F =~~= Identity): SqlValue[A] =
+    eitherSqlValue(value.runT)
+
   def toEither(implicit i: F =~~= Identity): Either[Err, A] =
     value.runT
 
@@ -88,8 +91,8 @@ sealed trait SqlValueT[F[_], A] {
 }
 
 object SqlValueT extends SqlValueTs {
-  def apply[F[_], A](a: EitherT[Err, F, A]): SqlValueT[F, A] =
-    eitherSqlValueT(a)
+  def apply[F[_], A](a: F[A])(implicit ftr: Functor[F]): SqlValueT[F, A] =
+    sqlValueT(a)
 }
 
 trait SqlValueTs {
