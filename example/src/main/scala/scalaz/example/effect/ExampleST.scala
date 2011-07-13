@@ -10,7 +10,7 @@ object ExampleST {
 
   // Creates a new mutable reference and mutates it
   def e1[A] = for {
-    r <- newVar[A, Int](0)
+    r <- newVar[A](0)
     x <- r.mod(_ + 1)
   } yield x
 

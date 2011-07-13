@@ -5,6 +5,7 @@ sealed trait StateT[S, F[_], A] {
 
   import StateT._
   import WriterT._
+  import =~~=._
 
   def *->* : (({type λ[α] = StateT[S, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = StateT[S, F, α]})#λ, A](this)
@@ -12,31 +13,31 @@ sealed trait StateT[S, F[_], A] {
   def *->*->* : *->*->*[S, ({type λ[α, β] = StateT[α, F, β]})#λ, A] =
     scalaz.*->*->*.!**->**->**![S, ({type λ[α, β] = StateT[α, F, β]})#λ, A](this)
 
-  def run(s: S)(implicit i: F[(A, S)] =:= Identity[(A, S)]): (A, S) =
-    runT(s).value
+  def run(s: S)(implicit i: F =~~= Identity): (A, S) =
+    runT(s)
 
   def evalT(s: S)(implicit f: Functor[F]): F[A] =
     f.fmap[(A, S), A](_._1)(runT(s))
 
-  def eval(s: S)(implicit i: F[(A, S)] =:= Identity[(A, S)]): A =
+  def eval(s: S)(implicit i: F =~~= Identity): A =
     run(s)._1
 
   def execT(s: S)(implicit f: Functor[F]): F[S] =
     f.fmap[(A, S), S](_._2)(runT(s))
 
-  def exec(s: S)(implicit i: F[(A, S)] =:= Identity[(A, S)]): S =
+  def exec(s: S)(implicit i: F =~~= Identity): S =
     run(s)._2
 
   def usingT: (S => S) => StateT[S, F, A] =
     f => stateT[S, F, A](runT compose f)
 
-  def using(f: S => S)(implicit i: F[(A, S)] =:= Identity[(A, S)]): State[S, A] =
+  def using(f: S => S)(implicit i: F =~~= Identity): State[S, A] =
     state[S, A](s => run(f(s)))
 
   def writerT: S => WriterT[A, F, S] =
     s => WriterT.writerT(runT(s))
 
-  def writer(s: S)(implicit i: F[(A, S)] =:= Identity[(A, S)]): Writer[A, S] =
+  def writer(s: S)(implicit i: F =~~= Identity): Writer[A, S] =
     WriterT.writer(run(s))
 
   def map[B](f: A => B)(implicit ftr: Functor[F]): StateT[S, F, B] =

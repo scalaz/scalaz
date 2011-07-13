@@ -5,31 +5,33 @@ import Kleisli._
 sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   val apply: R => S => F[(A, S, W)]
 
+  import =~~=._
+
   def *->* : (({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ *->* A) =
     scalaz.*->*.!**->**![({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ, A](this)
 
   import ReaderWriterStateT._
 
-  def run(r: R, s: S)(implicit i: F[(A, S, W)] =:= Identity[(A, S, W)]): (A, S, W) =
-    apply(r)(s).value
+  def run(r: R, s: S)(implicit i: F =~~= Identity): (A, S, W) =
+    apply(r)(s)
 
   def rT(r: R, s: S)(implicit ftr: Functor[F]): F[A] =
-    implicitly[Functor[F]].fmap((asw: (A, S, W)) => asw._1)(apply(r)(s))
+    ftr.fmap((asw: (A, S, W)) => asw._1)(apply(r)(s))
 
-  def r(r: R, s: S)(implicit ftr: Functor[F], i: F[A] =:= Identity[A]): A =
-    rT(r, s).value
+  def r(r: R, s: S)(implicit i: F =~~= Identity): A =
+    rT(r, s)
 
   def sT(r: R, s: S)(implicit ftr: Functor[F]): F[S] =
-    implicitly[Functor[F]].fmap((asw: (A, S, W)) => asw._2)(apply(r)(s))
+    ftr.fmap((asw: (A, S, W)) => asw._2)(apply(r)(s))
 
-  def s(r: R, s: S)(implicit ftr: Functor[F], i: F[S] =:= Identity[S]): S =
-    sT(r, s).value
+  def s(r: R, s: S)(implicit i: F =~~= Identity): S =
+    sT(r, s)
 
   def wT(r: R, s: S)(implicit ftr: Functor[F]): F[W] =
-    implicitly[Functor[F]].fmap((asw: (A, S, W)) => asw._3)(apply(r)(s))
+    ftr.fmap((asw: (A, S, W)) => asw._3)(apply(r)(s))
 
-  def w(r: R, s: S)(implicit ftr: Functor[F], i: F[W] =:= Identity[W]): W =
-    wT(r, s).value
+  def w(r: R, s: S)(implicit i: F =~~= Identity): W =
+    wT(r, s)
 
   def state(r: R)(implicit ftr: Functor[F]): StateT[S, F, A] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._1, asw._2))(apply(r)(s)))
@@ -47,8 +49,8 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
   def evalT(r: R, s: S)(implicit ftr: Functor[F]): F[(A, W)] =
     ftr.fmap((asw: (A, S, W)) => (asw._1, asw._3))(apply(r)(s))
 
-  def eval(r: R, s: S)(implicit ftr: Functor[F], i: F[(A, W)] =:= Identity[(A, W)]): (A, W) =
-    evalT(r, s).value
+  def eval(r: R, s: S)(implicit i: F =~~= Identity): (A, W) =
+    evalT(r, s)
 
   def exec(r: R)(implicit ftr: Functor[F]): StateT[S, F, W] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._3, asw._2))(apply(r)(s)))

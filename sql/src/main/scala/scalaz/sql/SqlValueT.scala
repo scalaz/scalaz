@@ -1,33 +1,47 @@
 package scalaz
 package sql
 
-import SqlValueT._
+import SqlExceptionContext._
+import RowValueT._
 
 sealed trait SqlValueT[F[_], A] {
-  val value: EitherT[SqlException, F, A]
-
   import SqlValueT._
+  import =~~=._
 
-  def toEither(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Either[SqlException, A] =
-    value.runT.value
+  val value: EitherT[Err, F, A]
+
+  def *->* : (({type λ[α] = SqlValueT[F, α]})#λ *->* A) =
+    scalaz.*->*.!**->**![({type λ[α] = SqlValueT[F, α]})#λ, A](this)
+
+  def toRowValue(implicit ftr: Functor[F]): RowValueT[F, A] =
+    RowValueT.fromSqlValue(this)
+
+  def toEither(implicit i: F =~~= Identity): Either[Err, A] =
+    value.runT
 
   def ?[X](left: => X, right: => X)(implicit ftr: Functor[F]): F[X] =
     value ? (left, right)
 
-  def -?-[X](left: => X, right: => X)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): X =
+  def -?-[X](left: => X, right: => X)(implicit i: F =~~= Identity): X =
     value -?- (left, right)
 
   def isErrorT(implicit ftr: Functor[F]): F[Boolean] =
     value isLeftT
 
-  def isError(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
+  def isError(implicit i: F =~~= Identity): Boolean =
     value isLeft
 
   def isValueT(implicit ftr: Functor[F]): F[Boolean] =
     value isRightT
 
-  def isValue(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
+  def isValue(implicit i: F =~~= Identity): Boolean =
     value isRight
+
+  def fold[X](e: Err => X, a: A => X)(implicit i: F =~~= Identity): X =
+    value.run fold (e, a)
+
+  def foldT[X](e: Err => X, a: A => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((_: Either[Err, A]).fold(e, a))(value.runT)
 
   def map[B](f: A => B)(implicit ftr: Functor[F]): SqlValueT[F, B] =
     eitherSqlValueT(value map f)
@@ -38,75 +52,70 @@ sealed trait SqlValueT[F[_], A] {
   def flatMap[B](f: A => SqlValueT[F, B])(implicit m: Monad[F]): SqlValueT[F, B] =
     eitherSqlValueT(value flatMap (f(_).value))
 
-  def valueOrT(default: => A)(implicit ftr: Functor[F]): F[A] =
+  def mapErr(k: Err => Err)(implicit ftr: Functor[F]): SqlValueT[F, A] =
+    eitherSqlValueT(value.left.map(k))
+
+  def err: ErrProjectionT[F, A] = new ErrProjectionT[F, A] {
+    val x = SqlValueT.this
+  }
+
+  def getErrorT(implicit ftr: Functor[F]): OptionT[F, Err] =
+    err.toOptionT
+
+  def getError(implicit i: F =~~= Identity): Option[Err] =
+    err.toOption
+
+  def getErrorOrT(e: => Err)(implicit ftr: Functor[F]): F[Err] =
+    err orT e
+
+  def getErrorOr(e: => Err)(implicit i: F =~~= Identity): Err =
+    err or e
+
+  def orT(default: => A)(implicit ftr: Functor[F]): F[A] =
     value getOrElseT default
 
-  def valueOr(default: => A)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): A =
+  def or(default: => A)(implicit i: F =~~= Identity): A =
     value getOrElse default
 
-  def errorOrT(default: => SqlException)(implicit ftr: Functor[F]): F[SqlException] =
-    value.left getOrElseT default
-
-  def errorOr(default: => SqlException)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): SqlException =
-    value.left getOrElse default
-
-  def valueExistsT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+  def existsT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     value existsT f
 
-  def valueExists(f: A => Boolean)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
+  def exists(f: A => Boolean)(implicit i: F =~~= Identity): Boolean =
     value exists f
 
-  def errorExistsT(f: SqlException => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
-    value.left existsT f
-
-  def errorExists(f: SqlException => Boolean)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
-    value.left exists f
-
-  def valueForallT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+  def forallT(f: A => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
     value forallT f
 
-  def valueForall(f: A => Boolean)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
+  def forall(f: A => Boolean)(implicit i: F =~~= Identity): Boolean =
     value forall f
 
-  def errorForallT(f: SqlException => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
-    value.left forallT f
-
-  def errorForall(f: SqlException => Boolean)(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Boolean =
-    value.left forall f
-
-  def valueOrElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
+  def orElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
     eitherSqlValueT(value orElse x.value)
 
-  def errorOrElse(x: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
-    eitherSqlValueT(value.left orElse x.value)
-
-  def valueOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
+  def toOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
     value toOptionT
 
-  def valueToOption(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Option[A] =
+  def toOption(implicit i: F =~~= Identity): Option[A] =
     value toOption
 
-  def errorOptionT(implicit ftr: Functor[F]): OptionT[F, SqlException] =
-    value.left toOptionT
+  def toListT(implicit ftr: Functor[F]): F[List[A]] =
+    value toListT
 
-  def errorToOption(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Option[SqlException] =
-    value.left toOption
+  def toList(implicit i: F =~~= Identity): List[A] =
+    value toList
 
-  def errorListT(implicit ftr: Functor[F]): F[List[SqlException]] =
-    value.left toListT
+  def toStreamT(implicit ftr: Functor[F]): F[Stream[A]] =
+    value toStreamT
 
-  def errorToList(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): List[SqlException] =
-    value.left toList
-
-  def errorStreamT(implicit ftr: Functor[F]): F[Stream[SqlException]] =
-    value.left toStreamT
-
-  def errorToStream(implicit i: F[Either[SqlException, A]] =:= Identity[Either[SqlException, A]]): Stream[SqlException] =
-    value.left toStream
+  def toStream(implicit i: F =~~= Identity): Stream[A] =
+    value toStream
 
 }
 
-object SqlValueT extends SqlValueTs
+object SqlValueT extends SqlValueTs {
+  def apply[F[_], A](a: F[A])(implicit ftr: Functor[F]): SqlValueT[F, A] =
+    sqlValueT(a)
+}
 
 trait SqlValueTs {
   type SqlException =
@@ -115,31 +124,34 @@ trait SqlValueTs {
   type SqlValue[A] =
   SqlValueT[Identity, A]
 
-  def eitherSqlValueT[F[_], A](a: EitherT[SqlException, F, A]): SqlValueT[F, A] = new SqlValueT[F, A] {
+  type Err =
+    SqlExceptionContext
+
+  def eitherSqlValueT[F[_], A](a: EitherT[Err, F, A]): SqlValueT[F, A] = new SqlValueT[F, A] {
     val value = a
   }
 
-  def eitherSqlValue[A](a: Either[SqlException, A]): SqlValue[A] =
+  def eitherSqlValue[A](a: Either[Err, A]): SqlValue[A] =
     eitherSqlValueT(a.fold(
       EitherT.leftT(_)
     , EitherT.rightT(_)
     ))
 
   def sqlValueT[F[_], A](a: F[A])(implicit ftr: Functor[F]): SqlValueT[F, A] = new SqlValueT[F, A] {
-    val value = EitherT.eitherT(ftr.fmap((a: A) => Right(a): Either[SqlException, A])(a))
+    val value = EitherT.eitherT(ftr.fmap((a: A) => Right(a): Either[Err, A])(a))
   }
 
-  def sqlErrorT[F[_], A](a: F[SqlException])(implicit ftr: Functor[F]): SqlValueT[F, A] = new SqlValueT[F, A] {
-    val value = EitherT.eitherT(ftr.fmap((e: SqlException) => Left(e): Either[SqlException, A])(a))
+  def sqlErrorT[F[_], A](a: F[Err])(implicit ftr: Functor[F]): SqlValueT[F, A] = new SqlValueT[F, A] {
+    val value = EitherT.eitherT(ftr.fmap((e: Err) => Left(e): Either[Err, A])(a))
   }
 
   def sqlErrorMessageT[F[_], A](a: F[String])(implicit ftr: Functor[F]): SqlValueT[F, A] =
-    sqlErrorT(implicitly[Functor[F]].fmap((s: String) => new SqlException(s))(a))
+    sqlErrorT(implicitly[Functor[F]].fmap((s: String) => sqlExceptionContext(new SqlException(s)))(a))
 
   def sqlValue[A]: A => SqlValue[A] =
     a => sqlValueT(Identity.id(a))
 
-  def sqlError[A]: SqlException => SqlValue[A] =
+  def sqlError[A]: Err => SqlValue[A] =
     e => sqlErrorT(Identity.id(e))
 
   def sqlErrorMessage[A]: String => SqlValue[A] =
@@ -152,7 +164,7 @@ trait SqlValueTs {
 
   implicit def SqlValueTApplic[F[_]: ApplicFunctor]: Applic[({type λ[α] = SqlValueT[F, α]})#λ] = new Applic[({type λ[α] = SqlValueT[F, α]})#λ] {
     def applic[A, B](f: SqlValueT[F, A => B]) =
-      a => eitherSqlValueT(implicitly[Applic[({type λ[α] = EitherT[SqlException, F, α]})#λ]].applic(f.value)(a.value))
+      a => eitherSqlValueT(implicitly[Applic[({type λ[α] = EitherT[Err, F, α]})#λ]].applic(f.value)(a.value))
   }
 
   implicit def SqlValueTBind[F[_]: Monad]: Bind[({type λ[α] = SqlValueT[F, α]})#λ] = new Bind[({type λ[α] = SqlValueT[F, α]})#λ] {
@@ -162,7 +174,7 @@ trait SqlValueTs {
 
   implicit def SqlValueTPointed[F[_]: Pointed]: Pointed[({type λ[α] = SqlValueT[F, α]})#λ] = new Pointed[({type λ[α] = SqlValueT[F, α]})#λ] {
     def point[A](a: => A) =
-      eitherSqlValueT(implicitly[Pointed[({type λ[α] = EitherT[SqlException, F, α]})#λ]].point(a))
+      eitherSqlValueT(implicitly[Pointed[({type λ[α] = EitherT[Err, F, α]})#λ]].point(a))
   }
 
   implicit def SqlValueTApplicFunctor[F[_]: ApplicFunctor]: ApplicFunctor[({type λ[α] = SqlValueT[F, α]})#λ] = {
@@ -187,31 +199,118 @@ trait SqlValueTs {
     PointedFunctor.pointedFunctor[({type λ[α] = SqlValueT[F, α]})#λ]
   }
 
+  implicit def SqlValueTMonad[F[_]: Monad]: Monad[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val bd = implicitly[Monad[F]].bind
+    implicit val p = implicitly[Monad[F]].pointed
+    Monad.monadBP[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
   implicit def SqlValueTFoldr[F[_]: Foldr]: Foldr[({type λ[α] = SqlValueT[F, α]})#λ] = new Foldr[({type λ[α] = SqlValueT[F, α]})#λ] {
     def foldr[A, B] = k => b => s =>
-      implicitly[Foldr[({type λ[α] = EitherT[SqlException, F, α]})#λ]].foldr(k)(b)(s.value)
+      implicitly[Foldr[({type λ[α] = EitherT[Err, F, α]})#λ]].foldr(k)(b)(s.value)
   }
 
   implicit def SqlValueTFoldl[F[_]: Foldl]: Foldl[({type λ[α] = SqlValueT[F, α]})#λ] = new Foldl[({type λ[α] = SqlValueT[F, α]})#λ] {
     def foldl[A, B] = k => b => s =>
-      implicitly[Foldl[({type λ[α] = EitherT[SqlException, F, α]})#λ]].foldl(k)(b)(s.value)
+      implicitly[Foldl[({type λ[α] = EitherT[Err, F, α]})#λ]].foldl(k)(b)(s.value)
   }
 
   implicit def SqlValueTTraverse[F[_]: Traverse]: Traverse[({type λ[α] = SqlValueT[F, α]})#λ] =
-    implicitly[Traverse[({type λ[α] = EitherT[SqlException, F, α]})#λ]].xmap[({type λ[α] = SqlValueT[F, α]})#λ](
-      new (({type λ[α] = EitherT[SqlException, F, α]})#λ ~> ({type λ[α] = SqlValueT[F, α]})#λ) {
-        def apply[A](a: EitherT[SqlException, F, A]) = eitherSqlValueT(a)
+    implicitly[Traverse[({type λ[α] = EitherT[Err, F, α]})#λ]].xmap[({type λ[α] = SqlValueT[F, α]})#λ](
+      new (({type λ[α] = EitherT[Err, F, α]})#λ ~> ({type λ[α] = SqlValueT[F, α]})#λ) {
+        def apply[A](a: EitherT[Err, F, A]) = eitherSqlValueT(a)
       }
-    , new (({type λ[α] = SqlValueT[F, α]})#λ ~> ({type λ[α] = EitherT[SqlException, F, α]})#λ) {
+    , new (({type λ[α] = SqlValueT[F, α]})#λ ~> ({type λ[α] = EitherT[Err, F, α]})#λ) {
         def apply[A](a: SqlValueT[F, A]) = a.value
       }
     )
 
+  implicit def SqlValueTPlus[F[_]](implicit m: ApplicFunctor[F]): Plus[({type λ[α] = SqlValueT[F, α]})#λ] = new Plus[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def plus[A](a1: SqlValueT[F, A], a2: => SqlValueT[F, A]) =
+      eitherSqlValueT(EitherT(m.liftA2((a1: Either[Err, A]) => (a2: Either[Err, A]) => a1 fold (_ => a2 fold (_ => a1, _ => a2), _ => a1))(a1.value.runT)(a2.value.runT)))
+  }
+
+  implicit def SqlValueTEmpty[F[_]](implicit p: Pointed[F]): Empty[({type λ[α] = SqlValueT[F, α]})#λ] = new Empty[({type λ[α] = SqlValueT[F, α]})#λ] {
+    def empty[A] = eitherSqlValueT(EitherT(p.point(Left(sqlExceptionContext(new SqlException)))))
+  }
+
+  implicit def SqlValueTMonadEmpty[F[_]: Monad]: MonadEmpty[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    MonadEmpty.monadEmpty[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
+  implicit def SqlValueTMonadEmptyPlus[F[_]: Monad]: MonadEmptyPlus[({type λ[α] = SqlValueT[F, α]})#λ] = {
+    implicit val p = implicitly[Monad[F]].pointed
+    implicit val ap = implicitly[Monad[F]].applicFunctor
+    MonadEmptyPlus.monadEmptyPlus[({type λ[α] = SqlValueT[F, α]})#λ]
+  }
+
+  implicit def SqlValueZero[A]: Zero[SqlValue[A]] =
+    Zero.zero(sqlError(sqlExceptionContext(new SqlException)))
+
+  implicit def SqlValueSemigroup[A]: Semigroup[SqlValue[A]] =
+    Semigroup.semigroup(a1 => a2 => a1 fold (_ => a2 fold (_ => a1, _ => a2), _ => a1))
+
+  implicit def SqlValueMonoid[A]: Monoid[SqlValue[A]] =
+    Monoid.monoid
+
+  implicit def SqlValueShow[A](implicit s: Show[A]): Show[SqlValue[A]] =
+    Show.shows(_.fold(
+      e => ("sql-error(" + implicitly[Show[Err]].shows(e) + ")")
+    , a => ("sql-value(" + s.shows(a) + ")")
+    ))
+
   implicit val SqlValueTMonadTrans: MonadTrans[SqlValueT] = new MonadTrans[SqlValueT] {
     def lift[G[_] : Monad, A](a: G[A]): SqlValueT[G, A] =
       new SqlValueT[G, A] {
-        val value = implicitly[MonadTrans[({type λ[α[_], β] = EitherT[SqlException, α, β]})#λ]].lift(a)
+        val value = implicitly[MonadTrans[({type λ[α[_], β] = EitherT[Err, α, β]})#λ]].lift(a)
       }
+  }
+
+  sealed trait ErrProjectionT[F[_], A] {
+    val x: SqlValueT[F, A]
+
+    def foreach(f: Err => Unit)(implicit e: Each[F]): Unit =
+      x.value.left foreach f
+
+    def orT(default: => Err)(implicit ftr: Functor[F]): F[Err] =
+      x.value.left getOrElseT default
+
+    def or(default: => Err)(implicit i: F =~~= Identity): Err =
+      x.value.left getOrElse default
+
+    def existsT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+      x.value.left existsT f
+
+    def exists(f: Err => Boolean)(implicit i: F =~~= Identity): Boolean =
+      x.value.left exists f
+
+    def forallT(f: Err => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+      x.value.left forallT f
+
+    def forall(f: Err => Boolean)(implicit i: F =~~= Identity): Boolean =
+      x.value.left forall f
+
+    def orElse(y: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
+      eitherSqlValueT(x.value.left orElse y.value)
+
+    def toOptionT(implicit ftr: Functor[F]): OptionT[F, Err] =
+      x.value.left toOptionT
+
+    def toOption(implicit i: F =~~= Identity): Option[Err] =
+      x.value.left toOption
+
+    def toListT(implicit ftr: Functor[F]): F[List[Err]] =
+      x.value.left toListT
+
+    def toList(implicit i: F =~~= Identity): List[Err] =
+      x.value.left toList
+
+    def toStreamT(implicit ftr: Functor[F]): F[Stream[Err]] =
+      x.value.left toStreamT
+
+    def toStream(implicit i: F =~~= Identity): Stream[Err] =
+      x.value.left toStream
   }
 
 }
