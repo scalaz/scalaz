@@ -33,6 +33,12 @@ trait EnumeratorTs {
 
   def enumerator[E, A](k: Iteratee[E, A] => Iteratee[E, A]): Enumerator[E, A] =
     enumeratorT[E, Identity, A](i => id(k(i)))
+  
+//  def enumChunk[E, F[_], A](el: E)(implicit mon: Monoid[E]): Enumerator[E, F, A] = enumeratorT { i => 
+//    i.foldT(
+//      done = (x, in) => doneT(x, elInput(el))
+//    )
+//  }
 
   implicit def StreamEnumerator[E, A](x: Stream[E]): Enumerator[E, A] =
     enumerator((i: E >@> A) => x match {

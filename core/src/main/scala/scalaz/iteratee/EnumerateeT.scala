@@ -25,24 +25,30 @@ trait EnumerateeTs {
    * Takes while the given predicate holds.
    */
   def takeWhile[E, F[_], A](p: E => Boolean)(implicit ftr: PointedFunctor[F]): EnumerateeT[E, E, F, A] = {
-    def step(k: Input[E] => IterT[E, F, A]): Input[E] => IterT[E, F, IterateeT[E, F, A]] = { in => in(
+    def step(k: Input[E] => IterT[E, F, A]): Input[E] => IterT[E, F, IterateeT[E, F, A]] = in => in(
       empty = ftr.point(continueT(step(k)))
       , el = el =>
         if (p(el)) (ftr.fmap(continueOrDone[E, E, F, A] { k2 => continueT(step(k2)) }))(k(in))
         else (ftr.fmap(doneT[F](_:IterateeT[E, F, A], in)))(k(eofInput))
       , eof = (ftr.fmap(doneT[F](_:IterateeT[E, F, A], in)))(k(in))
-    )}
-    
+    )
     enumerateeT(continueOrDone { k => continueT(step(k)) })
   }
 
   /**
-   * Produces chunked output split by the given predicate.
+   * Takes until the given predicate is true.
    */
-//  def groupBy[I, O, F[_], A](pred: (A, A) => Boolean): EnumerateeT[I, O, F, A] = {
-//    peek flatMap {
-//      case None => done(mon.z, emptyInput[A])
-//      case Some(h) => takeWhile(pred(_, h))
-//    }
+  def takeUntil[E, F[_]: PointedFunctor, A](p: E => Boolean): EnumerateeT[E, E, F, A] = takeWhile(!p(_))
+  
+  /**
+   * Produces chunked output split by the given predicate, chunking with the given monoid.
+   */
+//  def groupBy[E, G[_], F[_], A](p: (E, E) => Boolean)(implicit md: Monad[F], mon: Monoid[G[E]]): EnumerateeT[G[E], E, F, A] = {
+//    def step(inner: IterateeT[G[E], F, A], acc: G[E], prev: Option[E]): Input[E] => IterT[E, F, IterateeT[G[E], F, A]] = in => in(
+//      empty = md.point(continueT(step(inner, acc, prev)))
+//      , el = el => null
+//      , eof = null
+//    )
+//    enumerateeT(inner => continueT(step(inner, mon.z, None)))
 //  }
 }
