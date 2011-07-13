@@ -59,6 +59,18 @@ sealed trait SqlValueT[F[_], A] {
     val x = SqlValueT.this
   }
 
+  def getErrorT(implicit ftr: Functor[F]): OptionT[F, Err] =
+    err.toOptionT
+
+  def getError(implicit i: F =~~= Identity): Option[Err] =
+    err.toOption
+
+  def getErrorOrT(e: => Err)(implicit ftr: Functor[F]): F[Err] =
+    err orT e
+
+  def getErrorOr(e: => Err)(implicit i: F =~~= Identity): Err =
+    err or e
+
   def orT(default: => A)(implicit ftr: Functor[F]): F[A] =
     value getOrElseT default
 
@@ -282,10 +294,10 @@ trait SqlValueTs {
     def orElse(y: => SqlValueT[F, A])(implicit m: Bind[F]): SqlValueT[F, A] =
       eitherSqlValueT(x.value.left orElse y.value)
 
-    def optionT(implicit ftr: Functor[F]): OptionT[F, Err] =
+    def toOptionT(implicit ftr: Functor[F]): OptionT[F, Err] =
       x.value.left toOptionT
 
-    def option(implicit i: F =~~= Identity): Option[Err] =
+    def toOption(implicit i: F =~~= Identity): Option[Err] =
       x.value.left toOption
 
     def toListT(implicit ftr: Functor[F]): F[List[Err]] =

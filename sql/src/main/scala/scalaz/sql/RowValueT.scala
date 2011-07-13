@@ -14,16 +14,7 @@ sealed trait RowValueT[F[_], A] {
   import =~~=._
 
   def fold[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit i: F =~~= Identity): X =
-    value.fold(
-      _.fold(
-        m
-      , n
-      )
-    , _.fold(
-        e
-      , a
-      )
-    )
+    foldT(e, a, m, n)
 
   def foldT[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit ftr: Functor[F]): F[X] =
     ftr.fmap((_: Either[PossiblyNull[NullMsg], SqlValue[A]]).fold(
@@ -37,10 +28,39 @@ sealed trait RowValueT[F[_], A] {
       )
     ))(value)
 
-  def toEither: EitherT[PossiblyNull[NullMsg], F, SqlValue[A]] =
+  def foldOrNullMsg[X](defaultNullMsg: => NullMsg)(e: Err => X, a: A => X, nul: NullMsg => X)(implicit i: F =~~= Identity): X =
+    foldOrNullMsgT(defaultNullMsg)(e, a, nul)
+
+  def foldOrNullMsgT[X](defaultNullMsg: => NullMsg)(e: Err => X, a: A => X, nul: NullMsg => X)(implicit ftr: Functor[F]): F[X] =
+    foldT(e, a, nul, nul(defaultNullMsg))
+
+  final def loop[X](e: Err => X, v: A => Either[X, RowValue[A]], m: NullMsg => X, n: => X)(implicit i: F =~~= Identity): X =
+    loopT(e, v, m, n)
+
+  final def loopT[X](e: Err => X, v: A => Either[X, RowValue[A]], m: NullMsg => X, n: => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((x: Either[PossiblyNull[NullMsg], SqlValue[A]]) => {
+      @annotation.tailrec
+      def spin(y: Either[PossiblyNull[NullMsg], SqlValue[A]]): X =
+        y match {
+          case Left(k) => k.fold(m, n)
+          case Right(w) => w.toEither match {
+            case Left(d) => e(d)
+            case Right(a) => v(a) match {
+              case Left(x) => x
+              case Right(r) => spin(r.toEither)
+            }
+          }
+        }
+      spin(x)
+    })(value)
+
+  def toEither(implicit i: F =~~= Identity): Either[PossiblyNull[NullMsg], SqlValue[A]] =
+    value
+
+  def toEitherT: EitherT[PossiblyNull[NullMsg], F, SqlValue[A]] =
     EitherT.eitherT(value)
 
-  def toSqlValue(implicit ftr: Functor[F]): SqlValueT[F, Either[PossiblyNull[NullMsg], A]] =
+  def toSqlValueT(implicit ftr: Functor[F]): SqlValueT[F, Either[PossiblyNull[NullMsg], A]] =
     eitherSqlValueT[F, Either[PossiblyNull[NullMsg], A]](
       EitherT.eitherT[Err, F, Either[PossiblyNull[NullMsg], A]] (
         ftr.fmap((e: Either[PossiblyNull[NullMsg], SqlValue[A]]) =>
@@ -52,7 +72,7 @@ sealed trait RowValueT[F[_], A] {
             )
           })(value)))
 
-  def toPossiblyNull(implicit ftr: Functor[F]): PossiblyNullT[({type λ[α] = EitherT[NullMsg, ({type λ[α] = SqlValueT[F, α]})#λ, α]})#λ, A] =
+  def toPossiblyNullT(implicit ftr: Functor[F]): PossiblyNullT[({type λ[α] = EitherT[NullMsg, ({type λ[α] = SqlValueT[F, α]})#λ, α]})#λ, A] =
     PossiblyNullT.fromOptionT[({type λ[α] = EitherT[NullMsg, ({type λ[α] = SqlValueT[F, α]})#λ, α]})#λ, A](
       OptionT[({type λ[α] = EitherT[NullMsg, ({type λ[α] = SqlValueT[F, α]})#λ, α]})#λ, A](
         EitherT[String,({type λ[α] = SqlValueT[F, α]})#λ,Option[A]](

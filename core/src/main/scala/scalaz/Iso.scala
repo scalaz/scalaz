@@ -20,4 +20,9 @@ trait ==~~== {
   implicit def <=~~[F[_], A](a: A)(implicit i: F =~~= Identity): F[A] =
     i <=~~ Identity.id(a)
 
+  implicit def IdentityFunctor[F[_]](implicit i: F =~~= Identity): Functor[F] =
+    new Functor[F] {
+      def fmap[A, B](f: A => B) =
+        k => <=~~[F, B](f(~~=>(k)))
+    }
 }
