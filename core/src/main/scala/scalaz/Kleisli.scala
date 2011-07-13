@@ -19,8 +19,8 @@ sealed trait Kleisli[A, F[_], B] {
   def contramapRead[C](f: C => A): Kleisli[C, F, B] =
     kleisli[C, F, B](run compose f)
 
-  def reader(implicit i: F =~~= Identity): A => B =
-    a => run(a)
+  def reader(a: A)(implicit i: F =~~= Identity): B =
+    run(a)
 
   def toStateT(implicit ftr: Functor[F]): StateT[A, F, B] =
     stateT(a => ftr.fmap((b: B) => (b, a))(run(a)))
@@ -46,6 +46,9 @@ sealed trait Kleisli[A, F[_], B] {
   def rws[W, S](implicit ftr: Functor[F], z: Zero[W]): ReaderWriterStateT[A, W, S, F, B] =
     ReaderWriterStateT.readerWriterStateT(r => s =>
       implicitly[Functor[F]].fmap((b: B) => (b, s, z.zero))(run(r)))
+
+  def |(b: => B)(implicit i: F =~~= Option): Reader[A, B] =
+    Kleisli.reader(a => i ~~=> run(a) getOrElse b)
 }
 
 object Kleisli extends Kleislis {
