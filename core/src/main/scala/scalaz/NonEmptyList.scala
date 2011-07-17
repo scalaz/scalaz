@@ -60,6 +60,11 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs) 
   }
 
+  def foldl1Nel[B >: A](f : (B, A) => B) : B = ((head : B) /: tail) { f }
+
+  def sumNel[B >: A](implicit s : Semigroup[B]) : B = foldl1Nel[B]( (a1, a2) => s.append(a1, a2) )
+
+
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 
