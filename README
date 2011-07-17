@@ -42,13 +42,13 @@ This is the directory structure of the build.
                     | - <scala version M>    All built artifacts (classes, jars, scaladoc) for module N
                                              built for version M of Scala.
 
-1. ./sbt update (this step is required after a fresh checkout, after changing the version of
+1. ./sbt10 update (this step is required after a fresh checkout, after changing the version of
                      SBT, Scala, or other dependencies)
-2. ./sbt [compile | package | test-compile | test | publish-local | publish]
+2. ./sbt10 [compile | package | test-compile | test | publish-local | publish]
 
 For continuous compilation of a module:
 
-$ ./sbt
+$ ./sbt10
 > project scalaz-core
 > ~compile
 
