@@ -127,10 +127,12 @@ sealed trait OptionW[A] {
   /**
    * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
    */
+  /*
   def doneOr[F[_], B](b: => B, f: A => IterateeT[A, F, B]): IterateeT[A, F, B] = value match {
     case None => doneT(b, eofInput)
     case Some(a) => f(a)
   }
+  */
 }
 
 object OptionW extends OptionWs

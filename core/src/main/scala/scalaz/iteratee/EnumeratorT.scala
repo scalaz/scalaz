@@ -8,32 +8,39 @@ import effect._
 import java.io.{InputStream, Reader, BufferedReader}
 
 sealed trait EnumeratorT[E, F[_], A] {
+  /*
   val enumerateT: IterateeT[E, F, A] => IterT[E, F, A]
 
   def enumerate(i: Iteratee[E, A])(implicit x: IterateeT[E, Identity, A] =:= IterateeT[E, F, A], y: IterT[E, F, A] =:= IterT[E, Identity, A]): Iteratee[E, A] =
     enumerateT(i).value
-
+    */
+            /*
   def enumerateUp[G[_]](i: IterateeT[E, G, A])(implicit p: Pointed[F], t: CoPointedFunctor[G]): IterT[E, F, A] =
     enumerateT(i.up[F])
+    */
 
 }
 
 object EnumeratorT extends EnumeratorTs {
+  /*
   def apply[E, F[_], A](k: IterateeT[E, F, A] => IterT[E, F, A]): EnumeratorT[E, F, A] =
     enumeratorT[E, F, A](k)
+    */
 }
 
 trait EnumeratorTs {
   type Enumerator[E, A] =
   EnumeratorT[E, Identity, A]
-
+            /*
   def enumeratorT[E, F[_], A](k: IterateeT[E, F, A] => IterT[E, F, A]): EnumeratorT[E, F, A] = new EnumeratorT[E, F, A] {
     val enumerateT = k
   }
-
+  */
+                      /*
   def enumerator[E, A](k: Iteratee[E, A] => Iteratee[E, A]): Enumerator[E, A] =
     enumeratorT[E, Identity, A](i => id(k(i)))
-
+    */
+                    /*
   implicit def StreamEnumerator[E, A](x: Stream[E]): Enumerator[E, A] =
     enumerator((i: E >@> A) => x match {
       case Stream() => i
@@ -92,5 +99,5 @@ trait EnumeratorTs {
 
   implicit def InputStreamEnumerator[A](x: InputStream): EnumeratorT[IoExceptionOr[Byte], IO, A] =
     streamingEnumerator(x, (i: InputStream) => IoExceptionOr(i.read), (_: IoExceptionOr[Int]) map (_.toByte), (_, n: IoExceptionOr[Int]) => n exists (_ != -1))
-
+                      */
 }
