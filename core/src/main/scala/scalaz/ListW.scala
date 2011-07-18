@@ -112,6 +112,11 @@ sealed trait ListW[A] extends PimpedType[List[A]] {
   }
 
   def pairs: List[(A, A)] = value.tails.tail >>= (value.zip(_))
+
+  def groupNelBy[K](f : A => K) : Map[K, NonEmptyList[A]] = (Map.empty[K, NonEmptyList[A]] /: value) { (m, a) =>
+    val k  = f(a)
+    m + (k -> (m.get(k).map(a <:: _) | nel(a)))
+  }
 }
 
 trait Lists {
