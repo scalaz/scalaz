@@ -10,8 +10,9 @@ import collection.SeqLike
  * <p>
  * All instances must satisfy 2 laws:
  * <ol>
- * <li><strong>identity</strong><br/><code>forall a. lens.set(a,lens(a)) = a</core></li>
- * <li><strong>retention</strong><br/><code>forall a b. lens(lens.set(a,b)) = b</core></li>
+ * <li><strong>identity</strong><br/><code>forall a b. lens.set(a,lens(a)) = a</code></li>
+ * <li><strong>retention</strong><br/><code>forall a b. lens(lens.set(a,b)) = b</code></li>
+ * <li><strong>double-set</strong><br/><code>forall a b c. lens.set(lens.set(a,b),c) = lens.set(a,c)</code></li>
  * </ol>
  * </p>
  */
