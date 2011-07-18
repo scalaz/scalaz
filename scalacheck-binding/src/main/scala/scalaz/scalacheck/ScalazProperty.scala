@@ -122,4 +122,20 @@ trait ScalazPropertys {
     }
   }
 
+  class LensLaws[A : Arbitrary : Equal, B: Arbitrary : Equal](k: Lens[A, B]) extends Properties("Lens Laws") {
+    property("identity") = Lens.identity[A, B](k)
+    property("retention") = Lens.retention[A, B](k)
+    property("doubleSet") = Lens.doubleSet[A, B](k)
+  }
+
+  object Lens {
+    def identity[A: Arbitrary : Equal, B](k: Lens[A, B]) =
+      forAll((a: A) => k.set(a)(k(a)) === a)
+
+    def retention[A : Arbitrary, B: Arbitrary : Equal](k: Lens[A, B]) =
+      forAll((a: A, b: B) => k(k.set(a)(b)) === b)
+
+    def doubleSet[A : Arbitrary : Equal, B: Arbitrary](k: Lens[A, B]) =
+      forAll((a: A, b1: B, b2: B) => k.set(k.set(a)(b1))(b2) === k.set(a)(b2))
+  }
 }
