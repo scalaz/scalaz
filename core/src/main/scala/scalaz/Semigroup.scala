@@ -133,7 +133,16 @@ object Semigroup extends SemigroupLow {
   implicit def Tuple4Semigroup[A, B, C, D](implicit as: Semigroup[A], bs: Semigroup[B], cs: Semigroup[C], ds: Semigroup[D]): Semigroup[(A, B, C, D)] =
     semigroup((a, b) => (a._1 |+| b._1, a._2 |+| b._2, a._3 |+| b._3, a._4 |+| b._4))
 
-  implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
+  // Uglified to help diagnose https://github.com/scalaz/scalaz/issues/25
+  // was: semigroup((a1, a2) => a => a1(a) ⊹ a2.apply(a))
+  implicit def Function1ABSemigroup[A, B: Semigroup]: Semigroup[A => B] = semigroup {
+    val S = implicitly[Semigroup[B]]
+    (a1, a2) => {a =>
+      val b1 = a1(a)
+      lazy val b2 = a2.apply(a)
+      S.append(b1, b2)
+    }
+  }
 
   implicit def EndoSemigroup[A]: Semigroup[Endo[A]] = semigroup((x, y) => (EndoTo(x compose y)))
 
@@ -144,6 +153,21 @@ object Semigroup extends SemigroupLow {
     semigroup((x, y) => x <++> y)
 
   implicit def SemigroupKleisliSemigroup[M[_],A,B](implicit ss: Semigroup[M[B]]): Semigroup[Kleisli[M,A,B]] = semigroup((k1, k2) => ☆((a : A) => k1(a) ⊹ k2.apply(a)))
+
+  implicit def MapSemigroup[K, V](implicit ss: Semigroup[V]): Semigroup[Map[K, V]] = semigroup {
+    (m1, m2) => {
+      // semigroups are not commutative, so order may matter. 
+      val (from, to, semigroup) = {
+        if (m1.size > m2.size) (m2, m1, ss.append(_: V, _: V))
+        else (m1, m2, (ss.append(_: V, _: V)).flip)
+      }
+
+      from.foldLeft(to) {
+        case (to, (k, v)) => to + (k -> to.get(k).map(semigroup(_, v)).getOrElse(v))
+      }
+    }
+  }
+
 
   import concurrent.Strategy
   

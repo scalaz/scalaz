@@ -176,7 +176,7 @@ object Pure {
   }
 
   implicit def ZipStreamPure: Pure[ZipStream] = new Pure[ZipStream] {
-    def pure[A](a: => A) = zip(Stream(a))
+    def pure[A](a: => A) = zip(Stream.continually(a))
   }
 
   implicit def EndoPure: Pure[Endo] = new Pure[Endo] {

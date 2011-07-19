@@ -5,33 +5,33 @@ import Scalaz._
 /**
  * Data structures that can be folded.
  * Minimal complete definition: 'foldMap' or 'foldRight'.
- **/
+ */
 trait Foldable[F[_]] {
 
-  /**Combine the elements of a structure using a monoid. **/
+  /**Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t, x => x)
 
-  /**Map each element of the structure to a monoid, and combine the results. **/
+  /**Map each element of the structure to a monoid, and combine the results. */
   def foldMap[A, M: Monoid](t: F[A], f: A => M): M =
     foldRight[A, M](t, mzero[M], (x, y) => f(x) |+| y)
 
-  /**Right-associative fold of a structure. **/
+  /**Right-associative fold of a structure. */
   def foldRight[A, B](t: F[A], z: => B, f: (A, => B) => B): B =
     foldMap(t, (a: A) => (EndoTo(f.curried(a)(_: B)))) apply z
 
-  /**Left-associative fold of a structure. **/
+  /**Left-associative fold of a structure. */
   def foldLeft[A, B](t: F[A], z: B, f: (B, A) => B): B =
     foldMap(t, (a: A) => (EndoTo(f.flip.curried(a))) σ).value(z)
 
   /**A variant of 'foldr' that has no base case,
-   *  and thus is undefined for empty structures. **/
+   *  and thus is undefined for empty structures. */
   def foldr1[A, B](t: F[A], f: (A, => A) => A): Option[A] = {
     def mf(x: A, o: => Option[A]) = o.map(f(x, _)) orElse Some(x)
     foldRight(t, None, mf)
   }
 
   /**A variant of 'foldl' that has no base case,
-   *  and thus may only be applied to non-empty structures. **/
+   *  and thus may only be applied to non-empty structures. */
   def foldl1[A, B](t: F[A], f: (A, A) => A): Option[A] = {
     def mf(o: Option[A], x: A) = o.map(f(x, _)) orElse Some(x)
     foldLeft(t, None, mf)
