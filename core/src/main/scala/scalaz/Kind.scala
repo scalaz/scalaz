@@ -273,6 +273,12 @@ trait *[A] {
     if (p isDefinedAt value) p(value)
     else implicitly[Pointed[F]].point(value)
 
+  def isZero(implicit iz: IsZero[A]): Boolean =
+    iz.isZero(value)
+
+  def isnotZero(implicit iz: IsZero[A]): Boolean =
+    iz.isNotZero(value)
+
 }
 
 object * extends **
