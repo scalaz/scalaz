@@ -45,7 +45,7 @@ sealed trait Coord {
     val cos2Alpha = 1 - sin2Alpha
     def ab(d: Double, f: Double, g: Double, h: Double, i: Double) = {
       val s = cos2Alpha * (square(ellipsoid.semiMajor / sMnr) - 1)
-      (s / d) * ( f + s * (g + s * (h - i * s)))
+      (s / d) * (f + s * (g + s * (h - i * s)))
     }
     val a = 1 + ab(16384, 4096, -768, 320, 175)
     val b = ab(1024, 256, -128, 74, 47)
@@ -89,7 +89,7 @@ sealed trait Coord {
       rl(end) - rl(this)
     }
     val (u1, u2) = {
-      def at(d: Double) = atan ((1 - f) * (tan(d)))
+      def at(d: Double) = atan((1 - f) * (tan(d)))
       (at(phi1), at(phi2))
     }
     val sinu1 = sin(u1)
@@ -104,35 +104,35 @@ sealed trait Coord {
     def iter(q: Q): Q = {
       val sinlambda = sin(q.lambda)
       val coslambda = cos(q.lambda)
-      val sin2sigma = square(cosu2) * square(sinlambda)+ square(cosu1sinu2 - sinu1cosu2 * coslambda)
+      val sin2sigma = square(cosu2) * square(sinlambda) + square(cosu1sinu2 - sinu1cosu2 * coslambda)
       val sinsigma = sqrt(sin2sigma)
       val cossigma = sinu1sinu2 + cosu1cosu2 * coslambda
       val sigma = atan2(sinsigma, cossigma)
-      val sinalpha = if(sin2sigma == 0D) 0D else cosu1cosu2 * sinlambda / sinsigma
+      val sinalpha = if (sin2sigma == 0D) 0D else cosu1cosu2 * sinlambda / sinsigma
       val alpha = asin(sinalpha)
       val cos2alpha = square(cos(alpha))
-      val cos2sigmam = if(cos2alpha == 0D) 0D else cossigma - 2 * sinu1sinu2 / cos2alpha
+      val cos2sigmam = if (cos2alpha == 0D) 0D else cossigma - 2 * sinu1sinu2 / cos2alpha
       val u2 = cos2alpha * a2b2b2
       val cos2sigmam2 = square(cos2sigmam)
       val a = 1D + u2 / 16384 * (4096 + u2 * (u2 * (320 - 175 * u2) - 768))
       val b = u2 / 1024 * (256 + u2 * (u2 * (74 - 47 * u2) - 128))
       val deltasigma = b * sinsigma * (cos2sigmam + b / 4 * (cossigma * (2 * cos2sigmam2 - 1) - b / 6 * cos2sigmam * (4 * sin2sigma - 3) * (cos2sigmam2 * 4 - 3)))
-      val c  = f / 16 * cos2alpha * (4 + f * (4 - 3 * cos2alpha))
-      val l  = omega + (1 - c) * f * sinalpha * (sigma + c * sinsigma * (cos2sigmam + c * cossigma * (2 * cos2sigmam2 - 1)))
-      val r = if(q.count == 20) Limit
-              else if(q.count > 1 && cos(alpha) < convergence) Converge
-              else Continue
+      val c = f / 16 * cos2alpha * (4 + f * (4 - 3 * cos2alpha))
+      val l = omega + (1 - c) * f * sinalpha * (sigma + c * sinsigma * (cos2sigmam + c * cossigma * (2 * cos2sigmam2 - 1)))
+      val r = if (q.count == 20) Limit
+      else if (q.count > 1 && cos(alpha) < convergence) Converge
+      else Continue
       Q(q.count + 1, r, l, a, sigma, deltasigma)
     }
     def pred(q: Q) = q.result == Continue
     val ed = begin.whileDo(iter(_), pred(_))
-    def ifi[A](p: A => Boolean, t: A => A, a: A): A = if(p(a)) t(a) else a
+    def ifi[A](p: A => Boolean, t: A => A, a: A): A = if (p(a)) t(a) else a
 
-    def normalise(d: Double) = if(d >= 360) d - 360 else d
-    val (a1, a2) = if(ed.result == Converge) (0D, 0D)
-                           else if(phi1 gt phi2) (180D, 0D)
-                           else if(phi1 lt phi2) (0D, 180D)
-                           else (Double.NaN, Double.NaN)
+    def normalise(d: Double) = if (d >= 360) d - 360 else d
+    val (a1, a2) = if (ed.result == Converge) (0D, 0D)
+    else if (phi1 gt phi2) (180D, 0D)
+    else if (phi1 lt phi2) (0D, 180D)
+    else (Double.NaN, Double.NaN)
     val (alpha1, alpha2) = (normalise(a1), normalise(a2))
     curve(b * ed.a * (ed.sigma - ed.deltasigma), azimuth(alpha1), azimuth(alpha2))
   }
@@ -146,8 +146,12 @@ trait Coords {
 }
 
 object Coord {
-  import Scalaz._
-  import Geo._
+
+  import Show._
+  import Equal._
+  import Order._
+  import *._
+  import *->*->*._
 
   implicit def CoordShow: Show[Coord] = shows((c: Coord) => "[" + c.latitude.shows + " " + c.longitude.shows + "]")
 

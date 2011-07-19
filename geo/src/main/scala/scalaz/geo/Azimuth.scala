@@ -12,7 +12,11 @@ trait Azimuths {
 }
 
 object Azimuth {
-  import Scalaz._
+
+  import Show._
+  import Equal._
+  import Order._
+  import *._
 
   implicit def AzimuthShow: Show[Azimuth] = shows(_.value.shows + "°")
 

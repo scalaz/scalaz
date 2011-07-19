@@ -1,94 +1,20 @@
 package scalaz
 
-import Scalaz._
 import java.lang.ref.WeakReference
 
-object EphemeralStream {
-  val empty = new EphemeralStream[⊥] {
-    def isEmpty = true
-    def head: () => ⊥ = () => error("head of empty stream")
-    def tail: () => ⊥ = () => error("tail of empty stream")
-  }
+sealed trait EphemeralStream[A] {
 
-  object cons {
-    def apply[A](a: => A, as: => EphemeralStream[A]) = new EphemeralStream[A] {
-      def isEmpty = false
-      val head = weakMemo(a)
-      val tail = weakMemo(as)
-    }
-  }
-
-  def apply[A](as: A*): EphemeralStream[A] =
-    unfold(0, (b: Int) =>
-      if (b < as.size) Some((as(b), b + 1))
-      else None)
-
-  implicit val ephemeralStreamPure: Pure[EphemeralStream] = new Pure[EphemeralStream] {
-    def pure[A](a: => A) = EphemeralStream(a)
-  }
-
-  implicit val ephemeralStreamBind: Bind[EphemeralStream] = new Bind[EphemeralStream] {
-    def bind[A, B](a: EphemeralStream[A], f: A => EphemeralStream[B]) =
-      a.flatMap(f)
-  }
-
-  def unfold[A, B](b: => B, f: B => Option[(A, B)]): EphemeralStream[A] =
-    f(b) match {
-      case None => empty
-      case Some((a, r)) => cons(a, unfold(r, f))
-    }
-
-  def iterate[A](start: A)(f: A => A): EphemeralStream[A] =
-    unfold(start, (a: A) => {
-      val fa = f(a)
-      Some((fa, fa))
-    })
-
-  def range(lower: Int, upper: Int): EphemeralStream[Int] =
-    if (lower >= upper) empty else cons(lower, range(lower + 1, upper))
-
-  def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
-    case Stream() => empty
-    case h #:: t => cons(h, fromStream(t))
-  }
-
-  implicit def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
-    def iterator = new Iterator[A] {
-      var cur = e
-      def next = {
-        val t = cur.head()
-        cur = cur.tail()
-        t
-      }
-      def hasNext = !cur.isEmpty
-    }
-  }
-
-  def weakMemo[V](f: => V): () => V = {
-    val latch = new Object
-    @volatile var v: Option[WeakReference[V]] = None
-    () => {
-      val a = v.map(x => x.get)
-      if (a.isDefined && a.get != null) a.get else latch.synchronized {
-        val x = f
-        v = Some(new WeakReference(x))
-        x
-      }
-    }
-  }
-
-}
-
-sealed trait EphemeralStream[+A] {
   import EphemeralStream._
-  import Scalaz._
 
   def isEmpty: Boolean
+
   def head: () => A
+
   def tail: () => EphemeralStream[A]
+
   def toList: List[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
-    foldLeft(nil[A])(lcons _).reverse
+    foldLeft(Nil: List[A])(lcons _).reverse
   }
 
   def foldRight[B](z: => B)(f: (=> A) => (=> B) => B): B =
@@ -106,7 +32,7 @@ sealed trait EphemeralStream[+A] {
 
   def filter(p: A => Boolean): EphemeralStream[A] = {
     var rest = this dropWhile (!p(_))
-    if (rest.isEmpty) empty
+    if (rest.isEmpty) emptyEphemeralStream
     else cons(rest.head(), rest.tail() filter p)
   }
 
@@ -116,11 +42,11 @@ sealed trait EphemeralStream[+A] {
     these
   }
 
-  def ++[BB >: A](e: => EphemeralStream[BB]): EphemeralStream[BB] =
-    foldRight[EphemeralStream[BB]](e)((cons[BB](_, _)).curried)
+  def ++(e: => EphemeralStream[A]): EphemeralStream[A] =
+    foldRight[EphemeralStream[A]](e)((cons[A](_, _)).curried)
 
   def flatMap[B](f: A => EphemeralStream[B]): EphemeralStream[B] =
-    foldRight[EphemeralStream[B]](empty)(h => t => f(h) ++ t)
+    foldRight[EphemeralStream[B]](emptyEphemeralStream)(h => t => f(h) ++ t)
 
   def map[B](f: A => B): EphemeralStream[B] =
     flatMap(x => EphemeralStream(f(x)))
@@ -130,3 +56,89 @@ sealed trait EphemeralStream[+A] {
     foldLeft(0)(addOne _)
   }
 }
+
+object EphemeralStream extends EphemeralStreams {
+  def apply[A]: EphemeralStream[A] =
+    emptyEphemeralStream
+}
+
+trait EphemeralStreams {
+  def emptyEphemeralStream[A]: EphemeralStream[A] = new EphemeralStream[A] {
+    def isEmpty = true
+
+    def head: () => Nothing = () => sys.error("head of empty stream")
+
+    def tail: () => Nothing = () => sys.error("tail of empty stream")
+  }
+
+  def cons[A](a: => A, as: => EphemeralStream[A]) = new EphemeralStream[A] {
+    def isEmpty = false
+
+    val head = weakMemo(a)
+    val tail = weakMemo(as)
+  }
+
+  def apply[A](as: A*): EphemeralStream[A] =
+    unfold(0, (b: Int) =>
+      if (b < as.size) Some((as(b), b + 1))
+      else None)
+
+  implicit val EphemeralStreamPointed: Pointed[EphemeralStream] = new Pointed[EphemeralStream] {
+    def point[A](a: => A) = EphemeralStream(a)
+  }
+
+  implicit val EphemeralStreamBind: Bind[EphemeralStream] = new Bind[EphemeralStream] {
+    def bind[A, B](f: A => EphemeralStream[B]) =
+      _ flatMap f
+  }
+
+  def unfold[A, B](b: => B, f: B => Option[(A, B)]): EphemeralStream[A] =
+    f(b) match {
+      case None => emptyEphemeralStream
+      case Some((a, r)) => cons(a, unfold(r, f))
+    }
+
+  def iterate[A](start: A)(f: A => A): EphemeralStream[A] =
+    unfold(start, (a: A) => {
+      val fa = f(a)
+      Some((fa, fa))
+    })
+
+  def range(lower: Int, upper: Int): EphemeralStream[Int] =
+    if (lower >= upper) emptyEphemeralStream else cons(lower, range(lower + 1, upper))
+
+  def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
+    case Stream() => emptyEphemeralStream
+    case h #:: t => cons(h, fromStream(t))
+  }
+
+  implicit def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
+    def iterator = new Iterator[A] {
+      var cur = e
+
+      def next = {
+        val t = cur.head()
+        cur = cur.tail()
+        t
+      }
+
+      def hasNext = !cur.isEmpty
+    }
+  }
+
+  def weakMemo[V](f: => V): () => V = {
+    val latch = new Object
+    @volatile var v: Option[WeakReference[V]] = None
+    () => {
+      val a = v.map(x => x.get)
+      if (a.isDefined && a.get != null) a.get
+      else latch.synchronized {
+        val x = f
+        v = Some(new WeakReference(x))
+        x
+      }
+    }
+  }
+
+}
+

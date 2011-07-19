@@ -8,9 +8,10 @@ import Arbitrary._
 import Gen._
 
 object ArbitraryGeo {
+
   import geo._
   import Geo._
-  import ScalaCheckBinding._
+  import ScalaCheck._
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 

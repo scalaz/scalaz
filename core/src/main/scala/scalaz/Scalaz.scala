@@ -1,76 +1,76 @@
 package scalaz
 
-import concurrent._
+object Scalaz extends
+Alphas with
+Applics with
+Applicatives with
+Binds with
+BKTrees with
+Categorys with
+CoKleislis with
+Comps with
+Consts with
+CoStateTs with
+Dequeues with
+Digits with
+EitherTs with
+Endos with
+EphemeralStreams with
+Equals with
+FailProjections with
+Foldls with
+Functors with
+Heaps with
+Identitys with
+ImmutableArrays with
+Joins with
+Kleislis with
+LazyEithers with
+LazyEitherTs with
+LazyOptions with
+LazyOptionTs with
+LazyTuples with
+Lenss with
+Monads with
+Monoids with
+NonEmptyLists with
+OptionTs with
+Orders with
+Pointeds with
+PointedFunctors with
+ReaderWriterStateTs with
+Recursion with
+Semigroups with
+Shows with
+StateTs with
+StepListTs with
+StepStreamTs with
+Trees with
+TreeLocs with
+Validations with
+WriterTs with
+Zeros with
+Zippers with
+concurrent.Concurrents with
+effect.Effects with
+iteratee.Iteratees with
+newtypes.Newtypess with
+wrap.Wraps with
+Scalazs with
+** with
+**->** with
+**->**->** with
+~>> with
+^^*^^ with
+~** with
+!** with
+==~~==
 
-object Scalaz extends Actors
-    with    Alphas
-    with    Applys
-    with    ArrayBytes
-    with    BigIntegers
-    with    BigInts
-    with    BKTrees
-    with    Booleans
-    with    BooleanConjunctions
-    with    Bytes
-    with    Chars
-    with    CharSets
-    with    Cokleislis
-    with    Digits
-    with    Duals
-    with    Effects
-    with    Emptys
-    with    Endos
-    with    Enumerations
-    with    Equals
-    with    Extras
-    with    FirstOptions
-    with    FirstLazyOptions
-    with    Function0s
-    with    Function1s
-    with    Function2s
-    with    Kleislis
-    with    Identitys
-    with    InputStreams
-    with    Ints
-    with    LastOptions
-    with    LastLazyOptions
-    with    LazyTuples
-    with    Lists
-    with    Loggers
-    with    Longs
-    with    MAs
-    with    MABs
-    with    MetricSpaces
-    with    Memos
-    with    Multiplications
-    with    Names
-    with    NonEmptyLists
-    with    Options
-    with    OptionTs
-    with    Orders
-    with    Promises
-    with    Reducers
-    with    Resources
-    with    Semigroups 
-    with    FingerTree.IndSeqs
-    with    FingerTree.Ropes
-    with    Shorts
-    with    Shows
-    with    States
-    with    Streams
-    with    Strings
-    with    Trees
-    with    Tuples
-    with    TreeLocs
-    with    Writers
-    with    WriterTs
-    with    Validations
-    with    Zeros
-    with    Zippers
-    with    ZipStreams {
-  def ⊥ = error("undefined")
+object Scalazing extends Scalazs
 
-  def undefined = ⊥
+trait Scalazs extends {
+
+  import ~>._
 
   type ⊤ = Any
 
@@ -78,9 +78,9 @@ object Scalaz extends Actors
 
   type ℤ = scala.math.BigInt
 
-  lazy val π = java.lang.Math.PI
+  val π = java.lang.Math.PI
 
-  lazy val π2 = π * 2
+  val τ = π * 2
 
   type ArraySeq[A] = collection.mutable.ArraySeq[A]
 
@@ -88,7 +88,13 @@ object Scalaz extends Actors
 
   def ×[A, B] = (a: A) => (b: B) => (a, b)
 
-  def pure[F[_] : Pure] = new (Id ~> F) {
-    def apply[A](a: A) = implicitly[Pure[F]].pure(a)
+  def point[F[_] : Pointed]: (I ~> F) = new (I ~> F) {
+    def apply[A](a: A) = implicitly[Pointed[F]].point(a)
   }
+
+  def ∅[Z](implicit z: Zero[Z]): Z =
+    z.zero
+
+  def mzero[Z](implicit z: Zero[Z]): Z =
+    z.zero
 }

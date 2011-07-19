@@ -1,99 +1,219 @@
 package scalaz
 
-import Scalaz._
+sealed trait LazyOption[A] {
 
-sealed trait LazyOption[+A] {
-  self =>
-  def fold[B](ifSome: ((=> A) => B) = (a => a): ((=> A) => A), ifNone: => B = LazyOption.none[B]): B
+  import LazyOption._
+  import LazyEither._
+  import *._
+  import newtypes.{FirstLazyOption, LastLazyOption}
+  import =~~=._
 
-  def isDefined: Boolean
-
-  def isEmpty: Boolean = !isDefined
-
-  def orSome[B >: A](default: => B): B = fold[B](ifNone = default)
-
-  /** An alias for `orSome` */
-  def getOrElse[B >: A](default: => B): B = orSome(default)
-
-  def get: A = getOrElse(throw new NoSuchElementException())
-
-  def orNull[A1 >: A](implicit ev: Null <:< A1): A1 = this getOrElse null
-
-  def map[B](f: (=> A) => B): LazyOption[B] = fold(a => LazyOption.some(f(a)))
-
-  def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] = fold(f)
-
-  def filter(f: ((=> A) => Boolean)): LazyOption[A] = new LazyOption[A] {
-    lazy val isDefined = self.fold(f, false)
-    def fold[B](ifSome: (=> A) => B, ifNone: => B) = if (isDefined) self.fold(ifSome, ifNone) else ifNone
-  }
-
-  def foreach[U](f: (=> A) => U) {
-    fold(f)
-  }
-
-  def withFilter(p: (=> A) => Boolean): WithFilter = new WithFilter(p)
-
-  def exists(p: (=> A) => Boolean): Boolean = fold(p, false)
-
-  def forall(p: (=> A) => Boolean): Boolean = fold(p, true)
-
-  def orElse[B >: A](alternative: => LazyOption[B]): LazyOption[B] =
-    if (isEmpty) alternative else this
-
-  /** Forces evaluation of the contents of this `LazyOption` */
-  def force: LazyOption[A] = this
-
-  def toOption[AA >: A]: Option[A] = fold(Some(_), None)
-
-  def toRight[X](left: => X) = if (isEmpty) Left(left) else Right(get)
-
-  def toLeft[X](right: => X) = if (isEmpty) Right(right) else Left(get)
-
-  def fst[AA >: A]: FirstLazyOption[AA] = this
-
-  def lst[AA >: A]: LastLazyOption[AA] = this
-
-  class WithFilter(p: (=> A) => Boolean) {
-    def map[B](f: (=> A) => B): LazyOption[B] = self filter p map f
-
-    def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] = self filter p flatMap f
-
-    def foreach[U](f: (=> A) => U) {
-      self filter p foreach f
+  def fold[X](some: (=> A) => X, none: => X): X =
+    this match {
+      case LazySome(z) => some(z())
+      case LazyNone() => none
     }
 
-    def withFilter(q: (=> A) => Boolean): WithFilter = new WithFilter(x => p(x) && q(x))
-  }
+  def ?[X](some: => X, none: => X): X =
+    fold(_ => some, none)
+
+  def isDefined =
+    fold(_ => false, true)
+
+  def isEmpty =
+    !isDefined
+
+  def getOrElse(default: => A): A =
+    fold(a => a, default)
+
+  def exists(f: (=> A) => Boolean): Boolean =
+    fold(f, false)
+
+  def forall(f: (=> A) => Boolean): Boolean =
+    fold(f, true)
+
+  def toOption: Option[A] =
+    fold(a => Some(a), None)
+
+  def toLazyRight[X](left: => X): LazyEither[X, A] =
+    fold(lazyRight(_), lazyLeft(left))
+
+  def toLazyLeft[X](right: => X): LazyEither[A, X] =
+    fold(lazyLeft(_), lazyRight(right))
+
+  def toRight[X](left: => X): Either[X, A] =
+    fold(Right(_), Left(left))
+
+  def toLeft[X](right: => X): Either[A, X] =
+    fold(Left(_), Right(right))
+
+  def toList: List[A] =
+    fold(List(_), Nil)
+
+  def orElse(a: => LazyOption[A]): LazyOption[A] =
+    fold(_ => this, a)
+
+  def first: FirstLazyOption[A] =
+    this.*-->[FirstLazyOption[A]]
+
+  def last: LastLazyOption[A] =
+    this.*-->[LastLazyOption[A]]
+
+  def map[B](f: (=> A) => B): LazyOption[B] =
+    fold(a => lazySome(f(a)), lazyNone)
+
+  def foreach(f: (=> A) => Unit): Unit =
+    fold(f, ())
+
+  def filter(f: (=> A) => Boolean): LazyOption[A] =
+    fold(a => if (f(a)) this else lazyNone, lazyNone)
+
+  def flatMap[B](f: (=> A) => LazyOption[B]): LazyOption[B] =
+    fold(f, lazyNone)
 }
 
-object LazyOption {
-  def some[A](a: => A): LazyOption[A] = new Some(a)
-  def strictSome[A](a: A): LazyOption[A] = new StrictSome(a)
+private case class LazySome[A](a: () => A) extends LazyOption[A]
 
-  def none[A]: LazyOption[A] = None
+private case class LazyNone[A]() extends LazyOption[A]
 
-  private class Some[+A](a: => A) extends LazyOption[A] {
-    lazy val aa = a
+object LazyOption extends LazyOptions
 
-    def fold[B](ifSome: ((=> A) => B), ifNone: => B): B = ifSome(aa)
+trait LazyOptions {
+  def lazySome[A]: (=> A) => LazyOption[A] =
+    a => LazySome(() => a)
 
-    def isDefined = true
+  def lazyNone[A]: LazyOption[A] =
+    LazyNone()
 
-    override def force = new StrictSome(a)
-  }
+  implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
+    Show.shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))
 
-  private class StrictSome[+A](a: A) extends LazyOption[A] {
-    def fold[B](ifSome: ((=> A) => B), ifNone: => B): B = ifSome(a)
+  implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] =
+    Equal.equalBy(_.toOption)
 
-    def isDefined = true
-  }
+  implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
+    Order.orderBy(_.toOption)
+}
 
-  private object None extends LazyOption[Nothing] {
-    def fold[B](ifSome: ((=> Nothing) => B), ifNone: => B): B = ifNone
+sealed trait LazyOptionT[F[_], A] {
+  val runT: F[LazyOption[A]]
 
-    def isDefined = false
-  }
+  import LazyOption._
+  import LazyOptionT._
+  import LazyEitherT._
+  import EitherT._
+  import =~~=._
+
+  def *->* : (({type λ[α] = LazyOptionT[F, α]})#λ *->* A) =
+    scalaz.*->*.!**->**![({type λ[α] = LazyOptionT[F, α]})#λ, A](this)
+
+  def run(implicit i: F =~~= Identity): LazyOption[A] =
+    runT
+
+  def ?[X](some: => X, none: => X)(implicit ftr: Functor[F]): F[X] =
+    ftr.fmap((_: LazyOption[A]).?(some, none))(runT)
+
+  def -?-[X](some: => X, none: => X)(implicit i: F =~~= Identity): X =
+    run ? (some, none)
+
+  def isDefinedT(implicit ftr: Functor[F]): F[Boolean] =
+    ftr.fmap((_: LazyOption[A]).isDefined)(runT)
+
+  def isDefined(implicit i: F =~~= Identity): Boolean =
+    run.isDefined
+
+  def isEmptyT(implicit ftr: Functor[F]): F[Boolean] =
+    ftr.fmap((_: LazyOption[A]).isEmpty)(runT)
+
+  def isEmpty(implicit i: F =~~= Identity): Boolean =
+    run.isEmpty
+
+  def getOrElseT(default: => A)(implicit ftr: Functor[F]): F[A] =
+    ftr.fmap((_: LazyOption[A]).getOrElse(default))(runT)
+
+  def getOrElse(default: => A)(implicit i: F =~~= Identity): A =
+    run.getOrElse(default)
+
+  def existsT(f: (=> A) => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+    ftr.fmap((_: LazyOption[A]).exists(f))(runT)
+
+  def exists(f: (=> A) => Boolean)(implicit i: F =~~= Identity): Boolean =
+    run.exists(f)
+
+  def forallT(f: (=> A) => Boolean)(implicit ftr: Functor[F]): F[Boolean] =
+    ftr.fmap((_: LazyOption[A]).forall(f))(runT)
+
+  def forall(f: (=> A) => Boolean)(implicit i: F =~~= Identity): Boolean =
+    run.forall(f)
+
+  def toOptionT(implicit ftr: Functor[F]): OptionT[F, A] =
+    OptionT.optionT(ftr.fmap((_: LazyOption[A]).toOption)(runT))
+
+  def toOption(implicit i: F =~~= Identity): Option[A] =
+    run.toOption
+
+  def toLazyRightT[X](left: => X)(implicit ftr: Functor[F]): LazyEitherT[X, F, A] =
+    lazyEitherT(ftr.fmap((_: LazyOption[A]).toLazyRight(left))(runT))
+
+  def toLazyRight[X](left: => X)(implicit i: F =~~= Identity): LazyEither[X, A] =
+    run.toLazyRight(left)
+
+  def toLazyLeftT[X](right: => X)(implicit ftr: Functor[F]): LazyEitherT[A, F, X] =
+    lazyEitherT(ftr.fmap((_: LazyOption[A]).toLazyLeft(right))(runT))
+
+  def toLazyLeft[X](right: => X)(implicit i: F =~~= Identity): LazyEither[A, X] =
+    run.toLazyLeft(right)
+
+  def toRightT[X](left: => X)(implicit ftr: Functor[F]): EitherT[X, F, A] =
+    eitherT(ftr.fmap((_: LazyOption[A]).toRight(left))(runT))
+
+  def toRight[X](left: => X)(implicit i: F =~~= Identity): Either[X, A] =
+    run.toRight(left)
+
+  def toLeftT[X](right: => X)(implicit ftr: Functor[F]): EitherT[A, F, X] =
+    eitherT(ftr.fmap((_: LazyOption[A]).toLeft(right))(runT))
+
+  def toLeft[X](right: => X)(implicit i: F =~~= Identity): Either[A, X] =
+    run.toLeft(right)
+
+  def orElseT(a: => LazyOption[A])(implicit ftr: Functor[F]): LazyOptionT[F, A] =
+    lazyOptionT(ftr.fmap((_: LazyOption[A]).orElse(a))(LazyOptionT.this.runT))
+
+  def orElse(a: => LazyOption[A])(implicit i: F =~~= Identity): LazyOption[A] =
+    run.orElse(a)
+
+  def map[B](f: (=> A) => B)(implicit ftr: Functor[F]): LazyOptionT[F, B] =
+    lazyOptionT(ftr.fmap((_: LazyOption[A]) map f)(runT))
+
+  def foreach(f: (=> A) => Unit)(implicit e: Each[F]): Unit =
+    e.each((_: LazyOption[A]) foreach f)(runT)
+
+  def filter(f: (=> A) => Boolean)(implicit ftr: Functor[F]): LazyOptionT[F, A] =
+    lazyOptionT(ftr.fmap((_: LazyOption[A]).filter(f))(runT))
+
+  def flatMap[B](f: (=> A) => LazyOptionT[F, B])(implicit m: Monad[F]): LazyOptionT[F, B] =
+    lazyOptionT(m.bd((_: LazyOption[A]).fold(a => f(a).runT, m.point(lazyNone[B])))(runT))
+
+  def mapLazyOption[B](f: LazyOption[A] => LazyOption[B])(implicit ftr: Functor[F]): LazyOptionT[F, B] =
+    lazyOptionT(ftr.fmap(f)(runT))
 
 }
 
+object LazyOptionT extends LazyOptionTs {
+  def apply[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
+    lazyOptionT(r)
+}
+
+trait LazyOptionTs {
+  def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] = new LazyOptionT[F, A] {
+    val runT = r
+  }
+
+  import LazyOption._
+
+  def lazySomeT[F[_], A](a: => A)(implicit p: Pointed[F]): LazyOptionT[F, A] =
+    lazyOptionT(p.point(lazySome(a)))
+
+  def lazyNoneT[F[_], A](implicit p: Pointed[F]): LazyOptionT[F, A] =
+    lazyOptionT(p.point(lazyNone[A]))
+}

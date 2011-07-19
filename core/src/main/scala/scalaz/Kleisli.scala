@@ -1,64 +1,72 @@
 package scalaz
 
-sealed trait Kleisli[M[_], A, B] {
-  def apply(a: A): M[B]
+sealed trait Kleisli[A, F[_], B] {
+  val run: A => F[B]
 
-  import Scalaz._
+  import Kleisli._
+  import StateT._
+  import =~~=._
 
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = ☆((a: A) => b.bind(this(a), k(_: B)))
+  def *->* : (({type λ[α] = Kleisli[A, F, α]})#λ *->* B) =
+    scalaz.*->*.!**->**![({type λ[α] = Kleisli[A, F, α]})#λ, B](this)
 
-  def >=>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(☆(k))
+  def *->*->* : *->*->*[A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B] =
+    scalaz.*->*->*.!**->**->**![A, ({type λ[α, β] = Kleisli[α, F, β]})#λ, B](this)
 
-  def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
+  def mapValue[C](f: F[B] => F[C]): Kleisli[A, F, C] =
+    kleisli(f compose run)
 
-  def <=<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = ☆(k) >=> this
+  def contramapRead[C](f: C => A): Kleisli[C, F, B] =
+    kleisli[C, F, B](run compose f)
 
-  def compose[N[_]](f: M[B] => N[B]): Kleisli[N, A, B] = ☆((a: A) => f(this(a)))
+  def reader(a: A)(implicit i: F =~~= Identity): B =
+    run(a)
 
-  def traverse[F[_], AA <: A](f: F[AA])(implicit a: Applicative[M], t: Traverse[F]): M[F[B]] =
-    f ↦ (Kleisli.this(_)) 
+  def toStateT(implicit ftr: Functor[F]): StateT[A, F, B] =
+    stateT(a => ftr.fmap((b: B) => (b, a))(run(a)))
 
-  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a, apply _)  
-  
-  def map[C](f: B => C)(implicit m: Functor[M]): Kleisli[M, A, C] =
-    kleisli(a => m.fmap(apply(a), f))
+  def toState(implicit i: F =~~= Identity): State[A, B] =
+    state(a => (run(a), a))
 
-  def flatMap[C](f: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] =
-    kleisli(a => m.bind(apply(a), f))
+  def map[C](f: B => C)(implicit ftr: Functor[F]): Kleisli[A, F, C] =
+    kleisli[A, F, C](ftr.fmap(f) compose run)
+
+  def flatMap[C](f: B => Kleisli[A, F, C])(implicit bnd: Bind[F]): Kleisli[A, F, C] =
+    kleisli[A, F, C](a => bnd.bind((b: B) => f(b) run a)(run(a)))
+
+  def =<<(a: F[A])(implicit b: Bind[F]): F[B] =
+    b.bind(run)(a)
+
+  def >=>[C](c: Kleisli[B, F, C])(implicit b: Bind[F]): Kleisli[A, F, C] =
+    kleisli(a => c =<< run(a))
+
+  def <=<[C](c: Kleisli[C, F, A])(implicit b: Bind[F]): Kleisli[C, F, B] =
+    c >=> this
+
+  def rws[W, S](implicit ftr: Functor[F], z: Zero[W]): ReaderWriterStateT[A, W, S, F, B] =
+    ReaderWriterStateT.readerWriterStateT(r => s =>
+      implicitly[Functor[F]].fmap((b: B) => (b, s, z.zero))(run(r)))
+
+  def |(b: => B)(implicit i: F =~~= Option): Reader[A, B] =
+    Kleisli.reader(a => i ~~=> run(a) getOrElse b)
+}
+
+object Kleisli extends Kleislis {
+
+  def apply[A, F[_], B](r: A => F[B]): Kleisli[A, F, B] =
+    kleisli(r)
 }
 
 trait Kleislis {
-  def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
-    def apply(a: A) = f(a)
+  type ReaderT[A, F[_], B] = Kleisli[A, F, B]
+  type Reader[A, B] = Kleisli[A, Identity, B]
+
+  def kleisli[A, F[_], B](r: A => F[B]): Kleisli[A, F, B] = new Kleisli[A, F, B] {
+    val run = r
   }
 
-  def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
+  def reader[A, B](r: A => B): Reader[A, B] =
+    kleisli[A, Identity, B](a => Identity.id(r(a)))
 
-  implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
-
-  /** Pure Kleisli arrow */
-  def ask[M[_]: Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
-
-  def kleisliPure[M[_], R](implicit m: Pure[M])
-    : Pure[({type λ[x]=Kleisli[M, R, x]})#λ] =
-  new Pure[({type λ[x]=Kleisli[M, R, x]})#λ] {
-      def pure[A](a: => A) = kleisli((r: R) => m.pure(a))
-    }
-
-/*
-  implicit def kleisliBind[M[_]:Bind, R]
-    : Bind[({type λ[x]=Kleisli[M, R, x]})#λ] =
-  new Bind[({type λ[x]=Kleisli[M, R, x]})#λ] {
-      def bind[A,B](m: Kleisli[M, R, A], k: A => Kleisli[M, R, B]) =
-        kleisli((r: R) => m.apply(r) >>= ((a: A) => k(a).apply(r)))
-    }
-*/
-
-  implicit def kleisliBind[M[_], R](implicit b: Bind[M])
-    : Bind[({type λ[x]=Kleisli[M, R, x]})#λ] =
-  new Bind[({type λ[x]=Kleisli[M, R, x]})#λ] {
-      def bind[A,B](m: Kleisli[M, R, A], k: A => Kleisli[M, R, B]) =
-        kleisli((r: R) => b.bind[A,B](m.apply(r),((a: A) => k(a).apply(r))))
-    }
+  def ask[F[_] : Pointed, A]: Kleisli[A, F, A] = kleisli(a => implicitly[Pointed[F]].point(a))
 }
-

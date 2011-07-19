@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz._
+import scalaz._, newtypes._
 
 object ExampleMonad {
   def main(args: Array[String]) = run
@@ -34,24 +34,24 @@ object ExampleMonad {
     (List(List(1, 2, 3), List(4, 5, 6)) μ) assert_=== List(1, 2, 3, 4, 5, 6)
 
     // bind ∗
-    (List(1, 2, 3) ∗ (List(7, _))) assert_=== List(7, 1, 7, 2, 7, 3)
-    (some(7) ∗ (x => if (x % 2 == 0) some(x - 1) else none)) assert_=== none[Int]
-    (some(8) ∗ (x => if (x % 2 == 0) some(x - 1) else none)) assert_=== some(7)
+    (List(1, 2, 3) >>= (List(7, _))) assert_=== List(7, 1, 7, 2, 7, 3)
+    (some(7) >>= (x => if (x % 2 == 0) some(x - 1) else none)) assert_=== none[Int]
+    (some(8) >>= (x => if (x % 2 == 0) some(x - 1) else none)) assert_=== some(7)
 
-    // anonymous bind ∗|
-    (List(1, 2, 3) ∗| (List(3, 4))) assert_=== List(3, 4, 3, 4, 3, 4)
+    // anonymous bind >|>
+    (List(1, 2, 3) >|> (List(3, 4))) assert_=== List(3, 4, 3, 4, 3, 4)
 
     // Folding left on a List through the List monad
-    List(1, 2).foldLeftM(0)((b, a) => List(10, 20, a, b)) assert_=== List(10, 20, 2, 10, 10, 20, 2, 20, 10, 20, 2, 1, 10, 20, 2, 0)
+    List(1, 2).foldlM(0)(b => a => List(10, 20, a, b)) assert_=== List(10, 20, 2, 10, 10, 20, 2, 20, 10, 20, 2, 1, 10, 20, 2, 0)
 
     // Folding left on a Stream through the Option monad
-    Stream(1, 2).foldLeftM(0)((b, a) => some(a + b)) assert_=== some(3)
+    Stream(1, 2).foldlM(0)(b => a => some(a + b)) assert_=== some(3)
 
     // Folding right on a Stream through the List monad
-    Stream(1, 2).foldRightM(0)((b, a) => List(10, 20, a, b)) assert_=== List(10, 20, 10, 1, 10, 20, 20, 1, 10, 20, 0, 1, 10, 20, 2, 1)
+    Stream(1, 2).foldrM(0)(b => a => List(10, 20, a, b)) assert_=== List(10, 20, 10, 1, 10, 20, 20, 1, 10, 20, 0, 1, 10, 20, 2, 1)
 
     // Folding right on a List through the Option monad
-    List(1, 2).foldRightM(0)((b, a) => some(a + b)) assert_=== some(3)
+    List(1, 2).foldrM(0)(b => a => some(a + b)) assert_=== some(3)
 
     // Take-while on a List through the Option monad
     List.range(1, 50).takeWhileM(n => if (n < 100) some(n < 10) else none) assert_=== some(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
@@ -69,7 +69,7 @@ object ExampleMonad {
     List(1, 2, 3).replicateM[List](2) assert_=== List(List(1, 1), List(1, 2), List(1, 3), List(2, 1), List(2, 2), List(2, 3), List(3, 1), List(3, 2), List(3, 3))
 
     // Replicating a List through the FirstOption monoid
-    List(1, 2, 3).replicateM[FirstOption](2) assert_=== List(some(1), some(1), some(1), some(2), some(2), some(2), some(3), some(3), some(3)).map(_.fst)
+    List(1, 2, 3).replicateM[FirstOption](2) assert_=== List(some(1), some(1), some(1), some(2), some(2), some(2), some(3), some(3), some(3)).mapPack[FirstOption[Int]]
 
     // Replicating a List through the Option monoid
     List(1, 2, 3).replicateM[Option](2) assert_=== List(some(2), some(3), some(4), some(3), some(4), some(5), some(4), some(5), some(6))
@@ -81,6 +81,6 @@ object ExampleMonad {
     some(7).replicateM[Option](3) assert_=== some(some(21))
 
     // Replicating an Option through the FisrtOption monoid
-    some(7).replicateM[FirstOption](3) assert_=== some(some(7).fst)
+    some(7).replicateM[FirstOption](3) assert_=== some(some(7).first)
   }
 }

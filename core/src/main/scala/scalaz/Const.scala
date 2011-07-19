@@ -1,10 +1,35 @@
 package scalaz
 
-/**
- * Used to generate Phantom Applicative Functors and categories from a Monoidal type A
- *
- * @see scalaz.Applicative#MonoidalApplicative
- * @see scalaz.Category#MonoidCategory
- */
-case class Const[A, +B](value: A) extends NewType[A]
-case class Const2[A, +B, +C](value: A) extends NewType[A]
+
+sealed trait Const[A, B] {
+  val value: A
+
+  def map[X](f: B => X): Const[A, X] =
+    Const.const(value)
+}
+
+object Const extends Consts
+
+trait Consts {
+
+  import ~>._
+
+  def const[B]: (I ~> ({type λ[α] = Const[α, B]})#λ) = new (I ~> ({type λ[α] = Const[α, B]})#λ) {
+    def apply[A](a: A) = new Const[A, B] {
+      val value = a
+    }
+  }
+
+  implicit def ConstTo[A, B](c: Const[A, B]): A =
+    c.value
+
+  implicit def Const_^*^[A, B]: ^*^[Const[A, B], A] =
+    ^*^.^*^(_.value, a => new Const[A, B] {
+      val value = a
+    })
+
+  def liftConst[A, B](f: A => B): A => Const[B, A] = {
+    a: A => Const.const(f(a))
+  }
+
+}

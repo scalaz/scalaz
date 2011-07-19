@@ -5,10 +5,12 @@ object Boilerplate {
     val arities = 2 to 12
 
     def writeFileScalazPackage(fileName: String, source: String): File = {
-      val file = (outputDir / "scalaz" / fileName).asFile
+      val file = (outputDir / "scalaz" / "wrap" / fileName).asFile
       IO.write(file, source)
       file
     }
+
+    def double(s: String) = s + s
 
     val tuples = for (arity: Int <- arities) yield {
       val tupleWSource: String = {
@@ -42,7 +44,8 @@ object Boilerplate {
         }
 
         val pimp = """|
-          |trait Tuple%dW[%s] extends PimpedType[Tuple%d[%s]] {
+          |trait Tuple%dW[%s] {
+          |  val value: Tuple%d[%s]
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
           |  def mapElements[%s](%s): (%s) = (%s)
@@ -59,7 +62,7 @@ object Boilerplate {
       tupleWSource
     }
 
-    val source = "package scalaz\n\n" +
+    val source = "package scalaz\npackage wrap\n\n" +
             "trait Tuples {\n" +
             "  " + tuples.map("  " +).mkString("\n") +
             "}"

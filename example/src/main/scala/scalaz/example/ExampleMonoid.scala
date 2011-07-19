@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz._
+import scalaz._, newtypes._
 
 object ExampleMonoid {
   def main(args: Array[String]) = run
@@ -42,7 +42,12 @@ object ExampleMonoid {
     ∅[IntMultiplication] assert_=== (1 ∏)
 
     // Appending zero must leave t unchanged
-    def assertIdentity[T](t: T)(implicit st: Monoid[T], eq: Equal[T], sh: Show[T]) = (t ⊹ ∅[T]) assert_=== (t)
+    def assertIdentity[T](t: T)(implicit st: Monoid[T], eq: Equal[T], sh: Show[T]) = {
+      implicit val s = st.semigroup
+      implicit val z = st.zero
+      (t ⊹ ∅[T]) assert_=== (t)
+    }
+
     assertIdentity(List(1))
     assertIdentity(1)
     assertIdentity(1 ∏)
@@ -57,7 +62,9 @@ object ExampleMonoid {
     1.unfold[List, String]((a: Int) => (a < 5).option((a.toString, a + 1))) assert_=== List("1", "2", "3", "4")
 
     // Iterate over a function (Int, Int) => (Int, Int) through the Stream Monoid to generate the Fibonacci numbers
-    val fibs: Stream[Int] = (0, 1).iterate[Stream]{case (a, b) => (b, a + b)}.map(_._1)
+    val fibs: Stream[Int] = (0, 1).iterate[Stream] {
+      case (a, b) => (b, a + b)
+    }.map(_._1)
     fibs.take(7).toList assert_=== List(0, 1, 1, 2, 3, 5, 8)
   }
 }

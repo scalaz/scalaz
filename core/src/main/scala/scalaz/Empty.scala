@@ -1,43 +1,30 @@
 package scalaz
 
-import collection.TraversableLike
+import scalaz.Scalaz._
 
-trait Empty[E[_]] {
-  def empty[A]: E[A]
+trait Empty[F[_]] {
+  def empty[A]: F[A]
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Empty[G] =
+    new Empty[G] {
+      def empty[A] =
+        n.pack(Empty.this.empty[A])
+    }
 }
 
-trait Emptys {
-  def <∅>[E[_], A](implicit e: Empty[E]): E[A] = e.empty
-}
+object Empty extends Emptys
 
-object Empty {
-  import Scalaz._
-
-  implicit def ZipStreamEmpty: Empty[ZipStream] = new Empty[ZipStream] {
-    def empty[A] = emptyZipStream
-  }
-
+trait Emptys extends EmptysLow {
   implicit def OptionEmpty: Empty[Option] = new Empty[Option] {
     def empty[A] = None
   }
 
-  implicit def LazyOptionEmpty: Empty[LazyOption] = new Empty[LazyOption] {
-    def empty[A] = LazyOption.none[A]
+  implicit def ListEmpty: Empty[List] = new Empty[List] {
+    def empty[A] = Nil
   }
 
-  implicit def EitherLeftEmpty[X: Zero]: Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Empty[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
-    def empty[A] = Right(∅).left
-  }
-
-  implicit def EitherRightEmpty[X: Zero]: Empty[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Empty[({type λ[α]=Either.RightProjection[X, α]})#λ] {
-    def empty[A] = Left(∅).right
-  }
-  
-  implicit def TraversableEmpty[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Empty[CC] = new Empty[CC] {
-    def empty[A] = {
-      val builder = implicitly[CanBuildAnySelf[CC]].apply[⊥, A]
-      builder.result
-    }
+  implicit def StreamEmpty: Empty[Stream] = new Empty[Stream] {
+    def empty[A] = Stream.empty
   }
 
   implicit def MapEmpty[V: Semigroup]: Empty[({type λ[α] = Map[α, V]})#λ] = new Empty[({type λ[α] = Map[α, V]})#λ] {
@@ -101,5 +88,28 @@ object Empty {
 
   implicit def JavaSynchronousQueueEmpty: Empty[SynchronousQueue] = new Empty[SynchronousQueue] {
     def empty[A] = new SynchronousQueue[A]
+  }
+
+  implicit def StepListTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepListT[F, X]})#λ] = new Empty[({type λ[X] = StepListT[F, X]})#λ] {
+    def empty[A] =
+      stepListT[F, A]
+  }
+
+  implicit def StepStreamTEmpty[F[_] : Pointed]: Empty[({type λ[X] = StepStreamT[F, X]})#λ] = new Empty[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def empty[A] =
+      stepStreamT[F, A]
+  }
+
+}
+
+trait EmptysLow {
+
+  import collection.TraversableLike
+
+  implicit def TraversableEmpty[CC[X] <: TraversableLike[X, CC[X]] : CanBuildAnySelf]: Empty[CC] = new Empty[CC] {
+    def empty[A] = {
+      val builder = implicitly[CanBuildAnySelf[CC]].apply[⊥, A]
+      builder.result
+    }
   }
 }

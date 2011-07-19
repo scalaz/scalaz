@@ -9,12 +9,11 @@ case class Variable(name: String) {
 
 case class Template(name: String, value: String, description: String, variables: List[Variable]) {
   def toXml =
-  <template name={name} value={escape(value)} description={description} toReformat="false" toShortenFQNames="true">
-    {for (v <- variables) yield v.toXml}
-    <context>
-      <option name="SCALA" value="true"/>
+    <template name={name} value={escape(value)} description={description} toReformat="false" toShortenFQNames="true">
+      {for (v <- variables) yield v.toXml}<context>
+        <option name="SCALA" value="true"/>
     </context>
-  </template>
+    </template>
 }
 
 case class Param(val name: String)
@@ -26,7 +25,7 @@ def method(shortcut: String, name: String, params: Param*): List[Template] = {
   val vars = varNames.map(Variable(_))
   val dotTemplate = Template("." + shortcut, dotValue, name, vars)
   val template = Template(shortcut, name + " " + varNamesDelimited.mkString(" "), name, vars)
-  
+
   if (name.endsWith(":"))
     List(template)
   else if (params.size <= 1)

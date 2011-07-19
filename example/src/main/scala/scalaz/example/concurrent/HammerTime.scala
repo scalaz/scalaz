@@ -1,11 +1,10 @@
-package scalaz.example.concurrent
+package scalaz.example
+package concurrent
 
-import scalaz._
-import Scalaz._
+import scalaz._, Scalaz._
 
 import concurrent._
 import java.util.concurrent.Executors._
-import java.util.concurrent.ExecutorService
 
 object HammerTime {
   def main(args: Array[String]): Unit = run
@@ -27,9 +26,9 @@ object HammerTime {
     def hammer(other: => Actor[Int]) = actor(((i: Int) =>
       if (i == 0) done ! ()
       else other ! (i - 1)
-    ), fail)
+        ), fail)
 
     lazy val hammer1: Actor[Int] = hammer(hammer(hammer1))
-    hammer1 ! 1000000
+    // hammer1 ! 1000000
   }
 }

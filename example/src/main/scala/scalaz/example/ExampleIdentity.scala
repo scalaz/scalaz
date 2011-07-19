@@ -11,7 +11,7 @@ object ExampleIdentity {
 
   def run {
     // Any value can be converted to Identity
-    1: Identity[Int]
+    1: *[Int]
 
     // Wrap a value in NonEmptyList
     1.wrapNel assert_=== NonEmptyList(1)
@@ -25,14 +25,18 @@ object ExampleIdentity {
 
     // Starting with the initial value `n`, iterate a function (Int => Int) through the Stream Pure and Stream Monoid
     // to generate the Collatz sequence. In homage to http://xkcd.com/710/
-    def collatz(n: Int) = n.iterate[Stream](a => (a % 2 == 0) ? (a/2) | 3*a + 1).takeWhile(_ > 1)
+    def collatz(n: Int) = n.iterate[Stream](a => (a % 2 == 0) ? (a / 2) | 3 * a + 1).takeWhile(_ > 1)
     collatz(7).toList assert_=== List(7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2)
 
     // Elvis operator
     (null: String) ?? "default" assert_=== "default"
 
-    1 matchOrZero { case x: Int => x * 2 } assert_=== 2
-    
-    1 matchOrZero { case x: Int if false => x * 2 } assert_=== 0
+    1 matchOrZero {
+      case x: Int => x * 2
+    } assert_=== 2
+
+    1 matchOrZero {
+      case x: Int if false => x * 2
+    } assert_=== 0
   }
 }

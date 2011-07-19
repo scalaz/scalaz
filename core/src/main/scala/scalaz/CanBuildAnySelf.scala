@@ -7,6 +7,7 @@ import Scalaz._
 
 
 trait CanBuildAnySelf[CC[_]] {
+
   import CanBuildAnySelf._
 
   def builder[A, B]: CanBuildSelf[CC, A, B]
@@ -16,7 +17,9 @@ trait CanBuildAnySelf[CC[_]] {
   final def apply[A, B](f: CC[A]): Builder[B, CC[B]] = builder[A, B].apply(f)
 }
 
-object CanBuildAnySelf {
+object CanBuildAnySelf extends CanBuildAnySelfs
+
+trait CanBuildAnySelfs {
   type CanBuildSelf[CC[_], A, B] = CanBuildFrom[CC[A], B, CC[B]]
 
   type CanBuildSelfExistential[CC[_]] = CanBuildFrom[CC[A], B, CC[B]] forSome {type A; type B}

@@ -4,13 +4,14 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="scala-2.8.1" />
+        <option name="compilerLibraryName" value="scala-2.9.0-1" />
+        <option name="maximumHeapSize" value="1536" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../full/target/scala-2.8.1.final/classes" />
-    <output-test url="file://$MODULE_DIR$/../full/target/scala-2.8.1.final/test-classes" />
+    <output url="file://$MODULE_DIR$/../full/target/scala-2.9.0.1/classes" />
+    <output-test url="file://$MODULE_DIR$/../full/target/scala-2.9.0.1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../full">
       <sourceFolder url="file://$MODULE_DIR$/../full/src/main/scala" isTestSource="false" />
@@ -23,15 +24,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.scala-lang_scala-library_2.8.1" level="project" />
-    <orderEntry type="library" name="org.scala-tools.testing_scalacheck_2.8.1_1.8" level="project" />
+    <orderEntry type="library" name="org.scala-lang_scala-library_2.9.0-1" level="project" />
+    <orderEntry type="library" name="org.scala-tools.testing_scalacheck_2.9.0-1_1.9" level="project" />
     <orderEntry type="library" name="org.scala-tools.testing_test-interface_0.5" level="project" />
     <orderEntry type="library" name="javax.servlet_servlet-api_2.5" level="project" />
     <orderEntry type="module" module-name="scalaz-core" exported="" />
     <orderEntry type="module" module-name="scalaz-scalacheck-binding" exported="" />
-    <orderEntry type="module" module-name="scalaz-http" exported="" />
     <orderEntry type="module" module-name="scalaz-example" exported="" />
     <orderEntry type="module" module-name="scalaz-test-suite" exported="" />
+    <orderEntry type="module" module-name="scalaz-sql" />
   </component>
 </module>
 

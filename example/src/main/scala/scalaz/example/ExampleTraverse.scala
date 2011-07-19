@@ -1,7 +1,7 @@
 package scalaz.example
 
-import scalaz._
-import Digit._
+import scalaz._, newtypes._
+import Digit.Digit._
 
 object ExampleTraverse {
   def main(args: Array[String]) = run
@@ -19,9 +19,7 @@ object ExampleTraverse {
     val f = (_: String).map(_ - 48).toList
     def g(s: String): FirstOption[Int] = {
       val validation = s.parseInt
-      val option = validation.either.right.toOption
-      val fst = option.fst
-      fst
+      validation.toOption.first
     }
 
     // Traverse the List with the FirstOption applicative functor (domain of g)

@@ -4,6 +4,8 @@ sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
   def apply(z: K => V): K => V
 }
 
+object Memo extends Memos
+
 trait Memos {
   def memo[@specialized(Int) K, @specialized(Int, Long, Double) V](f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
     def apply(z: K => V) = f(z)
@@ -11,7 +13,7 @@ trait Memos {
 
   def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[K, V] = memo[K, V](z => z)
 
-  private class ArrayMemo[V >: Null: ClassManifest](n: Int) extends Memo[Int, V] {
+  private class ArrayMemo[V >: Null : ClassManifest](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       lazy val a = new Array[V](n)
       k => {
@@ -46,6 +48,7 @@ trait Memos {
   }
 
   def arrayMemo[V >: Null : ClassManifest](n: Int): Memo[Int, V] = new ArrayMemo(n)
+
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
   def mutableHashMapMemo[K, V]: Memo[K, V] = {

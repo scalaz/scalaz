@@ -1,29 +1,36 @@
 package scalaz
 
-trait Show[A] {
-  def show(a: A): List[Char]
+sealed trait Show[A] {
+  val show: A => List[Char]
+  val shows: A => String
+
+  def text: A => xml.Text =
+    a => xml.Text(shows(a))
+
+  def contramap[B](f: B => A): Show[B] =
+    Show.show(b => Show.this.show(f(b)))
 }
+
+object Show extends Shows
 
 trait Shows {
-  import Scalaz._
   def show[A](f: A => List[Char]): Show[A] = new Show[A] {
-    def show(a: A) = f(a)
+    val show = f
+    val shows = (a: A) => f(a).mkString
   }
 
-  def shows[A](f: A => String): Show[A] = show[A](f(_).toList)
+  def shows[A](f: A => String): Show[A] = new Show[A] {
+    val show = (a: A) => f(a).toList
+    val shows = f
+  }
 
-  def showA[A]: Show[A] = shows[A](_.toString)
-  
-  def showBy[A, B: Show](f: A => B): Show[A] = implicitly[Show[B]] ∙ f
-}
+  def showA[A]: Show[A] =
+    shows[A](_.toString)
 
-object Show {
-  import Scalaz._
+  def showBy[A, B: Show](f: A => B): Show[A] =
+    implicitly[Show[B]] contramap f
+
   import Predef.{implicitly => i}
-
-  implicit def DigitShow: Show[Digit] = showBy(_.toInt)
-
-  implicit def OrderingShow: Show[Ordering] = showA
 
   implicit def ThrowableShow: Show[Throwable] = showA
 
@@ -49,49 +56,17 @@ object Show {
 
   implicit def DoubleShow: Show[Double] = showA
 
-  def NewTypeShow[B: Show, A <: NewType[B]]: Show[A] = showBy(_.value)
-
-  implicit def IntMultiplicationShow: Show[IntMultiplication] = NewTypeShow[Int, IntMultiplication]
-
-  implicit def BooleanConjunctionShow: Show[BooleanConjunction] = NewTypeShow[Boolean, BooleanConjunction]
-
-  implicit def CharMultiplicationShow: Show[CharMultiplication] = NewTypeShow[Char, CharMultiplication]
-
-  implicit def ByteMultiplicationShow: Show[ByteMultiplication] = NewTypeShow[Byte, ByteMultiplication]
-
-  implicit def LongMultiplicationShow: Show[LongMultiplication] = NewTypeShow[Long, LongMultiplication]
-
-  implicit def ShortMultiplicationShow: Show[ShortMultiplication] = NewTypeShow[Short, ShortMultiplication]
+  def UnpackShow[T, R](implicit s: Show[R], u: ^*^[T, R]): Show[T] =
+    implicitly[Show[R]] contramap (u.unpack(_))
 
   implicit def BigIntegerShow: Show[java.math.BigInteger] = showA[java.math.BigInteger]
 
-  implicit def BigIntegerMultiplicationShow: Show[BigIntegerMultiplication] = NewTypeShow[java.math.BigInteger, BigIntegerMultiplication]
-
   implicit def BigIntShow: Show[BigInt] = showA
-
-  implicit def BigIntMultiplicationShow: Show[BigIntMultiplication] = NewTypeShow[BigInt, BigIntMultiplication]
-
-  implicit def ConstShow[B: Show, A]: Show[Const[B, A]] = NewTypeShow[B, Const[B, A]]
 
   implicit def NodeSeqShow: Show[xml.NodeSeq] = showA
 
-  implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = implicitly[Show[Iterable[A]]] ∙ ((_: NonEmptyList[A]).list)
-
-  implicit def IndSeqShow[A: Show]: Show[IndSeq[A]] = showBy(_.toList)
-
   implicit def Function1Show[A, B]: Show[A => B] =
     show((f: A => B) => "<function>".toList)
-
-  implicit def ZipStreamShow[A: Show]: Show[ZipStream[A]] = implicitly[Show[Stream[A]]] ∙ ((_: ZipStream[A]).value)
-
-  implicit def ZipperShow[A: Show]: Show[Zipper[A]] = show((z: Zipper[A]) =>
-    z.lefts.reverse.show ++ " " ++ z.focus.show ++ " " ++ z.rights.show)
-
-  implicit def TreeShow[A: Show]: Show[Tree[A]] = show((t: Tree[A]) =>
-    '{' :: t.rootLabel.show ++ " " ++ t.subForest.show ++ "}")
-
-  implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] = show((t: TreeLoc[A]) =>
-    t.toTree.show ++ "@" ++ t.parents.map(_._1.length).reverse.show)
 
   implicit def IterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = show((as: CC[A]) => {
     val i = as.iterator
@@ -99,7 +74,7 @@ object Show {
     k += '['
     while (i.hasNext) {
       val n = i.next
-      k ++= n.show
+      k ++= implicitly[Show[A]].show(n)
       if (i.hasNext)
         k += ','
     }
@@ -107,10 +82,18 @@ object Show {
     k.toList
   })
 
+  implicit def Function0Show[A: Show]: Show[Function0[A]] = show(a => {
+    val k = new collection.mutable.ListBuffer[Char]
+    k += '('
+    k ++= implicitly[Show[A]].show(a.apply)
+    k += ')'
+    k.toList
+  })
+
   implicit def Tuple1Show[A: Show]: Show[Tuple1[A]] = show(a => {
     val k = new collection.mutable.ListBuffer[Char]
     k += '('
-    k ++= a._1.show
+    k ++= implicitly[Show[A]].show(a._1)
     k += ')'
     k.toList
   })
@@ -119,9 +102,9 @@ object Show {
     case (a, b) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k += ')'
       k.toList
     }
@@ -131,11 +114,11 @@ object Show {
     case (a, b, c) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k ++= ", ".toList
-      k ++= c.show
+      k ++= implicitly[Show[C]].show(c)
       k += ')'
       k.toList
     }
@@ -145,13 +128,13 @@ object Show {
     case (a, b, c, d) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k ++= ", ".toList
-      k ++= c.show
+      k ++= implicitly[Show[C]].show(c)
       k ++= ", ".toList
-      k ++= d.show
+      k ++= implicitly[Show[D]].show(d)
       k += ')'
       k.toList
     }
@@ -161,15 +144,15 @@ object Show {
     case (a, b, c, d, e) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k ++= ", ".toList
-      k ++= c.show
+      k ++= implicitly[Show[C]].show(c)
       k ++= ", ".toList
-      k ++= d.show
+      k ++= implicitly[Show[D]].show(d)
       k ++= ", ".toList
-      k ++= e.show
+      k ++= implicitly[Show[E]].show(e)
       k += ')'
       k.toList
     }
@@ -179,17 +162,17 @@ object Show {
     case (a, b, c, d, e, f) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k ++= ", ".toList
-      k ++= c.show
+      k ++= implicitly[Show[C]].show(c)
       k ++= ", ".toList
-      k ++= d.show
+      k ++= implicitly[Show[D]].show(d)
       k ++= ", ".toList
-      k ++= e.show
+      k ++= implicitly[Show[E]].show(e)
       k ++= ", ".toList
-      k ++= f.show
+      k ++= implicitly[Show[F]].show(f)
       k += ')'
       k.toList
     }
@@ -199,70 +182,106 @@ object Show {
     case (a, b, c, d, e, f, g) => {
       val k = new collection.mutable.ListBuffer[Char]
       k += '('
-      k ++= a.show
+      k ++= implicitly[Show[A]].show(a)
       k ++= ", ".toList
-      k ++= b.show
+      k ++= implicitly[Show[B]].show(b)
       k ++= ", ".toList
-      k ++= c.show
+      k ++= implicitly[Show[C]].show(c)
       k ++= ", ".toList
-      k ++= d.show
+      k ++= implicitly[Show[D]].show(d)
       k ++= ", ".toList
-      k ++= e.show
+      k ++= implicitly[Show[E]].show(e)
       k ++= ", ".toList
-      k ++= f.show
+      k ++= implicitly[Show[F]].show(f)
       k ++= ", ".toList
-      k ++= g.show
+      k ++= implicitly[Show[G]].show(g)
       k += ')'
       k.toList
     }
   }
 
-  implicit def Function0Show[A: Show]: Show[() => A] = show(_.apply.show)
+  implicit def OptionShow[A: Show]: Show[Option[A]] = shows(_ map (implicitly[Show[A]].shows(_)) toString)
 
-  implicit def OptionShow[A: Show]: Show[Option[A]] = shows(_ map (_.shows) toString)
+  implicit def EitherShow[A: Show, B: Show]: Show[Either[A, B]] =
+    shows(_.fold(
+      implicitly[Show[A]].shows(_)
+      , implicitly[Show[B]].shows(_)
+    ).toString)
 
-  implicit def FirstOptionShow[A: Show]: Show[FirstOption[A]] = OptionShow[A] ∙ ((_: FirstOption[A]).value)
-
-  implicit def LastOptionShow[A: Show]: Show[LastOption[A]] = OptionShow[A] ∙ ((_: LastOption[A]).value)
-  
-  implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] = shows(_ map (_.shows) fold("Some(" + _ + ")", "None"))
-
-  implicit def FirstLazyOptionShow[A: Show]: Show[FirstLazyOption[A]] = LazyOptionShow[A] ∙ ((_: FirstLazyOption[A]).value)
-
-  implicit def LastLazyOptionShow[A: Show]: Show[LastLazyOption[A]] = LazyOptionShow[A] ∙ ((_: LastLazyOption[A]).value)
-  
-  implicit def EitherShow[A: Show, B: Show]: Show[Either[A, B]] = shows(e => (((_: A).shows) <-: e :-> (_.shows)).toString)
-
-  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] = shows {
-    case Success(a) => "Success(" + a.shows + ")"
-    case Failure(e) => "Failure(" + e.shows + ")"
-  }
-
-  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] contravary
+  implicit def MapShow[CC[K, V] <: collection.Map[K, V], A: Show, B: Show]: Show[CC[A, B]] = i[Show[Iterable[(A, B)]]] contramap (z => z)
 
   import java.{lang => jl, util => ju}
 
-  implicit def JavaIterableEqual[CC[X] <: jl.Iterable[X], A: Show]: Show[CC[A]] = {
+  implicit def JavaIterableShow[CC[X] <: jl.Iterable[X], A: Show]: Show[CC[A]] = {
     import scala.collection.JavaConversions._
     showBy((i: jl.Iterable[A]) => i: Iterable[A])
   }
 
-  implicit def JavaMapShow[K: Show, V: Show]: Show[ju.Map[K, V]] = show(m => {
-    import collection.JavaConversions
+  implicit def JavaMapEntryShow[K: Show, V: Show]: Show[java.util.Map.Entry[K, V]] =
+    show(m => {
+      val z = new collection.mutable.ListBuffer[Char]
+      z += '('
+      z ++= implicitly[Show[K]].shows(m.getKey)
+      z += ','
+      z ++= implicitly[Show[V]].shows(m.getValue)
+      z += ')'
+      z.toList
+    })
 
+  implicit def JavaMapShow[K: Show, V: Show]: Show[ju.Map[K, V]] = show(m => {
     val z = new collection.mutable.ListBuffer[Char]
     z += '{'
     val i = m.keySet.iterator
     while (i.hasNext) {
       val k = i.next
       val v = m get k
-      z ++= k.show
+      z ++= implicitly[Show[K]].show(k)
       z ++= " -> ".toList
-      z ++= v.show
+      z ++= implicitly[Show[V]].show(v)
       if (i.hasNext)
         z += ','
     }
     z += '}'
     z.toList
   })
+
+  implicit def CallableShow[A: Show]: Show[java.util.concurrent.Callable[A]] =
+    showBy(_.call)
+
+  implicit def ConstShow[B: Show, A]: Show[Const[B, A]] =
+    Show.UnpackShow[Const[B, A], B]
+
+  implicit def IdentityShow[A: Show]: Show[Identity[A]] =
+    Show.showBy(_.value)
+
+  implicit def DigitShow: Show[Digit] =
+    Show.showBy(_.toInt)
+
+  implicit def NonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
+    implicitly[Show[Iterable[A]]] contramap ((_: NonEmptyList[A]).list)
+
+  implicit def ShowOptionT[F[_], A](implicit e: Show[F[Option[A]]]): Show[OptionT[F, A]] =
+    Show.showBy(_.runT)
+
+  implicit def TreeShow[A: Show]: Show[Tree[A]] =
+    Show.show((t: Tree[A]) =>
+      '{' :: implicitly[Show[A]].show(t.rootLabel) ++ " " ++ implicitly[Show[Stream[Tree[A]]]].show(t.subForest) ++ "}")
+
+  implicit def TreeLocShow[A: Show]: Show[TreeLoc[A]] =
+    Show.show((t: TreeLoc[A]) =>
+      implicitly[Show[Tree[A]]].show(t.toTree) ++ "@" ++ implicitly[Show[Stream[Int]]].show(t.parents.map(_._1.length).reverse))
+
+  implicit def FailProjectionShow[E: Show, A: Show]: Show[FailProjection[E, A]] =
+    Show.showBy(_.validation)
+
+  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
+    Show.shows(_.fold(
+      "Success(" + implicitly[Show[E]].shows(_) + ")"
+      , "Failure(" + implicitly[Show[A]].shows(_) + ")"
+    ))
+
+  implicit def ZipperShow[A: Show]: Show[Zipper[A]] =
+    Show.show((z: Zipper[A]) =>
+      implicitly[Show[Stream[A]]].show(z.lefts.reverse) ++ " " ++ implicitly[Show[A]].show(z.focus) ++ " " ++ implicitly[Show[Stream[A]]].show(z.rights.reverse))
+
 }

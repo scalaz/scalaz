@@ -2,11 +2,13 @@ package scalaz
 
 import org.specs.{Sugar, Specification, ScalaCheck}
 import org.scalacheck.Arbitrary
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
+import newtypes._
 
 class FunctorTest extends Specification with Sugar with ScalaCheck {
-  import Scalaz._
-  import ScalaCheckBinding._
+
+  import scalaz._, Scalaz._
+  import scalaz.scalacheck.ScalaCheckBinding._
   import ScalazArbitrary._
 
   "functor laws" should {
@@ -22,16 +24,15 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     type M = Int
     type P = Int
 
-    implicit def IdentityEqual[X] = equalA[Identity[X]]
     checkFunctorLaws[Identity, A]
     checkFunctorLaws[NonEmptyList, A]
     checkFunctorLaws[ZipStream, A]
     checkFunctorLaws[Tuple1, A]
-    checkFunctorLaws[({type λ[α]=(R, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, U, α)})#λ, A]
-    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, U, α)})#λ, A]
+    checkFunctorLaws[({type λ[α] = (R, S, T, U, V, α)})#λ, A]
 
     // todo
     //    checkFunctorLaws[Function0, A]
@@ -52,8 +53,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     checkFunctorLaws[FirstOption, A]
     checkFunctorLaws[LastOption, A]
     checkFunctorLaws[ArraySeq, A]
-    checkFunctorLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Either.LeftProjection[α, X]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Either.RightProjection[X, α]})#λ, A]
 
     // todo
     //    checkFunctorLaws[Responder, A]
@@ -67,8 +68,8 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
     import java.util.AbstractMap.SimpleImmutableEntry
 
     //    checkFunctorLaws[({type λ[α]=Entry[X, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=Validation[X, α]})#λ, A]
-    checkFunctorLaws[({type λ[α]=FailProjection[α, X]})#λ, A]
+    checkFunctorLaws[({type λ[α] = Validation[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α] = FailProjection[α, X]})#λ, A]
     checkFunctorLaws[Zipper, A]
 
     // todo
@@ -102,9 +103,9 @@ class FunctorTest extends Specification with Sugar with ScalaCheck {
                                 arba: Arbitrary[A]): Unit = {
     val typeName = man.toString
     typeName in {
-      import ScalazProperties.Functor._
+      import ScalazProperty.Functor._
       identity[F, A] must pass
-      associative[F, A, A, A] must pass
+      composition[F, A, A, A] must pass
     }
   }
 }

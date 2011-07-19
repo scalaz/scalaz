@@ -1,13 +1,12 @@
 package scalaz.example
 
-import scalaz._
-import Scalaz._
+import scalaz._, Scalaz._
 
 object ExampleZipper {
   def main(args: Array[String]) = run
 
   def run {
-    val path = nel('usr, 'local, 'scala, 'bin)
+    val path = nels('usr, 'local, 'scala, 'bin)
 
     val z1: Zipper[Symbol] = path.toZipper
     z1.toStream assert_=== path.list.toStream
@@ -21,7 +20,7 @@ object ExampleZipper {
     z2 ∘ (_.lefts) assert_=== Stream('local, 'usr).some
     z2 ∘ (_.rights) assert_=== Stream('bin).some
 
-    (z1.next ∗ (_.next) ∗ (_.previous)) assert_=== z1.move(1)
+    (z1.next >>= (_.next) >>= (_.previous)) assert_=== z1.move(1)
 
     z1.previous assert_=== none[Zipper[Symbol]]
   }

@@ -2,12 +2,12 @@ package scalaz
 
 import org.specs.{Sugar, Specification, ScalaCheck}
 import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
+import scalacheck.{ScalazProperty, ScalazArbitrary, ScalaCheckBinding}
 import org.scalacheck.{Gen, Arbitrary}
 
 class ApplicativeTest extends Specification with Sugar with ScalaCheck {
 
-  import Scalaz._
+  import Scalaz._, newtypes._
   import ScalaCheckBinding._
   import ScalazArbitrary._
 
@@ -33,15 +33,16 @@ class ApplicativeTest extends Specification with Sugar with ScalaCheck {
                                     arbma: Arbitrary[M[A]],
                                     arba: Arbitrary[A]): Unit = {
     val typeName = man.toString
-    implicit val arbMAA: Arbitrary[M[A => A]] = ((a: A) => a).pure[M].pure[Arbitrary]
+    implicit val p = mm.pointed
+    implicit val arbEndo: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
     typeName in {
-      import ScalazProperties.Applicative._
+      import ScalazProperty.Applicative._
       identity[M, A] must pass
       composition[M, A, A, A] must pass
-      
+
       // TODO These don't terminate. Investigate.
-//      homomorphism[M, A, A] must pass
-//      interchange[M, A, A] must pass
+      //      homomorphism[M, A, A] must pass
+      //      interchange[M, A, A] must pass
     }
   }
 }

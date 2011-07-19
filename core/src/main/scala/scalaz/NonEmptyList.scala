@@ -1,17 +1,18 @@
 package scalaz
 
-sealed trait NonEmptyList[+A] {
+sealed trait NonEmptyList[A] {
   val head: A
   val tail: List[A]
 
-  import Scalaz._
+  import NonEmptyList._
+  import Zipper._
 
-  def <::[B >: A](b: B): NonEmptyList[B] = nel(b, head :: tail)
+  def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
 
   import collection.mutable.ListBuffer
 
-  def <:::[B >: A](bs: List[B]): NonEmptyList[B] = {
-    val b = new ListBuffer[B]
+  def <:::(bs: List[A]): NonEmptyList[A] = {
+    val b = new ListBuffer[A]
     b ++= bs
     b += head
     b ++= tail
@@ -19,7 +20,7 @@ sealed trait NonEmptyList[+A] {
     nel(bb.head, bb.tail)
   }
 
-  def :::>[B >: A](bs: List[B]): NonEmptyList[B] = nel(head, tail ::: bs)
+  def :::>(bs: List[A]): NonEmptyList[A] = nel(head, tail ::: bs)
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
@@ -37,9 +38,9 @@ sealed trait NonEmptyList[+A] {
     nel(bb.head, bb.tail)
   }
 
-  lazy val list: List[A] = head :: tail
+  def list: List[A] = head :: tail
 
-  lazy val stream: Stream[A] = head #:: tail.toStream
+  def stream: Stream[A] = head #:: tail.toStream
 
   def toZipper: Zipper[A] = zipper(Stream.Empty, head, tail.toStream)
 
@@ -51,30 +52,30 @@ sealed trait NonEmptyList[+A] {
     }
   }
 
-  def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail.toNel match {
-    case None => Nil
-    case Some(t) => t.tails.list
+  def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
+    case Nil => Nil
+    case h :: t => nel(h, t).tails.list
   })
 
   def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
-    case x :: xs => nel(x, xs) 
+    case x :: xs => nel(x, xs)
   }
 
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 
-trait NonEmptyLists {
-  def nel[A](h: A, t: A*): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t.toList
-  }
+object NonEmptyList extends NonEmptyLists {
+  def apply[A](h: A, t: A*): NonEmptyList[A] =
+    nels(h, t: _*)
+}
 
+trait NonEmptyLists {
   def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
     val head = h
     val tail = t.toList
   }
-}
 
-object NonEmptyList extends NonEmptyLists {
-  def apply[A](h: A, t: A*): NonEmptyList[A] = nel(h, t: _*)
+  def nels[A](h: A, t: A*): NonEmptyList[A] =
+    nel(h, t.toList)
+
 }

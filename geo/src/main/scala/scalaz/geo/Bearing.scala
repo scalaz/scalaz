@@ -12,7 +12,11 @@ trait Bearings {
 }
 
 object Bearing {
-  import Scalaz._
+
+  import Show._
+  import Equal._
+  import Order._
+  import *._
 
   implicit def BearingShow: Show[Bearing] = shows(_.value.shows + "°")
 

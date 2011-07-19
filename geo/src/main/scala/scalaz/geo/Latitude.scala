@@ -5,7 +5,7 @@ sealed trait Latitude {
   val value: Double
 
   import Geo.coord
-  
+
   def |:|(lon: Longitude) = coord(this, lon)
 }
 
@@ -16,7 +16,11 @@ trait Latitudes {
 }
 
 object Latitude {
-  import Scalaz._
+
+  import Show._
+  import Equal._
+  import Order._
+  import *._
 
   implicit def LatitudeShow: Show[Latitude] = shows(_.value.shows + "°")
 

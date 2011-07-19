@@ -1,241 +1,162 @@
 package scalaz
 
-/**
- * Covariant function application in an environment. i.e. a covariant Functor.
- *
- * <p>
- * All functor instances must satisfy 2 laws:
- * <ol>
- * <li><strong>identity</strong><br/><code>forall a. a == fmap(a, identity)</code></li>
- * <li><strong>composition</strong><br/><code>forall a f g. fmap(a, f compose g) == fmap(fmap(g, a), f)</code></li>
- * </ol>
- * </p>
- */
-trait Functor[F[_]] extends InvariantFunctor[F] {
-  def fmap[A, B](r: F[A], f: A => B): F[B]
+import java.util.Map.Entry
+import java.util.AbstractMap.SimpleImmutableEntry
 
-  final def xmap[A, B](ma: F[A], f: A => B, g: B => A) = fmap(ma, f)
+trait Functor[F[_]] {
+  def fmap[A, B](f: A => B): F[A] => F[B]
+
+  def compose[G[_]](gtr: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new Functor[({type λ[α] = F[G[α]]})#λ] {
+    def fmap[A, B](f: A => B): F[G[A]] => F[G[B]] =
+      Functor.this.fmap(gtr.fmap(f))
+  }
+
+  def applicBind(implicit b: Bind[F]): Applic[F] = new Applic[F] {
+    def applic[A, B](f: F[A => B]) =
+      a => b.bind((ff: A => B) => fmap((aa: A) => ff(aa))(a))(f)
+  }
+
+  def **[G[_] : Functor]: Functor[({type λ[α] = (F[α], G[α])})#λ] =
+    new Functor[({type λ[α] = (F[α], G[α])})#λ] {
+      def fmap[A, B](f: A => B) = {
+        case (a, b) => (Functor.this.fmap(f)(a), implicitly[Functor[G]].fmap(f)(b))
+      }
+    }
+
+  def deriving[G[_]](implicit n: ^**^[G, F]): Functor[G] =
+    new Functor[G] {
+      def fmap[A, B](f: A => B) =
+        k => n.pack(Functor.this.fmap(f)(n.unpack(k)))
+    }
 }
 
-object Functor {
-  import Scalaz._
+object Functor extends Functors
 
-  implicit def IdentityFunctor: Functor[Identity] = new Functor[Identity] {
-    def fmap[A, B](r: Identity[A], f: A => B) = f(r.value)
+trait Functors extends FunctorsLow {
+
+  implicit val OptionFunctor: Functor[Option] = new Functor[Option] {
+    def fmap[A, B](f: A => B) = _ map f
   }
 
-  implicit def TraversableFunctor[CC[X] <: collection.TraversableLike[X, CC[X]] : CanBuildAnySelf]: Functor[CC] = new Functor[CC] {
-    def fmap[A, B](r: CC[A], f: A => B) = {
-      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
-      r map f
-    }
+  implicit def EitherLeftFunctor[X]: Functor[({type λ[α] = Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α] = Either.LeftProjection[α, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _.map(f).left
   }
 
-  implicit def NonEmptyListFunctor = new Functor[NonEmptyList] {
-    def fmap[A, B](r: NonEmptyList[A], f: A => B) = r map f
+  implicit def EitherRightFunctor[X]: Functor[({type λ[α] = Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α] = Either.RightProjection[X, α]})#λ] {
+    def fmap[A, B](f: A => B) = _.map(f).right
   }
 
-  implicit def ConstFunctor[BB: Monoid] = new Functor[({type λ[α]=Const[BB, α]})#λ] {
-    def fmap[A, B](r: Const[BB, A], f: (A) => B) = Const(r.value)
-  }
-
-  implicit def StateFunctor[S] = new Functor[({type λ[α]=State[S, α]})#λ] {
-    def fmap[A, B](r: State[S, A], f: A => B) = r map f
-  }
-
-  implicit def ZipStreamFunctor: Functor[ZipStream] = new Functor[ZipStream] {
-    def fmap[A, B](r: ZipStream[A], f: A => B) = r.value map f ʐ
-  }
-
-  implicit def IndSeqFunctor: Functor[IndSeq] = new Functor[IndSeq] {
-    def fmap[A, B](r: IndSeq[A], f: A => B) = r map f
-  }
-
-  implicit def Tuple1Functor: Functor[Tuple1] = new Functor[Tuple1] {
-    def fmap[A, B](r: Tuple1[A], f: A => B) = Tuple1(f(r._1))
-  }
-
-  implicit def Tuple2Functor[R]: Functor[({type λ[α]=(R, α)})#λ] = new Functor[({type λ[α]=(R, α)})#λ] {
-    def fmap[A, B](r: (R, A), f: A => B) = (r._1, f(r._2))
-  }
-
-  implicit def Tuple3Functor[R, S]: Functor[({type λ[α]=(R, S, α)})#λ] = new Functor[({type λ[α]=(R, S, α)})#λ] {
-    def fmap[A, B](r: (R, S, A), f: A => B) = (r._1, r._2, f(r._3))
-  }
-
-  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α]=(R, S, T, α)})#λ] = new Functor[({type λ[α]=(R, S, T, α)})#λ] {
-    def fmap[A, B](r: (R, S, T, A), f: A => B) = (r._1, r._2, r._3, f(r._4))
-  }
-
-  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, α)})#λ] {
-    def fmap[A, B](r: (R, S, T, U, A), f: A => B) = (r._1, r._2, r._3, r._4, f(r._5))
-  }
-
-  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, α)})#λ] {
-    def fmap[A, B](r: (R, S, T, U, V, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, f(r._6))
-  }
-
-  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W, α)})#λ] {
-    def fmap[A, B](r: (R, S, T, U, V, W, A), f: A => B) = (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
-  }
-
-  implicit def Function0Functor: Functor[Function0] = new Functor[Function0] {
-    def fmap[A, B](r: Function0[A], f: A => B) = new Function0[B] {
-      def apply = f(r.apply)
-    }
-  }
-
-  implicit def Function1Functor[R]: Functor[({type λ[α]=(R) => α})#λ] = new Functor[({type λ[α]=(R) => α})#λ] {
-    def fmap[A, B](r: R => A, f: A => B) = r andThen f
-  }
-
-  implicit def Function2Functor[R, S]: Functor[({type λ[α]=(R, S) => α})#λ] = new Functor[({type λ[α]=(R, S) => α})#λ] {
-    def fmap[A, B](r: (R, S) => A, f: A => B) = (t1: R, t2: S) => f(r(t1, t2))
-  }
-
-  implicit def Function3Functor[R, S, T]: Functor[({type λ[α]=(R, S, T) => α})#λ] = new Functor[({type λ[α]=(R, S, T) => α})#λ] {
-    def fmap[A, B](r: (R, S, T) => A, f: A => B) = (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
-  }
-
-  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α]=(R, S, T, U) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U) => α})#λ] {
-    def fmap[A, B](r: (R, S, T, U) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
-  }
-
-  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V) => α})#λ] {
-    def fmap[A, B](r: (R, S, T, U, V) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
-  }
-
-  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α]=(R, S, T, U, V, W) => α})#λ] {
-    def fmap[A, B](r: (R, S, T, U, V, W) => A, f: A => B) = (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
-  }
-
-  implicit def OptionFunctor: Functor[Option] = new Functor[Option] {
-    def fmap[A, B](r: Option[A], f: A => B) = r map f
-  }
-
-  implicit def FirstOptionFunctor: Functor[FirstOption] = new Functor[FirstOption] {
-    def fmap[A, B](r: FirstOption[A], f: A => B) = (r.value map f).fst
-  }
-
-  implicit def LastOptionFunctor: Functor[LastOption] = new Functor[LastOption] {
-    def fmap[A, B](r: LastOption[A], f: A => B) = (r.value map f).lst
-  }
-
-  implicit def LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
-    def fmap[A, B](r: LazyOption[A], f: A => B) = r map (a => f(a))
-  }
-
-  implicit def FirstLazyOptionFunctor: Functor[FirstLazyOption] = new Functor[FirstLazyOption] {
-    def fmap[A, B](r: FirstLazyOption[A], f: A => B) = (r.value map(a => f(a))).fst
-  }
-
-  implicit def LastLazyOptionFunctor: Functor[LastLazyOption] = new Functor[LastLazyOption] {
-    def fmap[A, B](r: LastLazyOption[A], f: A => B) = (r.value map(a => f(a))).lst
-  }
-
-  implicit def EitherLeftFunctor[X]: Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] = new Functor[({type λ[α]=Either.LeftProjection[α, X]})#λ] {
-    def fmap[A, B](r: Either.LeftProjection[A, X], f: A => B) = r.map(f).left
-  }
-
-  implicit def EitherRightFunctor[X]: Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] = new Functor[({type λ[α]=Either.RightProjection[X, α]})#λ] {
-    def fmap[A, B](r: Either.RightProjection[X, A], f: A => B) = r.map(f).right
-  }
-
-  implicit def EitherFunctor[X]: Functor[({type λ[α]=Either[X, α]})#λ] = new Functor[({type λ[α]=Either[X, α]})#λ] {
-    def fmap[A, B](r: Either[X, A], f: A => B) = r match {
+  implicit def EitherFunctor[X]: Functor[({type λ[α] = Either[X, α]})#λ] = new Functor[({type λ[α] = Either[X, α]})#λ] {
+    def fmap[A, B](f: A => B) = {
       case Left(a) => Left(a)
       case Right(a) => Right(f(a))
     }
   }
 
-  implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
-    def fmap[A, B](r: Responder[A], f: A => B) = r map f
+  implicit val ListFunctor: Functor[List] = new Functor[List] {
+    def fmap[A, B](f: A => B) = _ map f
   }
 
-  implicit def IterVFunctor[X]: Functor[({type λ[α]=IterV[X, α]})#λ] = new Functor[({type λ[α]=IterV[X, α]})#λ] {
-    import IterV._
-    def fmap[A, B](r: IterV[X, A], f: A => B) = {
-      r fold (
-              done = (a, i) => Done(f(a), i),
-              cont = k => Cont(i => fmap(k(i), f))
-              )
-    }
-  }
-
-  implicit def KleisliFunctor[M[_], P](implicit ff: Functor[M]): Functor[({type λ[α]=Kleisli[M, P, α]})#λ] = new Functor[({type λ[α]=Kleisli[M, P, α]})#λ] {
-    def fmap[A, B](k: Kleisli[M, P, A], f: A => B): Kleisli[M, P, B] = ☆((p: P) => ff.fmap(k(p), f))
+  implicit val StreamFunctor: Functor[Stream] = new Functor[Stream] {
+    def fmap[A, B](f: A => B) = _ map f
   }
 
   import java.util.concurrent.Callable
 
   implicit def CallableFunctor: Functor[Callable] = new Functor[Callable] {
-    def fmap[A, B](r: Callable[A], f: A => B) = new Callable[B] {
-      def call = f(r.call)
+    def fmap[A, B](f: A => B) =
+      r => new Callable[B] {
+        def call = f(r.call)
+      }
+  }
+
+  implicit def MapEntryFunctor[X]: Functor[({type λ[α] = Entry[X, α]})#λ] = new Functor[({type λ[α] = Entry[X, α]})#λ] {
+    def fmap[A, B](f: A => B) = r => new SimpleImmutableEntry(r.getKey, f(r.getValue))
+  }
+
+  implicit def Tuple1Functor: Functor[Tuple1] = new Functor[Tuple1] {
+    def fmap[A, B](f: A => B) =
+      r => Tuple1(f(r._1))
+  }
+
+  implicit def Tuple2Functor[R]: Functor[({type λ[α] = (R, α)})#λ] = new Functor[({type λ[α] = (R, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, f(r._2))
+  }
+
+  implicit def Tuple3Functor[R, S]: Functor[({type λ[α] = (R, S, α)})#λ] = new Functor[({type λ[α] = (R, S, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, f(r._3))
+  }
+
+  implicit def Tuple4Functor[R, S, T]: Functor[({type λ[α] = (R, S, T, α)})#λ] = new Functor[({type λ[α] = (R, S, T, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, f(r._4))
+  }
+
+  implicit def Tuple5Functor[R, S, T, U]: Functor[({type λ[α] = (R, S, T, U, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, f(r._5))
+  }
+
+  implicit def Tuple6Functor[R, S, T, U, V]: Functor[({type λ[α] = (R, S, T, U, V, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, r._5, f(r._6))
+  }
+
+  implicit def Tuple7Functor[R, S, T, U, V, W]: Functor[({type λ[α] = (R, S, T, U, V, W, α)})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, W, α)})#λ] {
+    def fmap[A, B](f: A => B) =
+      r => (r._1, r._2, r._3, r._4, r._5, r._6, f(r._7))
+  }
+
+  implicit def Function0Functor: Functor[Function0] = new Functor[Function0] {
+    def fmap[A, B](f: A => B) = r => new Function0[B] {
+      def apply = f(r.apply)
     }
   }
 
-  import java.util.Map.Entry
-  import java.util.AbstractMap.SimpleImmutableEntry
-
-  implicit def MapEntryFunctor[X]: Functor[({type λ[α]=Entry[X, α]})#λ] = new Functor[({type λ[α]=Entry[X, α]})#λ] {
-    def fmap[A, B](r: Entry[X, A], f: A => B) = new SimpleImmutableEntry(r.getKey, f(r.getValue))
+  implicit def Function1Functor[R]: Functor[({type λ[α] = (R) => α})#λ] = new Functor[({type λ[α] = (R) => α})#λ] {
+    def fmap[A, B](f: A => B) = _ andThen f
   }
 
-  implicit def ValidationFunctor[X]: Functor[({type λ[α]=Validation[X, α]})#λ] = new Functor[({type λ[α]=Validation[X, α]})#λ] {
-    def fmap[A, B](r: Validation[X, A], f: A => B) = r map f
+  implicit def Function2Functor[R, S]: Functor[({type λ[α] = (R, S) => α})#λ] = new Functor[({type λ[α] = (R, S) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S) => f(r(t1, t2))
   }
 
-  implicit def ValidationFailureFunctor[X]: Functor[({type λ[α]=FailProjection[α, X]})#λ] = new Functor[({type λ[α]=FailProjection[α, X]})#λ] {
-    def fmap[A, B](r: FailProjection[A, X], f: A => B) = (r.validation match {
-      case Success(a) => Success(a)
-      case Failure(e) => Failure(f(e))
-    }).fail
+  implicit def Function3Functor[R, S, T]: Functor[({type λ[α] = (R, S, T) => α})#λ] = new Functor[({type λ[α] = (R, S, T) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T) => f(r(t1, t2, t3))
   }
 
-  implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
-    def fmap[A, B](z: Zipper[A], f: A => B) = zipper(z.lefts map f, f(z.focus), z.rights map f)
+  implicit def Function4Functor[R, S, T, U]: Functor[({type λ[α] = (R, S, T, U) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U) => f(r(t1, t2, t3, t4))
   }
 
-  implicit def TreeFunctor: Functor[Tree] = new Functor[Tree] {
-    def fmap[A, B](t: Tree[A], f: A => B): Tree[B] = node(f(t.rootLabel), t.subForest.map(fmap(_: Tree[A], f)))
+  implicit def Function5Functor[R, S, T, U, V]: Functor[({type λ[α] = (R, S, T, U, V) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U, V) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V) => f(r(t1, t2, t3, t4, t5))
   }
 
-  implicit def TreeLocFunctor: Functor[TreeLoc] = new Functor[TreeLoc] {
-    def fmap[A, B](t: TreeLoc[A], f: A => B): TreeLoc[B] = {
-      val ff = (_: Tree[A]).map(f)
-      loc(t.tree map f, t.lefts map ff, t.rights map ff,
-        t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
-    }
+  implicit def Function6Functor[R, S, T, U, V, W]: Functor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] = new Functor[({type λ[α] = (R, S, T, U, V, W) => α})#λ] {
+    def fmap[A, B](f: A => B) = r => (t1: R, t2: S, t3: T, t4: U, t5: V, t6: W) => f(r(t1, t2, t3, t4, t5, t6))
   }
 
-  import FingerTree._
-
-  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
-    def fmap[A, B](t: ViewL[S, A], f: A => B): ViewL[S, B] =
-      t.fold(EmptyL[S, B], (x, xs) => f(x) &: s.fmap(xs, f))
-  }
-
-  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
-    def fmap[A, B](t: ViewR[S, A], f: A => B): ViewR[S, B] =
-      t.fold(EmptyR[S, B], (xs, x) => s.fmap(xs, f) :& f(x))
-  }
-
-  import scalaz.concurrent.Promise
-  implicit def PromiseFunctor: Functor[Promise] = new Functor[Promise] {
-    def fmap[A, B](t: Promise[A], f: A => B): Promise[B] = t map f
+  implicit def ResponderFunctor: Functor[Responder] = new Functor[Responder] {
+    def fmap[A, B](f: A => B) =
+      _ map f
   }
 
   // todo use this rather than all the specific java.util._ Functor instances once the scala bug is fixed.
   // http://lampsvn.epfl.ch/trac/scala/ticket/2782
   /*implicit*/
   def JavaCollectionFunctor[S[X] <: java.util.Collection[X] : Empty]: Functor[S] = new Functor[S] {
-    def fmap[A, B](r: S[A], f: A => B) = {
-      val a: S[B] = <∅>
-      val i = r.iterator
-      while (i.hasNext)
-        a.add(f(i.next))
-      a
-    }
+    def fmap[A, B](f: A => B) =
+      r => {
+        val a: S[B] = implicitly[Empty[S]].empty
+        val i = r.iterator
+        while (i.hasNext)
+          a.add(f(i.next))
+        a
+      }
   }
 
   import java.util._
@@ -260,4 +181,150 @@ object Functor {
   implicit def JavaLinkedBlockingQueueFunctor: Functor[LinkedBlockingQueue] = JavaCollectionFunctor
 
   implicit def JavaSynchronousQueueFunctor: Functor[SynchronousQueue] = JavaCollectionFunctor
+
+  implicit val IdentityFunctor: Functor[Identity] = new Functor[Identity] {
+    def fmap[A, B](f: A => B) = a => Identity.id(f(a.value))
+  }
+
+  implicit def CoKleisliFunctor[F[_], R]: Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] =
+    new Functor[({type λ[α] = CoKleisli[R, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
+  implicit def ConstFunctor[A]: Functor[({type λ[α] = Const[A, α]})#λ] = new Functor[({type λ[α] = Const[A, α]})#λ] {
+    def fmap[B, X](f: B => X) =
+      _ map f
+  }
+
+  implicit def CoStateTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = CoStateT[A, F, α]})#λ] = new Functor[({type λ[α] = CoStateT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def KleisliFunctor[F[_], R](implicit ftr: Functor[F]): Functor[({type λ[α] = Kleisli[R, F, α]})#λ] =
+    new Functor[({type λ[α] = Kleisli[R, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
+  implicit val NonEmptyListFunctor: Functor[NonEmptyList] = new Functor[NonEmptyList] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def ReaderWriterStateTFunctor[R, W, S, F[_]](implicit ftr: Functor[F]): Functor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] =
+    new Functor[({type λ[α] = ReaderWriterStateT[R, W, S, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
+  implicit def StateTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = StateT[A, F, α]})#λ] = new Functor[({type λ[α] = StateT[A, F, α]})#λ] {
+    def fmap[X, Y](f: X => Y) =
+      _ map f
+  }
+
+  implicit def StepListTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepListT[F, X]})#λ] = new Functor[({type λ[X] = StepListT[F, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def StepStreamTFunctor[F[_] : Functor]: Functor[({type λ[X] = StepStreamT[F, X]})#λ] = new Functor[({type λ[X] = StepStreamT[F, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit val TreeFunctor: Functor[Tree] = new Functor[Tree] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def TreeLocFunctor: Functor[TreeLoc] = new Functor[TreeLoc] {
+    def fmap[A, B](f: A => B) =
+      t => {
+        val ff = (_: Tree[A]).map(f)
+        TreeLoc.loc(t.tree map f, t.lefts map ff, t.rights map ff,
+          t.parents.map((ltr) => (ltr._1 map ff, f(ltr._2), ltr._3 map ff)))
+      }
+  }
+
+  implicit def ValidationFunctor[X]: Functor[({type λ[α] = Validation[X, α]})#λ] = new Functor[({type λ[α] = Validation[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def FailProjectionFunctor[X]: Functor[({type λ[α] = FailProjection[α, X]})#λ] =
+    new Functor[({type λ[α] = FailProjection[α, X]})#λ] {
+      def fmap[A, B](f: A => B) =
+        r => (r.validation match {
+          case Success(a) => Success[B, X](a)
+          case Failure(e) => Failure[B, X](f(e))
+        }).fail
+    }
+
+  implicit def WriterTFunctor[A, F[_] : Functor]: Functor[({type λ[α] = WriterT[A, F, α]})#λ] = new Functor[({type λ[α] = WriterT[A, F, α]})#λ] {
+    def fmap[X, Y](f: X => Y) =
+      _ map f
+  }
+
+  implicit def ZipperFunctor: Functor[Zipper] = new Functor[Zipper] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def OptionTFunctor[F[_] : Functor]: Functor[({type λ[α] = OptionT[F, α]})#λ] = new Functor[({type λ[α] = OptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LazyOptionTPointed[F[_] : Functor]: Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new Functor[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def EitherTFunctor[F[_] : Functor, A]: Functor[({type λ[α] = EitherT[A, F, α]})#λ] = new Functor[({type λ[α] = EitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f
+  }
+
+  implicit def LeftEitherTFunctor[F[_] : Functor, B]: Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] = new Functor[({type λ[α] = EitherT.LeftProjectionT[α, F, B]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map f left
+  }
+
+  implicit def LazyEitherTFunctor[F[_] : Functor, A]: Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] = new Functor[({type λ[α] = LazyEitherT[A, F, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def LazyLeftEitherTFunctor[F[_] : Functor, X]: Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Functor[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_)) left
+  }
+
+  implicit val LazyOptionFunctor: Functor[LazyOption] = new Functor[LazyOption] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def LazyEitherFunctor[X]: Functor[({type λ[α] = LazyEither[X, α]})#λ] = new Functor[({type λ[α] = LazyEither[X, α]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_))
+  }
+
+  implicit def LazyLeftEitherFunctor[X]: Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Functor[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+    def fmap[A, B](f: A => B) =
+      _ map (f(_)) left
+  }
+
+}
+
+trait FunctorsLow {
+  implicit def TraversableFunctor[CC[X] <: collection.TraversableLike[X, CC[X]] : CanBuildAnySelf]: Functor[CC] = new Functor[CC] {
+    def fmap[A, B](f: A => B) =
+      r => {
+        implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[A, B]
+        r map f
+      }
+  }
 }

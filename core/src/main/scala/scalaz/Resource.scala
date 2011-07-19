@@ -1,67 +1,47 @@
 package scalaz
 
-import java.io.{OutputStream, InputStream}
-import java.sql.{PreparedStatement, ResultSet, Statement, Connection}
+import effect._
 
-sealed trait Resource[T] {
-  def close(t: T): Unit
+sealed trait Resource[A] {
+  val close: A => IO[Unit]
+
+  import Resource._
+
+  def contramap[B](f: B => A): Resource[B] =
+    resource(close compose f)
 }
 
-object Resource {
-  implicit val ResourceContravariant: Contravariant[Resource] = new Contravariant[Resource] {
-    def contramap[A, B](r: Resource[A], f: B => A) = new Resource[B] {
-      def close(b: B) = r close (f(b))
-    }
+object Resource extends Resources
+
+trait Resources {
+  def resource[A](c: A => IO[Unit]): Resource[A] = new Resource[A] {
+    val close = c
   }
 
+  import java.io.{OutputStream, InputStream}
+  import java.sql.{PreparedStatement, ResultSet, Statement, Connection}
+
   implicit val InputStreamResource: Resource[InputStream] = new Resource[InputStream] {
-    def close(c: InputStream) = c.close
+    val close = (r: InputStream) => IO(r.close)
   }
 
   implicit val OutputStreamResource: Resource[OutputStream] = new Resource[OutputStream] {
-    def close(c: OutputStream) = c.close
+    val close = (r: OutputStream) => IO(r.close)
   }
 
   implicit val SQLConnectionResource: Resource[Connection] = new Resource[Connection] {
-    def close(c: Connection) = c.close
+    val close = (r: Connection) => IO(r.close)
   }
 
   implicit val SQLStatementResource: Resource[Statement] = new Resource[Statement] {
-    def close(c: Statement) = c.close
+    val close = (r: Statement) => IO(r.close)
   }
 
   implicit val SQLPreparedStatementResource: Resource[PreparedStatement] = new Resource[PreparedStatement] {
-    def close(c: PreparedStatement) = c.close
+    val close = (r: PreparedStatement) => IO(r.close)
   }
 
   implicit val SQLResultSetResource: Resource[ResultSet] = new Resource[ResultSet] {
-    def close(c: ResultSet) = c.close
+    val close = (r: ResultSet) => IO(r.close)
   }
-}
-
-trait Resources {
-  def resource[T](cl: T => Unit): Resource[T] = new Resource[T] {
-    def close(t: T) = cl(t)
-  }
-
-  def withResource[T, R](
-                          value: => T
-                        , evaluate: T => R
-                        , whenComputing: Throwable => R = (t: Throwable) => throw t
-                        , whenClosing: Throwable => Unit = _ => ()
-                        )(implicit r: Resource[T]): R =
-    try {
-      val u = value
-      try {
-        evaluate(u)
-      } finally {
-        try {
-          r close u
-        } catch {
-          case ex => whenClosing(ex)
-        }
-      }
-    } catch {
-      case ex => whenComputing(ex)
-    }
 }
