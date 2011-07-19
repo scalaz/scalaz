@@ -121,8 +121,7 @@ package scalaz
  *  a delay queue, so each 'difference' can say, execute now or delay until later.
  */
 sealed trait Dequeue[A] {
-
-  import Dequeue._
+ import Dequeue._
 
   val pre: List[List[A] => List[A]]
   val post: List[List[A] => List[A]]
@@ -132,31 +131,25 @@ sealed trait Dequeue[A] {
     post.reverse.foldLeft(x)((l, f) => f(l))
   }
 
-  /**O(n) **/
   def toList: List[A] = apply(Nil)
 
-  /**O(n) **/
   def head: Option[A] = toList.headOption
 
-  /**O(n) **/
   def tail: Option[List[A]] = toList match {
     case Nil => None
     case _ :: t => Some(t)
   }
 
-  /**O(1) **/
   def ::(a: A): Dequeue[A] = new Dequeue[A] {
     val pre = Dequeue.this.pre
     val post = ((xs: List[A]) => a :: xs) :: Dequeue.this.post
   }
 
-  /**O(1) **/
   def ::>(a: A): Dequeue[A] = new Dequeue[A] {
     val pre = ((xs: List[A]) => a :: xs) :: Dequeue.this.pre
     val post = Dequeue.this.post
   }
 
-  /**O(n) **/
   def :::(as: Dequeue[A]): Dequeue[A] = new Dequeue[A] {
     val pre = (Dequeue.this.pre ::: Dequeue.this.post.reverse) ::: as.pre
     val post = as.post
@@ -174,12 +167,12 @@ sealed trait Dequeue[A] {
 }
 
 trait Dequeues {
-  def dequeue[A](f: List[A] => List[A]): Dequeue[A] = new Dequeue[A] {
+  def dlist[A](f: List[A] => List[A]): Dequeue[A] = new Dequeue[A] {
     val pre = List(f)
     val post = Nil
   }
 
-  def empty[A]: Dequeue[A] = dequeue(identity(_: List[A]))
+  def empty[A]: Dequeue[A] = dlist(identity(_: List[A]))
 }
 
 object Dequeue extends Dequeues
