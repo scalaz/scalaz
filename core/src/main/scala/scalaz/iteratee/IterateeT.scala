@@ -4,6 +4,17 @@ package iteratee
 import Input._
 import Identity._
 
+sealed trait IterateeT[X, E, F[_], A] {
+
+}
+
+object IterateeT extends IterateeTs
+
+trait IterateeTs {
+
+}
+
+/*
 sealed trait IterateeT[E, F[_], A] {
 
   import IterateeT._
@@ -53,20 +64,6 @@ sealed trait IterateeT[E, F[_], A] {
       }
     }
 
-  /*
-    foldT(
-      (a, _) => f(a)
-      , k => continueT(s =>
-        m.bd((_: IterateeT[E, F, A]).foldT(
-          done = (aa, ii) => f(aa).foldT(
-            done = (aaa, iii) => m.point(doneT[F](aaa, iii))
-            , cont = kk => kk(ii)
-          )
-          , cont = kk => m.point(continueT(kk) flatMap f)
-        ))(k(s)))
-    )
-    */
-     /*
   def enumerateT(e: EnumeratorT[E, F, A]): IterT[E, F, A] =
     e enumerateT this
 
@@ -100,15 +97,12 @@ sealed trait IterateeT[E, F[_], A] {
 
   def inputOr(d: => Input[E])(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Input[E] =
     fold((_, i) => i, _ => d)
-    */
 
 }
 
 object IterateeT extends IterateeTs {
-  /*
   def apply[E, F[_], A](f: Input[E] => IterT[E, F, A]): IterateeT[E, F, A] =
     continueT(f)
-    */
 }
 
 trait IterateeTs {
@@ -226,7 +220,7 @@ trait IterateeTs {
         eof = done(acc, eofInput))
     continue(step(r.monoid.z))
   }
-        /*
+
   implicit def IterateeTMonadTrans[E]: MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] {
     def lift[G[_] : Monad, A](a: G[A]): IterateeT[E, G, A] =
       continueT(i =>
@@ -285,6 +279,6 @@ trait IterateeTs {
     implicit val p = implicitly[Monad[F]].pointed
     Monad.monadBP[({type λ[α] = IterateeT[X, F, α]})#λ]
   }
-  */
 
 }
+*/
