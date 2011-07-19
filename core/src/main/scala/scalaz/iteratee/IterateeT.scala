@@ -53,40 +53,6 @@ sealed trait IterateeT[E, F[_], A] {
       }
     }
 
-  def flatMap[B](f: A => IterateeT[E, F, B])(implicit m: Monad[F]): IterateeT[E, F, B] =
-    new IterateeT[E, F, B] {
-      def foldT[Z](done: (=> B, => Input[E]) => F[Z], cont: (Input[E] => IterateeT[E, F, B]) => F[Z]) = {
-        IterateeT.this.foldT(
-          done = (a, i) => {
-            i apply (
-              empty = error("")
-            , el = error("")
-            , eof = error("")
-            )
-            error("")
-          }
-        , cont = k => error("")
-        )
-      }
-    }
-
-  /*
-bindIteratee :: (Monad m, Nullable s)
-    => Iteratee s m a
-    -> (a -> Iteratee s m b)
-    -> Iteratee s m b
-bindIteratee = self
-    where
-        self m f = Iteratee $ \onDone onCont ->
-             let m_done a (Chunk s)
-                   | nullC s      = runIter (f a) onDone onCont
-                 m_done a stream = runIter (f a) (const . flip onDone stream) f_cont
-                   where f_cont k Nothing = runIter (k stream) onDone onCont
-                         f_cont k e       = onCont k e
-             in runIter m m_done (onCont . (flip self f .))
-
-
-   */
   /*
     foldT(
       (a, _) => f(a)
