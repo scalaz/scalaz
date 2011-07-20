@@ -39,7 +39,7 @@ trait EnumeratorTs {
           , enumEofT(e) runT s
           ))
     , done = (a, _) =>
-        StepT.done[X, E, F, A](a, eofInput).pointI
+        StepT.doneT[X, E, F, A](a, eofInput).pointI
     , err = e(_)
     ))
   }
