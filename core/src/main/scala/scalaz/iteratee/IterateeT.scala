@@ -26,6 +26,30 @@ sealed trait IterateeT[X, E, F[_], A] {
     ))(>>==(enumEofT(lifte).runT).value)
   }
 
+  def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
+    def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
+      iterateeT(
+        m.bd((s: StepT[X, E, F, A]) => s.fold(
+          cont = k => m.point(StepT.cont(u => through(k(u))))
+        , done = (a, i) =>
+            if(i.isEmpty)
+              f(a).value
+            else
+              m.bd((ss: StepT[X, E, F, B]) => ss.fold(
+                cont = kk => kk(i).value
+              , done = (aa, _) => m.point(StepT.done[X, E, F, B](aa, i))
+              , err = ee => m.point(StepT.err[X, E, F, B](ee))
+              ))(f(a).value)
+        , err = e => m.point(StepT.err(e))
+        ): F[StepT[X, E, F, B]])(x.value))
+    through(this)
+  }
+
+  def map[B](f: A => B)(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
+    implicit val p = m.pointed
+    flatMap(a => StepT.done[X, E, F, B](f(a), emptyInput).pointI)
+  }
+
   def >>==[B, C](f: StepT[X, E, F, A] => IterateeT[X, B, F, C])(implicit m: Bind[F]): IterateeT[X, B, F, C] =
     iterateeT(m.bind((s: StepT[X, E, F, A]) => f(s).value)(value))
 
