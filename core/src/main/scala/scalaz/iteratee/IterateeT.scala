@@ -68,6 +68,59 @@ trait IterateeTs {
     val value = s
   }
 
+  implicit def IterateeTPointed[X, E, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
+    new Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
+      def point[A](a: => A) =
+        StepT.done(a, emptyInput).pointI
+    }
+
+  implicit def IterateeTFunctor[X, E, F[_] : Monad]: Functor[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
+    new Functor[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
+      def fmap[A, B](f: A => B) =
+        _ map f
+    }
+
+  implicit def IterateeTApplic[X, E, F[_] : Monad]: Applic[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
+    new Applic[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
+      implicit val ftr = implicitly[Monad[F]].functor
+
+      def applic[A, B](f: IterateeT[X, E, F, A => B]) =
+        a =>
+          for {
+            ff <- f
+            aa <- a
+          } yield ff(aa)
+    }
+
+  implicit def IterateeTBind[X, E, F[_] : Monad]: Bind[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
+    new Bind[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
+      def bind[A, B](f: A => IterateeT[X, E, F, B]) =
+        _ flatMap f
+    }
+
+  implicit def IterateeTApplicFunctor[X, E, F[_] : Monad]: ApplicFunctor[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    implicit val ftr = implicitly[Monad[F]].functor
+    ApplicFunctor.applicFunctor[({type λ[α] = IterateeT[X, E, F, α]})#λ]
+  }
+
+  implicit def IterateeTPointedFunctor[X, E, F[_] : Monad]: PointedFunctor[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    implicit val ftr = implicitly[Monad[F]].functor
+    implicit val p = implicitly[Monad[F]].pointed
+    PointedFunctor.pointedFunctor[({type λ[α] = IterateeT[X, E, F, α]})#λ]
+  }
+
+  implicit def IterateeTApplicative[X, E, F[_] : Monad]: Applicative[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    implicit val ap = implicitly[Monad[F]].applic
+    implicit val p = implicitly[Monad[F]].pointedFunctor
+    Applicative.applicative[({type λ[α] = IterateeT[X, E, F, α]})#λ]
+  }
+
+  implicit def IterateeTMonad[X, E, F[_] : Monad]: Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    implicit val b = implicitly[Monad[F]].bind
+    implicit val p = implicitly[Monad[F]].pointed
+    Monad.monadBP[({type λ[α] = IterateeT[X, E, F, α]})#λ]
+  }
+
   implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
     def lift[G[_] : Monad, A](a: G[A]): IterateeT[X, E, G, A] =
       iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.done[X, E, G, A](x, emptyInput))(a))
@@ -281,24 +334,6 @@ trait IterateeTs {
         eof = done(acc, eofInput))
     continue(step(r.monoid.z))
   }
-
-  implicit def IterateeTMonadTrans[E]: MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] {
-    def lift[G[_] : Monad, A](a: G[A]): IterateeT[E, G, A] =
-      continueT(i =>
-        implicitly[Monad[G]].fmap((aa: A) => doneT[G](aa, emptyInput[E]))(a))
-  }
-
-  implicit def IterateeTPointed[X, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[X, F, α]})#λ] =
-    new Pointed[({type λ[α] = IterateeT[X, F, α]})#λ] {
-      def point[A](a: => A) =
-        doneT(a, emptyInput)
-    }
-
-  implicit def IterateeTFunctor[X, F[_] : Functor]: Functor[({type λ[α] = IterateeT[X, F, α]})#λ] =
-    new Functor[({type λ[α] = IterateeT[X, F, α]})#λ] {
-      def fmap[A, B](f: A => B) =
-        _ map f
-    }
 
   implicit def IterateeTApplic[X, F[_] : Monad]: Applic[({type λ[α] = IterateeT[X, F, α]})#λ] =
     new Applic[({type λ[α] = IterateeT[X, F, α]})#λ] {
