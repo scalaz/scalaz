@@ -211,9 +211,9 @@ object Foldable extends FoldableLow {
       t.fold(v => b,
              (v, a) => f(b, a), 
              (v, pr, m, sf) =>
-               FingerFoldable[V].foldLeft(pr,
+               FingerFoldable[V].foldLeft(sf,
                                            foldLeft[Node[V, A], B](m,
-                                                     FingerFoldable[V].foldLeft(sf, b, f),
+                                                     FingerFoldable[V].foldLeft(pr, b, f),
                                                      (x, y) => NodeFoldable[V].foldLeft(y, x, f)),
                                            f))
   }

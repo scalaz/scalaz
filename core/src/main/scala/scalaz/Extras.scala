@@ -38,6 +38,13 @@ trait On[P[_,_], F[_]] {
 
 trait Extras {
   type Id[A] = A
+
+  /* N.B: not implicit, as that breaks everything. Make an implicit alias for this when you need it. */
+  val idMonad = new Monad[Id] {
+    def pure[A](a: => A): A = a
+    def bind[A,B](a: A, f: A => B): B = f(a)
+  }
+
   trait Konst[A] {
     type Apply[B] = A
   }
