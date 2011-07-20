@@ -3,14 +3,51 @@ package iteratee
 
 import Input._
 import Identity._
+import EnumeratorT._
 
 sealed trait IterateeT[X, E, F[_], A] {
+  val value: F[StepT[X, E, F, A]]
+
+  def *->* : (({type λ[α] = IterateeT[X, E, F, α]})#λ *->* A) =
+    scalaz.*->*.!**->**![({type λ[α] = IterateeT[X, E, F, α]})#λ, A](this)
+
+  def *->*->* : *->*->*[E, ({type λ[α, β] = IterateeT[X, α, F, β]})#λ, A] =
+    scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterateeT[X, α, F, β]})#λ, A](this)
+
+  import IterateeT._
+
+  def runT(e: (=> X) => F[A])(implicit m: Monad[F]): F[A] = {
+    implicit val b = m.bind
+    val lifte: (=> X) => IterateeT[X, E, F, A] = x => implicitly[MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ]].lift(e(x))
+    m.bd((s: StepT[X, E, F, A]) => s.fold(
+      cont = _ => sys.error("diverging iterate")
+    , done = (a, _) => m.point(a)
+    , err = e
+    ))(>>==(enumEofT(lifte).runT).value)
+  }
+
+  def >>==[B, C](f: StepT[X, E, F, A] => IterateeT[X, B, F, C])(implicit m: Bind[F]): IterateeT[X, B, F, C] =
+    iterateeT(m.bind((s: StepT[X, E, F, A]) => f(s).value)(value))
 
 }
 
-object IterateeT extends IterateeTs
+object IterateeT extends IterateeTs {
+  def apply[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] =
+    iterateeT(s)
+}
 
 trait IterateeTs {
+  type Iteratee[X, E, A] =
+  IterateeT[X, E, Identity, A]
+
+  def iterateeT[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] = new IterateeT[X, E, F, A] {
+    val value = s
+  }
+
+  implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
+    def lift[G[_] : Monad, A](a: G[A]): IterateeT[X, E, G, A] =
+      iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.done[X, E, G, A](x, emptyInput))(a))
+  }
 
 }
 
