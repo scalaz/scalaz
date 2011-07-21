@@ -24,6 +24,13 @@ sealed trait StepT[X, E, F[_], A] {
   def contOr(k: => Input[E] => IterateeT[X, E, F, A]): Input[E] => IterateeT[X, E, F, A] =
     cont getOrElse k
 
+  def mapContOr[Z](k: (Input[E] => IterateeT[X, E, F, A]) => Z, z: => Z) =
+    fold(
+      k(_)
+    , (_, _) => z
+    , _ => z
+    )
+
   def doneValue: LazyOption[A] =
     fold(
       _ => LazyOption.lazyNone
@@ -33,6 +40,13 @@ sealed trait StepT[X, E, F[_], A] {
 
   def doneValueOr(a: => A): A =
     doneValue getOrElse a
+
+  def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z) =
+    fold(
+      _ => z
+    , (a, _) => k(a)
+    , _ => z
+    )
 
   def doneInput: LazyOption[Input[E]] =
     fold(
@@ -44,6 +58,13 @@ sealed trait StepT[X, E, F[_], A] {
   def doneInputOr(a: => Input[E]): Input[E] =
     doneInput getOrElse a
 
+  def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z) =
+    fold(
+      _ => z
+    , (_, i) => k(i)
+    , _ => z
+    )
+
   def err: LazyOption[X] =
     fold(
       _ => LazyOption.lazyNone
@@ -53,6 +74,13 @@ sealed trait StepT[X, E, F[_], A] {
 
   def errOr(x: => X): X =
     err getOrElse x
+
+  def mapErrOr[Z](k: (=> X) => Z, z: => Z) =
+    fold(
+      _ => z
+    , (_, _) => z
+    , k
+    )
 
   def >-[Z](cont: => Z, done: => Z, err: => Z): Z =
     fold(_ => cont, (_, _) => done, _ => err)

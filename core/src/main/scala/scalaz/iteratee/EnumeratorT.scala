@@ -43,4 +43,27 @@ trait EnumeratorTs {
     , err = e(_)
     ))
   }
+
+  def checkCont0[X, E, F[_], A](z: EnumeratorT[X, E, F, A] => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
+    def step: StepT[X, E, F, A] => IterateeT[X, E, F, A] = {
+      s =>
+        s.mapContOr(
+          k => z(enumeratorT(step))(k)
+        , s.pointI
+        )
+    }
+    enumeratorT(step)
+  }
+
+  def checkCont1[S, X, E, F[_], A](z: (S => EnumeratorT[X, E, F, A]) => S => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A], t: S)(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
+    def step: S => StepT[X, E, F, A] => IterateeT[X, E, F, A] = {
+      o => s =>
+        s.mapContOr(
+          k => z(w => enumeratorT(step(w)))(o)(k)
+        , s.pointI
+        )
+    }
+    enumeratorT(step(t))
+  }
+
 }
