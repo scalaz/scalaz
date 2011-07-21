@@ -83,6 +83,9 @@ trait IterateeTs {
   type Iteratee[X, E, A] =
   IterateeT[X, E, Identity, A]
 
+  type Iter[E, F[_], A] =
+  IterateeT[Unit, E, F, A]
+
   type >@>[E, A] =
   Iteratee[Unit, E, A]
 
@@ -166,8 +169,8 @@ trait IterateeTs {
   }
 
   /**An iteratee that consumes the head of the input **/
-  def head[E]: (E >@> Option[E]) = {
-    def step(s: Input[E]): (E >@> Option[E]) =
+  def head[E, F[_]: Pointed]: Iter[E, F, Option[E]] = {
+    def step(s: Input[E]): Iter[E, F, Option[E]] =
       s(empty = cont(step)
       , el = e => done(Some(e), emptyInput[E])
       , eof = done(None, eofInput[E])
@@ -175,24 +178,34 @@ trait IterateeTs {
     cont(step)
   }
 
+  def headDoneOr[E, F[_]: Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
+    implicit val pt = implicitly[Monad[F]].pointed
+    head[E, F] flatMap {
+      case None => done(b, eofInput)
+      case Some(a) => f(a)
+    }
+  }
+
   /**An iteratee that returns the first element of the input **/
-  def peek[E]: (E >@> Option[E]) = {
-    def step(s: Input[E]): (E >@> Option[E])
+  def peek[E, F[_]: Pointed]: Iter[E, F, Option[E]] = {
+    def step(s: Input[E]): Iter[E, F, Option[E]]
     = s(el = e => done(Some(e), s),
       empty = cont(step),
       eof = done(None, eofInput[E]))
     cont(step)
   }
 
-  def peekDoneOr[A, B](b: => B, f: A => A >@> B): (A >@> B) =
-    peek[A] flatMap {
+  def peekDoneOr[E, F[_]: Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
+    implicit val pt = implicitly[Monad[F]].pointed
+    peek[E, F] flatMap {
       case None => done(b, eofInput)
       case Some(a) => f(a)
     }
+  }
 
   /**An iteratee that skips the first n elements of the input **/
-  def drop[E](n: Int): (E >@> Unit) = {
-    def step(s: Input[E]): (E >@> Unit) =
+  def drop[E, F[_]: Pointed](n: Int): Iter[E, F, Unit] = {
+    def step(s: Input[E]): Iter[E, F, Unit] =
       s(el = _ => drop(n - 1),
         empty = cont(step),
         eof = done((), eofInput[E]))
@@ -201,8 +214,8 @@ trait IterateeTs {
   }
 
   /**An iteratee that counts and consumes the elements of the input **/
-  def length[E]: (E >@> Int) = {
-    def step(acc: Int)(s: Input[E]): (E >@> Int) =
+  def length[E, F[_]: Pointed]: Iter[E, F, Int] = {
+    def step(acc: Int)(s: Input[E]): Iter[E, F, Int] =
       s(el = _ => cont(step(acc + 1)),
         empty = cont(step(acc)),
         eof = done(acc, eofInput[E]))
@@ -250,5 +263,4 @@ trait IterateeTs {
         eof = done(acc, eofInput))
     cont(step(r.monoid.z))
   }
-
 }
