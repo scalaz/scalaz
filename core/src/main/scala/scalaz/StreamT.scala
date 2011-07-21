@@ -154,7 +154,7 @@ object StreamT extends Extras {
 
   def unfoldM[M[_],A,B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Functor[M]): StreamT[M,A] =
     new StreamT[M,A](f(start) map {
-      case Some((a, b)) => Yield(a, error("oi"))
+      case Some((a, b)) => Yield(a, unfoldM(b)(f))
       case None => Done
     })
 
