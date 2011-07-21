@@ -18,6 +18,20 @@ sealed trait IterateeT[X, E, F[_], A] {
   import IterateeT._
   import =~~=._
 
+  def foldT[Z](
+    cont: (Input[E] => IterateeT[X, E, F, A]) => F[Z]
+  , done: (=> A, => Input[E]) => F[Z]
+  , err: (=> X) => F[Z]
+  )(implicit m: Bind[F]): F[Z] =
+    m.bind((s: StepT[X, E, F, A]) => s(cont, done, err))(value)
+
+  def fold[Z](
+    cont: (Input[E] => IterateeT[X, E, F, A]) => Z
+  , done: (=> A, => Input[E]) => Z
+  , err: (=> X) => Z
+  )(implicit i: F =~~= Identity): Z =
+    foldT(k => <=~~[F, Z](cont(k)), (a, o) => <=~~[F, Z](done(a, o)), e => <=~~[F, Z](err(e)))
+
   def runT(e: (=> X) => F[A])(implicit m: Monad[F]): F[A] = {
     implicit val b = m.bind
     val lifte: (=> X) => IterateeT[X, E, F, A] = x => implicitly[MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ]].lift(e(x))
@@ -34,7 +48,7 @@ sealed trait IterateeT[X, E, F[_], A] {
   def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
       iterateeT(
-        m.bd((s: StepT[X, E, F, A]) => s.fold(
+        m.bd((s: StepT[X, E, F, A]) => s.fold[F[StepT[X, E, F, B]]](
           cont = k => m.point(StepT.scont(u => through(k(u))))
         , done = (a, i) =>
             if(i.isEmpty)
@@ -46,7 +60,7 @@ sealed trait IterateeT[X, E, F[_], A] {
               , err = ee => m.point(StepT.serr[X, E, F, B](ee))
               ))(f(a).value)
         , err = e => m.point(StepT.serr(e))
-        ): F[StepT[X, E, F, B]])(x.value))
+        ))(x.value))
     through(this)
   }
 
@@ -68,6 +82,9 @@ object IterateeT extends IterateeTs {
 trait IterateeTs {
   type Iteratee[X, E, A] =
   IterateeT[X, E, Identity, A]
+
+  type >@>[E, A] =
+  Iteratee[Unit, E, A]
 
   def iterateeT[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] = new IterateeT[X, E, F, A] {
     val value = s
@@ -148,173 +165,48 @@ trait IterateeTs {
       iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.sdone[X, E, G, A](x, emptyInput))(a))
   }
 
-}
-
-/*
-sealed trait IterateeT[E, F[_], A] {
-
-  import IterateeT._
-  import EnumeratorT._
-  import =~~=._
-
-  def *->* : (({type λ[α] = IterateeT[E, F, α]})#λ *->* A) =
-    scalaz.*->*.!**->**![({type λ[α] = IterateeT[E, F, α]})#λ, A](this)
-
-  def *->*->* : *->*->*[E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A] =
-    scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterateeT[α, F, β]})#λ, A](this)
-
-  def foldT[Z](done: (=> A, => Input[E]) => F[Z], cont: (Input[E] => IterateeT[E, F, A]) => F[Z]): F[Z]
-
-  def iteratee(implicit iso: F =~~= Identity): (E >@> A) =
-    foldT[E >@> A](
-      (a, i) => <=~~[F, E >@> A](done(a, i))
-    , k => <=~~[F, E >@> A](continue[E, A](k(_).iteratee)))
-
-  def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[E, A]) => Z)(implicit iso: F =~~= Identity): Z =
-    iteratee.foldT[Z](
-      (a, i) => id(done(a, i))
-    , k => id(cont(k))
-    )
-
-  def runT(implicit p: Pointed[F]): F[A] =
-    foldT(
-      done = (x, _) => p.point(x)
-      , cont = k =>
-          k(eofInput[E]).foldT(
-            done = (xx, _) => p.point(xx)
-          , cont = _ => sys.error("Diverging iteratee")
-          )
-    )
-
-  def run(implicit iso: F =~~= Identity): A =
-    runT
-
-
-  def map[B](f: A => B)(implicit ftr: Functor[F]): IterateeT[E, F, B] =
-    new IterateeT[E, F, B] {
-      def foldT[Z](done: (=> B, => Input[E]) => F[Z], cont: (Input[E] => IterateeT[E, F, B]) => F[Z]) = {
-        IterateeT.this.foldT(
-          done = (a, i) => done(f(a), i)
-        , cont = k => cont(k(_) map f)
-        )
-      }
-    }
-
-  def enumerateT(e: EnumeratorT[E, F, A]): IterT[E, F, A] =
-    e enumerateT this
-
-  def enumerate(e: Enumerator[E, A])(implicit x: IterateeT[E, F, A] =:= IterateeT[E, Identity, A], y: IterT[E, Identity, A] =:= IterT[E, F, A]): Iteratee[E, A] =
-    e enumerate this
-
-  def enumerateUp[G[_]](e: EnumeratorT[E, G, A])(implicit p: Pointed[G], t: CoPointedFunctor[F]): IterT[E, G, A] =
-    e enumerateUp this
-
-  def mapI[G[_]](f: F ~> G)(implicit ftr: Functor[F]): IterateeT[E, G, A] =
-    foldT(
-      done = IterateeT.doneT(_, _)
-      , cont = k => Iteratee.continueT(i => f(ftr.fmap((x: IterateeT[E, F, A]) => x mapI f)(k(i))))
-    )
-
-  def up[G[_]](implicit p: Pointed[G], f: CoPointedFunctor[F]): IterateeT[E, G, A] = {
-    implicit val ftr = f.functor
-    mapI(new (F ~> G) {
-      def apply[A](a: F[A]) = implicitly[Pointed[G]].point(implicitly[CoPointedFunctor[F]].coPoint(a))
-    })
-  }
-
-  def ifDoneElseCont[Z](done: => Z, cont: => Z): Z =
-    foldT((_, _) => done, _ => cont)
-
-  def contOrT(d: => Input[E] => IterT[E, F, A]): Input[E] => IterT[E, F, A] =
-    foldT((_, _) => d, z => z)
-
-  def contOr(d: => Input[E] => Iteratee[E, A])(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Input[E] => Iteratee[E, A] =
-    fold((_, _) => d, z => z)
-
-  def inputOr(d: => Input[E])(implicit i: F[IterateeT[E, F, A]] =:= Identity[IterateeT[E, Identity, A]]): Input[E] =
-    fold((_, i) => i, _ => d)
-
-}
-
-object IterateeT extends IterateeTs {
-  def apply[E, F[_], A](f: Input[E] => IterT[E, F, A]): IterateeT[E, F, A] =
-    continueT(f)
-}
-
-trait IterateeTs {
-  type Iteratee[E, A] =
-  IterateeT[E, Identity, A]
-
-  type >@>[E, A] =
-  Iteratee[E, A]
-
-  import =~~=._
-
-  sealed trait DoneT[F[_]] {
-    def apply[E, A](a: => A, i: => Input[E]): IterateeT[E, F, A]
-  }
-
-  def doneT[F[_]]: DoneT[F] = new DoneT[F] {
-    def apply[E, A](a: => A, i: => Input[E]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
-      def foldT[Z](done: (=> A, => Input[E]) => F[Z], cont: (Input[E] => IterateeT[E, F, A]) => F[Z]) =
-        done(a, i)
-    }
-  }
-
-  def done[E, A](a: => A, i: => Input[E]): (E >@> A) =
-    doneT[Identity](a, i)
-
-  def continueT[E, F[_], A](f: Input[E] => IterateeT[E, F, A]): IterateeT[E, F, A] = new IterateeT[E, F, A] {
-    def foldT[Z](done: (=> A, => Input[E]) => F[Z], cont: (Input[E] => IterateeT[E, F, A]) => F[Z]) =
-      cont(f)
-  }
-
-  def continue[E, A](f: Input[E] => E >@> A): (E >@> A) =
-    continueT(i => f(i))
-
   /**An iteratee that consumes the head of the input **/
   def head[E]: (E >@> Option[E]) = {
     def step(s: Input[E]): (E >@> Option[E]) =
-      s(el = e => done(Some(e), emptyInput[E]),
-        empty = continue(step),
-        eof = done(None, eofInput[E]))
-    continue(step)
+      s(empty = cont(step)
+      , el = e => done(Some(e), emptyInput[E])
+      , eof = done(None, eofInput[E])
+      )
+    cont(step)
   }
 
   /**An iteratee that returns the first element of the input **/
   def peek[E]: (E >@> Option[E]) = {
     def step(s: Input[E]): (E >@> Option[E])
     = s(el = e => done(Some(e), s),
-      empty = continue(step),
+      empty = cont(step),
       eof = done(None, eofInput[E]))
-    continue(step)
+    cont(step)
   }
-             /* todo
-  /**Peeks and returns either a Done iteratee with the given value or runs the given function with the peeked value **/
+
   def peekDoneOr[A, B](b: => B, f: A => A >@> B): (A >@> B) =
     peek[A] flatMap {
-      case None => doneT(b, eofInput)
+      case None => done(b, eofInput)
       case Some(a) => f(a)
     }
-    */
 
   /**An iteratee that skips the first n elements of the input **/
   def drop[E](n: Int): (E >@> Unit) = {
     def step(s: Input[E]): (E >@> Unit) =
       s(el = _ => drop(n - 1),
-        empty = continue(step),
+        empty = cont(step),
         eof = done((), eofInput[E]))
     if (n == 0) done((), emptyInput[E])
-    else continue(step)
+    else cont(step)
   }
 
   /**An iteratee that counts and consumes the elements of the input **/
   def length[E]: (E >@> Int) = {
     def step(acc: Int)(s: Input[E]): (E >@> Int) =
-      s(el = _ => continue(step(acc + 1)),
-        empty = continue(step(acc)),
+      s(el = _ => cont(step(acc + 1)),
+        empty = cont(step(acc)),
         eof = done(acc, eofInput[E]))
-    continue(step(0))
+    cont(step(0))
   }
 
   /**
@@ -323,25 +215,27 @@ trait IterateeTs {
   def repeat[E, A, F[_]](iter: E >@> A)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (E >@> F[A]) = {
     def step(acc: F[A])(s: Input[E]): (E >@> F[A]) =
       s(el = e => iter.fold(
-        (a, _) => continue(step(mon.append(acc, pt.point(a)))),
-        k => k(elInput(e)).fold(
-          (a, _) => continue(step(mon.append(acc, pt.point(a)))),
-          (k2) => continue(step(acc))
-        )),
-        empty = continue(step(acc)),
+        done = (a, _) => cont(step(mon.append(acc, pt.point(a)))),
+        cont = k => k(elInput(e)).fold(
+          done = (a, _) => cont(step(mon.append(acc, pt.point(a)))),
+          cont = (k2) => cont(step(acc)),
+          err = e => err(e)
+        ),
+        err = e => err(e)),
+        empty = cont(step(acc)),
         eof = done(acc, eofInput))
-    continue(step(mon.z))
+    cont(step(mon.z))
   }
 
   /**
    * Iteratee that collects all inputs with the given monoid.
    */
   def collect[A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): (A >@> F[A]) = {
-    def step(acc: F[A])(s: Input[A]): Iteratee[A, F[A]] =
-      s(el = e => continue(step(mon.append(acc, pt.point(e)))),
-        empty = continue(step(acc)),
+    def step(acc: F[A])(s: Input[A]): (A >@> F[A]) =
+      s(el = e => cont(step(mon.append(acc, pt.point(e)))),
+        empty = cont(step(acc)),
         eof = done(acc, eofInput))
-    continue(step(mon.z))
+    cont(step(mon.z))
   }
 
   /**
@@ -350,12 +244,11 @@ trait IterateeTs {
    * This iteratee is useful for F[_] with efficient cons, i.e. List.
    */
   def reversed[A, F[_]](implicit r: Reducer[A, F[A]]): (A >@> F[A]) = {
-    def step(acc: F[A])(s: Input[A]): Iteratee[A, F[A]] =
-      s(el = e => continue(step(r.cons(e, acc))),
-        empty = continue(step(acc)),
+    def step(acc: F[A])(s: Input[A]): (A >@> F[A]) =
+      s(el = e => cont(step(r.cons(e, acc))),
+        empty = cont(step(acc)),
         eof = done(acc, eofInput))
-    continue(step(r.monoid.z))
+    cont(step(r.monoid.z))
   }
 
 }
-*/
