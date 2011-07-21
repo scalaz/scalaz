@@ -1,10 +1,11 @@
 package scalaz
 
+import Scalaz._
+
 sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
   def step: M[StreamT.Step[A, StreamT[M,A]]] = stepper
 
   import StreamT._
-  import Scalaz._
 
   def uncons(implicit M:Monad[M]): M[Option[(A, StreamT[M,A])]] = 
     step flatMap {
@@ -149,6 +150,19 @@ object StreamT extends Extras {
     : Zero[StreamT[M,A]] =
   new Zero[StreamT[M,A]] {
     val zero = empty[M,A]
+  }
+
+  def unfoldM[M[_],A,B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Functor[M]): StreamT[M,A] =
+    new StreamT[M,A](f(start) map {
+      case Some((a, b)) => Yield(a, error("oi"))
+      case None => Done
+    })
+
+  def unfold[A,B](b: B)(f: B => Option[(A,B)]): StreamT[Id,A] = unfoldM[Id,A,B](b)(f)(idMonad)
+
+  def fromIterable[A](s: Iterable[A]): StreamT[Id,A] = {
+    def stepper(b: Iterable[A]): Option[(A,Iterable[A])] = if (b.isEmpty) None else Some((b.head, b.tail))
+    unfold(s)(stepper)
   }
 
   def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S)
