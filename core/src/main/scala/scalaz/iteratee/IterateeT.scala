@@ -4,6 +4,7 @@ package iteratee
 import Input._
 import Identity._
 import EnumeratorT._
+import StepT._
 
 sealed trait IterateeT[X, E, F[_], A] {
   val value: F[StepT[X, E, F, A]]
@@ -15,6 +16,7 @@ sealed trait IterateeT[X, E, F[_], A] {
     scalaz.*->*->*.!**->**->**![E, ({type λ[α, β] = IterateeT[X, α, F, β]})#λ, A](this)
 
   import IterateeT._
+  import =~~=._
 
   def runT(e: (=> X) => F[A])(implicit m: Monad[F]): F[A] = {
     implicit val b = m.bind
@@ -25,6 +27,9 @@ sealed trait IterateeT[X, E, F[_], A] {
     , err = e
     ))(>>==(enumEofT(lifte).runT).value)
   }
+
+  def run(e: (=> X) => A)(implicit i: F =~~= Identity): A =
+    runT(x => <=~~[F, A](e(x)))
 
   def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
@@ -67,6 +72,9 @@ trait IterateeTs {
   def iterateeT[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] = new IterateeT[X, E, F, A] {
     val value = s
   }
+
+  def iteratee[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] =
+    iterateeT(Identity.id(s))
 
   implicit def IterateeTPointed[X, E, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
     new Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] {

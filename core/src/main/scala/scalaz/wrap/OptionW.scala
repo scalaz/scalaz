@@ -7,8 +7,6 @@ sealed trait OptionW[A] {
   import *._
   import Validation._
   import newtypes.{FirstOption, LastOption}
-  import iteratee.IterateeT, IterateeT._
-  import iteratee.Input._
 
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
