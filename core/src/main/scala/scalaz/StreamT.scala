@@ -153,7 +153,7 @@ object StreamT extends Extras {
   }
 
   def unfoldM[M[_],A,B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Functor[M]): StreamT[M,A] =
-    new StreamT[M,A](f(start) map {
+    StreamT[M,A](f(start) map {
       case Some((a, b)) => Yield(a, unfoldM(b)(f))
       case None => Done
     })
@@ -164,6 +164,8 @@ object StreamT extends Extras {
     def stepper(b: Iterable[A]): Option[(A,Iterable[A])] = if (b.isEmpty) None else Some((b.head, b.tail))
     unfold(s)(stepper)
   }
+
+  def wrapEffect[M[_]:Functor,A,B](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(m map { Skip(_) })
 
   def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S)
     : StreamT[Id,A] 
