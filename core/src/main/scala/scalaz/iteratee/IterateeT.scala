@@ -30,24 +30,24 @@ sealed trait IterateeT[X, E, F[_], A] {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
       iterateeT(
         m.bd((s: StepT[X, E, F, A]) => s.fold(
-          cont = k => m.point(StepT.contT(u => through(k(u))))
+          cont = k => m.point(StepT.cont(u => through(k(u))))
         , done = (a, i) =>
             if(i.isEmpty)
               f(a).value
             else
               m.bd((ss: StepT[X, E, F, B]) => ss.fold(
                 cont = kk => kk(i).value
-              , done = (aa, _) => m.point(StepT.doneT[X, E, F, B](aa, i))
-              , err = ee => m.point(StepT.errT[X, E, F, B](ee))
+              , done = (aa, _) => m.point(StepT.done[X, E, F, B](aa, i))
+              , err = ee => m.point(StepT.err[X, E, F, B](ee))
               ))(f(a).value)
-        , err = e => m.point(StepT.errT(e))
+        , err = e => m.point(StepT.err(e))
         ): F[StepT[X, E, F, B]])(x.value))
     through(this)
   }
 
   def map[B](f: A => B)(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
     implicit val p = m.pointed
-    flatMap(a => StepT.doneT[X, E, F, B](f(a), emptyInput).pointI)
+    flatMap(a => StepT.done[X, E, F, B](f(a), emptyInput).pointI)
   }
 
   def >>==[B, C](f: StepT[X, E, F, A] => IterateeT[X, B, F, C])(implicit m: Bind[F]): IterateeT[X, B, F, C] =
@@ -71,7 +71,7 @@ trait IterateeTs {
   implicit def IterateeTPointed[X, E, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
     new Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
       def point[A](a: => A) =
-        StepT.doneT(a, emptyInput).pointI
+        StepT.done(a, emptyInput).pointI
     }
 
   implicit def IterateeTFunctor[X, E, F[_] : Monad]: Functor[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
@@ -123,7 +123,7 @@ trait IterateeTs {
 
   implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
     def lift[G[_] : Monad, A](a: G[A]): IterateeT[X, E, G, A] =
-      iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.doneT[X, E, G, A](x, emptyInput))(a))
+      iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.done[X, E, G, A](x, emptyInput))(a))
   }
 
 }
