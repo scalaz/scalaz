@@ -317,6 +317,19 @@ trait Functors extends FunctorsLow {
       _ map (f(_)) left
   }
 
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecFunctor : Functor[TailRec] = new Functor[TailRec] {
+    def fmap[A,B](f : A => B) : TailRec[A] => TailRec[B] =
+      a => TailCalls.done(f(a.result))
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextFunctor[B] : Functor[({type T[A] = ControlContext[A,B,B]})#T] = new Functor[({type T[A] = ControlContext[A,B,B]})#T] {
+    def fmap[A,A1](f : A => A1) : ControlContext[A,B,B] => ControlContext[A1,B,B] =
+      _ map f
+  }
+
 }
 
 trait FunctorsLow {

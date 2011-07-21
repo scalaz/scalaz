@@ -34,4 +34,18 @@ trait Lengths {
     def len[A](a: Stream[A]) =
       a.length
   }
+
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecLength : Length[TailRec] = new Length[TailRec] {
+    def len[A](a: TailRec[A]) =
+      1
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextLength[B] : Length[({type T[A] = ControlContext[A,B,B]})#T] = new Length[({type T[A] = ControlContext[A,B,B]})#T] {
+    def len[A](a: ControlContext[A,B,B]) =
+      1
+  }
+
 }

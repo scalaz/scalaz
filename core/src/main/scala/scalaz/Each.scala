@@ -20,4 +20,18 @@ trait Eachs {
   implicit def StreamEach: Each[Stream] = new Each[Stream] {
     def each[A](f: A => Unit) = _ foreach f
   }
+
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecEach : Each[TailRec] = new Each[TailRec] {
+    def each[A](f: A => Unit) =
+      a => f(a.result)
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextEach[B] : Each[({type T[A] = ControlContext[A,B,B]})#T] = new Each[({type T[A] = ControlContext[A,B,B]})#T] {
+    def each[A](f: A => Unit) =
+      c => f(c.x)
+  }
+
 }

@@ -351,6 +351,7 @@ trait Binds extends BindsLow {
     def bind[A, B](f: A => LazyEither.LazyLeftProjection[B, X]) =
       _ flatMap (f(_).e) left
   }
+
   import scala.util.control.TailCalls
   import TailCalls.TailRec
   implicit def TailRecBind : Bind[TailRec] = new Bind[TailRec] {

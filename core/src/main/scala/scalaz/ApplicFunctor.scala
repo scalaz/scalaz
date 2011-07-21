@@ -245,4 +245,12 @@ trait ApplicFunctors {
   implicit def LazyLeftEitherApplicFunctor[B]: ApplicFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
     applicFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
+  import scala.util.control.TailCalls.TailRec
+  implicit val TailRecApplicFunctor : ApplicFunctor[TailRec] =
+    applicFunctor[TailRec]
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextApplicFunctor[B] : ApplicFunctor[({type T[A] = ControlContext[A,B,B]})#T] =
+    applicFunctor[({type T[A] = ControlContext[A,B,B]})#T]
+
 }

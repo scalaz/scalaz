@@ -56,4 +56,18 @@ trait Indexs {
         k
       }
   }
+
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecLength : Index[TailRec] = new Index[TailRec] {
+    def index[A](a: TailRec[A]) =
+      n => if(n == 0) Some(a.result) else None
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextLength[B] : Index[({type T[A] = ControlContext[A,B,B]})#T] = new Index[({type T[A] = ControlContext[A,B,B]})#T] {
+    def index[A](a: ControlContext[A,B,B]) =
+      n => if(n == 0) Some(a.x) else None
+  }
+
 }
