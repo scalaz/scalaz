@@ -39,8 +39,6 @@ object ContentTypeResolver {
    */
   def contentTypeResolverMap(m: Map[String, NonEmptyList[Char]]) = contentTypeResolver(m.get(_))
 
-  import collection.immutable.TreeHashMap
-
   /**
    * A content-type resolver using the table on the W3C Schools website at
    * http://www.w3schools.com/media/media_mimeref.asp. 
