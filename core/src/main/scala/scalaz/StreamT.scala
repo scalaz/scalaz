@@ -165,7 +165,7 @@ object StreamT extends Extras {
     unfold(s)(stepper)
   }
 
-  def wrapEffect[M[_]:Functor,A,B](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(m map { Skip(_) })
+  def wrapEffect[M[_]:Functor,A](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(m map { Skip(_) })
 
   def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S)
     : StreamT[Id,A] 
