@@ -225,7 +225,7 @@ trait IterateeTs {
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */
-  def repeat[E, A, F[_]](iter: E >@> A)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (E >@> F[A]) = {
+  def repeatBuild[E, A, F[_]](iter: E >@> A)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (E >@> F[A]) = {
     def step(acc: F[A])(s: Input[E]): (E >@> F[A]) =
       s(el = e => iter.fold(
         done = (a, _) => cont(step(mon.append(acc, pt.point(a)))),

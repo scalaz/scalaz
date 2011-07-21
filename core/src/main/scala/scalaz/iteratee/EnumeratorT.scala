@@ -66,4 +66,15 @@ trait EnumeratorTs {
     enumeratorT(step(t))
   }
 
+  def iterate[X, E, F[_]: Monad, A](f: E => E, e: E): EnumeratorT[X, E, F, A] = {
+    implicit val bd = implicitly[Monad[F]].bind
+    implicit val pt = implicitly[Monad[F]].pointed
+    checkCont1[E, X, E, F, A](s => t => k => k(elInput(e)) >>== s(f(t)).runT, e)
+  }
+
+  def repeat[X, E, F[_]: Monad, A](e: E): EnumeratorT[X, E, F, A] = {
+    implicit val bd = implicitly[Monad[F]].bind
+    implicit val pt = implicitly[Monad[F]].pointed
+    checkCont0[X, E, F, A](s => k => k(elInput(e)) >>== s.runT)
+  }
 }
