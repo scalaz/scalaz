@@ -99,8 +99,8 @@ object ScalazBuild extends Build {
 
     /** Scalac options for SXR */
     def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
-      val xplugin    = "-Xplugin:" + (baseDir / "lib" / "sxr_2.8.0.RC2-0.2.4-SNAPSHOT.jar").asFile.getAbsolutePath
-      val baseDirs   = sourceDirs.flatten
+      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
+      val baseDirs = sourceDirs.flatten
       val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
       Seq(xplugin, sxrBaseDir)
     }
@@ -121,7 +121,9 @@ object ScalazBuild extends Build {
         (compile in Compile) := inc.Analysis.Empty,
 
         // Include SXR in the Scaladoc Build to generated HTML annotated sources.
-        (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories) map sxrOptions,
+        (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories, scalaVersion) map {
+          (bd, asd, sv) => if (sv.contains("2.10")) Seq() else sxrOptions(bd, asd)
+        },
 
         // Package an archive containing all artifacts, readme, licence, and documentation.
         // Use `LocalProject("scalaz")` rather than `scalaz` to avoid a circular reference.
@@ -134,15 +136,15 @@ object ScalazBuild extends Build {
 
   object Dependency {
     // SBT's built in '%%' is not flexible enough. When we build with a snapshot version of the compiler,
-    // we want to fetch dependencies from the last stable release (hopefully binary compatible).
+    // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
-      case x                 => x
+      case x => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
 
-    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.8" withSources()
-    def Specs(scalaVersion: String)      = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test" withSources()
+    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.9"
+    def Specs(scalaVersion: String) = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test"
   }
 
   val dependencyScalaVersionTranslator = SettingKey[(String => String)]("dependency-scala-version-translator", "Function to translate the current scala version to the version used for dependency resolution")
@@ -151,9 +153,9 @@ object ScalazBuild extends Build {
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
     version      := "6.0.2-SNAPSHOT",
-    scalaVersion := "2.8.1",
+    scalaVersion := "2.9.0-1",
     resolvers    += ScalaToolsSnapshots,
-
+  
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,

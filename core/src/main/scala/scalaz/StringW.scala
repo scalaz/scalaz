@@ -54,7 +54,7 @@ sealed trait StringW extends PimpedType[String] {
    */
   def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = this.charsNel getOrElse e
 
-  def charsNelErr(message: => String): NonEmptyList[Char] = charsNel(error(message))
+  def charsNelErr(message: => String): NonEmptyList[Char] = charsNel(sys.error(message))
 
   def unsafeCharsNel : NonEmptyList[Char] = charsNelErr("cannot turn empty string into NonEmptyList")
 

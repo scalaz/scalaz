@@ -14,7 +14,7 @@ sealed trait InputStreamW extends PimpedType[InputStream] {
       def next = if(hasNext) {
         b = false
         i.toByte
-      } else error("Iterator.next (no more elements)")
+      } else sys.error("Iterator.next (no more elements)")
 
       def hasNext = {
         if(b) h

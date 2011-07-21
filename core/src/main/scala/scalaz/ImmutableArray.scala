@@ -69,7 +69,7 @@ object ImmutableArray {
     ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
-    (new StringBuilder).mapResult(fromString(_))
+    (new StringBuilder).mapResult(fromString)
 
   implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
     new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
@@ -192,14 +192,14 @@ object ImmutableArray {
     override def stringPrefix = "ImmutableArray"
 
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]] =
-      error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+      sys.error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
     override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 
   object WrappedImmutableArray {
     import scalaz.{ImmutableArray => IA}
     class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
-      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(new StringArray(_))
+      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str.toString))
     }
 
     abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
@@ -253,7 +253,7 @@ object ImmutableArray {
     def asString = value match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString
-      case _ => error("Unknown subtype of ImmutableArray[Char]")
+      case _ => sys.error("Unknown subtype of ImmutableArray[Char]")
     }
   }
 
