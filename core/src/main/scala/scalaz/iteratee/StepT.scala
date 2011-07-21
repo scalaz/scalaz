@@ -69,7 +69,7 @@ trait StepTs {
   type Step[X, E, A] =
   StepT[X, E, Identity, A]
 
-  def cont[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
+  def scont[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
     def fold[Z](
       cont: (Input[E] => IterateeT[X, E, F, A]) => Z
     , done: (=> A, => Input[E]) => Z
@@ -77,7 +77,7 @@ trait StepTs {
     ) = cont(c)
   }
 
-  def done[X, E, F[_], A](d: => A, r: => Input[E]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
+  def sdone[X, E, F[_], A](d: => A, r: => Input[E]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
     def fold[Z](
       cont: (Input[E] => IterateeT[X, E, F, A]) => Z
     , done: (=> A, => Input[E]) => Z
@@ -85,7 +85,7 @@ trait StepTs {
     ) = done(d, r)
   }
 
-  def err[X, E, F[_], A](e: => X): StepT[X, E, F, A] = new StepT[X, E, F, A] {
+  def serr[X, E, F[_], A](e: => X): StepT[X, E, F, A] = new StepT[X, E, F, A] {
     def fold[Z](
       cont: (Input[E] => IterateeT[X, E, F, A]) => Z
     , done: (=> A, => Input[E]) => Z

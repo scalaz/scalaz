@@ -7,6 +7,7 @@ sealed trait OptionW[A] {
   import *._
   import Validation._
   import newtypes.{FirstOption, LastOption}
+  import iteratee.{StepT, Input}
 
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
@@ -123,14 +124,13 @@ sealed trait OptionW[A] {
   def foldLiftOpt[B](b: => B, k: Option[A] => B): B = foldLift[Option, B](b, k)
 
   /**
-   * Returns a Done iteratee with the given value if the Option is not defined, otherwise runs the given function.
+   * Returns a Done step with the given value if the Option is not defined, otherwise runs the given function.
    */
-  /*
-  def doneOr[F[_], B](b: => B, f: A => IterateeT[A, F, B]): IterateeT[A, F, B] = value match {
-    case None => doneT(b, eofInput)
+  def sdoneOr[X, F[_], B](b: => B, f: A => StepT[X, A, F, B]): StepT[X, A, F, B] = value match {
+    case None => StepT.sdone[X, A, F, B](b, Input.eofInput)
     case Some(a) => f(a)
   }
-  */
+
 }
 
 object OptionW extends OptionWs
