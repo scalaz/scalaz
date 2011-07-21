@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-tools.testing/specs_2.8.1/jars/specs_2.8.1-1.6.8.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-tools.testing/specs_2.8.1/srcs/specs_2.8.1-1.6.8-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

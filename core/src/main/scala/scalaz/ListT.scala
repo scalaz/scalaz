@@ -64,7 +64,7 @@ sealed class ListT[M[_],A](val step : M[ListT.Step[A, ListT[M,A]]]) {
     step map { 
       case Yield(a,s) => Skip(s)
       case Skip(s) => Skip(s.tail)
-      case Done => error("tail: empty ListT")
+      case Done => sys.error("tail: empty ListT")
     }
   )
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Monad[M]): M[B] = 

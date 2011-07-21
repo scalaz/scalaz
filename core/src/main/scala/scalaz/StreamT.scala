@@ -76,7 +76,7 @@ sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
     step map { 
       case Yield(a,s) => Skip(s)
       case Skip(s) => Skip(s.tail)
-      case Done => error("tail: empty StreamT")
+      case Done => sys.error("tail: empty StreamT")
     }
   )
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Monad[M]): M[B] = 
