@@ -39,12 +39,15 @@ sealed trait STRef[S, A] {
 }
 
 object STRef extends STRefs {
+
   import ~>._
+
   def apply[S]: (I ~> ({type λ[α] = STRef[S, α]})#λ) =
     stRef[S]
 }
 
 trait STRefs {
+
   import ~>._
 
   def stRef[S]: (I ~> ({type λ[α] = STRef[S, α]})#λ) = new (I ~> ({type λ[α] = STRef[S, α]})#λ) {

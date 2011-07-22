@@ -201,11 +201,11 @@ sealed trait LazyEitherT[A, F[_], B] {
   def forall(f: (=> B) => Boolean)(implicit i: F =~~= Identity): Boolean =
     run forall f
 
-  def orElse(x: => LazyEitherT[A, F, B])(implicit m: Bind[F]): LazyEitherT[A, F, B] ={
+  def orElse(x: => LazyEitherT[A, F, B])(implicit m: Bind[F]): LazyEitherT[A, F, B] = {
     val g = runT
     LazyEitherT(m.bind((z: LazyEither[A, B]) => z.fold(
       _ => x.runT
-    , _ => g
+      , _ => g
     ))(g))
   }
 
@@ -299,7 +299,7 @@ trait LazyEitherTs {
       val g = e.runT
       LazyEitherT(m.bind((z: LazyEither[A, B]) => z.fold(
         _ => g
-      , _ => x.runT
+        , _ => x.runT
       ))(g))
     }
 

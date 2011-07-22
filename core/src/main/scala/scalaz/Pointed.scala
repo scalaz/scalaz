@@ -229,15 +229,23 @@ trait Pointeds extends PointedsLow {
   implicit def LazyLeftEitherPointed[B]: Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] = new Pointed[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] {
     def point[A](a: => A) = LazyEither.lazyLeft(a).left
   }
+
   import scala.util.control.TailCalls
   import TailCalls.TailRec
-  implicit def TailRecPointed : Pointed[TailRec] = new Pointed[TailRec] { def point[A](a : => A) = TailCalls.done(a) }
+
+  implicit def TailRecPointed: Pointed[TailRec] = new Pointed[TailRec] {
+    def point[A](a: => A) = TailCalls.done(a)
+  }
 
   // TODO - Use Oleg's Monadish for continuations.
+
   import scala.util.continuations.ControlContext
-  implicit def ControlContextPointed[B] : Pointed[({type T[A] = ControlContext[A,B,B]})#T] = new Pointed[({type T[A] = ControlContext[A,B,B]})#T] {
+
+  implicit def ControlContextPointed[B]: Pointed[({type T[A] = ControlContext[A, B, B]})#T] = new Pointed[({type T[A] = ControlContext[A, B, B]})#T] {
+
     import scala.util.continuations.shiftR
-    def point[A](a : => A) : ControlContext[A,B,B] = shiftR(_(a))
+
+    def point[A](a: => A): ControlContext[A, B, B] = shiftR(_(a))
   }
 }
 

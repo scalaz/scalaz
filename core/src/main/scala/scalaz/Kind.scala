@@ -730,7 +730,7 @@ trait *->*[F[_], A] {
     m.bd(
       (a: A) => m.bd(
         (_: B) => m.bd(
-          (b: A) => if(p(b)) whileM(p, z, e) else m.point(e(b)))(value))(z(a)))(value)
+          (b: A) => if (p(b)) whileM(p, z, e) else m.point(e(b)))(value))(z(a)))(value)
   }
 }
 

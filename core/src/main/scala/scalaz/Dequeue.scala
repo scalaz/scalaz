@@ -121,7 +121,8 @@ package scalaz
  *  a delay queue, so each 'difference' can say, execute now or delay until later.
  */
 sealed trait Dequeue[A] {
- import Dequeue._
+
+  import Dequeue._
 
   val pre: List[List[A] => List[A]]
   val post: List[List[A] => List[A]]
