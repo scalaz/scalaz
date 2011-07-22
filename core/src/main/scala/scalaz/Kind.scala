@@ -273,6 +273,12 @@ trait *[A] {
     if (p isDefinedAt value) p(value)
     else implicitly[Pointed[F]].point(value)
 
+  def isZero(implicit iz: IsZero[A]): Boolean =
+    iz.isZero(value)
+
+  def isnotZero(implicit iz: IsZero[A]): Boolean =
+    iz.isNotZero(value)
+
 }
 
 object * extends **
@@ -813,7 +819,7 @@ trait **->** extends **->**~ {
 
   implicit def ValidationFailure_*->*[A, E](f: FailProjection[E, A]) = *->*[({type λ[α] = FailProjection[α, A]})#λ, E](f)
 
-  implicit def IterateeT_*->*[E, F[_], A](v: IterateeT[E, F, A]) = *->*[({type λ[α] = IterateeT[E, F, α]})#λ, A](v)
+  implicit def IterateeT_*->*[X, E, F[_], A](v: IterateeT[X, E, F, A]) = *->*[({type λ[α] = IterateeT[X, E, F, α]})#λ, A](v)
 
   import java.util.Map.Entry
 

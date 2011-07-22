@@ -351,6 +351,18 @@ trait Binds extends BindsLow {
     def bind[A, B](f: A => LazyEither.LazyLeftProjection[B, X]) =
       _ flatMap (f(_).e) left
   }
+
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecBind : Bind[TailRec] = new Bind[TailRec] {
+    def bind[A,B](f : A => TailRec[B]) : TailRec[A] => TailRec[B] = { ta =>
+       TailCalls.tailcall {  f(ta.result) }
+    }
+  }
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextBind[B] : Bind[({type T[A] = ControlContext[A,B,B]})#T] = new Bind[({type T[A] = ControlContext[A,B,B]})#T] {
+    def bind[A,A1](f : A => ControlContext[A1,B,B]) : ControlContext[A,B,B] => ControlContext[A1,B,B] = { _ flatMap f }
+  }
 }
 
 trait BindsLow {

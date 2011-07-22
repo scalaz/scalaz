@@ -242,6 +242,14 @@ trait BindFunctors extends BindFunctorsLow {
   implicit def LazyLeftEitherBindFunctor[B]: BindFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
     bindFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
+  import scala.util.control.TailCalls.TailRec
+  implicit val TailRecBindFunctor : BindFunctor[TailRec] =
+    bindFunctor[TailRec]
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextBindFunctor[B] : BindFunctor[({type T[A] = ControlContext[A,B,B]})#T] =
+    bindFunctor[({type T[A] = ControlContext[A,B,B]})#T]
+
 }
 
 trait BindFunctorsLow {

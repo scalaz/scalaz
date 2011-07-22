@@ -226,4 +226,12 @@ trait PointedFunctors {
   implicit def LazyLeftEitherPointedFunctor[B]: PointedFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
     pointedFunctor[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
+  import scala.util.control.TailCalls.TailRec
+  implicit val TailRecPointedFunctor : PointedFunctor[TailRec] =
+    pointedFunctor[TailRec]
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextPointedFunctor[B] : PointedFunctor[({type T[A] = ControlContext[A,B,B]})#T] =
+    pointedFunctor[({type T[A] = ControlContext[A,B,B]})#T]
+
 }

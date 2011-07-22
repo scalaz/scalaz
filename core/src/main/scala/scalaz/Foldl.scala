@@ -128,6 +128,20 @@ trait Foldls extends FoldlsLow {
       )
   }
 
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecFoldl : Foldl[TailRec] = new Foldl[TailRec] {
+    def foldl[A, B] =
+      f => z => t => f(z)(t.result)
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextFoldl[B] : Foldl[({type T[A] = ControlContext[A,B,B]})#T] = new Foldl[({type T[A] = ControlContext[A,B,B]})#T] {
+    def foldl[A, B] =
+      f => z => t => f(z)(t.x)
+
+  }
+
 }
 
 

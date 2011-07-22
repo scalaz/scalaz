@@ -312,4 +312,12 @@ trait Applicatives {
   implicit def LazyLeftEitherApplicative[B]: Applicative[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ] =
     applicative[({type λ[α] = LazyEither.LazyLeftProjection[α, B]})#λ]
 
+  import scala.util.control.TailCalls.TailRec
+  implicit val TailRecApplicative : Applicative[TailRec] =
+    applicative[TailRec]
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextApplicative[B] : Applicative[({type T[A] = ControlContext[A,B,B]})#T] =
+    applicative[({type T[A] = ControlContext[A,B,B]})#T]
+
 }

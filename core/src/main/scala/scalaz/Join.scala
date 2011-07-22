@@ -219,4 +219,62 @@ trait Joins {
       _ flatMap (z => z)
   }
 
+  implicit def OptionTJoin[F[_] : Monad]: Join[({type λ[α] = OptionT[F, α]})#λ] = new Join[({type λ[α] = OptionT[F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def LazyOptionTJoin[F[_] : Monad]: Join[({type λ[α] = LazyOptionT[F, α]})#λ] = new Join[({type λ[α] = LazyOptionT[F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def EitherTJoin[F[_] : Monad, X]: Join[({type λ[α] = EitherT[X, F, α]})#λ] = new Join[({type λ[α] = EitherT[X, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def LeftEitherTJoin[F[_] : Monad, X]: Join[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] = new Join[({type λ[α] = EitherT.LeftProjectionT[α, F, X]})#λ] {
+    def join[A] =
+      _ flatMap (_.e) left
+  }
+
+  implicit def LazyEitherTJoin[F[_] : Monad, X]: Join[({type λ[α] = LazyEitherT[X, F, α]})#λ] = new Join[({type λ[α] = LazyEitherT[X, F, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def LazyLeftEitherTJoin[F[_] : Monad, X]: Join[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] = new Join[({type λ[α] = LazyEitherT.LazyLeftProjectionT[α, F, X]})#λ] {
+    def join[A] =
+      _ flatMap (_.e) left
+  }
+
+  implicit val LazyOptionJoin: Join[LazyOption] = new Join[LazyOption] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def LazyEitherJoin[X]: Join[({type λ[α] = LazyEither[X, α]})#λ] = new Join[({type λ[α] = LazyEither[X, α]})#λ] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
+  implicit def LazyLeftEitherJoin[X]: Join[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] = new Join[({type λ[α] = LazyEither.LazyLeftProjection[α, X]})#λ] {
+    def join[A] =
+      _ flatMap (_.e) left
+  }
+
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecJoin : Join[TailRec] = new Join[TailRec] {
+    def join[A] =
+      ta => TailCalls.tailcall {  ta.result }
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextJoin[B] : Join[({type T[A] = ControlContext[A,B,B]})#T] = new Join[({type T[A] = ControlContext[A,B,B]})#T] {
+    def join[A] =
+      _ flatMap (z => z)
+  }
+
 }

@@ -250,6 +250,20 @@ trait Traverses extends TraversesLow {
       )
   }
 
+  import scala.util.control.TailCalls
+  import TailCalls.TailRec
+  implicit def TailRecTraverse : Traverse[TailRec] = new Traverse[TailRec] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
+      t => implicitly[Applicative[F]].fmap((b: B) => TailCalls.done(b))(f(t.result))
+  }
+
+  import scala.util.continuations.ControlContext
+  implicit def ControlContextTraverse[B] : Traverse[({type T[A] = ControlContext[A,B,B]})#T] = new Traverse[({type T[A] = ControlContext[A,B,B]})#T] {
+    import scala.util.continuations.shiftR
+    def traverse[F[_] : Applicative, A, X](f: A => F[X]) =
+      t => implicitly[Applicative[F]].fmap((b: X) => shiftR[X, B, B](_(b)))(f(t.x))
+  }
+
 }
 
 trait TraversesLow {
