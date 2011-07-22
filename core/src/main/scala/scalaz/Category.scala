@@ -1,13 +1,13 @@
 package scalaz
 
-trait Category[F[_, _]] {
-  val id: Id[F]
-  val compose: Compose[F]
+trait Category[⇝[_, _]] {
+  val id: Id[⇝]
+  val compose: Compose[⇝]
 
-  def i[A]: F[A, A] =
+  def i[A]: (A ⇝ A) =
     id.id[A]
 
-  def comp[A, B, C](f: F[B, C], g: F[A, B]): F[A, C] =
+  def comp[A, B, C](f: B ⇝ C, g: A ⇝ B): (A ⇝ C) =
     compose.compose(f, g)
 }
 
