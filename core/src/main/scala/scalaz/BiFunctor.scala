@@ -14,8 +14,18 @@ package scalaz
 trait BiFunctor[F[_, _]] {
   def bimap[A, B, C, D](f: A => C, g: B => D): F[A, B] => F[C, D]
 
+  def leftFunctor[X]: Functor[({type λ[α] = F[α, X]})#λ] = new Functor[({type λ[α] = F[α, X]})#λ] {
+    def fmap[A, C](f: A => C): F[A, X] => F[C, X] =
+      bimap(f, z => z)
+  }
+
   def leftMap[A, B, C](f: A => C): F[A, B] => F[C, B] =
     bimap(f, z => z)
+
+  def rightFunctor[X]: Functor[({type λ[α] = F[X, α]})#λ] = new Functor[({type λ[α] = F[X, α]})#λ] {
+    def fmap[B, D](g: B => D): F[X, B] => F[X, D] =
+      bimap(z => z, g)
+  }
 
   def rightMap[A, B, D](g: B => D): F[A, B] => F[A, D] =
     bimap(z => z, g)

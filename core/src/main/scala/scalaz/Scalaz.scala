@@ -5,6 +5,7 @@ Alphas with
 Applics with
 Applicatives with
 Binds with
+BiTraverses with
 BKTrees with
 Categorys with
 CoKleislis with

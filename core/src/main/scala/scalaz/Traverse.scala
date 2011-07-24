@@ -8,6 +8,9 @@ trait Traverse[T[_]] {
     z(a)
   }
 
+  def sequence[F[_]: Applicative, A](x: T[F[A]]): F[T[A]] =
+    trav(x, identity[F[A]])
+
   def functor: Functor[T] = new Functor[T] {
     def fmap[A, B](f: A => B) = t => {
       val k = traverse[Identity, A, B](a => Identity.id(f(a)))
