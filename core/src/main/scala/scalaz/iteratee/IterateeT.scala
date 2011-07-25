@@ -4,6 +4,7 @@ package iteratee
 import Input._
 import Identity._
 import StepT._
+import effect._
 
 sealed trait IterateeT[X, E, F[_], A] {
   val value: F[StepT[X, E, F, A]]
@@ -79,6 +80,40 @@ sealed trait IterateeT[X, E, F[_], A] {
   def >>==[B, C](f: StepT[X, E, F, A] => IterateeT[X, B, F, C])(implicit m: Bind[F]): IterateeT[X, B, F, C] =
     iterateeT(m.bind((s: StepT[X, E, F, A]) => f(s).value)(value))
 
+  def mapI[G[_]](f: F ~> G)(implicit ftr: Functor[F]): IterateeT[X, E, G, A] = {
+    def step: StepT[X, E, F, A] => StepT[X, E, G, A] =
+      _.fold(
+        cont = k => scont[X, E, G, A](k andThen loop)
+      , done = (a, i) => sdone[X, E, G, A](a, i)
+      , err = e => serr[X, E, G, A](e)
+      )
+    def loop: IterateeT[X, E, F, A] => IterateeT[X, E, G, A] = i => iterateeT(f(ftr.fmap(step)(i.value)))
+    loop(this)
+  }
+  
+  def up[G[_]](implicit pt: Pointed[G], ftr: Functor[F], cpt: CoPointed[F]): IterateeT[X, E, G, A] = {
+    mapI(new (F ~> G) {
+      def apply[A](a: F[A]) = pt.point(cpt.coPoint(a))
+    })
+  }
+  
+  def joinI[I, B](implicit outer: IterateeT[X, E, F, A] =:= IterateeT[X, E, F, StepT[X, I, F, B]], m: Monad[F]): IterateeT[X, E, F, B] = {
+    implicit val b = m.bind
+    implicit val p = m.pointed
+    implicit val ip = IterateeTPointed[X, E, F]
+    def check: StepT[X, I, F, B] => IterateeT[X, E, F, B] = _.fold(
+      cont = k => k(eofInput) >>== { s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s)) }
+    , done = (a, _) => ip.point(a)
+    , err = e => err(e)
+    )
+
+    outer(this) flatMap check
+  }
+  
+  def <~[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
+    implicit val b = m.bind
+    (this >>== e).joinI[E, A]
+  }
 }
 
 object IterateeT extends IterateeTs {
@@ -304,6 +339,43 @@ trait IterateeTs {
       )
     }
 
+  implicit def enumStream[X, E, F[_]: Pointed : Bind, A](xs: Stream[E]): EnumeratorT[X, E, F, A] = { s =>
+    xs match {
+      case h #:: t => s.mapContOr(_(elInput(h)) >>== enumStream(t), s.pointI)
+      case _ => s.pointI
+    }
+  }
+  
+  implicit def enumIterator[X, E, A](x: Iterator[E]): EnumeratorT[X, E, IO, A] = {
+    def loop: EnumeratorT[X, E, IO, A] = { s =>
+      s.mapContOr(
+        k =>
+          if (x.hasNext) {
+            val n = x.next
+            k(elInput(n)) >>== loop
+          } else s.pointI
+      , s.pointI
+      )
+    }
+    loop
+  }
+
+  import java.io._
+  implicit def enumReader[X, A](r: Reader): EnumeratorT[X, IoExceptionOr[Char], IO, A] = {
+    def loop: EnumeratorT[X, IoExceptionOr[Char], IO, A] = { s =>
+      s.mapContOr(
+        k => {
+          val i = r.read
+          val c = IoExceptionOr(i.toChar)
+          if (i != -1) k(elInput(c)) >>== loop
+          else s.pointI
+        }
+      , s.pointI
+      )
+    }
+    loop
+  }
+
   def checkCont0[X, E, F[_], A](z: EnumeratorT[X, E, F, A] => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
     def step: EnumeratorT[X, E, F, A] = {
       s =>
@@ -338,4 +410,28 @@ trait IterateeTs {
     checkCont0[X, E, F, A](s => k => k(elInput(e)) >>== s)
   }
 
+  def doneOr[X, O, I, F[_]: Pointed, A](f: (Input[I] => IterateeT[X, I, F, A]) => IterateeT[X, O, F, StepT[X, I, F, A]]): EnumerateeT[X, O, I, F, A] = { s =>
+    def d: IterateeT[X, O, F, StepT[X, I, F, A]] = done(s, emptyInput)
+    s.fold(
+      cont = k => f(k)
+    , done = (_, _) => d
+    , err = _ => d
+    )
+  }
+  
+  def takeWhile[X, E, F[_], A](p: E => Boolean)(implicit m: Monad[F]): EnumerateeT[X, E, E, F, A] = {
+    implicit val pt = m.pointed
+    implicit val b = m.bind
+    def loop = step andThen cont[X, E, F, StepT[X, E, F, A]]
+    def step: (Input[E] => IterateeT[X, E, F, A]) => (Input[E] => IterateeT[X, E, F, StepT[X, E, F, A]]) = { k => in =>
+      in.fold(
+        el = el =>
+          if (p(el)) k(in) >>== doneOr(loop) 
+          else k(eofInput).map(sdone[X, E, F, A](_, in))
+      , empty = cont(step(k))
+      , eof = k(in).map(sdone[X, E, F, A](_, in))
+      )
+    }
+    doneOr(loop)
+  }
 }
