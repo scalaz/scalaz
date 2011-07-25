@@ -19,19 +19,28 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
     ftr.fmap((asw: (A, S, W)) => asw._1)(apply(r)(s))
 
   def r(r: R, s: S)(implicit i: F =~~= Identity): A =
-    rT(r, s)
+    rT(r, s)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def sT(r: R, s: S)(implicit ftr: Functor[F]): F[S] =
     ftr.fmap((asw: (A, S, W)) => asw._2)(apply(r)(s))
 
   def s(r: R, s: S)(implicit i: F =~~= Identity): S =
-    sT(r, s)
+    sT(r, s)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def wT(r: R, s: S)(implicit ftr: Functor[F]): F[W] =
     ftr.fmap((asw: (A, S, W)) => asw._3)(apply(r)(s))
 
   def w(r: R, s: S)(implicit i: F =~~= Identity): W =
-    wT(r, s)
+    wT(r, s)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def state(r: R)(implicit ftr: Functor[F]): StateT[S, F, A] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._1, asw._2))(apply(r)(s)))
@@ -50,7 +59,10 @@ sealed trait ReaderWriterStateT[R, W, S, F[_], A] {
     ftr.fmap((asw: (A, S, W)) => (asw._1, asw._3))(apply(r)(s))
 
   def eval(r: R, s: S)(implicit i: F =~~= Identity): (A, W) =
-    evalT(r, s)
+    evalT(r, s)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def exec(r: R)(implicit ftr: Functor[F]): StateT[S, F, W] =
     StateT.stateT((s: S) => ftr.fmap((asw: (A, S, W)) => (asw._3, asw._2))(apply(r)(s)))

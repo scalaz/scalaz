@@ -29,7 +29,10 @@ sealed trait IterateeT[X, E, F[_], A] {
                  , done: (=> A, => Input[E]) => Z
                  , err: (=> X) => Z
                  )(implicit i: F =~~= Identity): Z =
-    foldT(k => <=~~[F, Z](cont(k)), (a, o) => <=~~[F, Z](done(a, o)), e => <=~~[F, Z](err(e)))
+    foldT(k => <=~~[F, Z](cont(k)), (a, o) => <=~~[F, Z](done(a, o)), e => <=~~[F, Z](err(e)))(new Bind[F] {
+      def bind[A, B](f: A => F[B]) =
+        k => <=~~[F, B](~~=>(f(~~=>(k))))
+    })
 
   def runT(e: (=> X) => F[A])(implicit m: Monad[F]): F[A] = {
     implicit val b = m.bind
@@ -42,7 +45,12 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 
   def run(e: (=> X) => A)(implicit i: F =~~= Identity): A =
-    runT(x => <=~~[F, A](e(x)))
+    runT(x => <=~~[F, A](e(x)))(Monad.monadBP(new Bind[F] {
+      def bind[A, B](f: A => F[B]) =
+        k => <=~~[F, B](~~=>(f(~~=>(k))))
+    }, new Pointed[F] {
+      def point[A](a: => A) = i <=~~ Identity.id(a)
+    }))
 
   def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
