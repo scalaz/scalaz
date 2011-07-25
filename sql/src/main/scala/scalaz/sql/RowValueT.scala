@@ -14,7 +14,10 @@ sealed trait RowValueT[F[_], A] {
   import =~~=._
 
   def fold[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit i: F =~~= Identity): X =
-    foldT(e, a, m, n)
+    foldT(e, a, m, n)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def foldT[X](e: Err => X, a: A => X, m: NullMsg => X, n: => X)(implicit ftr: Functor[F]): F[X] =
     ftr.fmap((_: Either[PossiblyNull[NullMsg], SqlValue[A]]).fold(
@@ -29,13 +32,19 @@ sealed trait RowValueT[F[_], A] {
     ))(value)
 
   def foldOrNullMsg[X](defaultNullMsg: => NullMsg)(e: Err => X, a: A => X, nul: NullMsg => X)(implicit i: F =~~= Identity): X =
-    foldOrNullMsgT(defaultNullMsg)(e, a, nul)
+    foldOrNullMsgT(defaultNullMsg)(e, a, nul)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   def foldOrNullMsgT[X](defaultNullMsg: => NullMsg)(e: Err => X, a: A => X, nul: NullMsg => X)(implicit ftr: Functor[F]): F[X] =
     foldT(e, a, nul, nul(defaultNullMsg))
 
   final def loop[X](e: Err => X, v: A => Either[X, RowValue[A]], m: NullMsg => X, n: => X)(implicit i: F =~~= Identity): X =
-    loopT(e, v, m, n)
+    loopT(e, v, m, n)(new Functor[F] {
+        def fmap[A, B](f: A => B) =
+          k => <=~~[F, B](f(~~=>(k)(i)))
+      })
 
   final def loopT[X](e: Err => X, v: A => Either[X, RowValue[A]], m: NullMsg => X, n: => X)(implicit ftr: Functor[F]): F[X] =
     ftr.fmap((x: Either[PossiblyNull[NullMsg], SqlValue[A]]) => {
