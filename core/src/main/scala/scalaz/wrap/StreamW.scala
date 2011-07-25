@@ -7,6 +7,7 @@ sealed trait StreamW[A] {
   import StreamW._
   import newtypes.ZipStream
   import Zipper._
+  import iteratee._, IterateeT._, Input._
   import *._
 
   def ʐ : ZipStream[A] =
@@ -71,6 +72,13 @@ sealed trait StreamW[A] {
 
     mapM(value, unfoldTreeM)
   }
+
+  def enumerate[O]: (A >@@> O) =
+    i =>
+      value match {
+        case Stream.Empty => i
+        case x #:: xs => i.fold(done = (_, _) =>  i, cont = k => xs.enumerate(k(elInput(x)).value.value), err = e => err[Unit, A, Identity, O](e).value.value)
+      }
 }
 
 object StreamW extends StreamWs

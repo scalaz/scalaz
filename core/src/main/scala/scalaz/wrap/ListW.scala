@@ -1,6 +1,8 @@
 package scalaz
 package wrap
 
+import iteratee._, IterateeT._, Input._
+
 sealed trait ListW[A] {
 
   import ListW._
@@ -136,6 +138,14 @@ sealed trait ListW[A] {
     case Nil => Nil
     case (_ :: t) => value zip t
   }
+
+  def enumerate[O]: (A >@@> O) =
+    i =>
+      value match {
+        case Nil => i
+        case x :: xs => i.fold(done = (_, _) =>  i, cont = k => xs.enumerate(k(elInput(x)).value.value), err = e => err[Unit, A, Identity, O](e).value.value)
+      }
+
 }
 
 object ListW extends ListWs

@@ -106,7 +106,10 @@ trait IterateeTs {
   StepT[X, E, F, A] => IterateeT[X, E, F, A]
 
   type Enumerator[X, E, A] =
-  Step[X, E, A] => Iteratee[X, E, A]
+  Step[X, E, A] => Step[X, E, A]
+
+  type >@@>[E, A] =
+  Enumerator[Unit, E, A]
 
   def iterateeT[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] = new IterateeT[X, E, F, A] {
     val value = s
