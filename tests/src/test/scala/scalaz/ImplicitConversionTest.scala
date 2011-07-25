@@ -144,10 +144,10 @@ object ImplicitConversionTest {
     i[Pointed[Vector]]
   }
 
-  def foldable[A] {
-    i[Foldable[Stream]]
-    i[Foldable[List]]
-    i[Foldable[Set]]
+  def foldr[A] {
+    i[Foldr[Stream]]
+    i[Foldr[List]]
+    i[Foldr[Set]]
   }
 
   def equal {
