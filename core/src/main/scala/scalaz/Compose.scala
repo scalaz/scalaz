@@ -1,7 +1,7 @@
 package scalaz
 
-trait Compose[F[_, _]] {
-  def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C]
+trait Compose[⇝[_, _]] {
+  def compose[A, B, C](f: B ⇝ C, g: A ⇝ B): (A ⇝ C)
 }
 
 object Compose extends Composes

@@ -18,47 +18,55 @@ sealed trait IterateeT[X, E, F[_], A] {
   import =~~=._
 
   def foldT[Z](
-    cont: (Input[E] => IterateeT[X, E, F, A]) => F[Z]
-  , done: (=> A, => Input[E]) => F[Z]
-  , err: (=> X) => F[Z]
-  )(implicit m: Bind[F]): F[Z] =
+                  cont: (Input[E] => IterateeT[X, E, F, A]) => F[Z]
+                  , done: (=> A, => Input[E]) => F[Z]
+                  , err: (=> X) => F[Z]
+                  )(implicit m: Bind[F]): F[Z] =
     m.bind((s: StepT[X, E, F, A]) => s(cont, done, err))(value)
 
   def fold[Z](
-    cont: (Input[E] => IterateeT[X, E, F, A]) => Z
-  , done: (=> A, => Input[E]) => Z
-  , err: (=> X) => Z
-  )(implicit i: F =~~= Identity): Z =
-    foldT(k => <=~~[F, Z](cont(k)), (a, o) => <=~~[F, Z](done(a, o)), e => <=~~[F, Z](err(e)))
+                 cont: (Input[E] => IterateeT[X, E, F, A]) => Z
+                 , done: (=> A, => Input[E]) => Z
+                 , err: (=> X) => Z
+                 )(implicit i: F =~~= Identity): Z =
+    foldT(k => <=~~[F, Z](cont(k)), (a, o) => <=~~[F, Z](done(a, o)), e => <=~~[F, Z](err(e)))(new Bind[F] {
+      def bind[A, B](f: A => F[B]) =
+        k => <=~~[F, B](~~=>(f(~~=>(k))))
+    })
 
   def runT(e: (=> X) => F[A])(implicit m: Monad[F]): F[A] = {
     implicit val b = m.bind
     val lifte: (=> X) => IterateeT[X, E, F, A] = x => implicitly[MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ]].lift(e(x))
     m.bd((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
-    , done = (a, _) => m.point(a)
-    , err = e
+      , done = (a, _) => m.point(a)
+      , err = e
     ))(>>==(enumEofT(lifte)).value)
   }
 
   def run(e: (=> X) => A)(implicit i: F =~~= Identity): A =
-    runT(x => <=~~[F, A](e(x)))
+    runT(x => <=~~[F, A](e(x)))(Monad.monadBP(new Bind[F] {
+      def bind[A, B](f: A => F[B]) =
+        k => <=~~[F, B](~~=>(f(~~=>(k))))
+    }, new Pointed[F] {
+      def point[A](a: => A) = i <=~~ Identity.id(a)
+    }))
 
   def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
       iterateeT(
         m.bd((s: StepT[X, E, F, A]) => s.fold[F[StepT[X, E, F, B]]](
           cont = k => m.point(StepT.scont(u => through(k(u))))
-        , done = (a, i) =>
-            if(i.isEmpty)
+          , done = (a, i) =>
+            if (i.isEmpty)
               f(a).value
             else
               m.bd((ss: StepT[X, E, F, B]) => ss.fold(
                 cont = kk => kk(i).value
-              , done = (aa, _) => m.point(StepT.sdone[X, E, F, B](aa, i))
-              , err = ee => m.point(StepT.serr[X, E, F, B](ee))
+                , done = (aa, _) => m.point(StepT.sdone[X, E, F, B](aa, i))
+                , err = ee => m.point(StepT.serr[X, E, F, B](ee))
               ))(f(a).value)
-        , err = e => m.point(StepT.serr(e))
+          , err = e => m.point(StepT.serr(e))
         ))(x.value))
     through(this)
   }
@@ -107,13 +115,13 @@ trait IterateeTs {
   def iteratee[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] =
     iterateeT(Identity.id(s))
 
-  def cont[X, E, F[_]: Pointed, A](c: Input[E] => IterateeT[X, E, F, A]): IterateeT[X, E, F, A] =
+  def cont[X, E, F[_] : Pointed, A](c: Input[E] => IterateeT[X, E, F, A]): IterateeT[X, E, F, A] =
     iterateeT(implicitly[Pointed[F]].point(StepT.scont(c)))
 
-  def done[X, E, F[_]: Pointed, A](d: => A, r: => Input[E]): IterateeT[X, E, F, A] =
+  def done[X, E, F[_] : Pointed, A](d: => A, r: => Input[E]): IterateeT[X, E, F, A] =
     iterateeT(implicitly[Pointed[F]].point(StepT.sdone(d, r)))
 
-  def err[X, E, F[_]: Pointed, A](e: => X): IterateeT[X, E, F, A] =
+  def err[X, E, F[_] : Pointed, A](e: => X): IterateeT[X, E, F, A] =
     iterateeT(implicitly[Pointed[F]].point(StepT.serr(e)))
 
   implicit def IterateeTPointed[X, E, F[_] : Pointed]: Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
@@ -180,16 +188,16 @@ trait IterateeTs {
   }
 
   /**An iteratee that consumes the head of the input **/
-  def head[E, F[_]: Pointed]: Iter[E, F, Option[E]] = {
+  def head[E, F[_] : Pointed]: Iter[E, F, Option[E]] = {
     def step(s: Input[E]): Iter[E, F, Option[E]] =
       s(empty = cont(step)
-      , el = e => done(Some(e), emptyInput[E])
-      , eof = done(None, eofInput[E])
+        , el = e => done(Some(e), emptyInput[E])
+        , eof = done(None, eofInput[E])
       )
     cont(step)
   }
 
-  def headDoneOr[E, F[_]: Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
+  def headDoneOr[E, F[_] : Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
     implicit val pt = implicitly[Monad[F]].pointed
     head[E, F] flatMap {
       case None => done(b, eofInput)
@@ -198,7 +206,7 @@ trait IterateeTs {
   }
 
   /**An iteratee that returns the first element of the input **/
-  def peek[E, F[_]: Pointed]: Iter[E, F, Option[E]] = {
+  def peek[E, F[_] : Pointed]: Iter[E, F, Option[E]] = {
     def step(s: Input[E]): Iter[E, F, Option[E]]
     = s(el = e => done(Some(e), s),
       empty = cont(step),
@@ -206,7 +214,7 @@ trait IterateeTs {
     cont(step)
   }
 
-  def peekDoneOr[E, F[_]: Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
+  def peekDoneOr[E, F[_] : Monad, B](b: => B, f: E => Iter[E, F, B]): Iter[E, F, B] = {
     implicit val pt = implicitly[Monad[F]].pointed
     peek[E, F] flatMap {
       case None => done(b, eofInput)
@@ -215,7 +223,7 @@ trait IterateeTs {
   }
 
   /**An iteratee that skips the first n elements of the input **/
-  def drop[E, F[_]: Pointed](n: Int): Iter[E, F, Unit] = {
+  def drop[E, F[_] : Pointed](n: Int): Iter[E, F, Unit] = {
     def step(s: Input[E]): Iter[E, F, Unit] =
       s(el = _ => drop(n - 1),
         empty = cont(step),
@@ -225,7 +233,7 @@ trait IterateeTs {
   }
 
   /**An iteratee that counts and consumes the elements of the input **/
-  def length[E, F[_]: Pointed]: Iter[E, F, Int] = {
+  def length[E, F[_] : Pointed]: Iter[E, F, Int] = {
     def step(acc: Int)(s: Input[E]): Iter[E, F, Int] =
       s(el = _ => cont(step(acc + 1)),
         empty = cont(step(acc)),
@@ -275,7 +283,7 @@ trait IterateeTs {
     cont(step(r.monoid.z))
   }
 
-  def enumEofT[X, E, F[_]: Monad, A](e: (=> X) => IterateeT[X, E, F, A]): EnumeratorT[X, E, F, A] =
+  def enumEofT[X, E, F[_] : Monad, A](e: (=> X) => IterateeT[X, E, F, A]): EnumeratorT[X, E, F, A] =
     j => {
       implicit val p = implicitly[Monad[F]].pointed
       implicit val b = implicitly[Monad[F]].bind
@@ -283,13 +291,13 @@ trait IterateeTs {
         cont = k =>
           k(eofInput) >>== (s =>
             s >- (
-              sys.error("diverging iteratee")
-            , enumEofT(e) apply s
-            , enumEofT(e) apply s
-            ))
-      , done = (a, _) =>
+                sys.error("diverging iteratee")
+                , enumEofT(e) apply s
+                , enumEofT(e) apply s
+                ))
+        , done = (a, _) =>
           StepT.sdone[X, E, F, A](a, eofInput).pointI
-      , err = e(_)
+        , err = e(_)
       )
     }
 
@@ -298,7 +306,7 @@ trait IterateeTs {
       s =>
         s.mapContOr(
           k => z(step)(k)
-        , s.pointI
+          , s.pointI
         )
     }
     step
@@ -309,19 +317,19 @@ trait IterateeTs {
       o => s =>
         s.mapContOr(
           k => z(step)(o)(k)
-        , s.pointI
+          , s.pointI
         )
     }
     step(t)
   }
 
-  def iterate[X, E, F[_]: Monad, A](f: E => E, e: E): EnumeratorT[X, E, F, A] = {
+  def iterate[X, E, F[_] : Monad, A](f: E => E, e: E): EnumeratorT[X, E, F, A] = {
     implicit val bd = implicitly[Monad[F]].bind
     implicit val pt = implicitly[Monad[F]].pointed
     checkCont1[E, X, E, F, A](s => t => k => k(elInput(e)) >>== s(f(t)), e)
   }
 
-  def repeat[X, E, F[_]: Monad, A](e: E): EnumeratorT[X, E, F, A] = {
+  def repeat[X, E, F[_] : Monad, A](e: E): EnumeratorT[X, E, F, A] = {
     implicit val bd = implicitly[Monad[F]].bind
     implicit val pt = implicitly[Monad[F]].pointed
     checkCont0[X, E, F, A](s => k => k(elInput(e)) >>== s)

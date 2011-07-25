@@ -79,7 +79,7 @@ sealed trait OptionT[F[_], A] {
     optionT(ftr.fmap(f)(runT))
 
   def filterM(f: A => F[Boolean])(implicit m: Monad[F]): OptionT[F, A] =
-    flatMap(a => optionT(m.fmap((b: Boolean) => if(b) Some(a) else None)(f(a))))
+    flatMap(a => optionT(m.fmap((b: Boolean) => if (b) Some(a) else None)(f(a))))
 }
 
 object OptionT extends OptionTs {

@@ -98,8 +98,8 @@ trait Inputs {
     def foldl[A, B] =
       f => z => _.fold(
         empty = z
-      , el = a => f(z)(a)
-      , eof = z
+        , el = a => f(z)(a)
+        , eof = z
       )
   }
 
@@ -107,8 +107,8 @@ trait Inputs {
     def foldr[A, B] =
       f => z => _.fold(
         empty = z
-      , el = a => f(a)(z)
-      , eof = z
+        , el = a => f(a)(z)
+        , eof = z
       )
   }
 
@@ -116,25 +116,26 @@ trait Inputs {
     def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
       _.fold(
         empty = implicitly[Applicative[F]].point(emptyInput[B])
-      , el = x => implicitly[Applicative[F]].fmap((b: B) => elInput(b))(f(x))
-      , eof = implicitly[Applicative[F]].point(eofInput[B])
+        , el = x => implicitly[Applicative[F]].fmap((b: B) => elInput(b))(f(x))
+        , eof = implicitly[Applicative[F]].point(eofInput[B])
       )
   }
 
   implicit val InputIndex: Index[Input] = new Index[Input] {
     def index[A](a: Input[A]) =
-      n => if(n == 1) a.fold(
+      n => if (n == 1) a.fold(
         empty = None
-      , el = a => Some(a)
-      , eof = None
-      ) else None
+        , el = a => Some(a)
+        , eof = None
+      )
+      else None
   }
 
   implicit val InputLength: Length[Input] = new Length[Input] {
     def len[A](a: Input[A]) = a.fold(
       empty = 0
-    , el = _ => 1
-    , eof = 0
+      , el = _ => 1
+      , eof = 0
     )
   }
 
@@ -146,8 +147,8 @@ trait Inputs {
     def plus[A](a1: Input[A], a2: => Input[A]) =
       a1.fold(
         empty = a2
-      , el = _ => a1
-      , eof = a2
+        , el = _ => a1
+        , eof = a2
       )
   }
 
@@ -178,15 +179,15 @@ trait Inputs {
   implicit def InputEqual[A: Equal]: Equal[Input[A]] =
     Equal.equal(a1 => a2 => a1.fold(
       empty = a2.isEmpty
-    , el = a => a2.exists(z => implicitly[Equal[A]].equal(a)(z))
-    , eof = a2.isEmpty
+      , el = a => a2.exists(z => implicitly[Equal[A]].equal(a)(z))
+      , eof = a2.isEmpty
     ))
 
   implicit def InputShow[A: Show]: Show[Input[A]] =
     Show.shows(_.fold(
       empty = "empty-input"
-    , el = a => "el-input(" + implicitly[Show[A]].shows(a) + ")"
-    , eof = "eof-input"
+      , el = a => "el-input(" + implicitly[Show[A]].shows(a) + ")"
+      , eof = "eof-input"
     ))
 
   implicit def InputZero[A]: Zero[Input[A]] =
@@ -196,15 +197,15 @@ trait Inputs {
     Semigroup.semigroup(a1 => a2 => a1.fold(
       empty = a2.fold(
         empty = emptyInput
-      , el = elInput
-      , eof = eofInput
+        , el = elInput
+        , eof = eofInput
       )
-    , el = xa => a2.fold(
+      , el = xa => a2.fold(
         empty = elInput(xa)
-      , el = ya => elInput(implicitly[Semigroup[A]].append(xa, ya))
-      , eof = eofInput
+        , el = ya => elInput(implicitly[Semigroup[A]].append(xa, ya))
+        , eof = eofInput
       )
-    , eof = eofInput
+      , eof = eofInput
     ))
 
   implicit def InputMonoid[A: Semigroup]: Monoid[Input[A]] =

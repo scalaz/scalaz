@@ -14,8 +14,18 @@ package scalaz
 trait BiFunctor[F[_, _]] {
   def bimap[A, B, C, D](f: A => C, g: B => D): F[A, B] => F[C, D]
 
+  def leftFunctor[X]: Functor[({type λ[α] = F[α, X]})#λ] = new Functor[({type λ[α] = F[α, X]})#λ] {
+    def fmap[A, C](f: A => C): F[A, X] => F[C, X] =
+      bimap(f, z => z)
+  }
+
   def leftMap[A, B, C](f: A => C): F[A, B] => F[C, B] =
     bimap(f, z => z)
+
+  def rightFunctor[X]: Functor[({type λ[α] = F[X, α]})#λ] = new Functor[({type λ[α] = F[X, α]})#λ] {
+    def fmap[B, D](g: B => D): F[X, B] => F[X, D] =
+      bimap(z => z, g)
+  }
 
   def rightMap[A, B, D](g: B => D): F[A, B] => F[A, D] =
     bimap(z => z, g)
@@ -25,7 +35,7 @@ trait BiFunctor[F[_, _]] {
 }
 
 object BiFunctor {
-  type Bifunctor[F[_, _]]=
+  type Bifunctor[F[_, _]] =
   BiFunctor[F]
 
   implicit def Tuple2BiFunctor: BiFunctor[Tuple2] = new BiFunctor[Tuple2] {
@@ -45,12 +55,12 @@ object BiFunctor {
       _.map(x => g(x)).left.map(x => f(x))
   }
 
-  implicit def EitherTBiFunctor[F[_]: Functor]: BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
+  implicit def EitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
     def bimap[A, B, C, D](f: A => C, g: B => D) =
       _.map(g).left.map(f)
   }
 
-  implicit def LazyEitherTBiFunctor[F[_]: Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
+  implicit def LazyEitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
     def bimap[A, B, C, D](f: A => C, g: B => D) =
       _.map(x => g(x)).left.map(x => f(x))
   }

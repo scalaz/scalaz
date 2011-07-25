@@ -266,13 +266,17 @@ trait Joins {
 
   import scala.util.control.TailCalls
   import TailCalls.TailRec
-  implicit def TailRecJoin : Join[TailRec] = new Join[TailRec] {
+
+  implicit def TailRecJoin: Join[TailRec] = new Join[TailRec] {
     def join[A] =
-      ta => TailCalls.tailcall {  ta.result }
+      ta => TailCalls.tailcall {
+        ta.result
+      }
   }
 
   import scala.util.continuations.ControlContext
-  implicit def ControlContextJoin[B] : Join[({type T[A] = ControlContext[A,B,B]})#T] = new Join[({type T[A] = ControlContext[A,B,B]})#T] {
+
+  implicit def ControlContextJoin[B]: Join[({type T[A] = ControlContext[A, B, B]})#T] = new Join[({type T[A] = ControlContext[A, B, B]})#T] {
     def join[A] =
       _ flatMap (z => z)
   }

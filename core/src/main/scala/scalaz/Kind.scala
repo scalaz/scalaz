@@ -730,7 +730,7 @@ trait *->*[F[_], A] {
     m.bd(
       (a: A) => m.bd(
         (_: B) => m.bd(
-          (b: A) => if(p(b)) whileM(p, z, e) else m.point(e(b)))(value))(z(a)))(value)
+          (b: A) => if (p(b)) whileM(p, z, e) else m.point(e(b)))(value))(z(a)))(value)
   }
 }
 
@@ -1068,6 +1068,9 @@ trait *->*->*[A, F[_, _], B] {
 
   def <:>[C](f: A => C)(implicit z: B <:< C, t: BiFunctor[F]): F[C, C] =
     t.bimap(f, z)(value)
+
+  def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit bt: BiTraverse[F], ap: Applicative[G]): G[F[C, D]] =
+    bt.bitrav(value, f, g)
 }
 
 object *->*->* extends **->**->**

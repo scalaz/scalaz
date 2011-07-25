@@ -305,14 +305,16 @@ trait Applics {
 
   import scala.util.control.TailCalls
   import TailCalls.TailRec
-  implicit def TailRecApplic : Applic[TailRec] = new Applic[TailRec] {
-    def applic[A,B](f : TailRec[A => B]) : TailRec[A] => TailRec[B] =
+
+  implicit def TailRecApplic: Applic[TailRec] = new Applic[TailRec] {
+    def applic[A, B](f: TailRec[A => B]): TailRec[A] => TailRec[B] =
       a => TailCalls.done(f.result(a.result))
   }
 
   import scala.util.continuations.ControlContext
-  implicit def ControlContextApplic[B] : Applic[({type T[A] = ControlContext[A,B,B]})#T] = new Applic[({type T[A] = ControlContext[A,B,B]})#T] {
-    def applic[A,A1](f : ControlContext[A => A1,B,B]) : ControlContext[A,B,B] => ControlContext[A1,B,B] =
+
+  implicit def ControlContextApplic[B]: Applic[({type T[A] = ControlContext[A, B, B]})#T] = new Applic[({type T[A] = ControlContext[A, B, B]})#T] {
+    def applic[A, A1](f: ControlContext[A => A1, B, B]): ControlContext[A, B, B] => ControlContext[A1, B, B] =
       a =>
         for {
           ff <- f
