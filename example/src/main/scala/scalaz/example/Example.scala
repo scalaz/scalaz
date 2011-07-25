@@ -20,6 +20,7 @@ object Example {
     geo.ExampleVincenty.run
     concurrent.ExampleActor.run
     concurrent.HammerTime.run
+    iteratee.ExampleIteratee.run
     WordCount.wordCount
   }
 
