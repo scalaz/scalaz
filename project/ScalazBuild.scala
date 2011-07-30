@@ -146,6 +146,7 @@ object ScalazBuild extends Build {
     // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
+      case "2.9.1.RC1" => "2.9.0-1"
       case x => x
     }
 
@@ -163,11 +164,16 @@ object ScalazBuild extends Build {
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.0-1",
+    crossScalaVersions := Seq("2.9.0-1", "2.9.1.RC1"),
     resolvers += ScalaToolsSnapshots,
 
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
+
+    // TODO remove after deprecating Scala 2.9.0.1
+    (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
+
     credentialsSetting,
     scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     packageOptions ++= Seq[PackageOption](ManifestAttributes(
