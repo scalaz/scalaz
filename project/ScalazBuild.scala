@@ -139,11 +139,18 @@ object ScalazBuild extends Build {
     // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
+      case "2.9.1.RC1" => "2.9.0-1"
       case x => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
 
-    def ScalaCheck(scalaVersion: String) = "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % "1.9"
+    def ScalaCheck(scalaVersion: String) = {
+      val version = scalaVersion match {
+        case "2.8.1" => "1.8"
+        case _ => "1.9"
+      }
+      "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % version
+    }
     def Specs(scalaVersion: String) = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test"
   }
 
@@ -153,14 +160,14 @@ object ScalazBuild extends Build {
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
     version      := "6.0.2-SNAPSHOT",
-    scalaVersion := "2.9.0-1",
+    crossScalaVersions := Seq("2.9.0-1", "2.8.1", "2.9.1.RC1"),
     resolvers    += ScalaToolsSnapshots,
   
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
 
-    // TODO remove after updating to SBT 0.10.1, https://github.com/harrah/xsbt/commit/520f74d1146a1ba6244187c52a951eb4d0f9cc8c
+    // TODO remove after deprecating Scala 2.9.0.1
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     credentialsSetting,

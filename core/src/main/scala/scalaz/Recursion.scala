@@ -31,8 +31,10 @@ object Mu_ {
 } 
 
 /** Positive corecursion */
+// This works in Scala 2.9+, but not used yet until we stop supporting 2.8.1
+//trait Nu[+F[+_]] extends Nu_[F @uncheckedVariance] {
 
-trait Nu[+F[+_]] extends Nu_[F @uncheckedVariance] {
+trait Nu[F[+_]] extends Nu_[F] {
   def out: F[Nu[F]]
 }
 object Nu { 
@@ -45,8 +47,9 @@ object Nu {
 }
 
 /** Positive recursion */
-
-trait Mu[+F[+_]] extends Nu[F] with Mu_[F @uncheckedVariance] {
+// This works in Scala 2.9+, but not used yet until we stop supporting 2.8.1
+// trait Mu[+F[+_]] extends Nu[F] with Mu_[F @uncheckedVariance] {
+trait Mu[F[+_]] extends Nu[F] with Mu_[F] {
   val out: F[Mu[F]]
 }
 object Mu {
@@ -89,11 +92,14 @@ object Cofree_ {
 }
 
 /** Positive cofree corecursion */
-trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F @uncheckedVariance, A @uncheckedVariance] {
+// This works in Scala 2.9+, but not used yet until we stop supporting 2.8.1
+// trait Cofree[+F[+_],+A] extends Nu[F] with Cofree_[F @uncheckedVariance, A @uncheckedVariance] {
+trait Cofree[F[+_],A] extends Nu[F] with Cofree_[F,A] {
+
   val extract: A 
   def out: F[Cofree[F,A]]
-  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F @uncheckedVariance /* TODO is this safe?*/]): Cofree[F, B] = {
-    lazy val qs = out map (_.scanr(g))
+  def scanr[B](g: (A, F[Cofree[F,B]]) => B)(implicit f: Functor[F]): Cofree[F, B] = {
+    lazy val qs = out map ((_: Cofree[F,A]).scanr(g)(f))
     Cofree[B, F](g(extract, qs), qs)
   }
 }
