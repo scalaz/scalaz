@@ -7,7 +7,6 @@ object ExampleIteratee {
 
   import scalaz._, iteratee._, effect._, Scalaz._
 
-
   def run {
     ((head[Int, Identity] >>== Stream(1, 2, 3)) run(_ => none)) assert_=== Some(1)
     ((length[Int, Identity] >>== Stream(10, 20, 30)) run(_ => -1)) assert_=== 3
@@ -18,6 +17,11 @@ object ExampleIteratee {
     ((length[Int, IO] >>== Iterator(10, 20, 30)) runT(_ => IO(-1)) unsafePerformIO) assert_=== 3
     ((peek[Int, IO] >>== Iterator(1, 2, 3)) runT(_ => IO(none)) unsafePerformIO) assert_=== Some(1)
     ((head[Int, IO] >>== Iterator()) runT(_ => IO(Some(-1))) unsafePerformIO) assert_=== None
+
+    ((takeWhile[Int, List](_ <= 5) >>== (1 to 10).toStream) run(_ => List())) assert_=== (1 to 5).toList
+
+    val readLn = takeWhile[Char, List](_ != '\n') flatMap (ln => drop[Char, Identity](1).map(_ => ln))
+    ((length[List[Char], Identity] %= readLn.sequenceI[Int] >>== "Iteratees\nare\ncomposable".toStream) run(_ => -1)) assert_=== 3
 
     import java.io._
 
@@ -32,10 +36,7 @@ object ExampleIteratee {
     val m1 = head[Int, Identity] flatMap ((b:Option[Int]) => head[Int, Identity] map (b2 => (b <|*|> b2)))
     ((m1 >>== Stream(1,2,3)) run(_ => none)) assert_=== Some(1 -> 2)
 
-    val coli = collect[Int, List] <~ takeWhile(_ <= 5) 
-    ((coli >>== (1 to 10).toStream) run(_ => List())) assert_=== (1 to 5).toList
-
-    val colc = collect[IoExceptionOr[Char], List].up[IO] <~ takeWhile(_.fold(_ => false, _ != ' '))
-    ((colc >>== r) map(_ flatMap (_.toOption)) runT(_ => IO(List())) unsafePerformIO) assert_=== List('f', 'i', 'l', 'e')
+    val colc = takeWhile[IoExceptionOr[Char], List](_.fold(_ => false, _ != ' ')).up[IO]
+    ((colc >>== r) map(_ flatMap (_.toOption)) runT(_ => IO(List())) unsafePerformIO) assert_=== List('f', 'i', 'l', 'e')    
   }
 }

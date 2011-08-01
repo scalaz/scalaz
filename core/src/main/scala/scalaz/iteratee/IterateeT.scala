@@ -110,9 +110,27 @@ sealed trait IterateeT[X, E, F[_], A] {
     outer(this) flatMap check
   }
   
-  def <~[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
+  def %=[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
     implicit val b = m.bind
     (this >>== e).joinI[E, A]
+  }
+  
+  /**
+   * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
+   * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
+   */
+  def sequenceI[B](implicit m: Monad[F]): EnumerateeT[X, E, A, F, B] = {
+    implicit val p = m.pointed
+    implicit val b = m.bind
+    def loop: EnumerateeT[X, E, A, F, B] = doneOr(checkEof)
+    def checkEof: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+      isEof[X, E, F] flatMap { eof => 
+        if (eof)done(scont(k), eofInput)
+        else step(k)
+      }
+    def step: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+      this flatMap (a => k(elInput(a)) >>== loop)
+    loop
   }
 }
 
@@ -225,6 +243,11 @@ trait IterateeTs {
       iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.sdone[X, E, G, A](x, emptyInput))(a))
   }
 
+  implicit def EnumeratorTZero[X, E, F[_]: Pointed, A]: Zero[EnumeratorT[X, E, F, A]] = Zero.zero(_.pointI)
+  
+  implicit def EnumeratorTSemigroup[X, E, F[_]: Bind, A]: Semigroup[EnumeratorT[X, E, F, A]] =
+    Semigroup.semigroup(e1 => e2 => s => e1(s) >>== e2)
+
   /**An iteratee that consumes the head of the input **/
   def head[E, F[_] : Pointed]: Iter[E, F, Option[E]] = {
     def step(s: Input[E]): Iter[E, F, Option[E]] =
@@ -280,6 +303,11 @@ trait IterateeTs {
   }
 
   /**
+   * An iteratee that checks if the input is EOF.
+   */
+  def isEof[X, E, F[_]: Pointed]: IterateeT[X, E, F, Boolean] = cont[X, E, F, Boolean](in => done(in.isEof, in))
+  
+  /**
    * Repeats the given iteratee by appending with the given monoid.
    */
   def repeatBuild[E, A, F[_]](iter: E >@> A)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (E >@> F[A]) = {
@@ -319,6 +347,20 @@ trait IterateeTs {
         empty = cont(step(acc)),
         eof = done(acc, eofInput))
     cont(step(r.monoid.z))
+  }
+  
+  /**
+   * Iteratee that collects inputs with the given monoid until the input element fails a test.
+   */
+  def takeWhile[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): (A >@> F[A]) = {
+    def loop(acc: F[A])(s: Input[A]): (A >@> F[A]) = 
+      s(el = e =>
+          if (p(e)) cont(loop(mon.append(acc, pt.point(e))))
+          else done(acc, s)
+      , empty = cont(loop(acc))
+      , eof = done(acc, eofInput)
+      )
+    cont(loop(mon.z))
   }
 
   def enumEofT[X, E, F[_] : Monad, A](e: (=> X) => IterateeT[X, E, F, A]): EnumeratorT[X, E, F, A] =
@@ -365,9 +407,8 @@ trait IterateeTs {
     def loop: EnumeratorT[X, IoExceptionOr[Char], IO, A] = { s =>
       s.mapContOr(
         k => {
-          val i = r.read
-          val c = IoExceptionOr(i.toChar)
-          if (i != -1) k(elInput(c)) >>== loop
+          val i = IoExceptionOr(r.read)
+          if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== loop
           else s.pointI
         }
       , s.pointI
@@ -417,21 +458,5 @@ trait IterateeTs {
     , done = (_, _) => d
     , err = _ => d
     )
-  }
-  
-  def takeWhile[X, E, F[_], A](p: E => Boolean)(implicit m: Monad[F]): EnumerateeT[X, E, E, F, A] = {
-    implicit val pt = m.pointed
-    implicit val b = m.bind
-    def loop = step andThen cont[X, E, F, StepT[X, E, F, A]]
-    def step: (Input[E] => IterateeT[X, E, F, A]) => (Input[E] => IterateeT[X, E, F, StepT[X, E, F, A]]) = { k => in =>
-      in.fold(
-        el = el =>
-          if (p(el)) k(in) >>== doneOr(loop) 
-          else k(eofInput).map(sdone[X, E, F, A](_, in))
-      , empty = cont(step(k))
-      , eof = k(in).map(sdone[X, E, F, A](_, in))
-      )
-    }
-    doneOr(loop)
   }
 }
