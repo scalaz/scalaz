@@ -49,8 +49,22 @@ trait Monad[F[_]] {
     pointed.point(a)
 
   def liftM2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
-    a => b =>
-      bd((aa: A) => fmap((bb: B) => f(aa)(bb))(b))(a)
+    applicative.liftA2(f)
+
+  def rightAnon[A, B]: F[A] => F[B] => F[B] =
+    applicative.rightAnon
+
+  def leftAnon[A, B]: F[A] => F[B] => F[A] =
+    applicative.leftAnon
+
+  def rightAnonLift[A, B]: F[A] => B => F[B] =
+    applicative.rightAnonLift
+
+  def leftAnonLift[A, B]: F[A] => B => F[A] =
+    applicative.leftAnonLift
+
+  def bindThen[A, B](f: A => F[B]): F[A] => F[A] =
+    bd((a: A) => rightAnonLift(f(a))(a))
 
   def deriving[G[_]](implicit n: ^**^[G, F]): Monad[G] = {
     implicit val b: Bind[G] = bind.deriving[G]

@@ -435,6 +435,9 @@ trait *->*[F[_], A] {
   def >>=[B](f: A => F[B])(implicit b: Bind[F]): F[B] =
     b.bind(f)(value)
 
+  def >=>=[B](f: A => F[B])(implicit b: Monad[F]): F[A] =
+    b.bindThen(f)(value)
+
   def >|>[B](f: => F[B])(implicit b: Bind[F]): F[B] =
     b.bind((_: A) => f)(value)
 
