@@ -51,6 +51,18 @@ trait Applicative[F[_]] {
   def liftA2[A, B, C](f: A => B => C): F[A] => F[B] => F[C] =
     a => applic.applic(pointedFunctor.fmap(f)(a))
 
+  def rightAnon[A, B]: F[A] => F[B] => F[B] =
+    liftA2(_ => b => b)
+
+  def leftAnon[A, B]: F[A] => F[B] => F[A] =
+    liftA2(a => _ => a)
+
+  def rightAnonLift[A, B]: F[A] => B => F[B] =
+    a => b => rightAnon(a)(point(b))
+
+  def leftAnonLift[A, B]: F[A] => B => F[A] =
+    a => b => leftAnon(a)(point(b))
+
   def deriving[G[_]](implicit n: ^**^[G, F]): Applicative[G] = {
     implicit val p: PointedFunctor[G] = pointedFunctor.deriving[G]
     implicit val a: Applic[G] = applic.deriving[G]

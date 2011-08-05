@@ -435,6 +435,12 @@ trait *->*[F[_], A] {
   def >>=[B](f: A => F[B])(implicit b: Bind[F]): F[B] =
     b.bind(f)(value)
 
+  def #>>=#[G[_], B](f: A => G[F[B]])(implicit t: Traverse[F], mf: Monad[F], ap: Applicative[G]): G[F[B]] =
+    ap.fmap((ff: F[F[B]]) => mf.jn(ff))(t.trav(value, f))
+
+  def >=>=[B](f: A => F[B])(implicit b: Monad[F]): F[A] =
+    b.bindThen(f)(value)
+
   def >|>[B](f: => F[B])(implicit b: Bind[F]): F[B] =
     b.bind((_: A) => f)(value)
 
