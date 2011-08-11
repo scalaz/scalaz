@@ -62,7 +62,7 @@ package object effects {
   implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(io(_))
  
   /** Perform the given side-effect in an IO action */
-  def io[A](a: => A) = a.pure[IO]
+  def io[A](a: => A) = ioPure pure a
 
   /** Get the next character from standard input */
   def getChar: IO[Char] = IO(rw => (rw, readChar))
