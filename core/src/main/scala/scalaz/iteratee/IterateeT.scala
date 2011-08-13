@@ -242,11 +242,36 @@ trait IterateeTs {
     def lift[G[_] : Monad, A](a: G[A]): IterateeT[X, E, G, A] =
       iterateeT(implicitly[Monad[G]].fmap((x: A) => StepT.sdone[X, E, G, A](x, emptyInput))(a))
   }
+  
+  implicit def IterateeTLiftIO[X, E, F[_]](implicit lio: LiftIO[F], m: Monad[F]): LiftIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    new LiftIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
+      def liftIO[A] = a => IterateeTMonadTrans[X, E].lift(lio.liftIO(a))
+    }
+  }
+
+  implicit def IterateeTMonadIO[X, E, F[_]](implicit mio: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
+    implicit val l = mio.liftIO
+    implicit val m = mio.monad
+    MonadIO.monadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ]
+  }
 
   implicit def EnumeratorTZero[X, E, F[_]: Pointed, A]: Zero[EnumeratorT[X, E, F, A]] = Zero.zero(_.pointI)
   
   implicit def EnumeratorTSemigroup[X, E, F[_]: Bind, A]: Semigroup[EnumeratorT[X, E, F, A]] =
     Semigroup.semigroup(e1 => e2 => s => e1(s) >>== e2)
+
+  /**
+   * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
+   */
+  def writeToOutputStream[X, E](os: java.io.OutputStream)(implicit s: Show[E]): IterateeT[X, E, IO, Unit] = {
+    def write(e: E) = IO(os.write(s.shows(e).getBytes))
+    def step: Input[E] => IterateeT[X, E, IO, Unit] = _.fold(
+      empty = cont(step)
+    , el = e => write(e).liftIO[({type λ[α] = IterateeT[X, E, IO, α]})#λ] flatMap (_ => cont(step))
+    , eof = done((), eofInput)
+    )
+    cont(step)
+  }
 
   /**An iteratee that consumes the head of the input **/
   def head[X, E, F[_] : Pointed]: IterateeT[X, E, F, Option[E]] = {
@@ -489,11 +514,30 @@ trait IterateeTs {
     )
   }
   
+  /**
+   * Applies a function to each input element and feeds the resulting outputs to the inner iteratee.
+   */
   def map[X, O, I, F[_]: Pointed : Bind, A](f: O => I): EnumerateeT[X, O, I, F, A] = { 
     def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
     def step: (Input[I] => IterateeT[X, I, F, A]) => (Input[O] => IterateeT[X, O, F, StepT[X, I, F, A]]) = { k => in =>
       in(
         el = e => k(elInput(f(e))) >>== doneOr(loop)
+      , empty = cont(step(k))
+      , eof = done(scont(k), in)
+      )
+    }
+    doneOr(loop)
+  }
+
+  /**
+   * Applies a function to each input element and, if the result is a right feeds the resulting outputs to the inner
+   * iteratee, otherwise throws an error.
+   */
+  def mapErrorOr[X, O, I, F[_]: Pointed : Bind, A](f: O => Either[X, I]): EnumerateeT[X, O, I, F, A] = {
+    def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
+    def step: (Input[I] => IterateeT[X, I, F, A]) => (Input[O] => IterateeT[X, O, F, StepT[X, I, F, A]]) = { k => in =>
+      in(
+        el = e => f(e).fold(err(_), i => k(elInput(i)) >>== doneOr(loop))
       , empty = cont(step(k))
       , eof = done(scont(k), in)
       )
