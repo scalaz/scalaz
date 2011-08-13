@@ -263,14 +263,9 @@ trait IterateeTs {
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
    */
-  def writeToOutputStream[X, E](os: java.io.OutputStream)(implicit s: Show[E]): IterateeT[X, E, IO, Unit] = {
+  def putStrTo[X, E](os: java.io.OutputStream)(implicit s: Show[E]): IterateeT[X, E, IO, Unit] = {
     def write(e: E) = IO(os.write(s.shows(e).getBytes))
-    def step: Input[E] => IterateeT[X, E, IO, Unit] = _.fold(
-      empty = cont(step)
-    , el = e => write(e).liftIO[({type λ[α] = IterateeT[X, E, IO, α]})#λ] flatMap (_ => cont(step))
-    , eof = done((), eofInput)
-    )
-    cont(step)
+    foldM(())((_: Unit, e: E) => write(e))
   }
 
   /**An iteratee that consumes the head of the input **/
@@ -337,6 +332,15 @@ trait IterateeTs {
   def fold[X, E, F[_]: Pointed, A](init: A)(f: (A, E) => A): IterateeT[X, E, F, A] = {
     def step(acc: A): Input[E] => IterateeT[X, E, F, A] = s =>
       s(el = e => cont(step(f(acc, e))),
+        empty = cont(step(acc)),
+        eof = done(acc, eofInput[E]))
+    cont(step(init))
+  }
+
+  def foldM[X, E, F[_], A](init: A)(f: (A, E) => F[A])(implicit m: Monad[F]): IterateeT[X, E, F, A] = {
+    implicit val p = m.pointed
+    def step(acc: A): Input[E] => IterateeT[X, E, F, A] = s =>
+      s(el = e => IterateeTMonadTrans[X, E].lift(f(acc, e)) flatMap (a => cont(step(a))),
         empty = cont(step(acc)),
         eof = done(acc, eofInput[E]))
     cont(step(init))
