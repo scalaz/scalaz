@@ -1,3 +1,3 @@
 package scalaz
 
-object Scalaz extends Ids with States with Lists with Options
+object Scalaz extends Ids with States with Readers with Lists with Options 
