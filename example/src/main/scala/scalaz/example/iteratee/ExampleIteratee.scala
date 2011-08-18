@@ -47,5 +47,8 @@ object ExampleIteratee {
 
     val colc = takeWhile[Unit, IoExceptionOr[Char], List](_.fold(_ => false, _ != ' ')).up[IO]
     ((colc >>== r) map(_ flatMap (_.toOption)) runT(_ => IO(List())) unsafePerformIO) assert_=== List('f', 'i', 'l', 'e')    
+    
+    val take10And5ThenHead = take[Unit, Int, List](10) zip take[Unit, Int, List](5) flatMap (ab => head[Unit, Int, Identity] map (h => (ab, h)))
+    (take10And5ThenHead >>== (1 to 20).toStream) run(_ => ((Nil, Nil), None)) assert_=== (((1 to 10).toList, (1 to 5).toList), Some(11))
   }
 }

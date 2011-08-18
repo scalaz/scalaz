@@ -132,6 +132,33 @@ sealed trait IterateeT[X, E, F[_], A] {
       this flatMap (a => k(elInput(a)) >>== loop)
     loop
   }
+  
+  def zip[B](other: IterateeT[X, E, F, B])(implicit m: Monad[F]): IterateeT[X, E, F, (A, B)] = {
+    implicit val p = m.pointed
+    implicit val b = m.bind
+    def step[Z](i: IterateeT[X, E, F, Z], in: Input[E]) =
+      IterateeTMonadTrans[X, E].lift(i.foldT[(Either[X, Option[(Z, Input[E])]], IterateeT[X, E, F, Z])](
+        cont = k => p.point((Right(None), k(in)))
+      , done = (a, x) => p.point((Right(Some((a, x))), done(a, x)))
+      , err = e => p.point((Left(e), err(e)))
+      ))
+    def loop(x: IterateeT[X, E, F, A], y: IterateeT[X, E, F, B])(in: Input[E]): IterateeT[X, E, F, (A, B)] = in(
+      el = _ =>
+        step(x, in) flatMap { case (a, xx) => 
+          step(y, in) flatMap { case (b, yy) =>
+            (a, b) match {
+              case (Left(e), _) => err(e)
+              case (_, Left(e)) => err(e)
+              case (Right(Some((a, e))), Right(Some((b, ee)))) => done((a, b), if (e.isEl) e else ee)
+              case _ => cont(loop(xx, yy))
+            }
+          }
+        }
+    , empty = cont(loop(x, y))
+    , eof = (x >>== enumEofT(e => err(e))) flatMap (a => (y >>== enumEofT(e => err(e))) map (b => (a, b)))
+    )
+    cont(loop(this, other))
+  }
 }
 
 object IterateeT extends IterateeTs {
@@ -521,17 +548,7 @@ trait IterateeTs {
   /**
    * Applies a function to each input element and feeds the resulting outputs to the inner iteratee.
    */
-  def map[X, O, I, F[_]: Pointed : Bind, A](f: O => I): EnumerateeT[X, O, I, F, A] = { 
-    def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
-    def step: (Input[I] => IterateeT[X, I, F, A]) => (Input[O] => IterateeT[X, O, F, StepT[X, I, F, A]]) = { k => in =>
-      in(
-        el = e => k(elInput(f(e))) >>== doneOr(loop)
-      , empty = cont(step(k))
-      , eof = done(scont(k), in)
-      )
-    }
-    doneOr(loop)
-  }
+  def map[X, O, I, F[_]: Pointed : Bind, A](f: O => I): EnumerateeT[X, O, I, F, A] = mapErrorOr(o => Right(f(o)))
 
   /**
    * Applies a function to each input element and, if the result is a right feeds the resulting outputs to the inner
@@ -572,5 +589,4 @@ trait IterateeTs {
     implicit val pg = mg.pointed
     (takeWhile[X, E, F](p).up[G] flatMap (xs => drop[X, E, G](1).map(_ => xs))).sequenceI[A]
   }    
-    
 }
