@@ -8,7 +8,7 @@ trait Traverse[T[_]] extends Functor[T] {
   override def fmap[A, B](k: T[A], f: A => B) = traverse[Identity, A, B](f(_), k)
 }
 
-object Traverse {
+object Traverse extends TraverseLow {
   import Scalaz._
 
   implicit def IdentityTraverse: Traverse[Identity] = new Traverse[Identity] {
@@ -19,20 +19,16 @@ object Traverse {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: NonEmptyList[A]) = (as.list ↦ f) ∘ ((x: List[B]) => nel(x.head, x.tail))
   }
 
-  implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] = {
-      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
-      val ap: Apply[F] = implicitly[Apply[F]]
-
-      // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
-      val flistbs: F[Stream[B]] = as.toStream.foldr(Stream.empty[B].η[F])((x, ys) => ap(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
-      flistbs ∘ {xs =>
-        val builder = cbf.apply()
-        for (x <- xs) builder += x
-        builder.result
-      }
+  implicit def ListTraverse: Traverse[List] = new Traverse[List] {
+    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: List[A]): F[List[B]] = {
+      val a = implicitly[Apply[F]]
+      as.reverse.foldLeft((Nil: List[B]) η)((ys, x) => a(f(x) ∘ ((a: B) => (b: List[B]) => a :: b), ys))
     }
+  }
 
+  implicit def StreamTraverse: Traverse[Stream] = new Traverse[Stream] {
+    def traverse[F[_]: Applicative, A, B](f: A => F[B], as: Stream[A]): F[Stream[B]] =
+      as.foldr[F[Stream[B]]]((Stream.Empty: Stream[B]) η)((x, ys) => implicitly[Apply[F]].apply(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
   }
 
   implicit def Tuple1Traverse: Traverse[Tuple1] = new Traverse[Tuple1] {
@@ -136,5 +132,25 @@ object Traverse {
 
   implicit def MapEntryTraverse[X]: Traverse[({type λ[α]=Entry[X, α]})#λ] = new Traverse[({type λ[α]=Entry[X, α]})#λ] {
     def traverse[F[_] : Applicative, A, B](f: A => F[B], as: Entry[X, A]): F[Entry[X, B]] = f(as.getValue) ∘ ((b: B) => new SimpleImmutableEntry(as.getKey, b))
+  }
+}
+
+trait TraverseLow {
+  import Scalaz._
+
+  implicit def TraversableTraverse[CC[X] <: collection.SeqLike[X, CC[X]] : CanBuildAnySelf]: Traverse[CC] = new Traverse[CC] {
+    def traverse[F[_] : Applicative, A, B](f: A => F[B], as: CC[A]): F[CC[B]] = {
+      implicit val cbf = implicitly[CanBuildAnySelf[CC]].builder[B, B]
+      val ap: Apply[F] = implicitly[Apply[F]]
+
+      // Build up the result using streams to avoid potentially expensive prepend operation on other collections.
+      val flistbs: F[Stream[B]] = as.toStream.foldr(Stream.empty[B].η[F])((x, ys) => ap(f(x) ∘ ((a: B) => (b: Stream[B]) => a #:: b), ys))
+      flistbs ∘ {xs =>
+        val builder = cbf.apply()
+        for (x <- xs) builder += x
+        builder.result
+      }
+    }
+
   }
 }
