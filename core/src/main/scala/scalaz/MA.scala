@@ -65,6 +65,11 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def traverse_[F[_],B](f: A => F[B])(implicit a: Applicative[F], t: Foldable[M]): F[Unit] =
     value.foldl(().pure)(((x, y) => x <* f(y)))
 
+  def traverseKleisli[S, N[_], B](g: A => Kleisli[N, S, B])(implicit m: Monad[N], t: Foldable[M]): Kleisli[N, S, List[B]] =
+    kleisli[N, S, List[B]](s =>
+      foldr((Nil: List[B]).pure[N])((b, z) => 
+        z >>= (x => g(b)(s) ∘ (_ :: x))))
+
   def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
   def >>=|[B](f: => M[B])(implicit b: Bind[M]): M[B] = >>=((x:A) => f)
@@ -435,3 +440,4 @@ trait MAContravariantSugar[M[_], A] {
   /** Alias for {@link scalaz.MAContravariant#contramap} */
   def ∙[B](f: B => A)(implicit t: Contravariant[M]): M[B] = t.contramap(value, f)
 }
+
