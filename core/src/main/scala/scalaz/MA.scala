@@ -67,8 +67,8 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def traverseKleisli[S, N[_], B](g: A => Kleisli[N, S, B])(implicit m: Monad[N], t: Foldable[M]): Kleisli[N, S, List[B]] =
     kleisli[N, S, List[B]](s =>
-      foldr((Nil: List[B]).pure[N])((b, z) => 
-        z >>= (x => g(b)(s) ∘ (_ :: x))))
+      listl.foldr((Nil: List[B]).pure[N])((b, z) =>
+        z >>= (x => g(b)(s) ∘ (_ :: x))) ∘ (_.reverse))
 
   def >>=[B](f: A => M[B])(implicit b: Bind[M]): M[B] = b.bind(value, f)
 
