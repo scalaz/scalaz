@@ -139,11 +139,14 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
   def asStream[B](f: Stream[A] => Stream[B])(implicit r: Foldable[M], m: Monoid[M[B]], p: Pure[M]): M[B] =
     f(stream).foldr(m.zero)(p.pure(_) |+| _)
 
-  def !!(n: Int)(implicit r: Foldable[M]): A = stream(r)(n)
 
-  def !(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
+  def foldIndex(n: Int)(implicit r: Foldable[M]): A = stream(r)(n)
 
-  def -!-(n: Int)(implicit i: Index[M]): A = this.!(n) getOrElse (sys.error("Index " + n + " out of bounds"))
+  def index(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
+
+  def index_!(n: Int)(implicit i: Index[M]): A = this.index(n) getOrElse (sys.error("Index " + n + " out of bounds"))
+
+  def -!-(n: Int)(implicit i: Index[M]): A = this.index_!(n) 
 
   def any(p: A => Boolean)(implicit r: Foldable[M]): Boolean = foldr(false)(p(_) || _)
 
