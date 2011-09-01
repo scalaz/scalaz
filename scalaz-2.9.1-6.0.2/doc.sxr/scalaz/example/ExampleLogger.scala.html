@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleLogger.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleLogger" id="24296">ExampleLogger</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> scalaz._, <a href="../Scalaz.scala.html#19350" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="689648">main</a><span class="delimiter">(</span><a title="Array[String]" id="689650">args</a>: <span title="Array[String]">Array</span><span class="delimiter">[</span>String<span class="delimiter">]</span><span class="delimiter">)</span> <span class="delimiter">{</span>
+    case <span class="keyword">class</span> <a title="class Person extends java.lang.Object with ScalaObject with Product with Serializable" id="689693">Person</a><a href="#689693" title="ScalaObject" class="delimiter">(</a><a title="String" id="689736">name</a>: <span title="String">String</span>, <a title="Int" id="689737">age</a>: <span title="Int">Int</span><span class="delimiter">)</span>
+
+    <span class="keyword">val</span> <a title="Int" id="689655">a</a> = <span title="Int(7)" class="int">7</span>
+    <span class="keyword">val</span> <a title="java.lang.String" id="689656">b</a> = <span title="java.lang.String(&quot;hello&quot;)" class="string">&quot;hello&quot;</span>
+    <span class="keyword">val</span> <a title="Person" id="689657">c</a> = <a href="#689693" title="(name: String, age: Int)Person">Person</a><span class="delimiter">(</span><span title="java.lang.String(&quot;Bob&quot;)" class="string">&quot;Bob&quot;</span>, <span title="Int(45)" class="int">45</span><span class="delimiter">)</span>
+    <span class="keyword">val</span> <a title="Int" id="689658">d</a> = <a href="#689655" title="Int">a</a> <span title="(x: Int)Int">+</span> <span title="Int(100)" class="int">100</span>
+    <span class="keyword">val</span> <a title="String" id="689659">e</a> = <a href="#689656" title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps">b</a>.<span title="=&gt; String">reverse</span>
+    <span class="keyword">val</span> <a title="Person" id="689660">f</a> = <a href="#689657" title="Person">c</a> <a href="#689736" title="String" id="689924">copy</a> <span class="delimiter">(</span>age = <a href="#689657" title="Person">c</a>.<a href="#689737" title="=&gt; Int">age</a> <a title="Int" id="689923">*</a> <span title="Int(10)" class="int">10</span><span class="delimiter">)</span>
+
+    <span class="keyword">val</span> <a title="scalaz.Logger[String,Int]" id="689661">r</a> =
+      <span class="delimiter">(</span><span class="keyword">for</span> <span class="delimiter">{</span>
+        <a title="Int" id="689993">aa</a> &lt;- <a href="../Identity.scala.html#39774" title="(x: =&gt; Int)scalaz.Identity[Int]">a</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,Int]">logger</a><span title="scalaz.Logger[String,Int]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span> <a href="../Logger.scala.html#213714" title="(f: Int =&gt; scalaz.Logger[String,Int])scalaz.Logger[String,Int]">:-&gt;&gt;</a> <span class="delimiter">(</span><span title="java.lang.String(&quot;starting off with &quot;)" class="string">&quot;starting off with &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#689988" title="Int">_</a><span class="delimiter">)</span>
+        <a title="java.lang.String" id="690058">bb</a> &lt;- <a href="../Identity.scala.html#39774" title="(x: =&gt; java.lang.String)scalaz.Identity[java.lang.String]">b</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,java.lang.String]">logger</a><span title="scalaz.Logger[String,java.lang.String]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span> <a href="../Logger.scala.html#213714" title="(f: java.lang.String =&gt; scalaz.Logger[String,Int])scalaz.Logger[String,Int]">:+-&gt;</a> <span title="java.lang.String(&quot;saying hello&quot;)" class="string">&quot;saying hello&quot;</span>
+        <a title="Person" id="690125">cc</a> &lt;- <span title="java.lang.String(&quot;Hi Bob&quot;)" class="string">&quot;Hi Bob&quot;</span> <a href="../Logger.scala.html#213714" title="(f: Person =&gt; scalaz.Logger[String,Int])scalaz.Logger[String,Int]">&lt;-+:</a> <span title="java.lang.String(&quot;Creating a person&quot;)" class="string">&quot;Creating a person&quot;</span> <a href="../Logger.scala.html#213723" title="(e: String)scalaz.Logger[String,Person]">&lt;-+:</a> <a href="../Identity.scala.html#39774" title="(x: =&gt; Person)scalaz.Identity[Person]">c</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,Person]">logger</a><span title="scalaz.Logger[String,Person]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span>
+        <a title="Int" id="690190">dd</a> &lt;- <a href="../Identity.scala.html#39774" title="(x: =&gt; Int)scalaz.Identity[Int]">d</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,Int]">logger</a><span title="scalaz.Logger[String,Int]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span> <a href="../Logger.scala.html#213711" title="(f: Int =&gt; Int)scalaz.Logger[String,Int]">:+-&gt;</a> <span title="java.lang.String(&quot;adding a hundred&quot;)" class="string">&quot;adding a hundred&quot;</span>
+      <span class="delimiter">}</span> <span class="keyword">yield</span> <a href="#690190" title="Int">dd</a><span class="delimiter">)</span> <a href="../Logger.scala.html#213737" title="(implicit s: scalaz.Show[String])scalaz.Logger[String,Int]">printFlushEachLog</a>
+
+    <span class="keyword">val</span> <a title="scalaz.Logger[String,(Int, Person)]" id="689662">s</a> =
+        <span class="keyword">for</span> <span class="delimiter">{</span>
+          <a title="Int" id="690286">rr</a> &lt;- <a href="../Logger.scala.html#213714" title="(f: Int =&gt; scalaz.Logger[String,(Int, Person)])scalaz.Logger[String,(Int, Person)]">r</a>
+          <a title="String" id="690355">ee</a> &lt;- <a href="../Identity.scala.html#39774" title="(x: =&gt; String)scalaz.Identity[String]">e</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,String]">logger</a><span title="scalaz.Logger[String,String]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span> <a href="../Logger.scala.html#213714" title="(f: String =&gt; scalaz.Logger[String,(Int, Person)])scalaz.Logger[String,(Int, Person)]">:+-&gt;</a> <span title="java.lang.String(&quot;reversing&quot;)" class="string">&quot;reversing&quot;</span>
+          <a title="Person" id="690422">ff</a> &lt;- <a href="../Identity.scala.html#39774" title="(x: =&gt; Person)scalaz.Identity[Person]">f</a>.<a href="../Identity.scala.html#48356" title="[L]=&gt; scalaz.Logger[L,Person]">logger</a><span title="scalaz.Logger[String,Person]" class="delimiter">[</span><span title="String">String</span><span class="delimiter">]</span> <a href="../Logger.scala.html#213711" title="(f: Person =&gt; (Int, Person))scalaz.Logger[String,(Int, Person)]">:-&gt;&gt;</a> <span class="delimiter">(</span><span title="java.lang.String(&quot;make Bob a bit older &quot;)" class="string">&quot;make Bob a bit older &quot;</span> <span title="(x$1: Any)java.lang.String">+</span> <a href="#690417" title="Person">_</a><span class="delimiter">)</span>
+        <span class="delimiter">}</span> <span class="keyword">yield</span> <span title="(_1: Int, _2: Person)(Int, Person)" class="delimiter">(</span><a href="#690286" title="Int">rr</a>, <a href="#690422" title="Person">ff</a><span class="delimiter">)</span>
+
+
+    <span title="(x: Any)Unit">println</span><span class="delimiter">(</span><span title="java.lang.String(&quot;FINAL LOG&quot;)" class="string">&quot;FINAL LOG&quot;</span><span class="delimiter">)</span>
+    <a href="#689662" title="scalaz.Logger[String,(Int, Person)]">s</a>.<a href="../Logger.scala.html#213735" title="(implicit s: scalaz.Show[String])scalaz.Logger[String,(Int, Person)]">printEachLog</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

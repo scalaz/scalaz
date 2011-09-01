@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/response/Body.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> response
+
+<span class="comment">/**
+ * Type constructors that can be used in request and response bodies.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Body[OUT[_], A] extends java.lang.Object" id="27719">Body</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="28156">OUT</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="871547">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="28157">A</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="comment">/**
+   * Take the given value to a request/response body value.
+   */</span>
+  <span class="keyword">def</span> <a title="(a: A)OUT[Byte]" id="871519">apply</a><span class="delimiter">(</span><a title="A" id="871546">a</a>: <a href="#28157" title="A">A</a><span class="delimiter">)</span>: <a href="#28156" title="OUT[Byte]">OUT</a><span class="delimiter">[</span>Byte<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19350" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> scala.xml.<span class="delimiter">{</span>Elem, NodeSeq<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Bodys extends java.lang.Object with ScalaObject" id="27743">Bodys</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="#27720" title="object scalaz.http.response.Body">Body</a>._
+  <span class="comment">/**
+   * The body implementation for stream identity.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="apply extends java.lang.Object with scalaz.http.response.Body[Stream,Stream[Byte]]" id="870895">StreamIdentityBody</a> = <a href="#871512" title="[OUT[_]]=&gt; java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]">identityBody</a><span title="apply extends java.lang.Object with scalaz.http.response.Body[Stream,Stream[Byte]]" class="delimiter">[</span><span title="Stream">Stream</span><span class="delimiter">]</span>
+
+  <span class="comment">/**
+   * The body implementation for a stream of characters to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.CharStreamBody : (implicit c: scalaz.CharSet)java.lang.Object with scalaz.http.response.Body[Stream,Stream[Char]]" id="870897">CharStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871528">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#871624" title="(f: Stream[Char] =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,Stream[Char]]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><span class="delimiter">(</span><a href="#871634" title="Stream[Char]">_</a>: <span title="Stream[Char]">Stream</span><span class="delimiter">[</span>Char<span class="delimiter">]</span><span class="delimiter">)</span>.<span title="=&gt; String">mkString</span>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871528" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for a list to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.http.response.Body[Stream,List[Byte]]" id="870898">ByteListStreamBody</a>: <a href="#27719" title="scalaz.http.response.Body[Stream,List[Byte]]">Body</a><span class="delimiter">[</span>Stream, List<span class="delimiter">[</span>Byte<span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#923829" title="(f: List[Byte] =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,List[Byte]]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#923845" title="List[Byte]">_</a>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for a list of characters to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.CharListStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,List[Char]]" id="870900">CharListStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871526">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span>: <a href="#27719" title="scalaz.http.response.Body[Stream,List[Char]]">Body</a><span class="delimiter">[</span>Stream, List<span class="delimiter">[</span>Char<span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#923859" title="(f: List[Char] =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,List[Char]]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#923869" title="List[Char]">_</a>.<span title="=&gt; String">mkString</span>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871526" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for a list of characters to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.StringStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,String]" id="870901">StringStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871524">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span>: <a href="#27719" title="scalaz.http.response.Body[Stream,String]">Body</a><span class="delimiter">[</span>Stream, String<span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#924017" title="(f: String =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,String]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#924027" title="String">_</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871524" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for an XML element to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.ElemStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scala.xml.Elem]" id="870902">ElemStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871522">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span>: <a href="#27719" title="scalaz.http.response.Body[Stream,scala.xml.Elem]">Body</a><span class="delimiter">[</span>Stream, Elem<span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#924169" title="(f: scala.xml.Elem =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scala.xml.Elem]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#924179" title="scala.xml.Elem">_</a>.<span title="()String">toString</span>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871522" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for an XML element to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.NodeSeqStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scala.xml.NodeSeq]" id="870903">NodeSeqStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871520">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span>: <a href="#27719" title="scalaz.http.response.Body[Stream,scala.xml.NodeSeq]">Body</a><span class="delimiter">[</span>Stream, NodeSeq<span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#924321" title="(f: scala.xml.NodeSeq =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scala.xml.NodeSeq]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#924331" title="scala.xml.NodeSeq">_</a>.<span title="()String">toString</span>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871520" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+
+  <span class="comment">/**
+   * The body implementation for an XHTML doctype to a stream.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.response.Bodys.XhtmlDoctypeStreamBody : (implicit c: scalaz.CharSet)scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]" id="870904">XhtmlDoctypeStreamBody</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.CharSet" id="871507">c</a>: <a href="../../CharSet.scala.html#10454" title="scalaz.CharSet">CharSet</a><span class="delimiter">)</span>: <a href="#27719" title="scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]">Body</a><span class="delimiter">[</span>Stream, xhtml.Doctype<span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#924473" title="(f: scalaz.http.response.xhtml.Doctype =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,scalaz.http.response.xhtml.Doctype]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#924483" title="scalaz.http.response.xhtml.Doctype">_</a>.<a href="xhtml/Doctype.scala.html#872577" title="=&gt; String">asString</a>.<span title="(x$1: java.lang.String)Array[Byte]">getBytes</span><span title="implicit scala.Predef.byteArrayOps : (xs: Array[Byte])scala.collection.mutable.ArrayOps[Byte]" class="delimiter">(</span><a href="#871507" title="scalaz.CharSet">c</a>.<a href="../../CharSet.scala.html#67455" title="=&gt; String">value</a><span class="delimiter">)</span>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>
+
+  
+<span class="comment">//  /**</span>
+<span class="comment">//   * The contravariant implementation for a body.</span>
+<span class="comment">//   */</span>
+<span class="comment">//  def bodyContravariant[OUT[_]]: Contravariant[PartialType2[Body, OUT]#Apply] = new Contravariant[PartialType2[Body, OUT]#Apply] {</span>
+<span class="comment">//    def contramap[A, B](body: PartialType2[Body, OUT]#Apply[A], f: B =&gt; A): Body[OUT, B] = new Body[OUT, B] {</span>
+<span class="comment">//      def apply(b: B) = body(f(b))</span>
+<span class="comment">//    }</span>
+<span class="comment">//  }</span>
+
+  <span class="comment">/**
+   * The contravariant wrapper implementation for a body.
+   */</span>
+  <span class="comment">//def bodyContravariantW[OUT[_], A](c: PartialType2[Body, OUT]#Apply[A]): scalaz.ContravariantW[PartialType2[Body, OUT]#Apply, A] = contravariant[PartialType2[Body, OUT]#Apply](c)(bodyContravariant[OUT])</span>
+
+  <span class="comment">/**
+   * The contravariant implementation for a stream body.
+   */</span>
+<span class="comment">//  implicit val StreamBodyContravariant = bodyContravariant[Stream]</span>
+
+  <span class="comment">/**
+   * The contravariant wrapper implementation for a stream body.
+   */</span>
+  <span class="comment">//implicit def StreamBodyContravariantW[A](c: PartialType2[Body, Stream]#Apply[A]) = bodyContravariantW[Stream, A](c)</span>
+<span class="delimiter">}</span>
+<span class="comment">/**
+ * Type constructors that can be used in request and response bodies.
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.response.Body" id="27720">Body</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#27743" title="scalaz.http.response.Bodys">Bodys</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * Construct a body implementation from the given function.
+   */</span>
+  <span class="keyword">def</span> <a title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}" id="871509">body</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="871511">OUT</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="871541">_</a><span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#871534" title="java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object" id="871534" class="delimiter">{</a>
+    <span class="keyword">def</span> <a title="[A](f: A =&gt; OUT[Byte])java.lang.Object with scalaz.http.response.Body[OUT,A]" id="871536">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="871538">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A =&gt; OUT[Byte]" id="871539">f</a>: A =&gt; OUT<span class="delimiter">[</span>Byte<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#871540" title="java.lang.Object with scalaz.http.response.Body[OUT,A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.response.Body[OUT,A]" id="871540">Body</a><span class="delimiter">[</span>OUT, A<span class="delimiter">]</span> <span class="delimiter">{</span>
+      <span class="keyword">def</span> <a title="(a: A)OUT[Byte]" id="871543">apply</a><span class="delimiter">(</span><a title="A" id="871544">a</a>: <a href="#871538" title="A">A</a><span class="delimiter">)</span> = <a href="#871539" title="(v1: A)OUT[Byte]">f</a><span class="delimiter">(</span><a href="#871544" title="A">a</a><span class="delimiter">)</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * The body implementation for identity.
+   */</span>
+  <span class="keyword">def</span> <a title="[OUT[_]]=&gt; java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]" id="871512">identityBody</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="871514">OUT</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="871652">_</a><span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#871663" title="(f: OUT[Byte] =&gt; OUT[Byte])java.lang.Object with scalaz.http.response.Body[OUT,OUT[Byte]]" class="delimiter">[</a><a href="#871514" title="OUT">OUT</a><span class="delimiter">]</span><span class="delimiter">(</span><span title="[A](x: A)A">identity</span><a href="#871674" title="(x: OUT[Byte])OUT[Byte]" class="delimiter">[</a><a href="#871514" title="OUT[Byte]">OUT</a><span class="delimiter">[</span>Byte<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+  <span class="comment">/**
+   * The body implementation for stream.
+   */</span>
+  <span class="keyword">def</span> <a title="[A](f: A =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,A]" id="871515">streamBody</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="871517">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A =&gt; Stream[Byte]" id="924616">f</a>: A =&gt; Stream<span class="delimiter">[</span>Byte<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#871509" title="[OUT[_]]=&gt; java.lang.Object{def apply[A](f: A =&gt; OUT[Byte]): java.lang.Object with scalaz.http.response.Body[OUT,A]}">body</a><a href="#924629" title="(f: A =&gt; Stream[Byte])java.lang.Object with scalaz.http.response.Body[Stream,A]" class="delimiter">[</a><span title="Stream">Stream</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="#924616" title="A =&gt; Stream[Byte]">f</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

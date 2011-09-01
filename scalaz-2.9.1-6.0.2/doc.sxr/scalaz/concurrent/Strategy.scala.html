@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/concurrent/Strategy.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> concurrent
+
+<span class="keyword">import</span> <a href="../Scalaz.scala.html#19350" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> java.util.concurrent.<span class="delimiter">{</span>ExecutorService, ThreadFactory, Executors<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
+ * evaluation and return a function that, when called, will block until the result is ready.
+ */</span>
+<span class="keyword">trait</span> <a title="trait Strategy extends java.lang.Object" id="22557">Strategy</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="60558">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="60560">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="123200">a</a>: =&gt; A<span class="delimiter">)</span>: <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; A
+<span class="delimiter">}</span>
+
+<span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class StrategyLow extends java.lang.Object with ScalaObject" id="22605">StrategyLow</a> <a href="#22605" title="ScalaObject" class="delimiter">{</a>
+  <span class="comment">/**
+   * A strategy that evaluates its argument in the current thread.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101022">Sequential</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#417863" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="417863">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="417867">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="417869">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="417870">a</a>: =&gt; A<span class="delimiter">)</span> = <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="A" id="417878">v</a> = <a href="#417870" title="=&gt; A">a</a>
+      <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; <a href="#417878" title="A">v</a>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="keyword">import</span> java.util.concurrent.ExecutorService
+
+  <span class="comment">/**
+   * A strategy that evaluates its arguments using an implicit ExecutorService.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy" id="101025">Executor</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="java.util.concurrent.ExecutorService" id="417886">s</a>: <span title="java.util.concurrent.ExecutorService">ExecutorService</span><span class="delimiter">)</span> = <a href="#417889" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="417889">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">import</span> java.util.concurrent.Callable
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="417892">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="417894">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="417895">a</a>: =&gt; A<span class="delimiter">)</span> = <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="java.util.concurrent.Future[A]" id="417903">fut</a> = <a href="#417886" title="java.util.concurrent.ExecutorService">s</a>.<span title="(x$1: java.util.concurrent.Callable[A])java.util.concurrent.Future[A]">submit</span><span class="delimiter">(</span><a href="#417984" title="java.lang.Object with java.util.concurrent.Callable[A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with java.util.concurrent.Callable[A]" id="417984">Callable</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+        <span class="keyword">def</span> <a title="()A" id="417986">call</a> = <a href="#417895" title="=&gt; A">a</a>
+      <span class="delimiter">}</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; <a href="#417903" title="java.util.concurrent.Future[A]">fut</a>.<span title="()A">get</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * A strategy that performs no evaluation of its argument.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101026">Id</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#418022" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="418022">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="418026">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="418028">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="418029">a</a>: =&gt; A<span class="delimiter">)</span> = <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; <a href="#418029" title="=&gt; A">a</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * A simple strategy that spawns a new thread for every evaluation.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101028">Naive</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#418044" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="418044">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">import</span> scala.concurrent.<span title="object scala.concurrent.ops">ops</span>.future
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="418049">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="418051">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="418052">a</a>: =&gt; A<span class="delimiter">)</span> = <span title="object scala.concurrent.ops">future</span> <a title="scala.concurrent.FutureTaskRunner" id="418342" class="delimiter">{</a><a href="#418052" title="() =&gt; A" id="418339">a</a><span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * A strategy that evaluates its arguments using the pool of Swing worker threads.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101030">SwingWorker</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#418349" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="418349">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">import</span> javax.swing.SwingWorker
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="418354">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="418356">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="418357">a</a>: =&gt; A<span class="delimiter">)</span> = <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="javax.swing.SwingWorker[A,Unit]" id="418365">worker</a> = <a href="#418366" title="javax.swing.SwingWorker[A,Unit]" class="keyword">new</a> <a title="anonymous class $anon extends javax.swing.SwingWorker[A,Unit]" id="418366">SwingWorker</a><span class="delimiter">[</span>A, Unit<span class="delimiter">]</span> <span class="delimiter">{</span>
+        <span class="keyword">def</span> <a title="()A" id="420563">doInBackground</a> = <a href="#418357" title="=&gt; A">a</a>
+      <span class="delimiter">}</span>
+      <a href="#418365" title="javax.swing.SwingWorker[A,Unit]">worker</a>.<span title="()Unit">execute</span>
+      <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; <a href="#418365" title="javax.swing.SwingWorker[A,Unit]">worker</a>.<span title="()A">get</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * A strategy that evaluates its arguments on the Swing Event Dispatching thread.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101032">SwingInvokeLater</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#420581" title="java.lang.Object with scalaz.concurrent.Strategy" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.concurrent.Strategy" id="420581">Strategy</a> <span class="delimiter">{</span>
+    <span class="keyword">import</span> javax.swing.SwingUtilities
+    <span class="keyword">import</span> <span title="object javax.swing.SwingUtilities">SwingUtilities</span>.invokeLater
+    <span class="keyword">import</span> java.util.concurrent.<span class="delimiter">{</span>Callable, FutureTask<span class="delimiter">}</span>
+    <span class="keyword">def</span> <a title="[A](a: =&gt; A)() =&gt; A" id="420588">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="420590">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="=&gt; A" id="420591">a</a>: =&gt; A<span class="delimiter">)</span> = <span class="delimiter">{</span>
+      <span class="keyword">val</span> <a title="java.util.concurrent.FutureTask[A]" id="420599">task</a> = <span title="java.util.concurrent.FutureTask[A]" class="keyword">new</span> <span title="java.util.concurrent.FutureTask[A]">FutureTask</span><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">(</span><a href="#420636" title="java.lang.Object with java.util.concurrent.Callable[A]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with java.util.concurrent.Callable[A]" id="420636">Callable</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+        <span class="keyword">def</span> <a title="()A" id="420640">call</a> = <a href="#420591" title="=&gt; A">a</a>
+      <span class="delimiter">}</span><span class="delimiter">)</span>
+      <span title="(x$1: java.lang.Runnable)Unit">invokeLater</span><span class="delimiter">(</span><a href="#420599" title="java.util.concurrent.FutureTask[A]">task</a><span class="delimiter">)</span>
+      <span class="delimiter">(</span><span class="delimiter">)</span> =&gt; <a href="#420599" title="java.util.concurrent.FutureTask[A]">task</a>.<span title="()A">get</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.concurrent.Strategy" id="22558">Strategy</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#22605" title="scalaz.concurrent.StrategyLow">StrategyLow</a> <span class="delimiter">{</span>
+  <span class="comment">/**
+   * The default executor service is a fixed thread pool with N daemon threads,
+   * where N is equal to the number of available processors.
+   */</span>
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="java.util.concurrent.ExecutorService" id="101036">DefaultExecutorService</a>: <span title="java.util.concurrent.ExecutorService">ExecutorService</span> = <span class="delimiter">{</span>
+    <span class="keyword">import</span> <span title="object java.util.concurrent.Executors">Executors</span>._
+    <span title="(x$1: Int, x$2: java.util.concurrent.ThreadFactory)java.util.concurrent.ExecutorService">newFixedThreadPool</span><span class="delimiter">(</span><span title="object java.lang.Runtime">Runtime</span>.<span title="()java.lang.Runtime">getRuntime</span>.<span title="()Int">availableProcessors</span>, <a href="#422084" title="java.lang.Object with java.util.concurrent.ThreadFactory" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with java.util.concurrent.ThreadFactory" id="422084">ThreadFactory</a> <span class="delimiter">{</span>
+      <span class="keyword">def</span> <a title="(r: java.lang.Runnable)java.lang.Thread" id="422088">newThread</a><span class="delimiter">(</span><a title="java.lang.Runnable" id="422089">r</a>: <span title="java.lang.Runnable">Runnable</span><span class="delimiter">)</span> = <span class="delimiter">{</span>
+        <span class="keyword">val</span> <a title="java.lang.Thread" id="422467">t</a> = <span title="()java.util.concurrent.ThreadFactory">defaultThreadFactory</span>.<span title="(x$1: java.lang.Runnable)java.lang.Thread">newThread</span><span class="delimiter">(</span><a href="#422089" title="java.lang.Runnable">r</a><span class="delimiter">)</span>
+        <a href="#422467" title="java.lang.Thread">t</a>.<span title="(x$1: Boolean)Unit">setDaemon</span><span class="delimiter">(</span><span title="Boolean(true)" class="keyword">true</span><span class="delimiter">)</span>
+        <a href="#422467" title="java.lang.Thread">t</a>
+      <span class="delimiter">}</span>
+    <span class="delimiter">}</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * A strategy that executes its arguments on {@Strategy#DefaultExecutorService}.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="scalaz.concurrent.Strategy" id="101038">DefaultStrategy</a>: <a href="#22557" title="scalaz.concurrent.Strategy">Strategy</a> = <a href="#101025" title="implicit scalaz.concurrent.StrategyLow.Executor : (implicit s: java.util.concurrent.ExecutorService)java.lang.Object with scalaz.concurrent.Strategy">Executor</a><span class="delimiter">(</span><a href="#101035" title="=&gt; java.util.concurrent.ExecutorService">DefaultExecutorService</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

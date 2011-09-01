@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Scalaz.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">import</span> concurrent._
+
+<span class="keyword">object</span> <a title="object scalaz.Scalaz" id="19350">Scalaz</a> <span title="ScalaObject" class="keyword">extends</span> <a href="concurrent/Actor.scala.html#22449" title="scalaz.concurrent.Actors">Actors</a>
+    <span class="keyword">with</span>    <a href="Alpha.scala.html#9530" title="scalaz.Alphas">Alphas</a>
+    <span class="keyword">with</span>    <a href="Apply.scala.html#9677" title="scalaz.Applys">Applys</a>
+    <span class="keyword">with</span>    <a href="ArrayByte.scala.html#9686" title="scalaz.ArrayBytes">ArrayBytes</a>
+    <span class="keyword">with</span>    <a href="BigIntegerW.scala.html#9785" title="scalaz.BigIntegers">BigIntegers</a>
+    <span class="keyword">with</span>    <a href="BigIntW.scala.html#9797" title="scalaz.BigInts">BigInts</a>
+    <span class="keyword">with</span>    <a href="BKTree.scala.html#10190" title="scalaz.BKTrees">BKTrees</a>
+    <span class="keyword">with</span>    <a href="BooleanW.scala.html#10214" title="scalaz.Booleans">Booleans</a>
+    <span class="keyword">with</span>    <a href="BooleanConjunction.scala.html#10208" title="scalaz.BooleanConjunctions">BooleanConjunctions</a>
+    <span class="keyword">with</span>    <a href="ByteW.scala.html#10247" title="scalaz.Bytes">Bytes</a>
+    <span class="keyword">with</span>    <a href="CharW.scala.html#10451" title="scalaz.Chars">Chars</a>
+    <span class="keyword">with</span>    <a href="CharSet.scala.html#10460" title="scalaz.CharSets">CharSets</a>
+    <span class="keyword">with</span>    <a href="Cokleisli.scala.html#10685" title="scalaz.Cokleislis">Cokleislis</a>
+    <span class="keyword">with</span>    <a href="Digit.scala.html#10889" title="scalaz.Digits">Digits</a>
+    <span class="keyword">with</span>    <a href="Dual.scala.html#10904" title="scalaz.Duals">Duals</a>
+    <span class="keyword">with</span>    <a href="concurrent/Effect.scala.html#22470" title="scalaz.concurrent.Effects">Effects</a>
+    <span class="keyword">with</span>    <a href="Empty.scala.html#11057" title="scalaz.Emptys">Emptys</a>
+    <span class="keyword">with</span>    <a href="Endo.scala.html#11072" title="scalaz.Endos">Endos</a>
+    <span class="keyword">with</span>    <a href="EnumerationW.scala.html#11078" title="scalaz.Enumerations">Enumerations</a>
+    <span class="keyword">with</span>    <a href="Equal.scala.html#11504" title="scalaz.Equals">Equals</a>
+    <span class="keyword">with</span>    <a href="Extras.scala.html#11519" title="scalaz.Extras">Extras</a>
+    <span class="keyword">with</span>    <a href="FirstOption.scala.html#14300" title="scalaz.FirstOptions">FirstOptions</a>
+    <span class="keyword">with</span>    <a href="FirstLazyOption.scala.html#14291" title="scalaz.FirstLazyOptions">FirstLazyOptions</a>
+    <span class="keyword">with</span>    <a href="Function0W.scala.html#14684" title="scalaz.Function0s">Function0s</a>
+    <span class="keyword">with</span>    <a href="Function1W.scala.html#14693" title="scalaz.Function1s">Function1s</a>
+    <span class="keyword">with</span>    <a href="Function2W.scala.html#14729" title="scalaz.Function2s">Function2s</a>
+    <span class="keyword">with</span>    <a href="Kleisli.scala.html#16370" title="scalaz.Kleislis">Kleislis</a>
+    <span class="keyword">with</span>    <a href="Identity.scala.html#15578" title="scalaz.Identitys">Identitys</a>
+    <span class="keyword">with</span>    <a href="InputStreamW.scala.html#15797" title="scalaz.InputStreams">InputStreams</a>
+    <span class="keyword">with</span>    <a href="IntW.scala.html#15815" title="scalaz.Ints">Ints</a>
+    <span class="keyword">with</span>    <a href="LastOption.scala.html#16388" title="scalaz.LastOptions">LastOptions</a>
+    <span class="keyword">with</span>    <a href="LastLazyOption.scala.html#16379" title="scalaz.LastLazyOptions">LastLazyOptions</a>
+    <span class="keyword">with</span>    <a href="LazyTuple.scala.html#16484" title="scalaz.LazyTuples">LazyTuples</a>
+    <span class="keyword">with</span>    <a href="ListW.scala.html#17159" title="scalaz.Lists">Lists</a>
+    <span class="keyword">with</span>    <a href="Logger.scala.html#17567" title="scalaz.Loggers">Loggers</a>
+    <span class="keyword">with</span>    <a href="LongW.scala.html#17576" title="scalaz.Longs">Longs</a>
+    <span class="keyword">with</span>    <a href="MA.scala.html#17891" title="scalaz.MAs">MAs</a>
+    <span class="keyword">with</span>    <a href="MAB.scala.html#17864" title="scalaz.MABs">MABs</a>
+    <span class="keyword">with</span>    <a href="MetricSpace.scala.html#17996" title="scalaz.MetricSpaces">MetricSpaces</a>
+    <span class="keyword">with</span>    <a href="Memo.scala.html#17981" title="scalaz.Memos">Memos</a>
+    <span class="keyword">with</span>    <a href="Multiplications.scala.html#18086" title="scalaz.Multiplications">Multiplications</a>
+    <span class="keyword">with</span>    <a href="Name.scala.html#18266" title="scalaz.Names">Names</a>
+    <span class="keyword">with</span>    <a href="NonEmptyList.scala.html#18395" title="scalaz.NonEmptyLists">NonEmptyLists</a>
+    <span class="keyword">with</span>    <a href="OptionW.scala.html#18437" title="scalaz.Options">Options</a>
+    <span class="keyword">with</span>    <a href="OptionT.scala.html#18497" title="scalaz.OptionTs">OptionTs</a>
+    <span class="keyword">with</span>    <a href="Order.scala.html#18782" title="scalaz.Orders">Orders</a>
+    <span class="keyword">with</span>    <a href="concurrent/Promise.scala.html#22548" title="scalaz.concurrent.Promises">Promises</a>
+    <span class="keyword">with</span>    <a href="Reducer.scala.html#19283" title="scalaz.Reducers">Reducers</a>
+    <span class="keyword">with</span>    <a href="Resource.scala.html#19331" title="scalaz.Resources">Resources</a>
+    <span class="keyword">with</span>    <a href="Semigroup.scala.html#19685" title="scalaz.Semigroups">Semigroups</a> 
+    <span class="keyword">with</span>    FingerTree.<a href="FingerTree.scala.html#39543" title="scalaz.FingerTree.IndSeqs">IndSeqs</a>
+    <span class="keyword">with</span>    FingerTree.<a href="FingerTree.scala.html#39542" title="scalaz.FingerTree.Ropes">Ropes</a>
+    <span class="keyword">with</span>    <a href="ShortW.scala.html#19694" title="scalaz.Shorts">Shorts</a>
+    <span class="keyword">with</span>    <a href="Show.scala.html#19952" title="scalaz.Shows">Shows</a>
+    <span class="keyword">with</span>    <a href="State.scala.html#19988" title="scalaz.States">States</a>
+    <span class="keyword">with</span>    <a href="StreamW.scala.html#20021" title="scalaz.Streams">Streams</a>
+    <span class="keyword">with</span>    <a href="StringW.scala.html#20249" title="scalaz.Strings">Strings</a>
+    <span class="keyword">with</span>    <a href="Tree.scala.html#20759" title="scalaz.Trees">Trees</a>
+    <span class="keyword">with</span>    <a href="TupleW.scala.html#21290" title="scalaz.Tuples">Tuples</a>
+    <span class="keyword">with</span>    <a href="TreeLoc.scala.html#20747" title="scalaz.TreeLocs">TreeLocs</a>
+    <span class="keyword">with</span>    <a href="Writer.scala.html#21545" title="scalaz.Writers">Writers</a>
+    <span class="keyword">with</span>    <a href="WriterT.scala.html#21614" title="scalaz.WriterTs">WriterTs</a>
+    <span class="keyword">with</span>    <a href="Validation.scala.html#21395" title="scalaz.Validations">Validations</a>
+    <span class="keyword">with</span>    <a href="Zero.scala.html#21647" title="scalaz.Zeros">Zeros</a>
+    <span class="keyword">with</span>    <a href="Zipper.scala.html#21734" title="scalaz.Zippers">Zippers</a>
+    <span class="keyword">with</span>    <a href="ZipStream.scala.html#21743" title="scalaz.ZipStreams">ZipStreams</a> <span class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="=&gt; Nothing" id="39553">⊥</a> = <a href="package.scala.html#28380" title="object scalaz.package.sys">sys</a>.<a href="package.scala.html#116376" title="(m: String)Nothing">error</a><span class="delimiter">(</span><span title="java.lang.String(&quot;undefined&quot;)" class="string">&quot;undefined&quot;</span><span class="delimiter">)</span>
+
+  <span class="keyword">def</span> <a title="=&gt; Nothing" id="39554">undefined</a> = <a href="#39553" title="=&gt; Nothing">⊥</a>
+
+  <span class="keyword">type</span> <a title="Any" id="39555">⊤</a> = <span title="Any">Any</span>
+
+  <span class="keyword">type</span> <a title="Nothing" id="39556">⊥</a> = <span title="Nothing">Nothing</span>
+
+  <span class="keyword">type</span> <a title="scala.math.BigInt" id="39557">ℤ</a> = scala.math.<span title="scala.math.BigInt">BigInt</span>
+
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Double" id="39559">π</a> = java.lang.<span title="object java.lang.Math">Math</span>.<span title="Double(3.141592653589793)">PI</span>
+
+  <span class="keyword">lazy</span> <span class="keyword">val</span> <a title="Double" id="39561">π2</a> = <a href="#39558" title="=&gt; Double">π</a> <span title="(x: Int)Double">*</span> <span title="Int(2)" class="int">2</span>
+
+  <span class="keyword">type</span> <a title="[A]scala.collection.mutable.ArraySeq[A]" id="39562">ArraySeq</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39563">A</a><span class="delimiter">]</span> = <span title="scala.collection.mutable.ArraySeq[A]">collection</span>.mutable.ArraySeq<span class="delimiter">[</span>A<span class="delimiter">]</span>
+
+  <span class="keyword">val</span> <a title="collection.mutable.ArraySeq.type" id="39564">ArraySeq</a> = collection.mutable.<span title="object scala.collection.mutable.ArraySeq">ArraySeq</span>
+
+  <span class="keyword">def</span> <a title="[A, B]=&gt; A =&gt; B =&gt; (A, B)" id="39566">×</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="39569">A</a>, <a title="&gt;: Nothing &lt;: Any" id="39570">B</a><span class="delimiter">]</span> = <span class="delimiter">(</span>a: <a href="#39569" title="A">A</a><span class="delimiter">)</span> =&gt; <span class="delimiter">(</span>b: <a href="#39570" title="B">B</a><span class="delimiter">)</span> =&gt; <span title="(_1: A, _2: B)(A, B)" class="delimiter">(</span><a href="#329705" title="A">a</a>, <a href="#329707" title="B">b</a><span class="delimiter">)</span>
+
+  <span class="keyword">def</span> <a title="[F[_]](implicit evidence$1: scalaz.Pure[F])java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,F]" id="329714">pure</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="39573">F</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="329718">_</a><span class="delimiter">]</span> : Pure<span class="delimiter">]</span> = <a href="#329717" title="java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,F]" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.~&gt;[scalaz.Scalaz.Id,F]" id="329717" class="delimiter">(</a>Id <a href="Extras.scala.html#9440" title="scalaz.~&gt;[scalaz.Scalaz.Id,F]">~&gt;</a> F<span class="delimiter">)</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="[A](a: A)F[A]" id="329720">apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="329722">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A" id="329723">a</a>: <a href="#329722" title="A">A</a><span class="delimiter">)</span> = <span title="[T](implicit e: T)T">implicitly</span><a href="#329714" title="(implicit e: scalaz.Pure[F])scalaz.Pure[F]" class="delimiter">[</a><a href="Pure.scala.html#19169" title="scalaz.Pure[F]">Pure</a><span class="delimiter">[</span>F<span class="delimiter">]</span><span class="delimiter">]</span>.<a href="Pure.scala.html#39241" title="(a: =&gt; A)F[A]">pure</a><span class="delimiter">(</span><a href="#329723" title="A">a</a><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

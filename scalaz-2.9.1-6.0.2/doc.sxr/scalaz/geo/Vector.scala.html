@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Vector.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Vector extends java.lang.Object" id="26597">Vector</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">val</span> <a title="=&gt; scalaz.geo.Coord" id="870184">coord</a>: <a href="Coord.scala.html#26321" title="scalaz.geo.Coord">Coord</a>
+  <span class="keyword">val</span> <a title="=&gt; scalaz.geo.Bearing" id="870185">bearing</a>: <a href="Bearing.scala.html#26240" title="scalaz.geo.Bearing">Bearing</a>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Vectors extends java.lang.Object with ScalaObject" id="26603">Vectors</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(c: scalaz.geo.Coord, b: scalaz.geo.Bearing)java.lang.Object with scalaz.geo.Vector" id="869971">vector</a><span class="delimiter">(</span><a title="scalaz.geo.Coord" id="870284">c</a>: <a href="Coord.scala.html#26321" title="scalaz.geo.Coord">Coord</a>, <a title="scalaz.geo.Bearing" id="870285">b</a>: <a href="Bearing.scala.html#26240" title="scalaz.geo.Bearing">Bearing</a><span class="delimiter">)</span> = <a href="#870288" title="java.lang.Object with scalaz.geo.Vector{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Vector" id="870288">Vector</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="scalaz.geo.Coord" id="870290">coord</a> = <a href="#870284" title="scalaz.geo.Coord">c</a>
+    <span class="keyword">val</span> <a title="scalaz.geo.Bearing" id="870292">bearing</a> = <a href="#870285" title="scalaz.geo.Bearing">b</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Vector" id="26598">Vector</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19350" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Show[scalaz.geo.Vector]" id="870213">VectorShow</a>: <a href="../Show.scala.html#19940" title="scalaz.Show[scalaz.geo.Vector]">Show</a><span class="delimiter">[</span>Vector<span class="delimiter">]</span> = <a href="../Show.scala.html#40594" title="(f: scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing))(implicit evidence$1: scalaz.Show[(scalaz.geo.Coord, scalaz.geo.Bearing)])scalaz.Show[scalaz.geo.Vector]">showBy</a><a href="../Show.scala.html#168944" title="(implicit evidence$12: scalaz.Show[scalaz.geo.Coord], implicit evidence$13: scalaz.Show[scalaz.geo.Bearing])scalaz.Show[(scalaz.geo.Coord, scalaz.geo.Bearing)]" class="delimiter">(</a><span class="delimiter">(</span><span class="delimiter">(</span><a href="#894936" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="../MAB.scala.html#40070" title="(a: scalaz.geo.Vector =&gt; scalaz.geo.Coord)scalaz.MAB[Function1,scalaz.geo.Vector,scalaz.geo.Coord]">coord</a><span class="delimiter">)</span> <a href="../MAB.scala.html#64157" title="(k: scalaz.geo.Vector =&gt; scalaz.geo.Bearing)(implicit a: scalaz.Arrow[Function1])scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing)">&amp;&amp;&amp;</a> <span class="delimiter">(</span><span class="delimiter">(</span><a href="#895001" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="#870185" title="=&gt; scalaz.geo.Bearing">bearing</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[scalaz.geo.Vector]" id="870214">VectorEqual</a>: <a href="../Equal.scala.html#11465" title="scalaz.Equal[scalaz.geo.Vector]">Equal</a><span class="delimiter">[</span>Vector<span class="delimiter">]</span> = <a href="../Equal.scala.html#39670" title="(f: scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing))(implicit evidence$1: scalaz.Equal[(scalaz.geo.Coord, scalaz.geo.Bearing)])scalaz.Equal[scalaz.geo.Vector]">equalBy</a><a href="../Equal.scala.html#130580" title="(implicit evidence$10: scalaz.Equal[scalaz.geo.Coord], implicit evidence$11: scalaz.Equal[scalaz.geo.Bearing])scalaz.Equal[(scalaz.geo.Coord, scalaz.geo.Bearing)]" class="delimiter">(</a><span class="delimiter">(</span><span class="delimiter">(</span><a href="#895471" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="../MAB.scala.html#40070" title="(a: scalaz.geo.Vector =&gt; scalaz.geo.Coord)scalaz.MAB[Function1,scalaz.geo.Vector,scalaz.geo.Coord]">coord</a><span class="delimiter">)</span> <a href="../MAB.scala.html#64157" title="(k: scalaz.geo.Vector =&gt; scalaz.geo.Bearing)(implicit a: scalaz.Arrow[Function1])scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing)">&amp;&amp;&amp;</a> <span class="delimiter">(</span><span class="delimiter">(</span><a href="#895531" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="#870185" title="=&gt; scalaz.geo.Bearing">bearing</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Order[scalaz.geo.Vector]" id="870215">VectorOrder</a>: <a href="../Order.scala.html#18767" title="scalaz.Order[scalaz.geo.Vector]">Order</a><span class="delimiter">[</span>Vector<span class="delimiter">]</span> = <a href="../Order.scala.html#40478" title="(f: scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing))(implicit evidence$1: scalaz.Order[(scalaz.geo.Coord, scalaz.geo.Bearing)])scalaz.Order[scalaz.geo.Vector]">orderBy</a><a href="../Order.scala.html#176703" title="(implicit evidence$8: scalaz.Order[scalaz.geo.Coord], implicit evidence$9: scalaz.Order[scalaz.geo.Bearing])scalaz.Order[(scalaz.geo.Coord, scalaz.geo.Bearing)]" class="delimiter">(</a><span class="delimiter">(</span><span class="delimiter">(</span><a href="#895821" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="../MAB.scala.html#40070" title="(a: scalaz.geo.Vector =&gt; scalaz.geo.Coord)scalaz.MAB[Function1,scalaz.geo.Vector,scalaz.geo.Coord]">coord</a><span class="delimiter">)</span> <a href="../MAB.scala.html#64157" title="(k: scalaz.geo.Vector =&gt; scalaz.geo.Bearing)(implicit a: scalaz.Arrow[Function1])scalaz.geo.Vector =&gt; (scalaz.geo.Coord, scalaz.geo.Bearing)">&amp;&amp;&amp;</a> <span class="delimiter">(</span><span class="delimiter">(</span><a href="#895881" title="scalaz.geo.Vector">_</a>: <a href="#26597" title="scalaz.geo.Vector">Vector</a><span class="delimiter">)</span>.<a href="#870185" title="=&gt; scalaz.geo.Bearing">bearing</a><span class="delimiter">)</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+        </pre>
+    </body>
+</html>

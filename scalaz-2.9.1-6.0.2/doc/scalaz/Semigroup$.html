@@ -1,0 +1,989 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.Semigroup</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../lib/template.css" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a title="Go to companion" href="Semigroup.html"><img src="../lib/object_to_trait_big.png" /></a>
+        <p id="owner"><a name="scalaz" class="extype" href="package.html">scalaz</a></p>
+        <h1><a title="Go to companion" href="Semigroup.html">Semigroup</a></h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <span class="name">Semigroup</span>
+        
+        <span class="result"> extends <a name="scalaz.SemigroupLow" class="extype" href="SemigroupLow.html">SemigroupLow</a></span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a name="scalaz.SemigroupLow" class="extype" href="SemigroupLow.html">SemigroupLow</a>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.Semigroup" class="in"><span>Semigroup</span></li><li name="scalaz.SemigroupLow" class="in"><span>SemigroupLow</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        
+
+        
+        
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ArraySemigroup" data-isabs="false">
+      <a id="ArraySemigroup[A](Manifest[A]):Semigroup[Array[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ArraySemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Array" class="extype">Array</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ArraySeqSemigroup" data-isabs="false">
+      <a id="ArraySeqSemigroup[A]:Semigroup[ArraySeq[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ArraySeqSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[ArraySeq[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BigIntMultiplicationSemigroup" data-isabs="false">
+      <a id="BigIntMultiplicationSemigroup:Semigroup[BigIntMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BigIntMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.BigIntMultiplication" class="extype" href="BigIntMultiplication.html">BigIntMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BigIntSemigroup" data-isabs="false">
+      <a id="BigIntSemigroup:Semigroup[BigInt]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BigIntSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[BigInt]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BigIntegerMultiplicationSemigroup" data-isabs="false">
+      <a id="BigIntegerMultiplicationSemigroup:Semigroup[BigIntegerMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BigIntegerMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.BigIntegerMultiplication" class="extype" href="BigIntegerMultiplication.html">BigIntegerMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BigIntegerSemigroup" data-isabs="false">
+      <a id="BigIntegerSemigroup:Semigroup[BigInteger]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BigIntegerSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.math.BigInteger" class="extype">BigInteger</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BooleanConjunctionSemigroup" data-isabs="false">
+      <a id="BooleanConjunctionSemigroup:Semigroup[BooleanConjunction]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BooleanConjunctionSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.BooleanConjunction" class="extype" href="BooleanConjunction.html">BooleanConjunction</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#BooleanSemigroup" data-isabs="false">
+      <a id="BooleanSemigroup:Semigroup[Boolean]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">BooleanSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Boolean" class="extype">Boolean</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ByteMultiplicationSemigroup" data-isabs="false">
+      <a id="ByteMultiplicationSemigroup:Semigroup[ByteMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ByteMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.ByteMultiplication" class="extype" href="ByteMultiplication.html">ByteMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ByteSemigroup" data-isabs="false">
+      <a id="ByteSemigroup:Semigroup[Byte]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ByteSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#CharMultiplicationSemigroup" data-isabs="false">
+      <a id="CharMultiplicationSemigroup:Semigroup[CharMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">CharMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.CharMultiplication" class="extype" href="CharMultiplication.html">CharMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#CharSemigroup" data-isabs="false">
+      <a id="CharSemigroup:Semigroup[Char]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">CharSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Char" class="extype">Char</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#DigitSemigroup" data-isabs="false">
+      <a id="DigitSemigroup:Semigroup[Digit]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">DigitSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.Digit" class="extype" href="Digit.html">Digit</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#DoubleSemigroup" data-isabs="false">
+      <a id="DoubleSemigroup:Semigroup[Double]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">DoubleSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Double" class="extype">Double</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#DualSemigroup" data-isabs="false">
+      <a id="DualSemigroup[A](Semigroup[A]):Semigroup[Dual[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">DualSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.Dual" class="extype" href="Dual.html">Dual</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#EitherLeftSemigroup" data-isabs="false">
+      <a id="EitherLeftSemigroup[A, B]:Semigroup[LeftProjection[A, B]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">EitherLeftSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Either.LeftProjection" class="extype">LeftProjection</span>[A, B]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#EitherRightSemigroup" data-isabs="false">
+      <a id="EitherRightSemigroup[A, B]:Semigroup[RightProjection[B, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">EitherRightSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Either.RightProjection" class="extype">RightProjection</span>[B, A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#EndoSemigroup" data-isabs="false">
+      <a id="EndoSemigroup[A]:Semigroup[Endo[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">EndoSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.Endo" class="extype" href="Endo.html">Endo</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#FingerTreeSemigroup" data-isabs="false">
+      <a id="FingerTreeSemigroup[V, A](Reducer[A, V]):Semigroup[FingerTree[V, A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">FingerTreeSemigroup</span>
+        <span class="tparams">[<span name="V">V</span>, <span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="m">m: <a name="scalaz.Reducer" class="extype" href="Reducer.html">Reducer</a>[A, V]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.FingerTree" class="extype" href="FingerTree.html">FingerTree</a>[V, A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#FirstLazyOptionSemigroup" data-isabs="false">
+      <a id="FirstLazyOptionSemigroup[A]:Semigroup[FirstLazyOption[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">FirstLazyOptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.FirstLazyOption" class="extype" href="FirstLazyOption.html">FirstLazyOption</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#FirstOptionSemigroup" data-isabs="false">
+      <a id="FirstOptionSemigroup[A]:Semigroup[FirstOption[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">FirstOptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.FirstOption" class="extype" href="FirstOption.html">FirstOption</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#FirstSemigroup" data-isabs="false">
+      <a id="FirstSemigroup[A]:Semigroup[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">FirstSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.Semigroup#FloatSemigroup" data-isabs="false">
+      <a id="FloatSemigroup:Semigroup[Float]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">FloatSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Float" class="extype">Float</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#Function1ABSemigroup" data-isabs="false">
+      <a id="Function1ABSemigroup[A, B](Semigroup[B]):Semigroup[(A) ⇒ B]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">Function1ABSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[B]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A) ⇒ B]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#IndSeqSemigroup" data-isabs="false">
+      <a id="IndSeqSemigroup[A]:Semigroup[IndSeq[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">IndSeqSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.FingerTree.IndSeqs.IndSeq" class="extype" href="FingerTree$$IndSeqs$IndSeq.html">IndSeq</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#IntMultiplicationSemigroup" data-isabs="false">
+      <a id="IntMultiplicationSemigroup:Semigroup[IntMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">IntMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.IntMultiplication" class="extype" href="IntMultiplication.html">IntMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#IntSemigroup" data-isabs="false">
+      <a id="IntSemigroup:Semigroup[Int]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">IntSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Int" class="extype">Int</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaArrayBlockingQueueSemigroup" data-isabs="false">
+      <a id="JavaArrayBlockingQueueSemigroup[A]:Semigroup[ArrayBlockingQueue[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaArrayBlockingQueueSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.concurrent.ArrayBlockingQueue" class="extype">ArrayBlockingQueue</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaArrayListSemigroup" data-isabs="false">
+      <a id="JavaArrayListSemigroup[A]:Semigroup[ArrayList[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaArrayListSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.ArrayList" class="extype">ArrayList</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaConcurrentLinkedQueueSemigroup" data-isabs="false">
+      <a id="JavaConcurrentLinkedQueueSemigroup[A]:Semigroup[ConcurrentLinkedQueue[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaConcurrentLinkedQueueSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.concurrent.ConcurrentLinkedQueue" class="extype">ConcurrentLinkedQueue</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaCopyOnWriteArrayListSemigroup" data-isabs="false">
+      <a id="JavaCopyOnWriteArrayListSemigroup[A]:Semigroup[CopyOnWriteArrayList[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaCopyOnWriteArrayListSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.concurrent.CopyOnWriteArrayList" class="extype">CopyOnWriteArrayList</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaLinkedBlockingQueueSemigroup" data-isabs="false">
+      <a id="JavaLinkedBlockingQueueSemigroup[A]:Semigroup[LinkedBlockingQueue[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaLinkedBlockingQueueSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.concurrent.LinkedBlockingQueue" class="extype">LinkedBlockingQueue</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaLinkedListSemigroup" data-isabs="false">
+      <a id="JavaLinkedListSemigroup[A]:Semigroup[LinkedList[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaLinkedListSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.LinkedList" class="extype">LinkedList</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaPriorityQueueSemigroup" data-isabs="false">
+      <a id="JavaPriorityQueueSemigroup[A]:Semigroup[PriorityQueue[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaPriorityQueueSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.PriorityQueue" class="extype">PriorityQueue</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaStackSemigroup" data-isabs="false">
+      <a id="JavaStackSemigroup[A]:Semigroup[Stack[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaStackSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.Stack" class="extype">Stack</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaSynchronousQueueSemigroup" data-isabs="false">
+      <a id="JavaSynchronousQueueSemigroup[A]:Semigroup[SynchronousQueue[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaSynchronousQueueSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.concurrent.SynchronousQueue" class="extype">SynchronousQueue</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#JavaVectorSemigroup" data-isabs="false">
+      <a id="JavaVectorSemigroup[A]:Semigroup[Vector[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">JavaVectorSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.Vector" class="extype">Vector</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#LastLazyOptionSemigroup" data-isabs="false">
+      <a id="LastLazyOptionSemigroup[A]:Semigroup[LastLazyOption[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">LastLazyOptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.LastLazyOption" class="extype" href="LastLazyOption.html">LastLazyOption</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#LastOptionSemigroup" data-isabs="false">
+      <a id="LastOptionSemigroup[A]:Semigroup[LastOption[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">LastOptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.LastOption" class="extype" href="LastOption.html">LastOption</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#LastSemigroup" data-isabs="false">
+      <a id="LastSemigroup[A]:Semigroup[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">LastSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="scalaz.Semigroup#LazyOptionSemigroup" data-isabs="false">
+      <a id="LazyOptionSemigroup[A](Semigroup[A]):Semigroup[LazyOption[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">LazyOptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.LazyOption" class="extype" href="LazyOption.html">LazyOption</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#LongMultiplicationSemigroup" data-isabs="false">
+      <a id="LongMultiplicationSemigroup:Semigroup[LongMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">LongMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.LongMultiplication" class="extype" href="LongMultiplication.html">LongMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#LongSemigroup" data-isabs="false">
+      <a id="LongSemigroup:Semigroup[Long]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">LongSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Long" class="extype">Long</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#MapSemigroup" data-isabs="false">
+      <a id="MapSemigroup[K, V](Semigroup[V]):Semigroup[Map[K, V]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">MapSemigroup</span>
+        <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="ss">ss: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[V]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[Map[K, V]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#NodeSeqSemigroup" data-isabs="false">
+      <a id="NodeSeqSemigroup:Semigroup[NodeSeq]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">NodeSeqSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.xml.NodeSeq" class="extype">NodeSeq</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#NonEmptyListSemigroup" data-isabs="false">
+      <a id="NonEmptyListSemigroup[A]:Semigroup[NonEmptyList[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">NonEmptyListSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.NonEmptyList" class="extype" href="NonEmptyList.html">NonEmptyList</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#OptionSemigroup" data-isabs="false">
+      <a id="OptionSemigroup[A](Semigroup[A]):Semigroup[Option[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">OptionSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Option" class="extype">Option</span>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#OrderingSemigroup" data-isabs="false">
+      <a id="OrderingSemigroup:Semigroup[Ordering]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">OrderingSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.Ordering" class="extype" href="Ordering.html">Ordering</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#SemigroupKleisliSemigroup" data-isabs="false">
+      <a id="SemigroupKleisliSemigroup[M, A, B](Semigroup[M[B]]):Semigroup[Kleisli[M, A, B]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">SemigroupKleisliSemigroup</span>
+        <span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="ss">ss: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[M[B]]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.Kleisli" class="extype" href="Kleisli.html">Kleisli</a>[M, A, B]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ShortMultiplicationSemigroup" data-isabs="false">
+      <a id="ShortMultiplicationSemigroup:Semigroup[ShortMultiplication]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ShortMultiplicationSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.ShortMultiplication" class="extype" href="ShortMultiplication.html">ShortMultiplication</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ShortSemigroup" data-isabs="false">
+      <a id="ShortSemigroup:Semigroup[Short]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ShortSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Short" class="extype">Short</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#StrategySemigroup" data-isabs="false">
+      <a id="StrategySemigroup:Semigroup[Strategy]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">StrategySemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.concurrent.Strategy" class="extype" href="concurrent/Strategy.html">Strategy</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#StreamSemigroup" data-isabs="false">
+      <a id="StreamSemigroup[A]:Semigroup[Stream[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">StreamSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[Stream[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#StringSemigroup" data-isabs="false">
+      <a id="StringSemigroup:Semigroup[String]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">StringSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[String]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.SemigroupLow#TraversableSemigroup" data-isabs="false">
+      <a id="TraversableSemigroup[X, CC&lt;:TraversableLike[Y, CC[Y]]](CanBuildAnySelf[CC]):Semigroup[CC[X]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">TraversableSemigroup</span>
+        <span class="tparams">[<span name="X">X</span>, <span name="CC">CC<span class="tparams">[<span name="Y">Y</span>]</span> &lt;: <span name="scala.collection.TraversableLike" class="extype">TraversableLike</span>[Y, CC[Y]]</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="scalaz.CanBuildAnySelf" class="extype" href="CanBuildAnySelf.html">CanBuildAnySelf</a>[CC]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[CC[X]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="scalaz.SemigroupLow" class="extype" href="SemigroupLow.html">SemigroupLow</a></dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#Tuple2Semigroup" data-isabs="false">
+      <a id="Tuple2Semigroup[A, B](Semigroup[A],Semigroup[B]):Semigroup[(A, B)]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">Tuple2Semigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="as">as: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>, <span name="bs">bs: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[B]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A, B)]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#Tuple3Semigroup" data-isabs="false">
+      <a id="Tuple3Semigroup[A, B, C](Semigroup[A],Semigroup[B],Semigroup[C]):Semigroup[(A, B, C)]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">Tuple3Semigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="as">as: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>, <span name="bs">bs: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[B]</span>, <span name="cs">cs: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[C]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A, B, C)]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#Tuple4Semigroup" data-isabs="false">
+      <a id="Tuple4Semigroup[A, B, C, D](Semigroup[A],Semigroup[B],Semigroup[C],Semigroup[D]):Semigroup[(A, B, C, D)]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">Tuple4Semigroup</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="as">as: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[A]</span>, <span name="bs">bs: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[B]</span>, <span name="cs">cs: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[C]</span>, <span name="ds">ds: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[D]</span>)</span><span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#UnitSemigroup" data-isabs="false">
+      <a id="UnitSemigroup:Semigroup[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">UnitSemigroup</span>
+        
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Unit" class="extype">Unit</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.Semigroup#ZipStreamSemigroup" data-isabs="false">
+      <a id="ZipStreamSemigroup[A]:Semigroup[ZipStream[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">ZipStreamSemigroup</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="result">: <a name="scalaz.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="scalaz.ZipStream" class="extype" href="ZipStream.html">ZipStream</a>[A]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div name="scalaz.SemigroupLow" class="parent">
+              <h3>Inherited from <a name="scalaz.SemigroupLow" class="extype" href="SemigroupLow.html">SemigroupLow</a></h3>
+            </div><div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

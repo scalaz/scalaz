@@ -1,0 +1,674 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.http.response.Response</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a title="Go to companion" href="Response$.html"><img src="../../../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a name="scalaz" class="extype" href="../../package.html">scalaz</a>.<a name="scalaz.http" class="extype" href="../package.html">http</a>.<a name="scalaz.http.response" class="extype" href="package.html">response</a></p>
+        <h1><a title="Go to companion" href="Response$.html">Response</a></h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <span class="name">Response</span>
+        <span class="tparams">[<span name="OUT">OUT<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>HTTP response.
+<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6">RFC 2616 Section 6 Response</a>.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.http.response.Response" class="in"><span>Response</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        
+
+        
+        
+        <div class="values members" id="values">
+              <h3>Abstract Value Members</h3>
+              <ol><li visbl="pub" name="scalaz.http.response.Response#body" data-isabs="true">
+      <a id="body:OUT[Byte]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">body</span>
+        
+        <span class="result">: OUT[<span name="scala.Byte" class="extype">Byte</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response body.</p><div class="fullcomment"><div class="comment cmt"><p>The response body.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#headers" data-isabs="true">
+      <a id="headers:List[(ResponseHeader, NonEmptyList[Char])]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">headers</span>
+        
+        <span class="result">: List[(<a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a>, <a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>])]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response headers.</p><div class="fullcomment"><div class="comment cmt"><p>The response headers.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#line" data-isabs="true">
+      <a id="line:StatusLine"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">line</span>
+        
+        <span class="result">: <a name="scalaz.http.response.StatusLine" class="extype" href="StatusLine.html">StatusLine</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response status line.</p><div class="fullcomment"><div class="comment cmt"><p>The response status line.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Concrete Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#-" data-isabs="false">
+      <a id="-(ResponseHeader):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">-</span>
+        
+        <span class="params">(<span name="h">h: <a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a></span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Delete the given header value from this response.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#&lt;&lt;" data-isabs="false">
+      <a id="&lt;&lt;[A](A)(Body[OUT, A],Semigroup[OUT[Byte]]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">&lt;&lt;</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a name="scalaz.http.response.Body" class="extype" href="Body.html">Body</a>[OUT, A]</span>, <span name="s">s: <a name="scalaz.Semigroup" class="extype" href="../../Semigroup.html">Semigroup</a>[OUT[<span name="scala.Byte" class="extype">Byte</span>]]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Append the given value to the body of this response.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#&lt;&lt;:" data-isabs="false">
+      <a id="&lt;&lt;:[A](A)(Body[OUT, A],Semigroup[OUT[Byte]]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">&lt;&lt;:</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="a">a: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="b">b: <a name="scalaz.http.response.Body" class="extype" href="Body.html">Body</a>[OUT, A]</span>, <span name="s">s: <a name="scalaz.Semigroup" class="extype" href="../../Semigroup.html">Semigroup</a>[OUT[<span name="scala.Byte" class="extype">Byte</span>]]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Prepend the given value to the body of this response.</p>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#&gt;&gt;" data-isabs="false">
+      <a id="&gt;&gt;(OUT[Byte]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">&gt;&gt;</span>
+        
+        <span class="params">(<span name="b">b: OUT[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Replace the body of this response with the given body.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#acceptsXhtml" data-isabs="false">
+      <a id="acceptsXhtml[IN](Request[IN]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">acceptsXhtml</span>
+        <span class="tparams">[<span name="IN">IN<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="req">req: <a name="scalaz.http.request.Request" class="extype" href="../request/Request.html">Request</a>[IN]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sets the content-type response header for XHTML (<code>application/xhtml+xml</code>), however, if the browser
+identifies itself as not accepting this content type, set the response header for HTML
+(<code>text/html</code>).</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#apply" data-isabs="false">
+      <a id="apply(ResponseHeader):Option[NonEmptyList[Char]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        
+        <span class="params">(<span name="h">h: <a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the value of given header.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#apply" data-isabs="false">
+      <a id="apply(StatusLine):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        
+        <span class="params">(<span name="l">l: <a name="scalaz.http.response.StatusLine" class="extype" href="StatusLine.html">StatusLine</a></span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Replace the status line of this reponse with the given status line.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#apply" data-isabs="false">
+      <a id="apply(ResponseHeader,String):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        
+        <span class="params">(<span name="h">h: <a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a></span>, <span name="s">s: String</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Add the given header and value to this response.</p><div class="fullcomment"><div class="comment cmt"><p>Add the given header and value to this response.
+<strong>This function fails if the given string value is empty</strong>.
+</p></div></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#apply" data-isabs="false">
+      <a id="apply(ResponseHeader,NonEmptyList[Char]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        
+        <span class="params">(<span name="h">h: <a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a></span>, <span name="v">v: <a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Add the given header and value to this response.</p>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#bodyLength" data-isabs="false">
+      <a id="bodyLength(Foldable[OUT]):Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">bodyLength</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="f">f: <a name="scalaz.Foldable" class="extype" href="../../Foldable.html">Foldable</a>[OUT]</span>)</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The length of the response body.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#bodyString" data-isabs="false">
+      <a id="bodyString(Each[OUT]):String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">bodyString</span>
+        
+        <span class="params">(<span class="implicit">implicit </span><span name="e">e: <a name="scalaz.Each" class="extype" href="../../Each.html">Each</a>[OUT]</span>)</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns the response body as a string.</p>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#contentType" data-isabs="false">
+      <a id="contentType((NonEmptyList[Char]) ⇒ Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">contentType</span>
+        
+        <span class="params">(<span name="f">f: (<a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>]) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns <code>true</code> if the value of the given content-type header satisfies the given condition.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#contentTypeEquals" data-isabs="false">
+      <a id="contentTypeEquals(String):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">contentTypeEquals</span>
+        
+        <span class="params">(<span name="s">s: String</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns <code>true</code> if the value of the given content-type header equals the given value.</p>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#hasContentType" data-isabs="false">
+      <a id="hasContentType:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hasContentType</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns <code>true</code> if this response has set the content-type header.</p>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#headersMap" data-isabs="false">
+      <a id="headersMap:Map[ResponseHeader, NonEmptyList[NonEmptyList[Char]]]"></a>
+      <h4 class="signature">
+      <span class="kind">lazy val</span>
+      <span class="symbol"> 
+        <span class="name">headersMap</span>
+        
+        <span class="result">: <span name="scala.collection.immutable.Map" class="extype">Map</span>[<a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a>, <a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>]]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A map of headers offering optimal seek time.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#headersMapHeads" data-isabs="false">
+      <a id="headersMapHeads:Map[ResponseHeader, NonEmptyList[Char]]"></a>
+      <h4 class="signature">
+      <span class="kind">lazy val</span>
+      <span class="symbol"> 
+        <span class="name">headersMapHeads</span>
+        
+        <span class="result">: <span name="scala.collection.immutable.Map" class="extype">Map</span>[<a name="scalaz.http.response.ResponseHeader" class="extype" href="ResponseHeader.html">ResponseHeader</a>, <a name="scalaz.NonEmptyList" class="extype" href="../../NonEmptyList.html">NonEmptyList</a>[<span name="scala.Char" class="extype">Char</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A map of headers offering optimal seek time.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#html" data-isabs="false">
+      <a id="html:Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">html</span>
+        
+        <span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sets the Content-Type response header for HTML.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#isBadRequest" data-isabs="false">
+      <a id="isBadRequest:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isBadRequest</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns <code>true</code> if the status code of this response is a 400 Bad Request.</p>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#isOK" data-isabs="false">
+      <a id="isOK:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isOK</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns <code>true</code> if the status code of this response is a 200 OK.</p>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#reasonPhrase" data-isabs="false">
+      <a id="reasonPhrase:List[Char]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">reasonPhrase</span>
+        
+        <span class="result">: List[<span name="scala.Char" class="extype">Char</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response status.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#status" data-isabs="false">
+      <a id="status:Status"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">status</span>
+        
+        <span class="result">: <a name="scalaz.http.response.Status" class="extype" href="Status.html">Status</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response status.</p>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#unary_~" data-isabs="false">
+      <a id="unary_~[IN](Request[IN]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">unary_~</span>
+        <span class="tparams">[<span name="IN">IN<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="request">request: <a name="scalaz.http.request.Request" class="extype" href="../request/Request.html">Request</a>[IN]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sets the ContentType response header according to the
+<a href="http://www.w3schools.com/media/media_mimeref.asp">W3C MIME Reference</a> if the given request path
+has a file extension and corresponds to a known file extension.</a href="http://www.w3schools.com/media/media_mimeref.asp"></p><div class="fullcomment"><div class="comment cmt"><p>Sets the ContentType response header according to the
+<a href="http://www.w3schools.com/media/media_mimeref.asp">W3C MIME Reference</a> if the given request path
+has a file extension and corresponds to a known file extension.
+</p></div></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#versionMajor" data-isabs="false">
+      <a id="versionMajor:Digit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">versionMajor</span>
+        
+        <span class="result">: <a name="scalaz.Digit" class="extype" href="../../Digit.html">Digit</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response version major of the status line.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#versionMinor" data-isabs="false">
+      <a id="versionMinor:Digit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">versionMinor</span>
+        
+        <span class="result">: <a name="scalaz.Digit" class="extype" href="../../Digit.html">Digit</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The response version minor of the status line.</p>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.response.Response#xhtml" data-isabs="false">
+      <a id="xhtml:Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">xhtml</span>
+        
+        <span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sets the Content-Type response header for XHTML.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#xml" data-isabs="false">
+      <a id="xml:Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">xml</span>
+        
+        <span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sets the Content-Type response header for XML.</p>
+    </li><li visbl="pub" name="scalaz.http.response.Response#|+|" data-isabs="false">
+      <a id="|+|(OUT[Byte])(Semigroup[OUT[Byte]]):Response[OUT]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">|+|</span>
+        
+        <span class="params">(<span name="b">b: OUT[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="s">s: <a name="scalaz.Semigroup" class="extype" href="../../Semigroup.html">Semigroup</a>[OUT[<span name="scala.Byte" class="extype">Byte</span>]]</span>)</span><span class="result">: <a name="scalaz.http.response.Response" class="extype" href="">Response</a>[OUT]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Append the given value to the body of this response.</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

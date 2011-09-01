@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Bearing.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Bearing extends java.lang.Object" id="26240">Bearing</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">val</span> <a title="=&gt; Double" id="870168">value</a>: <span title="Double">Double</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Bearings extends java.lang.Object with ScalaObject" id="26246">Bearings</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(d: Double)java.lang.Object with scalaz.geo.Bearing" id="869909">bearing</a><span class="delimiter">(</span><a title="Double" id="870164">d</a>: <span title="Double">Double</span><span class="delimiter">)</span> = <a href="#870167" title="java.lang.Object with scalaz.geo.Bearing{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Bearing" id="870167">Bearing</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="Double" id="870170">value</a> = <a href="#870164" title="Double">d</a> <span title="(x: Int)Double">%</span> <span title="Int(360)" class="int">360</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Bearing" id="26241">Bearing</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19350" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Show[scalaz.geo.Bearing]" id="885557">BearingShow</a>: <a href="../Show.scala.html#19940" title="scalaz.Show[scalaz.geo.Bearing]">Show</a><span class="delimiter">[</span>Bearing<span class="delimiter">]</span> = <a href="../Show.scala.html#40588" title="(f: scalaz.geo.Bearing =&gt; String)scalaz.Show[scalaz.geo.Bearing]">shows</a><span class="delimiter">(</span><a href="#885566" title="scalaz.geo.Bearing">_</a>.<a href="../Identity.scala.html#39774" title="(x: =&gt; Double)scalaz.Identity[Double]">value</a>.<a href="../Identity.scala.html#48265" title="(implicit s: scalaz.Show[Double])String">shows</a> <span title="(x$1: Any)java.lang.String">+</span> <span title="java.lang.String(&quot;°&quot;)" class="string">&quot;°&quot;</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Equal[scalaz.geo.Bearing]" id="885558">BearingEqual</a>: <a href="../Equal.scala.html#11465" title="scalaz.Equal[scalaz.geo.Bearing]">Equal</a><span class="delimiter">[</span>Bearing<span class="delimiter">]</span> = <a href="../Equal.scala.html#39670" title="(f: scalaz.geo.Bearing =&gt; Double)(implicit evidence$1: scalaz.Equal[Double])scalaz.Equal[scalaz.geo.Bearing]">equalBy</a><a href="../Equal.scala.html#130556" title="=&gt; scalaz.Equal[Double]" class="delimiter">(</a><a href="#885746" title="scalaz.geo.Bearing">_</a>.<a href="#870168" title="=&gt; Double">value</a><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="=&gt; scalaz.Order[scalaz.geo.Bearing]" id="885559">BearingOrder</a>: <a href="../Order.scala.html#18767" title="scalaz.Order[scalaz.geo.Bearing]">Order</a><span class="delimiter">[</span>Bearing<span class="delimiter">]</span> = <a href="../Order.scala.html#40478" title="(f: scalaz.geo.Bearing =&gt; Double)(implicit evidence$1: scalaz.Order[Double])scalaz.Order[scalaz.geo.Bearing]">orderBy</a><a href="../Order.scala.html#176685" title="=&gt; scalaz.Order[Double]" class="delimiter">(</a><a href="#885843" title="scalaz.geo.Bearing">_</a>.<a href="#870168" title="=&gt; Double">value</a><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+        </pre>
+    </body>
+</html>

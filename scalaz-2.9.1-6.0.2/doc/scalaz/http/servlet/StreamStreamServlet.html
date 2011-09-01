@@ -1,0 +1,658 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.http.servlet.StreamStreamServlet</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../../lib/class_big.png" />
+        <p id="owner"><a name="scalaz" class="extype" href="../../package.html">scalaz</a>.<a name="scalaz.http" class="extype" href="../package.html">http</a>.<a name="scalaz.http.servlet" class="extype" href="package.html">servlet</a></p>
+        <h1>StreamStreamServlet</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">class</span>
+      <span class="symbol"> 
+        <span class="name">StreamStreamServlet</span>
+        
+        <span class="result"> extends <a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a>[Stream, Stream, <a name="scalaz.http.servlet.StreamStreamServletApplication" class="extype" href="StreamStreamServletApplication.html">StreamStreamServletApplication</a>]</span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a>[Stream, Stream, <a name="scalaz.http.servlet.StreamStreamServletApplication" class="extype" href="StreamStreamServletApplication.html">StreamStreamServletApplication</a>], <span name="javax.servlet.http.HttpServlet" class="extype">HttpServlet</span>, <span name="javax.servlet.GenericServlet" class="extype">GenericServlet</span>, <span name="java.io.Serializable" class="extype">Serializable</span>, <span name="javax.servlet.ServletConfig" class="extype">ServletConfig</span>, <span name="javax.servlet.Servlet" class="extype">Servlet</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.http.servlet.StreamStreamServlet" class="in"><span>StreamStreamServlet</span></li><li name="scalaz.http.servlet.ScalazServlet" class="in"><span>ScalazServlet</span></li><li name="javax.servlet.http.HttpServlet" class="in"><span>HttpServlet</span></li><li name="javax.servlet.GenericServlet" class="in"><span>GenericServlet</span></li><li name="java.io.Serializable" class="in"><span>Serializable</span></li><li name="javax.servlet.ServletConfig" class="in"><span>ServletConfig</span></li><li name="javax.servlet.Servlet" class="in"><span>Servlet</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        <div class="members" id="constructors">
+              <h3>Instance Constructors</h3>
+              <ol><li visbl="pub" name="scalaz.http.servlet.StreamStreamServlet#this" data-isabs="false">
+      <a id="this:StreamStreamServlet"></a>
+      <h4 class="signature">
+      <span class="kind">new</span>
+      <span class="symbol"> 
+        <span class="name">StreamStreamServlet</span>
+        
+        <span class="params">()</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" name="scalaz.http.servlet.ScalazServlet#App" data-isabs="false">
+      <a id="App:App"></a>
+      <h4 class="signature">
+      <span class="kind">type</span>
+      <span class="symbol"> 
+        <span class="name">App</span>
+        
+        <span class="result"> = AnyRef { def application: scalaz.http.servlet.ServletApplication[Stream,Stream] }</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A servlet application from request to response.</p><div class="fullcomment"><div class="comment cmt"><p>A servlet application from request to response.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a></dd></dl></div>
+    </li></ol>
+            </div>
+        
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.servlet.ScalazServlet#applicationInitParam" data-isabs="false">
+      <a id="applicationInitParam:String"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">applicationInitParam</span>
+        
+        <span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The <code>init-param</code> to specify in <code>web.xml</code> that denotes the class that is assignable to the
+class given in the constructor.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>init-param</code> to specify in <code>web.xml</code> that denotes the class that is assignable to the
+class given in the constructor. It is the application that takes a request to a response.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a></dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#destroy" data-isabs="false">
+      <a id="destroy():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">destroy</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → Servlet</dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doDelete" data-isabs="false">
+      <a id="doDelete(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doDelete</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doGet" data-isabs="false">
+      <a id="doGet(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doGet</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doHead" data-isabs="false">
+      <a id="doHead(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doHead</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doOptions" data-isabs="false">
+      <a id="doOptions(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doOptions</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doPost" data-isabs="false">
+      <a id="doPost(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doPost</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doPut" data-isabs="false">
+      <a id="doPut(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doPut</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#doTrace" data-isabs="false">
+      <a id="doTrace(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">doTrace</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getInitParameter" data-isabs="false">
+      <a id="getInitParameter(String):String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getInitParameter</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="java.lang.String" class="extype">String</span></span>)</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → ServletConfig</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getInitParameterNames" data-isabs="false">
+      <a id="getInitParameterNames():java.util.Enumeration[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getInitParameterNames</span>
+        
+        <span class="params">()</span><span class="result">: java.util.Enumeration[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → ServletConfig</dd></dl></div>
+    </li><li visbl="prt" name="javax.servlet.http.HttpServlet#getLastModified" data-isabs="false">
+      <a id="getLastModified(HttpServletRequest):Long"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getLastModified</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>)</span><span class="result">: <span name="scala.Long" class="extype">Long</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="javax.servlet.http" class="extype" href="../../../javax/servlet/http/package.html">http</a>] </dd><dt>Definition Classes</dt><dd>HttpServlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getServletConfig" data-isabs="false">
+      <a id="getServletConfig():ServletConfig"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getServletConfig</span>
+        
+        <span class="params">()</span><span class="result">: <span name="javax.servlet.ServletConfig" class="extype">ServletConfig</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → Servlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getServletContext" data-isabs="false">
+      <a id="getServletContext():ServletContext"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getServletContext</span>
+        
+        <span class="params">()</span><span class="result">: <span name="javax.servlet.ServletContext" class="extype">ServletContext</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → ServletConfig</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getServletInfo" data-isabs="false">
+      <a id="getServletInfo():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getServletInfo</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → Servlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#getServletName" data-isabs="false">
+      <a id="getServletName():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getServletName</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet → ServletConfig</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.servlet.ScalazServlet#init" data-isabs="false">
+      <a id="init(ServletConfig):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">init</span>
+        
+        <span class="params">(<span name="config">config: <span name="javax.servlet.ServletConfig" class="extype">ServletConfig</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Checks for the existence of the application init-param, that it is of a correct type and instantiates it.</p><div class="fullcomment"><div class="comment cmt"><p>Checks for the existence of the application init-param, that it is of a correct type and instantiates it.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd><a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a> → GenericServlet → Servlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#init" data-isabs="false">
+      <a id="init():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">init</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#log" data-isabs="false">
+      <a id="log(String,Throwable):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">log</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="java.lang.String" class="extype">String</span></span>, <span name="arg1">arg1: <span name="java.lang.Throwable" class="extype">Throwable</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.GenericServlet#log" data-isabs="false">
+      <a id="log(String):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">log</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="java.lang.String" class="extype">String</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>GenericServlet</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.http.servlet.ScalazServlet#service" data-isabs="false">
+      <a id="service(HttpServletRequest,HttpServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">service</span>
+        
+        <span class="params">(<span name="request">request: <span name="javax.servlet.http.HttpServletRequest" class="extype">HttpServletRequest</span></span>, <span name="response">response: <span name="javax.servlet.http.HttpServletResponse" class="extype">HttpServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Applies the given request to the underlying web application and sends the resulting response to the given response.</p><div class="fullcomment"><div class="comment cmt"><p>Applies the given request to the underlying web application and sends the resulting response to the given response.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd><a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a> → HttpServlet</dd></dl></div>
+    </li><li visbl="pub" name="javax.servlet.http.HttpServlet#service" data-isabs="false">
+      <a id="service(ServletRequest,ServletResponse):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">service</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="javax.servlet.ServletRequest" class="extype">ServletRequest</span></span>, <span name="arg1">arg1: <span name="javax.servlet.ServletResponse" class="extype">ServletResponse</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>HttpServlet → GenericServlet → Servlet</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div name="scalaz.http.servlet.ScalazServlet" class="parent">
+              <h3>Inherited from <a name="scalaz.http.servlet.ScalazServlet" class="extype" href="ScalazServlet.html">ScalazServlet</a>[Stream, Stream, <a name="scalaz.http.servlet.StreamStreamServletApplication" class="extype" href="StreamStreamServletApplication.html">StreamStreamServletApplication</a>]</h3>
+            </div><div name="javax.servlet.http.HttpServlet" class="parent">
+              <h3>Inherited from <span name="javax.servlet.http.HttpServlet" class="extype">HttpServlet</span></h3>
+            </div><div name="javax.servlet.GenericServlet" class="parent">
+              <h3>Inherited from <span name="javax.servlet.GenericServlet" class="extype">GenericServlet</span></h3>
+            </div><div name="java.io.Serializable" class="parent">
+              <h3>Inherited from <span name="java.io.Serializable" class="extype">Serializable</span></h3>
+            </div><div name="javax.servlet.ServletConfig" class="parent">
+              <h3>Inherited from <span name="javax.servlet.ServletConfig" class="extype">ServletConfig</span></h3>
+            </div><div name="javax.servlet.Servlet" class="parent">
+              <h3>Inherited from <span name="javax.servlet.Servlet" class="extype">Servlet</span></h3>
+            </div><div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>
