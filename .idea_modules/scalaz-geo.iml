@@ -4,13 +4,13 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="scala-2.9.0-1" />
+        <option name="compilerLibraryName" value="scala-2.9.1" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../geo/target/scala-2.9.0.1/classes" />
-    <output-test url="file://$MODULE_DIR$/../geo/target/scala-2.9.0.1/test-classes" />
+    <output url="file://$MODULE_DIR$/../geo/target/scala-2.9.1.final/classes" />
+    <output-test url="file://$MODULE_DIR$/../geo/target/scala-2.9.1.final/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../geo">
       <sourceFolder url="file://$MODULE_DIR$/../geo/src/main/scala" isTestSource="false" />
@@ -23,7 +23,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.scala-lang_scala-library_2.9.0-1" level="project" />
+    <orderEntry type="library" name="org.scala-lang_scala-library_2.9.1" level="project" />
+    <orderEntry type="library" name="dummy" level="project" />
     <orderEntry type="module" module-name="scalaz-core" exported="" />
   </component>
 </module>
