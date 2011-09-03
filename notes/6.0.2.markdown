@@ -1,4 +1,4 @@
 * Migrate build to SBT 0.10.x
 * Update to Scala 2.9.1
 * Unify branches for the 2.8.x and 2.9.x builds
-* rename MA#{!, !!, -!-} to {index, foldIndex, index_!}
+* rename `MA#{!, !!, -!-}` to `{index, foldIndex, index_!}`
