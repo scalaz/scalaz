@@ -144,7 +144,7 @@ trait MA[M[_], A] extends PimpedType[M[A]] with MASugar[M, A] {
 
   def index(n: Int)(implicit i: Index[M]): Option[A] = i.index(value, n)
 
-  def index_!(n: Int)(implicit i: Index[M]): A = this.index(n) getOrElse (sys.error("Index " + n + " out of bounds"))
+  def index_!(n: Int)(implicit i: Index[M]): A = this.index(n) getOrElse (error_("Index " + n + " out of bounds"))
 
   def -!-(n: Int)(implicit i: Index[M]): A = this.index_!(n) 
 

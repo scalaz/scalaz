@@ -55,7 +55,7 @@ sealed trait Heap[A] {
     fold(None, (_, _, t) => Some((t.rootLabel.value, deleteMin)))
 
   /** Get the minimum key on the (nonempty) heap. O(1) */
-  def minimum: A = fold(sys.error("Heap.minimum: empty heap"), (_, _, t) => t.rootLabel.value)
+  def minimum: A = fold(error_("Heap.minimum: empty heap"), (_, _, t) => t.rootLabel.value)
 
   /** Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
@@ -227,7 +227,7 @@ object Heap {
 
   private def rootZ[A]: ForestZipper[A] => A = {
     case (_, x #:: _) => x.rootLabel.value
-    case _ => sys.error("Heap.rootZ: empty zipper")
+    case _ => error_("Heap.rootZ: empty zipper")
   }
 
   private def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)
@@ -273,7 +273,7 @@ object Heap {
       if (y % 2 == 0) g(x union x, y / 2, z) else
       if (y == 1) x union z else
         g(x union x, (y - 1) / 2, x union z)
-    if (i < 0) sys.error("Heap.replicate: negative length") else
+    if (i < 0) error_("Heap.replicate: negative length") else
     if (i == 0) Empty[A] else
        f(singleton(a), i)
   }
@@ -322,7 +322,7 @@ object Heap {
         if (rank(t1) == rank(t2)) (zs, t1 #:: t2 #:: ts, cf) else
         if (rank(t1) == 0) splitForest(r-1, t1 #:: zs, t2 #:: ts, cf) else
           splitForest(r-1, zs, t1 #:: ts, t2 #:: cf)
-      case (_, _, _, _) => sys.error("Heap.splitForest: invalid arguments")
+      case (_, _, _, _) => error_("Heap.splitForest: invalid arguments")
     }
   private def skewMeld[A](f: (A, A) => Boolean, ts: Forest[A], tsp: Forest[A]) =
     unionUniq(f)(uniqify(f)(ts), uniqify(f)(tsp))

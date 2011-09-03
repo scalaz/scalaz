@@ -68,7 +68,7 @@ object Scalaz extends Actors
     with    Zeros
     with    Zippers
     with    ZipStreams {
-  def ⊥ = sys.error("undefined")
+  def ⊥ = error_("undefined")
 
   def undefined = ⊥
 
@@ -91,4 +91,11 @@ object Scalaz extends Actors
   def pure[F[_] : Pure] = new (Id ~> F) {
     def apply[A](a: A) = implicitly[Pure[F]].pure(a)
   }
+
+  // This is to avoid calliing Predef.error (deprecated in 2.9.x), or error_ (not available in
+  // 2.8.1. Despite being private[scalaz], we can't just call this `error`, as even outside
+  // of the package it is importable (bug?) `import Scalaz._; import Predef; error() // ambiguous!
+  //
+  // Drop this when we drop 2.8.1 support.
+  private[scalaz] def error_(m: String) = throw new RuntimeException(m)
 }
