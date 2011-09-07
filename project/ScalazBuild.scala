@@ -139,7 +139,7 @@ object ScalazBuild extends Build {
     // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
-      case "2.9.1.RC1" => "2.9.0-1"
+      case "2.9.1" => "2.9.0-1"
       case x => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
@@ -159,9 +159,9 @@ object ScalazBuild extends Build {
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
-    version      := "6.0.2-SNAPSHOT",
-    scalaVersion := "2.8.1",
-    crossScalaVersions := Seq("2.9.0-1", "2.8.1", "2.9.1.RC1"),
+    version      := "6.0.3-SNAPSHOT",
+    scalaVersion := "2.9.1",
+    crossScalaVersions := Seq("2.9.1", "2.9.0-1", "2.8.1"),
     resolvers    += ScalaToolsSnapshots,
   
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),

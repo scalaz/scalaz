@@ -1,0 +1,1 @@
+* Remove `scalaz.sys`, which despite being `private[scalaz]`, led to ambiguity after `import scala._; import Scalaz._; sys.error("")`
