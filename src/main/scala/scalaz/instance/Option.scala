@@ -1,4 +1,5 @@
 package scalaz
+package instance
 
 trait Options {
   implicit val option = new MonadPlusInstance[Option] with TraverseInstance[Option] {
