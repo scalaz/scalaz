@@ -4,7 +4,7 @@ trait MonadPlusLike[F[_]] extends MonadLike[F] with ApplicativePlusLike[F] with 
   def filter[A](fa: F[A])(f: A => Boolean) = bind(fa)(a => if (f(a)) pure(a) else empty[A])
 }
   
-trait MonadPlus[F[_]] extends MonadLike[F]
+trait MonadPlus[F[_]] extends MonadPlusLike[F]
 trait MonadPlusInstance[F[_]] extends MonadPlus[F] with MonadInstance[F] with PlusInstance[F]
 
 trait ToMonadPlusSyntax extends ToMonadSyntax with ToPlusSyntax
