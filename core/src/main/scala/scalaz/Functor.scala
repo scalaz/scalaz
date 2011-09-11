@@ -7,8 +7,7 @@ trait FunctorLike[F[_]] { self =>
   def apply[A,B](f: A => B): F[A] => F[B] = map(_)(f)
   def strengthL[A,B](a: A, f: F[B]): F[(A,B)] = map(f)(b => (a,b))
   def strengthR[A,B](f: F[A], b: B): F[(A,B)] = map(f)(a => (a,b))
-  lazy val Functor: Functor[F] = new Functor[F] { 
-    def map[A,B](fa: F[A])(f: A => B) = FunctorLike.this.map(fa)(f) }
+
   val syntax = new scalaz.syntax.FunctorSyntax[F] {}
 }
 
