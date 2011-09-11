@@ -1,4 +1,5 @@
 package scalaz
+package syntax
 
 trait Syntaxes {
   object functor extends ToFunctorSyntax
