@@ -4,7 +4,6 @@ import Keys._
 object build extends Build {
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
-    name := "scalaz-core",
     version := "7.1-SNAPSHOT",
     scalaVersion := "2.9.1"
   )
@@ -25,6 +24,7 @@ object build extends Build {
   lazy val example = Project(
     id = "scalaz-example",
     base = file("example"),
+    dependencies = Seq(core),
     settings = standardSettings
   )
 }
