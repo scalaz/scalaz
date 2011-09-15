@@ -18,7 +18,27 @@ object build extends Build {
   lazy val core = Project(
     id = "scalaz-core",
     base = file("core"),
-    settings = standardSettings
+    settings = standardSettings ++ Seq(
+      createTypeClass <<= inputTask { (argTask: TaskKey[Seq[String]]) =>
+        (argTask, scalaSource in Compile, streams).map { (args: Seq[String], scalaSource: File, streams: TaskStreams) =>
+          val (typeClassName, extendsList) = args match {
+            case List() => error("Type class name not specified")
+            case List(typeClassName) => (typeClassName, List())
+            case List(typeClassName, extendsList) => (typeClassName, extendsList.split(",").map(_.trim).toList)
+          }
+          
+          val typeClassSource0 = GenTypeClass.typeclassSource(typeClassName, extendsList)
+          def write(source: GenTypeClass.SourceFile) {
+            val outFile = source.file(scalaSource)
+            streams.log.info("Writing %s".format(outFile))
+            streams.log.debug("Contents: %s".format(source.source))
+            IO.write(outFile, source.source)
+          }
+          typeClassSource0.sources.foreach(write)
+          typeClassSource0.sources.map(_.file(scalaSource))
+        }
+      }
+    )
   )
 
   lazy val example = Project(
@@ -27,4 +47,7 @@ object build extends Build {
     dependencies = Seq(core),
     settings = standardSettings
   )
+
+  lazy val createTypeClass = InputKey[Seq[File]]("create-type-class",
+    "Creates skeleton for a new type class. Overwrites existing files. Example `create-type-class Monad Functor,Bind`")
 }
