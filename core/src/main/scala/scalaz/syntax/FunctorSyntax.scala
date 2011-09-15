@@ -14,6 +14,8 @@ trait FunctorV[F[_], A] extends SyntaxV[F[A]] {
 
 trait ToFunctorSyntax {
   implicit def functor[F[_], A](v: F[A]) = (new FunctorSyntax[F] {}).functorV(v)
+  implicit def functorBin[F[_, _], X, A](v: F[X, A]) =
+    (new FunctorSyntax[({type f[a] = F[X, a]})#f] {}).functorV(v)
 
   implicit def lift[F[_], A, B](v: A => B) = (new FunctorSyntax[F] {}).liftV(v)
 }
