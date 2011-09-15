@@ -20,8 +20,8 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToTraverseSyntax {
-  implicit def functor[F[_],A](v: F[A]) = (new TraverseSyntax[F] {}).functorV(v)
+  implicit def traverse[F[_],A](v: F[A]) = (new TraverseSyntax[F] {}).traverseV(v)
 }
 trait TraverseSyntax[F[_]] {
-  implicit def functorV[A](v: F[A]) = new TraverseV[F,A] { def self = v }
+  implicit def traverseV[A](v: F[A]) = new TraverseV[F,A] { def self = v }
 }
