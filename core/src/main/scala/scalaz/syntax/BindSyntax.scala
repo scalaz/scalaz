@@ -4,10 +4,10 @@ package syntax
 
 trait BindV[F[_], A] extends SyntaxV[F[A]] {
   def flatMap[B](f: A => F[B])(implicit F: Bind[F]) = F.bind(self)(f)
-}
 
-trait JoinV[F[_], A] extends SyntaxV[F[F[A]]] {
-  def join(implicit F: Bind[F]) = F.join(self)
+  def >>=[B](f: A => F[B])(implicit F: Bind[F]) = F.bind(self)(f)
+
+  def join[B](implicit F: Bind[F], ev: F[A] <:< F[F[B]]) = F.join(ev(self))
 }
 
 trait ToBindSyntax extends ToApplySyntax {
