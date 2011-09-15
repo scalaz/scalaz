@@ -21,13 +21,14 @@ object build extends Build {
     settings = standardSettings ++ Seq(
       createTypeClass <<= inputTask { (argTask: TaskKey[Seq[String]]) =>
         (argTask, scalaSource in Compile, streams).map { (args: Seq[String], scalaSource: File, streams: TaskStreams) =>
-          val (typeClassName, extendsList) = args match {
+
+          val (typeClassName, kind, extendsList) = args match {
             case List() => error("Type class name not specified")
-            case List(typeClassName) => (typeClassName, List())
-            case List(typeClassName, extendsList) => (typeClassName, extendsList.split(",").map(_.trim).toList)
+            case List(typeClassName, GenTypeClass.KindExtractor(kind)) => (typeClassName, kind, List())
+            case List(typeClassName, GenTypeClass.KindExtractor(kind), extendsList) => (typeClassName, kind, extendsList.split(",").map(_.trim).toList)
           }
           
-          val typeClassSource0 = GenTypeClass.typeclassSource(typeClassName, extendsList)
+          val typeClassSource0 = GenTypeClass.typeclassSource(typeClassName, kind, extendsList)
           def write(source: GenTypeClass.SourceFile) {
             val outFile = source.file(scalaSource)
             streams.log.info("Writing %s".format(outFile))
@@ -49,5 +50,5 @@ object build extends Build {
   )
 
   lazy val createTypeClass = InputKey[Seq[File]]("create-type-class",
-    "Creates skeleton for a new type class. Overwrites existing files. Example `create-type-class Monad Functor,Bind`")
+    "Creates skeleton for a new type class. Overwrites existing files. Examples `create-type-class * Monoid Semigroup`, `create-type-class *->* Monad Functor,Bind`")
 }
