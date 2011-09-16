@@ -1,5 +1,70 @@
 import sbt._
 
+case class TypeClass(name: String, kind: Kind, extendsList: TypeClass*)
+
+object TypeClass {
+  import Kind._
+
+  lazy val semigroup = TypeClass("Semigroup", *)
+  lazy val monoid = TypeClass("Monoid", *)
+  lazy val equal = TypeClass("Equal", *)
+  lazy val show = TypeClass("Show", *)
+  lazy val order = TypeClass("Order", *, equal)
+
+  lazy val functor = TypeClass("Functor", *->*)
+  lazy val pointed = TypeClass("Pointed", *->*, functor)
+  lazy val contravariant = TypeClass("Contravariant", *->*)
+  lazy val copointed = TypeClass("Copointed", *->*, contravariant)
+  lazy val apply: TypeClass = TypeClass("Apply", *->*, functor)
+  lazy val applicative = TypeClass("Applicative", *->*, apply, pointed)
+  lazy val bind = TypeClass("Bind", *->*, apply)
+  lazy val monad = TypeClass("Monad", *->*, applicative, bind)
+  lazy val cobind = TypeClass("Cobind", *->*)
+  lazy val comonad = TypeClass("Comonad", *->*, cobind)
+  lazy val plus = TypeClass("Plus", *->*, functor)
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, applicative, plus)
+  lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
+  lazy val traverse = TypeClass("Traverse", *->*, functor)
+
+  def all: List[TypeClass] = List(semigroup,
+    monoid,
+    equal,
+    show,
+    order,
+    functor,
+    pointed,
+    contravariant,
+    copointed,
+    apply,
+    applicative,
+    bind,
+    monad,
+    cobind,
+    comonad,
+    plus,
+    applicativePlus,
+    monadPlus,
+    traverse)
+}
+
+sealed abstract class Kind
+
+object Kind {
+
+  case object * extends Kind
+
+  case object *->* extends Kind
+
+  def parse(s: String): Option[Kind] = s match {
+    case "*" => Some(*)
+    case "*->*" => Some(*->*)
+    case _ => None
+  }
+}
+
+object KindExtractor {
+  def unapply(s: String): Option[Kind] = Kind.parse(s)
+}
 
 object GenTypeClass {
 
@@ -44,25 +109,6 @@ object GenTypeClass {
     def sources = List(mainFile, syntaxFile)
   }
 
-  sealed abstract class Kind
-
-  object Kind {
-
-    case object * extends Kind
-
-    case object *->* extends Kind
-
-    def parse(s: String): Option[Kind] = s match {
-      case "*" => Some(*)
-      case "*->*" => Some(*->*)
-      case _ => None
-    }
-  }
-
-  object KindExtractor {
-    def unapply(s: String): Option[Kind] = GenTypeClass.Kind.parse(s)
-  }
-
   def typeclassSource(typeClassName: String, kind: Kind,
                       extendsList: Seq[String]): TypeClassSource = {
     val classifiedType = kind match {
@@ -73,7 +119,7 @@ object GenTypeClass {
       val (init, rest) = s.splitAt(1)
       init.toLowerCase + rest
     }
-    def extendsListText(suffix: String) = extendsList match {
+    def extendsListText(suffix: String, parents: Seq[String] = extendsList) = parents match {
       case Seq() => ""
       case es => es.map(n => n + suffix + "[F]").mkString("extends ", " with ", "")
     }
@@ -82,14 +128,9 @@ object GenTypeClass {
       case es => es.map(n => "To" + n + "Syntax").mkString("extends ", " with ", "")
     }
     val extendsLikeList = extendsListText("Like")
-    val extendsInstanceList = extendsListText("Instance")
+    val extendsInstanceList = extendsListText("", typeClassName +: extendsList.map(_ + "Instance"))
 
-    val syntaxOverride =
-      if (extendsList.size > 1) ""
-      else {
-        val modifier = if (extendsList.isEmpty) "" else "override "
-        modifier + "val syntax = new scalaz.syntax.%sSyntax[F] {}".format(typeClassName)
-      }
+    val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[F] {}".format(initLower(typeClassName), typeClassName)
 
     val mainSource = """package scalaz
 
@@ -110,7 +151,7 @@ trait %sLike[%s] %s { self =>
 trait %s[%s] extends %sLike[F]
 
 trait %sInstance[%s] %s
-""".format(typeClassName, classifiedType, extendsLikeList, syntaxOverride, typeClassName, classifiedType,
+""".format(typeClassName, classifiedType, extendsLikeList, syntaxMember, typeClassName, classifiedType,
       typeClassName, typeClassName, classifiedType, extendsInstanceList)
     val mainSourceFile = SourceFile(List("scalaz"), typeClassName + ".scala", mainSource)
 
@@ -129,10 +170,6 @@ trait %sV[F] extends SyntaxV[F] {
 trait To%sSyntax %s {
   implicit def %s[F](v: F) =
     (new %sSyntax[F] {}).%sV(v)
-
-  ////
-
-  ////
 }
 
 trait %sSyntax[F] %s {
@@ -172,10 +209,6 @@ trait To%sSyntax %s {
     (new %sSyntax[({type f[a] = F[X, G, a]})#f] {}).%sV(v)
   implicit def %sBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new %sSyntax[({type f[a] = F[X, Id, a]})#f] {}).%sV(v)
-
-  ////
-
-  ////
 }
 
 trait %sSyntax[F[_]] %s {

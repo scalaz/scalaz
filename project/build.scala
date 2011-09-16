@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import GenTypeClass._
 
 object build extends Build {
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
@@ -24,15 +25,23 @@ object build extends Build {
 
           val (typeClassName, kind, extendsList) = args match {
             case List() => error("Type class name not specified")
-            case List(typeClassName, GenTypeClass.KindExtractor(kind)) => (typeClassName, kind, List())
-            case List(typeClassName, GenTypeClass.KindExtractor(kind), extendsList) =>
+            case List(typeClassName, KindExtractor(kind)) => (typeClassName, kind, List())
+            case List(typeClassName, KindExtractor(kind), extendsList) =>
               (typeClassName, kind, extendsList.split(",").map(_.trim).toList)
           }
           
-          val typeClassSource0 = GenTypeClass.typeclassSource(typeClassName, kind, extendsList)
+          val typeClassSource0 = typeclassSource(typeClassName, kind, extendsList)
           typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
         }
-      }
+      },
+      createAllTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
+        (scalaSource, streams, typeClasses) =>
+          typeClasses.flatMap { tc =>
+              val typeClassSource0 = typeclassSource(tc.name, tc.kind, tc.extendsList.toList.map(_.name))
+              typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
+          }
+      },
+      typeClasses := TypeClass.all
     )
   )
 
@@ -45,4 +54,8 @@ object build extends Build {
 
   lazy val createTypeClass = InputKey[Seq[File]]("create-type-class",
     "Creates skeleton for a new type class. Overwrites existing files. Examples: `create-type-class * Monoid Semigroup`, `create-type-class *->* Monad Functor,Bind`")
+
+  lazy val createAllTypeClasses = TaskKey[Seq[File]]("create-all-type-classes")
+
+  lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 }
