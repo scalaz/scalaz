@@ -13,18 +13,20 @@ object TypeClass {
 
   lazy val functor = TypeClass("Functor", *->*)
   lazy val pointed = TypeClass("Pointed", *->*, functor)
-  lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, contravariant)
   lazy val apply: TypeClass = TypeClass("Apply", *->*, functor)
   lazy val applicative = TypeClass("Applicative", *->*, apply, pointed)
   lazy val bind = TypeClass("Bind", *->*, apply)
   lazy val monad = TypeClass("Monad", *->*, applicative, bind)
-  lazy val cobind = TypeClass("Cobind", *->*)
-  lazy val comonad = TypeClass("Comonad", *->*, cobind)
+  lazy val traverse = TypeClass("Traverse", *->*, functor)
+
+  lazy val contravariant = TypeClass("Contravariant", *->*)
+  lazy val copointed = TypeClass("Copointed", *->*, contravariant)
+  lazy val cojoin = TypeClass("Cojoin", *->*)
+  lazy val comonad = TypeClass("Comonad", *->*, copointed, cojoin)
+
   lazy val plus = TypeClass("Plus", *->*, functor)
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, applicative, plus)
   lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
-  lazy val traverse = TypeClass("Traverse", *->*, functor)
 
   def all: List[TypeClass] = List(semigroup,
     monoid,
@@ -39,7 +41,7 @@ object TypeClass {
     applicative,
     bind,
     monad,
-    cobind,
+    cojoin,
     comonad,
     plus,
     applicativePlus,
