@@ -1,9 +1,10 @@
 package scalaz
 
-trait ApplicativeLike[F[_]] extends PointedLike[F] with ApplyLike[F] { self => 
- 
+trait ApplicativeLike[F[_]] extends ApplyLike[F] with PointedLike[F] { self =>
+  ////
+
   // derived functions
-  def map[A,B](fa: F[A])(f: A => B): F[B] = 
+  def map[A,B](fa: F[A])(f: A => B): F[B] =
     ap(fa)(pure(f))
   def map2[A,B,C](fa: F[A], fb: F[B])(f: (A,B) => C): F[C] = 
     ap2(fa, fb)(pure(f))
@@ -24,7 +25,15 @@ trait ApplicativeLike[F[_]] extends PointedLike[F] with ApplyLike[F] { self =>
 
   // impls of sequence, traverse, etc
 
-  override val syntax = new scalaz.syntax.ApplicativeSyntax[F] {}
+  ////
+  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {}
 }
+
+////
+/**
+ *
+ */
+////
 trait Applicative[F[_]] extends ApplicativeLike[F]
+
 trait ApplicativeInstance[F[_]] extends Applicative[F] with ApplyInstance[F] with PointedInstance[F]

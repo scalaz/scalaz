@@ -1,6 +1,7 @@
 package scalaz
 
-trait ApplyLike[F[_]] extends FunctorLike[F] { self => 
+trait ApplyLike[F[_]] extends FunctorLike[F] { self =>
+  ////
   def ap[A,B](fa: F[A])(f: F[A => B]): F[B]
   
   // derived functions
@@ -13,8 +14,15 @@ trait ApplyLike[F[_]] extends FunctorLike[F] { self =>
   def ap5[A,B,C,D,E,R](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E])(f: F[(A,B,C,D,E) => R]): F[R] =
     ap(fe)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d:D) => (e:E) => f(a,b,c,d,e)))))
 
-  override val syntax = new scalaz.syntax.ApplySyntax[F] {}
+  ////
+  val applySyntax = new scalaz.syntax.ApplySyntax[F] {}
 }
-trait Apply[F[_]] extends ApplyLike[F] 
-trait ApplyInstance[F[_]] extends Apply[F] with FunctorInstance[F]
 
+////
+/**
+ *
+ */
+////
+trait Apply[F[_]] extends ApplyLike[F]
+
+trait ApplyInstance[F[_]] extends Apply[F] with FunctorInstance[F]

@@ -1,10 +1,11 @@
 package scalaz
 
-import Id.{Id,id}
-import State.State
-import State.state
+trait TraverseLike[F[_]] extends FunctorLike[F] { self =>
+  ////
+  import Id.{Id,id}
+  import State.State
+  import State.state
 
-trait TraverseLike[F[_]] extends FunctorLike[F] {
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
   class Traversal[G[_]](implicit G: Applicative[G]) { 
@@ -59,6 +60,16 @@ trait TraverseLike[F[_]] extends FunctorLike[F] {
   def zipR[A,B](fa: F[A], fb: F[B]) = zipWithR(fa, fb)((_,_))
 
   // foldLeft, foldRight, mapAccumL, mapAccumR, map, filter?
+
+  ////
+  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] {}
 }
+
+////
+/**
+ *
+ */
+////
 trait Traverse[F[_]] extends TraverseLike[F]
+
 trait TraverseInstance[F[_]] extends Traverse[F] with FunctorInstance[F]
