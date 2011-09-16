@@ -10,9 +10,10 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
 
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
+  private val errorHandlers = new ConcurrentLinkedQueue[Throwable => Unit]
   @volatile private var v: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
-  private val e = actor[Signal[A]](_.eval)
+  private val e = actor[Signal[A]](_.eval, x => v.fulfill(throw x, this))
 
   def get = {
     latch.await
@@ -20,6 +21,7 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   }
 
   def to(k: A => Unit): Unit = e ! new Cont(k, this)
+  def errorTo(k: Throwable => Unit): Unit = e ! new Err(k, this)
   def fulfill(a: => A): Unit = e ! new Done(a, this)
   def fulfilled: Boolean = v.fulfilled
   def threw: Boolean = v.threw
@@ -34,7 +36,17 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   def map[B](f: A => B) = flatMap(a => Promise(f(a)))
   def flatMap[B](f: A => Promise[B]) = {
     val r = new Promise[B]()
-    to(a => f(a) to effect[B](b => r fulfill b))
+    errorTo (x => r fulfill (throw x))
+    to(a => (try {
+      val p = f(a)
+      p errorTo (x => r fulfill (throw x))
+      p
+    } catch {
+      case x => {
+        r fulfill (throw x)
+        (throw x) : Promise[B]
+      }
+    }) to effect[B](b => r fulfill b))
     r
   }
   def filter(p: A => Boolean): Promise[A] = {
@@ -73,7 +85,7 @@ object Promise {
     val threw: Boolean
     def break(promise: Promise[_]): Unit
   }
-  private class Thrown(e: Throwable) extends State[Nothing] {
+  private case class Thrown(e: Throwable) extends State[Nothing] {
     def get: Nothing = throw e
     def fulfill[B](a: => B, promise: Promise[B]) {
       // we could allow users to manually fulfill a thrown promise, 
@@ -98,16 +110,19 @@ object Promise {
       if (!promise.borked) {
         try { 
           promise.v = new Fulfilled(a)
-          promise.latch.countDown
-          val as = promise.waiting
-          while (!as.isEmpty) as.remove()(a)
         } catch { 
           case e : Throwable => {
             promise.v = new Thrown(e)
+            val es = promise.errorHandlers
+            while (!es.isEmpty) es.remove()(e)
             promise.latch.countDown
             promise.waiting.clear // kill teh hordes
+            promise.errorHandlers.clear
           }
         }
+        promise.latch.countDown
+        val as = promise.waiting
+        while (!as.isEmpty) as.remove()(a)
       }
     }
     val fulfilled = false
@@ -138,4 +153,12 @@ object Promise {
       promise.v.break(promise)
     }
   }
+  private class Err[+A](k: Throwable => Unit, promise: Promise[A]) extends Signal[A] {
+    def eval {
+      promise.v match {
+        case Thrown(e) => k(e)
+        case _ => promise.errorHandlers.offer(k)
+      }
+    }
+  } 
 }
