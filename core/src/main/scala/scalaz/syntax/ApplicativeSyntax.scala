@@ -18,6 +18,10 @@ trait ToApplicativeSyntax extends ToApplySyntax with ToPointedSyntax {
     (new ApplicativeSyntax[({type f[a] = F[X, G, a]})#f] {}).applicativeV(v)
   implicit def applicativeBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new ApplicativeSyntax[({type f[a] = F[X, Id, a]})#f] {}).applicativeV(v)
+
+  ////
+
+  ////
 }
 
 trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with PointedSyntax[F] {

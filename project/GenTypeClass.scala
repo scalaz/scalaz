@@ -172,6 +172,10 @@ trait %sV[F] extends SyntaxV[F] {
 trait To%sSyntax %s {
   implicit def %s[F](v: F) =
     (new %sSyntax[F] {}).%sV(v)
+
+  ////
+
+  ////
 }
 
 trait %sSyntax[F] %s {
@@ -209,6 +213,10 @@ trait To%sSyntax %s {
     (new %sSyntax[({type f[a] = F[X, G, a]})#f] {}).%sV(v)
   implicit def %sBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new %sSyntax[({type f[a] = F[X, Id, a]})#f] {}).%sV(v)
+
+  ////
+
+  ////
 }
 
 trait %sSyntax[F[_]] %s {

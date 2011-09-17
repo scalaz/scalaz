@@ -17,6 +17,10 @@ trait ToApplicativePlusSyntax extends ToApplicativeSyntax with ToPlusSyntax {
     (new ApplicativePlusSyntax[({type f[a] = F[X, G, a]})#f] {}).applicativePlusV(v)
   implicit def applicativePlusBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new ApplicativePlusSyntax[({type f[a] = F[X, Id, a]})#f] {}).applicativePlusV(v)
+
+  ////
+
+  ////
 }
 
 trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusSyntax[F] {

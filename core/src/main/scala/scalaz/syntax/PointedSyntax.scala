@@ -17,6 +17,10 @@ trait ToPointedSyntax extends ToFunctorSyntax {
     (new PointedSyntax[({type f[a] = F[X, G, a]})#f] {}).pointedV(v)
   implicit def pointedBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new PointedSyntax[({type f[a] = F[X, Id, a]})#f] {}).pointedV(v)
+
+  ////
+
+  ////
 }
 
 trait PointedSyntax[F[_]] extends FunctorSyntax[F] {

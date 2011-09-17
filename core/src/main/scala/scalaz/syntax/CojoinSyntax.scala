@@ -17,6 +17,10 @@ trait ToCojoinSyntax  {
     (new CojoinSyntax[({type f[a] = F[X, G, a]})#f] {}).cojoinV(v)
   implicit def cojoinBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new CojoinSyntax[({type f[a] = F[X, Id, a]})#f] {}).cojoinV(v)
+
+  ////
+
+  ////
 }
 
 trait CojoinSyntax[F[_]]  {

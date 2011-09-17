@@ -17,6 +17,10 @@ trait ToComonadSyntax extends ToCopointedSyntax with ToCojoinSyntax {
     (new ComonadSyntax[({type f[a] = F[X, G, a]})#f] {}).comonadV(v)
   implicit def comonadBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new ComonadSyntax[({type f[a] = F[X, Id, a]})#f] {}).comonadV(v)
+
+  ////
+
+  ////
 }
 
 trait ComonadSyntax[F[_]] extends CopointedSyntax[F] with CojoinSyntax[F] {

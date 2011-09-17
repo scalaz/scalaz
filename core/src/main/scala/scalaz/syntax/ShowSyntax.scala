@@ -11,6 +11,10 @@ trait ShowV[F] extends SyntaxV[F] {
 trait ToShowSyntax  {
   implicit def show[F](v: F) =
     (new ShowSyntax[F] {}).showV(v)
+
+  ////
+
+  ////
 }
 
 trait ShowSyntax[F]  {

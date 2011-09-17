@@ -19,6 +19,10 @@ trait ToPlusSyntax extends ToFunctorSyntax {
     (new PlusSyntax[({type f[a] = F[X, G, a]})#f] {}).plusV(v)
   implicit def plusBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new PlusSyntax[({type f[a] = F[X, Id, a]})#f] {}).plusV(v)
+
+  ////
+
+  ////
 }
 
 trait PlusSyntax[F[_]] extends FunctorSyntax[F] {

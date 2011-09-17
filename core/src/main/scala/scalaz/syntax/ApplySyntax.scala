@@ -17,6 +17,10 @@ trait ToApplySyntax extends ToFunctorSyntax {
     (new ApplySyntax[({type f[a] = F[X, G, a]})#f] {}).applyV(v)
   implicit def applyBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new ApplySyntax[({type f[a] = F[X, Id, a]})#f] {}).applyV(v)
+
+  ////
+
+  ////
 }
 
 trait ApplySyntax[F[_]] extends FunctorSyntax[F] {

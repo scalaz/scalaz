@@ -11,6 +11,10 @@ trait MonoidV[F] extends SyntaxV[F] {
 trait ToMonoidSyntax  {
   implicit def monoid[F](v: F) =
     (new MonoidSyntax[F] {}).monoidV(v)
+
+  ////
+
+  ////
 }
 
 trait MonoidSyntax[F]  {

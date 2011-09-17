@@ -11,6 +11,10 @@ trait SemigroupV[F] extends SyntaxV[F] {
 trait ToSemigroupSyntax  {
   implicit def semigroup[F](v: F) =
     (new SemigroupSyntax[F] {}).semigroupV(v)
+
+  ////
+
+  ////
 }
 
 trait SemigroupSyntax[F]  {

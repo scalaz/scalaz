@@ -31,6 +31,10 @@ trait ToTraverseSyntax extends ToFunctorSyntax {
     (new TraverseSyntax[({type f[a] = F[X, G, a]})#f] {}).traverseV(v)
   implicit def traverseBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new TraverseSyntax[({type f[a] = F[X, Id, a]})#f] {}).traverseV(v)
+
+  ////
+
+  ////
 }
 
 trait TraverseSyntax[F[_]] extends FunctorSyntax[F] {

@@ -21,6 +21,10 @@ trait ToBindSyntax extends ToApplySyntax {
     (new BindSyntax[({type f[a] = F[X, G, a]})#f] {}).bindV(v)
   implicit def bindBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new BindSyntax[({type f[a] = F[X, Id, a]})#f] {}).bindV(v)
+
+  ////
+
+  ////
 }
 
 trait BindSyntax[F[_]] extends ApplySyntax[F] {

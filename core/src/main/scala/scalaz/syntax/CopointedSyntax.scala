@@ -17,6 +17,10 @@ trait ToCopointedSyntax extends ToContravariantSyntax {
     (new CopointedSyntax[({type f[a] = F[X, G, a]})#f] {}).copointedV(v)
   implicit def copointedBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new CopointedSyntax[({type f[a] = F[X, Id, a]})#f] {}).copointedV(v)
+
+  ////
+
+  ////
 }
 
 trait CopointedSyntax[F[_]] extends ContravariantSyntax[F] {

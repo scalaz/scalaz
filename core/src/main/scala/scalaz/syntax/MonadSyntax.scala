@@ -17,6 +17,10 @@ trait ToMonadSyntax extends ToApplicativeSyntax with ToBindSyntax {
     (new MonadSyntax[({type f[a] = F[X, G, a]})#f] {}).monadV(v)
   implicit def monadBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new MonadSyntax[({type f[a] = F[X, Id, a]})#f] {}).monadV(v)
+
+  ////
+
+  ////
 }
 
 trait MonadSyntax[F[_]] extends ApplicativeSyntax[F] with BindSyntax[F] {

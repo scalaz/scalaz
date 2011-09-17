@@ -17,6 +17,10 @@ trait ToContravariantSyntax  {
     (new ContravariantSyntax[({type f[a] = F[X, G, a]})#f] {}).contravariantV(v)
   implicit def contravariantBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new ContravariantSyntax[({type f[a] = F[X, Id, a]})#f] {}).contravariantV(v)
+
+  ////
+
+  ////
 }
 
 trait ContravariantSyntax[F[_]]  {

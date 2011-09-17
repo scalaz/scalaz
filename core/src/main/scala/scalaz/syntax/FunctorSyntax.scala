@@ -23,6 +23,12 @@ trait ToFunctorSyntax  {
     (new FunctorSyntax[({type f[a] = F[X, G, a]})#f] {}).functorV(v)
   implicit def functorBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
     (new FunctorSyntax[({type f[a] = F[X, Id, a]})#f] {}).functorV(v)
+
+  ////
+
+  implicit def lift[F[_], A, B](v: A => B) = (new FunctorSyntax[F] {}).liftV(v)
+
+  ////
 }
 
 trait FunctorSyntax[F[_]]  {
@@ -32,10 +38,6 @@ trait FunctorSyntax[F[_]]  {
   implicit def liftV[A, B](v: A => B) = new LiftV[F, A, B] {
     def self = v
   }
-  // TODO Reinstate ToFunctorSyntax#LiftV
-  //      implicit def lift[F[_], A, B](v: A => B) = (new FunctorSyntax[F] {}).liftV(v)
-  //
-  //      Need to add some new preserved chunks to the type class template.
 
   trait LiftV[F[_],A,B] extends SyntaxV[A => B] {
     def lift(implicit F: Functor[F]) = F(self)

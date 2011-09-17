@@ -11,6 +11,10 @@ trait EqualV[F] extends SyntaxV[F] {
 trait ToEqualSyntax  {
   implicit def equal[F](v: F) =
     (new EqualSyntax[F] {}).equalV(v)
+
+  ////
+
+  ////
 }
 
 trait EqualSyntax[F]  {
