@@ -1,6 +1,8 @@
 package scalaz
 
 trait CopointedLike[F[_]] extends ContravariantLike[F] { self =>
+  def copure[A](a: F[A]): A
+
   ////
 
   // derived functions
