@@ -14,4 +14,12 @@ trait ApplicativePlusLike[F[_]] extends ApplicativeLike[F] with PlusLike[F] { se
 ////
 trait ApplicativePlus[F[_]] extends ApplicativePlusLike[F]
 
+object ApplicativePlus {
+  def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
+
+  ////
+
+  ////
+}
+
 trait ApplicativePlusInstance[F[_]] extends ApplicativePlus[F] with ApplicativeInstance[F] with PlusInstance[F]

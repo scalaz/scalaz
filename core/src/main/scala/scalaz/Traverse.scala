@@ -72,4 +72,12 @@ trait TraverseLike[F[_]] extends FunctorLike[F] { self =>
 ////
 trait Traverse[F[_]] extends TraverseLike[F]
 
+object Traverse {
+  def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
+
+  ////
+
+  ////
+}
+
 trait TraverseInstance[F[_]] extends Traverse[F] with FunctorInstance[F]

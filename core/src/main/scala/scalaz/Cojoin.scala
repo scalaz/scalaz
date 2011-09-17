@@ -17,4 +17,12 @@ trait CojoinLike[F[_]]  { self =>
 ////
 trait Cojoin[F[_]] extends CojoinLike[F]
 
+object Cojoin {
+  def apply[F[_]](implicit F: Cojoin[F]): Cojoin[F] = F
+
+  ////
+
+  ////
+}
+
 trait CojoinInstance[F[_]] extends Cojoin[F]

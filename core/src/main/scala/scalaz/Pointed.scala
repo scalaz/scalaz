@@ -16,4 +16,12 @@ trait PointedLike[F[_]] extends FunctorLike[F] { self =>
 ////
 trait Pointed[F[_]] extends PointedLike[F]
 
+object Pointed {
+  def apply[F[_]](implicit F: Pointed[F]): Pointed[F] = F
+
+  ////
+
+  ////
+}
+
 trait PointedInstance[F[_]] extends Pointed[F] with FunctorInstance[F]

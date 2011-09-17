@@ -16,4 +16,12 @@ trait MonadLike[F[_]] extends ApplicativeLike[F] with BindLike[F] { self =>
 ////
 trait Monad[F[_]] extends MonadLike[F]
 
+object Monad {
+  def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
+
+  ////
+
+  ////
+}
+
 trait MonadInstance[F[_]] extends Monad[F] with ApplicativeInstance[F] with BindInstance[F]

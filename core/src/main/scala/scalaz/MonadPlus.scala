@@ -15,4 +15,12 @@ trait MonadPlusLike[F[_]] extends MonadLike[F] with ApplicativePlusLike[F] { sel
 ////
 trait MonadPlus[F[_]] extends MonadPlusLike[F]
 
+object MonadPlus {
+  def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
+
+  ////
+
+  ////
+}
+
 trait MonadPlusInstance[F[_]] extends MonadPlus[F] with MonadInstance[F] with ApplicativePlusInstance[F]

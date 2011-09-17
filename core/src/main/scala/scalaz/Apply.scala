@@ -25,4 +25,12 @@ trait ApplyLike[F[_]] extends FunctorLike[F] { self =>
 ////
 trait Apply[F[_]] extends ApplyLike[F]
 
+object Apply {
+  def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
+
+  ////
+
+  ////
+}
+
 trait ApplyInstance[F[_]] extends Apply[F] with FunctorInstance[F]

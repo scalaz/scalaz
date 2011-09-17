@@ -20,4 +20,12 @@ trait OrderLike[F] extends EqualLike[F] { self =>
 ////
 trait Order[F] extends OrderLike[F]
 
+object Order {
+  def apply[F](implicit F: Order[F]): Order[F] = F
+
+  ////
+
+  ////
+}
+
 trait OrderInstance[F] extends Order[F] with EqualInstance[F]

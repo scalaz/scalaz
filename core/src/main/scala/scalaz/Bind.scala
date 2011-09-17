@@ -20,4 +20,12 @@ trait BindLike[F[_]] extends ApplyLike[F] { self =>
 ////
 trait Bind[F[_]] extends BindLike[F]
 
+object Bind {
+  def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
+
+  ////
+
+  ////
+}
+
 trait BindInstance[F[_]] extends Bind[F] with ApplyInstance[F]

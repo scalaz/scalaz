@@ -36,4 +36,12 @@ trait ApplicativeLike[F[_]] extends ApplyLike[F] with PointedLike[F] { self =>
 ////
 trait Applicative[F[_]] extends ApplicativeLike[F]
 
+object Applicative {
+  def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
+
+  ////
+
+  ////
+}
+
 trait ApplicativeInstance[F[_]] extends Applicative[F] with ApplyInstance[F] with PointedInstance[F]

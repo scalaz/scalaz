@@ -152,9 +152,19 @@ trait %sLike[%s] %s { self =>
 ////
 trait %s[%s] extends %sLike[F]
 
+object %s {
+  def apply[%s](implicit F: %s[F]): %s[F] = F
+
+  ////
+
+  ////
+}
+
 trait %sInstance[%s] %s
 """.format(typeClassName, classifiedType, extendsLikeList, syntaxMember, typeClassName, classifiedType,
-      typeClassName, typeClassName, classifiedType, extendsInstanceList)
+      typeClassName,
+      typeClassName, classifiedType, typeClassName, typeClassName,
+      typeClassName, classifiedType, extendsInstanceList)
     val mainSourceFile = SourceFile(List("scalaz"), typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {
