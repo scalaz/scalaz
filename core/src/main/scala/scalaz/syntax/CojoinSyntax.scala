@@ -1,8 +1,6 @@
 package scalaz
 package syntax
 
-import Id.Id
-
 /** Wraps a value `self` and provides methods related to `Cojoin` */
 trait CojoinV[F[_],A] extends SyntaxV[F[A]] {
   ////

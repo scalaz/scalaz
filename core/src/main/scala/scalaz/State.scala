@@ -1,7 +1,5 @@
 package scalaz
 
-import Id.Id
-
 trait States {
   type State[S,A] = StateT[S,Id,A] 
   def apply[S,A](f: S => (A,S)): State[S,A] = new StateT[S,Id,A] {

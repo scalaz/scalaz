@@ -1,7 +1,5 @@
 package scalaz
 
-import scalaz.Id.{Id,id}
-
 trait Readers {
   type ReaderT[E,F[_],A] = E => F[A]
   type Reader[E,A] = E => A

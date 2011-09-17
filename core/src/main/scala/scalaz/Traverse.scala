@@ -2,7 +2,7 @@ package scalaz
 
 trait TraverseLike[F[_]] extends FunctorLike[F] { self =>
   ////
-  import Id.{Id,id}
+  import Id.id
   import State.State
   import State.state
 

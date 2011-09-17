@@ -1,12 +1,10 @@
 package scalaz
 package syntax
 
-import Id.Id
-
 /** Wraps a value `self` and provides methods related to `Traverse` */
 trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
-  import Id.{Id,id}
+  import Id.{id}
   import State.State
   import State.state
 

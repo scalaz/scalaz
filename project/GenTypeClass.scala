@@ -193,8 +193,6 @@ trait %sSyntax[F] %s {
     """package scalaz
 package syntax
 
-import Id.Id
-
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F[_],A] extends SyntaxV[F[A]] {
   ////
