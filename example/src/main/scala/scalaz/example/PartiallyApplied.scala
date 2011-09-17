@@ -1,7 +1,5 @@
 package scalaz.example
 
-import scalaz.syntax.FunctorV
-
 object PartiallyApplied extends App {
   val f1: (String => Int) = _.length
   val f2: (String => String => Int) = x => y => x.length + y.length
@@ -13,14 +11,8 @@ object PartiallyApplied extends App {
     import instance.Function1._
     import syntax.Syntax.monad._
 
+    // uses implicit view ToFunctorVFromBin
     f1.map(_ * 2)
-
-    // This implicit view is used:
-    {
-      val functorV: FunctorV[({type f[a] = (String) => a})#f, Int] = functorBin[Function1, String, Int](f1)
-      functorV.map(_ * 2)
-    }
-
     f2.join
   }
 }

@@ -9,8 +9,8 @@ trait MonoidV[F] extends SyntaxV[F] {
 }
 
 trait ToMonoidSyntax  {
-  implicit def monoid[F](v: F) =
-    (new MonoidSyntax[F] {}).monoidV(v)
+  implicit def ToMonoidV[F](v: F) =
+    (new MonoidSyntax[F] {}).ToMonoidV(v)
 
   ////
 
@@ -18,7 +18,7 @@ trait ToMonoidSyntax  {
 }
 
 trait MonoidSyntax[F]  {
-  implicit def monoidV(v: F): MonoidV[F] = new MonoidV[F] { def self = v }
+  implicit def ToMonoidV(v: F): MonoidV[F] = new MonoidV[F] { def self = v }
 
   ////
 

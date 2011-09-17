@@ -23,14 +23,14 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToTraverseSyntax extends ToFunctorSyntax {
-  implicit def traverse[F[_],A](v: F[A]) =
-    (new TraverseSyntax[F] {}).traverseV(v)
-  implicit def traverseBin[F[_, _], X, A](v: F[X, A]) =
-    (new TraverseSyntax[({type f[a] = F[X, a]})#f] {}).traverseV(v)
-  implicit def traverseBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new TraverseSyntax[({type f[a] = F[X, G, a]})#f] {}).traverseV(v)
-  implicit def traverseBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new TraverseSyntax[({type f[a] = F[X, Id, a]})#f] {}).traverseV(v)
+  implicit def ToTraverseV[F[_],A](v: F[A]) =
+    (new TraverseSyntax[F] {}).ToTraverseV(v)
+  implicit def ToTraverseVFromBin[F[_, _], X, A](v: F[X, A]) =
+    (new TraverseSyntax[({type f[a] = F[X, a]})#f] {}).ToTraverseV(v)
+  implicit def ToTraverseVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
+    (new TraverseSyntax[({type f[a] = F[X, G, a]})#f] {}).ToTraverseV(v)
+  implicit def ToTraverseVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
+    (new TraverseSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToTraverseV(v)
 
   ////
 
@@ -38,7 +38,7 @@ trait ToTraverseSyntax extends ToFunctorSyntax {
 }
 
 trait TraverseSyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def traverseV[A](v: F[A]): TraverseV[F, A] = new TraverseV[F,A] { def self = v }
+  implicit def ToTraverseV[A](v: F[A]): TraverseV[F, A] = new TraverseV[F,A] { def self = v }
 
   ////
 

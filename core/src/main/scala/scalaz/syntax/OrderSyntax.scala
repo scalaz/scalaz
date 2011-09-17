@@ -9,8 +9,8 @@ trait OrderV[F] extends SyntaxV[F] {
 }
 
 trait ToOrderSyntax extends ToEqualSyntax {
-  implicit def order[F](v: F) =
-    (new OrderSyntax[F] {}).orderV(v)
+  implicit def ToOrderV[F](v: F) =
+    (new OrderSyntax[F] {}).ToOrderV(v)
 
   ////
 
@@ -18,7 +18,7 @@ trait ToOrderSyntax extends ToEqualSyntax {
 }
 
 trait OrderSyntax[F] extends EqualSyntax[F] {
-  implicit def orderV(v: F): OrderV[F] = new OrderV[F] { def self = v }
+  implicit def ToOrderV(v: F): OrderV[F] = new OrderV[F] { def self = v }
 
   ////
 

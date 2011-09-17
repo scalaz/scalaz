@@ -9,8 +9,8 @@ trait ShowV[F] extends SyntaxV[F] {
 }
 
 trait ToShowSyntax  {
-  implicit def show[F](v: F) =
-    (new ShowSyntax[F] {}).showV(v)
+  implicit def ToShowV[F](v: F) =
+    (new ShowSyntax[F] {}).ToShowV(v)
 
   ////
 
@@ -18,7 +18,7 @@ trait ToShowSyntax  {
 }
 
 trait ShowSyntax[F]  {
-  implicit def showV(v: F): ShowV[F] = new ShowV[F] { def self = v }
+  implicit def ToShowV(v: F): ShowV[F] = new ShowV[F] { def self = v }
 
   ////
 

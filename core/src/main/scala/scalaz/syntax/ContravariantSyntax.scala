@@ -9,14 +9,14 @@ trait ContravariantV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToContravariantSyntax  {
-  implicit def contravariant[F[_],A](v: F[A]) =
-    (new ContravariantSyntax[F] {}).contravariantV(v)
-  implicit def contravariantBin[F[_, _], X, A](v: F[X, A]) =
-    (new ContravariantSyntax[({type f[a] = F[X, a]})#f] {}).contravariantV(v)
-  implicit def contravariantBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new ContravariantSyntax[({type f[a] = F[X, G, a]})#f] {}).contravariantV(v)
-  implicit def contravariantBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new ContravariantSyntax[({type f[a] = F[X, Id, a]})#f] {}).contravariantV(v)
+  implicit def ToContravariantV[F[_],A](v: F[A]) =
+    (new ContravariantSyntax[F] {}).ToContravariantV(v)
+  implicit def ToContravariantVFromBin[F[_, _], X, A](v: F[X, A]) =
+    (new ContravariantSyntax[({type f[a] = F[X, a]})#f] {}).ToContravariantV(v)
+  implicit def ToContravariantVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
+    (new ContravariantSyntax[({type f[a] = F[X, G, a]})#f] {}).ToContravariantV(v)
+  implicit def ToContravariantVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
+    (new ContravariantSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToContravariantV(v)
 
   ////
 
@@ -24,7 +24,7 @@ trait ToContravariantSyntax  {
 }
 
 trait ContravariantSyntax[F[_]]  {
-  implicit def contravariantV[A](v: F[A]): ContravariantV[F, A] = new ContravariantV[F,A] { def self = v }
+  implicit def ToContravariantV[A](v: F[A]): ContravariantV[F, A] = new ContravariantV[F,A] { def self = v }
 
   ////
 

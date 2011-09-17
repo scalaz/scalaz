@@ -9,8 +9,8 @@ trait SemigroupV[F] extends SyntaxV[F] {
 }
 
 trait ToSemigroupSyntax  {
-  implicit def semigroup[F](v: F) =
-    (new SemigroupSyntax[F] {}).semigroupV(v)
+  implicit def ToSemigroupV[F](v: F) =
+    (new SemigroupSyntax[F] {}).ToSemigroupV(v)
 
   ////
 
@@ -18,7 +18,7 @@ trait ToSemigroupSyntax  {
 }
 
 trait SemigroupSyntax[F]  {
-  implicit def semigroupV(v: F): SemigroupV[F] = new SemigroupV[F] { def self = v }
+  implicit def ToSemigroupV(v: F): SemigroupV[F] = new SemigroupV[F] { def self = v }
 
   ////
 
