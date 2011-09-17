@@ -18,7 +18,11 @@ trait OrderLike[F] extends EqualLike[F] { self =>
  *
  */
 ////
-trait Order[F] extends OrderLike[F]
+trait Order[F] extends OrderLike[F] {
+  self : EqualInstance[F] =>
+
+  implicit val orderParents: EqualInstance[F] = this
+}
 
 object Order {
   def apply[F](implicit F: Order[F]): Order[F] = F

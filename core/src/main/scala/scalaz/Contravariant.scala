@@ -15,7 +15,11 @@ trait ContravariantLike[F[_]]  { self =>
  *
  */
 ////
-trait Contravariant[F[_]] extends ContravariantLike[F]
+trait Contravariant[F[_]] extends ContravariantLike[F] {
+  self  =>
+
+
+}
 
 object Contravariant {
   def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F

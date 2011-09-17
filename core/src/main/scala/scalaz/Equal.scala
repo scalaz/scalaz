@@ -15,7 +15,11 @@ trait EqualLike[F]  { self =>
  *
  */
 ////
-trait Equal[F] extends EqualLike[F]
+trait Equal[F] extends EqualLike[F] {
+  self  =>
+
+
+}
 
 object Equal {
   def apply[F](implicit F: Equal[F]): Equal[F] = F

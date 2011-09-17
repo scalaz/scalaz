@@ -10,12 +10,13 @@ trait Functions {
 
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]): G[() => B] = {
       val G = Applicative[G]
+      import G.applicativeSyntax._
 
-      // TODO how to use the syntax here?
-      // import G.applicativeSyntax._
-      // f(fa()) map ((b: B) => () => b) // could not find implicit value for parameter F: scalaz.Functor[G]
-      
-      G.map(f(fa()))(b => () => b)
+      // This import enables implicitly[Functor[G]]
+      // implicitly[Applicative[G]] still unambiguously refers to the context bound.
+      import G.applicativeParents
+
+      f(fa()).map((b: B) => () => b)
     }
   }
 

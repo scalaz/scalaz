@@ -12,7 +12,11 @@ trait ApplicativePlusLike[F[_]] extends ApplicativeLike[F] with PlusLike[F] { se
  *
  */
 ////
-trait ApplicativePlus[F[_]] extends ApplicativePlusLike[F]
+trait ApplicativePlus[F[_]] extends ApplicativePlusLike[F] {
+  self : ApplicativeInstance[F] with PlusInstance[F] =>
+
+  implicit val applicativePlusParents: ApplicativeInstance[F] with PlusInstance[F] = this
+}
 
 object ApplicativePlus {
   def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F

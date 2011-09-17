@@ -15,7 +15,11 @@ trait PlusLike[F[_]] extends FunctorLike[F] { self =>
  *
  */
 ////
-trait Plus[F[_]] extends PlusLike[F]
+trait Plus[F[_]] extends PlusLike[F] {
+  self : FunctorInstance[F] =>
+
+  implicit val plusParents: FunctorInstance[F] = this
+}
 
 object Plus {
   def apply[F[_]](implicit F: Plus[F]): Plus[F] = F

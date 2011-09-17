@@ -15,7 +15,11 @@ trait ShowLike[F]  { self =>
  *
  */
 ////
-trait Show[F] extends ShowLike[F]
+trait Show[F] extends ShowLike[F] {
+  self  =>
+
+
+}
 
 object Show {
   def apply[F](implicit F: Show[F]): Show[F] = F

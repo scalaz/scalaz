@@ -16,7 +16,11 @@ trait SemigroupLike[F]  { self =>
  *
  */
 ////
-trait Semigroup[F] extends SemigroupLike[F]
+trait Semigroup[F] extends SemigroupLike[F] {
+  self  =>
+
+
+}
 
 object Semigroup {
   def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F

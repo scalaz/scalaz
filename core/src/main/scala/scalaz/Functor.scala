@@ -19,7 +19,11 @@ trait FunctorLike[F[_]]  { self =>
  *
  */
 ////
-trait Functor[F[_]] extends FunctorLike[F]
+trait Functor[F[_]] extends FunctorLike[F] {
+  self  =>
+
+
+}
 
 object Functor {
   def apply[F[_]](implicit F: Functor[F]): Functor[F] = F

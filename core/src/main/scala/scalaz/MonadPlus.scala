@@ -13,7 +13,11 @@ trait MonadPlusLike[F[_]] extends MonadLike[F] with ApplicativePlusLike[F] { sel
  *
  */
 ////
-trait MonadPlus[F[_]] extends MonadPlusLike[F]
+trait MonadPlus[F[_]] extends MonadPlusLike[F] {
+  self : MonadInstance[F] with ApplicativePlusInstance[F] =>
+
+  implicit val monadPlusParents: MonadInstance[F] with ApplicativePlusInstance[F] = this
+}
 
 object MonadPlus {
   def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F

@@ -130,7 +130,14 @@ object GenTypeClass {
       case es => es.map(n => "To" + n + "Syntax").mkString("extends ", " with ", "")
     }
     val extendsLikeList = extendsListText("Like")
-    val extendsInstanceList = extendsListText("", typeClassName +: extendsList.map(_ + "Instance"))
+    val instanceList = extendsList.map(_ + "Instance")
+    val (selfType, parentsDef) = instanceList match {
+      case List() => ("", "")
+      case es =>
+        val parentsType = instanceList.map(_ + "[F]").mkString(" with ")
+        (": " + parentsType, "  implicit val " + initLower(typeClassName) + "Parents: " + parentsType + " = this")
+    }
+    val extendsInstanceList = extendsListText("", typeClassName +: instanceList)
 
     val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[F] {}".format(initLower(typeClassName), typeClassName)
 
@@ -150,7 +157,11 @@ trait %sLike[%s] %s { self =>
  *
  */
 ////
-trait %s[%s] extends %sLike[F]
+trait %s[%s] extends %sLike[F] {
+  self %s =>
+
+%s
+}
 
 object %s {
   def apply[%s](implicit F: %s[F]): %s[F] = F
@@ -163,6 +174,8 @@ object %s {
 trait %sInstance[%s] %s
 """.format(typeClassName, classifiedType, extendsLikeList, syntaxMember, typeClassName, classifiedType,
       typeClassName,
+      selfType,
+      parentsDef,
       typeClassName, classifiedType, typeClassName, typeClassName,
       typeClassName, classifiedType, extendsInstanceList)
     val mainSourceFile = SourceFile(List("scalaz"), typeClassName + ".scala", mainSource)

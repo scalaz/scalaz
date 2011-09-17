@@ -12,7 +12,7 @@ trait Options {
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
   }
 
-  implicit def optionSemigroup[A: Semigroup] = new Semigroup[Option[A]] {
+  implicit def optionSemigroup[A: Semigroup]: Semigroup[Option[A]] = new SemigroupInstance[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
       case (Some(a1), None) => f1
@@ -22,7 +22,7 @@ trait Options {
   }
 
   // TODO duplication with optionSemigroup
-  implicit def optionMonoid[A: Monoid] = new Monoid[Option[A]] {
+  implicit def optionMonoid[A: Monoid]: Monoid[Option[A]] = new MonoidInstance[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Monoid[A].append(a1, a2))
       case (Some(a1), None) => f1
