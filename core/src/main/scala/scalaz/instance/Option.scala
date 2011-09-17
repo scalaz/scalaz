@@ -22,15 +22,15 @@ trait Options {
   }
 
   // TODO duplication with optionSemigroup
-  implicit def optionMonoid[A: Monoid]: Monoid[Option[A]] = new MonoidInstance[Option[A]] {
+  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new MonoidInstance[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
-      case (Some(a1), Some(a2)) => Some(Monoid[A].append(a1, a2))
+      case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
       case (Some(a1), None) => f1
       case (None, Some(a2)) => f2
       case (None, None) => None
     }
 
-    def zero: Option[A] = Some(Monoid[A].zero)
+    def zero: Option[A] = None
   }
 }
 
