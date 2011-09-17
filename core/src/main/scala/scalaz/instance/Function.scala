@@ -3,19 +3,29 @@ package instance
 
 
 trait Functions {
-  implicit def function0[T] = new MonadInstance[Function0] {
+  implicit def function0[T] = new TraverseInstance[Function0] with MonadInstance[Function0] {
     def pure[A](a: => A) = () => a
 
     def bind[A, B](fa: () => A)(f: (A) => () => B): () => B = f(fa())
+
+    def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]): G[() => B] = {
+      val G = Applicative[G]
+
+      // TODO how to use the syntax here?
+      // import G.applicativeSyntax._
+      // f(fa()) map ((b: B) => () => b) // could not find implicit value for parameter F: scalaz.Functor[G]
+      
+      G.map(f(fa()))(b => () => b)
+    }
   }
 
-  implicit def function1Apply[T] = new MonadInstance[({type l[a] = (T => a)})#l] {
+  implicit def function1[T] = new MonadInstance[({type l[a] = (T => a)})#l] {
     def pure[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B): (T => B) = (t: T) => f(fa(t))(t)
   }
 
-  implicit def function1Flip[R] = new ContravariantInstance[({type l[a] = (a => R)})#l] {
+  implicit def function1Contravariant[R] = new ContravariantInstance[({type l[a] = (a => R)})#l] {
     def contramap[A, B](r: (A) => R, f: (B) => A): (B) => R = null
   }
 
