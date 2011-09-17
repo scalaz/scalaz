@@ -1,6 +1,6 @@
 package scalaz
 
-trait MonoidLike[F]  { self =>
+trait MonoidLike[F] extends SemigroupLike[F] { self =>
   ////
   def zero: F
 
@@ -25,4 +25,4 @@ object Monoid {
   ////
 }
 
-trait MonoidInstance[F] extends Monoid[F]
+trait MonoidInstance[F] extends Monoid[F] with SemigroupInstance[F]

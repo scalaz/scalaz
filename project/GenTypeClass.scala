@@ -6,7 +6,7 @@ object TypeClass {
   import Kind._
 
   lazy val semigroup = TypeClass("Semigroup", *)
-  lazy val monoid = TypeClass("Monoid", *)
+  lazy val monoid = TypeClass("Monoid", *, semigroup)
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, equal)
