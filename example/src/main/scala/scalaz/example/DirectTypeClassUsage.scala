@@ -1,5 +1,7 @@
 package scalaz.example
 
+import scalaz.Semigroup
+
 
 object DirectTypeClassUsage extends App {
 
@@ -28,11 +30,18 @@ object DirectTypeClassUsage extends App {
     import scalaz._
 
     // Import the type class instances for Option and List.
-    import instance.Option.option
+    import instance.Option.{option, optionMonoid}
     import instance.List.list
 
     option.bind(o1)(x => if (x > 0) Some(2) else None)
     option.join(o2)
     list.join(l2)
+
+    implicit object IntSemigroup extends Semigroup[Int] {
+      def append(f1: Int, f2: => Int): Int = f1 + f2
+    }
+
+    Semigroup[Option[Int]].append(Some(1), None)
   }
+
 }
