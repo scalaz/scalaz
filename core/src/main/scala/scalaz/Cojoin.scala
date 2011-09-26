@@ -10,12 +10,6 @@ trait Cojoin[F[_]]  { self =>
   val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Cojoin {
   def apply[F[_]](implicit F: Cojoin[F]): Cojoin[F] = F
 

@@ -10,12 +10,6 @@ trait Show[F]  { self =>
   val showSyntax = new scalaz.syntax.ShowSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Show {
   def apply[F](implicit F: Show[F]): Show[F] = F
 

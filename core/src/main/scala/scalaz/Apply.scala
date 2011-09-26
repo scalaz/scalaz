@@ -18,12 +18,6 @@ trait Apply[F[_]] extends Functor[F] { self =>
   val applySyntax = new scalaz.syntax.ApplySyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Apply {
   def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 

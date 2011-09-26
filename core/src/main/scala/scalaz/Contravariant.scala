@@ -10,12 +10,6 @@ trait Contravariant[F[_]]  { self =>
   val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Contravariant {
   def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
 

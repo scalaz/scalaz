@@ -14,12 +14,6 @@ trait Functor[F[_]]  { self =>
   val functorSyntax = new scalaz.syntax.FunctorSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Functor {
   def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
