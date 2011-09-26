@@ -6,7 +6,7 @@ object StateTUsage extends App {
   import State._
 
   val stateT: StateT[Int, Option, Int] = StateT((t: Int) => Some(0, t + 1))
-  import instance.Option._
+  import std.Option._
 
   {
     // Use State.stateTPointed to lift Pointed[Option] to Pointed[[a]StateT[Int, Option, a]]

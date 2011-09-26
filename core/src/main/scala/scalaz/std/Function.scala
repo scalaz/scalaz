@@ -1,5 +1,5 @@
 package scalaz
-package instance
+package std
 
 
 trait Functions {

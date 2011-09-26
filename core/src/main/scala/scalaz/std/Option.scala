@@ -1,5 +1,5 @@
 package scalaz
-package instance
+package std
 
 trait Options {
   implicit val option = new MonadPlus[Option] with Traverse[Option] {

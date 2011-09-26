@@ -18,7 +18,7 @@ object DirectTypeClassUsage extends App {
     import scalaz._
 
     // Import the members of the type class instance for Option.
-    import instance.Option.option.{join, bind}
+    import std.Option.option.{join, bind}
 
     bind(o1)(x => if (x > 0) Some(2) else None)
     join(o2)
@@ -30,8 +30,8 @@ object DirectTypeClassUsage extends App {
     import scalaz._
 
     // Import the type class instances for Option and List.
-    import instance.Option.{option, optionMonoid}
-    import instance.List.list
+    import std.Option.{option, optionMonoid}
+    import std.List.list
 
     option.bind(o1)(x => if (x > 0) Some(2) else None)
     option.join(o2)

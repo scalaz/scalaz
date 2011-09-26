@@ -1,5 +1,5 @@
 package scalaz
-package instance
+package std
 
 trait Lists {
   implicit val list = new MonadPlus[List] with Traverse[List] {
