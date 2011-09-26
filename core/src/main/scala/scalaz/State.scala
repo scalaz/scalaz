@@ -54,7 +54,7 @@ trait StateT[S,F[_],A] {
 object State extends States
 object StateT extends StateTs
 
-trait StateTPointed[S, F[_]] extends PointedInstance[({type f[a] = StateT[S, F, a]})#f] {
+trait StateTPointed[S, F[_]] extends Pointed[({type f[a] = StateT[S, F, a]})#f] {
  implicit def F: Pointed[F]
 
  def pure[A](a: => A): StateT[S, F, A] = StateT(s => F.pure(a, s))
@@ -65,7 +65,7 @@ trait StateTPointed[S, F[_]] extends PointedInstance[({type f[a] = StateT[S, F, 
    })
 }
 
-trait StateTApplicative[S, F[_]] extends ApplicativeInstance[({type f[a] = StateT[S, F, a]})#f] with StateTPointed[S, F] {
+trait StateTApplicative[S, F[_]] extends Applicative[({type f[a] = StateT[S, F, a]})#f] with StateTPointed[S, F] {
  implicit def F: Applicative[F]
  override def ap[A, B](fa: StateT[S, F, A])(f: StateT[S, F, (A) => B]): StateT[S, F, B] = StateT {
      s =>

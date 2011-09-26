@@ -1,6 +1,6 @@
 package scalaz
 
-trait ShowLike[F]  { self =>
+trait Show[F]  { self =>
   ////
   def show(f: F): List[Char]
 
@@ -15,11 +15,6 @@ trait ShowLike[F]  { self =>
  *
  */
 ////
-trait Show[F] extends ShowLike[F] {
-  self  =>
-
-
-}
 
 object Show {
   def apply[F](implicit F: Show[F]): Show[F] = F
@@ -29,4 +24,3 @@ object Show {
   ////
 }
 
-trait ShowInstance[F] extends Show[F]

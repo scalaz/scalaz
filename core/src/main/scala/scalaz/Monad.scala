@@ -1,6 +1,6 @@
 package scalaz
 
-trait MonadLike[F[_]] extends Applicative[F] with Bind[F] { self =>
+trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   ////
 
   override def map[A,B](fa: F[A])(f: A => B) = bind(fa)(a => pure(f(a)))
@@ -14,11 +14,6 @@ trait MonadLike[F[_]] extends Applicative[F] with Bind[F] { self =>
  *
  */
 ////
-trait Monad[F[_]] extends MonadLike[F] {
-  self  =>
-
-
-}
 
 object Monad {
   def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
@@ -28,4 +23,3 @@ object Monad {
   ////
 }
 
-trait MonadInstance[F[_]] extends Monad[F] with ApplicativeInstance[F] with BindInstance[F]

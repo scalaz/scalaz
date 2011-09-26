@@ -2,7 +2,7 @@ package scalaz
 package instance
 
 trait Lists {
-  implicit val list = new MonadPlusInstance[List] with TraverseInstance[List] {
+  implicit val list = new MonadPlus[List] with Traverse[List] {
     def pure[A](a: => A): List[A] = scala.List(a)
     def bind[A,B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()

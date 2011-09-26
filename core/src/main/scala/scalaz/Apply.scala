@@ -1,6 +1,6 @@
 package scalaz
 
-trait ApplyLike[F[_]] extends Functor[F] { self =>
+trait Apply[F[_]] extends Functor[F] { self =>
   ////
   def ap[A,B](fa: F[A])(f: F[A => B]): F[B]
   
@@ -23,11 +23,6 @@ trait ApplyLike[F[_]] extends Functor[F] { self =>
  *
  */
 ////
-trait Apply[F[_]] extends ApplyLike[F] {
-  self  =>
-
-
-}
 
 object Apply {
   def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -37,4 +32,3 @@ object Apply {
   ////
 }
 
-trait ApplyInstance[F[_]] extends Apply[F] with FunctorInstance[F]

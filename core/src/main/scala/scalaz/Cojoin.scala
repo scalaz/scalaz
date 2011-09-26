@@ -1,6 +1,6 @@
 package scalaz
 
-trait CojoinLike[F[_]]  { self =>
+trait Cojoin[F[_]]  { self =>
   ////
   def cojoin[A](a: F[A]): F[F[A]]
 
@@ -15,11 +15,6 @@ trait CojoinLike[F[_]]  { self =>
  *
  */
 ////
-trait Cojoin[F[_]] extends CojoinLike[F] {
-  self  =>
-
-
-}
 
 object Cojoin {
   def apply[F[_]](implicit F: Cojoin[F]): Cojoin[F] = F
@@ -29,4 +24,3 @@ object Cojoin {
   ////
 }
 
-trait CojoinInstance[F[_]] extends Cojoin[F]

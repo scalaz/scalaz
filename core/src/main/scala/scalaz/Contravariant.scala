@@ -1,6 +1,6 @@
 package scalaz
 
-trait ContravariantLike[F[_]]  { self =>
+trait Contravariant[F[_]]  { self =>
   ////
   def contramap[A, B](r: F[A], f: B => A): F[B]
 
@@ -15,11 +15,6 @@ trait ContravariantLike[F[_]]  { self =>
  *
  */
 ////
-trait Contravariant[F[_]] extends ContravariantLike[F] {
-  self  =>
-
-
-}
 
 object Contravariant {
   def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
@@ -29,4 +24,3 @@ object Contravariant {
   ////
 }
 
-trait ContravariantInstance[F[_]] extends Contravariant[F]

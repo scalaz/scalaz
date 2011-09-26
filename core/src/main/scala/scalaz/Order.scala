@@ -1,6 +1,6 @@
 package scalaz
 
-trait OrderLike[F] extends Equal[F] { self =>
+trait Order[F] extends Equal[F] { self =>
   ////
   // TODO
 //  def order(a1: F, a2: F): Ordering
@@ -18,11 +18,6 @@ trait OrderLike[F] extends Equal[F] { self =>
  *
  */
 ////
-trait Order[F] extends OrderLike[F] {
-  self  =>
-
-
-}
 
 object Order {
   def apply[F](implicit F: Order[F]): Order[F] = F
@@ -32,4 +27,3 @@ object Order {
   ////
 }
 
-trait OrderInstance[F] extends Order[F] with EqualInstance[F]

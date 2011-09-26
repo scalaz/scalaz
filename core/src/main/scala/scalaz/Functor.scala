@@ -1,6 +1,6 @@
 package scalaz
 
-trait FunctorLike[F[_]]  { self =>
+trait Functor[F[_]]  { self =>
   ////
 
   def map[A,B](fa: F[A])(f: A => B): F[B]
@@ -19,11 +19,6 @@ trait FunctorLike[F[_]]  { self =>
  *
  */
 ////
-trait Functor[F[_]] extends FunctorLike[F] {
-  self  =>
-
-
-}
 
 object Functor {
   def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
@@ -33,4 +28,3 @@ object Functor {
   ////
 }
 
-trait FunctorInstance[F[_]] extends Functor[F]
