@@ -8,7 +8,7 @@ object PartiallyApplied extends App {
 
   def function1() {
     import scalaz._
-    import instance.Function._
+    import std.Function._
     import syntax.Syntax.monad._
 
     // uses implicit view ToFunctorVFromBin

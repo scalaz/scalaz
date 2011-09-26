@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.instance
+import scalaz.std
 
 object SyntaxUsage extends App {
 
@@ -16,8 +16,8 @@ object SyntaxUsage extends App {
     import scalaz._
 
     // Import type class instances for Option and List
-    import instance.Option._
-    import instance.List._
+    import std.Option._
+    import std.List._
 
     // Implicit conversions from M[A] => BindV[M, A], etc.
     import syntax.Syntax.monad._
@@ -39,6 +39,8 @@ object SyntaxUsage extends App {
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
     l2.join
+
+    o2.pair(o2)
   }
 
   def useParentTypeClass {
@@ -46,7 +48,7 @@ object SyntaxUsage extends App {
     
     def needPointed[F[_]: Pointed] = ()
     
-    import instance.Option._
+    import std.Option._
     needPointed[Option]
   }
 }
