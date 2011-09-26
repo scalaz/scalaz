@@ -4,7 +4,7 @@ trait Readers {
   type ReaderT[E,F[_],A] = E => F[A]
   type Reader[E,A] = E => A
 
-  implicit def reader[S]: MonadReaderInstance[({type f[s,a]=Reader[s,a]})#f, S] = 
+  implicit def reader[S]: MonadReader[({type f[s,a]=Reader[s,a]})#f, S] =
     readerTInstance[S,Id](Id.id)
   implicit def readerT[S,F[_]:Monad] = readerTInstance[S,F]: 
     MonadReader[({ type f[s,a]=ReaderT[s,F,a] })#f, S] with 
@@ -14,7 +14,7 @@ trait Readers {
     Bind[({ type f[a]=ReaderT[S,F,a] })#f]
 
   private def readerTInstance[S,F[_]](implicit F: Monad[F]) = 
-    new MonadReaderInstance[({type f[s,a]=ReaderT[s,F,a]})#f,S] {
+    new MonadReader[({type f[s,a]=ReaderT[s,F,a]})#f,S] {
       def pure[A](a: => A): ReaderT[S,F,A] = s => F.pure(a) 
       override def map[A,B](fa: ReaderT[S,F,A])(f: A => B): ReaderT[S,F,B] = fa andThen F(f)
       def bind[A,B](fa: ReaderT[S,F,A])(f: A => ReaderT[S,F,B]): ReaderT[S,F,B] =

@@ -1,6 +1,6 @@
 package scalaz
 
-trait EqualLike[F]  { self =>
+trait Equal[F]  { self =>
   ////
   def equal(a1: F, a2: F): Boolean
 
@@ -15,11 +15,6 @@ trait EqualLike[F]  { self =>
  *
  */
 ////
-trait Equal[F] extends EqualLike[F] {
-  self  =>
-
-
-}
 
 object Equal {
   def apply[F](implicit F: Equal[F]): Equal[F] = F
@@ -29,4 +24,3 @@ object Equal {
   ////
 }
 
-trait EqualInstance[F] extends Equal[F]

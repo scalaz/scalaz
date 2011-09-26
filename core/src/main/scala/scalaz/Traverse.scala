@@ -1,6 +1,6 @@
 package scalaz
 
-trait TraverseLike[F[_]] extends Functor[F] { self =>
+trait Traverse[F[_]] extends Functor[F] { self =>
   ////
   import Id.id
   import State.State
@@ -70,11 +70,6 @@ trait TraverseLike[F[_]] extends Functor[F] { self =>
  *
  */
 ////
-trait Traverse[F[_]] extends TraverseLike[F] {
-  self  =>
-
-
-}
 
 object Traverse {
   def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
@@ -84,4 +79,3 @@ object Traverse {
   ////
 }
 
-trait TraverseInstance[F[_]] extends Traverse[F] with FunctorInstance[F]

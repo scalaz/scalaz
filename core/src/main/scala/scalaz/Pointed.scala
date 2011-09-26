@@ -1,6 +1,6 @@
 package scalaz
 
-trait PointedLike[F[_]] extends Functor[F] { self =>
+trait Pointed[F[_]] extends Functor[F] { self =>
   ////
 
   def pure[A](a: => A): F[A]
@@ -14,11 +14,6 @@ trait PointedLike[F[_]] extends Functor[F] { self =>
  *
  */
 ////
-trait Pointed[F[_]] extends PointedLike[F] {
-  self  =>
-
-
-}
 
 object Pointed {
   def apply[F[_]](implicit F: Pointed[F]): Pointed[F] = F
@@ -28,4 +23,3 @@ object Pointed {
   ////
 }
 
-trait PointedInstance[F[_]] extends Pointed[F] with FunctorInstance[F]

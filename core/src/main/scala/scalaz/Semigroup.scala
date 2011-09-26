@@ -1,6 +1,6 @@
 package scalaz
 
-trait SemigroupLike[F]  { self =>
+trait Semigroup[F]  { self =>
   ////
 
   def append(f1: F, f2: => F): F
@@ -16,11 +16,6 @@ trait SemigroupLike[F]  { self =>
  *
  */
 ////
-trait Semigroup[F] extends SemigroupLike[F] {
-  self  =>
-
-
-}
 
 object Semigroup {
   def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
@@ -30,4 +25,3 @@ object Semigroup {
   ////
 }
 
-trait SemigroupInstance[F] extends Semigroup[F]

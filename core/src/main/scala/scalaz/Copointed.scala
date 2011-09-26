@@ -1,6 +1,6 @@
 package scalaz
 
-trait CopointedLike[F[_]] extends Contravariant[F] { self =>
+trait Copointed[F[_]] extends Contravariant[F] { self =>
   ////
 
   // derived functions
@@ -14,11 +14,6 @@ trait CopointedLike[F[_]] extends Contravariant[F] { self =>
  *
  */
 ////
-trait Copointed[F[_]] extends CopointedLike[F] {
-  self  =>
-
-
-}
 
 object Copointed {
   def apply[F[_]](implicit F: Copointed[F]): Copointed[F] = F
@@ -28,4 +23,3 @@ object Copointed {
   ////
 }
 
-trait CopointedInstance[F[_]] extends Copointed[F] with ContravariantInstance[F]
