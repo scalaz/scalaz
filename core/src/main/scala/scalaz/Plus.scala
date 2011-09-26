@@ -10,12 +10,6 @@ trait Plus[F[_]] extends Functor[F] { self =>
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Plus {
   def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
 

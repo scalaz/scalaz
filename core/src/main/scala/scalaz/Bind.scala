@@ -13,12 +13,6 @@ trait Bind[F[_]] extends Apply[F] { self =>
   val bindSyntax = new scalaz.syntax.BindSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Bind {
   def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 

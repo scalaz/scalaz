@@ -65,12 +65,6 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Traverse {
   def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
 

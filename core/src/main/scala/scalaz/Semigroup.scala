@@ -11,12 +11,6 @@ trait Semigroup[F]  { self =>
   val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Semigroup {
   def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 

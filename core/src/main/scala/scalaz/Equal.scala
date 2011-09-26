@@ -10,12 +10,6 @@ trait Equal[F]  { self =>
   val equalSyntax = new scalaz.syntax.EqualSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Equal {
   def apply[F](implicit F: Equal[F]): Equal[F] = F
 

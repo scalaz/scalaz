@@ -29,12 +29,6 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Applicative {
   def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 

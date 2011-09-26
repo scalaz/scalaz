@@ -13,12 +13,6 @@ trait Order[F] extends Equal[F] { self =>
   val orderSyntax = new scalaz.syntax.OrderSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Order {
   def apply[F](implicit F: Order[F]): Order[F] = F
 

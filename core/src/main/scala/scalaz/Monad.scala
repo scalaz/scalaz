@@ -9,12 +9,6 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   val monadSyntax = new scalaz.syntax.MonadSyntax[F] {}
 }
 
-////
-/**
- *
- */
-////
-
 object Monad {
   def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 
