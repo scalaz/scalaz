@@ -12,10 +12,6 @@ trait Functions {
       val G = Applicative[G]
       import G.applicativeSyntax._
 
-      // This import enables implicitly[Functor[G]]
-      // implicitly[Applicative[G]] still unambiguously refers to the context bound.
-      import G.applicativeParents
-
       f(fa()).map((b: B) => () => b)
     }
   }

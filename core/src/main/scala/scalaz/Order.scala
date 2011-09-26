@@ -1,6 +1,6 @@
 package scalaz
 
-trait OrderLike[F] extends EqualLike[F] { self =>
+trait OrderLike[F] extends Equal[F] { self =>
   ////
   // TODO
 //  def order(a1: F, a2: F): Ordering
@@ -19,9 +19,9 @@ trait OrderLike[F] extends EqualLike[F] { self =>
  */
 ////
 trait Order[F] extends OrderLike[F] {
-  self : EqualInstance[F] =>
+  self  =>
 
-  implicit val orderParents: EqualInstance[F] = this
+
 }
 
 object Order {

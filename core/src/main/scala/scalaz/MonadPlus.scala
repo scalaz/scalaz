@@ -1,6 +1,6 @@
 package scalaz
 
-trait MonadPlusLike[F[_]] extends MonadLike[F] with ApplicativePlusLike[F] { self =>
+trait MonadPlusLike[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   ////
   def filter[A](fa: F[A])(f: A => Boolean) = bind(fa)(a => if (f(a)) pure(a) else empty[A])
 
@@ -14,9 +14,9 @@ trait MonadPlusLike[F[_]] extends MonadLike[F] with ApplicativePlusLike[F] { sel
  */
 ////
 trait MonadPlus[F[_]] extends MonadPlusLike[F] {
-  self : MonadInstance[F] with ApplicativePlusInstance[F] =>
+  self  =>
 
-  implicit val monadPlusParents: MonadInstance[F] with ApplicativePlusInstance[F] = this
+
 }
 
 object MonadPlus {

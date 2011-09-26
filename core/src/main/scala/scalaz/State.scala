@@ -1,6 +1,19 @@
 package scalaz
 
-trait States {
+trait States0 {
+  self: States =>
+  implicit def stateTPointed[S,F[_]](implicit F0: Pointed[F]): Pointed[({ type f[a]=StateT[S,F,a] })#f] = new StateTPointed[S,F] {
+    implicit def F: Pointed[F] = F0
+  }
+}
+trait States1 {
+  self: States =>
+  implicit def stateTApplicative[S,F[_]](implicit F0: Applicative[F]): Applicative[({ type f[a]=StateT[S,F,a] })#f] = new StateTApplicative[S, F] {
+    implicit def F: Applicative[F] = F0
+  }
+}
+
+trait States extends States0 with States1 {
   type State[S,A] = StateT[S,Id,A] 
   def apply[S,A](f: S => (A,S)): State[S,A] = new StateT[S,Id,A] {
     def apply(s: S) = f(s)
@@ -9,53 +22,12 @@ trait States {
   def put[S](s: S): State[S,S] = State(_ => (s,s))
   def modify[S](f: S => S): State[S,S] = State(s => { val r = f(s); (r,r) })
 
-  implicit def state[S]: MonadStateInstance[({type f[s,a]=State[s,a]})#f, S] = 
-    stateTMonadInstance[S,Id](Id.id)
-
-  implicit def stateTMonadState[S,F[_]:Monad]:
-      MonadState[({ type f[s,a]=StateT[s,F,a] })#f, S] with
-      Monad[({ type f[a]=StateT[S,F,a] })#f] = stateTMonadInstance[S,F]
-
-  implicit def stateTPointed[S,F[_]:Pointed]: Pointed[({ type f[a]=StateT[S,F,a] })#f] = stateTPointedInstance[S,F]
-
-  implicit def stateTApplicative[S,F[_]:Applicative]: Applicative[({ type f[a]=StateT[S,F,a] })#f] = stateTApplicativeInstance[S,F]
-
-  private def stateTMonadInstance[S,F[_]](implicit F: Monad[F]) =
-    new MonadStateInstance[({type f[s,a]=StateT[s,F,a]})#f,S] {
-      def pure[A](a: => A): StateT[S,F,A] = StateT(s => F.pure(a,s)) 
-      override def map[A,B](fa: StateT[S,F,A])(f: A => B): StateT[S,F,B] = 
-        StateT(s => F.map(fa(s)) { case (a,s) => (f(a),s) } )
-      def bind[A,B](fa: StateT[S,F,A])(f: A => StateT[S,F,B]): StateT[S,F,B] =
-        StateT(s => F.bind(fa(s)) { case (a,s) => f(a)(s) })
-      def init: StateT[S,F,S] = StateT(s => F.pure((s,s)))
-      def put(s: S): StateT[S,F,S] = StateT(_ => F.pure((s,s)))
-    }
-
-  private def stateTPointedInstance[S,F[_]](implicit F: Pointed[F]) =
-    new PointedInstance[({type f[a]=StateT[S,F,a]})#f] {
-      def pure[A](a: => A): StateT[S,F,A] = StateT(s => F.pure(a,s))
-      override def map[A,B](fa: StateT[S,F,A])(f: A => B): StateT[S,F,B] =
-        StateT(s => F.map(fa(s)) { case (a,s) => (f(a),s) } )
-    }
-
-  private def stateTApplicativeInstance[S,F[_]](implicit F: Applicative[F]) =
-    new ApplicativeInstance[({type f[a]=StateT[S,F,a]})#f] {
-      def pure[A](a: => A): StateT[S,F,A] = StateT(s => F.pure(a,s))
-
-      override def map[A,B](fa: StateT[S,F,A])(f: A => B): StateT[S,F,B] =
-        StateT(s => F.map(fa(s)) { case (a,s) => (f(a),s) } )
-
-      def ap[A, B](fa: StateT[S, F, A])(f: StateT[S, F, (A) => B]): StateT[S, F, B] = StateT {
-          s =>
-            F.ap(fa(s)) {
-              F.map(f(s)) {
-                case (fab, _) => {
-                  case (a, s) => (fab(a), s)
-                }
-              }
-            }
-        }
-    }
+  implicit def state[S]: MonadState[({type f[s,a]=State[s,a]})#f, S] =
+    stateTMonadState[S,Id](Id.id)
+  
+  implicit def stateTMonadState[S,F[_]](implicit F0: Monad[F]) = new StateTMonadState[S,F] {
+    implicit def F: Monad[F] = F0
+  }
 
   trait StateTF[S,G[_]] { type f[x] = StateT[S,G,x] }
 
@@ -81,3 +53,41 @@ trait StateT[S,F[_],A] {
 
 object State extends States
 object StateT extends StateTs
+
+trait StateTPointed[S, F[_]] extends PointedInstance[({type f[a] = StateT[S, F, a]})#f] {
+ implicit def F: Pointed[F]
+
+ def pure[A](a: => A): StateT[S, F, A] = StateT(s => F.pure(a, s))
+
+ override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] =
+   StateT(s => F.map(fa(s)) {
+     case (a, s) => (f(a), s)
+   })
+}
+
+trait StateTApplicative[S, F[_]] extends ApplicativeInstance[({type f[a] = StateT[S, F, a]})#f] with StateTPointed[S, F] {
+ implicit def F: Applicative[F]
+ override def ap[A, B](fa: StateT[S, F, A])(f: StateT[S, F, (A) => B]): StateT[S, F, B] = StateT {
+     s =>
+       F.ap(fa(s)) {
+         F.map(f(s)) {
+           case (fab, _) => {
+             case (a, s) => (fab(a), s)
+           }
+         }
+       }
+   }
+}
+
+trait StateTMonadState[S, F[_]] extends MonadState[({type f[s,a]=StateT[s,F,a]})#f,S] with StateTApplicative[S, F] {
+ implicit def F: Monad[F]
+
+ def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] =
+   StateT(s => F.bind(fa(s)) {
+     case (a, s) => f(a)(s)
+   })
+
+ def init: StateT[S, F, S] = StateT(s => F.pure((s, s)))
+
+ def put(s: S): StateT[S, F, S] = StateT(_ => F.pure((s, s)))
+}

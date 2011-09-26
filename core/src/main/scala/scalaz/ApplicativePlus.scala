@@ -1,6 +1,6 @@
 package scalaz
 
-trait ApplicativePlusLike[F[_]] extends ApplicativeLike[F] with PlusLike[F] { self =>
+trait ApplicativePlusLike[F[_]] extends Applicative[F] with Plus[F] { self =>
   ////
 
   ////
@@ -13,9 +13,9 @@ trait ApplicativePlusLike[F[_]] extends ApplicativeLike[F] with PlusLike[F] { se
  */
 ////
 trait ApplicativePlus[F[_]] extends ApplicativePlusLike[F] {
-  self : ApplicativeInstance[F] with PlusInstance[F] =>
+  self  =>
 
-  implicit val applicativePlusParents: ApplicativeInstance[F] with PlusInstance[F] = this
+
 }
 
 object ApplicativePlus {

@@ -1,6 +1,6 @@
 package scalaz
 
-trait BindLike[F[_]] extends ApplyLike[F] { self =>
+trait BindLike[F[_]] extends Apply[F] { self =>
   ////
 
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
@@ -19,9 +19,9 @@ trait BindLike[F[_]] extends ApplyLike[F] { self =>
  */
 ////
 trait Bind[F[_]] extends BindLike[F] {
-  self : ApplyInstance[F] =>
+  self  =>
 
-  implicit val bindParents: ApplyInstance[F] = this
+
 }
 
 object Bind {

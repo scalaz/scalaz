@@ -1,6 +1,6 @@
 package scalaz
 
-trait TraverseLike[F[_]] extends FunctorLike[F] { self =>
+trait TraverseLike[F[_]] extends Functor[F] { self =>
   ////
   import Id.id
   import State.State
@@ -71,9 +71,9 @@ trait TraverseLike[F[_]] extends FunctorLike[F] { self =>
  */
 ////
 trait Traverse[F[_]] extends TraverseLike[F] {
-  self : FunctorInstance[F] =>
+  self  =>
 
-  implicit val traverseParents: FunctorInstance[F] = this
+
 }
 
 object Traverse {

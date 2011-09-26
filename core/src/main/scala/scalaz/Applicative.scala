@@ -1,6 +1,6 @@
 package scalaz
 
-trait ApplicativeLike[F[_]] extends ApplyLike[F] with PointedLike[F] { self =>
+trait ApplicativeLike[F[_]] extends Apply[F] with Pointed[F] { self =>
   ////
 
   // derived functions
@@ -35,9 +35,9 @@ trait ApplicativeLike[F[_]] extends ApplyLike[F] with PointedLike[F] { self =>
  */
 ////
 trait Applicative[F[_]] extends ApplicativeLike[F] {
-  self : ApplyInstance[F] with PointedInstance[F] =>
+  self  =>
 
-  implicit val applicativeParents: ApplyInstance[F] with PointedInstance[F] = this
+
 }
 
 object Applicative {
