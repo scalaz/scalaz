@@ -15,9 +15,9 @@ trait MonadLike[F[_]] extends ApplicativeLike[F] with BindLike[F] { self =>
  */
 ////
 trait Monad[F[_]] extends MonadLike[F] {
-  self : ApplicativeInstance[F] with BindInstance[F] =>
+  self : MonadInstance[F] =>  
 
-  implicit val monadParents: ApplicativeInstance[F] with BindInstance[F] = this
+  implicit val monadParents: MonadInstance[F] = this 
 }
 
 object Monad {
