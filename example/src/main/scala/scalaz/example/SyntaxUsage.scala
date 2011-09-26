@@ -1,5 +1,7 @@
 package scalaz.example
 
+import scalaz.instance
+
 object SyntaxUsage extends App {
 
   val o1: Option[Int] = Some(0)
@@ -37,5 +39,14 @@ object SyntaxUsage extends App {
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
     l2.join
+  }
+
+  def useParentTypeClass {
+    import scalaz._
+    
+    def needPointed[F[_]: Pointed] = ()
+    
+    import instance.Option._
+    needPointed[Option]
   }
 }
