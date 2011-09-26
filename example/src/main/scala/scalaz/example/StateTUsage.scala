@@ -9,9 +9,6 @@ object StateTUsage extends App {
   import instance.Option._
 
   {
-    // Make the parent type classes of MonadPlus implicitly available.
-    implicit val P = MonadPlus[Option].monadPlusParents
-
     // Use State.stateTPointed to lift Pointed[Option] to Pointed[[a]StateT[Int, Option, a]]
     Pointed[({type l[a] = StateT[Int, Option, a]})#l]
 
@@ -19,6 +16,7 @@ object StateTUsage extends App {
     Applicative[({type l[a] = StateT[Int, Option, a]})#l]
   }
 
-  implicitly[Monad[({type l[a] = StateT[Int, Option, a]})#l]]
+//  implicitly[Monad[({type l[a] = StateT[Int, Option, a]})#l]]
+  stateTMonadState[Int,  Option] : Monad[({type l[a] = StateT[Int, Option, a]})#l]
 
 }

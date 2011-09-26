@@ -1,6 +1,6 @@
 package scalaz
 
-trait ComonadLike[F[_]] extends CopointedLike[F] with CojoinLike[F] { self =>
+trait ComonadLike[F[_]] extends Copointed[F] with Cojoin[F] { self =>
   ////
 
   // derived functions
@@ -15,9 +15,9 @@ trait ComonadLike[F[_]] extends CopointedLike[F] with CojoinLike[F] { self =>
  */
 ////
 trait Comonad[F[_]] extends ComonadLike[F] {
-  self : CopointedInstance[F] with CojoinInstance[F] =>
+  self  =>
 
-  implicit val comonadParents: CopointedInstance[F] with CojoinInstance[F] = this
+
 }
 
 object Comonad {

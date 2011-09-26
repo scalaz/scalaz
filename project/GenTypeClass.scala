@@ -129,14 +129,9 @@ object GenTypeClass {
       case Seq() => ""
       case es => es.map(n => "To" + n + "Syntax").mkString("extends ", " with ", "")
     }
-    val extendsLikeList = extendsListText("Like")
+    val extendsLikeList = extendsListText("")
     val instanceList = extendsList.map(_ + "Instance")
-    val (selfType, parentsDef) = instanceList match {
-      case List() => ("", "")
-      case es =>
-        val parentsType = instanceList.map(_ + "[F]").mkString(" with ")
-        (": " + parentsType, "  implicit val " + initLower(typeClassName) + "Parents: " + parentsType + " = this")
-    }
+    val (selfType, parentsDef) = ("", "")
     val extendsInstanceList = extendsListText("", typeClassName +: instanceList)
 
     val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[F] {}".format(initLower(typeClassName), typeClassName)

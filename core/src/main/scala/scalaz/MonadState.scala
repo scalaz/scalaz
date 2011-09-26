@@ -1,6 +1,6 @@
 package scalaz
 
-trait MonadStateLike[F[_,_],S] extends MonadLike[({type f[x]=F[S,x]})#f] {
+trait MonadStateLike[F[_,_],S] extends Monad[({type f[x]=F[S,x]})#f] {
   def init: F[S,S]
   def put(s: S): F[S,S]
   def modify(f: S => S): F[S,S] = bind(init)(s => put(f(s)))

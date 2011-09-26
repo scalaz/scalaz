@@ -1,6 +1,6 @@
 package scalaz
 
-trait PlusLike[F[_]] extends FunctorLike[F] { self =>
+trait PlusLike[F[_]] extends Functor[F] { self =>
   ////
 
   def plus[A](a: F[A], b: => F[A]): F[A]
@@ -16,9 +16,9 @@ trait PlusLike[F[_]] extends FunctorLike[F] { self =>
  */
 ////
 trait Plus[F[_]] extends PlusLike[F] {
-  self : FunctorInstance[F] =>
+  self  =>
 
-  implicit val plusParents: FunctorInstance[F] = this
+
 }
 
 object Plus {
