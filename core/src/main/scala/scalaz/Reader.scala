@@ -5,7 +5,7 @@ trait Readers {
   type Reader[E,A] = E => A
 
   implicit def reader[S]: MonadReader[({type f[s,a]=Reader[s,a]})#f, S] =
-    readerTInstance[S,Id](Id.id)
+    readerTInstance[S,Id](Ident.id)
   implicit def readerT[S,F[_]:Monad] = readerTInstance[S,F]: 
     MonadReader[({ type f[s,a]=ReaderT[s,F,a] })#f, S] with 
     Monad[({ type f[a]=ReaderT[S,F,a] })#f] with 

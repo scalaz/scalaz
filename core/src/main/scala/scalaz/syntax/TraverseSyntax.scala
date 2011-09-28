@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Traverse` */
 trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
-  import Id.{id}
+  import Ident.{id}
   import State.State
   import State.state
 

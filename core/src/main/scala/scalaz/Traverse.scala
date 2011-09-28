@@ -2,7 +2,7 @@ package scalaz
 
 trait Traverse[F[_]] extends Functor[F] { self =>
   ////
-  import Id.id
+  import Ident.id
   import State.State
   import State.state
 

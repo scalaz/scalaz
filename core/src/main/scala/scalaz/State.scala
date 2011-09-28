@@ -14,7 +14,7 @@ trait States1 {
 }
 
 trait States extends States0 with States1 {
-  type State[S,A] = StateT[S,Id,A] 
+  type State[S,A] = StateT[S,Id,A]
   def apply[S,A](f: S => (A,S)): State[S,A] = new StateT[S,Id,A] {
     def apply(s: S) = f(s)
   }
@@ -23,7 +23,7 @@ trait States extends States0 with States1 {
   def modify[S](f: S => S): State[S,S] = State(s => { val r = f(s); (r,r) })
 
   implicit def state[S]: MonadState[({type f[s,a]=State[s,a]})#f, S] =
-    stateTMonadState[S,Id](Id.id)
+    stateTMonadState[S,Id](Ident.id)
   
   implicit def stateTMonadState[S,F[_]](implicit F0: Monad[F]) = new StateTMonadState[S,F] {
     implicit def F: Monad[F] = F0
@@ -49,6 +49,7 @@ trait StateT[S,F[_],A] {
   def apply(s: S): F[(A,S)]
   def !(s: S)(implicit F: Functor[F]): F[A] = 
     F.map(apply(s))(_._1)
+  
 }
 
 object State extends States
