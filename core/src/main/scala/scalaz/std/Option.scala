@@ -22,6 +22,21 @@ trait Options {
 
     def zero: Option[A] = None
   }
+  
+  sealed trait First
+  sealed trait Last
+  
+  implicit def optionFirst[A] = new Monoid[Option[A] @@ First] {
+    def zero: Option[A] @@ First = Tag(None)
+
+    def append(f1: Option[A] @@ First, f2 : => Option[A] @@ First) = Tag(f1.orElse(f2))
+  }
+
+  implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
+    def zero: Option[A] @@ Last = Tag(None)
+
+    def append(f1: Option[A] @@ Last, f2 : => Option[A] @@ Last) = Tag(f2.orElse(f1))
+  }
 }
 
 object Option extends Options
