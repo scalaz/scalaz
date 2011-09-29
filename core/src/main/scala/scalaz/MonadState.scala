@@ -5,3 +5,7 @@ trait MonadState[F[_,_],S] extends Monad[({type f[x]=F[S,x]})#f] {
   def put(s: S): F[S,S]
   def modify(f: S => S): F[S,S] = bind(init)(s => put(f(s)))
 }
+
+object MonadState {
+  def apply[F[_,_],S](implicit F: MonadState[F, S]) = F
+}
