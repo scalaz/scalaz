@@ -30,8 +30,8 @@ trait AnyVals {
     }
   }
 
-  trait Disjunction
-  trait Conjunction
+  sealed trait Disjunction
+  sealed trait Conjunction
 
   implicit object booleanDisjunctionNewType extends Monoid[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Tag(f1 || f2)
@@ -45,7 +45,7 @@ trait AnyVals {
     def zero: Boolean @@ Conjunction = Tag(true)
   }
   
-  trait Multiplication  
+  sealed trait Multiplication
 
   implicit object short extends Monoid[Short] with Order[Short] with Show[Short] {
     def show(f: Short): List[Char] = f.toString.toList
