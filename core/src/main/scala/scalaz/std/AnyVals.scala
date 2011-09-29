@@ -33,16 +33,16 @@ trait AnyVals {
   trait Disjunction
   trait Conjunction
 
-  implicit object booleanDisjunctionNewType extends Monoid[Boolean ## Disjunction] {
-    def append(f1: Boolean ## Disjunction, f2: => Boolean ## Disjunction) = NewType(f1 && f2)
+  implicit object booleanDisjunctionNewType extends Monoid[Boolean @@ Disjunction] {
+    def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Tag(f1 || f2)
 
-    def zero: Boolean ## Disjunction = NewType(true)
+    def zero: Boolean @@ Disjunction = Tag(false)
   }
 
-  implicit object booleanConjunctionNewType extends Monoid[Boolean ## Conjunction] {
-    def append(f1: Boolean ## Conjunction, f2: => Boolean ## Conjunction) = NewType(f1 && f2)
+  implicit object booleanConjunctionNewType extends Monoid[Boolean @@ Conjunction] {
+    def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Tag(f1 && f2)
 
-    def zero: Boolean ## Conjunction = NewType(true)
+    def zero: Boolean @@ Conjunction = Tag(true)
   }
   
   trait Multiplication  
@@ -73,10 +73,10 @@ trait AnyVals {
     }
   }
 
-  implicit object intMultiplicationNewType extends Monoid[Int ## Multiplication] {
-    def append(f1: Int ## Multiplication, f2: => Int ## Multiplication): Int ## Multiplication = NewType(f1 * f2)
+  implicit object intMultiplicationNewType extends Monoid[Int @@ Multiplication] {
+    def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication): Int @@ Multiplication = Tag(f1 * f2)
 
-    def zero: Int ## Multiplication = NewType(1)
+    def zero: Int @@ Multiplication = Tag(1)
   }
   
 
@@ -96,10 +96,10 @@ trait AnyVals {
     }
   }
 
-  implicit object longMultiplicationNewType extends Monoid[Long ## Multiplication] {
-    def append(f1: Long ## Multiplication, f2: => Long ## Multiplication): Long ## Multiplication = NewType(f1 * f2)
+  implicit object longMultiplicationNewType extends Monoid[Long @@ Multiplication] {
+    def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication): Long @@ Multiplication = Tag(f1 * f2)
 
-    def zero: Long ## Multiplication = NewType(1)
+    def zero: Long @@ Multiplication = Tag(1)
   }
 
   implicit object float extends Monoid[Float] with Order[Float] with Show[Float] {
