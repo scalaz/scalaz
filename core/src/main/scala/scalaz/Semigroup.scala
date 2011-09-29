@@ -15,7 +15,13 @@ object Semigroup {
   def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
   ////
+  def firstSemigroup[A] = new Semigroup[A] {
+    def append(f1: A, f2: => A): A = f1
+  }
 
+  def lastSemigroup[A] = new Semigroup[A] {
+    def append(f1: A, f2: => A): A = f2
+  }
   ////
 }
 
