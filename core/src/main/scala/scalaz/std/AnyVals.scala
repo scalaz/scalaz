@@ -12,22 +12,40 @@ trait AnyVals {
     def order(x: Unit, y: Unit): Ordering = Ordering.EQ
   }
 
-  implicit object boolean extends Monoid[Boolean] with Order[Boolean] with Show[Boolean] {
+  implicit object boolean extends Order[Boolean] with Show[Boolean] {
     def show(f: Boolean): List[Char] = f.toString.toList
 
-    def append(f1: Boolean, f2: => Boolean): Boolean = f1 || f2
-
-    def zero: Boolean = false
-
     def order(x: Boolean, y: Boolean): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    object conjunction extends Monoid[Boolean] {
+      def append(f1: Boolean, f2: => Boolean): Boolean = f1 && f2
+
+      def zero: Boolean = true
+    }
+
+    object disjunction extends Monoid[Boolean] {
+      def append(f1: Boolean, f2: => Boolean): Boolean = f1 || f2
+
+      def zero: Boolean = false
+    }
   }
 
-  // TODO newtype?
-  object booleanConjunction extends Monoid[Boolean] {
-    def append(f1: Boolean, f2: => Boolean): Boolean = f1 && f2
+  trait Disjunction
+  trait Conjunction
 
-    def zero: Boolean = true
+  implicit object booleanDisjunctionNewType extends Monoid[Boolean ## Disjunction] {
+    def append(f1: Boolean ## Disjunction, f2: => Boolean ## Disjunction) = NewType(f1 && f2)
+
+    def zero: Boolean ## Disjunction = NewType(true)
   }
+
+  implicit object booleanConjunctionNewType extends Monoid[Boolean ## Conjunction] {
+    def append(f1: Boolean ## Conjunction, f2: => Boolean ## Conjunction) = NewType(f1 && f2)
+
+    def zero: Boolean ## Conjunction = NewType(true)
+  }
+  
+  trait Multiplication  
 
   implicit object short extends Monoid[Short] with Order[Short] with Show[Short] {
     def show(f: Short): List[Char] = f.toString.toList
@@ -38,7 +56,7 @@ trait AnyVals {
 
     def order(x: Short, y: Short): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
-
+  
   implicit object int extends Monoid[Int] with Order[Int] with Show[Int] {
     def show(f: Int): List[Char] = f.toString.toList
 
@@ -47,7 +65,20 @@ trait AnyVals {
     def zero: Int = 0
 
     def order(x: Int, y: Int): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    
+    object multiplication extends Monoid[Int] {
+      def append(f1: Int, f2: => Int): Int = f1 * f2
+
+      def zero: Int = 1
+    }
   }
+
+  implicit object intMultiplicationNewType extends Monoid[Int ## Multiplication] {
+    def append(f1: Int ## Multiplication, f2: => Int ## Multiplication): Int ## Multiplication = NewType(f1 * f2)
+
+    def zero: Int ## Multiplication = NewType(1)
+  }
+  
 
   implicit object long extends Monoid[Long] with Order[Long] with Show[Long] {
     def show(f: Long): List[Char] = f.toString.toList
@@ -57,6 +88,18 @@ trait AnyVals {
     def zero: Long = 0L
 
     def order(x: Long, y: Long): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    
+    object multiplication extends Monoid[Long] {
+      def append(f1: Long, f2: => Long): Long = f1 * f2
+
+      def zero: Long = 1
+    }
+  }
+
+  implicit object longMultiplicationNewType extends Monoid[Long ## Multiplication] {
+    def append(f1: Long ## Multiplication, f2: => Long ## Multiplication): Long ## Multiplication = NewType(f1 * f2)
+
+    def zero: Long ## Multiplication = NewType(1)
   }
 
   implicit object float extends Monoid[Float] with Order[Float] with Show[Float] {
