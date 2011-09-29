@@ -6,3 +6,7 @@ trait MonadReader[F[_,_],S] extends Monad[({type f[x]=F[S,x]})#f] {
   def scope[A](k: S)(fa: F[S,A]): F[S,A] = local(_ => k)(fa)
   def asks[A](f: S => A): F[S,A] = map(ask)(f)
 }
+
+object MonadReader {
+  def apply[F[_, _], S](implicit F: MonadReader[F, S]) = F
+}
