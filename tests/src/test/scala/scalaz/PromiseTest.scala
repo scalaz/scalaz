@@ -7,7 +7,7 @@ import Scalaz._
 
 class PromiseTest extends Specification with Sugar {
   "exception in flatMapped promise is propagated" in {
-    def !!! = sys.error("!!!")
+    def !!! = error_("!!!")
     def flatMapError: Promise[Int] = promise(1).flatMap(_ => promise[Int](!!!))
     flatMapError.get must throwA[RuntimeException]
 
