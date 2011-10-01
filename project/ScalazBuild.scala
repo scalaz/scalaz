@@ -129,7 +129,7 @@ object ScalazBuild extends Build {
         // Use `LocalProject("scalaz")` rather than `scalaz` to avoid a circular reference.
         (mappings in packageBin in Compile) <<= (
                 baseDirectory in LocalProject("scalaz"), baseDirectory, scalaVersion, version,
-                docDirectory in Compile, allPackagedArtifacts) map artifactMappings
+                target in doc in Compile, allPackagedArtifacts) map artifactMappings
       )
     )
   }

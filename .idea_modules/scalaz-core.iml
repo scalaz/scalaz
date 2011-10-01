@@ -9,18 +9,24 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../core/target/scala-2.9.1.final/classes" />
-    <output-test url="file://$MODULE_DIR$/../core/target/scala-2.9.1.final/test-classes" />
+    <output url="file://$MODULE_DIR$/../core/target/scala-2.9.1/classes" />
+    <output-test url="file://$MODULE_DIR$/../core/target/scala-2.9.1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../core">
       <sourceFolder url="file://$MODULE_DIR$/../core/src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../core/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.1.final/src_managed/main" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.1/src_managed/main" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../core/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../core/src/test/scala" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../core/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../core/src/test/resources" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/../core/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.10.0.r25222-b20110703020236" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.8.1.final" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.0.1" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.1.RC1" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.1.final" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/scala-2.9.1/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../core/target/streams" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

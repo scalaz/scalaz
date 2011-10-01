@@ -4,6 +4,8 @@
       <root url="jar://$USER_HOME$/.ivy2/cache/javax.servlet/servlet-api/jars/servlet-api-2.5.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/javax.servlet/servlet-api/srcs/servlet-api-2.5-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

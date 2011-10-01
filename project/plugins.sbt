@@ -1,0 +1,1 @@
+scalacOptions in Compile += "-deprecation"

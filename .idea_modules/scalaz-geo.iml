@@ -9,8 +9,8 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../geo/target/scala-2.9.1.final/classes" />
-    <output-test url="file://$MODULE_DIR$/../geo/target/scala-2.9.1.final/test-classes" />
+    <output url="file://$MODULE_DIR$/../geo/target/scala-2.9.1/classes" />
+    <output-test url="file://$MODULE_DIR$/../geo/target/scala-2.9.1/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../geo">
       <sourceFolder url="file://$MODULE_DIR$/../geo/src/main/scala" isTestSource="false" />
