@@ -177,7 +177,7 @@ download_url () {
       curl --silent "$url" --output "$jar"
     elif which wget >/dev/null; then
 #      wget --quiet "$url" > "$jar"
-      wget  "$url" > "$jar"
+      wget  -O "$jar" $url"
     fi
   } && [[ -f "$jar" ]]
 }
