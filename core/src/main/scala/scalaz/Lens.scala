@@ -2,7 +2,7 @@ package scalaz
 
 import Scalaz._
 import scalaz.Category._
-import scala.collection.generic.{Subtractable, Addable}
+import scala.collection.generic.Subtractable
 import scala.collection.{SetLike, SeqLike}
 import scala.collection.immutable._
 import scala._
