@@ -245,7 +245,7 @@ object ImplicitConversionTest {
   def maVsMAB {
     trait Bin[A, B]
     trait Un[A]
-    object M extends Un[Any] with Bin[Any, Any]
+    val M: Un[Any] = new Un[Any] with Bin[Any, Any] {}
     M.asMA
 
     Traversable(1).asMA
