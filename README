@@ -12,20 +12,17 @@ Snapshots and Releases published to the repository on scala-tools.org.
 Build Instructions
 ------------------
 
-The root directory of the project contains the SBT launcher, shell script, and Windows command script.
+The root directory of the project contains the SBT launcher script.
 
 This is the directory structure of the build.
 
 |- project +
-|          |-build +
-|          |       |- ScalazProject.scala.   Project Definition, containing module structure, compiler
-|          |       |                         options, cross module dependencies, etc.
-|          |       |- build.properties       Version of SBT, Scala, and Scalaz.
-|          |                                 A different version of Scala is used to run SBT and compile
-|          |                                 the Project Definition than is used to compile Scalaz.
-|          |-target                          Compiled Project Definition
+|          |-ScalazBuild.scala               Project Definition, containing module structure, compiler
+|          |                                 options, cross module dependencies, etc.
 |          |
-|-         +-boot                            Versions of Scala Compiler and Library.
+|          |-plugins.sbt                     Plugins and settings for the build itself.
+|          |
+|          - build.properties                Version of SBT
 |
 |- <mod N> +
 
@@ -36,20 +33,16 @@ This is the directory structure of the build.
            |       |-test +
            |              |-scala            Test source files
            |
-           |-lib_managed                     Managed Dependencies for this module, e.g. Scalacheck.
-           |
            |-target +
                     | - <scala version M>    All built artifacts (classes, jars, scaladoc) for module N
                                              built for version M of Scala.
+IDE Support
+------------------
 
-1. ./sbt update (this step is required after a fresh checkout, after changing the version of
-                     SBT, Scala, or other dependencies)
-2. ./sbt [compile | package | test-compile | test | publish-local | publish]
+To generate IntelliJ Project Files:
 
-For continuous compilation of a module:
-
-$ ./sbt
-> project scalaz-core
-> ~compile
-
-For other options, read: http://code.google.com/p/simple-build-tool/wiki/DocumentationHome
+  ./sbt
+  > add-sbt-idea // unless already installed in ~/.sbt/plugins/build.sbt
+  [info] Reapplying settings...
+  [info] Set current project to scalaz (in build file:/Users/jason/code/scalaz/)
+  > gen-idea

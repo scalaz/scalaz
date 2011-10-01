@@ -22,19 +22,23 @@
     <option value="true" name="OPEN_IN_BROWSER" />
   </component>
   <component name="NullableNotNullManager">
-    <option value="org.jetbrains.annotations.Nullable" name="myDefaultNullable" />
-    <option value="org.jetbrains.annotations.NotNull" name="myDefaultNotNull" />
+    <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
+    <option name="myDefaultNotNull" value="org.jetbrains.annotations.NotNull" />
     <option name="myNullables">
       <value>
-        <list size="0" />
+        <list size="3">
+          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
+          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
+          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
+        </list>
       </value>
     </option>
     <option name="myNotNulls">
       <value>
         <list size="3">
-          <item itemvalue="org.jetbrains.annotations.NotNull" class="java.lang.String" index="0" />
-          <item itemvalue="javax.annotation.Nonnull" class="java.lang.String" index="1" />
-          <item itemvalue="edu.umd.cs.findbugs.annotations.NonNull" class="java.lang.String" index="2" />
+          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
+          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
+          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
         </list>
       </value>
     </option>
