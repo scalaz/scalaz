@@ -12,3 +12,6 @@ tags
 build.log
 .history
 .idea/inspectionProfiles/**
+.lib
+.idea
+.idea_modules

@@ -240,4 +240,14 @@ object ImplicitConversionTest {
   def strategy {
     i[concurrent.Strategy]
   }
+
+  // See https://github.com/scalaz/scalaz/issues/39
+  def maVsMAB {
+    trait Bin[A, B]
+    trait Un[A]
+    val M: Un[Any] = new Un[Any] with Bin[Any, Any] {}
+    M.asMA
+
+    Traversable(1).asMA
+  }
 }

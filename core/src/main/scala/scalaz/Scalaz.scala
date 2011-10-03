@@ -38,7 +38,6 @@ object Scalaz extends Actors
     with    Lists
     with    Loggers
     with    Longs
-    with    MAs
     with    MABs
     with    MetricSpaces
     with    Memos

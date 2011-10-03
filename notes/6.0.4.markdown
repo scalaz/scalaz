@@ -1,0 +1,2 @@
+* Propagate exceptions from flatMapped Promise to the calling thread
+* Resolve ambiguous implicit conversion to MA / MAB [#39](https://github.com/scalaz/scalaz/issues/39)
