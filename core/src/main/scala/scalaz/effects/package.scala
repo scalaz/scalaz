@@ -108,16 +108,17 @@ package object effects {
   /** Enumerate the lines from a BufferedReader */
   def getReaderLines(r: => BufferedReader): EnumeratorM[IO, String] = new EnumeratorM[IO, String] {
     def apply[A](it: IterV[String, A]) = {
-      def loop: IterV[String, A] => IO[IterV[String, A]] = {
-        case i@Done(_, _) => io { i }
-        case i@Cont(k) => for {
+      def loop(i: IterV[String, A]): IO[IterV[String, A]] = i.fold(
+        done = (_,_) => io { i },
+        cont = k => for {
           s <- rReadLn(r)
           a <- s.map(l => loop(k(El(l)))).getOrElse(io(i))
         } yield a
-      }
+      )
       loop(it)
     }
   }
+
   def closeReader(r: Reader): IO[Unit] = io { r.close }
 
   def getFileLines(f: File): EnumeratorM[IO, String] = new EnumeratorM[IO, String] {

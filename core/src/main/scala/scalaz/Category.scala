@@ -147,6 +147,22 @@ object Category {
   implicit def flipFunctorIso[F[_], G[_]](implicit i: F <~> G): G <~> F =
     new Iso2[~>, G, F](i.from, i.to)
 
+  /** Natural isomorphism is reflexive */
+  implicit def reflFunctorIso[F[_]]: F <~> F = {
+    val id = new (F ~> F) {
+      def apply[A](f: F[A]) = f
+    }
+    new Iso2[~>, F, F](id, id)
+  }
+
+  /** Natural isomorphism is transitive */
+  implicit def transFunctorIso[F[_], G[_], H[_]](implicit fg: F <~> G, gh: G <~> H): F <~> H =
+    new Iso2[~>, F, H](new (F ~> H) {
+      def apply[A](f: F[A]): H[A] = gh.to(fg.to(f))
+    }, new (H ~> F) {
+      def apply[A](h: H[A]): F[A] = fg.from(gh.from(h))
+    })
+
   /** Every NewType is isomorphic to its underlying type.
       If its constructor is made implicit, we get an implicit isomorphism. */
   implicit def newTypeIso[A, B <: NewType[A]](implicit c: A => B): A <=> B =
