@@ -57,19 +57,15 @@ package object effects {
     def equal(s1: STRef[S, A], s2: STRef[S, A]): Boolean = s1 == s2
   }
 
-  import IO._
-
   // Implicit conversions between IO and ST
-  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = new IO[A] {
-    def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = kp(st(realWorld)._2)
-  }
-  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(rw => (rw, io.unsafePerformIO))
+  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => promise(st(s)))
+  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s).get)
  
   /** Perform the given side-effect in an IO action */
   def io[A](a: => A) = IO.ioPure pure a
 
   /** Get the next character from standard input */
-  def getChar: IO[Char] = io { val c = readChar; c }
+  def getChar: IO[Char] = io { readChar }
 
   /** Write a character to standard output */
   def putChar(c: Char): IO[Unit] = io { print(c); () }
@@ -81,7 +77,7 @@ package object effects {
   def putStrLn(s: String): IO[Unit] = io { println(s); () }
 
   /** Read the next line from standard input */
-  def readLn: IO[String] = io { val r = readLine; r }
+  def readLn: IO[String] = io { readLine }
 
   /** Print the given object to standard output */
   def putOut[A](a: A): IO[Unit] = io { print(a); () }
@@ -135,9 +131,7 @@ package object effects {
   def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => io { new IORef(v) })
 
   /** Throw the given error in the IO monad. */
-  def throwIO[A](e: Throwable): IO[A] = new IO[A] {
-    def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = ke(e)
-  }
+  def throwIO[A](e: Throwable): IO[A] = IO(rw => throw e)
 
 }
 

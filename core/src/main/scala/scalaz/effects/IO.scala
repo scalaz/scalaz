@@ -2,45 +2,29 @@ package scalaz
 package effects
 
 import Scalaz._
+import concurrent._
 
-private[effects] sealed trait I[R] {
-  def apply[A](f: A => R, g: Throwable => R, i: => A): R
-}
-
-private[effects] object I {
-  def eval[R]: I[R] = new I[R] {
-    def apply[A](f: A => R, g: Throwable => R, i: => A): R =
-      try { f(i) } catch { case e => g(e) }
-  }
-}
-
-trait IO[A] {
-
-  import IO._
-
-  private case class Control[A](v: A) extends Throwable
-
-  private[effects] def apply[R](k: A => R, i: I[R], e: Throwable => R): R
+sealed trait IO[A] {
+  private[effects] def apply(rw: World[RealWorld]): Promise[(World[RealWorld], A)]
   /**
    * Unsafe operation. Runs I/O and performs side-effects.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(a => a, I.eval, e => throw e)
+  def unsafePerformIO: A = apply(realWorld).get._2
 
-  def flatMap[B](f: A => IO[B]): IO[B] = new IO[B] {
-  def apply[R](kp: B => R, kf: I[R], ke: Throwable => R) =
-    try { IO.this.apply(a => throw Control(a), kf, ke) } catch { case Control(a) => f(a.asInstanceOf[A]).apply(kp, kf, ke) }
-  }
+  def flatMap[B](f: A => IO[B]): IO[B] = IO(rw =>
+    apply(rw) flatMap {
+      case (nw, a) => f(a)(nw)
+    })
 
-  def map[B](f: A => B): IO[B] = new IO[B] {
-    def apply[R](kp: B => R, kf: I[R], ke: Throwable => R) =
-      try { IO.this.apply(x => throw Control(x), kf, ke) } catch { case Control(x) => kp(f(x.asInstanceOf[A])) }
-  }
+  def map[B](f: A => B): IO[B] = IO(rw =>
+    apply(rw) map {
+      case (nw, a) => (nw, f(a))
+    })
 
   /** Executes the handler if an exception is raised. */
-  def except(handler: Throwable => IO[A]): IO[A] = new IO[A] {
-    def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = IO.this.apply(kp, kf, e => handler(e).apply(kp, kf, ke))
-  }
+  def except(handler: Throwable => IO[A]): IO[A] = 
+    IO(rw => try { this(rw) } catch { case e => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
@@ -109,12 +93,13 @@ class IORef[A](val value: STRef[RealWorld, A]) extends NewType[STRef[RealWorld, 
 }
 
 object IO {
-  implicit val ioPure: Pure[IO] = new Pure[IO] {
-    def pure[A](a: => A) = new IO[A] {
-      def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = kp(a)
-    }
+  def apply[A](f: World[RealWorld] => Promise[(World[RealWorld], A)]): IO[A] = new IO[A] {
+    private[effects] def apply(rw: World[RealWorld]) = f(rw)
   }
 
+  implicit val ioPure: Pure[IO] = new Pure[IO] {
+    def pure[A](a: => A) = IO(rw => promise((rw, a)))
+  }
   implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f
   }

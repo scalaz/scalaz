@@ -8,9 +8,15 @@ object ExampleIteratee {
   import IterV._
 
   implicit val StreamEnumerator = new Enumerator[Stream] {
-    def apply[E, A](e: Stream[E], i: IterV[E, A]): IterV[E, A] = e match {
-      case Stream() => i
-      case x #:: xs => i.fold(done = (_, _) => i, cont = k => apply(xs, k(El(x))))
+    @annotation.tailrec def apply[E, A](e: Stream[E], i: IterV[E, A]): IterV[E, A] = {
+       val next: Option[(Stream[E], IterV[E, A])] = e match {
+         case Stream() => None
+         case x #:: xs => i.fold(done = (_, _) => None, cont = k => some((xs, k(El(x)))))
+       }
+       next match {
+         case None => i
+         case Some((es, is)) => apply(es, is)
+       }
     }
   }
 
