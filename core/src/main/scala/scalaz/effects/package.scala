@@ -57,30 +57,34 @@ package object effects {
     def equal(s1: STRef[S, A], s2: STRef[S, A]): Boolean = s1 == s2
   }
 
+  import IO._
+
   // Implicit conversions between IO and ST
-  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(st(_))
-  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(io(_))
+  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = new IO[A] {
+    def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = kp(st(realWorld)._2)
+  }
+  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(rw => (rw, io.unsafePerformIO))
  
   /** Perform the given side-effect in an IO action */
   def io[A](a: => A) = IO.ioPure pure a
 
   /** Get the next character from standard input */
-  def getChar: IO[Char] = IO(rw => (rw, readChar))
+  def getChar: IO[Char] = io { val c = readChar; c }
 
   /** Write a character to standard output */
-  def putChar(c: Char): IO[Unit] = IO(rw => (rw, { print(c); () }))
+  def putChar(c: Char): IO[Unit] = io { print(c); () }
 
   /** Write a String to standard output */
-  def putStr(s: String): IO[Unit] = IO(rw => (rw, { print(s); () }))
+  def putStr(s: String): IO[Unit] = io { print(s); () }
 
   /** Write a String to standard output, followed by a newline */
-  def putStrLn(s: String): IO[Unit] = IO((rw => (rw, { println(s); () })))
+  def putStrLn(s: String): IO[Unit] = io { println(s); () }
 
   /** Read the next line from standard input */
-  def readLn: IO[String] = IO(rw => (rw, readLine))
+  def readLn: IO[String] = io { val r = readLine; r }
 
   /** Print the given object to standard output */
-  def putOut[A](a: A): IO[Unit] = IO(rw => (rw, { print(a); () }))
+  def putOut[A](a: A): IO[Unit] = io { print(a); () }
 
   import IterV._
   import java.io._
@@ -131,7 +135,9 @@ package object effects {
   def newIORef[A](a: => A) = stToIO(newVar(a)) >>= (v => io { new IORef(v) })
 
   /** Throw the given error in the IO monad. */
-  def throwIO[A](e: Throwable): IO[A] = IO(rw => (rw, throw e))
+  def throwIO[A](e: Throwable): IO[A] = new IO[A] {
+    def apply[R](kp: A => R, kf: I[R], ke: Throwable => R) = ke(e)
+  }
 
 }
 
