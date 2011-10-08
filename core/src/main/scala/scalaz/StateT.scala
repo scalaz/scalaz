@@ -1,5 +1,22 @@
 package scalaz
 
+/**
+ * StateT Monad Transformer
+ */
+trait StateT[S, F[_], A] {
+  def apply(s: S): F[(A, S)]
+
+  def !(s: S)(implicit F: Functor[F]): F[A] =
+    F.map(apply(s))(_._1)
+
+  // TODO `!!` is a placeholder.
+  def !!(s: S)(implicit F: Functor[F]): F[S] =
+    F.map(apply(s))(_._2)
+}
+
+//
+// Prioritized Implicits for type class instances
+//
 
 trait StateTsLow2 {
   implicit def stateTFunctor[S, F[_]](implicit F0: Functor[F]) = new StateTFunctor[S, F] {
@@ -36,18 +53,11 @@ trait StateTs extends StateTsLow1 {
   }
 }
 
-trait StateT[S, F[_], A] {
-  def apply(s: S): F[(A, S)]
-
-  def !(s: S)(implicit F: Functor[F]): F[A] =
-    F.map(apply(s))(_._1)
-
-  // TODO `!!` is a placeholder.
-  def !!(s: S)(implicit F: Functor[F]): F[S] =
-    F.map(apply(s))(_._2)
-}
-
 object StateT extends StateTs
+
+//
+// Implementation traits for type class instances
+//
 
 trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = StateT[S, F, a]})#f] {
   implicit def F: Functor[F]
