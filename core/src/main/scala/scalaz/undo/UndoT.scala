@@ -119,43 +119,43 @@ trait UndoTMonadTrans[S]
   }
 }
 
-
 trait Undos {
-  def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F], F: Monad[F]): UndoT[S, F, Boolean] =
+  def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+    import HMS._
     UndoT(
-      HMS.bind(HMS.init) {
-        case History(current, undos, redos) =>
-          if (undos.isEmpty)
-            HMS.pure(false)
-          else
-            HMS.bind(HMS.put(History[S](current = undos.head, undos = undos.tail, redos = current :: redos)))(
-              _ => HMS.pure(true)
-            )
+      bind(init) {
+        case History(current, Nil, redos) =>
+          pure(false)
+        case History(current, u :: us, redos) =>
+          val newHistory = History[S](current = u, undos = us, redos = current :: redos)
+          bind(put(newHistory))(_ => pure(true))
       }
     )
+  }
 
-  def ⎌[S, F[_]](implicit HMS: HStateTMonadState[S, F], F: Monad[F]): UndoT[S, F, Boolean] = undo
+  def ⎌[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = undo
 
-  def redo[S, F[_]](implicit HMS: HStateTMonadState[S, F], F: Monad[F]): UndoT[S, F, Boolean] =
+  def redo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+    import HMS._
     UndoT(
-      HMS.bind(HMS.init) {
-        case History(current, undos, redos) =>
-          if (redos.isEmpty)
-            HMS.pure(false)
-          else
-            HMS.bind(HMS.put(History(current = redos.head, undos = current :: undos, redos.tail))) {
-              _ => HMS.pure(true)
-            }
+      bind(init) {
+        case History(current, undos, Nil) =>
+          pure(false)
+        case History(current, undos, r :: rs) =>
+          val newHistory = History(current = r, undos = current :: undos, rs)
+          bind(put(newHistory))(_ => pure(true))
       }
     )
+  }
 
-  def hput[S, F[_]](s: S)(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Unit] =
+  def hput[S, F[_]](s: S)(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Unit] = {
+    import HMS._
     UndoT(
-      HMS.bind(HMS.init) {
-        case History(current, undos, redos) =>
-          HMS.put(History(s, current :: undos, Nil))
+      bind(init) {
+        case History(current, undos, redos) => put(History(s, current :: undos, Nil))
       }
     )
+  }
 }
 
 object Undo extends Undos
