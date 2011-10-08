@@ -11,7 +11,13 @@ package undo
  * @author Gerolf Seitz
  * @author Jason Zaugg
  */
-case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A])
+case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
+  def apply(initial: S)(implicit F: Functor[F]): F[(A, History[S])] = hstate(History(initial))
+  
+  def !(initial: S)(implicit F: Functor[F]): F[A] = F.map(apply(initial))(_._1)
+
+  def !!(initial: S)(implicit F: Functor[F]): F[S] = F.map(apply(initial))(_._2.current)
+}
 
 //
 // Prioritized Implicits for type class instances
@@ -150,12 +156,6 @@ trait Undos {
           HMS.put(History(s, current :: undos, Nil))
       }
     )
-
-  def evalUndoT[S, F[_] : Monad, A](undoT: UndoT[S, F, A], initial: S): F[A] =
-    undoT.hstate ! (History(initial))
-
-  def execUndoT[S, F[_], A](undoT: UndoT[S, F, A], initial: S)(implicit F: Monad[F]): F[S] =
-    F.map(undoT.hstate !! History(initial))(_.current)
 }
 
 object Undo extends Undos
