@@ -41,6 +41,10 @@ trait StateT[S, F[_], A] {
 
   def !(s: S)(implicit F: Functor[F]): F[A] =
     F.map(apply(s))(_._1)
+
+  // TODO `!!` is a placeholder.
+  def !!(s: S)(implicit F: Functor[F]): F[S] =
+    F.map(apply(s))(_._2)
 }
 
 object StateT extends StateTs
@@ -70,5 +74,5 @@ trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F,
 
   def init: StateT[S, F, S] = StateT(s => F.pure((s, s)))
 
-  def put(s: S): StateT[S, F, S] = StateT(_ => F.pure((s, s)))
+  def put(s: S): StateT[S, F, Unit] = StateT(_ => F.pure((s, s)))
 }
