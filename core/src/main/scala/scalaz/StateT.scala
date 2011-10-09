@@ -14,6 +14,14 @@ trait StateT[S, F[_], A] {
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(initial: S)(implicit F: Functor[F]): F[S] =
     F.map(apply(initial))(_._2)
+
+  def map[B](f: A => B)(implicit F: Functor[F]): StateT[S, F, B] = StateT(s => F.map(apply(s)) {
+    case (a, s) => (f(a), s)
+  })
+
+  def flatMap[B](f: A => StateT[S, F, B])(implicit F: Bind[F]): StateT[S, F, B] = StateT(s => F.bind(apply(s)) {
+    case (a, s) => f(a)(s)
+  })
 }
 
 //
@@ -53,10 +61,7 @@ object StateT extends StateTs
 private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = StateT[S, F, a]})#f] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] =
-    StateT(s => F.map(fa(s)) {
-      case (a, s) => (f(a), s)
-    })
+  override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] = fa.map(f)
 }
 
 private[scalaz] trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Pointed[({type f[a] = StateT[S, F, a]})#f] {
@@ -68,10 +73,7 @@ private[scalaz] trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Po
 private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] with StateTPointed[S, F] {
   implicit def F: Monad[F]
 
-  def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] =
-    StateT(s => F.bind(fa(s)) {
-      case (a, s) => f(a)(s)
-    })
+  def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] = fa.flatMap(f)
 
   def init: StateT[S, F, S] = StateT(s => F.pure((s, s)))
 
