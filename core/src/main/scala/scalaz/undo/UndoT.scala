@@ -5,7 +5,7 @@ package undo
  * UndoT Monad Transformer.
  *
  * Ported from [[http://hackage.haskell.org/packages/archive/Hedi/0.1.1/doc/html/Undo.html]]
- * 
+ *
  * Supports undo, redo and hput to push the last state on history. The redo stack is blanked on hput.
  *
  * @author Gerolf Seitz
@@ -13,7 +13,7 @@ package undo
  */
 case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
   def apply(initial: S)(implicit F: Functor[F]): F[(A, History[S])] = hstate(History(initial))
-  
+
   def eval(initial: S)(implicit F: Functor[F]): F[A] = F.map(apply(initial))(_._1)
 
   def exec(initial: S)(implicit F: Functor[F]): F[S] = F.map(apply(initial))(_._2.current)
@@ -25,22 +25,62 @@ case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
 
 trait UndoTsLow2 {
   // Prefer Pointed over Functor
-  implicit def undoTFunctor[S, F[_]](implicit F0: Functor[F]) = new UndoTFunctor[S, F] {
+  implicit def undoTFunctor[S, F[_]](implicit F0: Functor[F]): Functor[({type G[x] = UndoT[S, F, x]})#G] = new UndoTFunctor[S, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
 trait UndoTsLow1 extends UndoTsLow2 {
   // Prefer Monad over Pointed
-  implicit def undoTPointed[S, F[_]](implicit F0: Pointed[F]) = new UndoTPointed[S, F] {
+  implicit def undoTPointed[S, F[_]](implicit F0: Pointed[F]): Pointed[({type G[x] = UndoT[S, F, x]})#G] = new UndoTPointed[S, F] {
     implicit def F: Pointed[F] = F0
   }
 }
 
-trait UndoTs {
-  implicit def undoTMonadTrans[S] = new UndoTMonadTrans[S] {}
+trait UndoTFunctions {
+  /**Restores the latest item in the history */
+  def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+    import HMS._
+    UndoT(
+      bind(init) {
+        case History(current, Nil, redos) =>
+          pure(false)
+        case History(current, u :: us, redos) =>
+          val newHistory = History[S](current = u, undos = us, redos = current :: redos)
+          bind(put(newHistory))(_ => pure(true))
+      }
+    )
+  }
 
-  implicit def undoTStateTMonadState[S, F[_]](implicit F0: Monad[F]) = new UndoTMonadState[S, F] {
+  /**Reverses the previous undo */
+  def redo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+    import HMS._
+    UndoT(
+      bind(init) {
+        case History(current, undos, Nil) =>
+          pure(false)
+        case History(current, undos, r :: rs) =>
+          val newHistory = History(current = r, undos = current :: undos, rs)
+          bind(put(newHistory))(_ => pure(true))
+      }
+    )
+  }
+
+  /**Replace the current state with `s`. The redo stack is cleared. A subsequent `undo` will restore the previous state. */
+  def hput[S, F[_]](s: S)(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Unit] = {
+    import HMS._
+    UndoT(
+      bind(init) {
+        case History(current, undos, redos) => put(History(s, current :: undos, Nil))
+      }
+    )
+  }
+}
+
+trait UndoTs extends UndoTFunctions with UndoTsLow1 {
+  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] = new UndoTMonadTrans[S] {}
+
+  implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S] = new UndoTMonadState[S, F] {
     implicit def F: Monad[F] = F0
 
     implicit def HMS: HStateTMonadState[S, F] = MonadState[({type f[s, a] = StateT[s, F, a]})#f, History[S]]
@@ -53,7 +93,7 @@ object UndoT extends UndoTs
 // Implementation traits for type class instances
 //
 
-trait UndoTFunctor[S, F[_]]
+private[scalaz] trait UndoTFunctor[S, F[_]]
   extends Functor[({type G[x] = UndoT[S, F, x]})#G] {
 
   implicit def F: Functor[F]
@@ -67,7 +107,7 @@ trait UndoTFunctor[S, F[_]]
   }
 }
 
-trait UndoTPointed[S, F[_]]
+private[scalaz] trait UndoTPointed[S, F[_]]
   extends Pointed[({type G[x] = UndoT[S, F, x]})#G]
   with UndoTFunctor[S, F] {
 
@@ -76,7 +116,7 @@ trait UndoTPointed[S, F[_]]
   def pure[A](a: => A) = UndoT[S, F, A](StateT(s => F.pure(a, s)))
 }
 
-trait UndoTMonadState[S, F[_]]
+private[scalaz] trait UndoTMonadState[S, F[_]]
   extends MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S]
   with UndoTPointed[S, F] {
 
@@ -101,7 +141,7 @@ trait UndoTMonadState[S, F[_]]
   )
 }
 
-trait UndoTMonadTrans[S]
+private[scalaz] trait UndoTMonadTrans[S]
   extends MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] {
 
   trait UndoTF[S, G[_]] {
@@ -118,44 +158,3 @@ trait UndoTMonadTrans[S]
     UndoT[S, G, A](StateT(s => G.map(ga)(a => (a, s))))
   }
 }
-
-trait Undos {
-  def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
-    import HMS._
-    UndoT(
-      bind(init) {
-        case History(current, Nil, redos) =>
-          pure(false)
-        case History(current, u :: us, redos) =>
-          val newHistory = History[S](current = u, undos = us, redos = current :: redos)
-          bind(put(newHistory))(_ => pure(true))
-      }
-    )
-  }
-
-  def ⎌[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = undo
-
-  def redo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
-    import HMS._
-    UndoT(
-      bind(init) {
-        case History(current, undos, Nil) =>
-          pure(false)
-        case History(current, undos, r :: rs) =>
-          val newHistory = History(current = r, undos = current :: undos, rs)
-          bind(put(newHistory))(_ => pure(true))
-      }
-    )
-  }
-
-  def hput[S, F[_]](s: S)(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Unit] = {
-    import HMS._
-    UndoT(
-      bind(init) {
-        case History(current, undos, redos) => put(History(s, current :: undos, Nil))
-      }
-    )
-  }
-}
-
-object Undo extends Undos
