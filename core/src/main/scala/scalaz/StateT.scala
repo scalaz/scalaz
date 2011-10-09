@@ -21,13 +21,13 @@ trait StateT[S, F[_], A] {
 //
 
 trait StateTsLow2 {
-  implicit def stateTFunctor[S, F[_]](implicit F0: Functor[F]) = new StateTFunctor[S, F] {
+  implicit def stateTFunctor[S, F[_]](implicit F0: Functor[F]): Functor[({type f[a] = StateT[S, F, a]})#f] = new StateTFunctor[S, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
 trait StateTsLow1 extends StateTsLow2 {
-  implicit def stateTPointed[S, F[_]](implicit F0: Pointed[F]) = new StateTPointed[S, F] {
+  implicit def stateTPointed[S, F[_]](implicit F0: Pointed[F]): Pointed[({type f[a] = StateT[S, F, a]})#f] = new StateTPointed[S, F] {
     implicit def F: Pointed[F] = F0
   }
 }
@@ -37,11 +37,11 @@ trait StateTs extends StateTsLow1 {
     def apply(s: S) = f(s)
   }
 
-  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]) = new StateTMonadState[S, F] {
+  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] = new StateTMonadState[S, F] {
     implicit def F: Monad[F] = F0
   }
 
-  implicit def StateMonadTrans[S] = new StateTMonadTrans[S] {}
+  implicit def StateMonadTrans[S]: MonadTrans[({type f[g[_], a] = StateT[S, g, a]})#f] = new StateTMonadTrans[S] {}
 }
 
 object StateT extends StateTs
@@ -50,7 +50,7 @@ object StateT extends StateTs
 // Implementation traits for type class instances
 //
 
-trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = StateT[S, F, a]})#f] {
+private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = StateT[S, F, a]})#f] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] =
@@ -59,13 +59,13 @@ trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = StateT[S, F, a]})#f] 
     })
 }
 
-trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Pointed[({type f[a] = StateT[S, F, a]})#f] {
+private[scalaz] trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Pointed[({type f[a] = StateT[S, F, a]})#f] {
   implicit def F: Pointed[F]
 
   def pure[A](a: => A): StateT[S, F, A] = StateT(s => F.pure(a, s))
 }
 
-trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] with StateTPointed[S, F] {
+private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] with StateTPointed[S, F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] =
@@ -78,7 +78,7 @@ trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F,
   def put(s: S): StateT[S, F, Unit] = StateT(_ => F.pure((s, s)))
 }
 
-trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[S, g, a]})#f] {
+private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[S, g, a]})#f] {
   trait StateTF[S, G[_]] {
     type f[x] = StateT[S, G, x]
   }
