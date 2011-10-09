@@ -14,9 +14,9 @@ package undo
 case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
   def apply(initial: S)(implicit F: Functor[F]): F[(A, History[S])] = hstate(History(initial))
   
-  def !(initial: S)(implicit F: Functor[F]): F[A] = F.map(apply(initial))(_._1)
+  def eval(initial: S)(implicit F: Functor[F]): F[A] = F.map(apply(initial))(_._1)
 
-  def !!(initial: S)(implicit F: Functor[F]): F[S] = F.map(apply(initial))(_._2.current)
+  def exec(initial: S)(implicit F: Functor[F]): F[S] = F.map(apply(initial))(_._2.current)
 }
 
 //

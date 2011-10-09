@@ -19,7 +19,7 @@ object UndoTUsage extends App {
     } yield ()
 
   // This should print 'Some(4)'
-  assert(result !! 1 == Some(4))
+  assert(result.exec(1) == Some(4))
   println("success")
 
 }
