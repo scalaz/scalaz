@@ -16,7 +16,11 @@ trait Functions {
     }
   }
 
-  implicit def function1[T] = new Monad[({type l[a] = (T => a)})#l] {
+  implicit def function1 = new Arr[Function1] {
+    def arr[A, B](f: A => B): A => B = f
+  }
+
+  implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {
     def pure[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B): (T => B) = (t: T) => f(fa(t))(t)

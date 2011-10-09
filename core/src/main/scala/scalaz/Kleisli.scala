@@ -3,7 +3,7 @@ package scalaz
 sealed trait Kleisli[M[_], A, B] {
   def apply(a: A): M[B]
 
-  import Kliesli._
+  import Kleisli._
 
   // TODO provide non-symbolic aliases.
 
@@ -60,12 +60,16 @@ trait Kleislis extends KleislisLow0 {
   /** Pure Kleisli arrow */
   def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
 
+  implicit def kleisliArr[F[_]](implicit F0: Pointed[F]): Arr[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new Arr[({type λ[α, β]=Kleisli[F, α, β]})#λ] {
+    def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F0.pure(f(a)))
+  }
+
   implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]): Monad[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliMonad[F, R] {
     implicit def F: Monad[F] = F0
   }
 }
 
-object Kliesli extends Kleislis
+object Kleisli extends Kleislis
 
 //
 // Implementation traits for type class instances
@@ -80,7 +84,7 @@ private[scalaz] trait KleisliFunctor[F[_], R] extends Functor[({type λ[α] = Kl
 private[scalaz] trait KleisliPointed[F[_], R] extends Pointed[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliFunctor[F, R] {
   implicit def F: Pointed[F]
 
-  def pure[A](a: => A): Kleisli[F, R, A] = Kliesli.kleisli((r: R) => F.pure(a))
+  def pure[A](a: => A): Kleisli[F, R, A] = Kleisli.kleisli((r: R) => F.pure(a))
 }
 
 private[scalaz] trait KleisliMonad[F[_], R] extends Monad[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPointed[F, R] {
