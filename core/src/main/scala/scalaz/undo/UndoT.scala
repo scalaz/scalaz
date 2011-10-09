@@ -50,7 +50,7 @@ trait UndoTsLow1 extends UndoTsLow2 {
 }
 
 trait UndoTFunctions {
-  def mkUndoT[S, F[_], A](f: History[S] => F[(A, History[S])]) =
+  def mkUndoT[S, F[_], A](f: History[S] => F[(A, History[S])]): UndoT[S, F, A] =
     new UndoT[S, F, A](StateT(f))
 
   def bindInit[S, F[_], B](f: History[S] => StateTHistory[S, F, B])(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, B] = {
