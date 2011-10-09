@@ -16,11 +16,11 @@ trait StateT[S, F[_], A] {
     F.map(apply(initial))(_._2)
 
   def map[B](f: A => B)(implicit F: Functor[F]): StateT[S, F, B] = StateT(s => F.map(apply(s)) {
-    case (a, s) => (f(a), s)
+    case (a, s1) => (f(a), s1)
   })
 
   def flatMap[B](f: A => StateT[S, F, B])(implicit F: Bind[F]): StateT[S, F, B] = StateT(s => F.bind(apply(s)) {
-    case (a, s) => f(a)(s)
+    case (a, s1) => f(a)(s1)
   })
 }
 
