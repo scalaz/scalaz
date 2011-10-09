@@ -10,7 +10,7 @@ trait PlusV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToPlusSyntax extends ToFunctorSyntax {
+trait ToPlusSyntax extends ToFunctorSyntax with ToEmptySyntax {
   implicit def ToPlusV[F[_],A](v: F[A]) =
     (new PlusSyntax[F] {}).ToPlusV(v)
   implicit def ToPlusVFromBin[F[_, _], X, A](v: F[X, A]) =
@@ -25,7 +25,7 @@ trait ToPlusSyntax extends ToFunctorSyntax {
   ////
 }
 
-trait PlusSyntax[F[_]] extends FunctorSyntax[F] {
+trait PlusSyntax[F[_]] extends FunctorSyntax[F] with EmptySyntax[F] {
   implicit def ToPlusV[A](v: F[A]): PlusV[F, A] = new PlusV[F,A] { def self = v }
 
   ////

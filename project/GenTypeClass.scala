@@ -11,6 +11,7 @@ object TypeClass {
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, equal)
 
+  lazy val empty = TypeClass("Empty", *->*)
   lazy val functor = TypeClass("Functor", *->*)
   lazy val pointed = TypeClass("Pointed", *->*, functor)
   lazy val apply: TypeClass = TypeClass("Apply", *->*, functor)
@@ -24,7 +25,7 @@ object TypeClass {
   lazy val cojoin = TypeClass("Cojoin", *->*)
   lazy val comonad = TypeClass("Comonad", *->*, copointed, cojoin)
 
-  lazy val plus = TypeClass("Plus", *->*, functor)
+  lazy val plus = TypeClass("Plus", *->*, functor, empty)
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, applicative, plus)
   lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
 
@@ -33,6 +34,7 @@ object TypeClass {
     equal,
     show,
     order,
+    empty,
     functor,
     pointed,
     contravariant,

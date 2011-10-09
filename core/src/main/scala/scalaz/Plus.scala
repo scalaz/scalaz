@@ -1,10 +1,9 @@
 package scalaz
 
-trait Plus[F[_]] extends Functor[F] { self =>
+trait Plus[F[_]] extends Functor[F] with Empty[F] { self =>
   ////
 
   def plus[A](a: F[A], b: => F[A]): F[A]
-  def empty[A]: F[A]
 
   ////
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] {}
