@@ -43,6 +43,9 @@ trait Options {
 
     def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
   }
+
+  def some[A](a: A): Option[A] = Some(a)
+  def none[A]: Option[A] = None
 }
 
 object Option extends Options
