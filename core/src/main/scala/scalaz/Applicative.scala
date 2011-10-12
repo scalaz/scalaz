@@ -12,13 +12,11 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
 
   // impls of sequence, traverse, etc
 
-  def traverse[A, G[_], B](value: G[A])(f: A => F[B])(implicit a: Applicative[F], t: Traverse[G]): F[G[B]] =
-    t.traverse(value)(f)
+  def traverse[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse[G]): F[G[B]] =
+    G.traverse(value)(f)(this)
 
-  def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] = {
-    implicit val F = this
+  def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
     traverse(as)(a => a)
-  }
 
   /**The composition of Applicatives F and G, [x]F[G[x]], is an Applicative */
   def compose[G[_]](G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
