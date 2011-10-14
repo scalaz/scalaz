@@ -1,7 +1,5 @@
 package scalaz.example
 
-import scalaz.std
-
 object SyntaxUsage extends App {
 
   val o1: Option[Int] = Some(0)
@@ -11,8 +9,28 @@ object SyntaxUsage extends App {
 
   syntax1()
   syntax2()
+  syntax3()
 
+  // Use the syntax only for Monad[Option]
+  // This includes the syntax for the parent type classes.
   def syntax1() {
+    import scalaz._
+
+    // Import type class instances for Option, and the
+    // Monad syntax for Option.
+    import std.Option._
+    import std.Option.option.monadSyntax._
+    val x = 1.pure
+    val y = pure(1)
+    x: Option[Int]
+    y: Option[Int]
+
+    o1 >>= (x => if (x == 0) Some(0) else None)
+    o2.join
+  }
+
+  // Use two different instances, and the syntax for all Monads
+  def syntax2() {
     import scalaz._
 
     // Import type class instances for Option and List
@@ -25,9 +43,11 @@ object SyntaxUsage extends App {
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
     l2.join
+
+    1.pure[Option]
   }
 
-  def syntax2() {
+  def syntax3() {
     import scalaz._
 
     // Import all type class instances
@@ -43,6 +63,8 @@ object SyntaxUsage extends App {
     o2.pair(o2)
   }
 
+
+  // Monad extends from Pointed, so we can use (std.Option.option: Monad[Option]) where Pointed[F] is called for.
   def useParentTypeClass {
     import scalaz._
     
