@@ -10,7 +10,7 @@ trait SemigroupV[F] extends SyntaxV[F] {
 
 trait ToSemigroupSyntax  {
   implicit def ToSemigroupV[F](v: F) =
-    (new SemigroupSyntax[F] {}).ToSemigroupV(v)
+    new SemigroupV[F] { def self = v }
 
   ////
 

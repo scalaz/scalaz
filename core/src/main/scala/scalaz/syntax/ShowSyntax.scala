@@ -10,7 +10,7 @@ trait ShowV[F] extends SyntaxV[F] {
 
 trait ToShowSyntax  {
   implicit def ToShowV[F](v: F) =
-    (new ShowSyntax[F] {}).ToShowV(v)
+    new ShowV[F] { def self = v }
 
   ////
 

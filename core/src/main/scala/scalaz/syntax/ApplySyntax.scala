@@ -10,13 +10,13 @@ trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToApplySyntax extends ToFunctorSyntax {
   implicit def ToApplyV[F[_],A](v: F[A]) =
-    (new ApplySyntax[F] {}).ToApplyV(v)
+    new ApplyV[F,A] { def self = v }
   implicit def ToApplyVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new ApplySyntax[({type f[a] = F[X, a]})#f] {}).ToApplyV(v)
+    new ApplyV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToApplyVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new ApplySyntax[({type f[a] = F[X, G, a]})#f] {}).ToApplyV(v)
+    new ApplyV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToApplyVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new ApplySyntax[({type f[a] = F[X, Id, a]})#f] {}).ToApplyV(v)
+    new ApplyV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

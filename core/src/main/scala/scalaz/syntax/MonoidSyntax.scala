@@ -10,7 +10,7 @@ trait MonoidV[F] extends SyntaxV[F] {
 
 trait ToMonoidSyntax extends ToSemigroupSyntax {
   implicit def ToMonoidV[F](v: F) =
-    (new MonoidSyntax[F] {}).ToMonoidV(v)
+    new MonoidV[F] { def self = v }
 
   ////
 

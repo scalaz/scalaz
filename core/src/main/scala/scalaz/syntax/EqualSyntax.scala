@@ -10,7 +10,7 @@ trait EqualV[F] extends SyntaxV[F] {
 
 trait ToEqualSyntax  {
   implicit def ToEqualV[F](v: F) =
-    (new EqualSyntax[F] {}).ToEqualV(v)
+    new EqualV[F] { def self = v }
 
   ////
 

@@ -12,13 +12,13 @@ trait PlusV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToPlusSyntax extends ToFunctorSyntax with ToEmptySyntax {
   implicit def ToPlusV[F[_],A](v: F[A]) =
-    (new PlusSyntax[F] {}).ToPlusV(v)
+    new PlusV[F,A] { def self = v }
   implicit def ToPlusVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new PlusSyntax[({type f[a] = F[X, a]})#f] {}).ToPlusV(v)
+    new PlusV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToPlusVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new PlusSyntax[({type f[a] = F[X, G, a]})#f] {}).ToPlusV(v)
+    new PlusV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToPlusVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new PlusSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToPlusV(v)
+    new PlusV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

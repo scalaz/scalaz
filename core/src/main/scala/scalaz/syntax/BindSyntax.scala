@@ -14,13 +14,13 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToBindSyntax extends ToApplySyntax {
   implicit def ToBindV[F[_],A](v: F[A]) =
-    (new BindSyntax[F] {}).ToBindV(v)
+    new BindV[F,A] { def self = v }
   implicit def ToBindVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new BindSyntax[({type f[a] = F[X, a]})#f] {}).ToBindV(v)
+    new BindV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToBindVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new BindSyntax[({type f[a] = F[X, G, a]})#f] {}).ToBindV(v)
+    new BindV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToBindVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new BindSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToBindV(v)
+    new BindV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

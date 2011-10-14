@@ -1,8 +1,8 @@
 package scalaz
 
 trait Empty[F[_]]  { self =>
-  def empty[A]: F[A]
   ////
+  def empty[A]: F[A]
 
   // derived functions
 

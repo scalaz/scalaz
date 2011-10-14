@@ -13,13 +13,13 @@ trait ApplicativeV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToApplicativeSyntax extends ToApplySyntax with ToPointedSyntax {
   implicit def ToApplicativeV[F[_],A](v: F[A]) =
-    (new ApplicativeSyntax[F] {}).ToApplicativeV(v)
+    new ApplicativeV[F,A] { def self = v }
   implicit def ToApplicativeVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new ApplicativeSyntax[({type f[a] = F[X, a]})#f] {}).ToApplicativeV(v)
+    new ApplicativeV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToApplicativeVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new ApplicativeSyntax[({type f[a] = F[X, G, a]})#f] {}).ToApplicativeV(v)
+    new ApplicativeV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToApplicativeVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new ApplicativeSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToApplicativeV(v)
+    new ApplicativeV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

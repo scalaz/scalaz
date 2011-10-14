@@ -173,7 +173,7 @@ trait %sV[F] extends SyntaxV[F] {
 
 trait To%sSyntax %s {
   implicit def To%sV[F](v: F) =
-    (new %sSyntax[F] {}).To%sV(v)
+    new %sV[F] { def self = v }
 
   ////
 
@@ -190,7 +190,7 @@ trait %sSyntax[F] %s {
 """.format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
       // implicits in ToXxxSyntax
-      typeClassName, typeClassName, typeClassName,
+      typeClassName, typeClassName,
 
       typeClassName, extendsListText("Syntax"),
       typeClassName, typeClassName, typeClassName
@@ -208,13 +208,13 @@ trait %sV[F[_],A] extends SyntaxV[F[A]] {
 
 trait To%sSyntax %s {
   implicit def To%sV[F[_],A](v: F[A]) =
-    (new %sSyntax[F] {}).To%sV(v)
+    new %sV[F,A] { def self = v }
   implicit def To%sVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new %sSyntax[({type f[a] = F[X, a]})#f] {}).To%sV(v)
+    new %sV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def To%sVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new %sSyntax[({type f[a] = F[X, G, a]})#f] {}).To%sV(v)
+    new %sV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def To%sVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new %sSyntax[({type f[a] = F[X, Id, a]})#f] {}).To%sV(v)
+    new %sV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 
@@ -231,10 +231,10 @@ trait %sSyntax[F[_]] %s {
 """.format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
           // implicits in ToXxxSyntax
-          typeClassName, typeClassName, typeClassName,
-          typeClassName, typeClassName, typeClassName,
-          typeClassName, typeClassName, typeClassName,
-          typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName,
+          typeClassName, typeClassName,
+          typeClassName, typeClassName,
+          typeClassName, typeClassName,
 
           typeClassName, extendsListText("Syntax"),
           typeClassName, typeClassName, typeClassName

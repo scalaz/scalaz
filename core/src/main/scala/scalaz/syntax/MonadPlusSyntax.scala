@@ -10,13 +10,13 @@ trait MonadPlusV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToMonadPlusSyntax extends ToMonadSyntax with ToApplicativePlusSyntax {
   implicit def ToMonadPlusV[F[_],A](v: F[A]) =
-    (new MonadPlusSyntax[F] {}).ToMonadPlusV(v)
+    new MonadPlusV[F,A] { def self = v }
   implicit def ToMonadPlusVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new MonadPlusSyntax[({type f[a] = F[X, a]})#f] {}).ToMonadPlusV(v)
+    new MonadPlusV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToMonadPlusVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new MonadPlusSyntax[({type f[a] = F[X, G, a]})#f] {}).ToMonadPlusV(v)
+    new MonadPlusV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToMonadPlusVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new MonadPlusSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToMonadPlusV(v)
+    new MonadPlusV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

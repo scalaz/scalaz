@@ -7,7 +7,7 @@ trait ArrV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 
 trait ToArrSyntax  {
   implicit def ToArrV[F[_, _],A, B](v: F[A, B]) =
-    (new ArrSyntax[F] {}).ToArrV(v)
+    new ArrV[F,A,B] { def self = v }
 
 }
 

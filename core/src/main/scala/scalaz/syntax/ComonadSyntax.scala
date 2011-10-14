@@ -10,13 +10,13 @@ trait ComonadV[F[_],A] extends SyntaxV[F[A]] {
 
 trait ToComonadSyntax extends ToCopointedSyntax with ToCojoinSyntax {
   implicit def ToComonadV[F[_],A](v: F[A]) =
-    (new ComonadSyntax[F] {}).ToComonadV(v)
+    new ComonadV[F,A] { def self = v }
   implicit def ToComonadVFromBin[F[_, _], X, A](v: F[X, A]) =
-    (new ComonadSyntax[({type f[a] = F[X, a]})#f] {}).ToComonadV(v)
+    new ComonadV[({type f[a] = F[X, a]})#f,A] { def self = v }
   implicit def ToComonadVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    (new ComonadSyntax[({type f[a] = F[X, G, a]})#f] {}).ToComonadV(v)
+    new ComonadV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
   implicit def ToComonadVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    (new ComonadSyntax[({type f[a] = F[X, Id, a]})#f] {}).ToComonadV(v)
+    new ComonadV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
 
   ////
 

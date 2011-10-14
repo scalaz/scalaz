@@ -10,7 +10,7 @@ trait OrderV[F] extends SyntaxV[F] {
 
 trait ToOrderSyntax extends ToEqualSyntax {
   implicit def ToOrderV[F](v: F) =
-    (new OrderSyntax[F] {}).ToOrderV(v)
+    new OrderV[F] { def self = v }
 
   ////
 
