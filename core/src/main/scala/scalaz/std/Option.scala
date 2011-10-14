@@ -45,6 +45,7 @@ trait Options {
   }
 
   def some[A](a: A): Option[A] = Some(a)
+
   def none[A]: Option[A] = None
 }
 
