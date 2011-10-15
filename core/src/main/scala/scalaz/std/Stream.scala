@@ -6,8 +6,8 @@ trait Streams {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
       val seed: G[Stream[B]] = G.pure(scala.Stream.empty[B])
-      fa.foldRight(seed) {
-        (x, ys) =>
+      foldR(fa, seed) {
+        x => ys =>
           G.ap(ys)(G.map(f(x))((a: B) => (b: Stream[B]) => a #:: b))
       }
     }

@@ -4,10 +4,10 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Applicative` */
 trait ApplicativeV[F[_],A] extends SyntaxV[F[A]] {
   ////
-  def map2[B,C](fb: F[B])(f: (A,B) => C)(implicit F: Applicative[F]) = F.map2(self,fb)(f)
+  def map2[B,C](fb: F[B])(f: (A,B) => C)(implicit F: Applicative[F]): F[C] = F.map2(self,fb)(f)
   def pair[B](fb: F[B])(implicit F: Applicative[F]): F[(A, B)] = F.map2(self, fb)((_,_))
-  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]) = G.traverse(self)(f)
-  def sequence[G[_], B](implicit ev: F[A] <:< F[G[B]], F: Traverse[F], G: Applicative[G]) = G.sequence(ev(self))
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[F[B]] = G.traverse(self)(f)
+  def sequence[G[_], B](implicit ev: F[A] <:< F[G[B]], F: Traverse[F], G: Applicative[G]): G[F[B]] = G.sequence(ev(self))
   ////
 }
 
