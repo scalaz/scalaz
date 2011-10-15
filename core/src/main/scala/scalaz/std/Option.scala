@@ -15,6 +15,11 @@ trait Options {
     def empty[A]: Option[A] = None
 
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+
+    def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B): B = fa match {
+      case Some(a) => f(a)(z)
+      case None => z
+    }
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {

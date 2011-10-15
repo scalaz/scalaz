@@ -35,6 +35,11 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   def map[A,B](fa: F[A])(f: A => B): F[B] = 
     traversal[Id](id).run(fa)(f)
 
+  // TODO can we provide a default impl in terms of traverseImpl?
+  def foldR[A, B](fa: F[A], z: B)(f: A => (=> B) => B): B
+  def foldR1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldR(fa, None: Option[A])(a => o => o.map(f(a)(_)) orElse Some(a))
+
+  // TODO by-name type in `f` like foldR?
   def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
 
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2

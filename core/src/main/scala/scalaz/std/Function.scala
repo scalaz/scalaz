@@ -8,12 +8,10 @@ trait Functions {
 
     def bind[A, B](fa: () => A)(f: (A) => () => B): () => B = f(fa())
 
-    def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]): G[() => B] = {
-      val G = Applicative[G]
-      import G.applicativeSyntax._
+    def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]): G[() => B] =
+      Applicative[G].map(f(fa()))((b: B) => () => b)
 
-      f(fa()).map((b: B) => () => b)
-    }
+    def foldR[A, B](fa: () => A, z: B)(f: (A) => (=> B) => B): B = f(fa())(z)
   }
 
   implicit def function1 = new Arr[Function1] {
