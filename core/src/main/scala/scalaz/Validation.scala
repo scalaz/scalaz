@@ -171,6 +171,7 @@ trait Validations {
   def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
     e.fold(e => failure[A].apply[E](e), a => success[E].apply[A](a))
 
+  // TODO Equal, show, monoid, etc.
   implicit def validation[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def pure[A](a: => A): Validation[E, A] = Success(a)
 
@@ -186,4 +187,6 @@ trait Validations {
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }
+
+  // TODO instances for fail / success
 }
