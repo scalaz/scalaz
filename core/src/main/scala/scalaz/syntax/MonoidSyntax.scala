@@ -13,7 +13,7 @@ trait ToMonoidSyntax extends ToSemigroupSyntax {
     new MonoidV[F] { def self = v }
 
   ////
-
+  def mzero[F](implicit F: Monoid[F]): F = F.zero
   ////
 }
 
@@ -21,6 +21,6 @@ trait MonoidSyntax[F] extends SemigroupSyntax[F] {
   implicit def ToMonoidV(v: F): MonoidV[F] = new MonoidV[F] { def self = v }
 
   ////
-
+  def mzero(implicit F: Monoid[F]): F = F.zero
   ////
 }
