@@ -64,8 +64,8 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   def zipWithL[A,B,C](fa: F[A], fb: F[B])(f: (A,Option[B]) => C): F[C] = zipWith(fa, fb)(f)._1
   def zipWithR[A,B,C](fa: F[A], fb: F[B])(f: (Option[A],B) => C): F[C] = zipWith(fb, fa)((b,oa) => f(oa,b))._1
 
-  def zipL[A,B](fa: F[A], fb: F[B]) = zipWithL(fa, fb)((_,_))
-  def zipR[A,B](fa: F[A], fb: F[B]) = zipWithR(fa, fb)((_,_))
+  def zipL[A,B](fa: F[A], fb: F[B]): F[(A, Option[B])] = zipWithL(fa, fb)((_,_))
+  def zipR[A,B](fa: F[A], fb: F[B]): F[(Option[A], B)] = zipWithR(fa, fb)((_,_))
 
   // foldLeft, foldRight, mapAccumL, mapAccumR, map, filter?
 
