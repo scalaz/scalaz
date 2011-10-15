@@ -32,7 +32,7 @@ object Order {
 
   ////
   implicit object order extends Contravariant[Order] {
-    def contramap[A, B](r: Order[A], f: (B) => A): Order[B] = r.contramap(f)
+    def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
   }
 
   ////

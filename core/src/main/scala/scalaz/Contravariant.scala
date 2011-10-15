@@ -2,7 +2,7 @@ package scalaz
 
 trait Contravariant[F[_]]  { self =>
   ////
-  def contramap[A, B](r: F[A], f: B => A): F[B]
+  def contramap[A, B](r: F[A])(f: B => A): F[B]
 
   // derived functions
 

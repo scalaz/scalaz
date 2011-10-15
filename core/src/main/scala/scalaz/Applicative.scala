@@ -4,7 +4,7 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   ////
 
   // derived functions
-  def map[A, B](fa: F[A])(f: A => B): F[B] =
+  override def map[A, B](fa: F[A])(f: A => B): F[B] =
     ap(fa)(pure(f))
 
   override def map2[A, B, C](fa: F[A], fb: F[B])(f: (A, B) => C): F[C] =

@@ -1,7 +1,5 @@
 package scalaz
 
-package scalaz
-
 // TODO Variance removed since Scalaz6. Happy with that?
 sealed trait Validation[E, A] {
 
@@ -130,21 +128,46 @@ object FailProjection extends FailProjections {
 }
 
 trait FailProjections {
-  // TODO Reintegrate the the Isomorphisms
-  //  implicit def FailProjection_^*^[E, A]: (FailProjection[E, A] ^*^ Validation[E, A]) =
-  //    ^*^.^*^(_.validation, b => new FailProjection[E, A] {
-  //      val validation = b
-  //    })
-  //
-  //
-  //  implicit def FailProjection_^**^[E]: (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) =
-  //    new (({type λ[α] = FailProjection[E, α]})#λ ^**^ ({type λ[α] = Validation[E, α]})#λ) {
-  //      def unpack[A] = _.validation
-  //
-  //      def pack[A] = b => new FailProjection[E, A] {
-  //        val validation = b
-  //      }
-  //    }
+  import Isomorphism._
+
+  /** FailProjection is isomorphic to Validation */
+  implicit def FailProjectionIso[E, A] = new (FailProjection[E, A] <=> Validation[E, A]) {
+    def to: (FailProjection[E, A]) => Validation[E, A] = _.validation
+    def from: (Validation[E, A]) => FailProjection[E, A] = _.fail
+  }
+
+  /** FailProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
+  implicit def FailProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α]=FailProjection[E, α]})#λ, ({type λ[α]=Validation[E, α]})#λ] {
+    def to[A](fa: FailProjection[E, A]) = fa.validation
+    def from[A](ga: Validation[E, A]) = ga.fail
+  }
+
+  /** FailProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
+  implicit def FailProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α]=FailProjection[α, A]})#λ, ({type λ[α]=Validation[α, A]})#λ] {
+    def to[E](fa: FailProjection[E, A]) = fa.validation
+    def from[E](ga: Validation[E, A]) = ga.fail
+  }
+
+  /** Derive the type class instance for `FailProjection` from `Validation`. */
+  implicit def failProjectionApplicative[E](implicit E: Semigroup[E]) = {
+    type F[a] = FailProjection[E, a]
+    type G[a] = Validation[E, a]
+
+    new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G]{
+      def iso = FailProjectionEIso2[E]
+      implicit def G = Validation.validationApplicative(E)
+    }
+  }
+
+  def failProjectionMonad[E] = {
+    type F[a] = FailProjection[E, a]
+    type G[a] = Validation[E, a]
+
+    new IsomorphismPointed[F, G] with IsomorphismTraverse[F, G] with IsomorphismMonad[F, G] {
+      def iso = FailProjectionEIso2[E]
+      implicit def G = Validation.validationMonad
+    }
+  }
 }
 
 object Validation extends Validations {
@@ -171,8 +194,30 @@ trait Validations {
   def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
     e.fold(e => failure[A].apply[E](e), a => success[E].apply[A](a))
 
-  // TODO Equal, show, monoid, etc.
-  implicit def validation[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
+  /** Validation is an Applicative Functor, if the error type forms a Semigroup */
+  implicit def validationApplicative[E](E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
+    def pure[A](a: => A): Validation[E, A] = Success(a)
+
+    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
+      case Success(a) => Applicative[G].map(f(a))(Success(_))
+      case Failure(e) => Applicative[G].pure(Failure(e))
+    }
+
+    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa match {
+      case Success(a) => f(a)(z)
+      case Failure(e) => z
+    }
+
+    def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = (fa, f) match {
+      case (Success(a), Success(f)) => Success(f(a))
+      case (Failure(e), Success(_)) => Failure(e)
+      case (Success(f), Failure(e)) => Failure(e)
+      case (Failure(e1), Failure(e2)) => Failure(E.append(e1, e2))
+    }
+  }
+
+  // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
+  def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def pure[A](a: => A): Validation[E, A] = Success(a)
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
@@ -187,6 +232,4 @@ trait Validations {
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }
-
-  // TODO instances for fail / success
 }

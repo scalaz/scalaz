@@ -25,7 +25,7 @@ trait Functions {
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
-    def contramap[A, B](r: (A) => R, f: (B) => A): (B) => R = null
+    def contramap[A, B](r: (A) => R)(f: (B) => A): (B) => R = null
   }
 
   implicit def function2[T1, T2] = new Monad[({type l[a] = ((T1, T2) => a)})#l] {
