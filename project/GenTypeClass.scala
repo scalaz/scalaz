@@ -29,6 +29,14 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, applicative, plus)
   lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
 
+
+  /* Not automatically generated.
+  lazy val arrId = TypeClass("ArrId", `(*->*)->*`)
+  lazy val compose = TypeClass("Compose", `(*->*)->*`)
+  lazy val category = TypeClass("Category", `(*->*)->*`, arrId, compose)
+  lazy val monadState = TypeClass("MonadState", `(*->*)->*`, monad)
+  */
+
   def all: List[TypeClass] = List(semigroup,
     monoid,
     equal,
@@ -49,6 +57,7 @@ object TypeClass {
     applicativePlus,
     monadPlus,
     traverse)
+
 }
 
 sealed abstract class Kind

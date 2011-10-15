@@ -14,8 +14,12 @@ trait Functions {
     def foldR[A, B](fa: () => A, z: B)(f: (A) => (=> B) => B): B = f(fa())(z)
   }
 
-  implicit def function1 = new Arr[Function1] {
+  implicit def function1 = new Arr[Function1] with Category[Function1]{
     def arr[A, B](f: A => B): A => B = f
+
+    def compose[A, B, C](f: (B) => C, g: (A) => B): (A) => C = f compose g
+
+    def id[A]: (A) => A = a => a
   }
 
   implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {

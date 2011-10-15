@@ -17,8 +17,9 @@ trait NaturalTransformations {
   def id = new (Id ~> Id) {
     def apply[A](a: A) = a
   }
-}
 
+  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
+}
 
 object NaturalTransformation extends NaturalTransformations
 
@@ -30,3 +31,36 @@ trait BinaturalTransformation[F[_, _], G[_, _]] {
     def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
   }
 }
+
+/** A constrained natural transformation */
+trait ConstrainedNaturalTransformation[F[_], G[_], E[_]] {
+  def apply[A: E](f: F[A]): G[A]
+}
+
+/** A constrained transformation natural in both sides of a bifunctor */
+trait BiconstrainedNaturalTransformation[F[_,_], G[_,_], C[_], E[_]] {
+  def apply[A: C, B: E](f: F[A,B]): G[A,B]
+}
+
+trait DinaturalTransformation[F[_,_], G[_,_]] {
+  def apply[A](f: F[A,A]): G[A,A]
+}
+
+// TODO needed, or just use type lambdas?
+//type Thunk[A] = () => A
+//
+//trait Konst[A] {
+//  type Apply[B] = A
+//}
+//
+//trait Biff[P[_,_], F[_], G[_]] {
+//  type Apply[A, B] = P[F[A], G[B]]
+//}
+//
+//trait On[P[_,_], F[_]] {
+//  type Apply[A, B] = P[F[A], F[B]]
+//}
+//
+//trait Distributes[F[_], G[_]] {
+//  def apply[A](f: F[G[A]]): G[F[A]]
+//}

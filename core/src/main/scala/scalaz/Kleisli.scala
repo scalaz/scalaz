@@ -64,6 +64,12 @@ trait Kleislis extends KleislisLow0 {
     def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F0.pure(f(a)))
   }
 
+  implicit def kleisliCategory[F[_]](implicit F: Monad[F]) = new Category[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+    def id[A]: Kleisli[F, A, A] = kleisli(a => F.pure(a))
+
+    def compose[A, B, C](f: Kleisli[F, B, C], g: Kleisli[F, A, B]): Kleisli[F, A, C] = g >=> f
+  }
+
   implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]): Monad[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliMonad[F, R] {
     implicit def F: Monad[F] = F0
   }
@@ -92,3 +98,4 @@ private[scalaz] trait KleisliMonad[F[_], R] extends Monad[({type λ[α] = Kleisl
 
   def bind[A, B](fa: Kleisli[F, R, A])(f: A => Kleisli[F, R, B]): Kleisli[F, R, B] = fa flatMapK f
 }
+

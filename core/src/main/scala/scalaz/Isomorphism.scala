@@ -6,7 +6,7 @@ trait Isomorphisms {
   trait Iso[Arr[_, _], A, B] { self =>
     def to: Arr[A, B]
     def from: Arr[B, A]
-    def swap = new Iso[Arr, B, A] {
+    def flip = new Iso[Arr, B, A] {
       val to = self.from
       val from = self.to
     }
@@ -14,9 +14,9 @@ trait Isomorphisms {
 
   /** Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
   trait Iso2[Arr[_[_], _[_]], F[_], G[_]] { self =>
-    val to: Arr[F, G]
-    val from: Arr[G, F]
-    def swap = new Iso2[Arr, G, F] {
+    def to: Arr[F, G]
+    def from: Arr[G, F]
+    def flip = new Iso2[Arr, G, F] {
       val to = self.from
       val from = self.to
     }
@@ -26,7 +26,7 @@ trait Isomorphisms {
   trait Iso3[Arr[_[_, _], _[_, _]], F[_, _], G[_, _]] { self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
-    def swap = new Iso3[Arr, G, F] {
+    def flip = new Iso3[Arr, G, F] {
       val to = self.from
       val from = self.to
     }
@@ -61,6 +61,12 @@ trait Isomorphisms {
 
   /** Alias for IsoBifunctor */
   type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
+
+  /** Set isomorphism is commutative */
+  implicit def flipIso[A, B](implicit i: A <=> B): B <=> A = i.flip
+
+  /** Natural isomorphism is commutative */
+  implicit def flipFunctorIso[F[_], G[_]](implicit i: F <~> G): G <~> F = i.flip
 }
 
 object Isomorphism extends Isomorphisms
