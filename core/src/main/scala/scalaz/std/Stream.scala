@@ -28,7 +28,7 @@ trait Streams {
     def zero: Stream[A] = scala.Stream.empty
   }
 
-  // TODO show, monoid, equal, order, ...
+  // TODO show, equal, order, ...
 }
 
 object Stream extends Streams

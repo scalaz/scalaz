@@ -14,6 +14,11 @@ trait Lists {
     
     def foldR[A, B](fa: List[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)((a, b) => f(a)(b))
   }
+
+  implicit def listMonoid[A] = new Monoid[List[A]] {
+    def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
+    def zero: List[A] = Nil
+  }
 }
 
 object List extends Lists

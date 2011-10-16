@@ -2,6 +2,7 @@ package scalaz
 package std
 
 trait AnyVals {
+
   implicit object unit extends Monoid[Unit] with Order[Unit] with Show[Unit] {
     def show(f: Unit): List[Char] = ().toString.toList
 
@@ -28,9 +29,11 @@ trait AnyVals {
 
       def zero: Boolean = false
     }
+
   }
 
   sealed trait Disjunction
+
   sealed trait Conjunction
 
   implicit object booleanDisjunctionNewType extends Monoid[Boolean @@ Disjunction] {
@@ -44,8 +47,54 @@ trait AnyVals {
 
     def zero: Boolean @@ Conjunction = Tag(true)
   }
-  
+
   sealed trait Multiplication
+
+  implicit object byte extends Monoid[Byte] with Order[Byte] with Show[Byte] {
+    def show(f: Byte): List[Char] = f.toString.toList
+
+    def append(f1: Byte, f2: => Byte): Byte = (f1 + f2).toByte
+
+    def zero: Byte = 0
+
+    def order(x: Byte, y: Byte): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    object multiplication extends Monoid[Byte] {
+      def append(f1: Byte, f2: => Byte): Byte = (f1 * f2).toByte
+
+      def zero: Byte = 1
+    }
+
+  }
+
+  implicit object byteMultiplicationNewType extends Monoid[Byte @@ Multiplication] {
+    def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication): Byte @@ Multiplication = Tag((f1 * f2).toByte)
+
+    def zero: Byte @@ Multiplication = Tag(1)
+  }
+
+  implicit object char extends Monoid[Char] with Order[Char] with Show[Char] {
+    def show(f: Char): List[Char] = f.toString.toList
+
+    def append(f1: Char, f2: => Char): Char = (f1 + f2).toChar
+
+    def zero: Char = 0
+
+    def order(x: Char, y: Char): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    object multiplication extends Monoid[Char] {
+      def append(f1: Char, f2: => Char): Char = (f1 * f2).toChar
+
+      def zero: Char = 1
+    }
+
+  }
+
+  implicit object charMultiplicationNewType extends Monoid[Char @@ Multiplication] {
+    def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication): Char @@ Multiplication = Tag((f1 * f2).toChar)
+
+    def zero: Char @@ Multiplication = Tag(1)
+  }
 
   implicit object short extends Monoid[Short] with Order[Short] with Show[Short] {
     def show(f: Short): List[Char] = f.toString.toList
@@ -55,8 +104,21 @@ trait AnyVals {
     def zero: Short = 0
 
     def order(x: Short, y: Short): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    object multiplication extends Monoid[Short] {
+      def append(f1: Short, f2: => Short): Short = (f1 * f2).toShort
+
+      def zero: Short = 1
+    }
+
   }
-  
+
+  implicit object shortMultiplicationNewType extends Monoid[Short @@ Multiplication] {
+    def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication): Short @@ Multiplication = Tag((f1 * f2).toShort)
+
+    def zero: Short @@ Multiplication = Tag(1)
+  }
+
   implicit object int extends Monoid[Int] with Order[Int] with Show[Int] {
     def show(f: Int): List[Char] = f.toString.toList
 
@@ -65,12 +127,13 @@ trait AnyVals {
     def zero: Int = 0
 
     def order(x: Int, y: Int): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-    
+
     object multiplication extends Monoid[Int] {
       def append(f1: Int, f2: => Int): Int = f1 * f2
 
       def zero: Int = 1
     }
+
   }
 
   implicit object intMultiplicationNewType extends Monoid[Int @@ Multiplication] {
@@ -78,7 +141,7 @@ trait AnyVals {
 
     def zero: Int @@ Multiplication = Tag(1)
   }
-  
+
 
   implicit object long extends Monoid[Long] with Order[Long] with Show[Long] {
     def show(f: Long): List[Char] = f.toString.toList
@@ -88,12 +151,13 @@ trait AnyVals {
     def zero: Long = 0L
 
     def order(x: Long, y: Long): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-    
+
     object multiplication extends Monoid[Long] {
       def append(f1: Long, f2: => Long): Long = f1 * f2
 
       def zero: Long = 1
     }
+
   }
 
   implicit object longMultiplicationNewType extends Monoid[Long @@ Multiplication] {
@@ -121,6 +185,7 @@ trait AnyVals {
 
     def order(x: Double, y: Double): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
+
 }
 
 object AnyVal extends AnyVals
