@@ -9,7 +9,7 @@ object PartiallyApplied extends App {
   def function1() {
     import scalaz._
     import std.Function._
-    import syntax.Syntax.monad._
+    import syntax.monad._
 
     // uses implicit view ToFunctorVFromBin
     f1.map(_ * 2)

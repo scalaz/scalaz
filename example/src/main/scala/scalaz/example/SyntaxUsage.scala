@@ -38,7 +38,7 @@ object SyntaxUsage extends App {
     import std.List._
 
     // Implicit conversions from M[A] => BindV[M, A], etc.
-    import syntax.Syntax.monad._
+    import syntax.monad._
 
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
@@ -54,7 +54,7 @@ object SyntaxUsage extends App {
     import Scalaz._
 
     // Import all conversions for syntax for all type classes
-    import syntax.Syntax.all._
+    import syntax.all._
 
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join

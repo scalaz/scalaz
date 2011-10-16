@@ -1,7 +1,8 @@
 package scalaz.example
 
-import scalaz.syntax.Syntax.monad._
-import scalaz.std.Option._
+import scalaz.{syntax, std}
+import syntax.monad._
+import std.Option._
 import scalaz.undo.UndoT
 import scalaz.undo.UndoT._
 

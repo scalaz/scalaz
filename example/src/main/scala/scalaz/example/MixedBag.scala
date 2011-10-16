@@ -11,7 +11,7 @@ object MixedBag extends App {
     import std.AnyVal._
     import std.Option._
 
-    import syntax.Syntax.monoid._
+    import syntax.monoid._
     
     1 |+| 2
     1 mappend 2
@@ -24,7 +24,7 @@ object MixedBag extends App {
   def traverseBigList() {
     import std.Option._
     import std.List._
-    import syntax.Syntax.applicative._
+    import syntax.applicative._
 
     val xs: Option[List[Int]] = (1 to 100000 toList).traverse(x => some(x * 2))
     println(xs map (_ take 10))
@@ -33,7 +33,7 @@ object MixedBag extends App {
   def traverseBigStream() {
 //    import std.Option._
 //    import std.Stream._
-//    import syntax.Syntax.applicative._
+//    import syntax.applicative._
 //
 //    (1 to 100000 toStream).traverse(x => some(x * 2))
   }

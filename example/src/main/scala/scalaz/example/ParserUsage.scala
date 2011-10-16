@@ -10,9 +10,9 @@ object ParserUsage extends App {
     val parsers: List[Parser[List[String]]] = List(1, 2, 3).map(repN(_, """\d+""".r))
 
     def apply(s: String): ParseResult[List[List[String]]] = {
-      import scalaz.syntax.Syntax.applicative._ // for _.sequence
-      import scalaz.std.List._ // for Traverse[List]
-      import scalaz.std.util.parsing.combinator.Parser.parserMonad
+      import syntax.applicative._ // for _.sequence
+      import std.List._ // for Traverse[List]
+      import std.util.parsing.combinator.Parser.parserMonad
 
       implicit val M: Monad[Parser] = parserMonad(testParser)
       val sequence: Parser[List[List[String]]] = parsers.sequence

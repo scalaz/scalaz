@@ -9,7 +9,7 @@ class TraverseUsage {
   import Ident.id
 
   // syntax
-  import syntax.Syntax.applicative._
+  import syntax.applicative._
 
   // traverse usages
 

@@ -19,4 +19,5 @@ trait ToAllSyntax
 
 trait SyntaxV[A] { def self: A }
 
+/** The members of this object are also offered in the package object [[scalaz.syntax]] */
 object Syntax extends Syntaxes
