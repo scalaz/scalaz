@@ -1,6 +1,6 @@
 package scalaz
 
-trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] {
+trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
   ////
   def applyInstance[C]: Apply[({type λ[α] = F[C, α]})#λ] =
     new Apply[({type λ[α] = F[C, α]})#λ] {
@@ -36,10 +36,14 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] {
   def mapsnd[A, B, C](f: B => C)(fab: F[A, B]): F[A, C] =
     <<<[A, B, C](arr(f), fab)
   ////
+  val arrowSyntax = new scalaz.syntax.ArrowSyntax[F] {}
 }
 
 object Arrow {
+  def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
+
   ////
 
   ////
 }
+

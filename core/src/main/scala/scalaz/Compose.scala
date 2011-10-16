@@ -1,13 +1,16 @@
 package scalaz
 
-trait Compose[~>:[_, _]] {
+trait Compose[=>:[_, _]]  { self =>
   ////
-  def compose[A, B, C](f: B ~>: C, g: A ~>: B): (A ~>: C)
+  def compose[A, B, C](f: B =>: C, g: A =>: B): (A =>: C)
 
   ////
+  val composeSyntax = new scalaz.syntax.ComposeSyntax[=>:] {}
 }
 
 object Compose {
+  def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
+
   ////
 
   //
@@ -52,3 +55,4 @@ object Compose {
 
   ////
 }
+

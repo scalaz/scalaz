@@ -1,16 +1,14 @@
 package scalaz
 
-trait Arr[F[_, _]] {
+trait Arr[=>:[_, _]]  { self =>
   ////
-  def arr[A, B](f: A => B): F[A, B]
+  def arr[A, B](f: A => B): A =>: B
 
   // derived functions
 
   ////
-
-  val emptySyntax = new scalaz.syntax.ArrSyntax[F] {}
+  val arrSyntax = new scalaz.syntax.ArrSyntax[=>:] {}
 }
-
 
 object Arr {
   def apply[F[_, _]](implicit F: Arr[F]): Arr[F] = F
@@ -19,3 +17,4 @@ object Arr {
   // TODO CokleisliArr instance
   ////
 }
+

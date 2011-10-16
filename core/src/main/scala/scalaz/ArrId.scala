@@ -1,15 +1,18 @@
 package scalaz
 
-trait ArrId[F[A, B]] {
+trait ArrId[=>:[_, _]]  { self =>
   ////
-  def id[A]: F[A, A]
+  def id[A]: A =>: A
 
   ////
+  val arrIdSyntax = new scalaz.syntax.ArrIdSyntax[=>:] {}
 }
 
 object ArrId {
+  def apply[F[_, _]](implicit F: ArrId[F]): ArrId[F] = F
 
   ////
 
   ////
 }
+

@@ -1,13 +1,15 @@
 package scalaz
 
-trait Category[~>:[_, _]] extends ArrId[~>:] with Compose[~>:] {
+trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 
   ////
+  val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] {}
 }
 
 object Category {
+  def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
   ////
   // TODO
@@ -27,3 +29,4 @@ object Category {
   //    Category.category
   ////
 }
+

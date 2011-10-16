@@ -1,3 +1,4 @@
+import java.lang.String
 import sbt._
 
 case class TypeClass(name: String, kind: Kind, extendsList: TypeClass*)
@@ -30,12 +31,15 @@ object TypeClass {
   lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
 
 
-  /* Not automatically generated.
-  lazy val arrId = TypeClass("ArrId", `(*->*)->*`)
-  lazy val compose = TypeClass("Compose", `(*->*)->*`)
-  lazy val category = TypeClass("Category", `(*->*)->*`, arrId, compose)
-  lazy val monadState = TypeClass("MonadState", `(*->*)->*`, monad)
-  */
+  lazy val arr = TypeClass("Arr", *^*->*)
+  lazy val arrId = TypeClass("ArrId", *^*->*)
+  lazy val compose = TypeClass("Compose", *^*->*)
+  lazy val category = TypeClass("Category", *^*->*, arrId, compose)
+  lazy val first = TypeClass("First", *^*->*)
+  lazy val arrow = TypeClass("Arrow", *^*->*, category, arr, first)
+
+  //   Not automatically generated.
+  //  lazy val monadState = TypeClass("MonadState", *^*->*, monad)
 
   def all: List[TypeClass] = List(semigroup,
     monoid,
@@ -56,7 +60,14 @@ object TypeClass {
     plus,
     applicativePlus,
     monadPlus,
-    traverse)
+    traverse,
+    arrId,
+    arr,
+    compose,
+    category,
+    first,
+    arrow
+  )
 
 }
 
@@ -67,16 +78,8 @@ object Kind {
   case object * extends Kind
 
   case object *->* extends Kind
-
-  def parse(s: String): Option[Kind] = s match {
-    case "*" => Some(*)
-    case "*->*" => Some(*->*)
-    case _ => None
-  }
-}
-
-object KindExtractor {
-  def unapply(s: String): Option[Kind] = Kind.parse(s)
+  
+  case object *^*->* extends Kind
 }
 
 object GenTypeClass {
@@ -122,19 +125,31 @@ object GenTypeClass {
     def sources = List(mainFile, syntaxFile)
   }
 
-  def typeclassSource(typeClassName: String, kind: Kind,
-                      extendsList: Seq[String]): TypeClassSource = {
-    val classifiedType = kind match {
-      case Kind.* => "F"
-      case Kind.*->* => "F[_]"
+  def typeclassSource(tc: TypeClass): TypeClassSource = {
+    val typeClassName = tc.name
+    val kind = tc.kind
+    val extendsList = tc.extendsList.toList.map(_.name)
+
+    import TypeClass._
+    val classifiedTypeIdent = if (Set(arr, arrId, category, compose)(tc)) "=>:"
+    else "F"
+
+    val typeShape: String = kind match {
+      case Kind.* => ""
+      case Kind.*->* => "[_]"
+      case Kind.*^*->* => "[_, _]"
     }
+    val classifiedType = classifiedTypeIdent +  typeShape
+
+    val classifiedTypeF = "F" +  typeShape
+
     def initLower(s: String) = {
       val (init, rest) = s.splitAt(1)
       init.toLowerCase + rest
     }
-    def extendsListText(suffix: String, parents: Seq[String] = extendsList) = parents match {
+    def extendsListText(suffix: String, parents: Seq[String] = extendsList, cti: String = classifiedTypeIdent) = parents match {
       case Seq() => ""
-      case es => es.map(n => n + suffix + "[F]").mkString("extends ", " with ", "")
+      case es => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
     }
     def extendsToSyntaxListText = extendsList match {
       case Seq() => ""
@@ -142,7 +157,7 @@ object GenTypeClass {
     }
     val extendsLikeList = extendsListText("")
 
-    val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[F] {}".format(initLower(typeClassName), typeClassName)
+    val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[%s] {}".format(initLower(typeClassName), typeClassName, classifiedTypeIdent)
 
     val mainSource = """package scalaz
 
@@ -164,7 +179,8 @@ object %s {
 }
 
 """.format(typeClassName, classifiedType, extendsLikeList, syntaxMember,
-      typeClassName, classifiedType, typeClassName, typeClassName, typeClassName
+      typeClassName,
+      classifiedTypeF, typeClassName, typeClassName, typeClassName, classifiedTypeIdent, classifiedTypeIdent
       )
     val mainSourceFile = SourceFile(List("scalaz"), typeClassName + ".scala", mainSource)
 
@@ -201,7 +217,7 @@ trait %sSyntax[F] %s {
       // implicits in ToXxxSyntax
       typeClassName, typeClassName,
 
-      typeClassName, extendsListText("Syntax"),
+      typeClassName, extendsListText("Syntax", cti = "F"),
       typeClassName, typeClassName, typeClassName
     )
     case Kind.*->* =>
@@ -245,7 +261,42 @@ trait %sSyntax[F[_]] %s {
           typeClassName, typeClassName,
           typeClassName, typeClassName,
 
-          typeClassName, extendsListText("Syntax"),
+          typeClassName, extendsListText("Syntax", cti = "F"),
+          typeClassName, typeClassName, typeClassName
+        )
+      case Kind.*^*->* =>
+    """package scalaz
+package syntax
+
+/** Wraps a value `self` and provides methods related to `%s` */
+trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+  ////
+
+  ////
+}
+
+trait To%sSyntax %s {
+  implicit def To%sV[F[_, _],A, B](v: F[A, B]) =
+    new %sV[F,A, B] { def self = v }
+
+  ////
+
+  ////
+}
+
+trait %sSyntax[F[_, _]] %s {
+  implicit def To%sV[A, B](v: F[A, B]): %sV[F, A, B] = new %sV[F, A, B] { def self = v }
+
+  ////
+
+  ////
+}
+""".format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+
+          // implicits in ToXxxSyntax
+          typeClassName, typeClassName,
+
+          typeClassName, extendsListText("Syntax", cti = "F"),
           typeClassName, typeClassName, typeClassName
         )
     }

@@ -20,24 +20,10 @@ object build extends Build {
     id = "scalaz-core",
     base = file("core"),
     settings = standardSettings ++ Seq(
-      createTypeClass <<= inputTask { (argTask: TaskKey[Seq[String]]) =>
-        (argTask, scalaSource in Compile, streams).map { (args: Seq[String], scalaSource: File, streams: TaskStreams) =>
-
-          val (typeClassName, kind, extendsList) = args match {
-            case List() => error("Type class name not specified")
-            case List(typeClassName, KindExtractor(kind)) => (typeClassName, kind, List())
-            case List(typeClassName, KindExtractor(kind), extendsList) =>
-              (typeClassName, kind, extendsList.split(",").map(_.trim).toList)
-          }
-          
-          val typeClassSource0 = typeclassSource(typeClassName, kind, extendsList)
-          typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
-        }
-      },
       createAllTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
         (scalaSource, streams, typeClasses) =>
           typeClasses.flatMap { tc =>
-              val typeClassSource0 = typeclassSource(tc.name, tc.kind, tc.extendsList.toList.map(_.name))
+              val typeClassSource0 = typeclassSource(tc)
               typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
           }
       },
@@ -51,9 +37,6 @@ object build extends Build {
     dependencies = Seq(core),
     settings = standardSettings
   )
-
-  lazy val createTypeClass = InputKey[Seq[File]]("create-type-class",
-    "Creates skeleton for a new type class. Overwrites existing files. Examples: `create-type-class * Monoid Semigroup`, `create-type-class *->* Monad Functor,Bind`")
 
   lazy val createAllTypeClasses = TaskKey[Seq[File]]("create-all-type-classes")
 
