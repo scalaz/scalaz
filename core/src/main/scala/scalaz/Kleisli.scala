@@ -1,7 +1,7 @@
 package scalaz
 
 sealed trait Kleisli[M[_], A, B] {
-  def apply(a: A): M[B]
+  def run(a: A): M[B]
 
   import Kleisli._
 
@@ -20,16 +20,16 @@ sealed trait Kleisli[M[_], A, B] {
   def traverse[F[_], AA <: A](f: F[AA])(implicit M: Applicative[M], F: Traverse[F]): M[F[B]] =
     F.traverse(f)(Kleisli.this(_))
 
-  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a)(apply _)
+  def =<<[AA <: A](a: M[AA])(implicit m: Bind[M]): M[B] = m.bind(a)(run _)
 
   def map[C](f: B => C)(implicit m: Functor[M]): Kleisli[M, A, C] =
-    kleisli(a => m.map(apply(a))(f))
+    kleisli(a => m.map(run(a))(f))
 
   def flatMap[C](f: B => M[C])(implicit M: Bind[M]): Kleisli[M, A, C] =
-    kleisli(a => M.bind(apply(a))(f))
+    kleisli(a => M.bind(run(a))(f))
   
   def flatMapK[C](f: B => Kleisli[M, A, C])(implicit M: Bind[M]): Kleisli[M, A, C] =
-    kleisli((r: A) => M.bind[B,C](apply(r))(((b: B) => f(b).apply(r))))
+    kleisli((r: A) => M.bind[B,C](run(r))(((b: B) => f(b).run(r))))
 }
 
 //
@@ -51,26 +51,28 @@ trait KleislisLow0 extends KleislisLow1 {
 trait Kleislis extends KleislisLow0 {
   /** Construct a Kliesli from a Function1 */
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
-    def apply(a: A) = f(a)
+    def run(a: A) = f(a)
   }
 
   /** Implicitly unwrap the Function1 represented by the Kleisli */
-  implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = (a: A) => k(a)
+  implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = (a: A) => k.run(a)
 
   /** Pure Kleisli arrow */
   def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
 
-  implicit def kleisliArr[F[_]](implicit F0: Pointed[F]): Arr[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new Arr[({type λ[α, β]=Kleisli[F, α, β]})#λ] {
-    def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F0.pure(f(a)))
+  implicit def kleisliFirst[F[_]](implicit F0: Functor[F]) = new KleisliFirst[F] {
+    implicit def F: Functor[F] = F0
   }
 
-  implicit def kleisliCategory[F[_]](implicit F: Monad[F]) = new Category[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
-    def id[A]: Kleisli[F, A, A] = kleisli(a => F.pure(a))
-
-    def compose[A, B, C](f: Kleisli[F, B, C], g: Kleisli[F, A, B]): Kleisli[F, A, C] = g >=> f
+  implicit def kleisliArrArrId[F[_]](implicit F0: Pointed[F]) = new KleisliArrIdArr[F] {
+    implicit def F: Pointed[F] = F0
   }
 
-  implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]): Monad[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliMonad[F, R] {
+  implicit def kleisliCategory[F[_]](implicit F0: Monad[F]) = new KleisliCategory[F] {
+    implicit def F: Monad[F] = F0
+  }
+
+  implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]) = new KleisliMonad[F, R] {
     implicit def F: Monad[F] = F0
   }
 }
@@ -79,6 +81,12 @@ object Kleisli extends Kleislis
 
 //
 // Implementation traits for type class instances
+//
+
+import Kleisli.kleisli
+
+//
+// * -> *
 //
 
 private[scalaz] trait KleisliFunctor[F[_], R] extends Functor[({type λ[α] = Kleisli[F, R, α]})#λ] {
@@ -90,7 +98,7 @@ private[scalaz] trait KleisliFunctor[F[_], R] extends Functor[({type λ[α] = Kl
 private[scalaz] trait KleisliPointed[F[_], R] extends Pointed[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliFunctor[F, R] {
   implicit def F: Pointed[F]
 
-  def pure[A](a: => A): Kleisli[F, R, A] = Kleisli.kleisli((r: R) => F.pure(a))
+  def pure[A](a: => A): Kleisli[F, R, A] = kleisli((r: R) => F.pure(a))
 }
 
 private[scalaz] trait KleisliMonad[F[_], R] extends Monad[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPointed[F, R] {
@@ -99,3 +107,32 @@ private[scalaz] trait KleisliMonad[F[_], R] extends Monad[({type λ[α] = Kleisl
   def bind[A, B](fa: Kleisli[F, R, A])(f: A => Kleisli[F, R, B]): Kleisli[F, R, B] = fa flatMapK f
 }
 
+//
+// (* *) -> *
+//
+
+private[scalaz] trait KleisliFirst[F[_]] extends First[({type λ[α, β]=Kleisli[F, α, β]})#λ] {
+  implicit def F: Functor[F]
+
+  def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
+    case (a, c) => F.map(f.run(a))((b: B) => (b, c))
+  }
+}
+
+private[scalaz] trait KleisliArrIdArr[F[_]] extends KleisliFirst[F] with ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ] with Arr[({type λ[α, β]=Kleisli[F, α, β]})#λ]{
+  implicit def F: Pointed[F]
+
+  def id[A]: Kleisli[F, A, A] = kleisli(a => F.pure(a))
+
+  def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F.pure(f(a)))
+}
+
+private[scalaz] trait KleisliCategory[F[_]] extends KleisliArrIdArr[F] with Category[({type λ[α, β]=Kleisli[F, α, β]})#λ] {
+  implicit def F: Monad[F]
+
+  def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
+}
+
+private[scalaz] trait KleisliArrow[F[_]] extends KleisliCategory[F] with Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ] {
+  implicit def F: Monad[F]
+}

@@ -12,22 +12,6 @@ object Compose {
   def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   ////
-
-  //
-  //  implicit val Function1Compose: Compose[Function1] = new Compose[Function1] {
-  //    def compose[A, B, C](f: B => C, g: A => B) =
-  //      f compose g
-  //  }
-  //
-  //  implicit val PartialFunctionCompose: Compose[PartialFunction] = new Compose[PartialFunction] {
-  //    def compose[A, B, C](f: PartialFunction[B, C], g: PartialFunction[A, B]) =
-  //      new PartialFunction[A, C] {
-  //        def isDefinedAt(a: A) = g.isDefinedAt(a) && f.isDefinedAt(g(a))
-  //
-  //        def apply(a: A) = f(g(a))
-  //      }
-  //  }
-  //
   //  implicit val `<:<_Compose` : Compose[<:<] = new Compose[<:<] {
   //    def compose[A, B, C](f: <:<[B, C], g: <:<[A, B]) =
   //      f.asInstanceOf[A <:< C]
@@ -36,11 +20,6 @@ object Compose {
   //  implicit val `=:=_Compose` : Compose[=:=] = new Compose[=:=] {
   //    def compose[A, B, C](f: =:=[B, C], g: =:=[A, B]) =
   //      f.asInstanceOf[A =:= C]
-  //  }
-  //
-  //  implicit def KleisliCompose[F[_]](implicit bd: Bind[F]): Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = Kleisli[α, F, β]})#λ] {
-  //    def compose[A, B, C](f: Kleisli[B, F, C], g: Kleisli[A, F, B]) =
-  //      f <=< g
   //  }
   //
   //  implicit def CokleisliCompose[F[_]](implicit ex: Extend[F]): Compose[({type λ[α, β] = Cokleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = Cokleisli[α, F, β]})#λ] {
