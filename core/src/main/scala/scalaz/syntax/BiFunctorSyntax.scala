@@ -9,6 +9,9 @@ trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 
   def <-:[C](f: A => C)(implicit b: BiFunctor[F]): F[C, B] = b.bimap(self)(f, b => b)
 
+  def <:>[C](f: A => C)(implicit z: B <:< C, t: BiFunctor[F]): F[C, C] =
+    t.bimap(self)(f, z)
+
   ////
 }
 
