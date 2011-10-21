@@ -47,7 +47,7 @@ trait Isomorphisms {
   type <~>[F[_], G[_]] = IsoFunctor[F, G]
 
   /** Convenience template trait to implement `<~>` */
-  trait IsoFunctorTemplate[F[_], G[_]] extends Iso2[NaturalTransformation, F, G] {
+  trait IsoFunctorTemplate[F[_], G[_]] extends IsoFunctor[F, G] {
     final val to: NaturalTransformation[F, G] = new (F ~> G) {
       def apply[A](fa: F[A]): G[A] = to[A](fa)
     }
@@ -61,6 +61,19 @@ trait Isomorphisms {
 
   /** Alias for IsoBifunctor */
   type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
+
+  /** Convenience template trait to implement `<~~>` */
+  trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBifunctor[F, G] {
+    final val to: BinaturalTransformation[F, G] = new (F ~~> G) {
+      def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
+    }
+    final val from: BinaturalTransformation[G, F] = new (G ~~> F) {
+      def apply[A, B](gab: G[A, B]): F[A, B] = from[A, B](gab)
+    }
+
+    def to[A, B](fa: F[A, B]): G[A, B]
+    def from[A, B](ga: G[A, B]): F[A, B]
+  }
 
   /** Set isomorphism is commutative */
   implicit def flipIso[A, B](implicit i: A <=> B): B <=> A = i.flip
@@ -210,5 +223,14 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFuncto
   }
 
   def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B): B = G.foldR[A, B](iso.to(fa), z)(f)
+}
+
+trait IsomorphismBiFunctor[F[_, _], G[_, _]] extends BiFunctor[F] {
+  def iso: F <~~> G
+
+  implicit def G: BiFunctor[G]
+
+  def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] =
+    iso.from(G.bimap(iso.to(fab))(f, g))
 }
 

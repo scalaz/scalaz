@@ -12,6 +12,10 @@ trait TuplesLow0 {
     implicit def _1: Semigroup[A1] = A1
     implicit def _2: Semigroup[A2] = A2
   }
+  
+  implicit def tuple2[A1, A2] = new BiFunctor[Tuple2] {
+    def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
+  }
 }
 
 trait Tuples extends TuplesLow0 {
