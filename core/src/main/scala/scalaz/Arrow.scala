@@ -14,7 +14,7 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
   def >>>[A, B, C](fab: F[A, B], fbc: F[B, C]): F[A, C] =
     compose(fbc, fab)
 
-  def snd[A, B, C](f: F[A, B]): F[(C, A), (C, B)] = {
+  def second[A, B, C](f: F[A, B]): F[(C, A), (C, B)] = {
     def swap[X, Y] = arr[(X, Y), (Y, X)] {
       case (x, y) => (y, x)
     }
@@ -24,16 +24,16 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
 
   // ***
   def split[A, B, C, D](fab: F[A, B], fcd: F[C, D]): F[(A, C), (B, D)] =
-      >>>(first[A, B, C](fab), snd[C, D, B](fcd))
+      >>>(first[A, B, C](fab), second[C, D, B](fcd))
 
   // &&&
   def combine[A, B, C](fab: F[A, B], fac: F[A, C]): F[A, (B, C)] =
       >>>(arr((a: A) => (a, a)), split(fab, fac))
 
-  def mapfst[A, B, C](f: C => A)(fab: F[A, B]): F[C, B] =
+  def mapfst[A, B, C](fab: F[A, B])(f: C => A): F[C, B] =
     >>>[C, A, B](arr(f), fab)
 
-  def mapsnd[A, B, C](f: B => C)(fab: F[A, B]): F[A, C] =
+  def mapsnd[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
     <<<[A, B, C](arr(f), fab)
   ////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[F] {}
