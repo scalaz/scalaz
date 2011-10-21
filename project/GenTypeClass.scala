@@ -32,6 +32,7 @@ object TypeClass {
 
 
   lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
+  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, biFunctor)
   lazy val arr = TypeClass("Arr", *^*->*)
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
@@ -63,6 +64,7 @@ object TypeClass {
     monadPlus,
     traverse,
     biFunctor,
+    biTraverse,
     arrId,
     arr,
     compose,
