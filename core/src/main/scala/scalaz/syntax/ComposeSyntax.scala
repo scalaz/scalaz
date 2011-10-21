@@ -4,7 +4,17 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Compose` */
 trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
+  def <<<[C](x: F[C, A])(implicit c: Compose[F]): F[C, B] =
+    c.compose(self, x)
 
+  def ⋘[C](x: F[C, A])(implicit c: Compose[F]): F[C, B] =
+    <<<(x)
+
+  def >>>[C](x: F[B, C])(implicit c: Compose[F]): F[A, C] =
+    c.compose(x, self)
+
+  def ⋙[C](x: F[B, C])(implicit c: Compose[F]): F[A, C] =
+    >>>(x)
   ////
 }
 
