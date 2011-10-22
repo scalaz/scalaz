@@ -1,7 +1,6 @@
 package scalaz
 package syntax
 
-
 /** Wraps a value `self` and provides methods related to `BiFunctor` */
 trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////

@@ -137,6 +137,22 @@ trait IsomorphismEmpty[F[_], G[_]] extends Empty[F] {
   def empty[A]: F[A] = iso.from(G.empty[A])
 }
 
+trait IsomorphismEach[F[_], G[_]] extends Each[F] {
+  implicit def G: Each[G]
+
+  def iso: F <~> G
+
+  def each[A](fa: F[A])(f: (A) => Unit) = G.each(iso.to(fa))(f)
+}
+
+trait IsomorphismIndex[F[_], G[_]] extends Index[F] {
+  implicit def G: Index[G]
+
+  def iso: F <~> G
+
+  def index[A](fa: F[A], n: Int): Option[A] = G.index(iso.to(fa), n)
+}
+
 trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] {
   implicit def G: Functor[G]
 

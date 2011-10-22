@@ -12,6 +12,8 @@ object TypeClass {
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, equal)
 
+  lazy val each = TypeClass("Each", *->*)
+  lazy val index = TypeClass("Index", *->*)
   lazy val empty = TypeClass("Empty", *->*)
   lazy val functor = TypeClass("Functor", *->*)
   lazy val pointed = TypeClass("Pointed", *->*, functor)
@@ -49,6 +51,8 @@ object TypeClass {
     show,
     order,
     empty,
+    each,
+    index,
     functor,
     pointed,
     contravariant,
