@@ -11,6 +11,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, equal)
+  lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val length = TypeClass("Length", *->*)
   lazy val each = TypeClass("Each", *->*)
@@ -52,6 +53,7 @@ object TypeClass {
     length,
     show,
     order,
+    metricSpace,
     empty,
     each,
     index,
