@@ -14,6 +14,10 @@ object Equal {
   def apply[F](implicit F: Equal[F]): Equal[F] = F
 
   ////
+  /** Creates an Equal instance based on reference equality, `a1 eq a2` */
+  def equalA[A <: AnyRef]: Equal[A] = new Equal[A] {
+    def equal(a1: A, a2: A): Boolean = a1 eq a2
+  }
 
   ////
 }
