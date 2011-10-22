@@ -2,3 +2,6 @@
 - implicitNotFound("Could not find instance of type class Monoid[${T}]") (?)
 - review order of supertypes in type class inheritance
 
+= INSTANCES =
+- TailRec / ControlContext
+

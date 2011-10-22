@@ -2,7 +2,8 @@ package scalaz
 package std
 
 trait Streams {
-  implicit object stream extends Traverse[Stream] with MonadPlus[Stream] {
+
+  implicit object stream extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
       val seed: G[Stream[B]] = G.pure(scala.Stream.empty[B])
@@ -10,6 +11,21 @@ trait Streams {
         x => ys =>
           G.ap(ys)(G.map(f(x))((a: B) => (b: Stream[B]) => a #:: b))
       }
+    }
+
+    def each[A](fa: Stream[A])(f: (A) => Unit) = fa foreach f
+
+    def index[A](fa: Stream[A], i: Int): Option[A] = {
+      var n = 0
+      var k: Option[A] = None
+      val it = fa.iterator
+      while (it.hasNext && k.isEmpty) {
+        val z = it.next
+        if (n == i) k = Some(z)
+        n = n + 1
+      }
+
+      k
     }
 
     def foldR[A, B](fa: Stream[A], z: B)(f: (A) => (=> B) => B): B = if (fa.isEmpty)
