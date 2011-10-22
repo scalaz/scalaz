@@ -8,21 +8,17 @@ trait MetricSpaceV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToMetricSpaceSyntax {
+trait ToMetricSpaceSyntax  {
   implicit def ToMetricSpaceV[F](v: F) =
-    new MetricSpaceV[F] {
-      def self = v
-    }
+    new MetricSpaceV[F] { def self = v }
 
   ////
 
   ////
 }
 
-trait MetricSpaceSyntax[F] {
-  implicit def ToMetricSpaceV(v: F): MetricSpaceV[F] = new MetricSpaceV[F] {
-    def self = v
-  }
+trait MetricSpaceSyntax[F]  {
+  implicit def ToMetricSpaceV(v: F): MetricSpaceV[F] = new MetricSpaceV[F] { def self = v }
 
   ////
 

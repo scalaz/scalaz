@@ -8,7 +8,7 @@ trait CopointedV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCopointedSyntax extends ToContravariantSyntax {
+trait ToCopointedSyntax  {
   implicit def ToCopointedV[F[_],A](v: F[A]) =
     new CopointedV[F,A] { def self = v }
   implicit def ToCopointedVFromBin[F[_, _], X, A](v: F[X, A]) =
@@ -23,7 +23,7 @@ trait ToCopointedSyntax extends ToContravariantSyntax {
   ////
 }
 
-trait CopointedSyntax[F[_]] extends ContravariantSyntax[F] {
+trait CopointedSyntax[F[_]]  {
   implicit def ToCopointedV[A](v: F[A]): CopointedV[F, A] = new CopointedV[F,A] { def self = v }
 
   ////

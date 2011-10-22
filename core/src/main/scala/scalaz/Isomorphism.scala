@@ -175,8 +175,10 @@ trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
   def contramap[A, B](r: F[A])(f: B => A): F[B] = iso.from(G.contramap(iso.to(r))(f))
 }
 
-trait IsomorphismCopointed[F[_], G[_]] extends Copointed[F] with IsomorphismContravariant[F, G] {
+trait IsomorphismCopointed[F[_], G[_]] extends Copointed[F] {
   implicit def G: Copointed[G]
+
+  def iso: F <~> G
 
   def copure[A](p: F[A]): A = G.copure(iso.to(p))
 }

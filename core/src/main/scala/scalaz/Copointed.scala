@@ -1,6 +1,6 @@
 package scalaz
 
-trait Copointed[F[_]] extends Contravariant[F] { self =>
+trait Copointed[F[_]]  { self =>
   ////
   def copure[A](p: F[A]): A
 

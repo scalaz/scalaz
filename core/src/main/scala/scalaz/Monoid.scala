@@ -1,7 +1,6 @@
 package scalaz
 
-trait Monoid[F] extends Semigroup[F] {
-  self =>
+trait Monoid[F] extends Semigroup[F] { self =>
   ////
   def zero: F
 

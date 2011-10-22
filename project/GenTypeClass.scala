@@ -1,16 +1,24 @@
 import java.lang.String
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, extendsList: TypeClass*)
+case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq()) {
+  require(pack.head == "scalaz")
+  def syntaxPack = {
+    Seq("scalaz", "syntax") ++ pack.drop(1)
+  }
+
+  def packageString0 = pack.map("package " + _).mkString("\n")
+  def packageString = pack.mkString(".")
+}
 
 object TypeClass {
   import Kind._
 
   lazy val semigroup = TypeClass("Semigroup", *)
-  lazy val monoid = TypeClass("Monoid", *, semigroup)
+  lazy val monoid = TypeClass("Monoid", *, extendsList = Seq(semigroup))
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
-  lazy val order = TypeClass("Order", *, equal)
+  lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val length = TypeClass("Length", *->*)
@@ -18,31 +26,33 @@ object TypeClass {
   lazy val index = TypeClass("Index", *->*)
   lazy val empty = TypeClass("Empty", *->*)
   lazy val functor = TypeClass("Functor", *->*)
-  lazy val pointed = TypeClass("Pointed", *->*, functor)
-  lazy val apply: TypeClass = TypeClass("Apply", *->*, functor)
-  lazy val applicative = TypeClass("Applicative", *->*, apply, pointed)
-  lazy val bind = TypeClass("Bind", *->*, apply)
-  lazy val monad = TypeClass("Monad", *->*, applicative, bind)
-  lazy val traverse = TypeClass("Traverse", *->*, functor)
+  lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
+  lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
+  lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
+  lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, contravariant)
+  lazy val copointed = TypeClass("Copointed", *->*)
   lazy val cojoin = TypeClass("Cojoin", *->*)
-  lazy val comonad = TypeClass("Comonad", *->*, copointed, cojoin)
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin))
 
-  lazy val plus = TypeClass("Plus", *->*, functor, empty)
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, applicative, plus)
-  lazy val monadPlus = TypeClass("MonadPlus", *->*, monad, applicativePlus)
-
+  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor, empty))
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plus))
+  lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
-  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, biFunctor)
+  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, extendsList = Seq(biFunctor))
   lazy val arr = TypeClass("Arr", *^*->*)
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
-  lazy val category = TypeClass("Category", *^*->*, arrId, compose)
+  lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
   lazy val first = TypeClass("First", *^*->*)
-  lazy val arrow = TypeClass("Arrow", *^*->*, category, arr, first)
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category, arr, first))
+
+  lazy val run = TypeClass("Run", *, pack = Seq("scalaz", "concurrent"))
+
 
   //   Not automatically generated.
   //  lazy val monadState = TypeClass("MonadState", *^*->*, monad)
@@ -78,9 +88,10 @@ object TypeClass {
     compose,
     category,
     first,
-    arrow
-  )
+    arrow,
 
+    run
+  )
 }
 
 sealed abstract class Kind
@@ -96,7 +107,7 @@ object Kind {
 
 object GenTypeClass {
 
-  case class SourceFile(packages: List[String], fileName: String, source: String) {
+  case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
     def createOrUpdate(scalaSource: File, log: Logger): sbt.File = {
@@ -169,9 +180,11 @@ object GenTypeClass {
     }
     val extendsLikeList = extendsListText("")
 
-    val syntaxMember = "val %sSyntax = new scalaz.syntax.%sSyntax[%s] {}".format(initLower(typeClassName), typeClassName, classifiedTypeIdent)
+    val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n")
+    val syntaxPackString1 = tc.syntaxPack.mkString(".")
+    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
 
-    val mainSource = """package scalaz
+    val mainSource = """%s
 
 trait %s[%s] %s { self =>
   ////
@@ -190,16 +203,15 @@ object %s {
   ////
 }
 
-""".format(typeClassName, classifiedType, extendsLikeList, syntaxMember,
+""".format(tc.packageString0, typeClassName, classifiedType, extendsLikeList, syntaxMember,
       typeClassName,
       classifiedTypeF, typeClassName, typeClassName, typeClassName, classifiedTypeIdent, classifiedTypeIdent
       )
-    val mainSourceFile = SourceFile(List("scalaz"), typeClassName + ".scala", mainSource)
+    val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {
       case Kind.* =>
-        """package scalaz
-package syntax
+        """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F] extends SyntaxV[F] {
@@ -224,7 +236,7 @@ trait %sSyntax[F] %s {
 
   ////
 }
-""".format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
       // implicits in ToXxxSyntax
       typeClassName, typeClassName,
@@ -233,8 +245,7 @@ trait %sSyntax[F] %s {
       typeClassName, typeClassName, typeClassName
     )
     case Kind.*->* =>
-    """package scalaz
-package syntax
+    """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F[_],A] extends SyntaxV[F[A]] {
@@ -265,7 +276,7 @@ trait %sSyntax[F[_]] %s {
 
   ////
 }
-""".format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
           // implicits in ToXxxSyntax
           typeClassName, typeClassName,
@@ -277,8 +288,7 @@ trait %sSyntax[F[_]] %s {
           typeClassName, typeClassName, typeClassName
         )
       case Kind.*^*->* =>
-    """package scalaz
-package syntax
+    """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
@@ -303,7 +313,7 @@ trait %sSyntax[F[_, _]] %s {
 
   ////
 }
-""".format(typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
           // implicits in ToXxxSyntax
           typeClassName, typeClassName,
@@ -312,7 +322,7 @@ trait %sSyntax[F[_, _]] %s {
           typeClassName, typeClassName, typeClassName
         )
     }
-    val syntaxSourceFile = SourceFile(List("scalaz", "syntax"), typeClassName + "Syntax.scala", syntaxSource)
+    val syntaxSourceFile = SourceFile(tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource)
     TypeClassSource(mainSourceFile, syntaxSourceFile)
   }
 }
