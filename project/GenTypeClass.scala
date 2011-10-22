@@ -12,6 +12,7 @@ object TypeClass {
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, equal)
 
+  lazy val length = TypeClass("Length", *->*)
   lazy val each = TypeClass("Each", *->*)
   lazy val index = TypeClass("Index", *->*)
   lazy val empty = TypeClass("Empty", *->*)
@@ -48,6 +49,7 @@ object TypeClass {
   def all: List[TypeClass] = List(semigroup,
     monoid,
     equal,
+    length,
     show,
     order,
     empty,

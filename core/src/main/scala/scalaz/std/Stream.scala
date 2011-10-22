@@ -3,7 +3,7 @@ package std
 
 trait Streams {
 
-  implicit object stream extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] {
+  implicit object stream extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
       val seed: G[Stream[B]] = G.pure(scala.Stream.empty[B])
@@ -14,7 +14,7 @@ trait Streams {
     }
 
     def each[A](fa: Stream[A])(f: (A) => Unit) = fa foreach f
-
+    def length[A](fa: Stream[A]): Int = fa.length
     def index[A](fa: Stream[A], i: Int): Option[A] = {
       var n = 0
       var k: Option[A] = None

@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait Lists {
-  implicit val list = new MonadPlus[List] with Traverse[List] with Empty[List] with Each[List] with Index[List] {
+  implicit val list = new MonadPlus[List] with Traverse[List] with Empty[List] with Each[List] with Index[List] with Length[List] {
     def each[A](fa: List[A])(f: (A) => Unit): Unit = fa foreach f
     def index[A](fa: List[A], i: Int): Option[A] = {
       var n = 0
@@ -16,6 +16,7 @@ trait Lists {
 
       k
     }
+    def length[A](fa: List[A]): Int = fa.length
     def pure[A](a: => A): List[A] = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()

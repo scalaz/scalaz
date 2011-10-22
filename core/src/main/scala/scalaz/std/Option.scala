@@ -2,12 +2,14 @@ package scalaz
 package std
 
 trait Options {
-  implicit val option = new MonadPlus[Option] with Traverse[Option] with Each[Option] with Index[Option] {
+  implicit val option = new MonadPlus[Option] with Traverse[Option] with Each[Option] with Index[Option] with Length[Option] {
     def pure[A](a: => A) = Some(a)
 
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
 
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
+
+    def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
 
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
 
