@@ -11,7 +11,7 @@ object build extends Build {
     version := "7.1-SNAPSHOT",
     scalaVersion := "2.9.1",
 
-    createAllTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
+    genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
       (scalaSource, streams, typeClasses) =>
         typeClasses.flatMap {
           tc =>
@@ -26,7 +26,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings,
-    aggregate = Seq(core, effect, iteratee, example)
+    aggregate = Seq(core, concurrent, effect, iteratee, example)
   )
 
   lazy val core = Project(
@@ -75,7 +75,7 @@ object build extends Build {
     )
   )
 
-  lazy val createAllTypeClasses = TaskKey[Seq[File]]("create-all-type-classes")
+  lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 }

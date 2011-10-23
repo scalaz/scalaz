@@ -1,2 +1,2 @@
 alias c=compile
-alias catc=scalaz-core/create-all-type-classes
+alias gtc=gen-type-classes
