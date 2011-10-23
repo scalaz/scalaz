@@ -1,9 +1,36 @@
 package scalaz
 
-trait Isomorphisms {
+trait IsomorphismsLow1 {
+  self: Isomorphisms =>
 
-  /** Isomorphism for arrows of kind * -> * -> * */
-  trait Iso[Arr[_, _], A, B] { self =>
+  /**Set isomorphism is commutative */
+  implicit def isoCommutative[A, B](implicit i: A <=> B): B <=> A = i.flip
+
+  /**Natural isomorphism is commutative */
+  implicit def isoNaturalCommutative[F[_], G[_]](implicit i: F <~> G): G <~> F = i.flip
+}
+
+trait IsomorphismsLow0 extends IsomorphismsLow1 {
+  self: Isomorphisms =>
+
+  /**Set isomorphism is reflexive */
+  implicit def isoRefl[A]: A <=> A = new (A <=> A) {
+    def to: A => A = a => a
+    def from: A => A = a => a
+  }
+
+  /**Natural isomorphism is reflexive */
+  implicit def isoNaturalRefl[F[_]]: F <~> F = new IsoFunctorTemplate[F, F] {
+    def to[A](fa: F[A]): F[A] = fa
+    def from[A](fa: F[A]): F[A] = fa
+  }
+}
+
+trait Isomorphisms extends IsomorphismsLow0{
+
+  /**Isomorphism for arrows of kind * -> * -> * */
+  trait Iso[Arr[_, _], A, B] {
+    self =>
     def to: Arr[A, B]
     def from: Arr[B, A]
     def flip = new Iso[Arr, B, A] {
@@ -12,8 +39,9 @@ trait Isomorphisms {
     }
   }
 
-  /** Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
-  trait Iso2[Arr[_[_], _[_]], F[_], G[_]] { self =>
+  /**Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
+  trait Iso2[Arr[_[_], _[_]], F[_], G[_]] {
+    self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip = new Iso2[Arr, G, F] {
@@ -22,8 +50,9 @@ trait Isomorphisms {
     }
   }
 
-  /** Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */
-  trait Iso3[Arr[_[_, _], _[_, _]], F[_, _], G[_, _]] { self =>
+  /**Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */
+  trait Iso3[Arr[_[_, _], _[_, _]], F[_, _], G[_, _]] {
+    self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip = new Iso3[Arr, G, F] {
@@ -32,21 +61,21 @@ trait Isomorphisms {
     }
   }
 
-  /** Set isomorphism */
+  /**Set isomorphism */
   type IsoSet[A, B] = Iso[Function1, A, B]
 
-  /** Natural isomorphism between functors */
+  /**Natural isomorphism between functors */
   type IsoFunctor[F[_], G[_]] = Iso2[NaturalTransformation, F, G]
 
   type IsoBifunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
 
-  /** Alias for IsoSet */
+  /**Alias for IsoSet */
   type <=>[A, B] = IsoSet[A, B]
 
-  /** Alias for IsoFunctor */
+  /**Alias for IsoFunctor */
   type <~>[F[_], G[_]] = IsoFunctor[F, G]
 
-  /** Convenience template trait to implement `<~>` */
+  /**Convenience template trait to implement `<~>` */
   trait IsoFunctorTemplate[F[_], G[_]] extends IsoFunctor[F, G] {
     final val to: NaturalTransformation[F, G] = new (F ~> G) {
       def apply[A](fa: F[A]): G[A] = to[A](fa)
@@ -59,10 +88,10 @@ trait Isomorphisms {
     def from[A](ga: G[A]): F[A]
   }
 
-  /** Alias for IsoBifunctor */
+  /**Alias for IsoBifunctor */
   type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
 
-  /** Convenience template trait to implement `<~~>` */
+  /**Convenience template trait to implement `<~~>` */
   trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBifunctor[F, G] {
     final val to: BinaturalTransformation[F, G] = new (F ~~> G) {
       def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
@@ -75,11 +104,6 @@ trait Isomorphisms {
     def from[A, B](ga: G[A, B]): F[A, B]
   }
 
-  /** Set isomorphism is commutative */
-  implicit def flipIso[A, B](implicit i: A <=> B): B <=> A = i.flip
-
-  /** Natural isomorphism is commutative */
-  implicit def flipFunctorIso[F[_], G[_]](implicit i: F <~> G): G <~> F = i.flip
 }
 
 object Isomorphism extends Isomorphisms
@@ -87,6 +111,7 @@ object Isomorphism extends Isomorphisms
 //
 // Derive a type class instance through an Isomorphism
 //
+
 import Isomorphism._
 
 trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
@@ -221,7 +246,7 @@ trait IsomorphismPlus[F[_], G[_]] extends Plus[F] with IsomorphismEmpty[F, G] wi
   implicit def G: Plus[G]
 
   def iso: F <~> G
-  
+
   def plus[A](a: F[A], b: => F[A]): F[A] = iso.from(G.plus(iso.to(a), iso.to(b)))
 }
 
@@ -236,7 +261,7 @@ trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismPlus
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
 
-  def traverseImpl[H[_]: Applicative, A, B](fa: F[A])(f: (A) => H[B]): H[F[B]] = {
+  def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: (A) => H[B]): H[F[B]] = {
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
   }
 
