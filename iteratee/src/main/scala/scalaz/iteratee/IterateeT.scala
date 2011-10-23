@@ -184,30 +184,6 @@ trait IterateeTLow0 extends IterateeTLow1 {
 }
 
 trait IterateeTs extends IterateeTLow0 {
-  type Iteratee[X, E, A] =
-  IterateeT[X, E, Id, A]
-
-  type Iter[E, F[_], A] =
-  IterateeT[Unit, E, F, A]
-
-  type >@>[E, A] =
-  Iteratee[Unit, E, A]
-
-  type EnumerateeT[X, O, I, F[_], A] =
-  StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]]
-
-  type Enumeratee[X, O, I, A] =
-  Step[X, I, A] => Iteratee[X, O, Step[X, I, A]]
-
-  type EnumeratorT[X, E, F[_], A] =
-  StepT[X, E, F, A] => IterateeT[X, E, F, A]
-
-  type Enumerator[X, E, A] =
-  Step[X, E, A] => Step[X, E, A]
-
-  type >@@>[E, A] =
-  Enumerator[Unit, E, A]
-
   def iterateeT[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] = new IterateeT[X, E, F, A] {
     val value = s
   }
@@ -229,7 +205,7 @@ trait IterateeTs extends IterateeTLow0 {
       iterateeT(Monad[G].map(ga)((x: A) => StepT.sdone[X, E, G, A](x, emptyInput)))
   }
 
-  /*
+  /* TODO
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit mio: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] = {
     implicit val l = mio.liftIO
@@ -553,8 +529,6 @@ private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = I
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
   override def map[A, B](fa: IterateeT[X, E, F, A])(f: A => B): IterateeT[X, E, F, B] = fa map f
 }
-
-import IterateeT.EnumeratorT
 
 private[scalaz] trait EnumeratorTSemigroup[X, E, F[_], A] extends Semigroup[EnumeratorT[X, E, F, A]] {
   implicit def F: Bind[F]

@@ -94,8 +94,6 @@ sealed trait StepT[X, E, F[_], A] {
 object StepT extends StepTs
 
 trait StepTs {
-  type Step[X, E, A] =
-  StepT[X, E, Id, A]
 
   def scont[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
     def fold[Z](
