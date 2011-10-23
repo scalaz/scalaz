@@ -57,7 +57,7 @@ object TypeClass {
   //   Not automatically generated.
   //  lazy val monadState = TypeClass("MonadState", *^*->*, monad)
 
-  def all: List[TypeClass] = List(semigroup,
+  def core: List[TypeClass] = List(semigroup,
     monoid,
     equal,
     length,
@@ -88,10 +88,9 @@ object TypeClass {
     compose,
     category,
     first,
-    arrow,
-
-    run
+    arrow
   )
+  lazy val concurrent = Seq(run)
 }
 
 sealed abstract class Kind

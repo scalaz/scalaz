@@ -1,6 +1,5 @@
 package scalaz
 package concurrent
-package concurrent
 
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
 
