@@ -18,6 +18,13 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
       case Some(z) => f(z).value
     }
   )
+
+  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
+    F.bind(self.value) {
+      case None => F.pure(None: Option[B])
+      case Some(z) => F.map(f(z))(b => Some(b))
+    }
+  )
 }
 
 //
