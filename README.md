@@ -1,4 +1,4 @@
-## Scalaz
+## Scalaz Seven
 
 This is an experimental fork of [Scalaz](https://github.com/scalaz/scalaz) for prototyping
 changes for [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7).
@@ -12,11 +12,11 @@ Scalaz has grown to contain a wide range of useful type classes and data structu
 to the beginner trying to learn the library -- where to start, what to ignore? To help alleviate this, the
 library has further been modularised.
 
-* *scalaz-core*: Type class heirarchy, data structures, type class instances for the Scala and Java standard libraries,
+* **scalaz-core**: Type class heirarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
-* *scalaz-effect*:  Data structures represent and compose IO effects in the type system.
-* *scalaz-concurrent*: Actor and Promise implementation
-* *scalaz-iteratee*: Iteratee implementation
+* **scalaz-effect**:  Data structures represent and compose IO effects in the type system.
+* **scalaz-concurrent**: Actor and Promise implementation
+* **scalaz-iteratee**: Iteratee implementation
 
 ### Type Class Heirarchy
 
@@ -54,7 +54,7 @@ val plusOpt = O.lift2(plus)
 
 * 'Constructive' implicits, which create a type class instance automatically based on instances of
   all parent type classes, are removed. These led to subtle errors with ambiguous implicits, such as
-  this problem with [http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111](FunctorBindApply)
+  this problem with [FunctorBindApply](http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
   are defined in the package `scalaz.std`, and must be imported. These instances are defined in traits which will be
   mixed together into an object for importing en-masse, if desired.
@@ -125,7 +125,7 @@ and a corresponding set of [prioritized implicit methods](https://github.com/ret
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
 when in cases like the following:
 
-```
+```scala
 type OptionTList[A] = OptionT[List[A]]
 implicitly[Functor[OptionTList]]
 
@@ -155,7 +155,7 @@ in Scala flows from left-to-right, can require fewer type annotations.
 Syntax can be imported in two ways. Firstly, the syntax specialized for a particular instance
 of a type class can be imported directly from the instance itself.
 
-```
+```scala
 // import the type class instance
 import scalaz.Option.option
 
@@ -170,7 +170,7 @@ io.join
 
 Alternatively, the syntax can be imported for a particular type class.
 
-```
+```scala
 // import the type class instance
 import scalaz.Option.option
 
