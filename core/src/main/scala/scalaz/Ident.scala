@@ -1,15 +1,17 @@
 package scalaz
 
 trait Idents {
-  implicit val id = new Monad[Id] {
+  implicit val id = new Monad[Id] with Comonad[Id] {
     def pure[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
+    def cojoin[A](a: Id[A]): A = a
+    def copure[A](p: Id[A]): A = p
 
     // Overrides for efficiency.
 
     override def apply[A, B](f: (A) => B): Id[A] => Id[B] = f
 
-    // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `fff: A` is identical.
+    // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `ffa: A` is identical.
     override def join[A](ffa: A) = ffa
 
     override def traverse[A, G[_], B](value: G[A])(f: A => Id[B])(implicit G: Traverse[G]): Id[G[B]] = G.map(value)(f)

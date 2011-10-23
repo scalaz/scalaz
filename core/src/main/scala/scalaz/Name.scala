@@ -17,12 +17,13 @@ object Name {
   }
   def unapply[A](v: Name[A]): Option[A] = Some(v.value)
 
-  implicit val name: Monad[Name] = new Monad[Name] {
+  implicit val name = new Monad[Name] with Comonad[Name] {
     def pure[A](a: => A) = Name(a)
 
     override def map[A, B](fa: Name[A])(f: (A) => B) = Name(f(fa.value))
-
     def bind[A,B](v: Name[A])(f: A => Name[B]): Name[B] = f(v.value)
+    def cojoin[A](a: Name[A]): Name[Name[A]] = Name(a)
+    def copure[A](p: Name[A]): A = p.value
   }
 }
 
@@ -35,19 +36,20 @@ object Need {
   }
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
-  implicit val need: Monad[Need] = new Monad[Need] {
+  implicit val need = new Monad[Need] with Comonad[Need] {
     def pure[A](a: => A) = Need(a)
-
     override def map[A, B](fa: Need[A])(f: A => B) = Need(f(fa.value))
-
     def bind[A, B](v: Need[A])(f: A => Need[B]): Need[B] = f(v.value)
+    def cojoin[A](a: Need[A]): Need[Need[A]] = Need(a)
+    def copure[A](p: Need[A]): A = p.value
   }
 }
 
 object Value {
-  implicit val value: Monad[Value] = new Monad[Value] {
+  implicit val value = new Monad[Value] with Comonad[Value] {
     def pure[A](a: => A) = Value(a)
-
     def bind[A, B](v: Value[A])(f: A => Value[B]): Value[B] = f(v.value)
+    def cojoin[A](a: Value[A]): Value[Value[A]] = Value(a)
+    def copure[A](p: Value[A]): A = p.value
   }
 }
