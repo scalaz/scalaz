@@ -26,6 +26,7 @@ sealed trait IterateeT[X, E, F[_], A] {
     i.to(foldT(k => i.from(cont(k)), (a, o) => i.from(done(a, o)), e => i.from(err(e)))(new Bind[F] {
       def bind[A, B](k: F[A])(f: (A) => F[B]): F[B] =
         i.from(i.to(f(i.to(k))))
+      def map[A, B](fa: F[A])(f: (A) => B): F[B] = i.from(f(i.to(fa)))
     }))
 
   def runT(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
@@ -88,7 +89,7 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 
   def joinI[I, B](implicit outer: IterateeT[X, E, F, A] =:= IterateeT[X, E, F, StepT[X, I, F, B]], M: Monad[F]): IterateeT[X, E, F, B] = {
-    val ITP = IterateeTPointed[X, E, F]
+    val ITP = IterateeTMonad[X, E, F]
     def check: StepT[X, I, F, B] => IterateeT[X, E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {
         s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
@@ -154,13 +155,7 @@ object IterateeT extends IterateeTs {
     iterateeT(s)
 }
 
-trait IterateeTLow2 {
-  implicit def IterateeTPointed[X, E, F[_]](implicit F0: Pointed[F]) = new IterateeTPointed[X, E, F] {
-    implicit def F = F0
-  }
-}
-
-trait IterateeTLow1 extends IterateeTLow2 {
+trait IterateeTLow1 {
   implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]) = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
@@ -201,7 +196,16 @@ trait IterateeTs extends IterateeTLow0 {
     iterateeT(Pointed[F].pure(StepT.serr(e)))
 
   implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
-    def lift[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
+    def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = IterateeT[X, E, M, x]})#f ~> ({type f[x] = IterateeT[X, E, N, x]})#f) {
+      val M: Functor[M] = sys.error("Need to change signature of hoist to support IterateeTMonadTrans") // TODO
+      def apply[A](fa: IterateeT[X, E, M, A]): IterateeT[X, E, N, A] = sys.error("not implemented")
+    } 
+    
+//    def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = LazyEitherT[Z, M, x]})#f ~> ({type f[x] = LazyEitherT[Z, N, x]})#f) {
+//          def apply[A](fa: LazyEitherT[Z, M, A]): LazyEitherT[Z, N, A] = LazyEitherT(f.apply(fa.runT))
+//        }
+//
+    def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
       iterateeT(Monad[G].map(ga)((x: A) => StepT.sdone[X, E, G, A](x, emptyInput)))
   }
 
@@ -329,26 +333,32 @@ trait IterateeTs extends IterateeTLow0 {
   /**
    * Iteratee that collects all inputs with the given monoid.
    */
-  def collect[X, A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] =
-    fold(mon.zero)((acc, e) => mon.append(acc, pt.pure(e)))
+  def collect[X, A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
+    import Ident.id
+    fold[X, A, Id, F[A]](mon.zero)((acc, e) => mon.append(acc, pt.pure(e)))
+  }
 
   /**
    * Iteratee that collects all inputs in reverse with the given reducer.
    *
    * This iteratee is useful for F[_] with efficient cons, i.e. List.
    */
-  def reversed[X, A, F[_]](implicit r: Reducer[A, F[A]]): Iteratee[X, A, F[A]] = fold(r.monoid.zero)((acc, e) => r.cons(e, acc))
+  def reversed[X, A, F[_]](implicit r: Reducer[A, F[A]]): Iteratee[X, A, F[A]] = {
+    import Ident.id
+    fold[X, A, Id, F[A]](r.monoid.zero)((acc, e) => r.cons(e, acc))
+  }
 
   /**
    * Iteratee that collects the first n inputs.
    */
   def take[X, A, F[_]](n: Int)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
+    import Ident.id
     def loop(acc: F[A], n: Int)(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
-        if (n <= 0) done(acc, s)
+        if (n <= 0) done[X, A, Id, F[A]](acc, s)
         else cont(loop(mon.append(acc, pt.pure(e)), n - 1))
         , empty = cont(loop(acc, n))
-        , eof = done(acc, s)
+        , eof = done[X, A, Id, F[A]](acc, s)
       )
     cont(loop(mon.zero, n))
   }
@@ -357,12 +367,13 @@ trait IterateeTs extends IterateeTLow0 {
    * Iteratee that collects inputs with the given monoid until the input element fails a test.
    */
   def takeWhile[X, A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
+    import Ident.id
     def loop(acc: F[A])(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
         if (p(e)) cont(loop(mon.append(acc, pt.pure(e))))
-        else done(acc, s)
+        else done[X, A, Id, F[A]](acc, s)
         , empty = cont(loop(acc))
-        , eof = done(acc, eofInput)
+        , eof = done[X, A, Id, F[A]](acc, eofInput)
       )
     cont(loop(mon.zero))
   }
@@ -506,11 +517,13 @@ trait IterateeTs extends IterateeTLow0 {
     doneOr(loop)
   }
 
-  def group[X, E, F[_], G[_], A](n: Int)(implicit pf: Pointed[F], mon: Monoid[F[E]], m: Monad[G]): EnumerateeT[X, E, F[E], G, A] = {
+  def group[X, E, F[_], G[_], A](n: Int)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: Copointed[G]): EnumerateeT[X, E, F[E], G, A] = {
+    import Ident.id
     take[X, E, F](n).up[G].sequenceI[A]
   }
 
-  def splitOn[X, E, F[_], G[_], A](p: E => Boolean)(implicit pf: Pointed[F], mon: Monoid[F[E]], mg: Monad[G]): EnumerateeT[X, E, F[E], G, A] = {
+  def splitOn[X, E, F[_], G[_], A](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: Copointed[G]): EnumerateeT[X, E, F[E], G, A] = {
+    import Ident.id
     (takeWhile[X, E, F](p).up[G] flatMap (xs => drop[X, E, G](1).map(_ => xs))).sequenceI[A]
   }
 }
@@ -519,22 +532,20 @@ trait IterateeTs extends IterateeTLow0 {
 // Type class implementation traits
 //
 
-private[scalaz] trait IterateeTPointed[X, E, F[_]] extends Pointed[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
-  implicit def F: Pointed[F]
-  def pure[A](a: => A) = StepT.sdone(a, emptyInput).pointI
-}
-
-private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] with IterateeTPointed[X, E, F] {
+private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
   implicit def F: Monad[F]
+
+  def pure[A](a: => A) = StepT.sdone(a, emptyInput).pointI
+  override def map[A, B](fa: IterateeT[X, E, F, A])(f: (A) => B): IterateeT[X, E, F, B] = fa map f
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
-  override def map[A, B](fa: IterateeT[X, E, F, A])(f: A => B): IterateeT[X, E, F, B] = fa map f
 }
 
 private[scalaz] trait EnumeratorTSemigroup[X, E, F[_], A] extends Semigroup[EnumeratorT[X, E, F, A]] {
   implicit def F: Bind[F]
 
-  def append(f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A], f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]):
-  (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = s => f1(s) >>== f2
+  def append(f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A], 
+             f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = 
+    s => f1(s) >>== f2
 }
 
 private[scalaz] trait EnumeratorTMonoid[X, E, F[_], A] extends Monoid[EnumeratorT[X, E, F, A]] with EnumeratorTSemigroup[X, E, F, A] {
