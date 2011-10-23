@@ -16,6 +16,8 @@ trait Run[F]  { self =>
   }
 
   ////
+
+
   val runSyntax = new scalaz.syntax.concurrent.RunSyntax[F] {}
 }
 
