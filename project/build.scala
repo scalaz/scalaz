@@ -31,10 +31,17 @@ object build extends Build {
     )
   )
 
+  lazy val iteratee = Project(
+    id = "scalaz-iteratee",
+    base = file("iteratee"),
+    settings = standardSettings,
+    dependencies = Seq(core)
+  )
+
   lazy val example = Project(
     id = "scalaz-example",
     base = file("example"),
-    dependencies = Seq(core),
+    dependencies = Seq(core, iteratee),
     settings = standardSettings
   )
 
