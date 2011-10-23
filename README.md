@@ -132,7 +132,7 @@ implicitly[Functor[OptionTList]]
 // Candidates:
 // 1. OptionT.OptionTFunctor[List](implicitly[Functor[List]])
 // 2. OptionT.OptionTMonad[List](implicitly[Functor[List]])
-// #2 is defined in a superclass, so is preferred (although, either would have sufficed).
+// #2 is defined in a subclass, so is preferred (although, either would have sufficed).
 ```
 
 ### Syntax
