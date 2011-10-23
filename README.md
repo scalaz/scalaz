@@ -1,10 +1,10 @@
 ## Scalaz
 
-This is an experimental fork of [https://github.com/scalaz/scalaz]("Scalaz") for prototyping
-changes for [http://code.google.com/p/scalaz/wiki/Scalaz7]("Scalaz 7").
+This is an experimental fork of [Scalaz](https://github.com/scalaz/scalaz) for prototyping
+changes for [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7).
 
-This is only a candidate design for Scalaz 7. An alternative design, which eschews type class inheritance
-is available in the [https://github.com/scalaz/scalaz/tree/scalaz7](scalaz7) branch in the main repository.
+This is only a candidate design for Scalaz 7. An alternative design, which eschews type class inheritance,
+is available in the [scalaz7](https://github.com/scalaz/scalaz/tree/scalaz7) branch in the main repository.
 
 ### Modularity
 
@@ -54,7 +54,7 @@ val plusOpt = O.lift2(plus)
 
 * 'Constructive' implicits, which create a type class instance automatically based on instances of
   all parent type classes, are removed. These led to subtle errors with ambiguous implicits, such as
-  this problem with [http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111]("FunctorBindApply")
+  this problem with [http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111](FunctorBindApply)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
   are defined in the package `scalaz.std`, and must be imported. These instances are defined in traits which will be
   mixed together into an object for importing en-masse, if desired.
@@ -119,8 +119,8 @@ ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 The `OptionT#map` requires `Functor[F]`, whereas `OptionT#flatMap` requires `Monad[F]`. The capabilities of
 `OptionT` increase with those of `F`. We need to encode this into the type class instances for `[a]OptionT[F[A]]`.
 
-This is done with a heirarchy of [https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L59]("type class implementation traits")
-and a corresponding set of [https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L23]("prioritized implicit methods").
+This is done with a heirarchy of [type class implementation traits](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L59)
+and a corresponding set of [prioritized implicit methods](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L23).
 
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
 when in cases like the following:
