@@ -1,9 +1,12 @@
 import sbt._
 import Keys._
 import GenTypeClass._
+import Project.Setting
 
 object build extends Build {
-  lazy val standardSettings: Seq[Project.Setting[_]] = Defaults.defaultSettings ++ Seq[Project.Setting[_]](
+  type Sett = Project.Setting[_]
+
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
     version := "7.1-SNAPSHOT",
     scalaVersion := "2.9.1",
@@ -27,41 +30,49 @@ object build extends Build {
   )
 
   lazy val core = Project(
-    id = "scalaz-core",
+    id = "core",
     base = file("core"),
-    settings = standardSettings ++ Seq(
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-core",
       typeClasses := TypeClass.core
     )
   )
 
   lazy val concurrent = Project(
-    id = "scalaz-concurrent",
+    id = "concurrent",
     base = file("concurrent"),
-    settings = standardSettings ++ Seq(
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-concurrent",
       typeClasses := TypeClass.concurrent
     ),
     dependencies = Seq(core)
   )
 
   lazy val effect = Project(
-    id = "scalaz-effect",
+    id = "effect",
     base = file("effect"),
-    settings = standardSettings,
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-effect"
+    ),
     dependencies = Seq(concurrent)
   )
 
   lazy val iteratee = Project(
-    id = "scalaz-iteratee",
+    id = "iteratee",
     base = file("iteratee"),
-    settings = standardSettings,
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-iteratee"
+    ),
     dependencies = Seq(effect)
   )
 
   lazy val example = Project(
-    id = "scalaz-example",
+    id = "example",
     base = file("example"),
     dependencies = Seq(core, iteratee, concurrent),
-    settings = standardSettings
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-example"
+    )
   )
 
   lazy val createAllTypeClasses = TaskKey[Seq[File]]("create-all-type-classes")
