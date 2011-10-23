@@ -57,7 +57,7 @@ val plusOpt = O.lift2(plus)
   this problem with [FunctorBindApply](http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
   are defined in the package `scalaz.std`, and must be imported. These instances are defined in traits which will be
-  mixed together into an object for importing en-masse, if desired.
+  mixed together into an object for importing *en-masse*, if desired.
 * A single implicit can define a number of type class instances or a type.
 * A type class definition can override methods (including derived methods) for efficiency.
 
@@ -137,14 +137,14 @@ implicitly[Functor[OptionTList]]
 
 ### Syntax
 
-We co-opt the the term 'syntax' to refer to the way we allow the functionality of Scalaz to be
+We co-opt the the term *syntax* to refer to the way we allow the functionality of Scalaz to be
 called in the `object.method(args)` form, which can be easier to read, and, given that type inference
 in Scala flows from left-to-right, can require fewer type annotations.
 
 * Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
 * All Scalaz functionality is avaialable *without* using the provided syntax, by directly calling methods
   on the type class or it's companion object.
-* Syntax is available a-la-carte. You can import the syntax for working with a particular
+* Syntax is available *a-la-carte*. You can import the syntax for working with a particular
   type classes where you need it. This avoids flooding the autocompletion in your IDE with
   every possible pimped method. In principle, this should also help compiler performance,
   by reducing the implicit search space.
