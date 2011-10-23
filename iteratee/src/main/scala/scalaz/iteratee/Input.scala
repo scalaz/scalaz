@@ -66,135 +66,35 @@ trait Inputs {
       eof
   }
 
-  /*implicit val InputFunctor: Functor[Input] = new Functor[Input] {
-    def fmap[A, B](f: A => B) = _ map (e => f(e))
-  }
-
-  implicit val InputPointed: Pointed[Input] = new Pointed[Input] {
-    def point[A](a: => A) = elInput(a)
-  }
-
-  implicit val InputApplic: Applic[Input] = new Applic[Input] {
-    def applic[A, B](f: Input[A => B]) =
-      a => f flatMap (k => a map (k apply _))
-  }
-
-  implicit val InputBind: Bind[Input] = new Bind[Input] {
-    def bind[A, B](f: A => Input[B]) =
-      _ flatMap (e => f(e))
-  }
-
-  implicit val InputJoin: Join[Input] = new Join[Input] {
-    def join[A] =
-      _ flatMap (x => x)
-  }
-
-  implicit val InputEach: Each[Input] = new Each[Input] {
-    def each[A](f: A => Unit) =
-      _ foreach (e => f(e))
-  }
-
-  implicit val InputFoldl: Foldl[Input] = new Foldl[Input] {
-    def foldl[A, B] =
-      f => z => _.fold(
-        empty = z
-        , el = a => f(z)(a)
-        , eof = z
-      )
-  }
-
-  implicit val InputFoldr: Foldr[Input] = new Foldr[Input] {
-    def foldr[A, B] =
-      f => z => _.fold(
-        empty = z
-        , el = a => f(a)(z)
-        , eof = z
-      )
-  }
-
-  implicit val InputTraverse: Traverse[Input] = new Traverse[Input] {
-    def traverse[F[_] : Applicative, A, B](f: A => F[B]) =
-      _.fold(
-        empty = implicitly[Applicative[F]].point(emptyInput[B])
-        , el = x => implicitly[Applicative[F]].fmap((b: B) => elInput(b))(f(x))
-        , eof = implicitly[Applicative[F]].point(eofInput[B])
-      )
-  }
-
-  implicit val InputIndex: Index[Input] = new Index[Input] {
-    def index[A](a: Input[A]) =
-      n => if (n == 1) a.fold(
-        empty = None
-        , el = a => Some(a)
-        , eof = None
-      )
-      else None
-  }
-
-  implicit val InputLength: Length[Input] = new Length[Input] {
-    def len[A](a: Input[A]) = a.fold(
+  implicit val input = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {
+    def length[A](fa: Input[A]): Int = fa.fold(
       empty = 0
       , el = _ => 1
       , eof = 0
     )
+    def pure[A](a: => A): Input[A] = elInput(a)
+    def traverseImpl[G[_]: Applicative, A, B](fa: Input[A])(f: (A) => G[B]): G[Input[B]] = fa.fold(
+      empty = Applicative[G].pure(emptyInput[B])
+      , el = x => Applicative[G].map(f(x))(b => elInput(b))
+      , eof = Applicative[G].pure(eofInput[B])
+    )
+    def foldR[A, B](fa: Input[A], z: B)(f: (A) => (=> B) => B): B = fa.fold(
+      empty = z
+      , el = a => f(a)(z)
+      , eof = z
+    )
+    def each[A](fa: Input[A])(f: (A) => Unit) = fa foreach (a => f(a))
+    def plus[A](a: Input[A], b: => Input[A]): Input[A] = a.fold(
+      empty = b
+      , el = _ => a
+      , eof = b
+    )
+    def bind[A, B](fa: Input[A])(f: (A) => Input[B]): Input[B] = fa flatMap (a => f(a))
+    def empty[A]: Input[A] = emptyInput
   }
 
-  implicit val InputEmpty: Empty[Input] = new Empty[Input] {
-    def empty[A] = emptyInput
-  }
-
-  implicit val InputPlus: Plus[Input] = new Plus[Input] {
-    def plus[A](a1: Input[A], a2: => Input[A]) =
-      a1.fold(
-        empty = a2
-        , el = _ => a1
-        , eof = a2
-      )
-  }
-
-  implicit val InputApplicative: Applicative[Input] =
-    Applicative.applicative
-
-  implicit val InputApplicFunctor: ApplicFunctor[Input] =
-    ApplicFunctor.applicFunctor
-
-  implicit val InputBindFunctor: BindFunctor[Input] =
-    BindFunctor.bindFunctor
-
-  implicit val InputMonad: Monad[Input] =
-    Monad.monadBP
-
-  implicit val InputMonadEmpty: MonadEmpty[Input] =
-    MonadEmpty.monadEmpty
-
-  implicit val InputMonadEmptyPlus: MonadEmptyPlus[Input] =
-    MonadEmptyPlus.monadEmptyPlus
-
-  implicit val InputPointedEmpty: PointedEmpty[Input] =
-    PointedEmpty.pointedEmpty
-
-  implicit val InputPointedFunctor: PointedFunctor[Input] =
-    PointedFunctor.pointedFunctor
-
-  implicit def InputEqual[A: Equal]: Equal[Input[A]] =
-    Equal.equal(a1 => a2 => a1.fold(
-      empty = a2.isEmpty
-      , el = a => a2.exists(z => implicitly[Equal[A]].equal(a)(z))
-      , eof = a2.isEmpty
-    ))
-
-  implicit def InputShow[A: Show]: Show[Input[A]] =
-    Show.shows(_.fold(
-      empty = "empty-input"
-      , el = a => "el-input(" + implicitly[Show[A]].shows(a) + ")"
-      , eof = "eof-input"
-    ))
-
-  implicit def InputZero[A]: Zero[Input[A]] =
-    Zero.zero(emptyInput)
-
-  implicit def InputSemigroup[A: Semigroup]: Semigroup[Input[A]] =
-    Semigroup.semigroup(a1 => a2 => a1.fold(
+  implicit def inputMonoid[A](implicit A: Monoid[A]) = new Monoid[Input[A]] {
+    def append(a1: Input[A], a2: => Input[A]): Input[A] = a1.fold(
       empty = a2.fold(
         empty = emptyInput
         , el = elInput
@@ -202,15 +102,28 @@ trait Inputs {
       )
       , el = xa => a2.fold(
         empty = elInput(xa)
-        , el = ya => elInput(implicitly[Semigroup[A]].append(xa, ya))
+        , el = ya => elInput(A.append(xa, ya))
         , eof = eofInput
       )
       , eof = eofInput
-    ))
+    )
 
-  implicit def InputMonoid[A: Semigroup]: Monoid[Input[A]] =
-    Monoid.monoid
+    def zero: Input[A] = emptyInput
+  }
 
-  implicit def InputIsZero[A]: IsZero[Input[A]] =
-    IsZero.isZero(_.isEmpty)*/
+  implicit def inputEqual[A](implicit A: Equal[A]) = new Equal[Input[A]] {
+    def equal(a1: Input[A], a2: Input[A]): Boolean = a1.fold(
+      empty = a2.isEmpty
+      , el = a => a2.exists(z => A.equal(a, z))
+      , eof = a2.isEmpty
+    )
+  }
+
+  implicit def inputShow[A](implicit A: Show[A]) = new Show[Input[A]] {
+    def show(f: Input[A]): List[Char] = f.fold(
+      empty = "empty-input"
+      , el = a => "el-input(" + A.shows(a) + ")"
+      , eof = "eof-input"
+    ).toList
+  }
 }
