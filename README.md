@@ -35,7 +35,7 @@ def foo[M: Monad] = bar
 
 ### Standalone Type Class Usage
 
-Type classes should directly usable, without first needing to trigger implicit conversions. This might be
+Type classes should be directly usable, without first needing to trigger implicit conversions. This might be
 desirable to reduce the runtime or cognitive overhead of the pimped types, or to define your own pimped
 types with a syntax of your choosing.
 
@@ -142,7 +142,7 @@ called in the `object.method(args)` form, which can be easier to read, and, give
 in Scala flows from left-to-right, can require fewer type annotations.
 
 * Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
-* All Scalaz functionality is avaialable *without* using the provided syntax, by directly calling methods
+* All Scalaz functionality is available *without* using the provided syntax, by directly calling methods
   on the type class or it's companion object.
 * Syntax is available *a-la-carte*. You can import the syntax for working with a particular
   type classes where you need it. This avoids flooding the autocompletion in your IDE with
