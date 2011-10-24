@@ -45,6 +45,13 @@ trait StateTs extends StateTsLow1 {
     def apply(s: S) = f(s)
   }
 
+  def constantStateT[F[_], A, S](a: A)(s: => S)(implicit F: Pointed[F]): StateT[S, F, A] =
+    StateT((_: S) => F.pure((a, s)))
+
+  def stateT[F[_], A, S](a: A)(implicit F: Pointed[F]): StateT[S, F, A] =
+    StateT(s => F.pure((a, s)))
+
+
   implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] = new StateTMonadState[S, F] {
     implicit def F: Monad[F] = F0
   }

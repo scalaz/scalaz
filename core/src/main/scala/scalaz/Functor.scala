@@ -12,6 +12,8 @@ trait Functor[F[_]]  { self =>
 
   def strengthR[A, B](f: F[A], b: B): F[(A, B)] = map(f)(a => (a, b))
 
+  def mapply[A, B](a: A)(f: F[A => B]): F[B] = map(f)((ff: A => B) => ff(a))
+
   /**The composition of Functors F and G, [x]F[G[x]], is an Functors */
   def compose[G[_]](G: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
     implicit def F: Functor[F] = self

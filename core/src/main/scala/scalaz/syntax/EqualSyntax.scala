@@ -6,6 +6,13 @@ trait EqualV[F] extends SyntaxV[F] {
   implicit def F: Equal[F]
   ////
 
+  def ===(other: F): Boolean = F.equal(self, other)
+  def /==(other: F): Boolean = !F.equal(self, other)
+
+  /** Raises an exception unless self === other. */
+  def assert_===[B](other: B)(implicit S: Show[F], ev: B <:< F) =
+      if (/==(other)) sys.error(S.shows(self) + " ≠ " + S.shows(ev(other)))
+
   ////
 }
 

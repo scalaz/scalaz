@@ -16,7 +16,7 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   def traversal[G[_]:Applicative]: Traversal[G] = 
     new Traversal[G]
   def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] = 
-    new Traversal[({type f[x]=State[S,x]})#f]
+    new Traversal[({type f[x]=State[S,x]})#f]()(State.stateMonad)
 
   def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] = 
     traversal[G].run(fa)(f)
