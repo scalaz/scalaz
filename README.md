@@ -12,15 +12,15 @@ Scalaz has grown to contain a wide range of useful type classes and data structu
 to the beginner trying to learn the library -- where to start, what to ignore? To help alleviate this, the
 library has further been modularised.
 
-* **scalaz-core**: Type class heirarchy, data structures, type class instances for the Scala and Java standard libraries,
+* **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
 * **scalaz-iteratee**: Iteratee implementation
 
-### Type Class Heirarchy
+### Type Class Hierarchy
 
-* Type classes form an inheritance heirarchy, as in Scalaz 6. This is convenient both at the call site and at the
+* Type classes form an inheritance hierarchy, as in Scalaz 6. This is convenient both at the call site and at the
   type class instance definition. Considering for now the call site, it ensures the following code is valid:
 
 ```
@@ -125,7 +125,7 @@ ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 The `OptionT#map` requires `Functor[F]`, whereas `OptionT#flatMap` requires `Monad[F]`. The capabilities of
 `OptionT` increase with those of `F`. We need to encode this into the type class instances for `[a]OptionT[F[A]]`.
 
-This is done with a heirarchy of [type class implementation traits](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L59)
+This is done with a hierarchy of [type class implementation traits](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L59)
 and a corresponding set of [prioritized implicit methods](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L23).
 
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
