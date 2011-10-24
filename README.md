@@ -41,12 +41,18 @@ types with a syntax of your choosing.
 
 * The methods in type classes have been curried to maximize type inference.
 * Derived methods, based on the abstract methods in a type class, are defined in the type class itself.
+* Each type class companion object is fitted with a convenient `apply` method to obtain an instance of the type class.
 
 ```
+// Equivalent to `implicitly[Monad[Option]]`
 val O = Monad[Option]
+
+// `bind` is defined with type parameter lists, so that the type of `x` is inferred as `Int`.
 O.bind(Some(1))(x => Some(x * 2)
 
 def plus(a: Int, b: Int) = a + b
+
+// `Apply#lift2` is a function derived from `Apply#ap`.
 val plusOpt = O.lift2(plus)
 ```
 
