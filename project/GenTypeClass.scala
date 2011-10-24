@@ -179,7 +179,7 @@ object GenTypeClass {
     }
     val extendsLikeList = extendsListText("")
 
-    val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n")
+    val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
 
@@ -214,14 +214,15 @@ object %s {
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F] extends SyntaxV[F] {
+  implicit def F: %s[F]
   ////
 
   ////
 }
 
 trait To%sSyntax %s {
-  implicit def To%sV[F](v: F) =
-    new %sV[F] { def self = v }
+  implicit def To%sV[F](v: F)(implicit F0: %s[F]) =
+    new %sV[F] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
@@ -229,39 +230,40 @@ trait To%sSyntax %s {
 }
 
 trait %sSyntax[F] %s {
-  implicit def To%sV(v: F): %sV[F] = new %sV[F] { def self = v }
+  implicit def To%sV(v: F)(implicit F0: %s[F]): %sV[F] = new %sV[F] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
       // implicits in ToXxxSyntax
-      typeClassName, typeClassName,
+      typeClassName, typeClassName, typeClassName, typeClassName,
 
       typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName
+      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
     )
     case Kind.*->* =>
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F[_],A] extends SyntaxV[F[A]] {
+  implicit def F: %s[F]
   ////
 
   ////
 }
 
 trait To%sSyntax %s {
-  implicit def To%sV[F[_],A](v: F[A]) =
-    new %sV[F,A] { def self = v }
-  implicit def To%sVFromBin[F[_, _], X, A](v: F[X, A]) =
-    new %sV[({type f[a] = F[X, a]})#f,A] { def self = v }
-  implicit def To%sVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A]) =
-    new %sV[({type f[a] = F[X, G, a]})#f,A] { def self = v }
-  implicit def To%sVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A]) =
-    new %sV[({type f[a] = F[X, Id, a]})#f,A] { def self = v }
+  implicit def To%sV[F[_],A](v: F[A])(implicit F0: %s[F]) =
+    new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: %s[({type f[a] = F[X, a]})#f]) =
+    new %sV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, a]})#f] = F0 }
+  implicit def To%sVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: %s[({type f[a] = F[X, G, a]})#f]) =
+    new %sV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, G, a]})#f] = F0 }
+  implicit def To%sVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: %s[({type f[a] = F[X, Id, a]})#f]) =
+    new %sV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, Id, a]})#f] = F0 }
 
   ////
 
@@ -269,36 +271,39 @@ trait To%sSyntax %s {
 }
 
 trait %sSyntax[F[_]] %s {
-  implicit def To%sV[A](v: F[A]): %sV[F, A] = new %sV[F,A] { def self = v }
+  implicit def To%sV[A](v: F[A])(implicit F0: %s[F]): %sV[F, A] = new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName,
+      typeClassName,
+      typeClassName, extendsToSyntaxListText,
 
           // implicits in ToXxxSyntax
-          typeClassName, typeClassName,
-          typeClassName, typeClassName,
-          typeClassName, typeClassName,
-          typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )
       case Kind.*^*->* =>
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
 trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+  implicit def F: %s[F]
   ////
 
   ////
 }
 
 trait To%sSyntax %s {
-  implicit def To%sV[F[_, _],A, B](v: F[A, B]) =
-    new %sV[F,A, B] { def self = v }
+  implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
+    new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
@@ -306,19 +311,19 @@ trait To%sSyntax %s {
 }
 
 trait %sSyntax[F[_, _]] %s {
-  implicit def To%sV[A, B](v: F[A, B]): %sV[F, A, B] = new %sV[F, A, B] { def self = v }
+  implicit def To%sV[A, B](v: F[A, B])(implicit F0: %s[F]): %sV[F, A, B] = new %sV[F, A, B] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
           // implicits in ToXxxSyntax
-          typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )
     }
     val syntaxSourceFile = SourceFile(tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource)

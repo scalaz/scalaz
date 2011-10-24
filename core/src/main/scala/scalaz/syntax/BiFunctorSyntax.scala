@@ -3,20 +3,20 @@ package syntax
 
 /** Wraps a value `self` and provides methods related to `BiFunctor` */
 trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+  implicit def F: BiFunctor[F]
   ////
-  def :->[D](g: B => D)(implicit b: BiFunctor[F]): F[A, D] = b.bimap(self)(a => a, g)
+  def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
 
-  def <-:[C](f: A => C)(implicit b: BiFunctor[F]): F[C, B] = b.bimap(self)(f, b => b)
+  def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
 
-  def <:>[C](f: A => C)(implicit z: B <:< C, t: BiFunctor[F]): F[C, C] =
-    t.bimap(self)(f, z)
+  def <:>[C](f: A => C)(implicit z: B <:< C): F[C, C] = F.bimap(self)(f, z)
 
   ////
 }
 
 trait ToBiFunctorSyntax  {
-  implicit def ToBiFunctorV[F[_, _],A, B](v: F[A, B]) =
-    new BiFunctorV[F,A, B] { def self = v }
+  implicit def ToBiFunctorV[F[_, _],A, B](v: F[A, B])(implicit F0: BiFunctor[F]) =
+    new BiFunctorV[F,A, B] { def self = v; implicit def F: BiFunctor[F] = F0 }
 
   ////
 
@@ -24,7 +24,7 @@ trait ToBiFunctorSyntax  {
 }
 
 trait BiFunctorSyntax[F[_, _]]  {
-  implicit def ToBiFunctorV[A, B](v: F[A, B]): BiFunctorV[F, A, B] = new BiFunctorV[F, A, B] { def self = v }
+  implicit def ToBiFunctorV[A, B](v: F[A, B])(implicit F0: BiFunctor[F]): BiFunctorV[F, A, B] = new BiFunctorV[F, A, B] { def self = v; implicit def F: BiFunctor[F] = F0 }
 
   ////
 

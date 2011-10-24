@@ -24,7 +24,7 @@ object MixedBag extends App {
   def traverseBigList() {
     import std.Option._
     import std.List._
-    import syntax.applicative._
+    import syntax.traverse._
 
     val xs: Option[List[Int]] = (1 to 100000 toList).traverse(x => some(x * 2))
     println(xs map (_ take 10))

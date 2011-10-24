@@ -10,7 +10,7 @@ object ParserUsage extends App {
     val parsers: List[Parser[List[String]]] = List(1, 2, 3).map(repN(_, """\d+""".r))
 
     def apply(s: String): ParseResult[List[List[String]]] = {
-      import syntax.applicative._ // for _.sequence
+      import syntax.traverse._ // for _.sequence
       import std.List._ // for Traverse[List]
       import std.util.parsing.combinator.Parser.parserMonad
 

@@ -17,7 +17,9 @@ trait Syntaxes {
 trait ToAllSyntax
   extends ToSemigroupSyntax with ToMonoidSyntax with ToFunctorSyntax with ToPointedSyntax with ToApplySyntax with ToApplicativeSyntax with ToBindSyntax with ToMonadSyntax with ToTraverseSyntax
 
-trait SyntaxV[A] { def self: A }
+trait SyntaxV[A] {
+  def self: A
+}
 
 /** The members of this object are also offered in the package object [[scalaz.syntax]] */
 object Syntax extends Syntaxes
