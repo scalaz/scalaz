@@ -58,7 +58,7 @@ val plusOpt = O.lift2(plus)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
   are defined in the package `scalaz.std`, and must be imported. These instances are defined in traits which will be
   mixed together into an object for importing *en-masse*, if desired.
-* A single implicit can define a number of type class instances or a type.
+* A single implicit can define a number of type class instances for a type.
 * A type class definition can override methods (including derived methods) for efficiency.
 
 Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
