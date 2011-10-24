@@ -20,7 +20,7 @@ library has further been modularised.
 
 ### Type Class Heirarchy
 
-* Type classes for an inheritance heirarchy, as in Scalaz 6. This is convenient both at the call site and at the
+* Type classes form an inheritance heirarchy, as in Scalaz 6. This is convenient both at the call site and at the
   type class instance definition. Considering for now the call site, it ensures the following code is valid:
 
 ```
