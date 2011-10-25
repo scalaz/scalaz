@@ -143,7 +143,7 @@ implicitly[Functor[OptionTList]]
 
 ### Syntax
 
-We co-opt the the term *syntax* to refer to the way we allow the functionality of Scalaz to be
+We co-opt the term *syntax* to refer to the way we allow the functionality of Scalaz to be
 called in the `object.method(args)` form, which can be easier to read, and, given that type inference
 in Scala flows from left-to-right, can require fewer type annotations.
 
