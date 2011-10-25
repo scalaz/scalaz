@@ -9,7 +9,7 @@ trait LengthV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToLengthSyntax  {
+trait ToLengthV  {
   implicit def ToLengthV[F[_],A](v: F[A])(implicit F0: Length[F]) =
     new LengthV[F,A] { def self = v; implicit def F: Length[F] = F0 }
   implicit def ToLengthVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Length[({type f[a] = F[X, a]})#f]) =

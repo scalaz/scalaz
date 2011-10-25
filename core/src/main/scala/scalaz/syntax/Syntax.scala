@@ -5,82 +5,82 @@ import std.{ToStreamV, ToOptionV}
 
 trait Syntaxes {
 
-  object semigroup extends ToSemigroupSyntax
+  object semigroup extends ToSemigroupV
 
-  object monoid extends ToMonoidSyntax
+  object monoid extends ToMonoidV
 
-  object equal extends ToEqualSyntax
+  object equal extends ToEqualV
 
-  object length extends ToLengthSyntax
+  object length extends ToLengthV
 
-  object show extends ToShowSyntax
+  object show extends ToShowV
 
-  object order extends ToOrderSyntax
+  object order extends ToOrderV
 
-  object metricSpace extends ToMetricSpaceSyntax
+  object metricSpace extends ToMetricSpaceV
 
-  object empty extends ToEmptySyntax
+  object empty extends ToEmptyV
 
-  object each extends ToEachSyntax
+  object each extends ToEachV
 
-  object index extends ToIndexSyntax
+  object index extends ToIndexV
 
-  object functor extends ToFunctorSyntax
+  object functor extends ToFunctorV
 
-  object pointed extends ToPointedSyntax
+  object pointed extends ToPointedV
 
-  object contravariant extends ToContravariantSyntax
+  object contravariant extends ToContravariantV
 
-  object copointed extends ToCopointedSyntax
+  object copointed extends ToCopointedV
 
-  object apply extends ToApplySyntax
+  object apply extends ToApplyV
 
-  object applicative extends ToApplicativeSyntax
+  object applicative extends ToApplicativeV
 
-  object bind extends ToBindSyntax
+  object bind extends ToBindV
 
-  object monad extends ToMonadSyntax
+  object monad extends ToMonadV
 
-  object cojoin extends ToCojoinSyntax
+  object cojoin extends ToCojoinV
 
-  object comonad extends ToComonadSyntax
+  object comonad extends ToComonadV
 
-  object plus extends ToPlusSyntax
+  object plus extends ToPlusV
 
-  object applicativePlus extends ToApplicativePlusSyntax
+  object applicativePlus extends ToApplicativePlusV
 
-  object monadPlus extends ToMonadPlusSyntax
+  object monadPlus extends ToMonadPlusV
 
-  object traverse extends ToTraverseSyntax
+  object traverse extends ToTraverseV
 
-  object biFunctor extends ToBiFunctorSyntax
+  object biFunctor extends ToBiFunctorV
 
-  object biTraverse extends ToBiTraverseSyntax
+  object biTraverse extends ToBiTraverseV
 
-  object arrId extends ToArrIdSyntax
+  object arrId extends ToArrIdV
 
-  object arr extends ToArrSyntax
+  object arr extends ToArrV
 
-  object compose extends ToComposeSyntax
+  object compose extends ToComposeV
 
-  object category extends ToCategorySyntax
+  object category extends ToCategoryV
 
-  object first extends ToFirstSyntax
+  object first extends ToFirstV
 
-  object arrow extends ToArrowSyntax
+  object arrow extends ToArrowV
 
-  object all extends ToAllTypeClassSyntax
+  object all extends ToAllTypeClassV
 
 }
 
-trait ToAllTypeClassSyntax
-  extends ToSemigroupSyntax with ToMonoidSyntax with ToEqualSyntax with ToLengthSyntax with ToShowSyntax
-  with ToOrderSyntax with ToMetricSpaceSyntax with ToEmptySyntax with ToEachSyntax with ToIndexSyntax
-  with ToFunctorSyntax with ToPointedSyntax with ToContravariantSyntax with ToCopointedSyntax with ToApplySyntax
-  with ToApplicativeSyntax with ToBindSyntax with ToMonadSyntax with ToCojoinSyntax with ToComonadSyntax
-  with ToPlusSyntax with ToApplicativePlusSyntax with ToMonadPlusSyntax with ToTraverseSyntax with ToBiFunctorSyntax
-  with ToBiTraverseSyntax with ToArrIdSyntax with ToArrSyntax with ToComposeSyntax with ToCategorySyntax
-  with ToFirstSyntax with ToArrowSyntax
+trait ToAllTypeClassV
+  extends ToSemigroupV with ToMonoidV with ToEqualV with ToLengthV with ToShowV
+  with ToOrderV with ToMetricSpaceV with ToEmptyV with ToEachV with ToIndexV
+  with ToFunctorV with ToPointedV with ToContravariantV with ToCopointedV with ToApplyV
+  with ToApplicativeV with ToBindV with ToMonadV with ToCojoinV with ToComonadV
+  with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
+  with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
+  with ToFirstV with ToArrowV
 
 trait ToAllStdV
   extends ToOptionV with ToStreamV

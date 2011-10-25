@@ -9,7 +9,7 @@ trait EachV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToEachSyntax  {
+trait ToEachV  {
   implicit def ToEachV[F[_],A](v: F[A])(implicit F0: Each[F]) =
     new EachV[F,A] { def self = v; implicit def F: Each[F] = F0 }
   implicit def ToEachVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Each[({type f[a] = F[X, a]})#f]) =

@@ -9,7 +9,7 @@ trait CopointedV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCopointedSyntax  {
+trait ToCopointedV  {
   implicit def ToCopointedV[F[_],A](v: F[A])(implicit F0: Copointed[F]) =
     new CopointedV[F,A] { def self = v; implicit def F: Copointed[F] = F0 }
   implicit def ToCopointedVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Copointed[({type f[a] = F[X, a]})#f]) =

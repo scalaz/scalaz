@@ -9,7 +9,7 @@ trait CojoinV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCojoinSyntax  {
+trait ToCojoinV  {
   implicit def ToCojoinV[F[_],A](v: F[A])(implicit F0: Cojoin[F]) =
     new CojoinV[F,A] { def self = v; implicit def F: Cojoin[F] = F0 }
   implicit def ToCojoinVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Cojoin[({type f[a] = F[X, a]})#f]) =

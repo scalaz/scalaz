@@ -12,7 +12,7 @@ trait ShowV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToShowSyntax  {
+trait ToShowV  {
   implicit def ToShowV[F](v: F)(implicit F0: Show[F]) =
     new ShowV[F] { def self = v; implicit def F: Show[F] = F0 }
 

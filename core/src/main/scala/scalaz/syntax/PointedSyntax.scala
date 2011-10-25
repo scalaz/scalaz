@@ -8,7 +8,7 @@ trait PointedV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToPointedSyntax extends ToFunctorSyntax {
+trait ToPointedV extends ToFunctorV {
   implicit def ToPointedV[F[_],A](v: F[A])(implicit F0: Pointed[F]) =
     new PointedV[F,A] { def self = v; implicit def F: Pointed[F] = F0 }
   implicit def ToPointedVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Pointed[({type f[a] = F[X, a]})#f]) =

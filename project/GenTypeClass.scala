@@ -171,7 +171,7 @@ object GenTypeClass {
     }
     def extendsToSyntaxListText = extendsList match {
       case Seq() => ""
-      case es => es.map(n => "To" + n + "Syntax").mkString("extends ", " with ", "")
+      case es => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
     }
     val extendsLikeList = extendsListText("")
 
@@ -216,7 +216,7 @@ trait %sV[F] extends SyntaxV[F] {
   ////
 }
 
-trait To%sSyntax %s {
+trait To%sV %s {
   implicit def To%sV[F](v: F)(implicit F0: %s[F]) =
     new %sV[F] { def self = v; implicit def F: %s[F] = F0 }
 
@@ -251,7 +251,7 @@ trait %sV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait To%sSyntax %s {
+trait To%sV %s {
   implicit def To%sV[F[_],A](v: F[A])(implicit F0: %s[F]) =
     new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
   implicit def To%sVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: %s[({type f[a] = F[X, a]})#f]) =
@@ -277,7 +277,7 @@ trait %sSyntax[F[_]] %s {
       typeClassName,
       typeClassName, extendsToSyntaxListText,
 
-          // implicits in ToXxxSyntax
+          // implicits in ToXxxV
           typeClassName, typeClassName, typeClassName, typeClassName,
           typeClassName, typeClassName, typeClassName, typeClassName,
           typeClassName, typeClassName, typeClassName, typeClassName,
@@ -297,7 +297,7 @@ trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait To%sSyntax %s {
+trait To%sV %s {
   implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
     new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
 

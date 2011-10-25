@@ -9,7 +9,7 @@ trait MonoidV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToMonoidSyntax extends ToSemigroupSyntax {
+trait ToMonoidV extends ToSemigroupV {
   implicit def ToMonoidV[F](v: F)(implicit F0: Monoid[F]) =
     new MonoidV[F] { def self = v; implicit def F: Monoid[F] = F0 }
 

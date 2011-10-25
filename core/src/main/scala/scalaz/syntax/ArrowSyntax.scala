@@ -29,7 +29,7 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToArrowSyntax extends ToCategorySyntax with ToArrSyntax with ToFirstSyntax {
+trait ToArrowV extends ToCategoryV with ToArrV with ToFirstV {
   implicit def ToArrowV[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
     new ArrowV[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
 

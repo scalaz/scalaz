@@ -19,7 +19,7 @@ trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToComposeSyntax  {
+trait ToComposeV  {
   implicit def ToComposeV[F[_, _],A, B](v: F[A, B])(implicit F0: Compose[F]) =
     new ComposeV[F,A, B] { def self = v; implicit def F: Compose[F] = F0 }
 

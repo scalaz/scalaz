@@ -25,7 +25,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToTraverseSyntax extends ToFunctorSyntax {
+trait ToTraverseV extends ToFunctorV {
   implicit def ToTraverseV[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseV[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
   implicit def ToTraverseVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Traverse[({type f[a] = F[X, a]})#f]) =

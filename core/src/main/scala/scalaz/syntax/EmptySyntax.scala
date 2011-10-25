@@ -9,7 +9,7 @@ trait EmptyV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToEmptySyntax  {
+trait ToEmptyV  {
   implicit def ToEmptyV[F[_],A](v: F[A])(implicit F0: Empty[F]) =
     new EmptyV[F,A] { def self = v; implicit def F: Empty[F] = F0 }
   implicit def ToEmptyVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Empty[({type f[a] = F[X, a]})#f]) =

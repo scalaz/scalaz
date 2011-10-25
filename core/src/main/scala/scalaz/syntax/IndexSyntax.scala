@@ -10,7 +10,7 @@ trait IndexV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToIndexSyntax  {
+trait ToIndexV  {
   implicit def ToIndexV[F[_],A](v: F[A])(implicit F0: Index[F]) =
     new IndexV[F,A] { def self = v; implicit def F: Index[F] = F0 }
   implicit def ToIndexVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Index[({type f[a] = F[X, a]})#f]) =

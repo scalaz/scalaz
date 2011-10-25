@@ -12,7 +12,7 @@ trait RunV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToRunSyntax  {
+trait ToRunV  {
   implicit def ToRunV[F](v: F)(implicit F0: Run[F]) =
     new RunV[F] { def self = v; implicit def F: Run[F] = F0 }
 

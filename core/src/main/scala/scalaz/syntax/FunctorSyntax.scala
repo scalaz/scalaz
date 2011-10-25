@@ -15,7 +15,7 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToFunctorSyntax  {
+trait ToFunctorV  {
   implicit def ToFunctorV[F[_],A](v: F[A])(implicit F0: Functor[F]) =
     new FunctorV[F,A] { def self = v; implicit def F: Functor[F] = F0 }
   implicit def ToFunctorVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Functor[({type f[a] = F[X, a]})#f]) =

@@ -14,7 +14,7 @@ trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToBiFunctorSyntax  {
+trait ToBiFunctorV  {
   implicit def ToBiFunctorV[F[_, _],A, B](v: F[A, B])(implicit F0: BiFunctor[F]) =
     new BiFunctorV[F,A, B] { def self = v; implicit def F: BiFunctor[F] = F0 }
 

@@ -10,7 +10,7 @@ trait BiTraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToBiTraverseSyntax extends ToBiFunctorSyntax {
+trait ToBiTraverseV extends ToBiFunctorV {
   implicit def ToBiTraverseV[F[_, _],A, B](v: F[A, B])(implicit F0: BiTraverse[F]) =
     new BiTraverseV[F,A, B] { def self = v; implicit def F: BiTraverse[F] = F0 }
 

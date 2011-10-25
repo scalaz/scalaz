@@ -9,7 +9,7 @@ trait MetricSpaceV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToMetricSpaceSyntax  {
+trait ToMetricSpaceV  {
   implicit def ToMetricSpaceV[F](v: F)(implicit F0: MetricSpace[F]) =
     new MetricSpaceV[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
 

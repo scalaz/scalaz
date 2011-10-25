@@ -9,7 +9,7 @@ trait CategoryV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToCategorySyntax extends ToArrIdSyntax with ToComposeSyntax {
+trait ToCategoryV extends ToArrIdV with ToComposeV {
   implicit def ToCategoryV[F[_, _],A, B](v: F[A, B])(implicit F0: Category[F]) =
     new CategoryV[F,A, B] { def self = v; implicit def F: Category[F] = F0 }
 

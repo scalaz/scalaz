@@ -9,7 +9,7 @@ trait ComonadV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToComonadSyntax extends ToCopointedSyntax with ToCojoinSyntax {
+trait ToComonadV extends ToCopointedV with ToCojoinV {
   implicit def ToComonadV[F[_],A](v: F[A])(implicit F0: Comonad[F]) =
     new ComonadV[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
   implicit def ToComonadVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Comonad[({type f[a] = F[X, a]})#f]) =

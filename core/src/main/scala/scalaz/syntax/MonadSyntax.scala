@@ -9,7 +9,7 @@ trait MonadV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToMonadSyntax extends ToApplicativeSyntax with ToBindSyntax {
+trait ToMonadV extends ToApplicativeV with ToBindV {
   implicit def ToMonadV[F[_],A](v: F[A])(implicit F0: Monad[F]) =
     new MonadV[F,A] { def self = v; implicit def F: Monad[F] = F0 }
   implicit def ToMonadVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Monad[({type f[a] = F[X, a]})#f]) =

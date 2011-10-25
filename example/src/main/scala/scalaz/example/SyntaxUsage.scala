@@ -77,18 +77,17 @@ object SyntaxUsage extends App {
   
   def stdSyntax() {
     import scalaz.std.AnyVal._
-    import scalaz.std.List._
-    import scalaz.std.Option._
-    import scalaz.std.Option.optionSyntax._
     import scalaz.std.Stream.streamSyntax._
-
-    val lists: List[Int] = some(1).orEmpty[List]
 
     val merged = Stream(1, 3, 5).merge(Stream(2, 4, 6))
 
+    import scalaz.std.List._
+    import scalaz.std.Option._
+    import scalaz.std.Option.optionSyntax._
     import scalaz.syntax.monoid._
     import scalaz.syntax.equal._
-    
+
+    val lists: List[Int] = some(1).orEmpty[List]
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
   }
 }

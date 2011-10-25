@@ -9,7 +9,7 @@ trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToApplySyntax extends ToFunctorSyntax {
+trait ToApplyV extends ToFunctorV {
   implicit def ToApplyV[F[_],A](v: F[A])(implicit F0: Apply[F]) =
     new ApplyV[F,A] { def self = v; implicit def F: Apply[F] = F0 }
   implicit def ToApplyVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Apply[({type f[a] = F[X, a]})#f]) =

@@ -16,7 +16,7 @@ trait EqualV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToEqualSyntax  {
+trait ToEqualV  {
   implicit def ToEqualV[F](v: F)(implicit F0: Equal[F]) =
     new EqualV[F] { def self = v; implicit def F: Equal[F] = F0 }
 

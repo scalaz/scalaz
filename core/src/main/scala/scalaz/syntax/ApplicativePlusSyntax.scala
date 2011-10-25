@@ -9,7 +9,7 @@ trait ApplicativePlusV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToApplicativePlusSyntax extends ToApplicativeSyntax with ToPlusSyntax {
+trait ToApplicativePlusV extends ToApplicativeV with ToPlusV {
   implicit def ToApplicativePlusV[F[_],A](v: F[A])(implicit F0: ApplicativePlus[F]) =
     new ApplicativePlusV[F,A] { def self = v; implicit def F: ApplicativePlus[F] = F0 }
   implicit def ToApplicativePlusVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: ApplicativePlus[({type f[a] = F[X, a]})#f]) =

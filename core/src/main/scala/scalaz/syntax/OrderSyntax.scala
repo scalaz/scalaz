@@ -19,7 +19,7 @@ trait OrderV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToOrderSyntax extends ToEqualSyntax {
+trait ToOrderV extends ToEqualV {
   implicit def ToOrderV[F](v: F)(implicit F0: Order[F]) =
     new OrderV[F] { def self = v; implicit def F: Order[F] = F0 }
 
