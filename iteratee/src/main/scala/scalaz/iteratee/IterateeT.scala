@@ -195,6 +195,15 @@ trait IterateeTs extends IterateeTLow0 {
   def err[X, E, F[_] : Pointed, A](e: => X): IterateeT[X, E, F, A] =
     iterateeT(Pointed[F].pure(StepT.serr(e)))
 
+  def enumerate[A, O](as: Stream[A]): Enumerator[Unit, A, O] =
+    i =>
+      as match {
+        case Stream.Empty => i
+        case x #:: xs =>
+          import Ident.id
+          i.fold(done = (_, _) => i, cont = k => enumerate(xs)(k(elInput(x)).value), err = e => err[Unit, A, Id, O](e).value)
+      }
+
   implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
     def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = IterateeT[X, E, M, x]})#f ~> ({type f[x] = IterateeT[X, E, N, x]})#f) {
       val M: Functor[M] = sys.error("Need to change signature of hoist to support IterateeTMonadTrans") // TODO
