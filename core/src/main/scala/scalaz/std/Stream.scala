@@ -52,61 +52,62 @@ trait Streams {
   }
 
   import scala.Stream.{Empty, empty}
-  
+
   def toZipper[A](as: Stream[A]): Option[Zipper[A]] = as match {
     case Empty => None
     case h #:: t => Some(Zipper.zipper(empty, h, t))
   }
 
   def zipperEnd[A](as: Stream[A]): Option[Zipper[A]] = as match {
-     case Empty => None
-     case _ =>
-       val x = as.reverse
-       Some(Zipper.zipper(x.tail, x.head, empty))
-   }
+    case Empty => None
+    case _ =>
+      val x = as.reverse
+      Some(Zipper.zipper(x.tail, x.head, empty))
+  }
 
-   def heads[A](as: Stream[A]): Stream[Stream[A]] = as match {
-     case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
-     case _ => empty
-   }
+  def heads[A](as: Stream[A]): Stream[Stream[A]] = as match {
+    case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
+    case _ => empty
+  }
 
-   def tails[A](as: Stream[A]): Stream[Stream[A]] = as match {
-     case h #:: t => as #:: tails(t)
-     case _ => empty
-   }
+  def tails[A](as: Stream[A]): Stream[Stream[A]] = as match {
+    case h #:: t => as #:: tails(t)
+    case _ => empty
+  }
 
-   def zapp[A, B, C](a: Stream[A])(f: Stream[A => B => C]): Stream[B => C] = {
-     val ff = f
-     val aa = a
-     if (ff.isEmpty || aa.isEmpty) empty
-     else scala.Stream.cons((ff.head)(aa.head), zapp(aa.tail)(ff.tail))
-   }
+  def zapp[A, B, C](a: Stream[A])(f: Stream[A => B => C]): Stream[B => C] = {
+    val ff = f
+    val aa = a
+    if (ff.isEmpty || aa.isEmpty) empty
+    else scala.Stream.cons((ff.head)(aa.head), zapp(aa.tail)(ff.tail))
+  }
 
-   def unfoldForest[A, B](as: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
-     as.map(a => {
-       def unfoldTree(x: A): Tree[B] =
-         f(x) match {
-           case (b, bs) => Tree.node(b, unfoldForest(bs())(f))
-         }
+  def unfoldForest[A, B](as: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
+    as.map(a => {
+      def unfoldTree(x: A): Tree[B] =
+        f(x) match {
+          case (b, bs) => Tree.node(b, unfoldForest(bs())(f))
+        }
 
-       unfoldTree(a)
-     })
+      unfoldTree(a)
+    })
 
-   def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
-     def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
-       ts.foldRight[M[Stream[U]]](Monad[M].pure(scala.Stream())) {
-         case (g, h) => Monad[M].lift2((x: U, xs: Stream[U]) => x #:: xs)(f(g), h)
-       }
+  def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
+    def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
+      ts.foldRight[M[Stream[U]]](Monad[M].pure(scala.Stream())) {
+        case (g, h) => Monad[M].lift2((x: U, xs: Stream[U]) => x #:: xs)(f(g), h)
+      }
 
-     def unfoldTreeM(v: A) =
-         Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
-           Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: Stream[Tree[B]]) =>
-             Tree.node(abs._1, ts)))
+    def unfoldTreeM(v: A) =
+      Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
+        Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: Stream[Tree[B]]) =>
+          Tree.node(abs._1, ts)))
 
-     mapM(as, unfoldTreeM)
-   }
+    mapM(as, unfoldTreeM)
+  }
 
-  // TODO offer a syntax to pimp these methods on to Stream.
+  object streamSyntax extends scalaz.syntax.std.ToStreamV
+
 }
 
 object Stream extends Streams

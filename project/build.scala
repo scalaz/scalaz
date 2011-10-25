@@ -19,7 +19,13 @@ object build extends Build {
             typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
         }
     },
-    typeClasses := Seq()
+    typeClasses := Seq(),
+    genToSyntax <<= (typeClasses) map {
+      (tcs: Seq[TypeClass]) =>
+        val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
+        val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
+        objects + "\n\n" + all
+    }
   )
 
   lazy val scalaz = Project(
@@ -78,4 +84,6 @@ object build extends Build {
   lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
+
+  lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
 }

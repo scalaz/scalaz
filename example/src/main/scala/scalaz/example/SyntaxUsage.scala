@@ -10,6 +10,7 @@ object SyntaxUsage extends App {
   syntax1()
   syntax2()
   syntax3()
+  stdSyntax()
 
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
@@ -72,5 +73,22 @@ object SyntaxUsage extends App {
     
     import std.Option._
     needPointed[Option]
+  }
+  
+  def stdSyntax() {
+    import scalaz.std.AnyVal._
+    import scalaz.std.List._
+    import scalaz.std.Option._
+    import scalaz.std.Option.optionSyntax._
+    import scalaz.std.Stream.streamSyntax._
+
+    val lists: List[Int] = some(1).orEmpty[List]
+
+    val merged = Stream(1, 3, 5).merge(Stream(2, 4, 6))
+
+    import scalaz.syntax.monoid._
+    import scalaz.syntax.equal._
+    
+    ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
   }
 }

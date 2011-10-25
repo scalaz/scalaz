@@ -165,10 +165,6 @@ object GenTypeClass {
 
     val classifiedTypeF = "F" +  typeShape
 
-    def initLower(s: String) = {
-      val (init, rest) = s.splitAt(1)
-      init.toLowerCase + rest
-    }
     def extendsListText(suffix: String, parents: Seq[String] = extendsList, cti: String = classifiedTypeIdent) = parents match {
       case Seq() => ""
       case es => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
@@ -181,7 +177,7 @@ object GenTypeClass {
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
-    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
+    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
 
     val mainSource = """%s
 

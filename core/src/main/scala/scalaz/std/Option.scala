@@ -30,6 +30,22 @@ trait Options {
     def zero: Option[A] = None
   }
 
+  implicit def optionEqual[A: Equal]: Equal[Option[A]] = new Equal[Option[A]] {
+    def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
+      case (Some(a1), Some(a2)) => Equal[A].equal(a1, a2)
+      case (None, None) => false
+      case (None, Some(_)) => false
+      case (Some(_), None) => false
+    }
+  }
+
+  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
+    def show(o1: Option[A]): List[Char] = (o1 match {
+      case Some(a1) => "Some(" + Show[A].show(a1) + ")"
+      case None => "None"
+    }).toList
+  }
+
   sealed trait First
 
   sealed trait Last
@@ -46,9 +62,57 @@ trait Options {
     def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
   }
 
+  object optionSyntax extends scalaz.syntax.std.ToOptionV
+
   def some[A](a: A): Option[A] = Some(a)
 
   def none[A]: Option[A] = None
+
+
+  /**
+   * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
+   * if it is defined, otherwise, the provided value `none`.
+   */
+  def cata[A, X](oa: Option[A])(some: A => X, none: => X): X = oa match {
+    case None => none
+    case Some(a) => some(a)
+  }
+
+  /**Alias for `cata` */
+  def fold[A, X](oa: Option[A])(some: A => X, none: => X): X = cata(oa)(some, none)
+
+  def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
+    case Some(a) => Success(a)
+    case None => Failure(e)
+  }
+
+  def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] = oa match {
+    case Some(e) => Failure(e)
+    case None => Success(b)
+  }
+
+  /**
+   * Returns the item contained in the Option wrapped in type M if the Option is defined,
+   * otherwise, the empty value for type M.
+   */
+  def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
+    case Some(a) => implicitly[Pointed[M]].pure(a)
+    case None => implicitly[Empty[M]].empty
+  }
+
+  /**
+   * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
+   */
+  def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
+    case None => b
+    case Some(a) => k(Pointed[F].pure(a))
+  }
+
+  /**
+   * Returns the given value if None, otherwise lifts the Some value to Option and passes it to the given function.
+   */
+  def foldLiftOpt[A, B](oa: Option[A])(b: => B, k: Option[A] => B): B = foldLift[Option, A, B](oa)(b, k)
+
 }
 
 object Option extends Options
