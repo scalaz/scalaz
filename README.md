@@ -171,7 +171,7 @@ import option.monadSyntax._
 val oi: Option[Option[Int]] = Some(Some(1))
 
 // Expands to: `ToBindV(io).join`
-io.join
+oi.join
 ```
 
 Alternatively, the syntax can be imported for a particular type class.
@@ -186,7 +186,7 @@ import scalaz.syntax.monad._
 val oi: Option[Option[Int]] = Some(Some(1))
 
 // Expands to: ToBindV(io).join
-io.join
+oi.join
 ```
 
 For some degree of backwards compability with Scalaz 6, the über-import of `import scalaz.Scalaz._`
