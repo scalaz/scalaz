@@ -15,16 +15,16 @@ trait Options {
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
     def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B): B = fa match {
       case Some(a) => f(a)(z)
-      case None => z
+      case None    => z
     }
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
-      case (Some(a1), None) => f1
-      case (None, Some(a2)) => f2
-      case (None, None) => None
+      case (Some(a1), None)     => f1
+      case (None, Some(a2))     => f2
+      case (None, None)         => None
     }
 
     def zero: Option[A] = None
@@ -33,22 +33,20 @@ trait Options {
   implicit def optionEqual[A: Equal]: Equal[Option[A]] = new Equal[Option[A]] {
     def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
       case (Some(a1), Some(a2)) => Equal[A].equal(a1, a2)
-      case (None, None) => false
-      case (None, Some(_)) => false
-      case (Some(_), None) => false
+      case (None, None)         => false
+      case (None, Some(_))      => false
+      case (Some(_), None)      => false
     }
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
     def show(o1: Option[A]): List[Char] = (o1 match {
       case Some(a1) => "Some(" + Show[A].show(a1) + ")"
-      case None => "None"
+      case None     => "None"
     }).toList
   }
 
-  sealed trait First
-
-  sealed trait Last
+  import Tags.{First, Last}
 
   implicit def optionFirst[A] = new Monoid[Option[A] @@ First] {
     def zero: Option[A] @@ First = Tag(None)
@@ -74,7 +72,7 @@ trait Options {
    * if it is defined, otherwise, the provided value `none`.
    */
   def cata[A, X](oa: Option[A])(some: A => X, none: => X): X = oa match {
-    case None => none
+    case None    => none
     case Some(a) => some(a)
   }
 
@@ -83,12 +81,12 @@ trait Options {
 
   def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
     case Some(a) => Success(a)
-    case None => Failure(e)
+    case None    => Failure(e)
   }
 
   def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] = oa match {
     case Some(e) => Failure(e)
-    case None => Success(b)
+    case None    => Success(b)
   }
 
   /**
@@ -97,14 +95,14 @@ trait Options {
    */
   def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
     case Some(a) => implicitly[Pointed[M]].pure(a)
-    case None => implicitly[Empty[M]].empty
+    case None    => implicitly[Empty[M]].empty
   }
 
   /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
   def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
-    case None => b
+    case None    => b
     case Some(a) => k(Pointed[F].pure(a))
   }
 

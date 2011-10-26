@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-object PartialFunction {
+trait PartialFunctions {
   val partialFunction = new Arr[PartialFunction] with Category[PartialFunction] {
     def arr[A, B](f: (A) => B): PartialFunction[A, B] = {
       case a => f(a)
@@ -14,3 +14,5 @@ object PartialFunction {
     def id[A]: PartialFunction[A, A] = null
   }
 }
+
+object PartialFunction extends PartialFunctions

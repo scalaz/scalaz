@@ -48,8 +48,6 @@ trait AnyVals {
     def zero: Boolean @@ Conjunction = Tag(true)
   }
 
-  sealed trait Multiplication
-
   implicit object byte extends Monoid[Byte] with Order[Byte] with Show[Byte] {
     def show(f: Byte): List[Char] = f.toString.toList
 
@@ -66,6 +64,8 @@ trait AnyVals {
     }
 
   }
+
+  import Tags.{Multiplication}
 
   implicit object byteMultiplicationNewType extends Monoid[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication): Byte @@ Multiplication = Tag((f1 * f2).toByte)

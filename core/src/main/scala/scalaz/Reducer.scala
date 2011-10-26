@@ -31,6 +31,7 @@ sealed trait Reducer[C, M] {
     implicit val m = Reducer.this.monoid
     implicit val n = r.monoid
     new Reducer[C, (M, N)] {
+
       import std.Tuple._
 
       val monoid = implicitly[Monoid[(M, N)]]
@@ -115,37 +116,39 @@ trait Reducers {
   implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
 
   // TODO
-//  implicit def EndoReducer[A]: Reducer[(=> A) => A, Endo[A]] = unitReducer(_.*-->[Endo[A]])
-//
-//  implicit def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = unitReducer(_.*-->[Dual[A]])
+  //  implicit def EndoReducer[A]: Reducer[(=> A) => A, Endo[A]] = unitReducer(_.*-->[Endo[A]])
+  //
+  //  implicit def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = unitReducer(_.*-->[Dual[A]])
+
+  import Tags.{Multiplication, First, Last}
 
   implicit def IntProductReducer: Reducer[Int, Int @@ Multiplication] = unitReducer(i => Tag[Int, Multiplication](i))
 
   implicit def CharProductReducer: Reducer[Char, Char @@ Multiplication] = unitReducer(c => Tag[Char, Multiplication](c))
-  
+
   implicit def ByteProductReducer: Reducer[Byte, Byte @@ Multiplication] = unitReducer(b => Tag[Byte, Multiplication](b))
-  
+
   implicit def LongProductReducer: Reducer[Long, Long @@ Multiplication] = unitReducer(l => Tag[Long, Multiplication](l))
-  
+
   implicit def ShortProductReducer: Reducer[Short, Short @@ Multiplication] = unitReducer(s => Tag[Short, Multiplication](s))
 
 
-  implicit def BigIntProductReducer: Reducer[BigInt, BigInt @@ std.math.BigInt.Multiplication] = {
+  implicit def BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] = {
     import std.math.BigInt._
-    unitReducer(b => Tag[BigInt, std.math.BigInt.Multiplication](b))
+    unitReducer(b => Tag[BigInt, Multiplication](b))
   }
 
   // TODO
-//  import java.math.BigInteger
-//
-//  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.*-->[BigIntegerMultiplication])
+  //  import java.math.BigInteger
+  //
+  //  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.*-->[BigIntegerMultiplication])
 
   import std.Option._
-  
+
   implicit def FirstReducer[A]: Reducer[A, Option[A] @@ First] = unitReducer(a => Tag[Option[A], First](Some(a)))
 
   implicit def FirstOptionReducer[A]: Reducer[Option[A], Option[A] @@ First] = unitReducer(o => Tag[Option[A], First](o))
-  
+
   implicit def LastReducer[A]: Reducer[A, Option[A] @@ Last] = unitReducer(a => Tag[Option[A], Last](Some(a)))
 
   implicit def LastOptionReducer[A]: Reducer[Option[A], Option[A] @@ Last] = unitReducer(o => Tag[Option[A], Last](o))

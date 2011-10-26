@@ -71,6 +71,8 @@ trait Syntaxes {
 
   object all extends ToAllTypeClassV
 
+  object allStd extends ToAllStdV
+
 }
 
 trait ToAllTypeClassV

@@ -3,7 +3,7 @@ package syntax
 package std
 
 import scalaz.std.Option
-import scalaz.std.Option.{Last, First}
+import scalaz.Tags.{Last, First}
 
 trait OptionV[A] extends SyntaxV[Option[A]] {
   def cata[X](some: A => X, none: => X): X = Option.cata(self)(some, none)
@@ -42,7 +42,7 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    */
   def ?[X](s: => X): Conditional[X] = new Conditional[X] {
     def |(n: => X): X = self match {
-      case None => n
+      case None    => n
       case Some(_) => s
     }
   }
@@ -73,19 +73,19 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    * </pre>
    */
   def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
-  
-  def toSuccess[E](e: => E): Validation[E, A] = Option.toSuccess(self)(e) 
-  
+
+  def toSuccess[E](e: => E): Validation[E, A] = Option.toSuccess(self)(e)
+
   def toFailure[B](b: => B): Validation[A, B] = Option.toFailure(self)(b)
-  
+
   def first: Option[A] @@ First = Tag(self)
-  
+
   def last: Option[A] @@ Last = Tag(self)
-  
+
   def orEmpty[M[_] : Pointed : Empty]: M[A] = Option.orEmpty(self)
-  
+
   def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = Option.foldLift(self)(b, k)
-  
+
   def foldLiftOpt[B](b: => B, k: Option[A] => B): B = Option.foldLiftOpt[A, B](self)(b, k)
 }
 

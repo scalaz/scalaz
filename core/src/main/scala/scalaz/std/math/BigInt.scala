@@ -19,7 +19,7 @@ trait BigInts {
     }
   }
 
-  sealed trait Multiplication
+  import Tags.Multiplication
 
   implicit object BigIntMultiplicationNewType extends Monoid[BigInt @@ Multiplication] {
     def append(f1: BigInt @@ Multiplication, f2: => BigInt @@ Multiplication): BigInt @@ Multiplication = Tag(f1 * f2)

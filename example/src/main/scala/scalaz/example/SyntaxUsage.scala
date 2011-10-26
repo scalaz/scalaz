@@ -11,6 +11,7 @@ object SyntaxUsage extends App {
   syntax2()
   syntax3()
   stdSyntax()
+  stdSyntaxUeber()
 
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
@@ -54,9 +55,6 @@ object SyntaxUsage extends App {
     // Import all type class instances
     import Scalaz._
 
-    // Import all conversions for syntax for all type classes
-    import syntax.all._
-
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
     l2.join
@@ -68,13 +66,13 @@ object SyntaxUsage extends App {
   // Monad extends from Pointed, so we can use (std.Option.option: Monad[Option]) where Pointed[F] is called for.
   def useParentTypeClass {
     import scalaz._
-    
-    def needPointed[F[_]: Pointed] = ()
-    
+
+    def needPointed[F[_] : Pointed] = ()
+
     import std.Option._
     needPointed[Option]
   }
-  
+
   def stdSyntax() {
     import scalaz.std.AnyVal._
     import scalaz.std.Stream.streamSyntax._
@@ -89,5 +87,21 @@ object SyntaxUsage extends App {
 
     val lists: List[Int] = some(1).orEmpty[List]
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
+  }
+
+  def stdSyntaxUeber() {
+    // Scalaz 6 Style: import everything: type class instances, implicit conversions
+    // to the syntax wrappers, general functions.
+    import scalaz._
+    import scalaz.Scalaz._
+
+    // prefix style function call `op(args)`
+    orEmpty[Int, List](some(1))
+
+    // syntax to provide `x.op(args)`
+    some(1).orEmpty[List]
+
+    ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
+    some(some(1)).join assert_=== some(1)
   }
 }

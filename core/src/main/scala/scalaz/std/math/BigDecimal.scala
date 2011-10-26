@@ -19,7 +19,7 @@ trait BigDecimals {
     }
   }
 
-  sealed trait Multiplication
+  import Tags.Multiplication
 
   implicit object BigDecimalMultiplicationNewType extends Monoid[BigDecimal @@ Multiplication] {
     def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication): BigDecimal @@ Multiplication = Tag(f1 * f2)
