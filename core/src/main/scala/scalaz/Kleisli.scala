@@ -65,7 +65,7 @@ trait Kleislis extends KleislisLow0 {
   implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = (a: A) => k.run(a)
 
   /**Pure Kleisli arrow */
-  def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
+  def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].pure(a))
 
   implicit def kleisliCategory[F[_]](implicit F0: Monad[F]) = new KleisliCategory[F] {
     implicit def F: Monad[F] = F0

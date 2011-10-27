@@ -30,7 +30,7 @@ sealed trait IterateeT[X, E, F[_], A] {
     }))
 
   def runT(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
-    val lifte: (=> X) => IterateeT[X, E, F, A] = x => implicitly[MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ]].liftM(e(x))
+    val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
     F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
       , done = (a, _) => F.pure(a)

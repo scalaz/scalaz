@@ -34,7 +34,7 @@ sealed trait Reducer[C, M] {
 
       import std.Tuple._
 
-      val monoid = implicitly[Monoid[(M, N)]]
+      val monoid = Monoid[(M, N)]
 
       override def unit(x: C) = (Reducer.this.unit(x), r.unit(x))
 

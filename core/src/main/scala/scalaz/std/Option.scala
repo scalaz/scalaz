@@ -94,8 +94,8 @@ trait Options {
    * otherwise, the empty value for type M.
    */
   def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
-    case Some(a) => implicitly[Pointed[M]].pure(a)
-    case None    => implicitly[Empty[M]].empty
+    case Some(a) => Pointed[M].pure(a)
+    case None    => Empty[M].empty
   }
 
   /**
