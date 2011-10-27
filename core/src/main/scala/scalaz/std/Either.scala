@@ -4,7 +4,7 @@ package std
 import scala.Either.{LeftProjection, RightProjection}
 import scalaz.Isomorphism._
 
-trait Eithers {
+trait EitherInstances {
   implicit def eitherInstance = new BiFunctor[Either] {
     def bimap[A, B, C, D](fab: Either[A, B])(f: (A) => C, g: (B) => D): Either[C, D] = fab match {
       case Left(a)  => Left(f(a))
@@ -75,4 +75,4 @@ trait Eithers {
   // TODO Semigroup(?), Show, ...
 }
 
-object either extends Eithers
+object either extends EitherInstances

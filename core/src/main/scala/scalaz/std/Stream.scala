@@ -1,8 +1,7 @@
 package scalaz
 package std
 
-trait Streams {
-
+trait StreamInstances {
   implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
@@ -45,11 +44,9 @@ trait Streams {
   }
 
   // TODO show, equal, order, ...
+}
 
-  //
-  // Functions for Streams
-  //
-
+trait StreamFunctions {
   def merge[A](s1: Stream[A], s2: Stream[A]): Stream[A] = {
     if (s1.isEmpty) s2
     else s1.head #:: merge(s2, s1.tail)
@@ -109,9 +106,8 @@ trait Streams {
 
     mapM(as, unfoldTreeM)
   }
-
-  object streamSyntax extends scalaz.syntax.std.ToStreamV
-
 }
 
-object stream extends Streams
+object stream extends StreamInstances with StreamFunctions {
+  object streamSyntax extends scalaz.syntax.std.ToStreamV
+}

@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait AnyVals {
+trait AnyValInstances {
 
   implicit object unitInstance extends Monoid[Unit] with Order[Unit] with Show[Unit] {
     def show(f: Unit): List[Char] = ().toString.toList
@@ -188,4 +188,4 @@ trait AnyVals {
 
 }
 
-object anyVal extends AnyVals
+object anyVal extends AnyValInstances

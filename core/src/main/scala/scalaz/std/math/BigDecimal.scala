@@ -2,7 +2,7 @@ package scalaz
 package std
 package math
 
-trait BigDecimals {
+trait BigDecimalInstances {
   implicit object bigDecimalInstance extends Monoid[BigDecimal] with Order[BigDecimal] with Show[BigDecimal] {
     def show(f: BigDecimal): List[Char] = f.toString.toList
 
@@ -28,4 +28,4 @@ trait BigDecimals {
   }
 }
 
-object bigDecimal extends BigDecimals
+object bigDecimal extends BigDecimalInstances

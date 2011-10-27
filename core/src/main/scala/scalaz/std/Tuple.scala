@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait TuplesLow0 {
+trait TupleInstances0 {
   implicit def tuple1Semigroup[A1: Semigroup] = new Semigroup[Tuple1[A1]] {
     def append(f1: Tuple1[A1], f2: => Tuple1[A1]): Tuple1[A1] = (
       Tuple1(Semigroup[A1].append(f1._1, f2._1))
@@ -21,7 +21,7 @@ trait TuplesLow0 {
   }
 }
 
-trait Tuples extends TuplesLow0 {
+trait TupleInstances extends TupleInstances0 {
   implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]) = new Tuple2Monoid[A1, A2] {
     implicit def _1: Monoid[A1] = A1
     implicit def _2: Monoid[A2] = A2
@@ -30,7 +30,7 @@ trait Tuples extends TuplesLow0 {
   // TODO pump up the arity.
 }
 
-object tuple extends Tuples
+object tuple extends TupleInstances
 
 //
 // Type class implementation traits

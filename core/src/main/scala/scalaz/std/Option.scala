@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait Options {
+trait OptionInstances {
   implicit val optionInstance = new MonadPlus[Option] with Traverse[Option] with Each[Option] with Index[Option] with Length[Option] {
     def pure[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
@@ -59,9 +59,9 @@ trait Options {
 
     def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
   }
+}
 
-  object optionSyntax extends scalaz.syntax.std.ToOptionV
-
+trait OptionFunctions {
   def some[A](a: A): Option[A] = Some(a)
 
   def none[A]: Option[A] = None
@@ -109,9 +109,13 @@ trait Options {
   /**
    * Returns the given value if None, otherwise lifts the Some value to Option and passes it to the given function.
    */
-  def foldLiftOpt[A, B](oa: Option[A])(b: => B, k: Option[A] => B): B = foldLift[Option, A, B](oa)(b, k)
-
+  def foldLiftOpt[A, B](oa: Option[A])(b: => B, k: Option[A] => B): B = {
+    import scalaz.std.option.optionInstance
+    foldLift[Option, A, B](oa)(b, k)
+  }
 }
 
-object option extends Options
+object option extends OptionInstances with OptionFunctions {
+  object optionSyntax extends scalaz.syntax.std.ToOptionV
+}
 

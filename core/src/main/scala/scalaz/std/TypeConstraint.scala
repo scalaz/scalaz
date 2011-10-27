@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait TypeConstraints {
+trait TypeConstraintInstances {
   val <:< = new Category[<:<] {
     def id[A]: <:<[A, A] = conforms[A]
     def compose[A, B, C](f: B <:< C, g: A <:< B): A <:< C = f.asInstanceOf[A <:< C]
@@ -13,4 +13,4 @@ trait TypeConstraints {
   }
 }
 
-object typeConstraint extends TypeConstraints
+object typeConstraint extends TypeConstraintInstances

@@ -2,7 +2,7 @@ package scalaz
 package std
 
 
-trait Functions {
+trait FunctionInstances {
   implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] {
     def pure[A](a: => A) = () => a
 
@@ -75,4 +75,4 @@ trait Functions {
   }
 }
 
-object function extends Functions
+object function extends FunctionInstances

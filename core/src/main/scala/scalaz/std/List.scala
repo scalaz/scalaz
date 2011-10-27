@@ -3,7 +3,7 @@ package std
 
 import annotation.tailrec
 
-trait Lists {
+trait ListInstances {
   implicit val listInstance = new MonadPlus[List] with Traverse[List] with Empty[List] with Each[List] with Index[List] with Length[List] {
     def each[A](fa: List[A])(f: (A) => Unit): Unit = fa foreach f
     def index[A](fa: List[A], i: Int): Option[A] = {
@@ -38,11 +38,9 @@ trait Lists {
     def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
     def zero: List[A] = Nil
   }
+}
 
-  //
-  // Functions for Lists
-  //
-
+trait ListFunctions {
   def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec
     def intersperse0(accum: List[A], rest: List[A]): List[A] = rest match {
@@ -103,15 +101,18 @@ trait Lists {
       if (b) Monad[M].pure(Some(h): Option[A]) else findM(t)(p))
   }
 
-  def powerset[A](as: List[A]): List[List[A]] = filterM(as)(_ => scala.List(true, false))
+  def powerset[A](as: List[A]): List[List[A]] = {
+    import list.listInstance
+
+    filterM(as)(_ => scala.List(true, false))
+  }
 
   def partitionM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil    => Monad[M].pure(Nil: List[A], Nil: List[A])
     case h :: t =>
       Monad[M].bind(p(h))(b =>
         Monad[M].map(partitionM(t)(p)) {
-          case (x, y) =>
-            if (b) (h :: x, y) else (x, h :: y)
+          case (x, y) => if (b) (h :: x, y) else (x, h :: y)
         }
       )
   }
@@ -175,4 +176,6 @@ trait Lists {
   }
 }
 
-object list extends Lists
+object list extends ListInstances with ListFunctions {
+  object listSyntax extends scalaz.syntax.std.ToListV
+}
