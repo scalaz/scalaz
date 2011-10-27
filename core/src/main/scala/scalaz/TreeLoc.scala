@@ -12,32 +12,32 @@ sealed trait TreeLoc[A] {
 
   def parent: Option[TreeLoc[A]] = parents match {
     case (pls, v, prs) #:: ps => Some(loc(node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
-    case Stream.Empty => None
+    case Stream.Empty         => None
   }
 
   def root: TreeLoc[A] =
     parent match {
       case Some(z) => z.root
-      case None => this
+      case None    => this
     }
 
   def left: Option[TreeLoc[A]] = lefts match {
-    case t #:: ts => Some(loc(t, ts, tree #:: rights, parents))
+    case t #:: ts     => Some(loc(t, ts, tree #:: rights, parents))
     case Stream.Empty => None
   }
 
   def right: Option[TreeLoc[A]] = rights match {
-    case t #:: ts => Some(loc(t, tree #:: lefts, ts, parents))
+    case t #:: ts     => Some(loc(t, tree #:: lefts, ts, parents))
     case Stream.Empty => None
   }
 
   def firstChild: Option[TreeLoc[A]] = tree.subForest match {
-    case t #:: ts => Some(loc(t, Stream.Empty, ts, downParents))
+    case t #:: ts     => Some(loc(t, Stream.Empty, ts, downParents))
     case Stream.Empty => None
   }
 
   def lastChild: Option[TreeLoc[A]] = tree.subForest.reverse match {
-    case t #:: ts => Some(loc(t, ts, Stream.Empty, downParents))
+    case t #:: ts     => Some(loc(t, ts, Stream.Empty, downParents))
     case Stream.Empty => None
   }
 
@@ -50,7 +50,7 @@ sealed trait TreeLoc[A] {
     def split(acc: TreeForest[A], xs: TreeForest[A]): Option[(TreeForest[A], Tree[A], TreeForest[A])] =
       (acc, xs) match {
         case (acc, Stream.cons(x, xs)) => if (p(x)) Some((acc, x, xs)) else split(Stream.cons(x, acc), xs)
-        case _ => None
+        case _                         => None
       }
     for (ltr <- split(Stream.Empty, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
   }
@@ -94,9 +94,9 @@ sealed trait TreeLoc[A] {
 
   def delete: Option[TreeLoc[A]] = rights match {
     case Stream.cons(t, ts) => Some(loc(t, lefts, ts, parents))
-    case _ => lefts match {
+    case _                  => lefts match {
       case Stream.cons(t, ts) => Some(loc(t, ts, rights, parents))
-      case _ => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => node(t.rootLabel, Stream.Empty))
+      case _                  => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => node(t.rootLabel, Stream.Empty))
     }
   }
 
@@ -112,9 +112,9 @@ sealed trait TreeLoc[A] {
 
   private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
     (acc, xs, n) match {
-      case (acc, xs, 0) => Some((acc, xs))
+      case (acc, xs, 0)                 => Some((acc, xs))
       case (acc, Stream.cons(x, xs), n) => splitChildren(Stream.cons(x, acc), xs, n - 1)
-      case _ => None
+      case _                            => None
     }
 }
 

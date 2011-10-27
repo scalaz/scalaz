@@ -44,8 +44,8 @@ sealed trait Validation[E, A] {
 
   def >>*<<(x: Validation[E, A])(implicit es: Semigroup[E], as: Semigroup[A]): Validation[E, A] = (this, x) match {
     case (Success(a1), Success(a2)) => Success(as.append(a1, a2))
-    case (Success(a1), Failure(_)) => Success(a1)
-    case (Failure(_), Success(a2)) => Success(a2)
+    case (Success(a1), Failure(_))  => Success(a1)
+    case (Failure(_), Success(a2))  => Success(a2)
     case (Failure(e1), Failure(e2)) => Failure(es.append(e1, e2))
   }
 
@@ -209,9 +209,9 @@ trait Validations {
     }
 
     def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = (fa, f) match {
-      case (Success(a), Success(f)) => Success(f(a))
-      case (Failure(e), Success(_)) => Failure(e)
-      case (Success(f), Failure(e)) => Failure(e)
+      case (Success(a), Success(f))   => Success(f(a))
+      case (Failure(e), Success(_))   => Failure(e)
+      case (Success(f), Failure(e))   => Failure(e)
       case (Failure(e1), Failure(e2)) => Failure(E.append(e1, e2))
     }
   }

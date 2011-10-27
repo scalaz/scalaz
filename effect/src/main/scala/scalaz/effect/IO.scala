@@ -61,9 +61,9 @@ sealed trait IO[A] {
     r <- this.catchLeft
     x <- r match {
       case Right(v) => IO(Right(v): Either[B, A])
-      case Left(e) => p(e) match {
+      case Left(e)  => p(e) match {
         case Some(b) => IO(Left(b): Either[B, A])
-        case None => throw e
+        case None    => throw e
       }
     }
   } yield x

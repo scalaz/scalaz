@@ -157,8 +157,8 @@ object GenTypeClass {
     else "F"
 
     val typeShape: String = kind match {
-      case Kind.* => ""
-      case Kind.*->* => "[_]"
+      case Kind.*      => ""
+      case Kind.*->*   => "[_]"
       case Kind.*^*->* => "[_, _]"
     }
     val classifiedType = classifiedTypeIdent +  typeShape
@@ -167,11 +167,11 @@ object GenTypeClass {
 
     def extendsListText(suffix: String, parents: Seq[String] = extendsList, cti: String = classifiedTypeIdent) = parents match {
       case Seq() => ""
-      case es => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
+      case es    => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
     }
     def extendsToSyntaxListText = extendsList match {
       case Seq() => ""
-      case es => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
+      case es    => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
     }
     val extendsLikeList = extendsListText("")
 

@@ -136,10 +136,10 @@ sealed trait IterateeT[X, E, F[_], A] {
             step(y, in) flatMap {
               case (b, yy) =>
                 (a, b) match {
-                  case (Left(e), _) => err(e)
-                  case (_, Left(e)) => err(e)
+                  case (Left(e), _)                                => err(e)
+                  case (_, Left(e))                                => err(e)
                   case (Right(Some((a, e))), Right(Some((b, ee)))) => done((a, b), if (e.isEl) e else ee)
-                  case _ => cont(loop(xx, yy))
+                  case _                                           => cont(loop(xx, yy))
                 }
             }
         }
@@ -199,7 +199,7 @@ trait IterateeTs extends IterateeTLow0 {
     i =>
       as match {
         case Stream.Empty => i
-        case x #:: xs =>
+        case x #:: xs     =>
           import Ident.id
           i.fold(done = (_, _) => i, cont = k => enumerate(xs)(k(elInput(x)).value), err = e => err[Unit, A, Id, O](e).value)
       }
@@ -413,7 +413,7 @@ trait IterateeTs extends IterateeTLow0 {
     s =>
       xs match {
         case h #:: t => s.mapContOr(_(elInput(h)) >>== enumStream(t), s.pointI)
-        case _ => s.pointI
+        case _       => s.pointI
       }
   }
 

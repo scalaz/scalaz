@@ -20,7 +20,7 @@ sealed trait Zipper[A] {
 
   private def unfoldStream[T, B](x: T, f: T => Option[(B, T)]): Stream[B] =
     f(x) match {
-      case None => Stream()
+      case None         => Stream()
       case Some((b, a)) => b #:: unfoldStream(a, f)
     }
 
@@ -41,7 +41,7 @@ sealed trait Zipper[A] {
    */
   def next: Option[Zipper[A]] = rights match {
     case Stream.Empty => None
-    case r #:: rs => Some(zipper(Stream.cons(focus, lefts), r, rs))
+    case r #:: rs     => Some(zipper(Stream.cons(focus, lefts), r, rs))
   }
 
   /**
@@ -60,7 +60,7 @@ sealed trait Zipper[A] {
    */
   def previous: Option[Zipper[A]] = lefts match {
     case Stream.Empty => None
-    case l #:: ls => Some(zipper(ls, l, Stream.cons(focus, rights)))
+    case l #:: ls     => Some(zipper(ls, l, Stream.cons(focus, rights)))
   }
 
   /**
@@ -100,9 +100,9 @@ sealed trait Zipper[A] {
    */
   def deleteLeft: Option[Zipper[A]] = rights match {
     case Stream.Empty => None
-    case r #:: rs => Some(lefts match {
+    case r #:: rs     => Some(lefts match {
       case Stream.Empty => zipper(Stream.Empty, r, rs)
-      case l #:: ls => zipper(ls, l, rights)
+      case l #:: ls     => zipper(ls, l, rights)
     })
   }
 
@@ -119,9 +119,9 @@ sealed trait Zipper[A] {
    */
   def deleteRight: Option[Zipper[A]] = rights match {
     case Stream.Empty => None
-    case r #:: rs => Some(lefts match {
+    case r #:: rs     => Some(lefts match {
       case Stream.Empty => zipper(Stream.Empty, r, rs)
-      case l #:: ls => zipper(ls, l, rights)
+      case l #:: ls     => zipper(ls, l, rights)
     })
   }
 
@@ -239,11 +239,10 @@ sealed trait Zipper[A] {
    */
   def nextC: Zipper[A] = (lefts, rights) match {
     case (Stream.Empty, Stream.Empty) => this
-    case (_, Stream.Empty) => {
+    case (_, Stream.Empty)            =>
       val xs = lefts.reverse
       zipper(rights, xs.head, xs.tail.append(Stream(focus)))
-    }
-    case (_, _) => tryNext
+    case (_, _)                       => tryNext
   }
 
   /**
@@ -251,11 +250,10 @@ sealed trait Zipper[A] {
    */
   def previousC: Zipper[A] = (lefts, rights) match {
     case (Stream.Empty, Stream.Empty) => this
-    case (Stream.Empty, _) => {
+    case (Stream.Empty, _)            =>
       val xs = rights.reverse
       zipper(xs.tail.append(Stream(focus)), xs.head, lefts)
-    }
-    case (_, _) => tryPrevious
+    case (_, _)                       => tryPrevious
   }
 
   /**
@@ -265,11 +263,10 @@ sealed trait Zipper[A] {
   def deleteLeftC: Option[Zipper[A]] = rights match {
     case Stream.Empty => None
     case _ #:: _ => Some(lefts match {
-      case l #:: ls => zipper(ls, l, rights)
-      case Stream.Empty => {
+      case l #:: ls     => zipper(ls, l, rights)
+      case Stream.Empty =>
         val r = rights.reverse
         zipper(r.tail, r.head, Stream.Empty)
-      }
     })
   }
 
@@ -286,12 +283,11 @@ sealed trait Zipper[A] {
    */
   def deleteRightC: Option[Zipper[A]] = lefts match {
     case Stream.Empty => None
-    case _ #:: _ => Some(rights match {
-      case r #:: rs => zipper(lefts, r, rs)
-      case Stream.Empty => {
+    case _ #:: _      => Some(rights match {
+      case r #:: rs     => zipper(lefts, r, rs)
+      case Stream.Empty =>
         val l = lefts.reverse
         zipper(Stream.Empty, l.head, l.tail)
-      }
     })
   }
 

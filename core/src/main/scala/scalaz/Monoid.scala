@@ -25,7 +25,7 @@ object Monoid {
 
   def unfold[F[_], A, B](seed: A)(f: A => Option[(B, A)])(implicit F: Pointed[F], FB: Monoid[F[B]]): F[B] =
     f(seed) match {
-      case None => FB.zero
+      case None         => FB.zero
       case Some((b, a)) => FB.append(F.pure(b), unfold[F, A, B](a)(f))
     }
 

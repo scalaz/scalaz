@@ -47,14 +47,14 @@ sealed trait NonEmptyList[A] {
 
   def zipperEnd: Zipper[A] = {
     import Stream._
-    tail reverse match {
-      case Nil => zipper(empty, head, empty)
+    tail.reverse match {
+      case Nil     => zipper(empty, head, empty)
       case t :: ts => zipper(ts.toStream :+ head, t, empty)
     }
   }
 
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
-    case Nil => Nil
+    case Nil    => Nil
     case h :: t => nel(h, t).tails.list
   })
 

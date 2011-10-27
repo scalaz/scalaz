@@ -7,7 +7,7 @@ import scalaz.Isomorphism._
 trait Eithers {
   implicit def either = new BiFunctor[Either] {
     def bimap[A, B, C, D](fab: Either[A, B])(f: (A) => C, g: (B) => D): Either[C, D] = fab match {
-      case Left(a) => Left(f(a))
+      case Left(a)  => Left(f(a))
       case Right(b) => Right(g(b))
     }
   }
@@ -15,7 +15,7 @@ trait Eithers {
   /** Right biased monad */
   implicit def eitherMonad[L] = new Monad[({type l[a] = Either[L, a]})#l] {
     def bind[A, B](fa: Either[L, A])(f: (A) => Either[L, B]): Either[L, B] = fa match {
-      case Left(a) => Left(a)
+      case Left(a)  => Left(a)
       case Right(b) => f(b)
     }
 
@@ -59,15 +59,15 @@ trait Eithers {
   implicit def eitherRightL[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
     def pure[A](a: => A): RightProjection[L, A] = Right(a).right
     def bind[A, B](fa: RightProjection[L, A])(f: (A) => RightProjection[L, B]): RightProjection[L, B] = fa.e match {
-      case Left(a) => Left(a).right
+      case Left(a)  => Left(a).right
       case Right(b) => f(b)
     }
   }
 
   implicit def eitherLeftR[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
     def pure[A](a: => A): LeftProjection[A, R] = Left(a).left
-    def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]): LeftProjection[B, R] =  fa.e match {
-      case Left(a) => f(a)
+    def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]): LeftProjection[B, R] = fa.e match {
+      case Left(a)  => f(a)
       case Right(b) => Right(b).left
     }
   }

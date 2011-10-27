@@ -38,18 +38,18 @@ trait ImmutableArrays {
 
   def make[A](x: AnyRef): ImmutableArray[A] = {
     val y = x match {
-      case null => null
-      case x: Array[Byte] => new ofByte(x)
-      case x: Array[Short] => new ofShort(x)
-      case x: Array[Char] => new ofChar(x)
-      case x: Array[Int] => new ofInt(x)
-      case x: Array[Long] => new ofLong(x)
-      case x: Array[Float] => new ofFloat(x)
-      case x: Array[Double] => new ofDouble(x)
+      case null              => null
+      case x: Array[Byte]    => new ofByte(x)
+      case x: Array[Short]   => new ofShort(x)
+      case x: Array[Char]    => new ofChar(x)
+      case x: Array[Int]     => new ofInt(x)
+      case x: Array[Long]    => new ofLong(x)
+      case x: Array[Float]   => new ofFloat(x)
+      case x: Array[Double]  => new ofDouble(x)
       case x: Array[Boolean] => new ofBoolean(x)
-      case x: Array[Unit] => new ofUnit(x)
-      case x: Array[AnyRef] => new ofRef(x)
-      case x: String => new StringArray(x)
+      case x: Array[Unit]    => new ofUnit(x)
+      case x: Array[AnyRef]  => new ofRef(x)
+      case x: String         => new StringArray(x)
     }
     y.asInstanceOf[ImmutableArray[A]]
   }
@@ -57,17 +57,17 @@ trait ImmutableArrays {
   /**Gives better type inference than make[A] */
   def fromArray[A](x: Array[A]): ImmutableArray[A] = {
     val y = x.asInstanceOf[AnyRef] match {
-      case null => null
-      case x: Array[Byte] => new ofByte(x)
-      case x: Array[Short] => new ofShort(x)
-      case x: Array[Char] => new ofChar(x)
-      case x: Array[Int] => new ofInt(x)
-      case x: Array[Long] => new ofLong(x)
-      case x: Array[Float] => new ofFloat(x)
-      case x: Array[Double] => new ofDouble(x)
+      case null              => null
+      case x: Array[Byte]    => new ofByte(x)
+      case x: Array[Short]   => new ofShort(x)
+      case x: Array[Char]    => new ofChar(x)
+      case x: Array[Int]     => new ofInt(x)
+      case x: Array[Long]    => new ofLong(x)
+      case x: Array[Float]   => new ofFloat(x)
+      case x: Array[Double]  => new ofDouble(x)
       case x: Array[Boolean] => new ofBoolean(x)
-      case x: Array[Unit] => new ofUnit(x)
-      case _: Array[AnyRef] => new ofRef(x.asInstanceOf[Array[AnyRef]])
+      case x: Array[Unit]    => new ofUnit(x)
+      case _: Array[AnyRef]  => new ofRef(x.asInstanceOf[Array[AnyRef]])
     }
     y.asInstanceOf[ImmutableArray[A]]
   }
@@ -183,7 +183,7 @@ trait ImmutableArrays {
     def ++(other: ImmutableArray[Char]) =
       other match {
         case other: StringArray => new StringArray(str + other.str)
-        case _ => {
+        case _                  => {
           val newArr = new Array[Char](length + other.length)
           this.copyToArray(newArr, 0, length)
           other.copyToArray(newArr.asInstanceOf[Array[Char]], length, other.length)

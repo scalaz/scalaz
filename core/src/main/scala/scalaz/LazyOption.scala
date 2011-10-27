@@ -9,7 +9,7 @@ sealed trait LazyOption[A] {
   def fold[X](some: (=> A) => X, none: => X): X =
     this match {
       case LazySome(z) => some(z())
-      case LazyNone() => none
+      case LazyNone()  => none
     }
 
   def ?[X](some: => X, none: => X): X =

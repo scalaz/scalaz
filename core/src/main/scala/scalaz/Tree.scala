@@ -37,8 +37,8 @@ sealed trait Tree[A] {
   def draw(implicit sh: Show[A]): Stream[String] = {
     def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
       case Stream.Empty => Stream.Empty
-      case Stream(t) => "|" #:: shift("`- ", "   ", t.draw)
-      case t #:: ts => "|" #:: shift("+- ", "|  ", t.draw) append drawSubTrees(ts)
+      case Stream(t)    => "|" #:: shift("`- ", "   ", t.draw)
+      case t #:: ts     => "|" #:: shift("+- ", "|  ", t.draw) append drawSubTrees(ts)
     }
     def shift(first: String, other: String, s: Stream[String]): Stream[String] =
       s.zip(first #:: Stream.continually(other)).map {

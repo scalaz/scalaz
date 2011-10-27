@@ -54,25 +54,25 @@ trait Streams {
   import scala.Stream.{Empty, empty}
 
   def toZipper[A](as: Stream[A]): Option[Zipper[A]] = as match {
-    case Empty => None
+    case Empty   => None
     case h #:: t => Some(Zipper.zipper(empty, h, t))
   }
 
   def zipperEnd[A](as: Stream[A]): Option[Zipper[A]] = as match {
     case Empty => None
-    case _ =>
+    case _     =>
       val x = as.reverse
       Some(Zipper.zipper(x.tail, x.head, empty))
   }
 
   def heads[A](as: Stream[A]): Stream[Stream[A]] = as match {
     case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
-    case _ => empty
+    case _       => empty
   }
 
   def tails[A](as: Stream[A]): Stream[Stream[A]] = as match {
     case h #:: t => as #:: tails(t)
-    case _ => empty
+    case _       => empty
   }
 
   def zapp[A, B, C](a: Stream[A])(f: Stream[A => B => C]): Stream[B => C] = {

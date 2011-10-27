@@ -7,7 +7,7 @@ sealed trait LazyEither[A, B] {
 
   def fold[X](left: (=> A) => X, right: (=> B) => X): X =
     this match {
-      case LazyLeft(a) => left(a())
+      case LazyLeft(a)  => left(a())
       case LazyRight(b) => right(b())
     }
 

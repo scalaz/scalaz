@@ -9,15 +9,13 @@ object Ordering {
   
   implicit object ordering extends Order[Ordering] with Show[Ordering] {
     def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match {
-      case (LT, LT) => EQ
+      case (LT, LT)      => EQ
       case (LT, EQ | GT) => LT
-
-      case (EQ, LT) => GT
-      case (EQ, EQ) => EQ
-      case (EQ, GT) => LT
-
+      case (EQ, LT)      => GT
+      case (EQ, EQ)      => EQ
+      case (EQ, GT)      => LT
       case (GT, LT | EQ) => GT
-      case (GT, GT) => EQ
+      case (GT, GT)      => EQ
     }
 
     def show(f: Ordering): List[Char] = f.name.toList
@@ -30,7 +28,7 @@ object Ordering {
 
   def fromInt(intOrdering: Int) = intOrdering match {
     case -1 => LT
-    case 0 => EQ
-    case 1 => GT
+    case 0  => EQ
+    case 1  => GT
   }
 }
