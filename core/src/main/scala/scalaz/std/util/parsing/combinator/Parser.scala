@@ -42,4 +42,4 @@ trait Parsers {
    */
 }
 
-object Parser extends Parsers
+object parser extends Parsers

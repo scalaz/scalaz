@@ -13,7 +13,7 @@ trait TuplesLow0 {
     implicit def _2: Semigroup[A2] = A2
   }
   
-  implicit def tuple2[A1, A2] = new BiTraverse[Tuple2] {
+  implicit def tuple2Instance[A1, A2] = new BiTraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
     def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]): G[(C, D)] = {
       Applicative[G].lift2((c: C, d: D) => (c, d))(f(fab._1), g(fab._2))
@@ -30,9 +30,7 @@ trait Tuples extends TuplesLow0 {
   // TODO pump up the arity.
 }
 
-object Tuple extends Tuples {
-  
-}
+object tuple extends Tuples
 
 //
 // Type class implementation traits

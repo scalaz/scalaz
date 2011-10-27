@@ -32,7 +32,7 @@ sealed trait Reducer[C, M] {
     implicit val n = r.monoid
     new Reducer[C, (M, N)] {
 
-      import std.Tuple._
+      import std.tuple._
 
       val monoid = Monoid[(M, N)]
 
@@ -91,27 +91,27 @@ trait Reducers {
   def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(x => x)
 
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
-    import std.List._
+    import std.list._
     unitConsReducer(List(_), c => c :: _)
   }
 
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
-    import std.Stream._
+    import std.stream._
     unitConsReducer(Stream(_), c => c #:: _)
   }
 
 
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
-    import std.AnyVal._
+    import std.anyVal._
     unitReducer((_: C) => ())
   }
 
   implicit def AnyReducer: Reducer[Boolean, Boolean] = {
-    implicit val B = std.AnyVal.boolean.disjunction
+    implicit val B = std.anyVal.booleanInstance.disjunction
     unitReducer(x => x)
   }
 
-  import std.AnyVal._
+  import std.anyVal._
 
   implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
 
@@ -134,7 +134,7 @@ trait Reducers {
 
 
   implicit def BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] = {
-    import std.math.BigInt._
+    import std.math.bigInt._
     unitReducer(b => Tag[BigInt, Multiplication](b))
   }
 
@@ -143,7 +143,7 @@ trait Reducers {
   //
   //  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.*-->[BigIntegerMultiplication])
 
-  import std.Option._
+  import std.option._
 
   implicit def FirstReducer[A]: Reducer[A, Option[A] @@ First] = unitReducer(a => Tag[Option[A], First](Some(a)))
 

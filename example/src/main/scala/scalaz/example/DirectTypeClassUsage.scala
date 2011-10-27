@@ -18,7 +18,7 @@ object DirectTypeClassUsage extends App {
     import scalaz._
 
     // Import the members of the type class instance for Option.
-    import std.Option.option.{join, bind}
+    import std.option.optionInstance.{join, bind}
 
     bind(o1)(x => if (x > 0) Some(2) else None)
     join(o2)
@@ -30,12 +30,12 @@ object DirectTypeClassUsage extends App {
     import scalaz._
 
     // Import the type class instances for Option and List.
-    import std.Option.{option, optionMonoid}
-    import std.List.list
+    import std.option.{optionInstance, optionMonoid}
+    import std.list.listInstance
 
-    option.bind(o1)(x => if (x > 0) Some(2) else None)
-    option.join(o2)
-    list.join(l2)
+    optionInstance.bind(o1)(x => if (x > 0) Some(2) else None)
+    optionInstance.join(o2)
+    listInstance.join(l2)
 
     implicit object IntSemigroup extends Semigroup[Int] {
       def append(f1: Int, f2: => Int): Int = f1 + f2

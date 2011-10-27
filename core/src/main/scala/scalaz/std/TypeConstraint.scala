@@ -13,4 +13,4 @@ trait TypeConstraints {
   }
 }
 
-object TypeConstraint extends TypeConstraints
+object typeConstraint extends TypeConstraints

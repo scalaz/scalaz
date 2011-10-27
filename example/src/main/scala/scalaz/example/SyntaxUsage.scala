@@ -20,8 +20,8 @@ object SyntaxUsage extends App {
 
     // Import type class instances for Option, and the
     // Monad syntax for Option.
-    import std.Option._
-    import std.Option.option.monadSyntax._
+    import std.option._
+    import std.option.optionInstance.monadSyntax._
     val x = 1.pure
     val y = pure(1)
     x: Option[Int]
@@ -36,8 +36,8 @@ object SyntaxUsage extends App {
     import scalaz._
 
     // Import type class instances for Option and List
-    import std.Option._
-    import std.List._
+    import std.option._
+    import std.list._
 
     // Implicit conversions from M[A] => BindV[M, A], etc.
     import syntax.monad._
@@ -69,19 +69,19 @@ object SyntaxUsage extends App {
 
     def needPointed[F[_] : Pointed] = ()
 
-    import std.Option._
+    import std.option._
     needPointed[Option]
   }
 
   def stdSyntax() {
-    import scalaz.std.AnyVal._
-    import scalaz.std.Stream.streamSyntax._
+    import scalaz.std.anyVal._
+    import scalaz.std.stream.streamSyntax._
 
     val merged = Stream(1, 3, 5).merge(Stream(2, 4, 6))
 
-    import scalaz.std.List._
-    import scalaz.std.Option._
-    import scalaz.std.Option.optionSyntax._
+    import scalaz.std.list._
+    import scalaz.std.option._
+    import scalaz.std.option.optionSyntax._
     import scalaz.syntax.monoid._
     import scalaz.syntax.equal._
 
@@ -103,5 +103,7 @@ object SyntaxUsage extends App {
 
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
     some(some(1)).join assert_=== some(1)
+    
+    List(1, 2, 3).powerset
   }
 }

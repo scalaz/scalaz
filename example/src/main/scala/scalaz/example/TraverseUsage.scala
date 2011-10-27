@@ -4,8 +4,8 @@ class TraverseUsage {
   import scalaz._
 
   // type class instances
-  import std.List._
-  import std.Option._
+  import std.list._
+  import std.option._
   import Ident.id
 
   // syntax

@@ -1,6 +1,6 @@
 package scalaz
 
-import std.Option.option
+import std.option.optionInstance
 
 /**
  * OptionT monad transformer.
@@ -83,7 +83,7 @@ private[scalaz] trait OptionTApply[F[_]] extends OptionTFunctor[F] with Apply[({
   implicit def F: Apply[F]
 
   def ap[A, B](fa: OptionT[F, A])(f: OptionT[F, A => B]): OptionT[F, B] =
-    OptionT(F.map2(f.value, fa.value)({ case (ff, aa) => option.ap(aa)(ff) }))
+    OptionT(F.map2(f.value, fa.value)({ case (ff, aa) => optionInstance.ap(aa)(ff) }))
 }
 
 private[scalaz] trait OptionTMonad[F[_]] extends OptionTPointed[F] with Monad[({type λ[α] = OptionT[F, α]})#λ] {

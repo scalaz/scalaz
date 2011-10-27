@@ -1,8 +1,6 @@
 package scalaz
 package syntax
 
-import std.{ToStreamV, ToOptionV}
-
 trait Syntaxes {
 
   object semigroup extends ToSemigroupV
@@ -71,8 +69,6 @@ trait Syntaxes {
 
   object all extends ToAllTypeClassV
 
-  object allStd extends ToAllStdV
-
 }
 
 trait ToAllTypeClassV
@@ -83,9 +79,6 @@ trait ToAllTypeClassV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
   with ToFirstV with ToArrowV
-
-trait ToAllStdV
-  extends ToOptionV with ToStreamV
 
 
 trait SyntaxV[A] {

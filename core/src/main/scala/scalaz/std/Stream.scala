@@ -3,7 +3,7 @@ package std
 
 trait Streams {
 
-  implicit object stream extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
+  implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
       val seed: G[Stream[B]] = G.pure(scala.Stream.empty[B])
@@ -45,6 +45,10 @@ trait Streams {
   }
 
   // TODO show, equal, order, ...
+
+  //
+  // Functions for Streams
+  //
 
   def merge[A](s1: Stream[A], s2: Stream[A]): Stream[A] = {
     if (s1.isEmpty) s2
@@ -110,4 +114,4 @@ trait Streams {
 
 }
 
-object Stream extends Streams
+object stream extends Streams

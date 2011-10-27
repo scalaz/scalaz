@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait Strings {
-  implicit object string extends Monoid[String] with Show[String] with Equal[String] with Order[String]{
+  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String]{
     def append(f1: String, f2: => String): String = f1 + f2
     def zero: String = ""
     def show(f: String): List[Char] = f.toList
@@ -10,4 +10,4 @@ trait Strings {
   }
 }
 
-object String extends Strings
+object string extends Strings

@@ -82,7 +82,7 @@ trait NonEmptyLists {
   // TODO Show, monoid, etc.
   implicit object nonEmptyList extends Traverse[NonEmptyList] with Monad[NonEmptyList] {
     def traverseImpl[G[_]: Applicative, A, B](fa: NonEmptyList[A])(f: (A) => G[B]): G[NonEmptyList[B]] = {
-      import std.List.list
+      import std.list.listInstance
 
       Applicative[G].map(Traverse[List].traverse(fa.list)(f))((x: List[B]) => NonEmptyList.nel(x.head, x.tail))
     }

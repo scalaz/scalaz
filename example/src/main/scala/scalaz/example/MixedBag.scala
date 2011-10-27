@@ -8,8 +8,8 @@ object MixedBag extends App {
   traverseBigStream()
 
   def monoid() {
-    import std.AnyVal._
-    import std.Option._
+    import std.anyVal._
+    import std.option._
 
     import syntax.monoid._
     
@@ -18,12 +18,12 @@ object MixedBag extends App {
     some(1) |+| some(2)
     some(1) |+| mzero[Option[Int]]
 
-    int.semigroupSyntax.mappend(1, 2)
+    intInstance.semigroupSyntax.mappend(1, 2)
   }
 
   def traverseBigList() {
-    import std.Option._
-    import std.List._
+    import std.option._
+    import std.list._
     import syntax.traverse._
 
     val xs: Option[List[Int]] = (1 to 100000 toList).traverse(x => some(x * 2))

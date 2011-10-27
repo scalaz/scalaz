@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait PartialFunctions {
-  val partialFunction = new Arr[PartialFunction] with Category[PartialFunction] {
+  val partialFunctionInstance = new Arr[PartialFunction] with Category[PartialFunction] {
     def arr[A, B](f: (A) => B): PartialFunction[A, B] = {
       case a => f(a)
     }
@@ -15,4 +15,4 @@ trait PartialFunctions {
   }
 }
 
-object PartialFunction extends PartialFunctions
+object partialFunction extends PartialFunctions

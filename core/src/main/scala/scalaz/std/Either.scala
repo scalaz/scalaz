@@ -5,7 +5,7 @@ import scala.Either.{LeftProjection, RightProjection}
 import scalaz.Isomorphism._
 
 trait Eithers {
-  implicit def either = new BiFunctor[Either] {
+  implicit def eitherInstance = new BiFunctor[Either] {
     def bimap[A, B, C, D](fab: Either[A, B])(f: (A) => C, g: (B) => D): Either[C, D] = fab match {
       case Left(a)  => Left(f(a))
       case Right(b) => Right(g(b))
@@ -46,17 +46,17 @@ trait Eithers {
     def from[A, B](ga: Either[A, B]) = ga.right
   }
 
-  implicit def eitherLeft = new IsomorphismBiFunctor[LeftProjection, Either] {
+  implicit def eitherLeftInstance = new IsomorphismBiFunctor[LeftProjection, Either] {
     def iso = LeftProjectionIso2
-    implicit def G: BiFunctor[Either] = either
+    implicit def G: BiFunctor[Either] = eitherInstance
   }
 
-  implicit def eitherRight = new IsomorphismBiFunctor[RightProjection, Either] {
+  implicit def eitherRightInstance = new IsomorphismBiFunctor[RightProjection, Either] {
     def iso = RightProjectionIso2
-    implicit def G: BiFunctor[Either] = either
+    implicit def G: BiFunctor[Either] = eitherInstance
   }
 
-  implicit def eitherRightL[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
+  implicit def eitherRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
     def pure[A](a: => A): RightProjection[L, A] = Right(a).right
     def bind[A, B](fa: RightProjection[L, A])(f: (A) => RightProjection[L, B]): RightProjection[L, B] = fa.e match {
       case Left(a)  => Left(a).right
@@ -64,7 +64,7 @@ trait Eithers {
     }
   }
 
-  implicit def eitherLeftR[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
+  implicit def eitherLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
     def pure[A](a: => A): LeftProjection[A, R] = Left(a).left
     def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]): LeftProjection[B, R] = fa.e match {
       case Left(a)  => f(a)
@@ -75,4 +75,4 @@ trait Eithers {
   // TODO Semigroup(?), Show, ...
 }
 
-object Either extends Eithers
+object either extends Eithers

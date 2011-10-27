@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz.{syntax, std}
 import syntax.monad._
-import std.Option._
+import std.option._
 import scalaz.undo.UndoT
 import scalaz.undo.UndoT._
 

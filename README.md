@@ -88,13 +88,66 @@ Here is an instance definition for `Option`. Notice that the method `map` has be
 To use this, one would:
 
 ```
-import scalaz.std.Option.option
+import scalaz.std.option.optionInstance
 // or, importing all instances en-masse
 // import scalaz.Scalaz._
 
 val M = Monad[Option]
 val oi: Option[Int] = M.pure(0)
 ```
+
+### Syntax
+
+We co-opt the term *syntax* to refer to the way we allow the functionality of Scalaz to be
+called in the `object.method(args)` form, which can be easier to read, and, given that type inference
+in Scala flows from left-to-right, can require fewer type annotations.
+
+* Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
+* All Scalaz functionality is available *without* using the provided syntax, by directly calling methods
+  on the type class or it's companion object.
+* Syntax is available *a-la-carte*. You can import the syntax for working with a particular
+  type classes where you need it. This avoids flooding the autocompletion in your IDE with
+  every possible pimped method. In principle, this should also help compiler performance,
+  by reducing the implicit search space.
+* Syntax is layered in the same way as type classes. Importing the syntax for, say, `Applicative`
+  will also provide the syntax for `Pointed` and `Functor`.
+* Use of symbolic identifiers is largely restricted to the `syntax` package.
+
+Syntax can be imported in two ways. Firstly, the syntax specialized for a particular instance
+of a type class can be imported directly from the instance itself.
+
+```scala
+// import the type class instance
+import scalaz.std.option.optionInstance
+
+// import the implicit conversions to `MonadV[Option, A]`, `BindV[Option, A]`, ...
+import optionInstance.monadSyntax._
+
+val oi: Option[Option[Int]] = Some(Some(1))
+
+// Expands to: `ToBindV(io).join`
+oi.join
+```
+
+Alternatively, the syntax can be imported for a particular type class.
+
+```scala
+// import the type class instance
+import scalaz.option.optionInstance
+
+// import the implicit conversions to `MonadV[F, A]`, `BindV[F, A]`, ...
+import scalaz.syntax.monad._
+
+val oi: Option[Option[Int]] = Some(Some(1))
+
+// Expands to: ToBindV(io).join
+oi.join
+```
+
+For some degree of backwards compability with Scalaz 6, the über-import of `import scalaz.Scalaz._`
+will import *all* implicit conversions that provide syntax (as well as type class instances and other
+functions). However, it is recommended to review usage of this and replace with more focussed imports.
+
 
 ### Type Class Instance Dependencies
 
@@ -140,58 +193,6 @@ implicitly[Functor[OptionTList]]
 // 2. OptionT.OptionTMonad[List](implicitly[Functor[List]])
 // #2 is defined in a subclass, so is preferred (although, either would have sufficed).
 ```
-
-### Syntax
-
-We co-opt the term *syntax* to refer to the way we allow the functionality of Scalaz to be
-called in the `object.method(args)` form, which can be easier to read, and, given that type inference
-in Scala flows from left-to-right, can require fewer type annotations.
-
-* Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
-* All Scalaz functionality is available *without* using the provided syntax, by directly calling methods
-  on the type class or it's companion object.
-* Syntax is available *a-la-carte*. You can import the syntax for working with a particular
-  type classes where you need it. This avoids flooding the autocompletion in your IDE with
-  every possible pimped method. In principle, this should also help compiler performance,
-  by reducing the implicit search space.
-* Syntax is layered in the same way as type classes. Importing the syntax for, say, `Applicative`
-  will also provide the syntax for `Pointed` and `Functor`.
-* Use of symbolic identifiers is largely restricted to the `syntax` package.
-
-Syntax can be imported in two ways. Firstly, the syntax specialized for a particular instance
-of a type class can be imported directly from the instance itself.
-
-```scala
-// import the type class instance
-import scalaz.Option.option
-
-// import the implicit conversions to `MonadV[Option, A]`, `BindV[Option, A]`, ...
-import option.monadSyntax._
-
-val oi: Option[Option[Int]] = Some(Some(1))
-
-// Expands to: `ToBindV(io).join`
-oi.join
-```
-
-Alternatively, the syntax can be imported for a particular type class.
-
-```scala
-// import the type class instance
-import scalaz.Option.option
-
-// import the implicit conversions to `MonadV[F, A]`, `BindV[F, A]`, ...
-import scalaz.syntax.monad._
-
-val oi: Option[Option[Int]] = Some(Some(1))
-
-// Expands to: ToBindV(io).join
-oi.join
-```
-
-For some degree of backwards compability with Scalaz 6, the über-import of `import scalaz.Scalaz._`
-will import *all* implicit conversions that provide syntax. However, it is recommended to review usage
-of this and replace with more focussed imports.
 
 ### Transformers and Identity
 

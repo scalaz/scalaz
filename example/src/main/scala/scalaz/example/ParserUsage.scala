@@ -11,8 +11,8 @@ object ParserUsage extends App {
 
     def apply(s: String): ParseResult[List[List[String]]] = {
       import syntax.traverse._ // for _.sequence
-      import std.List._ // for Traverse[List]
-      import std.util.parsing.combinator.Parser.parserMonad
+      import std.list._ // for Traverse[List]
+      import std.util.parsing.combinator.parser.parserMonad
 
       implicit val M: Monad[Parser] = parserMonad(testParser)
       val sequence: Parser[List[List[String]]] = parsers.sequence

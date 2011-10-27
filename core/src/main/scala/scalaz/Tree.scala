@@ -1,7 +1,7 @@
 package scalaz
 
-import std.Stream.{stream, streamMonoid}
-import std.String.string
+import std.stream.{streamInstance, streamMonoid}
+import std.string.stringInstance
 
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].

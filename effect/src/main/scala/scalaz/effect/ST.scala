@@ -173,7 +173,7 @@ trait STs {
 
   /**Accumulates an integer-associated list into an immutable array. */
   def accumArray[F[_], A, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Traverse[F], mf: Manifest[A]): ImmutableArray[A] = {
-    import std.AnyVal.unit
+    import std.anyVal.unitInstance
     type STA[S] = ST[S, ImmutableArray[A]]
     runST(new Forall[STA] {
       def apply[S] = for {

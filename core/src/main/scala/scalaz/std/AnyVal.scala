@@ -3,7 +3,7 @@ package std
 
 trait AnyVals {
 
-  implicit object unit extends Monoid[Unit] with Order[Unit] with Show[Unit] {
+  implicit object unitInstance extends Monoid[Unit] with Order[Unit] with Show[Unit] {
     def show(f: Unit): List[Char] = ().toString.toList
 
     def append(f1: Unit, f2: => Unit): Unit = ()
@@ -13,7 +13,7 @@ trait AnyVals {
     def order(x: Unit, y: Unit): Ordering = Ordering.EQ
   }
 
-  implicit object boolean extends Order[Boolean] with Show[Boolean] {
+  implicit object booleanInstance extends Order[Boolean] with Show[Boolean] {
     def show(f: Boolean): List[Char] = f.toString.toList
 
     def order(x: Boolean, y: Boolean): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -36,19 +36,19 @@ trait AnyVals {
 
   sealed trait Conjunction
 
-  implicit object booleanDisjunctionNewType extends Monoid[Boolean @@ Disjunction] {
+  implicit object booleanDisjunctionNewTypeInstance extends Monoid[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Tag(f1 || f2)
 
     def zero: Boolean @@ Disjunction = Tag(false)
   }
 
-  implicit object booleanConjunctionNewType extends Monoid[Boolean @@ Conjunction] {
+  implicit object booleanConjunctionNewTypeInstance extends Monoid[Boolean @@ Conjunction] {
     def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Tag(f1 && f2)
 
     def zero: Boolean @@ Conjunction = Tag(true)
   }
 
-  implicit object byte extends Monoid[Byte] with Order[Byte] with Show[Byte] {
+  implicit object byteInstance extends Monoid[Byte] with Order[Byte] with Show[Byte] {
     def show(f: Byte): List[Char] = f.toString.toList
 
     def append(f1: Byte, f2: => Byte): Byte = (f1 + f2).toByte
@@ -96,7 +96,7 @@ trait AnyVals {
     def zero: Char @@ Multiplication = Tag(1)
   }
 
-  implicit object short extends Monoid[Short] with Order[Short] with Show[Short] {
+  implicit object shortInstance extends Monoid[Short] with Order[Short] with Show[Short] {
     def show(f: Short): List[Char] = f.toString.toList
 
     def append(f1: Short, f2: => Short): Short = (f1 + f2).toShort
@@ -119,7 +119,7 @@ trait AnyVals {
     def zero: Short @@ Multiplication = Tag(1)
   }
 
-  implicit object int extends Monoid[Int] with Order[Int] with Show[Int] {
+  implicit object intInstance extends Monoid[Int] with Order[Int] with Show[Int] {
     def show(f: Int): List[Char] = f.toString.toList
 
     def append(f1: Int, f2: => Int): Int = f1 + f2
@@ -143,7 +143,7 @@ trait AnyVals {
   }
 
 
-  implicit object long extends Monoid[Long] with Order[Long] with Show[Long] {
+  implicit object longInstance extends Monoid[Long] with Order[Long] with Show[Long] {
     def show(f: Long): List[Char] = f.toString.toList
 
     def append(f1: Long, f2: => Long): Long = f1 + f2
@@ -166,7 +166,7 @@ trait AnyVals {
     def zero: Long @@ Multiplication = Tag(1)
   }
 
-  implicit object float extends Monoid[Float] with Order[Float] with Show[Float] {
+  implicit object floatInstance extends Monoid[Float] with Order[Float] with Show[Float] {
     def show(f: Float): List[Char] = f.toString.toList
 
     def append(f1: Float, f2: => Float): Float = f1 + f2
@@ -176,7 +176,7 @@ trait AnyVals {
     def order(x: Float, y: Float): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit object double extends Monoid[Double] with Order[Double] with Show[Double] {
+  implicit object doubleInstance extends Monoid[Double] with Order[Double] with Show[Double] {
     def show(f: Double): List[Char] = f.toString.toList
 
     def append(f1: Double, f2: => Double): Double = f1 + f2
@@ -188,4 +188,4 @@ trait AnyVals {
 
 }
 
-object AnyVal extends AnyVals
+object anyVal extends AnyVals
