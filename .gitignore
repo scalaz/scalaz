@@ -5,3 +5,5 @@ project/boot
 *.swp
 project.vim
 tags
+.lib
+

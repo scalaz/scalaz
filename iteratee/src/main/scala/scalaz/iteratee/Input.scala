@@ -3,12 +3,10 @@ package iteratee
 
 import LazyOption._
 
-
 /**The input to an iteratee. **/
 sealed trait Input[E] {
+  
   def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
-
-  import Input._
 
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
     fold(empty, el, eof)
