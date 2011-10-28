@@ -104,6 +104,12 @@ object SyntaxUsage extends App {
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
     some(some(1)).join assert_=== some(1)
     
-    List(1, 2, 3).powerset
+    List(1, 2, 3).powerset.join
+
+    import Kleisli._
+
+    val k = kleisli((a: Int) => some(0))
+    kleisliCategory[Option].compose(k, k)
+    k >>> k
   }
 }

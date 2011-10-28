@@ -24,6 +24,9 @@ trait ToComposeV  {
     new ComposeV[F,A, B] { def self = v; implicit def F: Compose[F] = F0 }
 
   ////
+  // TODO Roll this back into gen-type-class to add to all type classes classifying * * -> *
+  implicit def ToComposeVFromKliesliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new ComposeV[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Compose[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
 
   ////
 }
