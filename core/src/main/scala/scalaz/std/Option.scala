@@ -62,29 +62,29 @@ trait OptionInstances {
 }
 
 trait OptionFunctions {
-  def some[A](a: A): Option[A] = Some(a)
+  final def some[A](a: A): Option[A] = Some(a)
 
-  def none[A]: Option[A] = None
+  final def none[A]: Option[A] = None
 
 
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
    * if it is defined, otherwise, the provided value `none`.
    */
-  def cata[A, X](oa: Option[A])(some: A => X, none: => X): X = oa match {
+  final def cata[A, X](oa: Option[A])(some: A => X, none: => X): X = oa match {
     case None    => none
     case Some(a) => some(a)
   }
 
   /**Alias for `cata` */
-  def fold[A, X](oa: Option[A])(some: A => X, none: => X): X = cata(oa)(some, none)
+  final def fold[A, X](oa: Option[A])(some: A => X, none: => X): X = cata(oa)(some, none)
 
-  def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
+  final def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
     case Some(a) => Success(a)
     case None    => Failure(e)
   }
 
-  def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] = oa match {
+  final def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] = oa match {
     case Some(e) => Failure(e)
     case None    => Success(b)
   }
@@ -93,7 +93,7 @@ trait OptionFunctions {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
+  final def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
     case Some(a) => Pointed[M].pure(a)
     case None    => Empty[M].empty
   }
@@ -101,7 +101,7 @@ trait OptionFunctions {
   /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
-  def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
+  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
     case None    => b
     case Some(a) => k(Pointed[F].pure(a))
   }
@@ -109,7 +109,7 @@ trait OptionFunctions {
   /**
    * Returns the given value if None, otherwise lifts the Some value to Option and passes it to the given function.
    */
-  def foldLiftOpt[A, B](oa: Option[A])(b: => B, k: Option[A] => B): B = {
+  final def foldLiftOpt[A, B](oa: Option[A])(b: => B, k: Option[A] => B): B = {
     import scalaz.std.option.optionInstance
     foldLift[Option, A, B](oa)(b, k)
   }

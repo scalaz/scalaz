@@ -6,8 +6,8 @@ import scalaz.std.option
 import scalaz.Tags.{Last, First}
 
 trait OptionV[A] extends SyntaxV[Option[A]] {
-  def cata[X](some: A => X, none: => X): X = option.cata(self)(some, none)
-  def fold[X](oa: Option[A])(some: A => X, none: => X): X = cata(some, none)
+  final def cata[X](some: A => X, none: => X): X = option.cata(self)(some, none)
+  final def fold[X](oa: Option[A])(some: A => X, none: => X): X = cata(some, none)
 
   sealed trait Fold[X] {
     def none(s: => X): X
@@ -24,7 +24,7 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    * option.some(_ * 2).none(0)
    * </code>
    */
-  def some[X](s: A => X): Fold[X] = new Fold[X] {
+  final def some[X](s: A => X): Fold[X] = new Fold[X] {
     def none(n: => X): X = cata(s, n)
   }
 
@@ -40,7 +40,7 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    * option ? "defined" | "undefined"
    * </code>
    */
-  def ?[X](s: => X): Conditional[X] = new Conditional[X] {
+  final def ?[X](s: => X): Conditional[X] = new Conditional[X] {
     def |(n: => X): X = self match {
       case None    => n
       case Some(_) => s
@@ -51,17 +51,17 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
   /**
    * Executes the provided side effect if the Option if it is undefined.
    */
-  def ifNone(n: => Unit): Unit = if (self.isEmpty) n
+  final def ifNone(n: => Unit): Unit = if (self.isEmpty) n
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
    */
-  def err(message: => String): A = self.getOrElse(sys.error(message))
+  final def err(message: => String): A = self.getOrElse(sys.error(message))
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
    */
-  def |(a: => A): A = self getOrElse a
+  final def |(a: => A): A = self getOrElse a
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
@@ -72,21 +72,21 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    * val a: List[String] = ~o
    * </pre>
    */
-  def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
+  final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 
-  def toSuccess[E](e: => E): Validation[E, A] = option.toSuccess(self)(e)
+  final def toSuccess[E](e: => E): Validation[E, A] = option.toSuccess(self)(e)
 
-  def toFailure[B](b: => B): Validation[A, B] = option.toFailure(self)(b)
+  final def toFailure[B](b: => B): Validation[A, B] = option.toFailure(self)(b)
 
-  def first: Option[A] @@ First = Tag(self)
+  final def first: Option[A] @@ First = Tag(self)
 
-  def last: Option[A] @@ Last = Tag(self)
+  final def last: Option[A] @@ Last = Tag(self)
 
-  def orEmpty[M[_] : Pointed : Empty]: M[A] = option.orEmpty(self)
+  final def orEmpty[M[_] : Pointed : Empty]: M[A] = option.orEmpty(self)
 
-  def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = option.foldLift(self)(b, k)
+  final def foldLift[F[_], B](b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = option.foldLift(self)(b, k)
 
-  def foldLiftOpt[B](b: => B, k: Option[A] => B): B = option.foldLiftOpt[A, B](self)(b, k)
+  final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = option.foldLiftOpt[A, B](self)(b, k)
 }
 
 trait ToOptionV {

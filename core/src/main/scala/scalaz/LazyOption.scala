@@ -85,6 +85,11 @@ trait LazyOptions {
   def lazyNone[A]: LazyOption[A] =
     LazyNone()
 
+  /**
+   * Returns the given argument in `lazySome` if this is `true`, `lazyNone` otherwise.
+   */
+  def condLazyOption[A](value: Boolean, a: => A): LazyOption[A] = if (value) lazySome(a) else lazyNone
+
   /* TODO
   implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
     Show[A].shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))

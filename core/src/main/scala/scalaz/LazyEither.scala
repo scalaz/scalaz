@@ -73,6 +73,13 @@ object LazyEither extends LazyEithers
 
 trait LazyEithers {
 
+
+  /**
+   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
+   * `LazyRight`
+   */
+  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
+
   trait LazyLeftConstruct[B] {
     def apply[A](a: => A): LazyEither[A, B]
   }

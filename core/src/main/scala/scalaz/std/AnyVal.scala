@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scalaz._
+
 trait AnyValInstances {
 
   implicit object unitInstance extends Monoid[Unit] with Order[Unit] with Show[Unit] {
@@ -188,4 +190,170 @@ trait AnyValInstances {
 
 }
 
+trait BooleanFunctions {
+
+  /**
+   * Conjunction. (AND)
+   *
+   * <pre>
+   * p q  p ∧ q
+   * 0 0  0
+   * 0 1  0
+   * 1 0  0
+   * 1 1  1
+   * </pre>
+   */
+  final def conjunction(p: Boolean, q: => Boolean) = p && q
+
+  /**
+   * Disjunction. (OR)
+   *
+   * <pre>
+   * p q  p ∨ q
+   * 0 0  0
+   * 0 1  1
+   * 1 0  1
+   * 1 1  1
+   * </pre>
+   */
+  final def disjunction(p: Boolean, q: => Boolean) = p || q
+
+  /**
+   * Negation of Conjunction. (NOR)
+   *
+   * <pre>
+   * p q  p !&& q
+   * 0 0  1
+   * 0 1  1
+   * 1 0  1
+   * 1 1  0
+   * </pre>
+   */
+  final def nor(p: Boolean, q: => Boolean) = !p || !q
+
+  /**
+   * Negation of Disjunction. (NAND)
+   *
+   * <pre>
+   * p q  p !|| q
+   * 0 0  1
+   * 0 1  0
+   * 1 0  0
+   * 1 1  0
+   * </pre>
+   */
+  final def nand(p: Boolean, q: => Boolean) = !p && !q
+
+  /**
+   * Conditional.
+   *
+   * <pre>
+   * p q  p --> q
+   * 0 0  1
+   * 0 1  1
+   * 1 0  0
+   * 1 1  1
+   * </pre>
+   */
+  final def conditional(p: Boolean, q: => Boolean) = !p || q
+
+  /**
+   * Inverse Conditional.
+   *
+   * <pre>
+   * p q  p <-- q
+   * 0 0  1
+   * 0 1  0
+   * 1 0  1
+   * 1 1  1
+   * </pre>
+   */
+  final def inverseConditional(p: Boolean, q: => Boolean) = p || !q
+
+  /**
+   * Negational of Conditional.
+   *
+   * <pre>
+   * p q  p ⇏ q
+   * 0 0  0
+   * 0 1  0
+   * 1 0  1
+   * 1 1  0
+   * </pre>
+   */
+  final def negConditional(p: Boolean, q: => Boolean) = p && !q
+
+  /**
+   * Negation of Inverse Conditional.
+   *
+   * <pre>
+   * p q  p <\- q
+   * 0 0  0
+   * 0 1  1
+   * 1 0  0
+   * 1 1  0
+   * </pre>
+   */
+  final def negInverseConditional(p: Boolean, q: => Boolean) = !p && q
+
+
+  /**
+   * Executes the given side-effect if `cond` is <code>false</code>.
+   */
+  final def unless(cond: Boolean)(f: => Unit) = if (!cond) f
+
+  /**
+   * Executes the given side-effect if `cond` is <code>true</code>.
+   */
+  final def when(cond: Boolean)(f: => Unit) = if (cond) f
+
+  /**
+   * @return `t` if `cond` is `true`, `f` otherwise
+   */
+  final def fold[A](cond: Boolean, t: => A, f: => A): A = if (cond) t else f
+
+  /**
+   * Returns the given argument in <code>Some</code> if `cond` is `true`, `None` otherwise.
+   */
+  final def option[A](cond: Boolean, a: => A): Option[A] = if (cond) Some(a) else None
+
+  /**
+   * Returns the given argument if `cond` is `true`, otherwise, the zero element for the type of the given
+   * argument.
+   */
+  final def valueOrZero[A](cond: Boolean)(value: => A)(implicit z: Monoid[A]): A = if (cond) value else z.zero
+
+  /**
+   * Returns the given argument if `cond` is `false`, otherwise, the zero element for the type of the given
+   * argument.
+   */
+  final def zeroOrValue[A](cond: Boolean)(value: => A)(implicit z: Monoid[A]): A = if (!cond) value else z.zero
+
+  /**
+   * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
+   * for `M`.
+   */
+  final def pureOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+    if (cond) M.pure(a) else M0.empty
+
+  /**
+   * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
+   * for `M`.
+   */
+  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+    if (!cond) M.pure(a) else M0.empty
+
+  final def pureOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+    new (Id ~> M) {
+      def apply[A](a: A): M[A] = pureOrEmpty(cond)(a)
+    }
+
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+    new (Id ~> M) {
+      def apply[A](a: A): M[A] = emptyOrPure(cond)(a)
+    }
+}
+
 object anyVal extends AnyValInstances
+
+object boolean extends BooleanFunctions
