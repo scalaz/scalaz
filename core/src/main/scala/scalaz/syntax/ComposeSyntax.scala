@@ -5,16 +5,16 @@ package syntax
 trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   implicit def F: Compose[F]
   ////
-  def <<<[C](x: F[C, A]): F[C, B] =
+  final def <<<[C](x: F[C, A]): F[C, B] =
     F.compose(self, x)
 
-  def ⋘[C](x: F[C, A]): F[C, B] =
+  final def ⋘[C](x: F[C, A]): F[C, B] =
     <<<(x)
 
-  def >>>[C](x: F[B, C]): F[A, C] =
+  final def >>>[C](x: F[B, C]): F[A, C] =
     F.compose(x, self)
 
-  def ⋙[C](x: F[B, C]): F[A, C] =
+  final def ⋙[C](x: F[B, C]): F[A, C] =
     >>>(x)
   ////
 }
@@ -25,7 +25,7 @@ trait ToComposeV  {
 
   ////
   // TODO Roll this back into gen-type-class to add to all type classes classifying * * -> *
-  implicit def ToComposeVFromKliesliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[({type λ[α, β]=F[G, α, β]})#λ]) =
+  implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[({type λ[α, β]=F[G, α, β]})#λ]) =
         new ComposeV[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Compose[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
 
   ////

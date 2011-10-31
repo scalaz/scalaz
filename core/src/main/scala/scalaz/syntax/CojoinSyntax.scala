@@ -5,7 +5,7 @@ package syntax
 trait CojoinV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Cojoin[F]
   ////
-
+  final def cojoin: F[F[A]] = F.cojoin(self)
   ////
 }
 

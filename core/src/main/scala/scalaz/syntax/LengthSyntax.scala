@@ -5,7 +5,7 @@ package syntax
 trait LengthV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Length[F]
   ////
-
+  final def length: Int = F.length(self)
   ////
 }
 

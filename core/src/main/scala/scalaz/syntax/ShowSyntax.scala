@@ -5,10 +5,10 @@ package syntax
 trait ShowV[F] extends SyntaxV[F] {
   implicit def F: Show[F]
   ////
-  def show: List[Char] = F.show(self)
-  def shows: String = F.show(self).mkString
-  def print: Unit = Console.print(shows)
-  def println: Unit = Console.println(shows)
+  final def show: List[Char] = F.show(self)
+  final def shows: String = F.show(self).mkString
+  final def print: Unit = Console.print(shows)
+  final def println: Unit = Console.println(shows)
   ////
 }
 

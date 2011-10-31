@@ -5,7 +5,8 @@ package syntax
 trait ContravariantV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Contravariant[F]
   ////
-
+  final def contramap[B](f: B => A): F[B] = F.contramap(self)(f)
+  final def ∙[B](f: B => A): F[B] = F.contramap(self)(f)
   ////
 }
 

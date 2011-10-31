@@ -5,11 +5,11 @@ package syntax
 trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   implicit def F: BiFunctor[F]
   ////
-  def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
+  final def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
 
-  def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
+  final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
 
-  def <:>[C](f: A => C)(implicit z: B <:< C): F[C, C] = F.bimap(self)(f, z)
+  final def <:>[C](f: A => C)(implicit z: B <:< C): F[C, C] = F.bimap(self)(f, z)
 
   ////
 }

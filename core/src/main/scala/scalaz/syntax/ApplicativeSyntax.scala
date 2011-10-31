@@ -5,8 +5,8 @@ package syntax
 trait ApplicativeV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Applicative[F]
   ////
-  def map2[B,C](fb: F[B])(f: (A,B) => C): F[C] = F.map2(self,fb)(f)
-  def pair[B](fb: F[B]): F[(A, B)] = F.map2(self, fb)((_,_))
+  final def map2[B,C](fb: F[B])(f: (A,B) => C): F[C] = F.map2(self,fb)(f)
+  final def pair[B](fb: F[B]): F[(A, B)] = F.map2(self, fb)((_,_))
   ////
 }
 

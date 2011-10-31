@@ -5,17 +5,17 @@ package syntax
 trait OrderV[F] extends SyntaxV[F] {
   implicit def F: Order[F]
   ////
-  def <(other: F): Boolean = F.lessThan(self, other)
-  def <=(other: F): Boolean = F.lessThanOrEqual(self, other)
-  def >(other: F): Boolean = F.greaterThan(self, other)
-  def >=(other: F): Boolean = F.greaterThanOrEqual(self, other)
-  def max(other: F): F = F.max(self, other)
-  def min(other: F): F = F.min(self, other)
-  def ?|?(other: F): Ordering = F.order(self, other)
-  def lte(other: F): Boolean = F.lessThanOrEqual(self, other)
-  def gte(other: F): Boolean = F.greaterThanOrEqual(self, other)
-  def lt(other: F): Boolean = F.lessThan(self, other)
-  def gt(other: F): Boolean = F.greaterThan(self, other)
+  final def <(other: F): Boolean = F.lessThan(self, other)
+  final def <=(other: F): Boolean = F.lessThanOrEqual(self, other)
+  final def >(other: F): Boolean = F.greaterThan(self, other)
+  final def >=(other: F): Boolean = F.greaterThanOrEqual(self, other)
+  final def max(other: F): F = F.max(self, other)
+  final def min(other: F): F = F.min(self, other)
+  final def ?|?(other: F): Ordering = F.order(self, other)
+  final def lte(other: F): Boolean = F.lessThanOrEqual(self, other)
+  final def gte(other: F): Boolean = F.greaterThanOrEqual(self, other)
+  final def lt(other: F): Boolean = F.lessThan(self, other)
+  final def gt(other: F): Boolean = F.greaterThan(self, other)
   ////
 }
 

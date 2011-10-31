@@ -5,7 +5,7 @@ package syntax
 trait EachV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Each[F]
   ////
-  def foreach(f: A => Unit): Unit = F.each(self)(f)
+  final def foreach(f: A => Unit): Unit = F.each(self)(f)
   ////
 }
 

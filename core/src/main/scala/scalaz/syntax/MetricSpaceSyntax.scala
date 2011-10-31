@@ -5,7 +5,7 @@ package syntax
 trait MetricSpaceV[F] extends SyntaxV[F] {
   implicit def F: MetricSpace[F]
   ////
-  def <===>(a: F): Int = F.distance(self, a)
+  final def <===>(a: F): Int = F.distance(self, a)
   ////
 }
 

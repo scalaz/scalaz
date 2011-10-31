@@ -5,13 +5,10 @@ package syntax
 trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Functor[F]
   ////
-
-  def map[B](f: A => B): F[B] = F.map(self)(f)
-
-  def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
-
-  def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
-
+  final def map[B](f: A => B): F[B] = F.map(self)(f)
+  final def ∘[B](f: A => B): F[B] = F.map(self)(f)
+  final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
+  final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
   ////
 }
 

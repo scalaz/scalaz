@@ -5,8 +5,8 @@ package syntax
 trait SemigroupV[F] extends SyntaxV[F] {
   implicit def F: Semigroup[F]
   ////
-  def |+|(other: => F): F = F.append(self, other)
-  def mappend(other: => F): F = F.append(self, other)
+  final def |+|(other: => F): F = F.append(self, other)
+  final def mappend(other: => F): F = F.append(self, other)
   ////
 }
 

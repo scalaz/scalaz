@@ -5,7 +5,7 @@ package syntax
 trait BiTraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   implicit def F: BiTraverse[F]
   ////
-  def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =
+  final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =
       F.bitraverse(self)(f, g)
   ////
 }

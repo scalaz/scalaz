@@ -5,8 +5,8 @@ package syntax
 trait IndexV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Index[F]
   ////
-  def index(n: Int): Option[A] = F.index(self, n)
-  def indexOr(default: => A, n: Int): A = F.indexOr(self, default, n)
+  final def index(n: Int): Option[A] = F.index(self, n)
+  final def indexOr(default: => A, n: Int): A = F.indexOr(self, default, n)
   ////
 }
 

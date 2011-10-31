@@ -5,25 +5,25 @@ package syntax
 trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   implicit def F: Arrow[F]
   ////
-  def first[C]: F[(A, C), (B, C)] =
+  final def first[C]: F[(A, C), (B, C)] =
     F.first(self)
 
-  def second[C]: F[(C, A), (C, B)] =
+  final def second[C]: F[(C, A), (C, B)] =
     F.second(self)
 
-  def ***[C, D](k: F[C, D]): F[(A, C), (B, D)] =
+  final def ***[C, D](k: F[C, D]): F[(A, C), (B, D)] =
     F.split(self, k)
 
-  def &&&[C](k: F[A, C]): F[A, (B, C)] =
+  final def &&&[C](k: F[A, C]): F[A, (B, C)] =
     F.combine(self, k)
 
-  def product: F[(A, A), (B, B)] =
+  final def product: F[(A, A), (B, B)] =
     ***(self)
 
-  def ^>>[C](f: C => A): F[C, B] =
+  final def ^>>[C](f: C => A): F[C, B] =
     F.mapfst(self)(f)
 
-  def >>^[C](f: B => C): F[A, C] =
+  final def >>^[C](f: B => C): F[A, C] =
     F.mapsnd(self)(f)
 
   ////

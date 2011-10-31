@@ -5,7 +5,7 @@ package syntax
 trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Apply[F]
   ////
-  def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
+  final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
   ////
 }
 

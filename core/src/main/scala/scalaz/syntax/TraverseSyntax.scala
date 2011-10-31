@@ -9,17 +9,17 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   import State.State
   import State.state
 
-  def tmap[B](f: A => B) = F.map(self)(f)
+  final def tmap[B](f: A => B) = F.map(self)(f)
 
-  def traverse[G[_],B](f: A => G[B])(implicit G: Applicative[G]) =
+  final def traverse[G[_],B](f: A => G[B])(implicit G: Applicative[G]) =
     G.traverse(self)(f)
 
-  def sequence[G[_], B](implicit ev: F[A] <:< F[G[B]], G: Applicative[G]): G[F[B]] = F.sequence(ev(self))(G)
+  final def sequence[G[_], B](implicit ev: F[A] <:< F[G[B]], G: Applicative[G]): G[F[B]] = F.sequence(ev(self))(G)
 
-  def traverseS[S,B](f: A => State[S,B]) =
+  final def traverseS[S,B](f: A => State[S,B]) =
     F.traverseS[S,A,B](self)(f)
 
-  def runTraverseS[S,B](s: S)(f: A => State[S,B]) =
+  final def runTraverseS[S,B](s: S)(f: A => State[S,B]) =
     F.runTraverseS(self, s)(f)
 
   ////

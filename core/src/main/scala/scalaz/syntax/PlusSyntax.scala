@@ -6,7 +6,7 @@ trait PlusV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Plus[F]
   ////
 
-  def <+>(other: => F[A]) = F.plus(self, other)
+  final def <+>(other: => F[A]) = F.plus(self, other)
 
   ////
 }
