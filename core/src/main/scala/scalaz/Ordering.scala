@@ -2,11 +2,16 @@ package scalaz
 
 sealed abstract class Ordering(val toInt: Int, val name: String)
 
-object Ordering {
+object Ordering extends OrderingFunctions with OrderingInstances {
   case object LT extends Ordering(-1, "LT")
   case object EQ extends Ordering(0, "EQ")
   case object GT extends Ordering(1, "GT")
-  
+}
+
+trait OrderingInstances {
+
+  import Ordering._
+
   implicit object ordering extends Order[Ordering] with Show[Ordering] {
     def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match {
       case (LT, LT)      => EQ
@@ -20,11 +25,15 @@ object Ordering {
 
     def show(f: Ordering): List[Char] = f.name.toList
   }
-  
-  def fromLessThan[A](a1: A, a2: A)(f: (A, A) => Boolean): Ordering = 
-     if (f(a1, a2)) LT
-     else if (f(a2, a1)) GT
-     else EQ
+}
+
+trait OrderingFunctions {
+  import Ordering._
+
+  def fromLessThan[A](a1: A, a2: A)(f: (A, A) => Boolean): Ordering =
+    if (f(a1, a2)) LT
+    else if (f(a2, a1)) GT
+    else EQ
 
   def fromInt(intOrdering: Int) = intOrdering match {
     case -1 => LT

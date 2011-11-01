@@ -31,37 +31,39 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait OptionTsLow2 {
+trait OptionTInstances2 {
   implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait OptionTsLow1 extends OptionTsLow2 {
+trait OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTPointed[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = OptionT[F, α]})#λ] = new OptionTPointed[F] {
     implicit def F: Pointed[F] = F0
   }
 }
 
-trait OptionTsLow0 extends OptionTsLow1 {
+trait OptionTInstances0 extends OptionTInstances1 {
   implicit def optionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
       implicit def F: Apply[F] = F0
     }
 }
 
-trait OptionTs extends OptionTsLow0 {
+trait OptionTInstances extends OptionTInstances0 {
   implicit def optionTMonadTrans: MonadTrans[OptionT] = new OptionTMonadTrans {}
 
   implicit def optionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonad[F] {
     implicit def F: Monad[F] = F0
   }
+}
 
+trait OptionFunctions {
   def optionT[M[_]] = new (({type λ[α] = M[Option[α]]})#λ ~> ({type λ[α] = OptionT[M, α]})#λ) {
     def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
   }
 }
 
-object OptionT extends OptionTs
+object OptionT extends OptionFunctions
 
 //
 // Implementation traits for type class instances

@@ -118,12 +118,16 @@ sealed trait TreeLoc[A] {
     }
 }
 
-object TreeLoc extends TreeLocs {
+object TreeLoc extends TreeLocFunctions with TreeLocInstances {
   def apply[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
     loc(t, l, r, p)
 }
 
-trait TreeLocs {
+trait TreeLocInstances {
+  // TODO
+}
+
+trait TreeLocFunctions {
   type TreeForest[A] =
   Stream[Tree[A]]
 

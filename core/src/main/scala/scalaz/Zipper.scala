@@ -304,12 +304,16 @@ sealed trait Zipper[A] {
   def deleteC: Option[Zipper[A]] = deleteRightC
 }
 
-object Zipper extends Zippers {
+object Zipper extends ZipperFunctions with ZipperInstances {
   def apply[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
     zipper(ls, a, rs)
 }
 
-trait Zippers {
+trait ZipperInstances {
+  // TODO
+}
+
+trait ZipperFunctions {
   def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] = new Zipper[A] {
     val focus = a
     val lefts = ls

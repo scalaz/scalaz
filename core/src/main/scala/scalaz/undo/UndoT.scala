@@ -35,17 +35,27 @@ final case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
 // Prioritized Implicits for type class instances
 //
 
-trait UndoTsLow2 {
+trait UndoTInstances1 {
   // Prefer Pointed over Functor
   implicit def undoTFunctor[S, F[_]](implicit F0: Functor[F]): Functor[({type G[x] = UndoT[S, F, x]})#G] = new UndoTFunctor[S, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait UndoTsLow1 extends UndoTsLow2 {
+trait UndoTInstances0 extends UndoTInstances1 {
   // Prefer Monad over Pointed
   implicit def undoTPointed[S, F[_]](implicit F0: Pointed[F]): Pointed[({type G[x] = UndoT[S, F, x]})#G] = new UndoTPointed[S, F] {
     implicit def F: Pointed[F] = F0
+  }
+}
+
+trait UndoTInstances extends UndoTInstances0 {
+  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] = new UndoTMonadTrans[S] {}
+
+  implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S] = new UndoTMonadState[S, F] {
+    implicit def F: Monad[F] = F0
+
+    implicit def HMS: HStateTMonadState[S, F] = MonadState[({type f[s, a] = StateT[s, F, a]})#f, History[S]]
   }
 }
 
@@ -59,7 +69,7 @@ trait UndoTFunctions {
   }
 
   /**
-   * Restores the latest item in the history 
+   * Restores the latest item in the history
    *
    */
   def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
@@ -94,17 +104,7 @@ trait UndoTFunctions {
   }
 }
 
-trait UndoTs extends UndoTFunctions with UndoTsLow1 {
-  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] = new UndoTMonadTrans[S] {}
-
-  implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S] = new UndoTMonadState[S, F] {
-    implicit def F: Monad[F] = F0
-
-    implicit def HMS: HStateTMonadState[S, F] = MonadState[({type f[s, a] = StateT[s, F, a]})#f, History[S]]
-  }
-}
-
-object UndoT extends UndoTs
+object UndoT extends UndoTInstances with UndoTFunctions
 
 //
 // Implementation traits for type class instances

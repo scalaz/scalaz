@@ -94,7 +94,7 @@ sealed trait EitherT[A, F[_], B] {
 
 }
 
-object EitherT extends EitherTs {
+object EitherT extends EitherTFunctions with EitherTInstances {
   def apply[A, F[_], B](a: F[Either[A, B]]): EitherT[A, F, B] =
     eitherT[A, F, B](a)
 
@@ -156,10 +156,13 @@ object EitherT extends EitherTs {
     def flatMap[C](f: A => EitherT[C, F, B])(implicit F: Monad[F]): EitherT[C, F, B] =
       eitherT(F.bind(e.runT)(_.fold(a => f(a).runT, b => F.pure(Right(b): Either[C, B]))))
   }
-
 }
 
-trait EitherTs {
+trait EitherTInstances {
+  // TODO
+}
+
+trait EitherTFunctions {
   def eitherT[A, F[_], B](a: F[Either[A, B]]): EitherT[A, F, B] = new EitherT[A, F, B] {
     val runT = a
   }

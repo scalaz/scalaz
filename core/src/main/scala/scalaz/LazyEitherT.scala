@@ -10,14 +10,14 @@ sealed trait LazyEitherT[A, F[_], B] {
   import LazyOptionT._
   import Isomorphism.{<~>, <~~>}
 
-   def run(implicit i: F <~> Id): LazyEither[A, B] =
+  def run(implicit i: F <~> Id): LazyEither[A, B] =
     i.to(runT)
 
   def ?[X](left: => X, right: => X)(implicit F: Functor[F]): F[X] =
     F.map(runT)(_.fold(_ => left, _ => right))
 
   def -?-[X](left: => X, right: => X)(implicit i: F <~> Id): X =
-    run ? (left, right)
+    run ?(left, right)
 
   def isLeftT(implicit F: Functor[F]): F[Boolean] =
     F.map(runT)(_.isLeft)
@@ -108,31 +108,9 @@ sealed trait LazyEitherT[A, F[_], B] {
 
 }
 
-object LazyEitherT extends LazyEitherTs {
+object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
   def apply[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] =
     lazyEitherT(a)
-}
-
-trait LazyEitherTs {
-  def lazyEitherT[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] = new LazyEitherT[A, F, B] {
-    val runT = a
-  }
-
-  import LazyEither._
-
-  def lazyLeftT[A, F[_], B](a: => A)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
-    lazyEitherT(p.pure(lazyLeft(a)))
-
-  def lazyRightT[A, F[_], B](b: => B)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
-    lazyEitherT(p.pure(lazyRight(b)))
-
-  implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
-    def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = LazyEitherT[Z, M, x]})#f ~> ({type f[x] = LazyEitherT[Z, N, x]})#f) {
-      def apply[A](fa: LazyEitherT[Z, M, A]): LazyEitherT[Z, N, A] = LazyEitherT(f.apply(fa.runT))
-    }
-
-    def liftM[G[_]: Monad, A](a: G[A]): LazyEitherT[Z, G, A] = lazyEitherT(Monad[G].map(a)((a: A) => lazyRight(a): LazyEither[Z, A]))
-  }
 
   sealed trait LazyLeftProjectionT[A, F[_], B] {
     def e: LazyEitherT[A, F, B]
@@ -198,6 +176,31 @@ trait LazyEitherTs {
       F.each(e.runT)(_.left foreach f)
 
     def flatMap[C](f: (=> A) => LazyEitherT[C, F, B])(implicit M: Monad[F]): LazyEitherT[C, F, B] =
-      lazyEitherT(M.bind(e.runT)(_.fold(a => f(a).runT, b => M.pure(lazyRight[C](b)))))
+      LazyEitherT(M.bind(e.runT)(_.fold(a => f(a).runT, b => M.pure(LazyEither.lazyRight[C](b)))))
   }
+
+}
+
+trait LazyEitherTInstances {
+  implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
+    def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = LazyEitherT[Z, M, x]})#f ~> ({type f[x] = LazyEitherT[Z, N, x]})#f) {
+      def apply[A](fa: LazyEitherT[Z, M, A]): LazyEitherT[Z, N, A] = LazyEitherT(f.apply(fa.runT))
+    }
+
+    def liftM[G[_] : Monad, A](a: G[A]): LazyEitherT[Z, G, A] = LazyEitherT(Monad[G].map(a)((a: A) => LazyEither.lazyRight(a): LazyEither[Z, A]))
+  }
+}
+
+trait LazyEitherTFunctions {
+  def lazyEitherT[A, F[_], B](a: F[LazyEither[A, B]]): LazyEitherT[A, F, B] = new LazyEitherT[A, F, B] {
+    val runT = a
+  }
+
+  import LazyEither._
+
+  def lazyLeftT[A, F[_], B](a: => A)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
+    lazyEitherT(p.pure(lazyLeft(a)))
+
+  def lazyRightT[A, F[_], B](b: => B)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
+    lazyEitherT(p.pure(lazyRight(b)))
 }

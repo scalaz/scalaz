@@ -76,9 +76,22 @@ private case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private case class LazyNone[A]() extends LazyOption[A]
 
-object LazyOption extends LazyOptions
+object LazyOption extends LazyOptionFunctions with LazyOptionInstances
 
-trait LazyOptions {
+trait LazyOptionInstances {
+
+  /* TODO
+implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
+  Show[A].shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))
+
+implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] =
+  Equal.equalBy(_.toOption)
+
+implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
+  Order.orderBy(_.toOption)*/
+}
+
+trait LazyOptionFunctions {
   def lazySome[A]: (=> A) => LazyOption[A] =
     a => LazySome(() => a)
 
@@ -89,14 +102,4 @@ trait LazyOptions {
    * Returns the given argument in `lazySome` if this is `true`, `lazyNone` otherwise.
    */
   def condLazyOption[A](value: Boolean, a: => A): LazyOption[A] = if (value) lazySome(a) else lazyNone
-
-  /* TODO
-  implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
-    Show[A].shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))
-
-  implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] =
-    Equal.equalBy(_.toOption)
-
-  implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
-    Order.orderBy(_.toOption)*/
 }

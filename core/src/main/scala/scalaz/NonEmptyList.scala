@@ -65,23 +65,15 @@ sealed trait NonEmptyList[A] {
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 
-object NonEmptyList extends NonEmptyLists {
+object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 }
 
-trait NonEmptyLists {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t.toList
-  }
-
-  def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, t.toList)
-
+trait NonEmptyListInstances {
   // TODO Show, monoid, etc.
   implicit object nonEmptyList extends Traverse[NonEmptyList] with Monad[NonEmptyList] {
-    def traverseImpl[G[_]: Applicative, A, B](fa: NonEmptyList[A])(f: (A) => G[B]): G[NonEmptyList[B]] = {
+    def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: (A) => G[B]): G[NonEmptyList[B]] = {
       import std.list.listInstance
 
       Applicative[G].map(Traverse[List].traverse(fa.list)(f))((x: List[B]) => NonEmptyList.nel(x.head, x.tail))
@@ -93,4 +85,14 @@ trait NonEmptyLists {
 
     def pure[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
   }
+}
+
+trait NonEmptyListFunctions {
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
+    val head = h
+    val tail = t.toList
+  }
+
+  def nels[A](h: A, t: A*): NonEmptyList[A] =
+    nel(h, t.toList)
 }

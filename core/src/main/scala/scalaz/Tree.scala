@@ -83,17 +83,20 @@ sealed trait Tree[A] {
     node(f(rootLabel), subForest map (_ map f))
 }
 
-object Tree extends Trees {
+object Tree extends TreeFunctions with TreeInstances {
   /** Construct a tree node with no children. */
   def apply[A](root: => A): Tree[A] = leaf(root)
-}
-
-trait Trees {
 
   object Node {
     def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
   }
+}
 
+trait TreeInstances {
+  // TODO
+}
+
+trait TreeFunctions {
   /** Construct a new Tree node. */
   def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
     lazy val rootLabel = root
@@ -110,6 +113,6 @@ trait Trees {
 
   def unfoldTree[A, B](v: A, f: A => (B, () => Stream[A])): Tree[B] =
     f(v) match {
-      case (a, bs) => node(a, unfoldForest(bs.apply, f))
+      case (a, bs) => node(a, unfoldForest(bs.apply(), f))
     }
 }

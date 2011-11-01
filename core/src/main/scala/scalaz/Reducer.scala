@@ -45,50 +45,13 @@ sealed trait Reducer[C, M] {
   }
 }
 
-object Reducer extends Reducers {
+object Reducer extends ReducerFunctions with ReducerInstances {
   def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
 }
 
-trait Reducers {
-
-  def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    new Reducer[C, M] {
-      val monoid = mm
-
-      def unit(c: C) = u(c)
-
-      def snoc(m: M, c: C): M = sc(m)(c)
-
-      def cons(c: C, m: M): M = cs(c)(m)
-    }
-
-  def foldReduce[F[_], A, B](a: F[A])(implicit f: Traverse[F], r: Reducer[A, B]): B =
-    f.foldMap(a)(r.unit(_))(r.monoid)
-
-  /**Construct a Reducer with the given unit function and monoid **/
-  def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    new Reducer[C, M] {
-      val monoid = mm
-
-      def unit(c: C) = u(c)
-
-      def snoc(m: M, c: C): M = mm.append(m, u(c))
-
-      def cons(c: C, m: M): M = mm.append(u(c), m)
-    }
-
-  def unitConsReducer[C, M](u: C => M, cs: C => M => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
-    val monoid = mm
-
-    def unit(c: C) = u(c)
-
-    def snoc(m: M, c: C): M = mm.append(m, u(c))
-
-    def cons(c: C, m: M): M = cs(c)(m)
-  }
-
-  def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(x => x)
+trait ReducerInstances {
+  import Reducer._
 
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
@@ -152,4 +115,45 @@ trait Reducers {
   implicit def LastReducer[A]: Reducer[A, Option[A] @@ Last] = unitReducer(a => Tag[Option[A], Last](Some(a)))
 
   implicit def LastOptionReducer[A]: Reducer[Option[A], Option[A] @@ Last] = unitReducer(o => Tag[Option[A], Last](o))
+}
+
+trait ReducerFunctions {
+
+  def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
+    new Reducer[C, M] {
+      val monoid = mm
+
+      def unit(c: C) = u(c)
+
+      def snoc(m: M, c: C): M = sc(m)(c)
+
+      def cons(c: C, m: M): M = cs(c)(m)
+    }
+
+  def foldReduce[F[_], A, B](a: F[A])(implicit f: Traverse[F], r: Reducer[A, B]): B =
+    f.foldMap(a)(r.unit(_))(r.monoid)
+
+  /**Construct a Reducer with the given unit function and monoid **/
+  def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
+    new Reducer[C, M] {
+      val monoid = mm
+
+      def unit(c: C) = u(c)
+
+      def snoc(m: M, c: C): M = mm.append(m, u(c))
+
+      def cons(c: C, m: M): M = mm.append(u(c), m)
+    }
+
+  def unitConsReducer[C, M](u: C => M, cs: C => M => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
+    val monoid = mm
+
+    def unit(c: C) = u(c)
+
+    def snoc(m: M, c: C): M = mm.append(m, u(c))
+
+    def cons(c: C, m: M): M = cs(c)(m)
+  }
+
+  def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(x => x)
 }

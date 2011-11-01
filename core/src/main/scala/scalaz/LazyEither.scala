@@ -69,32 +69,7 @@ private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
 
 private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
-object LazyEither extends LazyEithers
-
-trait LazyEithers {
-
-
-  /**
-   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
-   * `LazyRight`
-   */
-  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
-
-  trait LazyLeftConstruct[B] {
-    def apply[A](a: => A): LazyEither[A, B]
-  }
-
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
-    def apply[A](a: => A) = LazyLeft(() => a)
-  }
-
-  trait LazyRightConstruct[A] {
-    def apply[B](b: => B): LazyEither[A, B]
-  }
-
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
-    def apply[B](b: => B) = LazyRight(() => b)
-  }
+object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
   sealed trait LazyLeftProjection[A, B] {
     def e: LazyEither[A, B]
@@ -135,4 +110,34 @@ trait LazyEithers {
       e.fold(f, lazyRight(_))
   }
 
+}
+
+trait LazyEitherInstances {
+  // TODO
+}
+
+trait LazyEitherFunctions {
+
+
+  /**
+   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
+   * `LazyRight`
+   */
+  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
+
+  trait LazyLeftConstruct[B] {
+    def apply[A](a: => A): LazyEither[A, B]
+  }
+
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
+    def apply[A](a: => A) = LazyLeft(() => a)
+  }
+
+  trait LazyRightConstruct[A] {
+    def apply[B](b: => B): LazyEither[A, B]
+  }
+
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
+    def apply[B](b: => B) = LazyRight(() => b)
+  }
 }

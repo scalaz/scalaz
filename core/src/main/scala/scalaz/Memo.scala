@@ -4,9 +4,12 @@ sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
   def apply(z: K => V): K => V
 }
 
-object Memo extends Memos
+object Memo extends MemoFunctions with MemoInstances
 
-trait Memos {
+trait MemoInstances {
+}
+
+trait MemoFunctions {
   def memo[@specialized(Int) K, @specialized(Int, Long, Double) V](f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
     def apply(z: K => V) = f(z)
   }
