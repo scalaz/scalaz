@@ -111,5 +111,7 @@ object SyntaxUsage extends App {
     val k = kleisli((a: Int) => some(0))
     kleisliCategory[Option].compose(k, k)
     k >>> k
+
+    List(some(0)).sequence
   }
 }

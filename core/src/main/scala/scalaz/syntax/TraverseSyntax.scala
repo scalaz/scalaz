@@ -1,6 +1,8 @@
 package scalaz
 package syntax
 
+import Leibniz.===
+
 /** Wraps a value `self` and provides methods related to `Traverse` */
 trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Traverse[F]
@@ -9,12 +11,16 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   import State.State
   import State.state
 
-  final def tmap[B](f: A => B) = F.map(self)(f)
+  final def tmap[B](f: A => B) =
+    F.map(self)(f)
 
   final def traverse[G[_],B](f: A => G[B])(implicit G: Applicative[G]) =
     G.traverse(self)(f)
 
-  final def sequence[G[_], B](implicit ev: F[A] <:< F[G[B]], G: Applicative[G]): G[F[B]] = F.sequence(ev(self))(G)
+  final def sequence[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
+    val fgb: F[G[B]] = ev.subst[F](self)
+    F.sequence(fgb)
+  }
 
   final def traverseS[S,B](f: A => State[S,B]) =
     F.traverseS[S,A,B](self)(f)

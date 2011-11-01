@@ -7,6 +7,8 @@ package scalaz
  * (e.g. if you could pass an A into any function that expects a B.)
  */
 trait Liskov[-A, +B] {
+  def apply(a: A): B = Liskov.witness(this)(a)
+
   def subst[F[-_]](p: F[B]): F[A]
 
   final def *[+[+_, +_], C, D](that: Liskov[C, D]): Liskov[A + C, B + D] = Liskov.lift2(this, that)

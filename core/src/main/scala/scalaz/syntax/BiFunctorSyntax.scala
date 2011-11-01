@@ -1,6 +1,8 @@
 package scalaz
 package syntax
 
+import Liskov.<~<
+
 /** Wraps a value `self` and provides methods related to `BiFunctor` */
 trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   implicit def F: BiFunctor[F]
@@ -9,7 +11,7 @@ trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 
   final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
 
-  final def <:>[C](f: A => C)(implicit z: B <:< C): F[C, C] = F.bimap(self)(f, z)
+  final def <:>[C](f: A => C)(implicit z: B <~< C): F[C, C] = F.bimap(self)(f, z)
 
   ////
 }

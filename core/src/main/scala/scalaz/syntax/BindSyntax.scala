@@ -1,6 +1,8 @@
 package scalaz
 package syntax
 
+import Liskov.<~<
+
 /** Wraps a value `self` and provides methods related to `Bind` */
 trait BindV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Bind[F]
@@ -9,7 +11,7 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
 
   def >>=[B](f: A => F[B]) = F.bind(self)(f)
 
-  def join[B](implicit ev: F[A] <:< F[F[B]]) = F.join(ev(self))
+  def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
   ////
 }
 
