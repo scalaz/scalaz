@@ -27,7 +27,7 @@ trait Traverse[F[_]] extends Functor[F] { self =>
 
   // derived functions
   def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] = 
-    traversal[G].run(fga)(a => a)
+    traversal[G].run[G[A], A](fga)(ga => ga)
 
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] = 
     traversalS[S].run(fga)(a => a)

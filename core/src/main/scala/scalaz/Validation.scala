@@ -124,7 +124,7 @@ sealed trait FailProjection[E, A] {
 
 object FailProjection extends FailProjections {
   def apply[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
-    Validation.failure[A]
+    Validation.failureNT[A]
 }
 
 trait FailProjections {
@@ -170,14 +170,12 @@ trait FailProjections {
   }
 }
 
-object Validation extends Validations {
-  def apply[E]: (Id ~> ({type λ[α] = Validation[E, α]})#λ) = success[E]
-}
+object Validation extends Validations
 
 trait Validations {
   type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
 
-  def success[E]: (Id ~> ({type λ[α] = Validation[E, α]})#λ) =
+  def successNT[E]: (Id ~> ({type λ[α] = Validation[E, α]})#λ) =
     new (Id ~> ({type λ[α] = Validation[E, α]})#λ) {
       def apply[A](a: A) = Success(a)
     }
@@ -186,13 +184,19 @@ trait Validations {
 
   def failure[E, A](e: E): Validation[E, A] = Failure(e)
 
-  def failure[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
+  def failureNT[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
     new (Id ~> ({type λ[α] = Validation[α, A]})#λ) {
       def apply[E](e: E) = Failure(e)
     }
 
   def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
-    e.fold(e => failure[A].apply[E](e), a => success[E].apply[A](a))
+    e.fold(e => Failure(e), a => Success(a))
+
+  def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
+    success(a)
+  } catch {
+    case e => failure(e)
+  }
 
   /** Validation is an Applicative Functor, if the error type forms a Semigroup */
   implicit def validationApplicative[E](E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
