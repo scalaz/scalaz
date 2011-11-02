@@ -81,6 +81,11 @@ sealed trait Tree[A] {
 
   def map[B](f: A => B): Tree[B] =
     node(f(rootLabel), subForest map (_ map f))
+
+  def flatMap[B](f: A => Tree[B]): Tree[B] = {
+    val r: Tree[B] = f(rootLabel)
+    Tree.node(r.rootLabel, r.subForest #::: subForest.map(_.flatMap(f)))
+  }
 }
 
 object Tree extends TreeFunctions with TreeInstances {
@@ -93,7 +98,17 @@ object Tree extends TreeFunctions with TreeInstances {
 }
 
 trait TreeInstances {
-  // TODO
+  implicit object treeInstance extends Monad[Tree] with Comonad[Tree] {
+    def pure[A](a: => A): Tree[A] = Tree.leaf(a)
+    def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
+    def copure[A](p: Tree[A]): A = p.rootLabel
+    override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
+    def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
+  }
+
+  /* TODO
+  def applic[A, B](f: Tree[A => B]) = a => Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
+   */
 }
 
 trait TreeFunctions {
