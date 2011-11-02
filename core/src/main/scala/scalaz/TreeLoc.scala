@@ -38,7 +38,7 @@ sealed trait TreeLoc[+A] {
     case Stream.Empty => None
   }
 
-  /** Select the leftmost chils of the current node. */
+  /** Select the leftmost child of the current node. */
   def firstChild: Option[TreeLoc[A]] = tree.subForest match {
     case t #:: ts => Some(loc(t, Stream.Empty, ts, downParents))
     case Stream.Empty => None
