@@ -168,31 +168,30 @@ object TreeLoc extends TreeLocFunctions with TreeLocInstances {
 trait TreeLocInstances {
   // TODO more instances
   implicit val treeLocInstance: Cojoin[TreeLoc] = new Cojoin[TreeLoc] {
+    import std.stream.{streamInstance, streamMonoid}
+    import TreeLoc.Parent
+
     def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = {
       val lft = (_: TreeLoc[A]).left
       val rgt = (_: TreeLoc[A]).right
-      import std.stream.{streamInstance, streamMonoid}
-      val p = Monoid.unfold[Stream, Option[TreeLoc[A]], (Stream[Tree[TreeLoc[A]]], TreeLoc[A], Stream[Tree[TreeLoc[A]]])](a.parent) {
-        (o: Option[TreeLoc[A]]) =>
-          for (z <- o) yield ((uf(z, lft), z, uf(z, rgt)), z.parent)
+      val p = Monoid.unfold[Stream, Option[TreeLoc[A]], Parent[TreeLoc[A]]](a.parent) {
+        (o: Option[TreeLoc[A]]) => for (z <- o) yield ((uf(z, lft), z, uf(z, rgt)), z.parent)
       }
       TreeLoc.loc(Tree.unfoldTree(a)(dwn[A](_: TreeLoc[A])), uf(a, lft), uf(a, rgt), p)
     }
 
     private def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => Stream[TreeLoc[A]]) = {
-      import std.stream.{streamMonoid, streamInstance}
       val f = () => Monoid.unfold[Stream, Option[TreeLoc[A]], TreeLoc[A]](tz.firstChild) {
-        (o: Option[TreeLoc[A]]) =>
-          for (c <- o) yield (c, c.right)
+        (o: Option[TreeLoc[A]]) => for (c <- o) yield (c, c.right)
       }
       (tz, f)
     }
 
     private def uf[A](a: TreeLoc[A], f: TreeLoc[A] => Option[TreeLoc[A]]): Stream[Tree[TreeLoc[A]]] = {
-      import std.stream.{streamMonoid, streamInstance}
-      Monoid.unfold(f(a))((o: Option[TreeLoc[A]]) =>
-              for (c <- o) yield (Tree.unfoldTree(c)(dwn[A](_: TreeLoc[A])), f(c)))
+      Monoid.unfold(f(a)) {
+        (o: Option[TreeLoc[A]]) => for (c <- o) yield (Tree.unfoldTree(c)(dwn[A](_: TreeLoc[A])), f(c))
       }
+    }
   }
 }
 
