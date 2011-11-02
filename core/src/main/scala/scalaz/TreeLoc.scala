@@ -49,6 +49,9 @@ sealed trait TreeLoc[+A] {
     for (ltr <- split(Stream.Empty, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
   }
 
+  def find(p: TreeLoc[A] => Boolean): Option[TreeLoc[A]] =
+    this.cojoin.tree.flatten.find(p)
+
   def toTree: Tree[A] = root.tree
 
   def toForest: Stream[Tree[A]] = combChildren(root.lefts, root.tree, root.rights)
