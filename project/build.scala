@@ -10,6 +10,7 @@ object build extends Build {
     organization := "org.scalaz",
     version := "7.1-SNAPSHOT",
     scalaVersion := "2.9.1",
+    (publishArtifact in Docs) := false,
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
       (scalaSource, streams, typeClasses) =>
@@ -26,6 +27,7 @@ object build extends Build {
         val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
         objects + "\n\n" + all
     }
+
   )
 
   lazy val scalaz = Project(
