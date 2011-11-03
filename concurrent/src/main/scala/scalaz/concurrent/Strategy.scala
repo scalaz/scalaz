@@ -30,7 +30,7 @@ trait Strategys extends StrategysLow {
   }
 
   /**
-   * A strategy that executes its arguments on {@Strategy# D e f a u l t E x e c u t o r S e r v i c e}.
+   * A strategy that executes its arguments on `DefaultExecutorService`
    */
   implicit val DefaultStrategy: Strategy = Executor(DefaultExecutorService)
 }

@@ -14,10 +14,10 @@ sealed trait Promise[A] {
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var v: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
-  lazy private val e = actor[Signal[A]](_.eval)
+  lazy private[concurrent] val e = actor[Signal[A]](_.eval)
 
   def get = {
-    latch.await
+    latch.await()
     v.get
   }
 
@@ -66,17 +66,9 @@ sealed trait Promise[A] {
   }
 }
 
-object Promise extends Promises {
+object Promise extends PromiseFunctions with PromiseInstances {
   def apply[A](a: => A)(implicit s: Strategy): Promise[A] =
     promise(a)
-
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
-    val p = new Promise[A] {
-      implicit val strategy = s
-    }
-    p.e ! new Promise.Done(a, p)
-    p
-  }
 
   protected sealed abstract class State[+A] {
     def get: A
@@ -121,14 +113,14 @@ object Promise extends Promises {
       if (!promise.borked) {
         try {
           promise.v = new Fulfilled(a)
-          promise.latch.countDown
+          promise.latch.countDown()
           val as = promise.waiting
           while (!as.isEmpty) as.remove()(a)
         } catch {
           case e: Throwable => {
             promise.v = new Thrown(e)
-            promise.latch.countDown
-            promise.waiting.clear // kill teh hordes
+            promise.latch.countDown()
+            promise.waiting.clear() // kill teh hordes
           }
         }
       }
@@ -138,30 +130,30 @@ object Promise extends Promises {
     val threw = false
 
     def break(promise: Promise[_]) {
-      promise.latch.countDown // free the hordes
+      promise.latch.countDown() // free the hordes
     }
   }
 
   sealed class BrokenException extends Exception
 
-  protected abstract sealed class Signal[A] {
+  protected[concurrent] abstract sealed class Signal[A] {
     def eval: Unit
   }
 
-  protected class Done[A](a: => A, promise: Promise[A]) extends Signal[A] {
+  protected[concurrent] class Done[A](a: => A, promise: Promise[A]) extends Signal[A] {
     def eval {
       promise.v.fulfill(a, promise)
     }
   }
 
-  protected class Cont[A](k: A => Unit, promise: Promise[A]) extends Signal[A] {
+  protected[concurrent] class Cont[A](k: A => Unit, promise: Promise[A]) extends Signal[A] {
     def eval {
       if (promise.v.fulfilled) k(promise.v.get)
       else promise.waiting.offer(k)
     }
   }
 
-  protected class Break[A](promise: Promise[_]) extends Signal[A] {
+  protected[concurrent] class Break[A](promise: Promise[_]) extends Signal[A] {
     def eval {
       promise.v.break(promise)
     }
@@ -169,7 +161,7 @@ object Promise extends Promises {
 
 }
 
-trait Promises {
+trait PromiseInstances {
 
   import Promise._
 
@@ -177,9 +169,20 @@ trait Promises {
     def cojoin[A](a: Promise[A]): Promise[Promise[A]] = promise(a)
     def pure[A](a: => A): Promise[A] = promise(a)
     def copure[A](p: Promise[A]): A = p.get
-    def traverseImpl[G[_]: Applicative, A, B](fa: Promise[A])(f: (A) => G[B]): G[Promise[B]] =
+    def traverseImpl[G[_] : Applicative, A, B](fa: Promise[A])(f: (A) => G[B]): G[Promise[B]] =
       Applicative[G].map(f(fa.get))(promise(_: B)(fa.strategy))
     def foldR[A, B](fa: Promise[A], z: B)(f: (A) => (=> B) => B): B = f(fa.get)(z)
     def bind[A, B](fa: Promise[A])(f: (A) => Promise[B]): Promise[B] = fa flatMap f
+  }
+}
+
+trait PromiseFunctions {
+
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
+    val p = new Promise[A] {
+      implicit val strategy = s
+    }
+    p.e ! new Promise.Done(a, p)
+    p
   }
 }

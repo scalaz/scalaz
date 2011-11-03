@@ -47,15 +47,17 @@ sealed case class Actor[A](e: A => Unit, onError: Throwable => Unit = throw (_))
   })
 }
 
-object Actor extends Actors
+object Actor extends ActorFunctions with ActorInstances
 
-trait Actors {
-  def actor[A](e: A => Unit, err: Throwable => Unit = throw (_))(implicit s: Strategy): Actor[A] =
-    Actor[A](e, err)
-
+trait ActorInstances {
   implicit def actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
     def contramap[A, B](r: Actor[A])(f: (B) => A): Actor[B] = r contramap f
   }
+}
 
-  implicit def ActorFrom[A](a: Actor[A]): A => Unit = a ! _
+trait ActorFunctions {
+  def actor[A](e: A => Unit, err: Throwable => Unit = throw (_))(implicit s: Strategy): Actor[A] =
+    Actor[A](e, err)
+
+  implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
 }
