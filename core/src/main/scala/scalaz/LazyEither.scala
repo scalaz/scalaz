@@ -114,6 +114,11 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
 trait LazyEitherInstances {
   // TODO
+
+  implicit def lazyEitherBiFunctor: BiFunctor[LazyEither] = new BiFunctor[LazyEither] {
+    def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
+      fab.map(x => g(x)).left.map(x => f(x))
+  }
 }
 
 trait LazyEitherFunctions {

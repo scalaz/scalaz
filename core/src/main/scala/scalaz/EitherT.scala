@@ -160,6 +160,9 @@ object EitherT extends EitherTFunctions with EitherTInstances {
 
 trait EitherTInstances {
   // TODO
+  implicit def eitherTInstance[F[_] : Functor] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
+    def bimap[A, B, C, D](fab: EitherT[A, F, B])(f: (A) => C, g: (B) => D): EitherT[C, F, D] = fab.map(g).left.map(f)
+  }
 }
 
 trait EitherTFunctions {

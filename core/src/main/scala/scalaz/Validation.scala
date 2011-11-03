@@ -195,6 +195,13 @@ trait ValidationInstances {
     }
   }
 
+  implicit def validationBifunctor = new BiFunctor[Validation] {
+    def bimap[A, B, C, D](fab: Validation[A, B])(f: (A) => C, g: (B) => D): Validation[C, D] = fab match {
+      case Failure(a) => Validation.failure(f(a))
+      case Success(b) => Validation.success(g(b))
+    }
+  }
+
   // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def pure[A](a: => A): Validation[E, A] = Success(a)

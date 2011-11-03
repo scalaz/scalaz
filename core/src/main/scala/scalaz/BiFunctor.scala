@@ -27,44 +27,6 @@ object BiFunctor {
   def apply[F[_, _]](implicit F: BiFunctor[F]): BiFunctor[F] = F
 
   ////
-  /*
-  implicit def EitherBiFunctor: BiFunctor[Either] = new BiFunctor[Either] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) = {
-      case Left(a) => Left(f(a))
-      case Right(b) => Right(g(b))
-    }
-  }
-
-  implicit def LazyEitherBiFunctor: BiFunctor[LazyEither] = new BiFunctor[LazyEither] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) =
-      _.map(x => g(x)).left.map(x => f(x))
-  }
-
-  implicit def EitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) =
-      _.map(g).left.map(f)
-  }
-
-  implicit def LazyEitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) =
-      _.map(x => g(x)).left.map(x => f(x))
-  }
-
-  implicit def ValidationBiFunctor: BiFunctor[Validation] = new BiFunctor[Validation] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) = {
-      case Failure(a) => Validation.failure(f(a))
-      case Success(b) => Validation.success(g(b))
-    }
-  }
-
-  import java.util.Map.Entry
-  import java.util.AbstractMap.SimpleImmutableEntry
-
-  implicit def MapEntryBiFunctor: BiFunctor[Entry] = new BiFunctor[Entry] {
-    def bimap[A, B, C, D](f: A => C, g: B => D) =
-      k => new SimpleImmutableEntry(f(k.getKey), g(k.getValue))
-  }
-  */
 
   ////
 }

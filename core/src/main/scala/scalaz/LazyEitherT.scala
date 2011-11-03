@@ -182,6 +182,11 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 }
 
 trait LazyEitherTInstances {
+  implicit def lazyEitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
+    def bimap[A, B, C, D](fab: LazyEitherT[A, F, B])(f: A => C, g: B => D) =
+      fab.map(x => g(x)).left.map(x => f(x))
+  }
+
   implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
     def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = LazyEitherT[Z, M, x]})#f ~> ({type f[x] = LazyEitherT[Z, N, x]})#f) {
       def apply[A](fa: LazyEitherT[Z, M, A]): LazyEitherT[Z, N, A] = LazyEitherT(f.apply(fa.runT))
