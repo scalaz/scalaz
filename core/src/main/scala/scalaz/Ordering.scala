@@ -35,9 +35,5 @@ trait OrderingFunctions {
     else if (f(a2, a1)) GT
     else EQ
 
-  def fromInt(intOrdering: Int) = intOrdering match {
-    case -1 => LT
-    case 0  => EQ
-    case 1  => GT
-  }
+  def fromInt(intOrdering: Int) = if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
 }
