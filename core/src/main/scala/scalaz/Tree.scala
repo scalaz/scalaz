@@ -63,7 +63,7 @@ sealed trait Tree[A] {
   }
 
   /** Binds the given function across all the subtrees of this tree. */
-  def cobind[B](f: Tree[A] => B): Tree[B] = unfoldTree(this, (t: Tree[A]) => (f(t), () => t.subForest))
+  def cobind[B](f: Tree[A] => B): Tree[B] = unfoldTree(this)(t => (f(t), () => t.subForest))
 
   /** A TreeLoc zipper of this tree, focused on the root node. */
   def loc: TreeLoc[A] = TreeLoc.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
@@ -81,6 +81,11 @@ sealed trait Tree[A] {
 
   def map[B](f: A => B): Tree[B] =
     node(f(rootLabel), subForest map (_ map f))
+
+  def flatMap[B](f: A => Tree[B]): Tree[B] = {
+    val r: Tree[B] = f(rootLabel)
+    Tree.node(r.rootLabel, r.subForest #::: subForest.map(_.flatMap(f)))
+  }
 }
 
 object Tree extends TreeFunctions with TreeInstances {
@@ -93,7 +98,17 @@ object Tree extends TreeFunctions with TreeInstances {
 }
 
 trait TreeInstances {
-  // TODO
+  implicit object treeInstance extends Monad[Tree] with Comonad[Tree] {
+    def pure[A](a: => A): Tree[A] = Tree.leaf(a)
+    def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
+    def copure[A](p: Tree[A]): A = p.rootLabel
+    override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
+    def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
+  }
+
+  /* TODO
+  def applic[A, B](f: Tree[A => B]) = a => Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
+   */
 }
 
 trait TreeFunctions {
@@ -108,11 +123,11 @@ trait TreeFunctions {
   /** Construct a tree node with no children. */
   def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
 
-  def unfoldForest[A, B](s: Stream[A], f: A => (B, () => Stream[A])): Stream[Tree[B]] =
-    s.map(unfoldTree(_, f))
+  def unfoldForest[A, B](s: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
+    s.map(unfoldTree(_)(f))
 
-  def unfoldTree[A, B](v: A, f: A => (B, () => Stream[A])): Tree[B] =
+  def unfoldTree[A, B](v: A)(f: A => (B, () => Stream[A])): Tree[B] =
     f(v) match {
-      case (a, bs) => node(a, unfoldForest(bs.apply(), f))
+      case (a, bs) => node(a, unfoldForest(bs.apply())(f))
     }
 }
