@@ -1,7 +1,9 @@
 package scalaz
 package iteratee
 
-trait EnumerateeTs {
+import Iteratee._
+
+trait EnumerateeTFunctions {
   /**
    * Applies a function to each input element and feeds the resulting outputs to the inner iteratee.
    */
@@ -50,4 +52,4 @@ trait EnumerateeTs {
   }
 }
 
-object EnumerateeT extends EnumerateeTs
+object EnumerateeT extends EnumerateeTFunctions

@@ -1,13 +1,6 @@
 package scalaz
 
-// TODO not so sure about mixing all the functions into the package object.
-package object iteratee
-  extends IterateeTFunctions
-  with Iteratees
-  with EnumeratorTFunctions
-  with EnumerateeTs
-  with StepTFunctions
-  with Inputs {
+package object iteratee {
 
   type Step[X, E, A] =
   StepT[X, E, Id, A]

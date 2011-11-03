@@ -2,6 +2,7 @@ package scalaz
 package iteratee
 
 import effect._
+import Iteratee._
 
 sealed trait IterateeT[X, E, F[_], A] {
   def value: F[StepT[X, E, F, A]]

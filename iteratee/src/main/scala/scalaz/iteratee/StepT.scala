@@ -1,6 +1,8 @@
 package scalaz
 package iteratee
 
+import Iteratee._
+
 sealed trait StepT[X, E, F[_], A] {
   def fold[Z](
                  cont: (Input[E] => IterateeT[X, E, F, A]) => Z

@@ -3,7 +3,7 @@ package iteratee
 
 import effect._
 
-import IterateeT._, Input._
+import Iteratee._
 
 object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
 
@@ -126,8 +126,6 @@ trait EnumeratorTFunctions {
       )
   }
 }
-
-import EnumeratorT._
 
 //
 // Type class implementation traits

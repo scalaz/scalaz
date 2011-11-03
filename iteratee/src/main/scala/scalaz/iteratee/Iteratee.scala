@@ -1,7 +1,9 @@
 package scalaz
 package iteratee
 
-trait Iteratees {
+import Iteratee._
+
+trait IterateeFunctions {
   def iteratee[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] =
     iterateeT[X, E, Id, A](s)
   
@@ -80,6 +82,13 @@ trait Iteratees {
     takeWhile(!p(_))
 }
 
-object Iteratee extends Iteratees {
+object Iteratee
+  extends IterateeFunctions
+  with IterateeTFunctions
+  with EnumeratorTFunctions
+  with EnumerateeTFunctions
+  with StepTFunctions
+  with InputFunctions {
+
   def apply[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] = iteratee(s)
 }
