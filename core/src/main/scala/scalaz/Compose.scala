@@ -12,15 +12,10 @@ object Compose {
   def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   ////
-  //  implicit def CokleisliCompose[F[_]](implicit ex: Extend[F]): Compose[({type λ[α, β] = Cokleisli[α, F, β]})#λ] = new Compose[({type λ[α, β] = Cokleisli[α, F, β]})#λ] {
-  //    def compose[A, B, C](f: Cokleisli[B, F, C], g: Cokleisli[A, F, B]) =
-  //      f =<= g
-  //  }
-  //
+  //  TODO
   //  implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
   //    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]) =
   //      f >=> g
   //  }
   ////
 }
-

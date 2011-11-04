@@ -1,12 +1,12 @@
 package scalaz
 package syntax
 
-import Liskov.<~<
-
 /** Wraps a value `self` and provides methods related to `Bind` */
 trait BindV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Bind[F]
   ////
+  import Liskov.<~<
+
   def flatMap[B](f: A => F[B]) = F.bind(self)(f)
 
   def >>=[B](f: A => F[B]) = F.bind(self)(f)

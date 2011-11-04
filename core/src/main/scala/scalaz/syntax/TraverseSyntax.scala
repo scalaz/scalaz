@@ -1,12 +1,11 @@
 package scalaz
 package syntax
 
-import Leibniz.===
-
 /** Wraps a value `self` and provides methods related to `Traverse` */
 trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Traverse[F]
   ////
+  import Leibniz.===
   import Ident.{id}
   import State.State
   import State.state

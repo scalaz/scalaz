@@ -1,7 +1,5 @@
 package scalaz
 
-import annotation.tailrec
-
 trait Monoid[F] extends Semigroup[F] { self =>
   ////
   def zero: F
@@ -16,6 +14,7 @@ object Monoid {
   def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
   ////
+  import annotation.tailrec
 
   /**A monoid for sequencing Applicative effects. */
   def liftMonoid[F[_], M](implicit F: Applicative[F], M: Monoid[M]): Monoid[F[M]] = new Monoid[F[M]] {
