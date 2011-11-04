@@ -176,7 +176,7 @@ object TreeLoc extends TreeLocFunctions with TreeLocInstances {
 
 trait TreeLocInstances {
   // TODO more instances
-  implicit val treeLocInstance: Comonad[TreeLoc] with Functor[TreeLoc] = new Comonad[TreeLoc] with Functor[TreeLoc] {
+  implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] with Cobind.FromCojoin[TreeLoc] {
     import std.stream.{streamInstance, streamMonoid}
     import TreeLoc.Parent
 

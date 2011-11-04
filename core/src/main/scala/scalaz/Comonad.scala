@@ -1,11 +1,13 @@
 package scalaz
 
-trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] { self =>
+trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
+
   ////
 
   // derived functions
 
   ////
+
   val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] {}
 }
 

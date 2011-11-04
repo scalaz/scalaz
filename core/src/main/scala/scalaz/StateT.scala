@@ -2,6 +2,8 @@ package scalaz
 
 /**
  * StateT Monad Transformer
+ *
+ * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
  */
 trait StateT[S, F[_], A] {
   /** Run and return the final value and state in the context of `F` */

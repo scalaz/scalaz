@@ -34,9 +34,10 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or Comonad?
+  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or should Comonad?
   lazy val cojoin = TypeClass("Cojoin", *->*)
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin))
+  lazy val cobind = TypeClass("Cobind", *->*)
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor, empty))
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plus))
@@ -76,6 +77,7 @@ object TypeClass {
     bind,
     monad,
     cojoin,
+    cobind,
     comonad,
     plus,
     applicativePlus,

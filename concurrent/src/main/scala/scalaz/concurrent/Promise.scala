@@ -167,6 +167,7 @@ trait PromiseInstances {
 
   implicit def promiseInstance(implicit s: Strategy) = new Traverse[Promise] with Monad[Promise] with Comonad[Promise] {
     def cojoin[A](a: Promise[A]): Promise[Promise[A]] = promise(a)
+    def cobind[A, B](fa: Promise[A])(f: (Promise[A]) => B): Promise[B] = promise(f(fa))
     def pure[A](a: => A): Promise[A] = promise(a)
     def copure[A](p: Promise[A]): A = p.get
     def traverseImpl[G[_] : Applicative, A, B](fa: Promise[A])(f: (A) => G[B]): G[Promise[B]] =
