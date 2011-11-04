@@ -10,7 +10,7 @@ is available in the [scalaz7](https://github.com/scalaz/scalaz/tree/scalaz7) bra
 
 Scalaz has grown to contain a wide range of useful type classes and data structures. This presents a challenge
 to the beginner trying to learn the library -- where to start, what to ignore? To help alleviate this, the
-library has further been modularised.
+library has been modularised further.
 
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
