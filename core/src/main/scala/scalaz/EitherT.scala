@@ -158,10 +158,16 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   }
 }
 
-trait EitherTInstances {
-  // TODO
-  implicit def eitherTInstance[F[_] : Functor] = new BiFunctor[({type λ[α, β] = EitherT[α, F, β]})#λ] {
-    def bimap[A, B, C, D](fab: EitherT[A, F, B])(f: (A) => C, g: (B) => D): EitherT[C, F, D] = fab.map(g).left.map(f)
+trait EitherTInstances0 {
+  implicit def eitherTBiFunctor[F[_]](implicit F0: Functor[F]) = new EitherTBiFunctor[F] {
+    implicit def F = F0
+  }
+}
+
+// TODO more instances
+trait EitherTInstances extends EitherTInstances0 {
+  implicit def eitherTBiTraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBiTraverse[F] {
+    implicit def F = F0
   }
 }
 
@@ -181,4 +187,23 @@ trait EitherTFunctions {
 
   def fromEither[A, F[_], B](e: A \/ B)(implicit F: Pointed[F]): EitherT[A, F, B] =
     eitherT(F.pure(e.runT))
+}
+
+//
+// Type class implementation traits
+//
+trait EitherTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=EitherT[α, F, β]})#λ] {
+  implicit def F: Functor[F]
+
+  override def bimap[A, B, C, D](fab: EitherT[A, F, B])(f: (A) => C, g: (B) => D): EitherT[C, F, D] = fab.map(g).left.map(f)
+}
+
+trait EitherTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = EitherT[α, F, β]})#λ] with EitherTBiFunctor[F] {
+  implicit def F: Traverse[F]
+
+  import std.either.eitherInstance
+
+  def bitraverse[G[_] : Applicative, A, B, C, D](fab: EitherT[A, F, B])
+                                                (f: (A) => G[C], g: (B) => G[D]): G[EitherT[C, F, D]] =
+    Applicative[G].map(F.traverse(fab.runT)(BiTraverse[Either].bitraverseF(f, g)))(EitherT.eitherT(_: F[Either[C, D]]))
 }

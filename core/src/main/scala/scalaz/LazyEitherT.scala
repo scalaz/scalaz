@@ -181,10 +181,15 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
 }
 
-trait LazyEitherTInstances {
-  implicit def lazyEitherTBiFunctor[F[_] : Functor]: BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
-    def bimap[A, B, C, D](fab: LazyEitherT[A, F, B])(f: A => C, g: B => D) =
-      fab.map(x => g(x)).left.map(x => f(x))
+trait LazyEitherTInstance0 {
+  implicit def lazyEitherTBiFunctor[F[_]](implicit F0: Functor[F]): BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new LazyEitherTBifunctor[F] {
+    implicit def F = F0
+  }
+}
+
+trait LazyEitherTInstances extends LazyEitherTInstance0 {
+  implicit def lazyEitherTBiTraverse[F[_]](implicit F0: Traverse[F]): BiTraverse[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] = new LazyEitherTBiTraverse[F] {
+    implicit def F = F0
   }
 
   implicit def LazyEitherTMonadTrans[Z]: MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = LazyEitherT[Z, α, β]})#λ] {
@@ -208,4 +213,21 @@ trait LazyEitherTFunctions {
 
   def lazyRightT[A, F[_], B](b: => B)(implicit p: Pointed[F]): LazyEitherT[A, F, B] =
     lazyEitherT(p.pure(lazyRight(b)))
+}
+
+//
+// Type class implementation traits
+//
+trait LazyEitherTBifunctor[F[_]] extends BiFunctor[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
+  implicit def F: Functor[F]
+
+  def bimap[A, B, C, D](fab: LazyEitherT[A, F, B])(f: A => C, g: B => D) =
+    fab.map(x => g(x)).left.map(x => f(x))
+}
+
+trait LazyEitherTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = LazyEitherT[α, F, β]})#λ] {
+  implicit def F: Traverse[F]
+
+  def bitraverse[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[A, F, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyEitherT[C, F, D]] =
+    Applicative[G].map(F.traverse(fab.runT)(BiTraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
 }

@@ -195,10 +195,14 @@ trait ValidationInstances {
     }
   }
 
-  implicit def validationBifunctor = new BiFunctor[Validation] {
-    def bimap[A, B, C, D](fab: Validation[A, B])(f: (A) => C, g: (B) => D): Validation[C, D] = fab match {
-      case Failure(a) => Validation.failure(f(a))
-      case Success(b) => Validation.success(g(b))
+  implicit def validationBiTraverse = new BiTraverse[Validation] {
+    override def bimap[A, B, C, D](fab: Validation[A, B])(f: (A) => C, g: (B) => D): Validation[C, D] = fab match {
+      case Failure(a) => Failure(f(a))
+      case Success(b) => Success(g(b))
+    }
+    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab match {
+      case Failure(a) => Applicative[G].map(f(a))(Failure(_))
+      case Success(b) => Applicative[G].map(g(b))(Success(_))
     }
   }
 

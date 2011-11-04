@@ -5,10 +5,17 @@ import scala.Either.{LeftProjection, RightProjection}
 import scalaz.Isomorphism._
 
 trait EitherInstances {
-  implicit def eitherInstance = new BiFunctor[Either] {
-    def bimap[A, B, C, D](fab: Either[A, B])(f: (A) => C, g: (B) => D): Either[C, D] = fab match {
+  implicit def eitherInstance = new BiTraverse[Either] {
+    override def bimap[A, B, C, D](fab: Either[A, B])
+                                  (f: (A) => C, g: (B) => D): Either[C, D] = fab match {
       case Left(a)  => Left(f(a))
       case Right(b) => Right(g(b))
+    }
+
+    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Either[A, B])
+                                                  (f: (A) => G[C], g: (B) => G[D]): G[Either[C, D]] = fab match {
+      case Left(a)  => Applicative[G].map(f(a))(b => Left(b))
+      case Right(b) => Applicative[G].map(g(b))(d => Right(d))
     }
   }
 

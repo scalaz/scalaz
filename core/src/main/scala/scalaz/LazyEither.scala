@@ -115,9 +115,15 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 trait LazyEitherInstances {
   // TODO
 
-  implicit def lazyEitherBiFunctor: BiFunctor[LazyEither] = new BiFunctor[LazyEither] {
-    def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
+  implicit def lazyEitherBiFunctor: BiTraverse[LazyEither] = new BiTraverse[LazyEither] {
+    override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
+
+    def bitraverse[G[_] : Applicative, A, B, C, D](fab: LazyEither[A, B])
+                                                  (f: (A) => G[C], g: (B) => G[D]): G[LazyEither[C, D]] = fab.fold(
+      a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
+      b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
+    )
   }
 }
 
