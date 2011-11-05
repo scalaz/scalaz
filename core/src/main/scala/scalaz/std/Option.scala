@@ -3,14 +3,14 @@ package std
 
 trait OptionInstances {
   implicit val optionInstance = new MonadPlus[Option] with Traverse[Option] with Each[Option] with Index[Option] with Length[Option] {
-    def pure[A](a: => A) = Some(a)
+    def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
     def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
     def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
-      fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.pure(None)
+      fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
     def empty[A]: Option[A] = None
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
     def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B): B = fa match {
@@ -94,7 +94,7 @@ trait OptionFunctions {
    * otherwise, the empty value for type M.
    */
   final def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
-    case Some(a) => Pointed[M].pure(a)
+    case Some(a) => Pointed[M].point(a)
     case None    => Empty[M].empty
   }
 
@@ -103,7 +103,7 @@ trait OptionFunctions {
    */
   final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
     case None    => b
-    case Some(a) => k(Pointed[F].pure(a))
+    case Some(a) => k(Pointed[F].point(a))
   }
 
   /**

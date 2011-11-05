@@ -54,7 +54,7 @@ sealed trait Validation[E, A] {
   }
 
   def pointSuccess[M[_] : Pointed]: Validation[E, M[A]] = this match {
-    case Success(a) => Success(Pointed[M].pure(a: A))
+    case Success(a) => Success(Pointed[M].point(a: A))
     case Failure(e) => Failure(e)
   }
 
@@ -99,7 +99,7 @@ sealed trait FailProjection[E, A] {
 
   def pointFail[M[_] : Pointed]: Validation[M[E], A] = validation match {
     case Success(a) => Success(a)
-    case Failure(e) => Failure(Pointed[M].pure(e: E))
+    case Failure(e) => Failure(Pointed[M].point(e: E))
   }
 
   def pointFailNel: ValidationNEL[E, A] = pointFail[NonEmptyList]
@@ -175,11 +175,11 @@ object Validation extends ValidationFunctions with ValidationInstances
 trait ValidationInstances {
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
   implicit def validationApplicative[E](E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
-    def pure[A](a: => A): Validation[E, A] = Success(a)
+    def point[A](a: => A): Validation[E, A] = Success(a)
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
       case Success(a) => Applicative[G].map(f(a))(Success(_))
-      case Failure(e) => Applicative[G].pure(Failure(e))
+      case Failure(e) => Applicative[G].point(Failure(e))
     }
 
     def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa match {
@@ -208,11 +208,11 @@ trait ValidationInstances {
 
   // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
-    def pure[A](a: => A): Validation[E, A] = Success(a)
+    def point[A](a: => A): Validation[E, A] = Success(a)
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
       case Success(a) => Applicative[G].map(f(a))(Success(_))
-      case Failure(e) => Applicative[G].pure(Failure(e))
+      case Failure(e) => Applicative[G].point(Failure(e))
     }
 
     def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa match {

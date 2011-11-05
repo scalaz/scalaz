@@ -24,7 +24,7 @@ trait ToPointedV extends ToFunctorV {
   }
 
   trait PointedIdV[A] extends SyntaxV[A] {
-    def pure[F[_] : Pointed]: F[A] = Pointed[F].pure(self)
+    def point[F[_] : Pointed]: F[A] = Pointed[F].point(self)
   }
   ////
 }
@@ -33,14 +33,14 @@ trait PointedSyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToPointedV[A](v: F[A])(implicit F0: Pointed[F]): PointedV[F, A] = new PointedV[F,A] { def self = v; implicit def F: Pointed[F] = F0 }
 
   ////
-  def pure[A](a: => A)(implicit F: Pointed[F]): F[A] = F.pure(a)
+  def point[A](a: => A)(implicit F: Pointed[F]): F[A] = F.point(a)
 
   implicit def PointedIdV[A](v: => A) = new PointedIdV[A] {
     lazy val self = v
   }
 
   trait PointedIdV[A] extends SyntaxV[A] {
-    def pure(implicit F: Pointed[F]): F[A] = Pointed[F].pure(self)
+    def point(implicit F: Pointed[F]): F[A] = Pointed[F].point(self)
   }
   ////
 }

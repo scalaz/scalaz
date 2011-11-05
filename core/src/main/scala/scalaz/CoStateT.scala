@@ -20,10 +20,10 @@ sealed trait CoStateT[F[_], A, B] {
   def pos: A =
     runT._2
 
-  def copureT(implicit F: CoPointed[F]): B =
-    F.copure(runT._1)(runT._2)
+  def copointT(implicit F: CoPointed[F]): B =
+    F.copoint(runT._1)(runT._2)
 
-  def copure(implicit i: F <~> Id): B =
+  def copoint(implicit i: F <~> Id): B =
     run._1(run._2)
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[F, A, C] =

@@ -15,7 +15,7 @@ private[scalaz] trait ProductPointed[F[_], G[_]] extends Pointed[({type λ[α] =
 
   implicit def G: Pointed[G]
 
-  def pure[A](a: => A): (F[A], G[A]) = (F.pure(a), G.pure(a))
+  def point[A](a: => A): (F[A], G[A]) = (F.point(a), G.point(a))
 }
 
 private[scalaz] trait ProductApplicative[F[_], G[_]] extends Applicative[({type λ[α] = (F[α], G[α])})#λ] with ProductPointed[F, G] {

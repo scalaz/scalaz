@@ -7,7 +7,7 @@ trait HistoryInstances {
   implicit def history: Functor[History] = new Pointed[History] {
     def map[A, B](fa: History[A])(f: (A) => B): History[B] = History(f(fa.current), fa.undos.map(f), fa.redos.map(f))
 
-    def pure[A](a: => A): History[A] = History(a)
+    def point[A](a: => A): History[A] = History(a)
   }
 
   implicit def historyShow[S](implicit SL: Show[List[S]], S: Show[S]) = new Show[History[S]] {

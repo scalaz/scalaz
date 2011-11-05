@@ -9,12 +9,12 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 
   def uncons(implicit M: Monad[M]): M[Option[(A, ListT[M, A])]] =
     M.bind(step) {
-      case Yield(a, s) => M.pure(Some((a, s)))
+      case Yield(a, s) => M.point(Some((a, s)))
       case Skip(s) => s.uncons
-      case Done => M.pure(None)
+      case Done => M.point(None)
     }
 
-  def ::(a: A)(implicit M: Pointed[M]): ListT[M, A] = ListT[M, A](M pure (Yield(a, this)))
+  def ::(a: A)(implicit M: Pointed[M]): ListT[M, A] = ListT[M, A](M point (Yield(a, this)))
 
   def isEmpty(implicit M: Monad[M]) = M.map(uncons)(_.isDefined)
 
@@ -69,7 +69,7 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
     M.bind(step) {
       case Yield(a, s) => s.foldLeft(f(z, a))(f)
       case Skip(s) => s.foldLeft(z)(f)
-      case Done => M pure z
+      case Done => M point z
     }
 
   def toList(implicit M: Monad[M]): M[List[A]] = M.map(rev(Nil))(_.reverse)
@@ -90,7 +90,7 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
     M.bind(step) {
       case Yield(a, s) => s rev (a :: xs)
       case Skip(s) => s rev xs
-      case Done => M pure xs
+      case Done => M point xs
     }
 }
 
@@ -127,7 +127,7 @@ trait ListTs extends ListTsLow0 {
 object ListT {
   def apply[M[_], A](step: M[Step[A, ListT[M, A]]]): ListT[M, A] = new ListT[M, A](step)
 
-  def empty[M[_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M pure Done)
+  def empty[M[_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M point Done)
 
   abstract sealed class Step[+A, +S]
 
@@ -164,7 +164,7 @@ private[scalaz] trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with List
 private[scalaz] trait ListTPointed[F[_]] extends Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
   implicit def F: Pointed[F]
 
-  def pure[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
+  def point[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
 
   def empty[A]: ListT[F, A] = ListT.empty
 

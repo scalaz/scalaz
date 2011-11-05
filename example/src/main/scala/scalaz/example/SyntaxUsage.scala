@@ -22,8 +22,8 @@ object SyntaxUsage extends App {
     // Monad syntax for Option.
     import std.option._
     import std.option.optionInstance.monadSyntax._
-    val x = 1.pure
-    val y = pure(1)
+    val x = 1.point
+    val y = point(1)
     x: Option[Int]
     y: Option[Int]
 
@@ -46,7 +46,7 @@ object SyntaxUsage extends App {
     o2.join
     l2.join
 
-    1.pure[Option]
+    1.point[Option]
   }
 
   def syntax3() {

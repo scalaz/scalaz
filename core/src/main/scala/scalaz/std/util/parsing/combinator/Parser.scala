@@ -10,7 +10,7 @@ trait Parsers {
   class ParsersW[P <: combinator.Parsers](val parser: P) {
     type Parser[A] = parser.Parser[A]
     def instance: Monad[Parser] = new Monad[Parser] {
-      def pure[A](a: => A): Parser[A] = parser.success(a)
+      def point[A](a: => A): Parser[A] = parser.success(a)
       def bind[A, B](fa: Parser[A])(f: (A) => Parser[B]): Parser[B] = fa flatMap f
     }
   }

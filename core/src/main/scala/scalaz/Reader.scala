@@ -20,11 +20,11 @@ trait ReaderInstances {
 
   private def readerTInstance[S, F[_]](implicit F: Monad[F]) =
     new MonadReader[({type f[s, a] = ReaderT[s, F, a]})#f, S] {
-      def pure[A](a: => A): ReaderT[S, F, A] = s => F.pure(a)
+      def point[A](a: => A): ReaderT[S, F, A] = s => F.point(a)
       override def map[A, B](fa: ReaderT[S, F, A])(f: A => B): ReaderT[S, F, B] = fa andThen F(f)
       def bind[A, B](fa: ReaderT[S, F, A])(f: A => ReaderT[S, F, B]): ReaderT[S, F, B] =
         s => F.bind(fa(s))(a => f(a)(s))
-      def ask: ReaderT[S, F, S] = s => F.pure(s)
+      def ask: ReaderT[S, F, S] = s => F.point(s)
       def local[A](f: S => S)(fa: ReaderT[S, F, A]) = fa compose f
     }
 

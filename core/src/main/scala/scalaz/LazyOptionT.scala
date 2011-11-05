@@ -94,7 +94,7 @@ sealed trait LazyOptionT[F[_], A] {
     lazyOptionT(F.map(runT)(_.filter(f)))
 
   def flatMap[B](f: (=> A) => LazyOptionT[F, B])(implicit M: Monad[F]): LazyOptionT[F, B] =
-    lazyOptionT(M.bind(runT)(_.fold(a => f(a).runT, M.pure(lazyNone[B]))))
+    lazyOptionT(M.bind(runT)(_.fold(a => f(a).runT, M.point(lazyNone[B]))))
 
   def mapLazyOption[B](f: LazyOption[A] => LazyOption[B])(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(runT)(f))
@@ -114,8 +114,8 @@ trait LazyOptionTs {
   import LazyOption._
 
   def lazySomeT[F[_], A](a: => A)(implicit F: Pointed[F]): LazyOptionT[F, A] =
-    lazyOptionT(F.pure(lazySome(a)))
+    lazyOptionT(F.point(lazySome(a)))
 
   def lazyNoneT[F[_], A](implicit F: Pointed[F]): LazyOptionT[F, A] =
-    lazyOptionT(F.pure(lazyNone[A]))
+    lazyOptionT(F.point(lazyNone[A]))
 }

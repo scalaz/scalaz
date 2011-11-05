@@ -189,7 +189,7 @@ trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] {
 trait IsomorphismPointed[F[_], G[_]] extends Pointed[F] with IsomorphismFunctor[F, G] {
   implicit def G: Pointed[G]
 
-  def pure[A](a: => A): F[A] = iso.from(G.pure(a))
+  def point[A](a: => A): F[A] = iso.from(G.point(a))
 }
 
 trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
@@ -205,7 +205,7 @@ trait IsomorphismCoPointed[F[_], G[_]] extends CoPointed[F] {
 
   def iso: F <~> G
 
-  def copure[A](p: F[A]): A = G.copure(iso.to(p))
+  def copoint[A](p: F[A]): A = G.copoint(iso.to(p))
 }
 
 trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] {

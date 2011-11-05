@@ -2,10 +2,10 @@ package scalaz
 
 trait Idents {
   implicit val id = new Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
-    def pure[A](a: => A): A = a
+    def point[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
     def cojoin[A](a: Id[A]): A = a
-    def copure[A](p: Id[A]): A = p
+    def copoint[A](p: Id[A]): A = p
 
     // Overrides for efficiency.
 

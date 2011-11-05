@@ -237,7 +237,7 @@ trait BooleanV extends SyntaxV[Boolean] {
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: Empty[M]) = boolean.pureOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: Empty[M]) = boolean.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {

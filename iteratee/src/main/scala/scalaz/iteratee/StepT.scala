@@ -88,7 +88,7 @@ sealed trait StepT[X, E, F[_], A] {
     fold(_ => cont, (_, _) => done, _ => err)
 
   def pointI(implicit P: Pointed[F]): IterateeT[X, E, F, A] =
-    iterateeT(P.pure(this))
+    iterateeT(P.point(this))
 }
 
 object StepT extends StepTFunctions

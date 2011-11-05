@@ -83,7 +83,7 @@ trait NonEmptyListInstances {
 
     def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
-    def pure[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
+    def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
   }
 }
 

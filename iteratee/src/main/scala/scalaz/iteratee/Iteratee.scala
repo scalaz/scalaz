@@ -15,9 +15,9 @@ trait IterateeFunctions {
 
     def step(acc: F[A])(s: Input[E]): Iteratee[X, E, F[A]] =
       s(el = e => iter.foldT[Iteratee[X, E, F[A]]](
-        done = (a, _) => cont(step(mon.append(acc, F.pure(a)))),
+        done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
         cont = k => k(elInput(e)).foldT(
-          done = (a, _) => cont(step(mon.append(acc, F.pure(a)))),
+          done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
           cont = (k2) => cont(step(acc)),
           err = e => err(e)
         ),
@@ -32,7 +32,7 @@ trait IterateeFunctions {
    */
   def collect[X, A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
     import Ident.id
-    fold[X, A, Id, F[A]](mon.zero)((acc, e) => mon.append(acc, pt.pure(e)))
+    fold[X, A, Id, F[A]](mon.zero)((acc, e) => mon.append(acc, pt.point(e)))
   }
 
   /**
@@ -53,7 +53,7 @@ trait IterateeFunctions {
     def loop(acc: F[A], n: Int)(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
         if (n <= 0) done[X, A, Id, F[A]](acc, s)
-        else cont(loop(mon.append(acc, pt.pure(e)), n - 1))
+        else cont(loop(mon.append(acc, pt.point(e)), n - 1))
         , empty = cont(loop(acc, n))
         , eof = done[X, A, Id, F[A]](acc, s)
       )
@@ -67,7 +67,7 @@ trait IterateeFunctions {
     import Ident.id
     def loop(acc: F[A])(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
-        if (p(e)) cont(loop(mon.append(acc, pt.pure(e))))
+        if (p(e)) cont(loop(mon.append(acc, pt.point(e))))
         else done[X, A, Id, F[A]](acc, s)
         , empty = cont(loop(acc))
         , eof = done[X, A, Id, F[A]](acc, eofInput)

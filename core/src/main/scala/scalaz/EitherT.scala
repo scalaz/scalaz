@@ -86,7 +86,7 @@ sealed trait EitherT[F[_], A, B] {
     F.each(runT)(_.right foreach f)
 
   def flatMap[C](f: B => EitherT[F, A, C])(implicit F: Monad[F]): EitherT[F, A, C] =
-    eitherT(F.bind(runT)(_.fold(a => F.pure(Left(a): Either[A, C]), b => f(b).runT)))
+    eitherT(F.bind(runT)(_.fold(a => F.point(Left(a): Either[A, C]), b => f(b).runT)))
 
   def left: LeftProjectionT[F, A, B] = new LeftProjectionT[F, A, B]() {
     val e = EitherT.this
@@ -154,7 +154,7 @@ object EitherT extends EitherTFunctions with EitherTInstances {
       F.each(e.runT)(_.left foreach f)
 
     def flatMap[C](f: A => EitherT[F, C, B])(implicit F: Monad[F]): EitherT[F, C, B] =
-      eitherT(F.bind(e.runT)(_.fold(a => f(a).runT, b => F.pure(Right(b): Either[C, B]))))
+      eitherT(F.bind(e.runT)(_.fold(a => f(a).runT, b => F.point(Right(b): Either[C, B]))))
   }
 }
 
@@ -180,13 +180,13 @@ trait EitherTFunctions {
   EitherT[Id, A, B]
 
   def leftT[F[_], A, B](a: A)(implicit F: Pointed[F]): EitherT[F, A, B] =
-    eitherT(F.pure(Left(a): Either[A, B]))
+    eitherT(F.point(Left(a): Either[A, B]))
 
   def rightT[F[_], A, B](b: B)(implicit F: Pointed[F]): EitherT[F, A, B] =
-    eitherT(F.pure(Right(b): Either[A, B]))
+    eitherT(F.point(Right(b): Either[A, B]))
 
   def fromEither[F[_], A, B](e: A \/ B)(implicit F: Pointed[F]): EitherT[F, A, B] =
-    eitherT(F.pure(e.runT))
+    eitherT(F.point(e.runT))
 }
 
 //

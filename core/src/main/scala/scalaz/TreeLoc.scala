@@ -180,7 +180,7 @@ trait TreeLocInstances {
     import std.stream.{streamInstance, streamMonoid}
     import TreeLoc.Parent
 
-    def copure[A](p: TreeLoc[A]): A = p.tree.rootLabel
+    def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
     def map[A, B](fa: TreeLoc[A])(f: A => B): TreeLoc[B] = fa map f
 

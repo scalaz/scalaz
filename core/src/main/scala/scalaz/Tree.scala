@@ -99,9 +99,9 @@ object Tree extends TreeFunctions with TreeInstances {
 
 trait TreeInstances {
   implicit object treeInstance extends Monad[Tree] with CoMonad[Tree] with CoBind.FromCoJoin[Tree] {
-    def pure[A](a: => A): Tree[A] = Tree.leaf(a)
+    def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
-    def copure[A](p: Tree[A]): A = p.rootLabel
+    def copoint[A](p: Tree[A]): A = p.rootLabel
     override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
     def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
   }

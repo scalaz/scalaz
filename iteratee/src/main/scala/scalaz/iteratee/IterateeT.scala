@@ -18,7 +18,7 @@ sealed trait IterateeT[X, E, F[_], A] {
     val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
     F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
-      , done = (a, _) => F.pure(a)
+      , done = (a, _) => F.point(a)
       , err = e
     ))
   }
@@ -27,17 +27,17 @@ sealed trait IterateeT[X, E, F[_], A] {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
       iterateeT(
         F.bind(x.value)((s: StepT[X, E, F, A]) => s.fold[F[StepT[X, E, F, B]]](
-          cont = k => F.pure(StepT.scont(u => through(k(u))))
+          cont = k => F.point(StepT.scont(u => through(k(u))))
           , done = (a, i) =>
             if (i.isEmpty)
               f(a).value
             else
               F.bind(f(a).value)(_.fold(
                 cont = kk => kk(i).value
-                , done = (aa, _) => F.pure(StepT.sdone[X, E, F, B](aa, i))
-                , err = ee => F.pure(StepT.serr[X, E, F, B](ee))
+                , done = (aa, _) => F.point(StepT.sdone[X, E, F, B](aa, i))
+                , err = ee => F.point(StepT.serr[X, E, F, B](ee))
               ))
-          , err = e => F.pure(StepT.serr(e))
+          , err = e => F.point(StepT.serr(e))
         )))
     through(this)
   }
@@ -62,7 +62,7 @@ sealed trait IterateeT[X, E, F[_], A] {
 
   def up[G[_]](implicit G: Pointed[G], F: Functor[F], FC: CoPointed[F]): IterateeT[X, E, G, A] = {
     mapI(new (F ~> G) {
-      def apply[A](a: F[A]) = G.pure(FC.copure(a))
+      def apply[A](a: F[A]) = G.point(FC.copoint(a))
     })
   }
 
@@ -72,7 +72,7 @@ sealed trait IterateeT[X, E, F[_], A] {
       cont = k => k(eofInput) >>== {
         s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
       }
-      , done = (a, _) => ITP.pure(a)
+      , done = (a, _) => ITP.point(a)
       , err = e => err(e)
     )
 
@@ -103,9 +103,9 @@ sealed trait IterateeT[X, E, F[_], A] {
   def zip[B](other: IterateeT[X, E, F, B])(implicit F: Monad[F]): IterateeT[X, E, F, (A, B)] = {
     def step[Z](i: IterateeT[X, E, F, Z], in: Input[E]) =
       IterateeT.IterateeTMonadTrans[X, E].liftM(i.foldT[(Either[X, Option[(Z, Input[E])]], IterateeT[X, E, F, Z])](
-        cont = k => F.pure((Right(None), k(in)))
-        , done = (a, x) => F.pure((Right(Some((a, x))), done(a, x)))
-        , err = e => F.pure((Left(e), err(e)))
+        cont = k => F.point((Right(None), k(in)))
+        , done = (a, x) => F.point((Right(Some((a, x))), done(a, x)))
+        , err = e => F.point((Left(e), err(e)))
       ))
     def loop(x: IterateeT[X, E, F, A], y: IterateeT[X, E, F, B])(in: Input[E]): IterateeT[X, E, F, (A, B)] = in(
       el = _ =>
@@ -186,13 +186,13 @@ trait IterateeTFunctions {
   }
 
   def cont[X, E, F[_] : Pointed, A](c: Input[E] => IterateeT[X, E, F, A]): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].pure(StepT.scont(c)))
+    iterateeT(Pointed[F].point(StepT.scont(c)))
 
   def done[X, E, F[_] : Pointed, A](d: => A, r: => Input[E]): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].pure(StepT.sdone(d, r)))
+    iterateeT(Pointed[F].point(StepT.sdone(d, r)))
 
   def err[X, E, F[_] : Pointed, A](e: => X): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].pure(StepT.serr(e)))
+    iterateeT(Pointed[F].point(StepT.serr(e)))
 
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
@@ -295,7 +295,7 @@ trait IterateeTFunctions {
 private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
   implicit def F: Monad[F]
 
-  def pure[A](a: => A) = StepT.sdone(a, emptyInput).pointI
+  def point[A](a: => A) = StepT.sdone(a, emptyInput).pointI
   override def map[A, B](fa: IterateeT[X, E, F, A])(f: (A) => B): IterateeT[X, E, F, B] = fa map f
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
 }

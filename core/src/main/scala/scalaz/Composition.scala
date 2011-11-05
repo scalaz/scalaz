@@ -13,7 +13,7 @@ private[scalaz] trait CompositionPointed[F[_], G[_]] extends Pointed[({type λ[�
 
   implicit def G: Pointed[G]
 
-  def pure[A](a: => A): F[G[A]] = F.pure(G.pure(a))
+  def point[A](a: => A): F[G[A]] = F.point(G.point(a))
 }
 
 private[scalaz] trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[α] = F[G[α]]})#λ] with CompositionPointed[F, G] {

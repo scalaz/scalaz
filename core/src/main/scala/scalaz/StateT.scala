@@ -58,10 +58,10 @@ trait StateTInstances extends StateTInstances1 {
 
 trait StateTFunctions {
   def constantStateT[F[_], A, S](a: A)(s: => S)(implicit F: Pointed[F]): StateT[S, F, A] =
-    StateT((_: S) => F.pure((a, s)))
+    StateT((_: S) => F.point((a, s)))
 
   def stateT[F[_], A, S](a: A)(implicit F: Pointed[F]): StateT[S, F, A] =
-    StateT(s => F.pure((a, s)))
+    StateT(s => F.point((a, s)))
 }
 
 //
@@ -77,7 +77,7 @@ private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = State
 private[scalaz] trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Pointed[({type f[a] = StateT[S, F, a]})#f] {
   implicit def F: Pointed[F]
 
-  def pure[A](a: => A): StateT[S, F, A] = StateT(s => F.pure(a, s))
+  def point[A](a: => A): StateT[S, F, A] = StateT(s => F.point(a, s))
 }
 
 private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[s, F, a]})#f, S] with StateTPointed[S, F] {
@@ -85,9 +85,9 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
 
   def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] = fa.flatMap(f)
 
-  def init: StateT[S, F, S] = StateT(s => F.pure((s, s)))
+  def init: StateT[S, F, S] = StateT(s => F.point((s, s)))
 
-  def put(s: S): StateT[S, F, Unit] = StateT(_ => F.pure((s, s)))
+  def put(s: S): StateT[S, F, Unit] = StateT(_ => F.point((s, s)))
 }
 
 private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[S, g, a]})#f] {

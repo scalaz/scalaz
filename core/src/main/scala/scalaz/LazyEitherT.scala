@@ -100,7 +100,7 @@ sealed trait LazyEitherT[F[_], A, B] {
     e.each(runT)(_ foreach f)
 
   def flatMap[C](f: (=> B) => LazyEitherT[F, A, C])(implicit M: Monad[F]): LazyEitherT[F, A, C] =
-    lazyEitherT(M.bind(runT)(_.fold(a => M.pure(lazyLeft[C](a)), b => f(b).runT)))
+    lazyEitherT(M.bind(runT)(_.fold(a => M.point(lazyLeft[C](a)), b => f(b).runT)))
 
   def left: LazyLeftProjectionT[F, A, B] = new LazyLeftProjectionT[F, A, B]() {
     val e = LazyEitherT.this
@@ -176,7 +176,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
       F.each(e.runT)(_.left foreach f)
 
     def flatMap[C](f: (=> A) => LazyEitherT[F, C, B])(implicit M: Monad[F]): LazyEitherT[F, C, B] =
-      LazyEitherT(M.bind(e.runT)(_.fold(a => f(a).runT, b => M.pure(LazyEither.lazyRight[C](b)))))
+      LazyEitherT(M.bind(e.runT)(_.fold(a => f(a).runT, b => M.point(LazyEither.lazyRight[C](b)))))
   }
 
 }
@@ -209,10 +209,10 @@ trait LazyEitherTFunctions {
   import LazyEither._
 
   def lazyLeftT[F[_], A, B](a: => A)(implicit p: Pointed[F]): LazyEitherT[F, A, B] =
-    lazyEitherT(p.pure(lazyLeft(a)))
+    lazyEitherT(p.point(lazyLeft(a)))
 
   def lazyRightT[F[_], A, B](b: => B)(implicit p: Pointed[F]): LazyEitherT[F, A, B] =
-    lazyEitherT(p.pure(lazyRight(b)))
+    lazyEitherT(p.point(lazyRight(b)))
 }
 
 //

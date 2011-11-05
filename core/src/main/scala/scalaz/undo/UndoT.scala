@@ -76,10 +76,10 @@ trait UndoTFunctions {
     import HMS._
     bindInit {
       case History(current, Nil, redos) =>
-        pure(false)
+        point(false)
       case History(current, u :: us, redos) =>
         val newHistory = History[S](current = u, undos = us, redos = current :: redos)
-        bind(put(newHistory))(_ => pure(true))
+        bind(put(newHistory))(_ => point(true))
     }
   }
 
@@ -88,10 +88,10 @@ trait UndoTFunctions {
     import HMS._
     bindInit {
       case History(current, undos, Nil) =>
-        pure(false)
+        point(false)
       case History(current, undos, r :: rs) =>
         val newHistory = History(current = r, undos = current :: undos, rs)
-        bind(put(newHistory))(_ => pure(true))
+        bind(put(newHistory))(_ => point(true))
     }
   }
 
@@ -124,7 +124,7 @@ private[scalaz] trait UndoTPointed[S, F[_]]
 
   implicit def F: Pointed[F]
 
-  def pure[A](a: => A) = UndoT[S, F, A](StateT(s => F.pure(a, s)))
+  def point[A](a: => A) = UndoT[S, F, A](StateT(s => F.point(a, s)))
 }
 
 private[scalaz] trait UndoTMonadState[S, F[_]]

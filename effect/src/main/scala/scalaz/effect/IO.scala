@@ -152,7 +152,7 @@ trait IOs {
 
   def idLiftControl[M[_], A](f: RunInBase[M, M] => M[A])(implicit m: Monad[M]): M[A] =
     f(new RunInBase[M, M] {
-      def apply[B] = (x: M[B]) => m.pure(x)
+      def apply[B] = (x: M[B]) => m.point(x)
     })
 
   def controlIO[M[_], A](f: RunInBase[M, IO] => IO[M[A]])(implicit M: MonadControlIO[M]): M[A] =
@@ -201,7 +201,7 @@ trait IOs {
     io(rw => (rw, ()))
 
   implicit val ioMonad = new Monad[IO] {
-    def pure[A](a: => A): IO[A] = IO(a)
+    def point[A](a: => A): IO[A] = IO(a)
     def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
   }
 }

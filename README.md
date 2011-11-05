@@ -71,11 +71,11 @@ Here is an instance definition for `Option`. Notice that the method `map` has be
 
 ```
   implicit val option = new MonadPlus[Option] with Traverse[Option] {
-    def pure[A](a: => A) = Some(a)
+    def point[A](a: => A) = Some(a)
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
     def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
-      fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.pure(None)
+      fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
     def empty[A]: Option[A] = None
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
     def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B): B = fa match {
@@ -93,7 +93,7 @@ import scalaz.std.option.optionInstance
 // import scalaz.Scalaz._
 
 val M = Monad[Option]
-val oi: Option[Int] = M.pure(0)
+val oi: Option[Int] = M.point(0)
 ```
 
 ### Syntax

@@ -5,7 +5,7 @@ trait StreamInstances {
   implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
       val G = Applicative[G]
-      val seed: G[Stream[B]] = G.pure(scala.Stream.empty[B])
+      val seed: G[Stream[B]] = G.point(scala.Stream.empty[B])
       foldR(fa, seed) {
         x => ys =>
           G.ap(ys)(G.map(f(x))((a: B) => (b: Stream[B]) => a #:: b))
@@ -35,7 +35,7 @@ trait StreamInstances {
     def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]): Stream[B] = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]): Stream[A] = a #::: b
-    def pure[A](a: => A): Stream[A] = scala.Stream(a)
+    def point[A](a: => A): Stream[A] = scala.Stream(a)
   }
 
   implicit def streamMonoid[A] = new Monoid[Stream[A]] {
@@ -95,7 +95,7 @@ trait StreamFunctions {
 
   final def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
     def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
-      ts.foldRight[M[Stream[U]]](Monad[M].pure(scala.Stream())) {
+      ts.foldRight[M[Stream[U]]](Monad[M].point(scala.Stream())) {
         case (g, h) => Monad[M].lift2((x: U, xs: Stream[U]) => x #:: xs)(f(g), h)
       }
 

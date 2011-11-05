@@ -26,7 +26,7 @@ trait EitherInstances {
       case Right(b) => f(b)
     }
 
-    def pure[A](a: => A): Either[L, A] = Right(a)
+    def point[A](a: => A): Either[L, A] = Right(a)
   }
 
   /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
@@ -64,7 +64,7 @@ trait EitherInstances {
   }
 
   implicit def eitherRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
-    def pure[A](a: => A): RightProjection[L, A] = Right(a).right
+    def point[A](a: => A): RightProjection[L, A] = Right(a).right
     def bind[A, B](fa: RightProjection[L, A])(f: (A) => RightProjection[L, B]): RightProjection[L, B] = fa.e match {
       case Left(a)  => Left(a).right
       case Right(b) => f(b)
@@ -72,7 +72,7 @@ trait EitherInstances {
   }
 
   implicit def eitherLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
-    def pure[A](a: => A): LeftProjection[A, R] = Left(a).left
+    def point[A](a: => A): LeftProjection[A, R] = Left(a).left
     def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]): LeftProjection[B, R] = fa.e match {
       case Left(a)  => f(a)
       case Right(b) => Right(b).left

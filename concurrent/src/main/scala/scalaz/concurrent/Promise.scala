@@ -168,8 +168,8 @@ trait PromiseInstances {
   implicit def promiseInstance(implicit s: Strategy) = new Traverse[Promise] with Monad[Promise] with CoMonad[Promise] {
     def cojoin[A](a: Promise[A]): Promise[Promise[A]] = promise(a)
     def cobind[A, B](fa: Promise[A])(f: (Promise[A]) => B): Promise[B] = promise(f(fa))
-    def pure[A](a: => A): Promise[A] = promise(a)
-    def copure[A](p: Promise[A]): A = p.get
+    def point[A](a: => A): Promise[A] = promise(a)
+    def copoint[A](p: Promise[A]): A = p.get
     def traverseImpl[G[_] : Applicative, A, B](fa: Promise[A])(f: (A) => G[B]): G[Promise[B]] =
       Applicative[G].map(f(fa.get))(promise(_: B)(fa.strategy))
     def foldR[A, B](fa: Promise[A], z: B)(f: (A) => (=> B) => B): B = f(fa.get)(z)
