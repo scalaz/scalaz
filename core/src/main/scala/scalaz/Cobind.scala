@@ -14,7 +14,7 @@ object CoBind {
   def apply[F[_]](implicit F: CoBind[F]): CoBind[F] = F
 
   ////
-
+  /** Define `CoBind` in terms of `CoJoin` and `Functor` */
   trait FromCoJoin[F[_]] extends CoBind[F]{
     self: CoJoin[F] with Functor[F] =>
 
