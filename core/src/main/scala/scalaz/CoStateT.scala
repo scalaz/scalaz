@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait CoStateT[A, F[_], B] {
+sealed trait CoStateT[F[_], A, B] {
   def runT: (F[A => B], A)
 
   import CoStateT._
@@ -26,19 +26,19 @@ sealed trait CoStateT[A, F[_], B] {
   def copure(implicit i: F <~> Id): B =
     run._1(run._2)
 
-  def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[A, F, C] =
-    coStateT[A, F, C](mapRunT(k => f compose k))
+  def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[F, A, C] =
+    coStateT(mapRunT(k => f compose k))
 
-  def duplicateT(implicit F: CoMonad[F]): CoStateT[A, F, CoStateT[A, F, B]] =
-    coStateT[A, F, CoStateT[A, F, B]]((F.cobind(runT._1)(ff => (a: A) => coStateT[A, F, B]((ff, a))), pos))
+  def duplicateT(implicit F: CoMonad[F]): CoStateT[F, A, CoStateT[F, A, B]] =
+    coStateT((F.cobind(runT._1)(ff => (a: A) => coStateT[F, A, B]((ff, a))), pos))
 
   def duplicate(implicit i: F <~> Id): CoState[A, CoState[A, B]] =
     coState[A, CoState[A, B]](
       mapRun[A => CoState[A, B]](k => a =>
         coState[A, B]((k, run._2))))
 
-  def cobindT[C](f: CoStateT[A, F, B] => C)(implicit c: CoBind[F]): CoStateT[A, F, C] =
-    coStateT[A, F, C]((CoBind[F].cobind(runT._1)(ff => (a: A) => f(coStateT[A, F, B]((ff, a)))), pos))
+  def cobindT[C](f: CoStateT[F, A, B] => C)(implicit c: CoBind[F]): CoStateT[F, A, C] =
+    coStateT((CoBind[F].cobind(runT._1)(ff => (a: A) => f(coStateT[F, A, B]((ff, a)))), pos))
 
   def cobind[C](f: CoState[A, B] => C)(implicit i: F <~> Id): CoState[A, C] =
     coState[A, C](((a: A) => f(coState[A, B]((run._1, a))), pos))
@@ -53,17 +53,13 @@ sealed trait CoStateT[A, F[_], B] {
 }
 
 object CoStateT extends CoStateTs {
-  def apply[A, F[_], B](r: (F[A => B], A)): CoStateT[A, F, B] =
+  def apply[F[_], A, B](r: (F[A => B], A)): CoStateT[F, A, B] =
     coStateT(r)
 }
 
 trait CoStateTs {
   type CoState[A, B] =
-  CoStateT[A, Id, B]
-  type CostateT[A, F[_], B] =
-  CoStateT[A, F, B]
-  type Costate[A, B] =
-  CoState[A, B]
+  CoStateT[Id, A, B]
   // CoState is also known as Store
   type Store[A, B] =
   CoState[A, B]
@@ -71,10 +67,10 @@ trait CoStateTs {
   type |-->[A, B] =
   CoState[B, A]
 
-  def coStateT[A, F[_], B](r: (F[A => B], A)): CoStateT[A, F, B] = new CoStateT[A, F, B] {
+  def coStateT[F[_], A, B](r: (F[A => B], A)): CoStateT[F, A, B] = new CoStateT[F, A, B] {
     val runT = r
   }
 
   def coState[A, B](r: (A => B, A)): CoState[A, B] =
-    coStateT[A, Id, B](r._1, r._2)
+    coStateT[Id, A, B](r._1, r._2)
 }

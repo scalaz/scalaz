@@ -32,7 +32,7 @@ trait Cokleisli[F[_], A, B] { self =>
 }
 
 object Cokleisli extends CokleisliFunctions with CokleisliInstances {
-  def apply[A, F[_], B](f: F[A] => B): Cokleisli[F, A, B] = new Cokleisli[F, A, B] {
+  def apply[F[_], A, B](f: F[A] => B): Cokleisli[F, A, B] = new Cokleisli[F, A, B] {
     def run(fa: F[A]): B = f(fa)
   }
 }
@@ -90,7 +90,7 @@ trait CokleisliFirst[F[_]] extends First[({type λ[α, β] = Cokleisli[F, α, β
   implicit def F: CoPointed[F]
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
-    Cokleisli[(A, C), F, (B, C)](w => (f.run(F.map(w)(ac => ac._1)), F.copure(w)._2))
+    Cokleisli[F, (A, C), (B, C)](w => (f.run(F.map(w)(ac => ac._1)), F.copure(w)._2))
 }
 
 trait CokleisliArrId[F[_]] extends ArrId[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {

@@ -54,25 +54,25 @@ sealed trait LazyOptionT[F[_], A] {
   def toOption(implicit i: F <~> Id): Option[A] =
     run.toOption
 
-  def toLazyRightT[X](left: => X)(implicit F: Functor[F]): LazyEitherT[X, F, A] =
+  def toLazyRightT[X](left: => X)(implicit F: Functor[F]): LazyEitherT[F, X, A] =
     lazyEitherT(F.map(runT)(_.toLazyRight(left)))
 
   def toLazyRight[X](left: => X)(implicit i: F <~> Id): LazyEither[X, A] =
     run.toLazyRight(left)
 
-  def toLazyLeftT[X](right: => X)(implicit F: Functor[F]): LazyEitherT[A, F, X] =
+  def toLazyLeftT[X](right: => X)(implicit F: Functor[F]): LazyEitherT[F, A, X] =
     lazyEitherT(F.map(runT)(_.toLazyLeft(right)))
 
   def toLazyLeft[X](right: => X)(implicit i: F <~> Id): LazyEither[A, X] =
     run.toLazyLeft(right)
 
-  def toRightT[X](left: => X)(implicit F: Functor[F]): EitherT[X, F, A] =
+  def toRightT[X](left: => X)(implicit F: Functor[F]): EitherT[F, X, A] =
     eitherT(F.map(runT)(_.toRight(left)))
 
   def toRight[X](left: => X)(implicit i: F <~> Id): Either[X, A] =
     run.toRight(left)
 
-  def toLeftT[X](right: => X)(implicit F: Functor[F]): EitherT[A, F, X] =
+  def toLeftT[X](right: => X)(implicit F: Functor[F]): EitherT[F, A, X] =
     eitherT(F.map(runT)(_.toLeft(right)))
 
   def toLeft[X](right: => X)(implicit i: F <~> Id): Either[A, X] =
