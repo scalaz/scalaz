@@ -7,6 +7,7 @@ object MixedBag extends App {
   traverseBigList()
   traverseBigStream()
   tree()
+  kleisiArrow()
 
   def monoid() {
     import std.anyVal._
@@ -54,5 +55,17 @@ object MixedBag extends App {
     f assert_=== "12345"
     val m = tree.foldMap(_.toString)
     m assert_=== "12345"
+  }
+
+  def kleisiArrow() {
+    import Kleisli._
+    import std.option._
+    import syntax.compose._
+
+    val f = kleisli((i: Int) => some(i))
+    f map (i => i * 2) map (x => println(x)) run 3
+
+    val K = Kleisli.kleisliArrId[Option] // or, Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ].arr(f)
+    f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 }
