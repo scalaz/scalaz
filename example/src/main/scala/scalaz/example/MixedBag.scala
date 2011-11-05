@@ -6,6 +6,7 @@ object MixedBag extends App {
   monoid()
   traverseBigList()
   traverseBigStream()
+  tree()
 
   def monoid() {
     import std.anyVal._
@@ -36,5 +37,22 @@ object MixedBag extends App {
 //    import syntax.applicative._
 //
 //    (1 to 100000 toStream).traverse(x => some(x * 2))
+  }
+
+  def tree() {
+    import std.string._
+    import syntax.semigroup._
+    import syntax.equal._
+    import syntax.tree._
+    import syntax.traverse._
+    import std.stream._
+
+    val tree: Tree[Int] = 1.node(2.node(3.leaf), 4.leaf, 5.leaf)
+    val r = tree.foldRight(".")(i => s => i.toString |+| s)
+    r assert_=== "12345."
+    val f = tree.flatten.foldMap(_.toString)
+    f assert_=== "12345"
+    val m = tree.foldMap(_.toString)
+    m assert_=== "12345"
   }
 }

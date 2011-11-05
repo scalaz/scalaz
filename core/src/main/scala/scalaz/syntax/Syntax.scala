@@ -67,7 +67,9 @@ trait Syntaxes {
 
   object arrow extends ToArrowV
 
-  object all extends ToAllTypeClassV
+  object tree extends ToTreeV
+
+  object all extends ToAllTypeClassV with ToTreeV
 
 }
 

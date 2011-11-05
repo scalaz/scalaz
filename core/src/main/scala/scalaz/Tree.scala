@@ -20,6 +20,9 @@ sealed trait Tree[A] {
   def foldMap[B: Monoid](f: A => B): B =
     Monoid[B].append(f(rootLabel), Traverse[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
 
+  def foldRight[B](z: B)(f: A => (=> B) => B): B =
+    Traverse[Stream].foldR(flatten, z)(f)
+
   /** A 2D String representation of this Tree. */
   def drawTree(implicit sh: Show[A]): String =
     Traverse[Stream].foldMap(draw)((_: String) + "\n")
@@ -49,10 +52,12 @@ sealed trait Tree[A] {
   }
 
   /** Pre-order traversal. */
-  def flatten: Stream[A] = squish(Stream.Empty)
+  def flatten: Stream[A] = {
+    def squish(tree: Tree[A], xs: Stream[A]): Stream[A] =
+      Stream.cons(tree.rootLabel, Traverse[Stream].foldR[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
 
-  private def squish(xs: Stream[A]): Stream[A] =
-    Stream.cons(rootLabel, Traverse[Stream].foldR[Tree[A], Stream[A]](subForest, xs)(a => b => a.squish(b)))
+    squish(this, Stream.Empty)
+  }
 
   /** Breadth-first traversal. */
   def levels: Stream[Stream[A]] = {
@@ -86,6 +91,12 @@ sealed trait Tree[A] {
     val r: Tree[B] = f(rootLabel)
     Tree.node(r.rootLabel, r.subForest #::: subForest.map(_.flatMap(f)))
   }
+
+  def traverse[G[_] : Applicative, B](f: A => G[B]): G[Tree[B]] = {
+    val G = implicitly[Applicative[G]]
+    import std.stream._
+    G.apF(G.map(f(rootLabel))((x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, xs)))(Traverse[Stream].traverse[G, Tree[A], Tree[B]](subForest)((_: Tree[A]).traverse[G, B](f)))
+  }
 }
 
 object Tree extends TreeFunctions with TreeInstances {
@@ -95,15 +106,20 @@ object Tree extends TreeFunctions with TreeInstances {
   object Node {
     def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
   }
+
+
 }
 
 trait TreeInstances {
-  implicit object treeInstance extends Monad[Tree] with CoMonad[Tree] with CoBind.FromCoJoin[Tree] {
+  implicit object treeInstance extends Traverse[Tree] with Monad[Tree] with CoMonad[Tree] with CoBind.FromCoJoin[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
     def copoint[A](p: Tree[A]): A = p.rootLabel
     override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
     def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
+    def traverseImpl[G[_]: Applicative, A, B](fa: Tree[A])(f: (A) => G[B]): G[Tree[B]] = fa traverse f
+    def foldR[A, B](fa: Tree[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+    override def foldMap[A, B](fa: Tree[A])(f: (A) => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
 
   /* TODO
