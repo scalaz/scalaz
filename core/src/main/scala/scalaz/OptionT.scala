@@ -57,13 +57,13 @@ trait OptionTInstances extends OptionTInstances0 {
   }
 }
 
-trait OptionFunctions {
+trait OptionTFunctions {
   def optionT[M[_]] = new (({type λ[α] = M[Option[α]]})#λ ~> ({type λ[α] = OptionT[M, α]})#λ) {
     def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
   }
 }
 
-object OptionT extends OptionFunctions
+object OptionT extends OptionTFunctions with OptionTInstances
 
 //
 // Implementation traits for type class instances
