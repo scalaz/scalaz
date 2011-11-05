@@ -39,6 +39,14 @@ sealed trait NonEmptyList[A] {
     nel(bb.head, bb.tail)
   }
 
+  def traverse[G[_] : Applicative, B](f: A => G[B]): G[NonEmptyList[B]] = {
+    import std.list.listInstance
+
+    Applicative[G].map(Traverse[List].traverse(list)(f))(bs => NonEmptyList.nel(bs.head, bs.tail))
+  }
+
+  def foldRight[B](z: B)(f: (A) => (=> B) => B): B = list.foldRight(z)((a, b) => f(a)(b))
+
   def list: List[A] = head :: tail
 
   def stream: Stream[A] = head #:: tail.toStream
@@ -73,13 +81,10 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 trait NonEmptyListInstances {
   // TODO Show, monoid, etc.
   implicit object nonEmptyList extends Traverse[NonEmptyList] with Monad[NonEmptyList] {
-    def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: (A) => G[B]): G[NonEmptyList[B]] = {
-      import std.list.listInstance
+    def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
+      fa traverse f
 
-      Applicative[G].map(Traverse[List].traverse(fa.list)(f))((x: List[B]) => NonEmptyList.nel(x.head, x.tail))
-    }
-
-    def foldR[A, B](fa: NonEmptyList[A], z: B)(f: (A) => (=> B) => B): B = fa.list.foldRight(z)((a, b) => f(a)(b))
+    def foldR[A, B](fa: NonEmptyList[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 

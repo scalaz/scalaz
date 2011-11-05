@@ -79,6 +79,33 @@ sealed trait Validation[E, A] {
     case Success(a) => f(a)
     case Failure(_) => true
   }
+
+  def traverse[G[_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
+    case Success(a) => Applicative[G].map(f(a))(Success(_))
+    case Failure(e) => Applicative[G].point(Failure(e))
+  }
+
+  def foldRight[B](z: B)(f: (A) => (=> B) => B): B = this match {
+    case Success(a) => f(a)(z)
+    case Failure(e) => z
+  }
+
+  def ap[B](f: Validation[E, A => B])(implicit E: Semigroup[E]): Validation[E, B] = (this, f) match {
+    case (Success(a), Success(f))   => Success(f(a))
+    case (Failure(e), Success(_))   => Failure(e)
+    case (Success(f), Failure(e))   => Failure(e)
+    case (Failure(e1), Failure(e2)) => Failure(E.append(e1, e2))
+  }
+
+  def bimap[C, D](f: (E) => C, g: (A) => D): Validation[C, D] = this match {
+    case Failure(a) => Failure(f(a))
+    case Success(b) => Success(g(b))
+  }
+
+  def bitraverse[G[_] : Applicative, C, D](f: (E) => G[C], g: (A) => G[D]): G[Validation[C, D]] = this match {
+    case Failure(a) => Applicative[G].map(f(a))(Failure(_))
+    case Success(b) => Applicative[G].map(g(b))(Success(_))
+  }
 }
 
 // TODO private?
@@ -122,12 +149,38 @@ sealed trait FailProjection[E, A] {
   }
 }
 
-object FailProjection extends FailProjections {
+object FailProjection extends FailProjectionFunctions with FailProjectionInstances {
   def apply[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
     Validation.failureNT[A]
 }
 
-trait FailProjections {
+trait FailProjectionInstances {
+  import FailProjection._
+
+  /**Derive the type class instance for `FailProjection` from `Validation`. */
+  implicit def failProjectionApplicative[E](implicit E: Semigroup[E]) = {
+    type F[a] = FailProjection[E, a]
+    type G[a] = Validation[E, a]
+
+    new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G] {
+      def iso = FailProjectionEIso2[E]
+      implicit def G = Validation.validationApplicative(E)
+    }
+  }
+
+  /** Intentionally non-implicit */
+  def failProjectionMonad[E] = {
+    type F[a] = FailProjection[E, a]
+    type G[a] = Validation[E, a]
+
+    new IsomorphismPointed[F, G] with IsomorphismTraverse[F, G] with IsomorphismMonad[F, G] {
+      def iso = FailProjectionEIso2[E]
+      implicit def G = Validation.validationMonad
+    }
+  }
+}
+
+trait FailProjectionFunctions {
   import Isomorphism._
 
   /** FailProjection is isomorphic to Validation */
@@ -147,78 +200,35 @@ trait FailProjections {
     def to[E](fa: FailProjection[E, A]) = fa.validation
     def from[E](ga: Validation[E, A]) = ga.fail
   }
-
-  /** Derive the type class instance for `FailProjection` from `Validation`. */
-  implicit def failProjectionApplicative[E](implicit E: Semigroup[E]) = {
-    type F[a] = FailProjection[E, a]
-    type G[a] = Validation[E, a]
-
-    new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G]{
-      def iso = FailProjectionEIso2[E]
-      implicit def G = Validation.validationApplicative(E)
-    }
-  }
-
-  def failProjectionMonad[E] = {
-    type F[a] = FailProjection[E, a]
-    type G[a] = Validation[E, a]
-
-    new IsomorphismPointed[F, G] with IsomorphismTraverse[F, G] with IsomorphismMonad[F, G] {
-      def iso = FailProjectionEIso2[E]
-      implicit def G = Validation.validationMonad
-    }
-  }
 }
 
 object Validation extends ValidationFunctions with ValidationInstances
 
 trait ValidationInstances {
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
-  implicit def validationApplicative[E](E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
+  implicit def validationApplicative[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
-      case Success(a) => Applicative[G].map(f(a))(Success(_))
-      case Failure(e) => Applicative[G].point(Failure(e))
-    }
+    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa match {
-      case Success(a) => f(a)(z)
-      case Failure(e) => z
-    }
+    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
 
-    def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = (fa, f) match {
-      case (Success(a), Success(f))   => Success(f(a))
-      case (Failure(e), Success(_))   => Failure(e)
-      case (Success(f), Failure(e))   => Failure(e)
-      case (Failure(e1), Failure(e2)) => Failure(E.append(e1, e2))
-    }
+    def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = fa ap f
   }
 
   implicit def validationBiTraverse = new BiTraverse[Validation] {
-    override def bimap[A, B, C, D](fab: Validation[A, B])(f: (A) => C, g: (B) => D): Validation[C, D] = fab match {
-      case Failure(a) => Failure(f(a))
-      case Success(b) => Success(g(b))
-    }
-    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab match {
-      case Failure(a) => Applicative[G].map(f(a))(Failure(_))
-      case Success(b) => Applicative[G].map(g(b))(Success(_))
-    }
+    override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
+
+    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
   }
 
   // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa match {
-      case Success(a) => Applicative[G].map(f(a))(Success(_))
-      case Failure(e) => Applicative[G].point(Failure(e))
-    }
+    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa match {
-      case Success(a) => f(a)(z)
-      case Failure(e) => z
-    }
+    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }
