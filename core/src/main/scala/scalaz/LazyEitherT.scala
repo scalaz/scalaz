@@ -182,7 +182,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 }
 
 trait LazyEitherTInstance0 {
-  implicit def lazyEitherTBiFunctor[F[_]](implicit F0: Functor[F]): BiFunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] = new LazyEitherTBifunctor[F] {
+  implicit def lazyEitherTBiFunctor[F[_]](implicit F0: Functor[F]): BiFunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] = new LazyEitherTBiFunctor[F] {
     implicit def F = F0
   }
 }
@@ -218,7 +218,7 @@ trait LazyEitherTFunctions {
 //
 // Type class implementation traits
 //
-trait LazyEitherTBifunctor[F[_]] extends BiFunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
+trait LazyEitherTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   def bimap[A, B, C, D](fab: LazyEitherT[F, A, B])(f: A => C, g: B => D) =

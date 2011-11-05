@@ -23,11 +23,11 @@ trait NaturalTransformations {
 
 object NaturalTransformation extends NaturalTransformations
 
-trait BinaturalTransformation[F[_, _], G[_, _]] {
+trait BiNaturalTransformation[F[_, _], G[_, _]] {
   self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
-  def compose[E[_, _]](f: BinaturalTransformation[E, F]) = new BinaturalTransformation[E, G] {
+  def compose[E[_, _]](f: BiNaturalTransformation[E, F]) = new BiNaturalTransformation[E, G] {
     def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
   }
 }
@@ -38,11 +38,11 @@ trait ConstrainedNaturalTransformation[F[_], G[_], E[_]] {
 }
 
 /** A constrained transformation natural in both sides of a bifunctor */
-trait BiconstrainedNaturalTransformation[F[_,_], G[_,_], C[_], E[_]] {
+trait BiConstrainedNaturalTransformation[F[_,_], G[_,_], C[_], E[_]] {
   def apply[A: C, B: E](f: F[A,B]): G[A,B]
 }
 
-trait DinaturalTransformation[F[_,_], G[_,_]] {
+trait DiNaturalTransformation[F[_,_], G[_,_]] {
   def apply[A](f: F[A,A]): G[A,A]
 }
 

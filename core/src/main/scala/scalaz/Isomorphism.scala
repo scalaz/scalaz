@@ -67,7 +67,7 @@ trait Isomorphisms extends IsomorphismsLow0{
   /**Natural isomorphism between functors */
   type IsoFunctor[F[_], G[_]] = Iso2[NaturalTransformation, F, G]
 
-  type IsoBifunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
+  type IsoBiFunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
 
   /**Alias for IsoSet */
   type <=>[A, B] = IsoSet[A, B]
@@ -88,11 +88,11 @@ trait Isomorphisms extends IsomorphismsLow0{
     def from[A](ga: G[A]): F[A]
   }
 
-  /**Alias for IsoBifunctor */
-  type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
+  /**Alias for IsoBiFunctor */
+  type <~~>[F[_, _], G[_, _]] = IsoBiFunctor[F, G]
 
   /**Convenience template trait to implement `<~~>` */
-  trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBifunctor[F, G] {
+  trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBiFunctor[F, G] {
     final val to: BinaturalTransformation[F, G] = new (F ~~> G) {
       def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
     }
