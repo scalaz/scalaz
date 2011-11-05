@@ -7,6 +7,11 @@ trait BiTraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
   final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =
       F.bitraverse(self)(f, g)
+
+  import Leibniz.===
+
+  final def bisequence[G[_], A1, B1](implicit G: Applicative[G], eva: A === G[A1], evb: B === G[B1]): G[F[A1, B1]] =
+    bitraverse(fa => eva(fa), fb => evb(fb))
   ////
 }
 
