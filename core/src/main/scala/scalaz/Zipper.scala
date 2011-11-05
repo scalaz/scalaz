@@ -137,14 +137,14 @@ sealed trait Zipper[A] {
    */
   def deleteOthers: Zipper[A] = zipper(Stream.Empty, focus, Stream.Empty)
 
-  def foldLeft[B](b: B, f: B => A => B): B =
-    lefts.foldRight((focus #:: rights).foldLeft(b)((b, a) => f(b)(a)))((a, b) => f(b)(a))
+  def foldLeft[B](b: B)(f: (B, A) => B): B =
+    lefts.foldRight((focus #:: rights).foldLeft(b)((b, a) => f(b, a)))((a, b) => f(b, a))
 
-  def foldRight[B](b: => B, f: A => (=> B) => B): B =
+  def foldRight[B](b: => B)(f: A => (=> B) => B): B =
     lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a)(b)))((a, b) => f(b)(a))
 
   def length: Int =
-    this.foldLeft(0, (b: Int) => (_: A) => b + 1)
+    this.foldLeft(0)((b, _) => b + 1)
 
   /**
    * Whether the focus is on the first element in the zipper.
@@ -302,6 +302,23 @@ sealed trait Zipper[A] {
    * An alias for deleteRightC
    */
   def deleteC: Option[Zipper[A]] = deleteRightC
+
+  def traverse[G[_] : Applicative, B](f: (A) => G[B]): G[Zipper[B]] = {
+    val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried
+    val G = Applicative[G]
+    import std.stream.streamInstance
+    G.apF(G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(s => z(s.reverse)))(f(focus)))(Traverse[Stream].traverse[G, A, B](rights)(f))
+  }
+
+  def ap[B](f: Zipper[A => B]): Zipper[B] = {
+    val ls = lefts.zip(f.lefts) map {
+      case (aa, ff) => ff(aa)
+    }
+    val rs = rights.zip(f.rights) map {
+      case (aa, ff) => ff(aa)
+    }
+    zipper(ls, f.focus(focus), rs)
+  }
 }
 
 object Zipper extends ZipperFunctions with ZipperInstances {
@@ -310,7 +327,24 @@ object Zipper extends ZipperFunctions with ZipperInstances {
 }
 
 trait ZipperInstances {
-  // TODO
+  import Zipper._
+
+  implicit def zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with CoMonad[Zipper] with CoBind.FromCoJoin[Zipper] {
+    def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
+      a.positions
+    def copoint[A](p: Zipper[A]): A =
+      p.focus
+    def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: (A) => G[B]): G[Zipper[B]] =
+      za traverse f
+    def foldR[A, B](fa: Zipper[A], z: B)(f: (A) => (=> B) => B): B =
+      fa.foldRight(z)(f)
+    override def foldL[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
+      fa.foldLeft(z)(f)
+    def point[A](a: => A): Zipper[A] =
+      zipper(Stream(), a, Stream())
+    def ap[A, B](fa: Zipper[A])(f: Zipper[A => B]): Zipper[B] =
+      fa ap f
+  }
 }
 
 trait ZipperFunctions {

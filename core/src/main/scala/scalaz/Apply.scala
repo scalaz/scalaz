@@ -3,8 +3,11 @@ package scalaz
 trait Apply[F[_]] extends Functor[F] { self =>
   ////
   def ap[A,B](fa: F[A])(f: F[A => B]): F[B]
-  
+
   // derived functions
+
+  def apF[A,B](f: F[A => B]): F[A] => F[B] = ap(_)(f)
+
   def ap2[A,B,C](fa: F[A], fb: F[B])(f: F[(A,B) => C]): F[C] =
     ap(fb)(ap(fa)(map(f)(_.curried)))
   def ap3[A,B,C,D](fa: F[A], fb: F[B], fc: F[C])(f: F[(A,B,C) => D]): F[D] =

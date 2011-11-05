@@ -2,9 +2,12 @@ package scalaz
 
 trait CoPointed[F[_]] extends Functor[F] { self =>
   ////
-  def copure[A](p: F[A]): A
+  def copoint[A](p: F[A]): A
 
   // derived functions
+
+  /** alias for `copoint` */
+  def copure[A](p: F[A]): A = copoint(p)
 
   ////
   val coPointedSyntax = new scalaz.syntax.CoPointedSyntax[F] {}
