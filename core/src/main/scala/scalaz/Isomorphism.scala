@@ -93,10 +93,10 @@ trait Isomorphisms extends IsomorphismsLow0{
 
   /**Convenience template trait to implement `<~~>` */
   trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBiFunctor[F, G] {
-    final val to: BinaturalTransformation[F, G] = new (F ~~> G) {
+    final val to: BiNaturalTransformation[F, G] = new (F ~~> G) {
       def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
     }
-    final val from: BinaturalTransformation[G, F] = new (G ~~> F) {
+    final val from: BiNaturalTransformation[G, F] = new (G ~~> F) {
       def apply[A, B](gab: G[A, B]): F[A, B] = from[A, B](gab)
     }
 
