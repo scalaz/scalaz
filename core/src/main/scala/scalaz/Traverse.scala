@@ -32,7 +32,7 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] = 
     traversalS[S].run(fga)(a => a)
 
-  def map[A,B](fa: F[A])(f: A => B): F[B] = 
+  override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](id).run(fa)(f)
 
   // TODO can we provide a default impl in terms of traverseImpl?

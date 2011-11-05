@@ -20,13 +20,23 @@ trait EitherInstances {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L] = new Monad[({type l[a] = Either[L, a]})#l] {
+  implicit def eitherMonad[L] = new Monad[({type l[a] = Either[L, a]})#l] with Traverse[({type l[a] = Either[L, a]})#l] {
     def bind[A, B](fa: Either[L, A])(f: (A) => Either[L, B]): Either[L, B] = fa match {
       case Left(a)  => Left(a)
       case Right(b) => f(b)
     }
 
     def point[A](a: => A): Either[L, A] = Right(a)
+
+    def traverseImpl[G[_] : Applicative, A, B](fa: Either[L, A])(f: (A) => G[B]): G[Either[L, B]] = fa match {
+      case Left(x)  => Applicative[G].point(Left(x))
+      case Right(x) => Applicative[G].map(f(x))(Right(_))
+    }
+
+    def foldR[A, B](fa: Either[L, A], z: B)(f: (A) => (=> B) => B): B = fa match {
+      case Left(_)  => z
+      case Right(a) => f(a)(z)
+    }
   }
 
   /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
