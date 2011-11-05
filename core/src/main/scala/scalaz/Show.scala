@@ -16,6 +16,10 @@ object Show {
 
   ////
 
+  def showFromToString[A]: Show[A] = new Show[A] {
+    def show(f: A): List[Char] = f.toString.toList
+  }
+
   ////
 }
 
