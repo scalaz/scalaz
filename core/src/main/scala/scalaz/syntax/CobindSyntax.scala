@@ -5,7 +5,7 @@ package syntax
 trait CoBindV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: CoBind[F]
   ////
-
+  def cobind[B](f: F[A] => B) = F.cobind(self)(f)
   ////
 }
 
