@@ -62,7 +62,7 @@ sealed trait Lens[A, B] {
 
   def %%=[C](s: State[B, C]): State[A, C] =
     State[A, C](a => {
-      val (c: C, b: B) = s(get(a))
+      val (c, b) = s(get(a))
       (c, set(a, b))
     })
 
