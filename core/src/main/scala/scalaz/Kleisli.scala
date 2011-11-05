@@ -36,7 +36,7 @@ sealed trait Kleisli[M[_], A, B] {
 // Prioritized Implicits for type class instances
 //
 
-trait KleislisLow1 {
+trait KleislisInstances1 {
   implicit def kleisliFunctor[F[_], R](implicit F0: Functor[F]): Functor[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliFunctor[F, R] {
     implicit def F: Functor[F] = F0
   }
@@ -45,7 +45,7 @@ trait KleislisLow1 {
   }
 }
 
-trait KleislisLow0 extends KleislisLow1 {
+trait KleislisInstances0 extends KleislisInstances1 {
   implicit def kleisliPointed[F[_], R](implicit F0: Pointed[F]): Pointed[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliPointed[F, R] {
     implicit def F: Pointed[F] = F0
   }
@@ -55,7 +55,17 @@ trait KleislisLow0 extends KleislisLow1 {
   }
 }
 
-trait Kleislis extends KleislisLow0 {
+trait KleisliInstances extends KleislisInstances0 {
+  implicit def kleisliCategory[F[_]](implicit F0: Monad[F]) = new KleisliCategory[F] {
+    implicit def F: Monad[F] = F0
+  }
+
+  implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]) = new KleisliMonad[F, R] {
+    implicit def F: Monad[F] = F0
+  }
+}
+
+trait KleisliFunctions extends KleislisInstances0 {
   /**Construct a Kliesli from a Function1 */
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
     def run(a: A) = f(a)
@@ -66,17 +76,11 @@ trait Kleislis extends KleislisLow0 {
 
   /**Pure Kleisli arrow */
   def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
-
-  implicit def kleisliCategory[F[_]](implicit F0: Monad[F]) = new KleisliCategory[F] {
-    implicit def F: Monad[F] = F0
-  }
-
-  implicit def kleisliMonad[F[_], R](implicit F0: Monad[F]) = new KleisliMonad[F, R] {
-    implicit def F: Monad[F] = F0
-  }
 }
 
-object Kleisli extends Kleislis
+object Kleisli extends KleisliFunctions with KleisliInstances {
+  def apply[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
+}
 
 //
 // Implementation traits for type class instances
