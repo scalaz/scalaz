@@ -20,7 +20,7 @@ sealed trait CoStateT[A, F[_], B] {
   def pos: A =
     runT._2
 
-  def copureT(implicit F: Copointed[F]): B =
+  def copureT(implicit F: CoPointed[F]): B =
     F.copure(runT._1)(runT._2)
 
   def copure(implicit i: F <~> Id): B =
@@ -29,7 +29,7 @@ sealed trait CoStateT[A, F[_], B] {
   def map[C](f: B => C)(implicit ftr: Functor[F]): CoStateT[A, F, C] =
     coStateT[A, F, C](mapRunT(k => f compose k))
 
-  def duplicateT(implicit F: Comonad[F]): CoStateT[A, F, CoStateT[A, F, B]] =
+  def duplicateT(implicit F: CoMonad[F]): CoStateT[A, F, CoStateT[A, F, B]] =
     coStateT[A, F, CoStateT[A, F, B]]((F.cobind(runT._1)(ff => (a: A) => coStateT[A, F, B]((ff, a))), pos))
 
   def duplicate(implicit i: F <~> Id): CoState[A, CoState[A, B]] =
@@ -37,8 +37,8 @@ sealed trait CoStateT[A, F[_], B] {
       mapRun[A => CoState[A, B]](k => a =>
         coState[A, B]((k, run._2))))
 
-  def cobindT[C](f: CoStateT[A, F, B] => C)(implicit c: Cobind[F]): CoStateT[A, F, C] =
-    coStateT[A, F, C]((Cobind[F].cobind(runT._1)(ff => (a: A) => f(coStateT[A, F, B]((ff, a)))), pos))
+  def cobindT[C](f: CoStateT[A, F, B] => C)(implicit c: CoBind[F]): CoStateT[A, F, C] =
+    coStateT[A, F, C]((CoBind[F].cobind(runT._1)(ff => (a: A) => f(coStateT[A, F, B]((ff, a)))), pos))
 
   def cobind[C](f: CoState[A, B] => C)(implicit i: F <~> Id): CoState[A, C] =
     coState[A, C](((a: A) => f(coState[A, B]((run._1, a))), pos))

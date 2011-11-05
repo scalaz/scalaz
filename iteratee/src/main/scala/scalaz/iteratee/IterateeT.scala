@@ -60,7 +60,7 @@ sealed trait IterateeT[X, E, F[_], A] {
     loop(this)
   }
 
-  def up[G[_]](implicit G: Pointed[G], F: Functor[F], FC: Copointed[F]): IterateeT[X, E, G, A] = {
+  def up[G[_]](implicit G: Pointed[G], F: Functor[F], FC: CoPointed[F]): IterateeT[X, E, G, A] = {
     mapI(new (F ~> G) {
       def apply[A](a: F[A]) = G.pure(FC.copure(a))
     })

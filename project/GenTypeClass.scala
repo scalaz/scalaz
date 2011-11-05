@@ -34,10 +34,10 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or should Comonad?
-  lazy val cojoin = TypeClass("Cojoin", *->*)
-  lazy val cobind = TypeClass("Cobind", *->*)
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
+  lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or should CoMonad?
+  lazy val coJoin = TypeClass("CoJoin", *->*)
+  lazy val coBind = TypeClass("CoBind", *->*)
+  lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor, empty))
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plus))
@@ -71,14 +71,14 @@ object TypeClass {
     functor,
     pointed,
     contravariant,
-    copointed,
+    coPointed,
     apply,
     applicative,
     bind,
     monad,
-    cojoin,
-    cobind,
-    comonad,
+    coJoin,
+    coBind,
+    coMonad,
     plus,
     applicativePlus,
     monadPlus,
@@ -122,6 +122,7 @@ object GenTypeClass {
         source
       }
       log.debug("Contents: %s".format(updatedSource))
+      IO.delete(f)
       IO.write(f, updatedSource)
       f
     }

@@ -76,7 +76,7 @@ sealed trait TreeLoc[A] {
 
   /**Select the first descendant node of the current node that satisfies the given predicate. */
   def find(p: TreeLoc[A] => Boolean): Option[TreeLoc[A]] =
-    Cojoin[TreeLoc].cojoin(this).tree.flatten.find(p)
+    CoJoin[TreeLoc].cojoin(this).tree.flatten.find(p)
 
   /** Get the entire tree represented by this zipper. */
   def toTree: Tree[A] = root.tree
@@ -176,7 +176,7 @@ object TreeLoc extends TreeLocFunctions with TreeLocInstances {
 
 trait TreeLocInstances {
   // TODO more instances
-  implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] with Cobind.FromCojoin[TreeLoc] {
+  implicit val treeLocInstance: CoMonad[TreeLoc] = new CoMonad[TreeLoc] with CoBind.FromCoJoin[TreeLoc] {
     import std.stream.{streamInstance, streamMonoid}
     import TreeLoc.Parent
 

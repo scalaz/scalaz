@@ -18,16 +18,16 @@ trait Cokleisli[F[_], A, B] { self =>
 //  def redaer(implicit i: Identity[A] =:= W[A]): A => B =
 //    a => run(id(a))
 
-  def <<=(a: F[A])(implicit F: Functor[F], FC: Cojoin[F]): F[B] =
+  def <<=(a: F[A])(implicit F: Functor[F], FC: CoJoin[F]): F[B] =
     F.map(FC.cojoin(a))(run)
 
-  def =>=[C](c: Cokleisli[F, B, C])(implicit F: Functor[F], FC: Cojoin[F]): Cokleisli[F, A, C] =
+  def =>=[C](c: Cokleisli[F, B, C])(implicit F: Functor[F], FC: CoJoin[F]): Cokleisli[F, A, C] =
     Cokleisli(fa => c run (<<=(fa)))
 
-  def compose[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: Cojoin[F]): Cokleisli[F, C, B] =
+  def compose[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: CoJoin[F]): Cokleisli[F, C, B] =
     c =>= this
 
-  def =<=[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: Cojoin[F]): Cokleisli[F, C, B] =
+  def =<=[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: CoJoin[F]): Cokleisli[F, C, B] =
     compose(c)
 }
 
@@ -38,19 +38,19 @@ object Cokleisli extends CokleisliFunctions with CokleisliInstances {
 }
 
 trait CokleisliInstances1 {
-  implicit def cokleisliArr[F[_]](implicit F0: Copointed[F]) = new CokleisliArr[F] {
+  implicit def cokleisliArr[F[_]](implicit F0: CoPointed[F]) = new CokleisliArr[F] {
     override implicit def F = F0
   }
-  implicit def cokleisliFirst[F[_]](implicit F0: Copointed[F]) = new CokleisliFirst[F] {
+  implicit def cokleisliFirst[F[_]](implicit F0: CoPointed[F]) = new CokleisliFirst[F] {
     override implicit def F = F0
   }
-  implicit def cokleisliArrId[F[_]](implicit F0: Copointed[F]) = new CokleisliArrId[F] {
+  implicit def cokleisliArrId[F[_]](implicit F0: CoPointed[F]) = new CokleisliArrId[F] {
     override implicit def F = F0
   }
 }
 
 trait CokleisliInstances0 extends CokleisliInstances1 {
-  implicit def cokleisliCompose[F[_]](implicit F0: Cojoin[F] with Functor[F]) = new CokleisliCompose[F] {
+  implicit def cokleisliCompose[F[_]](implicit F0: CoJoin[F] with Functor[F]) = new CokleisliCompose[F] {
     override implicit def F = F0
   }
 }
@@ -58,7 +58,7 @@ trait CokleisliInstances0 extends CokleisliInstances1 {
 trait CokleisliInstances extends CokleisliInstances0 {
   implicit def cokleisliMonad[F[_], R] = new CokleisliMonad[F, R] {}
   
-  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]) = new CokleisliArrow[F] {
+  implicit def cokleisliArrow[F[_]](implicit F0: CoMonad[F]) = new CokleisliArrow[F] {
     override implicit def F = F0
   }
 }
@@ -82,25 +82,25 @@ trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]}
 }
 
 trait CokleisliArr[F[_]] extends Arr[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
-  implicit def F: Copointed[F]
+  implicit def F: CoPointed[F]
   def arr[A, B](f: (A) => B) = Cokleisli(a => f(F.copure(a)))
 }
 
 trait CokleisliFirst[F[_]] extends First[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
-  implicit def F: Copointed[F]
+  implicit def F: CoPointed[F]
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
     Cokleisli[(A, C), F, (B, C)](w => (f.run(F.map(w)(ac => ac._1)), F.copure(w)._2))
 }
 
 trait CokleisliArrId[F[_]] extends ArrId[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
-  implicit def F: Copointed[F]
+  implicit def F: CoPointed[F]
 
   override def id[A] = Cokleisli(F.copure)
 }
 
 trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
-  implicit def F: Cojoin[F] with Functor[F]
+  implicit def F: CoJoin[F] with Functor[F]
 
   override def compose[A, B, C](f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]) = f compose g
 }
@@ -113,5 +113,5 @@ trait CokleisliArrow[F[_]]
   with CokleisliCompose[F]
   with CokleisliFirst[F] {
   
-  implicit def F: Comonad[F]
+  implicit def F: CoMonad[F]
 }

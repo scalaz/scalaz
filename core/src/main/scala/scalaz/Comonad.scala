@@ -1,18 +1,16 @@
 package scalaz
 
-trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
-
+trait CoMonad[F[_]] extends CoPointed[F] with CoJoin[F] with CoBind[F] { self =>
   ////
 
   // derived functions
 
   ////
-
-  val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] {}
+  val coMonadSyntax = new scalaz.syntax.CoMonadSyntax[F] {}
 }
 
-object Comonad {
-  def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
+object CoMonad {
+  def apply[F[_]](implicit F: CoMonad[F]): CoMonad[F] = F
 
   ////
 

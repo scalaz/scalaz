@@ -1,31 +1,31 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `Comonad` */
-trait ComonadV[F[_],A] extends SyntaxV[F[A]] {
-  implicit def F: Comonad[F]
+/** Wraps a value `self` and provides methods related to `CoMonad` */
+trait CoMonadV[F[_],A] extends SyntaxV[F[A]] {
+  implicit def F: CoMonad[F]
   ////
 
   ////
 }
 
-trait ToComonadV extends ToCopointedV with ToCojoinV with ToCobindV {
-  implicit def ToComonadV[F[_],A](v: F[A])(implicit F0: Comonad[F]) =
-    new ComonadV[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
-  implicit def ToComonadVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Comonad[({type f[a] = F[X, a]})#f]) =
-    new ComonadV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Comonad[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToComonadVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Comonad[({type f[a] = F[X, G, a]})#f]) =
-    new ComonadV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Comonad[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToComonadVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Comonad[({type f[a] = F[X, Id, a]})#f]) =
-    new ComonadV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Comonad[({type f[a] = F[X, Id, a]})#f] = F0 }
+trait ToCoMonadV extends ToCoPointedV with ToCoJoinV with ToCoBindV {
+  implicit def ToCoMonadV[F[_],A](v: F[A])(implicit F0: CoMonad[F]) =
+    new CoMonadV[F,A] { def self = v; implicit def F: CoMonad[F] = F0 }
+  implicit def ToCoMonadVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: CoMonad[({type f[a] = F[X, a]})#f]) =
+    new CoMonadV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: CoMonad[({type f[a] = F[X, a]})#f] = F0 }
+  implicit def ToCoMonadVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: CoMonad[({type f[a] = F[X, G, a]})#f]) =
+    new CoMonadV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: CoMonad[({type f[a] = F[X, G, a]})#f] = F0 }
+  implicit def ToCoMonadVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: CoMonad[({type f[a] = F[X, Id, a]})#f]) =
+    new CoMonadV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: CoMonad[({type f[a] = F[X, Id, a]})#f] = F0 }
 
   ////
 
   ////
 }
 
-trait ComonadSyntax[F[_]] extends CopointedSyntax[F] with CojoinSyntax[F] with CobindSyntax[F] {
-  implicit def ToComonadV[A](v: F[A])(implicit F0: Comonad[F]): ComonadV[F, A] = new ComonadV[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
+trait CoMonadSyntax[F[_]] extends CoPointedSyntax[F] with CoJoinSyntax[F] with CoBindSyntax[F] {
+  implicit def ToCoMonadV[A](v: F[A])(implicit F0: CoMonad[F]): CoMonadV[F, A] = new CoMonadV[F,A] { def self = v; implicit def F: CoMonad[F] = F0 }
 
   ////
 

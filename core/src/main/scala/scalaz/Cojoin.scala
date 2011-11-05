@@ -1,17 +1,17 @@
 package scalaz
 
-trait Cojoin[F[_]]  { self =>
+trait CoJoin[F[_]]  { self =>
   ////
   def cojoin[A](a: F[A]): F[F[A]]
 
   // derived functions
 
   ////
-  val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] {}
+  val coJoinSyntax = new scalaz.syntax.CoJoinSyntax[F] {}
 }
 
-object Cojoin {
-  def apply[F[_]](implicit F: Cojoin[F]): Cojoin[F] = F
+object CoJoin {
+  def apply[F[_]](implicit F: CoJoin[F]): CoJoin[F] = F
 
   ////
 
