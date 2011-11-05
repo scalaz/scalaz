@@ -74,7 +74,7 @@ private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = State
   override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] = fa.map(f)
 }
 
-private[scalaz] trait StateTPointed[S, F[_]] extends StateTFunctor[S, F] with Pointed[({type f[a] = StateT[S, F, a]})#f] {
+private[scalaz] trait StateTPointed[S, F[_]] extends Pointed[({type f[a] = StateT[S, F, a]})#f] with StateTFunctor[S, F] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): StateT[S, F, A] = StateT(s => F.point(a, s))

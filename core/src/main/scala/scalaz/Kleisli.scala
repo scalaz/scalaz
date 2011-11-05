@@ -118,7 +118,7 @@ private[scalaz] trait KleisliFirst[F[_]] extends First[({type λ[α, β] = Kleis
   }
 }
 
-private[scalaz] trait KleisliArrIdArr[F[_]] extends KleisliFirst[F] with ArrId[({type λ[α, β] = Kleisli[F, α, β]})#λ] with Arr[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+private[scalaz] trait KleisliArrIdArr[F[_]] extends ArrId[({type λ[α, β] = Kleisli[F, α, β]})#λ] with Arr[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliFirst[F] {
   implicit def F: Pointed[F]
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
@@ -126,12 +126,12 @@ private[scalaz] trait KleisliArrIdArr[F[_]] extends KleisliFirst[F] with ArrId[(
   def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
 }
 
-private[scalaz] trait KleisliCategory[F[_]] extends KleisliArrIdArr[F] with Category[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+private[scalaz] trait KleisliCategory[F[_]] extends Category[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliArrIdArr[F] {
   implicit def F: Monad[F]
 
   def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
 }
 
-private[scalaz] trait KleisliArrow[F[_]] extends KleisliCategory[F] with Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliCategory[F] {
   implicit def F: Monad[F]
 }

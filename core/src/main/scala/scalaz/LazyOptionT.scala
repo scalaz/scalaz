@@ -158,23 +158,23 @@ trait LazyOptionTs {
 private[scalaz] trait LazyOptionTFunctor[F[_]] extends Functor[({type λ[α] = LazyOptionT[F, α]})#λ] {
   implicit def F: Functor[F]
 
-  def map[A, B](fa: LazyOptionT[F, A])(f: A => B): LazyOptionT[F, B] = fa map (a => f(a))
+  override def map[A, B](fa: LazyOptionT[F, A])(f: A => B): LazyOptionT[F, B] = fa map (a => f(a))
 }
 
-private[scalaz] trait LazyOptionTPointed[F[_]] extends LazyOptionTFunctor[F] with Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] {
+private[scalaz] trait LazyOptionTPointed[F[_]] extends Pointed[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTFunctor[F] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): LazyOptionT[F, A] = LazyOptionT[F, A](F.point(LazyOption.lazySome(a)))
 }
 
-private[scalaz] trait LazyOptionTApply[F[_]] extends LazyOptionTFunctor[F] with Apply[({type λ[α] = LazyOptionT[F, α]})#λ] {
+private[scalaz] trait LazyOptionTApply[F[_]] extends Apply[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTFunctor[F] {
   implicit def F: Apply[F]
 
   def ap[A, B](fa: LazyOptionT[F, A])(f: LazyOptionT[F, A => B]): LazyOptionT[F, B] =
     LazyOptionT(F.map2(f.runT, fa.runT)({ case (ff, aa) => LazyOption.lazyOptionInstance.ap(aa)(ff) }))
 }
 
-private[scalaz] trait LazyOptionTMonad[F[_]] extends LazyOptionTPointed[F] with Monad[({type λ[α] = LazyOptionT[F, α]})#λ] {
+private[scalaz] trait LazyOptionTMonad[F[_]] extends Monad[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTPointed[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: LazyOptionT[F, A])(f: A => LazyOptionT[F, B]): LazyOptionT[F, B] = fa flatMap (a => f(a))

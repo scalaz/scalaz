@@ -4,7 +4,7 @@ package std
 import annotation.tailrec
 
 trait ListInstances {
-  implicit val listInstance = new MonadPlus[List] with Traverse[List] with Empty[List] with Each[List] with Index[List] with Length[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Empty[List] with Each[List] with Index[List] with Length[List] {
     def each[A](fa: List[A])(f: (A) => Unit): Unit = fa foreach f
     def index[A](fa: List[A], i: Int): Option[A] = {
       var n = 0

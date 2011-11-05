@@ -72,23 +72,23 @@ object OptionT extends OptionTFunctions with OptionTInstances
 private[scalaz] trait OptionTFunctor[F[_]] extends Functor[({type λ[α] = OptionT[F, α]})#λ] {
   implicit def F: Functor[F]
 
-  def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] = fa map f
+  override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] = fa map f
 }
 
-private[scalaz] trait OptionTPointed[F[_]] extends OptionTFunctor[F] with Pointed[({type λ[α] = OptionT[F, α]})#λ] {
+private[scalaz] trait OptionTPointed[F[_]] extends Pointed[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(Some(a)))
 }
 
-private[scalaz] trait OptionTApply[F[_]] extends OptionTFunctor[F] with Apply[({type λ[α] = OptionT[F, α]})#λ] {
+private[scalaz] trait OptionTApply[F[_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
   implicit def F: Apply[F]
 
   def ap[A, B](fa: OptionT[F, A])(f: OptionT[F, A => B]): OptionT[F, B] =
     OptionT(F.map2(f.value, fa.value)({ case (ff, aa) => optionInstance.ap(aa)(ff) }))
 }
 
-private[scalaz] trait OptionTMonad[F[_]] extends OptionTPointed[F] with Monad[({type λ[α] = OptionT[F, α]})#λ] {
+private[scalaz] trait OptionTMonad[F[_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTPointed[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f

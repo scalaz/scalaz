@@ -1,11 +1,13 @@
 package scalaz
 
 trait Idents {
-  implicit val id = new Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
+  implicit val id = new Traverse[Id] with Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
     def point[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
     def cojoin[A](a: Id[A]): A = a
     def copoint[A](p: Id[A]): A = p
+    def traverseImpl[G[_]: Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
+    def foldR[A, B](fa: scalaz.Id[A], z: B)(f: (A) => (=> B) => B): B = f(fa)(z)
 
     // Overrides for efficiency.
 

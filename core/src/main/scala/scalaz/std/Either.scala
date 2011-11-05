@@ -20,7 +20,7 @@ trait EitherInstances {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L] = new Monad[({type l[a] = Either[L, a]})#l] with Traverse[({type l[a] = Either[L, a]})#l] {
+  implicit def eitherMonad[L] = new Traverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] {
     def bind[A, B](fa: Either[L, A])(f: (A) => Either[L, B]): Either[L, B] = fa match {
       case Left(a)  => Left(a)
       case Right(b) => f(b)

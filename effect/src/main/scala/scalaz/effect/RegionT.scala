@@ -10,7 +10,7 @@ import Kleisli._
 /**
  * A monad transformer in which scarce resources can be opened. When the region
  * terminates, all opened resources will be closed automatically. It's a type error
- * to return an opened resorce from the region, and no I/O with closed
+ * to return an opened resource from the region, and no I/O with closed
  * resources is possible.
  */
 sealed trait RegionT[S, P[_], A] {

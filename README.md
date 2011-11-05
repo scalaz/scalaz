@@ -70,7 +70,7 @@ val plusOpt = O.lift2(plus)
 Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
 
 ```
-  implicit val option = new MonadPlus[Option] with Traverse[Option] {
+  implicit val option = new Traverse[Option] with MonadPlus[Option] {
     def point[A](a: => A) = Some(a)
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f

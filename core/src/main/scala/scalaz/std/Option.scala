@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait OptionInstances {
-  implicit val optionInstance = new MonadPlus[Option] with Traverse[Option] with Each[Option] with Index[Option] with Length[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
