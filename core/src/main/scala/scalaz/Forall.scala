@@ -3,6 +3,9 @@ package scalaz
 /** A universally quantified value */
 trait Forall[P[_]] {
   def apply[A]: P[A]
+  def map[Q[_]](f: P ~> Q): Forall[Q] = new Forall[Q] {
+    def apply[A] = f(Forall.this.apply[A])
+  }
 }
 
 trait ForallK[K, P[_]] {

@@ -1018,13 +1018,21 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       implicit def sizer[A] = Reducer((a: A) => 1)
       def apply(i: Int): A =
         value.split(_ > i)._2.viewl.headOption.getOrElse(error_("Index " + i + " > " + value.measure))
-      def ++(xs: IndSeq[A]) = indSeq(value <++> xs.value)
-      def :+(x: => A) = indSeq(value :+ x)
-      def +:(x: => A) = indSeq(x +: value)
-      def tail = indSeq(value.tail)
-      def init = indSeq(value.init)
-      def map[B](f: A => B) = indSeq(value map f)
-      def flatMap[B](f: A => IndSeq[B]) =
+      def replace(i: Int, a: => A): IndSeq[A] = {
+        val (l, r) = value.split(_ > i)
+        indSeq(l <++> (a |-: r))
+      }
+      def split(i: Int): (IndSeq[A], IndSeq[A]) = {
+        val (l, r) = value.split(_ > i)
+        (indSeq(l), indSeq(r))
+      }
+      def ++(xs: IndSeq[A]): IndSeq[A] = indSeq(value <++> xs.value)
+      def :+(x: => A): IndSeq[A] = indSeq(value :+ x)
+      def +:(x: => A): IndSeq[A] = indSeq(x +: value)
+      def tail: IndSeq[A] = indSeq(value.tail)
+      def init: IndSeq[A] = indSeq(value.init)
+      def map[B](f: A => B): IndSeq[B] = indSeq(value map f)
+      def flatMap[B](f: A => IndSeq[B]): IndSeq[B] =
         indSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
     }
 

@@ -2,24 +2,25 @@ package scalaz
 package effects
 
 import Scalaz._
+import concurrent._
 
 sealed trait IO[A] {
-  private[effects] def apply(rw: World[RealWorld]): (World[RealWorld], A)
+  private[effects] def apply(rw: World[RealWorld]): Promise[(World[RealWorld], A)]
   /**
    * Unsafe operation. Runs I/O and performs side-effects.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(realWorld)._2
+  def unsafePerformIO: A = apply(realWorld).get._2
 
-  def flatMap[B](f: A => IO[B]): IO[B] = IO(rw => {
-    val (nw, a) = apply(rw)
-    f(a)(nw)
-  })
+  def flatMap[B](f: A => IO[B]): IO[B] = IO(rw =>
+    apply(rw) flatMap {
+      case (nw, a) => f(a)(nw)
+    })
 
-  def map[B](f: A => B): IO[B] = IO(rw => {
-    val (nw, a) = apply(rw)
-    (nw, f(a))
-  })
+  def map[B](f: A => B): IO[B] = IO(rw =>
+    apply(rw) map {
+      case (nw, a) => (nw, f(a))
+    })
 
   /** Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] = 
@@ -92,12 +93,12 @@ class IORef[A](val value: STRef[RealWorld, A]) extends NewType[STRef[RealWorld, 
 }
 
 object IO {
-  def apply[A](f: World[RealWorld] => (World[RealWorld], A)): IO[A] = new IO[A] {
+  def apply[A](f: World[RealWorld] => Promise[(World[RealWorld], A)]): IO[A] = new IO[A] {
     private[effects] def apply(rw: World[RealWorld]) = f(rw)
   }
 
   implicit val ioPure: Pure[IO] = new Pure[IO] {
-    def pure[A](a: => A) = IO(rw => (rw, a))
+    def pure[A](a: => A) = IO(rw => promise((rw, a)))
   }
   implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f
