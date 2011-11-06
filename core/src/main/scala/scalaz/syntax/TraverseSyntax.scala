@@ -14,8 +14,14 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def tmap[B](f: A => B) =
     F.map(self)(f)
 
-  final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]) =
+  final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]): G[F[B]] =
     G.traverse(self)(f)
+
+  // An experiment with Miles Sabine's trick with dependent method types to hold the
+  // compiler's hand in lieu of higher order unification.
+  final def traverseU[GB](f: A => GB)(implicit U: UnpackM[GB]) = new {
+    def run(implicit G: Applicative[U.M]): U.M[F[U.A]] = G.traverse(self)(a => U(f(a)))
+  }
 
   final def sequence[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
     val fgb: F[G[B]] = ev.subst[F](self)

@@ -60,7 +60,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def zipL[A,B](fa: F[A], fb: F[B]): F[(A, Option[B])] = zipWithL(fa, fb)((_,_))
   def zipR[A,B](fa: F[A], fb: F[B]): F[(Option[A], B)] = zipWithR(fa, fb)((_,_))
 
-  // foldLeft, foldRight, mapAccumL, mapAccumR, map, filter?
+  // mapAccumL, mapAccumR, map, filter?
 
   ////
   val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] {}
