@@ -68,4 +68,21 @@ object MixedBag extends App {
     val K = Kleisli.kleisliArrId[Option] // or, Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
+
+  def kleisiArrowTricksy() {
+    import Kleisli._
+    import std.option._
+    import syntax.compose._
+
+    implicit def myArrK[M[_], F[M[_], _, _], A, B](f: A => B)(implicit arrow: Arr[({type λ[α, β] = F[M, α, β]})#λ]): F[M, A, B] =
+      arrow.arr(f)
+
+    val f = kleisli((a: Int) => some(0))
+    val x: Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ] =kleisliArrId
+    f >>> myArrK(((i: Int) => i * 2))(kleisliArrId(optionInstance))
+
+    // TODO Investigate compiler hang
+    // f >>> myArrK(((i: Int) => i * 2))(kleisliArrId)
+    // f >>> ((i: Int) => i * 2))
+  }
 }
