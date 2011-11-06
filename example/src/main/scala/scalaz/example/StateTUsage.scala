@@ -21,11 +21,19 @@ object StateTUsage extends App {
     MonadState[({type f[s, a] = StateT[s, M, a]})#f, Int]
   }
 
-  def foo {
+
+  def stateTraverse1 {
     import scalaz._, Scalaz._
-    val traverseOpt = List(1, 2, 3).traverseU(a => some(a))
-    traverseOpt: Option[List[Int]]
-    val traverseState = List(1, 2, 3).traverseU(a => State((x: Int) => (x + 1, a)))
-    traverseState: State[Int, List[Int]]
+    import State.{State, stateMonad}
+    val ls = List(1, 2, 3)
+    val traverseOpt: Option[List[Int]] = ls.traverse(a => Some(a))
+    val traverseState: State[Int, List[Int]] = ls.traverse[({type λ[α]=State[Int, α]})#λ, Int](a => State((x: Int) => (x + 1, a)))
+  }
+
+  def stateTraverse2 {
+    import scalaz._, Scalaz._
+    val ls = List(1, 2, 3)
+    val traverseOpt: Option[List[Int]] = ls.traverseI(a => some(a))
+    val traverseState = ls.traverseI(a => State((x: Int) => (x + 1, a)))
   }
 }
