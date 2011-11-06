@@ -23,7 +23,9 @@ object StateTUsage extends App {
 
   def foo {
     import scalaz._, Scalaz._
-    val traverse = List(1, 2, 3).traverseU(a => State((x: Int) => (x + 1, a)))
-    traverse: State[Int, List[Int]]
+    val traverseOpt = List(1, 2, 3).traverseU(a => some(a))
+    traverseOpt: Option[List[Int]]
+    val traverseState = List(1, 2, 3).traverseU(a => State((x: Int) => (x + 1, a)))
+    traverseState: State[Int, List[Int]]
   }
 }
