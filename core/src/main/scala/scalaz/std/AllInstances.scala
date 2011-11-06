@@ -5,6 +5,7 @@ trait AllInstances
   with OptionInstances with StringInstances with StreamInstances with TupleInstances
   with EitherInstances with PartialFunctionInstances with TypeConstraintInstances
   with scalaz.std.math.BigDecimalInstances with scalaz.std.math.BigInts
+  with scalaz.std.math.OrderingInstances
   with scalaz.std.util.parsing.combinator.Parsers
   with scalaz.std.java.util.MapInstances
 

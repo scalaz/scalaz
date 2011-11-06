@@ -5,3 +5,4 @@ trait AllFunctions
   extends ListFunctions
   with OptionFunctions
   with StreamFunctions
+  with math.OrderingFunctions

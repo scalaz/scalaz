@@ -31,8 +31,17 @@ object Order {
   def apply[F](implicit F: Order[F]): Order[F] = F
 
   ////
-  implicit object order extends Contravariant[Order] {
+  implicit object orderInstance extends Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
+  }
+
+  implicit def orderMonoid[A] = new Monoid[Order[A]] {
+    def zero: Order[A] = new Order[A] {
+      def order(x: A, y: A): Ordering = Monoid[Ordering].zero
+    }
+    def append(f1: Order[A], f2: => Order[A]): Order[A] = new Order[A] {
+      def order(x: A, y: A): Ordering = Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
+    }
   }
 
   ////
