@@ -40,6 +40,7 @@ object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   ////
+  type Of[FA] = UnpackMClass[Applicative, FA]
 
   ////
 }
