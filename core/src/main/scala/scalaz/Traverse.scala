@@ -41,7 +41,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (F[Unit], B) = 
     runTraverseS(fa, z)(a => State(b => ((), f(b,a))))
 
-  def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
+  override def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
 
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2
 

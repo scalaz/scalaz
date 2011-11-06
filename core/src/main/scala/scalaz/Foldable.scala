@@ -10,7 +10,10 @@ trait Foldable[F[_]]  { self =>
   def foldR[A, B](fa: F[A], z: B)(f: A => (=> B) => B): B
 
   /**Left-associative fold of a structure. */
-  def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B
+  def foldL[A, B](fa: F[A], z: B)(f: (B, A) => B) = {
+    import Dual._, Endo._, syntax.std.allV._
+    foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
+  }
 
   // derived functions
 
@@ -46,7 +49,7 @@ object Foldable {
    * }
    * }}}
    */
-  trait FromFoldMap[F[_]] extends Foldable[F] with FoldLFromFoldMap[F] {
+  trait FromFoldMap[F[_]] extends Foldable[F] {
     override def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B) =
       foldMap(fa)((a: A) => (Endo.endo(f(a)(_: B)))) apply z
   }
@@ -64,16 +67,9 @@ object Foldable {
    * }
    * }}}
    */
-  trait FromFoldr[F[_]] extends Foldable[F] with FoldLFromFoldMap[F] {
+  trait FromFoldr[F[_]] extends Foldable[F] {
     override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) =
         foldR[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
-  }
-
-  trait FoldLFromFoldMap[F[_]] extends Foldable[F] {
-    override def foldL[A, B](fa: F[A], z: B)(f: (B, A) => B) = {
-      import Dual._, Endo._, syntax.std.allV._
-      foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
-    }
   }
 
   ////
