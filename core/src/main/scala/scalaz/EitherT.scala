@@ -102,7 +102,7 @@ sealed trait EitherT[F[_], A, B] {
     G.map(F.traverse(runT)(o => Traverse[({type λ[α] = Either[A, α]})#λ].traverse(o)(f)))(EitherT.eitherT(_))
   }
 
-  def foldRight[Z](z: Z)(f: (B) => (=> Z) => Z)(implicit F: Traverse[F]): Z = {
+  def foldRight[Z](z: Z)(f: (B) => (=> Z) => Z)(implicit F: Foldable[F]): Z = {
     import std.either._
     F.foldR[Either[A, B], Z](runT, z)(a => b => eitherMonad[A].foldR[B, Z](a, b)(f))
   }
@@ -228,6 +228,9 @@ trait EitherTInstances0 extends EitherTInstances1 {
     implicit def G = eitherTMonad[F, L]
     def iso = EitherT.eitherTLeftProjectionEIso2[F, L]
   }
+  implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]) = new EitherTFoldable[F, L] {
+    implicit def F = F0
+  }
 }
 
 // TODO more instances
@@ -307,12 +310,16 @@ trait EitherTMonad[F[_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] 
   def bind[A, B](fa: EitherT[F, E, A])(f: (A) => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
 
-trait EitherTTraverse[F[_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] {
+trait EitherTFoldable[F[_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
+  implicit def F: Foldable[F]
+
+  override def foldR[A, B](fa: EitherT[F, E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+}
+
+trait EitherTTraverse[F[_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: (A) => G[B]): G[EitherT[F, E, B]] = fa traverse f
-
-  def foldR[A, B](fa: EitherT[F, E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
 }
 
 trait EitherTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {

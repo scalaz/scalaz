@@ -130,7 +130,7 @@ trait ReducerFunctions {
       def cons(c: C, m: M): M = cs(c)(m)
     }
 
-  def foldReduce[F[_], A, B](a: F[A])(implicit f: Traverse[F], r: Reducer[A, B]): B =
+  def foldReduce[F[_], A, B](a: F[A])(implicit f: Foldable[F], r: Reducer[A, B]): B =
     f.foldMap(a)(r.unit(_))(r.monoid)
 
   /**Construct a Reducer with the given unit function and monoid **/

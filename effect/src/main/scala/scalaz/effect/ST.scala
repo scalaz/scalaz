@@ -172,7 +172,7 @@ trait STs {
   })
 
   /**Accumulates an integer-associated list into an immutable array. */
-  def accumArray[F[_], A, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Traverse[F], mf: Manifest[A]): ImmutableArray[A] = {
+  def accumArray[F[_], A, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Foldable[F], mf: Manifest[A]): ImmutableArray[A] = {
     import std.anyVal.unitInstance
     type STA[S] = ST[S, ImmutableArray[A]]
     runST(new Forall[STA] {

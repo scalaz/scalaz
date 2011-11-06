@@ -8,5 +8,8 @@ object Tags {
 
   sealed trait Multiplication
 
+  sealed trait Dual
+
+  sealed trait Zip
 }
 

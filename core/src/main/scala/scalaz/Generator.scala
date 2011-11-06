@@ -17,13 +17,13 @@ object Generator extends Generators
 
 trait Generators {
 
-  def FoldrGenerator[F[_] : Traverse]: Generator[F] = new Generator[F] {
+  def FoldrGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Traverse[F].foldR(c, r.zero)(a => b => r.cons(a, b))
+      Foldable[F].foldR(c, r.zero)(a => b => r.cons(a, b))
   }
 
-  def FoldlGenerator[F[_] : Traverse]: Generator[F] = new Generator[F] {
+  def FoldlGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Traverse[F].foldL(c, r.zero)((b, a) => r.snoc(b, a))
+      Foldable[F].foldL(c, r.zero)((b, a) => r.snoc(b, a))
   }
 }

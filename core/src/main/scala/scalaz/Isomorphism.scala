@@ -258,6 +258,18 @@ trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismPlus
   implicit def G: MonadPlus[G]
 }
 
+trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
+  implicit def G: Foldable[G]
+
+  def iso: F <~> G
+
+  override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) = G.foldMap(iso.to(fa))(f)
+
+  override def foldL[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldL(iso.to(fa), z)(f)
+
+  override def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B): B = G.foldR[A, B](iso.to(fa), z)(f)
+}
+
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
 
@@ -283,4 +295,3 @@ trait IsomorphismBiTraverse[F[_, _], G[_, _]] extends BiTraverse[F] with Isomorp
   def bitraverse[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverse(iso.to(fab))(f, g))(iso.from.apply)
 }
-

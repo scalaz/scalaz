@@ -28,13 +28,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]) =
     F.runTraverseS(self, s)(f)
 
-  final def foldMap[B](f: A => B)(implicit B: Monoid[B]): B = F.foldMap(self)(f)
-  final def foldMapIdentity[B](implicit B: Monoid[A]): A = F.foldMapIdentity(self)
   final def reverse: F[A] = F.reverse(self)
-
-  final def toList: List[A] = F.toList(self)
-  final def toIndexedSeq(fa: F[A]): IndexedSeq[A] = F.toIndexedSeq(self)
-  final def toSet(fa: F[A]): Set[A] = F.toSet(self)
 
   final def zipWith[B, C](fb: F[B])(f: (A, Option[B]) => C): (F[C], List[B]) = F.zipWith(self, fb)(f)
   final def zipWithL[B, C](fb: F[B])(f: (A, Option[B]) => C): F[C] = F.zipWithL(self, fb)(f)
@@ -45,7 +39,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToTraverseV extends ToFunctorV {
+trait ToTraverseV extends ToFunctorV with ToFoldableV {
   implicit def ToTraverseV[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseV[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
   implicit def ToTraverseVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Traverse[({type f[a] = F[X, a]})#f]) =
@@ -60,7 +54,7 @@ trait ToTraverseV extends ToFunctorV {
   ////
 }
 
-trait TraverseSyntax[F[_]] extends FunctorSyntax[F] {
+trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
   implicit def ToTraverseV[A](v: F[A])(implicit F0: Traverse[F]): TraverseV[F, A] = new TraverseV[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
 
   ////

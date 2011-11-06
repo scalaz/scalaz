@@ -31,7 +31,8 @@ object TypeClass {
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor))
+  lazy val foldable = TypeClass("Foldable", *->*)
+  lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
   lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or should CoMonad?
@@ -82,6 +83,7 @@ object TypeClass {
     plus,
     applicativePlus,
     monadPlus,
+    foldable,
     traverse,
     biFunctor,
     biTraverse,

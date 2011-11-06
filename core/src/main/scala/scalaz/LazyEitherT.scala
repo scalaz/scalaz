@@ -114,7 +114,7 @@ sealed trait LazyEitherT[F[_], A, B] {
     G.map(F.traverse(runT)(o => LazyEither.lazyEitherInstance[A].traverse(o)(f)))(LazyEitherT(_))
   }
 
-  def foldRight[Z](z: Z)(f: (B) => (=> Z) => Z)(implicit F: Traverse[F]): Z = {
+  def foldRight[Z](z: Z)(f: (B) => (=> Z) => Z)(implicit F: Foldable[F]): Z = {
     F.foldR[LazyEither[A, B], Z](runT, z)(a => b => LazyEither.lazyEitherInstance[A].foldR[B, Z](a, b)(f))
   }
 
@@ -246,6 +246,13 @@ trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
     implicit def G = lazyEitherTMonad[F, L]
     def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
   }
+  implicit def lazyEitherTFoldable[F[_], L](implicit F0: Foldable[F]) = new LazyEitherTFoldable[F, L] {
+    implicit def F = F0
+  }
+  implicit def lazyEitherTLeftProjectionFoldable[F[_], L](implicit F0: Foldable[F]) = new IsomorphismFoldable[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
+    implicit def G = lazyEitherTFoldable[F, L]
+    def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
+  }
 }
 
 // TODO more instances
@@ -321,12 +328,18 @@ trait LazyEitherTMonad[F[_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α
   def bind[A, B](fa: LazyEitherT[F, E, A])(f: (A) => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] = fa flatMap (a => f(a))
 }
 
-trait LazyEitherTTraverse[F[_], E] extends Traverse[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
+trait LazyEitherTFoldable[F[_], E] extends Foldable.FromFoldr[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
+  implicit def F: Foldable[F]
+
+  def foldR[A, B](fa: LazyEitherT[F, E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+}
+
+trait LazyEitherTTraverse[F[_], E] extends Traverse[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: LazyEitherT[F, E, A])(f: (A) => G[B]): G[LazyEitherT[F, E, B]] = fa traverse f
 
-  def foldR[A, B](fa: LazyEitherT[F, E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+  override def foldR[A, B](fa: LazyEitherT[F, E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
 }
 
 trait LazyEitherTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {

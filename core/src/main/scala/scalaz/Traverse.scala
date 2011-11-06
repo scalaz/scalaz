@@ -1,6 +1,6 @@
 package scalaz
 
-trait Traverse[F[_]] extends Functor[F] { self =>
+trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
   import Ident.id
   import State.State
@@ -12,6 +12,7 @@ trait Traverse[F[_]] extends Functor[F] { self =>
     def run[A,B](fa: F[A])(f: A => G[B]): G[F[B]] = traverseImpl[G,A,B](fa)(f)
     // def ***
   }
+
   // reduce - given monoid
   def traversal[G[_]:Applicative]: Traversal[G] = 
     new Traversal[G]
@@ -35,27 +36,19 @@ trait Traverse[F[_]] extends Functor[F] { self =>
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](id).run(fa)(f)
 
-  // TODO can we provide a default impl in terms of traverseImpl?
-  def foldR[A, B](fa: F[A], z: B)(f: A => (=> B) => B): B
-  def foldR1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldR(fa, None: Option[A])(a => o => o.map(f(a)(_)) orElse Some(a))
-
-  // TODO by-name type in `f` like foldR?
-  def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
-
-  def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2
-  def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldLShape(fa, F.zero)((b, a) => F.append(b, a))._2
+  // TODO can we provide a default impl of foldR in terms of traverseImpl?
 
   def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (F[Unit], B) = 
     runTraverseS(fa, z)(a => State(b => ((), f(b,a))))
+
+  def foldL[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
+
+  def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2
 
   def reverse[A](fa: F[A]): F[A] = { 
     val (shape, as) = foldLShape(fa, scala.List[A]())((t,h) => h :: t)
     runTraverseS(shape, as)(_ => State(e => (e.head, e.tail)))._1
   }
-
-  def toList[A](fa: F[A]): List[A] = foldL(fa, scala.List[A]())((t,h) => h :: t).reverse 
-  def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldL(fa, IndexedSeq[A]())(_ :+ _)
-  def toSet[A](fa: F[A]): Set[A] = foldL(fa, Set[A]())(_ + _)
 
   def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (F[C], List[B]) = 
     runTraverseS(fa, toList(fb))(a => 

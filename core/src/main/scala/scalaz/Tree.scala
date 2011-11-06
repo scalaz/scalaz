@@ -18,14 +18,14 @@ sealed trait Tree[A] {
 
   /** Maps the elements of the Tree into a Monoid and folds the resulting Tree. */
   def foldMap[B: Monoid](f: A => B): B =
-    Monoid[B].append(f(rootLabel), Traverse[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
+    Monoid[B].append(f(rootLabel), Foldable[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
 
   def foldRight[B](z: B)(f: A => (=> B) => B): B =
-    Traverse[Stream].foldR(flatten, z)(f)
+    Foldable[Stream].foldR(flatten, z)(f)
 
   /** A 2D String representation of this Tree. */
   def drawTree(implicit sh: Show[A]): String =
-    Traverse[Stream].foldMap(draw)((_: String) + "\n")
+    Foldable[Stream].foldMap(draw)((_: String) + "\n")
 
   /** A histomorphic transform. Each element in the resulting tree
    * is a function of the corresponding element in this tree
@@ -54,7 +54,7 @@ sealed trait Tree[A] {
   /** Pre-order traversal. */
   def flatten: Stream[A] = {
     def squish(tree: Tree[A], xs: Stream[A]): Stream[A] =
-      Stream.cons(tree.rootLabel, Traverse[Stream].foldR[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
+      Stream.cons(tree.rootLabel, Foldable[Stream].foldR[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
 
     squish(this, Stream.Empty)
   }
@@ -62,7 +62,7 @@ sealed trait Tree[A] {
   /** Breadth-first traversal. */
   def levels: Stream[Stream[A]] = {
     val f = (s: Stream[Tree[A]]) => {
-      Traverse[Stream].foldMap(s)((_: Tree[A]).subForest)
+      Foldable[Stream].foldMap(s)((_: Tree[A]).subForest)
     }
     Stream.iterate(Stream(this))(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
   }
