@@ -17,7 +17,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]): G[F[B]] =
     G.traverse(self)(f)
 
-  // An experiment with Miles Sabine's trick with dependent method types to hold the
+  // An experiment with Miles Sabin's trick with dependent method types to hold the
   // compiler's hand in lieu of higher order unification.
   final def traverseU[GB](f: A => GB)(implicit U: UnpackM[GB]) = new {
     def run(implicit G: Applicative[U.M]): U.M[F[U.A]] = G.traverse(self)(a => U(f(a)))
