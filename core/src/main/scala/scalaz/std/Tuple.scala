@@ -26,6 +26,11 @@ trait TupleInstances extends TupleInstances0 {
     implicit def _1: Monoid[A1] = A1
     implicit def _2: Monoid[A2] = A2
   }
+  implicit def tuple3Monoid[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]) = new Tuple3Monoid[A1, A2, A3] {
+    implicit def _1: Monoid[A1] = A1
+    implicit def _2: Monoid[A2] = A2
+    implicit def _3: Monoid[A3] = A3
+  }
   // TODO Show, Equal/Order
   // TODO pump up the arity.
 }
@@ -51,6 +56,26 @@ private[scalaz] trait Tuple2Monoid[A1, A2] extends Tuple2Semigroup[A1, A2] with 
   implicit def _2 : Monoid[A2]
 
   def zero: (A1, A2) = (_1.zero, _2.zero)
+}
+
+private[scalaz] trait Tuple3Semigroup[A1, A2, A3] extends Semigroup[(A1, A2, A3)] {
+  implicit def _1 : Semigroup[A1]
+  implicit def _2 : Semigroup[A2]
+  implicit def _3 : Semigroup[A3]
+
+  def append(f1: (A1, A2, A3), f2: => (A1, A2, A3)): (A1, A2, A3) = (
+    _1.append(f1._1, f2._1),
+    _2.append(f1._2, f2._2),
+    _3.append(f1._3, f2._3)
+  )
+}
+
+private[scalaz] trait Tuple3Monoid[A1, A2, A3] extends Tuple3Semigroup[A1, A2, A3] with Monoid[(A1, A2, A3)] {
+  implicit def _1 : Monoid[A1]
+  implicit def _2 : Monoid[A2]
+  implicit def _3 : Monoid[A3]
+
+  def zero: (A1, A2, A3) = (_1.zero, _2.zero, _3.zero)
 }
 
 
