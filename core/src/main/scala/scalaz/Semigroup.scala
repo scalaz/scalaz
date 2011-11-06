@@ -47,6 +47,10 @@ object Semigroup extends SemigroupLow {
     case (GT, _) => GT
   }
 
+  implicit def OrderSemigroup[A]: Semigroup[Order[A]] = semigroup {
+    (o1, o2) => order((a1, a2) => o1.order(a1, a2) |+| o2.order(a1, a2))
+  }
+
   implicit def UnitSemigroup: Semigroup[Unit] = semigroup((_, _) => ())
 
   implicit def StringSemigroup: Semigroup[String] = semigroup(_ + _)
