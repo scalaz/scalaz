@@ -1,8 +1,13 @@
 package scalaz
 package std
 
+trait FunctionInstances0 {
+  implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
+    implicit def R: Semigroup[R] = R0
+  }
+}
 
-trait FunctionInstances {
+trait FunctionInstances extends FunctionInstances0 {
   implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] {
     def point[A](a: => A) = () => a
 
@@ -31,7 +36,11 @@ trait FunctionInstances {
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
     def contramap[A, B](r: (A) => R)(f: (B) => A): (B) => R = null
   }
-
+  
+  implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
+    implicit def R: Monoid[R] = R0
+  }
+  
   implicit def function2Instance[T1, T2] = new Monad[({type l[a] = ((T1, T2) => a)})#l] {
     def point[A](a: => A): (T1, T2) => A = (t1, t2) => a
 
@@ -76,3 +85,18 @@ trait FunctionInstances {
 }
 
 object function extends FunctionInstances
+
+//
+// Type class implementation traits
+//
+
+trait Function1Semigroup[A, R] extends Semigroup[A => R] {
+  implicit def R: Semigroup[R]
+  
+  def append(f1: A => R, f2: => A => R) = a => R.append(f1(a), f2(a))
+}
+
+trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
+  implicit def R: Monoid[R]
+  def zero = a => R.zero
+}
