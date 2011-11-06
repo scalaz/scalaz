@@ -24,6 +24,6 @@ trait Generators {
 
   def FoldlGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Foldable[F].foldL(c, r.zero)((b, a) => r.snoc(b, a))
+      Foldable[F].foldLeft(c, r.zero)((b, a) => r.snoc(b, a))
   }
 }

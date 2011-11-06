@@ -45,7 +45,7 @@ sealed trait NonEmptyList[A] {
     Applicative[G].map(Traverse[List].traverse(list)(f))(bs => NonEmptyList.nel(bs.head, bs.tail))
   }
 
-  def foldRight[B](z: B)(f: (A) => (=> B) => B): B = list.foldRight(z)((a, b) => f(a)(b))
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = list.foldRight(z)((a, b) => f(a, b))
 
   def list: List[A] = head :: tail
 
@@ -84,7 +84,7 @@ trait NonEmptyListInstances {
     def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
       fa traverse f
 
-    def foldR[A, B](fa: NonEmptyList[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+    def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 

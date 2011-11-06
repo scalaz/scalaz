@@ -75,9 +75,9 @@ sealed trait WriterT[F[_], W, A] {
     })(WriterT(_))
   }
 
-  def foldRight[B](z: B)(f: (A) => (=> B) => B)(implicit F: Foldable[F]) =
+  def foldRight[B](z: => B)(f: (A, => B) => B)(implicit F: Foldable[F]) =
     F.foldR(runT, z) { a => b =>
-      f(a._2) (b)
+      f(a._2, b)
     }
 
   def bimap[C, D](f: (W) => C, g: (A) => D)(implicit F: Functor[F]) =
@@ -219,14 +219,13 @@ trait WriterTMonad[F[_], W] extends Bind[({type λ[α]=WriterT[F, W, α]})#λ] w
 trait WriterTFoldable[F[_], W] extends Foldable.FromFoldr[({type λ[α]=WriterT[F, W, α]})#λ] {
   implicit def F: Foldable[F]
 
-  override def foldR[A, B](fa: WriterT[F, W, A], z: B)(f: (A) => (=> B) => B) = fa.foldRight(z)(f)
+  override def foldRight[A, B](fa: WriterT[F, W, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
 }
 
 trait WriterTTraverse[F[_], W] extends Traverse[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
-  override def foldR[A, B](fa: WriterT[F, W, A], z: B)(f: (A) => (=> B) => B) = fa.foldRight(z)(f)
 }
 
 trait WriterTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] {

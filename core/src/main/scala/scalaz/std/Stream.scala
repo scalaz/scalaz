@@ -27,10 +27,10 @@ trait StreamInstances {
       k
     }
 
-    def foldR[A, B](fa: Stream[A], z: B)(f: (A) => (=> B) => B): B = if (fa.isEmpty)
+    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
-      f(fa.head)(foldR(fa.tail, z)(f))
+      f(fa.head, foldRight(fa.tail, z)(f))
 
     def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]): Stream[B] = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty

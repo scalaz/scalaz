@@ -161,9 +161,9 @@ sealed trait Heap[A] {
     F.map(F.traverse(toStream)(f))(fromCodata[Stream, B])
   }
 
-  def foldRight[B](z: B)(f: A => (=> B) => B): B = {
+  def foldRight[B](z: B)(f: (A, => B) => B): B = {
     import std.stream._
-    Foldable[Stream].foldR(toStream, z)(f)
+    Foldable[Stream].foldRight(toStream, z)(f)
   }
 
   private def withList(f: List[A] => List[A]) = {
@@ -345,7 +345,7 @@ object Heap extends HeapFunctions with HeapInstances {
 
 trait HeapInstances {
   implicit def heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
-    def foldR[A, B](fa: Heap[A], z: B)(f: (A) => (=> B) => B) = fa.foldRight(z)(f)
+    def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
   }
 
   implicit def heapMonoid[A]: Monoid[Heap[A]] = new Monoid[Heap[A]] {
@@ -371,13 +371,13 @@ trait HeapFunctions {
   import Heap.impl._
 
   def fromData[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldL(as, Empty[A])((b, a) => b insert a)
+    Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
 
   def fromCodata[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
     Foldable[F].foldR(as, Empty[A])(x => y => y insert x)
 
   def fromDataWith[F[_] : Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
-    Foldable[F].foldL(as, Empty[A])((x, y) => x.insertWith(f, y))
+    Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
 
   /**Heap sort */
   def sort[F[_] : Traverse, A: Order](xs: F[A]): List[A] = fromData(xs).toList

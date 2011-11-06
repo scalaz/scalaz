@@ -49,7 +49,7 @@ object MixedBag extends App {
     import std.stream._
 
     val tree: Tree[Int] = 1.node(2.node(3.leaf), 4.leaf, 5.leaf)
-    val r = tree.foldRight(".")(i => s => i.toString |+| s)
+    val r = tree.foldRight(".")((i, s) => i.toString |+| s)
     r assert_=== "12345."
     val f = tree.flatten.foldMap(_.toString)
     f assert_=== "12345"

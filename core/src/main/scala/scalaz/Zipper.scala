@@ -140,8 +140,8 @@ sealed trait Zipper[A] {
   def foldLeft[B](b: B)(f: (B, A) => B): B =
     lefts.foldRight((focus #:: rights).foldLeft(b)((b, a) => f(b, a)))((a, b) => f(b, a))
 
-  def foldRight[B](b: => B)(f: A => (=> B) => B): B =
-    lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a)(b)))((a, b) => f(b)(a))
+  def foldRight[B](b: => B)(f: (A, => B) => B): B =
+    lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a, b)))((a, b) => f(b, a))
 
   def length: Int =
     this.foldLeft(0)((b, _) => b + 1)
@@ -336,9 +336,9 @@ trait ZipperInstances {
       p.focus
     def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: (A) => G[B]): G[Zipper[B]] =
       za traverse f
-    def foldR[A, B](fa: Zipper[A], z: B)(f: (A) => (=> B) => B): B =
+    def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
-    override def foldL[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
+    override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
     def point[A](a: => A): Zipper[A] =
       zipper(Stream(), a, Stream())

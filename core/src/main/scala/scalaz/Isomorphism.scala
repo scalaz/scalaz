@@ -265,19 +265,16 @@ trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
 
   override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) = G.foldMap(iso.to(fa))(f)
 
-  override def foldL[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldL(iso.to(fa), z)(f)
+  override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldLeft(iso.to(fa), z)(f)
 
-  override def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B): B = G.foldR[A, B](iso.to(fa), z)(f)
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B = G.foldRight[A, B](iso.to(fa), z)(f)
 }
 
-trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] {
+trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldable[F, G] with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
 
-  def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: (A) => H[B]): H[F[B]] = {
+  def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: (A) => H[B]): H[F[B]] =
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
-  }
-
-  def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B): B = G.foldR[A, B](iso.to(fa), z)(f)
 }
 
 trait IsomorphismBiFunctor[F[_, _], G[_, _]] extends BiFunctor[F] {

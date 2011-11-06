@@ -16,7 +16,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]): G[() => B] =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
-    def foldR[A, B](fa: () => A, z: B)(f: (A) => (=> B) => B): B = f(fa())(z)
+    def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B): B = f(fa(), z)
   }
 
   implicit def function1Instance = new Arr[Function1] with Category[Function1]{

@@ -65,8 +65,8 @@ sealed trait LazyEither[A, B] {
       right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
     )
 
-  def foldRight[Z](z: Z)(f: B => (=> Z) => Z): Z =
-    fold(left = _ => z, right = a => f(a)(z))
+  def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
+    fold(left = _ => z, right = a => f(a, z))
 
   def ap[C](f: LazyEither[A, B => C]): LazyEither[A, C] =
     f flatMap (k => map(k apply _))
@@ -130,7 +130,7 @@ trait LazyEitherInstances {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: (A) => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
-    def foldR[A, B](fa: LazyEither[E, A], z: B)(f: (A) => (=> B) => B): B =
+    def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
 
     def bind[A, B](fa: LazyEither[E, A])(f: (A) => LazyEither[E, B]): LazyEither[E, B] =

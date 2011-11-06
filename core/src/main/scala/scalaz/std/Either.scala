@@ -33,9 +33,9 @@ trait EitherInstances {
       case Right(x) => Applicative[G].map(f(x))(Right(_))
     }
 
-    def foldR[A, B](fa: Either[L, A], z: B)(f: (A) => (=> B) => B): B = fa match {
+    def foldRight[A, B](fa: Either[L, A], z: => B)(f: (A, => B) => B): B = fa match {
       case Left(_)  => z
-      case Right(a) => f(a)(z)
+      case Right(a) => f(a, z)
     }
   }
 

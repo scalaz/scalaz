@@ -85,8 +85,8 @@ sealed trait Validation[E, A] {
     case Failure(e) => Applicative[G].point(Failure(e))
   }
 
-  def foldRight[B](z: B)(f: (A) => (=> B) => B): B = this match {
-    case Success(a) => f(a)(z)
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Success(a) => f(a, z)
     case Failure(e) => z
   }
 
@@ -211,7 +211,7 @@ trait ValidationInstances {
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+    def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = fa ap f
   }
@@ -228,7 +228,7 @@ trait ValidationInstances {
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldR[A, B](fa: Validation[E, A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+    def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }

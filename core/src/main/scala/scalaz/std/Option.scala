@@ -13,8 +13,8 @@ trait OptionInstances {
       fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
     def empty[A]: Option[A] = None
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
-    def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B): B = fa match {
-      case Some(a) => f(a)(z)
+    def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B): B = fa match {
+      case Some(a) => f(a, z)
       case None    => z
     }
   }

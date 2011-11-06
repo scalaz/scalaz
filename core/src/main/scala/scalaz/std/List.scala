@@ -31,7 +31,7 @@ trait ListInstances {
       l.reverse.foldLeft(fbs)((fbl, a) => F.map2(f(a), fbl)(_ :: _))
     }
 
-    def foldR[A, B](fa: List[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)((a, b) => f(a)(b))
+    def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)((a, b) => f(a, b))
   }
 
   implicit def listMonoid[A] = new Monoid[List[A]] {

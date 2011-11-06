@@ -20,8 +20,8 @@ sealed trait Tree[A] {
   def foldMap[B: Monoid](f: A => B): B =
     Monoid[B].append(f(rootLabel), Foldable[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
 
-  def foldRight[B](z: B)(f: A => (=> B) => B): B =
-    Foldable[Stream].foldR(flatten, z)(f)
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    Foldable[Stream].foldRight(flatten, z)(f)
 
   /** A 2D String representation of this Tree. */
   def drawTree(implicit sh: Show[A]): String =
@@ -118,7 +118,7 @@ trait TreeInstances {
     override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
     def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
     def traverseImpl[G[_]: Applicative, A, B](fa: Tree[A])(f: (A) => G[B]): G[Tree[B]] = fa traverse f
-    def foldR[A, B](fa: Tree[A], z: B)(f: (A) => (=> B) => B): B = fa.foldRight(z)(f)
+    def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def foldMap[A, B](fa: Tree[A])(f: (A) => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
 

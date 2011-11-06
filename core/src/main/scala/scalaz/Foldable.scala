@@ -6,11 +6,10 @@ trait Foldable[F[_]]  { self =>
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
 
   /**Right-associative fold of a structure. */
-  // TODO uncurry `f`.
-  def foldR[A, B](fa: F[A], z: B)(f: A => (=> B) => B): B
+  def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B
 
   /**Left-associative fold of a structure. */
-  def foldL[A, B](fa: F[A], z: B)(f: (B, A) => B) = {
+  def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B) = {
     import Dual._, Endo._, syntax.std.allV._
     foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
   }
@@ -20,11 +19,17 @@ trait Foldable[F[_]]  { self =>
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
+  /**Curried version of `foldRight` */
+  final def foldR[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
+
+  /**Curred version of `foldLeft` */
+  final def foldL[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def foldR1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldR(fa, None: Option[A])(a => o => o.map(f(a)(_)) orElse Some(a))
-  def toList[A](fa: F[A]): List[A] = foldL(fa, scala.List[A]())((t, h) => h :: t).reverse
-  def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldL(fa, IndexedSeq[A]())(_ :+ _)
-  def toSet[A](fa: F[A]): Set[A] = foldL(fa, Set[A]())(_ + _)
+  def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
+  def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
+  def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
 
   // TODO max/min/element/any/all etc.
 
@@ -50,8 +55,8 @@ object Foldable {
    * }}}
    */
   trait FromFoldMap[F[_]] extends Foldable[F] {
-    override def foldR[A, B](fa: F[A], z: B)(f: (A) => (=> B) => B) =
-      foldMap(fa)((a: A) => (Endo.endo(f(a)(_: B)))) apply z
+    override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
+      foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
   }
 
   /**

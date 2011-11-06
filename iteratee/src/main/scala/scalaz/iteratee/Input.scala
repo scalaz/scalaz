@@ -64,9 +64,9 @@ trait InputInstances {
        , el = x => Applicative[G].map(f(x))(b => elInput(b))
        , eof = Applicative[G].point(eofInput[B])
      )
-     def foldR[A, B](fa: Input[A], z: B)(f: (A) => (=> B) => B): B = fa.fold(
+     def foldRight[A, B](fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
        empty = z
-       , el = a => f(a)(z)
+       , el = a => f(a, z)
        , eof = z
      )
      def each[A](fa: Input[A])(f: (A) => Unit) = fa foreach (a => f(a))
