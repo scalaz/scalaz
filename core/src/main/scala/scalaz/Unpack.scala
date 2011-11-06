@@ -51,17 +51,16 @@ object UnpackMClass {
     def apply(ma: M0[A0]) = ma
   }
 
-  // Ambiguity ruins the party. Easy solution is to selectively import non-overlapping
-  // instances of unpackXxx where needed.
   //
-  // Better would be use the availability of an typeclass drive the selection. This probably
-  // needs more more support from the compiler.
+  // Requiring the type class instance `TC` here is a big win: it cleans up the methods that depend on this
+  // and it resolves ambiguity!
   //
-  /*implicit def unpackMBin1[M0[_, _], A0, B0] = new UnpackM[M0[A0, B0]] {
+  implicit def unpackMBin1[TC[_[_]], M0[_, _], A0, B0](implicit TC: TC[({type λ[α]=M0[α, B0]})#λ]) = new UnpackMClass[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
     type A = A0
+    def TypeClass = TC
     def apply(ma: M0[A0, B0]) = ma
-  }*/
+  }
 
   implicit def unpackMBin2[TC[_[_]], M0[_, _], A0, B0](implicit TC: TC[({type λ[α]=M0[A0, α]})#λ]) = new UnpackMClass[TC, M0[A0, B0]] {
     type M[X] = M0[A0, X]
