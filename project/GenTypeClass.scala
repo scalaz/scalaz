@@ -194,7 +194,7 @@ trait %s[%s] %s { self =>
 }
 
 object %s {
-  def apply[%s](implicit F: %s[F]): %s[F] = F
+  @inline def apply[%s](implicit F: %s[F]): %s[F] = F
 
   ////
 

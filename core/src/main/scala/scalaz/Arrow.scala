@@ -40,7 +40,7 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
 }
 
 object Arrow {
-  def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
+  @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
   ////
 

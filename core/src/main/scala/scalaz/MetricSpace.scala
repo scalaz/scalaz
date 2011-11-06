@@ -15,7 +15,7 @@ trait MetricSpace[F]  { self =>
 }
 
 object MetricSpace {
-  def apply[F](implicit F: MetricSpace[F]): MetricSpace[F] = F
+  @inline def apply[F](implicit F: MetricSpace[F]): MetricSpace[F] = F
 
   ////
   val metricSpace = new Contravariant[MetricSpace] {

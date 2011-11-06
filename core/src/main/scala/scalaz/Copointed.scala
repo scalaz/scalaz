@@ -14,7 +14,7 @@ trait CoPointed[F[_]] extends Functor[F] { self =>
 }
 
 object CoPointed {
-  def apply[F[_]](implicit F: CoPointed[F]): CoPointed[F] = F
+  @inline def apply[F[_]](implicit F: CoPointed[F]): CoPointed[F] = F
 
   ////
 

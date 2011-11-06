@@ -9,7 +9,7 @@ trait First[F[_, _]]  { self =>
 }
 
 object First {
-  def apply[F[_, _]](implicit F: First[F]): First[F] = F
+  @inline def apply[F[_, _]](implicit F: First[F]): First[F] = F
 
   ////
 

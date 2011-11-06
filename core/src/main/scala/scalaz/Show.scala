@@ -12,7 +12,7 @@ trait Show[F]  { self =>
 }
 
 object Show {
-  def apply[F](implicit F: Show[F]): Show[F] = F
+  @inline def apply[F](implicit F: Show[F]): Show[F] = F
 
   ////
 

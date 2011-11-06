@@ -39,7 +39,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
 }
 
 object Apply {
-  def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
+  @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
   ////
 

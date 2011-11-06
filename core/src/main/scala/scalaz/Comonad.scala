@@ -10,7 +10,7 @@ trait CoMonad[F[_]] extends CoPointed[F] with CoJoin[F] with CoBind[F] { self =>
 }
 
 object CoMonad {
-  def apply[F[_]](implicit F: CoMonad[F]): CoMonad[F] = F
+  @inline def apply[F[_]](implicit F: CoMonad[F]): CoMonad[F] = F
 
   ////
 

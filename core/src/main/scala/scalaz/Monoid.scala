@@ -11,7 +11,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
 }
 
 object Monoid {
-  def apply[F](implicit F: Monoid[F]): Monoid[F] = F
+  @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
   ////
   import annotation.tailrec

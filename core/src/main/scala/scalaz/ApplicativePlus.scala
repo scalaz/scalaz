@@ -8,7 +8,7 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with Plus[F] { self =>
 }
 
 object ApplicativePlus {
-  def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
+  @inline def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
 
   ////
 

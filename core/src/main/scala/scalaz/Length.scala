@@ -10,7 +10,7 @@ trait Length[F[_]]  { self =>
 }
 
 object Length {
-  def apply[F[_]](implicit F: Length[F]): Length[F] = F
+  @inline def apply[F[_]](implicit F: Length[F]): Length[F] = F
 
   ////
 

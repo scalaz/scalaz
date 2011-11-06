@@ -11,7 +11,7 @@ trait Empty[F[_]]  { self =>
 }
 
 object Empty {
-  def apply[F[_]](implicit F: Empty[F]): Empty[F] = F
+  @inline def apply[F[_]](implicit F: Empty[F]): Empty[F] = F
 
   ////
 

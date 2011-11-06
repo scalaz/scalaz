@@ -20,7 +20,7 @@ trait Run[F]  { self =>
 }
 
 object Run {
-  def apply[F](implicit F: Run[F]): Run[F] = F
+  @inline def apply[F](implicit F: Run[F]): Run[F] = F
 
   ////
   def run[A](c: A => Unit)(implicit s: Strategy): Run[A] = new Run[A] {

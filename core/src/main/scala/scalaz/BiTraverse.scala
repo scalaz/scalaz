@@ -21,7 +21,7 @@ trait BiTraverse[F[_, _]] extends BiFunctor[F] { self =>
 }
 
 object BiTraverse {
-  def apply[F[_, _]](implicit F: BiTraverse[F]): BiTraverse[F] = F
+  @inline def apply[F[_, _]](implicit F: BiTraverse[F]): BiTraverse[F] = F
 
   ////
 

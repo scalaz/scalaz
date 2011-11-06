@@ -9,7 +9,7 @@ trait ArrId[=>:[_, _]]  { self =>
 }
 
 object ArrId {
-  def apply[F[_, _]](implicit F: ArrId[F]): ArrId[F] = F
+  @inline def apply[F[_, _]](implicit F: ArrId[F]): ArrId[F] = F
 
   ////
 

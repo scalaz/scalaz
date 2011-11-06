@@ -10,7 +10,7 @@ trait Plus[F[_]] extends Functor[F] with Empty[F] { self =>
 }
 
 object Plus {
-  def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
+  @inline def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
 
   ////
 

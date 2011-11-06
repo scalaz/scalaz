@@ -10,7 +10,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 }
 
 object Monad {
-  def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
+  @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 
   ////
 

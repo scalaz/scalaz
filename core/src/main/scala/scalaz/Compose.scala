@@ -9,7 +9,7 @@ trait Compose[=>:[_, _]]  { self =>
 }
 
 object Compose {
-  def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
+  @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   ////
   //  TODO

@@ -24,7 +24,7 @@ trait BiFunctor[F[_, _]]  { self =>
 }
 
 object BiFunctor {
-  def apply[F[_, _]](implicit F: BiFunctor[F]): BiFunctor[F] = F
+  @inline def apply[F[_, _]](implicit F: BiFunctor[F]): BiFunctor[F] = F
 
   ////
 

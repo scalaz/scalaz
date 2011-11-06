@@ -11,7 +11,7 @@ trait Arr[=>:[_, _]]  { self =>
 }
 
 object Arr {
-  def apply[F[_, _]](implicit F: Arr[F]): Arr[F] = F
+  @inline def apply[F[_, _]](implicit F: Arr[F]): Arr[F] = F
 
   ////
   ////

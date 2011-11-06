@@ -9,7 +9,7 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
 }
 
 object Category {
-  def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
+  @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
   ////
   // TODO

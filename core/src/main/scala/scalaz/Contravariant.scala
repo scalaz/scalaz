@@ -11,7 +11,7 @@ trait Contravariant[F[_]]  { self =>
 }
 
 object Contravariant {
-  def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
+  @inline def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
 
   ////
 

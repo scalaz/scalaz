@@ -11,7 +11,7 @@ trait Equal[F]  { self =>
 }
 
 object Equal {
-  def apply[F](implicit F: Equal[F]): Equal[F] = F
+  @inline def apply[F](implicit F: Equal[F]): Equal[F] = F
 
   ////
   /** Creates an Equal instance based on reference equality, `a1 eq a2` */

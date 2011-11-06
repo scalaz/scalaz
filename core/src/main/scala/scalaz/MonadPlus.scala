@@ -9,7 +9,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
 }
 
 object MonadPlus {
-  def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
+  @inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
 
   ////
 

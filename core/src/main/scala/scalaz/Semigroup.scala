@@ -12,7 +12,7 @@ trait Semigroup[F]  { self =>
 }
 
 object Semigroup {
-  def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
+  @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
   ////
   def firstSemigroup[A] = new Semigroup[A] {

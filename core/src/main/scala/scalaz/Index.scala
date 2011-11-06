@@ -14,7 +14,7 @@ trait Index[F[_]]  { self =>
 }
 
 object Index {
-  def apply[F[_]](implicit F: Index[F]): Index[F] = F
+  @inline def apply[F[_]](implicit F: Index[F]): Index[F] = F
 
   ////
 

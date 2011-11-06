@@ -74,7 +74,7 @@ trait Traverse[F[_]] extends Functor[F] { self =>
 }
 
 object Traverse {
-  def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
+  @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
 
   ////
 

@@ -11,7 +11,7 @@ trait CoJoin[F[_]]  { self =>
 }
 
 object CoJoin {
-  def apply[F[_]](implicit F: CoJoin[F]): CoJoin[F] = F
+  @inline def apply[F[_]](implicit F: CoJoin[F]): CoJoin[F] = F
 
   ////
   /** Define `CoJoin` in terms of `CoBind` */

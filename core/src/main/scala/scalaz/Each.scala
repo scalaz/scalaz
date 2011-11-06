@@ -11,7 +11,7 @@ trait Each[F[_]]  { self =>
 }
 
 object Each {
-  def apply[F[_]](implicit F: Each[F]): Each[F] = F
+  @inline def apply[F[_]](implicit F: Each[F]): Each[F] = F
 
   ////
 

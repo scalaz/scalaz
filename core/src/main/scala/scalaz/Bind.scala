@@ -14,7 +14,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
 }
 
 object Bind {
-  def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
+  @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
   ////
 

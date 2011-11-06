@@ -28,7 +28,7 @@ trait Order[F] extends Equal[F] { self =>
 }
 
 object Order {
-  def apply[F](implicit F: Order[F]): Order[F] = F
+  @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
   ////
   implicit object orderInstance extends Contravariant[Order] {

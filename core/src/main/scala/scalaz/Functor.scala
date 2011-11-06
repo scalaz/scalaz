@@ -33,7 +33,7 @@ trait Functor[F[_]]  { self =>
 }
 
 object Functor {
-  def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
+  @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
   ////
 

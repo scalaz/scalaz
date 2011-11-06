@@ -15,7 +15,7 @@ trait Pointed[F[_]] extends Functor[F] { self =>
 }
 
 object Pointed {
-  def apply[F[_]](implicit F: Pointed[F]): Pointed[F] = F
+  @inline def apply[F[_]](implicit F: Pointed[F]): Pointed[F] = F
 
   ////
 
