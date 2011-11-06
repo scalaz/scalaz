@@ -41,14 +41,26 @@ object Semigroup extends SemigroupLow {
 
   implicit def DigitSemigroup: Semigroup[Digit] = semigroup((a, b) => a.toInt + b.toInt)
 
+  /** lexicographical order for `scalaz.Ordering` */
   implicit def OrderingSemigroup: Semigroup[Ordering] = semigroup {
     case (EQ, a) => a
     case (LT, _) => LT
     case (GT, _) => GT
   }
 
+  /** lexicographical order for `scalaz.Order` */
   implicit def OrderSemigroup[A]: Semigroup[Order[A]] = semigroup {
     (o1, o2) => order((a1, a2) => o1.order(a1, a2) |+| o2.order(a1, a2))
+  }
+
+  /** lexicographical order for `scala.Ordering` */
+  implicit def ScalaOrderingSemigroup[A]: Semigroup[scala.Ordering[A]] = semigroup {
+    (o1, o2) => new scala.Ordering[A] {
+      def compare(x: A, y: A): Int = o1.compare(x, y) match {
+        case 0 => o2.compare(x, y)
+        case i => i
+      }
+    }
   }
 
   implicit def UnitSemigroup: Semigroup[Unit] = semigroup((_, _) => ())
