@@ -109,6 +109,7 @@ object Kind {
 }
 
 object GenTypeClass {
+  val useDependentMethodTypes = true
 
   case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
@@ -246,7 +247,6 @@ trait %sSyntax[F] %s {
       typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
     )
     case Kind.*->* =>
-      val useDependentMethodTypes = true
       val ToV = if (useDependentMethodTypes) {
 """  implicit def To%sV[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
     new %sV[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
@@ -298,6 +298,19 @@ trait %sSyntax[F[_]] %s {
           typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )
       case Kind.*^*->* =>
+
+        val ToV = if (useDependentMethodTypes) {
+  """  implicit def To%sV[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
+      new %sV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
+  """.format(Seq.fill(4)(typeClassName): _*)
+        } else {
+  """
+  implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
+      new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
+  """.format(Seq.fill(4)(typeClassName) :_*)
+        }
+
+
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
@@ -309,8 +322,7 @@ trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 }
 
 trait To%sV %s {
-  implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
-    new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
+  %s
 
   ////
 
@@ -325,10 +337,7 @@ trait %sSyntax[F[_, _]] %s {
   ////
 }
 """.format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
-
-          // implicits in ToXxxSyntax
-          typeClassName, typeClassName, typeClassName, typeClassName,
-
+          ToV,
           typeClassName, extendsListText("Syntax", cti = "F"),
           typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )

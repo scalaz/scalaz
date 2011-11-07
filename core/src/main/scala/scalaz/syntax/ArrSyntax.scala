@@ -10,8 +10,9 @@ trait ArrV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 }
 
 trait ToArrV  {
-  implicit def ToArrV[F[_, _],A, B](v: F[A, B])(implicit F0: Arr[F]) =
-    new ArrV[F,A, B] { def self = v; implicit def F: Arr[F] = F0 }
+    implicit def ToArrV[FA](v: FA)(implicit F0: Unapply2[Arr, FA]) =
+      new ArrV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Arr[F0.M] = F0.TC }
+  
 
   ////
 

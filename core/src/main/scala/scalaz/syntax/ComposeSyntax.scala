@@ -20,8 +20,9 @@ trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
 }
 
 trait ToComposeV  {
-  implicit def ToComposeV[F[_, _],A, B](v: F[A, B])(implicit F0: Compose[F]) =
-    new ComposeV[F,A, B] { def self = v; implicit def F: Compose[F] = F0 }
+    implicit def ToComposeV[FA](v: FA)(implicit F0: Unapply2[Compose, FA]) =
+      new ComposeV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Compose[F0.M] = F0.TC }
+  
 
   ////
   // TODO Roll this back into gen-type-class to add to all type classes classifying * * -> *
