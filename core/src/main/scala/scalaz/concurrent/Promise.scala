@@ -4,7 +4,8 @@ package concurrent
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
 import Scalaz._
 
-
+/** Represents an expression that is evaluated asynchronously, according to some
+    evaluation strategy. */
 sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   import Promise._
 
@@ -15,25 +16,43 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   @volatile private var borked: Boolean = false
   private val e = actor[Signal[A]](_.eval, x => v.fulfill(throw x, this))
 
+  /** Syncrhonously blocks until the value is ready, then returns it.
+    * WARNING: May block indefinitely. A kitten dies every time you call this method. */
   def get = {
     latch.await
     v.get
   }
 
+  /** Registers the given actor or effect as a continuation receiving the promised value. */
   def to(k: A => Unit): Unit = e ! new Cont(k, this)
+
+  /** Registers the given error handler as a continuation receiving errors thrown by the evaluation. */
   def errorTo(k: Throwable => Unit): Unit = e ! new Err(k, this)
+
+  /** Sets the value of this promise, out of band.
+    * WARNING: Once the value of a promise is set, it is forever immutable. */
   def fulfill(a: => A): Unit = e ! new Done(a, this)
+
+  /** Indicates whether the evaluation of this promise has finished. */
   def fulfilled: Boolean = v.fulfilled
+
+  /** Indicates whether the evaluation of this promise threw an error. */
   def threw: Boolean = v.threw
+
+  /** Indicates whether the promise has been broken. A broken promise is never fulfilled. */
   def broken = borked
 
-  // out of band signal
+  /** Breaks the promise. After this method finishes, any registered continuation will not receive the value.
+    * If evaluation has not yet started, it will never start. */
   def break { 
     borked = true 
     e ! new Break(this)
   }
 
+  /** Registers the given function as a continuation, returning a promise of the result. */
   def map[B](f: A => B) = flatMap(a => Promise(f(a)))
+
+  /** Registers the given function as a continuation, returning the result of that function. */
   def flatMap[B](f: A => Promise[B]) = {
     val r = new Promise[B]()
     errorTo (x => r fulfill (throw x))
@@ -49,15 +68,26 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
     }) to effect[B](b => r fulfill b))
     r
   }
+
+  /** Returns a promise that is only ever fulfilled if the value of this promise matches the given predicate. */
   def filter(p: A => Boolean): Promise[A] = {
     val r = new Promise[A]()
     to(a => promise(p(a)) to effect[Boolean](b => if (b) r fulfill a))
     r
   }
 
+  /** Syncrhonously blocks until the value is ready, then returns it.
+    * WARNING: May block indefinitely. A kitten dies every time you call this method. */
   def apply = get
+
   override def toString = "<promise>"
 
+  /** Speculative concurrency. In the expression `guess.spec(f, actual)` the value of 
+    * `guess` is an inexpensive guess at the value and `actual` is the actual value,
+    * usually a more expensive computation. The function `f` is ''speculatively'' applied
+    * to the `guess`. Once the `actual` value is available, it's compared with the `guess`.
+    * If the `guess` was correct, we will have already applied `f` to the correct value,
+    * saving time. If the guess was incorrect, then `f` is applied to the value of `actual`. */
   def spec[B](f: A => B, actual: Promise[A])(implicit equality: Equal[A]): Promise[B] = {
     val speculation = this map f
     actual flatMap (a => this flatMap (g => if (a === g) speculation else {
@@ -68,10 +98,15 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
 }
 
 trait Promises {
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = Promise(a) 
+  /** Evaluate the given expression asynchronously given the strategy. */
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = Promise(a)
+
+  /** Construct an empty promise that you must remember to fulfill later. */
+  def emptyPromise[A](implicit s: Strategy) = new Promise[A]()(s)
 }
 
 object Promise {
+  /** Evaluate the given expression asynchronously given the strategy. */
   def apply[A](a: => A)(implicit s: Strategy): Promise[A] = { 
     val p = new Promise[A]()(s)
     p.e ! new Done(a, p)
