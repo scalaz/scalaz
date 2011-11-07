@@ -17,7 +17,8 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]): G[F[B]] =
     G.traverse(self)(f)
 
-  final def traverseI[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
+  /** A version of `traverse` that infers the type constructor `G` */
+  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
     G.TC.traverse(self)(a => G(f(a)))
   }
 
