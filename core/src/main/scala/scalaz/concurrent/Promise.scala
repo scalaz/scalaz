@@ -89,11 +89,13 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
     * If the `guess` was correct, we will have already applied `f` to the correct value,
     * saving time. If the guess was incorrect, then `f` is applied to the value of `actual`. */
   def spec[B](f: A => B, actual: Promise[A])(implicit equality: Equal[A]): Promise[B] = {
-    val speculation = this map f
-    actual flatMap (a => this flatMap (g => if (a === g) speculation else {
-      speculation.break
-      promise(f(a))
-    }))
+    if (!actual.fulfilled) {
+      val speculation = this map f
+      actual flatMap (a => this flatMap (g => if (a === g) speculation else {
+        speculation.break
+        promise(f(a))
+      }))
+    } else actual map f
   }
 }
 

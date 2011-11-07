@@ -1031,6 +1031,8 @@ def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single
       def +:(x: => A): IndSeq[A] = indSeq(x +: value)
       def tail: IndSeq[A] = indSeq(value.tail)
       def init: IndSeq[A] = indSeq(value.init)
+      def drop(n: Int): IndSeq[A] = split(n)._2
+      def take(n: Int): IndSeq[A] = split(n)._1
       def map[B](f: A => B): IndSeq[B] = indSeq(value map f)
       def flatMap[B](f: A => IndSeq[B]): IndSeq[B] =
         indSeq(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
