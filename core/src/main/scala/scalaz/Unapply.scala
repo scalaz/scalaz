@@ -1,8 +1,8 @@
 package scalaz
 
 /**
- * Represents a type `MA` that is being viewed as a type constructor `M[_]` applied to `A`
- * along with an instance of the type class `TC` that classifies type `M`.
+ * Represents a type `MA` that has been destructured into as a type constructor `M[_]`
+ * applied to type `A`, along with a corresponding type class instance `TC[M]`.
  *
  * The implicit conversions in the companion object provide a means to obtain type class
  * instances for partially applied type constructors, in lieu of direct compiler support
@@ -40,7 +40,7 @@ package scalaz
  *
  * Credits to Miles Sabin.
  */
-trait Instance[TC[_[_]], MA] {
+trait Unapply[TC[_[_]], MA] {
 
   /** The type constructor */
   type M[_]
@@ -55,25 +55,25 @@ trait Instance[TC[_[_]], MA] {
   def apply(ma: MA): M[A]
 }
 
-object Instance {
-  /** Unpack a value of type `M[A]` into types `M` and `A`, given a instance of `TC` */
-  implicit def instanceMA[TC[_[_]], M0[_], A0](implicit TC: TC[M0]) = new Instance[TC, M0[A0]] {
+object Unapply {
+  /** Unpack a value of type `M0[A0]` into types `M0` and `A9`, given a instance of `TC` */
+  implicit def unapplyMA[TC[_[_]], M0[_], A0](implicit TC: TC[M0]) = new Unapply[TC, M0[A0]] {
     type M[X] = M0[X]
     type A = A0
     def TC = TC
     def apply(ma: M0[A0]) = ma
   }
 
-  /** Unpack a value of type `M[A, B]` into types `[a]M[A, B]` and `A`, given an instance of `TC` */
-  implicit def instanceMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α]=M0[α, B0]})#λ]) = new Instance[TC, M0[A0, B0]] {
+  /** Unpack a value of type `M0[A0, B0]` into types `[a]M0[A, B0]` and `A`, given an instance of `TC` */
+  implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α]=M0[α, B0]})#λ]) = new Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
     type A = A0
     def TC = TC
     def apply(ma: M0[A0, B0]) = ma
   }
 
-  /** Unpack a value of type `M[A, B]` into types `[b]M[A, b]` and `B`, given an instance of `TC` */
-  implicit def instanceMAB2[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α]=M0[A0, α]})#λ]) = new Instance[TC, M0[A0, B0]] {
+  /** Unpack a value of type `M0[A0, B0]` into types `[b]M0[A0, b]` and `B`, given an instance of `TC` */
+  implicit def unapplyMAB2[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α]=M0[A0, α]})#λ]) = new Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[A0, X]
     type A = B0
     def TC = TC0

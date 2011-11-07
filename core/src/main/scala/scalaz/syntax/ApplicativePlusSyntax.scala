@@ -10,14 +10,8 @@ trait ApplicativePlusV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToApplicativePlusV extends ToApplicativeV with ToPlusV {
-  implicit def ToApplicativePlusV[F[_],A](v: F[A])(implicit F0: ApplicativePlus[F]) =
-    new ApplicativePlusV[F,A] { def self = v; implicit def F: ApplicativePlus[F] = F0 }
-  implicit def ToApplicativePlusVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: ApplicativePlus[({type f[a] = F[X, a]})#f]) =
-    new ApplicativePlusV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: ApplicativePlus[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToApplicativePlusVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: ApplicativePlus[({type f[a] = F[X, G, a]})#f]) =
-    new ApplicativePlusV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: ApplicativePlus[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToApplicativePlusVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: ApplicativePlus[({type f[a] = F[X, Id, a]})#f]) =
-    new ApplicativePlusV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: ApplicativePlus[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToApplicativePlusV[FA](v: FA)(implicit F0: Unapply[ApplicativePlus, FA]) =
+    new ApplicativePlusV[F0.M,F0.A] { def self = F0(v); implicit def F: ApplicativePlus[F0.M] = F0.TC }
 
   ////
 

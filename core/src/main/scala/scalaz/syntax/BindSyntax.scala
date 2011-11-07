@@ -16,14 +16,8 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToBindV extends ToApplyV {
-  implicit def ToBindV[F[_],A](v: F[A])(implicit F0: Bind[F]) =
-    new BindV[F,A] { def self = v; implicit def F: Bind[F] = F0 }
-  implicit def ToBindVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Bind[({type f[a] = F[X, a]})#f]) =
-    new BindV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Bind[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToBindVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Bind[({type f[a] = F[X, G, a]})#f]) =
-    new BindV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Bind[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToBindVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Bind[({type f[a] = F[X, Id, a]})#f]) =
-    new BindV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Bind[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToBindV[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
+    new BindV[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
 
   ////
 

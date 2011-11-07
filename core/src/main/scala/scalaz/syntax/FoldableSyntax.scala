@@ -14,14 +14,8 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToFoldableV  {
-  implicit def ToFoldableV[F[_],A](v: F[A])(implicit F0: Foldable[F]) =
-    new FoldableV[F,A] { def self = v; implicit def F: Foldable[F] = F0 }
-  implicit def ToFoldableVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Foldable[({type f[a] = F[X, a]})#f]) =
-    new FoldableV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Foldable[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToFoldableVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Foldable[({type f[a] = F[X, G, a]})#f]) =
-    new FoldableV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Foldable[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToFoldableVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Foldable[({type f[a] = F[X, Id, a]})#f]) =
-    new FoldableV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Foldable[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToFoldableV[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
+    new FoldableV[F0.M,F0.A] { def self = F0(v); implicit def F: Foldable[F0.M] = F0.TC }
 
   ////
 

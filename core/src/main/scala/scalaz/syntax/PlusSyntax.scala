@@ -12,14 +12,8 @@ trait PlusV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToPlusV extends ToFunctorV with ToEmptyV {
-  implicit def ToPlusV[F[_],A](v: F[A])(implicit F0: Plus[F]) =
-    new PlusV[F,A] { def self = v; implicit def F: Plus[F] = F0 }
-  implicit def ToPlusVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Plus[({type f[a] = F[X, a]})#f]) =
-    new PlusV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Plus[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToPlusVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Plus[({type f[a] = F[X, G, a]})#f]) =
-    new PlusV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Plus[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToPlusVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Plus[({type f[a] = F[X, Id, a]})#f]) =
-    new PlusV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Plus[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToPlusV[FA](v: FA)(implicit F0: Unapply[Plus, FA]) =
+    new PlusV[F0.M,F0.A] { def self = F0(v); implicit def F: Plus[F0.M] = F0.TC }
 
   ////
 

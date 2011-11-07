@@ -11,14 +11,8 @@ trait ApplicativeV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToApplicativeV extends ToApplyV with ToPointedV {
-  implicit def ToApplicativeV[F[_],A](v: F[A])(implicit F0: Applicative[F]) =
-    new ApplicativeV[F,A] { def self = v; implicit def F: Applicative[F] = F0 }
-  implicit def ToApplicativeVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Applicative[({type f[a] = F[X, a]})#f]) =
-    new ApplicativeV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Applicative[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToApplicativeVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Applicative[({type f[a] = F[X, G, a]})#f]) =
-    new ApplicativeV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Applicative[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToApplicativeVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Applicative[({type f[a] = F[X, Id, a]})#f]) =
-    new ApplicativeV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Applicative[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToApplicativeV[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
+    new ApplicativeV[F0.M,F0.A] { def self = F0(v); implicit def F: Applicative[F0.M] = F0.TC }
 
   ////
 

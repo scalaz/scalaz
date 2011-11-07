@@ -13,14 +13,8 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
 }
 
 trait ToFunctorV  {
-  implicit def ToFunctorV[F[_],A](v: F[A])(implicit F0: Functor[F]) =
-    new FunctorV[F,A] { def self = v; implicit def F: Functor[F] = F0 }
-  implicit def ToFunctorVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: Functor[({type f[a] = F[X, a]})#f]) =
-    new FunctorV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: Functor[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def ToFunctorVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: Functor[({type f[a] = F[X, G, a]})#f]) =
-    new FunctorV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: Functor[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def ToFunctorVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: Functor[({type f[a] = F[X, Id, a]})#f]) =
-    new FunctorV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: Functor[({type f[a] = F[X, Id, a]})#f] = F0 }
+  implicit def ToFunctorV[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
+    new FunctorV[F0.M,F0.A] { def self = F0(v); implicit def F: Functor[F0.M] = F0.TC }
 
   ////
 

@@ -26,7 +26,7 @@ object StateTUsage extends App {
     import scalaz._, Scalaz._
     import State.{State, stateMonad}
     val ls = List(1, 2, 3)
-    val traverseOpt: Option[List[Int]] = ls.traverse(a => Some(a))
+    val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
     val traverseState: State[Int, List[Int]] = ls.traverse[({type λ[α]=State[Int, α]})#λ, Int](a => State((x: Int) => (x + 1, a)))
   }
 
@@ -35,5 +35,8 @@ object StateTUsage extends App {
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverseI(a => some(a))
     val traverseState = ls.traverseI(a => State((x: Int) => (x + 1, a)))
+
+
+    val pair: State.State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
   }
 }
