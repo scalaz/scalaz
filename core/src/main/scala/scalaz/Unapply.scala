@@ -55,13 +55,34 @@ trait Unapply[TC[_[_]], MA] {
   def apply(ma: MA): M[A]
 }
 
-object Unapply {
+trait Unapply0 {
+  // Things get tricky with type State[S, A] = StateT[Id, S, A], both unapplyMAB2 and unapplyMFAB2 are applicable
+  // Without characterizing this fully, I'm using the standard implicit prioritization to avoid this.
+
+  /**Unpack a value of type `M0[F[_], A0, B0]` into types `[a]M0[F, a, B0]` and `A0`, given an instance of `TC` */
+  implicit def unapplyMFAB1[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, B0]})#λ]) = new Unapply[TC, M0[F, A0, B0]] {
+    type M[X] = M0[F, X, B0]
+    type A = A0
+    def TC = TC0
+    def apply(ma: M0[F, A0, B0]) = ma
+  }
+
+  /**Unpack a value of type `M0[F[_], A0, B0]` into types `[b]M0[F, A0, b]` and `B0`, given an instance of `TC` */
+  implicit def unapplyMFAB2[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[β] = M0[F, A0, β]})#λ]) = new Unapply[TC, M0[F, A0, B0]] {
+    type M[X] = M0[F, A0, X]
+    type A = B0
+    def TC = TC0
+    def apply(ma: M0[F, A0, B0]) = ma
+  }
+}
+
+object Unapply extends Unapply0 {
 
   /** Unpack a value of type `M0[A0]` into types `M0` and `A9`, given a instance of `TC` */
-  implicit def unapplyMA[TC[_[_]], M0[_], A0](implicit TC: TC[M0]) = new Unapply[TC, M0[A0]] {
+  implicit def unapplyMA[TC[_[_]], M0[_], A0](implicit TC0: TC[M0]) = new Unapply[TC, M0[A0]] {
     type M[X] = M0[X]
     type A = A0
-    def TC = TC
+    def TC = TC0
     def apply(ma: M0[A0]) = ma
   }
 
@@ -70,7 +91,7 @@ object Unapply {
   implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α]=M0[α, B0]})#λ]) = new Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
     type A = A0
-    def TC = TC
+    def TC = TC0
     def apply(ma: M0[A0, B0]) = ma
   }
 
@@ -80,22 +101,6 @@ object Unapply {
     type A = B0
     def TC = TC0
     def apply(ma: M0[A0, B0]) = ma
-  }
-
-  /**Unpack a value of type `M0[F[_], A0, B0]` into types `[a]M0[F, a, B0]` and `A0`, given an instance of `TC` */
-  implicit def unapplyMFAB1[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, B0]})#λ]) = new Unapply[TC, M0[F, A0, B0]] {
-    type M[X] = M0[F, X, B0]
-    type A = A0
-    def TC = TC
-    def apply(ma: M0[F, A0, B0]) = ma
-  }
-
-  /**Unpack a value of type `M0[F[_], A0, B0]` into types `[b]M0[F, A0, b]` and `B0`, given an instance of `TC` */
-  implicit def unapplyMFAB2[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[β] = M0[F, A0, β]})#λ]) = new Unapply[TC, M0[F, A0, B0]] {
-    type M[X] = M0[F, A0, X]
-    type A = B0
-    def TC = TC
-    def apply(ma: M0[F, A0, B0]) = ma
   }
 
   // TODO More!
@@ -119,23 +124,24 @@ trait Unapply2[TC[_[_, _]], MAB] {
   def apply(ma: MAB): M[A, B]
 }
 
-object Unapply2 {
-  /**Unpack a value of type `M0[A0, B0]` into types `M0`, `A`, and 'B', given an instance of `TC` */
-  implicit def unapplyMAB[TC[_[_, _]], M0[_, _], A0, B0](implicit TC0: TC[M0]) = new Unapply2[TC, M0[A0, B0]] {
-    type M[X, Y] = M0[X, Y]
-    type A = A0
-    type B = B0
-    def TC = TC
-    def apply(ma: M0[A0, B0]) = ma
-  }
-
+trait Unapply20 {
   /**Unpack a value of type `M0[F[_], A0, B0]` into types `[a, b]=M0[F, a, b]`, `A0`, and 'B9', given an instance of `TC` */
   implicit def unapplyMFAB[TC[_[_, _]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[α, β] = M0[F, α, β]})#λ]) = new Unapply2[TC, M0[F, A0, B0]] {
     type M[X, Y] = M0[F, X, Y]
     type A = A0
     type B = B0
-    def TC = TC
+    def TC = TC0
     def apply(ma: M0[F, A0, B0]) = ma
   }
+}
 
+object Unapply2 extends Unapply20 {
+  /**Unpack a value of type `M0[A0, B0]` into types `M0`, `A`, and 'B', given an instance of `TC` */
+  implicit def unapplyMAB[TC[_[_, _]], M0[_, _], A0, B0](implicit TC0: TC[M0]) = new Unapply2[TC, M0[A0, B0]] {
+    type M[X, Y] = M0[X, Y]
+    type A = A0
+    type B = B0
+    def TC = TC0
+    def apply(ma: M0[A0, B0]) = ma
+  }
 }

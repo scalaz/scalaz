@@ -11,20 +11,20 @@ package undo
  * @author Gerolf Seitz
  * @author Jason Zaugg
  */
-final case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
+final case class UndoT[F[_], S, A](hstate: StateT[F, History[S], A]) {
   def apply(initial: S)(implicit F: Functor[F]): F[(A, History[S])] = hstate(History(initial))
 
   def eval(initial: S)(implicit F: Functor[F]): F[A] = F.map(apply(initial))(_._1)
 
   def exec(initial: S)(implicit F: Functor[F]): F[S] = F.map(apply(initial))(_._2.current)
   
-  def map[B](f: A => B)(implicit F: Functor[F]) = UndoT.mkUndoT[S, F, B](
+  def map[B](f: A => B)(implicit F: Functor[F]) = UndoT.mkUndoT[F, S, B](
     hs => F.map(hstate(hs)) {
       case (a, s) => (f(a), s)
     }
   )
 
-  def flatMap[B](f: A => UndoT[S, F, B])(implicit F: Bind[F]): UndoT[S, F, B] = UndoT.mkUndoT[S, F, B](
+  def flatMap[B](f: A => UndoT[F, S, B])(implicit F: Bind[F]): UndoT[F, S, B] = UndoT.mkUndoT[F, S, B](
     hs => F.bind(hstate(hs)) {
       case (a, s) => f(a).hstate(s)
     }
@@ -37,33 +37,33 @@ final case class UndoT[S, F[_], A](hstate: StateT[History[S], F, A]) {
 
 trait UndoTInstances1 {
   // Prefer Pointed over Functor
-  implicit def undoTFunctor[S, F[_]](implicit F0: Functor[F]): Functor[({type G[x] = UndoT[S, F, x]})#G] = new UndoTFunctor[S, F] {
+  implicit def undoTFunctor[S, F[_]](implicit F0: Functor[F]): Functor[({type G[x] = UndoT[F, S, x]})#G] = new UndoTFunctor[S, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
 trait UndoTInstances0 extends UndoTInstances1 {
   // Prefer Monad over Pointed
-  implicit def undoTPointed[S, F[_]](implicit F0: Pointed[F]): Pointed[({type G[x] = UndoT[S, F, x]})#G] = new UndoTPointed[S, F] {
+  implicit def undoTPointed[S, F[_]](implicit F0: Pointed[F]): Pointed[({type G[x] = UndoT[F, S, x]})#G] = new UndoTPointed[S, F] {
     implicit def F: Pointed[F] = F0
   }
 }
 
 trait UndoTInstances extends UndoTInstances0 {
-  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] = new UndoTMonadTrans[S] {}
+  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[x, S, a]})#G] = new UndoTMonadTrans[S] {}
 
-  implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S] = new UndoTMonadState[S, F] {
+  implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[F, S, Y]})#HS, S] = new UndoTMonadState[S, F] {
     implicit def F: Monad[F] = F0
 
-    implicit def HMS: HStateTMonadState[S, F] = MonadState[({type f[s, a] = StateT[s, F, a]})#f, History[S]]
+    implicit def HMS: HStateTMonadState[F, S] = MonadState[({type f[s, a] = StateT[F, s, a]})#f, History[S]]
   }
 }
 
 trait UndoTFunctions {
-  def mkUndoT[S, F[_], A](f: History[S] => F[(A, History[S])]): UndoT[S, F, A] =
-    new UndoT[S, F, A](StateT(f))
+  def mkUndoT[F[_], S, A](f: History[S] => F[(A, History[S])]): UndoT[F, S, A] =
+    new UndoT[F, S, A](StateT(f))
 
-  def bindInit[S, F[_], B](f: History[S] => StateTHistory[S, F, B])(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, B] = {
+  def bindInit[F[_], S, B](f: History[S] => StateTHistory[F, S, B])(implicit HMS: HStateTMonadState[F, S]): UndoT[F, S, B] = {
     import HMS._
     UndoT(bind(init)(f))
   }
@@ -72,7 +72,7 @@ trait UndoTFunctions {
    * Restores the latest item in the history
    *
    */
-  def undo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+  def undo[F[_], S](implicit HMS: HStateTMonadState[F, S]): UndoT[F, S, Boolean] = {
     import HMS._
     bindInit {
       case History(current, Nil, redos) =>
@@ -84,7 +84,7 @@ trait UndoTFunctions {
   }
 
   /**Reverses the previous undo */
-  def redo[S, F[_]](implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Boolean] = {
+  def redo[F[_], S](implicit HMS: HStateTMonadState[F, S]): UndoT[F, S, Boolean] = {
     import HMS._
     bindInit {
       case History(current, undos, Nil) =>
@@ -96,7 +96,7 @@ trait UndoTFunctions {
   }
 
   /**Replace the current state with `s`. The redo stack is cleared. A subsequent `undo` will restore the previous state. */
-  def hput[S, F[_]](s: S)(implicit HMS: HStateTMonadState[S, F]): UndoT[S, F, Unit] = {
+  def hput[F[_], S](s: S)(implicit HMS: HStateTMonadState[F, S]): UndoT[F, S, Unit] = {
     import HMS._
     bindInit {
       case History(current, undos, redos) => put(History(s, current :: undos, Nil))
@@ -111,35 +111,35 @@ object UndoT extends UndoTInstances with UndoTFunctions
 //
 
 private[scalaz] trait UndoTFunctor[S, F[_]]
-  extends Functor[({type G[x] = UndoT[S, F, x]})#G] {
+  extends Functor[({type G[x] = UndoT[F, S, x]})#G] {
 
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: UndoT[S, F, A])(f: A => B) = fa.map(f)
+  override def map[A, B](fa: UndoT[F, S, A])(f: A => B) = fa.map(f)
 }
 
 private[scalaz] trait UndoTPointed[S, F[_]]
-  extends Pointed[({type G[x] = UndoT[S, F, x]})#G]
+  extends Pointed[({type G[x] = UndoT[F, S, x]})#G]
   with UndoTFunctor[S, F] {
 
   implicit def F: Pointed[F]
 
-  def point[A](a: => A) = UndoT[S, F, A](StateT(s => F.point(a, s)))
+  def point[A](a: => A) = UndoT[F, S, A](StateT(s => F.point(a, s)))
 }
 
 private[scalaz] trait UndoTMonadState[S, F[_]]
-  extends MonadState[({type HS[X, Y] = UndoT[S, F, Y]})#HS, S]
+  extends MonadState[({type HS[X, Y] = UndoT[F, S, Y]})#HS, S]
   with UndoTPointed[S, F] {
 
   implicit def F: Monad[F]
 
-  implicit def HMS: HStateTMonadState[S, F]
+  implicit def HMS: HStateTMonadState[F, S]
 
-  def bind[A, B](fa: UndoT[S, F, A])(f: A => UndoT[S, F, B]) = fa.flatMap(f)
+  def bind[A, B](fa: UndoT[F, S, A])(f: A => UndoT[F, S, B]) = fa.flatMap(f)
 
-  def init = UndoT[S, F, S](HMS.gets(s => s.current))
+  def init = UndoT[F, S, S](HMS.gets(s => s.current))
 
-  def put(s: S) = UndoT[S, F, Unit](
+  def put(s: S) = UndoT[F, S, Unit](
     HMS.bind(HMS.init) {
       case History(_, us, rs) => HMS.put(History(s, us, rs))
     }
@@ -147,19 +147,19 @@ private[scalaz] trait UndoTMonadState[S, F[_]]
 }
 
 private[scalaz] trait UndoTMonadTrans[S]
-  extends MonadTrans[({type G[x[_], a] = UndoT[S, x, a]})#G] {
+  extends MonadTrans[({type G[x[_], a] = UndoT[x, S, a]})#G] {
 
-  trait UndoTF[S, G[_]] {
-    type f[x] = UndoT[S, G, x]
+  trait UndoTF[G[_], S] {
+    type f[x] = UndoT[G, S, x]
   }
 
-  def hoist[M[_], N[_]](f: M ~> N) = new (UndoTF[S, M]#f ~> UndoTF[S, N]#f) {
-    def apply[A](fa: UndoT[S, M, A]): UndoT[S, N, A] = {
-      UndoT[S, N, A](StateT(s => f(fa.hstate(s))))
+  def hoist[M[_], N[_]](f: M ~> N) = new (UndoTF[M, S]#f ~> UndoTF[N, S]#f) {
+    def apply[A](fa: UndoT[M, S, A]): UndoT[N, S, A] = {
+      UndoT[N, S,A](StateT(s => f(fa.hstate(s))))
     }
   }
 
-  def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): UndoT[S, G, A] = {
-    UndoT[S, G, A](StateT(s => G.map(ga)(a => (a, s))))
+  def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): UndoT[G, S, A] = {
+    UndoT[G, S, A](StateT(s => G.map(ga)(a => (a, s))))
   }
 }

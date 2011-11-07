@@ -1,11 +1,11 @@
 package scalaz
 
 object State extends StateFunctions with StateInstances {
-  def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[S, Id, A] {
+  def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
     def apply(s: S) = f(s)
   }
 
-  type State[S, A] = StateT[S, Id, A]
+  type State[S, A] = StateT[Id, S, A]
 
 }
 

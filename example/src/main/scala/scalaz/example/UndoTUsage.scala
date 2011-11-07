@@ -10,15 +10,15 @@ object UndoTUsage extends App {
   // TODO: Omitting the type parameters on hput leads to a compiler infinite loop
   // if UndoT.undoTMonadState is imported.
 
-  val result: UndoT[Int, Option, _] =
+  val result: UndoT[Option, Int, _] =
     for {
-      one           <- hput[Int, Option](1)
-      two           <- hput[Int, Option](2)
-      three         <- hput[Int, Option](3)
-      twoAgain      <- undo[Int, Option]
-      four          <- hput[Int, Option](4)
-      twoAgainAgain <- undo[Int, Option]
-      fourAgain     <- redo[Int, Option]
+      one           <- hput[Option, Int](1)
+      two           <- hput[Option, Int](2)
+      three         <- hput[Option, Int](3)
+      twoAgain      <- undo[Option, Int]
+      four          <- hput[Option, Int](4)
+      twoAgainAgain <- undo[Option, Int]
+      fourAgain     <- redo[Option, Int]
     } yield ()
 
   // This should print 'Some(4)'

@@ -7,10 +7,9 @@ trait BiFunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
   import Liskov.<~<
 
+  final def bimap[C, D](f: A => C, g: B => D): F[C, D] = F.bimap(self)(f, g)
   final def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
-
   final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
-
   final def <:>[C](f: A => C)(implicit z: B <~< C): F[C, C] = F.bimap(self)(f, z)
 
   ////
