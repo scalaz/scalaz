@@ -145,3 +145,26 @@ object Unapply2 extends Unapply20 {
     def apply(ma: M0[A0, B0]) = ma
   }
 }
+
+trait UnapplyProduct[TC[_[_]], MA, MB] {
+  type M[X]
+  type A
+  type B
+  def TC: TC[M]
+  type MA_ = MA
+  def _1(ma: MA): M[A]
+  def _2(mb: MB): M[B]
+}
+
+object UnapplyProduct {
+  import Isomorphism.<~>
+  // This seems to motivate multiple implicit parameter sections. Is there another way?
+  /*implicit */ def unapply[TC[_[_]], MA0, MB0](/*implicit */U1: Unapply[TC, MA0], U2: Unapply[TC, MB0])(implicit iso: U1.M <~> U2.M) = new UnapplyProduct[TC, MA0, MB0] {
+    type M[X] = U1.M[X]
+    type A = U1.A
+    type B = U2.A
+    def TC = U1.TC
+    def _1(ma: MA0) = U1(ma)
+    def _2(mb: MB0) = iso.from(U2(mb))
+  }
+}

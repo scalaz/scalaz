@@ -8,6 +8,11 @@ trait BiTraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =
       F.bitraverse(self)(f, g)
 
+  // Would be nice, but I'm not sure we can conjure UnapplyProduct implicitly, at least without multiple implicit
+  // parameter lists.
+  final def bitraverseU[GC, GD](f: A => GC, g: B => GD)(implicit G1: UnapplyProduct[Applicative, GC, GD]): G1.M[F[G1.A, G1.B]] =
+      F.bitraverse(self)(a => G1._1(f(a)), b => G1._2(g(b)))(G1.TC)
+
   import Leibniz.===
 
   final def bisequence[G[_], A1, B1](implicit G: Applicative[G], eva: A === G[A1], evb: B === G[B1]): G[F[A1, B1]] =
