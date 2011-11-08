@@ -22,15 +22,22 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
     G.TC.traverse(self)(a => G(f(a)))
   }
 
+  /** Traverse with the identity function */
   final def sequence[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
     val fgb: F[G[B]] = ev.subst[F](self)
     F.sequence(fgb)
   }
 
-  final def traverseS[S, B](f: A => State[S, B]) =
+  /** A version of `sequence` that infers the nested type constructor */
+  final def sequenceU(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
+    G.TC.traverse(self)(x => G.apply(x))
+  }
+
+  /** A version of `traverse` specialized for `State` */
+  final def traverseS[S, B](f: A => State[S, B]): State.State[S, F[B]] =
     F.traverseS[S, A, B](self)(f)
 
-  final def runTraverseS[S, B](s: S)(f: A => State[S, B]) =
+  final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =
     F.runTraverseS(self, s)(f)
 
   final def reverse: F[A] = F.reverse(self)

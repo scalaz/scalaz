@@ -159,6 +159,21 @@ trait UnapplyProduct[TC[_[_]], MA, MB] {
 object UnapplyProduct {
   import Isomorphism.<~>
   // This seems to motivate multiple implicit parameter sections. Is there another way?
+  // Currently, a type annotation in a parameter declaration may be path-dependent on a
+  // parameter from a previous parameter section, hence `iso` can't be in the first parameter
+  // section; which itself can't be implicit.
+  //
+  // There are two possible changes to Scalac that could help:
+  //
+  // 1. Allow multiple implicit parameter sections
+  // 2. Allow path-dependent parameter types to refer to the current (or even subsequent)
+  //    parameter sections.
+  //
+  //    A motivating example for #2 is in neg/depmet_try_implicit.scala
+  //
+  //    def foo[T, T2](a: T, x: T2)(implicit w: ComputeT2[T, T2]) // awkward, if you provide T you must also provide T2
+  //    def foo[T](a: T, x: w.T2)(implicit w: ComputeT2[T])       // more compact, and allows you to provide T1 and infer T2.
+  //
   /*implicit */ def unapply[TC[_[_]], MA0, MB0](/*implicit */U1: Unapply[TC, MA0], U2: Unapply[TC, MB0])(implicit iso: U1.M <~> U2.M) = new UnapplyProduct[TC, MA0, MB0] {
     type M[X] = U1.M[X]
     type A = U1.A
