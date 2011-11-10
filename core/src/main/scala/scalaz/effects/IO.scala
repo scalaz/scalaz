@@ -5,12 +5,29 @@ import Scalaz._
 import concurrent._
 
 sealed trait IO[A] {
-  private[effects] def apply(rw: World[RealWorld]): Promise[(World[RealWorld], A)]
+  private[effects] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
   /**
-   * Unsafe operation. Runs I/O and performs side-effects.
+   * Runs I/O and performs side-effects. An unsafe operation.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(realWorld).get._2
+  def unsafePerformIO: A = apply(realWorld).run._2
+
+  /**
+   * Constructs an IO action whose steps may be interleaved with another.
+   * An unsafe operation, since it exposes a trampoline that allows one to
+   * step through the components of the IO action.
+   */
+  def unsafeInterleaveIO: IO[Trampoline[A]] = io(apply(realWorld).map(_._2))
+
+  /**
+   * Interleaves the steps of this IO action with the steps of another,
+   * consuming the results of both with the given function.
+   */
+  def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => IO[C]): IO[C] = (for {
+    a <- unsafeInterleaveIO
+    b <- iob.unsafeInterleaveIO
+    c <- (a zipWith (b, f)).map(_.run)
+  } yield c)
 
   def flatMap[B](f: A => IO[B]): IO[B] = IO(rw =>
     apply(rw) flatMap {
@@ -93,12 +110,13 @@ class IORef[A](val value: STRef[RealWorld, A]) extends NewType[STRef[RealWorld, 
 }
 
 object IO {
-  def apply[A](f: World[RealWorld] => Promise[(World[RealWorld], A)]): IO[A] = new IO[A] {
+  def apply[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
     private[effects] def apply(rw: World[RealWorld]) = f(rw)
   }
 
+  import Trampoline._
   implicit val ioPure: Pure[IO] = new Pure[IO] {
-    def pure[A](a: => A) = IO(rw => promise((rw, a)))
+    def pure[A](a: => A) = IO(rw => More(() => Return((rw, a))))
   }
   implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f

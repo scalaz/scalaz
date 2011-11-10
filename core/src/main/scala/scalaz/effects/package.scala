@@ -58,8 +58,11 @@ package object effects {
   }
 
   // Implicit conversions between IO and ST
-  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => promise(st(s)))
-  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s).get)
+  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => {
+    import Trampoline._
+    More(() => Return(st(s)))
+  })
+  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s).run)
  
   /** Perform the given side-effect in an IO action */
   def io[A](a: => A) = IO.ioPure pure a
