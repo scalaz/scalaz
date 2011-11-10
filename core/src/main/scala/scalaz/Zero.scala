@@ -113,7 +113,7 @@ object Zero {
 
   implicit def FirstLazyOptionZero[A]: Zero[FirstLazyOption[A]] = zero(LazyOption.none[A])
 
-  implicit def LastLazyOptionZero[A]: Zero[FirstLazyOption[A]] = zero(LazyOption.none[A])
+  implicit def LastLazyOptionZero[A]: Zero[LastLazyOption[A]] = zero(LazyOption.none[A])
 
   implicit def ArrayZero[A: Manifest]: Zero[Array[A]] = zero(new Array[A](0))
 
