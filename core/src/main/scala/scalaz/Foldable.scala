@@ -15,6 +15,10 @@ trait Foldable[F[_]]  { self =>
   }
 
   // derived functions
+  def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
+    import std.option._
+    foldMap(fa)(a => some(f(a)))
+  }
 
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
