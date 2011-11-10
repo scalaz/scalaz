@@ -63,7 +63,7 @@ sealed trait EitherT[F[_], A, B] {
   }
 
   def toOptionT(implicit F: Functor[F]): OptionT[F, B] =
-    optionT(F.map(runT)((_: Either[A, B]).right toOption))
+    optionT[F](F.map(runT)((_: Either[A, B]).right toOption))
 
   def toOption(implicit i: F <~> Id): Option[B] =
     run.right.toOption

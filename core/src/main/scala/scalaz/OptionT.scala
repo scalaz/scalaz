@@ -5,26 +5,31 @@ import std.option.optionInstance
 /**
  * OptionT monad transformer.
  */
-final case class OptionT[F[_], A](value: F[Option[A]]) {
+final case class OptionT[F[_], A](runT: F[Option[A]]) {
   self =>
-  
+
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](
-    F.map(value)(_ map f)
+    F.map(runT)(_ map f)
   )
 
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
-    F.bind(self.value) {
-      case None => F.point(None: Option[B])
-      case Some(z) => f(z).value
+    F.bind(self.runT) {
+      case None    => F.point(None: Option[B])
+      case Some(z) => f(z).runT
     }
   )
 
   def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
-    F.bind(self.value) {
-      case None => F.point(None: Option[B])
+    F.bind(self.runT) {
+      case None    => F.point(None: Option[B])
       case Some(z) => F.map(f(z))(b => Some(b))
     }
   )
+
+  def ap[B](f: OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
+    OptionT(F.map2(f.runT, runT) {
+      case (ff, aa) => optionInstance.ap(aa)(ff)
+    })
 }
 
 //
@@ -45,8 +50,8 @@ trait OptionTInstances1 extends OptionTInstances2 {
 
 trait OptionTInstances0 extends OptionTInstances1 {
   implicit def optionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
-      implicit def F: Apply[F] = F0
-    }
+    implicit def F: Apply[F] = F0
+  }
 }
 
 trait OptionTInstances extends OptionTInstances0 {
@@ -84,8 +89,7 @@ private[scalaz] trait OptionTPointed[F[_]] extends Pointed[({type λ[α] = Optio
 private[scalaz] trait OptionTApply[F[_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
   implicit def F: Apply[F]
 
-  def ap[A, B](fa: OptionT[F, A])(f: OptionT[F, A => B]): OptionT[F, B] =
-    OptionT(F.map2(f.value, fa.value)({ case (ff, aa) => optionInstance.ap(aa)(ff) }))
+  def ap[A, B](fa: OptionT[F, A])(f: OptionT[F, A => B]): OptionT[F, B] = fa ap f
 }
 
 private[scalaz] trait OptionTMonad[F[_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTPointed[F] {
@@ -99,6 +103,6 @@ private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => Some(a)))
 
   def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {
-    def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.value))
+    def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.runT))
   }
 }
