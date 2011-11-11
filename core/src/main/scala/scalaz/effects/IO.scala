@@ -23,10 +23,10 @@ sealed trait IO[A] {
    * Interleaves the steps of this IO action with the steps of another,
    * consuming the results of both with the given function.
    */
-  def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => IO[C]): IO[C] = (for {
+  def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => C): IO[C] = (for {
     a <- unsafeInterleaveIO
     b <- iob.unsafeInterleaveIO
-    c <- (a zipWith (b, f)).map(_.run)
+    c <- IO(rw => a zipWith (b, (x: A, y: B) => (rw -> f(x, y))))
   } yield c)
 
   def flatMap[B](f: A => IO[B]): IO[B] = IO(rw =>
