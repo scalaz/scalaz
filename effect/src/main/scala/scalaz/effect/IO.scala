@@ -7,38 +7,53 @@ import RefCountedFinalizer._
 import FinalizerHandle._
 import ST._
 import Kleisli._
+import Coroutine._
+import std.function._
 
 sealed trait IO[A] {
-  private[effect] def apply(rw: World[RealWorld]): (World[RealWorld], A)
+  private[effect] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
 
   import IO._
 
   /**
-   * Unsafe operation. Runs I/O and performs side-effects.
+   * Runs I/O and performs side-effects. An unsafe operation.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(realWorld)._2
+  def unsafePerformIO: A = apply(realWorld).run._2
 
-  def flatMap[B](f: A => IO[B]): IO[B] = io(rw => {
-    val (nw, a) = apply(rw)
-    f(a)(nw)
-  })
+  /**
+   * Constructs an IO action whose steps may be interleaved with another.
+   * An unsafe operation, since it exposes a trampoline that allows one to
+   * step through the components of the IO action.
+   */
+  def unsafeInterleaveIO: IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
 
-  def map[B](f: A => B): IO[B] = io(rw => {
-    val (nw, a) = apply(rw)
-    (nw, f(a))
-  })
+  /**
+   * Interleaves the steps of this IO action with the steps of another,
+   * consuming the results of both with the given function.
+   */
+  def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => C): IO[C] = (for {
+    a <- unsafeInterleaveIO
+    b <- iob.unsafeInterleaveIO
+    c <- io(rw => a zipWith (b, (x: A, y: B) => (rw -> f(x, y))))
+  } yield c)
+
+  def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
+    apply(rw) flatMap {
+      case (nw, a) => f(a)(nw)
+    })
+
+  def map[B](f: A => B): IO[B] = io(rw =>
+    apply(rw) map {
+      case (nw, a) => (nw, f(a))
+    })
 
   def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
     m.liftIO(this)
 
-  /**Executes the handler if an exception is raised. */
-  def except(handler: Throwable => IO[A]): IO[A] =
-    io(rw => try {
-      this(rw)
-    } catch {
-      case e => handler(e)(rw)
-    })
+  /** Executes the handler if an exception is raised. */
+  def except(handler: Throwable => IO[A]): IO[A] = 
+    io(rw => try { this(rw) } catch { case e => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
@@ -105,40 +120,39 @@ sealed trait IO[A] {
 }
 
 object IO extends IOs {
-
   def apply[A](a: => A): IO[A] =
-    io(rw => (rw, a))
+    io(rw => suspend(rw -> a))
 }
 
 trait IOs {
   type RunInBase[M[_], Base[_]] =
   Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
 
-  def io[A](f: World[RealWorld] => (World[RealWorld], A)): IO[A] = new IO[A] {
+  def io[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
     private[effect] def apply(rw: World[RealWorld]) = f(rw)
   }
 
   // Standard I/O
-  def getChar: IO[Char] = io(rw => (rw, readChar))
+  def getChar: IO[Char] = IO(readChar)
 
-  def putChar(c: Char): IO[Unit] = io(rw => (rw, {
+  def putChar(c: Char): IO[Unit] = io(rw => suspend(rw -> {
     print(c);
     ()
   }))
 
-  def putStr(s: String): IO[Unit] = io(rw => (rw, {
+  def putStr(s: String): IO[Unit] = io(rw => suspend(rw -> {
     print(s);
     ()
   }))
 
-  def putStrLn(s: String): IO[Unit] = io((rw => (rw, {
+  def putStrLn(s: String): IO[Unit] = io(rw => suspend(rw -> {
     println(s);
     ()
-  })))
+  }))
 
-  def readLn: IO[String] = io(rw => (rw, readLine))
+  def readLn: IO[String] = IO(readLine)
 
-  def putOut[A](a: A): IO[Unit] = io(rw => (rw, {
+  def putOut[A](a: A): IO[Unit] = io(rw => suspend(rw -> {
     print(a);
     ()
   }))
@@ -148,7 +162,7 @@ trait IOs {
     STToIO(newVar(a)) flatMap (v => IO(IORef.ioRef(v)))
 
   /**Throw the given error in the IO monad. */
-  def throwIO[A](e: Throwable): IO[A] = io(rw => (rw, throw e))
+  def throwIO[A](e: Throwable): IO[A] = IO(throw e)
 
   def idLiftControl[M[_], A](f: RunInBase[M, M] => M[A])(implicit m: Monad[M]): M[A] =
     f(new RunInBase[M, M] {
@@ -192,13 +206,13 @@ trait IOs {
   }
 
   implicit def IOToST[A](io: IO[A]): ST[RealWorld, A] =
-    st(io(_))
+    st(io(_).run)
 
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
     Monoid.liftMonoid[IO, A](IO.ioMonad, A)
 
   val ioUnit: IO[Unit] =
-    io(rw => (rw, ()))
+    IO(())
 
   implicit val ioMonad = new Monad[IO] {
     def point[A](a: => A): IO[A] = IO(a)
