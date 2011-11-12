@@ -2,7 +2,14 @@ package scalaz
 
 ////
 /**
+ * A categorical monoid.
  *
+ * All monoid instances must satisfy the [[scalaz.Semigroup]] law and 2 additional laws:
+ *
+ *  - '''left identity''': `forall a. append(zero, a) == a`
+ *  - '''right identity''' : `forall a. append(a, zero) == a`
+ *
+ * @see [[scalaz.syntax.MonoidV]]
  */
 ////
 trait Monoid[F] extends Semigroup[F] { self =>

@@ -2,7 +2,12 @@ package scalaz
 
 ////
 /**
+ * A semigroup in type S must satisfy two laws:
  *
+ *  - '''closure''': `∀ a, b in S, append(a, b)` is also in `S`. This is enforced by the type system.
+ *  - '''associativity''': `∀ a, b, c` in `S`, the equation `append(append(a, b), c) = append(a, append(b , c))` holds.
+ *
+ * @see [[scalaz.syntax.SemigroupV]]
  */
 ////
 trait Semigroup[F]  { self =>
