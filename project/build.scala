@@ -30,6 +30,8 @@ object build extends Build {
       objects + "\n\n" + all
     },
 
+    publishArtifact in (Compile, packageDoc) := false,
+
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
