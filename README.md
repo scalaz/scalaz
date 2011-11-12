@@ -1,10 +1,12 @@
 ## Scalaz Seven
 
-This is an experimental fork of [Scalaz](https://github.com/scalaz/scalaz) for prototyping
-changes for [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7).
+This is the in-progress [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7). The branch was prevously developed
+at [retronym/scalaz7-experimental](https://github.com/retronym/scalaz7-experimental), and before that at
+[retronym/scalaz7-experimental](https://github.com/pchiusano/scalaz7-experimental). The 
+[alternative design](https://github.com/scalaz/scalaz/tree/scalaz7), which eschewed type class inheritance,
+is no longer active.
 
-This is only a candidate design for Scalaz 7. An alternative design, which eschews type class inheritance,
-is available in the [scalaz7](https://github.com/scalaz/scalaz/tree/scalaz7) branch in the main repository.
+[Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/doc/DeveloperGuide.md)
 
 ### Modularity
 
