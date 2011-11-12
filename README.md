@@ -2,7 +2,7 @@
 
 This is the in-progress [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7). The branch was prevously developed
 at [retronym/scalaz7-experimental](https://github.com/retronym/scalaz7-experimental), and before that at
-[retronym/scalaz7-experimental](https://github.com/pchiusano/scalaz7-experimental). The 
+[pchiusano/scalaz7-experimental](https://github.com/pchiusano/scalaz7-experimental). The 
 [alternative design](https://github.com/scalaz/scalaz/tree/scalaz7), which eschewed type class inheritance,
 is no longer active.
 
@@ -180,8 +180,8 @@ ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 The `OptionT#map` requires `Functor[F]`, whereas `OptionT#flatMap` requires `Monad[F]`. The capabilities of
 `OptionT` increase with those of `F`. We need to encode this into the type class instances for `[a]OptionT[F[A]]`.
 
-This is done with a hierarchy of [type class implementation traits](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L59)
-and a corresponding set of [prioritized implicit methods](https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/OptionT.scala#L23).
+This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L59)
+and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L23).
 
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
 when in cases like the following:
@@ -204,14 +204,14 @@ TODO: Describe relationship between `Id` / `Value` / `Name` / `Need`, show usage
 
 ### Deriving Type Class Instances through Isomorphisms
 
-https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/Isomorphism.scala
+https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Isomorphism.scala
 
 ### Deriving Type Class Instances through Composition / Product
 
-https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/Composition.scala
+https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Composition.scala
 
-https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/Product.scala
+https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Product.scala
 
 ### Unboxed Tagged Types
 
-https://github.com/retronym/scalaz7-experimental/blob/master/core/src/main/scala/scalaz/std/AnyVal.scala#L35
+https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/std/AnyVal.scala#L35
