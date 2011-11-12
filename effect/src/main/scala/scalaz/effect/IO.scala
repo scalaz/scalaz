@@ -50,14 +50,14 @@ sealed trait IO[A] {
    */
   def unsafeZip_[B](iob: IO[B]): IO[B] = unsafeZipWith(iob, (a: A, b: B) => b)
 
-  def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
-    apply(rw) flatMap {
-      case (nw, a) => f(a)(nw)
-    })
-
   def map[B](f: A => B): IO[B] = io(rw =>
     apply(rw) map {
       case (nw, a) => (nw, f(a))
+    })
+
+  def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
+    apply(rw) flatMap {
+      case (nw, a) => f(a)(nw)
     })
 
   def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
@@ -131,21 +131,32 @@ sealed trait IO[A] {
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 
-object IO extends IOs {
+object IO extends IOFunctions with IOInstances{
   def apply[A](a: => A): IO[A] =
     io(rw => suspend(rw -> a))
 }
 
-trait IOs {
-  type RunInBase[M[_], Base[_]] =
-  Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
+trait IOInstances0 {
+  implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
+      Monoid.liftSemigroup[IO, A](IO.ioMonad, A)
+}
 
-  def io[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
-    private[effect] def apply(rw: World[RealWorld]) = f(rw)
+trait IOInstances extends IOInstances0 {
+  implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
+    Monoid.liftMonoid[IO, A](IO.ioMonad, A)
+
+  implicit val ioMonad = new Monad[IO] {
+    def point[A](a: => A): IO[A] = IO(a)
+    override def map[A, B](fa: IO[A])(f: (A) => B) = fa map f
+    def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
   }
+}
 
-  // Standard I/O
-  def getChar: IO[Char] = IO(readChar)
+/** IO Actions for writing to standard output and and reading from standard input */
+trait IOStd {
+  import IO.io
+
+  def getChar: IO[Char] = IO(readChar())
 
   def putChar(c: Char): IO[Unit] = io(rw => suspend(rw -> {
     print(c);
@@ -162,12 +173,21 @@ trait IOs {
     ()
   }))
 
-  def readLn: IO[String] = IO(readLine)
+  def readLn: IO[String] = IO(readLine())
 
   def putOut[A](a: A): IO[Unit] = io(rw => suspend(rw -> {
     print(a);
     ()
   }))
+}
+
+trait IOFunctions extends IOStd {
+  type RunInBase[M[_], Base[_]] =
+  Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
+
+  def io[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
+    private[effect] def apply(rw: World[RealWorld]) = f(rw)
+  }
 
   // Mutable variables in the IO monad
   def newIORef[A](a: => A): IO[IORef[A]] =
@@ -220,15 +240,6 @@ trait IOs {
   implicit def IOToST[A](io: IO[A]): ST[RealWorld, A] =
     st(io(_).run)
 
-  implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
-    Monoid.liftMonoid[IO, A](IO.ioMonad, A)
-
   val ioUnit: IO[Unit] =
     IO(())
-
-  implicit val ioMonad = new Monad[IO] {
-    def point[A](a: => A): IO[A] = IO(a)
-    def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
-  }
 }
-

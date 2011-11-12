@@ -51,7 +51,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   }
 
   def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (F[C], List[B]) = 
-    runTraverseS(fa, toList(fb))(a => 
+    runTraverseS(fa, toList(fb))(a =>
       State(bs => (f(a,bs.headOption), if (bs.isEmpty) bs else bs.tail)))
 
   def zipWithL[A,B,C](fa: F[A], fb: F[B])(f: (A,Option[B]) => C): F[C] = zipWith(fa, fb)(f)._1

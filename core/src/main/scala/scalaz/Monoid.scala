@@ -16,10 +16,27 @@ object Monoid {
   ////
   import annotation.tailrec
 
-  /**A monoid for sequencing Applicative effects. */
-  def liftMonoid[F[_], M](implicit F: Applicative[F], M: Monoid[M]): Monoid[F[M]] = new Monoid[F[M]] {
-    val zero = F.point(M.zero)
+  trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
+    implicit def F: Applicative[F]
+    implicit def M: Semigroup[M]
     def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
+  }
+
+  trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with ApplicativeSemigroup[F, M] {
+    implicit def M: Monoid[M]
+    val zero = F.point(M.zero)
+  }
+
+  /**A semigroup for sequencing Applicative effects. */
+  def liftSemigroup[F[_], M](implicit F0: Applicative[F], M0: Semigroup[M]): Semigroup[F[M]] = new ApplicativeSemigroup[F, M] {
+    implicit def F: Applicative[F] = F0
+    implicit def M: Semigroup[M] = M0
+  }
+
+  /**A semigroup for sequencing Applicative effects. */
+  def liftMonoid[F[_], M](implicit F0: Applicative[F], M0: Monoid[M]): Monoid[F[M]] = new ApplicativeMonoid[F, M] {
+    implicit def F: Applicative[F] = F0
+    implicit def M: Monoid[M] = M0
   }
 
   def unfold[F[_], A, B](seed: A)(f: A => Option[(B, A)])(implicit F: Pointed[F], FB: Monoid[F[B]]): F[B] =

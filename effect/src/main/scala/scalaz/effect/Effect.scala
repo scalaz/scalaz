@@ -7,7 +7,7 @@ trait Effects
   extends Dups
   with FinalizerHandles
   with IoExceptionOrs
-  with IOs
+  with IOFunctions
   with IORefs
   with LiftControlIOs
   with MonadControlIOs
