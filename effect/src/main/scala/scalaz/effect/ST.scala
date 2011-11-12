@@ -137,7 +137,7 @@ trait STs {
 
   // Implicit conversions between IO and ST
   implicit def STToIO[A](st: ST[RealWorld, A]): IO[A] =
-    IO.io(st(_))
+    IO.io(rw => Coroutine.suspend(st(rw)))
 
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
     Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
