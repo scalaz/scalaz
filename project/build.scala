@@ -34,6 +34,7 @@ object build extends Build {
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
+    credentialsSetting,
     publishSetting
   )
 
@@ -99,12 +100,14 @@ object build extends Build {
   }
 
   lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
+    val c = Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
+        println("user: " + user)
         Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
       case _                           =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
+    c
   }
 
   lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
