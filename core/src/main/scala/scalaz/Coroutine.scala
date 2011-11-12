@@ -10,6 +10,8 @@ case class Suspend[S[_], A](a: S[Coroutine[S, A]]) extends Coroutine[S, A]
 case class Gosub[S[_], A, B](a: Coroutine[S, A],
                              f: A => Coroutine[S, B]) extends Coroutine[S, B]
 
+case class Control[S[_], A](a: Coroutine[S, A]) extends Throwable
+
 sealed trait Coroutine[S[_], A] {
   final def map[B](f: A => B): Coroutine[S, B] =
     flatMap(a => Return(f(a)))
@@ -25,7 +27,7 @@ sealed trait Coroutine[S[_], A] {
     case a Gosub f => a match {
       case Return(a) => f(a).resume
       case Suspend(t) => Left(fun.map(t)(((_:Coroutine[S, Any]) >>= f)))
-      case _ => sys.error("Left-associated bind. Use >>= instead of constructing binds by hand.")
+      case b Gosub g => (Gosub(b, (x: Any) => Gosub(g(x), f)):Coroutine[S, A]).resume
     }
   }
   final def mapSuspension[T[_]](f: S ~> T)(implicit fun: Functor[S]): Coroutine[T, A] = 
