@@ -4,7 +4,7 @@ This is the in-progress [Scalaz 7](http://code.google.com/p/scalaz/wiki/Scalaz7)
 at [retronym/scalaz7-experimental](https://github.com/retronym/scalaz7-experimental), and before that at
 [pchiusano/scalaz7-experimental](https://github.com/pchiusano/scalaz7-experimental). The 
 [alternative design](https://github.com/scalaz/scalaz/tree/scalaz7), which eschewed type class inheritance,
-is no longer active.
+is no longer being pursued.
 
 [Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/doc/DeveloperGuide.md)
 
