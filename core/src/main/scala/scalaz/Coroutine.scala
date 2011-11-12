@@ -145,6 +145,13 @@ trait Coroutines {
 
   def request[I, O](x: I): Coroutine[({type f[x] = Request[I, O, x]})#f, O] =
     Suspend[({type f[x] = Request[I, O, x]})#f, O](Request(x, Return[({type f[x] = Request[I, O, x]})#f, O](_:O)))
+
+  implicit def coroutineMonad[S[_]]: Monad[({type f[x] = Coroutine[S, x]})#f] =
+    new Monad[({type f[x] = Coroutine[S, x]})#f] {
+      def point[A](a: => A) = Return(a)
+      def bind[A, B](a: Coroutine[S, A])(f: A => Coroutine[S, B]) = a >>= f
+    }
+
 }
 
 
