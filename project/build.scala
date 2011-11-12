@@ -61,7 +61,8 @@ object build extends Build {
     base = file("effect"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-effect"
-    )
+    ),
+    dependencies = Seq(core)
   )
 
   lazy val iteratee = Project(
