@@ -11,6 +11,7 @@ object build extends Build {
     version := "7.1-SNAPSHOT",
     scalaVersion := "2.9.1",
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-Ydependent-method-types"),
+    scaladocOptions in Compile <<= scalacOptions,
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
       (scalaSource, streams, typeClasses) =>
