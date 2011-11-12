@@ -20,17 +20,17 @@ trait Functor[F[_]]  { self =>
   def mapply[A, B](a: A)(f: F[A => B]): F[B] = map(f)((ff: A => B) => ff(a))
 
   /**The composition of Functors F and G, [x]F[G[x]], is an Functors */
-  def compose[G[_]](G: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
-    implicit def F: Functor[F] = self
+  def compose[G[_]](G0: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
+    implicit def F = self
 
-    implicit def G: Functor[G] = G
+    implicit def G = G0
   }
 
   /**The product of Functors F and G, [x](F[x], G[x]]), is an Functor */
-  def product[G[_]](implicit G: Functor[G]): Functor[({type λ[α] = (F[α], G[α])})#λ] = new ProductFunctor[F, G] {
-    implicit def F: Functor[F] = self
+  def product[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = (F[α], G[α])})#λ] = new ProductFunctor[F, G] {
+    implicit def F = self
 
-    implicit def G: Functor[G] = G
+    implicit def G = G0
   }
 
   ////
