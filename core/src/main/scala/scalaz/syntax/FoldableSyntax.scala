@@ -10,6 +10,7 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   final def toList: List[A] = F.toList(self)
   final def toIndexedSeq(fa: F[A]): IndexedSeq[A] = F.toIndexedSeq(self)
   final def toSet(fa: F[A]): Set[A] = F.toSet(self)
+  final def toStream(fa: F[A]): Stream[A] = F.toStream(self)
   ////
 }
 
