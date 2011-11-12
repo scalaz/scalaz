@@ -5,14 +5,23 @@ import Coroutine._
 import std.function._
 import std.tuple._
 
-case class Return[S[_], A](a: A) extends Coroutine[S, A]
+// TODO report compiler bug when this appears just above CoroutineInstances:
+//      "java.lang.Error: typeConstructor inapplicable for <none>"
+object Coroutine extends CoroutineFunctions with CoroutineInstances {
 
-case class Suspend[S[_], A](a: S[Coroutine[S, A]]) extends Coroutine[S, A]
+  case class Return[S[_], A](a: A) extends Coroutine[S, A]
 
-case class Gosub[S[_], A, B](a: Coroutine[S, A],
-                             f: A => Coroutine[S, B]) extends Coroutine[S, B]
+  case class Suspend[S[_], A](a: S[Coroutine[S, A]]) extends Coroutine[S, A]
 
-case class Control[S[_], A](a: Coroutine[S, A]) extends Throwable
+  case class Gosub[S[_], A, B](a: Coroutine[S, A],
+                               f: A => Coroutine[S, B]) extends Coroutine[S, B]
+
+  case class Control[S[_], A](a: Coroutine[S, A]) extends Throwable
+
+  type Trampoline[A] = Coroutine[Function0, A]
+  type Source[A, B] = Coroutine[({type f[x] = (A, x)})#f, B]
+  type Sink[A, B] = Coroutine[({type f[x] = (=> A) => x})#f, B]
+}
 
 sealed trait Coroutine[S[_], A] {
   final def map[B](f: A => B): Coroutine[S, B] =
@@ -136,8 +145,6 @@ trait SourceInstances {
     }
 }
 
-object Coroutine extends CoroutineFunctions with CoroutineInstances
-
 trait CoroutineInstances {
   implicit def coroutineMonad[S[_]]: Monad[({type f[x] = Coroutine[S, x]})#f] =
     new Monad[({type f[x] = Coroutine[S, x]})#f] {
@@ -148,10 +155,6 @@ trait CoroutineInstances {
 }
 
 trait CoroutineFunctions {
-  type Trampoline[A] = Coroutine[Function0, A]
-  type Source[A, B] = Coroutine[({type f[x] = (A, x)})#f, B]
-  type Sink[A, B] = Coroutine[({type f[x] = (=> A) => x})#f, B]
-
   def suspend[A](value: => A): Trampoline[A] =
     Suspend[Function0, A](() => Return[Function0, A](value))
 
