@@ -17,9 +17,9 @@ when adding large new features.
 
 Type class extension is encoded with inheritance. For example, `Monoid` extends `Semigroup`.
 
-### Heirarchy
+### Hierarchy
 
-The type class heirarchy is configured in the build (`GenTypeClass`). The SBT command `gtc`
+The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gtc`
 will recreate all type classes, preserving chunks of code delimited by pairs of `////` comments.
 
 Do not add code, comments, or imports outside of these delimiters.
@@ -93,7 +93,7 @@ Define type class instances in the same files as the data structure. Type class 
 
 ### General
 
-Type class instances are packged in a a trait `ClassifiedTypeInstances`.
+Type class instances are packaged in a trait `ClassifiedTypeInstances`.
 
 The implicit members within the `Instances` class should be named:
 
@@ -102,7 +102,7 @@ The implicit members within the `Instances` class should be named:
 
 ### Scala and Java standard libary
 
-Instances are organized under `scalaz.std` according the the package of the classified type. The package prefix `scala`
+Instances are organized under `scalaz.std` according to the package of the classified type. The package prefix `scala`
 is ommited. Where a type is aliased under the package `scala`, the shorter path to the alias determines the location
 of the type class.
 
@@ -131,7 +131,7 @@ For example:
 `(Monoid[A], Monoid[B]) => Monoid[(A, B)]`
 
 This demands careful organization of these implicits to ensure that `implicitly[Semigroup[(Int, Int)]` resolves
-without ambiguity (Both of these functions could provide that).
+without ambiguity (both of these functions could provide that).
 
 Here's how to organize the type class instances and implicits for `Tuple2`. See the comments inline.
 
@@ -214,7 +214,7 @@ conversions use the `Unapply` and `Unapply2` types to maximize type inference, s
 `scalaz.example.UnapplyInference`. The same technique may be used in the methods in the syntax wrapper,
 see `TraverseV#sequence`.
 
-Standard libary types, and Scalaz data structures, may also have a syntax defined. These files and implicit conversions
+Standard library types, and Scalaz data structures, may also have a syntax defined. These files and implicit conversions
 are created by hand. For example, see `scalaz.syntax.TreeV` and `scalaz.syntax.std.OptionV`. Remember to add these to
 either `ToAllOtherV` or `ToAllStdV`, and to update `Syntaxes`.
 
@@ -236,7 +236,7 @@ In the absense of a context specific name for the type parameters, use these:
  * Use `A`, `B`, `C`, `X` for kind `*`
  * Use `F`, `G` for kind `* -> *`.
 
-Declare type parameters requiring type constructors first in type parameter declarations. This is and arbitrary choice,
+Declare type parameters requiring type constructors first in type parameter declarations. This is an arbitrary choice,
 but the consistency is worth it.
 
     class Foo[F[_], A, B] // good
