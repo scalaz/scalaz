@@ -38,6 +38,18 @@ sealed trait IO[A] {
     c <- io(rw => a zipWith (b, (x: A, y: B) => (rw -> f(x, y))))
   } yield c)
 
+  /**
+   * Interleaves the steps of this IO action with the steps of another,
+   * yielding the results of both.
+   */
+  def unsafeZip[B](iob: IO[B]): IO[(A, B)] = unsafeZipWith(iob, Tuple2[A, B])
+
+  /**
+   * Interlaves the steps of this IO action with the steps of another,
+   * ignoring the result of this action.
+   */
+  def unsafeZip_[B](iob: IO[B]): IO[B] = unsafeZipWith(iob, (a: A, b: B) => b)
+
   def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
     apply(rw) flatMap {
       case (nw, a) => f(a)(nw)
