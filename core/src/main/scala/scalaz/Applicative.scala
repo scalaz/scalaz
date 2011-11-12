@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   ////
 

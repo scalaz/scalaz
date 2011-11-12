@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait BiTraverse[F[_, _]] extends BiFunctor[F] { self =>
   ////
   def bitraverse[G[_] : Applicative, A, B, C, D](fab: F[A, B])(f: A => G[C], g: B => G[D]): G[F[C, D]]

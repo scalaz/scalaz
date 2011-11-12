@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Index[F[_]]  { self =>
   ////
   def index[A](fa: F[A], i: Int): Option[A]

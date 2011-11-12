@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Pointed[F[_]] extends Functor[F] { self =>
   ////
 

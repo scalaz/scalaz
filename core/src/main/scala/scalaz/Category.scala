@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?

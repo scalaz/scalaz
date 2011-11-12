@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Arr[=>:[_, _]]  { self =>
   ////
   def arr[A, B](f: A => B): A =>: B

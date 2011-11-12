@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Length[F[_]]  { self =>
   ////
   def length[A](fa: F[A]): Int

@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Foldable[F[_]]  { self =>
   ////
   /** Map each element of the structure to a monoid, and combine the results. */

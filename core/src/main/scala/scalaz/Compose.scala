@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Compose[=>:[_, _]]  { self =>
   ////
   def compose[A, B, C](f: B =>: C, g: A =>: B): (A =>: C)

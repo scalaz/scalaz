@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
   import Ident.id

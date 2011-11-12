@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Show[F]  { self =>
   ////
   def show(f: F): List[Char]

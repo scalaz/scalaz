@@ -1,6 +1,11 @@
 package scalaz
 package concurrent
 
+////
+/**
+ *
+ */
+////
 trait Run[F]  { self =>
   ////
 

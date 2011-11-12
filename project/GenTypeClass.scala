@@ -187,6 +187,11 @@ object GenTypeClass {
 
     val mainSource = """%s
 
+////
+/**
+ *
+ */
+////
 trait %s[%s] %s { self =>
   ////
 

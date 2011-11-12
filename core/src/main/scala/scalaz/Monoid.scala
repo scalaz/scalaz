@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Monoid[F] extends Semigroup[F] { self =>
   ////
   def zero: F

@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait ArrId[=>:[_, _]]  { self =>
   ////
   def id[A]: A =>: A

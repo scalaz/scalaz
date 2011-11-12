@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Equal[F]  { self =>
   ////
   def equal(a1: F, a2: F): Boolean

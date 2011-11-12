@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Plus[F[_]] extends Functor[F] with Empty[F] { self =>
   ////
 

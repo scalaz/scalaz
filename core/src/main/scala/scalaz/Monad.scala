@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   ////
 

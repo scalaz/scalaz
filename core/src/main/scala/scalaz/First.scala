@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait First[F[_, _]]  { self =>
   ////
   def first[A, B, C](f: F[A, B]): F[(A, C), (B, C)]

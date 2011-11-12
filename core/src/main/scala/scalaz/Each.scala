@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Each[F[_]]  { self =>
   ////
   def each[A](fa: F[A])(f: A => Unit)

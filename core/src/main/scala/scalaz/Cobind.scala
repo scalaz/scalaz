@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait CoBind[F[_]]  { self =>
   ////
   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]

@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait CoMonad[F[_]] extends CoPointed[F] with CoJoin[F] with CoBind[F] { self =>
   ////
 

@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Bind[F[_]] extends Apply[F] { self =>
   ////
 

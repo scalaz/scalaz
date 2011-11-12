@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
   ////
   def applyInstance[C]: Apply[({type λ[α] = F[C, α]})#λ] =

@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Order[F] extends Equal[F] { self =>
   ////
   def order(x: F, y: F): Ordering 

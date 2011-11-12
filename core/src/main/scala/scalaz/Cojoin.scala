@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait CoJoin[F[_]]  { self =>
   ////
   def cojoin[A](a: F[A]): F[F[A]]

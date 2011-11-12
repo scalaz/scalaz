@@ -1,5 +1,10 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait CoPointed[F[_]] extends Functor[F] { self =>
   ////
   def copoint[A](p: F[A]): A
