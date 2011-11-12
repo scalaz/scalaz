@@ -6,7 +6,6 @@ import Project.Setting
 
 object build extends Build {
   type Sett = Project.Setting[_]
-  lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -24,17 +23,18 @@ object build extends Build {
         }
     },
     typeClasses := Seq(),
+    genToSyntax <<= (typeClasses) map {
+      (tcs: Seq[TypeClass]) =>
+      val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
+      val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
+      objects + "\n\n" + all
+    },
+
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
-    genToSyntax <<= (typeClasses) map {
-      (tcs: Seq[TypeClass]) =>
-        val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
-        val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
-        objects + "\n\n" + all
-    }
-
+    publishSetting
   )
 
   lazy val scalaz = Project(
@@ -90,9 +90,28 @@ object build extends Build {
     )
   )
 
+  lazy val publishSetting = publishTo <<= (version) {
+    version: String =>
+      def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
+      val isSnapshot = version.trim.endsWith("SNAPSHOT")
+      val repoName = if (isSnapshot) "snapshots" else "releases"
+      Some(repo(repoName))
+  }
+
+  lazy val credentialsSetting = credentials += {
+    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
+      case Seq(Some(user), Some(pass)) =>
+        Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
+      case _                           =>
+        Credentials(Path.userHome / ".ivy2" / ".credentials")
+    }
+  }
+
   lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 
   lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
+
+  lazy val showDoc = TaskKey[Unit]("show-doc")
 }
