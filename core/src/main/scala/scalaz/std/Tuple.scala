@@ -19,6 +19,11 @@ trait TupleInstances0 {
       Applicative[G].lift2((c: C, d: D) => (c, d))(f(fab._1), g(fab._2))
     }
   }
+
+  implicit def tupleFunctor[S]: Functor[({type f[x] = (S, x)})#f] = new Functor[({type f[x] = (S, x)})#f] {
+    def map[A, B](t: (S, A))(f: A => B): (S, B) =
+      (t._1, f(t._2))
+  }
 }
 
 trait TupleInstances extends TupleInstances0 {
