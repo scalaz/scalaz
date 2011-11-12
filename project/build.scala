@@ -1,3 +1,4 @@
+import java.awt.Desktop
 import sbt._
 import Keys._
 import GenTypeClass._
@@ -5,6 +6,7 @@ import Project.Setting
 
 object build extends Build {
   type Sett = Project.Setting[_]
+  lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -22,6 +24,10 @@ object build extends Build {
         }
     },
     typeClasses := Seq(),
+    showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
+      val index = out / "index.html"
+      if (index.exists()) Desktop.getDesktop.open(out / "index.html")
+    },
     genToSyntax <<= (typeClasses) map {
       (tcs: Seq[TypeClass]) =>
         val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
