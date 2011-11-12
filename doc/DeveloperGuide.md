@@ -224,7 +224,7 @@ recommended, to be more fine grained with imports.
     import scalaz._, syntax.applicative._, std.option._  // fine grained imports: preferred
     import scalaz._, Scalaz._                            // über import: convenient, but clutters namespace and slows compiler/IDE
 
-Because all the conversions are packaged in traits, it is possible for users to create objects to that aggregate a smaller
+Because all the conversions are packaged in traits, it is possible for users to create objects that aggregate a smaller
 set of the imports.
 
 ## General
