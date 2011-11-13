@@ -1,5 +1,5 @@
 package scalaz
-package std.util.concurrent
+package std.java.util.concurrent
 
 import java.util.concurrent.Callable
 

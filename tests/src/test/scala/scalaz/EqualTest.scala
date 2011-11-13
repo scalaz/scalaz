@@ -14,7 +14,7 @@ class EqualTest extends Specification with ScalaCheck {
   import std.anyVal._
   import std.math._
   import std.list._
-  import std.util.concurrent.callable._
+  import std.java.util.concurrent.callable._
   import bigInt._
   import std.java.math.bigInteger._
   import Zipper._

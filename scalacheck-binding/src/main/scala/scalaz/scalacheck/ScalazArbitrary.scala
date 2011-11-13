@@ -16,7 +16,7 @@ object ScalazArbitrary {
   import Gen._
   import ScalaCheckBinding._
   import syntax.std.booleanV._
-  import std.util.concurrent.callable._
+  import std.java.util.concurrent.callable._
   import syntax.functor._
 
   // todo report and/or work around compilation error: "scalaz is not an enclosing class"
@@ -27,7 +27,7 @@ object ScalazArbitrary {
   implicit def ImmutableArrayArbitrary[A](implicit F: Functor[Arbitrary], M: ClassManifest[A], A: Arbitrary[A]) =
     F.map(arbArray[A])(ImmutableArray.fromArray[A](_))
 
-//  implicit def IdentityArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Identity[A]] = Functor[Arbitrary].map(fa)(a => Ident.apply(a))
+  implicit def IdentityArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Identity[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
