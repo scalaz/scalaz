@@ -25,7 +25,7 @@ sealed trait Trampoline[A] {
         case Return(a) => if(stack.isEmpty) 
                           result = Some(a.asInstanceOf[A]) 
                         else
-                          cur = stack.pop()(a)
+                          cur = stack.pop().apply(a)
         case More(t) => cur = t()
         case a >>= f => {
           cur = a
