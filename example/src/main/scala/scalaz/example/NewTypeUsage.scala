@@ -3,7 +3,8 @@ package scalaz.example
 object NewTypeUsage extends App {
 
   import scalaz._
-  import std.anyVal.{Conjunction, Disjunction, booleanInstance, booleanDisjunctionNewTypeInstance, booleanConjunctionNewTypeInstance}
+  import std.anyVal.{booleanInstance, booleanDisjunctionNewTypeInstance, booleanConjunctionNewTypeInstance}
+  import Tags.{Conjunction, Disjunction}
   import std.list.listInstance
 
   assert(!booleanInstance.disjunction.zero)

@@ -1,5 +1,7 @@
 package scalaz
 
+import scalaz.Tags.Conjunction
+
 /**
  * A Reducer[C,M] is a Monoid[M] that maps
  * values of type C through `unit` to values of type M. A C-Reducer may also

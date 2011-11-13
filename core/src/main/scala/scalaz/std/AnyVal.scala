@@ -34,9 +34,7 @@ trait AnyValInstances {
 
   }
 
-  sealed trait Disjunction
-
-  sealed trait Conjunction
+  import Tags.{Conjunction, Disjunction}
 
   implicit object booleanDisjunctionNewTypeInstance extends Monoid[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Tag(f1 || f2)
