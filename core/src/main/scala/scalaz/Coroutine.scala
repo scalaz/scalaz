@@ -92,7 +92,7 @@ sealed trait Coroutine[S[_], A] {
   def feed[E](ss: Stream[E])(implicit ev: Coroutine[S, A] <~< Sink[E, A], fun: Functor[S]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
-      case (Stream(), Left(f)) => go(f(sys.error("No more values.")), Stream())
+      case (Stream(), Left(f)) => go(f(error_("No more values.")), Stream())
       case (_, Right(r))       => r
     }
     go(ev(this), ss)
@@ -102,7 +102,7 @@ sealed trait Coroutine[S[_], A] {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))
       case (Left((e, c)), Right(y)) => go(c, Sink.sinkPure[E].pure(y))
-      case (Right(x), Left(f))      => sys.error("Not enough values in source.")
+      case (Right(x), Left(f))      => error_("Not enough values in source.")
       case (Right(x), Right(y))     => (y, x)
     }
     go(source, ev(this))
