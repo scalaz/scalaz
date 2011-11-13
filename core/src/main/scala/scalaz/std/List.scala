@@ -54,6 +54,9 @@ trait ListInstances {
       k.toList
     }
   }
+  implicit def listEqual[A] = new Equal[List[A]] {
+    def equal(a1: List[A], a2: List[A]) = a1 == a2
+  }
 }
 
 trait ListFunctions {

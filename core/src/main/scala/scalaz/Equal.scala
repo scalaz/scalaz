@@ -24,6 +24,10 @@ object Equal {
     def equal(a1: A, a2: A): Boolean = a1 eq a2
   }
 
+  def equalBy[A, B](f: A => B)(implicit B: Equal[B]): Equal[A] = new Equal[A] {
+    def equal(a1: A, a2: A) = B.equal(f(a1), f(a2))
+  }
+
   ////
 }
 

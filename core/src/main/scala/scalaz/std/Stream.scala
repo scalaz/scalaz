@@ -43,6 +43,10 @@ trait StreamInstances {
     def zero: Stream[A] = scala.Stream.empty
   }
 
+  implicit def streamEqual[A: Equal] = new Equal[Stream[A]] {
+    def equal(a1: Stream[A], a2: Stream[A]) = a1 == a2
+  }
+
   // TODO show, equal, order, ...
 }
 

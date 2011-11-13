@@ -19,6 +19,11 @@ trait FunctionInstances extends FunctionInstances0 {
     def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B): B = f(fa(), z)
   }
 
+  implicit def function0Equal[R: Equal] = new Equal[() => R] {
+    def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
+  }
+
+
   implicit def function1Instance = new Arr[Function1] with Category[Function1]{
     def arr[A, B](f: A => B): A => B = f
 

@@ -39,6 +39,16 @@ trait OptionInstances {
     }
   }
 
+  implicit def optionOrder[A: Order]: Order[Option[A]] = new Order[Option[A]] {
+    import Ordering._
+    def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
+      case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
+      case (None, Some(_)) => GT
+      case (Some(_), None) => LT
+      case (None, None) => EQ
+    }
+  }
+
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
     def show(o1: Option[A]): List[Char] = (o1 match {
       case Some(a1) => "Some(" + Show[A].show(a1) + ")"
@@ -54,11 +64,20 @@ trait OptionInstances {
     def append(f1: Option[A] @@ First, f2: => Option[A] @@ First) = Tag(f1.orElse(f2))
   }
 
+  implicit def optionFirstShow[A: Show]: Show[Option[A] @@ First] = Tag.subst(Show[Option[A]])
+
+  implicit def optionFirstOrder[A: Order]: Order[Option[A] @@ First] = Tag.subst(Order[Option[A]])
+
   implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
     def zero: Option[A] @@ Last = Tag(None)
 
     def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
   }
+
+  implicit def optionLastShow[A: Show]: Show[Option[A] @@ Last] = Tag.subst(Show[Option[A]])
+
+  implicit def optionLastOrder[A: Order]: Order[Option[A] @@ Last] = Tag.subst(Order[Option[A]])
+
 }
 
 trait OptionFunctions {

@@ -89,6 +89,36 @@ trait EitherInstances {
     }
   }
 
+  implicit def eitherOrder[A: Order, B: Order] = new Order[Either[A, B]] {
+    import Ordering._
+    def order(a1: Either[A, B], a2: Either[A, B]) = (a1, a2) match {
+      case (Right(x), Right(y)) => Order[B].order(x, y)
+      case (Left(x), Left(y)) => Order[A].order(x, y)
+      case (Left(_), Right(_)) => LT
+      case (Right(_), Left(_)) => GT
+    }
+  }
+
+  implicit def eitherLeftOrder[A: Order, X] = new Order[LeftProjection[A, X]] {
+    import Ordering._
+    def order(f1: LeftProjection[A, X], f2: LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Order[A].order(x, y)
+      case (None, Some(_)) => LT
+      case (Some(_), None) => GT
+      case (None, None) => EQ
+    }
+  }
+
+  implicit def eitherRightOrder[X, A: Order] = new Order[RightProjection[X, A]] {
+    import Ordering._
+    def order(f1: RightProjection[X, A], f2: RightProjection[X, A]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Order[A].order(x, y)
+      case (None, Some(_)) => LT
+      case (Some(_), None) => GT
+      case (None, None) => EQ
+    }
+  }
+
   // TODO Semigroup(?), Show, ...
 }
 
