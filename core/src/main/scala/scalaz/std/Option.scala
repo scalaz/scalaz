@@ -68,6 +68,11 @@ trait OptionInstances {
 
   implicit def optionFirstOrder[A: Order]: Order[Option[A] @@ First] = Tag.subst(Order[Option[A]])
 
+  implicit def optionfirstFunctor[A]: Functor[({type f[x] = Option[x] @@ First})#f] = new Functor[({type f[x] = Option[x] @@ First})#f] {
+      def map[A, B](fa: Option[A] @@ First)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
+    }
+
+
   implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
     def zero: Option[A] @@ Last = Tag(None)
 
@@ -77,6 +82,10 @@ trait OptionInstances {
   implicit def optionLastShow[A: Show]: Show[Option[A] @@ Last] = Tag.subst(Show[Option[A]])
 
   implicit def optionLastOrder[A: Order]: Order[Option[A] @@ Last] = Tag.subst(Order[Option[A]])
+
+  implicit def optionLastFunctor[A]: Functor[({type f[x] = Option[x] @@ Last})#f] = new Functor[({type f[x] = Option[x] @@ Last})#f] {
+    def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
+  }
 
 }
 

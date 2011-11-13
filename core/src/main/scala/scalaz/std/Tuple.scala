@@ -7,12 +7,12 @@ trait TupleInstances0 {
       Tuple1(Semigroup[A1].append(f1._1, f2._1))
     )
   }
-  
+
   implicit def tuple2Semigroup[A1, A2](implicit A1: Semigroup[A1], A2: Semigroup[A2]) = new Tuple2Semigroup[A1, A2] {
     implicit def _1: Semigroup[A1] = A1
     implicit def _2: Semigroup[A2] = A2
   }
-  
+
   implicit def tuple2Instance[A1, A2] = new BiTraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
     def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]): G[(C, D)] = {
@@ -27,6 +27,14 @@ trait TupleInstances0 {
 }
 
 trait TupleInstances extends TupleInstances0 {
+  implicit def tuple1Order[A: Order] = new Order[Tuple1[A]] {
+    def order(f1: Tuple1[A], f2: Tuple1[A]) = Order[A].order(f1._1, f2._1)
+  }
+
+  implicit def tuple1Functor[A] = new Functor[Tuple1] {
+    def map[A, B](fa: Tuple1[A])(f: (A) => B): Tuple1[B] = Tuple1(f(fa._1))
+  }
+
   implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]) = new Tuple2Monoid[A1, A2] {
     implicit def _1: Monoid[A1] = A1
     implicit def _2: Monoid[A2] = A2
@@ -54,6 +62,10 @@ trait TupleInstances extends TupleInstances0 {
     implicit def _2: Show[A2] = A2
     implicit def _3: Show[A3] = A3
   }
+  implicit def tuple3Functor[A1, A2]: Functor[({type f[x] = (A1, A2, x)})#f] = new Functor[({type f[x] = (A1, A2, x)})#f] {
+    def map[A, B](fa: (A1, A2, A))(f: (A) => B) = (fa._1, fa._2, f(fa._3))
+  }
+
   // TODO Show, Equal/Order
   // TODO pump up the arity.
 }
@@ -67,7 +79,7 @@ object tuple extends TupleInstances
 private[scalaz] trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
   implicit def _1 : Semigroup[A1]
   implicit def _2 : Semigroup[A2]
-  
+
   def append(f1: (A1, A2), f2: => (A1, A2)): (A1, A2) = (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2)
