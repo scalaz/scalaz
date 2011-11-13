@@ -111,12 +111,7 @@ sealed trait Coroutine[S[_], A] {
 
 case class Request[I, O, A](request: I, response: O => A)
 
-object Trampoline extends TrampolineInstances {
-  def returnn[A](a : => A): Trampoline[A] = Return[Function0, A](a)
-  def suspend[A](ta : => Trampoline[A]): Trampoline[A] = Suspend[Function0, A](() => ta)
-  def gosub[A, B](a: Trampoline[A], f: A => Trampoline[B]): Trampoline[B] = Gosub[Function0, A, B](a, f)
-  def control[A](a: Trampoline[A]): Throwable = Control(a)
-}
+object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
   implicit val trampolinePure: Pure[Trampoline] = new Pure[Trampoline] {
