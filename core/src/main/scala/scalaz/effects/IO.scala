@@ -2,7 +2,7 @@ package scalaz
 package effects
 
 import Scalaz._
-import concurrent._
+import Coroutine._
 
 sealed trait IO[A] {
   private[effects] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
@@ -114,9 +114,9 @@ object IO {
     private[effects] def apply(rw: World[RealWorld]) = f(rw)
   }
 
-  import Trampoline._
   implicit val ioPure: Pure[IO] = new Pure[IO] {
-    def pure[A](a: => A) = IO(rw => More(() => Return((rw, a))))
+    import Trampoline._
+    def pure[A](a: => A) = IO(rw => suspend(returnn((rw, a))))
   }
   implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f

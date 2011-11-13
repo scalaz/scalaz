@@ -60,7 +60,7 @@ package object effects {
   // Implicit conversions between IO and ST
   implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => {
     import Trampoline._
-    More(() => Return(st(s)))
+    suspend(returnn(st(s)))
   })
   implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s).run)
  
