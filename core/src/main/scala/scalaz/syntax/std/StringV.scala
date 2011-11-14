@@ -12,29 +12,6 @@ trait StringV extends SyntaxV[String]{
    */
   def plural(n: Long): String = string.plural(self, n)
 
-  import xml._
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]): Node = string.node(self, prefix, attributes, scope, a)
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](prefix: String, a: Option[A]): Node = string.node(prefix, a)
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](a: Option[A]): Node = string.node(self, a)
-  
-  def |:|[A: Show](a: Option[A]): Node = node(a)
-
-
   def encode(implicit c: CharSet): Array[Byte] = string.encode(self)
 
   /**
@@ -50,10 +27,6 @@ trait StringV extends SyntaxV[String]{
   def charsNelErr(message: => String): NonEmptyList[Char] = string.charsNelErr(self, message)
 
   def unsafeCharsNel : NonEmptyList[Char] = string.unsafeCharsNel(self)
-
-//  def readFile[X](x: X, f: (X, Byte) => X): X = string.readFile[X](self, x, f)
-
-//  def readLines[X, Y](x: X, f: (X, Char) => X, y: Y, g: (Y, X) => Y):Unit = string.readLines[X, Y](self, x, f, y, g)
 
   // Parsing functions.
 

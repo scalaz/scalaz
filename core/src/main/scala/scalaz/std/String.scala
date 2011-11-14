@@ -20,32 +20,6 @@ trait StringFunctions {
   if((s endsWith "y") && (List("ay", "ey","iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
   else s + "s"
 
-  import xml._
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](s:String, prefix: String, attributes: MetaData, scope: NamespaceBinding, a: Option[A]): Node =
-    a match {
-      case Some(t) => Elem(prefix, s, Null, TopScope, Show[A].text(t))
-      case None => Text("")
-    }
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](s:String, prefix: String, a: Option[A]): Node =
-    node(s, prefix, Null, TopScope, a)
-
-  /**
-   * Construct an XML node based on the given option value. If there is no value available, then an empty text node is returned,
-   * otherwise, the string representation (using show) of the value is returned in an element with the given label.
-   */
-  def node[A: Show](s:String, a: Option[A]): Node =
-    node(s, null, a)
-
   def encode(s:String)(implicit c: CharSet): Array[Byte] = s getBytes c.value
 
   /**
@@ -61,53 +35,6 @@ trait StringFunctions {
   def charsNelErr(s:String, message: => String): NonEmptyList[Char] = charsNel(s, sys.error(message))
 
   def unsafeCharsNel(s:String) : NonEmptyList[Char] = charsNelErr(s, "cannot turn empty string into NonEmptyList")
-
-//  import _root_.java.io.FileInputStream
-//
-//  def readFile[X](x: X, f: (X, Byte) => X): X = {
-//    val in = new FileInputStream(s)
-//
-//    try {
-//      in.elements.foldLeft(x)(f)
-//    } finally {
-//      in.close
-//    }
-//  }
-//
-//  def fileEach(f: Byte => Unit) {
-//    val in = new FileInputStream(s)
-//
-//    try {
-//      in.elements.foreach(f)
-//    } finally {
-//      in.close
-//    }
-//  }
-//
-//  def readLines[X, Y](x: X, f: (X, Char) => X, y: Y, g: (Y, X) => Y) {
-//    val in = new FileInputStream(s)
-//
-//    try {
-//      var t = x
-//      var u = y
-//      val i = in.elements
-//      val lineSeparators = List('\r'.toByte, '\n'.toByte)
-//
-//      while(i.hasNext) {
-//        val c = i.next.toChar
-//
-//        if(lineSeparators.contains(c)) {
-//          u = g(u, t)
-//          t = x
-//        } else
-//          t = f(t, c)
-//      }
-//
-//      u
-//    } finally {
-//      in.close
-//    }
-//  }
 
   // Parsing functions.
   import Validation.{success, failure}
