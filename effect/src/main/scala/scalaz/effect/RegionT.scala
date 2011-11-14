@@ -18,24 +18,42 @@ sealed trait RegionT[S, P[_], A] {
 
   def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =
     value.run(r)
-
-/*  def run(r: IORef[List[RefCountedFinalizer]])(implicit i: P =~~= Identity): A =
-    runT(r)*/
 }
 
-object RegionT extends RegionTs
-
-trait RegionTs {
-  type Region[S, A] =
-  RegionT[S, Identity, A]
-
-  def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
+object RegionT extends RegionTFunctions with RegionTInstances {
+  def apply[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
     val value = k
   }
+}
 
-  implicit def RegionTMonad[S, M[_]](implicit M: Monad[M]) = new Monad[({type λ[α] = RegionT[S, M, α]})#λ] {
-    def point[A](a: => A): RegionT[S, M, A] = regionT(kleisli(s => M.point(a)))
-    def bind[A, B](fa: RegionT[S, M, A])(f: (A) => RegionT[S, M, B]): RegionT[S, M, B] =
-       regionT(kleisli(s => M.bind(fa.value.run(s))((a: A) => f(a).value.run(s))))
+trait RegionTInstances1 {
+  implicit def RegionTLiftIO[S, M[_]](implicit M: LiftIO[M]): LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] = new RegionTLiftIO[S, M] {
+    implicit def L = M
+  }
+
+  implicit def RegionTMonad[S, M[_]](implicit M0: Monad[M]): Monad[({type λ[α] = RegionT[S, M, α]})#λ] = new RegionTMonad[S, M] {
+    implicit def M = M0
   }
 }
+
+trait RegionTInstances extends RegionTInstances1 {
+}
+
+trait RegionTFunctions {
+  def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
+}
+
+trait RegionTMonad[S, M[_]] extends Monad[({type λ[α] = RegionT[S, M, α]})#λ] {
+  implicit def M: Monad[M]
+
+  def point[A](a: => A): RegionT[S, M, A] = RegionT(kleisli(s => M.point(a)))
+  def bind[A, B](fa: RegionT[S, M, A])(f: (A) => RegionT[S, M, B]): RegionT[S, M, B] =
+    RegionT(kleisli(s => M.bind(fa.value.run(s))((a: A) => f(a).value.run(s))))
+}
+
+trait RegionTLiftIO[S, M[_]] extends LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] {
+  implicit def L: LiftIO[M]
+  
+  def liftIO[A](ioa: IO[A]) = RegionT.regionT(kleisli(_ => L.liftIO(ioa)))
+}
+

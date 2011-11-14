@@ -1,6 +1,5 @@
 package scalaz
-
-import effect._
+package effect
 
 // TODO Add to GenTypeClass
 sealed trait Resource[A] { self =>

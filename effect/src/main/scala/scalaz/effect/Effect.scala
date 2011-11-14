@@ -11,7 +11,6 @@ trait Effects
   with IORefs
   with LiftControlIOs
   with MonadControlIOs
-  with MonadIOs
   with RefCountedFinalizers
-  with RegionTs
+  with RegionTFunctions
   with STs

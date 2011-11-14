@@ -1,36 +1,45 @@
 package scalaz
 package effect
 
-import Kleisli._
+////
+/**
+ *
+ */
+////
+trait LiftIO[F[_]]  { self =>
+  ////
 
-trait LiftIO[F[_]] {
   def liftIO[A](ioa: IO[A]): F[A]
+
+  // derived functions
+
+  ////
+  val liftIOSyntax = new scalaz.syntax.effect.LiftIOSyntax[F] {}
 }
 
-object LiftIO extends LiftIOs
+object LiftIO {
+  @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
 
-trait LiftIOs {
+  ////
 
-  implicit val IOLiftIO: LiftIO[IO] = new LiftIO[IO] {
-    def liftIO[A](ioa: IO[A]) = ioa
+  implicit def kleisliLiftIO[M[_], R](implicit M0: LiftIO[M]): LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] = new KleisliLiftIO[M, R] {
+    implicit def L = M0
+  }
+  
+  trait KleisliLiftIO[M[_], R] extends LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] {
+    implicit def L: LiftIO[M]
+    
+    def liftIO[A](ioa: IO[A]) = Kleisli(_ => L.liftIO(ioa))
+  }
+  
+  implicit def StateTLiftIO[M[_], S](implicit M0: MonadIO[M]): LiftIO[({type λ[α] = StateT[M, S, α]})#λ] = new StateTLiftIO[M, S] {
+    implicit def M = M0
   }
 
-  implicit def ReaderLiftIO[M[_], R](implicit lio: LiftIO[M]):
-  LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] = {
-    new LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] {
-      def liftIO[A](ioa: IO[A]) = kleisli(_ => lio.liftIO(ioa))
-    }
+  trait StateTLiftIO[M[_], S] extends LiftIO[({type λ[α] = StateT[M, S, α]})#λ] {
+    implicit def M: MonadIO[M]
+    
+    def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = StateT[α, S, β]})#λ].liftM(M.liftIO(ioa))
   }
-
-  implicit def RegionTLiftIO[M[_], S](implicit lio: LiftIO[M]):
-  LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] = {
-    new LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] {
-      def liftIO[A](ioa: IO[A]) = RegionT.regionT(kleisli(_ => lio.liftIO(ioa)))
-    }
-  }
-
-  implicit def StateTLiftIO[S, F[_]](implicit lio: LiftIO[F], m: Monad[F]): LiftIO[({type λ[α] = StateT[F, S, α]})#λ] =
-    new LiftIO[({type λ[α] = StateT[F, S, α]})#λ] {
-      def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = StateT[α, S, β]})#λ].liftM(lio.liftIO(ioa))
-    }
+  ////
 }

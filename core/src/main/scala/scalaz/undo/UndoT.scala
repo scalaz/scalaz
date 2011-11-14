@@ -153,7 +153,7 @@ private[scalaz] trait UndoTMonadTrans[S]
     type f[x] = UndoT[G, S, x]
   }
 
-  def hoist[M[_], N[_]](f: M ~> N) = new (UndoTF[M, S]#f ~> UndoTF[N, S]#f) {
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (UndoTF[M, S]#f ~> UndoTF[N, S]#f) {
     def apply[A](fa: UndoT[M, S, A]): UndoT[N, S, A] = {
       UndoT[N, S,A](StateT(s => f(fa.hstate(s))))
     }
