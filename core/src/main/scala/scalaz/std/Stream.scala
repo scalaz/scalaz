@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import annotation.tailrec
+
 trait StreamInstances {
   implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
@@ -44,7 +46,13 @@ trait StreamInstances {
   }
 
   implicit def streamEqual[A: Equal] = new Equal[Stream[A]] {
-    def equal(a1: Stream[A], a2: Stream[A]) = a1 == a2
+    def equal(a1: Stream[A], a2: Stream[A]) = equal0(a1, a2)
+    @tailrec
+    def equal0(s1: Stream[A], s2: Stream[A]): Boolean = (s1.headOption, s2.headOption) match {
+      case (None, None) => true
+      case (Some(h1), Some(h2)) if Equal[A].equal(h1, h2) => equal0(s1.tail, s2.tail)
+      case _ => false
+    }
   }
 
   // TODO show, equal, order, ...

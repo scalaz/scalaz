@@ -34,7 +34,7 @@ trait ListInstances {
     def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)((a, b) => f(a, b))
   }
 
-  implicit def listMonoid[A] = new Monoid[List[A]] {
+  implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
     def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
     def zero: List[A] = Nil
   }
@@ -54,8 +54,18 @@ trait ListInstances {
       k.toList
     }
   }
-  implicit def listEqual[A] = new Equal[List[A]] {
-    def equal(a1: List[A], a2: List[A]) = a1 == a2
+  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
+    def equal(a1: List[A], a2: List[A]) = {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var unequal = false
+
+      while(i1.hasNext && i2.hasNext && !unequal) {
+        if (!Equal[A].equal(i1.next, i2.next))
+          unequal = true
+      }
+      !(unequal || i1.hasNext || i2.hasNext)
+    }
   }
 }
 

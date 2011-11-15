@@ -3,8 +3,90 @@ package std
 
 import scala.Either.{LeftProjection, RightProjection}
 import scalaz.Isomorphism._
+import scalaz.Tags.{First, Last}
 
-trait EitherInstances {
+trait EitherInstances0 {
+  implicit def eitherEqual[A: Equal, B: Equal]: Equal[Either[A, B]] = new Equal[Either[A, B]] {
+    def equal(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
+      case (Left(a1), Left(a2)) => Equal[A].equal(a1, a2)
+      case (Right(b1), Right(b2)) => Equal[B].equal(b1, b2)
+      case (Right(_), Left(_)) | (Left(_), Right(_)) => false
+    }
+  }
+
+  implicit def eitherLeftEqual[A: Equal, X]: Equal[LeftProjection[A, X]] = new Equal[LeftProjection[A, X]] {
+    def equal(f1: LeftProjection[A, X], f2: LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Equal[A].equal(x, y)
+      case (None, None) => true
+      case _ => false
+    }
+  }
+
+  implicit def eitherRightEqual[X, A: Equal]: Equal[RightProjection[X, A]] = new Equal[RightProjection[X, A]] {
+    def equal(f1: RightProjection[X, A], f2: RightProjection[X, A]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Equal[A].equal(x, y)
+      case (None, None) => true
+      case _ => false
+    }
+  }
+
+  implicit def eitherFirstRightEqual[X, A: Equal]: Equal[RightProjection[X, A] @@ First] = new Equal[RightProjection[X, A] @@ First] {
+    def equal(a1: RightProjection[X, A] @@ First, a2: RightProjection[X, A] @@ First) =
+      Equal[RightProjection[X, A]].equal(a1, a2)
+  }
+
+  implicit def eitherLastRightEqual[X, A: Equal]: Equal[RightProjection[X, A] @@ Last] = new Equal[RightProjection[X, A] @@ Last] {
+    def equal(a1: RightProjection[X, A] @@ Last, a2: RightProjection[X, A] @@ Last) =
+      Equal[RightProjection[X, A]].equal(a1, a2)
+  }
+
+  implicit def eitherFirstLeftEqual[A: Equal, X]: Equal[LeftProjection[A, X] @@ First] = new Equal[LeftProjection[A, X] @@ First] {
+    def equal(a1: LeftProjection[A, X] @@ First, a2: LeftProjection[A, X] @@ First) =
+      Equal[LeftProjection[A, X]].equal(a1, a2)
+  }
+
+  implicit def eitherLastLeftEqual[A: Equal, X]: Equal[LeftProjection[A, X] @@ Last] = new Equal[LeftProjection[A, X] @@ Last] {
+    def equal(a1: LeftProjection[A, X] @@ Last, a2: LeftProjection[A, X] @@ Last) =
+      Equal[LeftProjection[A, X]].equal(a1, a2)
+  }
+
+  implicit def eitherFirstLeftSemigroup[A: Semigroup, X]: Semigroup[LeftProjection[A, X] @@ First] = new Semigroup[LeftProjection[A, X] @@ First] {
+    def append(f1: LeftProjection[A, X] @@ First, f2: => LeftProjection[A, X] @@ First) = if (f1.e.isLeft) f1 else f2
+  }
+
+  implicit def eitherFirstRightSemigroup[X, A: Semigroup]: Semigroup[RightProjection[X, A] @@ First] = new Semigroup[RightProjection[X, A] @@ First] {
+    def append(f1: RightProjection[X, A] @@ First, f2: => RightProjection[X, A] @@ First) = if (f1.e.isRight) f1 else f2
+  }
+
+  implicit def eitherLastLeftSemigroup[A: Semigroup, X]: Semigroup[LeftProjection[A, X] @@ Last] = new Semigroup[LeftProjection[A, X] @@ Last] {
+    def append(f1: LeftProjection[A, X] @@ Last, f2: => LeftProjection[A, X] @@ Last) = if (f1.e.isLeft) f1 else f2
+  }
+
+  implicit def eitherLastRightSemigroup[X, A: Semigroup]: Semigroup[RightProjection[X, A] @@ Last] = new Semigroup[RightProjection[X, A] @@ Last] {
+    def append(f1: RightProjection[X, A] @@ Last, f2: => RightProjection[X, A] @@ Last) = if (f1.e.isRight) f1 else f2
+  }
+
+  implicit def eitherLeftSemigroup[A: Semigroup, X: Monoid]: Semigroup[LeftProjection[A, X]] = new Semigroup[LeftProjection[A, X]] {
+    def append(f1: LeftProjection[A, X], f2: => LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Left(Semigroup[A].append(x, y)).left
+      case (None, Some(_)) => f2
+      case (Some(_), None) => f1
+      case (None, None) => Right(Monoid[X].zero).left
+    }
+  }
+
+  implicit def eitherRightSemigroup[X: Monoid, A: Semigroup]: Semigroup[RightProjection[X, A]] = new Semigroup[RightProjection[X, A]] {
+    def append(f1: RightProjection[X, A], f2: => RightProjection[X, A]) = (f1.toOption, f2.toOption) match {
+      case (Some(x), Some(y)) => Right(Semigroup[A].append(x, y)).right
+      case (None, Some(_)) => f2
+      case (Some(_), None) => f1
+      case (None, None) => Left(Monoid[X].zero).right
+    }
+  }
+
+}
+
+trait EitherInstances extends EitherInstances0 {
   implicit def eitherInstance = new BiTraverse[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
                                   (f: (A) => C, g: (B) => D): Either[C, D] = fab match {
@@ -91,7 +173,7 @@ trait EitherInstances {
 
   implicit def eitherOrder[A: Order, B: Order] = new Order[Either[A, B]] {
     import Ordering._
-    def order(a1: Either[A, B], a2: Either[A, B]) = (a1, a2) match {
+    def order(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
       case (Right(x), Right(y)) => Order[B].order(x, y)
       case (Left(x), Left(y)) => Order[A].order(x, y)
       case (Left(_), Right(_)) => LT
@@ -99,7 +181,7 @@ trait EitherInstances {
     }
   }
 
-  implicit def eitherLeftOrder[A: Order, X] = new Order[LeftProjection[A, X]] {
+  implicit def eitherLeftOrder[A: Order, X]: Order[LeftProjection[A, X]] = new Order[LeftProjection[A, X]] {
     import Ordering._
     def order(f1: LeftProjection[A, X], f2: LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
       case (Some(x), Some(y)) => Order[A].order(x, y)
@@ -118,6 +200,46 @@ trait EitherInstances {
       case (None, None) => EQ
     }
   }
+
+  implicit def eitherFirstLeftMonoid[A: Monoid, X: Monoid]: Monoid[LeftProjection[A, X] @@ First] = new Monoid[LeftProjection[A, X] @@ First] {
+    def append(f1: LeftProjection[A, X] @@ First, f2: => LeftProjection[A, X] @@ First): LeftProjection[A, X] @@ First =
+      eitherFirstLeftSemigroup(Semigroup[A]).append(f1, f2)
+    def zero: LeftProjection[A, X] @@ First =
+      Tag(Right(Monoid[X].zero).left)
+  }
+
+  implicit def eitherFirstRightMonoid[X: Monoid, A: Monoid]: Monoid[RightProjection[X, A] @@ First] = new Monoid[RightProjection[X, A] @@ First] {
+    def append(f1: RightProjection[X, A] @@ First, f2: => RightProjection[X, A] @@ First): RightProjection[X, A] @@ First =
+      eitherFirstRightSemigroup(Semigroup[A]).append(f1, f2)
+    def zero: RightProjection[X, A] @@ First =
+      Tag(Left(Monoid[X].zero).right)
+  }
+
+  implicit def eitherLastLeftMonoid[A: Monoid, X: Monoid]: Monoid[LeftProjection[A, X] @@ Last] = new Monoid[LeftProjection[A, X] @@ Last] {
+    def append(f1: LeftProjection[A, X] @@ Last, f2: => LeftProjection[A, X] @@ Last): LeftProjection[A, X] @@ Last =
+      eitherLastLeftSemigroup(Semigroup[A]).append(f1, f2)
+    def zero: LeftProjection[A, X] @@ Last =
+      Tag(Right(Monoid[X].zero).left)
+  }
+
+  implicit def eitherLastRightMonoid[X: Monoid, A: Monoid]: Monoid[RightProjection[X, A] @@ Last] = new Monoid[RightProjection[X, A] @@ Last] {
+    def append(f1: RightProjection[X, A] @@ Last, f2: => RightProjection[X, A] @@ Last): RightProjection[X, A] @@ Last =
+      eitherLastRightSemigroup(Semigroup[A]).append(f1, f2)
+    def zero: RightProjection[X, A] @@ Last =
+      Tag(Left(Monoid[X].zero).right)
+  }
+
+  implicit def eitherLeftMonoid[A: Monoid, X: Monoid]: Monoid[LeftProjection[A, X]] = new Monoid[LeftProjection[A, X]] {
+    def append(f1: LeftProjection[A, X], f2: => LeftProjection[A, X]) = eitherLeftSemigroup(Semigroup[A], Monoid[X]).append(f1, f2)
+    def zero = Right(Monoid[X].zero).left
+  }
+
+  implicit def eitherRightMonoid[X: Monoid, A: Monoid]: Monoid[RightProjection[X, A]] = new Monoid[RightProjection[X, A]] {
+    def append(f1: RightProjection[X, A], f2: => RightProjection[X, A]) = eitherRightSemigroup(Monoid[X], Semigroup[A]).append(f1, f2)
+    def zero = Left(Monoid[X].zero).right
+  }
+
+
 
   // TODO Semigroup(?), Show, ...
 }

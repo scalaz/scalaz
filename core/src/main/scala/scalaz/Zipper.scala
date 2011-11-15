@@ -346,8 +346,10 @@ trait ZipperInstances {
       fa ap f
   }
 
-  implicit def zipperEqual[A: Equal] = Equal.equalBy[Zipper[A], Stream[A]](_.toStream)(std.stream.streamEqual[A])
-
+  implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
+    import std.stream.streamEqual
+    def equal(a1: Zipper[A], a2: Zipper[A]) = streamEqual[A].equal(a1.toStream, a2.toStream)
+  }
 }
 
 trait ZipperFunctions {
