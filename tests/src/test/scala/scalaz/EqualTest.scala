@@ -73,7 +73,11 @@ class EqualTest extends Specification with ScalaCheck {
     checkEqualLaws[Option[A] @@ Last]
     checkEqualLaws[Either[A, B]]
     checkEqualLaws[Either.LeftProjection[A, X]]
+    checkEqualLaws[Either.LeftProjection[A, X] @@ First]
+    checkEqualLaws[Either.LeftProjection[A, X] @@ Last]
     checkEqualLaws[Either.RightProjection[X, A]]
+    checkEqualLaws[Either.RightProjection[X, A] @@ First]
+    checkEqualLaws[Either.RightProjection[X, A] @@ Last]
     checkEqualLaws[Validation[E, A]]
     checkEqualLaws[FailProjection[E, A]]
     // todo Arbitrary for Tree producing large (infinite?) trees.

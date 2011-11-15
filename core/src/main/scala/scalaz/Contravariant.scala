@@ -22,9 +22,3 @@ object Contravariant {
 
   ////
 }
-
-trait ContravariantInstances {
-  def equalContravariat: Contravariant[Equal] = new Contravariant[Equal] {
-    def contramap[A, B](r: Equal[A])(f: (B) => A) = r.contramap(f)
-  }
-}

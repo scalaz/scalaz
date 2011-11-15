@@ -61,7 +61,11 @@ class FunctorTest extends Specification with ScalaCheck {
     // todo
     // checkFunctorLaws[ArraySeq, A]
     checkFunctorLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]
+    checkFunctorLaws[({type λ[α]=Either.LeftProjection[α, X] @@ First})#λ, A]
+    checkFunctorLaws[({type λ[α]=Either.LeftProjection[α, X] @@ Last})#λ, A]
     checkFunctorLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]
+    checkFunctorLaws[({type λ[α]=Either.RightProjection[X, α] @@ First})#λ, A]
+    checkFunctorLaws[({type λ[α]=Either.RightProjection[X, α] @@ Last})#λ, A]
 
     // todo
     //    checkFunctorLaws[Responder, A]
