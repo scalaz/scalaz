@@ -135,7 +135,7 @@ Alternatively, the syntax can be imported for a particular type class.
 
 ```scala
 // import the type class instance
-import scalaz.option.optionInstance
+import scalaz.std.option.optionInstance
 
 // import the implicit conversions to `MonadV[F, A]`, `BindV[F, A]`, ...
 import scalaz.syntax.monad._
