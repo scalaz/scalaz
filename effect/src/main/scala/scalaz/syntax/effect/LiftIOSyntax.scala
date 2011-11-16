@@ -8,9 +8,6 @@ import scalaz.effect.LiftIO
 trait LiftIOV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: LiftIO[F]
   ////
-  import scalaz.effect.IO
-  
-  def liftIO[G](a: IO[A]) = F.liftIO(a)
   
   ////
 }

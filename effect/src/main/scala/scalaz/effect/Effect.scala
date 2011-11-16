@@ -9,8 +9,8 @@ trait Effects
   with IoExceptionOrs
   with IOFunctions
   with IORefs
-  with LiftControlIOs
-  with MonadControlIOs
   with RefCountedFinalizers
   with RegionTFunctions
   with STs
+  with syntax.effect.ToAllEffectTypeClassV
+  with std.effect.AllEffectInstances
