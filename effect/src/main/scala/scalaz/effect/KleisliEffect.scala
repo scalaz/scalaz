@@ -3,7 +3,7 @@ package effect
 
 object kleisliEffect extends KleisliEffectInstances  
 
-trait KleisliEffectInstances0 {
+trait KleisliEffectInstances0 extends KleisliInstances {
   implicit def kleisliLiftIO[M[_], R](implicit M0: LiftIO[M]): LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] = new KleisliLiftIO[M, R] {
     implicit def L = M0
   }

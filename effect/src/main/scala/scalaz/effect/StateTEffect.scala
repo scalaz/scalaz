@@ -3,7 +3,7 @@ package effect
 
 object stateTEffect extends StateTEffectInstances
 
-trait StateTEffectInstances0 {
+trait StateTEffectInstances0 extends StateTInstances {
   implicit def StateTLiftIO[M[_], S](implicit M0: MonadIO[M]): LiftIO[({type λ[α] = StateT[M, S, α]})#λ] = new StateTLiftIO[M, S] {
     implicit def M = M0
   }
