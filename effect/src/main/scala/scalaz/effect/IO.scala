@@ -222,7 +222,7 @@ trait IOFunctions extends IOStd {
   RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)
-      val h = refCountedFinalizer(finalizer)(refCntIORef)
+      val h = refCountedFinalizer(finalizer, refCntIORef)
       _ <- hsIORef.mod(h :: _)
     } yield finalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
 

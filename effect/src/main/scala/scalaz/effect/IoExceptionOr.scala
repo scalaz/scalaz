@@ -26,7 +26,7 @@ sealed trait IoExceptionOr[A] {
     fold(_ => a, x => x)
 }
 
-object IoExceptionOr extends IoExceptionOrs {
+object IoExceptionOr extends IoExceptionOrFunctions {
   def apply[A](a: => A): IoExceptionOr[A] =
     try {
       ioExceptionOr(a)
@@ -35,7 +35,7 @@ object IoExceptionOr extends IoExceptionOrs {
     }
 }
 
-trait IoExceptionOrs {
+trait IoExceptionOrFunctions {
   type IoException =
   java.io.IOException
 

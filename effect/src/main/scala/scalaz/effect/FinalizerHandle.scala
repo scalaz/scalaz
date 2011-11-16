@@ -10,12 +10,13 @@ sealed trait FinalizerHandle[R[_]] {
   val finalizer: RefCountedFinalizer
 }
 
-object FinalizerHandle extends FinalizerHandles
+object FinalizerHandle extends FinalizerHandleFunctions {
+  def apply[R[_]](r: RefCountedFinalizer): FinalizerHandle[R] = finalizerHandle[R](r)
+}
 
-trait FinalizerHandles {
-  def finalizerHandle[R[_]]: RefCountedFinalizer => FinalizerHandle[R] =
-    r =>
-      new FinalizerHandle[R] {
-        val finalizer = r
-      }
+trait FinalizerHandleFunctions {
+  def finalizerHandle[R[_]](r: RefCountedFinalizer): FinalizerHandle[R] =
+    new FinalizerHandle[R] {
+      val finalizer = r
+    }
 }
