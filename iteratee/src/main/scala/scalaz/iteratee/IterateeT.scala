@@ -137,9 +137,6 @@ trait IterateeTInstances1 {
   implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]) = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
-  implicit def EnumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]) = new EnumeratorTSemigroup[X, E, F, A] {
-    implicit def F = F0
-  }
 }
 
 trait IterateeTInstances0 extends IterateeTInstances1 {
@@ -149,10 +146,6 @@ trait IterateeTInstances0 extends IterateeTInstances1 {
     new IterateeTLiftIO[X, E, F] {
       implicit def M = F
     }
-
-  implicit def EnumeratorTMonoid[X, E, F[_], A](implicit F0: Bind[F] with Pointed[F]) = new EnumeratorTMonoid[X, E, F, A] {
-    implicit def F = F0
-  }
 }
 
 trait IterateeTInstances extends IterateeTInstances0 {
