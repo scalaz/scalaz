@@ -19,18 +19,6 @@ object MonadIO {
   @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
 
   ////
-  implicit def KleisliMonadIO[R, M[_]](implicit M0: MonadIO[M]): MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] =
-    new MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] with LiftIO.KleisliLiftIO[M, R] with KleisliMonad[M, R] {
-      implicit def L = M0
-      implicit def F = M0
-    }
-
-  implicit def StateTMonadIO[M[_], S](implicit M0: MonadIO[M]): MonadIO[({type λ[α] = StateT[M, S, α]})#λ] = {
-    new MonadIO[({type λ[α] = StateT[M, S, α]})#λ] with LiftIO.StateTLiftIO[M, S] with StateTMonadState[S, M] {
-      implicit def F = M0
-      implicit def M = M0
-    }
-  }
 
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
   implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
