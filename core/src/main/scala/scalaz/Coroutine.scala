@@ -1,59 +1,76 @@
 package scalaz
 
 import annotation.tailrec
-import Coroutine._
+import Free._
 import std.function._
 import std.tuple._
 
-// TODO report compiler bug when this appears just above CoroutineInstances:
+// TODO report compiler bug when this appears just above FreeInstances:
 //      "java.lang.Error: typeConstructor inapplicable for <none>"
-object Coroutine extends CoroutineFunctions with CoroutineInstances {
+object Free extends FreeFunctions with FreeInstances {
 
-  case class Return[S[_], A](a: A) extends Coroutine[S, A]
+  /** Return from the computation with the given value. */
+  case class Return[S[_], A](a: A) extends Free[S, A]
 
-  case class Suspend[S[_], A](a: S[Coroutine[S, A]]) extends Coroutine[S, A]
+  /** Suspend the computation with the given suspension. */
+  case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
 
-  case class Gosub[S[_], A, B](a: Coroutine[S, A],
-                               f: A => Coroutine[S, B]) extends Coroutine[S, B]
+  /** Call a subroutine and continue with the given function. */
+  case class Gosub[S[_], A, B](a: Free[S, A],
+                               f: A => Free[S, B]) extends Free[S, B]
 
-  case class Control[S[_], A](a: Coroutine[S, A]) extends Throwable
+  /** A computation that can be stepped through, suspended, paused */
+  type Trampoline[A] = Free[Function0, A]
 
-  type Trampoline[A] = Coroutine[Function0, A]
-  type Source[A, B] = Coroutine[({type f[x] = (A, x)})#f, B]
-  type Sink[A, B] = Coroutine[({type f[x] = (=> A) => x})#f, B]
+  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
+  type Source[A, B] = Free[({type f[x] = (A, x)})#f, B]
+
+  /** A computatio that accepts values of type `A`, eventually resulting in a value of type `B`.
+    * Note the similarity to an Iteratee.
+    */
+  type Sink[A, B] = Free[({type f[x] = (=> A) => x})#f, B]
 }
 
-sealed trait Coroutine[S[_], A] {
-  final def map[B](f: A => B): Coroutine[S, B] =
+/** A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
+  * allowing tail-call elimination. */
+sealed trait Free[S[_], A] {
+  final def map[B](f: A => B): Free[S, B] =
     flatMap(a => Return(f(a)))
 
-  final def >>=[B](f: A => Coroutine[S, B]): Coroutine[S, B] = this match {
+  /** Binds the given continuation to the result of this computation. This implementation is codense,
+    * so all binds are reassociated to the right. */
+  final def >>=[B](f: A => Free[S, B]): Free[S, B] = this match {
     case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(g(x), f))
     case a           => Gosub(a, f)
   }
 
-  final def flatMap[B](f: A => Coroutine[S, B]): Coroutine[S, B] =
+  /** Binds the given continuation to the result of this computation. This implementation is codense,
+    * so all binds are reassociated to the right. */
+  final def flatMap[B](f: A => Free[S, B]): Free[S, B] =
     this >>= f
 
-  @tailrec final def resume(implicit fun: Functor[S]): Either[S[Coroutine[S, A]], A] = this match {
+  /** Evaluates a single layer of the free monad. */
+  @tailrec final def resume(implicit fun: Functor[S]): Either[S[Free[S, A]], A] = this match {
     case Return(a)  => Right(a)
     case Suspend(t) => Left(t)
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
-      case Suspend(t) => Left(fun.map(t)(((_: Coroutine[S, Any]) >>= f)))
-      case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Coroutine[S, A]).resume
+      case Suspend(t) => Left(fun.map(t)(((_: Free[S, Any]) >>= f)))
+      case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Free[S, A]).resume
     }
   }
 
-  final def mapSuspension[T[_]](f: S ~> T)(implicit fun: Functor[S]): Coroutine[T, A] =
+  /** Modifies the suspension with the given natural transformation. */
+  final def mapSuspension[T[_]](f: S ~> T)(implicit fun: Functor[S]): Free[T, A] =
     resume match {
-      case Left(s)  => Suspend(f(fun.map(s)(((_: Coroutine[S, A]) mapSuspension f))))
+      case Left(s)  => Suspend(f(fun.map(s)(((_: Free[S, A]) mapSuspension f))))
       case Right(r) => Return(r)
     }
 
   import Liskov._
 
-  def run(implicit ev: Coroutine[S, A] <~< Trampoline[A], fun: Functor[S]): A = {
+  /** Runs a trampoline all the way to the end, tail-recursively. */
+  def run(implicit ev: Free[S, A] <~< Trampoline[A], fun: Functor[S]): A = {
     @tailrec def go(t: Trampoline[A]): A =
       t.resume match {
         case Left(s)  => go(s())
@@ -62,7 +79,8 @@ sealed trait Coroutine[S[_], A] {
     go(ev(this))
   }
 
-  def zipWith[B, C](tb: Coroutine[S, B], f: (A, B) => C)(implicit S: Functor[S]): Coroutine[S, C] = {
+  /** Interleave this computation with another, combining the results with the given function. */
+  def zipWith[B, C](tb: Free[S, B], f: (A, B) => C)(implicit S: Functor[S]): Free[S, C] = {
     (resume, tb.resume) match {
       case (Left(a), Left(b))   => Suspend(S.map(a)(x => Suspend(S.map(b)(y => x zipWith(y, f)))))
       case (Left(a), Right(b))  => Suspend(S.map(a)(x => x zipWith(Return(b), f)))
@@ -71,7 +89,8 @@ sealed trait Coroutine[S[_], A] {
     }
   }
 
-  def collect[B](implicit ev: Coroutine[S, A] <~< Source[B, A],
+  /** Runs a Source all the way to the end, tail-recursively, collecting the produced values. */
+  def collect[B](implicit ev: Free[S, A] <~< Source[B, A],
                  fun: Functor[S]): (Vector[B], A) = {
     @tailrec def go(c: Source[B, A], v: Vector[B] = Vector()): (Vector[B], A) =
       c.resume match {
@@ -81,7 +100,8 @@ sealed trait Coroutine[S[_], A] {
     go(ev(this))
   }
 
-  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Coroutine[S, A] <~< Source[E, A], fun: Functor[S]): (A, B) = {
+  /** Drive this Source with the given Sink. */
+  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] <~< Source[E, A], fun: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (Left((e, c)), Left(f))  => go(c, f(Some(e)))
@@ -92,7 +112,8 @@ sealed trait Coroutine[S[_], A] {
     go(ev(this), sink)
   }
 
-  def feed[E](ss: Stream[E])(implicit ev: Coroutine[S, A] <~< Sink[E, A], fun: Functor[S]): A = {
+  /** Feed the given stream to this Source. */
+  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] <~< Sink[E, A], fun: Functor[S]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
       case (Stream(), Left(f)) => go(f(sys.error("No more values.")), Stream())
@@ -101,7 +122,8 @@ sealed trait Coroutine[S[_], A] {
     go(ev(this), ss)
   }
 
-  def drain[E, B](source: Source[E, B])(implicit ev: Coroutine[S, A] <~< Sink[E, A], fun: Functor[S]): (A, B) = {
+  /** Feed the given source to this Sink. */
+  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] <~< Sink[E, A], fun: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))
       case (Left((e, c)), Right(y)) => go(c, Sink.sinkMonad[E].pure(y))
@@ -145,29 +167,37 @@ trait SourceInstances {
     }
 }
 
-trait CoroutineInstances {
-  implicit def coroutineMonad[S[_]]: Monad[({type f[x] = Coroutine[S, x]})#f] =
-    new Monad[({type f[x] = Coroutine[S, x]})#f] {
+trait FreeInstances {
+  implicit def coroutineMonad[S[_]]: Monad[({type f[x] = Free[S, x]})#f] =
+    new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)
-      override def map[A, B](fa: Coroutine[S, A])(f: A => B) = fa map f
-      def bind[A, B](a: Coroutine[S, A])(f: A => Coroutine[S, B]) = a flatMap f
+      override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
+      def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 }
 
-trait CoroutineFunctions {
+trait FreeFunctions {
+  /** Collapse a trampoline to a single step. */
+  def reset[A](r: Trampoline[A]): Trampoline[A] = suspend(r.run)
+
+  /** Suspend the given computation in a trampoline step. */
   def suspend[A](value: => A): Trampoline[A] =
     Suspend[Function0, A](() => Return[Function0, A](value))
 
+  /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
     suspend(())
 
+  /** A source that produces the given value. */
   def produce[A](a: A): Source[A, Unit] =
     Suspend[({type f[x] = (A, x)})#f, Unit](a -> Return[({type f[x] = (A, x)})#f, Unit](()))
 
+  /** A sink that waits for a single value and returns it. */
   def await[A]: Sink[A, A] =
     Suspend[({type f[x] = (=> A) => x})#f, A](a => Return[({type f[x] = (=> A) => x})#f, A](a))
 
-  def request[I, O](x: I): Coroutine[({type f[x] = Request[I, O, x]})#f, O] =
+  /** A request that simply returns the response. */
+  def request[I, O](x: I): Free[({type f[x] = Request[I, O, x]})#f, O] =
     Suspend[({type f[x] = Request[I, O, x]})#f, O](Request(x, Return[({type f[x] = Request[I, O, x]})#f, O](_: O)))
 }
 
