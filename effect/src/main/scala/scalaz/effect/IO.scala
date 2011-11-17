@@ -45,7 +45,7 @@ sealed trait IO[A] {
   def unsafeZip[B](iob: IO[B]): IO[(A, B)] = unsafeZipWith(iob, Tuple2[A, B])
 
   /**
-   * Interlaves the steps of this IO action with the steps of another,
+   * Interleaves the steps of this IO action with the steps of another,
    * ignoring the result of this action.
    */
   def unsafeZip_[B](iob: IO[B]): IO[B] = unsafeZipWith(iob, (a: A, b: B) => b)
@@ -190,7 +190,7 @@ trait IOStd {
     ()
   }))
 
-  /** Reads a line of standard otput. */
+  /** Reads a line of standard input. */
   def readLn: IO[String] = IO(readLine())
 
   /** Write the given value to standard output. */
@@ -261,7 +261,7 @@ trait IOFunctions extends IOStd {
   implicit def IOToST[A](io: IO[A]): ST[RealWorld, A] =
     st(io(_).run)
 
-  /** An io action that does nothing. */
+  /** An IO action that does nothing. */
   val ioUnit: IO[Unit] =
     IO(())
 }

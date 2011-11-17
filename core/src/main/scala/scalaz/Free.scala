@@ -25,7 +25,7 @@ object Free extends FreeFunctions with FreeInstances {
   /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
   type Source[A, B] = Free[({type f[x] = (A, x)})#f, B]
 
-  /** A computatio that accepts values of type `A`, eventually resulting in a value of type `B`.
+  /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
     * Note the similarity to an Iteratee.
     */
   type Sink[A, B] = Free[({type f[x] = (=> A) => x})#f, B]
@@ -50,27 +50,27 @@ sealed trait Free[S[_], A] {
     this >>= f
 
   /** Evaluates a single layer of the free monad. */
-  @tailrec final def resume(implicit fun: Functor[S]): Either[S[Free[S, A]], A] = this match {
+  @tailrec final def resume(implicit S: Functor[S]): Either[S[Free[S, A]], A] = this match {
     case Return(a)  => Right(a)
     case Suspend(t) => Left(t)
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
-      case Suspend(t) => Left(fun.map(t)(((_: Free[S, Any]) >>= f)))
+      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) >>= f)))
       case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Free[S, A]).resume
     }
   }
 
   /** Modifies the suspension with the given natural transformation. */
-  final def mapSuspension[T[_]](f: S ~> T)(implicit fun: Functor[S]): Free[T, A] =
+  final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S]): Free[T, A] =
     resume match {
-      case Left(s)  => Suspend(f(fun.map(s)(((_: Free[S, A]) mapSuspension f))))
+      case Left(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
       case Right(r) => Return(r)
     }
 
   import Liskov._
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
-  def run(implicit ev: Free[S, A] <~< Trampoline[A], fun: Functor[S]): A = {
+  def run(implicit ev: Free[S, A] <~< Trampoline[A], S: Functor[S]): A = {
     @tailrec def go(t: Trampoline[A]): A =
       t.resume match {
         case Left(s)  => go(s())
@@ -91,7 +91,7 @@ sealed trait Free[S[_], A] {
 
   /** Runs a Source all the way to the end, tail-recursively, collecting the produced values. */
   def collect[B](implicit ev: Free[S, A] <~< Source[B, A],
-                 fun: Functor[S]): (Vector[B], A) = {
+                 S: Functor[S]): (Vector[B], A) = {
     @tailrec def go(c: Source[B, A], v: Vector[B] = Vector()): (Vector[B], A) =
       c.resume match {
         case Left((b, cont)) => go(cont, v :+ b)
@@ -101,7 +101,7 @@ sealed trait Free[S[_], A] {
   }
 
   /** Drive this Source with the given Sink. */
-  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] <~< Source[E, A], fun: Functor[S]): (A, B) = {
+  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] <~< Source[E, A], S: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (Left((e, c)), Left(f))  => go(c, f(Some(e)))
@@ -113,7 +113,7 @@ sealed trait Free[S[_], A] {
   }
 
   /** Feed the given stream to this Source. */
-  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] <~< Sink[E, A], fun: Functor[S]): A = {
+  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] <~< Sink[E, A], S: Functor[S]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
       case (Stream(), Left(f)) => go(f(sys.error("No more values.")), Stream())
@@ -123,7 +123,7 @@ sealed trait Free[S[_], A] {
   }
 
   /** Feed the given source to this Sink. */
-  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] <~< Sink[E, A], fun: Functor[S]): (A, B) = {
+  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] <~< Sink[E, A], S: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))
       case (Left((e, c)), Right(y)) => go(c, Sink.sinkMonad[E].pure(y))
@@ -179,11 +179,11 @@ trait FreeFunctions {
   def reset[A](r: Trampoline[A]): Trampoline[A] = return_(r.run)
 
   /** Suspend the given computation in a single step. */
-  def return_[S[_], A](value: => A)(implicit p: Pointed[S]): Free[S, A] =
-    Suspend[S, A](p.point(Return[S, A](value)))
+  def return_[S[_], A](value: => A)(implicit S: Pointed[S]): Free[S, A] =
+    Suspend[S, A](S.point(Return[S, A](value)))
 
-  def suspend[S[_], A](value: => Free[S, A])(implicit p: Pointed[S]): Free[S, A] =
-    Suspend[S, A](p.point(value))
+  def suspend[S[_], A](value: => Free[S, A])(implicit S: Pointed[S]): Free[S, A] =
+    Suspend[S, A](S.point(value))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
