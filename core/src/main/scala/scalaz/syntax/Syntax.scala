@@ -69,11 +69,12 @@ trait Syntaxes {
 
   object tree extends ToTreeV
 
-  object all extends ToAllTypeClassV with ToAllOtherV
+  object writer extends ToWriterV
 
+  object all extends ToAllTypeClassV with ToAllOtherV
 }
 
-trait ToAllOtherV extends ToTreeV
+trait ToAllOtherV extends ToTreeV with ToWriterV
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToEqualV with ToLengthV with ToShowV
