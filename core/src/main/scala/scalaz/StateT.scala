@@ -99,7 +99,7 @@ private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] =
   def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
     StateT(s => G.map(ga)(a => (a, s)))
 
-  def hoist[M[_], N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
     def apply[A](action: StateT[M, S, A]) = StateT[N, S, A](s => f(action(s)))
   }
 }

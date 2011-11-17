@@ -38,20 +38,23 @@ sealed trait STRef[S, A] {
   } yield ()
 }
 
-object STRef extends STRefs {
+object STRef extends STRefFunctions with STRefInstances {
 
   def apply[S]: (Id ~> ({type λ[α] = STRef[S, α]})#λ) =
     stRef[S]
 }
 
-trait STRefs {
+trait STRefFunctions {
 
   def stRef[S]: (Id ~> ({type λ[α] = STRef[S, α]})#λ) = new (Id ~> ({type λ[α] = STRef[S, α]})#λ) {
     def apply[A](a: A) = new STRef[S, A] {
       var value = a
     }
   }
+}
 
+trait STRefInstances {
+  
   /**Equality for STRefs is reference equality */
   implicit def STRefEqual[S, A]: Equal[STRef[S, A]] =
     Equal.equalA // todo reference equality?
@@ -95,9 +98,11 @@ sealed trait STArray[S, A] {
   } yield ()
 }
 
-object STArray extends STArrays
+object STArray extends STArrayFunctions {
+  def apply[S, A](s: Int, a: A)(implicit m: Manifest[A]): STArray[S, A] = stArray(s, a)
+}
 
-trait STArrays {
+trait STArrayFunctions {
   def stArray[S, A](s: Int, a: A)(implicit m: Manifest[A]): STArray[S, A] = new STArray[S, A] {
     val size = s
     val z = a
@@ -125,12 +130,12 @@ sealed trait ST[S, A] {
     })
 }
 
-object ST extends STs {
+object ST extends STFunctions with STInstances {
   def apply[S, A](a: => A): ST[S, A] =
     returnST(a)
 }
 
-trait STs {
+trait STFunctions {
   def st[S, A](f: World[S] => (World[S], A)): ST[S, A] = new ST[S, A] {
     private[effect] def apply(s: World[S]) = f(s)
   }
@@ -138,14 +143,6 @@ trait STs {
   // Implicit conversions between IO and ST
   implicit def STToIO[A](st: ST[RealWorld, A]): IO[A] =
     IO.io(rw => Coroutine.suspend(st(rw)))
-
-  implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
-    Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
-
-  implicit def stMonad[S]: Monad[({type λ[α] = ST[S, α]})#λ] = new Monad[({type λ[α] = ST[S, α]})#λ] {
-    def point[A](a: => A): ST[S, A] = returnST(a)
-    def bind[A, B](fa: ST[S, A])(f: (A) => ST[S, B]): ST[S, B] = fa flatMap f
-  }
 
   /**Put a value in a state thread */
   def returnST[S, A](a: => A): ST[S, A] =
@@ -184,5 +181,15 @@ trait STs {
         frozen <- a.freeze
       } yield frozen
     })
+  }
+}
+
+trait STInstances {
+  implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
+    Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
+
+  implicit def stMonad[S]: Monad[({type λ[α] = ST[S, α]})#λ] = new Monad[({type λ[α] = ST[S, α]})#λ] {
+    def point[A](a: => A): ST[S, A] = returnST(a)
+    def bind[A, B](fa: ST[S, A])(f: (A) => ST[S, B]): ST[S, B] = fa flatMap f
   }
 }

@@ -102,7 +102,7 @@ private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): OptionT[G, A] =
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => Some(a)))
 
-  def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {
     def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.runT))
   }
 }

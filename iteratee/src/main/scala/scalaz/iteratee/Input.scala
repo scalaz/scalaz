@@ -44,7 +44,7 @@ sealed trait Input[E] {
 
 }
 
-object Input extends InputFunctions {
+object Input extends InputFunctions with InputInstances {
   def apply[E](e: => E): Input[E] =
     elInput(e)
 }

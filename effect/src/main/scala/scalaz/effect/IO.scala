@@ -134,7 +134,7 @@ sealed trait IO[A] {
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 }
 
-object IO extends IOFunctions with IOInstances{
+object IO extends IOFunctions with IOInstances {
   def apply[A](a: => A): IO[A] =
     io(rw => suspend(rw -> a))
 }
@@ -142,17 +142,27 @@ object IO extends IOFunctions with IOInstances{
 trait IOInstances0 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
       Monoid.liftSemigroup[IO, A](IO.ioMonad, A)
+
+  implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
+
+  implicit val ioMonad: Monad[IO] = new IOMonad {}
 }
 
 trait IOInstances extends IOInstances0 {
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
-    Monoid.liftMonoid[IO, A](IO.ioMonad, A)
+    Monoid.liftMonoid[IO, A](ioMonad, A)
+  
+  implicit val ioMonadIO: MonadIO[IO] = new MonadIO[IO] with IOLiftIO with IOMonad
+}
 
-  implicit val ioMonad = new Monad[IO] {
-    def point[A](a: => A): IO[A] = IO(a)
-    override def map[A, B](fa: IO[A])(f: (A) => B) = fa map f
-    def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
-  }
+private trait IOMonad extends Monad[IO] {
+  def point[A](a: => A): IO[A] = IO(a)
+  override def map[A, B](fa: IO[A])(f: (A) => B) = fa map f
+  def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
+}
+
+private trait IOLiftIO extends LiftIO[IO] {
+  def liftIO[A](ioa: IO[A]) = ioa
 }
 
 /** IO Actions for writing to standard output and and reading from standard input */
@@ -222,7 +232,7 @@ trait IOFunctions extends IOStd {
   RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)
-      val h = refCountedFinalizer(finalizer)(refCntIORef)
+      val h = refCountedFinalizer(finalizer, refCntIORef)
       _ <- hsIORef.mod(h :: _)
     } yield finalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
 

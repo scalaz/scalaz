@@ -4,14 +4,5 @@ package effect
 object Effect extends Effects
 
 trait Effects
-  extends Dups
-  with FinalizerHandles
-  with IoExceptionOrs
-  with IOFunctions
-  with IORefs
-  with LiftControlIOs
-  with MonadControlIOs
-  with MonadIOs
-  with RefCountedFinalizers
-  with RegionTs
-  with STs
+  extends syntax.effect.ToAllEffectTypeClassV
+  with std.effect.AllEffectInstances

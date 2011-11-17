@@ -6,3 +6,4 @@ trait AllFunctions
   with OptionFunctions
   with StreamFunctions
   with math.OrderingFunctions
+  with StringFunctions

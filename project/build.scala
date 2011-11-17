@@ -70,7 +70,8 @@ object build extends Build {
     id = "effect",
     base = file("effect"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-effect"
+      name := "scalaz-effect",
+      typeClasses := TypeClass.effect
     ),
     dependencies = Seq(core)
   )

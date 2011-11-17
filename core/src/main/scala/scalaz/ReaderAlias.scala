@@ -37,7 +37,7 @@ trait ReaderAliasInstances {
   implicit def readerMT[S] = new MonadTrans[({type f[g[_], a] = ReaderAliasT[S, g, a]})#f] {
     def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): ReaderAliasT[S, G, A] =
       s => G.map(ga)(a => a)
-    def hoist[M[_], N[_]](f: M ~> N) = new (ReaderTF[S, M]#f ~> ReaderTF[S, N]#f) {
+    def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (ReaderTF[S, M]#f ~> ReaderTF[S, N]#f) {
       def apply[A](action: ReaderAliasT[S, M, A]) = ((s: S) => f(action(s)))
     }
   }

@@ -81,7 +81,7 @@ trait ReaderTMonadReader[F[_], E] extends MonadReader[({type f[s, a] = ReaderT[F
 trait ReaderTMonadTrans[E] extends MonadTrans[({type f[g[_], a] = ReaderT[g, E, a]})#f] {
   def liftM[G[_]: Monad, A](ga: G[A]) = ReaderT[G, E, A](e => Monad[G].map(ga)(a => a))
 
-  def hoist[M[_], N[_]](f: M ~> N) = new (({type f[x] = ReaderT[M, E, x]})#f ~> ({type f[x] = ReaderT[N, E, x]})#f) {
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = ReaderT[M, E, x]})#f ~> ({type f[x] = ReaderT[N, E, x]})#f) {
     def apply[A](fa: ReaderT[M, E, A]): ReaderT[N, E, A] = ReaderT[N, E, A](e => f(fa.runT(e)))
   }
 }

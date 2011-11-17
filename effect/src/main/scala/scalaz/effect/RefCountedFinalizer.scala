@@ -6,11 +6,13 @@ sealed trait RefCountedFinalizer {
   val refcount: IORef[Int]
 }
 
-object RefCountedFinalizer extends RefCountedFinalizers
+object RefCountedFinalizer extends RefCountedFinalizers {
+  def apply(u: IO[Unit], i: IORef[Int]): RefCountedFinalizer = refCountedFinalizer(u, i)
+}
 
 trait RefCountedFinalizers {
-  val refCountedFinalizer: IO[Unit] => IORef[Int] => RefCountedFinalizer =
-    u => i => new RefCountedFinalizer {
+  def refCountedFinalizer(u: IO[Unit], i: IORef[Int]): RefCountedFinalizer =
+    new RefCountedFinalizer {
       val finalizer = u
       val refcount = i
     }
