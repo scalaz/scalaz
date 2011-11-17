@@ -19,7 +19,7 @@ object Free extends FreeFunctions with FreeInstances {
   case class Gosub[S[_], A, B](a: Free[S, A],
                                f: A => Free[S, B]) extends Free[S, B]
 
-  /** A computation that can be stepped through, suspended, paused */
+  /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[A] = Free[Function0, A]
 
   /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
@@ -37,15 +37,15 @@ sealed trait Free[S[_], A] {
   final def map[B](f: A => B): Free[S, B] =
     flatMap(a => Return(f(a)))
 
-  /** Binds the given continuation to the result of this computation. This implementation is codense,
-    * so all binds are reassociated to the right. */
+  /** Binds the given continuation to the result of this computation. 
+    * All left-associated binds are reassociated to the right. */
   final def >>=[B](f: A => Free[S, B]): Free[S, B] = this match {
     case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(g(x), f))
     case a           => Gosub(a, f)
   }
 
-  /** Binds the given continuation to the result of this computation. This implementation is codense,
-    * so all binds are reassociated to the right. */
+  /** Binds the given continuation to the result of this computation.
+    * All left-associated binds are reassociated to the right. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] =
     this >>= f
 
@@ -134,13 +134,11 @@ sealed trait Free[S[_], A] {
   }
 }
 
-case class Request[I, O, A](request: I, response: O => A)
-
 object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
   implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
-    override def point[A](a: => A) = suspend(a)
+    override def point[A](a: => A) = return_(a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
   }
 }
@@ -178,15 +176,18 @@ trait FreeInstances {
 
 trait FreeFunctions {
   /** Collapse a trampoline to a single step. */
-  def reset[A](r: Trampoline[A]): Trampoline[A] = suspend(r.run)
+  def reset[A](r: Trampoline[A]): Trampoline[A] = return_(r.run)
 
-  /** Suspend the given computation in a trampoline step. */
-  def suspend[A](value: => A): Trampoline[A] =
-    Suspend[Function0, A](() => Return[Function0, A](value))
+  /** Suspend the given computation in a single step. */
+  def return_[S[_], A](value: => A)(implicit p: Pointed[S]): Free[S, A] =
+    Suspend[S, A](p.point(Return[S, A](value)))
+
+  def suspend[S[_], A](value: => Free[S, A])(implicit p: Pointed[S]): Free[S, A] =
+    Suspend[S, A](p.point(value))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
-    suspend(())
+    return_(())
 
   /** A source that produces the given value. */
   def produce[A](a: A): Source[A, Unit] =
@@ -195,11 +196,5 @@ trait FreeFunctions {
   /** A sink that waits for a single value and returns it. */
   def await[A]: Sink[A, A] =
     Suspend[({type f[x] = (=> A) => x})#f, A](a => Return[({type f[x] = (=> A) => x})#f, A](a))
-
-  /** A request that simply returns the response. */
-  def request[I, O](x: I): Free[({type f[x] = Request[I, O, x]})#f, O] =
-    Suspend[({type f[x] = Request[I, O, x]})#f, O](Request(x, Return[({type f[x] = Request[I, O, x]})#f, O](_: O)))
 }
-
-
 

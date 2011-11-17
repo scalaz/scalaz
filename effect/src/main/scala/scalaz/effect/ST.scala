@@ -5,6 +5,7 @@ import RealWorld._
 import STRef._
 import STArray._
 import ST._
+import std.function._
 
 /**Mutable variable in state thread S containing a value of type A. http://research.microsoft.com/en-us/um/people/simonpj/papers/lazy-functional-state-threads.ps.Z */
 sealed trait STRef[S, A] {
@@ -142,7 +143,7 @@ trait STFunctions {
 
   // Implicit conversions between IO and ST
   implicit def STToIO[A](st: ST[RealWorld, A]): IO[A] =
-    IO.io(rw => Coroutine.suspend(st(rw)))
+    IO.io(rw => Free.return_(st(rw)))
 
   /**Put a value in a state thread */
   def returnST[S, A](a: => A): ST[S, A] =

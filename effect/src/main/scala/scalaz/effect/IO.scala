@@ -136,7 +136,7 @@ sealed trait IO[A] {
 
 object IO extends IOFunctions with IOInstances {
   def apply[A](a: => A): IO[A] =
-    io(rw => suspend(rw -> a))
+    io(rw => return_(rw -> a))
 }
 
 trait IOInstances0 {
@@ -173,19 +173,19 @@ trait IOStd {
   def getChar: IO[Char] = IO(readChar())
 
   /** Writes a character to standard output. */
-  def putChar(c: Char): IO[Unit] = io(rw => suspend(rw -> {
+  def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
     print(c);
     ()
   }))
 
   /** Writes a string to standard output. */
-  def putStr(s: String): IO[Unit] = io(rw => suspend(rw -> {
+  def putStr(s: String): IO[Unit] = io(rw => return_(rw -> {
     print(s);
     ()
   }))
 
   /** Writes a string to standard output, followed by a newline.*/
-  def putStrLn(s: String): IO[Unit] = io(rw => suspend(rw -> {
+  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
     println(s);
     ()
   }))
@@ -194,7 +194,7 @@ trait IOStd {
   def readLn: IO[String] = IO(readLine())
 
   /** Write the given value to standard output. */
-  def putOut[A](a: A): IO[Unit] = io(rw => suspend(rw -> {
+  def putOut[A](a: A): IO[Unit] = io(rw => return_(rw -> {
     print(a);
     ()
   }))
