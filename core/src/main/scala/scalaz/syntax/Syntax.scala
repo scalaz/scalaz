@@ -73,6 +73,8 @@ trait Syntaxes {
   
   object foldable extends ToFoldableV
   
+  object validation extends ToValidationV
+  
   object all extends ToAllTypeClassV with ToAllOtherV
 }
 
@@ -85,7 +87,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
-  with ToFirstV with ToArrowV with ToFoldableV
+  with ToFirstV with ToArrowV with ToFoldableV with ToValidationV
 
 
 trait SyntaxV[A] {

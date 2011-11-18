@@ -116,6 +116,6 @@ trait OptionFunctions {
 }
 
 object option extends OptionInstances with OptionFunctions {
-  object optionSyntax extends scalaz.syntax.std.ToOptionV
+  object optionSyntax extends scalaz.syntax.std.ToOptionV with scalaz.syntax.std.ToOptionIdV 
 }
 

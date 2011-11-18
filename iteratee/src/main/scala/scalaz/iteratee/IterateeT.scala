@@ -128,7 +128,7 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 }
 
-object IterateeT extends IterateeTFunctions with IterateeTInstances {
+object IterateeT extends IterateeTFunctions with IterateeTInstances with EnumeratorTInstances{
   def apply[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] =
     iterateeT(s)
 }

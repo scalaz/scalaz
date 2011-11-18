@@ -8,5 +8,5 @@ package object std {
   object function2V extends ToFunction2V
   object allV extends ToAllStdV
   object stringV extends ToStringV
-  object optionV extends ToOptionV
+  object optionV extends ToOptionV with ToOptionIdV
 }

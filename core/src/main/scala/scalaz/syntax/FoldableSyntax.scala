@@ -5,8 +5,7 @@ package syntax
 trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Foldable[F]
   ////
-  final def foldMap[B: Monoid](f: A => B): B = F.foldMap(self)(f)
-  final def foldMapIdentity(implicit A: Monoid[A]): A = F.foldMapIdentity(self)
+  final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def toList: List[A] = F.toList(self)
   final def toIndexedSeq: IndexedSeq[A] = F.toIndexedSeq(self)
   final def toSet: Set[A] = F.toSet(self)
