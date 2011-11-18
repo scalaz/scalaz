@@ -70,7 +70,9 @@ trait Syntaxes {
   object tree extends ToTreeV
 
   object writer extends ToWriterV
-
+  
+  object foldable extends ToFoldableV
+  
   object all extends ToAllTypeClassV with ToAllOtherV
 }
 
@@ -83,7 +85,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
-  with ToFirstV with ToArrowV
+  with ToFirstV with ToArrowV with ToFoldableV
 
 
 trait SyntaxV[A] {
