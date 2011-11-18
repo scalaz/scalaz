@@ -35,10 +35,11 @@ class FunctorTest extends Specification with ScalaCheck {
     checkFunctorLaws[Tuple1, A]
     checkFunctorLaws[({type λ[α]=(R, α)})#λ, A]
     checkFunctorLaws[({type λ[α]=(R, S, α)})#λ, A]
-    // todo
-    // checkFunctorLaws[({type λ[α]=(R, S, T, α)})#λ, A]
-    // checkFunctorLaws[({type λ[α]=(R, S, T, U, α)})#λ, A]
-    // checkFunctorLaws[({type λ[α]=(R, S, T, U, V, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, W, α)})#λ, A]
+    checkFunctorLaws[({type λ[α]=(R, S, T, U, V, W, X, α)})#λ, A]
 
     // todo
     //    checkFunctorLaws[Function0, A]

@@ -27,6 +27,12 @@ class MonoidTest extends Specification with ScalaCheck {
   "monoid laws" in {
     type A = Int
     type B = Int
+    type C = Int
+    type D = Int
+    type E = Int
+    type F = Int
+    type G = Int
+    type H = Int
 
     checkMonoidLaws[Boolean @@ Conjunction]
     checkMonoidLaws[Boolean]
@@ -46,6 +52,14 @@ class MonoidTest extends Specification with ScalaCheck {
     checkMonoidLaws[Long]
     checkMonoidLaws[Long @@ Multiplication]
 //    checkMonoidLaws[ZipStream[A]]
+    checkMonoidLaws[(A)]
+    checkMonoidLaws[(A, B)]
+    checkMonoidLaws[(A, B, C)]
+    checkMonoidLaws[(A, B, C, D)]
+    checkMonoidLaws[(A, B, C, D, E)]
+    checkMonoidLaws[(A, B, C, D, E, F)]
+    checkMonoidLaws[(A, B, C, D, E, F, G)]
+    checkMonoidLaws[(A, B, C, D, E, F, G, H)]
     checkMonoidLaws[List[A]]
     checkMonoidLaws[Option[A]]
     checkMonoidLaws[Option[A] @@ First]

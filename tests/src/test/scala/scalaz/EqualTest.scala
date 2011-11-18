@@ -30,6 +30,7 @@ class EqualTest extends Specification with ScalaCheck {
     type E = String
     type F = String
     type G = String
+    type H = String
     type K = String
     type V = String
     type X = String
@@ -63,10 +64,11 @@ class EqualTest extends Specification with ScalaCheck {
     checkEqualLaws[(A)]
     checkEqualLaws[(A, B)]
     checkEqualLaws[(A, B, C)]
-//    checkEqualLaws[(A, B, C, D)]
-//    checkEqualLaws[(A, B, C, D, E)]
-//    checkEqualLaws[(A, B, C, D, E, F)]
-//    checkEqualLaws[(A, B, C, D, E, F, G)]
+    checkEqualLaws[(A, B, C, D)]
+    checkEqualLaws[(A, B, C, D, E)]
+    checkEqualLaws[(A, B, C, D, E, F)]
+    checkEqualLaws[(A, B, C, D, E, F, G)]
+    checkEqualLaws[(A, B, C, D, E, F, G, H)]
     checkEqualLaws[() => A]
     checkEqualLaws[Option[A]]
     checkEqualLaws[Option[A] @@ First]
