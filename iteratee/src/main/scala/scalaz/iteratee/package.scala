@@ -28,4 +28,6 @@ package object iteratee {
 
   type >@@>[E, A] =
   Enumerator[Unit, E, A]
+
+  object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
 }
