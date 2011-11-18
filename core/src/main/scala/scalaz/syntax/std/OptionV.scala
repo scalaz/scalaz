@@ -7,7 +7,7 @@ import scalaz.Tags.{Last, First}
 
 trait OptionV[A] extends SyntaxV[Option[A]] {
   final def cata[X](some: A => X, none: => X): X = option.cata(self)(some, none)
-  final def fold[X](oa: Option[A])(some: A => X, none: => X): X = cata(some, none)
+  final def fold[X](some: A => X, none: => X): X = cata(some, none)
 
   sealed trait Fold[X] {
     def none(s: => X): X
