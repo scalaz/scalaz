@@ -6,33 +6,33 @@ import scalaz.Isomorphism._
 import scalaz.Tags.{First, Last}
 
 trait EitherInstances0 {
-  implicit def eitherEqual[A, B](implicit EqA: Equal[A], EqB: Equal[B]): Equal[Either[A, B]] = new EitherEqual[A, B] {
-    implicit def A: Equal[A] = EqA
-    implicit def B: Equal[B] = EqB
+  implicit def eitherEqual[A, B](implicit A0: Equal[A], B0: Equal[B]): Equal[Either[A, B]] = new EitherEqual[A, B] {
+    implicit def A = A0
+    implicit def B = B0
   }
 
-  implicit def eitherLeftEqual[A, X](implicit EqA: Equal[A]): Equal[LeftProjection[A, X]] = new EitherLeftEqual[A, X] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X]] = new EitherLeftEqual[A, X] {
+    implicit def A = A0
   }
 
-  implicit def eitherRightEqual[X, A](implicit EqA: Equal[A]): Equal[RightProjection[X, A]] = new EitherRightEqual[X, A] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A]] = new EitherRightEqual[X, A] {
+    implicit def A = A0
   }
 
-  implicit def eitherFirstRightEqual[X, A](implicit EqA: Equal[A]): Equal[RightProjection[X, A] @@ First] = new EitherFirstRightEqual[X, A] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherFirstRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ First] = new EitherFirstRightEqual[X, A] {
+    implicit def A = A0
   }
 
-  implicit def eitherLastRightEqual[X, A](implicit EqA: Equal[A]): Equal[RightProjection[X, A] @@ Last] = new EitherLastRightEqual[X, A] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherLastRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ Last] = new EitherLastRightEqual[X, A] {
+    implicit def A = A0
   }
 
-  implicit def eitherFirstLeftEqual[A, X](implicit EqA: Equal[A]): Equal[LeftProjection[A, X] @@ First] = new EitherFirstLeftEqual[A, X] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherFirstLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ First] = new EitherFirstLeftEqual[A, X] {
+    implicit def A = A0
   }
 
-  implicit def eitherLastLeftEqual[A, X](implicit EqA: Equal[A]): Equal[LeftProjection[A, X] @@ Last] = new EitherLastLeftEqual[A, X] {
-    implicit def A: Equal[A] = EqA
+  implicit def eitherLastLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ Last] = new EitherLastLeftEqual[A, X] {
+    implicit def A = A0
   }
 
   implicit def eitherFirstLeftSemigroup[A: Semigroup, X]: Semigroup[LeftProjection[A, X] @@ First] = new EitherFirstLeftSemigroup[A, X] {}
@@ -44,13 +44,13 @@ trait EitherInstances0 {
   implicit def eitherLastRightSemigroup[X, A: Semigroup]: Semigroup[RightProjection[X, A] @@ Last] = new EitherLastRightSemigroup[X, A] {}
 
   implicit def eitherLeftSemigroup[A, X](implicit SemigroupA: Semigroup[A], MonoidX: Monoid[X]): Semigroup[LeftProjection[A, X]] = new EitherLeftSemigroup[A, X] {
-    implicit def A: Semigroup[A] = SemigroupA
-    implicit def X: Monoid[X] = MonoidX
+    implicit def A = SemigroupA
+    implicit def X = MonoidX
   }
 
   implicit def eitherRightSemigroup[X, A](implicit MonoidX: Monoid[X], SemigroupA: Semigroup[A]): Semigroup[RightProjection[X, A]] = new EitherRightSemigroup[X, A] {
-    implicit def X: Monoid[X] = MonoidX
-    implicit def A: Semigroup[A] = SemigroupA
+    implicit def X = MonoidX
+    implicit def A = SemigroupA
   }
 
 }
@@ -234,12 +234,12 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherOrder[A, B](implicit OrderA: Order[A], OrderB: Order[B]): Order[Either[A, B]] = new EitherOrder[A, B] {
-    implicit def A: Order[A] = OrderA
-    implicit def B: Order[B] = OrderB
+    implicit def A = OrderA
+    implicit def B = OrderB
   }
 
   implicit def eitherLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X]] = new EitherLeftOrder[A, X] {
-    implicit def A: Order[A] = OrderA
+    implicit def A = OrderA
   }
 
   implicit def eitherRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A]] = new EitherRightOrder[X, A] {
@@ -247,7 +247,7 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherFirstLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ First] = new EitherFirstLeftOrder[A, X] {
-    implicit def A: Order[A] = OrderA
+    implicit def A = OrderA
   }
 
   implicit def eitherFirstRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ First] = new EitherFirstRightOrder[X, A] {
@@ -255,7 +255,7 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherLastLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ Last] = new EitherLastLeftOrder[A, X] {
-    implicit def A: Order[A] = OrderA
+    implicit def A = OrderA
   }
 
   implicit def eitherLastRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ Last] = new EitherLastRightOrder[X, A] {
@@ -263,30 +263,30 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherFirstLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ First] = new EitherFirstLeftMonoid[A, X] {
-    implicit def X: Monoid[X] = MonoidX
+    implicit def X = MonoidX
   }
 
   implicit def eitherFirstRightMonoid[X, A](implicit MonoidX: Monoid[X]): Monoid[RightProjection[X, A] @@ First] = new EitherFirstRightMonoid[X, A] {
-    implicit def X: Monoid[X] = MonoidX
+    implicit def X = MonoidX
   }
 
 
   implicit def eitherLastLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ Last] = new EitherLastLeftMonoid[A, X] {
-    implicit def X: Monoid[X] = MonoidX
+    implicit def X = MonoidX
   }
 
   implicit def eitherLastRightMonoid[X, A](implicit MonoidX: Monoid[X]): Monoid[RightProjection[X, A] @@ Last] = new EitherLastRightMonoid[X, A] {
-    implicit def X: Monoid[X] = MonoidX
+    implicit def X = MonoidX
   }
 
   implicit def eitherLeftMonoid[A, X](implicit MonoidA: Monoid[A], MonoidX: Monoid[X]): Monoid[LeftProjection[A, X]] = new EitherLeftMonoid[A, X] {
-    implicit def A: Monoid[A] = MonoidA
-    implicit def X: Monoid[X] = MonoidX
+    implicit def A = MonoidA
+    implicit def X = MonoidX
   }
 
   implicit def eitherRightMonoid[X, A](implicit MonoidX: Monoid[X], MonoidA: Monoid[A]): Monoid[RightProjection[X, A]] = new EitherRightMonoid[X, A] {
-    implicit def X: Monoid[X] = MonoidX
-    implicit def A: Monoid[A] = MonoidA
+    implicit def X = MonoidX
+    implicit def A = MonoidA
   }
 }
 
@@ -406,37 +406,37 @@ private[scalaz] trait EitherRightSemigroup[X, A] extends Semigroup[RightProjecti
 }
 
 
-private[scalaz] trait EitherFirstLeftMonoid[A, X] extends EitherFirstLeftSemigroup[A, X] with Monoid[LeftProjection[A, X] @@ First] {
+private[scalaz] trait EitherFirstLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ First] with EitherFirstLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero: LeftProjection[A, X] @@ First = Tag(Right(Monoid[X].zero).left)
 }
 
-private[scalaz] trait EitherLastLeftMonoid[A, X] extends EitherLastLeftSemigroup[A, X] with Monoid[LeftProjection[A, X] @@ Last] {
+private[scalaz] trait EitherLastLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ Last] with EitherLastLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero: LeftProjection[A, X] @@ Last = Tag(Right(Monoid[X].zero).left)
 }
 
-private[scalaz] trait EitherLeftMonoid[A, X] extends EitherLeftSemigroup[A, X] with Monoid[LeftProjection[A, X]] {
+private[scalaz] trait EitherLeftMonoid[A, X] extends Monoid[LeftProjection[A, X]] with EitherLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero: LeftProjection[A, X] = Right(Monoid[X].zero).left
 }
 
-private[scalaz] trait EitherFirstRightMonoid[X, A] extends EitherFirstRightSemigroup[X, A] with Monoid[RightProjection[X, A] @@ First] {
+private[scalaz] trait EitherFirstRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ First] with EitherFirstRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero: RightProjection[X, A] @@ First = Tag(Left(Monoid[X].zero).right)
 }
 
-private[scalaz] trait EitherLastRightMonoid[X, A] extends EitherLastRightSemigroup[X, A] with Monoid[RightProjection[X, A] @@ Last] {
+private[scalaz] trait EitherLastRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ Last] with EitherLastRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero: RightProjection[X, A] @@ Last = Tag(Left(Monoid[X].zero).right)
 }
 
-private[scalaz] trait EitherRightMonoid[X, A] extends EitherRightSemigroup[X, A] with Monoid[RightProjection[X, A]] {
+private[scalaz] trait EitherRightMonoid[X, A] extends Monoid[RightProjection[X, A]] with EitherRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero: RightProjection[X, A] = Left(Monoid[X].zero).right
