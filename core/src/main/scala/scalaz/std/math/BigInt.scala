@@ -21,10 +21,14 @@ trait BigInts {
 
   import Tags.Multiplication
 
-  implicit object bigIntMultiplication extends Monoid[BigInt @@ Multiplication] {
+  implicit object bigIntMultiplication extends Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
+    def show(f: scalaz.@@[BigInt, Multiplication]) = f.toString.toList
+
     def append(f1: BigInt @@ Multiplication, f2: => BigInt @@ Multiplication): BigInt @@ Multiplication = Tag(f1 * f2)
 
     def zero: BigInt @@ Multiplication = Tag(1)
+
+    def order(x: BigInt @@ Multiplication, y: BigInt @@ Multiplication): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 }
 

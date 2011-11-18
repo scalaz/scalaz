@@ -34,20 +34,23 @@ trait AnyValInstances {
 
   }
 
-  sealed trait Disjunction
+  import Tags.{Conjunction, Disjunction}
 
-  sealed trait Conjunction
-
-  implicit object booleanDisjunctionNewTypeInstance extends Monoid[Boolean @@ Disjunction] {
+  implicit object booleanDisjunctionNewTypeInstance extends Monoid[Boolean @@ Disjunction] with Order[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Tag(f1 || f2)
 
     def zero: Boolean @@ Disjunction = Tag(false)
+
+    def order(a1: Boolean @@ Disjunction, a2: Boolean @@ Disjunction) = Order[Boolean].order(a1, a2)
   }
 
-  implicit object booleanConjunctionNewTypeInstance extends Monoid[Boolean @@ Conjunction] {
+  implicit object booleanConjunctionNewTypeInstance extends Monoid[Boolean @@ Conjunction] with Order[Boolean @@ Conjunction] {
     def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Tag(f1 && f2)
 
     def zero: Boolean @@ Conjunction = Tag(true)
+
+    def order(a1: Boolean @@ Conjunction, a2: Boolean @@ Conjunction) = Order[Boolean].order(a1, a2)
+
   }
 
   implicit object byteInstance extends Monoid[Byte] with Order[Byte] with Show[Byte] {
@@ -69,10 +72,13 @@ trait AnyValInstances {
 
   import Tags.{Multiplication}
 
-  implicit object byteMultiplicationNewType extends Monoid[Byte @@ Multiplication] {
+  implicit object byteMultiplicationNewType extends Monoid[Byte @@ Multiplication] with Order[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication): Byte @@ Multiplication = Tag((f1 * f2).toByte)
 
     def zero: Byte @@ Multiplication = Tag(1)
+
+    def order(a1: Byte @@ Multiplication, a2: Byte @@ Multiplication) = Order[Byte].order(a1, a2)
+
   }
 
   implicit object char extends Monoid[Char] with Order[Char] with Show[Char] {
@@ -92,10 +98,12 @@ trait AnyValInstances {
 
   }
 
-  implicit object charMultiplicationNewType extends Monoid[Char @@ Multiplication] {
+  implicit object charMultiplicationNewType extends Monoid[Char @@ Multiplication] with Order[Char @@ Multiplication] {
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication): Char @@ Multiplication = Tag((f1 * f2).toChar)
 
     def zero: Char @@ Multiplication = Tag(1)
+
+    def order(a1: Char @@ Multiplication, a2: Char @@ Multiplication) = Order[Char].order(a1, a2)
   }
 
   implicit object shortInstance extends Monoid[Short] with Order[Short] with Show[Short] {
@@ -115,10 +123,12 @@ trait AnyValInstances {
 
   }
 
-  implicit object shortMultiplicationNewType extends Monoid[Short @@ Multiplication] {
+  implicit object shortMultiplicationNewType extends Monoid[Short @@ Multiplication] with Order[Short @@ Multiplication] {
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication): Short @@ Multiplication = Tag((f1 * f2).toShort)
 
     def zero: Short @@ Multiplication = Tag(1)
+
+    def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
   implicit object intInstance extends Monoid[Int] with Order[Int] with Show[Int] {
@@ -135,15 +145,15 @@ trait AnyValInstances {
 
       def zero: Int = 1
     }
-
   }
 
-  implicit object intMultiplicationNewType extends Monoid[Int @@ Multiplication] {
+  implicit object intMultiplicationNewType extends Monoid[Int @@ Multiplication] with Order[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication): Int @@ Multiplication = Tag(f1 * f2)
 
     def zero: Int @@ Multiplication = Tag(1)
-  }
 
+    def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
+  }
 
   implicit object longInstance extends Monoid[Long] with Order[Long] with Show[Long] {
     def show(f: Long): List[Char] = f.toString.toList
@@ -162,10 +172,12 @@ trait AnyValInstances {
 
   }
 
-  implicit object longMultiplicationNewType extends Monoid[Long @@ Multiplication] {
+  implicit object longMultiplicationNewType extends Monoid[Long @@ Multiplication] with Order[Long @@ Multiplication] {
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication): Long @@ Multiplication = Tag(f1 * f2)
 
     def zero: Long @@ Multiplication = Tag(1)
+
+    def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
   implicit object floatInstance extends Monoid[Float] with Order[Float] with Show[Float] {

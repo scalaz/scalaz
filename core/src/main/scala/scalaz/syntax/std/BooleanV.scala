@@ -4,6 +4,7 @@ package std
 
 import scalaz.std.boolean
 import scalaz.std.anyVal._
+import scalaz.Tags.Conjunction
 
 
 trait BooleanV extends SyntaxV[Boolean] {
