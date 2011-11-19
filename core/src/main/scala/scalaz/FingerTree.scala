@@ -689,6 +689,17 @@ class FingerTreeIntPlus[A](val value: FingerTree[Int, A]) {
 }
 
 trait FingerTreeInstances {
+  import fingerTree._
+
+  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
+    def map[A, B](t: ViewL[S, A])(f: A => B): ViewL[S, B] =
+      t.fold(EmptyL[S, B], (x, xs) => OnL(f(x), s.map(xs)(f))) //TODO define syntax for &: and :&
+  }
+
+  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
+    def map[A, B](t: ViewR[S, A])(f: A => B): ViewR[S, B] =
+      t.fold(EmptyR[S, B], (xs, x) => OnR(s.map(xs)(f), f(x)))
+  }
 
   implicit def FingerFoldable[V] = new Foldable[({type l[a]=Finger[V, a]})#l] with Foldable.FromFoldMap[({type l[a]=Finger[V, a]})#l] {
     override def foldMap[A, M: Monoid](v: Finger[V, A])(f: A => M) = v.foldMap(f)
@@ -755,6 +766,10 @@ trait FingerTreeInstances {
 object fingerTree extends FingerTreeInstances with FingerTreeFunctions
 
 trait FingerTreeFunctions {
+//  def &:[A](a: A) = OnL[M,A](a, value)
+//
+//  def :&[A](a: A) = OnR[M,A](value, a)
+
   def Node2[V, A](v: V, a1: => A, a2: => A)(implicit r: Reducer[A, V]) = new Node[V, A] {
     def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
       two(v, a1, a2)
