@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+
+
 trait IterableInstances {
 
   implicit def IterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
@@ -17,6 +19,35 @@ trait IterableInstances {
       }
       k += ']'
       k.toList
+    }
+  }
+
+  implicit def IterableOrder[A: Order]: Order[Iterable[A]] = new Order[Iterable[A]] {
+    def order(a1: Iterable[A], a2: Iterable[A]) = {
+      import scalaz.Ordering._
+      import syntax.order._
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = true
+      var r: Ordering = EQ
+
+      while (i1.hasNext && i2.hasNext && b) {
+        val a1 = i1.next
+        val a2 = i2.next
+
+        val o = a1 ?|? a2
+        if (o != EQ) {
+          r = o
+          b = false
+        }
+      }
+      if (i1.hasNext)
+        if (i2.hasNext)
+          r
+        else
+          GT
+      else
+        LT
     }
   }
 }
