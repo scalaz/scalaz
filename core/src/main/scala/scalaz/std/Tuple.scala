@@ -328,10 +328,66 @@ trait TupleInstances1 extends TupleInstances0 {
     implicit def _7 = A7
   }
 
+}
+
+trait TupleInstances2 extends TupleInstances1 {
+
+  implicit def tuple1Group[A1](implicit A1: Group[A1]) = new Tuple1Group[A1] {
+      implicit def _1 = A1
+  }
+  implicit def tuple2Group[A1, A2](implicit A1: Group[A1], A2: Group[A2]) = new Tuple2Group[A1, A2] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+  }
+  implicit def tuple3Group[A1, A2, A3](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3]) = new Tuple3Group[A1, A2, A3] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+  }
+  implicit def tuple4Group[A1, A2, A3, A4](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4]) = new Tuple4Group[A1, A2, A3, A4] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+    implicit def _4 = A4
+  }
+  implicit def tuple5Group[A1, A2, A3, A4, A5](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4], A5: Group[A5]) = new Tuple5Group[A1, A2, A3, A4, A5] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+    implicit def _4 = A4
+    implicit def _5 = A5
+  }
+  implicit def tuple6Group[A1, A2, A3, A4, A5, A6](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4], A5: Group[A5], A6: Group[A6]) = new Tuple6Group[A1, A2, A3, A4, A5, A6] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+    implicit def _4 = A4
+    implicit def _5 = A5
+    implicit def _6 = A6
+  }
+  implicit def tuple7Group[A1, A2, A3, A4, A5, A6, A7](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4], A5: Group[A5], A6: Group[A6], A7: Group[A7]) = new Tuple7Group[A1, A2, A3, A4, A5, A6, A7] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+    implicit def _4 = A4
+    implicit def _5 = A5
+    implicit def _6 = A6
+    implicit def _7 = A7
+  }
+  implicit def tuple8Group[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4], A5: Group[A5], A6: Group[A6], A7: Group[A7], A8: Group[A8]) = new Tuple8Group[A1, A2, A3, A4, A5, A6, A7, A8] {
+    implicit def _1 = A1
+    implicit def _2 = A2
+    implicit def _3 = A3
+    implicit def _4 = A4
+    implicit def _5 = A5
+    implicit def _6 = A6
+    implicit def _7 = A7
+    implicit def _8 = A8
+  }
 
 }
 
-trait TupleInstances extends TupleInstances1
+trait TupleInstances extends TupleInstances2
 
 object tuple extends TupleInstances
 
@@ -786,6 +842,67 @@ private[scalaz] trait Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] extends Monoi
   implicit def _7 : Monoid[A7]
   implicit def _8 : Monoid[A8]
   def zero: (A1, A2, A3, A4, A5, A6, A7, A8) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, _7.zero, _8.zero)
+}
+
+private[scalaz] trait Tuple1Group[A1] extends Group[Tuple1[A1]] with Tuple1Monoid[A1] {
+  implicit def _1 : Group[A1]
+  def inverse(f: Tuple1[A1]): Tuple1[A1] = Tuple1(_1.inverse(f._1))
+}
+private[scalaz] trait Tuple2Group[A1, A2] extends Group[(A1, A2)] with Tuple2Monoid[A1, A2] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  def inverse(f: (A1, A2)): (A1, A2) = (_1.inverse(f._1), _2.inverse(f._2))
+}
+private[scalaz] trait Tuple3Group[A1, A2, A3] extends Group[(A1, A2, A3)] with Tuple3Monoid[A1, A2, A3] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  def inverse(f: (A1, A2, A3)): (A1, A2, A3) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3))
+}
+private[scalaz] trait Tuple4Group[A1, A2, A3, A4] extends Group[(A1, A2, A3, A4)] with Tuple4Monoid[A1, A2, A3, A4] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  implicit def _4 : Group[A4]
+  def inverse(f: (A1, A2, A3, A4)): (A1, A2, A3, A4) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4))
+}
+private[scalaz] trait Tuple5Group[A1, A2, A3, A4, A5] extends Group[(A1, A2, A3, A4, A5)] with Tuple5Monoid[A1, A2, A3, A4, A5] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  implicit def _4 : Group[A4]
+  implicit def _5 : Group[A5]
+  def inverse(f: (A1, A2, A3, A4, A5)): (A1, A2, A3, A4, A5) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4), _5.inverse(f._5))
+}
+private[scalaz] trait Tuple6Group[A1, A2, A3, A4, A5, A6] extends Group[(A1, A2, A3, A4, A5, A6)] with Tuple6Monoid[A1, A2, A3, A4, A5, A6] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  implicit def _4 : Group[A4]
+  implicit def _5 : Group[A5]
+  implicit def _6 : Group[A6]
+  def inverse(f: (A1, A2, A3, A4, A5, A6)): (A1, A2, A3, A4, A5, A6) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4), _5.inverse(f._5), _6.inverse(f._6))
+}
+private[scalaz] trait Tuple7Group[A1, A2, A3, A4, A5, A6, A7] extends Group[(A1, A2, A3, A4, A5, A6, A7)] with Tuple7Monoid[A1, A2, A3, A4, A5, A6, A7] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  implicit def _4 : Group[A4]
+  implicit def _5 : Group[A5]
+  implicit def _6 : Group[A6]
+  implicit def _7 : Group[A7]
+  def inverse(f: (A1, A2, A3, A4, A5, A6, A7)): (A1, A2, A3, A4, A5, A6, A7) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4), _5.inverse(f._5), _6.inverse(f._6), _7.inverse(f._7))
+}
+private[scalaz] trait Tuple8Group[A1, A2, A3, A4, A5, A6, A7, A8] extends Group[(A1, A2, A3, A4, A5, A6, A7, A8)] with Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] {
+  implicit def _1 : Group[A1]
+  implicit def _2 : Group[A2]
+  implicit def _3 : Group[A3]
+  implicit def _4 : Group[A4]
+  implicit def _5 : Group[A5]
+  implicit def _6 : Group[A6]
+  implicit def _7 : Group[A7]
+  implicit def _8 : Group[A8]
+  def inverse(f: (A1, A2, A3, A4, A5, A6, A7, A8)): (A1, A2, A3, A4, A5, A6, A7, A8) = (_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4), _5.inverse(f._5), _6.inverse(f._6), _7.inverse(f._7), _8.inverse(f._8))
 }
 
 private[scalaz] trait Tuple1Monad extends Monad[Tuple1] {
