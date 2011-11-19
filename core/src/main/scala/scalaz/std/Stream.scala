@@ -45,15 +45,25 @@ trait StreamInstances {
     def zero: Stream[A] = scala.Stream.empty
   }
 
-  implicit def streamEqual[A: Equal] = new Equal[Stream[A]] {
-    def equal(a1: Stream[A], a2: Stream[A]) = equal0(a1, a2)
-    @tailrec
-    def equal0(s1: Stream[A], s2: Stream[A]): Boolean = (s1.headOption, s2.headOption) match {
-      case (None, None) => true
-      case (Some(h1), Some(h2)) if Equal[A].equal(h1, h2) => equal0(s1.tail, s2.tail)
-      case _ => false
+  implicit def streamEqual[A](implicit A0: Equal[A]) = new Equal[Stream[A]] {
+    def equal(a1: Stream[A], a2: Stream[A]): Boolean = (a1 corresponds a2)(A0.equal)
+  }
+  implicit def streamShow[A](implicit A0: Show[A]) = new Show[Stream[A]] {
+    def show(as: Stream[A]) = {
+      val i = as.iterator
+      val k = new collection.mutable.ListBuffer[Char]
+      k += '['
+      while (i.hasNext) {
+        val n = i.next()
+        k ++= Show[A].show(n)
+        if (i.hasNext)
+          k += ','
+      }
+      k += ']'
+      k.toList
     }
   }
+
 
   // TODO show, equal, order, ...
 }

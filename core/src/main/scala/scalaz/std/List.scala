@@ -54,18 +54,9 @@ trait ListInstances {
       k.toList
     }
   }
-  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
-    def equal(a1: List[A], a2: List[A]) = {
-      val i1 = a1.iterator
-      val i2 = a2.iterator
-      var unequal = false
 
-      while(i1.hasNext && i2.hasNext && !unequal) {
-        if (!Equal[A].equal(i1.next, i2.next))
-          unequal = true
-      }
-      !(unequal || i1.hasNext || i2.hasNext)
-    }
+  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
+    def equal(a1: List[A], a2: List[A]): Boolean = (a1 corresponds a2)(Equal[A].equal)
   }
 }
 

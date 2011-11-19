@@ -33,7 +33,7 @@ trait OptionInstances {
   implicit def optionEqual[A: Equal]: Equal[Option[A]] = new Equal[Option[A]] {
     def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
       case (Some(a1), Some(a2)) => Equal[A].equal(a1, a2)
-      case (None, None)         => false
+      case (None, None)         => true
       case (None, Some(_))      => false
       case (Some(_), None)      => false
     }

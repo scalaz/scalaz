@@ -9,7 +9,7 @@ trait Order[F] extends Equal[F] { self =>
   ////
   def order(x: F, y: F): Ordering 
   
-  final def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
+  def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
 
   // derived functions
   def lessThan(x: F, y: F) = order(x, y) == Ordering.LT
