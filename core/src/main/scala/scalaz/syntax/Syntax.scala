@@ -23,6 +23,8 @@ trait Syntaxes {
 
   object index extends ToIndexV
 
+  object foldable extends ToFoldableV
+
   object functor extends ToFunctorV
 
   object pointed extends ToPointedV
@@ -69,8 +71,9 @@ trait Syntaxes {
 
   object tree extends ToTreeV
 
-  object all extends ToAllTypeClassV with ToAllOtherV
+  object reducer extends ToReducerV
 
+  object all extends ToAllTypeClassV with ToAllOtherV
 }
 
 trait ToAllOtherV extends ToTreeV
@@ -82,7 +85,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
-  with ToFirstV with ToArrowV
+  with ToFirstV with ToArrowV with ToReducerV
 
 
 trait SyntaxV[A] {

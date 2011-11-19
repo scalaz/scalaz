@@ -48,6 +48,8 @@ sealed trait Reducer[C, M] {
 object Reducer extends ReducerFunctions with ReducerInstances {
   def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
+  def apply[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
+    unitReducer[C, M](u)
 }
 
 trait ReducerInstances {

@@ -1,6 +1,9 @@
 package scalaz
 package std
 
+
+
+
 trait OptionInstances {
   implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
     def point[A](a: => A) = Some(a)
@@ -44,6 +47,16 @@ trait OptionInstances {
       case Some(a1) => "Some(" + Show[A].show(a1) + ")"
       case None     => "None"
     }).toList
+  }
+
+  implicit def optionOrder[A: Order]: Order[Option[A]] = new Order[Option[A]] {
+    import scalaz.Ordering._
+    def order(x: Option[A], y: Option[A]) = (x, y) match {
+      case (Some(x), Some(y)) => Order[A].order (x, y)
+      case (Some(_), None) => GT
+      case (None, Some(_)) => LT
+      case (None, None) => EQ
+    }
   }
 
   import Tags.{First, Last}
