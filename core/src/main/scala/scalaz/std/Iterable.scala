@@ -1,8 +1,6 @@
 package scalaz
 package std
 
-
-
 trait IterableInstances {
 
   implicit def IterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
@@ -55,11 +53,31 @@ trait IterableInstances {
     def length[A](a: Iterable[A]) = {
       var n = 0
       val i = a.iterator
-      while(i.hasNext) {
+      while (i.hasNext) {
         n = n + 1
         i.next
       }
       n
+    }
+  }
+
+  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+    import syntax.equal._
+    def equal(a1: CC[A], a2: CC[A]) = {
+      val i1 = a1.iterator
+      val i2 = a2.iterator
+      var b = false
+
+      while (i1.hasNext && i2.hasNext && !b) {
+        val x1 = i1.next
+        val x2 = i2.next
+
+        if (x1 /== x2) {
+          b = true
+        }
+      }
+
+      !(b || i1.hasNext || i2.hasNext)
     }
   }
 }
