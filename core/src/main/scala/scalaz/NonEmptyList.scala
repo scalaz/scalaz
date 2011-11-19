@@ -99,6 +99,8 @@ trait NonEmptyListInstances {
     import std.list._
     def show(fa: NonEmptyList[A]) = Show[List[A]].show(fa.list)
   }
+
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
 }
 
 trait NonEmptyListFunctions {

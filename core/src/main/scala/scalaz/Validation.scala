@@ -178,6 +178,11 @@ trait FailProjectionInstances {
       implicit def G = Validation.validationMonad
     }
   }
+
+  implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
+    def iso = FailProjectionIso
+    implicit def G = Validation.validationOrder
+  }
 }
 
 trait FailProjectionFunctions {
@@ -231,6 +236,16 @@ trait ValidationInstances {
     def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
+  }
+
+  implicit def validationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
+    import Ordering._
+    def order(f1: Validation[E, A], f2: Validation[E, A]) = (f1, f2) match {
+      case (Success(x), Success(y)) => Order[A].order(x, y)
+      case (Failure(x), Failure(y)) => Order[E].order(x, y)
+      case (Failure(_), Success(_)) => LT
+      case (Success(_), Failure(_)) => GT
+    }
   }
 }
 

@@ -44,7 +44,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings,
-    aggregate = Seq(core, concurrent, effect, iteratee, example)
+    aggregate = Seq(core, concurrent, effect, iteratee, example, scalacheckBinding, tests)
   )
 
   lazy val core = Project(
@@ -91,6 +91,29 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example"
+    )
+  )
+
+  lazy val scalacheckBinding = Project(
+    id           = "scalacheck-binding",
+    base         = file("scalacheck-binding"),
+    dependencies = Seq(core, concurrent),
+    settings     = standardSettings ++ Seq(
+      name := "scalaz-scalacheck-binding",
+      libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"
+    )
+  )
+
+  lazy val tests = Project(
+    id = "tests",
+    base = file("tests"),
+    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
+    settings = standardSettings ++Seq[Sett](
+      name := "scalaz-tests",
+      libraryDependencies ++= Seq(
+        "org.specs2" %% "specs2" % "1.6" % "test",
+        "org.scala-tools.testing" %% "scalacheck" % "1.9" % "test"
+      )
     )
   )
 
