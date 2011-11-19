@@ -5,8 +5,6 @@ import effect._
 
 import Iteratee._
 
-object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
-
 trait EnumeratorTInstances0 {
   implicit def EnumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]) = new EnumeratorTSemigroup[X, E, F, A] {
     implicit def F = F0

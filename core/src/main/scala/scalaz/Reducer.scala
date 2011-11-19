@@ -44,12 +44,25 @@ sealed trait Reducer[C, M] {
     }
   }
 }
+sealed trait UnitReducer[C, M] extends Reducer[C, M] {
+  implicit def monoid: Monoid[M]
+  def unit(c: C): M
+
+  def snoc(m: M, c: C): M = monoid.append(m, unit(c))
+
+  def cons(c: C, m: M): M = monoid.append(unit(c), m)
+}
+
+object UnitReducer {
+  def apply[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] = new UnitReducer[C, M] {
+    val monoid = mm
+    def unit(c: C) = u(c)
+  }
+}
 
 object Reducer extends ReducerFunctions with ReducerInstances {
   def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
-  def apply[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    unitReducer[C, M](u)
 }
 
 trait ReducerInstances {
@@ -64,7 +77,6 @@ trait ReducerInstances {
     import std.stream._
     unitConsReducer(Stream(_), c => c #:: _)
   }
-
 
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
     import std.anyVal._
@@ -137,14 +149,9 @@ trait ReducerFunctions {
 
   /**Construct a Reducer with the given unit function and monoid **/
   def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    new Reducer[C, M] {
+    new UnitReducer[C, M] {
       val monoid = mm
-
       def unit(c: C) = u(c)
-
-      def snoc(m: M, c: C): M = mm.append(m, u(c))
-
-      def cons(c: C, m: M): M = mm.append(u(c), m)
     }
 
   def unitConsReducer[C, M](u: C => M, cs: C => M => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {

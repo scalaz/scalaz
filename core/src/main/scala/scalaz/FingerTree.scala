@@ -696,19 +696,19 @@ trait FingerTreeInstances {
 
   implicit def FingerMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Finger[V, A], V] = {
     implicit val vm = m.monoid
-    Reducer((a: Finger[V, A]) => a.measure)
+    UnitReducer((a: Finger[V, A]) => a.measure)
   }
 
   implicit def NodeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Node[V, A], V] = {
     implicit val vm = m.monoid
-    Reducer((a: Node[V, A]) => a fold (
+    UnitReducer((a: Node[V, A]) => a fold (
             (v, _, _) => v,
             (v, _, _, _) => v))
   }
 
   implicit def FingerTreeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[FingerTree[V, A], V] = {
     implicit val vm = m.monoid
-    Reducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
+    UnitReducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
   }
   
   implicit def NodeFoldable[V] = new Foldable[({type l[a]=Node[V, a]})#l] {
@@ -867,7 +867,7 @@ trait FingerTreeFunctions {
     sealed class Rope[A : ClassManifest](val self: FingerTreeIntPlus[ImmutableArray[A]])
              extends SyntaxV[FingerTreeIntPlus[ImmutableArray[A]]] {//TODO move this to the syntax package?
       import Rope._
-      implicit def sizer = Reducer((arr: ImmutableArray[A]) => arr.length)
+      implicit def sizer = UnitReducer((arr: ImmutableArray[A]) => arr.length)
 
       def length = self.measure
 
@@ -932,7 +932,7 @@ trait FingerTreeFunctions {
 
     object Rope {
       private[Ropes] val baseChunkLength = 16
-      implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = Reducer(_.length)
+      implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
       def empty[A : ClassManifest] = rope(fingerTree.empty[Int, ImmutableArray[A]])
       def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
         if (a.isEmpty) empty[A] else rope(single(IA.fromArray(a)))
@@ -1067,7 +1067,7 @@ trait FingerTreeFunctions {
     sealed trait IndSeq[A] extends SyntaxV[FingerTree[Int, A]] {
       import std.anyVal._
       val self: FingerTree[Int, A]
-      implicit def sizer[A] = Reducer((a: A) => 1)
+      implicit def sizer[A] = UnitReducer((a: A) => 1)
       def apply(i: Int): A =
       self.split(_ > i)._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))
       def replace(i: Int, a: => A): IndSeq[A] = {
@@ -1097,7 +1097,7 @@ trait FingerTreeFunctions {
     object IndSeq {
       import std.anyVal._
       def apply[A](as: A*) = fromSeq(as)
-      def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
+      def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
     }
   }
 
@@ -1133,7 +1133,7 @@ trait FingerTreeFunctions {
         def append(k1: Option[A], k2: => Option[A]) = k2 orElse k1
         val zero: Option[A] = none
       }
-      implicit def keyer[A] = Reducer((a: A) => some(a))
+      implicit def keyer[A] = UnitReducer((a: A) => some(a))
       as.foldLeft(ordSeq(empty[Option[A], A]))((x, y) => x insert y)
     }
   }

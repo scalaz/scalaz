@@ -12,6 +12,9 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
   def >>=[B](f: A => F[B]) = F.bind(self)(f)
 
   def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
+
+  def >>[B](b: F[B]): F[B] = F.bind(self)(_ => b)
+
   ////
 }
 

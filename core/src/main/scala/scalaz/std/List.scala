@@ -38,6 +38,22 @@ trait ListInstances {
     def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
     def zero: List[A] = Nil
   }
+
+  implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
+    def show(as: List[A]) = {
+      val i = as.iterator
+      val k = new collection.mutable.ListBuffer[Char]
+      k += '['
+      while (i.hasNext) {
+        val n = i.next
+        k ++= Show[A].show(n)
+        if (i.hasNext)
+          k += ','
+      }
+      k += ']'
+      k.toList
+    }
+  }
 }
 
 trait ListFunctions {

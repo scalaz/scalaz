@@ -85,4 +85,34 @@ object MixedBag extends App {
     // f >>> myArrK(((i: Int) => i * 2))(kleisliArrId)
     // f >>> ((i: Int) => i * 2))
   }
+
+  def dListExample = {
+    import DList._
+    import syntax.monad._
+    import syntax.writer._
+    import WriterT._
+    import Ident.id
+    import Free._
+
+    type Pair[A] = (A, A)
+    type Tree[A] = Free[Pair, A]
+
+    def leaf[A](a: A): Tree[A] = Return(a)
+    def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Suspend[Pair, A](l -> r)
+
+    implicit val pairFunctor: Functor[Pair] = new Functor[Pair] {
+      def map[A, B](as: Pair[A])(f: A => B) =
+        f(as._1) -> f(as._2)
+    }
+
+    def flattenWriter[A](t: Tree[A]): DList[A] = {
+      def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
+        case Right(a) => DList(a).tell
+        case Left((x, y)) => flatten(x) >> flatten(y)
+      }
+      flatten(t).run._1
+    }
+
+    flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
+  }
 }

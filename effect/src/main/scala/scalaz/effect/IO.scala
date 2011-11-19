@@ -7,7 +7,7 @@ import RefCountedFinalizer._
 import FinalizerHandle._
 import ST._
 import Kleisli._
-import Coroutine._
+import Free._
 import std.function._
 
 sealed trait IO[A] {
@@ -50,16 +50,19 @@ sealed trait IO[A] {
    */
   def unsafeZip_[B](iob: IO[B]): IO[B] = unsafeZipWith(iob, (a: A, b: B) => b)
 
+  /** Continues this action with the given function. */
   def map[B](f: A => B): IO[B] = io(rw =>
     apply(rw) map {
       case (nw, a) => (nw, f(a))
     })
 
+  /** Continues this action with the given action. */
   def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
     apply(rw) flatMap {
       case (nw, a) => f(a)(nw)
     })
 
+  /** Lift this action to a given IO-like monad. */
   def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
     m.liftIO(this)
 
@@ -133,7 +136,7 @@ sealed trait IO[A] {
 
 object IO extends IOFunctions with IOInstances {
   def apply[A](a: => A): IO[A] =
-    io(rw => suspend(rw -> a))
+    io(rw => return_(rw -> a))
 }
 
 trait IOInstances0 {
@@ -166,26 +169,32 @@ private trait IOLiftIO extends LiftIO[IO] {
 trait IOStd {
   import IO.io
 
+  /** Reads a character from standard input. */
   def getChar: IO[Char] = IO(readChar())
 
-  def putChar(c: Char): IO[Unit] = io(rw => suspend(rw -> {
+  /** Writes a character to standard output. */
+  def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
     print(c);
     ()
   }))
 
-  def putStr(s: String): IO[Unit] = io(rw => suspend(rw -> {
+  /** Writes a string to standard output. */
+  def putStr(s: String): IO[Unit] = io(rw => return_(rw -> {
     print(s);
     ()
   }))
 
-  def putStrLn(s: String): IO[Unit] = io(rw => suspend(rw -> {
+  /** Writes a string to standard output, followed by a newline.*/
+  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
     println(s);
     ()
   }))
 
+  /** Reads a line of standard otput. */
   def readLn: IO[String] = IO(readLine())
 
-  def putOut[A](a: A): IO[Unit] = io(rw => suspend(rw -> {
+  /** Write the given value to standard output. */
+  def putOut[A](a: A): IO[Unit] = io(rw => return_(rw -> {
     print(a);
     ()
   }))
@@ -195,6 +204,7 @@ trait IOFunctions extends IOStd {
   type RunInBase[M[_], Base[_]] =
   Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
 
+  /** Construct an IO action from a world-transition function. */
   def io[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
     private[effect] def apply(rw: World[RealWorld]) = f(rw)
   }
@@ -247,9 +257,11 @@ trait IOFunctions extends IOStd {
     newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
 
+  /** An IO action is an ST action. */
   implicit def IOToST[A](io: IO[A]): ST[RealWorld, A] =
     st(io(_).run)
 
+  /** An io action that does nothing. */
   val ioUnit: IO[Unit] =
     IO(())
 }

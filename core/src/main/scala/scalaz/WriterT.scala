@@ -166,6 +166,8 @@ trait WriterTFunctions {
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)
+
+  def tell[W](w: W): Writer[W, Unit] = writer(w -> ())
 }
 
 //
@@ -210,7 +212,7 @@ trait WriterTIndex[F[_], W] extends Index[({type λ[α]=WriterT[F, W, α]})#λ] 
   def index[A](fa: WriterT[F, W, A], i: Int) = if(i == 0) Some(fa.over) else None
 }
 
-trait WriterTMonad[F[_], W] extends Bind[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] {
+trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] with WriterTPointed[F, W] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: WriterT[F, W, A])(f: (A) => WriterT[F, W, B]) = fa flatMap f
