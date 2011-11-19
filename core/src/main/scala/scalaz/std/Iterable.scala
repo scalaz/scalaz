@@ -50,6 +50,18 @@ trait IterableInstances {
         LT
     }
   }
+
+  implicit def IterableLength: Length[Iterable] = new Length[Iterable] {
+    def length[A](a: Iterable[A]) = {
+      var n = 0
+      val i = a.iterator
+      while(i.hasNext) {
+        n = n + 1
+        i.next
+      }
+      n
+    }
+  }
 }
 
 object iterable extends IterableInstances {
