@@ -5,12 +5,15 @@ import annotation.tailrec
 
 trait StreamInstances {
   implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
-    def traverseImpl[G[_] : Applicative, A, B](fa: Stream[A])(f: (A) => G[B]): G[Stream[B]] = {
-      val G = Applicative[G]
-      val seed: G[Stream[B]] = G.point(scala.Stream.empty[B])
-      foldR(fa, seed) {
-        x => ys =>
-          G.ap(ys)(G.map(f(x))((a: B) => (b: Stream[B]) => a #:: b))
+    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
+      val seed: G[Stream[B]] = G.point(Stream[B]())
+      foldRight(fa, seed) {
+        (x, ys) =>
+          // This allows partial traversal (given lazy `Applicative`) but applies effects in the reverse order.
+          // See TraverseTest
+          // G.map2(ys, f(x))((bs, b) => b #:: bs)
+
+          G.map2(f(x), ys)((b, bs) => b #:: bs)
       }
     }
 
@@ -21,7 +24,7 @@ trait StreamInstances {
       var k: Option[A] = None
       val it = fa.iterator
       while (it.hasNext && k.isEmpty) {
-        val z = it.next
+        val z = it.next()
         if (n == i) k = Some(z)
         n = n + 1
       }

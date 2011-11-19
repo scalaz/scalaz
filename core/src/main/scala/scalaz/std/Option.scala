@@ -7,6 +7,13 @@ trait OptionInstances {
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
     def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
+    override def ap[A, B](fa: Option[A])(f: => Option[(A) => B]): Option[B] = fa match {
+      case Some(x) => f match {
+        case Some(f) => Some(f(x))
+        case None    => None
+      }
+      case None    => None
+    }
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
     def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =

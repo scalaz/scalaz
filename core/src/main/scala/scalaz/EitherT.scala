@@ -107,10 +107,10 @@ sealed trait EitherT[F[_], A, B] {
     F.foldRight[Either[A, B], Z](runT, z)((a, b) => eitherMonad[A].foldRight[B, Z](a, b)(f))
   }
 
-  def ap[C](f: EitherT[F, A, B => C])(implicit F: Applicative[F]): EitherT[F, A, C] = {
+  def ap[C](f: => EitherT[F, A, B => C])(implicit F: Applicative[F]): EitherT[F, A, C] = {
     import std.either._
 
-    EitherT.eitherT[F, A, C](F.lift2((ff: Either[A, B => C], aa: Either[A, B]) => eitherMonad[A].ap(aa)(ff))(f.runT, runT))
+    EitherT.eitherT[F, A, C](F.map2(f.runT, runT)((ff: Either[A, B => C], aa: Either[A, B]) => eitherMonad[A].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LeftProjectionT[F, A, B]() {
@@ -301,7 +301,7 @@ trait EitherTPointed[F[_], E] extends Pointed[({type λ[α]=EitherT[F, E, α]})#
 trait EitherTApplicative[F[_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTPointed[F, E] {
   implicit def F: Applicative[F]
 
-  override def ap[A, B](fa: EitherT[F, E, A])(f: EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
+  override def ap[A, B](fa: EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
 }
 
 trait EitherTMonad[F[_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApplicative[F, E] {

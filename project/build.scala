@@ -23,7 +23,7 @@ object build extends Build {
         }
     },
     typeClasses := Seq(),
-    genToSyntax <<= (typeClasses) map {
+    genToSyntax <<= typeClasses map {
       (tcs: Seq[TypeClass]) =>
       val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
       val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
@@ -98,7 +98,7 @@ object build extends Build {
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
     dependencies = Seq(core, concurrent),
-    settings     = standardSettings ++ Seq(
+    settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"
     )
@@ -111,13 +111,13 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.6" % "test",
+        "org.specs2" %% "specs2" % "1.6.1" % "test",
         "org.scala-tools.testing" %% "scalacheck" % "1.9" % "test"
       )
     )
   )
 
-  lazy val publishSetting = publishTo <<= (version) {
+  lazy val publishSetting = publishTo <<= (version).apply{
     version: String =>
       def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
       val isSnapshot = version.trim.endsWith("SNAPSHOT")

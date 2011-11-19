@@ -118,8 +118,9 @@ sealed trait LazyEitherT[F[_], A, B] {
     F.foldR[LazyEither[A, B], Z](runT, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
   }
 
-  def ap[C](f: LazyEitherT[F, A, B => C])(implicit F: Applicative[F]): LazyEitherT[F, A, C] = {
-    LazyEitherT[F, A, C](F.lift2((ff: LazyEither[A, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[A].ap(aa)(ff))(f.runT, runT))
+  def ap[C](f: => LazyEitherT[F, A, B => C])(implicit F: Applicative[F]): LazyEitherT[F, A, C] = {
+    // TODO check laziness
+    LazyEitherT[F, A, C](F.map2(f.runT, runT)((ff: LazyEither[A, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[A].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B]() {
@@ -319,7 +320,7 @@ trait LazyEitherTPointed[F[_], E] extends Pointed[({type λ[α]=LazyEitherT[F, E
 trait LazyEitherTApplicative[F[_], E] extends Applicative[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTPointed[F, E] {
   implicit def F: Applicative[F]
 
-  override def ap[A, B](fa: LazyEitherT[F, E, A])(f: LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
+  override def ap[A, B](fa: LazyEitherT[F, E, A])(f: => LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
 }
 
 trait LazyEitherTMonad[F[_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApplicative[F, E] {

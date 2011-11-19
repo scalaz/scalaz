@@ -26,9 +26,14 @@ trait ListInstances {
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] = {
-      val fbs: F[List[B]] = F.point(scala.List[B]())
+      // This version blows the stack.
+      // l.foldRight(F.point(Nil: List[B])) {
+      //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+      // }
 
-      l.reverse.foldLeft(fbs)((fbl, a) => F.map2(f(a), fbl)(_ :: _))
+      DList.fromList(l).foldr(F.point(List[B]())) {
+        (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+      }
     }
 
     def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)((a, b) => f(a, b))
