@@ -38,7 +38,7 @@ class ApplicativeTest extends Specification with ScalaCheck {
     val typeName = man.toString
     implicit val arbMAA: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
     typeName in {
-      import ScalazProperties.Applicative._
+      import ScalazProperties.applicative._
       check(identity[M, A])
       check(composition[M, A, A, A])
       
