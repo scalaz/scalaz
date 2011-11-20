@@ -2,13 +2,13 @@ package scalaz
 
 import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder
-import org.specs2.specification.{Fragments, BaseSpecification, SpecificationStructure}
+import org.specs2.specification.{Example, Fragments, BaseSpecification, SpecificationStructure}
 
 /** A minimal version of the Specs2 mutable base class */
 trait Spec
   extends BaseSpecification with FragmentsBuilder with MustExpectations
   with MustThrownExpectations with ShouldThrownExpectations with ScalaCheckMatchers
-  with MatchersImplicits {
+  with MatchersImplicits with StandardMatchResults  {
 
   def is = specFragments
 

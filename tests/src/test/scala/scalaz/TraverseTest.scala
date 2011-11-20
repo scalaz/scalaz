@@ -1,14 +1,15 @@
 package scalaz
 
-import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
-import org.scalacheck.{Gen, Arbitrary}
+import scalacheck.ScalazProperties
+import org.scalacheck.Arbitrary
+import org.specs2.matcher.Parameters
 
 class TraverseTest extends Spec {
 
   import scalaz._
-  import std.string._, std.tuple._, std.anyVal._, std.option._
-  import syntax.traverse._, syntax.equal._
+  import std.AllInstances._
+  import std.AllFunctions._
+  import syntax.traverse._
   import Ident._
   import WriterT._
 
@@ -22,7 +23,7 @@ class TraverseTest extends Spec {
     // (["1","2","3"],"123")
     "apply effects in order" in {
       val s: Writer[String, List[Int]] = List(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.runT must be_=== (("123", List(1, 2, 3)))
+      s.runT must be_===(("123", List(1, 2, 3)))
     }
 
     "traverse through option effect" in {
@@ -52,6 +53,34 @@ class TraverseTest extends Spec {
       val stream = Stream.from(1)
       val s: Option[Stream[Int]] = stream.traverseU((x: Int) => if (x < 3) some(x) else none)
       s must be_===(none)
+    }
+  }
+
+  checkTraverseLaws[List, Int]
+  checkTraverseLaws[Stream, Int]
+  checkTraverseLaws[Option, Int]
+  checkTraverseLaws[Id, Int]
+  // checkTraverseLaws[NonEmptyList, Int]
+  // checkTraverseLaws[({type λ[α]=Validation[Int, α]})#λ, Int]
+  // checkTraverseLaws[Zipper, Int]
+  // checkTraverseLaws[LazyOption, Int]
+
+  def checkTraverseLaws[M[_], A](implicit mm: Traverse[M],
+                                 ea: Equal[A],
+                                 ema: Equal[M[A]],
+                                 arbma: Arbitrary[M[A]],
+                                 arba: Arbitrary[A], man: Manifest[M[_]]) = {
+    man.toString should {
+      import ScalazProperties.traverse._
+      import std.option._, std.list._
+
+      implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 5))
+
+      "identityTraverse" in check(identityTraverse[M, A, A])
+      "purity (Option)" in check(purity[M, Option, A])
+      "purity (List)" in check(purity[M, List, A])
+      "sequentialFusion (List/Option)" in check(sequentialFusion[M, List, Option, A, A, A])
+      "parallelFusion (List/Option)" in check(parallelFusion[M, List, Option, A, A])
     }
   }
 }
