@@ -66,19 +66,20 @@ class MonadTest extends Specification with ScalaCheck {
     checkMonadLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]("Either.LeftProjection")
     checkMonadLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]("Either.RightProjection")
 //    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
+    ok
   }
 
   def checkMonadLaws[M[_], A](typeName: String)(implicit mm: Monad[M],
                               ea: Equal[A],
                               ema: Equal[M[A]],
                               arbma: Arbitrary[M[A]],
-                              arba: Arbitrary[A]
-          ) = {
-    typeName in {
+                              arba: Arbitrary[A]) = {
+    typeName should {
       import ScalazProperties.monad._
-      check(leftIdentity[M, A, A])
-      check(rightIdentity[M, A])
-      check(associativity[M, A, A, A])
+
+      "leftIdentity" in check(leftIdentity[M, A, A])
+      "rightIdentity" in check(rightIdentity[M, A])
+      "associativity" in check(associativity[M, A, A, A])
     }
   }
 }
