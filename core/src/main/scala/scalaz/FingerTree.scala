@@ -1131,7 +1131,6 @@ trait FingerTreeFunctions {
       val self: FingerTree[Option[A], A]
       implicit val ord: Order[A]
 
-
       def partition(a: A) = (ordSeq[A](_)).product.apply(self.split(_ gte some(a)))
       
       def insert(a: A) = partition(a) match {

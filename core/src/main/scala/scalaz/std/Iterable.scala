@@ -88,7 +88,6 @@ trait IterableInstances {
 
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B): B = fa.foldRight(b)(f(_, _))
   }
-
 }
 
 object iterable extends IterableInstances {

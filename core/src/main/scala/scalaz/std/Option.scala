@@ -66,16 +66,6 @@ trait OptionInstances {
     }).toList
   }
 
-  implicit def optionOrder[A: Order]: Order[Option[A]] = new Order[Option[A]] {
-    import scalaz.Ordering._
-    def order(x: Option[A], y: Option[A]) = (x, y) match {
-      case (Some(x), Some(y)) => Order[A].order (x, y)
-      case (Some(_), None) => GT
-      case (None, Some(_)) => LT
-      case (None, None) => EQ
-    }
-  }
-
   import Tags.{First, Last}
 
   implicit def optionFirst[A] = new Monoid[Option[A] @@ First] {
