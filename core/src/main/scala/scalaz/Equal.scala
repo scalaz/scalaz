@@ -14,6 +14,15 @@ trait Equal[F]  { self =>
   }
   // derived functions
 
+  trait EqualLaw {
+    def commutative(f1: F, f2: F): Boolean = equal(f1, f2) == equal(f2, f1)
+    def reflexive(f: F): Boolean = equal(f, f)
+    def transitive(f1: F, f2: F, f3: F): Boolean = {
+      import std.boolean.conditional
+      conditional(equal(f1, f2) && equal(f2, f3), equal(f1, f3))
+    }
+  }
+  def equalLaw = new EqualLaw {}
   ////
   val equalSyntax = new scalaz.syntax.EqualSyntax[F] {}
 }

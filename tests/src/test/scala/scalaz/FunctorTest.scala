@@ -107,6 +107,8 @@ class FunctorTest extends Specification with ScalaCheck {
     //    checkFunctorLaws[CopyOnWriteArrayList, A]
     //    checkFunctorLaws[LinkedBlockingQueue, A]
     //    checkFunctorLaws[SynchronousQueue, A]
+
+    ok
   }
 
   def checkFunctorLaws[F[_], A](implicit mm: Functor[F],
@@ -114,12 +116,12 @@ class FunctorTest extends Specification with ScalaCheck {
                                 man: Manifest[F[A]],
                                 ema: Equal[F[A]],
                                 arbma: Arbitrary[F[A]],
-                                arba: Arbitrary[A]): Example = {
+                                arba: Arbitrary[A]) = {
     val typeName = man.toString
-    typeName in {
-      import ScalazProperties.Functor._
-      check(identity[F, A])
-      check(associative[F, A, A, A])
+    typeName should {
+      import ScalazProperties.functor._
+      "identity" in check(identity[F, A])
+      "associative" in check(associative[F, A, A, A])
     }
   }
 }

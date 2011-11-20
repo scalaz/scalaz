@@ -1,10 +1,13 @@
 package scalaz
 package std
 
+trait OptionInstances0 {
+  implicit def optionEqual[A](implicit A0: Equal[A]) = new OptionEqual[A] {
+    implicit def A = A0
+  }
+}
 
-
-
-trait OptionInstances {
+trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
@@ -40,23 +43,8 @@ trait OptionInstances {
     def zero: Option[A] = None
   }
 
-  implicit def optionEqual[A: Equal]: Equal[Option[A]] = new Equal[Option[A]] {
-    def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
-      case (Some(a1), Some(a2)) => Equal[A].equal(a1, a2)
-      case (None, None)         => true
-      case (None, Some(_))      => false
-      case (Some(_), None)      => false
-    }
-  }
-
-  implicit def optionOrder[A: Order]: Order[Option[A]] = new Order[Option[A]] {
-    import Ordering._
-    def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
-      case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
-      case (None, Some(_)) => GT
-      case (Some(_), None) => LT
-      case (None, None) => EQ
-    }
+  implicit def optionOrder[A](implicit A0: Order[A]): Order[Option[A]] = new OptionOrder[A] {
+    implicit def A = A0
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
@@ -96,14 +84,12 @@ trait OptionInstances {
   implicit def optionLastFunctor[A]: Functor[({type f[x] = Option[x] @@ Last})#f] = new Functor[({type f[x] = Option[x] @@ Last})#f] {
     def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
   }
-
 }
 
 trait OptionFunctions {
   final def some[A](a: A): Option[A] = Some(a)
 
   final def none[A]: Option[A] = None
-
 
   /**
    * Catamorphism over the option. Returns the provided function `some` applied to item contained in the Option
@@ -157,3 +143,30 @@ object option extends OptionInstances with OptionFunctions {
   object optionSyntax extends scalaz.syntax.std.ToOptionV with scalaz.syntax.std.ToOptionIdV 
 }
 
+//
+// Type class implementation traits
+//
+
+trait OptionEqual[A] extends Equal[Option[A]] {
+  implicit def A: Equal[A]
+  override def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
+    case (Some(a1), Some(a2)) => A.equal(a1, a2)
+    case (None, None)         => true
+    case (None, Some(_))      => false
+    case (Some(_), None)      => false
+  }
+}
+
+
+trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
+  implicit def A: Order[A]
+
+  import Ordering._
+
+  def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
+    case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
+    case (None, Some(_))      => GT
+    case (Some(_), None)      => LT
+    case (None, None)         => EQ
+  }
+}

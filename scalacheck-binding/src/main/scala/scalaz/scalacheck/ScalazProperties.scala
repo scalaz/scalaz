@@ -2,100 +2,82 @@ package scalaz
 package scalacheck
 
 import org.scalacheck.{Arbitrary, Prop, Properties}
+import Prop.forAll
+import Scalaz._
 
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
-// todo
-// dibblego: I think the ScalazProperties.Functor should have identity+composition (not associativity)
-// dibblego: and Monad should have: associativity, right identity, left identity
 object ScalazProperties {
-  import Scalaz._
-  import scalaz.syntax.equal._
-  import Prop.forAll
 
-  object Equal {
-    def commutativity[A: Equal : Arbitrary] =
-      forAll((a1: A, a2: A) => (a1 === a2) === (a2 === a1)).label("commutativity")
+  object equal {
+    def commutativity[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.commutative _).label("commutativity")
 
-    def identity[A: Equal : Arbitrary] = forAll((a: A) => a === a).label("identity")
+    def reflexive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.reflexive _).label("reflexive")
+
+    def transitive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.transitive _).label("transitive")
   }
 
-  object Semigroup {
-    def associative[A: Semigroup : Equal : Arbitrary] =
-      forAll((a1: A, a2: A, a3: A) => ((a1 |+| a2) |+| a3) === (a1 |+| (a2 |+| a3))).label("associative")
+  object semigroup {
+    def associative[A](implicit A: Semigroup[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _).label("associative")
   }
 
-  object Monoid {
-    def identity[A: Monoid : Equal : Arbitrary] = forAll((a: A) => (a |+| scalaz.Monoid[A].zero) === a).label("identity")
+  object monoid {
+    def identity[A](implicit A: Monoid[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.identity _).label("identity")
   }
 
-  object Functor {
-    def identity[F[_], X](implicit f: Functor[F],
+  object functor {
+    def identity[F[_], X](implicit F: Functor[F],
                           afx: Arbitrary[F[X]],
                           ef: Equal[F[X]]) =
-      forAll((a: F[X]) => (a ∘ Predef.identity) === a).label("identity")
+      forAll(F.functorLaw.identity[X] _).label("identity")
 
-    def associative[F[_], X, Y, Z](implicit f: Functor[F],
+    def associative[F[_], X, Y, Z](implicit F: Functor[F],
                           af: Arbitrary[F[X]],
                           axy: Arbitrary[(X => Y)],
                           ayz: Arbitrary[(Y => Z)],
                           ef: Equal[F[Z]]) =
-      forAll((a1: F[X], f1: (X => Y), f2: (Y => Z)) => ((a1 ∘ f1) ∘ f2) === (a1 ∘ (f1 ∘ f2))).label("associative")
+      forAll(F.functorLaw.associative[X, Y, Z] _).label("associative")
+  }
+
+  object monad {
+    def rightIdentity[M[_], X](implicit M: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
+      forAll(M.monadLaw.rightIdentity[X] _).label("Right identity")
+
+    def leftIdentity[M[_], X, Y](implicit am: Monad[M], emy: Equal[M[Y]], ax: Arbitrary[X], af: Arbitrary[(X => M[Y])]) =
+      forAll(am.monadLaw.leftIdentity[X, Y] _).label("Left identity")
+
+    def associativity[M[_], X, Y, Z](implicit M: Monad[M], amx: Arbitrary[M[X]], af: Arbitrary[(X => M[Y])],
+                                     ag: Arbitrary[(Y => M[Z])], emz: Equal[M[Z]]) =
+      forAll(M.monadLaw.associativeBind[X, Y, Z] _).label("Associativity")
+  }
+
+  object applicative {
+    def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(f.applicativeLaw.identity[X] _)
+
+    def composition[F[_], X, Y, Z](implicit ap: Applicative[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
+                                   av: Arbitrary[F[X => Y]], e: Equal[F[Z]]) = forAll(ap.applicativeLaw.composition[X, Y, Z] _)
+
+    def homomorphism[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], af: Arbitrary[X => Y], e: Equal[F[Y]]) =
+      forAll(ap.applicativeLaw.homomorphism[X, Y] _)
+
+    def interchange[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], afx: Arbitrary[F[X => Y]], e: Equal[F[Y]]) =
+      forAll(ap.applicativeLaw.interchange[X, Y] _)
+  }
+
+  class ApplicativeLaws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
+    extends Properties("Applicative Laws") {
+    property("identity") = applicative.identity[F, Int]
+    property("composition") = applicative.composition[F, Int, Int, Int]
+    property("homomorphism") = applicative.homomorphism[F, Int, Int]
+    property("interchange") = applicative.interchange[F, Int, Int]
   }
 
   class MonadLaws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]], af: Arbitrary[Int => M[Int]], e: Equal[M[Int]])
         extends Properties("Monad Laws") {
-    property("Right identity") = Monad.rightIdentity[M, Int]
-    property("Left identity") = Monad.leftIdentity[M, Int, Int]
-    property("Associativity") = Monad.associativity[M, Int, Int, Int]
-  }
-
-  object Monad {
-    import scalaz.syntax.monad._
-    def rightIdentity[M[_], X](implicit m: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
-      forAll((a: M[X]) => m.bind(a)(m.point(_: X)) === a).label("Right identity")
-
-    def leftIdentity[M[_], X, Y](implicit am: Monad[M],
-                         emy: Equal[M[Y]],
-                         ax: Arbitrary[X],
-                         af: Arbitrary[(X => M[Y])]) =
-      forAll((a: X, f: X => M[Y]) => (a.point[M] >>= f) === f(a)).label("Left identity")
-
-    def associativity[M[_], X, Y, Z](implicit mm: Monad[M],
-                                     amx: Arbitrary[M[X]],
-                                     af: Arbitrary[(X => M[Y])],
-                                     ag: Arbitrary[(Y => M[Z])],
-                                     emz: Equal[M[Z]]) =
-//      forAll((a: M[X], f: X => M[Y], g: Y => M[Z]) => ((a ∗ f ∗ g) === (a ∗ ((x) => f(x) ∗ g)))).label("Associativity")
-      forAll((a: M[X], f: X => M[Y], g: Y => M[Z]) => ((a >>= f >>= g) === (a >>= ((x: X) => f(x) >>= g)))).label("Associativity")
-  }
-
-  class ApplicativeLaws[F[_]](implicit a: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
-        extends Properties("Applicative Laws") {
-    property("identity") = Applicative.identity[F, Int]
-    property("composition") = Applicative.composition[F, Int, Int, Int]
-    property("homomorphism") = Applicative.homomorphism[F, Int, Int]
-    property("interchange") = Applicative.interchange[F, Int, Int]
-  }
-
-  object Applicative {
-    import scalaz.syntax.applicative._
-    def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll((v: F[X]) => v <*> f.point((x: X) => x) === v)
-
-    def composition[F[_], X, Y, Z](implicit ap: Applicative[F], 
-                                   afx: Arbitrary[F[X]],
-                                   au: Arbitrary[F[Y => Z]],
-                                   av: Arbitrary[F[X => Y]],
-                                   e: Equal[F[Z]]) =
-      forAll((u: F[Y => Z], v: F[X => Y], w: F[X]) =>
-        (w <*> (v <*> (u <*> (((f: Y => Z) => (g: X => Y) => f compose g).point[F])))) === (w <*> v) <*> u)
-
-    def homomorphism[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], af: Arbitrary[X => Y], e: Equal[F[Y]]) =
-      forAll((f: X => Y, x: X) => x.point[F] <*> f.point[F] === f(x).point[F])
-
-    def interchange[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], afx: Arbitrary[F[X => Y]], e: Equal[F[Y]]) =
-      forAll((u: F[X => Y], y: X) => y.point[F] <*> u === u <*> ((f: X => Y) => f(y)).point[F])
+    property("Right identity") = monad.rightIdentity[M, Int]
+    property("Left identity") = monad.leftIdentity[M, Int, Int]
+    property("Associativity") = monad.associativity[M, Int, Int, Int]
   }
 }

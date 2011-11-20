@@ -119,7 +119,7 @@ class EqualTest extends Specification with ScalaCheck {
 
     success
   }
-  
+
 //  "collection equality" in {
 //    def equalityConsistent[C](c1: C, c2: C)(implicit eq: Equal[C]): Boolean = (c1 == c2) must be_==(c1 === c2)
 //    equalityConsistent(Set(1, 2, 3), Set(3, 2, 1))
@@ -132,10 +132,12 @@ class EqualTest extends Specification with ScalaCheck {
 
   def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {
     val typeName = manifest[A].toString
-    typeName in {
-      import ScalazProperties.Equal._
-      check(commutativity[A])
-      check(identity[A])
+    typeName should {
+      import ScalazProperties.equal._
+
+      "commutativity" in check(commutativity[A])
+      "reflexive" in check(reflexive[A])
+      "transitive" in check(transitive[A])
     }
   }
 }

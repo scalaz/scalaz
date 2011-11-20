@@ -77,11 +77,12 @@ class MonoidTest extends Specification with ScalaCheck {
 
   def checkMonoidLaws[A: Monoid : Equal : Manifest : Arbitrary] = {
     val typeName = manifest[A].toString
-    typeName in {
-      import ScalazProperties.Semigroup._
-      import ScalazProperties.Monoid._
-      check(associative[A])
-      check(identity[A])
+    typeName should {
+      import ScalazProperties.semigroup._
+      import ScalazProperties.monoid._
+
+      "associative" in check(associative[A])
+      "identity" in check(identity[A])
     }
   }
 }

@@ -27,6 +27,8 @@ class ApplicativeTest extends Specification with ScalaCheck {
     type Z = Int
 
     checkApplicativeLaws[Option, A]
+
+    ok
   }
 
   def checkApplicativeLaws[M[_], A](implicit mm: Applicative[M],
@@ -37,10 +39,11 @@ class ApplicativeTest extends Specification with ScalaCheck {
                                     arba: Arbitrary[A]) = {
     val typeName = man.toString
     implicit val arbMAA: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
-    typeName in {
-      import ScalazProperties.Applicative._
-      check(identity[M, A])
-      check(composition[M, A, A, A])
+    typeName should {
+      import ScalazProperties.applicative._
+
+      "identity" in check(identity[M, A])
+      "composition" in check(composition[M, A, A, A])
       
       // TODO These don't terminate. Investigate.
 //      homomorphism[M, A, A] must pass

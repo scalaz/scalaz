@@ -17,6 +17,13 @@ trait Semigroup[F]  { self =>
 
   // derived functions
 
+  trait SemigroupLaw {
+    def associative(f1: F, f2: F, f3: F)(implicit F: Equal[F]): Boolean =
+      F.equal(append(f1, append(f2, f3)), append(append(f1, f2), f3))
+  }
+  def semigroupLaw = new SemigroupLaw {}
+
+
   ////
   val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] {}
 }
