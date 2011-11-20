@@ -22,5 +22,9 @@ object FingerTreeUsage extends App{
 
   assert((emptyTree :+ 2 :+ 3).toList == List(2, 3))
 
+  assert((3 +: 2 +: emptyTree).toList == List(3, 2))
+
+  assert(streamToTree(Stream.from(1).take(20)).foldRight(0)(_ + _) == (1 to 20).sum)
+
   println(streamToTree(Stream.from(1).take(20)))
 }
