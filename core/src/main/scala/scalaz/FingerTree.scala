@@ -1,13 +1,11 @@
 package scalaz
 
-//import scalaz.Scalaz._
 import collection.Iterator
-import collection.immutable.StringLike
 import syntax.semigroup._
 import syntax.reducer._
 import std.option.optionSyntax._
-import syntax.show._
 import syntax.SyntaxV
+import scalaz.Foldable.FromFoldMap
 
 
 /**
@@ -339,6 +337,17 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
+
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = {
+    foldMap((a: A) => (Endo.endo(f(a, _: B)))) apply z
+  }
+
+  def foldLeft[B](b: B)(f: (B, A) => B): B = {
+    fold(v => b,
+          (v, a) => f(b, a),
+          (v, pr, m, sf) =>
+              FingerFoldable[V].foldLeft(sf, m.foldLeft[B](FingerFoldable[V].foldLeft(pr, b)(f))((x, y) => NodeFoldable[V].foldLeft(y, x)(f)))(f))
+  }
 
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
@@ -729,24 +738,12 @@ trait FingerTreeInstances {
   }
 
   implicit def fingerTreeFoldable[V]: Foldable[({type l[a]=FingerTree[V, a]})#l] = new Foldable[({type l[a]=FingerTree[V, a]})#l] {
-    override def foldLeft[A, B](t: FingerTree[V, A], b: B)(f: (B, A) => B) = {
-      t.fold(v => b,
-            (v, a) => f(b, a),
-            (v, pr, m, sf) =>
-                FingerFoldable[V].foldLeft(sf, foldLeft[Node[V, A], B](m, FingerFoldable[V].foldLeft(pr, b)(f))((x, y) => NodeFoldable[V].foldLeft(y, x)(f)))(f))
-    }
+    override def foldLeft[A, B](t: FingerTree[V, A], b: B)(f: (B, A) => B) = t.foldLeft(b)(f)
 
-    override def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t foldMap f
-         override def foldRight[A, B](t: FingerTree[V, A], b: => B)(f: (A, => B) => B): B = {
-           t.fold(v => b,
-                (v, a) => f(a, b),
-                (v, pr, m, sf) =>
-                    FingerFoldable[V].foldRight(pr,
-                                           foldRight[Node[V, A], B](m,
-                                                     FingerFoldable[V].foldRight(sf, b)(f))
-                                                     ((x, y) => NodeFoldable[V].foldRight(x, y)(f)))(f))
-         }
-    }
+    def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t foldMap(f)
+
+    override def foldRight[A, B](t: FingerTree[V, A], z: => B)(f: (A, => B) => B) = t.foldRight(z)(f)
+  }
 
   implicit def fingerTreeSemigroup[V, A](implicit m: Reducer[A, V]): Semigroup[FingerTree[V, A]]= new Semigroup[FingerTree[V, A]] {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
