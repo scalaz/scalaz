@@ -39,7 +39,7 @@ trait IterableInstances {
           b = false
         }
       }
-      if (i1.hasNext || i2.hasNext || (!i1.hasNext && !i2.hasNext)) r
+      if (i1.length == i2.length) r
       else if (i1.hasNext) GT
       else LT
     }
