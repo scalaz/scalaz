@@ -75,7 +75,7 @@ class MonadTest extends Specification with ScalaCheck {
                               arba: Arbitrary[A]
           ) = {
     typeName in {
-      import ScalazProperties.Monad._
+      import ScalazProperties.monad._
       check(leftIdentity[M, A, A])
       check(rightIdentity[M, A])
       check(associativity[M, A, A, A])

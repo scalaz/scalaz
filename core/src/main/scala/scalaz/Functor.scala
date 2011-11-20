@@ -35,6 +35,11 @@ trait Functor[F[_]]  { self =>
     implicit def G = G0
   }
 
+  trait FunctorLaw {
+    def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
+    def associative[A, B, C](fa: F[A], f1: A => B, f2: B => C)(implicit FC: Equal[F[C]]): Boolean = FC.equal(map(map(fa)(f1))(f2), map(fa)(f2 compose f1))
+  }
+  def functorLaw = new FunctorLaw {}
   ////
   val functorSyntax = new scalaz.syntax.FunctorSyntax[F] {}
 }

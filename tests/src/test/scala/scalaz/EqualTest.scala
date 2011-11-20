@@ -130,9 +130,9 @@ class EqualTest extends Specification with ScalaCheck {
   def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {
     val typeName = manifest[A].toString
     typeName in {
-      import ScalazProperties.Equal._
+      import ScalazProperties.equal._
       check(commutativity[A])
-      check(identity[A])
+      check(reflexive[A])
     }
   }
 }

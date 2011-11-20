@@ -1,5 +1,6 @@
 package scalaz
 
+/** An algebraic data type representing the characters 'a' to 'z' */
 sealed trait Alpha {
   val toChar: Char
 

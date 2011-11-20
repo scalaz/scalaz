@@ -117,7 +117,7 @@ class FunctorTest extends Specification with ScalaCheck {
                                 arba: Arbitrary[A]): Example = {
     val typeName = man.toString
     typeName in {
-      import ScalazProperties.Functor._
+      import ScalazProperties.functor._
       check(identity[F, A])
       check(associative[F, A, A, A])
     }

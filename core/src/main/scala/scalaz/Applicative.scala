@@ -2,6 +2,7 @@ package scalaz
 
 ////
 /**
+ * Applicative Functor, described in [[http://www.soi.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects]]
  *
  */
 ////
@@ -36,6 +37,22 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
 
     implicit def G: Applicative[G] = G0
   }
+
+  trait ApplicativeLaw extends FunctorLaw {
+    def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = {
+      FA.equal(ap(fa)(point((a: A) => a)), fa)
+    }
+    def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]) = {
+      FC.equal(ap(ap(fa)(fab))(fbc), ap(fa)(ap(fab)(ap(fbc)(point((bc: B => C) => (ab: A => B) => bc compose ab)))))
+    }
+    def homomorphism[A, B](ab: A => B, a: A)(implicit FB: Equal[F[B]]): Boolean = {
+      FB.equal(ap(point(a))(point(ab)), point(ab(a)))
+    }
+    def interchange[A, B](f: F[A => B], a: A)(implicit FB: Equal[F[B]]): Boolean = {
+      FB.equal(ap(point(a))(f), ap(f)(point((f: A => B) => f(a))))
+    }
+  }
+  def applicativeLaw = new ApplicativeLaw {}
 
   ////
   val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {}
