@@ -685,13 +685,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
   def toList: List[A] = toStream.toList
 
-
   override def toString = {
-    //TODO
-//    implicit val v = show[V]
-//    implicit val a = showA[A]
-//    this.shows
-    ""
+    "<fingertree>"
   }
 }
 
