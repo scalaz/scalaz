@@ -5,13 +5,14 @@ import syntax.semigroup._
 import syntax.reducer._
 import std.option.optionSyntax._
 import syntax.SyntaxV
-import scalaz.Foldable.FromFoldMap
 
 
 /**
  * Finger Trees provide a base for implementations of various collection types,
  * as described in "Finger trees: a simple general-purpose data structure", by
  * Ralf Hinze and Ross Paterson.
+ *
+ *
  * <br>
  * Finger Trees have excellent (amortized) asymptotics:
  * <br>
@@ -21,6 +22,8 @@ import scalaz.Foldable.FromFoldMap
  * Random access to an element at n is O(lg min(n, l - n)), where
  *   l is the size of the tree.
  * Constructing a tree with n copies of a value is O(lg n).
+ *
+ * @see <a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf">Finger trees: a simple general-purpose data structure</a>
  */
 
 sealed abstract class ViewL[S[_], A] {
@@ -758,9 +761,13 @@ trait FingerTreeInstances {
       deep = (v, pf, m, sf) => v.show ++ (" [" + pf.toList.shows + ", ?, " + sf.toList.shows + "]").toList
     )
   }
-}
 
-object fingerTree extends FingerTreeInstances with FingerTreeFunctions
+  import fingerTree.ftip2ft
+  import rope.Rope
+  implicit def RopeLength: Length[Rope] = new Length[Rope] {
+    def length[A](a: Rope[A]) = a.self.measure
+  }
+}
 
 trait FingerTreeFunctions {
 //  def &:[A](a: A) = OnL[M,A](a, value)
@@ -1150,3 +1157,6 @@ trait FingerTreeFunctions {
     }
   }
 }
+
+object rope extends Ropes
+object fingerTree extends FingerTreeInstances with FingerTreeFunctions
