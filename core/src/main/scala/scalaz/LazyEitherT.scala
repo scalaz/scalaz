@@ -320,7 +320,7 @@ trait LazyEitherTPointed[F[_], E] extends Pointed[({type λ[α]=LazyEitherT[F, E
 trait LazyEitherTApplicative[F[_], E] extends Applicative[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTPointed[F, E] {
   implicit def F: Applicative[F]
 
-  override def ap[A, B](fa: LazyEitherT[F, E, A])(f: => LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
+  override def ap[A, B](fa: => LazyEitherT[F, E, A])(f: => LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
 }
 
 trait LazyEitherTMonad[F[_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApplicative[F, E] {

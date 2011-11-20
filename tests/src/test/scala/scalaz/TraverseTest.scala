@@ -49,7 +49,6 @@ class TraverseTest extends Spec {
     // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
     // Nothing
     "allow partial traversal" in {
-      skipped("TODO") // TODO
       val stream = Stream.from(1)
       val s: Option[Stream[Int]] = stream.traverseU((x: Int) => if (x < 3) some(x) else none)
       s must be_===(none)

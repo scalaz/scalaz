@@ -20,7 +20,7 @@ trait Idents {
 
     override def sequence[A, G[_]: Traverse](as: G[Id[A]]): Id[G[A]] = as
 
-    override def ap[A, B](fa: Id[A])(f: => Id[A => B]): Id[B] = f(fa)
+    override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
     /*TODO Bring back after Apply is remodelled.
     override def ap2[A, B, C](fa: Id[A], fb: Id[B])(f: Id[(A, B) => C]): Id[C] = f(fa, fb)

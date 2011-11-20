@@ -76,7 +76,7 @@ trait CokleisliFunctions {
 }
 
 trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]})#λ] {
-  override def ap[A, B](fa: Cokleisli[F, R, A])(f: => Cokleisli[F, R, (A) => B]) = f flatMap (fa map _)
+  override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, (A) => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: (A) => Cokleisli[F, R, B]) = fa flatMap f
 }

@@ -301,7 +301,7 @@ trait EitherTPointed[F[_], E] extends Pointed[({type λ[α]=EitherT[F, E, α]})#
 trait EitherTApplicative[F[_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTPointed[F, E] {
   implicit def F: Applicative[F]
 
-  override def ap[A, B](fa: EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
+  override def ap[A, B](fa: => EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
 }
 
 trait EitherTMonad[F[_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApplicative[F, E] {

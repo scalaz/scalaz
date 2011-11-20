@@ -348,7 +348,7 @@ trait ZipperInstances {
       fa.foldLeft(z)(f)
     def point[A](a: => A): Zipper[A] =
       zipper(Stream.continually(a), a, Stream.continually(a))
-    def ap[A, B](fa: Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
+    def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
       fa ap f
     override def map[A, B](fa: Zipper[A])(f: (A) => B): Zipper[B] =
       fa map f

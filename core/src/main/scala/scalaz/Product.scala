@@ -23,6 +23,6 @@ private[scalaz] trait ProductApplicative[F[_], G[_]] extends Applicative[({type 
 
   implicit def G: Applicative[G]
 
-  def ap[A, B](fa: (F[A], G[A]))(f: => (F[(A) => B], G[(A) => B])): (F[B], G[B]) = (F.ap(fa._1)(f._1), G.ap(fa._2)(f._2))
+  def ap[A, B](fa: => (F[A], G[A]))(f: => (F[(A) => B], G[(A) => B])): (F[B], G[B]) = (F.ap(fa._1)(f._1), G.ap(fa._2)(f._2))
 }
 
