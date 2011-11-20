@@ -44,13 +44,14 @@ class TraverseTest extends Spec {
       s.runT must be_===(("123", Stream(1, 2, 3)))
     }
 
-    // ghci> import Data.Traversable
-    // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
-    // Nothing
+  // ghci> import Data.Traversable
+  // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
+  // Nothing
     "allow partial traversal" in {
       val stream = Stream.from(1)
       val s: Option[Stream[Int]] = stream.traverseU((x: Int) => if (x < 3) some(x) else none)
       s must be_===(none)
+      "" mustEqual ""
     }
   }
 }

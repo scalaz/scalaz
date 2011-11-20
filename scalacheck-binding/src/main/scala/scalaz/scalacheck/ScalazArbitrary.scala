@@ -75,6 +75,10 @@ object ScalazArbitrary {
     Gen.sized(tree _)
   }
 
+  implicit def IterableArbitrary[A] (implicit a: Arbitrary[A]): Arbitrary[Iterable[A]] =
+      Apply[Arbitrary].map2[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
+
+
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
     Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
 
@@ -107,10 +111,10 @@ object ScalazArbitrary {
 
   implicit def EitherLastRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B] @@ Last] = arb[Either[A, B]] ∘ ((x: Either[A, B]) => Tag(x.right))
 
-
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = arb[List[A]] ∘ ((x: List[A]) => ArraySeq(x: _*))
 
-//  import FingerTree._
+//  import fingerTree._
+//  import rope.Rope
 //
 //  implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
 //    arbitrary[A] ∘ (one(_): Finger[V, A]),
@@ -118,7 +122,7 @@ object ScalazArbitrary {
 //    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(three(_, _, _): Finger[V, A]),
 //    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])(four(_, _, _, _): Finger[V, A])
 //  ))
-
+//
 //  implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
 //    (arbitrary[A] ⊛ arbitrary[A])((a, b) => node2[V, A](a, b)),
 //    (arbitrary[A] ⊛ arbitrary[A] ⊛ arbitrary[A])((a, b, c) => node3[V, A](a, b, c))

@@ -26,6 +26,10 @@ import syntax.SyntaxV
  * @see <a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf">Finger trees: a simple general-purpose data structure</a>
  */
 
+
+/*
+ * View of the left end of a sequence.
+ */
 sealed abstract class ViewL[S[_], A] {
   def fold[B](b: => B, f: (=> A, => S[A]) => B): B
   def headOption: Option[A] = fold(None, (a, sa) => Some(a))
@@ -34,6 +38,9 @@ sealed abstract class ViewL[S[_], A] {
   def tail: S[A] = tailOption.getOrElse(sys.error("Tail on empty view"))
 }
 
+/*
+ * View of the right end of a sequence.
+ */
 sealed abstract class ViewR[S[_], A] {
   def fold[B](b: => B, f: (=> S[A], => A) => B): B
   def lastOption: Option[A] = fold(None, (sa, a) => Some(a))
@@ -335,6 +342,10 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
     })
 }
 
+/**
+ * Finger trees with element type A, annotated with measures of type V.
+ * The operations enforce the constraint measured (as an instance of a Reducer).
+ */
 sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def measure = this.unit[V]
 
@@ -686,7 +697,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def toList: List[A] = toStream.toList
 
   override def toString = {
-    "<fingertree>"
+    import syntax.show._
+    def showA[A] = new Show[A] {
+      def show(a: A) = a.toString.toList
+    }
+    implicit val v = showA[V]
+    implicit val a = showA[A]
+    this.shows
   }
 }
 
@@ -765,7 +782,7 @@ trait FingerTreeInstances {
 }
 
 trait FingerTreeFunctions {
-//  def &:[A](a: A) = OnL[M,A](a, value)
+//   def &:[A](a: A) = OnL[M,A](a, value)
 //
 //  def :&[A](a: A) = OnR[M,A](value, a)
 

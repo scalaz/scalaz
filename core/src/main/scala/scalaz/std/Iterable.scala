@@ -39,13 +39,9 @@ trait IterableInstances {
           b = false
         }
       }
-      if (i1.hasNext)
-        if (i2.hasNext)
-          r
-        else
-          GT
-      else
-        LT
+      if (i1.hasNext || i2.hasNext || (!i1.hasNext && !i2.hasNext)) r
+      else if (i1.hasNext) GT
+      else LT
     }
   }
 
@@ -61,9 +57,15 @@ trait IterableInstances {
     }
   }
 
-  def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     import syntax.equal._
     def equal(a1: CC[A], a2: CC[A]) = {
+      println("checking equality")
+      if (a1.isEmpty && a2.isEmpty) {
+        println("both empty iterables, return true")
+        true
+      }
+      else {
       val i1 = a1.iterator
       val i2 = a2.iterator
       var b = false
@@ -78,10 +80,10 @@ trait IterableInstances {
       }
 
       !(b || i1.hasNext || i2.hasNext)
-    }
+    }}
   }
 
-  def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
+  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
     import syntax.monoid._
 
     def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]): B = foldRight(fa, F.zero)((x,y) => f(x) |+| y)
