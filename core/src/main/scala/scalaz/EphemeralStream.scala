@@ -139,6 +139,7 @@ trait EphemeralStreamFunctions {
 
   def weakMemo[V](f: => V): () => V = {
     val latch = new Object
+    // TODO I don't think this annotation does anything, as `v` isn't a class member.
     @volatile var v: Option[WeakReference[V]] = None
     () => {
       val a = v.map(x => x.get)

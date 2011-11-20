@@ -26,15 +26,20 @@ trait ListInstances {
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] = {
-      val fbs: F[List[B]] = F.point(scala.List[B]())
+      // This version blows the stack.
+      // l.foldRight(F.point(Nil: List[B])) {
+      //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+      // }
 
-      l.reverse.foldLeft(fbs)((fbl, a) => F.map2(f(a), fbl)(_ :: _))
+      DList.fromList(l).foldr(F.point(List[B]())) {
+        (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+      }
     }
 
     def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)((a, b) => f(a, b))
   }
 
-  implicit def listMonoid[A] = new Monoid[List[A]] {
+  implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
     def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
     def zero: List[A] = Nil
   }
@@ -53,6 +58,10 @@ trait ListInstances {
       k += ']'
       k.toList
     }
+  }
+
+  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
+    def equal(a1: List[A], a2: List[A]): Boolean = (a1 corresponds a2)(Equal[A].equal)
   }
 }
 

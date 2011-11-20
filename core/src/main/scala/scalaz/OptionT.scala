@@ -26,7 +26,7 @@ final case class OptionT[F[_], A](runT: F[Option[A]]) {
     }
   )
 
-  def ap[B](f: OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
+  def ap[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
     OptionT(F.map2(f.runT, runT) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
@@ -89,7 +89,7 @@ private[scalaz] trait OptionTPointed[F[_]] extends Pointed[({type λ[α] = Optio
 private[scalaz] trait OptionTApply[F[_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
   implicit def F: Apply[F]
 
-  def ap[A, B](fa: OptionT[F, A])(f: OptionT[F, A => B]): OptionT[F, B] = fa ap f
+  def ap[A, B](fa: OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
 }
 
 private[scalaz] trait OptionTMonad[F[_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTPointed[F] {

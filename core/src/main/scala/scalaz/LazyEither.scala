@@ -68,7 +68,7 @@ sealed trait LazyEither[A, B] {
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
     fold(left = _ => z, right = a => f(a, z))
 
-  def ap[C](f: LazyEither[A, B => C]): LazyEither[A, C] =
+  def ap[C](f: => LazyEither[A, B => C]): LazyEither[A, C] =
     f flatMap (k => map(k apply _))
 
   def left = new LeftProjection[A, B]() {
@@ -136,7 +136,7 @@ trait LazyEitherInstances {
     def bind[A, B](fa: LazyEither[E, A])(f: (A) => LazyEither[E, B]): LazyEither[E, B] =
       fa flatMap (a => f(a))
 
-    override def ap[A, B](fa: LazyEither[E, A])(f: LazyEither[E, (A) => B]): LazyEither[E, B] =
+    override def ap[A, B](fa: LazyEither[E, A])(f: => LazyEither[E, (A) => B]): LazyEither[E, B] =
       fa ap f
 
     def point[A](a: => A): LazyEither[E, A] =

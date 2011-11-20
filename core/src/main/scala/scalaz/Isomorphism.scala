@@ -211,13 +211,13 @@ trait IsomorphismCoPointed[F[_], G[_]] extends CoPointed[F] {
 trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] {
   implicit def G: Apply[G]
 
-  override def ap[A, B](fa: F[A])(f: F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+  override def ap[A, B](fa: F[A])(f: => F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
 }
 
 trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] with IsomorphismPointed[F, G] {
   implicit def G: Applicative[G]
 
-  override def ap[A, B](fa: F[A])(f: F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+  override def ap[A, B](fa: F[A])(f: => F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
 }
 
 trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {

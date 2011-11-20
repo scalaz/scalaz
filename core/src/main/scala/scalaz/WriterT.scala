@@ -57,7 +57,7 @@ sealed trait WriterT[F[_], W, A] {
   def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
     E.each(runT)(wa => f(wa._2))
 
-  def ap[B](f: WriterT[F, W, (A) => B])(implicit F: Apply[F], W: Semigroup[W]): WriterT[F, W, B] = writerT {
+  def ap[B](f: => WriterT[F, W, (A) => B])(implicit F: Apply[F], W: Semigroup[W]): WriterT[F, W, B] = writerT {
     F.map2(f.runT, runT) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))
     }
@@ -159,6 +159,7 @@ trait WriterTInstances extends WriterTInstances0 {
 
 trait WriterTFunctions {
   type Writer[W, A] = WriterT[Id, W, A]
+  def Writer[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
 
   def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = new WriterT[F, W, A] {
     val runT = v
@@ -192,7 +193,7 @@ trait WriterTApply[F[_], W] extends Apply[({type λ[α]=WriterT[F, W, α]})#λ] 
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
-  override def ap[A, B](fa: WriterT[F, W, A])(f: WriterT[F, W, (A) => B]) = fa ap f
+  override def ap[A, B](fa: WriterT[F, W, A])(f: => WriterT[F, W, (A) => B]) = fa ap f
 }
 
 trait WriterTApplicative[F[_], W] extends Applicative[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] with WriterTPointed[F, W] {

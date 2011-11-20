@@ -310,7 +310,7 @@ sealed trait Zipper[A] {
     G.apF(G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(s => z(s.reverse)))(f(focus)))(Traverse[Stream].traverse[G, A, B](rights)(f))
   }
 
-  def ap[B](f: Zipper[A => B]): Zipper[B] = {
+  def ap[B](f: => Zipper[A => B]): Zipper[B] = {
     val ls = lefts.zip(f.lefts) map {
       case (aa, ff) => ff(aa)
     }
@@ -342,8 +342,13 @@ trait ZipperInstances {
       fa.foldLeft(z)(f)
     def point[A](a: => A): Zipper[A] =
       zipper(Stream(), a, Stream())
-    def ap[A, B](fa: Zipper[A])(f: Zipper[A => B]): Zipper[B] =
+    def ap[A, B](fa: Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
       fa ap f
+  }
+
+  implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
+    import std.stream.streamEqual
+    def equal(a1: Zipper[A], a2: Zipper[A]) = streamEqual[A].equal(a1.toStream, a2.toStream)
   }
 }
 

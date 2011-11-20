@@ -7,6 +7,7 @@ trait StringInstances {
     def zero: String = ""
     def show(f: String): List[Char] = f.toList
     def order(x: String, y: String): Ordering = Ordering.fromInt(x.compareTo(y))
+    override def equal(x: String, y: String): Boolean = x == y
   }
 }
 

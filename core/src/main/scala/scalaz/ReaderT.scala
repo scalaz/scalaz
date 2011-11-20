@@ -2,7 +2,7 @@ package scalaz
 
 case class ReaderT[F[_], E, A](runT: E => F[A]) {
   def map[B](f: A => B)(implicit F: Functor[F]): ReaderT[F, E, B] = ReaderT(e => F.map(runT(e))(f))
-  def ap[B](f: ReaderT[F, E, A => B])(implicit F: Apply[F]): ReaderT[F, E, B] = ReaderT(e => F.ap(runT(e))(f.runT(e)))
+  def ap[B](f: => ReaderT[F, E, A => B])(implicit F: Apply[F]): ReaderT[F, E, B] = ReaderT(e => F.ap(runT(e))(f.runT(e)))
   def flatMap[B](f: A => ReaderT[F, E, B])(implicit F: Monad[F]): ReaderT[F, E, B] = ReaderT(e => F.bind(runT(e))(a => f(a).runT(e)))
 }
 
@@ -63,7 +63,7 @@ trait ReaderTPointed[F[_], E] extends Pointed[({type λ[α]=ReaderT[F, E, α]})#
 trait ReaderTApply[F[_], E] extends Apply[({type λ[α]=ReaderT[F, E, α]})#λ] with ReaderTFunctor[F, E] {
   implicit def F: Apply[F]
 
-  override def ap[A, B](fa: ReaderT[F, E, A])(f: ReaderT[F, E, A => B]) = fa ap f
+  override def ap[A, B](fa: ReaderT[F, E, A])(f: => ReaderT[F, E, A => B]) = fa ap f
 }
 
 trait ReaderTApplicative[F[_], E] extends Applicative[({type λ[α]=ReaderT[F, E, α]})#λ] with ReaderTApply[F, E] with ReaderTPointed[F, E] {

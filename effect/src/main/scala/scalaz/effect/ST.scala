@@ -185,7 +185,12 @@ trait STFunctions {
   }
 }
 
-trait STInstances {
+trait STInstance0 {
+  implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
+      Monoid.liftSemigroup[({type λ[α] = ST[S, α]})#λ, A](ST.stMonad[S], A)
+}
+
+trait STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
     Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
 

@@ -20,8 +20,9 @@ trait Idents {
 
     override def sequence[A, G[_]: Traverse](as: G[Id[A]]): Id[G[A]] = as
 
-    override def ap[A, B](fa: Id[A])(f: Id[A => B]): Id[B] = f(fa)
+    override def ap[A, B](fa: Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
+    /*TODO Bring back after Apply is remodelled.
     override def ap2[A, B, C](fa: Id[A], fb: Id[B])(f: Id[(A, B) => C]): Id[C] = f(fa, fb)
 
     override def ap3[A, B, C, D](fa: Id[A], fb: Id[B], fc: Id[C])(f: Id[(A, B, C) => D]): Id[D] = f(fa, fb, fc)
@@ -46,7 +47,7 @@ trait Idents {
 
     override def lift4[A, B, C, D, E](f: (A, B, C, D) => E): (Id[A], Id[B], Id[C], Id[D]) => Id[E] = f
 
-    override def lift5[A, B, C, D, E, R](f: (A, B, C, D, E) => R): (Id[A], Id[B], Id[C], Id[D], Id[E]) => Id[R] = f
+    override def lift5[A, B, C, D, E, R](f: (A, B, C, D, E) => R): (Id[A], Id[B], Id[C], Id[D], Id[E]) => Id[R] = f*/
 
     override def compose[G[_]](G0: Applicative[G]): Applicative[G] = G0
 

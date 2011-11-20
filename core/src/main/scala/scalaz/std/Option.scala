@@ -10,6 +10,13 @@ trait OptionInstances {
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
     def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
+    override def ap[A, B](fa: Option[A])(f: => Option[(A) => B]): Option[B] = fa match {
+      case Some(x) => f match {
+        case Some(f) => Some(f(x))
+        case None    => None
+      }
+      case None    => None
+    }
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
     def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
@@ -36,9 +43,19 @@ trait OptionInstances {
   implicit def optionEqual[A: Equal]: Equal[Option[A]] = new Equal[Option[A]] {
     def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
       case (Some(a1), Some(a2)) => Equal[A].equal(a1, a2)
-      case (None, None)         => false
+      case (None, None)         => true
       case (None, Some(_))      => false
       case (Some(_), None)      => false
+    }
+  }
+
+  implicit def optionOrder[A: Order]: Order[Option[A]] = new Order[Option[A]] {
+    import Ordering._
+    def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
+      case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
+      case (None, Some(_)) => GT
+      case (Some(_), None) => LT
+      case (None, None) => EQ
     }
   }
 
@@ -67,11 +84,29 @@ trait OptionInstances {
     def append(f1: Option[A] @@ First, f2: => Option[A] @@ First) = Tag(f1.orElse(f2))
   }
 
+  implicit def optionFirstShow[A: Show]: Show[Option[A] @@ First] = Tag.subst(Show[Option[A]])
+
+  implicit def optionFirstOrder[A: Order]: Order[Option[A] @@ First] = Tag.subst(Order[Option[A]])
+
+  implicit def optionfirstFunctor[A]: Functor[({type f[x] = Option[x] @@ First})#f] = new Functor[({type f[x] = Option[x] @@ First})#f] {
+      def map[A, B](fa: Option[A] @@ First)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
+    }
+
+
   implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
     def zero: Option[A] @@ Last = Tag(None)
 
     def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
   }
+
+  implicit def optionLastShow[A: Show]: Show[Option[A] @@ Last] = Tag.subst(Show[Option[A]])
+
+  implicit def optionLastOrder[A: Order]: Order[Option[A] @@ Last] = Tag.subst(Order[Option[A]])
+
+  implicit def optionLastFunctor[A]: Functor[({type f[x] = Option[x] @@ Last})#f] = new Functor[({type f[x] = Option[x] @@ Last})#f] {
+    def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
+  }
+
 }
 
 trait OptionFunctions {

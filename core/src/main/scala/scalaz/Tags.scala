@@ -11,5 +11,9 @@ object Tags {
   sealed trait Dual
 
   sealed trait Zip
+
+  sealed trait Disjunction
+
+  sealed trait Conjunction
 }
 

@@ -90,7 +90,7 @@ sealed trait Validation[E, A] {
     case Failure(e) => z
   }
 
-  def ap[B](f: Validation[E, A => B])(implicit E: Semigroup[E]): Validation[E, B] = (this, f) match {
+  def ap[B](f: => Validation[E, A => B])(implicit E: Semigroup[E]): Validation[E, B] = (this, f) match {
     case (Success(a), Success(f))   => Success(f(a))
     case (Failure(e), Success(_))   => Failure(e)
     case (Success(f), Failure(e))   => Failure(e)
@@ -178,6 +178,11 @@ trait FailProjectionInstances {
       implicit def G = Validation.validationMonad
     }
   }
+
+  implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
+    def iso = FailProjectionIso
+    implicit def G = Validation.validationOrder
+  }
 }
 
 trait FailProjectionFunctions {
@@ -213,7 +218,7 @@ trait ValidationInstances {
 
     def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
-    def ap[A, B](fa: Validation[E, A])(f: Validation[E, A => B]): Validation[E, B] = fa ap f
+    def ap[A, B](fa: Validation[E, A])(f: => Validation[E, A => B]): Validation[E, B] = fa ap f
   }
 
   implicit def validationBiTraverse = new BiTraverse[Validation] {
@@ -231,6 +236,16 @@ trait ValidationInstances {
     def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
+  }
+
+  implicit def validationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
+    import Ordering._
+    def order(f1: Validation[E, A], f2: Validation[E, A]) = (f1, f2) match {
+      case (Success(x), Success(y)) => Order[A].order(x, y)
+      case (Failure(x), Failure(y)) => Order[E].order(x, y)
+      case (Failure(_), Success(_)) => LT
+      case (Success(_), Failure(_)) => GT
+    }
   }
 }
 
