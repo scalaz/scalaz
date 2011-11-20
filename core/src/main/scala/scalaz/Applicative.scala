@@ -24,14 +24,14 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
     traverse(as)(a => a)
 
-  /**The composition of Applicatives F and G, [x]F[G[x]], is an Applicative */
+  /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
     implicit def F: Applicative[F] = self
 
     implicit def G: Applicative[G] = G0
   }
 
-  /**The product of Applicatives F and G, [x](F[x], G[x]]), is an Applicative */
+  /**The product of Applicatives `F` and `G`, `[x](F[x], G[x]])`, is an Applicative */
   def product[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = (F[α], G[α])})#λ] = new ProductApplicative[F, G] {
     implicit def F: Applicative[F] = self
 
