@@ -3,7 +3,7 @@ package std
 
 trait IterableInstances {
 
-  implicit def IterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
+  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
     import syntax.show._
     def show(as: CC[A]) = {
       val i = as.iterator
@@ -20,7 +20,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def IterableOrder[A: Order]: Order[Iterable[A]] = new Order[Iterable[A]] {
+  implicit def iterableOrder[A: Order]: Order[Iterable[A]] = new Order[Iterable[A]] {
     def order(a1: Iterable[A], a2: Iterable[A]) = {
       import scalaz.Ordering._
       import syntax.order._
@@ -49,7 +49,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def IterableLength: Length[Iterable] = new Length[Iterable] {
+  implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
     def length[A](a: Iterable[A]) = {
       var n = 0
       val i = a.iterator
@@ -61,7 +61,7 @@ trait IterableInstances {
     }
   }
 
-  def IterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+  def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     import syntax.equal._
     def equal(a1: CC[A], a2: CC[A]) = {
       val i1 = a1.iterator
@@ -80,6 +80,15 @@ trait IterableInstances {
       !(b || i1.hasNext || i2.hasNext)
     }
   }
+
+  def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
+    import syntax.monoid._
+
+    def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]): B = foldRight(fa, F.zero)((x,y) => f(x) |+| y)
+
+    def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B): B = fa.foldRight(b)(f(_, _))
+  }
+
 }
 
 object iterable extends IterableInstances {
