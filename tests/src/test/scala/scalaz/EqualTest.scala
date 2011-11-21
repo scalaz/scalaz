@@ -14,6 +14,7 @@ class EqualTest extends Specification with ScalaCheck {
   import std.anyVal._
   import std.math._
   import std.list._
+  import std.iterable._
   import std.java.util.concurrent.callable._
   import bigInt._
   import std.java.math.bigInteger._
@@ -60,6 +61,7 @@ class EqualTest extends Specification with ScalaCheck {
     // todo Arbitrary instance
     // checkEqualLaws[xml.NodeSeq]
     checkEqualLaws[NonEmptyList[A]]
+
 //    checkEqualLaws[ZipStream[A]]
     checkEqualLaws[(A)]
     checkEqualLaws[(A, B)]
@@ -90,6 +92,7 @@ class EqualTest extends Specification with ScalaCheck {
     //checkEqualLaws[Promise[A]]
     checkEqualLaws[List[A]]
     checkEqualLaws[Stream[A]]
+    checkEqualLaws[Iterable[A]]
 //    checkEqualLaws[ArraySeq[A]]
 
 //    import geo._
