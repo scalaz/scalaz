@@ -23,20 +23,11 @@ trait FunctionInstances extends FunctionInstances0 {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-
-  implicit def function1Instance = new Arr[Function1] with Category[Function1]{
-    def arr[A, B](f: A => B): A => B = f
-
-    def compose[A, B, C](f: (B) => C, g: (A) => B): (A) => C = f compose g
-
-    def id[A]: (A) => A = a => a
-  }
-
-  implicit def Function1Arrow: Arrow[Function1] = new Arrow[Function1] with Category[Function1] {
+  implicit def function1Instance = new Arrow[Function1] with Arr[Function1] with Category[Function1]{
     def arr[A, B](f: A => B): A => B = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
-
+    
     def compose[A, B, C](f: (B) => C, g: (A) => B): (A) => C = f compose g
 
     def id[A]: (A) => A = a => a
