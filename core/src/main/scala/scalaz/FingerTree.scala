@@ -631,10 +631,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 
   /**
-   * Splits this tree into a pair of subtrees according to a predicate.
+   * Splits this tree into a pair of subtrees at the point where the given predicate, based on the measure,
+   * changes from `true` to `false`. O(log(min(i,n-i)))
    *
-   * @return `(ts, fs)` `ts`: the subtree containing elements where `pred` holds
-   *                    `fs` the subtree containing the other elements.
+   * @return `(as, bs)` `as`: the subtree containing elements before the point where `pred` first holds
+   *                    `fs` the subtree containing element at and after the point where `pred` first holds. Empty if `pred` never holds.
    */
   def split(pred: V => Boolean): (FingerTree[V, A], FingerTree[V, A]) =
     if (!isEmpty && pred(measure)) {
@@ -644,6 +645,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     else
       (this, empty)
 
+  /**
+   * Like `split`, but returns the element where `pred` first holds separately
+   *
+   * @throws if the tree is empty.
+   */
   def split1(pred: V => Boolean): (FingerTree[V, A], A, FingerTree[V, A]) = split1(pred, measurer.monoid.zero)
 
   private def split1(pred: V => Boolean, accV: V): (FingerTree[V, A], A, FingerTree[V, A]) = fold(
