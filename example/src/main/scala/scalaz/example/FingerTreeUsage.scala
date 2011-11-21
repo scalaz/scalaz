@@ -3,7 +3,7 @@ package example
 
 
 object FingerTreeUsage extends App{
-  import fingerTree._
+  import FingerTree._
   import std.anyVal._
 
   def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] = stream.foldLeft(empty(SizeReducer[A])) {

@@ -7,26 +7,6 @@ import std.option.optionSyntax._
 import syntax.SyntaxV
 
 
-/**
- * Finger Trees provide a base for implementations of various collection types,
- * as described in "Finger trees: a simple general-purpose data structure", by
- * Ralf Hinze and Ross Paterson.
- *
- *
- * <br>
- * Finger Trees have excellent (amortized) asymptotics:
- * <br>
- * Access to the first and last elements is O(1).
- * Appending/prepending a single value is O(1).
- * Concatenating two trees is (O lg min(l1, l2)) where l1 and l2 are their sizes.
- * Random access to an element at n is O(lg min(n, l - n)), where
- *   l is the size of the tree.
- * Constructing a tree with n copies of a value is O(lg n).
- *
- * @see <a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf">Finger trees: a simple general-purpose data structure</a>
- */
-
-
 /*
  * View of the left end of a sequence.
  */
@@ -49,18 +29,30 @@ sealed abstract class ViewR[S[_], A] {
   def init: S[A] = initOption.getOrElse(sys.error("Init on empty view"))
 }
 
-import fingerTree._
+import FingerTree._
 import std.option._
 
 sealed abstract class Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]): B
 
+  /**
+   * Append the given element to the right
+   *
+   * @throws if the finger is `Four`.
+   */
   def +:(a: => A): Finger[V, A]
 
+  /**
+   * Prepends the given element to the left
+   *
+   * @throws if the finger is `Four`.
+   */
   def :+(a: => A): Finger[V, A]
 
+  /** Replaces the first element of this finger with `a` */
   def |-:(a: => A): Finger[V, A]
 
+  /** Replaces the last element of this finger with `a` */
   def :-|(a: => A): Finger[V, A]
 
   def lhead: A
@@ -75,15 +67,18 @@ sealed abstract class Finger[V, A] {
 
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): Finger[V2, B]
 
+  /** Apply the given side effect to each element. */
   def foreach(f: A => Unit): Unit
 
+  /** An iterator that visits elech element. */
   def iterator: Iterator[A]
 
+  /** An iterator that visits elech element in reverse order. */
   def reverseIterator: Iterator[A]
 
   def measure: V
 
-  def toList = map(x => x)(Reducer.ListReducer[A]).measure
+  def toList: List[A] = map(x => x)(Reducer.ListReducer[A]).measure
 
   private[scalaz] def split1(pred: V => Boolean, accV: V): (Option[Finger[V, A]], A, Option[Finger[V, A]])
 }
@@ -344,15 +339,32 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
 
 /**
  * Finger trees with leaves of type A and Nodes that are annotated with type V.
- * The Node type annotation allows the implementation of functionality for different data structures, depending on their needs.
- * For example, binary tree can be implemented by annotating each node with the size of its subtree, while a priority queue can be
- * implemented by labelling the nodes by the minimum priority of its children.
  *
+ * Finger Trees provide a base for implementations of various collection types,
+ * as described in "Finger trees: a simple general-purpose data structure", by
+ * Ralf Hinze and Ross Paterson.
+ *
+ * This is done by choosing a a suitable type to annotate the nodes. For example,
+ * a binary tree can be implemented by annotating each node with the size of its subtree,
+ * while a priority queue can be implemented by labelling the nodes by the minimum priority of its children.
  *
  * The operations on FingerTree enforce the constraint measured (in the form of a Reducer instance).
+ *
+ * Finger Trees have excellent (amortized) asymptotic performance:
+ *
+ *  - Access to the first and last elements is O(1)
+ *  - Appending/prepending a single value is O(1)
+ *  - Concatenating two trees is (O lg min(l1, l2)) where l1 and l2 are their sizes
+ *  - Random access to an element at n is O(lg min(n, l - n)), where l is the size of the tree.
+ *  - Constructing a tree with n copies of a value is O(lg n).
+ *
+ * @tparam V The type of the annotations of the nodes (the '''measure''')
+ * @tparam A The type of the elements stored at the leaves
+ *
+ * @see [[http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf Finger trees: a simple general-purpose data structure]]
  */
 sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
-  def measure = this.unit[V]
+  def measure: V = this.unit[V]
 
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
     fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
@@ -365,16 +377,21 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     fold(v => b,
           (v, a) => f(b, a),
           (v, pr, m, sf) =>
-              FingerFoldable[V].foldLeft(sf, m.foldLeft[B](FingerFoldable[V].foldLeft(pr, b)(f))((x, y) => NodeFoldable[V].foldLeft(y, x)(f)))(f))
+              fingerFoldable[V].foldLeft(sf, m.foldLeft[B](fingerFoldable[V].foldLeft(pr, b)(f))((x, y) => nodeFoldable[V].foldLeft(y, x)(f)))(f))
   }
 
+  /**
+   * Fold over the structure of the tree. The given functions correspond to the three possible variations of the finger tree.
+   *
+   * @param empty if the three is empty, convert the measure to a `B`
+   * @param single if the three contains a single element, convert the measure and this element to a `B`
+   * @param deep otherwise, convert the measure, the two fingers, and the sub tree to a `B`.
+   */
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
-  /**
-   * O(1). Prepends an element to the left of the tree.
-   */
+  /** Prepends an element to the left of the tree. O(1). */
   def +:(a: => A): FingerTree[V, A] = {
-    implicit val nm = NodeMeasure[A, V]
+    implicit val nm = nodeMeasure[A, V]
     fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
       val mz = m
       pr match {
@@ -383,11 +400,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       }})
   }
 
-  /**
-   * O(1). Appends an element to the right of the tree.
-   */
+  /** Appends an element to the right of the tree. O(1). */
   def :+(a: => A): FingerTree[V, A] = {
-    implicit val nm = NodeMeasure[A, V]
+    implicit val nm = nodeMeasure[A, V]
     fold(v => single(v snoc a, a), (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)), (v, pr, m, sf) => {
       val mz = m
       sf match {
@@ -396,9 +411,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       }})
   }
 
-  /**
-   * O(1) Replace the first element of the tree with the given value.
-   */
+  /** Replace the first element of the tree with the given value. O(1) */
   def |-:(a: => A): FingerTree[V, A] = {
     fold(
       v => sys.error("Replacing first element of an empty FingerTree"),
@@ -406,9 +419,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, m, sf) => deep(a |-: pr, m, sf))
   }
 
-  /**
-   * O(1) Replace the last element of the tree with the given value.
-   */
+  /** Replace the last element of the tree with the given value. O(1) */
   def :-|(a: => A): FingerTree[V, A] = {
     fold(
       v => sys.error("Replacing last element of an empty FingerTree"),
@@ -416,9 +427,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, m, sf) => deep(pr, m, sf :-| a))
   }
 
-  /**
-   * Appends the given fingertree to the right of this tree.
-   */
+  /** Appends the given finger tree to the right of this tree. */
   def <++>(right: FingerTree[V, A]): FingerTree[V, A] = fold(
       v => right,
       (v, x) => x +: right,
@@ -621,6 +630,12 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
+  /**
+   * Splits this tree into a pair of subtrees according to a predicate.
+   *
+   * @return `(ts, fs)` `ts`: the subtree containing elements where `pred` holds
+   *                    `fs` the subtree containing the other elements.
+   */
   def split(pred: V => Boolean): (FingerTree[V, A], FingerTree[V, A]) =
     if (!isEmpty && pred(measure)) {
       val (l, x, r) = split1(pred)
@@ -639,15 +654,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       if (pred(accVpr)) {
         val (l, x, r) = pr.split1(pred, accV)
         (l.cata(_.toTree, empty), x, deepL(r, m, sf))
-      }
-      else {
+      } else {
         val accVm = mappendVal(accVpr, m)
         if (pred(accVm)) {
           val (ml, xs, mr) = m.split1(pred, accVpr)
           val (l, x, r) = xs.split1(pred, mappendVal(accVpr, ml))
           (deepR(pr, ml, l), x, deepL(r, mr, sf))
-        }
-        else {
+        } else {
           val (l, x, r) = sf.split1(pred, accVm)
           (deepR(pr, m, l), x, r.cata(_.toTree, empty))
         }
@@ -655,7 +668,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   )
 
-  def isEmpty = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
+  def isEmpty: Boolean = fold(v => true, (v, x) => false, (v, pr, m, sf) => false)
 
   def viewl: ViewL[({type λ[α]=FingerTree[V, α]})#λ, A] =
     fold(
@@ -677,22 +690,44 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           case _ => OnR[({type λ[α]=FingerTree[V, α]})#λ, A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
-  def head = viewl.head
+  /**
+   * Selects the first element in the tree.
+   *
+   * @throws if the tree is empty
+   */
+  def head: A = viewl.head
 
-  def last = viewr.last
+  /**
+   * Selects the last element in the tree.
+   *
+   * @throws if the tree is empty
+   */
+  def last: A = viewr.last
 
-  def tail = viewl.tail
+  /**
+   * Selects a subtree containing all elements except the first
+   *
+   * @throws if the tree is empty
+   */
+  def tail: FingerTree[V, A] = viewl.tail
 
-  def init = viewr.init
+  /**
+   * Selects a subtree containing all elements except the last
+   *
+   * @throws if the tree is empty
+   */
+  def init: FingerTree[V, A] = viewr.init
 
+  /** Maps the given function across the tree, annotating nodes in the resulting tree according to the provided `Reducer`. */
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
-    implicit val nm = NodeMeasure[B, V2]
+    implicit val nm = nodeMeasure[B, V2]
     fold(
       v => empty,
       (v, x) => single(f(x)),
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
 
+  /** Execute the provided side effect for each element in the tree. */
   def foreach(f: A => Unit) {
     fold(
       _ => {},
@@ -700,11 +735,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (_, pr, m, sf) => { pr.foreach(f); m.foreach(_.foreach(f)); sf.foreach(f) }
     )}
 
+  /** An iterator that visits each element in the tree. */
   def iterator: Iterator[A] = fold(
     _ => Iterator.empty,
     (_, x) => Iterator.single(x),
     (_, pr, m, sf) => pr.iterator ++ m.iterator.flatMap(_.iterator) ++ sf.iterator)
 
+  /** An iterator that visits each element in the tree in reverse order. */
   def reverseIterator: Iterator[A] = fold(
     _ => Iterator.empty,
     (_, x) => Iterator.single(x),
@@ -713,9 +750,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
 
+  /** Convert the leaves of the tree to a [[scala.Stream]] */
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
+
+  /** Convert the leaves of the tree to a [[scala.List]] */
   def toList: List[A] = toStream.toList
 
+  /** Convert the tree to a String. Unsafe: this uses `Any#toString` for types `V` and `A` */
   override def toString = {
     import syntax.show._
     def showA[A] = new Show[A] {
@@ -733,40 +774,40 @@ class FingerTreeIntPlus[A](val value: FingerTree[Int, A]) {
 }
 
 trait FingerTreeInstances {
-  import fingerTree._
+  import FingerTree._
 
-  implicit def ViewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
+  implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {
     def map[A, B](t: ViewL[S, A])(f: A => B): ViewL[S, B] =
       t.fold(EmptyL[S, B], (x, xs) => OnL(f(x), s.map(xs)(f))) //TODO define syntax for &: and :&
   }
 
-  implicit def ViewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
+  implicit def viewRFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewR[S, α]})#λ] = new Functor[({type λ[α]=ViewR[S, α]})#λ] {
     def map[A, B](t: ViewR[S, A])(f: A => B): ViewR[S, B] =
       t.fold(EmptyR[S, B], (xs, x) => OnR(s.map(xs)(f), f(x)))
   }
 
-  implicit def FingerFoldable[V] = new Foldable[({type l[a]=Finger[V, a]})#l] with Foldable.FromFoldMap[({type l[a]=Finger[V, a]})#l] {
+  implicit def fingerFoldable[V] = new Foldable[({type l[a]=Finger[V, a]})#l] with Foldable.FromFoldMap[({type l[a]=Finger[V, a]})#l] {
     override def foldMap[A, M: Monoid](v: Finger[V, A])(f: A => M) = v.foldMap(f)
   }
 
-  implicit def FingerMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Finger[V, A], V] = {
+  implicit def fingerMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Finger[V, A], V] = {
     implicit val vm = m.monoid
     UnitReducer((a: Finger[V, A]) => a.measure)
   }
 
-  implicit def NodeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Node[V, A], V] = {
+  implicit def nodeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[Node[V, A], V] = {
     implicit val vm = m.monoid
     UnitReducer((a: Node[V, A]) => a fold (
             (v, _, _) => v,
             (v, _, _, _) => v))
   }
 
-  implicit def FingerTreeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[FingerTree[V, A], V] = {
+  implicit def fingerTreeMeasure[A, V](implicit m: Reducer[A, V]): Reducer[FingerTree[V, A], V] = {
     implicit val vm = m.monoid
     UnitReducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
   }
   
-  implicit def NodeFoldable[V] = new Foldable[({type l[a]=Node[V, a]})#l] {
+  implicit def nodeFoldable[V] = new Foldable[({type l[a]=Node[V, a]})#l] {
     def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
     def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
        foldMap(v)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z
@@ -784,7 +825,7 @@ trait FingerTreeInstances {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
   }
 
-  implicit def FingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
+  implicit def fingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
     import syntax.show._
     import std.iterable._
     def show(t: FingerTree[V,A]) = t.fold(
@@ -794,9 +835,10 @@ trait FingerTreeInstances {
     )
   }
 
-  import fingerTree.ftip2ft
-  import rope.Rope
-  implicit def RopeLength: Length[Rope] = new Length[Rope] {
+  import FingerTree.ftip2ft
+  import Rope.Rope
+
+  implicit def ropeLength: Length[Rope] = new Length[Rope] {
     def length[A](a: Rope[A]) = a.self.measure
   }
 }
@@ -874,7 +916,7 @@ trait FingerTreeFunctions {
   def deep[V, A](v: V, pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A])
              (implicit ms: Reducer[A, V]): FingerTree[V, A] =
     new FingerTree[V, A] {
-      implicit val nodeMeasure = NodeMeasure[A, V]
+      implicit val nMeasure = nodeMeasure[A, V]
       lazy val mz = m
       def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz, sf)
@@ -984,13 +1026,13 @@ trait FingerTreeFunctions {
     object Rope {
       private[Ropes] val baseChunkLength = 16
       implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
-      def empty[A : ClassManifest] = rope(fingerTree.empty[Int, ImmutableArray[A]])
+      def empty[A : ClassManifest] = rope(FingerTree.empty[Int, ImmutableArray[A]])
       def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
         if (a.isEmpty) empty[A] else rope(single(IA.fromArray(a)))
       def fromString(str: String): Rope[Char] =
         if (str.isEmpty) empty[Char] else rope(single(IA.fromString(str)))
       def fromChunks[A : ClassManifest](chunks: Seq[ImmutableArray[A]]): Rope[A] =
-        rope(chunks.foldLeft(fingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
+        rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
 //      def apply[A](as: A*) = fromSeq(as)
 //      def fromSeq[A](as: Seq[A]) = rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
 
@@ -1137,7 +1179,7 @@ trait FingerTreeFunctions {
       def drop(n: Int): IndSeq[A] = split(n)._2
       def take(n: Int): IndSeq[A] = split(n)._1
       def map[B](f: A => B): IndSeq[B] = indSeq(self map f)
-      import fingerTree.fingerTreeFoldable
+      import FingerTree.fingerTreeFoldable
       def flatMap[B](f: A => IndSeq[B]): IndSeq[B] = indSeq(fingerTreeFoldable.foldLeft(self, empty[Int, B])((ys, x) => ys <++> f(x).self))
     }
 
@@ -1189,5 +1231,5 @@ trait FingerTreeFunctions {
   }
 }
 
-object rope extends Ropes
-object fingerTree extends FingerTreeInstances with FingerTreeFunctions
+object Rope extends Ropes
+object FingerTree extends FingerTreeInstances with FingerTreeFunctions
