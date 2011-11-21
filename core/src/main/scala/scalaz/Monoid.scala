@@ -19,7 +19,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
   // derived functions
 
   trait MonoidLaw extends SemigroupLaw {
-    def identity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero))
+    def identity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero)) && F.equal(a, append(zero, a))
   }
   def monoidLaw = new MonoidLaw {}
 

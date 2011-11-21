@@ -16,6 +16,7 @@ object TypeClass {
 
   lazy val semigroup = TypeClass("Semigroup", *)
   lazy val monoid = TypeClass("Monoid", *, extendsList = Seq(semigroup))
+  lazy val group = TypeClass("Group", *, extendsList = Seq(monoid))
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
@@ -66,6 +67,7 @@ object TypeClass {
 
   def core: List[TypeClass] = List(semigroup,
     monoid,
+    group,
     equal,
     length,
     show,

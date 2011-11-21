@@ -26,6 +26,10 @@ object ScalazProperties {
     def identity[A](implicit A: Monoid[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.identity _).label("identity")
   }
 
+  object group {
+    def inverseExists[A](implicit A: Group[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.groupLaw.inverseExists _).label("inverseExists")
+  }
+
   object functor {
     def identity[F[_], X](implicit F: Functor[F],
                           afx: Arbitrary[F[X]],
