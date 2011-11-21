@@ -26,17 +26,24 @@ trait ListInstances {
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] = {
-      // This version blows the stack.
-      // l.foldRight(F.point(Nil: List[B])) {
+      // TODO pick between these implementations.
+      // DList.fromList(l).foldr(F.point(List[B]())) {
       //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       // }
-
-      DList.fromList(l).foldr(F.point(List[B]())) {
+      foldRight(l, F.point(List[B]())) {
         (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       }
     }
 
-    def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)((a, b) => f(a, b))
+    override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = {
+      import scala.collection.mutable.ArrayStack
+      val s = new ArrayStack[A]
+      fa.foreach(a => s += a)
+      var r = z
+      while (!s.isEmpty) {r = f(s.pop, r)}
+      r
+    }
+
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
@@ -66,6 +73,7 @@ trait ListInstances {
 }
 
 trait ListFunctions {
+  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec
     def intersperse0(accum: List[A], rest: List[A]): List[A] = rest match {
