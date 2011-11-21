@@ -343,8 +343,13 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
 }
 
 /**
- * Finger trees with element type A, annotated with measures of type V.
- * The operations enforce the constraint measured (as an instance of a Reducer).
+ * Finger trees with leaves of type A and Nodes that are annotated with type V.
+ * The Node type annotation allows the implementation of functionality for different data structures, depending on their needs.
+ * For example, binary tree can be implemented by annotating each node with the size of its subtree, while a priority queue can be
+ * implemented by labelling the nodes by the minimum priority of its children.
+ *
+ *
+ * The operations on FingerTree enforce the constraint measured (in the form of a Reducer instance).
  */
 sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def measure = this.unit[V]
@@ -365,6 +370,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
+  /**
+   * O(1). Prepends an element to the left of the tree.
+   */
   def +:(a: => A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
     fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
@@ -375,6 +383,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       }})
   }
 
+  /**
+   * O(1). Appends an element to the right of the tree.
+   */
   def :+(a: => A): FingerTree[V, A] = {
     implicit val nm = NodeMeasure[A, V]
     fold(v => single(v snoc a, a), (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)), (v, pr, m, sf) => {
@@ -385,6 +396,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       }})
   }
 
+  /**
+   * O(1) Replace the first element of the tree with the given value.
+   */
   def |-:(a: => A): FingerTree[V, A] = {
     fold(
       v => sys.error("Replacing first element of an empty FingerTree"),
@@ -392,6 +406,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, m, sf) => deep(a |-: pr, m, sf))
   }
 
+  /**
+   * O(1) Replace the last element of the tree with the given value.
+   */
   def :-|(a: => A): FingerTree[V, A] = {
     fold(
       v => sys.error("Replacing last element of an empty FingerTree"),
@@ -399,6 +416,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, m, sf) => deep(pr, m, sf :-| a))
   }
 
+  /**
+   * Appends the given fingertree to the right of this tree.
+   */
   def <++>(right: FingerTree[V, A]): FingerTree[V, A] = fold(
       v => right,
       (v, x) => x +: right,

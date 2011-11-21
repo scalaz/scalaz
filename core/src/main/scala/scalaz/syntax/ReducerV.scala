@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-trait ReducerV [A] extends SyntaxV[A] {
+trait ReducerV[A] extends SyntaxV[A] {
   /** Convert the value into a monoid */
   def unit[M](implicit r: Reducer[A,M]): M = r.unit(self)
 
