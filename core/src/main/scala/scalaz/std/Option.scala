@@ -13,9 +13,9 @@ trait OptionInstances extends OptionInstances0 {
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
     def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
-    override def ap[A, B](fa: Option[A])(f: => Option[(A) => B]): Option[B] = fa match {
-      case Some(x) => f match {
-        case Some(f) => Some(f(x))
+    override def ap[A, B](fa: => Option[A])(f: => Option[(A) => B]): Option[B] = f match {
+      case Some(f) => fa match {
+        case Some(x) => Some(f(x))
         case None    => None
       }
       case None    => None

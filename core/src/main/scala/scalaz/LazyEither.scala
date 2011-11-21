@@ -136,7 +136,7 @@ trait LazyEitherInstances {
     def bind[A, B](fa: LazyEither[E, A])(f: (A) => LazyEither[E, B]): LazyEither[E, B] =
       fa flatMap (a => f(a))
 
-    override def ap[A, B](fa: LazyEither[E, A])(f: => LazyEither[E, (A) => B]): LazyEither[E, B] =
+    override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, (A) => B]): LazyEither[E, B] =
       fa ap f
 
     def point[A](a: => A): LazyEither[E, A] =

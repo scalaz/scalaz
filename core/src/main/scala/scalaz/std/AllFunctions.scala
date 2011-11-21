@@ -7,3 +7,5 @@ trait AllFunctions
   with StreamFunctions
   with math.OrderingFunctions
   with StringFunctions
+
+object AllFunctions extends AllFunctions

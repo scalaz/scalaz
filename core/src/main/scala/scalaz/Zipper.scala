@@ -319,6 +319,12 @@ sealed trait Zipper[A] {
     }
     zipper(ls, f.focus(focus), rs)
   }
+
+  /** Unsafe `toString. Uses `Any#toString` for type `A` */
+  override def toString: String = {
+    implicit val A = Show.showFromToString[A]
+    Zipper.zipperShow[A].shows(this)
+  }
 }
 
 object Zipper extends ZipperFunctions with ZipperInstances {
@@ -341,14 +347,26 @@ trait ZipperInstances {
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
     def point[A](a: => A): Zipper[A] =
-      zipper(Stream(), a, Stream())
-    def ap[A, B](fa: Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
+      zipper(Stream.continually(a), a, Stream.continually(a))
+    def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
       fa ap f
+    override def map[A, B](fa: Zipper[A])(f: (A) => B): Zipper[B] =
+      fa map f
   }
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
     import std.stream.streamEqual
     def equal(a1: Zipper[A], a2: Zipper[A]) = streamEqual[A].equal(a1.toStream, a2.toStream)
+  }
+
+  implicit def zipperShow[A: Show] = new Show[Zipper[A]]{
+    import std.stream._
+
+    def show(f: Zipper[A]): List[Char] =
+      "Zipper(".toList :::
+        Show[Stream[A]].show(f.lefts) ::: ", ".toList :::
+        Show[A].show(f.focus) ::: ", ".toList :::
+        Show[Stream[A]].show(f.rights) ::: ")".toList
   }
 }
 

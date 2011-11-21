@@ -9,7 +9,7 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
   ////
   def applyInstance[C]: Apply[({type λ[α] = F[C, α]})#λ] =
     new Apply[({type λ[α] = F[C, α]})#λ] {
-      def ap[A, B](fa: F[C, A])(f: => F[C, (A) => B]): F[C, B] = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
+      def ap[A, B](fa: => F[C, A])(f: => F[C, (A) => B]): F[C, B] = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
       def map[A, B](fa: F[C, A])(f: (A) => B): F[C, B] = <<<(arr(f), fa)
     }
 

@@ -193,7 +193,7 @@ trait WriterTApply[F[_], W] extends Apply[({type λ[α]=WriterT[F, W, α]})#λ] 
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
-  override def ap[A, B](fa: WriterT[F, W, A])(f: => WriterT[F, W, (A) => B]) = fa ap f
+  override def ap[A, B](fa: => WriterT[F, W, A])(f: => WriterT[F, W, (A) => B]) = fa ap f
 }
 
 trait WriterTApplicative[F[_], W] extends Applicative[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] with WriterTPointed[F, W] {

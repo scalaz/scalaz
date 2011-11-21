@@ -33,10 +33,10 @@ object ScalazProperties {
       forAll(F.functorLaw.identity[X] _).label("identity")
 
     def associative[F[_], X, Y, Z](implicit F: Functor[F],
-                          af: Arbitrary[F[X]],
-                          axy: Arbitrary[(X => Y)],
-                          ayz: Arbitrary[(Y => Z)],
-                          ef: Equal[F[Z]]) =
+                                   af: Arbitrary[F[X]],
+                                   axy: Arbitrary[(X => Y)],
+                                   ayz: Arbitrary[(Y => Z)],
+                                   ef: Equal[F[Z]]) =
       forAll(F.functorLaw.associative[X, Y, Z] _).label("associative")
   }
 
@@ -66,6 +66,26 @@ object ScalazProperties {
       forAll(ap.applicativeLaw.interchange[X, Y] _)
   }
 
+  object traverse {
+    def identityTraverse[F[_], X, Y](implicit f: Traverse[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
+      forAll(f.traverseLaw.identityTraverse[X, Y] _)
+
+    def purity[F[_], G[_], X](implicit f: Traverse[F], afx: Arbitrary[F[X]], G: Applicative[G], ef: Equal[G[F[X]]]) =
+      forAll(f.traverseLaw.purity[G, X] _)
+
+    def sequentialFusion[F[_], N[_], M[_], A, B, C](implicit fa: Arbitrary[F[A]], amb: Arbitrary[A => M[B]], bnc: Arbitrary[B => N[C]],
+                                                      F: Traverse[F], N: Applicative[N], M: Applicative[M], MN: Equal[M[N[F[C]]]]): Prop =
+      forAll(F.traverseLaw.sequentialFusion[N, M, A, B, C] _)
+
+    def naturality[F[_], N[_], M[_], A](nat: (M ~> N))
+                                       (implicit fma: Arbitrary[F[M[A]]], F: Traverse[F], N: Applicative[N], M: Applicative[M], NFA: Equal[N[F[A]]]): Prop =
+      forAll(F.traverseLaw.naturality[N, M, A](nat) _)
+
+    def parallelFusion[F[_], N[_], M[_], A, B](implicit fa: Arbitrary[F[A]], amb: Arbitrary[A => M[B]], anb: Arbitrary[A => N[B]],
+                                               F: Traverse[F], N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
+      forAll(F.traverseLaw.parallelFusion[N, M, A, B] _)
+  }
+
   class ApplicativeLaws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]])
     extends Properties("Applicative Laws") {
     property("identity") = applicative.identity[F, Int]
@@ -75,9 +95,10 @@ object ScalazProperties {
   }
 
   class MonadLaws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]], af: Arbitrary[Int => M[Int]], e: Equal[M[Int]])
-        extends Properties("Monad Laws") {
+    extends Properties("Monad Laws") {
     property("Right identity") = monad.rightIdentity[M, Int]
     property("Left identity") = monad.leftIdentity[M, Int, Int]
     property("Associativity") = monad.associativity[M, Int, Int, Int]
   }
+
 }

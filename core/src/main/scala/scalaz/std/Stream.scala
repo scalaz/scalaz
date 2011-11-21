@@ -8,12 +8,7 @@ trait StreamInstances {
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
       foldRight(fa, seed) {
-        (x, ys) =>
-          // This allows partial traversal (given lazy `Applicative`) but applies effects in the reverse order.
-          // See TraverseTest
-          // G.map2(ys, f(x))((bs, b) => b #:: bs)
-
-          G.map2(f(x), ys)((b, bs) => b #:: bs)
+        (x, ys) => G.map2(f(x), ys)((b, bs) => b #:: bs)
       }
     }
 

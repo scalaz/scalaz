@@ -27,6 +27,7 @@ class ApplicativeTest extends Specification with ScalaCheck {
     type Z = Int
 
     checkApplicativeLaws[Option, A]
+    checkApplicativeLaws[Zipper, A]
 
     ok
   }
