@@ -5,12 +5,14 @@ import scalaz._
 
 trait AnyValInstances {
 
-  implicit object unitInstance extends Monoid[Unit] with Order[Unit] with Show[Unit] {
+  implicit object unitInstance extends Group[Unit] with Order[Unit] with Show[Unit] {
     def show(f: Unit): List[Char] = ().toString.toList
 
     def append(f1: Unit, f2: => Unit): Unit = ()
 
     def zero: Unit = ()
+
+    def inverse(f:Unit):Unit = ()
 
     def order(x: Unit, y: Unit): Ordering = Ordering.EQ
   }
@@ -106,12 +108,14 @@ trait AnyValInstances {
     def order(a1: Char @@ Multiplication, a2: Char @@ Multiplication) = Order[Char].order(a1, a2)
   }
 
-  implicit object shortInstance extends Monoid[Short] with Order[Short] with Show[Short] {
+  implicit object shortInstance extends Group[Short] with Order[Short] with Show[Short] {
     def show(f: Short): List[Char] = f.toString.toList
 
     def append(f1: Short, f2: => Short): Short = (f1 + f2).toShort
 
     def zero: Short = 0
+
+    def inverse(f:Short):Short = (-f).toShort
 
     def order(x: Short, y: Short): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -131,12 +135,14 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
-  implicit object intInstance extends Monoid[Int] with Order[Int] with Show[Int] {
+  implicit object intInstance extends Group[Int] with Order[Int] with Show[Int] {
     def show(f: Int): List[Char] = f.toString.toList
 
     def append(f1: Int, f2: => Int): Int = f1 + f2
 
     def zero: Int = 0
+
+    def inverse(f:Int):Int = -f
 
     def order(x: Int, y: Int): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -155,12 +161,14 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
-  implicit object longInstance extends Monoid[Long] with Order[Long] with Show[Long] {
+  implicit object longInstance extends Group[Long] with Order[Long] with Show[Long] {
     def show(f: Long): List[Char] = f.toString.toList
 
     def append(f1: Long, f2: => Long): Long = f1 + f2
 
     def zero: Long = 0L
+
+    def inverse(f: Long): Long = -f
 
     def order(x: Long, y: Long): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -180,24 +188,46 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit object floatInstance extends Monoid[Float] with Order[Float] with Show[Float] {
+  implicit object floatInstance extends Group[Float] with Order[Float] with Show[Float] {
     def show(f: Float): List[Char] = f.toString.toList
 
     def append(f1: Float, f2: => Float): Float = f1 + f2
 
     def zero: Float = 0f
 
+    def inverse(f: Float): Float = -f
+
     def order(x: Float, y: Float): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit object doubleInstance extends Monoid[Double] with Order[Double] with Show[Double] {
+  implicit object floatMultiplicationNewType extends Group[Float @@ Multiplication] {
+    def append(f1: Float @@ Multiplication, f2: => Float @@ Multiplication): Float @@ Multiplication = Tag(f1 * f2)
+
+    def zero: Float @@ Multiplication = Tag(1.0f)
+
+    def inverse(f: Float @@ Multiplication): Float @@ Multiplication = Tag(1.0f/f)
+
+  }
+
+  implicit object doubleInstance extends Group[Double] with Order[Double] with Show[Double] {
     def show(f: Double): List[Char] = f.toString.toList
 
     def append(f1: Double, f2: => Double): Double = f1 + f2
 
     def zero: Double = 0d
 
+    def inverse(f: Double): Double = -f
+
     def order(x: Double, y: Double): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+  }
+
+  implicit object doubleMultiplicationNewType extends Group[Double @@ Multiplication] {
+    def append(f1: Double @@ Multiplication, f2: => Double @@ Multiplication): Double @@ Multiplication = Tag(f1 * f2)
+
+    def zero: Double @@ Multiplication = Tag(1.0d)
+
+    def inverse(f: Double @@ Multiplication): Double @@ Multiplication = Tag(1.0d/f)
+
   }
 
 }

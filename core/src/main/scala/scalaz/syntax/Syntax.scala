@@ -7,6 +7,8 @@ trait Syntaxes {
 
   object monoid extends ToMonoidV
 
+  object group extends ToGroupV
+
   object equal extends ToEqualV
 
   object length extends ToLengthV
@@ -81,7 +83,7 @@ trait Syntaxes {
 trait ToAllOtherV extends ToTreeV with ToWriterV
 
 trait ToAllTypeClassV
-  extends ToSemigroupV with ToMonoidV with ToEqualV with ToLengthV with ToShowV
+  extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
   with ToOrderV with ToMetricSpaceV with ToEmptyV with ToEachV with ToIndexV
   with ToFunctorV with ToPointedV with ToContravariantV with ToCoPointedV with ToApplyV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV

@@ -45,7 +45,11 @@ trait FunctionInstances extends FunctionInstances0 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
     implicit def R: Monoid[R] = R0
   }
-  
+
+  implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
+    implicit def R: Group[R] = R0
+  }
+
   implicit def function2Instance[T1, T2] = new Monad[({type l[a] = ((T1, T2) => a)})#l] {
     def point[A](a: => A): (T1, T2) => A = (t1, t2) => a
 
@@ -104,4 +108,9 @@ trait Function1Semigroup[A, R] extends Semigroup[A => R] {
 trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
   implicit def R: Monoid[R]
   def zero = a => R.zero
+}
+
+trait Function1Group[A, R] extends Group[A => R] with Function1Monoid[A, R] {
+  implicit def R: Group[R]
+  def inverse(f: A=>R) = a => R.inverse(f(a))
 }

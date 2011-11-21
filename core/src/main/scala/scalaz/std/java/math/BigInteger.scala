@@ -4,12 +4,14 @@ package std.java.math
 import java.math.BigInteger
 
 trait BigIntegers {
-  implicit object bigIntegerInstance extends Monoid[BigInteger] with Order[BigInteger] with Show[BigInteger] {
+  implicit object bigIntegerInstance extends Group[BigInteger] with Order[BigInteger] with Show[BigInteger] {
     def show(f: BigInteger): List[Char] = f.toString.toList
 
     def append(f1: BigInteger, f2: => BigInteger): BigInteger = f1 add f2
 
     def zero: BigInteger = BigInteger.ZERO
+
+    def inverse(f: BigInteger): BigInteger = f.negate()
 
     def order(x: BigInteger, y: BigInteger): Ordering = x.compareTo(y) match {
       case x if x < 0   => Ordering.LT

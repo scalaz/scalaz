@@ -3,12 +3,14 @@ package std
 package math
 
 trait BigInts {
-  implicit object bigIntInstance extends Monoid[BigInt] with Order[BigInt] with Show[BigInt] {
+  implicit object bigIntInstance extends Group[BigInt] with Order[BigInt] with Show[BigInt] {
     def show(f: BigInt): List[Char] = f.toString.toList
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
 
     def zero: BigInt = 0L
+
+    def inverse(f: BigInt): BigInt = -f
 
     def order(x: BigInt, y: BigInt): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
