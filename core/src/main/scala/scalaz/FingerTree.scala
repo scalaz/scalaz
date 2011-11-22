@@ -960,7 +960,7 @@ trait FingerTreeFunctions {
 
     /**
      * Ropes or 'heavyweight Strings' are an alternative to Strings.
-     * In essence, they are in essence binary trees whose leaves are arrays of characters.
+     * In essence they are binary trees whose leaves are arrays of characters.
      * Their advantage over ordinary strings is support for efficient concatenation and substring operations,
      * which scale to long strings.
      *
