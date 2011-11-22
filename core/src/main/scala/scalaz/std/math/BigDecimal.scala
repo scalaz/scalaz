@@ -4,13 +4,13 @@ package math
 
 trait BigDecimalInstances {
   implicit object bigDecimalInstance extends Monoid[BigDecimal] with Order[BigDecimal] with Show[BigDecimal] {
-    def show(f: BigDecimal): List[Char] = f.toString.toList
+    def show(f: BigDecimal) = f.toString.toList
 
-    def append(f1: BigDecimal, f2: => BigDecimal): BigDecimal = f1 + f2
+    def append(f1: BigDecimal, f2: => BigDecimal) = f1 + f2
 
-    def zero: BigDecimal = 0L
+    def zero = 0L
 
-    def order(x: BigDecimal, y: BigDecimal): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x: BigDecimal, y: BigDecimal) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
     object multiplication extends Monoid[BigDecimal] {
       def append(f1: BigDecimal, f2: => BigDecimal): BigDecimal = f1 * f2
@@ -22,9 +22,9 @@ trait BigDecimalInstances {
   import Tags.Multiplication
 
   implicit object BigDecimalMultiplicationNewType extends Monoid[BigDecimal @@ Multiplication] {
-    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication): BigDecimal @@ Multiplication = Tag(f1 * f2)
+    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) = Multiplication(f1 * f2)
 
-    def zero: BigDecimal @@ Multiplication = Tag(1)
+    def zero = Multiplication(1)
   }
 }
 

@@ -5,7 +5,7 @@ import annotation.tailrec
 
 trait StreamInstances {
   implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
-    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
+    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]) = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
       foldRight(fa, seed) {
         (x, ys) => G.map2(f(x), ys)((b, bs) => b #:: bs)
@@ -13,8 +13,8 @@ trait StreamInstances {
     }
 
     def each[A](fa: Stream[A])(f: (A) => Unit) = fa foreach f
-    def length[A](fa: Stream[A]): Int = fa.length
-    def index[A](fa: Stream[A], i: Int): Option[A] = {
+    def length[A](fa: Stream[A]) = fa.length
+    def index[A](fa: Stream[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
       val it = fa.iterator
@@ -27,24 +27,43 @@ trait StreamInstances {
       k
     }
 
-    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
+    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B) = if (fa.isEmpty)
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
 
-    def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]): Stream[B] = fa flatMap f
+    def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
-    def plus[A](a: Stream[A], b: => Stream[A]): Stream[A] = a #::: b
-    def point[A](a: => A): Stream[A] = scala.Stream(a)
+    def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
+    def point[A](a: => A) = scala.Stream(a)
+  }
+
+  import Tags.Zip
+
+  /**
+   * An alternative [[scalaz.Applicative]] instance for `Stream`, discriminated by the type tag [[scalaz.Tags.Zip]],
+   * that zips streams together.
+   *
+   * @example
+   * {{{
+   * streamZipApplicative.map2(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
+   * }}}
+   */
+  implicit object streamZipApplicative extends Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
+    def point[A](a: => A) = Zip(Stream.continually(a))
+    def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
+      Zip(if (f.isEmpty || fa.isEmpty) Stream.empty[B]
+      else Stream.cons((f.head)(fa.head), ap(Zip(fa.tail))(Zip(f.tail))))
+    }
   }
 
   implicit def streamMonoid[A] = new Monoid[Stream[A]] {
-    def append(f1: Stream[A], f2: => Stream[A]): Stream[A] = f1 #::: f2
+    def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
     def zero: Stream[A] = scala.Stream.empty
   }
 
   implicit def streamEqual[A](implicit A0: Equal[A]) = new Equal[Stream[A]] {
-    def equal(a1: Stream[A], a2: Stream[A]): Boolean = (a1 corresponds a2)(A0.equal)
+    def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
   }
   implicit def streamShow[A](implicit A0: Show[A]) = new Show[Stream[A]] {
     def show(as: Stream[A]) = {

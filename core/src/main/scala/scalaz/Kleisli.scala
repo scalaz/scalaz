@@ -1,5 +1,8 @@
 package scalaz
 
+/**
+ * Represents a function `A => M[B]`.
+ */
 sealed trait Kleisli[M[_], A, B] {
   def run(a: A): M[B]
 

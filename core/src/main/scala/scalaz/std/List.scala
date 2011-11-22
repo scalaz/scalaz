@@ -5,8 +5,8 @@ import annotation.tailrec
 
 trait ListInstances {
   implicit val listInstance = new Traverse[List] with MonadPlus[List] with Empty[List] with Each[List] with Index[List] with Length[List] {
-    def each[A](fa: List[A])(f: (A) => Unit): Unit = fa foreach f
-    def index[A](fa: List[A], i: Int): Option[A] = {
+    def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
+    def index[A](fa: List[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
       val it = fa.iterator
@@ -18,14 +18,14 @@ trait ListInstances {
 
       k
     }
-    def length[A](fa: List[A]): Int = fa.length
-    def point[A](a: => A): List[A] = scala.List(a)
+    def length[A](fa: List[A]) = fa.length
+    def point[A](a: => A) = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
-    def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] = {
+    def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       // TODO pick between these implementations.
       // DList.fromList(l).foldr(F.point(List[B]())) {
       //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
@@ -35,7 +35,7 @@ trait ListInstances {
       }
     }
 
-    override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = {
+    override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
@@ -47,7 +47,7 @@ trait ListInstances {
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
-    def append(f1: List[A], f2: => List[A]): List[A] = f1 ::: f2
+    def append(f1: List[A], f2: => List[A]) = f1 ::: f2
     def zero: List[A] = Nil
   }
 
@@ -68,7 +68,7 @@ trait ListInstances {
   }
 
   implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
-    def equal(a1: List[A], a2: List[A]): Boolean = (a1 corresponds a2)(Equal[A].equal)
+    def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
   }
 }
 

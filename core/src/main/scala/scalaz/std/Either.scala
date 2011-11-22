@@ -58,13 +58,13 @@ trait EitherInstances0 {
 trait EitherInstances extends EitherInstances0 {
   implicit def eitherInstance = new BiTraverse[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
-                                  (f: (A) => C, g: (B) => D): Either[C, D] = fab match {
+                                  (f: (A) => C, g: (B) => D) = fab match {
       case Left(a)  => Left(f(a))
       case Right(b) => Right(g(b))
     }
 
     def bitraverse[G[_] : Applicative, A, B, C, D](fab: Either[A, B])
-                                                  (f: (A) => G[C], g: (B) => G[D]): G[Either[C, D]] = fab match {
+                                                  (f: (A) => G[C], g: (B) => G[D]) = fab match {
       case Left(a)  => Applicative[G].map(f(a))(b => Left(b))
       case Right(b) => Applicative[G].map(g(b))(d => Right(d))
     }
@@ -72,19 +72,19 @@ trait EitherInstances extends EitherInstances0 {
 
   /** Right biased monad */
   implicit def eitherMonad[L] = new Traverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] {
-    def bind[A, B](fa: Either[L, A])(f: (A) => Either[L, B]): Either[L, B] = fa match {
+    def bind[A, B](fa: Either[L, A])(f: (A) => Either[L, B]) = fa match {
       case Left(a)  => Left(a)
       case Right(b) => f(b)
     }
 
-    def point[A](a: => A): Either[L, A] = Right(a)
+    def point[A](a: => A) = Right(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: Either[L, A])(f: (A) => G[B]): G[Either[L, B]] = fa match {
+    def traverseImpl[G[_] : Applicative, A, B](fa: Either[L, A])(f: (A) => G[B]) = fa match {
       case Left(x)  => Applicative[G].point(Left(x))
       case Right(x) => Applicative[G].map(f(x))(Right(_))
     }
 
-    def foldRight[A, B](fa: Either[L, A], z: => B)(f: (A, => B) => B): B = fa match {
+    def foldRight[A, B](fa: Either[L, A], z: => B)(f: (A, => B) => B) = fa match {
       case Left(_)  => z
       case Right(a) => f(a, z)
     }
@@ -99,13 +99,13 @@ trait EitherInstances extends EitherInstances0 {
   /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
   implicit def FirstLeftProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α] = LeftProjection[E, α] @@ First})#λ, ({type λ[α] = Either[E, α]})#λ] {
     def to[A](fa: LeftProjection[E, A] @@ First) = fa.e
-    def from[A](ga: Either[E, A]): LeftProjection[E, A] @@ First = Tag(ga.left)
+    def from[A](ga: Either[E, A]) = First(ga.left)
   }
 
   /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
   implicit def LastLeftProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α] = LeftProjection[E, α] @@ Last})#λ, ({type λ[α] = Either[E, α]})#λ] {
     def to[A](fa: LeftProjection[E, A] @@ Last) = fa.e
-    def from[A](ga: Either[E, A]): LeftProjection[E, A] @@ Last = Tag(ga.left)
+    def from[A](ga: Either[E, A]) = Last(ga.left)
   }
 
   /** LeftProjection is isomorphic to Validation  */
@@ -117,13 +117,13 @@ trait EitherInstances extends EitherInstances0 {
   /** LeftProjection is isomorphic to Validation  */
   implicit def FirstLeftProjectionIso2 = new IsoBiFunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ First) = fa.e
-    def from[A, B](ga: Either[A, B]): LeftProjection[A, B] @@ First = Tag(ga.left)
+    def from[A, B](ga: Either[A, B]) = First(ga.left)
   }
 
   /** LeftProjection is isomorphic to Validation  */
   implicit def LastLeftProjectionIso2 = new IsoBiFunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ Last) = fa.e
-    def from[A, B](ga: Either[A, B]): LeftProjection[A, B] @@ Last = Tag(ga.left)
+    def from[A, B](ga: Either[A, B]) = Last(ga.left)
   }
 
   /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
@@ -135,13 +135,13 @@ trait EitherInstances extends EitherInstances0 {
   /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
   implicit def FirstRightProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α] = RightProjection[α, A] @@ First})#λ, ({type λ[α] = Either[α, A]})#λ] {
     def to[E](fa: RightProjection[E, A] @@ First) = fa.e
-    def from[E](ga: Either[E, A]): RightProjection[E, A] @@ First = Tag(ga.right)
+    def from[E](ga: Either[E, A]) = First(ga.right)
   }
 
   /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
   implicit def LastRightProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α] = RightProjection[α, A] @@ Last})#λ, ({type λ[α] = Either[α, A]})#λ] {
     def to[E](fa: RightProjection[E, A] @@ Last) = fa.e
-    def from[E](ga: Either[E, A]): RightProjection[E, A] @@ Last = Tag(ga.right)
+    def from[E](ga: Either[E, A]) = Last(ga.right)
   }
 
   /** RightProjection is isomorphic to Validation  */
@@ -153,13 +153,13 @@ trait EitherInstances extends EitherInstances0 {
   /** RightProjection is isomorphic to Validation  */
   implicit def FirstRightProjectionIso2 = new IsoBiFunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ First) = fa.e
-    def from[A, B](ga: Either[A, B]): RightProjection[A, B] @@ First = Tag(ga.right)
+    def from[A, B](ga: Either[A, B]) = First(ga.right)
   }
 
   /** RightProjection is isomorphic to Validation  */
   implicit def LastRightProjectionIso2 = new IsoBiFunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ Last) = fa.e
-    def from[A, B](ga: Either[A, B]): RightProjection[A, B] @@ Last = Tag(ga.right)
+    def from[A, B](ga: Either[A, B]) = Last(ga.right)
   }
 
   implicit def eitherLeftInstance = new IsomorphismBiFunctor[LeftProjection, Either] {
@@ -178,16 +178,16 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
-    def point[A](a: => A): RightProjection[L, A] = Right(a).right
-    def bind[A, B](fa: RightProjection[L, A])(f: (A) => RightProjection[L, B]): RightProjection[L, B] = fa.e match {
+    def point[A](a: => A) = Right(a).right
+    def bind[A, B](fa: RightProjection[L, A])(f: (A) => RightProjection[L, B]) = fa.e match {
       case Left(a)  => Left(a).right
       case Right(b) => f(b)
     }
   }
 
   implicit def eitherFirstRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ First})#λ] {
-    def point[A](a: => A): RightProjection[L, A] @@ First = Tag(Right(a).right)
-    def bind[A, B](fa: RightProjection[L, A] @@ First)(f: (A) => RightProjection[L, B] @@ First): RightProjection[L, B] @@ First = Tag(
+    def point[A](a: => A) = First(Right(a).right)
+    def bind[A, B](fa: RightProjection[L, A] @@ First)(f: (A) => RightProjection[L, B] @@ First) = First(
       fa.e match {
         case Left(a)  => Left(a).right
         case Right(b) => f(b)
@@ -196,26 +196,25 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherLastRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] {
-    def point[A](a: => A): RightProjection[L, A] @@ Last = Tag(Right(a).right)
-    def bind[A, B](fa: RightProjection[L, A] @@ Last)(f: (A) => RightProjection[L, B] @@ Last): RightProjection[L, B] @@ Last = Tag(
+    def point[A](a: => A) = Last(Right(a).right)
+    def bind[A, B](fa: RightProjection[L, A] @@ Last)(f: (A) => RightProjection[L, B] @@ Last) =
       fa.e match {
-        case Left(a)  => Left(a).right
+        case Left(a)  => Last(Left(a).right)
         case Right(b) => f(b)
       }
-    )
   }
 
   implicit def eitherLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
-    def point[A](a: => A): LeftProjection[A, R] = Left(a).left
-    def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]): LeftProjection[B, R] = fa.e match {
+    def point[A](a: => A) = Left(a).left
+    def bind[A, B](fa: LeftProjection[A, R])(f: (A) => LeftProjection[B, R]) = fa.e match {
       case Left(a)  => f(a)
       case Right(b) => Right(b).left
     }
   }
 
   implicit def eitherFirstLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] {
-    def point[A](a: => A): LeftProjection[A, R] @@ First = Tag(Left(a).left)
-    def bind[A, B](fa: LeftProjection[A, R] @@ First)(f: (A) => LeftProjection[B, R] @@ First): LeftProjection[B, R] @@ First = Tag(
+    def point[A](a: => A) = First(Left(a).left)
+    def bind[A, B](fa: LeftProjection[A, R] @@ First)(f: (A) => LeftProjection[B, R] @@ First) = First(
       fa.e match {
         case Left(a)  => f(a)
         case Right(b) => Right(b).left
@@ -224,8 +223,8 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   implicit def eitherLastLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] {
-    def point[A](a: => A): LeftProjection[A, R] @@ Last = Tag(Left(a).left)
-    def bind[A, B](fa: LeftProjection[A, R] @@ Last)(f: (A) => LeftProjection[B, R] @@ Last): LeftProjection[B, R] @@ Last = Tag(
+    def point[A](a: => A) = Last(Left(a).left)
+    def bind[A, B](fa: LeftProjection[A, R] @@ Last)(f: (A) => LeftProjection[B, R] @@ Last) = Last(
       fa.e match {
         case Left(a)  => f(a)
         case Right(b) => Right(b).left
@@ -409,13 +408,13 @@ private[scalaz] trait EitherRightSemigroup[X, A] extends Semigroup[RightProjecti
 private[scalaz] trait EitherFirstLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ First] with EitherFirstLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
-  def zero: LeftProjection[A, X] @@ First = Tag(Right(Monoid[X].zero).left)
+  def zero = First(Right(Monoid[X].zero).left)
 }
 
 private[scalaz] trait EitherLastLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ Last] with EitherLastLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
-  def zero: LeftProjection[A, X] @@ Last = Tag(Right(Monoid[X].zero).left)
+  def zero = Last(Right(Monoid[X].zero).left)
 }
 
 private[scalaz] trait EitherLeftMonoid[A, X] extends Monoid[LeftProjection[A, X]] with EitherLeftSemigroup[A, X] {
@@ -427,13 +426,13 @@ private[scalaz] trait EitherLeftMonoid[A, X] extends Monoid[LeftProjection[A, X]
 private[scalaz] trait EitherFirstRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ First] with EitherFirstRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
-  def zero: RightProjection[X, A] @@ First = Tag(Left(Monoid[X].zero).right)
+  def zero = First(Left(Monoid[X].zero).right)
 }
 
 private[scalaz] trait EitherLastRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ Last] with EitherLastRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
-  def zero: RightProjection[X, A] @@ Last = Tag(Left(Monoid[X].zero).right)
+  def zero = Last(Left(Monoid[X].zero).right)
 }
 
 private[scalaz] trait EitherRightMonoid[X, A] extends Monoid[RightProjection[X, A]] with EitherRightSemigroup[X, A] {

@@ -30,7 +30,9 @@ object build extends Build {
       val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
       objects + "\n\n" + all
     },
-
+    typeClassTree <<= typeClasses map {
+      tcs => tcs.map(_.doc).mkString("\n")
+    },
     publishArtifact in (Compile, packageDoc) := false,
 
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
@@ -142,4 +144,6 @@ object build extends Build {
   lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
 
   lazy val showDoc = TaskKey[Unit]("show-doc")
+
+  lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
 }

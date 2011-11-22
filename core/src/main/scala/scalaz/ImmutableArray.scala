@@ -9,20 +9,16 @@ import syntax.SyntaxV
 /**
  * An immutable wrapper for arrays
  *
- * @tparam A     type of the elements of the array
+ * @tparam A type of the elements of the array
  */
 trait ImmutableArray[+A] {
   protected[this] def elemManifest: ClassManifest[A]
-
-  //  override def stringPrefix = "ImmutableArray"
-  //  protected[this] override def newBuilder: Builder[A, ImmutableArray[A]] =
-  //    error("calling newBuilder directly on ImmutableArray[A]; this should be overridden in all subclasses")
 
   def apply(index: Int): A
 
   def length: Int
 
-  def isEmpty = length == 0
+  def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassManifest]: Array[B]
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
@@ -33,8 +29,7 @@ trait ImmutableArray[+A] {
 }
 
 
-
-trait ImmutableArrays {
+trait ImmutableArrayFunctions {
 
   def make[A](x: AnyRef): ImmutableArray[A] = {
     val y = x match {
@@ -54,7 +49,11 @@ trait ImmutableArrays {
     y.asInstanceOf[ImmutableArray[A]]
   }
 
-  /**Gives better type inference than make[A] */
+  /**
+   * Wrap `x` in an `ImmutableArray`.
+   *
+   * Provides better type inference than `make[A]`
+   */
   def fromArray[A](x: Array[A]): ImmutableArray[A] = {
     val y = x.asInstanceOf[AnyRef] match {
       case null              => null
@@ -72,6 +71,7 @@ trait ImmutableArrays {
     y.asInstanceOf[ImmutableArray[A]]
   }
 
+  /** Wrap the characters in `str` in an `ImmutableArray` */
   def fromString(str: String): ImmutableArray[Char] = new StringArray(str)
 
   def newBuilder[A](implicit elemManifest: ClassManifest[A]): Builder[A, ImmutableArray[A]] =
@@ -117,7 +117,6 @@ trait ImmutableArrays {
   }
 
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
-
     protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
   }
 
@@ -186,7 +185,7 @@ trait ImmutableArrays {
   }
 }
 
-object ImmutableArray extends ImmutableArrays {
+object ImmutableArray extends ImmutableArrayFunctions {
 
   implicit def wrapArray[A](immArray: ImmutableArray[A]): WrappedImmutableArray[A] = {
     import ImmutableArray.{WrappedImmutableArray => IAO}
@@ -215,7 +214,8 @@ object ImmutableArray extends ImmutableArrays {
     override def stringPrefix = "ImmutableArray"
 
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]] =
-    sys.error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+      sys.error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+
     override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 

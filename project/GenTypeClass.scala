@@ -9,6 +9,8 @@ case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz")
 
   def packageString0 = pack.map("package " + _).mkString("\n")
   def packageString = pack.mkString(".")
+  def fqn = (pack :+ name).mkString(".")
+  def doc = "[[" + fqn + "]]" + (if (extendsList.nonEmpty) " extends " + extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
 }
 
 object TypeClass {

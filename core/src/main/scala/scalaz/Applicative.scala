@@ -4,6 +4,16 @@ package scalaz
 /**
  * Applicative Functor, described in [[http://www.soi.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects]]
  *
+ * Whereas a [[scalaz.Functor]] allows application of a pure function to a value in a context, an Applicative
+ * also allows application of a function in a context to a value in a context (`ap`).
+ *
+ * It follows that a pure function can be applied to arguments in a context. (See `map2`, `map3`, ... )
+ *
+ * Applicative instances come in a few flavours:
+ *  - All [[scalaz.Monad]]s are also `Applicative`
+ *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.MonoidalApplicative]])
+ *  - Zipping together corresponding elements of Naperian data structures (those of of a fixed, possibly infinite shape)
+ *
  */
 ////
 trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
@@ -63,6 +73,25 @@ object Applicative {
 
   ////
 
+  /**
+   * A monoidal applicative functor, that implements `point` and `ap` with the operations `zero` and `append` respectively
+   * from the provided [[scalaz.Monoid]]. Note that the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is discarded;
+   * it is a phantom type.
+   */
+  trait MonoidalApplicative[F] extends Applicative[({type λ[α]=F})#λ] {
+    implicit def F: Monoid[F]
+    def point[A](a: => A): F = F.zero
+    def ap[A, B](fa: => F)(f: => F): F = F.append(fa, f)
+  }
+
+  /**
+   * Create a monoidal applicative functor from the given [[scalaz.Monoid]].
+   *
+   * @see [[scalaz.Applicative.MonoidalApplicative]]
+   */
+  def monoidalApplicative[F](implicit F: Monoid[F]): Applicative[({type λ[α]=F})#λ] = new MonoidalApplicative[F] {
+    implicit def F: Monoid[F] = F
+  }
   ////
 }
 

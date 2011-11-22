@@ -11,29 +11,29 @@ trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
-    def index[A](fa: Option[A], n: Int): Option[A] = if (n == 0) fa else None
-    def length[A](fa: Option[A]): Int = if (fa.isEmpty) 0 else 1
-    override def ap[A, B](fa: => Option[A])(f: => Option[(A) => B]): Option[B] = f match {
+    def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
+    def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
+    override def ap[A, B](fa: => Option[A])(f: => Option[(A) => B]) = f match {
       case Some(f) => fa match {
         case Some(x) => Some(f(x))
         case None    => None
       }
       case None    => None
     }
-    def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
-    override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa map f
+    def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa flatMap f
+    override def map[A, B](fa: Option[A])(f: A => B) = fa map f
     def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
       fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
     def empty[A]: Option[A] = None
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
-    def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B): B = fa match {
+    def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
       case Some(a) => f(a, z)
       case None    => z
     }
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
-    def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
+    def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
       case (Some(a1), None)     => f1
       case (None, Some(a2))     => f2
@@ -48,7 +48,7 @@ trait OptionInstances extends OptionInstances0 {
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    def show(o1: Option[A]): List[Char] = (o1 match {
+    def show(o1: Option[A]) = (o1 match {
       case Some(a1) => "Some(" + Show[A].show(a1) + ")"
       case None     => "None"
     }).toList

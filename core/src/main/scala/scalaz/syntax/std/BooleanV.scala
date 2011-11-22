@@ -9,7 +9,7 @@ import scalaz.Tags.Conjunction
 
 trait BooleanV extends SyntaxV[Boolean] {
 
-  final def conjunction: Boolean @@ Conjunction = Tag(self)
+  final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
   final def |∧| : Boolean @@ Conjunction = conjunction
 
