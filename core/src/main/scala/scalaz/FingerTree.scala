@@ -7,9 +7,7 @@ import std.option.optionSyntax._
 import syntax.SyntaxV
 
 
-/*
- * View of the left end of a sequence.
- */
+/**View of the left end of a sequence.*/
 sealed abstract class ViewL[S[_], A] {
   def fold[B](b: => B, f: (=> A, => S[A]) => B): B
   def headOption: Option[A] = fold(None, (a, sa) => Some(a))
@@ -18,9 +16,7 @@ sealed abstract class ViewL[S[_], A] {
   def tail: S[A] = tailOption.getOrElse(sys.error("Tail on empty view"))
 }
 
-/*
- * View of the right end of a sequence.
- */
+/**View of the right end of a sequence.*/
 sealed abstract class ViewR[S[_], A] {
   def fold[B](b: => B, f: (=> S[A], => A) => B): B
   def lastOption: Option[A] = fold(None, (sa, a) => Some(a))
@@ -70,10 +66,10 @@ sealed abstract class Finger[V, A] {
   /** Apply the given side effect to each element. */
   def foreach(f: A => Unit): Unit
 
-  /** An iterator that visits elech element. */
+  /** An iterator that visits each element. */
   def iterator: Iterator[A]
 
-  /** An iterator that visits elech element in reverse order. */
+  /** An iterator that visits each element in reverse order. */
   def reverseIterator: Iterator[A]
 
   def measure: V
@@ -343,6 +339,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
  * Finger Trees provide a base for implementations of various collection types,
  * as described in "Finger trees: a simple general-purpose data structure", by
  * Ralf Hinze and Ross Paterson.
+ * A gentle introduction is presented in the blog post "Monoids and Finger Trees" by Heinrich Apfelmus.
  *
  * This is done by choosing a a suitable type to annotate the nodes. For example,
  * a binary tree can be implemented by annotating each node with the size of its subtree,
@@ -362,6 +359,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
  * @tparam A The type of the elements stored at the leaves
  *
  * @see [[http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf Finger trees: a simple general-purpose data structure]]
+ * @see [[http://apfelmus.nfshost.com/articles/monoid-fingertree.html]]
  */
 sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def measure: V = this.unit[V]
@@ -383,8 +381,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   /**
    * Fold over the structure of the tree. The given functions correspond to the three possible variations of the finger tree.
    *
-   * @param empty if the three is empty, convert the measure to a `B`
-   * @param single if the three contains a single element, convert the measure and this element to a `B`
+   * @param empty if the tree is empty, convert the measure to a `B`
+   * @param single if the tree contains a single element, convert the measure and this element to a `B`
    * @param deep otherwise, convert the measure, the two fingers, and the sub tree to a `B`.
    */
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
@@ -850,9 +848,6 @@ trait FingerTreeInstances {
 }
 
 trait FingerTreeFunctions {
-//   def &:[A](a: A) = OnL[M,A](a, value)
-//
-//  def :&[A](a: A) = OnR[M,A](value, a)
 
   def Node2[V, A](v: V, a1: => A, a2: => A)(implicit r: Reducer[A, V]) = new Node[V, A] {
     def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
@@ -963,8 +958,19 @@ trait FingerTreeFunctions {
     import scalaz.{ImmutableArray => IA}
     import std.anyVal._
 
+    /**
+     * Ropes or 'heavyweight Strings' are an alternative to Strings.
+     * In essence they are binary trees whose leaves are arrays of characters.
+     * Their advantage over ordinary strings is support for efficient concatenation and substring operations,
+     * which scale to long strings.
+     *
+     * They were first described in the paper: Ropes: an Alternative to Strings.
+     * by Hans-J. Boehm , Russ Atkinson , Michael Plass
+     *
+     * @see [[http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf]]
+     */
     sealed class Rope[A : ClassManifest](val self: FingerTreeIntPlus[ImmutableArray[A]])
-             extends SyntaxV[FingerTreeIntPlus[ImmutableArray[A]]] {//TODO move this to the syntax package?
+             extends SyntaxV[FingerTreeIntPlus[ImmutableArray[A]]] {
       import Rope._
       implicit def sizer = UnitReducer((arr: ImmutableArray[A]) => arr.length)
 
@@ -975,8 +981,10 @@ trait FingerTreeFunctions {
         split._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))(i - split._1.value.measure)
       }
 
+      /**Concatenates two Ropes. (O lg min(r1, r2)) where r1 and r2 are their sizes. */
       def ++(xs: Rope[A]) = rope(self <++> xs.self)
 
+      /**Appends the given chunk to the rope*/
       def ::+(chunk: ImmutableArray[A]) =
         if (chunk.isEmpty)
           this
@@ -992,6 +1000,7 @@ trait FingerTreeFunctions {
             )
           )
 
+      /**Prepends the given chunk to this rope*/
       def +::(chunk: ImmutableArray[A]) =
         if (chunk.isEmpty)
           this
@@ -1007,13 +1016,18 @@ trait FingerTreeFunctions {
             )
           )
 
+      /**Appends the given element to this rope*/
       def :+(x: A) = this ::+ IA.fromArray(Array(x))
 
+      /**Prepends the given element to this rope*/
       def +:(x: A) = IA.fromArray(Array(x)) +:: this
 
+      /**tail of the Rope*/
       def tail = rope(self.tail).self
+
+      /**first element of the rope*/
       def init = rope(self.init).self
-//      def map[B](f: A => B) = rope(value map f)
+//      def map[B](f: A => B) = rope(value map f) TODO
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
 
