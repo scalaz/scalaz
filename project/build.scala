@@ -45,7 +45,7 @@ object build extends Build {
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
-    settings = standardSettings,
+    settings = standardSettings ++ Unidoc.settings,
     aggregate = Seq(core, concurrent, effect, iteratee, example, scalacheckBinding, tests)
   )
 
