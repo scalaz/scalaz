@@ -27,7 +27,7 @@ trait StreamInstances {
       k
     }
 
-    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B) = if (fa.isEmpty)
+    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
@@ -44,7 +44,7 @@ trait StreamInstances {
    * An alternative [[scalaz.Applicative]] instance for `Stream`, discriminated by the type tag [[scalaz.Tags.Zip]],
    * that zips streams together.
    *
-   * @example
+   * Example:
    * {{{
    * streamZipApplicative.map2(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
    * }}}
@@ -135,7 +135,7 @@ trait StreamFunctions {
   final def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
     def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
       ts.foldRight[M[Stream[U]]](Monad[M].point(scala.Stream())) {
-        case (g, h) => Monad[M].lift2((x: U, xs: Stream[U]) => x #:: xs)(f(g), h)
+        case (g, h) => Monad[M].map2(f(g), h)(_ #:: _)
       }
 
     def unfoldTreeM(v: A) =
