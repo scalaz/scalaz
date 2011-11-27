@@ -33,7 +33,6 @@ object build extends Build {
     typeClassTree <<= typeClasses map {
       tcs => tcs.map(_.doc).mkString("\n")
     },
-    publishArtifact in (Compile, packageDoc) := false,
 
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
       val index = out / "index.html"
