@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * @see [[scalaz.Functor.FunctorLaw]]
  */
 ////
 trait Functor[F[_]]  { self =>

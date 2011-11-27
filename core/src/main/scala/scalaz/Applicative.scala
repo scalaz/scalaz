@@ -14,6 +14,7 @@ package scalaz
  *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.MonoidalApplicative]])
  *  - Zipping together corresponding elements of Naperian data structures (those of of a fixed, possibly infinite shape)
  *
+ *  @see [[scalaz.Applicative.ApplicativeLaw]]
  */
 ////
 trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>

@@ -21,7 +21,6 @@ private[scalaz] trait CompositionApplicative[F[_], G[_]] extends Applicative[({t
 
   implicit def G: Applicative[G]
 
-  def ap[A, B](fa: => F[G[A]])(f: => F[G[A => B]]): F[G[B]] = {
-    F.lift2((ff: G[A => B], ga: G[A]) => G.ap(ga)(ff))(f, fa)
-  }
+  def ap[A, B](fa: => F[G[A]])(f: => F[G[A => B]]): F[G[B]] =
+    F.map2(f, fa)((ff, ga) => G.ap(ga)(ff))
 }

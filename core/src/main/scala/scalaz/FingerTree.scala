@@ -754,13 +754,13 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
 
-  /** Convert the leaves of the tree to a [[scala.Stream]] */
+  /** Convert the leaves of the tree to a `scala.Stream` */
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
 
-  /** Convert the leaves of the tree to a [[scala.List]] */
+  /** Convert the leaves of the tree to a `scala.List` */
   def toList: List[A] = toStream.toList
 
-  /** Convert the tree to a String. Unsafe: this uses `Any#toString` for types `V` and `A` */
+  /** Convert the tree to a `String`. Unsafe: this uses `Any#toString` for types `V` and `A` */
   override def toString = {
     import syntax.show._
     def showA[A] = new Show[A] {

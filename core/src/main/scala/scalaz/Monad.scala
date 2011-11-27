@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * @see [[scalaz.Monad.MonadLaw]]
  */
 ////
 trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>

@@ -1,10 +1,10 @@
 package scalaz
 
 /**
- * Liskov substitutability: A better <:<
+ * Liskov substitutability: A better `<:<`
  *
- * A <: B holds whenever A could be used in any negative context that expects a B.
- * (e.g. if you could pass an A into any function that expects a B.)
+ * `A <: B` holds whenever `A` could be used in any negative context that expects a `B`.
+ * (e.g. if you could pass an `A` into any function that expects a `B`.)
  */
 trait Liskov[-A, +B] {
   def apply(a: A): B = Liskov.witness(this)(a)
@@ -18,7 +18,18 @@ trait Liskov[-A, +B] {
   final def compose[C](that: Liskov[C, A]): Liskov[C, B] = Liskov.trans(this, that)
 }
 
-object Liskov {
+trait LiskovInstances {
+  import Liskov._
+
+  /**Subtyping forms a category */
+  implicit def liskov: Category[<~<] = new Category[<~<] {
+    def id[A]: (A <~< A) = refl[A]
+
+    def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
+  }
+}
+
+object Liskov extends LiskovInstances with LiskovFunctions {
 
   /**A convenient type alias for Liskov */
   type <~<[-A, +B] = Liskov[A, B]
@@ -26,7 +37,12 @@ object Liskov {
   /**A flipped alias, for those used to their arrows running left to right */
   type >~>[+B, -A] = Liskov[A, B]
 
-  /**Lift scala's subtyping relationship */
+}
+
+trait LiskovFunctions {
+  import Liskov._
+
+  /**Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
     def subst[F[-_]](p: F[B]): F[A] = p
   }
@@ -45,14 +61,6 @@ object Liskov {
   /**Subtyping is transitive */
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
     g.subst[({type λ[-α]= α <~< C})#λ](f)
-
-
-  /**Subtyping forms a category */
-  implicit def liskov: Category[<~<] = new Category[<~<] {
-    def id[A]: (A <~< A) = refl[A]
-
-    def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
-  }
 
   /**We can lift subtyping into any covariant type constructor */
   def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =

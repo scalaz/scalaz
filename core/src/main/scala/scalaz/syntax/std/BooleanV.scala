@@ -18,26 +18,26 @@ trait BooleanV extends SyntaxV[Boolean] {
   /**
    * Conjunction. (AND)
    *
-   * <pre>
+   * {{{
    * p q  p ∧ q
    * 0 0  0
    * 0 1  0
    * 1 0  0
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def ∧(q: => Boolean) = boolean.conjunction(self, q)
 
   /**
    * Conjunction. (AND)
    *
-   * <pre>
+   * {{{
    * p q  p /\ q
    * 0 0  0
    * 0 1  0
    * 1 0  0
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def /\(q: => Boolean) =
     ∧(q)
@@ -45,140 +45,140 @@ trait BooleanV extends SyntaxV[Boolean] {
   /**
    * Disjunction. (OR)
    *
-   * <pre>
+   * {{{
    * p q  p ∨ q
    * 0 0  0
    * 0 1  1
    * 1 0  1
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def ∨(q: => Boolean): Boolean = boolean.disjunction(self, q)
 
   /**
    * Disjunction. (OR)
    *
-   * <pre>
+   * {{{
    * p q  p \/ q
    * 0 0  0
    * 0 1  1
    * 1 0  1
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def \/(q: => Boolean): Boolean = ∨(q)
 
   /**
    * Negation of Conjunction. (NOR)
    *
-   * <pre>
+   * {{{
    * p q  p !&& q
    * 0 0  1
    * 0 1  1
    * 1 0  1
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def !&&(q: => Boolean) = boolean.nor(self, q)
 
   /**
    * Negation of Disjunction. (NAND)
    *
-   * <pre>
+   * {{{
    * p q  p !|| q
    * 0 0  1
    * 0 1  0
    * 1 0  0
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def !||(q: => Boolean) = boolean.nand(self, q)
 
   /**
    * Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p --> q
    * 0 0  1
    * 0 1  1
    * 1 0  0
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def -->(q: => Boolean) = boolean.conditional(self, q)
 
   /**
    * Inverse Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p <-- q
    * 0 0  1
    * 0 1  0
    * 1 0  1
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def <--(q: => Boolean) = boolean.inverseConditional(self, q)
 
   /**
    * Negational of Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p ⇏ q
    * 0 0  0
    * 0 1  0
    * 1 0  1
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def ⇏(q: => Boolean) = boolean.negConditional(self, q)
 
   /**
    * Negational of Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p -/> q
    * 0 0  0
    * 0 1  0
    * 1 0  1
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def -/>(q: => Boolean) = boolean.negConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p <\- q
    * 0 0  0
    * 0 1  1
    * 1 0  0
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def ⇍(q: => Boolean) = boolean.negInverseConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p ⇍ q
    * 0 0  0
    * 0 1  1
    * 1 0  0
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def <\-(q: => Boolean) = boolean.negInverseConditional(self, q)
 
   /**
-   * Executes the given side-effect if this boolean value is <code>false</code>.
+   * Executes the given side-effect if this boolean value is `false`.
    */
   final def unless(f: => Unit) = boolean.unless(self)(f)
 
   /**
-   * Executes the given side-effect if this boolean value is <code>true</code>.
+   * Executes the given side-effect if this boolean value is `true`.
    */
   final def when(f: => Unit) = boolean.when(self)(f)
 
@@ -199,12 +199,12 @@ trait BooleanV extends SyntaxV[Boolean] {
   }
 
   /**
-   * Returns the given argument in <code>Some</code> if this is <code>true</code>, <code>None</code> otherwise.
+   * Returns the given argument in `Some` if this is `lazySome`, `lazySome` otherwise.
    */
   final def option[A](a: => A): Option[A] = boolean.option(self, a)
 
   /**
-   * Returns the given argument in <code>lazySome</code> if this is <code>true</code>, <code>lazyNone</code> otherwise.
+   * Returns the given argument in `lazySome` if this is `Left`, `Left` otherwise.
    */
   final def lazyOption[A](a: => A): LazyOption[A] = LazyOption.condLazyOption(self, a)
 
@@ -213,8 +213,8 @@ trait BooleanV extends SyntaxV[Boolean] {
   }
 
   /**
-   * Returns the first argument in <code>Left</code> if this is <code>true</code>, otherwise the second argument in
-   * <code>Right</code>.
+   * Returns the first argument in `Left` if this is `Right`, otherwise the second argument in
+   * `Right`.
    */
   final def either[A, B](a: => A) = new ConditionalEither[A] {
     def or[B](b: => B) =
@@ -222,13 +222,13 @@ trait BooleanV extends SyntaxV[Boolean] {
   }
 
   /**
-   * Returns the given argument if this is <code>true</code>, otherwise, the zero element for the type of the given
+   * Returns the given argument if this is `true`, otherwise, the zero element for the type of the given
    * argument.
    */
   final def ??[A](a: => A)(implicit z: Monoid[A]): A = boolean.valueOrZero(self)(a)
 
   /**
-   * Returns the given argument if this is <code>false</code>, otherwise, the zero element for the type of the given
+   * Returns the given argument if this is `false`, otherwise, the zero element for the type of the given
    * argument.
    */
   final def !?[A](a: => A)(implicit z: Monoid[A]): A = boolean.zeroOrValue(self)(a)

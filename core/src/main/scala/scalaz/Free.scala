@@ -26,7 +26,7 @@ object Free extends FreeFunctions with FreeInstances {
   type Source[A, B] = Free[({type f[x] = (A, x)})#f, B]
 
   /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
-    * Note the similarity to an Iteratee.
+    * Note the similarity to an [[scalaz.iteratee.Iteratee]].
     */
   type Sink[A, B] = Free[({type f[x] = (=> A) => x})#f, B]
 }

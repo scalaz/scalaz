@@ -4,13 +4,13 @@ import Free._
 import std.function._
 
 /**
- * Difference lists: a data structure for O(1) append on lists.
+ * Difference lists: a data structure for `O(1)` append on lists.
  * Based on `Data.DList`, a Haskell library by Don Stewart.
  *
  * A difference list is a function that given a list, returns the
  * original contents of the difference list prepended at the given list.
  * 
- * This structure supports O(1) append and snoc operations on lists,
+ * This structure supports `O(1)` append and snoc operations on lists,
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
  */
@@ -18,7 +18,7 @@ trait DList[A] {
   import DList._
   def apply(xs: List[A]): Trampoline[List[A]]
 
-  /** Convert a DList to a normal list. */
+  /** Convert to a normal list. */
   def toList: List[A] = apply(List()).run
 
   /** Prepend a single element in constant time. */

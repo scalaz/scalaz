@@ -67,10 +67,10 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
    * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
    * <p/>
    * For example:
-   * <pre>
+   * {{{
    * val o: Option = None
    * val a: List[String] = ~o
-   * </pre>
+   * }}}
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 

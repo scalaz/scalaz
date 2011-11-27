@@ -237,115 +237,115 @@ trait BooleanFunctions {
   /**
    * Conjunction. (AND)
    *
-   * <pre>
+   * {{{
    * p q  p ∧ q
    * 0 0  0
    * 0 1  0
    * 1 0  0
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def conjunction(p: Boolean, q: => Boolean) = p && q
 
   /**
    * Disjunction. (OR)
    *
-   * <pre>
+   * {{{
    * p q  p ∨ q
    * 0 0  0
    * 0 1  1
    * 1 0  1
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def disjunction(p: Boolean, q: => Boolean) = p || q
 
   /**
    * Negation of Conjunction. (NOR)
    *
-   * <pre>
+   * {{{
    * p q  p !&& q
    * 0 0  1
    * 0 1  1
    * 1 0  1
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def nor(p: Boolean, q: => Boolean) = !p || !q
 
   /**
    * Negation of Disjunction. (NAND)
    *
-   * <pre>
+   * {{{
    * p q  p !|| q
    * 0 0  1
    * 0 1  0
    * 1 0  0
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def nand(p: Boolean, q: => Boolean) = !p && !q
 
   /**
    * Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p --> q
    * 0 0  1
    * 0 1  1
    * 1 0  0
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def conditional(p: Boolean, q: => Boolean) = !p || q
 
   /**
    * Inverse Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p <-- q
    * 0 0  1
    * 0 1  0
    * 1 0  1
    * 1 1  1
-   * </pre>
+   * }}}
    */
   final def inverseConditional(p: Boolean, q: => Boolean) = p || !q
 
   /**
    * Negational of Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p ⇏ q
    * 0 0  0
    * 0 1  0
    * 1 0  1
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def negConditional(p: Boolean, q: => Boolean) = p && !q
 
   /**
    * Negation of Inverse Conditional.
    *
-   * <pre>
+   * {{{
    * p q  p <\- q
    * 0 0  0
    * 0 1  1
    * 1 0  0
    * 1 1  0
-   * </pre>
+   * }}}
    */
   final def negInverseConditional(p: Boolean, q: => Boolean) = !p && q
 
 
   /**
-   * Executes the given side-effect if `cond` is <code>false</code>.
+   * Executes the given side-effect if `cond` is `false`
    */
   final def unless(cond: Boolean)(f: => Unit) = if (!cond) f
 
   /**
-   * Executes the given side-effect if `cond` is <code>true</code>.
+   * Executes the given side-effect if `cond` is `true`
    */
   final def when(cond: Boolean)(f: => Unit) = if (cond) f
 
@@ -355,7 +355,7 @@ trait BooleanFunctions {
   final def fold[A](cond: Boolean, t: => A, f: => A): A = if (cond) t else f
 
   /**
-   * Returns the given argument in <code>Some</code> if `cond` is `true`, `None` otherwise.
+   * Returns the given argument in `Some` if `cond` is `true`, `None` otherwise.
    */
   final def option[A](cond: Boolean, a: => A): Option[A] = if (cond) Some(a) else None
 

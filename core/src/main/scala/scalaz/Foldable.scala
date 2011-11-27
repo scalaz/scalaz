@@ -8,7 +8,7 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
-  /** Map each element of the structure to a monoid, and combine the results. */
+  /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
 
   /**Right-associative fold of a structure. */

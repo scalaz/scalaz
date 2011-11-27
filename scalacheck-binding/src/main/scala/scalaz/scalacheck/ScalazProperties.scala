@@ -23,7 +23,8 @@ object ScalazProperties {
   }
 
   object monoid {
-    def identity[A](implicit A: Monoid[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.identity _).label("identity")
+    def leftIdentity[A](implicit A: Monoid[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.leftIdentity _).label("leftIdentity")
+    def rightIdentity[A](implicit A: Monoid[A], eq: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.rightIdentity _).label("rightIdentity")
   }
 
   object group {

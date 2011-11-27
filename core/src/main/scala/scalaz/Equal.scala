@@ -2,7 +2,9 @@ package scalaz
 
 ////
 /**
+ * A type safe alternative to universal equality (`scala.Any#==`).
  *
+ * @see [[scalaz.Equal.EqualLaw]]
  */
 ////
 trait Equal[F]  { self =>

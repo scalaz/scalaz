@@ -2,11 +2,7 @@ package scalaz
 
 ////
 /**
- * A semigroup in type S must satisfy two laws:
- *
- *  - '''closure''': `∀ a, b in S, append(a, b)` is also in `S`. This is enforced by the type system.
- *  - '''associativity''': `∀ a, b, c` in `S`, the equation `append(append(a, b), c) = append(a, append(b , c))` holds.
- *
+ * @see [[scalaz.Semigroup.SemigroupLaw]]
  * @see [[scalaz.syntax.SemigroupV]]
  */
 ////
@@ -17,6 +13,12 @@ trait Semigroup[F]  { self =>
 
   // derived functions
 
+  /**
+   * A semigroup in type F must satisfy two laws:
+    *
+    *  - '''closure''': `∀ a, b in F, append(a, b)` is also in `F`. This is enforced by the type system.
+    *  - '''associativity''': `∀ a, b, c` in `F`, the equation `append(append(a, b), c) = append(a, append(b , c))` holds.
+   */
   trait SemigroupLaw {
     def associative(f1: F, f2: F, f3: F)(implicit F: Equal[F]): Boolean =
       F.equal(append(f1, append(f2, f3)), append(append(f1, f2), f3))

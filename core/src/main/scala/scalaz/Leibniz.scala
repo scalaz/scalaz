@@ -1,17 +1,17 @@
 package scalaz
 
 /**
- * Leibnizian equality: A better =:=
+ * Leibnizian equality: a better `=:=`
  *
  * This technique was first used in
- * <a href="http://portal.acm.org/citation.cfm?id=583852.581494">Typing Dynamic Typing</a> (Baars and Swierstra, ICFP 2002).
+ * [[http://portal.acm.org/citation.cfm?id=583852.581494  Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
  *
  * It is generalized here to handle subtyping so that it can be used with constrained type constructors.
  *
- * Leibniz[L,H,A,B] says that A = B, and that both of its types are between L and H. Subtyping lets you
- * loosen the bounds on L and H.
+ * `Leibniz[L,H,A,B]` says that `A` = `B`, and that both of its types are between `L` and `H`. Subtyping lets you
+ * loosen the bounds on `L` and `H`.
  *
- * If you just need a witness that A = B, then you can use A===B which is a supertype of any Leibniz[L,H,A,B]
+ * If you just need a witness that `A` = `B`, then you can use `A===B` which is a supertype of any `Leibniz[L,H,A,B]`
  *
  * The more refined types are useful if you need to be able to substitute into restricted contexts.
  */
@@ -23,10 +23,46 @@ trait Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     Leibniz.trans[L2, H2, A, B, C](that, this)
 }
 
-object Leibniz {
+object Leibniz extends LeibnizInstances with LeibnizFunctions{
 
-  /** (A === B) is a supertype of Leibniz[L,H,A,B] */
+  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
   type ===[A,B] = Leibniz[⊥, ⊤, A, B]
+}
+
+trait LeibnizInstances {
+  import Leibniz._
+
+  implicit def leibniz: Category[===] = new Category[===] {
+    def id[A]: (A === A) = refl[A]
+
+    def compose[A, B, C](bc: B === C, ab: A === B) = bc compose ab
+  }
+
+  // TODO
+  /*sealed class LeibnizGroupoid[L_, H_ >: L_] extends GeneralizedGroupoid with Hom {
+      type L = L_
+      type H = H_
+      type C[A >: L <: H, B >: L <: H] = Leibniz[L, H, A, B]
+      type U = LeibnizGroupoid[L, H]
+
+      def id[A >: L <: H]: Leibniz[A, A, A, A] = refl[A]
+
+      def compose[A >: L <: H, B >: L <: H, C >: L <: H](
+        bc: Leibniz[L, H, B, C],
+        ab: Leibniz[L, H, A, B]
+      ): Leibniz[L, H, A, C] = trans[L, H, A, B, C](bc, ab)
+
+      def invert[A >: L <: H, B >: L <: H](
+        ab: Leibniz[L, H, A, B]
+      ): Leibniz[L, H, B, A] = symm(ab)
+    }
+
+    implicit def leibnizGroupoid[L, H >: L]: LeibnizGroupoid[L, H] = new LeibnizGroupoid[L, H]*/
+
+}
+
+trait LeibnizFunctions {
+  import Leibniz._
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
   implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A] {
@@ -51,33 +87,6 @@ object Leibniz {
     f: Leibniz[L, H, A, B]
   )  : Leibniz[L, H, B, A] =
     f.subst[({type λ[X>:L<:H]=Leibniz[L, H, X, A]})#λ](refl)
-
-  implicit def liskov: Category[===] = new Category[===] {
-    def id[A]: (A === A) = refl[A]
-
-    def compose[A, B, C](bc: B === C, ab: A === B): (A === C) = bc compose ab
-  }
-
-  // TODO
-  /*sealed class LeibnizGroupoid[L_, H_ >: L_] extends GeneralizedGroupoid with Hom {
-    type L = L_
-    type H = H_
-    type C[A >: L <: H, B >: L <: H] = Leibniz[L, H, A, B]
-    type U = LeibnizGroupoid[L, H]
-
-    def id[A >: L <: H]: Leibniz[A, A, A, A] = refl[A]
-
-    def compose[A >: L <: H, B >: L <: H, C >: L <: H](
-      bc: Leibniz[L, H, B, C],
-      ab: Leibniz[L, H, A, B]
-    ): Leibniz[L, H, A, C] = trans[L, H, A, B, C](bc, ab)
-
-    def invert[A >: L <: H, B >: L <: H](
-      ab: Leibniz[L, H, A, B]
-    ): Leibniz[L, H, B, A] = symm(ab)
-  }
-
-  implicit def leibnizGroupoid[L, H >: L]: LeibnizGroupoid[L, H] = new LeibnizGroupoid[L, H]*/
 
   /** We can lift equality into any type constructor */
   def lift[
@@ -131,8 +140,10 @@ object Leibniz {
     def subst[F[_ >: L <: H]](fa: F[A]): F[B] = fa.asInstanceOf[F[B]]
   }
 
+  import Injectivity._
+
   /**
-   * Emir Pasalic's PhD thesis mentions that it is unknown whether or not <code>((A,B) === (C,D)) => (A === C)</code> is inhabited.
+   * Emir Pasalic's PhD thesis mentions that it is unknown whether or not `((A,B) === (C,D)) => (A === C)` is inhabited.
    * <p>
    * Haskell can work around this issue by abusing type families as noted in
    * <a href="http://osdir.com/ml/haskell-cafe@haskell.org/2010-05/msg00114.html">Leibniz equality can be injective</a> (Oleg Kiselyov, Haskell Cafe Mailing List 2010)
@@ -140,12 +151,9 @@ object Leibniz {
    * </p>
    *
    */
-
-  // import Injectivity._
-
   def lower[
     LA, HA >: LA,
-    T[_ >: LA <: HA], //:Injective,
+    T[_ >: LA <: HA] /*: Injective*/,
     A >: LA <: HA, A2 >: LA <: HA
   ](
     t: T[A] === T[A2]
@@ -154,7 +162,7 @@ object Leibniz {
   def lower2[
     LA, HA >: LA,
     LB, HB >: LB,
-    T[_ >: LA <: HA, _ >: LB <: HB], // :Injective2,
+    T[_ >: LA <: HA, _ >: LB <: HB]/*: Injective2*/,
     A >: LA <: HA, A2 >: LA <: HA,
     B >: LB <: HB, B2 >: LB <: HB
   ](

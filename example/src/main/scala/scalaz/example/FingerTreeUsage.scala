@@ -36,5 +36,8 @@ object FingerTreeUsage extends App{
   //appending two trees
   assert((streamToTree(intStream.take(5)) <++> streamToTree(Stream.from(6).take(5))).toStream == intStream.take(10))
 
-  println(streamToTree(intStream.take(50)))
+//  println(streamToTree(intStream.take(50)))
+
+  println(streamToTree(intStream.take(5)).split(_ == 2))
+
 }

@@ -55,7 +55,8 @@ class GroupTest extends Specification with ScalaCheck {
       import ScalazProperties.group._
 
       "associative" in check(associative[A])
-      "identity" in check(identity[A])
+      "left identity" in check(leftIdentity[A])
+      "right identity" in check(rightIdentity[A])
       "inverseExists" in check(inverseExists[A])
     }
   }

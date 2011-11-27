@@ -4,12 +4,8 @@ package scalaz
 /**
  * A categorical monoid.
  *
- * All monoid instances must satisfy the [[scalaz.Semigroup]] law and 2 additional laws:
- *
- *  - '''left identity''': `forall a. append(zero, a) == a`
- *  - '''right identity''' : `forall a. append(a, zero) == a`
- *
  * @see [[scalaz.syntax.MonoidV]]
+ * @see [[scalaz.Monoid.MonoidLaw]]
  */
 ////
 trait Monoid[F] extends Semigroup[F] { self =>
@@ -18,8 +14,15 @@ trait Monoid[F] extends Semigroup[F] { self =>
 
   // derived functions
 
+  /**
+   * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:
+   *
+   *  - '''left identity''': `forall a. append(zero, a) == a`
+   *  - '''right identity''' : `forall a. append(a, zero) == a`
+   */
   trait MonoidLaw extends SemigroupLaw {
-    def identity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero)) && F.equal(a, append(zero, a))
+    def leftIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(zero, a))
+    def rightIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero))
   }
   def monoidLaw = new MonoidLaw {}
 

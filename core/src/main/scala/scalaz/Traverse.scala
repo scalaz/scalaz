@@ -4,6 +4,8 @@ package scalaz
 /**
  * Idiomatic traversal of a structure, as described in
  * [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essense of the Iterator Pattern]].
+ *
+ * @see [[scalaz.Travserse.TraverseLaw]]
  */
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>

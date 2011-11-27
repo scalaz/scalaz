@@ -5,7 +5,7 @@ trait TupleInstances0 {
   implicit def tuple2Instance[A1, A2] = new BiTraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
     def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]): G[(C, D)] = {
-      Applicative[G].lift2((c: C, d: D) => (c, d))(f(fab._1), g(fab._2))
+      Applicative[G].map2(f(fab._1), g(fab._2))((_, _))
     }
   }
 
@@ -1001,4 +1001,3 @@ private[scalaz] trait Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends Monad[({ty
 
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, _7.zero, a)
 }
-
