@@ -40,7 +40,7 @@ trait EnumeratorTFunctions {
       as match {
         case Stream.Empty => i
         case x #:: xs     =>
-          import Ident.id
+          import Id.id
           i.fold(done = (_, _) => i, cont = k => enumerate(xs)(k(elInput(x)).value), err = e => err[Unit, A, Id, O](e).value)
       }
 

@@ -10,8 +10,7 @@ package scalaz
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
-  import Ident.id
-  import State.State
+  import Id.id
   import State.state
 
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
@@ -24,7 +23,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traversal[G[_]:Applicative]: Traversal[G] = 
     new Traversal[G]
   def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] = 
-    new Traversal[({type f[x]=State[S,x]})#f]()(State.stateMonad)
+    new Traversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad)
 
   def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] = 
     traversal[G].run(fa)(f)
@@ -72,7 +71,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
     def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
-      import Ident._
+      import Id._
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 

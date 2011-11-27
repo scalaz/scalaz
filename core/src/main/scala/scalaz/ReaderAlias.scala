@@ -12,7 +12,7 @@ trait ReaderAliasInstances {
   import ReaderAlias._
 
   implicit def reader[S]: MonadReader[({type f[s, a] = ReaderAlias[s, a]})#f, S] =
-    readerTInstance[S, Id](Ident.id)
+    readerTInstance[S, Id](Id.id)
   implicit def readerT[S, F[_] : Monad] = readerTInstance[S, F]:
     MonadReader[({type f[s, a] = ReaderAliasT[s, F, a]})#f, S] with
       Monad[({type f[a] = ReaderAliasT[S, F, a]})#f] with

@@ -11,7 +11,7 @@ trait IterateeFunctions {
    * Repeats the given iteratee by appending with the given monoid.
    */
   def repeatBuild[X, E, A, F[_]](iter: Iteratee[X, E, A])(implicit mon: Monoid[F[A]], F: Pointed[F]): Iteratee[X, E, F[A]] = {
-    import Ident.id
+    import Id.id
 
     def step(acc: F[A])(s: Input[E]): Iteratee[X, E, F[A]] =
       s(el = e => iter.foldT[Iteratee[X, E, F[A]]](
@@ -31,7 +31,7 @@ trait IterateeFunctions {
    * Iteratee that collects all inputs with the given monoid.
    */
   def collect[X, A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
-    import Ident.id
+    import Id.id
     fold[X, A, Id, F[A]](mon.zero)((acc, e) => mon.append(acc, pt.point(e)))
   }
 
@@ -41,7 +41,7 @@ trait IterateeFunctions {
    * This iteratee is useful for F[_] with efficient cons, i.e. List.
    */
   def reversed[X, A, F[_]](implicit r: Reducer[A, F[A]]): Iteratee[X, A, F[A]] = {
-    import Ident.id
+    import Id.id
     fold[X, A, Id, F[A]](r.monoid.zero)((acc, e) => r.cons(e, acc))
   }
 
@@ -49,7 +49,7 @@ trait IterateeFunctions {
    * Iteratee that collects the first n inputs.
    */
   def take[X, A, F[_]](n: Int)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
-    import Ident.id
+    import Id.id
     def loop(acc: F[A], n: Int)(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
         if (n <= 0) done[X, A, Id, F[A]](acc, s)
@@ -64,7 +64,7 @@ trait IterateeFunctions {
    * Iteratee that collects inputs with the given monoid until the input element fails a test.
    */
   def takeWhile[X, A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] = {
-    import Ident.id
+    import Id.id
     def loop(acc: F[A])(s: Input[A]): Iteratee[X, A, F[A]] =
       s(el = e =>
         if (p(e)) cont(loop(mon.append(acc, pt.point(e))))

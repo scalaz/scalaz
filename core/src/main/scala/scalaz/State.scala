@@ -1,24 +1,7 @@
 package scalaz
 
-object State extends StateFunctions with StateInstances {
-  def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
-    def apply(s: S) = f(s)
-  }
-
-  type State[S, A] = StateT[Id, S, A]
-
-}
-
-trait StateInstances {
-  import State._
-
-  implicit def stateMonad[S]: MonadState[({type f[s, a] = State[s, a]})#f, S] =
-    StateT.stateTMonadState[S, Id](Ident.id)
-}
 
 trait StateFunctions {
-  import State.State
-
   def constantState[S, A](a: A, s: => S): State[S, A] =
     State((_: S) => (a, s))
 

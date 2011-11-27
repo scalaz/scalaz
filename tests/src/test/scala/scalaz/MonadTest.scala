@@ -10,11 +10,10 @@ class MonadTest extends Specification with ScalaCheck {
   import Scalaz._
   import ScalaCheckBinding._
   import ScalazArbitrary._
-  import State.State
   import std.either._
   import std.tuple._
   import std.function._
-  import State.stateMonad
+  import StateT.stateMonad
 
 
   "monad laws" should {
@@ -39,7 +38,7 @@ class MonadTest extends Specification with ScalaCheck {
     checkMonadLaws[NonEmptyList, A]("NonEmptyList")
 
     implicit def StateEqual: Equal[State[Int, Int]] = new Equal[State[Int, Int]] {
-      def equal(a1: State.State[Int, Int], a2: State.State[Int, Int]) = a1.apply(0) == a2.apply(0)
+      def equal(a1: State[Int, Int], a2: State[Int, Int]) = a1.apply(0) == a2.apply(0)
     }
     implicit def StateArb: Arbitrary[State[Int, Int]] = Arbitrary(implicitly[Arbitrary[Function1[Int,Int]]].arbitrary.map(modify[Int]))
     checkMonadLaws[({type λ[α]=State[Int, α]})#λ, Int]("State")
@@ -69,11 +68,9 @@ class MonadTest extends Specification with ScalaCheck {
     ok
   }
 
-  def checkMonadLaws[M[_], A](typeName: String)(implicit mm: Monad[M],
-                              ea: Equal[A],
-                              ema: Equal[M[A]],
-                              arbma: Arbitrary[M[A]],
-                              arba: Arbitrary[A]) = {
+  def checkMonadLaws[M[_], A](typeName: String)
+                             (implicit mm: Monad[M], ea: Equal[A], ema: Equal[M[A]],
+                              arbma: Arbitrary[M[A]], arba: Arbitrary[A]) = {
     typeName should {
       import ScalazProperties.monad._
 

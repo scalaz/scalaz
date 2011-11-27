@@ -1,6 +1,7 @@
 package scalaz
 
-trait Idents {
+/** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
+trait IdInstances {
   implicit val id = new Traverse[Id] with Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
     def point[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
@@ -55,6 +56,3 @@ trait Idents {
     // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
   }
 }
-
-// Not named Id so as not to trigger https://issues.scala-lang.org/browse/SI-5031
-object Ident extends Idents

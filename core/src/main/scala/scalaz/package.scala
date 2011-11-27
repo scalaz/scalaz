@@ -56,6 +56,8 @@
 package object scalaz {
   type Id[X] = X
 
+  object Id extends IdInstances
+
   // TODO Review!
   type Identity[X] = Need[X]
 
@@ -78,6 +80,15 @@ package object scalaz {
 
   type ⊥ = Nothing
   type ⊤ = Any
+
+  /** A state transition, representing a function `S => (A, S)`. */
+  type State[S, A] = StateT[Id, S, A]
+
+  object State extends StateFunctions {
+    def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
+      def apply(s: S) = f(s)
+    }
+  }
 
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.

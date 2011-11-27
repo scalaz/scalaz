@@ -6,7 +6,7 @@ class TraverseUsage {
   // type class instances
   import std.list._
   import std.option._
-  import Ident.id
+  import Id.id
 
   // syntax
   import syntax.traverse._

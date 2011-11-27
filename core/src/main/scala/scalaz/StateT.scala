@@ -48,12 +48,17 @@ trait StateTInstances1 extends StateTInstances2 {
   }
 }
 
-trait StateTInstances extends StateTInstances1 {
+trait StateTInstances0 extends StateTInstances1 {
   implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] = new StateTMonadState[S, F] {
     implicit def F: Monad[F] = F0
   }
 
   implicit def StateMonadTrans[S]: MonadTrans[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTMonadTrans[S] {}
+}
+
+trait StateTInstances extends StateTInstances0 {
+  implicit def stateMonad[S]: MonadState[({type f[s, a] = State[s, a]})#f, S] =
+      StateT.stateTMonadState[S, Id](Id.id)
 }
 
 trait StateTFunctions {

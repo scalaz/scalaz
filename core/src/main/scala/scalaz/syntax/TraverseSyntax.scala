@@ -7,8 +7,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
 
   import Leibniz.===
-  import Ident.{id}
-  import State.State
+  import Id.{id}
   import State.state
 
   final def tmap[B](f: A => B) =
@@ -34,7 +33,7 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   }
 
   /** A version of `traverse` specialized for `State` */
-  final def traverseS[S, B](f: A => State[S, B]): State.State[S, F[B]] =
+  final def traverseS[S, B](f: A => State[S, B]): State[S, F[B]] =
     F.traverseS[S, A, B](self)(f)
 
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =

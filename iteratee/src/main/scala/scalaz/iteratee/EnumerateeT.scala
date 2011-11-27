@@ -42,12 +42,12 @@ trait EnumerateeTFunctions {
   }
 
   def group[X, E, F[_], G[_], A](n: Int)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: CoPointed[G]): EnumerateeT[X, E, F[E], G, A] = {
-    import Ident.id
+    import Id.id
     take[X, E, F](n).up[G].sequenceI[A]
   }
 
   def splitOn[X, E, F[_], G[_], A](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: CoPointed[G]): EnumerateeT[X, E, F[E], G, A] = {
-    import Ident.id
+    import Id.id
     (takeWhile[X, E, F](p).up[G] flatMap (xs => drop[X, E, G](1).map(_ => xs))).sequenceI[A]
   }
 }

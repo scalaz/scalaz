@@ -24,24 +24,23 @@ object UnapplyInference extends App {
     val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]
   }
 
-
   // Without Unapply
   def stateTraverse1 {
     import scalaz._, Scalaz._
-    import State.{State, stateMonad}
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
     val traverseState: State[Int, List[Int]] = ls.traverse[({type λ[α] = State[Int, α]})#λ, Int](a => State((x: Int) => (x + 1, a)))
   }
 
-  // With Unapply (in the signature of traverseI)
+  // With Unapply (in the signature of traverseU)
   def stateTraverse2 {
     import scalaz._, Scalaz._
+
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverseU(a => some(a))
     val traverseState = ls.traverseU(a => State((x: Int) => (x + 1, a)))
 
-    val pair: State.State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
+    val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
   }
 
   def kliesliCompose() {
