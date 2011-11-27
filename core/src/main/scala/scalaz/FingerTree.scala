@@ -974,18 +974,18 @@ trait FingerTreeFunctions {
       import Rope._
       implicit def sizer = UnitReducer((arr: ImmutableArray[A]) => arr.length)
 
-      def length = self.measure
+      def length: Int = self.measure
 
       def apply(i: Int): A = {
         val split = self.split(_ > i)
         split._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))(i - split._1.value.measure)
       }
 
-      /**Concatenates two Ropes. (O lg min(r1, r2)) where r1 and r2 are their sizes. */
-      def ++(xs: Rope[A]) = rope(self <++> xs.self)
+      /**Concatenates two Ropes. `(O lg min(r1, r2))` where `r1` and `r2` are their sizes. */
+      def ++(xs: Rope[A]): Rope[A] = rope(self <++> xs.self)
 
       /**Appends the given chunk to the rope*/
-      def ::+(chunk: ImmutableArray[A]) =
+      def ::+(chunk: ImmutableArray[A]): Rope[A] =
         if (chunk.isEmpty)
           this
         else
@@ -1001,7 +1001,7 @@ trait FingerTreeFunctions {
           )
 
       /**Prepends the given chunk to this rope*/
-      def +::(chunk: ImmutableArray[A]) =
+      def +::(chunk: ImmutableArray[A]): Rope[A] =
         if (chunk.isEmpty)
           this
         else
@@ -1017,16 +1017,16 @@ trait FingerTreeFunctions {
           )
 
       /**Appends the given element to this rope*/
-      def :+(x: A) = this ::+ IA.fromArray(Array(x))
+      def :+(x: A): Rope[A] = this ::+ IA.fromArray(Array(x))
 
       /**Prepends the given element to this rope*/
-      def +:(x: A) = IA.fromArray(Array(x)) +:: this
+      def +:(x: A): Rope[A] = IA.fromArray(Array(x)) +:: this
 
       /**tail of the Rope*/
-      def tail = rope(self.tail).self
+      def tail: Rope[A] = rope(self.tail)
 
       /**first element of the rope*/
-      def init = rope(self.init).self
+      def init: Rope[A] = rope(self.init)
 //      def map[B](f: A => B) = rope(value map f) TODO
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
@@ -1038,7 +1038,7 @@ trait FingerTreeFunctions {
 
       // TODO override def reverse
 
-      def chunks = self.toStream
+      def chunks: Stream[ImmutableArray[A]] = self.toStream
 
       // protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
     }
@@ -1061,11 +1061,11 @@ trait FingerTreeFunctions {
       implicit def canBuildFrom[T : ClassManifest]: CanBuildFrom[Rope[_], T, Rope[T]] =
         new CanBuildFrom[Rope[_], T, Rope[T]] {
           def apply(from: Rope[_]): Builder[T, Rope[T]] = newBuilder[T]
-          def apply: Builder[T, Rope[T]] = newBuilder[T]
+          def apply(): Builder[T, Rope[T]] = newBuilder[T]
         }
     }
 
-    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]) = new Rope[A](v)
+    def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)
 
     sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
         extends SyntaxV[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
@@ -1077,8 +1077,8 @@ trait FingerTreeFunctions {
 
       // override def :+(x: A) = wrapRope(value :+ x)
       // override def +:(x: A) = wrapRope(x +: value)
-      override def tail = rope(self.tail)
-      override def init = rope(self.init)
+      override def tail = self.tail
+      override def init = self.init
 //      def map[B](f: A => B) = rope(value map f)
 //      def flatMap[B](f: A => Rope[B]) =
 //        rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
@@ -1107,7 +1107,7 @@ trait FingerTreeFunctions {
       private var tailBuilder: Builder[A, ImmutableArray[A]] = IA.newBuilder[A]
       private var tailLength = 0
 
-      def clear {
+      def clear() {
         startRope = Rope.empty[A]
         tailBuilder = IA.newBuilder[A]
         tailLength = 0
@@ -1156,7 +1156,7 @@ trait FingerTreeFunctions {
 
       private def cleanTail {
         startRope ::+= tailBuilder.result
-        tailBuilder.clear
+        tailBuilder.clear()
       }
     }
 

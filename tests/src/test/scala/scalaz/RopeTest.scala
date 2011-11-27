@@ -11,7 +11,7 @@ import std.stream._
 import collection.GenTraversable
 import org.specs2.control.LazyParameter
 import collection.immutable.Traversable
-import org.specs2.matcher.{ContainInOrderMatcher, ContainMatcher}
+import org.specs2.matcher.{Parameters, ContainInOrderMatcher, ContainMatcher}
 
 class RopeTest extends Specification with ScalaCheck {
 
@@ -19,6 +19,8 @@ class RopeTest extends Specification with ScalaCheck {
 
   def beTheSameRopeSeq[A : ClassManifest] = containInOrder(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
   import scala.Predef.{implicitly => ?}
+
+  override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 25))
 
   //workaround, as contains(List(1,2,3):_*).inOrder gives a compilation error.
   // Should be fixed in the next specs version, see https://github.com/etorreborre/specs2/commit/5edb654ff8eb9bf46bdaf806f43739035671c356
@@ -63,13 +65,13 @@ class RopeTest extends Specification with ScalaCheck {
     rope.asString must beEqualTo(strings.mkString)
   }
 
-  "a rope converted to a stream is the same sequence as the original rope" ! check {(rope: Rope[Int]) =>
+  /*"a rope converted to a stream is the same sequence as the original rope" ! check {(rope: Rope[Int]) =>
      rope must beTheSameRopeSeq(m[Int])(rope.toStream)
   }.set(minTestsOk -> 15)
   
   "appending ropes works correctly" ! check {(rope1: Rope[Int], rope2: Rope[Int]) =>
     (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(m[Int])(rope1.toStream ++ rope2.toStream))
-  }.set(minTestsOk -> 15)
+  }.set(minTestsOk -> 15)*/
 
 //
 //  "converting a stream to a finger-tree and back produces an equal stream" verifies {(stream: Stream[Int]) =>
