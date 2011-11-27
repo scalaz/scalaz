@@ -79,4 +79,10 @@ package object scalaz {
   type ⊥ = Nothing
   type ⊤ = Any
 
+  /**
+   * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
+   *
+   * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
+   */
+  type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
 }

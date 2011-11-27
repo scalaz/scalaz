@@ -1,7 +1,7 @@
 package scalaz
 
 /**
- * A rose-tree zipper. Represents a scalaz.Tree together with a position in that tree.
+ * A rose-tree zipper. Represents a [[scalaz.Tree]] together with a position in that tree.
  * Provides navigation, persistent update, insertion, and deletes.
  */
 sealed trait TreeLoc[A] {
