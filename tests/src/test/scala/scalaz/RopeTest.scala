@@ -8,12 +8,23 @@ import org.specs2.matcher.TraversableMatchers._
 import syntax.equal._
 import std.anyVal._
 import std.stream._
+import collection.GenTraversable
+import org.specs2.control.LazyParameter
+import collection.immutable.Traversable
+import org.specs2.matcher.{ContainInOrderMatcher, ContainMatcher}
 
 class RopeTest extends Specification with ScalaCheck {
 
   import Rope._
-//  def beTheSameSeqAsForRope[A : ClassManifest] = contain(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
+
+  def beTheSameRopeSeq[A : ClassManifest] = containInOrder(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
   import scala.Predef.{implicitly => ?}
+
+  //workaround, as contains(List(1,2,3):_*).inOrder gives a compilation error.
+  // Should be fixed in the next specs version, see https://github.com/etorreborre/specs2/commit/5edb654ff8eb9bf46bdaf806f43739035671c356
+  implicit def seqToLazyParam[T](t: Seq[T]): Seq[LazyParameter[T]] = t.map(value => new LazyParameter(() => value))
+
+  def containInOrder[T](t: Seq[LazyParameter[T]]): ContainInOrderMatcher[T] = new ContainInOrderMatcher(t:_*)
 
   def m[A](implicit man: ClassManifest[A]) = man
 
@@ -35,7 +46,6 @@ class RopeTest extends Specification with ScalaCheck {
     else (rope(i) must throwA[RuntimeException])
   }
 
-
   "building a rope from chunks and converting it back is the same as filtering out empty chunks" ! check {(chunks: List[ImmutableArray[Int]]) =>
     Rope.fromChunks(chunks).chunks.toList must be_===(chunks.filterNot(_.isEmpty))
   }
@@ -53,53 +63,43 @@ class RopeTest extends Specification with ScalaCheck {
     rope.asString must beEqualTo(strings.mkString)
   }
 
-  //TODO
-//  "a rope converted to a stream is the same sequence as the original rope" ! check {(rope: Rope[Int]) =>
-//    rope must beTheSameSeqAsForRope(m[Int])(rope.toStream)
-//  }.set(minTestsOk -> 15)
+  "a rope converted to a stream is the same sequence as the original rope" ! check {(rope: Rope[Int]) =>
+     rope must beTheSameRopeSeq(m[Int])(rope.toStream)
+  }.set(minTestsOk -> 15)
   
-//  "appending ropes works correctly" verifies {(rope1: Rope[Int], rope2: Rope[Int]) =>
-//    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameSeqAsForRope(m[Int])(rope1.toStream ++ rope2.toStream))
-//  } set(minTestsOk -> 15)
-//
-
+  "appending ropes works correctly" ! check {(rope1: Rope[Int], rope2: Rope[Int]) =>
+    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(m[Int])(rope1.toStream ++ rope2.toStream))
+  }.set(minTestsOk -> 15)
 
 //
 //  "converting a stream to a finger-tree and back produces an equal stream" verifies {(stream: Stream[Int]) =>
 //    streamToTree(stream).toStream ≟ stream
 //  }
 //
-//  "splitting a tree works the same as splitting a stream" verifies {(tree: Rope[Int], index: Int) =>
+//  "splitting a tree works the same as splitting a stream" ! check {(tree: Rope[Int], index: Int) =>
 //    val asStream = tree.toStream
 //    val splitTree = tree.split(_ > index)
-//    (splitTree._1.toStream, splitTree._2.toStream) ≟ asStream.splitAt(index)
+//    (splitTree._1.toStream, splitTree._2.toStream) === asStream.splitAt(index)
 //  }
 //
-//  "replacing last element works correctly" verifies {(tree: Rope[Int], x: Int) =>
-//    tree.isEmpty || ((tree :-| x).toStream ≟ (tree.toStream.init :+ x))
+//  "replacing last element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+//    tree.isEmpty || ((tree :-| x).toStream === (tree.toStream.init :+ x))
 //  } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
 //
-//  "replacing first element works correctly" verifies {(tree: Rope[Int], x: Int) =>
-//    tree.isEmpty || ((x |-: tree).toStream ≟ (x +: tree.toStream.tail))
+//  "replacing first element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+//    tree.isEmpty || ((x |-: tree).toStream === (x +: tree.toStream.tail))
 //  }
-
-//  "head and tail work correctly" verifies {(tree: Rope[Int]) =>
+//  "last and init work correctly" ! check {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
-//    tree.isEmpty || ((tree.head ≟ tree.toStream.head) && (tree.tail.toStream ≟ tree.toStream.tail))
+//    tree.isEmpty || ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
 //  }
-//
-//  "last and init work correctly" verifies {(tree: Rope[Int]) =>
+//  "viewl works correctly" ! check {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
-//    tree.isEmpty || ((tree.last ≟ tree.toStream.last) && (tree.init.toStream ≟ tree.toStream.init))
-//  }
-
-//  "viewl works correctly" verifies {(tree: Rope[Int]) =>
-//    val asStream = tree.toStream
-//    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x ≟ asStream.head) && (t.toStream ≟ asStream.tail))
+//    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x === asStream.head) && (t.toStream === asStream.tail))
 //  }
 //
-//  "viewr works correctly" verifies {(tree: Rope[Int]) =>
+//  "viewr works correctly" ! check {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
-//    tree.viewr.fold[Boolean](true, (i: ({type λ[α]=FingerTree[Int, α]})#λ, x: Int) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+//    tree.viewr.fold[Boolean](true, (i: ({type λ[α]=FingerTree[Int, α]})#λ, x: Int) => (i.toStream === asStream.init) && (x === asStream.last))
 //  }
 }
