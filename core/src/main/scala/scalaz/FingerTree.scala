@@ -731,6 +731,30 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
 
+  /**
+   * Like traverse, but with a more constraint type: we need the additional measure
+   */
+  def traverseTree[F[_], V2, B](f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[FingerTree[V2, B]] = {
+    fold(_ => F.pure(FingerTree.empty[V2, B]),
+         (v, a) => F.map(f(a))(a => single(ms.unit(a), a)),
+         (v, pr, m, sf) => {
+            F.map3(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)), traverseFinger(sf)(f))((a, b, c) => deep(a, b, c))
+        })
+  }
+
+  private def traverseNode[F[_], V2, B](node: Node[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Node[V2, B]] = {
+    node.fold((v, a, b) => F.map2(f(a), f(b))((x, y) => node2(x, y)),
+              (v, a, b, c) => F.map3(f(a), f(b), f(c))((x, y, z) => node3(x, y, z))
+    )
+  }
+
+  private def traverseFinger[F[_], A, B, V2](digit: Finger[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Finger[V2, B]] = digit match {
+    case One(v, a) => F.map(f(a))(x => one(x))
+    case Two(v, a, b) => F.map2(f(a), f(b))((x, y) => two(x, y))
+    case Three(v, a, b, c) => F.map3(f(a), f(b), f(c))((x, y, z) => three(x, y, z))
+    case Four(v, a, b, c, d) => F.map4(f(a), f(b), f(c), f(d))((w, x, y, z) => four(w, x, y, z))
+  }
+
   /** Execute the provided side effect for each element in the tree. */
   def foreach(f: A => Unit) {
     fold(
@@ -750,6 +774,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     _ => Iterator.empty,
     (_, x) => Iterator.single(x),
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
+
+
 
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
