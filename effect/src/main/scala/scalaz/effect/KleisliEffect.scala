@@ -11,7 +11,7 @@ trait KleisliEffectInstances0 extends KleisliInstances {
 
 trait KleisliEffectInstances extends KleisliEffectInstances0 {
   implicit def KleisliMonadIO[R, M[_]](implicit M0: MonadIO[M]): MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] =
-    new MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] with KleisliLiftIO[M, R] with KleisliMonad[M, R] {
+    new MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] with KleisliLiftIO[M, R] with KleisliMonadReader[M, R] {
       implicit def L = M0
       implicit def F = M0
     }
