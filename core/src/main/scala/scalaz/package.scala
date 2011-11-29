@@ -46,12 +46,30 @@
  *  - [[scalaz.BiFunctor]]
  *  - [[scalaz.BiTraverse]] extends [[scalaz.BiFunctor]]
  *  - [[scalaz.ArrId]]
- *  - [[scalaz.Arr]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Category]] extends [[scalaz.ArrId]] with [[scalaz.Compose]]
- *  - [[scalaz.First]]
- *  - [[scalaz.Arrow]] extends [[scalaz.Category]] with [[scalaz.Arr]] with [[scalaz.First]]
+ *  - [[scalaz.Arrow]] extends [[scalaz.Category]]
  *
+ *  '''Data Structures Index'''
+ *  - [[scalaz.Validation]] Represent computations that may success or fail, accumulating multiple errors.
+ *  - [[scalaz.NonEmptyList]] A list containing at least one element.
+ *  - [[scalaz.DList]] A difference list, supporting efficient append and prepend.
+ *  - [[scalaz.EphemeralStream]] A stream that holds weak references to its elements, and recomputes them if needed
+ *    if reclaimed by the garbage collector.
+ *  - [[scalaz.Heap]] A priority queue, implemented with bootstrapped skew binomial heaps.
+ *  - [[scalaz.Endp]] Represents functions from `A => A`.
+ *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
+ *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
+ *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
+ *  - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
+ *  - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
+ *  - [[scalaz.Zipper]] A functional cursor over a List.
+ *
+ *  - [[scalaz.Kleisli]] Represents a function `A => M[B]`, allowing chaining. Also known, and aliased, as `scalaz.ReaderT`.
+ *  - [[scalaz.StateT]] Computations that modify state.
+ *  - [[scalaz.WriterT]] Computations that log a value
+ *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
+ *  - [[scalaz.EitherT]] Represents computations of type `F[Either[A, B]]`
  */
 package object scalaz {
   type Id[X] = X
@@ -84,6 +102,8 @@ package object scalaz {
   type ReaderT[F[_], E, A] = Kleisli[F, E, A]
   type Reader[E, A] = ReaderT[Id, E, A]
 
+  type Writer[W, A] = WriterT[Id, W, A]
+
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, A] = StateT[Id, S, A]
 
@@ -99,4 +119,7 @@ package object scalaz {
    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
    */
   type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
+
+  type FirstOption[A] = Option[A] @@ Tags.First
+  type LastOption[A] = Option[A] @@ Tags.Last
 }
