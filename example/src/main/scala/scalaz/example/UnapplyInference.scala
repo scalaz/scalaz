@@ -43,7 +43,7 @@ object UnapplyInference extends App {
     val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
   }
 
-  def kliesliCompose() {
+  def kleisliCompose() {
     import scalaz._
     import std.option._
     import syntax.compose._
