@@ -15,7 +15,7 @@ trait ToCategoryV extends ToArrIdV with ToComposeV {
   
 
   ////
-  implicit def ToCategoryVFromKliesliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Category[({type λ[α, β]=F[G, α, β]})#λ]) =
+  implicit def ToCategoryVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Category[({type λ[α, β]=F[G, α, β]})#λ]) =
       new CategoryV[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Category[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
 
   ////

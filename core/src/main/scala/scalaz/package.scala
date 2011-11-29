@@ -81,6 +81,9 @@ package object scalaz {
   type ⊥ = Nothing
   type ⊤ = Any
 
+  type ReaderT[F[_], E, A] = Kleisli[F, E, A]
+  type Reader[E, A] = ReaderT[Id, E, A]
+
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, A] = StateT[Id, S, A]
 

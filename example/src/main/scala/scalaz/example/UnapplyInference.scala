@@ -43,7 +43,7 @@ object UnapplyInference extends App {
     val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
   }
 
-  def kliesliCompose() {
+  def kleisliCompose() {
     import scalaz._
     import std.option._
     import syntax.compose._
@@ -51,5 +51,20 @@ object UnapplyInference extends App {
 
     val k = kleisli((a: Int) => some(a + 1))
     k >>> k
+  }
+
+  def functorSyntaxChaining() {
+    import scalaz._
+    import syntax.functor._
+    import std.either._
+
+    val e: Either[String, Int] = Right(1)
+
+    type T = (scalaz.Unapply[scalaz.Functor,Either[String,Int]]{type M[X] = Either[String,X]; type A = Int})#M[Int]
+    implicitly[Unapply[Functor, T]]
+
+    ToFunctorV(e.map(1 +)).map(1 +)
+
+    e.map(1 +).map(1 +)
   }
 }
