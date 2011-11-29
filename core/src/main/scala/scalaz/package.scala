@@ -57,7 +57,7 @@
  *  - [[scalaz.EphemeralStream]] A stream that holds weak references to its elements, and recomputes them if needed
  *    if reclaimed by the garbage collector.
  *  - [[scalaz.Heap]] A priority queue, implemented with bootstrapped skew binomial heaps.
- *  - [[scalaz.Endp]] Represents functions from `A => A`.
+ *  - [[scalaz.Endo]] Represents functions from `A => A`.
  *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
  *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
  *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
