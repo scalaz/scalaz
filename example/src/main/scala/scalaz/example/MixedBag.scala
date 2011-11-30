@@ -94,12 +94,37 @@ object MixedBag extends App {
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
-        case Right(a) => DList(a).tell
+        case Right(a)     => DList(a).tell
         case Left((x, y)) => flatten(x) >> flatten(y)
       }
       flatten(t).run._1
     }
 
     flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
+  }
+
+  def zipper() {
+    import scalaz.std.list
+
+    val fileName = "abc.txt"
+
+    val oldExtensionAndNewName: Option[(String, String)] = for {
+      zipper <- list.toZipper(fileName.toList)
+
+      // previousC from the first position rotates the focus to the last element
+      zipperAtLast = zipper.previousC
+
+      // focus on the first preceding character, if found, that `== '.'`
+      zipperAtDot <- zipper.findPrevious(_ == '.')
+
+      // Zipper#rights contains the elements to the right of the focus
+      oldExtension = zipperAtDot.rights.mkString
+
+      // Change the extension.
+      changedExtZipper = zipperAtDot.copy(rights = "log".toStream)
+
+      // Convert the Zipper back to a string
+      newFileName = changedExtZipper.toStream.mkString
+    } yield (oldExtension, newFileName)
   }
 }
