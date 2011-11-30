@@ -71,6 +71,12 @@ trait KleisliInstances extends KleisliInstances0 {
   implicit def kleisliMonadReader[F[_], R](implicit F0: Monad[F]) = new KleisliMonadReader[F, R] {
     implicit def F: Monad[F] = F0
   }
+
+  /** Kleisli version of `Monoid[Endo[A]]`. `append(f1, f2) == f1 <=< f2`. */
+  implicit def kleisliMonoid[F[_], A](implicit F0: Monad[F]) = new Monoid[Kleisli[F, A, A]] {
+    def append(f1: Kleisli[F, A, A], f2: => Kleisli[F, A, A]): Kleisli[F, A, A] = f1 <=< f2
+    def zero: Kleisli[F, A, A] = Kleisli(a => F0.point(a))
+  }
 }
 
 trait KleisliFunctions extends KleisliInstances0 {
