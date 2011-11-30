@@ -66,5 +66,14 @@ object UnapplyInference extends App {
     ToFunctorV(e.map(1 +)).map(1 +)
 
     e.map(1 +).map(1 +)
+
+    import std.tuple._
+
+    (1, 2).map(1+).map(1+)
+    (1, 2, 3).map(1+).map(1+)
+    (1, 2, 3, 4).map(1+).map(1+)
+    (1, 2, 3, 4, 5).map(1+).map(1+)
+    (1, 2, 3, 4, 5, 6).map(1+).map(1+)
+    (1, 2, 3, 4, 5, 6, 7).map(1+).map(1+)
   }
 }
