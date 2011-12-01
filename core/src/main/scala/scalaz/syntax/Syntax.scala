@@ -57,15 +57,11 @@ trait Syntaxes {
 
   object biTraverse extends ToBiTraverseV
 
-  object arrId extends ToArrIdV
-
-  object arr extends ToArrV
-
   object compose extends ToComposeV
 
   object category extends ToCategoryV
 
-  object first extends ToFirstV
+  object arrId extends ToArrIdV
 
   object arrow extends ToArrowV
 
@@ -91,8 +87,8 @@ trait ToAllTypeClassV
   with ToFunctorV with ToPointedV with ToContravariantV with ToCoPointedV with ToApplyV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
-  with ToBiTraverseV with ToArrIdV with ToArrV with ToComposeV with ToCategoryV
-  with ToFirstV with ToArrowV with ToFoldableV with ToValidationV with ToReducerV
+  with ToBiTraverseV with ToArrIdV with ToComposeV with ToCategoryV
+  with ToArrowV with ToFoldableV with ToValidationV with ToReducerV
 
 
 trait SyntaxV[A] {

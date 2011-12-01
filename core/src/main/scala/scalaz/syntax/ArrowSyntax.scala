@@ -18,7 +18,7 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
     F.combine(self, k)
 
   final def product: F[(A, A), (B, B)] =
-    ***(self)
+    F.product(self)
 
   final def ^>>[C](f: C => A): F[C, B] =
     F.mapfst(self)(f)
@@ -29,7 +29,7 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToArrowV extends ToCategoryV with ToArrV with ToFirstV {
+trait ToArrowV extends ToCategoryV {
     implicit def ToArrowV[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
       new ArrowV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Arrow[F0.M] = F0.TC }
   
@@ -39,7 +39,7 @@ trait ToArrowV extends ToCategoryV with ToArrV with ToFirstV {
   ////
 }
 
-trait ArrowSyntax[F[_, _]] extends CategorySyntax[F] with ArrSyntax[F] with FirstSyntax[F] {
+trait ArrowSyntax[F[_, _]] extends CategorySyntax[F] {
   implicit def ToArrowV[A, B](v: F[A, B])(implicit F0: Arrow[F]): ArrowV[F, A, B] = new ArrowV[F, A, B] { def self = v; implicit def F: Arrow[F] = F0 }
 
   ////

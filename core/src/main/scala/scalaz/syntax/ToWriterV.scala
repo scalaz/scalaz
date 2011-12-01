@@ -2,9 +2,9 @@ package scalaz
 package syntax
 
 trait WriterV[A] extends SyntaxV[A] {
-  def set[W](w: W): WriterT.Writer[W, A] = WriterT.writer(w -> self)
+  def set[W](w: W): Writer[W, A] = WriterT.writer(w -> self)
 
-  def tell: WriterT.Writer[A, Unit] = WriterT.tell(self)
+  def tell: Writer[A, Unit] = WriterT.tell(self)
 }
 
 trait ToWriterV {

@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait PartialFunctionInstances {
-  val partialFunctionInstance = new Arr[PartialFunction] with Category[PartialFunction] {
+  val partialFunctionInstance = new Arrow[PartialFunction] with Category[PartialFunction] {
     def arr[A, B](f: (A) => B) = {
       case a => f(a)
     }
@@ -13,6 +13,10 @@ trait PartialFunctionInstances {
 
     def id[A] = {
       case a => a
+    }
+
+    def first[A, B, C](f: PartialFunction[A, B]): PartialFunction[(A, C), (B, C)] = {
+      case (a, c) if f.isDefinedAt(a) => (f(a), c)
     }
   }
 }

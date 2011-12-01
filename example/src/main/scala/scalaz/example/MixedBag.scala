@@ -73,23 +73,6 @@ object MixedBag extends App {
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
-  def kleisiArrowTricksy() {
-    import Kleisli._
-    import std.option._
-    import syntax.compose._
-
-    implicit def myArrK[M[_], F[M[_], _, _], A, B](f: A => B)(implicit arrow: Arr[({type λ[α, β] = F[M, α, β]})#λ]): F[M, A, B] =
-      arrow.arr(f)
-
-    val f = kleisli((a: Int) => some(0))
-    val x: Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ] =kleisliArrId
-    f >>> myArrK(((i: Int) => i * 2))(kleisliArrId(optionInstance))
-
-    // TODO Investigate compiler hang
-    // f >>> myArrK(((i: Int) => i * 2))(kleisliArrId)
-    // f >>> ((i: Int) => i * 2))
-  }
-
   def dListExample() {
     import DList._
     import syntax.monad._
@@ -111,12 +94,37 @@ object MixedBag extends App {
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
-        case Right(a) => DList(a).tell
+        case Right(a)     => DList(a).tell
         case Left((x, y)) => flatten(x) >> flatten(y)
       }
       flatten(t).run._1
     }
 
     flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
+  }
+
+  def zipper() {
+    import scalaz.std.list
+
+    val fileName = "abc.txt"
+
+    val oldExtensionAndNewName: Option[(String, String)] = for {
+      zipper <- list.toZipper(fileName.toList)
+
+      // previousC from the first position rotates the focus to the last element
+      zipperAtLast = zipper.previousC
+
+      // focus on the first preceding character, if found, that `== '.'`
+      zipperAtDot <- zipper.findPrevious(_ == '.')
+
+      // Zipper#rights contains the elements to the right of the focus
+      oldExtension = zipperAtDot.rights.mkString
+
+      // Change the extension.
+      changedExtZipper = zipperAtDot.copy(rights = "log".toStream)
+
+      // Convert the Zipper back to a string
+      newFileName = changedExtZipper.toStream.mkString
+    } yield (oldExtension, newFileName)
   }
 }

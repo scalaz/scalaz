@@ -89,7 +89,7 @@ sealed trait Free[S[_], A] {
     }
   }
 
-  /** Runs a Source all the way to the end, tail-recursively, collecting the produced values. */
+  /** Runs a `Source` all the way to the end, tail-recursively, collecting the produced values. */
   def collect[B](implicit ev: Free[S, A] <~< Source[B, A],
                  S: Functor[S]): (Vector[B], A) = {
     @tailrec def go(c: Source[B, A], v: Vector[B] = Vector()): (Vector[B], A) =
@@ -100,7 +100,7 @@ sealed trait Free[S[_], A] {
     go(ev(this))
   }
 
-  /** Drive this Source with the given Sink. */
+  /** Drive this `Source` with the given Sink. */
   def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] <~< Source[E, A], S: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
@@ -112,7 +112,7 @@ sealed trait Free[S[_], A] {
     go(ev(this), sink)
   }
 
-  /** Feed the given stream to this Source. */
+  /** Feed the given stream to this `Source`. */
   def feed[E](ss: Stream[E])(implicit ev: Free[S, A] <~< Sink[E, A], S: Functor[S]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
@@ -122,7 +122,7 @@ sealed trait Free[S[_], A] {
     go(ev(this), ss)
   }
 
-  /** Feed the given source to this Sink. */
+  /** Feed the given source to this `Sink`. */
   def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] <~< Sink[E, A], S: Functor[S]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))

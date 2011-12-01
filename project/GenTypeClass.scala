@@ -49,12 +49,11 @@ object TypeClass {
 
   lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
   lazy val biTraverse = TypeClass("BiTraverse", *^*->*, extendsList = Seq(biFunctor))
-  lazy val arr = TypeClass("Arr", *^*->*)
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
   lazy val first = TypeClass("First", *^*->*)
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category, arr, first))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category))
 
   lazy val run = TypeClass("Run", *, pack = Seq("scalaz", "concurrent"))
 
@@ -97,10 +96,8 @@ object TypeClass {
     biFunctor,
     biTraverse,
     arrId,
-    arr,
     compose,
     category,
-    first,
     arrow
   )
   lazy val concurrent = Seq(run)
@@ -169,7 +166,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arr, arrId, category, compose)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrId, arrow, category, compose)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
