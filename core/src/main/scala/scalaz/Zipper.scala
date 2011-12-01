@@ -14,6 +14,9 @@ sealed trait Zipper[A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
+  def copy(lefts: Stream[A] = this.lefts, focus: A = this.focus, rights: Stream[A] = this.rights): Zipper[A] =
+    Zipper(lefts, focus, rights)
+
   private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
     if (s1.isEmpty) s2
     else s1.head #:: mergeStreams(s2, s1.tail)
@@ -328,8 +331,8 @@ sealed trait Zipper[A] {
 }
 
 object Zipper extends ZipperFunctions with ZipperInstances {
-  def apply[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
-    zipper(ls, a, rs)
+  def apply[A](lefts: Stream[A], focus: A, rights: Stream[A]): Zipper[A] =
+    zipper(lefts, focus, rights)
 }
 
 trait ZipperInstances {

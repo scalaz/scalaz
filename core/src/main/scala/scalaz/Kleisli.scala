@@ -51,9 +51,6 @@ trait KleisliInstances1 extends KleisliInstances2 {
   implicit def kleisliApply[F[_], R](implicit F0: Apply[F]): Apply[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliApply[F, R] {
     implicit def F: Apply[F] = F0
   }
-  implicit def kleisliFirst[F[_]](implicit F0: Functor[F]) = new KleisliFirst[F] {
-    implicit def F: Functor[F] = F0
-  }
 }
 
 trait KleisliInstances0 extends KleisliInstances1 {
@@ -73,6 +70,12 @@ trait KleisliInstances extends KleisliInstances0 {
 
   implicit def kleisliMonadReader[F[_], R](implicit F0: Monad[F]) = new KleisliMonadReader[F, R] {
     implicit def F: Monad[F] = F0
+  }
+
+  /** Kleisli version of `Monoid[Endo[A]]`. `append(f1, f2) == f1 <=< f2`. */
+  implicit def kleisliMonoid[F[_], A](implicit F0: Monad[F]) = new Monoid[Kleisli[F, A, A]] {
+    def append(f1: Kleisli[F, A, A], f2: => Kleisli[F, A, A]): Kleisli[F, A, A] = f1 <=< f2
+    def zero: Kleisli[F, A, A] = Kleisli(a => F0.point(a))
   }
 }
 
@@ -136,15 +139,7 @@ private[scalaz] trait KleisliMonadReader[F[_], R] extends MonadReader[({type f[s
 // (* *) -> *
 //
 
-private[scalaz] trait KleisliFirst[F[_]] extends First[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
-  implicit def F: Functor[F]
-
-  def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
-    case (a, c) => F.map(f.run(a))((b: B) => (b, c))
-  }
-}
-
-private[scalaz] trait KleisliArrIdArr[F[_]] extends ArrId[({type λ[α, β] = Kleisli[F, α, β]})#λ] with Arr[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliFirst[F] {
+private[scalaz] trait KleisliArrIdArr[F[_]] extends ArrId[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
   implicit def F: Pointed[F]
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
@@ -160,4 +155,8 @@ private[scalaz] trait KleisliCategory[F[_]] extends Category[({type λ[α, β] =
 
 private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliCategory[F] {
   implicit def F: Monad[F]
+
+  def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
+    case (a, c) => F.map(f.run(a))((b: B) => (b, c))
+  }
 }

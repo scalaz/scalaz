@@ -5,21 +5,27 @@ package scalaz
  *
  */
 ////
-trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
+trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
   ////
-  def applyInstance[C]: Apply[({type λ[α] = F[C, α]})#λ] =
-    new Apply[({type λ[α] = F[C, α]})#λ] {
-      def ap[A, B](fa: => F[C, A])(f: => F[C, (A) => B]): F[C, B] = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
-      def map[A, B](fa: F[C, A])(f: (A) => B): F[C, B] = <<<(arr(f), fa)
+  def id[A]: A =>: A
+
+  def arr[A, B](f: A => B): A =>: B
+
+  def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
+
+  def applyInstance[C]: Apply[({type λ[α] = (C =>: α)})#λ] =
+    new Apply[({type λ[α] = (C =>: α)})#λ] {
+      def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
+      def map[A, B](fa: (C =>: A))(f: (A) => B): (C =>: B) = <<<(arr(f), fa)
     }
 
-  def <<<[A, B, C](fbc: F[B, C], fab: F[A, B]): F[A, C] =
+  def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
     compose(fbc, fab)
 
-  def >>>[A, B, C](fab: F[A, B], fbc: F[B, C]): F[A, C] =
+  def >>>[A, B, C](fab: (A =>: B), fbc: (B =>: C)): (A =>: C) =
     compose(fbc, fab)
 
-  def second[A, B, C](f: F[A, B]): F[(C, A), (C, B)] = {
+  def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
     def swap[X, Y] = arr[(X, Y), (Y, X)] {
       case (x, y) => (y, x)
     }
@@ -28,20 +34,23 @@ trait Arrow[F[_, _]] extends Category[F] with Arr[F] with First[F] { self =>
   }
 
   // ***
-  def split[A, B, C, D](fab: F[A, B], fcd: F[C, D]): F[(A, C), (B, D)] =
+  def split[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
       >>>(first[A, B, C](fab), second[C, D, B](fcd))
 
+  def product[A, B](fab: (A =>: B)): ((A, A) =>: (B, B)) =
+    split(fab, fab)
+
   // &&&
-  def combine[A, B, C](fab: F[A, B], fac: F[A, C]): F[A, (B, C)] =
+  def combine[A, B, C](fab: (A =>: B), fac: (A =>: C)): (A =>: (B, C)) =
       >>>(arr((a: A) => (a, a)), split(fab, fac))
 
-  def mapfst[A, B, C](fab: F[A, B])(f: C => A): F[C, B] =
+  def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B) =
     >>>[C, A, B](arr(f), fab)
 
-  def mapsnd[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
+  def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
   ////
-  val arrowSyntax = new scalaz.syntax.ArrowSyntax[F] {}
+  val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] {}
 }
 
 object Arrow {

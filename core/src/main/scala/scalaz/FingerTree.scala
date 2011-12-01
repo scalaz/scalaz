@@ -349,10 +349,10 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
  *
  * Finger Trees have excellent (amortized) asymptotic performance:
  *
- *  - Access to the first and last elements is O(1)
- *  - Appending/prepending a single value is O(1)
- *  - Concatenating two trees is (O lg min(l1, l2)) where l1 and l2 are their sizes
- *  - Random access to an element at n is O(lg min(n, l - n)), where l is the size of the tree.
+ *  - Access to the first and last elements is `O(1)`
+ *  - Appending/prepending a single value is `O(1)`
+ *  - Concatenating two trees is `(O lg min(l1, l2))` where `l1` and `l2` are their sizes
+ *  - Random access to an element at `n` is `O(lg min(n, l - n))`, where `l` is the size of the tree.
  *  - Constructing a tree with n copies of a value is O(lg n).
  *
  * @tparam V The type of the annotations of the nodes (the '''measure''')
@@ -836,7 +836,7 @@ trait FingerTreeInstances {
     implicit val vm = m.monoid
     UnitReducer((a: FingerTree[V, A]) => a.fold(v => v, (v, x) => v, (v, x, y, z) => v))
   }
-  
+
   implicit def nodeFoldable[V] = new Foldable[({type l[a]=Node[V, a]})#l] {
     def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
     def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
@@ -1200,82 +1200,104 @@ trait FingerTreeFunctions {
 
     implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   }
-
-  // Indexed sequences
-  trait IndSeqs {
-    sealed trait IndSeq[A] extends SyntaxV[FingerTree[Int, A]] {
-      import std.anyVal._
-      val self: FingerTree[Int, A]
-      implicit def sizer[A] = UnitReducer((a: A) => 1)
-      def apply(i: Int): A =
-      self.split(_ > i)._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))
-      def replace(i: Int, a: => A): IndSeq[A] = {
-        val (l, r) = self.split(_ > i)
-        indSeq(l <++> (a |-: r))
-      }
-      def split(i: Int): (IndSeq[A], IndSeq[A]) = {
-        val (l, r) = self.split(_ > i)
-        (indSeq(l), indSeq(r))
-      }
-      def ++(xs: IndSeq[A]): IndSeq[A] = indSeq(self <++> xs.self)
-      def :+(x: => A): IndSeq[A] = indSeq(self :+ x)
-      def +:(x: => A): IndSeq[A] = indSeq(x +: self)
-      def tail: IndSeq[A] = indSeq(self.tail)
-      def init: IndSeq[A] = indSeq(self.init)
-      def drop(n: Int): IndSeq[A] = split(n)._2
-      def take(n: Int): IndSeq[A] = split(n)._1
-      def map[B](f: A => B): IndSeq[B] = indSeq(self map f)
-      import FingerTree.fingerTreeFoldable
-      def flatMap[B](f: A => IndSeq[B]): IndSeq[B] = indSeq(fingerTreeFoldable.foldLeft(self, empty[Int, B])((ys, x) => ys <++> f(x).self))
-    }
-
-    private def indSeq[A](v: FingerTree[Int, A]) = new IndSeq[A] {
-      val self = v
-    }
-
-    object IndSeq {
-      import std.anyVal._
-      def apply[A](as: A*) = fromSeq(as)
-      def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
-    }
-  }
-
-  // Ordered sequences
-  trait OrdSeqs {
-    sealed trait OrdSeq[A] extends SyntaxV[FingerTree[Option[A], A]] {
-      import syntax.arrow._
-      import std.function._
-      import syntax.order._
-      import std.option._
-      
-      val self: FingerTree[Option[A], A]
-      implicit val ord: Order[A]
-
-      def partition(a: A) = (ordSeq[A](_)).product.apply(self.split(_ gte some(a)))
-      
-      def insert(a: A) = partition(a) match {
-        case (l, r) => ordSeq(l <++> (a +: r))
-      }
-      def ++(xs: OrdSeq[A]) = xs.self.toList.foldLeft(this)(_ insert _)
-    }
-
-    private def ordSeq[A:Order](t: FingerTree[Option[A], A]) = new OrdSeq[A] {
-      val self = t
-      val ord = implicitly[Order[A]]
-    }
-    
-    implicit def unwrap[A](t: OrdSeq[A]): FingerTree[Option[A], A] = t.self
-
-    def OrdSeq[A:Order](as: A*): OrdSeq[A] = {
-      implicit def keyMonoid[A] = new Monoid[Option[A]] {
-        def append(k1: Option[A], k2: => Option[A]) = k2 orElse k1
-        val zero: Option[A] = none
-      }
-      implicit def keyer[A] = UnitReducer((a: A) => some(a))
-      as.foldLeft(ordSeq(empty[Option[A], A]))((x, y) => x insert y)
-    }
-  }
 }
 
 object Rope extends Ropes
+
 object FingerTree extends FingerTreeInstances with FingerTreeFunctions
+
+/** Indexed sequences, based on [[scalaz.FingerTree]]
+ *
+ * The measure is the count of the preceding elements, provided by `UnitReducer((e: Int) => 1)`.
+ */
+sealed trait IndSeq[A] extends SyntaxV[FingerTree[Int, A]] {
+
+  import std.anyVal._
+  import IndSeq.indSeq
+
+  implicit def sizer[A] = UnitReducer((a: A) => 1)
+  def apply(i: Int): A =
+    self.split(_ > i)._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))
+  def replace(i: Int, a: => A): IndSeq[A] = {
+    val (l, r) = self.split(_ > i)
+    indSeq(l <++> (a |-: r))
+  }
+  def split(i: Int): (IndSeq[A], IndSeq[A]) = {
+    val (l, r) = self.split(_ > i)
+    (indSeq(l), indSeq(r))
+  }
+  def ++(xs: IndSeq[A]): IndSeq[A] = indSeq(self <++> xs.self)
+  def :+(x: => A): IndSeq[A] = indSeq(self :+ x)
+  def +:(x: => A): IndSeq[A] = indSeq(x +: self)
+  def tail: IndSeq[A] = indSeq(self.tail)
+  def init: IndSeq[A] = indSeq(self.init)
+  def drop(n: Int): IndSeq[A] = split(n)._2
+  def take(n: Int): IndSeq[A] = split(n)._1
+  def map[B](f: A => B): IndSeq[B] = indSeq(self map f)
+
+  import FingerTree.fingerTreeFoldable
+
+  def flatMap[B](f: A => IndSeq[B]): IndSeq[B] = indSeq(fingerTreeFoldable.foldLeft(self, empty[Int, B])((ys, x) => ys <++> f(x).self))
+}
+
+object IndSeq {
+  private def indSeq[A](v: FingerTree[Int, A]) = new IndSeq[A] {
+    val self = v
+  }
+
+  import std.anyVal._
+
+  def apply[A](as: A*) = fromSeq(as)
+  def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
+}
+
+
+/** Ordered sequences, based on [[scalaz.FingerTree]]
+ *
+ *  `a` has a higher priority than `b` if `Order[A].greaterThan(a, b)`.
+ *
+ * `insert` and `++` maintains the ordering.
+ *
+ * The measure is calculated with a `Monoid[Option[A] @@ First]`, whose `append`
+ * operation favours the first argument. Accordingly, the measuer of a node is the
+ * item with the highest priority contained recursively below that node.
+ */
+sealed trait OrdSeq[A] extends SyntaxV[FingerTree[FirstOption[A], A]] {
+  import syntax.arrow._
+  import std.function._
+  import syntax.order._
+  import std.option._
+
+  implicit val ord: Order[A]
+
+  /**
+   * @return (higher, lowerOrEqual) The sub-sequences that contain elements of higher and of lower-than-or-equal
+   *                                priority than `a`, and of lower or equal priority respectively.
+   */
+  def partition(a: A): (OrdSeq[A], OrdSeq[A]) = function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[FirstOption[A], A]))(self.split(_ gte Tags.First(some(a))))
+
+  /** Insert `a` at a the first point that all elements to the left are of higher priority */
+  def insert(a: A): OrdSeq[A] = partition(a) match {
+    case (l, r) => OrdSeq.ordSeq(l <++> (a +: r))
+  }
+
+  /** Append `xs` to this sequence, reordering elements to  */
+  def ++(xs: OrdSeq[A]): OrdSeq[A] = xs.self.toList.foldLeft(this)(_ insert _)
+}
+
+object OrdSeq {
+  private def ordSeq[A: Order](t: FingerTree[FirstOption[A], A]): OrdSeq[A] = new OrdSeq[A] {
+    val self = t
+    val ord = implicitly[Order[A]]
+  }
+
+  implicit def unwrap[A](t: OrdSeq[A]): FingerTree[FirstOption[A], A] = t.self
+
+  def apply[A: Order](as: A*): OrdSeq[A] = {
+    val z: OrdSeq[A] = {
+      val keyer: Reducer[A, FirstOption[A]] = UnitReducer((a: A) => Tags.First(some(a)))
+      ordSeq(empty[FirstOption[A], A](keyer))
+    }
+    as.foldLeft(z)((x, y) => x insert y)
+  }
+}
