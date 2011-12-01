@@ -52,4 +52,3 @@ trait EnumerateeTFunctions {
   }
 }
 
-object EnumerateeT extends EnumerateeTFunctions

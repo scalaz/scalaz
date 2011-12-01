@@ -8,6 +8,17 @@ package object iteratee {
   type Iteratee[X, E, A] =
   IterateeT[X, E, Id, A]
 
+  object Iteratee
+    extends IterateeFunctions
+    with IterateeTFunctions
+    with EnumeratorTFunctions
+    with EnumerateeTFunctions
+    with StepTFunctions
+    with InputFunctions {
+
+    def apply[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] = iteratee(s)
+  }
+
   type Iter[E, F[_], A] =
   IterateeT[Unit, E, F, A]
 
@@ -17,11 +28,16 @@ package object iteratee {
   type EnumerateeT[X, O, I, F[_], A] =
   StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]]
 
+  object EnumerateeT extends EnumerateeTFunctions
+
   type Enumeratee[X, O, I, A] =
   Step[X, I, A] => Iteratee[X, O, Step[X, I, A]]
 
   type EnumeratorT[X, E, F[_], A] =
   StepT[X, E, F, A] => IterateeT[X, E, F, A]
+
+  // Instances are mixed in with the IterateeT object
+  object EnumeratorT extends EnumeratorTFunctions
 
   type Enumerator[X, E, A] =
   Step[X, E, A] => Step[X, E, A]
@@ -29,6 +45,4 @@ package object iteratee {
   type >@@>[E, A] =
   Enumerator[Unit, E, A]
 
-  // Instances are mixed in with the IterateeT object
-  object EnumeratorT extends EnumeratorTFunctions
 }
