@@ -155,6 +155,8 @@ trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTEach[F[_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
     implicit def F = F0
   }
+  implicit def writerMonad[W](implicit W0: Monoid[W]): WriterTMonad[Id, W] =
+     WriterT.writerTMonad[Id, W](W0, Id.id)
 }
 
 trait WriterTFunctions {

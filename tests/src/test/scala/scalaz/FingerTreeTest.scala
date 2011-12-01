@@ -8,6 +8,7 @@ import scalacheck.ScalazArbitrary._
 import std.anyVal._
 import syntax.equal._
 import std.stream._
+import Id._
 import WriterT._
 
 class FingerTreeTest extends Specification with ScalaCheck {
@@ -66,13 +67,19 @@ class FingerTreeTest extends Specification with ScalaCheck {
 
   import std.option._
   import syntax.applicative._
+  import std.string._
+
 
   "Fingertree" should {
 
-//    "apply effects in order" in {
-//      val s: Writer[Int, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[({type λ[α] = Writer[String, α]})#λ, Int, Int](x => Writer(x.toString, x))
-//      s.runT must be_===(2346, streamToTree(intStream.take(5)))
-//    }
+    "apply effects in order" in {
+      val tree: FingerTree[Int, Int] = streamToTree(intStream.take(5))
+      val s: Writer[String, FingerTree[Int, Int]] = tree.traverseTree[({type l[a] = Writer[String, a]})#l, Int, Int](x => Writer(x.toString, x))
+      //alternatively: type StringWriter[A] = Writer[String, A]; tree.traverseTee[StringWriter, Int, Int]
+      val (w, resTree) = s.runT
+      w must be_===("12345")
+      resTree.toStream must be_===(tree.toStream)
+    }
 
     "traverseTree through the option effect yielding result" in {
       val tree = streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i => Some(i * 2))
@@ -82,8 +89,6 @@ class FingerTreeTest extends Specification with ScalaCheck {
       val tree = streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i => if (i < 10) Some(i * 2) else None)
       tree must be_===(None)
     }
-    import std.AllInstances._
-    import std.AllFunctions._
 
     "not blow the stack" in {
       val tree: Option[FingerTree[Int, Int]] = streamToTree(intStream.take(32 * 1024)).traverseTree[Option, Int, Int](x => Some(x))
