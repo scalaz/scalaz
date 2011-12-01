@@ -26,7 +26,7 @@ trait ContFunctions {
     def apply(k:A => R):R = g(k)
   }
 
-  def callCC[A,B,R](k:(A => Cont[R,B]) => Cont[R,A]):Cont[R,A] =
+  def callCC[R,A,B](k:(A => Cont[R,B]) => Cont[R,A]):Cont[R,A] =
     cont((c:A=>R) => runCont(k((a:A) => cont((_:B => R) => c(a))))(c))
 }
 
