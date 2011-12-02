@@ -81,14 +81,3 @@ trait IterateeFunctions {
   def takeUntil[X, A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[X, A, F[A]] =
     takeWhile(!p(_))
 }
-
-object Iteratee
-  extends IterateeFunctions
-  with IterateeTFunctions
-  with EnumeratorTFunctions
-  with EnumerateeTFunctions
-  with StepTFunctions
-  with InputFunctions {
-
-  def apply[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] = iteratee(s)
-}
