@@ -2,7 +2,8 @@ package scalaz
 
 ////
 /**
- *
+ *  An implementation of a Continuations Monad derived from
+ *  Control.Monad.Cont [[http://hackage.haskell.org/packages/archive/mtl/2.0.1.0/doc/html/Control-Monad-Cont.html]]
  */
 ////
 trait Cont[R,A] { self =>
