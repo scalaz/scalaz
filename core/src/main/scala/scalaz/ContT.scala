@@ -45,12 +45,12 @@ trait ContTFunctions extends ContTInstances {
   def contT[F[_],R,A](g:(A => F[R]) => F[R]):ContT[F,R,A] = new ContT[F,R,A] {
     def apply(k:A => F[R]):F[R] = g(k)
   }
-  def exitT[F[_],R,A](r: => F[R]):ContT[F,R,A] = contT(_ => r)
+  def exitCCT[F[_],R,A](r: => F[R]):ContT[F,R,A] = contT(_ => r)
 
   def callCCT[F[_],R,A,B](k:(A => ContT[F,R,B]) => ContT[F,R,A]):ContT[F,R,A] =
     contT((c:A=>F[R]) => runContT(k((a:A) => contT((_:B => F[R]) => c(a))))(c))
 
-  implicit def ToKleisli[F[_],R,A](f:ContT[F,R,A]):Kleisli[F,A=>F[R],R] = Kleisli[F,A=>F[R],R](k => f(k))
+  implicit def ContTToKleisli[F[_],R,A](f:ContT[F,R,A]):Kleisli[F,A=>F[R],R] = Kleisli[F,A=>F[R],R](k => f(k))
 }
 
 object ContT extends ContTFunctions {

@@ -6,26 +6,34 @@ import scalaz.ContT
 import ContT._
 import Id._
 
-object ContTUsage extends App {
-  def calcLength[R](in:Seq[_]):ContT[Id,R,Int] = constT(in.length)
+object ContTUsage {
 
-  def foo[R](s:Boolean,alt2: => Id[R]):ContT[Id,R,Int] = for {
-    x <- calcLength[R](List(1,2,3))
-    z <- callCCT[Id,R,Int,Int](k => if (s) k(55) else exitT(alt2))
-    y <- calcLength[R](List(1,2,3,4))
-  } yield (x + y + z)
+  def test1 {
+    def calcLength[R](in:Seq[_]):ContT[Id,R,Int] = constT(in.length)
 
-  runContT[Id,Unit,Int](foo(true,println("WTF?")))(println _)
-  runContT[Id,Unit,Int](foo(false,println("WTF?")))(println _)
-  println("success")
-}
+    def foo[R](s:Boolean,alt2: => Id[R]):ContT[Id,R,Int] = for {
+      x <- calcLength[R](List(1,2,3))
+      z <- callCCT[Id,R,Int,Int](k => if (s) k(55) else exitCCT(alt2))
+      y <- calcLength[R](List(1,2,3,4))
+    } yield (x + y + z)
 
-object ContTUsageBind extends App {
-  def foo[R](a:Int):ContT[Id,R,Int] = constT(a + 7)
-  def bar[R](alt:Int => Id[R])(a:Int):ContT[Id,R,Int] = callCCT[Id,R,Int,Int](k => if (a > 20) exitT(alt(a)) else k(a * 7))
-  def baz[R](a:Int,alt:Int => Id[R]):ContT[Id,R,Int] = foo[R](a) >>= (x => bar[R](alt)(x))
+    assert(runContT[Id,String,Int](foo(true,"WTF?"))(_.toString) == "62")
+    assert(runContT[Id,String,Int](foo(false,"WTF?"))(_.toString) == "WTF?")
+    println("success")
+  }
 
-  runContT[Id,Unit,Int](baz(10,((x:Int) => println("%d>20 -> too big".format(x)))))(println _)
-  runContT[Id,Unit,Int](baz(20,((x:Int) => println("%d>20 -> too big".format(x)))))(println _)
-  println("success")
+  def test2 {
+    def foo[R](a:Int):ContT[Id,R,Int] = constT(a + 7)
+    def bar[R](alt:Int => Id[R])(a:Int):ContT[Id,R,Int] = callCCT[Id,R,Int,Int](k => if (a > 20) exitCCT(alt(a)) else k(a * 7))
+    def baz[R](a:Int,alt:Int => Id[R]):ContT[Id,R,Int] = foo[R](a) >>= (x => bar[R](alt)(x))
+
+    assert(runContT[Id,String,Int](baz(10,((x:Int) => "%d>20 -> too big".format(x))))(_.toString) == "119")
+    assert(runContT[Id,String,Int](baz(20,((x:Int) => "%d>20 -> too big".format(x))))(_.toString) == "27>20 -> too big")
+    println("success")
+  }
+
+  def main(args:Array[String]) {
+    test1
+    test2
+  }
 }
