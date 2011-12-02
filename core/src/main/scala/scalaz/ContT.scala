@@ -7,31 +7,54 @@ package scalaz
 ////
 trait ContT[F[_],R,A] { self =>
   ////
-  def apply(k:A => F[R])(implicit F: Functor[F]):F[R]
-  def map[B](f:A => B)(implicit F: Functor[F]):ContT[F,R,B] = new ContT[F,R,B] {
-    def apply(k:B => F[R])(implicit F: Functor[F]):F[R] = self.apply(k compose f)
+  def apply(k:A => F[R]):F[R]
+  def map[B](f:A => B):ContT[F,R,B] = new ContT[F,R,B] {
+    def apply(k:B => F[R]):F[R] = self.apply(k compose f)
   }
-  def flatMap[B](f:A => ContT[F,R,B])(implicit F: Monad[F]):ContT[F,R,B] = new ContT[F,R,B] {
-    def apply(k:B => F[R])(implicit F: Functor[F]):F[R] = self.apply((a:A) => f(a).apply(k))
+  def flatMap[B](f:A => ContT[F,R,B]):ContT[F,R,B] = new ContT[F,R,B] {
+    def apply(k:B => F[R]):F[R] = self.apply((a:A) => f(a).apply(k))
   }
   ////
 }
 
-trait ContTFunctions {
-  def runContT[F[_],R,A](cont:ContT[F,R,A])(f:A => F[R])(implicit F: Functor[F]):F[R] = cont(f)
-  def constT[F[_],R,A](g: => A)(implicit F: Functor[F]):ContT[F,R,A] = new ContT[F,R,A] {
-    def apply(k:A => F[R])(implicit F: Functor[F]):F[R] = k(g)
+trait ContTInstances2 {
+  implicit def contTFunctor[F[_], R](implicit F0: Functor[F]): Functor[({type λ[α] = ContT[F, R, α]})#λ] = new ContTFunctor[F, R] {
+    implicit def F: Functor[F] = F0
   }
-  def contT[F[_],R,A](g:(A => F[R]) => F[R])(implicit F: Functor[F]):ContT[F,R,A] = new ContT[F,R,A] {
-    def apply(k:A => F[R])(implicit F: Functor[F]):F[R] = g(k)
-  }
+}
 
-  def callCCT[F[_],R,A,B](k:(A => ContT[F,R,B]) => ContT[F,R,A])(implicit F: Functor[F]):ContT[F,R,A] =
+trait ContTInstances1 extends ContTInstances2 {
+  implicit def contTPointed[F[_], R](implicit F0: Pointed[F]): Pointed[({type λ[α] = ContT[F, R, α]})#λ] = new ContTPointed[F, R] {
+    implicit def F: Pointed[F] = F0
+  }
+}
+
+trait ContTInstances0 extends ContTInstances1 {
+  implicit def contTMonad[F[_], R](implicit F0: Monad[F]): Monad[({type λ[α] = ContT[F, R, α]})#λ] = new ContTMonad[F, R] {
+    implicit def F: Monad[F] = F0
+  }
+}
+
+trait ContTInstances extends ContTInstances0
+
+trait ContTFunctions extends ContTInstances {
+  def runContT[F[_],R,A](cont:ContT[F,R,A])(f:A => F[R]):F[R] = cont(f)
+  def constT[F[_],R,A](g: => A):ContT[F,R,A] = new ContT[F,R,A] {
+    def apply(k:A => F[R]):F[R] = k(g)
+  }
+  def contT[F[_],R,A](g:(A => F[R]) => F[R]):ContT[F,R,A] = new ContT[F,R,A] {
+    def apply(k:A => F[R]):F[R] = g(k)
+  }
+  def exitT[F[_],R,A](r: => F[R]):ContT[F,R,A] = contT(_ => r)
+
+  def callCCT[F[_],R,A,B](k:(A => ContT[F,R,B]) => ContT[F,R,A]):ContT[F,R,A] =
     contT((c:A=>F[R]) => runContT(k((a:A) => contT((_:B => F[R]) => c(a))))(c))
+
+  implicit def ToKleisli[F[_],R,A](f:ContT[F,R,A]):Kleisli[F,A=>F[R],R] = Kleisli[F,A=>F[R],R](k => f(k))
 }
 
 object ContT extends ContTFunctions {
-  @inline def apply[F[_],R,A](g:(A => F[R]) => F[R])(implicit F: Functor[F]):ContT[F,R,A] = contT(g)
+  @inline def apply[F[_],R,A](g:(A => F[R]) => F[R]):ContT[F,R,A] = contT(g)
 }
 
 private[scalaz] trait ContTFunctor[F[_],R] extends Functor[({type λ[α] = ContT[F, R, α]})#λ] {
@@ -40,6 +63,7 @@ private[scalaz] trait ContTFunctor[F[_],R] extends Functor[({type λ[α] = ContT
 }
 
 private[scalaz] trait ContTPointed[F[_], R] extends Pointed[({type λ[α] = ContT[F, R, α]})#λ] with ContTFunctor[F, R] {
+  implicit def F: Pointed[F]
   def point[A](a: => A): ContT[F, R, A] = ContT.constT(a)
 }
 
