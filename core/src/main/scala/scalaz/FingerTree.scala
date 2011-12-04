@@ -747,7 +747,6 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 
   private def traverseNode[F[_], V2, B](node: Node[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Node[V2, B]] = {
-    println("traverseNode")
     def mkNode(x: B)(y: B)(z: B): Node[V2, B] = node3(x, y, z)
     node.fold((v, a, b) => F.map2(f(a), f(b))((x, y) => node2(x, y)),
         (v, a, b, c) =>  {
