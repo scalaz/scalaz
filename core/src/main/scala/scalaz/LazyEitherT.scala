@@ -1,126 +1,86 @@
 package scalaz
 
 sealed trait LazyEitherT[F[_], A, B] {
-  def runT: F[LazyEither[A, B]]
+  def run: F[LazyEither[A, B]]
 
   import LazyEither._
   import LazyEitherT._
   import EitherT.{LeftProjectionT => _, _}
   import OptionT._
   import LazyOptionT._
-  import Isomorphism.{<~>, <~~>}
-
-  def run(implicit i: F <~> Id): LazyEither[A, B] =
-    i.to(runT)
 
   def ?[X](left: => X, right: => X)(implicit F: Functor[F]): F[X] =
-    F.map(runT)(_.fold(_ => left, _ => right))
+    F.map(run)(_.fold(_ => left, _ => right))
 
-  def -?-[X](left: => X, right: => X)(implicit i: F <~> Id): X =
-    run ?(left, right)
+  def isLeft(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isLeft)
 
-  def isLeftT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isLeft)
+  def isRight(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isRight)
 
-  def isLeft(implicit i: F <~> Id): Boolean =
-    run.isLeft
+  def swap(implicit F: Functor[F]): F[LazyEither[B, A]] =
+    F.map(run)(_.swap)
 
-  def isRightT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isRight)
+  def toEither(implicit F: Functor[F]): EitherT[F, A, B] =
+    eitherT(F.map(run)(_.toEither))
 
-  def isRight(implicit i: F <~> Id): Boolean =
-    run.isRight
+  def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
+    F.map(run)(_ getOrElse default)
 
-  def swapT(implicit F: Functor[F]): F[LazyEither[B, A]] =
-    F.map(runT)(_.swap)
+  def exists(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_ exists f)
 
-  def swap(implicit i: F <~> Id): LazyEither[B, A] =
-    run.swap
-
-  def toEitherT(implicit F: Functor[F]): EitherT[F, A, B] =
-    eitherT(F.map(runT)(_.toEither))
-
-  def toEither(implicit i: F <~> Id): Either[A, B] =
-    run.toEither
-
-  def getOrElseT(default: => B)(implicit F: Functor[F]): F[B] =
-    F.map(runT)(_ getOrElse default)
-
-  def getOrElse(default: => B)(implicit i: F <~> Id): B =
-    run getOrElse default
-
-  def existsT(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_ exists f)
-
-  def exists(f: (=> B) => Boolean)(implicit i: F <~> Id): Boolean =
-    run exists f
-
-  def forallT(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_ forall f)
-
-  def forall(f: (=> B) => Boolean)(implicit i: F <~> Id): Boolean =
-    run forall f
+  def forall(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_ forall f)
 
   def orElse(x: => LazyEitherT[F, A, B])(implicit m: Bind[F]): LazyEitherT[F, A, B] = {
-    val g = runT
+    val g = run
     LazyEitherT(m.bind(g)(_.fold(
-      _ => x.runT
+      _ => x.run
       , _ => g
     )))
   }
 
-  def toLazyOptionT(implicit F: Functor[F]): LazyOptionT[F, B] =
-    lazyOptionT(F.map(runT)(_ toLazyOption))
+  def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, B] =
+    lazyOptionT(F.map(run)(_ toLazyOption))
 
-  def toLazyOption(implicit i: F <~> Id): LazyOption[B] =
-    run toLazyOption
+  def toOption(implicit F: Functor[F]): OptionT[F, B] =
+    optionT(F.map(run)(_ toOption))
 
-  def toOptionT(implicit F: Functor[F]): OptionT[F, B] =
-    optionT(F.map(runT)(_ toOption))
+  def toList(implicit F: Functor[F]): F[List[B]] =
+    F.map(run)(_ toList)
 
-  def toOption(implicit i: F <~> Id): Option[B] =
-    run toOption
-
-  def toListT(implicit F: Functor[F]): F[List[B]] =
-    F.map(runT)(_ toList)
-
-  def toList(implicit i: F <~> Id): List[B] =
-    run toList
-
-  def toStreamT(implicit F: Functor[F]): F[Stream[B]] =
-    F.map(runT)(_ toStream)
-
-  def toStream(implicit i: F <~> Id): Stream[B] =
-    run toStream
+  def toStream(implicit F: Functor[F]): F[Stream[B]] =
+    F.map(run)(_ toStream)
 
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
-    lazyEitherT(F.map(runT)(_ map f))
+    lazyEitherT(F.map(run)(_ map f))
 
   def foreach(f: (=> B) => Unit)(implicit e: Each[F]): Unit =
-    e.each(runT)(_ foreach f)
+    e.each(run)(_ foreach f)
 
   def flatMap[C](f: (=> B) => LazyEitherT[F, A, C])(implicit M: Monad[F]): LazyEitherT[F, A, C] =
-    lazyEitherT(M.bind(runT)(_.fold(a => M.point(lazyLeft[C](a)), b => f(b).runT)))
+    lazyEitherT(M.bind(run)(_.fold(a => M.point(lazyLeft[C](a)), b => f(b).run)))
 
   def bimap[C, D](f: (=> A) => C, g: (=> B) => D)(implicit F: Functor[F]): LazyEitherT[F, C, D] =
     map(g).left.map(f)
 
   def bitraverse[G[_], C, D](f: (A) => G[C], g: (B) => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[LazyEitherT[F, C, D]] = {
     import std.either.eitherInstance
-    Applicative[G].map(F.traverse(runT)(BiTraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT(_: F[LazyEither[C, D]]))
+    Applicative[G].map(F.traverse(run)(BiTraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT(_: F[LazyEither[C, D]]))
   }
 
   def traverse[G[_], C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[LazyEitherT[F, A, C]] = {
-    G.map(F.traverse(runT)(o => LazyEither.lazyEitherInstance[A].traverse(o)(f)))(LazyEitherT(_))
+    G.map(F.traverse(run)(o => LazyEither.lazyEitherInstance[A].traverse(o)(f)))(LazyEitherT(_))
   }
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z = {
-    F.foldR[LazyEither[A, B], Z](runT, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
+    F.foldR[LazyEither[A, B], Z](run, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
   }
 
   def ap[C](f: => LazyEitherT[F, A, B => C])(implicit F: Applicative[F]): LazyEitherT[F, A, C] = {
     // TODO check laziness
-    LazyEitherT[F, A, C](F.map2(f.runT, runT)((ff: LazyEither[A, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[A].ap(aa)(ff)))
+    LazyEitherT[F, A, C](F.map2(f.run, run)((ff: LazyEither[A, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[A].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B]() {
@@ -137,66 +97,44 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
     import OptionT._
     import LazyOptionT._
-    import Isomorphism.<~>
 
-    def getOrElseT(default: => A)(implicit F: Functor[F]): F[A] =
-      F.map(lazyEitherT.runT)(_.left getOrElse default)
+    def getOrElse(default: => A)(implicit F: Functor[F]): F[A] =
+      F.map(lazyEitherT.run)(_.left getOrElse default)
 
-    def getOrElse(default: => A)(implicit i: F <~> Id): A =
-      lazyEitherT.run.left getOrElse default
+    def exists(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+      F.map(lazyEitherT.run)(_.left exists f)
 
-    def existsT(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(lazyEitherT.runT)(_.left exists f)
-
-    def exists(f: (=> A) => Boolean)(implicit i: F <~> Id): Boolean =
-      lazyEitherT.run.left exists f
-
-    def forallT(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(lazyEitherT.runT)(_.left forall f)
-
-    def forall(f: (=> A) => Boolean)(implicit i: F <~> Id): Boolean =
-      lazyEitherT.run.left forall f
+    def forall(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+      F.map(lazyEitherT.run)(_.left forall f)
 
     def orElse(x: => LazyEitherT[F, A, B])(implicit m: Bind[F]): LazyEitherT[F, A, B] = {
-      val g = lazyEitherT.runT
+      val g = lazyEitherT.run
       LazyEitherT(m.bind(g)((z: LazyEither[A, B]) => z.fold(
         _ => g
-        , _ => x.runT
+        , _ => x.run
       )))
     }
 
-    def toLazyOptionT(implicit F: Functor[F]): LazyOptionT[F, A] =
-      lazyOptionT(F.map(lazyEitherT.runT)(_.left toLazyOption))
+    def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, A] =
+      lazyOptionT(F.map(lazyEitherT.run)(_.left toLazyOption))
 
-    def toLazyOption(implicit i: F <~> Id): LazyOption[A] =
-      lazyEitherT.run.left.toLazyOption
+    def toOption(implicit F: Functor[F]): OptionT[F, A] =
+      optionT(F.map(lazyEitherT.run)(_.left toOption))
 
-    def toOptionT(implicit F: Functor[F]): OptionT[F, A] =
-      optionT(F.map(lazyEitherT.runT)(_.left toOption))
+    def toList(implicit F: Functor[F]): F[List[A]] =
+      F.map(lazyEitherT.run)(_.left toList)
 
-    def toOption(implicit i: F <~> Id): Option[A] =
-      lazyEitherT.run.left.toOption
-
-    def toListT(implicit F: Functor[F]): F[List[A]] =
-      F.map(lazyEitherT.runT)(_.left toList)
-
-    def toList(implicit i: F <~> Id): List[A] =
-      lazyEitherT.run.left.toList
-
-    def toStreamT(implicit F: Functor[F]): F[Stream[A]] =
-      F.map(lazyEitherT.runT)(_.left toStream)
-
-    def toStream(implicit i: F <~> Id): Stream[A] =
-      lazyEitherT.run.left.toStream
+    def toStream(implicit F: Functor[F]): F[Stream[A]] =
+      F.map(lazyEitherT.run)(_.left toStream)
 
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
-      LazyEitherT(F.map(lazyEitherT.runT)(_.left map f))
+      LazyEitherT(F.map(lazyEitherT.run)(_.left map f))
 
     def foreach(f: (=> A) => Unit)(implicit F: Each[F]): Unit =
-      F.each(lazyEitherT.runT)(_.left foreach f)
+      F.each(lazyEitherT.run)(_.left foreach f)
 
     def flatMap[C](f: (=> A) => LazyEitherT[F, C, B])(implicit M: Monad[F]): LazyEitherT[F, C, B] =
-      LazyEitherT(M.bind(lazyEitherT.runT)(_.fold(a => f(a).runT, b => M.point(LazyEither.lazyRight[C](b)))))
+      LazyEitherT(M.bind(lazyEitherT.run)(_.fold(a => f(a).run, b => M.point(LazyEither.lazyRight[C](b)))))
   }
 
 }
@@ -278,7 +216,7 @@ trait LazyEitherTInstances extends LazyEitherTInstances0 {
 
 trait LazyEitherTFunctions {
   def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] = new LazyEitherT[F, A, B] {
-    val runT = a
+    val run = a
   }
 
   import LazyEither._
@@ -354,5 +292,5 @@ trait LazyEitherTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = LazyEit
   implicit def F: Traverse[F]
 
   def bitraverse[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyEitherT[F, C, D]] =
-    Applicative[G].map(F.traverse(fab.runT)(BiTraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
+    Applicative[G].map(F.traverse(fab.run)(BiTraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
 }

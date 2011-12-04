@@ -1,116 +1,89 @@
 package scalaz
 
-import Isomorphism.{<~>}
-import scalaz.EitherT.LeftProjectionT
-
+/**
+ * Represents a computation of type `F[Either[A, B]]`.
+ *
+ * Example:
+ * {{{
+ * val x: Option[Either[Int, String]] = Some(Right(1))
+ * EitherT(x).map(1+).run // Some(Right(2)
+ * }}}
+ * */
 sealed trait EitherT[F[_], A, B] {
-  def runT: F[Either[A, B]]
+  def run: F[Either[A, B]]
 
   import EitherT._
   import OptionT._
 
-  def run(implicit iso: F <~> Id): Either[A, B] =
-    iso.to(runT)
-
   def ?[X](left: => X, right: => X)(implicit F: Functor[F]): F[X] =
-    F.map(runT)((_: Either[A, B]).fold(_ => left, _ => right))
+    F.map(run)((_: Either[A, B]).fold(_ => left, _ => right))
 
-  def -?-[X](left: => X, right: => X)(implicit i: F <~> Id): X =
-    run(i).fold(_ => left, _ => right)
+  def isLeft(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isLeft)
 
-  def isLeftT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isLeft)
+  def isRight(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isRight)
 
-  def isLeft(implicit i: F <~> Id): Boolean =
-    run.isLeft
+  def swap(implicit F: Functor[F]): F[Either[B, A]] =
+    F.map(run)(_.swap)
 
-  def isRightT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isRight)
+  def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
+    F.map(run)(_.right getOrElse default)
 
-  def isRight(implicit i: F <~> Id): Boolean =
-    run.isRight
+  def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.right exists f)
 
-  def swapT(implicit F: Functor[F]): F[Either[B, A]] =
-    F.map(runT)(_.swap)
-
-  def swap(implicit i: F <~> Id): Either[B, A] =
-    run.swap
-
-  def getOrElseT(default: => B)(implicit F: Functor[F]): F[B] =
-    F.map(runT)(_.right getOrElse default)
-
-  def getOrElse(default: => B)(implicit i: F <~> Id): B =
-    run.right getOrElse default
-
-  def existsT(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.right exists f)
-
-  def exists(f: B => Boolean)(implicit i: F <~> Id): Boolean =
-    run.right exists f
-
-  def forallT(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.right forall f)
-
-  def forall(f: B => Boolean)(implicit i: F <~> Id): Boolean =
-    run.right forall f
+  def forall(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.right forall f)
 
   def orElse(x: => EitherT[F, A, B])(implicit F: Bind[F]): EitherT[F, A, B] = {
-    val g = runT
+    val g = run
     EitherT(F.bind(g) {
-      case Left(_) => x.runT
+      case Left(_) => x.run
       case Right(_) => g
     })
   }
 
-  def toOptionT(implicit F: Functor[F]): OptionT[F, B] =
-    optionT[F](F.map(runT)((_: Either[A, B]).right toOption))
+  def toOption(implicit F: Functor[F]): OptionT[F, B] =
+    optionT[F](F.map(run)((_: Either[A, B]).right toOption))
 
-  def toOption(implicit i: F <~> Id): Option[B] =
-    run.right.toOption
+  def toList(implicit F: Functor[F]): F[List[B]] =
+    F.map(run)(_.fold(_ => Nil, List(_)))
 
-  def toListT(implicit F: Functor[F]): F[List[B]] =
-    F.map(runT)(_.fold(_ => Nil, List(_)))
-
-  def toList(implicit i: F <~> Id): List[B] =
-    run.fold(_ => Nil, List(_))
-
-  def toStreamT(implicit F: Functor[F]): F[Stream[B]] =
-    F.map(runT)((_: Either[A, B]).fold(_ => Stream(), Stream(_)))
-
-  def toStream(implicit i: F <~> Id): Stream[B] =
-    run.fold(_ => Stream(), Stream(_))
+  def toStream(implicit F: Functor[F]): F[Stream[B]] =
+    F.map(run)((_: Either[A, B]).fold(_ => Stream(), Stream(_)))
 
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
-    eitherT(F.map(runT)(_.right.map(f)))
+    eitherT(F.map(run)(_.right.map(f)))
 
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
-    F.each(runT)(_.right foreach f)
+    F.each(run)(_.right foreach f)
 
   def flatMap[C](f: B => EitherT[F, A, C])(implicit F: Monad[F]): EitherT[F, A, C] =
-    eitherT(F.bind(runT)(_.fold(a => F.point(Left(a): Either[A, C]), b => f(b).runT)))
+    eitherT(F.bind(run)(_.fold(a => F.point(Left(a): Either[A, C]), b => f(b).run)))
 
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): EitherT[F, C, D] =
     map(g).left.map(f)
 
   def bitraverse[G[_], C, D](f: (A) => G[C], g: (B) => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] = {
     import std.either.eitherInstance
-    Applicative[G].map(F.traverse(runT)(BiTraverse[Either].bitraverseF(f, g)))(EitherT.eitherT(_: F[Either[C, D]]))
+    Applicative[G].map(F.traverse(run)(BiTraverse[Either].bitraverseF(f, g)))(EitherT.eitherT(_: F[Either[C, D]]))
   }
 
   def traverse[G[_], C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] = {
     import std.either._
-    G.map(F.traverse(runT)(o => Traverse[({type λ[α] = Either[A, α]})#λ].traverse(o)(f)))(EitherT.eitherT(_))
+    G.map(F.traverse(run)(o => Traverse[({type λ[α] = Either[A, α]})#λ].traverse(o)(f)))(EitherT.eitherT(_))
   }
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z = {
     import std.either._
-    F.foldRight[Either[A, B], Z](runT, z)((a, b) => eitherMonad[A].foldRight[B, Z](a, b)(f))
+    F.foldRight[Either[A, B], Z](run, z)((a, b) => eitherMonad[A].foldRight[B, Z](a, b)(f))
   }
 
   def ap[C](f: => EitherT[F, A, B => C])(implicit F: Applicative[F]): EitherT[F, A, C] = {
     import std.either._
 
-    EitherT.eitherT[F, A, C](F.map2(f.runT, runT)((ff: Either[A, B => C], aa: Either[A, B]) => eitherMonad[A].ap(aa)(ff)))
+    EitherT.eitherT[F, A, C](F.map2(f.run, run)((ff: Either[A, B => C], aa: Either[A, B]) => eitherMonad[A].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LeftProjectionT[F, A, B]() {
@@ -127,58 +100,40 @@ object EitherT extends EitherTFunctions with EitherTInstances {
 
     import OptionT._
 
-    def getOrElseT(default: => A)(implicit F: Functor[F]): F[A] =
-      F.map(eitherT.runT)(_.left getOrElse default)
+    def getOrElse(default: => A)(implicit F: Functor[F]): F[A] =
+      F.map(eitherT.run)(_.left getOrElse default)
 
-    def getOrElse(default: => A)(implicit i: F <~> Id): A =
-      eitherT.run.left getOrElse default
+    def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
+      F.map(eitherT.run)(_.left exists f)
 
-    def existsT(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(eitherT.runT)(_.left exists f)
-
-    def exists(f: A => Boolean)(implicit i: F <~> Id): Boolean =
-      eitherT.run.left exists f
-
-    def forallT(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(eitherT.runT)(_.left forall f)
-
-    def forall(f: A => Boolean)(implicit i: F <~> Id): Boolean =
-      eitherT.run.left forall f
+    def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
+      F.map(eitherT.run)(_.left forall f)
 
     def orElse(x: => EitherT[F, A, B])(implicit m: Bind[F]): EitherT[F, A, B] = {
-      val g = eitherT.runT
+      val g = eitherT.run
       EitherT(m.bind(g){
         case Left(_) => g
-        case Right(_) => x.runT
+        case Right(_) => x.run
       })
     }
 
-    def toOptionT(implicit F: Functor[F]): OptionT[F, A] =
-      optionT(F.map(eitherT.runT)((_: Either[A, B]).left toOption))
+    def toOption(implicit F: Functor[F]): OptionT[F, A] =
+      optionT(F.map(eitherT.run)((_: Either[A, B]).left toOption))
 
-    def toOption(implicit i: F <~> Id): Option[A] =
-      eitherT.run.left.toOption
+    def toList(implicit F: Functor[F]): F[List[A]] =
+      F.map(eitherT.run)(_.fold(List(_), _ => Nil))
 
-    def toListT(implicit F: Functor[F]): F[List[A]] =
-      F.map(eitherT.runT)(_.fold(List(_), _ => Nil))
-
-    def toList(implicit i: F <~> Id): List[A] =
-      eitherT.run.fold(List(_), _ => Nil)
-
-    def toStreamT(implicit F: Functor[F]): F[Stream[A]] =
-      F.map(eitherT.runT)(_.fold(Stream(_), _ => Stream()))
-
-    def toStream(implicit i: F <~> Id): Stream[A] =
-      eitherT.run.fold(Stream(_), _ => Stream())
+    def toStream(implicit F: Functor[F]): F[Stream[A]] =
+      F.map(eitherT.run)(_.fold(Stream(_), _ => Stream()))
 
     def map[C](f: A => C)(implicit F: Functor[F]): EitherT[F, C, B] =
-      EitherT(F.map(eitherT.runT)(_.left.map(f): Either[C, B]))
+      EitherT(F.map(eitherT.run)(_.left.map(f): Either[C, B]))
 
     def foreach(f: A => Unit)(implicit F: Each[F]): Unit =
-      F.each(eitherT.runT)(_.left foreach f)
+      F.each(eitherT.run)(_.left foreach f)
 
     def flatMap[C](f: A => EitherT[F, C, B])(implicit F: Monad[F]): EitherT[F, C, B] =
-      EitherT(F.bind(eitherT.runT)(_.fold(a => f(a).runT, b => F.point(Right(b): Either[C, B]))))
+      EitherT(F.bind(eitherT.run)(_.fold(a => f(a).run, b => F.point(Right(b): Either[C, B]))))
   }
 }
 
@@ -255,7 +210,7 @@ trait EitherTInstances extends EitherTInstances0 {
 
 trait EitherTFunctions {
   def eitherT[F[_], A, B](a: F[Either[A, B]]): EitherT[F, A, B] = new EitherT[F, A, B] {
-    val runT = a
+    val run = a
   }
 
   type \/[A, B] =
@@ -268,7 +223,7 @@ trait EitherTFunctions {
     eitherT(F.point(Right(b): Either[A, B]))
 
   def fromEither[F[_], A, B](e: A \/ B)(implicit F: Pointed[F]): EitherT[F, A, B] =
-    eitherT(F.point(e.runT))
+    eitherT(F.point(e.run))
 
   import Isomorphism.{IsoFunctorTemplate, IsoBiFunctorTemplate}
 
