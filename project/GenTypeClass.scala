@@ -38,7 +38,7 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor)) // TODO should this extend functor, or should CoMonad?
+  lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor))
   lazy val coJoin = TypeClass("CoJoin", *->*)
   lazy val coBind = TypeClass("CoBind", *->*)
   lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
@@ -144,7 +144,7 @@ object GenTypeClass {
       }
       val oldChunks: Seq[String] = parse(oldSource)
       val newChunks: Seq[String] = parse(source)
-      if (oldChunks.length != newChunks.length) error("different number of chunks in old and new source: " + fileName)
+      if (oldChunks.length != newChunks.length) sys.error("different number of chunks in old and new source: " + fileName)
 
       val updatedChunks = for {
         ((o, n), i) <- oldChunks.zip(newChunks).zipWithIndex

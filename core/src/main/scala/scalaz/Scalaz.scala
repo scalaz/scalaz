@@ -1,7 +1,7 @@
 package scalaz
 
 object Scalaz
-  extends IdInstances with StateFunctions
+  extends StateFunctions
   with syntax.ToAllTypeClassV // syntax associated with type classes
   with syntax.ToAllOtherV     // syntax associated with Scalaz data structures
   with std.AllInstances       // Type class instances for the standard library types

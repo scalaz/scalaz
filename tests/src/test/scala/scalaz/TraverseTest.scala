@@ -10,7 +10,6 @@ class TraverseTest extends Spec {
   import std.AllInstances._
   import std.AllFunctions._
   import syntax.traverse._
-  import Id._
   import WriterT._
 
   "list" should {

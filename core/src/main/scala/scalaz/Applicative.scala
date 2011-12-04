@@ -90,8 +90,8 @@ object Applicative {
    *
    * @see [[scalaz.Applicative.MonoidalApplicative]]
    */
-  def monoidalApplicative[F](implicit F: Monoid[F]): Applicative[({type λ[α]=F})#λ] = new MonoidalApplicative[F] {
-    implicit def F: Monoid[F] = F
+  def monoidalApplicative[F](implicit F0: Monoid[F]): Applicative[({type λ[α]=F})#λ] = new MonoidalApplicative[F] {
+    implicit def F: Monoid[F] = F0
   }
   ////
 }
