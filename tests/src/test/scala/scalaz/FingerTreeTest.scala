@@ -109,8 +109,7 @@ class FingerTreeTest extends Specification with ScalaCheck {
       tree.map(_.toStream.take(10)) getOrElse Stream.empty must be_===(intStream.take(10))
     }
 
-    "identity fingertree traverse" ! check {(tree: SequenceTree[Int], f: (Int => Int)) =>
-//        tree.traverseTree[Id, Int, Int](Id.id.point(f)).toStream must be_===(tree.map(f).toStream)
+    "identity fingertree traverse" ! check {(tree: SequenceTree[Int]) =>
         identityTraverse[Id, Int, Int, Int](tree)
     }
 
