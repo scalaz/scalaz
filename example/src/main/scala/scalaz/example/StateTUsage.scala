@@ -19,4 +19,12 @@ object StateTUsage extends App {
     Monad[({type l[a] = StateT[M, Int, a]})#l]
     MonadState[({type f[s, a] = StateT[M, s, a]})#f, Int]
   }
+
+  def state() {
+    import Id.id // a bit annoying that we require this import.
+
+    val state: State[String, Int] = State((x: String) => (0, x + 1))
+    val eval: Int = state.eval("")
+    state.flatMap(_ => state)
+  }
 }
