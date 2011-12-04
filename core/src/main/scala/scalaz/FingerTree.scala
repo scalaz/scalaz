@@ -732,27 +732,40 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 
   /**
-   * Like traverse, but with a more constraint type: we need the additional measure
+   * Like traverse, but with a more constraint type: we need the additional measure to construct the new tree.
    */
   def traverseTree[F[_], V2, B](f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[FingerTree[V2, B]] = {
+    def mkDeep(pr: Finger[V2, B])(m: FingerTree[V2, Node[V2, B]])(sf: Finger[V2, B]): FingerTree[V2, B] = deep(pr, m, sf)
     fold(_ => F.pure(FingerTree.empty[V2, B]),
          (v, a) => F.map(f(a))(a => single(ms.unit(a), a)),
          (v, pr, m, sf) => {
-            F.map3(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)), traverseFinger(sf)(f))((a, b, c) => deep(a, b, c))
+           //F.ap(traverseFinger(sf)(f))(F.ap(m.traverseTree(n => traverseNode(n)(f)))(F.map(traverseFinger(pr)(f))(pr => mkDeep(pr)_)))
+           //the implementation below seems most efficient. The straightforward implementation using F.map3 leads to an explosion of traverseTree calls
+           val fmap2 = F.map2(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b)_)
+           F.ap(traverseFinger(sf)(f))(fmap2)
         })
   }
 
   private def traverseNode[F[_], V2, B](node: Node[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Node[V2, B]] = {
+    println("traverseNode")
+    def mkNode(x: B)(y: B)(z: B): Node[V2, B] = node3(x, y, z)
     node.fold((v, a, b) => F.map2(f(a), f(b))((x, y) => node2(x, y)),
-              (v, a, b, c) => F.map3(f(a), f(b), f(c))((x, y, z) => node3(x, y, z))
+        (v, a, b, c) =>  {
+          F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkNode(x)_)))
+        }
     )
   }
 
-  private def traverseFinger[F[_], A, B, V2](digit: Finger[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Finger[V2, B]] = digit match {
-    case One(v, a) => F.map(f(a))(x => one(x))
-    case Two(v, a, b) => F.map2(f(a), f(b))((x, y) => two(x, y))
-    case Three(v, a, b, c) => F.map3(f(a), f(b), f(c))((x, y, z) => three(x, y, z))
-    case Four(v, a, b, c, d) => F.map4(f(a), f(b), f(c), f(d))((w, x, y, z) => four(w, x, y, z))
+  private def traverseFinger[F[_], A, B, V2](digit: Finger[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Finger[V2, B]] = {
+    def mkTwo(x: B)(y: B): Finger[V2, B] = two(x, y)
+    def mkThree(x: B)(y: B)(z: B): Finger[V2, B] = three(x, y, z)
+    def mkFour(w: B)(x: B)(y: B)(z: B): Finger[V2, B] = four(w, x, y, z)
+    digit match {
+      case One(v, a) => F.map(f(a))(x => one(x))
+      case Two(v, a, b) => F.ap(f(b))(F.map(f(a))(x => mkTwo(x)_))
+      case Three(v, a, b, c) => F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkThree(x)_)))
+      case Four(v, a, b, c, d) => F.ap(f(d))(F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkFour(x)_))))
+    }
   }
 
   /** Execute the provided side effect for each element in the tree. */
@@ -1301,3 +1314,6 @@ object OrdSeq {
     as.foldLeft(z)((x, y) => x insert y)
   }
 }
+
+
+
