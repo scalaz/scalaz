@@ -144,7 +144,7 @@ object GenTypeClass {
       }
       val oldChunks: Seq[String] = parse(oldSource)
       val newChunks: Seq[String] = parse(source)
-      if (oldChunks.length != newChunks.length) error("different number of chunks in old and new source: " + fileName)
+      if (oldChunks.length != newChunks.length) sys.error("different number of chunks in old and new source: " + fileName)
 
       val updatedChunks = for {
         ((o, n), i) <- oldChunks.zip(newChunks).zipWithIndex
