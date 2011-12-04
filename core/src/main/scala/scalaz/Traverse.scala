@@ -10,7 +10,6 @@ package scalaz
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
-  import Id.id
   import State.state
 
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
@@ -40,7 +39,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traversalS[S].run(fga)(a => a)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
-    traversal[Id](id).run(fa)(f)
+    traversal[Id](Id.id).run(fa)(f)
 
   // TODO can we provide a default impl of foldR in terms of traverseImpl?
 
@@ -71,7 +70,6 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
     def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
-      import Id._
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 

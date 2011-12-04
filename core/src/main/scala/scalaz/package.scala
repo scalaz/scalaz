@@ -72,9 +72,24 @@
  *  - [[scalaz.EitherT]] Represents computations of type `F[Either[A, B]]`
  */
 package object scalaz {
+  /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
+   *  runtime representation.
+   */
   type Id[X] = X
 
-  object Id extends IdInstances
+  /**
+   * Type class instance for the strict identity type constructor
+   *
+   * This is important when using aliases like `State[A, B]`, which is a type alias for
+   * `StateT[Id, A, B]`.
+   */
+  // WARNING: Don't mix this instance in via a trait. https://issues.scala-lang.org/browse/SI-5268
+  implicit val idInstance = Id.id
+
+  object Id extends IdInstances {
+  }
+
+  trait Pointed1[M[X]]
 
   // TODO Review!
   type Identity[X] = Need[X]
