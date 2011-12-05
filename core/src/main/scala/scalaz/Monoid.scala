@@ -2,14 +2,23 @@ package scalaz
 
 ////
 /**
- * A categorical monoid.
+ * Provides an identity element (`zero`) to the binary `append` operation in [[scalaz.Semigroup]].
+ *
+ * Example instances:
+ *  - `Monoid[Int]`: `zero` and `append` are `0` and `Int#+` respectively
+ *  - `Monoid[List[A]]`: `zero` and `append` are `Nil` and `List#++` respectively
+ *
+ * References:
+ *  - [[http://mathworld.wolfram.com/Monoid.html]]
  *
  * @see [[scalaz.syntax.MonoidV]]
  * @see [[scalaz.Monoid.MonoidLaw]]
+ *
  */
 ////
 trait Monoid[F] extends Semigroup[F] { self =>
   ////
+  /** The identity element for `append`. */
   def zero: F
 
   // derived functions

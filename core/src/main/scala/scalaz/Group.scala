@@ -2,9 +2,13 @@ package scalaz
 
 ////
 /**
- * A group extends [[scalaz.Monoid]] with a inverse element, such that `append(a, inverse(a)) === zero`.
+ * A group extends [[scalaz.Monoid]] with an inverse element, such that `append(a, inverse(a)) === zero`.
  *
- * @see [[http://en.wikipedia.org/wiki/Group_(mathematics) Group on Wikipedia]]
+ * References:
+ * - [[http://en.wikipedia.org/wiki/Group_(mathematics) Group on Wikipedia]]
+ * - [[http://mathworld.wolfram.com/Group.html]]
+ *
+ * @see [[scalaz.syntax.GroupV]]
  * @see [[scalaz.Group.GroupLaw]]
  */
 ////

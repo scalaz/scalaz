@@ -22,7 +22,7 @@ class TraverseTest extends Spec {
     // (["1","2","3"],"123")
     "apply effects in order" in {
       val s: Writer[String, List[Int]] = List(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.runT must be_===(("123", List(1, 2, 3)))
+      s.run must be_===(("123", List(1, 2, 3)))
     }
 
     "traverse through option effect" in {
@@ -41,7 +41,7 @@ class TraverseTest extends Spec {
 
     "apply effects in order" in {
       val s: Writer[String, Stream[Int]] = Stream(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.runT must be_===(("123", Stream(1, 2, 3)))
+      s.run must be_===(("123", Stream(1, 2, 3)))
     }
 
     // ghci> import Data.Traversable

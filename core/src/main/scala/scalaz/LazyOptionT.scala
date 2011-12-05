@@ -1,103 +1,63 @@
 package scalaz
 
 sealed trait LazyOptionT[F[_], A] {
-  def runT: F[LazyOption[A]]
+  def run: F[LazyOption[A]]
 
   import LazyOption._
   import LazyOptionT._
   import LazyEitherT._
   import EitherT._
-  import Isomorphism.<~>
-
-  def run(implicit i: F <~> Id): LazyOption[A] =
-    i.to(runT)
 
   def ?[X](some: => X, none: => X)(implicit F: Functor[F]): F[X] =
-    F.map(runT)(_.?(some, none))
+    F.map(run)(_.?(some, none))
 
-  def -?-[X](some: => X, none: => X)(implicit i: F <~> Id): X =
-    run ? (some, none)
+  def isDefined(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isDefined)
 
-  def isDefinedT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isDefined)
+  def isEmpty(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.isEmpty)
 
-  def isDefined(implicit i: F <~> Id): Boolean =
-    run.isDefined
+  def getOrElse(default: => A)(implicit F: Functor[F]): F[A] =
+    F.map(run)(_.getOrElse(default))
 
-  def isEmptyT(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.isEmpty)
+  def exists(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.exists(f))
 
-  def isEmpty(implicit i: F <~> Id): Boolean =
-    run.isEmpty
+  def forall(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
+    F.map(run)(_.forall(f))
 
-  def getOrElseT(default: => A)(implicit F: Functor[F]): F[A] =
-    F.map(runT)(_.getOrElse(default))
+  def toOption(implicit F: Functor[F]): OptionT[F, A] =
+    OptionT.optionT(F.map(run)(_.toOption))
 
-  def getOrElse(default: => A)(implicit i: F <~> Id): A =
-    run.getOrElse(default)
+  def toLazyRight[X](left: => X)(implicit F: Functor[F]): LazyEitherT[F, X, A] =
+    lazyEitherT(F.map(run)(_.toLazyRight(left)))
 
-  def existsT(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.exists(f))
+  def toLazyLeft[X](right: => X)(implicit F: Functor[F]): LazyEitherT[F, A, X] =
+    lazyEitherT(F.map(run)(_.toLazyLeft(right)))
 
-  def exists(f: (=> A) => Boolean)(implicit i: F <~> Id): Boolean =
-    run.exists(f)
+  def toRight[X](left: => X)(implicit F: Functor[F]): EitherT[F, X, A] =
+    eitherT(F.map(run)(_.toRight(left)))
 
-  def forallT(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(runT)(_.forall(f))
+  def toLeft[X](right: => X)(implicit F: Functor[F]): EitherT[F, A, X] =
+    eitherT(F.map(run)(_.toLeft(right)))
 
-  def forall(f: (=> A) => Boolean)(implicit i: F <~> Id): Boolean =
-    run.forall(f)
-
-  def toOptionT(implicit F: Functor[F]): OptionT[F, A] =
-    OptionT.optionT(F.map(runT)(_.toOption))
-
-  def toOption(implicit i: F <~> Id): Option[A] =
-    run.toOption
-
-  def toLazyRightT[X](left: => X)(implicit F: Functor[F]): LazyEitherT[F, X, A] =
-    lazyEitherT(F.map(runT)(_.toLazyRight(left)))
-
-  def toLazyRight[X](left: => X)(implicit i: F <~> Id): LazyEither[X, A] =
-    run.toLazyRight(left)
-
-  def toLazyLeftT[X](right: => X)(implicit F: Functor[F]): LazyEitherT[F, A, X] =
-    lazyEitherT(F.map(runT)(_.toLazyLeft(right)))
-
-  def toLazyLeft[X](right: => X)(implicit i: F <~> Id): LazyEither[A, X] =
-    run.toLazyLeft(right)
-
-  def toRightT[X](left: => X)(implicit F: Functor[F]): EitherT[F, X, A] =
-    eitherT(F.map(runT)(_.toRight(left)))
-
-  def toRight[X](left: => X)(implicit i: F <~> Id): Either[X, A] =
-    run.toRight(left)
-
-  def toLeftT[X](right: => X)(implicit F: Functor[F]): EitherT[F, A, X] =
-    eitherT(F.map(runT)(_.toLeft(right)))
-
-  def toLeft[X](right: => X)(implicit i: F <~> Id): Either[A, X] =
-    run.toLeft(right)
-
-  def orElseT(a: => LazyOption[A])(implicit F: Functor[F]): LazyOptionT[F, A] =
-    lazyOptionT(F.map(LazyOptionT.this.runT)(_.orElse(a)))
-
-  def orElse(a: => LazyOption[A])(implicit i: F <~> Id): LazyOption[A] =
-    run.orElse(a)
+  def orElse(a: => LazyOption[A])(implicit F: Functor[F]): LazyOptionT[F, A] =
+    lazyOptionT(F.map(LazyOptionT.this.run)(_.orElse(a)))
 
   def map[B](f: (=> A) => B)(implicit F: Functor[F]): LazyOptionT[F, B] =
-    lazyOptionT(F.map(runT)(_ map f))
+    lazyOptionT(F.map(run)(_ map f))
 
   def foreach(f: (=> A) => Unit)(implicit e: Each[F]): Unit =
-    e.each(runT)(_ foreach f)
+    e.each(run)(_ foreach f)
 
   def filter(f: (=> A) => Boolean)(implicit F: Functor[F]): LazyOptionT[F, A] =
-    lazyOptionT(F.map(runT)(_.filter(f)))
+    lazyOptionT(F.map(run)(_.filter(f)))
 
   def flatMap[B](f: (=> A) => LazyOptionT[F, B])(implicit M: Monad[F]): LazyOptionT[F, B] =
-    lazyOptionT(M.bind(runT)(_.fold(a => f(a).runT, M.point(lazyNone[B]))))
+    lazyOptionT(M.bind(run)(_.fold(a => f(a).run, M.point(lazyNone[B]))))
 
   def mapLazyOption[B](f: LazyOption[A] => LazyOption[B])(implicit F: Functor[F]): LazyOptionT[F, B] =
-    lazyOptionT(F.map(runT)(f))
+    lazyOptionT(F.map(run)(f))
 
 }
 
@@ -138,7 +98,7 @@ trait LazyOptionTInstances extends LazyOptionTInstances0 {
 
 trait LazyOptionTs {
   def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] = new LazyOptionT[F, A] {
-    val runT = r
+    val run = r
   }
 
   import LazyOption._
@@ -171,7 +131,7 @@ private[scalaz] trait LazyOptionTApply[F[_]] extends Apply[({type λ[α] = LazyO
   implicit def F: Apply[F]
 
   def ap[A, B](fa: => LazyOptionT[F, A])(f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
-    LazyOptionT(F.map2(f.runT, fa.runT)({ case (ff, aa) => LazyOption.lazyOptionInstance.ap(aa)(ff) }))
+    LazyOptionT(F.map2(f.run, fa.run)({ case (ff, aa) => LazyOption.lazyOptionInstance.ap(aa)(ff) }))
 }
 
 private[scalaz] trait LazyOptionTMonad[F[_]] extends Monad[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTPointed[F] {
@@ -185,6 +145,6 @@ private[scalaz] trait LazyOptionTMonadTrans extends MonadTrans[LazyOptionT] {
     LazyOptionT[G, A](G.map[A, LazyOption[A]](a)((a: A) => LazyOption.lazySome(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = LazyOptionT[M, x]})#f ~> ({type f[x] = LazyOptionT[N, x]})#f) {
-    def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.runT))
+    def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
   }
 }
