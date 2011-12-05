@@ -96,7 +96,7 @@ object LazyOption extends LazyOptionFunctions with LazyOptionInstances
 trait LazyOptionInstances {
   import LazyOption._
 
-  implicit object lazyOptionInstance extends Traverse[LazyOption] with MonadPlus[LazyOption] {
+  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] = new Traverse[LazyOption] with MonadPlus[LazyOption] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyOption[A])(f: (A) => G[B]): G[LazyOption[B]] =  fa traverse (a => f(a))
     def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f

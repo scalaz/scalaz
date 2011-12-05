@@ -4,9 +4,10 @@ package std
 import annotation.tailrec
 
 trait StreamInstances {
-  implicit object streamInstance extends Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]) = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
+
       foldRight(fa, seed) {
         (x, ys) => G.map2(f(x), ys)((b, bs) => b #:: bs)
       }
@@ -49,7 +50,7 @@ trait StreamInstances {
    * streamZipApplicative.map2(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
    * }}}
    */
-  implicit object streamZipApplicative extends Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
+  implicit val streamZipApplicative: Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] = new Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
     def point[A](a: => A) = Zip(Stream.continually(a))
     def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
       Zip(if (f.isEmpty || fa.isEmpty) Stream.empty[B]

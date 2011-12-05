@@ -36,7 +36,7 @@ object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
   ////
-  implicit object orderInstance extends Contravariant[Order] {
+  implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
   }
 
