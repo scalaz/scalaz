@@ -174,7 +174,7 @@ trait FreeInstances {
 
 trait FreeFunctions {
   /** Collapse a trampoline to a single step. */
-  def reset[A](r: Trampoline[A]): Trampoline[A] = return_(r.run)
+  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
 
   /** Suspend the given computation in a single step. */
   def return_[S[+_], A](value: => A)(implicit S: Pointed[S]): Free[S, A] =
