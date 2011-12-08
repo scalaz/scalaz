@@ -82,7 +82,10 @@ private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = State
 private[scalaz] trait StateTPointed[S, F[_]] extends Pointed[({type f[a] = StateT[F, S, a]})#f] with StateTFunctor[S, F] {
   implicit def F: Pointed[F]
 
-  def point[A](a: => A): StateT[F, S, A] = StateT(s => F.point(a, s))
+  def point[A](a: => A): StateT[F, S, A] = {
+    lazy val aa = a
+    StateT(s => F.point(aa, s))
+  }
 }
 
 private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] with StateTPointed[S, F] {
