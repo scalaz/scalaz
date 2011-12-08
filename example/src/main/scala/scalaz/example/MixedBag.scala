@@ -80,7 +80,7 @@ object MixedBag extends App {
     import WriterT._
     import Free._
 
-    type Pair[A] = (A, A)
+    type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]
 
     def leaf[A](a: A): Tree[A] = Return(a)
