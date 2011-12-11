@@ -26,7 +26,7 @@ object WordCount {
     def atWordEnd(c: Char) = State[Boolean, Int] {
       (inWord) =>
         val s = c != ' '
-        (test(!(inWord && s)), s)
+        (test(!inWord && s), s)
     }
     // To count, we traverse with a function returning 0 or 1, and sum the results
     // with Monoid[Int], packaged in a constant monoidal applicative functor.
