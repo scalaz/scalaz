@@ -17,6 +17,9 @@ trait Group[F] extends Monoid[F] { self =>
   def inverse(f: F): F
 
   // derived functions
+
+  def minus(f1: F, f2: => F): F = append(f1, inverse(f2))
+
   trait GroupLaw extends MonoidLaw {
     def inverseExists(a: F)(implicit F: Equal[F]) = F.equal(zero, append(a, inverse(a))) && F.equal(zero, append(inverse(a), a))
   }

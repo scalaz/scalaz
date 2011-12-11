@@ -5,7 +5,7 @@ package syntax
 trait GroupV[F] extends SyntaxV[F] {
   implicit def F: Group[F]
   ////
-  final def |-|(other: => F): F = F.append(self, F.inverse(other) )
+  final def |-|(other: => F): F = F.minus(self, other)
   final def inverse: F = F.inverse(self)
   final def unary_-  = inverse
   ////
