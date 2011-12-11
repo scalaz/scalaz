@@ -20,6 +20,23 @@ trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
   /** Combine `self` and `fb` according to `Apply[F]` with a function that constructs a `Tuple2[A, B]` */
   final def <|*|>[B](fb: F[B]): F[(A, B)] = <**>(fb)((_, _))
 
+  /**
+   * DSL for constructing Applicative expressions.
+   *
+   * `(f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)` is an alternative to `Apply[F].mapN(f1, f2, ..., fn)((v1, v2, ... vn) => ...)`
+   *
+   * `(f1 |@| f2 |@| ... |@| fn).tupled` is an alternative to `Apply[F].mapN(f1, f2, ..., fn)(TupleN.apply _)`
+   *
+   * Warning: each call to `|@|` leads to an allocation of wrapper object. For performance sensitive code, consider using
+   *          [[scalaz.Apply]]`#mapN` directly.
+   */
+  final def |@|[B](fb: F[B]) = new ApplicativeBuilder[F, A, B] {
+    val a: F[A] = self
+    val b: F[B] = fb
+  }
+  /** Alias for `|@|` */
+  final def ⊛[B](fb: F[B]) = |@|(fb)
+
   ////
 }
 
