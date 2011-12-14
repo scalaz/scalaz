@@ -1,0 +1,119 @@
+package scalaz.example
+
+import scalaz._
+import Scalaz._
+import typelevel._
+import Typelevel._
+
+object TypelevelUsage {
+
+	object HLists {
+
+		val hlist1 = 3 :: HNil
+		val hlist2 = "foo" :: hlist1
+		
+		val _hlist1: HCons[Int, HNil] = hlist1
+		val _hlist2: HCons[String, HCons[Int, HNil]] = hlist2
+
+	}
+
+	object KLists {
+
+		val klist1 = None :^: Option(3) :^: Some("foo") :^: GenericNil[Some]
+		val klist2 = klist1.append(klist1)
+		
+		val klist3 = klist1.fold[Option, GenericList[Option], HFold.Append[Option, klist1.type]](new HFold.Append[Option, klist1.type](klist1))
+
+		val _klist1: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]] = klist1
+		val _klist2: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]]]]] = klist2
+		val _klist3: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]]]]] = klist3
+
+	}
+
+	object Kleislists {
+
+		val f1: Int => Option[String] = { n => Some(n.toString) }
+		val f2: String => Option[Float] = { s => s.parseFloat.toOption }
+
+		val kleislist1 = f1 :: f2 :: HNil
+		val fReverseCompose = kleislist1.reverseCompose
+
+		val kleislist2 = f2 :: f1 :: HNil
+		val fCompose = kleislist2.compose
+
+		val _frc: Kleisli[Option, Int, Float] = fReverseCompose
+		val _fc: Kleisli[Option, Int, Float] = fCompose
+
+
+		val f3: Int => String = { _.toString }
+		val f4: String => Float = { _.toFloat }
+
+		val kleislist3 = f3 :: f4 :: HNil
+		val fIdReverseCompose = kleislist3.reverseCompose
+
+		val _fidr: Kleisli[Id, Int, Float] = fIdReverseCompose
+
+	}
+
+	object Folding {
+
+		import KLists._
+
+		object SomeCount extends HFold[Option, Int] {
+			type Init = Int
+			def init = 0
+
+			type Apply[E, A <: Int] = Int
+			def apply[E, A <: Int](elem: Option[E], acc: A) = 
+				if (elem.isDefined) acc + 1
+				else acc
+		}
+
+		val count1 = klist1.fold[Option, Int, SomeCount.type](SomeCount)
+		assert(count1 === 2)
+
+		val count2 = klist1.fold[Option, Int, HFold.Count[Option]](new HFold.Count[Option])
+		assert(count2 === 3)
+
+	}
+
+	object ALists {
+
+		import KLists._
+
+		val aplist = klist1.coerce[Option]
+		val func: (Nothing, Int, String) => Double = { (x, y, z) => 2.0 }
+
+		val afunc = Option(func.curried)
+
+		assert(klist1(afunc) === None)
+		assert(aplist(afunc) === None)
+
+	}
+
+	object Downed {
+
+		import ALists._
+
+		val downed = aplist.down
+
+		val _downed: HCons[Option[Nothing], HCons[Option[Int], HCons[Option[String], HNil]]] = downed
+
+		assert(downed == aplist)
+
+	}
+
+	object Reversed {
+
+		import KLists._
+
+		val rev = klist1.fold[Option, GenericList[Option], HFold.Reverse[Option]](new HFold.Reverse[Option])
+
+		val _rev: GenericCons[Option, String, GenericCons[Option, Int, GenericCons[Option, Nothing, GenericNil[Option]]]] = rev
+
+	}
+
+}
+
+// vim: expandtab:ts=2:sw=2
+
