@@ -359,6 +359,9 @@ trait BooleanFunctions {
    */
   final def option[A](cond: Boolean, a: => A): Option[A] = if (cond) Some(a) else None
 
+  /** Returns `1` if `p` is true, or `0` otherwise. */
+  def test(p: Boolean): Int = if (p) 1 else 0
+
   /**
    * Returns the given argument if `cond` is `true`, otherwise, the zero element for the type of the given
    * argument.
@@ -396,6 +399,36 @@ trait BooleanFunctions {
     }
 }
 
+trait IntFunctions {
+  def heaviside(i: Int) = if (i < 0) 0 else i
+}
+
+trait ShortFunctions {
+  def heaviside(i: Short) = if (i < 0) 0 else i
+}
+
+trait LongFunctions {
+  def heaviside(i: Long) = if (i < 0) 0 else i
+}
+
+trait DoubleFunctions {
+  def heaviside(i: Double) = if (i < 0) 0 else i
+}
+
+trait FloatFunctions {
+  def heaviside(i: Float) = if (i < 0) 0 else i
+}
+
 object anyVal extends AnyValInstances
 
 object boolean extends BooleanFunctions
+
+object short extends ShortFunctions
+
+object int extends IntFunctions
+
+object long extends LongFunctions
+
+object double extends DoubleFunctions
+
+object float extends FloatFunctions

@@ -1,6 +1,7 @@
 package scalaz
 
-import scalaz.Tags.Conjunction
+import scalaz.Tags.{Conjunction}
+
 
 /**
  * A `Reducer[C,M]` is a [[scalaz.Monoid]]`[M]` that maps
@@ -94,10 +95,9 @@ trait ReducerInstances {
 
   implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
 
-  // TODO
-  //  implicit def EndoReducer[A]: Reducer[(=> A) => A, Endo[A]] = unitReducer(_.*-->[Endo[A]])
-  //
-  //  implicit def DualReducer[A: Monoid]: Reducer[A, Dual[A]] = unitReducer(_.*-->[Dual[A]])
+  implicit def EndoReducer[A]: Reducer[A => A, Endo[A]] = unitReducer(Endo(_))
+
+  implicit def DualReducer[A: Monoid]: Reducer[A, A @@ Tags.Dual] = unitReducer(Tags.Dual(_: A))(Dual.dualMonoid[A])
 
   import Tags.{Multiplication, First, Last}
 
@@ -116,11 +116,6 @@ trait ReducerInstances {
     import std.math.bigInt._
     unitReducer(b => Tag[BigInt, Multiplication](b))
   }
-
-  // TODO
-  //  import java.math.BigInteger
-  //
-  //  implicit def BigIntegerProductReducer: Reducer[BigInteger, BigIntegerMultiplication] = unitReducer(_.*-->[BigIntegerMultiplication])
 
   import std.option._
 

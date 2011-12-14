@@ -49,7 +49,7 @@ object Tags {
 
   def Disjunction[A](a: A): A @@ Disjunction = Tag[A, Disjunction](a)
 
-  /** Type tag to choose a [[scalaz.Monoid]] instance that performs conjunction (`||`) */
+  /** Type tag to choose a [[scalaz.Monoid]] instance that performs conjunction (`&&`) */
   sealed trait Conjunction
 
   def Conjunction[A](a: A): A @@ Conjunction = Tag[A, Conjunction](a)

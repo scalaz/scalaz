@@ -89,8 +89,6 @@ package object scalaz {
   object Id extends IdInstances {
   }
 
-  trait Pointed1[M[X]]
-
   // TODO Review!
   type Identity[X] = Need[X]
 

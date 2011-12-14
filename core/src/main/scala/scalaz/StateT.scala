@@ -5,7 +5,7 @@ package scalaz
  *
  * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
  */
-trait StateT[F[_], S, A] {
+trait StateT[F[_], S, A] { self =>
   /** Run and return the final value and state in the context of `F` */
   def apply(initial: S): F[(A, S)]
 
@@ -24,6 +24,17 @@ trait StateT[F[_], S, A] {
   def flatMap[B](f: A => StateT[F, S, B])(implicit F: Bind[F]): StateT[F, S, B] = StateT(s => F.bind(apply(s)) {
     case (a, s1) => f(a)(s1)
   })
+
+  def lift[M[_]: Pointed]: StateT[({type λ[α]=M[F[α]]})#λ, S, A] = new StateT[({type λ[α]=M[F[α]]})#λ, S, A] {
+    def apply(initial: S): M[F[(A, S)]] = Pointed[M].point(self(initial))
+  }
+
+  import Liskov._
+  def unlift[M[_], FF[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[FF[α]]})#λ, S, A]): StateT[FF, S, A] = new StateT[FF, S, A] {
+    def apply(initial: S): FF[(A, S)] = CoPointed[M].copoint(ev(self)(initial))
+  }
+
+  def unliftId[M[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[α]})#λ, S, A]): State[S, A] = unlift[M, Id]
 }
 
 object StateT extends StateTFunctions with StateTInstances {
@@ -82,7 +93,10 @@ private[scalaz] trait StateTFunctor[S, F[_]] extends Functor[({type f[a] = State
 private[scalaz] trait StateTPointed[S, F[_]] extends Pointed[({type f[a] = StateT[F, S, a]})#f] with StateTFunctor[S, F] {
   implicit def F: Pointed[F]
 
-  def point[A](a: => A): StateT[F, S, A] = StateT(s => F.point(a, s))
+  def point[A](a: => A): StateT[F, S, A] = {
+    lazy val aa = a
+    StateT(s => F.point(aa, s))
+  }
 }
 
 private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] with StateTPointed[S, F] {
@@ -105,6 +119,7 @@ private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] =
     StateT(s => G.map(ga)(a => (a, s)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
-    def apply[A](action: StateT[M, S, A]) = StateT[N, S, A](s => f(action(s)))
+    def apply[A](action: StateT[M, S, A]) =
+      StateT[N, S, A](s => f(action(s)))
   }
 }
