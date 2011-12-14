@@ -31,6 +31,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (F[B], S) =
     traverseS(fa)(f)(s)
 
+  /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
+  def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
+    import Free._
+    implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
+    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline]
+  }
+
   // derived functions
   def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] = 
     traversal[G].run[G[A], A](fga)(ga => ga)

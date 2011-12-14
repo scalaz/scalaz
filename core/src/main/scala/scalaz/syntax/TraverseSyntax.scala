@@ -35,6 +35,13 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def traverseS[S, B](f: A => State[S, B]): State[S, F[B]] =
     F.traverseS[S, A, B](self)(f)
 
+  /**
+   * A version of `traverse` specialized for `State[S, G[B]]` that internally uses a `Trampoline`
+   * to avoid stack-overflow.
+   */
+  final def traverseSTrampoline[G[_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
+    F.traverseSTrampoline[S, G, A, B](self)(f)
+
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =
     F.runTraverseS(self, s)(f)
 

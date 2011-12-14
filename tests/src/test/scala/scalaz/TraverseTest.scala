@@ -57,21 +57,10 @@ class TraverseTest extends Spec {
   "combos" should {
     "traverse large stream over trampolined StateT including IO" in {
       // Example usage from Eric Torreborre
-      import scalaz._
       import scalaz.effect._
-      import Free.Trampoline
-      import scalaz.syntax.applicative._
-
-      implicit def StateTMApplicative[M1[_] : Monad, S, M2[_] : Applicative] =
-        StateT.stateTMonadState[S, M1].compose(Applicative[M2])
-
-      def traverseStateTrampoline[S, M[_]: Applicative, A, B](as: Stream[A])(f: A => State[S, M[B]]): State[S, M[Stream[B]]] = {
-        type StateTrampM[a] = StateT[Trampoline, S, M[a]]
-        as.traverse[StateTrampM, B](f(_: A).lift[Trampoline]).unliftId[Trampoline]
-      }
 
       val as = Stream.range(0, 100000)
-      val state: State[Int, IO[Stream[Int]]] = traverseStateTrampoline(as)(a => State((s: Int) => (IO(a - s), a)))
+      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => State((s: Int) => (IO(a - s), a)))
       state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
     }
   }
