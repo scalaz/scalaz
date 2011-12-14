@@ -29,7 +29,7 @@ object ContTUsage {
   def test2 {
     def foo[R](a:Int):ContT[Id,R,Int] = constT(a + 7)
     def bar[R](alt:Int => Id[R])(a:Int):ContT[Id,R,Int] = callCCT[Id,R,Int,Int](k => if (a > 20) exitCCT(alt(a)) else k(a * 7))
-    def baz[R](a:Int,alt:Int => Id[R]):ContT[Id,R,Int] = foo[R](a) >>= (x => bar[R](alt)(x))
+    def baz[R](a:Int,alt:Int => Id[R]):ContT[Id,R,Int] = foo[R](a) flatMap (x => bar[R](alt)(x))
 
     assert(runContT[Id,String,Int](baz(10,((x:Int) => "%d>20 -> too big".format(x))))(_.toString) == "119")
     assert(runContT[Id,String,Int](baz(20,((x:Int) => "%d>20 -> too big".format(x))))(_.toString) == "27>20 -> too big")
