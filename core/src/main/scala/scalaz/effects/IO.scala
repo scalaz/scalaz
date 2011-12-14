@@ -2,7 +2,7 @@ package scalaz
 package effects
 
 import Scalaz._
-import Coroutine._
+import Free._
 
 sealed trait IO[A] {
   private[effects] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
@@ -41,7 +41,7 @@ sealed trait IO[A] {
 
   /** Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] = 
-    IO(rw => try { this(rw) } catch { case e => handler(e)(rw) })
+    IO(rw => try { Return(this(rw).run) } catch { case e => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
@@ -115,7 +115,7 @@ object IO {
   }
 
   implicit val ioPure: Pure[IO] = new Pure[IO] {
-    def pure[A](a: => A) = IO(rw => Coroutine.suspend((rw, a)))
+    def pure[A](a: => A) = IO(rw => return_((rw, a)))
   }
   implicit val ioBind: Bind[IO] = new Bind[IO] {
     def bind[A, B](io: IO[A], f: A => IO[B]): IO[B] = io flatMap f
