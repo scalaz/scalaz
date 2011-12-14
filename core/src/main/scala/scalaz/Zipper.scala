@@ -23,6 +23,8 @@ sealed trait Zipper[+A] {
   def toStream: Stream[A] =
     lefts.reverse ++ focus #:: rights
 
+  def copy[AA >: A](lefts: Stream[AA] = lefts, focus: AA = focus, rights: Stream[AA] = rights): Zipper[AA] = zipper[AA](lefts, focus, rights)
+
   /**
    * Possibly moves to next element to the right of focus.
    */
