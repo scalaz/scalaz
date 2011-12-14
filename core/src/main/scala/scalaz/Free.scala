@@ -135,9 +135,13 @@ sealed trait Free[S[+_], +A] {
 object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
-  implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
-    override def point[A](a: => A) = return_(a)
+  implicit val trampolineMonad: Monad[Trampoline] with CoPointed[Trampoline] = new Monad[Trampoline] with CoPointed[Trampoline] {
+    override def point[A](a: => A) = return_[Function0, A](a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
+    def copoint[A](p: Free.Trampoline[A]): A = {
+      import std.function.function0Instance
+      p.run
+    }
   }
 }
 
@@ -163,7 +167,9 @@ trait SourceInstances {
     }
 }
 
-trait FreeInstances {
+// Trampoline, Sink, and Source are type aliases. We need to add their type class instances
+// to Free to be part of the implicit scope.
+trait FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[+_]]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)
