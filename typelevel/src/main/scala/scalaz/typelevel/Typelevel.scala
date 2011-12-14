@@ -4,8 +4,9 @@ package typelevel
 object Typelevel extends Typelevels
 
 trait Typelevels
-  extends GenericLists
-  with HFolds
+  extends HLists
+  with Numerals
+  with NFolds
 
 // vim: expandtab:ts=2:sw=2
 

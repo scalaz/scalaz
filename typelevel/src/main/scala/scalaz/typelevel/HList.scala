@@ -1,9 +1,7 @@
 package scalaz
 package typelevel
 
-trait HListsLow {
-
-  import GenericLists._
+trait HListsLow { self: HLists =>
 
   // Kleisli proofs for `M` == `Id`
 
@@ -19,8 +17,6 @@ trait HListsLow {
 }
 
 trait HLists extends HListsLow {
-
-  import GenericLists._
 
   final class IdOps[T <: HList](list: T) {
 
@@ -41,6 +37,38 @@ trait HLists extends HListsLow {
   type HNil = GenericNil[Id]
 
   def HNil: HNil = GenericNil[Id]
+
+
+  // Kleisli proofs
+
+  import Kleisli._
+
+  sealed trait Direction
+  final class Forward extends Direction
+  final class Reverse extends Direction
+
+  sealed trait KleisliProof[D <: Direction, M[_], H, R, T <: HList] {
+    def apply(list: T)(implicit b: Bind[M]): Kleisli[M, H, R]
+  }
+
+  implicit def baseKleisliProof[D <: Direction, M[_], H, R]: KleisliProof[D, M, H, R, HCons[H => M[R], HNil]] = 
+    new KleisliProof[D, M, H, R, HCons[H => M[R], HNil]] {
+      def apply(list: HCons[H => M[R], HNil])(implicit b: Bind[M]) = kleisli(list.head)
+    }
+
+  implicit def consKleisliRevProof[M[_], OH, IH, R, T <: HList](
+    implicit proof: KleisliProof[Reverse, M, IH, R, T]
+  ): KleisliProof[Reverse, M, OH, R, HCons[OH => M[IH], T]] = 
+    new KleisliProof[Reverse, M, OH, R, HCons[OH => M[IH], T]] {
+      def apply(list: HCons[OH => M[IH], T])(implicit b: Bind[M]) = kleisli(list.head) >=> proof(list.tail)
+    }
+
+  implicit def consKleisliProof[M[_], H, OR, IR, T <: HList](
+    implicit proof: KleisliProof[Forward, M, H, IR, T]
+  ): KleisliProof[Forward, M, H, OR, HCons[IR => M[OR], T]] = 
+    new KleisliProof[Forward, M, H, OR, HCons[IR => M[OR], T]] {
+      def apply(list: HCons[IR => M[OR], T])(implicit b: Bind[M]) = kleisli(list.head) <=< proof(list.tail)
+    }
 
 }
 

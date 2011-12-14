@@ -11,7 +11,7 @@ trait HFold[M[_], U] {
 
 }
 
-trait HFolds {
+object HFold {
 
   final class Count[M[_]] extends HFold[M, Int] {
 
@@ -48,8 +48,6 @@ trait HFolds {
   }
 
 }
-
-object HFold extends HFolds
 
 // vim: expandtab:ts=2:sw=2
 
