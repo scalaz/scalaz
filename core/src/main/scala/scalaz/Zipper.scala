@@ -148,7 +148,7 @@ sealed trait Zipper[+A] {
   }
 
   /**
-   * Moves focus to the start of the zipper.
+   * Moves focus to the end of the zipper.
    */
   def end: Zipper[A] = {
     val lefts = this.lefts ++ focus #:: this.rights
