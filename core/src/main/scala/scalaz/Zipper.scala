@@ -33,6 +33,11 @@ sealed trait Zipper[+A] {
   }
 
   /**
+   * Apply f to the focus and update with the result.
+   */
+  def modify[AA >: A](f: A => AA) = this.update(f(this.focus))
+
+  /**
    * Possibly moves to next element to the right of focus.
    */
   def next: Option[Zipper[A]] = rights match {
