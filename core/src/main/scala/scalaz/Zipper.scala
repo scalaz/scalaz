@@ -26,6 +26,13 @@ sealed trait Zipper[+A] {
   def copy[AA >: A](lefts: Stream[AA] = lefts, focus: AA = focus, rights: Stream[AA] = rights): Zipper[AA] = zipper[AA](lefts, focus, rights)
 
   /**
+   * Update the focus in this zipper.
+   */
+  def update[AA >: A](focus: AA) = {
+    this.copy(this.lefts, focus, this.rights)
+  }
+
+  /**
    * Possibly moves to next element to the right of focus.
    */
   def next: Option[Zipper[A]] = rights match {
