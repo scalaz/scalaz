@@ -1,9 +1,12 @@
 package scalaz
 package typelevel
 
+import annotation.implicitNotFound
 import scalaz.{Apply, Kleisli}
 
 sealed trait GenericList[+M[_]] {
+
+  import Typelevel._
 
   type Transformed[N[_]] <: GenericList[N]
   type Folded[N[X] >: M[X], U, F <: HFold[N, U]] <: U
@@ -26,6 +29,8 @@ sealed trait GenericList[+M[_]] {
  
   final def :^:[A, N[X] >: M[X]](elem: N[A]): GenericCons[N, A, this.type] =
     GenericCons[N, A, this.type](elem, this)
+
+  final def at[N[X] >: M[X], I <: Nat, E](index: I)(implicit ev: IndexProof[N, E, I, this.type]): N[E] = ev(this)
 
 }
 
@@ -61,6 +66,33 @@ case class GenericNil[M[_]]() extends GenericList[M] {
   def append[N[X] >: M[X], L <: GenericList[N]](list: L) = list
   def apply[N[X] >: M[X] : Apply, R](f: N[Function[R]]): N[R] = f
   def down: Down = GenericNil[Id]()
+
+}
+
+trait GenericLists {
+
+  // Index access proofs
+
+  import Typelevel._
+
+  @implicitNotFound(msg = "Could not access element at index ${N} in ${T}")
+  sealed trait IndexProof[M[_], E, N <: Nat, -T <: GenericList[M]] {
+    def apply(list: T): M[E]
+  }
+
+  implicit def zeroIndexProof[M[_], H, T <: GenericList[M]]: IndexProof[M, H, _0, GenericCons[M, H, T]] = 
+    new IndexProof[M, H, _0, GenericCons[M, H, T]] {
+      def apply(list: GenericCons[M, H, T]) = list.head
+    }
+
+  implicit def succIndexProof[M[_], H, E, N <: Nat, T <: GenericList[M]](
+    implicit ev: IndexProof[M, E, N, T]
+  ): IndexProof[M, E, Succ[N], GenericCons[M, H, T]] = 
+    new IndexProof[M, E, Succ[N], GenericCons[M, H, T]] {
+      def apply(list: GenericCons[M, H, T]) = ev(list.tail)
+    }
+
+
 
 }
 

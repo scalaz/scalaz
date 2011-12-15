@@ -72,7 +72,5 @@ trait HLists extends HListsLow {
 
 }
 
-object HList extends HLists
-
 // vim: expandtab:ts=2:sw=2
 

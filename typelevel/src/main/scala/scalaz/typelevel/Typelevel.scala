@@ -5,8 +5,8 @@ object Typelevel extends Typelevels
 
 trait Typelevels
   extends HLists
+  with GenericLists
   with Numerals
-  with NFolds
 
 // vim: expandtab:ts=2:sw=2
 
