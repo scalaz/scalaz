@@ -140,6 +140,22 @@ sealed trait Zipper[+A] {
   }
 
   /**
+   * Moves focus to the start of the zipper.
+   */
+  def start: Zipper[A] = {
+    val rights = this.lefts ++ focus #:: this.rights
+    this.copy(Stream.Empty, rights.head, rights.tail)
+  }
+
+  /**
+   * Moves focus to the start of the zipper.
+   */
+  def end: Zipper[A] = {
+    val lefts = this.lefts ++ focus #:: this.rights
+    this.copy(lefts.init, lefts.last, Stream.empty)
+  }
+
+  /**
    * Moves focus to the nearest element matching the given predicate, preferring the left,
    * or None if no element matches.
    */
