@@ -113,6 +113,42 @@ object TypelevelUsage {
 
   }
 
+  object Naturals {
+
+    assert(_3.value === 3)
+
+    val hlist = "foo" :: 3 :: 'a :: HNil
+
+    val e0 = hlist.at(_0)
+    val e1 = hlist.at(_1)
+    val e2 = hlist.at(_2)
+
+    val _e0: String = e0
+    val _e1: Int = e1
+    val _e2: Symbol = e2
+
+    assert(_e0 == "foo")
+    assert(_e1 == 3)
+    assert(_e2 == 'a)
+
+    import KLists._
+
+    // Compiling the following snippets takes excessively long, so try to
+    // avoid access by index.
+
+    val f0 = klist2.at(_4)
+    // val f1 = klist3.at(_4)
+
+    val _f0: Option[Int] = f0
+    // val _f1: Option[Int] = f1
+
+    assert(_f0 == Some(3))
+    // assert(_f1 == Some(3))
+
+  }
+
+
+
 }
 
 // vim: expandtab:ts=2:sw=2
