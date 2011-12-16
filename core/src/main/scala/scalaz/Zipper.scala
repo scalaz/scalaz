@@ -14,7 +14,7 @@ sealed trait Zipper[A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
-  def copy(lefts: Stream[A] = this.lefts, focus: A = this.focus, rights: Stream[A] = this.rights): Zipper[A] =
+  def copy[AA >: A](lefts: Stream[AA] = this.lefts, focus: AA = this.focus, rights: Stream[AA] = this.rights): Zipper[AA] =
     Zipper(lefts, focus, rights)
 
   private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
