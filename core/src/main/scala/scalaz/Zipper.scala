@@ -40,6 +40,18 @@ sealed trait Zipper[A] {
     lefts.reverse ++ focus #:: rights
 
   /**
+   * Update the focus in this zipper.
+   */
+  def update[AA >: A](focus: AA) = {
+    this.copy(this.lefts, focus, this.rights)
+  }
+
+  /**
+   * Apply f to the focus and update with the result.
+   */
+  def modify[AA >: A](f: A => AA) = this.update(f(this.focus))
+
+  /**
    * Possibly moves to next element to the right of focus.
    */
   def next: Option[Zipper[A]] = rights match {
@@ -177,6 +189,22 @@ sealed trait Zipper[A] {
         else move0(z flatMap ((_: Zipper[A]).previous), n + 1)
       }
     move0(Some(this), n)
+  }
+
+  /**
+   * Moves focus to the start of the zipper.
+   */
+  def start: Zipper[A] = {
+    val rights = this.lefts ++ focus #:: this.rights
+    this.copy(Stream.Empty, rights.head, rights.tail)
+  }
+
+  /**
+   * Moves focus to the end of the zipper.
+   */
+  def end: Zipper[A] = {
+    val lefts = this.lefts ++ focus #:: this.rights
+    this.copy(lefts.init, lefts.last, Stream.empty)
   }
 
   /**
