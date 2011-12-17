@@ -27,7 +27,6 @@ object TypeClass {
   lazy val length = TypeClass("Length", *->*)
   lazy val each = TypeClass("Each", *->*)
   lazy val index = TypeClass("Index", *->*)
-  lazy val empty = TypeClass("Empty", *->*)
   lazy val functor = TypeClass("Functor", *->*)
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
@@ -43,8 +42,10 @@ object TypeClass {
   lazy val coBind = TypeClass("CoBind", *->*)
   lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
 
-  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor, empty))
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plus))
+  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor))
+  lazy val empty = TypeClass("Empty", *->*, extendsList = Seq(plus))
+
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, empty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
