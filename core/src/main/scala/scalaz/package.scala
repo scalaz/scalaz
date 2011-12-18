@@ -117,6 +117,10 @@ package object scalaz {
 
   type Writer[W, A] = WriterT[Id, W, A]
 
+  object Writer {
+    def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+  }
+
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, A] = StateT[Id, S, A]
 

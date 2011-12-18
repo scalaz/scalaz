@@ -14,7 +14,7 @@ sealed trait Zipper[A] {
   val lefts: Stream[A]
   val rights: Stream[A]
 
-  def copy(lefts: Stream[A] = this.lefts, focus: A = this.focus, rights: Stream[A] = this.rights): Zipper[A] =
+  def copy[AA >: A](lefts: Stream[AA] = this.lefts, focus: AA = this.focus, rights: Stream[AA] = this.rights): Zipper[AA] =
     Zipper(lefts, focus, rights)
 
   private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
@@ -38,6 +38,18 @@ sealed trait Zipper[A] {
    */
   def toStream: Stream[A] =
     lefts.reverse ++ focus #:: rights
+
+  /**
+   * Update the focus in this zipper.
+   */
+  def update[AA >: A](focus: AA) = {
+    this.copy(this.lefts, focus, this.rights)
+  }
+
+  /**
+   * Apply f to the focus and update with the result.
+   */
+  def modify[AA >: A](f: A => AA) = this.update(f(this.focus))
 
   /**
    * Possibly moves to next element to the right of focus.
@@ -177,6 +189,22 @@ sealed trait Zipper[A] {
         else move0(z flatMap ((_: Zipper[A]).previous), n + 1)
       }
     move0(Some(this), n)
+  }
+
+  /**
+   * Moves focus to the start of the zipper.
+   */
+  def start: Zipper[A] = {
+    val rights = this.lefts ++ focus #:: this.rights
+    this.copy(Stream.Empty, rights.head, rights.tail)
+  }
+
+  /**
+   * Moves focus to the end of the zipper.
+   */
+  def end: Zipper[A] = {
+    val lefts = this.lefts ++ focus #:: this.rights
+    this.copy(lefts.init, lefts.last, Stream.empty)
   }
 
   /**
@@ -323,10 +351,8 @@ sealed trait Zipper[A] {
     zipper(ls, f.focus(focus), rs)
   }
 
-  /** Unsafe `toString. Uses `Any#toString` for type `A` */
   override def toString: String = {
-    implicit val A = Show.showFromToString[A]
-    Zipper.zipperShow[A].shows(this)
+    "Zipper(<lefts>, " + focus + ", <rights>)"
   }
 }
 
@@ -359,7 +385,8 @@ trait ZipperInstances {
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
     import std.stream.streamEqual
-    def equal(a1: Zipper[A], a2: Zipper[A]) = streamEqual[A].equal(a1.toStream, a2.toStream)
+    def equal(a1: Zipper[A], a2: Zipper[A]) =
+      streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
   }
 
   implicit def zipperShow[A: Show] = new Show[Zipper[A]]{

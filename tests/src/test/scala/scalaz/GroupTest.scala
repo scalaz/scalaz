@@ -1,63 +1,46 @@
 package scalaz
 
-import org.scalacheck.Arbitrary
 import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
+import scalacheck.{ScalazProperties, ScalazArbitrary}
 
 
-class GroupTest extends Specification with ScalaCheck {
+class GroupTest extends Spec {
   addArguments(fullStackTrace)
+
   import Scalaz._
   import ScalazArbitrary._
-  import Tags._
+  import ScalazProperties._
+
   implicit val booleanGroup = std.anyVal.booleanInstance.conjunction
-  import std.java.math.bigInteger._
-  import std.option._
-  import std.either._
 
   "function minus" in {
-    ({ x:Int => x + 1 } |-| { x:Int => x + 2 }).apply(1) must_== -1
+    ({
+      x: Int => x + 1
+    } |-| {
+      x: Int => x + 2
+    }).apply(1) must_== -1
   }
 
-  "group laws" in {
-    type A = Int
-    type B = Int
-    type C = Int
-    type D = Int
-    type E = Int
-    type F = Int
-    type G = Int
-    type H = Int
+  type A = Int
+  type B = Int
+  type C = Int
+  type D = Int
+  type E = Int
+  type F = Int
+  type G = Int
+  type H = Int
 
-    checkGroupLaws[Int]
-    checkGroupLaws[BigInt]
-    checkGroupLaws[BigInteger]
-    checkGroupLaws[Short]
-    checkGroupLaws[Long]
-    checkGroupLaws[(A)]
-    checkGroupLaws[(A, B)]
-    checkGroupLaws[(A, B, C)]
-    checkGroupLaws[(A, B, C, D)]
-    checkGroupLaws[(A, B, C, D, E)]
-    checkGroupLaws[(A, B, C, D, E, F)]
-    checkGroupLaws[(A, B, C, D, E, F, G)]
-    checkGroupLaws[(A, B, C, D, E, F, G, H)]
-
-  }
-
-  def checkGroupLaws[A: Group : Equal : Manifest : Arbitrary] = {
-    val typeName = manifest[A].toString
-    typeName should {
-      import ScalazProperties.semigroup._
-      import ScalazProperties.monoid._
-      import ScalazProperties.group._
-
-      "associative" in check(associative[A])
-      "left identity" in check(leftIdentity[A])
-      "right identity" in check(rightIdentity[A])
-      "inverseExists" in check(inverseExists[A])
-    }
-  }
+  checkAll("Int", group.laws[Int])
+  checkAll("BigInt", group.laws[BigInt])
+  checkAll("BigInteger", group.laws[BigInteger])
+  checkAll("Short", group.laws[Short])
+  checkAll("Long", group.laws[Long])
+  checkAll("(A)", group.laws[(A)])
+  checkAll("(A, B)", group.laws[(A, B)])
+  checkAll("(A, B, C)", group.laws[(A, B, C)])
+  checkAll("(A, B, C, D)", group.laws[(A, B, C, D)])
+  checkAll("(A, B, C, D, E)", group.laws[(A, B, C, D, E)])
+  checkAll("(A, B, C, D, E, F)", group.laws[(A, B, C, D, E, F)])
+  checkAll("(A, B, C, D, E, F, G)", group.laws[(A, B, C, D, E, F, G)])
+  checkAll("(A, B, C, D, E, F, G, H)", group.laws[(A, B, C, D, E, F, G, H)])
 }

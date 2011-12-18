@@ -162,14 +162,6 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
-trait IsomorphismEmpty[F[_], G[_]] extends Empty[F] {
-  implicit def G: Empty[G]
-
-  def iso: F <~> G
-
-  def empty[A]: F[A] = iso.from(G.empty[A])
-}
-
 trait IsomorphismEach[F[_], G[_]] extends Each[F] {
   implicit def G: Each[G]
 
@@ -250,7 +242,7 @@ trait IsomorphismCoMonad[F[_], G[_]] extends CoMonad[F] with IsomorphismCoJoin[F
   implicit def G: CoMonad[G] with Functor[G] with CoPointed[G]
 }
 
-trait IsomorphismPlus[F[_], G[_]] extends Plus[F] with IsomorphismEmpty[F, G] with IsomorphismFunctor[F, G] {
+trait IsomorphismPlus[F[_], G[_]] extends Plus[F] with IsomorphismFunctor[F, G] {
   implicit def G: Plus[G]
 
   def iso: F <~> G
@@ -258,11 +250,17 @@ trait IsomorphismPlus[F[_], G[_]] extends Plus[F] with IsomorphismEmpty[F, G] wi
   def plus[A](a: F[A], b: => F[A]): F[A] = iso.from(G.plus(iso.to(a), iso.to(b)))
 }
 
-trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with IsomorphismPlus[F, G] with IsomorphismApplicative[F, G] {
+trait IsomorphismEmpty[F[_], G[_]] extends Empty[F] with IsomorphismPlus[F, G] {
+  implicit def G: Empty[G]
+
+  def empty[A]: F[A] = iso.from(G.empty[A])
+}
+
+trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with IsomorphismEmpty[F, G] with IsomorphismApplicative[F, G] {
   implicit def G: ApplicativePlus[G]
 }
 
-trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismPlus[F, G] with IsomorphismMonad[F, G] {
+trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismEmpty[F, G] with IsomorphismMonad[F, G] {
   implicit def G: MonadPlus[G]
 }
 

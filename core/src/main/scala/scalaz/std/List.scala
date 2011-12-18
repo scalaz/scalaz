@@ -43,6 +43,16 @@ trait ListInstances {
       }
     }
 
+    override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
+      State((s: S) => {
+        val buf = new collection.mutable.ListBuffer[B]
+        var cur = s
+        l.foreach { a => val bs = f(a)(cur); buf += bs._1; cur = bs._2 } 
+        (buf.toList, cur)
+      })
+    }
+
+
     override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
