@@ -1,143 +1,87 @@
 package scalaz
 
-import concurrent.Promise
-import org.scalacheck.{Arbitrary, Prop}
 import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
-import collection.mutable.ArraySeq
+import scalacheck.{ScalazArbitrary}
+import scalaz.scalacheck.ScalazProperties.equal
 
-class EqualTest extends Specification with ScalaCheck {
+class EqualTest extends Spec {
+
   import Scalaz._
-  import Tags._
-  import std.anyVal._
-  import std.math._
-  import std.list._
   import std.iterable._
-  import std.java.util.concurrent.callable._
-  import bigInt._
-  import std.java.math.bigInteger._
-  import Zipper._
-
-  import ScalaCheckBinding._
+  import Tags._
   import ScalazArbitrary._
 
-  "equal laws" should {
-    type A = String
-    type B = String
-    type C = String
-    type D = String
-    type E = String
-    type F = String
-    type G = String
-    type H = String
-    type K = String
-    type V = String
-    type X = String
+  type A = String
+  type B = String
+  type C = String
+  type D = String
+  type E = String
+  type F = String
+  type G = String
+  type H = String
+  type K = String
+  type V = String
+  type X = String
 
-    // AnyVal
-    checkEqualLaws[Unit]
-    checkEqualLaws[Boolean]
-    checkEqualLaws[Char]
-    checkEqualLaws[Short]
-    checkEqualLaws[Int]
-    checkEqualLaws[Long]
-    checkEqualLaws[Float]
+  // AnyVal
+  checkAll("Unit", equal.laws[Unit]) 
+  checkAll("Boolean", equal.laws[Boolean]) 
+  checkAll("Char", equal.laws[Char]) 
+  checkAll("Short", equal.laws[Short]) 
+  checkAll("Int", equal.laws[Int]) 
+  checkAll("Long", equal.laws[Long]) 
+  checkAll("Float", equal.laws[Float]) 
 
-//    checkEqualLaws[Digit]
-    checkEqualLaws[Ordering]
-    checkEqualLaws[String]
-    checkEqualLaws[Int @@ Multiplication]
-    checkEqualLaws[Boolean @@ Conjunction]
-    checkEqualLaws[Char @@ Multiplication]
-    checkEqualLaws[Byte @@ Multiplication]
-    checkEqualLaws[Long @@ Multiplication]
-    checkEqualLaws[Short @@ Multiplication]
-    checkEqualLaws[BigInteger]
-    checkEqualLaws[BigInteger @@ Multiplication]
-    checkEqualLaws[BigInt]
-    checkEqualLaws[BigInt @@ Multiplication]
-    // todo Arbitrary instance
-    // checkEqualLaws[xml.NodeSeq]
-    checkEqualLaws[NonEmptyList[A]]
+  //    checkAll("Digit", equal.laws[Digit]) 
+  checkAll("Ordering", equal.laws[Ordering]) 
+  checkAll("String", equal.laws[String]) 
+  checkAll("Int @@ Multiplication", equal.laws[Int @@ Multiplication]) 
+  checkAll("Boolean @@ Conjunction", equal.laws[Boolean @@ Conjunction]) 
+  checkAll("Char @@ Multiplication", equal.laws[Char @@ Multiplication]) 
+  checkAll("Byte @@ Multiplication", equal.laws[Byte @@ Multiplication]) 
+  checkAll("Long @@ Multiplication", equal.laws[Long @@ Multiplication]) 
+  checkAll("Short @@ Multiplication", equal.laws[Short @@ Multiplication]) 
+  checkAll("BigInteger", equal.laws[BigInteger]) 
+  checkAll("BigInteger @@ Multiplication", equal.laws[BigInteger @@ Multiplication]) 
+  checkAll("BigInt", equal.laws[BigInt]) 
+  checkAll("BigInt @@ Multiplication", equal.laws[BigInt @@ Multiplication]) 
+  // todo Arbitrary instance
+  // checkAll("xml.NodeSeq", equal.laws[xml.NodeSeq]) 
+  checkAll("NonEmptyList", equal.laws[NonEmptyList[A]])
 
-//    checkEqualLaws[ZipStream[A]]
-    checkEqualLaws[(A)]
-    checkEqualLaws[(A, B)]
-    checkEqualLaws[(A, B, C)]
-    checkEqualLaws[(A, B, C, D)]
-    checkEqualLaws[(A, B, C, D, E)]
-    checkEqualLaws[(A, B, C, D, E, F)]
-    checkEqualLaws[(A, B, C, D, E, F, G)]
-    checkEqualLaws[(A, B, C, D, E, F, G, H)]
-    checkEqualLaws[() => A]
-    checkEqualLaws[Option[A]]
-    checkEqualLaws[Option[A] @@ First]
-    checkEqualLaws[Option[A] @@ Last]
-    checkEqualLaws[Either[A, B]]
-    checkEqualLaws[Either.LeftProjection[A, X]]
-    checkEqualLaws[Either.LeftProjection[A, X] @@ First]
-    checkEqualLaws[Either.LeftProjection[A, X] @@ Last]
-    checkEqualLaws[Either.RightProjection[X, A]]
-    checkEqualLaws[Either.RightProjection[X, A] @@ First]
-    checkEqualLaws[Either.RightProjection[X, A] @@ Last]
-    checkEqualLaws[Validation[E, A]]
-    checkEqualLaws[FailProjection[E, A]]
-    // todo Arbitrary for Tree producing large (infinite?) trees.
-    //    checkEqualLaws[Tree[A]]
-    //    checkEqualLaws[TreeLoc[A]]
+  //    checkAll("ZipStream[A]", equal.laws[ZipStream[A]]) 
+  checkAll("(A)", equal.laws[(A)]) 
+  checkAll("(A, B)", equal.laws[(A, B)]) 
+  checkAll("(A, B, C)", equal.laws[(A, B, C)]) 
+  checkAll("(A, B, C, D)", equal.laws[(A, B, C, D)]) 
+  checkAll("(A, B, C, D, E)", equal.laws[(A, B, C, D, E)]) 
+  checkAll("(A, B, C, D, E, F)", equal.laws[(A, B, C, D, E, F)]) 
+  checkAll("(A, B, C, D, E, F, G)", equal.laws[(A, B, C, D, E, F, G)]) 
+  checkAll("(A, B, C, D, E, F, G, H)", equal.laws[(A, B, C, D, E, F, G, H)]) 
+  checkAll("() => A", equal.laws[() => A]) 
+  checkAll("Option", equal.laws[Option[A]])
+  checkAll("Option @@ First", equal.laws[Option[A] @@ First])
+  checkAll("Option @@ Last", equal.laws[Option[A] @@ Last])
+  checkAll("Either", equal.laws[Either[A, B]])
+  checkAll("Either.LeftProjection", equal.laws[Either.LeftProjection[A, X]])
+  checkAll("Either.LeftProjection @@ First", equal.laws[Either.LeftProjection[A, X] @@ First])
+  checkAll("Either.LeftProjection @@ Last", equal.laws[Either.LeftProjection[A, X] @@ Last])
+  checkAll("Either.RightProjection", equal.laws[Either.RightProjection[X, A]])
+  checkAll("Either.RightProjection @@ First", equal.laws[Either.RightProjection[X, A] @@ First])
+  checkAll("Either.RightProjection @@ Last", equal.laws[Either.RightProjection[X, A] @@ Last])
+  checkAll("Validation", equal.laws[Validation[E, A]])
+  checkAll("FailProjection", equal.laws[FailProjection[E, A]])
+  // todo Arbitrary for Tree producing large (infinite?) trees.
+  //    checkAll("Tree[A]", equal.laws[Tree[A]]) 
+  //    checkAll("TreeLoc[A]", equal.laws[TreeLoc[A]]) 
 
-    // todo add Arbitrary instance
-    //checkEqualLaws[Promise[A]]
-    checkEqualLaws[List[A]]
-    checkEqualLaws[Stream[A]]
-    checkEqualLaws[Iterable[A]]
-//    checkEqualLaws[ArraySeq[A]]
+  // todo add Arbitrary instance
+  //checkAll("Promise[A]", equal.laws[Promise[A]]) 
+  checkAll("List[A]", equal.laws[List[A]]) 
+  checkAll("Stream[A]", equal.laws[Stream[A]]) 
+  checkAll("Iterable[A]", equal.laws[Iterable[A]]) 
+  //    checkAll("ArraySeq[A]", equal.laws[ArraySeq[A]]) 
 
-//    import geo._
-//    import scalaz.scalacheck.ArbitraryGeo._
-//    checkEqualLaws[Azimuth]
-//    checkEqualLaws[Bearing]
-//    checkEqualLaws[Coord]
-//    checkEqualLaws[ElevatedCurve]
-//    checkEqualLaws[Elevation]
-//    checkEqualLaws[Ellipsoid]
-//    checkEqualLaws[GeodeticCurve]
-//    checkEqualLaws[Latitude]
-//    checkEqualLaws[Longitude]
-//    checkEqualLaws[Position]
-//    checkEqualLaws[Vector]
-
-    // todo add Arbitrary instances
-    // java collections
-    //checkEqualLaws[java.lang.Iterable[A]]
-    //checkEqualLaws[java.util.Map.Entry[K, V]]
-    //checkEqualLaws[java.util.Map[K, V]]
-    checkEqualLaws[java.util.concurrent.Callable[A]]
-    checkEqualLaws[Zipper[A]]
-
-    success
-  }
-
-//  "collection equality" in {
-//    def equalityConsistent[C](c1: C, c2: C)(implicit eq: Equal[C]): Boolean = (c1 == c2) must be_==(c1 === c2)
-//    equalityConsistent(Set(1, 2, 3), Set(3, 2, 1))
-//    equalityConsistent(Map(1 -> 2, 2 -> 3, 3 -> 4), Map(3 -> 4, 1 -> 2, 2 -> 3))
-//
-//    class A(val a: Int)
-//    implicit val aEq: Equal[A] = equalBy(_.a)
-//    (Set(new A(1), new A(1), new A(2)) === Set(new A(2), new A(1))) must beTrue
-//  }
-
-  def checkEqualLaws[A: Equal : Manifest : Arbitrary]: Unit = {
-    val typeName = manifest[A].toString
-    typeName should {
-      import ScalazProperties.equal._
-
-      "commutativity" in check(commutativity[A])
-      "reflexive" in check(reflexive[A])
-      "transitive" in check(transitive[A])
-    }
-  }
+  //checkAll("java.util.concurrent.Callable[A]", equal.laws[java.util.concurrent.Callable[A]])
+  checkAll("Zipper[A]", equal.laws[Zipper[A]]) 
 }

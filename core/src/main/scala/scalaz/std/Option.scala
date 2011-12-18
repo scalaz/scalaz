@@ -66,9 +66,11 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstOrder[A: Order]: Order[Option[A] @@ First] = Tag.subst(Order[Option[A]])
 
-  implicit def optionfirstFunctor[A]: Functor[({type f[x] = Option[x] @@ First})#f] = new Functor[({type f[x] = Option[x] @@ First})#f] {
-      def map[A, B](fa: Option[A] @@ First)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
-    }
+  implicit def optionFirstMonad[A]: Monad[({type f[x] = Option[x] @@ First})#f] = new Monad[({type f[x] = Option[x] @@ First})#f] {
+    def point[A](a: => A): (Option[A] @@ Tags.First) = Tag(Some(a))
+    override def map[A, B](fa: Option[A] @@ First)(f: (A) => B) = Tag(fa map f)
+    def bind[A, B](fa: (Option[A] @@ Tags.First))(f: (A) => (Option[B] @@ Tags.First)): (Option[B] @@ Tags.First) = Tag(fa flatMap f)
+  }
 
 
   implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
@@ -81,8 +83,10 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastOrder[A: Order]: Order[Option[A] @@ Last] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastFunctor[A]: Functor[({type f[x] = Option[x] @@ Last})#f] = new Functor[({type f[x] = Option[x] @@ Last})#f] {
-    def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(Functor[Option].map(fa)(f))
+  implicit def optionLastMonad[A]: Monad[({type f[x] = Option[x] @@ Last})#f] = new Monad[({type f[x] = Option[x] @@ Last})#f] {
+    def point[A](a: => A): (Option[A] @@ Tags.Last) = Tag(Some(a))
+    override def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(fa map f)
+    def bind[A, B](fa: (Option[A] @@ Tags.Last))(f: (A) => (Option[B] @@ Tags.Last)): (Option[B] @@ Tags.Last) = Tag(fa flatMap f)
   }
 }
 

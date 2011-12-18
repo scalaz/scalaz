@@ -351,10 +351,8 @@ sealed trait Zipper[A] {
     zipper(ls, f.focus(focus), rs)
   }
 
-  /** Unsafe `toString. Uses `Any#toString` for type `A` */
   override def toString: String = {
-    implicit val A = Show.showFromToString[A]
-    Zipper.zipperShow[A].shows(this)
+    "Zipper(<lefts>, " + focus + ", <rights>)"
   }
 }
 
@@ -387,7 +385,8 @@ trait ZipperInstances {
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
     import std.stream.streamEqual
-    def equal(a1: Zipper[A], a2: Zipper[A]) = streamEqual[A].equal(a1.toStream, a2.toStream)
+    def equal(a1: Zipper[A], a2: Zipper[A]) =
+      streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
   }
 
   implicit def zipperShow[A: Show] = new Show[Zipper[A]]{

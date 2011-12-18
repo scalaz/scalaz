@@ -8,6 +8,8 @@ trait AllInstances
   with scalaz.std.math.OrderingInstances
   with scalaz.std.util.parsing.combinator.Parsers
   with scalaz.std.java.util.MapInstances
+  with scalaz.std.java.math.BigIntegerInstances
+  with scalaz.std.java.util.concurrent.CallableInstances
   // Intentionally omitted: IterableInstances
 
 object AllInstances extends AllInstances

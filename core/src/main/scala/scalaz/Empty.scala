@@ -11,6 +11,9 @@ trait Empty[F[_]] extends Plus[F] { self =>
 
   // derived functions
   trait EmptyLaw extends PlusLaw {
+    def emptyMap[A](f1: A => A)(implicit FA: Equal[F[A]]): Boolean =
+      FA.equal(map(empty[A])(f1), empty[A])
+
     def rightPlusIdentity[A](f1: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(plus(f1, empty[A]), f1)
 

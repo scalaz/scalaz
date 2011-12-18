@@ -140,8 +140,6 @@ trait WriterTInstances extends WriterTInstances0 {
 }
 
 trait WriterTFunctions {
-  def Writer[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
-
   def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = new WriterT[F, W, A] {
     val run = v
   }

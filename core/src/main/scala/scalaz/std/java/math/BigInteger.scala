@@ -3,7 +3,7 @@ package std.java.math
 
 import java.math.BigInteger
 
-trait BigIntegers {
+trait BigIntegerInstances {
   implicit val bigIntegerInstance: Group[BigInteger] with Order[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Order[BigInteger] with Show[BigInteger] {
     def show(f: BigInteger) = f.toString.toList
 
@@ -43,6 +43,6 @@ trait BigIntegers {
   }
 }
 
-object bigInteger extends BigIntegers {
+object bigInteger extends BigIntegerInstances {
 
 }
