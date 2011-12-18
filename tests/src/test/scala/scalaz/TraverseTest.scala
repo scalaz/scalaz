@@ -5,6 +5,7 @@ import scalacheck.ScalazProperties
 class TraverseTest extends Spec {
 
   import scalaz._
+  import scalaz.State._
   import std.AllInstances._
   import std.AllFunctions._
   import syntax.traverse._
@@ -28,6 +29,18 @@ class TraverseTest extends Spec {
     "not blow the stack" in {
       val s: Option[List[Int]] = List.range(0, 32 * 1024).traverseU(x => some(x))
       s.map(_.take(3)) must be_===(some(List(0, 1, 2)))
+    }
+
+    "state traverse agrees with regular traverse" in {
+      var N = 10
+      List.range(0,N).traverseS(x => modify((x: Int) => x+1))(0) must be_=== (
+      List.range(0,N).traverseU(x => modify((x: Int) => x+1)).apply(0))
+    }
+
+    "state traverse does not blow stack" in {
+      var N = 10000
+      val s = List.range(0,N).traverseS(x => modify((x: Int) => x+1))
+      s.exec(0) must be_=== (N)
     }
   }
 
