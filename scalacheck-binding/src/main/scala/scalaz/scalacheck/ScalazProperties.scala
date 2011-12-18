@@ -11,11 +11,11 @@ import Scalaz._
 object ScalazProperties {
 
   object equal {
-    def commutativity[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.commutative _).label("commutativity")
+    def commutativity[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.commutative _)
 
-    def reflexive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.reflexive _).label("reflexive")
+    def reflexive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.reflexive _)
 
-    def transitive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.transitive _).label("transitive")
+    def transitive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.transitive _)
 
     def laws[A](implicit A: Equal[A], arb: Arbitrary[A]) = new Properties("equal") {
       property("commutativity") = commutativity[A]
@@ -25,7 +25,7 @@ object ScalazProperties {
   }
 
   object semigroup {
-    def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _).label("associative")
+    def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _)
 
     def laws[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("semigroup") {
       property("associative") = associative[A]
@@ -33,9 +33,9 @@ object ScalazProperties {
   }
 
   object monoid {
-    def leftIdentity[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.leftIdentity _).label("leftIdentity")
+    def leftIdentity[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.leftIdentity _)
 
-    def rightIdentity[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.rightIdentity _).label("rightIdentity")
+    def rightIdentity[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.monoidLaw.rightIdentity _)
 
     def laws[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("monoid") {
       include(semigroup.laws[A])
@@ -45,7 +45,7 @@ object ScalazProperties {
   }
 
   object group {
-    def inverseExists[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.groupLaw.inverseExists _).label("inverseExists")
+    def inverseExists[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.groupLaw.inverseExists _)
 
     def laws[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("group") {
       include(monoid.laws[A])
@@ -55,11 +55,11 @@ object ScalazProperties {
 
   object functor {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(F.functorLaw.identity[X] _).label("identity")
+      forAll(F.functorLaw.identity[X] _)
 
     def associative[F[_], X, Y, Z](implicit F: Functor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
                                    ayz: Arbitrary[(Y => Z)], ef: Equal[F[Z]]) =
-      forAll(F.functorLaw.associative[X, Y, Z] _).label("associative")
+      forAll(F.functorLaw.associative[X, Y, Z] _)
 
     def laws[F[_]](implicit F: Functor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("functor") {
@@ -93,14 +93,14 @@ object ScalazProperties {
 
   object monad {
     def rightIdentity[M[_], X](implicit M: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
-      forAll(M.monadLaw.rightIdentity[X] _).label("Right identity")
+      forAll(M.monadLaw.rightIdentity[X] _)
 
     def leftIdentity[M[_], X, Y](implicit am: Monad[M], emy: Equal[M[Y]], ax: Arbitrary[X], af: Arbitrary[(X => M[Y])]) =
-      forAll(am.monadLaw.leftIdentity[X, Y] _).label("Left identity")
+      forAll(am.monadLaw.leftIdentity[X, Y] _)
 
     def associativity[M[_], X, Y, Z](implicit M: Monad[M], amx: Arbitrary[M[X]], af: Arbitrary[(X => M[Y])],
                                      ag: Arbitrary[(Y => M[Z])], emz: Equal[M[Z]]) =
-      forAll(M.monadLaw.associativeBind[X, Y, Z] _).label("Associativity")
+      forAll(M.monadLaw.associativeBind[X, Y, Z] _)
 
     def laws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]],
                    af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("monad") {
