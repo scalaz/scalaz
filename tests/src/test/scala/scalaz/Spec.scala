@@ -4,7 +4,7 @@ import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder
 import org.specs2.specification.{Example, Fragments, BaseSpecification, SpecificationStructure}
 import org.specs2.main.{ArgumentsShortcuts, ArgumentsArgs}
-import org.scalacheck.Properties
+import org.scalacheck.{Prop, Properties}
 
 /** A minimal version of the Specs2 mutable base class */
 trait Spec
@@ -36,5 +36,12 @@ trait Spec
       for ((name, prop) <- props.properties) yield { name in check(prop)(p)}
       , "must satisfy"
     )
+  }
+
+  implicit def enrichProperties(props: Properties) = new {
+    def withProp(propName: String, prop: Prop) = new Properties(props.name) {
+      for {(name, p) <- props.properties} property(name) = p
+      property(propName) = prop
+    }
   }
 }

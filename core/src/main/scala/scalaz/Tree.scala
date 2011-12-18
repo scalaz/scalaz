@@ -122,6 +122,12 @@ trait TreeInstances {
     override def foldMap[A, B](fa: Tree[A])(f: (A) => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
 
+  implicit def treeEqual[A](implicit A: Equal[A]): Equal[Tree[A]] = new Equal[Tree[A]] {
+    def equal(a1: Tree[A], a2: Tree[A]): Boolean = {
+      A.equal(a1.rootLabel, a2.rootLabel) && a1.subForest.corresponds(a2.subForest)(equal _)
+    }
+  }
+
   /* TODO
   def applic[A, B](f: Tree[A => B]) = a => Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
    */

@@ -24,6 +24,18 @@ object ScalazProperties {
     }
   }
 
+  object order {
+    def transitiveOrder[A](implicit A: Order[A], arb: Arbitrary[A]) = forAll(A.orderLaw.transitiveOrder _)
+
+    def orderAndEqualConsistent[A](implicit A: Order[A], arb: Arbitrary[A]) = forAll(A.orderLaw.orderAndEqualConsistent _)
+
+    def laws[A](implicit A: Order[A], arb: Arbitrary[A]) = new Properties("order") {
+      include(equal.laws[A])
+      property("transitive order") = transitiveOrder[A]
+      property("order and equal consistent") = orderAndEqualConsistent[A]
+    }
+  }
+
   object semigroup {
     def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _)
 
@@ -39,8 +51,8 @@ object ScalazProperties {
 
     def laws[A](implicit A: Monoid[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("monoid") {
       include(semigroup.laws[A])
-      property("leftIdentity") = leftIdentity[A]
-      property("rightIdentity") = rightIdentity[A]
+      property("left identity") = leftIdentity[A]
+      property("right identity") = rightIdentity[A]
     }
   }
 
@@ -49,7 +61,7 @@ object ScalazProperties {
 
     def laws[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("group") {
       include(monoid.laws[A])
-      property("inverseExists") = inverseExists[A]
+      property("inverse exists") = inverseExists[A]
     }
   }
 
@@ -106,9 +118,9 @@ object ScalazProperties {
                    af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("monad") {
       include(applicative.laws[M])
 
-      property("Right identity") = monad.rightIdentity[M, Int]
-      property("Left identity") = monad.leftIdentity[M, Int, Int]
-      property("Associativity") = monad.associativity[M, Int, Int, Int]
+      property("right identity") = monad.rightIdentity[M, Int]
+      property("left identity") = monad.leftIdentity[M, Int, Int]
+      property("associativity") = monad.associativity[M, Int, Int, Int]
 
     }
   }
@@ -167,9 +179,9 @@ object ScalazProperties {
 
     def laws[F[_]](implicit f: Empty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("empty") {
       include(plus.laws[F])
-      property("emptyMap") = emptyMap[F, Int]
-      property("leftPlusIdentity") = leftPlusIdentity[F, Int]
-      property("rightPlusIdentity") = rightPlusIdentity[F, Int]
+      property("empty map") = emptyMap[F, Int]
+      property("left plus identity") = leftPlusIdentity[F, Int]
+      property("right plus identity") = rightPlusIdentity[F, Int]
     }
   }
 
@@ -183,8 +195,8 @@ object ScalazProperties {
     def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(monad.laws[F])
       include(plus.laws[F])
-      property("leftBindIdentity") = leftBindIdentity[F, Int]
-      property("rightBindIdentity") = rightBindIdentity[F, Int]
+      property("left bind identity") = leftBindIdentity[F, Int]
+      property("right bind identity") = rightBindIdentity[F, Int]
     }
   }
 }
