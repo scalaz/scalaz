@@ -151,9 +151,9 @@ object ScalazProperties {
     def laws[F[_]](implicit a: CoMonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
       include(copointed.laws[F])
-      property("cobindLeftIdentity") = cobindLeftIdentity[F, Int]
-      property("cobindRightIdentity") = cobindRightIdentity[F, Int, Int]
-      property("cobindAssociative") = cobindAssociative[F, Int, Int, Int, Int]
+      property("cobind left identity") = cobindLeftIdentity[F, Int]
+      property("cobind right identity") = cobindRightIdentity[F, Int, Int]
+      property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
     }
   }
 
@@ -179,14 +179,14 @@ object ScalazProperties {
     def laws[F[_]](implicit fa: Arbitrary[F[Int]], amb: Arbitrary[Int => Option[Int]], anb: Arbitrary[Int => Stream[Int]],
                    F: Traverse[F], EF: Equal[F[Int]], MN: Equal[(Option[F[Int]], Stream[F[Int]])]) =
       new Properties("traverse") {
-        property("identityTraverse") = identityTraverse[F, Int, Int]
+        property("identity traverse") = identityTraverse[F, Int, Int]
 
         import std.list._, std.option._, std.stream._, std.anyVal._
 
         property("purity.option") = purity[F, Option, Int]
         property("purity.stream") = purity[F, Stream, Int]
 
-        property("sequentialFusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+        property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
       }
   }
 
@@ -231,6 +231,24 @@ object ScalazProperties {
       include(empty.laws[F])
       property("left zero") = leftZero[F, Int]
       property("right zero") = rightZero[F, Int]
+    }
+  }
+
+  object category {
+    def leftIdentity[=>:[_, _], A, B](implicit ab: Arbitrary[A =>: B], C: Category[=>:], E: Equal[A =>: B]) =
+      forAll(C.categoryLaw.leftIdentity[A, B] _)
+
+    def rightIdentity[=>:[_, _], A, B](implicit ab: Arbitrary[A =>: B], C: Category[=>:], E: Equal[A =>: B]) =
+      forAll(C.categoryLaw.rightIdentity[A, B] _)
+
+    def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
+                                           cd: Arbitrary[C =>: D], C: Category[=>:], E: Equal[A =>: D]) =
+      forAll(C.categoryLaw.associative[A, B, C, D] _)
+
+    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("category") {
+      property("left identity") = leftIdentity[=>:, Int, Int]
+      property("right identity") = rightIdentity[=>:, Int, Int]
+      property("associative") = associative[=>:, Int, Int, Int, Int]
     }
   }
 }

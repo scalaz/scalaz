@@ -159,6 +159,8 @@ object ScalazArbitrary {
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
     Apply[Arbitrary].map3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
+  implicit def KliesliArbitrary[M[_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] = Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
+
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 }

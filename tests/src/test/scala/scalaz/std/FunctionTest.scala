@@ -38,4 +38,6 @@ class FunctionTest extends Spec {
 
   checkAll("Function0", traverse.laws[Function0])
 
+  checkAll("Function1", category.laws[Function1])
+
 }
