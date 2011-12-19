@@ -70,17 +70,4 @@ class TraverseTest extends Spec {
       state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
     }
   }
-
-  import ScalazProperties.traverse
-
-  checkAll("List", traverse.laws[List])
-  checkAll("Stream", traverse.laws[Stream])
-  checkAll("Option", traverse.laws[Option])
-  checkAll("Id", traverse.laws[Id])
-
-  // checkTraverseLaws[NonEmptyList, Int]
-  // checkTraverseLaws[({type λ[α]=Validation[Int, α]})#λ, Int]
-  // checkTraverseLaws[Zipper, Int]
-  // checkTraverseLaws[LazyOption, Int]
-
 }

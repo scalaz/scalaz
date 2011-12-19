@@ -29,6 +29,10 @@ object ScalazProperties {
 
     def orderAndEqualConsistent[A](implicit A: Order[A], arb: Arbitrary[A]) = forAll(A.orderLaw.orderAndEqualConsistent _)
 
+    import scala.math.{Ordering => SOrdering}
+
+    def scalaOrdering[A: Order: SOrdering: Arbitrary] = forAll((a1: A, a2: A) => Order[A].order(a1, a2) == Ordering.fromInt(SOrdering[A].compare(a1, a2)))
+
     def laws[A](implicit A: Order[A], arb: Arbitrary[A]) = new Properties("order") {
       include(equal.laws[A])
       property("transitive order") = transitiveOrder[A]
@@ -122,6 +126,34 @@ object ScalazProperties {
       property("left identity") = monad.leftIdentity[M, Int, Int]
       property("associativity") = monad.associativity[M, Int, Int, Int]
 
+    }
+  }
+
+
+  object copointed {
+    def laws[M[_]](implicit a: CoPointed[M], am: Arbitrary[M[Int]],
+                   af: Arbitrary[Int => Int], e: Equal[M[Int]]) = new Properties("copointed") {
+      include(functor.laws[M])
+    }
+  }
+
+  object comonad {
+    def cobindLeftIdentity[F[_], A](implicit F: CoMonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
+      forAll(F.coMonadLaw.cobindLeftIdentity[A] _)
+
+    def cobindRightIdentity[F[_], A, B](implicit F: CoMonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
+      forAll(F.coMonadLaw.cobindRightIdentity[A, B] _)
+
+    def cobindAssociative[F[_], A, B, C, D](implicit F: CoMonad[F], D: Equal[D], fa: Arbitrary[F[A]],
+                                            f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
+      forAll(F.coMonadLaw.cobindAssociative[A, B, C, D] _)
+
+    def laws[F[_]](implicit a: CoMonad[F], am: Arbitrary[F[Int]],
+                   af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
+      include(copointed.laws[F])
+      property("cobindLeftIdentity") = cobindLeftIdentity[F, Int]
+      property("cobindRightIdentity") = cobindRightIdentity[F, Int, Int]
+      property("cobindAssociative") = cobindAssociative[F, Int, Int, Int, Int]
     }
   }
 
