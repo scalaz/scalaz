@@ -80,7 +80,7 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   // TODO Show, etc.
-  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] = new Traverse[NonEmptyList] with Monad[NonEmptyList] {
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] = new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] {
     def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
       fa traverse f
 
@@ -89,6 +89,8 @@ trait NonEmptyListInstances {
     def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
     def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
+
+    def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
   }
   
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {

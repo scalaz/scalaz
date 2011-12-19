@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * Universally quantified [[scalaz.Semigroup]].
  */
 ////
 trait Plus[F[_]] extends Functor[F] { self =>

@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * Universally quantified [[scalaz.Monoid]].
  */
 ////
 trait Empty[F[_]] extends Plus[F] { self =>

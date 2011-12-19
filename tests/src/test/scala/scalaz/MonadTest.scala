@@ -1,19 +1,18 @@
 package scalaz
 
 import scalacheck.{ScalazProperties, ScalazArbitrary}
+import scalaz._
+import Tags._
+import Scalaz._
+import ScalazArbitrary._
+import std.either._
+import std.tuple._
+import std.function._
+import std.option._
+import StateT.stateMonad
+import ScalazProperties.{monad, monadPlus, plus}
 
 class MonadTest extends Spec {
-
-  import scalaz._
-  import Tags._
-  import Scalaz._
-  import ScalazArbitrary._
-  import std.either._
-  import std.tuple._
-  import std.function._
-  import std.option._
-  import StateT.stateMonad
-
   type A = Int
   type B = Int
   type C = Int
@@ -26,17 +25,19 @@ class MonadTest extends Spec {
   type X = Int
   type Z = Int
 
-  import ScalazProperties.monad
-
   implicit def IdentityEqual[X: Equal] = Equal.equalBy[Identity[X], X](_.value)
-  checkAll("Identity", monad.laws[Identity])
-  checkAll("Option", monad.laws[Option])
+  checkAll("Id", monad.laws[Id])
+  checkAll("Value", monad.laws[Value])
+  checkAll("Name", monad.laws[Name])
+  checkAll("Need", monad.laws[Need])
+  checkAll("Option", monadPlus.laws[Option])
   checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
   checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
-  checkAll("List", monad.laws[List])
+  checkAll("List", monadPlus.laws[List])
   // todo fix arbitrary instance for Stream
   //    checkMonadLaws[Stream, A]
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
+  checkAll("NonEmptyList", plus.laws[NonEmptyList])
 
   implicit def StateEqual: Equal[State[Int, Int]] = new Equal[State[Int, Int]] {
     def equal(a1: State[Int, Int], a2: State[Int, Int]) = a1.apply(0) == a2.apply(0)
