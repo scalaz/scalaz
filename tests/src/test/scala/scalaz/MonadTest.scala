@@ -1,15 +1,9 @@
 package scalaz
 
-import scalacheck.{ScalazProperties, ScalazArbitrary}
-import scalaz._
+import std.AllInstances._
 import Tags._
-import Scalaz._
+import scalacheck.{ScalazProperties, ScalazArbitrary}
 import ScalazArbitrary._
-import std.either._
-import std.tuple._
-import std.function._
-import std.option._
-import StateT.stateMonad
 import ScalazProperties.{monad, monadPlus, plus}
 
 class MonadTest extends Spec {
@@ -34,8 +28,7 @@ class MonadTest extends Spec {
   checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
   checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
   checkAll("List", monadPlus.laws[List])
-  // todo fix arbitrary instance for Stream
-  //    checkMonadLaws[Stream, A]
+  checkAll("Stream", monadPlus.laws[Stream])
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
 
