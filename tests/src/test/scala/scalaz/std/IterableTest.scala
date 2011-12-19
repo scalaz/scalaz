@@ -9,5 +9,5 @@ class IterableTest extends Spec {
 
   import std.iterable._
 
-  checkAll("Iterable", order.laws[Iterable[Boolean]].withProp("benchmark", order.scalaOrdering[Iterable[Boolean]]))
+  checkAll(order.laws[Iterable[Boolean]].withProp("benchmark", order.scalaOrdering[Iterable[Boolean]]))
 }

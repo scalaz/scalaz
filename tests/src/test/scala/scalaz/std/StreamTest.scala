@@ -5,8 +5,8 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 
 class StreamTest extends Spec {
-  checkAll("Stream", equal.laws[Stream[Int]])
-  checkAll("Stream", monoid.laws[Stream[Int]])
-  checkAll("Stream", monadPlus.laws[Stream])
-  checkAll("Stream", traverse.laws[Stream])
+  checkAll(equal.laws[Stream[Int]])
+  checkAll(monoid.laws[Stream[Int]])
+  checkAll(monadPlus.laws[Stream])
+  checkAll(traverse.laws[Stream])
 }

@@ -32,7 +32,14 @@ trait Spec
   override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 5).updated(minTestsOk, 33))
 
   def checkAll(name: String, props: Properties)(implicit p: Parameters) {
-    addFragments(name,
+    addFragments(name + " " + props.name,
+      for ((name, prop) <- props.properties) yield { name in check(prop)(p)}
+      , "must satisfy"
+    )
+  }
+
+  def checkAll(props: Properties)(implicit p: Parameters) {
+    addFragments(props.name,
       for ((name, prop) <- props.properties) yield { name in check(prop)(p)}
       , "must satisfy"
     )
