@@ -1,9 +1,15 @@
 package scalaz
 package std
 
-trait FunctionInstances0 {
+trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
     implicit def R: Semigroup[R] = R0
+  }
+}
+
+trait FunctionInstances0 extends FunctionInstances1 {
+  implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
+    implicit def R: Monoid[R] = R0
   }
 }
 
@@ -41,10 +47,6 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
     def contramap[A, B](r: (A) => R)(f: (B) => A) = null
-  }
-  
-  implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
-    implicit def R: Monoid[R] = R0
   }
 
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
