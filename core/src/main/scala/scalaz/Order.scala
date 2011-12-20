@@ -33,16 +33,7 @@ trait Order[F] extends Equal[F] { self =>
 
     def transitiveOrder(f1: F, f2: F, f3: F): Boolean = {
       val f1f2: Ordering = order(f1, f2)
-      val result: Boolean = conditional(Set(f1f2, Ordering.EQ)(order(f2, f3)), order(f1, f3) == f1f2)
-      if (!result) {
-        println("f1 = " + f1)
-        println("f2 = " + f2)
-        println("f3 = " + f3)
-        println("order(f1, f2) = " + order(f1, f2))
-        println("order(f2, f3) = " + order(f2, f3))
-        println("order(f1, f3)" + order(f1, f3))
-      }
-      result
+      conditional(Set(f1f2, Ordering.EQ)(order(f2, f3)), order(f1, f3) == f1f2)
     }
 
     def orderAndEqualConsistent(f1: F, f2: F): Boolean = {
