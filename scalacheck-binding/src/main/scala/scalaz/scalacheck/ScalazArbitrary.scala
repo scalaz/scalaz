@@ -179,6 +179,15 @@ object ScalazArbitrary {
 
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
+  implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
+    Applicative[Arbitrary].map2(A, B)(LazyTuple2(_, _))
+
+  implicit def lazyTuple3Arbitrary[A, B, C](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C]): Arbitrary[LazyTuple3[A, B, C]] =
+    Applicative[Arbitrary].map3(A, B, C)(LazyTuple3(_, _, _))
+
+  implicit def lazyTuple4Arbitrary[A, B, C, D](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C], D: Arbitrary[D]): Arbitrary[LazyTuple4[A, B, C, D]] =
+    Applicative[Arbitrary].map4(A, B, C, D)(LazyTuple4(_, _, _, _))
+
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
     import std.list._
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
