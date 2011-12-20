@@ -64,6 +64,8 @@ object Order {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
   }
 
+  def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
+
   implicit def orderMonoid[A] = new Monoid[Order[A]] {
     def zero: Order[A] = new Order[A] {
       def order(x: A, y: A): Ordering = Monoid[Ordering].zero

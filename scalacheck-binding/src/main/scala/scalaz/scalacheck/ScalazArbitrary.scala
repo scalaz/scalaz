@@ -168,6 +168,12 @@ object ScalazArbitrary {
   implicit def optionTArb[F[_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Functor[Arbitrary].map(A)(OptionT[F, A](_))
 
+  implicit def lazyOptionArb[F[_], A](implicit A: Arbitrary[Option[A]]): Arbitrary[LazyOption[A]] =
+    Functor[Arbitrary].map(A)(LazyOption.fromOption[A](_))
+
+  implicit def lazyOptionTArb[F[_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
+    Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
+
   implicit def stateTArb[F[_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
