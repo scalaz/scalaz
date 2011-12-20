@@ -165,6 +165,9 @@ object ScalazArbitrary {
   implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
     Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
 
+  implicit def optionTArb[F[_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
+    Functor[Arbitrary].map(A)(OptionT[F, A](_))
+
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 }
