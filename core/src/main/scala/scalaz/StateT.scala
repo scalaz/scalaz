@@ -9,6 +9,9 @@ trait StateT[F[_], S, A] { self =>
   /** Run and return the final value and state in the context of `F` */
   def apply(initial: S): F[(A, S)]
 
+  /** An alias for `apply` */
+  def run(initial: S): F[(A, S)] = apply(initial)
+
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(initial: S)(implicit F: Functor[F]): F[A] =
     F.map(apply(initial))(_._1)
