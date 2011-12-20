@@ -137,6 +137,7 @@ trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTEach[F[_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
     implicit def F = F0
   }
+  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: WriterT[F, W, A]).run)
 }
 
 trait WriterTFunctions {

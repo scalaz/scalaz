@@ -251,4 +251,12 @@ object ScalazProperties {
       property("associative") = associative[=>:, Int, Int, Int, Int]
     }
   }
+
+  object bifunctor {
+    def laws[F[_, _]](implicit F: BiFunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
+                      axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
+      include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
+      include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
+    }
+  }
 }
