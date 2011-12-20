@@ -75,6 +75,10 @@ trait DListInstances {
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
     def empty[A] = DList()
   }
+  implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
+    import std.list._
+    Equal[List[A]].contramap((_: DList[A]).toList)
+  }
 }
 
 trait DListFunctions {

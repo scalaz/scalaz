@@ -171,6 +171,7 @@ object ScalazArbitrary {
   implicit def stateTArb[F[_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
+  implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 }
