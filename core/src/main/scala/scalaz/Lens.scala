@@ -135,6 +135,11 @@ trait LensInstances {
   import State._
   import Lens._
 
+  implicit def lensCategory: Category[Lens] = new Category[Lens] {
+    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
+    def id[A]: Lens[A, A] = Lens.lensId[A]
+  }
+
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
   implicit def LensState[A, B](lens: Lens[A, B]): State[A, B] =
     lens.st
