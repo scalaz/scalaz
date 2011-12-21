@@ -15,7 +15,6 @@ trait BiTraverse[F[_, _]] extends BiFunctor[F] { self =>
     bitraverse(_)(f, g)
 
   def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] = {
-    import Id.id
     bitraverse[Id, A, B, C, D](fab)(f, g)
   }
   

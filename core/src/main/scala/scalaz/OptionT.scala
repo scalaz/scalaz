@@ -5,29 +5,29 @@ import std.option.optionInstance
 /**
  * OptionT monad transformer.
  */
-final case class OptionT[F[_], A](runT: F[Option[A]]) {
+final case class OptionT[F[_], A](run: F[Option[A]]) {
   self =>
 
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](
-    F.map(runT)(_ map f)
+    F.map(run)(_ map f)
   )
 
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
-    F.bind(self.runT) {
+    F.bind(self.run) {
       case None    => F.point(None: Option[B])
-      case Some(z) => f(z).runT
+      case Some(z) => f(z).run
     }
   )
 
   def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
-    F.bind(self.runT) {
+    F.bind(self.run) {
       case None    => F.point(None: Option[B])
       case Some(z) => F.map(f(z))(b => Some(b))
     }
   )
 
   def ap[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
-    OptionT(F.map2(f.runT, runT) {
+    OptionT(F.map2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
 }
@@ -103,6 +103,6 @@ private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => Some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {
-    def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.runT))
+    def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.run))
   }
 }

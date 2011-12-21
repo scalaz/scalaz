@@ -2,7 +2,7 @@ package scalaz
 
 /** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
 trait IdInstances {
-  implicit val id = new Traverse[Id] with Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
+  implicit val id: Traverse[Id] with Monad[Id] with CoMonad[Id] with CoJoin[Id] = new Traverse[Id] with Monad[Id] with CoMonad[Id] with CoBind.FromCoJoin[Id] {
     def point[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
     def cojoin[A](a: Id[A]): A = a

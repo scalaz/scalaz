@@ -10,7 +10,7 @@ object UnapplyInference extends App {
     val either: Either[Int, Int] = Right(1)
     val eitherT = EitherT(some(either))
 
-    println((eitherT :-> (_ - 1)).runT) // Some(Right(0))
+    println((eitherT :-> (_ - 1)).run) // Some(Right(0))
   }
 
   def eitherTBitraverse() {

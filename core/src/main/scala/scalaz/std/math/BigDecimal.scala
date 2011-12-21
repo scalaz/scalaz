@@ -3,7 +3,7 @@ package std
 package math
 
 trait BigDecimalInstances {
-  implicit object bigDecimalInstance extends Monoid[BigDecimal] with Order[BigDecimal] with Show[BigDecimal] {
+  implicit val bigDecimalInstance: Monoid[BigDecimal] with Order[BigDecimal] with Show[BigDecimal] = new Monoid[BigDecimal] with Order[BigDecimal] with Show[BigDecimal] {
     def show(f: BigDecimal) = f.toString.toList
 
     def append(f1: BigDecimal, f2: => BigDecimal) = f1 + f2
@@ -21,7 +21,7 @@ trait BigDecimalInstances {
 
   import Tags.Multiplication
 
-  implicit object BigDecimalMultiplicationNewType extends Monoid[BigDecimal @@ Multiplication] {
+  implicit val BigDecimalMultiplicationNewType: Monoid[BigDecimal @@ Multiplication] = new Monoid[BigDecimal @@ Multiplication] {
     def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) = Multiplication(f1 * f2)
 
     def zero = Multiplication(1)

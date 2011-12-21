@@ -4,6 +4,7 @@ import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder
 import org.specs2.specification.{Example, Fragments, BaseSpecification, SpecificationStructure}
 import org.specs2.main.{ArgumentsShortcuts, ArgumentsArgs}
+import org.scalacheck.Properties
 
 /** A minimal version of the Specs2 mutable base class */
 trait Spec
@@ -11,6 +12,8 @@ trait Spec
   with MustThrownExpectations with ShouldThrownExpectations with ScalaCheckMatchers
   with MatchersImplicits with StandardMatchResults
   with ArgumentsShortcuts with ArgumentsArgs {
+
+  addArguments(fullStackTrace)
 
   def is = specFragments
 
@@ -24,5 +27,14 @@ trait Spec
       def okMessage = "%s == %s".format(Show[T].shows(expected), Show[T].shows(actualT))
       Matcher.result(test, okMessage, koMessage, actual)
     }
+  }
+
+  override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 5).updated(minTestsOk, 33))
+
+  def checkAll(name: String, props: Properties)(implicit p: Parameters) {
+    addFragments(name,
+      for ((name, prop) <- props.properties) yield { name in check(prop)(p)}
+      , "must satisfy"
+    )
   }
 }

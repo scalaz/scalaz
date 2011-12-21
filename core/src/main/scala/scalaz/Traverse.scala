@@ -10,7 +10,6 @@ package scalaz
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
-  import Id.id
   import State.state
 
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
@@ -32,6 +31,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (F[B], S) =
     traverseS(fa)(f)(s)
 
+  /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
+  def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
+    import Free._
+    implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
+    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline]
+  }
+
   // derived functions
   def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] = 
     traversal[G].run[G[A], A](fga)(ga => ga)
@@ -40,7 +46,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traversalS[S].run(fga)(a => a)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
-    traversal[Id](id).run(fa)(f)
+    traversal[Id](Id.id).run(fa)(f)
 
   // TODO can we provide a default impl of foldR in terms of traverseImpl?
 
@@ -71,7 +77,6 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
     def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
-      import Id._
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 

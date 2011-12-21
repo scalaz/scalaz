@@ -106,6 +106,18 @@ sealed trait Validation[E, A] {
     case Failure(e) => f(e)
   }
 
+  /**
+   * Returns `this` if it is a `Success`, or `that` if it is a `Success`, otherwise a `Failure` containing
+   * the contents of the two `Failure`s, appended with the provided `Semigroup`.
+   */
+  def orElse(that: => Validation[E, A])(implicit E: Semigroup[E]): Validation[E, A] = this match {
+    case v1@Success(a1) => v1
+    case Failure(e1)    => that match {
+      case v2@Success(a2) => v2
+      case Failure(e2)    => Failure(E.append(e1, e2))
+    }
+  }
+
   /** Returns the contents of this `Validation` it if is a `Success`, otherwise the provided value. */
   def getOrElse(f: => A): A = |||(_ => f)
 
@@ -257,7 +269,8 @@ object Validation extends ValidationFunctions with ValidationInstances
 
 trait ValidationInstances {
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
-  implicit def validationApplicative[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Applicative[({type λ[α] = Validation[E, α]})#λ] {
+  implicit def validationApplicative[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
+    with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
@@ -265,6 +278,8 @@ trait ValidationInstances {
     def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def ap[A, B](fa: => Validation[E, A])(f: => Validation[E, A => B]): Validation[E, B] = fa ap f
+
+    def plus[A](a: Validation[E, A], b: => Validation[E, A]): Validation[E, A] = a orElse b
   }
 
   def validationNelApplicative[E] = validationApplicative[NonEmptyList[E]]

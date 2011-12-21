@@ -3,8 +3,8 @@ package std.java.math
 
 import java.math.BigInteger
 
-trait BigIntegers {
-  implicit object bigIntegerInstance extends Group[BigInteger] with Order[BigInteger] with Show[BigInteger] {
+trait BigIntegerInstances {
+  implicit val bigIntegerInstance: Group[BigInteger] with Order[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Order[BigInteger] with Show[BigInteger] {
     def show(f: BigInteger) = f.toString.toList
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
@@ -28,7 +28,7 @@ trait BigIntegers {
 
   import Tags.Multiplication
 
-  implicit object bigIntegerMultiplication extends Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
+  implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
     def show(f: scalaz.@@[BigInteger, Multiplication]) = f.toString.toList
 
     def append(f1: BigInteger @@ Multiplication, f2: => BigInteger @@ Multiplication) = Multiplication(f1 multiply f2)
@@ -43,6 +43,6 @@ trait BigIntegers {
   }
 }
 
-object bigInteger extends BigIntegers {
+object bigInteger extends BigIntegerInstances {
 
 }

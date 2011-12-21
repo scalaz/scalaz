@@ -1,82 +1,72 @@
 package scalaz
 
-import org.scalacheck.Arbitrary
-import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
+import scalacheck.{ScalazProperties, ScalazArbitrary}
 
-class MonadTest extends Specification with ScalaCheck {
+class MonadTest extends Spec {
+
+  import scalaz._
+  import Tags._
   import Scalaz._
-  import ScalaCheckBinding._
   import ScalazArbitrary._
   import std.either._
   import std.tuple._
   import std.function._
+  import std.option._
   import StateT.stateMonad
 
+  type A = Int
+  type B = Int
+  type C = Int
+  type D = Int
+  type E = Int
+  type F = Int
+  type G = Int
+  type H = Int
+  type R = Int
+  type X = Int
+  type Z = Int
 
-  "monad laws" should {
-    type A = Int
-    type B = Int
-    type C = Int
-    type D = Int
-    type E = Int
-    type F = Int
-    type G = Int
-    type H = Int
-    type R = Int
-    type X = Int
-    type Z = Int
+  import ScalazProperties.monad
 
+  implicit def IdentityEqual[X: Equal] = Equal.equalBy[Identity[X], X](_.value)
+  checkAll("Identity", monad.laws[Identity])
+  checkAll("Option", monad.laws[Option])
+  checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
+  checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
+  checkAll("List", monad.laws[List])
+  // todo fix arbitrary instance for Stream
+  //    checkMonadLaws[Stream, A]
+  checkAll("NonEmptyList", monad.laws[NonEmptyList])
 
-    implicit def IdentityEqual[X: Equal] = Equal.equalBy[Identity[X], X](_.value)
-    checkMonadLaws[Identity, A]("Identity")
-    checkMonadLaws[List, A]("List")
-    // todo fix arbitrary instance for Stream
-    //    checkMonadLaws[Stream, A]
-    checkMonadLaws[NonEmptyList, A]("NonEmptyList")
-
-    implicit def StateEqual: Equal[State[Int, Int]] = new Equal[State[Int, Int]] {
-      def equal(a1: State[Int, Int], a2: State[Int, Int]) = a1.apply(0) == a2.apply(0)
-    }
-    implicit def StateArb: Arbitrary[State[Int, Int]] = Arbitrary(implicitly[Arbitrary[Function1[Int,Int]]].arbitrary.map(modify[Int]))
-    checkMonadLaws[({type λ[α]=State[Int, α]})#λ, Int]("State")
-    checkMonadLaws[Tuple1, A]("Tuple1")
-    checkMonadLaws[({type λ[α]=(B, α)})#λ, A]("Tuple2")
-    checkMonadLaws[({type λ[α]=(B, C, α)})#λ, A]("Tuple3")
-    checkMonadLaws[({type λ[α]=(B, C, D, α)})#λ, A]("Tuple4")
-    checkMonadLaws[({type λ[α]=(B, C, D, E, α)})#λ, A]("Tuple5")
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F, α)})#λ, A]("Tuple6")
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F, G, α)})#λ, A]("Tuple7")
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F, G, H, α)})#λ, A]("Tuple8")
-    implicit def EqualFunction1 = Equal.equalBy[Int => Int, Int](_.apply(0))
-    implicit def EqualFunction2 = Equal.equalBy[(Int, Int) => Int, Int](_.apply(0, 0))
-    implicit def EqualFunction3 = Equal.equalBy[(Int, Int, Int) => Int, Int](_.apply(0, 0, 0))
-    implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
-    implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
-//    implicit def EqualFunction6 = implicitly[Equal[Int]] ∙ {f: ((Int, Int, Int, Int, Int, Int) => Int) => f(0, 0, 0, 0, 0, 0)}
-    checkMonadLaws[({type λ[α]=(B) => α})#λ, A]("Function1")
-    checkMonadLaws[({type λ[α]=(B, C) => α})#λ, A]("Function2")
-    checkMonadLaws[({type λ[α]=(B, C, D) => α})#λ, A]("Function3")
-    checkMonadLaws[({type λ[α]=(B, C, D, E) => α})#λ, A]("Function4")
-    checkMonadLaws[({type λ[α]=(B, C, D, E, F) => α})#λ, A]("Function5")
-//    checkMonadLaws[({type λ[α]=Function6[B, C, D, E, F, G, α]})#λ, A]
-    checkMonadLaws[({type λ[α]=Either.LeftProjection[α, X]})#λ, A]("Either.LeftProjection")
-    checkMonadLaws[({type λ[α]=Either.RightProjection[X, α]})#λ, A]("Either.RightProjection")
-//    checkMonadLaws[({type λ[α]=Entry[X, α]})#λ, A]
-    ok
+  implicit def StateEqual: Equal[State[Int, Int]] = new Equal[State[Int, Int]] {
+    def equal(a1: State[Int, Int], a2: State[Int, Int]) = a1.apply(0) == a2.apply(0)
   }
-
-  def checkMonadLaws[M[_], A](typeName: String)
-                             (implicit mm: Monad[M], ea: Equal[A], ema: Equal[M[A]],
-                              arbma: Arbitrary[M[A]], arba: Arbitrary[A]) = {
-    typeName should {
-      import ScalazProperties.monad._
-
-      "leftIdentity" in check(leftIdentity[M, A, A])
-      "rightIdentity" in check(rightIdentity[M, A])
-      "associativity" in check(associativity[M, A, A, A])
-    }
-  }
+//  implicit def StateArb: Arbitrary[State[S, A]] = arbitrary[S => (A, S)].map(State(_))
+//  checkAll("State", monad.laws[({type λ[α]=State[Int, α]})#λ])
+  checkAll("Tuple1", monad.laws[Tuple1])
+  checkAll("Tuple2", monad.laws[({type λ[α] = (B, α)})#λ])
+  checkAll("Tuple3", monad.laws[({type λ[α] = (B, C, α)})#λ])
+  checkAll("Tuple4", monad.laws[({type λ[α] = (B, C, D, α)})#λ])
+  checkAll("Tuple5", monad.laws[({type λ[α] = (B, C, D, E, α)})#λ])
+  checkAll("Tuple6", monad.laws[({type λ[α] = (B, C, D, E, F, α)})#λ])
+  checkAll("Tuple7", monad.laws[({type λ[α] = (B, C, D, E, F, G, α)})#λ])
+  checkAll("Tuple8", monad.laws[({type λ[α] = (B, C, D, E, F, G, H, α)})#λ])
+  implicit def EqualFunction0 = Equal.equalBy[() => Int, Int](_.apply())
+  implicit def EqualFunction1 = Equal.equalBy[Int => Int, Int](_.apply(0))
+  implicit def EqualFunction2 = Equal.equalBy[(Int, Int) => Int, Int](_.apply(0, 0))
+  implicit def EqualFunction3 = Equal.equalBy[(Int, Int, Int) => Int, Int](_.apply(0, 0, 0))
+  implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
+  implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
+  checkAll("Function0", monad.laws[Function0])
+  checkAll("Function1", monad.laws[({type λ[α] = (B) => α})#λ])
+  checkAll("Function2", monad.laws[({type λ[α] = (B, C) => α})#λ])
+  checkAll("Function3", monad.laws[({type λ[α] = (B, C, D) => α})#λ])
+  checkAll("Function4", monad.laws[({type λ[α] = (B, C, D, E) => α})#λ])
+  checkAll("Function5", monad.laws[({type λ[α] = (B, C, D, E, F) => α})#λ])
+  checkAll("Either.LeftProjection", monad.laws[({type λ[α] = Either.LeftProjection[α, X]})#λ])
+  checkAll("Either.RightProjection", monad.laws[({type λ[α] = Either.RightProjection[X, α]})#λ])
+  checkAll("Either.LeftProjection @@ First", monad.laws[({type λ[α] = Either.LeftProjection[α, X] @@ First})#λ])
+  checkAll("Either.RightProjection @@ First", monad.laws[({type λ[α] = Either.RightProjection[X, α] @@ First})#λ] )
+  checkAll("Either.LeftProjection @@ Last", monad.laws[({type λ[α] = Either.LeftProjection[α, X] @@ Last})#λ])
+  checkAll("Either.RightProjection @@ Last", monad.laws[({type λ[α] = Either.RightProjection[X, α] @@ Last})#λ])
 }

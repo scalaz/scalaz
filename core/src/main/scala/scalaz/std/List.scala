@@ -26,14 +26,32 @@ trait ListInstances {
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      // TODO pick between these implementations.
-      // DList.fromList(l).foldr(F.point(List[B]())) {
+      // implementation with `foldRight` leads to SOE in:
+      //
+      //  def wc(c: Char) = State[Boolean, Int]{(inWord) =>
+      //    val s = c != ' '
+      //    (test(!(inWord && s)), s)
+      //  }
+      //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
+
+      // foldRight(l, F.point(List[B]())) {
       //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       // }
-      foldRight(l, F.point(List[B]())) {
-        (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+
+      DList.fromList(l).foldr(F.point(List[B]())) {
+         (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       }
     }
+
+    override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
+      State((s: S) => {
+        val buf = new collection.mutable.ListBuffer[B]
+        var cur = s
+        l.foreach { a => val bs = f(a)(cur); buf += bs._1; cur = bs._2 } 
+        (buf.toList, cur)
+      })
+    }
+
 
     override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack

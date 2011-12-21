@@ -1,21 +1,16 @@
 package scalaz
 
 import scalacheck.ScalazProperties
-import org.scalacheck.Arbitrary
-import org.specs2.matcher.Parameters
 
 class TraverseTest extends Spec {
 
   import scalaz._
+  import scalaz.State._
   import std.AllInstances._
   import std.AllFunctions._
   import syntax.traverse._
-  import Id._
-  import WriterT._
 
   "list" should {
-    import std.list._
-
     // ghci> import Data.Traversable
     // ghci> import Control.Monad.Writer
     // ghci> let (|>) = flip ($)
@@ -23,7 +18,7 @@ class TraverseTest extends Spec {
     // (["1","2","3"],"123")
     "apply effects in order" in {
       val s: Writer[String, List[Int]] = List(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.runT must be_===(("123", List(1, 2, 3)))
+      s.run must be_===(("123", List(1, 2, 3)))
     }
 
     "traverse through option effect" in {
@@ -35,14 +30,24 @@ class TraverseTest extends Spec {
       val s: Option[List[Int]] = List.range(0, 32 * 1024).traverseU(x => some(x))
       s.map(_.take(3)) must be_===(some(List(0, 1, 2)))
     }
+
+    "state traverse agrees with regular traverse" in {
+      var N = 10
+      List.range(0,N).traverseS(x => modify((x: Int) => x+1))(0) must be_=== (
+      List.range(0,N).traverseU(x => modify((x: Int) => x+1)).apply(0))
+    }
+
+    "state traverse does not blow stack" in {
+      var N = 10000
+      val s = List.range(0,N).traverseS(x => modify((x: Int) => x+1))
+      s.exec(0) must be_=== (N)
+    }
   }
 
   "stream" should {
-    import std.stream._
-
     "apply effects in order" in {
       val s: Writer[String, Stream[Int]] = Stream(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.runT must be_===(("123", Stream(1, 2, 3)))
+      s.run must be_===(("123", Stream(1, 2, 3)))
     }
 
     // ghci> import Data.Traversable
@@ -55,31 +60,27 @@ class TraverseTest extends Spec {
     }
   }
 
-  checkTraverseLaws[List, Int]
-  checkTraverseLaws[Stream, Int]
-  checkTraverseLaws[Option, Int]
-  checkTraverseLaws[Id, Int]
+  "combos" should {
+    "traverse large stream over trampolined StateT including IO" in {
+      // Example usage from Eric Torreborre
+      import scalaz.effect._
+
+      val as = Stream.range(0, 100000)
+      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => State((s: Int) => (IO(a - s), a)))
+      state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
+    }
+  }
+
+  import ScalazProperties.traverse
+
+  checkAll("List", traverse.laws[List])
+  checkAll("Stream", traverse.laws[Stream])
+  checkAll("Option", traverse.laws[Option])
+  checkAll("Id", traverse.laws[Id])
+
   // checkTraverseLaws[NonEmptyList, Int]
   // checkTraverseLaws[({type λ[α]=Validation[Int, α]})#λ, Int]
   // checkTraverseLaws[Zipper, Int]
   // checkTraverseLaws[LazyOption, Int]
 
-  def checkTraverseLaws[M[_], A](implicit mm: Traverse[M],
-                                 ea: Equal[A],
-                                 ema: Equal[M[A]],
-                                 arbma: Arbitrary[M[A]],
-                                 arba: Arbitrary[A], man: Manifest[M[_]]) = {
-    man.toString should {
-      import ScalazProperties.traverse._
-      import std.option._, std.list._
-
-      implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 5))
-
-      "identityTraverse" in check(identityTraverse[M, A, A])
-      "purity (Option)" in check(purity[M, Option, A])
-      "purity (List)" in check(purity[M, List, A])
-      "sequentialFusion (List/Option)" in check(sequentialFusion[M, List, Option, A, A, A])
-      "parallelFusion (List/Option)" in check(parallelFusion[M, List, Option, A, A])
-    }
-  }
 }

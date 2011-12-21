@@ -80,7 +80,7 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   // TODO Show, etc.
-  implicit object nonEmptyList extends Traverse[NonEmptyList] with Monad[NonEmptyList] {
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] = new Traverse[NonEmptyList] with Monad[NonEmptyList] {
     def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
       fa traverse f
 

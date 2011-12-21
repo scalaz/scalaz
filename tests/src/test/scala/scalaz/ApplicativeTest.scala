@@ -1,54 +1,22 @@
 package scalaz
 
-import java.math.BigInteger
-import scalacheck.{ScalazProperties, ScalazArbitrary, ScalaCheckBinding}
-import org.scalacheck.{Gen, Arbitrary}
-import org.specs2.mutable.Specification
-import org.specs2.ScalaCheck
+import scalacheck.{ScalazProperties, ScalazArbitrary}
+import ScalazArbitrary._
+import std.AllInstances._
+import ScalazProperties.applicative
 
-class ApplicativeTest extends Specification with ScalaCheck {
+class ApplicativeTest extends Spec {
 
-  import Scalaz._
-  import ScalaCheckBinding._
-  import ScalazArbitrary._
-  import std.option._
-  import syntax.monad._
+  checkAll("Validation", applicative.laws[({type λ[α]=Validation[Int, α]})#λ])
+  checkAll("Zipper", applicative.laws[Zipper])
+  checkAll("Option", applicative.laws[Option])
 
-  "applicative laws" should {
-    type A = Int
-    type B = Int
-    type C = Int
-    type D = Int
-    type E = Int
-    type F = Int
-    type G = Int
-    type R = Int
-    type X = Int
-    type Z = Int
-
-    checkApplicativeLaws[Option, A]
-    checkApplicativeLaws[Zipper, A]
-
-    ok
-  }
-
-  def checkApplicativeLaws[M[_], A](implicit mm: Applicative[M],
-                                    ea: Equal[A],
-                                    man: Manifest[M[A]],
-                                    ema: Equal[M[A]],
-                                    arbma: Arbitrary[M[A]],
-                                    arba: Arbitrary[A]) = {
-    val typeName = man.toString
-    implicit val arbMAA: Arbitrary[M[A => A]] = ((a: A) => a).point[M].point[Arbitrary]
-    typeName should {
-      import ScalazProperties.applicative._
-
-      "identity" in check(identity[M, A])
-      "composition" in check(composition[M, A, A, A])
-      
-      // TODO These don't terminate. Investigate.
-//      homomorphism[M, A, A] must pass
-//      interchange[M, A, A] must pass
-    }
+  implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
+    import std.stream.streamEqual
+    def streamEqualApprox = streamEqual[A].contramap((_: Stream[A]).take(1000))
+    def equal(a1: Zipper[A], a2: Zipper[A]) =
+      streamEqualApprox.equal(a1.lefts, a2.lefts) &&
+        Equal[A].equal(a1.focus, a2.focus) &&
+        streamEqualApprox.equal(a1.rights, a2.rights)
   }
 }

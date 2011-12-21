@@ -21,8 +21,6 @@ object StateTUsage extends App {
   }
 
   def state() {
-    import Id.id // a bit annoying that we require this import.
-
     val state: State[String, Int] = State((x: String) => (0, x + 1))
     val eval: Int = state.eval("")
     state.flatMap(_ => state)

@@ -3,7 +3,7 @@ package std
 package math
 
 trait BigInts {
-  implicit object bigIntInstance extends Group[BigInt] with Order[BigInt] with Show[BigInt] {
+  implicit val bigIntInstance: Group[BigInt] with Order[BigInt] with Show[BigInt] = new Group[BigInt] with Order[BigInt] with Show[BigInt] {
     def show(f: BigInt): List[Char] = f.toString.toList
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
@@ -23,7 +23,7 @@ trait BigInts {
 
   import Tags.Multiplication
 
-  implicit object bigIntMultiplication extends Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
+  implicit val bigIntMultiplication: Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] = new Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
     def show(f: scalaz.@@[BigInt, Multiplication]) = f.toString.toList
 
     def append(f1: BigInt @@ Multiplication, f2: => BigInt @@ Multiplication): BigInt @@ Multiplication = Multiplication(f1 * f2)
