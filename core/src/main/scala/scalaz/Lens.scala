@@ -215,13 +215,13 @@ trait LensInstances {
     def |=(that: Set[K]): State[S, Set[K]] =
       lens %= (_ | that)
 
-    def +=(elem: K) =
+    def +=(elem: K): State[S, Set[K]] =
       lens %= (_ + elem)
 
-    def +=(elem1: K, elem2: K, elems: K*) =
+    def +=(elem1: K, elem2: K, elems: K*): State[S, Set[K]] =
       lens %= (_ + elem1 + elem2 ++ elems)
 
-    def ++=(xs: TraversableOnce[K]) =
+    def ++=(xs: TraversableOnce[K]): State[S, Set[K]] =
       lens %= (_ ++ xs)
 
     def -=(elem: K): State[S, Set[K]] =
@@ -260,8 +260,8 @@ trait LensInstances {
     def update(key: K, value: V): State[S, Unit] =
       lens %== (_.updated(key, value))
 
-    def -=(elem: K): State[S, Map[K, V]]
-    = lens %= (_ - elem)
+    def -=(elem: K): State[S, Map[K, V]] =
+      lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): State[S, Map[K, V]] =
       lens %= (_ - elem1 - elem2 -- elems)
@@ -274,11 +274,11 @@ trait LensInstances {
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
   case class SeqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: Lens[S, Repr]) {
-    def sortWith(lt: (A, A) => Boolean): State[S, Unit]
-    = lens %== (_ sortWith lt)
+    def sortWith(lt: (A, A) => Boolean): State[S, Unit] =
+      lens %== (_ sortWith lt)
 
-    def sortBy[B: math.Ordering](f: A => B): State[S, Unit]
-    = lens %== (_ sortBy f)
+    def sortBy[B: math.Ordering](f: A => B): State[S, Unit] =
+      lens %== (_ sortBy f)
 
     def sort[B >: A](implicit ord: math.Ordering[B]) =
       lens %== (_.sorted[B]): State[S, Unit]

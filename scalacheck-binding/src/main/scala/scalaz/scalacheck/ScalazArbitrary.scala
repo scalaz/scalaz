@@ -193,6 +193,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
+  implicit def coStateTArb[F[_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[CoStateT[F, A, B]] = Functor[Arbitrary].map(A)(CoStateT(_))
 
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}

@@ -22,4 +22,7 @@ class LensTest extends Spec {
   checkAll("Tuple2.first", lens.laws(Lens.firstLens[Int, Int]))
   checkAll("Tuple2.second", lens.laws(Lens.secondLens[Int, Int]))
   checkAll("Set.contains", lens.laws(Lens.lensId[Set[Int]].contains(0)))
+  checkAll("Map.member", lens.laws(Lens.lensId[Map[Boolean, Int]].member(true)))
+  checkAll("sum", lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
+
 }

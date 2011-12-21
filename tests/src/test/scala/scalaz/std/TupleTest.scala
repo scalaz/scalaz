@@ -45,4 +45,6 @@ class TupleTest extends Spec {
   checkAll("Tuple6", monad.laws[({type λ[α] = (B, C, D, E, F, α)})#λ])
   checkAll("Tuple7", monad.laws[({type λ[α] = (B, C, D, E, F, G, α)})#λ])
   checkAll("Tuple8", monad.laws[({type λ[α] = (B, C, D, E, F, G, H, α)})#λ])
+
+  checkAll("Tuple1", comonad.laws[Tuple1])
 }

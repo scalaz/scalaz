@@ -61,7 +61,11 @@ trait TupleInstances0 {
     implicit def _7 = A7
     implicit def _8 = A8
   }
-  implicit def tuple1Functor: Functor[Tuple1] = new Tuple1Functor {}
+  implicit def tuple1Instance: Functor[Tuple1] with CoMonad[Tuple1] = new Tuple1Functor with CoMonad[Tuple1] {
+    def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+    def copoint[A](p: Tuple1[A]) = p._1
+    def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
+  }
   implicit def tuple2Functor[A1]: Functor[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] {}
   implicit def tuple3Functor[A1, A2]: Functor[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
   implicit def tuple4Functor[A1, A2, A3]: Functor[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
