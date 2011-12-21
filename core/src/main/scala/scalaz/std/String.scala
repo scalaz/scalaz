@@ -8,6 +8,7 @@ trait StringInstances {
     def show(f: String) = f.toList
     def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
     override def equal(x: String, y: String) = x == y
+    override def equalIsNatural: Boolean = true
   }
 }
 

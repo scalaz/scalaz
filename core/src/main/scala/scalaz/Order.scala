@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.math.{Ordering => SOrdering}
+
 ////
 /**
  *
@@ -27,6 +29,8 @@ trait Order[F] extends Equal[F] { self =>
   override def contramap[B](f: B => F): Order[B] = new Order[B] {
     def order(b1: B, b2: B): Ordering = self.order(f(b1), f(b2))
   }
+
+  def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
 
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional

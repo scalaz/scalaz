@@ -17,10 +17,13 @@ object ScalazProperties {
 
     def transitive[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.transitive _)
 
+    def naturality[A](implicit A: Equal[A], arb: Arbitrary[A]) = forAll(A.equalLaw.naturality _)
+
     def laws[A](implicit A: Equal[A], arb: Arbitrary[A]) = new Properties("equal") {
       property("commutativity") = commutativity[A]
       property("reflexive") = reflexive[A]
       property("transitive") = transitive[A]
+      property("naturality") = naturality[A]
     }
   }
 
@@ -257,6 +260,18 @@ object ScalazProperties {
                       axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
       include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
       include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
+    }
+  }
+
+  object lens {
+    def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
+    def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
+    def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)
+
+    def laws[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EA: Equal[A], EB: Equal[B]) = new Properties("lens") {
+      property("identity") = identity[A, B](l)
+      property("retention") = retention[A, B](l)
+      property("doubleSet") = doubleSet[A, B](l)
     }
   }
 }

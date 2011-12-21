@@ -153,6 +153,9 @@ object option extends OptionInstances with OptionFunctions {
 
 trait OptionEqual[A] extends Equal[Option[A]] {
   implicit def A: Equal[A]
+
+  override def equalIsNatural: Boolean = A.equalIsNatural
+
   override def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
     case (Some(a1), Some(a2)) => A.equal(a1, a2)
     case (None, None)         => true

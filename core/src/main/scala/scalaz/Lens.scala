@@ -115,6 +115,14 @@ sealed trait Lens[A, B] {
 
   /** alias for `product` */
   def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] = product(that)
+
+  trait LensLaw {
+    def identity(a: A)(implicit A: Equal[A]): Boolean = A.equal(set(a, get(a)), a)
+    def retention(a: A, b: B)(implicit B: Equal[B]): Boolean = B.equal(get(set(a, b)), b)
+    def doubleSet(a: A, b1: B, b2: B)(implicit A: Equal[A]) = A.equal(set(set(a, b1), b2), set(a, b2))
+  }
+
+  def lensLaw = new LensLaw {}
 }
 
 object Lens extends LensFunctions with LensInstances {
@@ -211,8 +219,8 @@ trait LensInstances {
     def ++=(xs: TraversableOnce[K]) =
       lens %= (_ ++ xs)
 
-    def -=(elem: K): State[S, Set[K]]
-    = lens %= (_ - elem)
+    def -=(elem: K): State[S, Set[K]] =
+      lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): State[S, Set[K]] =
       lens %= (_ - elem1 - elem2 -- elems)
