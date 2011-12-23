@@ -3,13 +3,16 @@ package std
 
 trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
-    implicit def R: Semigroup[R] = R0
+    implicit def R = R0
   }
 }
 
 trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
-    implicit def R: Monoid[R] = R0
+    implicit def R = R0
+  }
+  implicit def function1CoMonad[A, R](implicit A0: Monoid[A]) = new Function1CoMonad[A, R] {
+    implicit def M = A0
   }
 }
 
@@ -111,6 +114,14 @@ trait Function1Semigroup[A, R] extends Semigroup[A => R] {
 trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
   implicit def R: Monoid[R]
   def zero = a => R.zero
+}
+
+trait Function1CoMonad[M, R] extends CoMonad[({type λ[α]=(M => α)})#λ] {
+  implicit def M: Monoid[M]
+  def cojoin[A](a: (M) => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
+  def copoint[A](p: (M) => A) = p(M.zero)
+  def cobind[A, B](fa: (M) => A)(f: ((M) => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
+  def map[A, B](fa: (M) => A)(f: (A) => B) = fa andThen f
 }
 
 trait Function1Group[A, R] extends Group[A => R] with Function1Monoid[A, R] {

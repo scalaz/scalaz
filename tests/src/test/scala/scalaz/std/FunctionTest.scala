@@ -18,7 +18,7 @@ class FunctionTest extends Spec {
   type X = Int
   type Z = Int
 
-  checkAll("() => A", equal.laws[() => Int])
+  checkAll("Function0", equal.laws[() => Int])
 
   implicit def EqualFunction0 = Equal.equalBy[() => Int, Int](_.apply())
   implicit def EqualFunction1 = Equal.equalBy[Int => Int, Int](_.apply(0))
@@ -39,4 +39,6 @@ class FunctionTest extends Spec {
   checkAll("Function0", traverse.laws[Function0])
 
   checkAll("Function1", category.laws[Function1])
+
+  checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
 }
