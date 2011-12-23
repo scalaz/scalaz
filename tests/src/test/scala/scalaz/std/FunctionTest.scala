@@ -41,4 +41,12 @@ class FunctionTest extends Spec {
   checkAll("Function1", category.laws[Function1])
 
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
+
+  object instances {
+    def equal[A, R: Equal] = Equal[() => R]
+    def semigroup[A, R: Semigroup] = Semigroup[A => R]
+    def monoid[A, R: Monoid] = Semigroup[A => R]
+    def group[A, R: Group] = Group[A => R]
+    def comonad[A: Monoid, R] = CoMonad[({type λ[α]=A => α})#λ]
+  }
 }
