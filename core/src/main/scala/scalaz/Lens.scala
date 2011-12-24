@@ -16,6 +16,7 @@ import collection.SeqLike
  * * '''double-set''' `forall a b c. lens.set(lens.set(a,b),c) = lens.set(a,c)`
  *
  * See [[http://www.youtube.com/watch?v=efv0SQNde5Q&feature=related Lenses, a Functional Imperative]]
+ * See [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/colens.pdf Lenses, coalgebraically: View updates through the looking glass]]
  */
 sealed trait Lens[A, B] {
 

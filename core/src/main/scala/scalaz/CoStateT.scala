@@ -1,5 +1,9 @@
 package scalaz
 
+
+/**
+ * @see [[scalaz.Lens]]
+ */
 sealed trait CoStateT[F[_], A, B] {
   def run: (F[A => B], A)
 

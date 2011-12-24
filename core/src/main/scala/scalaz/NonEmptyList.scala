@@ -70,6 +70,8 @@ sealed trait NonEmptyList[A] {
     case x :: xs => nel(x, xs)
   }
 
+  def size: Int = 1 + list.size
+
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 

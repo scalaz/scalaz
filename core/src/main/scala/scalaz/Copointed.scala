@@ -7,6 +7,7 @@ package scalaz
 ////
 trait CoPointed[F[_]] extends Functor[F] { self =>
   ////
+  /** Also known as `extract` / `copoint` */
   def copoint[A](p: F[A]): A
 
   // derived functions

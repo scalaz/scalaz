@@ -2,11 +2,11 @@ package scalaz
 package std
 
 trait TupleInstances0 {
-  implicit def tuple2Instance[A1, A2] = new BiTraverse[Tuple2] {
-    override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
-    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]): G[(C, D)] = {
+  implicit def tuple2BiTraverse[A1, A2] = new BiTraverse[Tuple2] {
+    override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
+      (f(fab._1), g(fab._2))
+    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
       Applicative[G].map2(f(fab._1), g(fab._2))((_, _))
-    }
   }
 
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]) = new Tuple1Semigroup[A1] {
@@ -61,12 +61,20 @@ trait TupleInstances0 {
     implicit def _7 = A7
     implicit def _8 = A8
   }
-  implicit def tuple1Instance: Functor[Tuple1] with CoMonad[Tuple1] = new Tuple1Functor with CoMonad[Tuple1] {
+  /** `Tuple1[A]` is isomorphic to `Id[X]` */
+  implicit def tuple1Instance: Monad[Tuple1] with CoMonad[Tuple1] = new Tuple1Monad with CoMonad[Tuple1] {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
-  implicit def tuple2Functor[A1]: Functor[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] {}
+
+  /** Product functor and comonad */
+  implicit def tuple2Instance[A1]: Functor[({type f[x] = (A1, x)})#f] with CoMonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with CoMonad[({type f[x] = (A1, x)})#f] {
+    def cojoin[A](a: (A1, A)) = (a._1, a)
+    def copoint[A](p: (A1, A)) = p._2
+    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  }
+
   implicit def tuple3Functor[A1, A2]: Functor[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
   implicit def tuple4Functor[A1, A2, A3]: Functor[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
   implicit def tuple5Functor[A1, A2, A3, A4]: Functor[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Functor[A1, A2, A3, A4] {}
@@ -286,8 +294,6 @@ trait TupleInstances1 extends TupleInstances0 {
     implicit def _7 = A7
     implicit def _8 = A8
   }
-
-  implicit def tuple1Monad: Monad[Tuple1] = new Tuple1Monad {}
 
   implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[({type f[x] = (A1, x)})#f] = new Tuple2Monad[A1] {
     implicit def _1 = A1

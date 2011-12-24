@@ -47,4 +47,38 @@ class TupleTest extends Spec {
   checkAll("Tuple8", monad.laws[({type λ[α] = (B, C, D, E, F, G, H, α)})#λ])
 
   checkAll("Tuple1", comonad.laws[Tuple1])
+  checkAll("Tuple2", comonad.laws[({type λ[α]=(Int, α)})#λ])
+
+  object instances {
+    object tuple1 {
+      def show[A: Show] = Show[Tuple1[A]]
+      def equal[A: Equal] = Equal[Tuple1[A]]
+      def order[A: Order] = Order[Tuple1[A]]
+      def semigroup[A: Semigroup] = Semigroup[Tuple1[A]]
+      def monoid[A: Monoid] = Monoid[Tuple1[A]]
+      
+      def monad = Monad[Tuple1]
+      def comonad = CoMonad[Tuple1]
+    }
+    object tuple2 {
+      def show[A: Show, B: Show] = Show[(A, B)]
+      def equal[A: Equal, B: Equal] = Equal[(A, B)]
+      def order[A: Order, B: Order] = Order[(A, B)]
+      def semigroup[A: Semigroup, B: Semigroup] = Semigroup[(A, B)]
+      def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
+      def group[A: Group, B: Group] = Group[(A, B)]
+      
+      def bitraverse = BiTraverse[Tuple2]
+      def functor = Functor[({type λ[α] = (B, α)})#λ]
+      def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
+    }
+    object tuple3 {
+      def show[A: Show, B: Show, C: Show] = Show[(A, B, C)]
+      def equal[A: Equal, B: Equal, C: Equal] = Equal[(A, B, C)]
+      def order[A: Order, B: Order, C: Order] = Order[(A, B, C)]
+      def semigroup[A: Semigroup, B: Semigroup, C: Semigroup] = Semigroup[(A, B, C)]
+      def monoid[A: Monoid, B: Monoid, C: Monoid] = Monoid[(A, B, C)]
+      def group[A: Group, B: Group, C: Group] = Group[(A, B, C)]
+    }
+  }
 }
