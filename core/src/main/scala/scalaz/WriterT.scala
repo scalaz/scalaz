@@ -86,7 +86,7 @@ object WriterT extends WriterTFunctions with WriterTInstances {
 }
 
 trait WriterTInstances4 {
-  implicit def writerTFunctor[F[_], W](F0: Functor[F]) = new WriterTFunctor[F, W] {
+  implicit def writerTFunctor[F[_], W](implicit F0: Functor[F]) = new WriterTFunctor[F, W] {
     implicit def F = F0
   }
 }
@@ -120,14 +120,21 @@ trait WriterTInstances0 extends WriterTInstances1 {
     implicit def F = F0
     implicit def W = W0
   }
+  implicit def writerTCoPointed[F[_], W](implicit F0: CoPointed[F]) = new WriterTCoPointed[F, W] {
+    implicit def F = F0
+  }
   implicit def writerTFoldable[F[_], W](implicit F0: Foldable[F]) = new WriterTFoldable[F, W] {
     implicit def F = F0
   }
+  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: WriterT[F, W, A]).run)
 }
 
 trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTBiTraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBiTraverse[F] {
     implicit def F = F0
+  }
+  implicit def writerCoMonad[W] = new WriterCoMonad[W] {
+    implicit def F = implicitly
   }
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {
     implicit def F = F0
@@ -137,7 +144,10 @@ trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTEach[F[_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
     implicit def F = F0
   }
-  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: WriterT[F, W, A]).run)
+  implicit def writerEqual[W, A](implicit W: Equal[W], A: Equal[A]) = {
+    import std.tuple._
+    Equal[(W, A)].contramap((_: Writer[W, A]).run)
+  }
 }
 
 trait WriterTFunctions {
@@ -222,4 +232,19 @@ trait WriterTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β]=WriterT[F, α
 
   def bitraverse[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
     fab.bitraverse(f, g)
+}
+
+trait WriterTCoPointed[F[_], W] extends CoPointed[({type λ[α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
+  implicit def F: CoPointed[F]
+
+  def copoint[A](p: WriterT[F, W, A]): A = F.copoint(p.over)
+}
+
+trait WriterCoMonad[W] extends CoMonad[({type λ[α] = Writer[W, α]})#λ] with WriterTCoPointed[Id, W] {
+
+  override def cojoin[A](fa: Writer[W, A]): Writer[W, Writer[W, A]] =
+    Writer(fa.written, fa)
+
+  override def cobind[A, B](fa: Writer[W, A])(f: (Writer[W, A]) => B): Writer[W, B] =
+    Writer(fa.written, f(fa))
 }
