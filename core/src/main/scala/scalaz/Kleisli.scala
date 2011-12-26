@@ -42,21 +42,27 @@ trait KleisliInstances2 {
   implicit def kleisliFunctor[F[_], R](implicit F0: Functor[F]): Functor[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliFunctor[F, R] {
     implicit def F: Functor[F] = F0
   }
+
+  implicit def kleisliIdFunctor[R]: Functor[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliFunctor[Id, R]
 }
 
 trait KleisliInstances1 extends KleisliInstances2 {
   implicit def kleisliPointed[F[_], R](implicit F0: Pointed[F]): Pointed[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliPointed[F, R] {
     implicit def F: Pointed[F] = F0
   }
+  implicit def kleisliIdPointed[R]: Pointed[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliPointed[Id, R]
+
   implicit def kleisliApply[F[_], R](implicit F0: Apply[F]): Apply[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliApply[F, R] {
     implicit def F: Apply[F] = F0
   }
+  implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
 }
 
 trait KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliApplicative[F[_], R](implicit F0: Applicative[F]): Applicative[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliApplicative[F, R] {
     implicit def F: Applicative[F] = F0
   }
+  implicit def kleisliIdApplicative[R]: Applicative[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApplicative[Id, R]
 
   implicit def kleisliArrId[F[_]](implicit F0: Pointed[F]) = new KleisliArrIdArr[F] {
     implicit def F: Pointed[F] = F0
@@ -64,13 +70,15 @@ trait KleisliInstances0 extends KleisliInstances1 {
 }
 
 trait KleisliInstances extends KleisliInstances0 {
-  implicit def kleisliCategory[F[_]](implicit F0: Monad[F]) = new KleisliCategory[F] {
+  implicit def kleisliArrow[F[_]](implicit F0: Monad[F]) = new KleisliArrow[F] {
     implicit def F: Monad[F] = F0
   }
 
   implicit def kleisliMonadReader[F[_], R](implicit F0: Monad[F]) = new KleisliMonadReader[F, R] {
     implicit def F: Monad[F] = F0
   }
+
+  implicit def kleisliIdMonadReader[R] = kleisliMonadReader[Id, R]
 
   /** Kleisli version of `Monoid[Endo[A]]`. `append(f1, f2) == f1 <=< f2`. */
   implicit def kleisliMonoid[F[_], A](implicit F0: Monad[F]) = new Monoid[Kleisli[F, A, A]] {
@@ -147,14 +155,10 @@ private[scalaz] trait KleisliArrIdArr[F[_]] extends ArrId[({type λ[α, β] = Kl
   def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
 }
 
-private[scalaz] trait KleisliCategory[F[_]] extends Category[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliArrIdArr[F] {
+private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliArrIdArr[F] {
   implicit def F: Monad[F]
 
   def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
-}
-
-private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliCategory[F] {
-  implicit def F: Monad[F]
 
   def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))

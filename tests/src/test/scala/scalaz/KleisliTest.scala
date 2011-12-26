@@ -8,6 +8,7 @@ import org.scalacheck.{Gen, Arbitrary}
 class KleisliTest extends Spec {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
+  type KleisliOptInt[B] = KleisliOpt[Int, B]
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
     Arbitrary(Gen.frequency[Int => Option[Int]](
@@ -25,4 +26,25 @@ class KleisliTest extends Spec {
   }
 
   checkAll(category.laws[KleisliOpt])
+  checkAll(monad.laws[KleisliOptInt])
+
+  object instances {
+    def functor[F[_] : Functor, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
+    def apply[F[_] : Apply, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
+    def pointed[F[_] : Pointed, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
+    def monadReader[F[_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
+
+    def arrId[F[_]: Pointed, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def category[F[_]: Monad, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def arrow[F[_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+
+    // F = Id
+    def readerFunctor[A] = Functor[({type λ[α]=Reader[A, α]})#λ]
+    def readerApply[A] = Apply[({type λ[α]=Reader[A, α]})#λ]
+    def readerPointed[A] = Pointed[({type λ[α]=Reader[A, α]})#λ]
+    def readerMonadReader[A] = MonadReader[({type f[s, a] = Reader[s, a]})#f, A]
+    def readerArrId[A] = ArrId[Reader]
+    def readerCategory[A] = ArrId[Reader]
+    def readerArrow[A] = Arrow[Reader]
+  }
 }
