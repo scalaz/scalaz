@@ -130,6 +130,12 @@ package object scalaz {
     }
   }
 
+  type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[Identity, R, W, S, A]
+
+  type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
+
+  type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
+
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
    *
