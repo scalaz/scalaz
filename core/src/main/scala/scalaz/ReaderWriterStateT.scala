@@ -1,6 +1,5 @@
 package scalaz
 
-// TODO MonadReader (?)
 sealed trait ReaderWriterStateT[F[_], R, W, S, A] {
   self =>
   def run(r: R, s: S): F[(W, A, S)]
@@ -55,8 +54,9 @@ trait ReaderWriterStateTInstances0 extends ReaderWriterStateTInstances1 {
 }
 
 trait ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 {
-  implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]): Monad[({type λ[α] = ReaderWriterStateT[F, R, W, S, α]})#λ] =
-    new ReaderWriterStateTMonad[F, R, W, S] {
+  implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]):
+  MonadReader[({type λ[r, α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R] with MonadState[({type f[s, a] = ReaderWriterStateT[F, R, W, s, a]})#f, S] =
+    new ReaderWriterStateTMonadReader[F, R, W, S] {
       implicit def F = F0
       implicit def W = W0
     }
@@ -73,7 +73,19 @@ trait ReaderWriterStateTPointed[F[_], R, W, S] extends Pointed[({type λ[α]=Rea
   def point[A](a: => A) = ReaderWriterStateT((r, s) => F.point((W.zero, a, s)))
 }
 
-trait ReaderWriterStateTMonad[F[_], R, W, S] extends Monad[({type λ[α]=ReaderWriterStateT[F, R, W, S, α]})#λ] with ReaderWriterStateTPointed[F, R, W, S] {
+trait ReaderWriterStateTMonadReader[F[_], R, W, S]
+  extends MonadReader[({type λ[r, α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R]
+  with MonadState[({type f[s, a] = ReaderWriterStateT[F, R, W, s, a]})#f, S]
+  with ReaderWriterStateTPointed[F, R, W, S] {
   implicit def F: Monad[F]
+
   def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => ReaderWriterStateT[F, R, W, S, B]) = fa flatMap f
+  def ask: ReaderWriterStateT[F, R, W, S, R] =
+    ReaderWriterStateT((r, s) => F.point((W.zero, r, s)))
+  def local[A](f: (R) => R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
+    ReaderWriterStateT((r, s) => fa.run(f(r), s))
+  def init: ReaderWriterStateT[F, R, W, S, S] =
+    ReaderWriterStateT((r, s) => F.point((W.zero, s, s)))
+  def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
+    ReaderWriterStateT((r, _) => F.point((W.zero, s, ())))
 }
