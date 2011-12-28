@@ -87,5 +87,5 @@ trait ReaderWriterStateTMonadReader[F[_], R, W, S]
   def init: ReaderWriterStateT[F, R, W, S, S] =
     ReaderWriterStateT((r, s) => F.point((W.zero, s, s)))
   def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
-    ReaderWriterStateT((r, _) => F.point((W.zero, s, ())))
+    ReaderWriterStateT((r, _) => F.point((W.zero, (), s)))
 }

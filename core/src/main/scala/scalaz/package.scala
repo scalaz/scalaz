@@ -134,6 +134,8 @@ package object scalaz {
 
   type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
 
+  val RWST: ReaderWriterStateT.type = ReaderWriterStateT
+
   type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
 
   /**
