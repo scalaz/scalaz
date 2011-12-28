@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait WriterT[F[_], W, A] {
+sealed trait WriterT[F[_], W, A] { self =>
   val run: F[(W, A)]
 
   import WriterT._
@@ -74,10 +74,11 @@ sealed trait WriterT[F[_], W, A] {
       case (a, b) => G.map2(f(a), g(b))((_, _))
     })(writerT(_))
 
-//  def rws[R, S](implicit ftr: Functor[F]): ReaderWriterStateT[A, W, S, F, A] =
-//    ReaderWriterStateT.readerWriterStateT(_ => s =>
-//      implicitly[Functor[F]].fmap((wa: (W, A)) => (wa._2, s, wa._1))(runT))
-
+  def rwst[R, S](implicit F: Functor[F]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
+    (r, s) => F.map(self.run) {
+      case (w, a) => (w, a, s)
+    }
+  )
 }
 
 object WriterT extends WriterTFunctions with WriterTInstances {

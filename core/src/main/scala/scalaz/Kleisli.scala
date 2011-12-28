@@ -3,7 +3,7 @@ package scalaz
 /**
  * Represents a function `A => M[B]`.
  */
-sealed trait Kleisli[M[_], A, B] {
+sealed trait Kleisli[M[_], A, B] { self =>
   def run(a: A): M[B]
 
   import Kleisli._
@@ -33,6 +33,12 @@ sealed trait Kleisli[M[_], A, B] {
 
   def flatMapK[C](f: B => Kleisli[M, A, C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli((r: A) => M.bind[B, C](run(r))(((b: B) => f(b).run(r))))
+
+  def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, B] = ReaderWriterStateT(
+    (r, s) => M.map(self(r)) {
+      b => (W.zero, b, s)
+    }
+  )
 }
 
 //

@@ -38,6 +38,12 @@ trait StateT[F[_], S, A] { self =>
   }
 
   def unliftId[M[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[α]})#λ, S, A]): State[S, A] = unlift[M, Id]
+
+  def rwst[W, R](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
+    (r, s) => F.map(self(s)) {
+      case (a, s) => (W.zero, a, s)
+    }
+  )
 }
 
 object StateT extends StateTFunctions with StateTInstances {
@@ -109,7 +115,7 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
 
-  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, s)))
+  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point(((), s)))
 }
 
 private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[g, S, a]})#f] {
