@@ -4,7 +4,9 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.scalacheck.ScalaCheckBinding._
 import Tags._
+import org.scalacheck.{Gen, Arbitrary}
 
 class AnyValTest extends Spec {
 
@@ -39,4 +41,10 @@ class AnyValTest extends Spec {
   checkAll("Int", group.laws[Int])
   checkAll("Short", group.laws[Short])
   checkAll("Long", group.laws[Long])
+
+  {
+    implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))
+
+    checkAll("Int", metricSpace.laws[Int])
+  }
 }

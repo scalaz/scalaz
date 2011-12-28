@@ -42,5 +42,5 @@ trait OrderingFunctions {
     else if (f(a2, a1)) GT
     else EQ
 
-  def fromInt(intOrdering: Int) = if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
+  def fromInt(intOrdering: Int): Ordering = if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
 }

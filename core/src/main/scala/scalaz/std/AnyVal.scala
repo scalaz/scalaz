@@ -158,6 +158,8 @@ trait AnyValInstances {
 
     def inverse(f:Int) = -f
 
+    def distance(a: Int, b: Int): Int = b - a
+
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
     override def equalIsNatural: Boolean = true
@@ -167,6 +169,11 @@ trait AnyValInstances {
 
       def zero: Int = 1
     }
+  }
+
+  /** Warning: the triangle inequality will not hold if `b - a` overflows. */
+  implicit val intMetricSpace: MetricSpace[Int] = new MetricSpace[Int] {
+    def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
   }
 
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Order[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Order[Int @@ Multiplication] {
