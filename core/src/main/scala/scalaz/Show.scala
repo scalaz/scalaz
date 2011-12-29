@@ -13,7 +13,6 @@ trait Show[F]  { self =>
   def xmlText(f: F): xml.Text = xml.Text(shows(f))
 
   // derived functions
-
   ////
   val showSyntax = new scalaz.syntax.ShowSyntax[F] {}
 }
@@ -25,6 +24,12 @@ object Show {
 
   def showFromToString[A]: Show[A] = new Show[A] {
     def show(f: A): List[Char] = f.toString.toList
+  }
+
+  implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
+    def contramap[A, B](r: Show[A])(f: (B) => A): Show[B] = new Show[B] {
+      def show(b: B): List[Char] = r.show(f(b))
+    }
   }
 
   ////
