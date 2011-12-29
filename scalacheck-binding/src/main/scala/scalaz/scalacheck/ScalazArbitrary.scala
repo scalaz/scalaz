@@ -56,8 +56,7 @@ object ScalazArbitrary {
 
   implicit def LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] = Tag.subst(arb[Long])
 
-  // TODO Is Digit not available anymore?
-  // implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
+  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].map2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
