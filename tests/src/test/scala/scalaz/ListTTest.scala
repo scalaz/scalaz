@@ -27,4 +27,11 @@ class ListTTest extends Spec {
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
   checkAll(monad.laws[ListTOpt])
+  
+  object instances {
+    def semigroup[F[_]: Functor, A] = Semigroup[ListT[F, A]]
+    def monoid[F[_]: Pointed, A] = Monoid[ListT[F, A]]
+    def functor[F[_]: Functor, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
+    def monad[F[_]: Monad, A] = Monad[({type λ[α]=ListT[F, α]})#λ]
+  }
 }
