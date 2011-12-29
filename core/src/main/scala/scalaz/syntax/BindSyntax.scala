@@ -15,6 +15,11 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
 
   def >>[B](b: F[B]): F[B] = F.bind(self)(_ => b)
 
+  def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A <~< Boolean): F[B] = {
+    val value: F[Boolean] = Liskov.co[F, A, Boolean](ev)(self)
+    F.ifM(value, ifTrue, ifFalse)
+  }
+
   ////
 }
 
