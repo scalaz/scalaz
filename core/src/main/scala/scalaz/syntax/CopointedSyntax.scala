@@ -5,6 +5,7 @@ package syntax
 trait CoPointedV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: CoPointed[F]
   ////
+  def copoint: A = F.copoint(self)
 
   ////
 }
