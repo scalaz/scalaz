@@ -135,7 +135,7 @@ object IterateeT extends IterateeTFunctions with IterateeTInstances with Enumera
 }
 
 trait IterateeTInstances1 {
-  implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]) = new IterateeTMonad[X, E, F] {
+  implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
 }
