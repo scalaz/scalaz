@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.annotation._
+
 /**
  * Represents a type `MA` that has been destructured into as a type constructor `M[_]`
  * applied to type `A`, along with a corresponding type class instance `TC[M]`.
@@ -40,6 +42,11 @@ package scalaz
  *
  * Credits to Miles Sabin.
  */
+@implicitNotFound(
+"""Unable to unapply type `${MA}` into a type constructor of kind `M[_]` that is classified by the type class `${TC}`
+1) Check that the type class is defined by compiling `implicitly[${TC}[<type constructor>]]`.
+2) Review the implicits in object Unapply, which only cover common type 'shapes'
+(implicit not found: scalaz.Unapply[${TC}, ${MA}])""")
 trait Unapply[TC[_[_]], MA] {
 
   /** The type constructor */
