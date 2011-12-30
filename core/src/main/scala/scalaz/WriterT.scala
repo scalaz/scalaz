@@ -160,6 +160,13 @@ trait WriterTFunctions {
     writerT[Id, W, A](v)
 
   def tell[W](w: W): Writer[W, Unit] = writer(w -> ())
+
+  def put[F[_], W, A](value: F[A])(w: W)(implicit F: Functor[F]): WriterT[F, W, A] =
+    WriterT(F.map(value)(a => (w, a)))
+
+  /** Puts the written value that is produced by applying the given function into a writer transformer and associates with `value` */
+  def putWith[F[_], W, A](value: F[A])(w: A => W)(implicit F: Functor[F]): WriterT[F, W, A] =
+    WriterT(F.map(value)(a => (w(a), a)))
 }
 
 //
