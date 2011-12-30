@@ -183,9 +183,17 @@ object GenTypeClass {
       case Seq() => ""
       case es    => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
     }
-    def extendsToSyntaxListText = extendsList match {
-      case Seq() => ""
-      case es    => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
+    def extendsToSyntaxListText = kind match {
+      case Kind.*->* | Kind.*^*->* =>
+        "extends To" + typeClassName + "V0" + (extendsList match {
+          case Seq() => ""
+          case es    => es.map(n => "To" + n + "V").mkString(" with ", " with ", "")
+        })
+      case _    =>
+        extendsList match {
+          case Seq() => ""
+          case es    => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
+        }
     }
     val extendsLikeList = extendsListText("")
 
@@ -260,22 +268,14 @@ trait %sSyntax[F] %s {
       typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
     )
     case Kind.*->* =>
-      val ToV = if (useDependentMethodTypes) {
-"""  implicit def To%sV[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
+      val ToVUnapply =
+"""  implicit def To%sVUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
     new %sV[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
 """.format(Seq.fill(4)(typeClassName): _*)
-      } else {
+      val ToVMA =
 """  implicit def To%sV[F[_],A](v: F[A])(implicit F0: %s[F]) =
     new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
-  implicit def To%sVFromBin[F[_, _], X, A](v: F[X, A])(implicit F0: %s[({type f[a] = F[X, a]})#f]) =
-    new %sV[({type f[a] = F[X, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, a]})#f] = F0 }
-  implicit def To%sVFromBinT[F[_, _[_], _], G[_], X, A](v: F[X, G, A])(implicit F0: %s[({type f[a] = F[X, G, a]})#f]) =
-    new %sV[({type f[a] = F[X, G, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, G, a]})#f] = F0 }
-  implicit def To%sVFromBinTId[F[_, _[_], _], X, A](v: F[X, Id, A])(implicit F0: %s[({type f[a] = F[X, Id, a]})#f]) =
-    new %sV[({type f[a] = F[X, Id, a]})#f,A] { def self = v; implicit def F: %s[({type f[a] = F[X, Id, a]})#f] = F0 }
-""".format(Seq.fill(4 * 4)(typeClassName) :_*)
-      }
-
+""".format(Seq.fill(4)(typeClassName) :_*)
 
     """%s
 
@@ -285,6 +285,10 @@ trait %sV[F[_],A] extends SyntaxV[F[A]] {
   ////
 
   ////
+}
+
+trait To%sV0 {
+%s
 }
 
 trait To%sV %s {
@@ -303,25 +307,25 @@ trait %sSyntax[F[_]] %s {
 }
 """.format(syntaxPackString, typeClassName, typeClassName,
       typeClassName,
+      typeClassName, ToVUnapply,
       typeClassName, extendsToSyntaxListText,
 
-          ToV,
+          ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
           typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )
       case Kind.*^*->* =>
 
-        val ToV = if (useDependentMethodTypes) {
-  """  implicit def To%sV[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
+        val ToVUnapply =
+  """  implicit def To%sVUnapply[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
       new %sV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
   """.format(Seq.fill(4)(typeClassName): _*)
-        } else {
+       val ToVFAB =
   """
   implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
       new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
   """.format(Seq.fill(4)(typeClassName) :_*)
-        }
 
 
     """%s
@@ -332,6 +336,10 @@ trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 
   ////
+}
+
+trait To%sV0 {
+  %s
 }
 
 trait To%sV %s {
@@ -349,8 +357,11 @@ trait %sSyntax[F[_, _]] %s {
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
-          ToV,
+""".format(syntaxPackString, typeClassName, typeClassName, typeClassName,
+          typeClassName,
+          ToVUnapply,
+          typeClassName, extendsToSyntaxListText,
+          ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
           typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
         )

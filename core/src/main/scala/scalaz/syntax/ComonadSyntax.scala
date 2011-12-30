@@ -9,9 +9,15 @@ trait CoMonadV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCoMonadV extends ToCoPointedV with ToCoJoinV with ToCoBindV {
-  implicit def ToCoMonadV[FA](v: FA)(implicit F0: Unapply[CoMonad, FA]) =
+trait ToCoMonadV0 {
+  implicit def ToCoMonadVUnapply[FA](v: FA)(implicit F0: Unapply[CoMonad, FA]) =
     new CoMonadV[F0.M,F0.A] { def self = F0(v); implicit def F: CoMonad[F0.M] = F0.TC }
+
+}
+
+trait ToCoMonadV extends ToCoMonadV0 with ToCoPointedV with ToCoJoinV with ToCoBindV {
+  implicit def ToCoMonadV[F[_],A](v: F[A])(implicit F0: CoMonad[F]) =
+    new CoMonadV[F,A] { def self = v; implicit def F: CoMonad[F] = F0 }
 
   ////
 

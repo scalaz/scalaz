@@ -9,9 +9,15 @@ trait CoJoinV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCoJoinV  {
-  implicit def ToCoJoinV[FA](v: FA)(implicit F0: Unapply[CoJoin, FA]) =
+trait ToCoJoinV0 {
+  implicit def ToCoJoinVUnapply[FA](v: FA)(implicit F0: Unapply[CoJoin, FA]) =
     new CoJoinV[F0.M,F0.A] { def self = F0(v); implicit def F: CoJoin[F0.M] = F0.TC }
+
+}
+
+trait ToCoJoinV extends ToCoJoinV0 {
+  implicit def ToCoJoinV[F[_],A](v: F[A])(implicit F0: CoJoin[F]) =
+    new CoJoinV[F,A] { def self = v; implicit def F: CoJoin[F] = F0 }
 
   ////
 

@@ -12,9 +12,15 @@ trait LiftControlIOV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToLiftControlIOV  {
-  implicit def ToLiftControlIOV[FA](v: FA)(implicit F0: Unapply[LiftControlIO, FA]) =
+trait ToLiftControlIOV0 {
+  implicit def ToLiftControlIOVUnapply[FA](v: FA)(implicit F0: Unapply[LiftControlIO, FA]) =
     new LiftControlIOV[F0.M,F0.A] { def self = F0(v); implicit def F: LiftControlIO[F0.M] = F0.TC }
+
+}
+
+trait ToLiftControlIOV extends ToLiftControlIOV0 {
+  implicit def ToLiftControlIOV[F[_],A](v: F[A])(implicit F0: LiftControlIO[F]) =
+    new LiftControlIOV[F,A] { def self = v; implicit def F: LiftControlIO[F] = F0 }
 
   ////
 

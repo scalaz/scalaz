@@ -8,9 +8,15 @@ trait PointedV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToPointedV extends ToFunctorV {
-  implicit def ToPointedV[FA](v: FA)(implicit F0: Unapply[Pointed, FA]) =
+trait ToPointedV0 {
+  implicit def ToPointedVUnapply[FA](v: FA)(implicit F0: Unapply[Pointed, FA]) =
     new PointedV[F0.M,F0.A] { def self = F0(v); implicit def F: Pointed[F0.M] = F0.TC }
+
+}
+
+trait ToPointedV extends ToPointedV0 with ToFunctorV {
+  implicit def ToPointedV[F[_],A](v: F[A])(implicit F0: Pointed[F]) =
+    new PointedV[F,A] { def self = v; implicit def F: Pointed[F] = F0 }
 
   ////
   implicit def PointedIdV[A](v: => A) = new PointedIdV[A] {

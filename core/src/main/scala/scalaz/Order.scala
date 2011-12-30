@@ -1,14 +1,15 @@
 package scalaz
 
+////
 import scala.math.{Ordering => SOrdering}
 
-////
 /**
  *
  */
 ////
 trait Order[F] extends Equal[F] { self =>
   ////
+
   def order(x: F, y: F): Ordering 
   
   def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ

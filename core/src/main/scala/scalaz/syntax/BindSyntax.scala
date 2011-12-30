@@ -23,9 +23,15 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToBindV extends ToApplyV {
-  implicit def ToBindV[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
+trait ToBindV0 {
+  implicit def ToBindVUnapply[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
     new BindV[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
+
+}
+
+trait ToBindV extends ToBindV0 with ToApplyV {
+  implicit def ToBindV[F[_],A](v: F[A])(implicit F0: Bind[F]) =
+    new BindV[F,A] { def self = v; implicit def F: Bind[F] = F0 }
 
   ////
 

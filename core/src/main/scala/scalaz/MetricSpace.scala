@@ -13,8 +13,7 @@ package scalaz
  * @see [[scalaz.BKTree]]
  */
 ////
-trait MetricSpace[F] {
-  self =>
+trait MetricSpace[F]  { self =>
   ////
   def distance(a: F, b: F): Int
 

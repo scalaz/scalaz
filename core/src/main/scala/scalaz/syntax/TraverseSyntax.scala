@@ -56,9 +56,15 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToTraverseV extends ToFunctorV with ToFoldableV {
-  implicit def ToTraverseV[FA](v: FA)(implicit F0: Unapply[Traverse, FA]) =
+trait ToTraverseV0 {
+  implicit def ToTraverseVUnapply[FA](v: FA)(implicit F0: Unapply[Traverse, FA]) =
     new TraverseV[F0.M,F0.A] { def self = F0(v); implicit def F: Traverse[F0.M] = F0.TC }
+
+}
+
+trait ToTraverseV extends ToTraverseV0 with ToFunctorV with ToFoldableV {
+  implicit def ToTraverseV[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
+    new TraverseV[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
 
   ////
 

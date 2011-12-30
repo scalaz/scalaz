@@ -9,9 +9,15 @@ trait LengthV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToLengthV  {
-  implicit def ToLengthV[FA](v: FA)(implicit F0: Unapply[Length, FA]) =
+trait ToLengthV0 {
+  implicit def ToLengthVUnapply[FA](v: FA)(implicit F0: Unapply[Length, FA]) =
     new LengthV[F0.M,F0.A] { def self = F0(v); implicit def F: Length[F0.M] = F0.TC }
+
+}
+
+trait ToLengthV extends ToLengthV0 {
+  implicit def ToLengthV[F[_],A](v: F[A])(implicit F0: Length[F]) =
+    new LengthV[F,A] { def self = v; implicit def F: Length[F] = F0 }
 
   ////
 

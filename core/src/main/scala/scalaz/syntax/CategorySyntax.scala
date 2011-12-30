@@ -9,9 +9,16 @@ trait CategoryV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToCategoryV extends ToArrIdV with ToComposeV {
-    implicit def ToCategoryV[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
+trait ToCategoryV0 {
+    implicit def ToCategoryVUnapply[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
       new CategoryV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Category[F0.M] = F0.TC }
+  
+}
+
+trait ToCategoryV extends ToCategoryV0 with ToArrIdV with ToComposeV {
+  
+  implicit def ToCategoryV[F[_, _],A, B](v: F[A, B])(implicit F0: Category[F]) =
+      new CategoryV[F,A, B] { def self = v; implicit def F: Category[F] = F0 }
   
 
   ////

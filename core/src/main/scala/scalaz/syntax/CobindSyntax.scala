@@ -9,9 +9,15 @@ trait CoBindV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToCoBindV  {
-  implicit def ToCoBindV[FA](v: FA)(implicit F0: Unapply[CoBind, FA]) =
+trait ToCoBindV0 {
+  implicit def ToCoBindVUnapply[FA](v: FA)(implicit F0: Unapply[CoBind, FA]) =
     new CoBindV[F0.M,F0.A] { def self = F0(v); implicit def F: CoBind[F0.M] = F0.TC }
+
+}
+
+trait ToCoBindV extends ToCoBindV0 {
+  implicit def ToCoBindV[F[_],A](v: F[A])(implicit F0: CoBind[F]) =
+    new CoBindV[F,A] { def self = v; implicit def F: CoBind[F] = F0 }
 
   ////
 

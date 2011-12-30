@@ -11,9 +11,15 @@ trait PlusV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToPlusV extends ToFunctorV {
-  implicit def ToPlusV[FA](v: FA)(implicit F0: Unapply[Plus, FA]) =
+trait ToPlusV0 {
+  implicit def ToPlusVUnapply[FA](v: FA)(implicit F0: Unapply[Plus, FA]) =
     new PlusV[F0.M,F0.A] { def self = F0(v); implicit def F: Plus[F0.M] = F0.TC }
+
+}
+
+trait ToPlusV extends ToPlusV0 with ToFunctorV {
+  implicit def ToPlusV[F[_],A](v: F[A])(implicit F0: Plus[F]) =
+    new PlusV[F,A] { def self = v; implicit def F: Plus[F] = F0 }
 
   ////
 

@@ -14,9 +14,15 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToFoldableV  {
-  implicit def ToFoldableV[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
+trait ToFoldableV0 {
+  implicit def ToFoldableVUnapply[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
     new FoldableV[F0.M,F0.A] { def self = F0(v); implicit def F: Foldable[F0.M] = F0.TC }
+
+}
+
+trait ToFoldableV extends ToFoldableV0 {
+  implicit def ToFoldableV[F[_],A](v: F[A])(implicit F0: Foldable[F]) =
+    new FoldableV[F,A] { def self = v; implicit def F: Foldable[F] = F0 }
 
   ////
 

@@ -10,9 +10,15 @@ trait ContravariantV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToContravariantV  {
-  implicit def ToContravariantV[FA](v: FA)(implicit F0: Unapply[Contravariant, FA]) =
+trait ToContravariantV0 {
+  implicit def ToContravariantVUnapply[FA](v: FA)(implicit F0: Unapply[Contravariant, FA]) =
     new ContravariantV[F0.M,F0.A] { def self = F0(v); implicit def F: Contravariant[F0.M] = F0.TC }
+
+}
+
+trait ToContravariantV extends ToContravariantV0 {
+  implicit def ToContravariantV[F[_],A](v: F[A])(implicit F0: Contravariant[F]) =
+    new ContravariantV[F,A] { def self = v; implicit def F: Contravariant[F] = F0 }
 
   ////
 
