@@ -87,10 +87,19 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
+  lazy val typelevel = Project(
+    id = "typelevel",
+    base = file("typelevel"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-typelevel"
+    ),
+    dependencies = Seq(core)
+  )
+
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent),
+    dependencies = Seq(core, iteratee, concurrent, typelevel),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example"
     )
@@ -109,7 +118,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(

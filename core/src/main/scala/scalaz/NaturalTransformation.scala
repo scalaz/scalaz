@@ -1,6 +1,6 @@
 package scalaz
 
-trait NaturalTransformation[F[_], G[_]] {
+trait NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
 
@@ -23,7 +23,7 @@ trait NaturalTransformations {
 
 object NaturalTransformation extends NaturalTransformations
 
-trait BiNaturalTransformation[F[_, _], G[_, _]] {
+trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
   self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
