@@ -9,7 +9,7 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   final def ∘[B](f: A => B): F[B] = F.map(self)(f)
   final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
   final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
-  def fpair: F[(A, A)] = F.fpair(self)
+  final def fpair: F[(A, A)] = F.fpair(self)
   ////
 }
 
@@ -30,6 +30,13 @@ trait ToFunctorV extends ToFunctorV0 {
   // TODO Duplication
   trait LiftV[F[_], A, B] extends SyntaxV[A => B] {
     def lift(implicit F: Functor[F]) = F(self)
+  }
+
+  implicit def ToFunctorIdV[A](v: A) = new FunctorIdV[A] { def self = v }
+
+  trait FunctorIdV[A] extends SyntaxV[A] {
+    def mapply[F[_], B](f: F[A => B])(implicit F: Functor[F]): F[B] =
+      F.map(f)(fab => fab(self))
   }
   ////
 }
