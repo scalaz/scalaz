@@ -48,10 +48,10 @@ trait OptionInstances extends OptionInstances0 {
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    def show(o1: Option[A]) = (o1 match {
-      case Some(a1) => "Some(" + Show[A].show(a1) + ")"
-      case None     => "None"
-    }).toList
+    def show(o1: Option[A]) = o1 match {
+      case Some(a1) => "Some(".toList ::: Show[A].show(a1) ::: ")".toList
+      case None     => "None".toList
+    }
   }
 
   import Tags.{First, Last}
