@@ -6,15 +6,18 @@ import effect._
 import Iteratee._
 
 trait EnumeratorTInstances0 {
-  implicit def EnumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]) = new EnumeratorTSemigroup[X, E, F, A] {
+  implicit def enumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]): Semigroup[EnumeratorT[X, E, F, A]] = new EnumeratorTSemigroup[X, E, F, A] {
     implicit def F = F0
   }
 }
 
-
 trait EnumeratorTInstances extends EnumeratorTInstances0 {
-  implicit def EnumeratorTMonoid[X, E, F[_], A](implicit F0: Bind[F] with Pointed[F]) = new EnumeratorTMonoid[X, E, F, A] {
+  implicit def enumeratorTMonoid[X, E, F[_], A](implicit F0: Monad[F]): Monoid[EnumeratorT[X, E, F, A]] = new EnumeratorTMonoid[X, E, F, A] {
     implicit def F = F0
+  }
+  implicit def enumeratorMonoid[X, E, A]: Monoid[Enumerator[X, E, A]] = new Monoid[Enumerator[X, E, A]] {
+    def append(f1: (Step[X, E, A]) => Step[X, E, A], f2: => (Step[X, E, A]) => Step[X, E, A]): Step[X, E, A] => Step[X, E, A] = f1 andThen f2
+    def zero: (Step[X, E, A]) => Step[X, E, A] = x => x
   }
 }
 
@@ -131,13 +134,13 @@ trait EnumeratorTFunctions {
 private[scalaz] trait EnumeratorTSemigroup[X, E, F[_], A] extends Semigroup[EnumeratorT[X, E, F, A]] {
   implicit def F: Bind[F]
 
-  def append(f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A], 
-             f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = 
+  def append(f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A],
+             f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] =
     s => f1(s) >>== f2
 }
 
 private[scalaz] trait EnumeratorTMonoid[X, E, F[_], A] extends Monoid[EnumeratorT[X, E, F, A]] with EnumeratorTSemigroup[X, E, F, A] {
-  implicit def F: Bind[F] with Pointed[F]
+  implicit def F: Monad[F]
 
   def zero: (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = _.pointI
 }

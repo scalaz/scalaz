@@ -14,7 +14,11 @@ sealed trait IterateeT[X, E, F[_], A] {
                 )(implicit F: Bind[F]): F[Z] =
     F.bind(value)((s: StepT[X, E, F, A]) => s(cont, done, err))
 
-  def apply(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
+  /** An alias for `run` */
+  def apply(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = run(e)
+
+  /** Run this iteratee */
+  def run(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
     val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
     F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
@@ -22,6 +26,9 @@ sealed trait IterateeT[X, E, F[_], A] {
       , err = e
     ))
   }
+
+  /** Like `run`, but uses `Monoid[F[A]].zero` in the error case */
+  def runOrZero(implicit F: Monad[F], FA: Monoid[F[A]]): F[A] = apply(_ => FA.zero)
 
   def flatMap[B](f: A => IterateeT[X, E, F, B])(implicit F: Monad[F]): IterateeT[X, E, F, B] = {
     def through(x: IterateeT[X, E, F, A]): IterateeT[X, E, F, B] =
@@ -128,25 +135,16 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 }
 
-// object IterateeT is in the implicit scope for EnumeratorT, so we mix in EnumeratorTInstances here.
-object IterateeT extends IterateeTFunctions with IterateeTInstances with EnumeratorTInstances{
+object IterateeT extends IterateeTFunctions with IterateeTInstances {
   def apply[X, E, F[_], A](s: F[StepT[X, E, F, A]]): IterateeT[X, E, F, A] =
     iterateeT(s)
 }
 
-trait IterateeTInstances1 {
+trait IterateeTInstances0 {
   implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
-}
-
-trait IterateeTInstances0 extends IterateeTInstances1 {
-  import IterateeT._
-
-  implicit def iterateeTLiftIO[X, E, F[_]](implicit F: MonadIO[F]): LiftIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] = 
-    new IterateeTLiftIO[X, E, F] {
-      implicit def M = F
-    }
+  implicit def IterateeMonad[X, E]: Monad[({type λ[α] = Iteratee[X, E, α]})#λ] = IterateeTMonad[X, E, Id]
 }
 
 trait IterateeTInstances extends IterateeTInstances0 {
@@ -160,9 +158,9 @@ trait IterateeTInstances extends IterateeTInstances0 {
   }
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
-    new MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] with IterateeTLiftIO[X, E, F] with IterateeTMonad[X, E, F] {
+    new IterateeTMonadIO[X, E, F] {
       implicit def F = M0
-      implicit def M = M0
+      implicit def G = M0
     }
 }
 
@@ -286,8 +284,8 @@ private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = I
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
 }
 
-private[scalaz] trait IterateeTLiftIO[X, E, F[_]] extends LiftIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] {
-  implicit def M: MonadIO[F]
+private[scalaz] trait IterateeTMonadIO[X, E, F[_]] extends MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] with IterateeTMonad[X, E, F] {
+  implicit def F: MonadIO[F]
   
-  def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(M.liftIO(ioa))
+  def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(F.liftIO(ioa))
 }
