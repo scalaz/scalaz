@@ -22,6 +22,14 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def zero: F
 
   // derived functions
+  /**
+   * For `n = 0`, `zero`
+   * For `n = 1`, `append(zero, value)`
+   * For `n = 2`, `append(append(zero, value), value)`
+   *
+   * [[scalaz.Monoid]]`.replicate` generalizes this function.
+   */
+  final def multiply(value: F, n: Int): F = Monoid.replicate[Id, F](value)(n)(implicitly, this)
 
   /**
    * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:

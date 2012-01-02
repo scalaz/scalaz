@@ -70,4 +70,26 @@ class TraverseTest extends Spec {
       state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
     }
   }
+
+  "derived functions" should {
+    "sequence" in {
+      some(List(1, 2, 3)).sequence must be_===(List(some(1), some(2), some(3)))
+      List(some(1), some(2)).sequence must be_===(some(List(1, 2)))
+      List(some(1), none[Int]).sequence must be_===(none)
+
+      val states: List[State[Int, Int]] = List(State((s: Int) => (0, s + 1)), State((s: Int) => (s, s + 1)))
+      val state: State[Int, List[Int]] = states.sequenceU
+      state.run(0) must be_===((List(0, 1), 2))
+    }
+
+    "reverse" in {
+      Traverse[List].reverse(List(1, 2, 3)) must be_===(List(3, 2, 1))
+    }
+
+    "double reverse" ! check {
+      (is: List[Int]) =>
+        import syntax.monoid._
+        Endo(Traverse[List].reverse[Int]).multiply(2).apply(is) must be_===(is)
+    }
+  }
 }
