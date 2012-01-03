@@ -4,6 +4,19 @@ package iteratee
 import effect._
 import Iteratee._
 
+/**
+ * A data sink.
+ *
+ * Represents a value of type `F[StepT[X, E, F, A]]`
+ *
+ * @see [[scalaz.iteratee.StepT]]
+ *
+ * @tparam X The type of the error (mnemonic: e'''X'''ception type)
+ * @tparam E The type of the input data (mnemonic: '''E'''lement type)
+ * @tparam F The type constructor representing an effect.
+ *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Step]].
+ * @tparam A The type of the calculated result
+ */
 sealed trait IterateeT[X, E, F[_], A] {
   def value: F[StepT[X, E, F, A]]
 
@@ -14,10 +27,11 @@ sealed trait IterateeT[X, E, F[_], A] {
                 )(implicit F: Bind[F]): F[Z] =
     F.bind(value)((s: StepT[X, E, F, A]) => s(cont, done, err))
 
-  /** An alias for `run` */
-  def apply(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = run(e)
-
-  /** Run this iteratee */
+  /**
+   * Run this iteratee
+   *
+   * @param e A function to calculate a result in case of an Error.
+   */
   def run(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
     val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
     F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
@@ -26,6 +40,9 @@ sealed trait IterateeT[X, E, F[_], A] {
       , err = e
     ))
   }
+
+  /** An alias for `run` */
+  def apply(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = run(e)
 
   /** Like `run`, but uses `Monoid[F[A]].zero` in the error case */
   def runOrZero(implicit F: Monad[F], FA: Monoid[F[A]]): F[A] = apply(_ => FA.zero)
@@ -49,12 +66,24 @@ sealed trait IterateeT[X, E, F[_], A] {
     through(this)
   }
 
-  def map[B](f: A => B)(implicit m: Monad[F]): IterateeT[X, E, F, B] = {
+  def map[B](f: A => B)(implicit F: Monad[F]): IterateeT[X, E, F, B] = {
     flatMap(a => StepT.sdone[X, E, F, B](f(a), emptyInput).pointI)
   }
 
-  def >>==[B, C](f: StepT[X, E, F, A] => IterateeT[X, B, F, C])(implicit m: Bind[F]): IterateeT[X, B, F, C] =
-    iterateeT(m.bind(value)((s: StepT[X, E, F, A]) => f(s).value))
+  /**
+   * Combine this Iteratee with an Enumerator-like function.
+   *
+   * Often used in combination with the implicit views such as `enumStream` and `enumIterator`, for example:
+   *
+   * {{{
+   * head[Unit, Int, Id] >>== Stream.continually(1) // enumStream(Stream.continually(1))
+   * }}}
+   *
+   * @param f An Enumerator-like function. If the type parameters `EE` and `BB` are chosen to be
+   *          `E` and `B` respectively, the type of `f` is equivalent to `EnumeratorT[X, E, F, A]`.
+   */
+  def >>==[EE, AA](f: StepT[X, E, F, A] => IterateeT[X, EE, F, AA])(implicit F: Bind[F]): IterateeT[X, EE, F, AA] =
+    iterateeT(F.bind(value)(s => f(s).value))
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[X, E, G, A] = {
     def step: StepT[X, E, F, A] => StepT[X, E, G, A] =
@@ -170,13 +199,13 @@ trait IterateeTFunctions {
   }
 
   def cont[X, E, F[_] : Pointed, A](c: Input[E] => IterateeT[X, E, F, A]): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].point(StepT.scont(c)))
+    StepT.scont(c).pointI
 
   def done[X, E, F[_] : Pointed, A](d: => A, r: => Input[E]): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].point(StepT.sdone(d, r)))
+    StepT.sdone(d, r).pointI
 
   def err[X, E, F[_] : Pointed, A](e: => X): IterateeT[X, E, F, A] =
-    iterateeT(Pointed[F].point(StepT.serr(e)))
+    StepT.serr(e).pointI
 
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.

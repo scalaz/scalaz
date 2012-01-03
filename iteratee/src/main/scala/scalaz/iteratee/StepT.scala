@@ -3,6 +3,18 @@ package iteratee
 
 import Iteratee._
 
+/**
+ * The current state of an Iteratee, one of:
+ *  - '''cont''' Waiting for more data
+ *  - '''done''' Already calculated a result
+ *  - '''err''' Error, unable to calculate a result
+ *
+ * @tparam X The type of the error (mnemonic: e'''X'''ception type)
+ * @tparam E The type of the input data (mnemonic: '''E'''lement type)
+ * @tparam F The type constructor representing an effect.
+ *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Step]].
+ * @tparam A The type of the calculated result
+ */
 sealed trait StepT[X, E, F[_], A] {
   def fold[Z](
                cont: (Input[E] => IterateeT[X, E, F, A]) => Z
@@ -33,6 +45,9 @@ sealed trait StepT[X, E, F[_], A] {
       , (_, _) => z
       , _ => z
     )
+
+  def mapCont(k: (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit F: Pointed[F]) =
+    mapContOr[IterateeT[X, E, F, A]](k, pointI)
 
   def doneValue: LazyOption[A] =
     fold(

@@ -49,7 +49,7 @@ trait EnumeratorTFunctions {
   implicit def enumStream[X, E, F[_] : Monad, A](xs: Stream[E]): EnumeratorT[X, E, F, A] = {
     s =>
       xs match {
-        case h #:: t => s.mapContOr(_(elInput(h)) >>== enumStream(t), s.pointI)
+        case h #:: t => s.mapCont(_(elInput(h)) >>== enumStream(t))
         case _       => s.pointI
       }
   }
@@ -57,13 +57,12 @@ trait EnumeratorTFunctions {
   implicit def enumIterator[X, E, A](x: Iterator[E]): EnumeratorT[X, E, IO, A] = {
     def loop: EnumeratorT[X, E, IO, A] = {
       s =>
-        s.mapContOr(
+        s.mapCont(
           k =>
             if (x.hasNext) {
-              val n = x.next
+              val n = x.next()
               k(elInput(n)) >>== loop
             } else s.pointI
-          , s.pointI
         )
     }
     loop
@@ -74,13 +73,12 @@ trait EnumeratorTFunctions {
   implicit def enumReader[X, A](r: Reader): EnumeratorT[X, IoExceptionOr[Char], IO, A] = {
     def loop: EnumeratorT[X, IoExceptionOr[Char], IO, A] = {
       s =>
-        s.mapContOr(
+        s.mapCont(
           k => {
             val i = IoExceptionOr(r.read)
             if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== loop
             else s.pointI
           }
-          , s.pointI
         )
     }
     loop
@@ -89,9 +87,8 @@ trait EnumeratorTFunctions {
   def checkCont0[X, E, F[_], A](z: EnumeratorT[X, E, F, A] => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
     def step: EnumeratorT[X, E, F, A] = {
       s =>
-        s.mapContOr(
+        s.mapCont(
           k => z(step)(k)
-          , s.pointI
         )
     }
     step
@@ -100,9 +97,8 @@ trait EnumeratorTFunctions {
   def checkCont1[S, X, E, F[_], A](z: (S => EnumeratorT[X, E, F, A]) => S => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A], t: S)(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
     def step: S => EnumeratorT[X, E, F, A] = {
       o => s =>
-        s.mapContOr(
+        s.mapCont(
           k => z(step)(o)(k)
-          , s.pointI
         )
     }
     step(t)

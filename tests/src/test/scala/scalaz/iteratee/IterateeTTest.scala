@@ -8,6 +8,8 @@ import effect._
 class IterateeTTest extends Spec {
 
   "head" in {
+    (head[Unit, Int, Id].>>==(enumStream(Stream(1, 2, 3)))).runOrZero must be_===(Some(1))
+
     (head[Unit, Int, Id] >>== Stream(1, 2, 3)).runOrZero must be_===(Some(1))
   }
 
