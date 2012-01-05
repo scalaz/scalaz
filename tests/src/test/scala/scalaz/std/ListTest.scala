@@ -48,4 +48,16 @@ class ListTest extends Spec {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupByM[Id]((a, b) => p(a, b)).flatten must be_===(a)
   }
+
+  "takeWhileM example" in {
+    def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[({type λ[α] = State[Int, α]})#λ](a => State {
+      i =>
+        val j = i + (if (f(a)) 0 else 1)
+        val done = j >= n
+        (!done, j)
+    }).eval(0)
+
+    val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
+    actual must be_===("/abc/def/hij")
+  }
 }
