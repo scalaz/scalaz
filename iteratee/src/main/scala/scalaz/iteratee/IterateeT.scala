@@ -184,6 +184,8 @@ trait IterateeTInstances extends IterateeTInstances0 {
 
     def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
       iterateeT(Monad[G].map(ga)((x: A) => StepT.sdone[X, E, G, A](x, emptyInput)))
+
+    implicit def apply[G[_] : Monad]: Monad[({type λ[α] = IterateeT[X, E, G, α]})#λ] = IterateeT.IterateeTMonad[X, E, G]
   }
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] =

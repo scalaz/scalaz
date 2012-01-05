@@ -146,4 +146,6 @@ private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] =
     def apply[A](action: StateT[M, S, A]) =
       StateT[N, S, A](s => f(action(s)))
   }
+
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StateT[G, S, α]})#λ] = StateT.stateTMonadState[S, G]
 }

@@ -149,4 +149,6 @@ private[scalaz] trait LazyOptionTMonadTrans extends MonadTrans[LazyOptionT] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = LazyOptionT[M, x]})#f ~> ({type f[x] = LazyOptionT[N, x]})#f) {
     def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
   }
+
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = LazyOptionT[G, α]})#λ] = LazyOptionT.lazyOptionTMonad[G]
 }
