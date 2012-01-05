@@ -16,9 +16,17 @@ trait StateT[F[_], S, A] { self =>
   def eval(initial: S)(implicit F: Functor[F]): F[A] =
     F.map(apply(initial))(_._1)
 
+  /** Calls `eval` using `Monoid[S].zero` as the initial state */
+  def evalZero(implicit F: Functor[F], S: Monoid[S]): F[A] =
+    eval(S.zero)
+
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(initial: S)(implicit F: Functor[F]): F[S] =
     F.map(apply(initial))(_._2)
+
+  /** Calls `exec` using `Monoid[S].zero` as the initial state */
+  def execZero(implicit F: Functor[F], S: Monoid[S]): F[S] =
+    exec(S.zero)
 
   def map[B](f: A => B)(implicit F: Functor[F]): StateT[F, S, B] = StateT(s => F.map(apply(s)) {
     case (a, s1) => (f(a), s1)
