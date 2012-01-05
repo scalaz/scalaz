@@ -5,6 +5,13 @@ package scalaz
  *
  * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
  */
+// TODO
+//dabblego: I have another, sec, but it will require Enum
+//[06:57am] dabblego: can you please put a comment there while yer there?
+//[06:57am] dabblego: \p -> if p then succ else id -- for a start
+//[06:58am] dabblego: :t \f p -> evalStateT (StateT (\s -> do r <- f s; q <- p s; return (r, if q then succ s else s))) mempty
+//[06:58am] lambdabot: forall s (m :: * -> *) a. (Monad m, Enum s, Monoid s) => (s -> m a) -> (s -> m Bool) -> m a
+//
 trait StateT[F[_], S, A] { self =>
   /** Run and return the final value and state in the context of `F` */
   def apply(initial: S): F[(A, S)]
