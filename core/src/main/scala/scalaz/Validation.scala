@@ -89,8 +89,8 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Wrap the success value in `M` */
-  def point[M[+_] : Pointed]: Validation[E, M[A]] = this match {
-    case Success(a) => Success(Pointed[M].point(a: A))
+  def point[M[_] : Pointed, AA >: A]: Validation[E, M[AA]] = this match {
+    case Success(a) => Success(Pointed[M].point(a: AA))
     case Failure(e) => Failure(e)
   }
 
