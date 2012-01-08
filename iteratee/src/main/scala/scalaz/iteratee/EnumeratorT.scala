@@ -9,10 +9,16 @@ trait EnumeratorTInstances0 {
   implicit def enumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]): Semigroup[EnumeratorT[X, E, F, A]] = new EnumeratorTSemigroup[X, E, F, A] {
     implicit def F = F0
   }
+  implicit def enumeratorTPlus[X, E, F[_]](implicit F0: Bind[F]): Plus[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] = new EnumeratorTPlus[X, E, F] {
+    implicit def F = F0
+  }
 }
 
 trait EnumeratorTInstances extends EnumeratorTInstances0 {
   implicit def enumeratorTMonoid[X, E, F[_], A](implicit F0: Monad[F]): Monoid[EnumeratorT[X, E, F, A]] = new EnumeratorTMonoid[X, E, F, A] {
+    implicit def F = F0
+  }
+  implicit def enumeratorTEmpty[X, E, F[_]](implicit F0: Monad[F]): Empty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] = new EnumeratorTEmpty[X, E, F] {
     implicit def F = F0
   }
   implicit def enumeratorMonoid[X, E, A]: Monoid[Enumerator[X, E, A]] = new Monoid[Enumerator[X, E, A]] {
@@ -139,4 +145,18 @@ private[scalaz] trait EnumeratorTMonoid[X, E, F[_], A] extends Monoid[Enumerator
   implicit def F: Monad[F]
 
   def zero: (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = _.pointI
+}
+
+private[scalaz] trait EnumeratorTPlus[X, E, F[_]] extends Plus[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] {
+  implicit def F: Bind[F]
+
+  def plus[A](f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A],
+              f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] =
+    s => f1(s) >>== f2
+}
+
+private[scalaz] trait EnumeratorTEmpty[X, E, F[_]] extends Empty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] with EnumeratorTPlus[X, E, F] {
+  implicit def F: Monad[F]
+
+  def empty[A]: (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = _.pointI
 }
