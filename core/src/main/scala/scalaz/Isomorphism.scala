@@ -242,7 +242,7 @@ trait IsomorphismCoMonad[F[_], G[_]] extends CoMonad[F] with IsomorphismCoJoin[F
   implicit def G: CoMonad[G] with Functor[G] with CoPointed[G]
 }
 
-trait IsomorphismPlus[F[_], G[_]] extends Plus[F] with IsomorphismFunctor[F, G] {
+trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
   implicit def G: Plus[G]
 
   def iso: F <~> G

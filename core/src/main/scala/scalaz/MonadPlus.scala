@@ -15,6 +15,9 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     bind(value)((ta) => T.foldMap(ta)(a => point(a))(monoid[A]))
 
   trait MonadPlusLaw extends EmptyLaw with MonadLaw {
+    def emptyMap[A](f1: A => A)(implicit FA: Equal[F[A]]): Boolean =
+      FA.equal(map(empty[A])(f1), empty[A])
+
     def leftZero[A](f: A => F[A])(implicit FA: Equal[F[A]]): Boolean = {
       FA.equal(bind(empty[A])(f), empty[A])
     }

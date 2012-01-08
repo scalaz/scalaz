@@ -42,7 +42,7 @@ object TypeClass {
   lazy val coBind = TypeClass("CoBind", *->*)
   lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
 
-  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(functor))
+  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val empty = TypeClass("Empty", *->*, extendsList = Seq(plus))
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, empty))
