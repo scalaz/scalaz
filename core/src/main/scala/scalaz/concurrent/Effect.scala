@@ -4,7 +4,7 @@ package concurrent
 sealed trait Effect[-A] {
   val e: A => Unit
   val strategy: Strategy
-
+  def apply(a: A) = strategy(e(a))
   def !(a: A) = strategy(e(a))
 }
 
