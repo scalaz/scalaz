@@ -23,6 +23,20 @@ sealed trait Zipper[+A] {
   def toStream: Stream[A] =
     lefts.reverse ++ focus #:: rights
 
+  def copy[AA >: A](lefts: Stream[AA] = lefts, focus: AA = focus, rights: Stream[AA] = rights): Zipper[AA] = zipper[AA](lefts, focus, rights)
+
+  /**
+   * Update the focus in this zipper.
+   */
+  def update[AA >: A](focus: AA) = {
+    this.copy(this.lefts, focus, this.rights)
+  }
+
+  /**
+   * Apply f to the focus and update with the result.
+   */
+  def modify[AA >: A](f: A => AA) = this.update(f(this.focus))
+
   /**
    * Possibly moves to next element to the right of focus.
    */
@@ -128,6 +142,22 @@ sealed trait Zipper[+A] {
         else move0(z >>= ((_:Zipper[A]).previous), n + 1)
       }
     move0(Some(this), n)
+  }
+
+  /**
+   * Moves focus to the start of the zipper.
+   */
+  def start: Zipper[A] = {
+    val rights = this.lefts ++ focus #:: this.rights
+    this.copy(Stream.Empty, rights.head, rights.tail)
+  }
+
+  /**
+   * Moves focus to the end of the zipper.
+   */
+  def end: Zipper[A] = {
+    val lefts = this.lefts ++ focus #:: this.rights
+    this.copy(lefts.init, lefts.last, Stream.empty)
   }
 
   /**

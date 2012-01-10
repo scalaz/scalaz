@@ -1,7 +1,7 @@
 package scalaz.example
 package http
 
-import scalaz.{Request => _, _}
+import scalaz._
 import Scalaz._
 import scalaz.http._
 import response._
