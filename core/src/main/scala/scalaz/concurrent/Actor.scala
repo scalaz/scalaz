@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentLinkedQueue
 import Scalaz._
                   
-sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = throw(_))(implicit val strategy: Strategy) { 
+final case class Actor[A](e: A => Unit, onError: Throwable => Unit = throw(_))(implicit val strategy: Strategy) {
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
@@ -14,14 +14,14 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
 
   val toEffect: Effect[A] = effect[A]((a) => this ! a)
 
-  def !(a: A) = {
+  def !(a: A) {
     mbox offer a
     work
   }
 
   def apply(a: A) = this ! a
   
-  private val act: Effect[Unit] = effect((u: Unit) =>
+  private val act: Effect[Unit] = effect {(u: Unit) =>
     var i = 0
     while (i < 1000) {
       val m = mbox.poll
@@ -33,7 +33,7 @@ sealed case class Actor[A](val e: A => Unit, val onError: Throwable => Unit = th
     }
     suspended.set(true)
     work
-  })
+  }
 }
 
 trait Actors {

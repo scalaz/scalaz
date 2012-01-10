@@ -14,12 +14,12 @@ sealed class Promise[A](implicit val strategy: Strategy) extends Function0[A] {
   private val errorHandlers = new ConcurrentLinkedQueue[Throwable => Unit]
   @volatile private var v: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
-  private val e = actor[Signal[A]](_.eval, x => v.fulfill(throw x, this))
+  private val e: Actor[Signal[A]] = actor[Signal[A]](_.eval, x => v.fulfill(throw x, this))
 
   /** Syncrhonously blocks until the value is ready, then returns it.
     * WARNING: May block indefinitely. A kitten dies every time you call this method. */
   def get = {
-    latch.await
+    latch.await()
     v.get
   }
 

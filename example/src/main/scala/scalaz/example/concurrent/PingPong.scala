@@ -9,6 +9,8 @@ import scalaz.concurrent._
 import scalaz.Scalaz._
 
 object PingPong {
+  def main(args: Array[String]) = run
+
   val actors = 10000
   val pings = 3
   implicit val pool = Executors.newFixedThreadPool(5)

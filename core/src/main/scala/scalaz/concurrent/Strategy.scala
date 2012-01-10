@@ -7,6 +7,10 @@ import java.util.concurrent.{ExecutorService, ThreadFactory, Executors}
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
  * evaluation and return a function that, when called, will block until the result is ready.
+ *
+ * Memory consistency effects: Actions in a thread prior to the submission of `a`
+ * to the `Strategy` happen-before any actions taken by `a`, which in turn happen-before
+ * the result is retrieved via returned function.
  */
 trait Strategy {
   def apply[A](a: => A): () => A

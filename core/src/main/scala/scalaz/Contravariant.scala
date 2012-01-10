@@ -47,7 +47,7 @@ object Contravariant {
   import concurrent.{Actor, Effect}
 
   implicit def ActorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
-    def contramap[A, B](r: Actor[A], f: B => A): Actor[B] = actor[B]((b: B) => (r ! f(b))(), r.onError)(r.strategy)
+    def contramap[A, B](r: Actor[A], f: B => A): Actor[B] = actor[B]((b: B) => (r ! f(b)), r.onError)(r.strategy)
   }
 
   implicit def EffectContravariant: Contravariant[Effect] = new Contravariant[Effect] {

@@ -2,6 +2,8 @@ package scalaz.example
 package concurrent
 
 object Fibs {
+  def main(args: Array[String]) = run
+
   import java.util.concurrent._
   import scalaz.concurrent._
   import scalaz.Scalaz._
