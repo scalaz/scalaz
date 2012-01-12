@@ -399,7 +399,9 @@ trait TupleInstances2 extends TupleInstances1 {
 
 trait TupleInstances extends TupleInstances2
 
-object tuple extends TupleInstances
+object tuple extends TupleInstances {
+  object tupleSyntax extends scalaz.syntax.std.ToTupleV
+}
 
 private[scalaz] trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {
   implicit def _1 : Semigroup[A1]

@@ -49,6 +49,20 @@ class TupleTest extends Spec {
   checkAll("Tuple1", comonad.laws[Tuple1])
   checkAll("Tuple2", comonad.laws[({type λ[α]=(Int, α)})#λ])
 
+  "syntax" should {
+    import std.tuple.tupleSyntax._
+    "mapElements" in {
+       (1, 2).mapElements(_1 = 2 *) must be_===((2, 2))
+    }
+    "toIndexedSeq" in {
+      val as: IndexedSeq[Int] = (1, 2).toIndexedSeq
+      as.toList must be_===(List(1, 2))
+    }
+    "fold" in {
+      (1, 2).fold(_ + _) must be_===(3)
+    }
+  }
+
   object instances {
     object tuple1 {
       def show[A: Show] = Show[Tuple1[A]]
