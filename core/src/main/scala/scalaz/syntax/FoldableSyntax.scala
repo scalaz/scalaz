@@ -6,6 +6,12 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Foldable[F]
   ////
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
+  final def foldRight[B](z: => B)(f: (A, => B) => B): B = F.foldRight(self, z)(f)
+  final def foldLeft[B](z: B)(f: (B, A) => B): B = F.foldLeft(self, z)(f)
+  final def foldR[B](z: => B)(f: A => (=> B) => B): B = F.foldR(self, z)(f)
+  final def foldL[B](z: B)(f: B => A => B): B = F.foldL(self, z)(f)
+  final def foldR1(f: (A => (=> A) => A)): Option[A] = F.foldR1(self)(f)
+  final def foldL1(f: (A => (=> A) => A)): Option[A] = F.foldL1(self)(f)
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
   final def suml(implicit A: Monoid[A]): A = F.foldLeft(self, A.zero)(A.append(_, _))
   final def toList: List[A] = F.toList(self)
