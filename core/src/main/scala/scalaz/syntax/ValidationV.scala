@@ -9,6 +9,8 @@ trait ValidationV[A] extends SyntaxV[A] {
   def successNel[X]: ValidationNEL[X, A] = success
 
   def fail[X]: Validation[A, X] = failure[A, X](self)
+
+  def failNel[X]: ValidationNEL[A, X] = failure[NonEmptyList[A], X](NonEmptyList(self))
 }
 
 trait ToValidationV {
