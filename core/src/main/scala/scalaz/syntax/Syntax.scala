@@ -65,21 +65,26 @@ trait Syntaxes {
 
   object arrow extends ToArrowV
 
+
+  object id extends ToIdV
+
+
   object tree extends ToTreeV
 
   object reducer extends ToReducerV
-  
+
   object writer extends ToWriterV
-  
+
   object foldable extends ToFoldableV
-  
+
   object validation extends ToValidationV
-  
+
+
   object all extends ToAllTypeClassV with ToAllOtherV
 
 }
 
-trait ToAllOtherV extends ToTreeV with ToWriterV
+trait ToAllOtherV extends ToTreeV with ToWriterV with ToValidationV with ToReducerV
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
@@ -88,7 +93,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToComposeV with ToCategoryV
-  with ToArrowV with ToFoldableV with ToValidationV with ToReducerV
+  with ToArrowV with ToFoldableV
 
 
 trait SyntaxV[A] {
