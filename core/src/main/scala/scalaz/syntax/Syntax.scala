@@ -84,7 +84,7 @@ trait Syntaxes {
 
 }
 
-trait ToAllOtherV extends ToTreeV with ToWriterV with ToValidationV with ToReducerV
+trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV with ToReducerV
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
