@@ -18,6 +18,16 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   final def toIndexedSeq: IndexedSeq[A] = F.toIndexedSeq(self)
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
+  final def all(p: A => Boolean): Boolean = F.all(self)(p)
+  final def any(p: A => Boolean): Boolean = F.any(self)(p)
+  final def count: Int = F.count(self)
+  final def maximum(implicit A: Order[A]): Option[A] = F.maximum(self)
+  final def minimum(implicit A: Order[A]): Option[A] = F.minimum(self)
+  final def longDigits(implicit d: A <:< Digit): Long = F.longDigits(self)
+  final def empty: Boolean = F.empty(self)
+  final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)
+  final def splitWith(p: A => Boolean): List[List[A]] = F.splitWith(self)(p)
+  final def selectSplit(p: A => Boolean): List[List[A]] = F.selectSplit(self)(p)
 
   ////
 }
