@@ -255,6 +255,11 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
     }
   }
 
+  implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailProjection[E, A]] = new IsomorphismSemigroup[FailProjection[E, A], Validation[E, A]] {
+    def iso = FailProjectionIso
+    implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
+  }
+
   implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
     def iso = FailProjectionIso
     implicit def G = Validation.validationOrder
@@ -347,6 +352,10 @@ trait ValidationInstances extends ValidationInstances0 {
     override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
 
     def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
+  }
+
+  implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
+    def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
   }
 
   // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
