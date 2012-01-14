@@ -428,9 +428,6 @@ trait BooleanFunctions {
 
 trait IntFunctions {
   def heaviside(i: Int) = if (i < 0) 0 else i
-
-  import Ordering._
-  def ordering(i: Int): Ordering = if (i < 0) LT else if (i > 0) GT else EQ
 }
 
 trait ShortFunctions {

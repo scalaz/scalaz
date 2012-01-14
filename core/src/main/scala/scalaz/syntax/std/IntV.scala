@@ -2,10 +2,8 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.int
-
 trait IntV extends SyntaxV[Int] {
-  def ordering = int.ordering(self)
+  def ordering = Ordering.fromInt(self)
 }
 
 trait ToIntV {
