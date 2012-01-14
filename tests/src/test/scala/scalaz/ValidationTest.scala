@@ -51,10 +51,19 @@ class ValidationTest extends Spec {
     Validation.failure[String, Int]("fail").shows must be_===("Failure(fail)")
   }
 
+  "example" in {
+    import std.AllInstances._
+    import syntax.functor._
+    import std.string.stringSyntax._
+    val x = "0".parseBoolean.fail.fpair
+    ok
+  }
+
   object instances {
     def show[E: Show, A: Show] = Show[Validation[E, A]]
     def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]
     def order[E: Order, A: Order] = Order[Validation[E, A]]
+    def pointed[E] = Pointed[({type λ[α]=Validation[E, α]})#λ]
     def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
     def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
     def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
@@ -63,6 +72,7 @@ class ValidationTest extends Spec {
       def show[E: Show, A: Show] = Show[FailProjection[E, A]]
       def equal[E: Equal, A: Equal] = Equal[FailProjection[E, A]]
       def order[E: Order, A: Order] = Order[FailProjection[E, A]]
+      def pointed[E] = Pointed[({type λ[α]=FailProjection[E, α]})#λ]
       def applicative[E: Semigroup] = Applicative[({type λ[α]=FailProjection[E, α]})#λ]
       def traverse[E: Semigroup] = Traverse[({type λ[α]=FailProjection[E, α]})#λ]
       def plus[E: Semigroup] = Plus[({type λ[α]=FailProjection[E, α]})#λ]

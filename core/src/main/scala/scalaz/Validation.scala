@@ -203,6 +203,11 @@ sealed trait FailProjection[+E, +A] {
     case Success(_) => true
     case Failure(e) => f(e)
   }
+
+  def map[B](f: E => B): FailProjection[B, A] = validation match {
+    case Success(a) => Success[B, A](a).fail
+    case Failure(e) => Failure(f(e)).fail
+  }
 }
 
 object FailProjection extends FailProjectionFunctions with FailProjectionInstances {
@@ -216,6 +221,12 @@ trait FailProjectionInstances0 {
   implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailProjection[E, X], Validation[E, X]] {
     def iso = FailProjectionIso
     implicit def G = Validation.validationEqual
+  }
+
+  /**Derive the type class instance for `FailProjection` from `Validation`. */
+  implicit def failProjectionPointed[E] = new IsomorphismPointed[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
+    def iso = FailProjectionEIso2[E]
+    implicit def G = Validation.validationPointed[E]
   }
 }
 
@@ -306,6 +317,12 @@ trait ValidationInstances0 {
       case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
       case _                          => false
     }
+  }
+
+  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
+    def point[A](a: => A): Validation[E, A] = Success(a)
+
+    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
   }
 }
 
