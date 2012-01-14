@@ -87,8 +87,8 @@ sealed trait Validation[+E, +A] {
     val validation = Validation.this
   }
 
-  /** Wrap the success value in `M` */
-  def point[M[_] : Pointed, AA >: A]: Validation[E, M[AA]] = this match {
+  /** Wrap the success value in `M`. */
+  def pointSuccess[M[_] : Pointed, AA >: A]: Validation[E, M[AA]] = this match {
     case Success(a) => Success(Pointed[M].point(a: AA))
     case Failure(e) => Failure(e)
   }
@@ -203,6 +203,11 @@ sealed trait FailProjection[+E, +A] {
     case Success(_) => true
     case Failure(e) => f(e)
   }
+
+  def map[B](f: E => B): FailProjection[B, A] = validation match {
+    case Success(a) => Success[B, A](a).fail
+    case Failure(e) => Failure(f(e)).fail
+  }
 }
 
 object FailProjection extends FailProjectionFunctions with FailProjectionInstances {
@@ -210,7 +215,22 @@ object FailProjection extends FailProjectionFunctions with FailProjectionInstanc
     Validation.failureNT[A]
 }
 
-trait FailProjectionInstances {
+trait FailProjectionInstances0 {
+  import FailProjection._
+
+  implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailProjection[E, X], Validation[E, X]] {
+    def iso = FailProjectionIso
+    implicit def G = Validation.validationEqual
+  }
+
+  /**Derive the type class instance for `FailProjection` from `Validation`. */
+  implicit def failProjectionPointed[E] = new IsomorphismPointed[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
+    def iso = FailProjectionEIso2[E]
+    implicit def G = Validation.validationPointed[E]
+  }
+}
+
+trait FailProjectionInstances extends FailProjectionInstances0 {
   import FailProjection._
 
   /**Derive the type class instance for `FailProjection` from `Validation`. */
@@ -235,10 +255,34 @@ trait FailProjectionInstances {
     }
   }
 
+  implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailProjection[E, A]] = new IsomorphismSemigroup[FailProjection[E, A], Validation[E, A]] {
+    def iso = FailProjectionIso
+    implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
+  }
+
   implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
     def iso = FailProjectionIso
     implicit def G = Validation.validationOrder
   }
+
+  implicit def failProjectionShow[E: Show, X: Show] = new IsomorphismShow[FailProjection[E, X], Validation[E, X]] {
+    def iso = FailProjectionIso
+    implicit def G = Validation.validationShow
+  }
+
+  implicit def failProjectionApplicativeTraversePlus[E: Semigroup] =
+    new IsomorphismApplicative[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
+      IsomorphismTraverse[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
+      IsomorphismPlus[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
+      def iso = FailProjectionEIso2
+      implicit def G = Validation.validationApplicative
+    }
+
+  implicit def failProjectionBiTraverse =
+    new IsomorphismBiTraverse[FailProjection, Validation] {
+      def iso = FailProjectionBiIso
+      implicit def G = Validation.validationBiTraverse
+    }
 }
 
 trait FailProjectionFunctions {
@@ -261,11 +305,33 @@ trait FailProjectionFunctions {
     def to[E](fa: FailProjection[E, A]) = fa.validation
     def from[E](ga: Validation[E, A]) = ga.fail
   }
+
+  /** The FailProjection type constructor is isomorphic to Validation */
+  implicit def FailProjectionBiIso[A] = new IsoBiFunctorTemplate[FailProjection, Validation] {
+    def to[A, B](fa: FailProjection[A, B]): Validation[A, B] = fa.validation
+    def from[A, B](ga: Validation[A, B]): FailProjection[A, B] = ga.fail
+  }
 }
 
 object Validation extends ValidationFunctions with ValidationInstances
 
-trait ValidationInstances {
+trait ValidationInstances0 {
+  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
+    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
+      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
+      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
+      case _                          => false
+    }
+  }
+
+  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
+    def point[A](a: => A): Validation[E, A] = Success(a)
+
+    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
+  }
+}
+
+trait ValidationInstances extends ValidationInstances0 {
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
   implicit def validationApplicative[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
     with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
@@ -288,6 +354,10 @@ trait ValidationInstances {
     def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
   }
 
+  implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
+    def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
+  }
+
   // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
@@ -306,6 +376,13 @@ trait ValidationInstances {
       case (Failure(x), Failure(y)) => Order[E].order(x, y)
       case (Failure(_), Success(_)) => LT
       case (Success(_), Failure(_)) => GT
+    }
+  }
+
+  implicit def validationShow[E: Show, A: Show]: Show[Validation[E, A]] = new Show[Validation[E, A]] {
+    def show(f: Validation[E, A]): List[Char] = f match {
+      case Success(a) => "Success(".toList ::: Show[A].show(a) ::: ")".toList
+      case Failure(e) => "Failure(".toList ::: Show[E].show(e) ::: ")".toList
     }
   }
 }
