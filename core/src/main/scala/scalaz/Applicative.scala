@@ -11,7 +11,7 @@ package scalaz
  *
  * Applicative instances come in a few flavours:
  *  - All [[scalaz.Monad]]s are also `Applicative`
- *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.MonoidalApplicative]])
+ *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.Monoid]]#applicative)
  *  - Zipping together corresponding elements of Naperian data structures (those of of a fixed, possibly infinite shape)
  *
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
