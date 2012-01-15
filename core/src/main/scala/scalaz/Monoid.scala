@@ -37,6 +37,14 @@ trait Monoid[F] extends Semigroup[F] { self =>
   }
 
   /**
+   * A monoidal applicative functor, that implements `point` and `ap` with the operations `zero` and `append` respectively.
+   * Note that the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is discarded; it is a phantom type.
+   */
+  final def applicative: Applicative[({type λ[α]=F})#λ] = new Applicative[({type λ[α]=F})#λ] with SemigroupApply {
+    def point[A](a: => A) = zero
+  }
+
+  /**
    * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:
    *
    *  - '''left identity''': `forall a. append(zero, a) == a`

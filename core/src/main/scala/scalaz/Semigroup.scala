@@ -26,6 +26,13 @@ trait Semigroup[F]  { self =>
 
   final def compose: Compose[({type λ[α, β]=F})#λ] = new SemigroupCompose {}
 
+  private[scalaz] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
+    override def map[A, B](fa: F)(f: (A) => B) = fa
+    def ap[A, B](fa: => F)(f: => F) = append(fa, f)
+  }
+
+  final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply {}
+
   /**
    * A semigroup in type F must satisfy two laws:
     *
