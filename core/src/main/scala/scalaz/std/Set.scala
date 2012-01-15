@@ -49,6 +49,11 @@ trait SetInstances {
     }
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
+
+  implicit def setMonoid[A]: Monoid[Set[A]] = new Monoid[Set[A]] {
+    def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
+    def zero: Set[A] = Set[A]()
+  }
 }
 
 trait SetFunctions

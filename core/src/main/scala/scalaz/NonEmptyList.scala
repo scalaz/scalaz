@@ -82,8 +82,8 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   // TODO Show, etc.
-  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] =
-    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] {
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with Each[NonEmptyList] =
+    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] with Each[NonEmptyList] {
       def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse f
 
@@ -98,6 +98,8 @@ trait NonEmptyListInstances {
       def copoint[A](p: NonEmptyList[A]): A = p.head
 
       def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
+      
+      def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
