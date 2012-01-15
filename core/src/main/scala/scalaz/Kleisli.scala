@@ -73,6 +73,12 @@ trait KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliArrId[F[_]](implicit F0: Pointed[F]) = new KleisliArrIdArr[F] {
     implicit def F: Pointed[F] = F0
   }
+  implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]) = new KleisliSemigroup[F, A, B] {
+    implicit def FB = FB0
+  }
+  implicit def kleislPlus[F[_], A](implicit F0: Plus[F]) = new KleisliPlus[F, A] {
+    implicit def F = F0
+  }
 }
 
 trait KleisliInstances extends KleisliInstances0 {
@@ -86,14 +92,15 @@ trait KleisliInstances extends KleisliInstances0 {
 
   implicit def kleisliIdMonadReader[R] = kleisliMonadReader[Id, R]
 
-  /** Kleisli version of `Monoid[Endo[A]]`. `append(f1, f2) == f1 <=< f2`. */
-  implicit def kleisliMonoid[F[_], A](implicit F0: Monad[F]) = new Monoid[Kleisli[F, A, A]] {
-    def append(f1: Kleisli[F, A, A], f2: => Kleisli[F, A, A]): Kleisli[F, A, A] = f1 <=< f2
-    def zero: Kleisli[F, A, A] = Kleisli(a => F0.point(a))
+  implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]) = new KleisliMonoid[F, A, B] {
+    implicit def FB = FB0
+  }
+  implicit def kleisliEmpty[F[_], A](implicit F0: Empty[F]) = new KleisliEmpty[F, A] {
+    implicit def F = F0
   }
 }
 
-trait KleisliFunctions extends KleisliInstances0 {
+trait KleisliFunctions {
   /**Construct a Kleisli from a Function1 */
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
     def run(a: A) = f(a)
@@ -169,4 +176,24 @@ private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleis
   def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))
   }
+}
+
+private[scalaz] trait KleisliSemigroup[F[_], A, B] extends Semigroup[Kleisli[F, A, B]] {
+  implicit def FB: Semigroup[F[B]]
+  def append(f1: Kleisli[F, A, B], f2: => Kleisli[F, A, B]) = Kleisli[F, A, B](a => FB.append(f1.run(a), f2.run(a)))
+}
+
+private[scalaz] trait KleisliMonoid[F[_], A, B] extends Monoid[Kleisli[F, A, B]] with KleisliSemigroup[F, A, B] {
+  implicit def FB: Monoid[F[B]]
+  def zero = Kleisli[F, A, B](a => FB.zero)
+}
+
+private[scalaz] trait KleisliPlus[F[_], A] extends Plus[({type λ[α]=Kleisli[F, A, α]})#λ] {
+  implicit def F: Plus[F]
+  def plus[B](f1: Kleisli[F, A, B], f2: => Kleisli[F, A, B]) = Kleisli[F, A, B](a => F.plus[B](f1.run(a), f2.run(a)))
+}
+
+private[scalaz] trait KleisliEmpty[F[_], A] extends Empty[({type λ[α]=Kleisli[F, A, α]})#λ] with KleisliPlus[F, A] {
+  implicit def F: Empty[F]
+  def empty[B] = Kleisli[F, A, B](a => F.empty[B])
 }

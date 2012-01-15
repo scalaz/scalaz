@@ -15,13 +15,5 @@ trait Compose[=>:[_, _]]  { self =>
 
 object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
-
-  ////
-  //  TODO
-  //  implicit def LensCompose: Compose[Lens] = new Compose[Lens] {
-  //    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]) =
-  //      f >=> g
-  //  }
-  ////
 }
 
