@@ -6,8 +6,17 @@ package scalaz
  */
 ////
 trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
+
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
+
+  def empty[A]: Empty[({type λ[α]=(α =>: α)})#λ] = new Empty[({type λ[α]=(α =>: α)})#λ] with ComposePlus[A] {
+    def empty[A] = id
+  }
+  def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
+    def zero = id
+  }
+
   trait CategoryLaw {
     def leftIdentity[A, B](ab: (A =>: B))(implicit E: Equal[A =>: B]): Boolean = {
       val ab1 = compose(ab, id[A])
@@ -24,6 +33,7 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
       E.equal(ad1, ad2)
     }
   }
+
   def categoryLaw = new CategoryLaw {}
 
   ////
