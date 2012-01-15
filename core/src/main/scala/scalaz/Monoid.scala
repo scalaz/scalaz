@@ -31,6 +31,11 @@ trait Monoid[F] extends Semigroup[F] { self =>
    */
   final def multiply(value: F, n: Int): F = Monoid.replicate[Id, F](value)(n)(implicitly, this)
 
+  /** Every `Monoid` gives rise to a [[scalaz.Category]] */
+  final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
+    def id[A] = zero
+  }
+
   /**
    * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:
    *
