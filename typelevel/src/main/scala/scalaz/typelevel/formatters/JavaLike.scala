@@ -3,7 +3,7 @@ package typelevel.formatters
 
 import typelevel.Formatter._
 
-object JavaLike {
+trait JavaLike {
   type c = unified.String.char
 
   type d = unified.Numeric.decimal
@@ -23,3 +23,5 @@ object JavaLike {
   def h = General.hex _
   def s = General.str _
 }
+
+object JavaLike extends JavaLike

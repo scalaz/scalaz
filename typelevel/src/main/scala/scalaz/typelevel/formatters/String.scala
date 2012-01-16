@@ -4,7 +4,7 @@ package typelevel.formatters
 import typelevel.Formatter._
 import unified.UnionFormat._
 
-object String {
+trait String {
   def charC(width: Int = 0, left: Boolean = false): Format{type Source = Char} =
     deunion(unified.String.char(width, left))
 
@@ -15,7 +15,9 @@ object String {
     deunion(unified.String.char(width, left))
 
   def subs(start: Int) = new Format {
-    type Source = String
-    def apply(s: String) = s substring start
+    type Source = java.lang.String
+    def apply(s: Source) = s substring start
   }
 }
+
+object String extends String

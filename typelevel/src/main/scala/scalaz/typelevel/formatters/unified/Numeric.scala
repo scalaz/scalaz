@@ -7,7 +7,7 @@ import java.math.BigInteger
 import UnionTypes._
 import typelevel.Formatter._
 
-object Numeric {
+trait Numeric {
   case class decimal(width: Int = 0,
                      left: Boolean = false,
                      padding: Boolean = false,
@@ -270,3 +270,5 @@ object Numeric {
     }
   }
 }
+
+object Numeric extends Numeric

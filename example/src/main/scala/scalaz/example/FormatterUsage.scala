@@ -4,75 +4,71 @@ import scalaz._
 import UnionTypes._
 import typelevel._
 import Typelevel._
-import Formatter._
-import formatters.General._
-import formatters.String._
-import formatters.Numeric._
-import formatters.unified.String._
+import Formatter.all._
 
 object FormatterUsage extends App {
 
-  def test1(): Unit = {
+  def test1() {
     println (("test" :: subs(3))("abcdef" :: HNil))
   }
 
-  def test2(): Unit = {
+  def test2() {
     println (subs(3)("abcdef" :: HNil))
   }
 
-  def test3(): Unit = {
+  def test3() {
     println ((subs(3) :: "test")("abcdef" :: HNil))
   }
 
-  def test4(): Unit = {
+  def test4() {
     println((subs(1) :: " " :: subs(2) :: " " :: subs(3))("abcdef" :: "abcdef" :: "abcdef" :: HNil))
   }
 
-  def test5(): Unit = {
+  def test5() {
     println ((subs(1) :<: subs(2)) format ("abcdef" :: HNil))
   }
 
-  def test6(): Unit = {
+  def test6() {
     println ((subs(1) :<: " " :: subs(2) :: " " :: subs(3)) format ("abcdef" :: "uvwxyz" :: HNil))
   }
 
-  def test7(): Unit = {
+  def test7() {
     println (("test" :: subs(3) :: FNil)("abcdef" :: HNil))
   }
 
-  def test8(): Unit = {
+  def test8() {
     println ((subs(3) :: FNil)("abcdef" :: HNil))
   }
 
-  def test9(): Unit = {
+  def test9() {
     println ((subs(3) :: "test" :: FNil)("abcdef" :: HNil))
   }
 
-  def test10(): Unit = {
+  def test10() {
     println ((char() :: FNil)('c'.union[char#D] :: HNil))
   }
 
-  def test11(): Unit = {
+  def test11() {
     println ((char() :: char() :: FNil)('c'.union[char#D] :: 's'.union[char#D] :: HNil))
   }
 
-  def test12(): Unit = {
+  def test12() {
     println ((char() :: "#" :: char() :: "#" :: char() :: FNil)('c'.union[char#D] :: (65.toByte).union[char#D] :: (68.toShort).union[char#D] :: HNil))
   }
 
-  def test13(): Unit = {
+  def test13() {
     println (("#" :: bool() :: "#" :: hex() :: "#" :: str() :: "#" :: FNil)(null :: System.out :: null :: HNil))
   }
 
-  def test14(): Unit = {
+  def test14() {
     println (("#" :: bool(width = 10, left = true) :: "#" :: hex(width = 10) :: "#" :: str(width = 10, left = true) :: "#" :: FNil)(null :: System.out :: null :: HNil))
   }
 
-  def test15(): Unit = {
+  def test15() {
     println ((charC() :: charC() :: FNil)('c' :: 's' :: HNil))
   }
 
-  def test16(): Unit = {
+  def test16() {
     println (("#" :: octalI(width = 10, left = true, indicator=true) :: "#" :: uHexDeciL(width = 10, padding=true) :: "#" :: uScientificF(width = 10, magnitude = 2, padding = true, separators = true, sign = true, space = false, brackets = true) :: "#" :: FNil)(5783 :: (4873.toLong) :: 6847.5897f :: HNil))
   }
 

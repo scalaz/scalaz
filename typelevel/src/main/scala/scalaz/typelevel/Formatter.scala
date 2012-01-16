@@ -70,7 +70,14 @@ trait Formatters {
 
 }
 
-object Formatter extends Formatters
+object Formatter extends Formatters {
+
+  object all
+    extends Formatters
+    with formatters.AllFormatters
+    with formatters.unified.AllFormatters
+
+}
 
 // vim: expandtab:ts=2:sw=2
 

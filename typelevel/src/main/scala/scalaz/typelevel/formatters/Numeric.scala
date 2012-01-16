@@ -5,11 +5,10 @@ import java.lang.Integer
 import java.math.BigInteger
 
 import typelevel.Formatter._
-import unified.UnionFormat._
+import unified.UnionFormat.deunion
 
-object Numeric {
+trait Numeric {
   def decimalB(width: Int = 0,
-               maxLength: Int = 0,
                left: Boolean = false,
                padding: Boolean = false,
                separators: Boolean = false,
@@ -358,3 +357,5 @@ object Numeric {
                       space: Boolean = false): Format{type Source = BigDecimal} =
     deunion(unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space))
 }
+
+object Numeric extends Numeric

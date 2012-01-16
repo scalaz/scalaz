@@ -10,9 +10,7 @@ trait UnionFormat extends Format {
 }
 
 object UnionFormat {
-  def deunion[U <: UnionFormat, S](
-    unionFormat: U)(implicit ev: !![S] <:< or[U#D]
-  ): Format{type Source = S} = new Format {
+  def deunion[U <: UnionFormat, S](unionFormat: U)(implicit ev: !![S] <:< or[U#D]): Fmt[S] = new Format {
     type Source = S
     def apply(x: Source) = unionFormat(x.union[unionFormat.D])
   }

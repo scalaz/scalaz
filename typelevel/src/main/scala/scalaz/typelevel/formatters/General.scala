@@ -3,7 +3,7 @@ package typelevel.formatters
 
 import typelevel.Formatter._
 
-object General {
+trait General {
   def bool(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Format {
     type Source = Any
     def apply(x: Source) = {
@@ -46,3 +46,5 @@ object General {
     }
   }
 }
+
+object General extends General

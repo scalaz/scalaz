@@ -4,7 +4,7 @@ package typelevel.formatters.unified
 import UnionTypes._
 import typelevel.Formatter._
 
-object String {
+trait String {
   case class char(width: Int = 0, left: Boolean = false) extends UnionFormat {
     type D = t[Char]#t[Byte]#t[Short]
     def apply(x: Union[D]) = {
@@ -18,3 +18,5 @@ object String {
     }
   }
 }
+
+object String extends String
