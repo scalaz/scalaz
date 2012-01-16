@@ -1,13 +1,13 @@
 package scalaz
 package typelevel.formatters.unified
 
-import java.lang.Integer
 import java.math.BigInteger
 
 import UnionTypes._
 import typelevel.Formatter._
 
 trait Numeric {
+
   case class decimal(width: Int = 0,
                      left: Boolean = false,
                      padding: Boolean = false,
@@ -15,7 +15,7 @@ trait Numeric {
                      sign: Boolean = false,
                      space: Boolean = false,
                      brackets: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Integer]#t[Long]#t[BigInteger]
+    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
     def apply(x: Union[D]) = {
       javaFormatter.write(
         "%" +
@@ -36,7 +36,7 @@ trait Numeric {
                    left: Boolean = false,
                    padding: Boolean = false,
                    indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Integer]#t[Long]#t[BigInteger]
+    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
     def apply(x: Union[D]) = {
       javaFormatter.write(
         "%" +
@@ -54,7 +54,7 @@ trait Numeric {
                      left: Boolean = false,
                      padding: Boolean = false,
                      indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Integer]#t[Long]#t[BigInteger]
+    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
     def apply(x: Union[D]) = {
       javaFormatter.write(
         "%" +
@@ -69,10 +69,10 @@ trait Numeric {
   }
 
   case class uHexDeci(width: Int = 0,
-                     left: Boolean = false,
-                     padding: Boolean = false,
-                     indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Integer]#t[Long]#t[BigInteger]
+                      left: Boolean = false,
+                      padding: Boolean = false,
+                      indicator: Boolean = false) extends UnionFormat {
+    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
     def apply(x: Union[D]) = {
       javaFormatter.write(
         "%" +
@@ -269,6 +269,7 @@ trait Numeric {
       )
     }
   }
+
 }
 
 object Numeric extends Numeric

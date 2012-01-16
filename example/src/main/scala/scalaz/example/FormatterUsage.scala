@@ -65,11 +65,11 @@ object FormatterUsage extends App {
   }
 
   def test15() {
-    println ((charC() :: charC() :: FNil)('c' :: 's' :: HNil))
+    println ((char().of[Char] :: char().of[Char] :: FNil)('c' :: 's' :: HNil))
   }
 
   def test16() {
-    println (("#" :: octalI(width = 10, left = true, indicator=true) :: "#" :: uHexDeciL(width = 10, padding=true) :: "#" :: uScientificF(width = 10, magnitude = 2, padding = true, separators = true, sign = true, space = false, brackets = true) :: "#" :: FNil)(5783 :: (4873.toLong) :: 6847.5897f :: HNil))
+    println (("#" :: octal(width = 10, left = true, indicator = true).of[Int] :: "#" :: uHexDeci(width = 10, padding = true).of[Long] :: "#" :: uScientific(width = 10, magnitude = 2, padding = true, separators = true, sign = true, space = false, brackets = true).of[Float] :: "#" :: FNil)(5783 :: (4873.toLong) :: 6847.5897f :: HNil))
   }
 
   test1()

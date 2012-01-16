@@ -72,10 +72,15 @@ trait Formatters {
 
 object Formatter extends Formatters {
 
+  import formatters._
+
   object all
     extends Formatters
-    with formatters.AllFormatters
-    with formatters.unified.AllFormatters
+    with General
+    with JavaLike
+    with String
+    with unified.Numeric
+    with unified.String
 
 }
 

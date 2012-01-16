@@ -5,6 +5,7 @@ import UnionTypes._
 import typelevel.Formatter._
 
 trait UnionFormat extends Format { self =>
+
   type D <: Disj
   type Source = Union[D]
 
@@ -12,4 +13,7 @@ trait UnionFormat extends Format { self =>
     type Source = S
     def apply(s: S) = self.apply(s.union)
   }
+
+  def of[S](implicit ev: S ∈ D): Fmt[S] = deunion
+
 }
