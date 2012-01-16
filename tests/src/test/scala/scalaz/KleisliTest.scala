@@ -37,7 +37,7 @@ class KleisliTest extends Spec {
     def apply[F[_] : Apply, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
     def pointed[F[_] : Pointed, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[_] : Plus, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
-    def empty[F[_] : Empty, A] = Empty[({type f[a] = Kleisli[F, A, a]})#f]
+    def empty[F[_] : PlusEmpty, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def monadReader[F[_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
 
     def arrId[F[_]: Pointed, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
