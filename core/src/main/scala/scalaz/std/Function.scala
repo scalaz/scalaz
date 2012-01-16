@@ -55,7 +55,7 @@ trait FunctionInstances extends FunctionInstances0 {
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
     implicit def R: Group[R] = R0
   }
-
+  
   implicit def function2Instance[T1, T2] = new Monad[({type l[a] = ((T1, T2) => a)})#l] {
     def point[A](a: => A) = (t1, t2) => a
 

@@ -56,11 +56,14 @@ trait OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTPointed[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = OptionT[F, α]})#λ] = new OptionTPointed[F] {
     implicit def F: Pointed[F] = F0
   }
+  implicit def optionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
+    implicit def F: Apply[F] = F0
+  }
 }
 
 trait OptionTInstances0 extends OptionTInstances1 {
-  implicit def optionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
-    implicit def F: Apply[F] = F0
+  implicit def optionTAlternative[F[_]](implicit F0: Alternative[F]): Alternative[({type λ[α] = OptionT[F, α]})#λ] = new OptionTAlternative[F] {
+    implicit def F: Alternative[F] = F0
   }
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
@@ -127,6 +130,12 @@ private[scalaz] trait OptionTTraverse[F[_]] extends Traverse[({type λ[α] = Opt
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: (A) => G[B]): G[OptionT[F, B]] = fa traverse f
+}
+
+trait OptionTAlternative[F[_]] extends Alternative[({type λ[α] = OptionT[F, α]})#λ] with OptionTApply[F] with OptionTPointed[F] {
+  implicit def F: Alternative[F]
+  
+  def orElse[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = OptionT(F.orElse(a.run, b.run))
 }
 
 private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {

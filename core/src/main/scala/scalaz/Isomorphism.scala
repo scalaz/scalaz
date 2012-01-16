@@ -250,8 +250,8 @@ trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
   def plus[A](a: F[A], b: => F[A]): F[A] = iso.from(G.plus(iso.to(a), iso.to(b)))
 }
 
-trait IsomorphismEmpty[F[_], G[_]] extends Empty[F] with IsomorphismPlus[F, G] {
-  implicit def G: Empty[G]
+trait IsomorphismEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus[F, G] {
+  implicit def G: PlusEmpty[G]
 
   def empty[A]: F[A] = iso.from(G.empty[A])
 }

@@ -405,22 +405,22 @@ trait BooleanFunctions {
    * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
    * for `M`.
    */
-  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
     if (cond) M.point(a) else M0.empty
 
   /**
    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
    * for `M`.
    */
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty(cond)(a)
     }
 
-  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = emptyOrPure(cond)(a)
     }

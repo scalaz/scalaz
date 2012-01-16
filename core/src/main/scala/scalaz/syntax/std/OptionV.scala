@@ -82,7 +82,7 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_] : Pointed : Empty]: M[A] = option.orEmpty(self)
+  final def orEmpty[M[_] : Pointed : PlusEmpty]: M[A] = option.orEmpty(self)
 
   final def foldLift[F[_] : Pointed, B](b: => B, k: F[A] => B): B = option.foldLift(self)(b, k)
 
