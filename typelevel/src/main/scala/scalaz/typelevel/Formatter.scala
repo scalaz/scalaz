@@ -11,7 +11,7 @@ trait Formatter[Params <: HList] extends (Params => String) { self =>
 
   def format = apply _
 
-  def ::[T](f: Format{type Source = T}): Formatter[HCons[_ <: T, Params]] =
+  def ::[T](f: Fmt[T]): Formatter[HCons[_ <: T, Params]] =
     new Formatter[HCons[_ <: T, Params]] {
       def apply(params: HCons[_ <: T, Params]): String = f(params.head) + self(params.tail)
     }
@@ -21,9 +21,7 @@ trait Formatter[Params <: HList] extends (Params => String) { self =>
       def apply(params: Params): String = s + self(params)
     }
 
-  def :<:[H, T <: HList](
-    f: Format{type Source = H})(implicit ev: Params <:< HCons[_ <: H, T]
-  ): Formatter[Params] =
+  def :<:[H, T <: HList](f: Fmt[H])(implicit ev: Params <:< HCons[_ <: H, T]): Formatter[Params] =
     new Formatter[Params] {
       def apply(params: Params): String = f(params.head) + self(params)
     }
@@ -31,16 +29,14 @@ trait Formatter[Params <: HList] extends (Params => String) { self =>
   // Structural type is necessary here, because `::` does not override the `::`
   // in `Formatter`.
   def :<:(s: String): Formatter[Params] =
-    new Formatter[Params] {spec =>
+    new Formatter[Params] { spec =>
       def apply(params: Params): String = s + self(params)
 
-      def ::[H, T <: HList](
-        f: Format{type Source = H})(implicit ev: Params <:< HCons[_ <: H, T]
-      ): Formatter[Params] =
+      def ::[H, T <: HList](f: Fmt[H])(implicit ev: Params <:< HCons[_ <: H, T]): Formatter[Params] =
         new Formatter[Params] {
           def apply(params: Params): String = f(params.head) + spec(params)
         }
-      }
+    }
 
 }
 
@@ -51,6 +47,8 @@ trait Formatters {
     def apply(s: Source): String
   }
 
+  type Fmt[T] = Format { type Source = T }
+
   object javaFormatter {
     def write(fmt: String, arg: Object): String =
       fmt format arg
@@ -60,7 +58,7 @@ trait Formatters {
     def apply(params: HNil) = ""
   }
 
-  implicit def format2Formatter[T](f: Format{type Source = T}): Formatter[HCons[_ <: T, HNil]] =
+  implicit def format2Formatter[T](f: Fmt[T]): Formatter[HCons[_ <: T, HNil]] =
     new Formatter[HCons[_ <: T, HNil]] {
       def apply(params: HCons[_ <: T, HNil]) = f(params.head)
     }
