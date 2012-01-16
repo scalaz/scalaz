@@ -40,6 +40,24 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
     OptionT(F.map2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
+
+  def isDefinedT(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.isDefined)
+
+  def isEmptyT(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.isEmpty)
+    
+  def foldT[X](some: A => X, none: => X)(implicit F: Functor[F]): F[X] =
+    F.map(run) {
+      case None => none
+      case Some(a) => some(a)
+    }
+
+  def getOrElseT(default: => A)(implicit F: Functor[F]): F[A] = F.map(run)(_.getOrElse(default))
+
+  def existsT(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.exists(f))
+
+  def forallT(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.forall(f))
+
+  def orElseT(a: => Option[A])(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(run)(_.orElse(a)))
 }
 
 //
