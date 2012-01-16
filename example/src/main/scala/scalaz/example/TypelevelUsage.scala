@@ -15,6 +15,12 @@ object TypelevelUsage {
     val _hlist1: HCons[Int, HNil] = hlist1
     val _hlist2: HCons[String, HCons[Int, HNil]] = hlist2
 
+    hlist2 match {
+      case str :: n :: _ =>
+        val _str: String = str
+        val _n: Int = n
+    }
+
   }
 
   object KLists {
