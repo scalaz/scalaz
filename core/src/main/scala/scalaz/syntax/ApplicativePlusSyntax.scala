@@ -15,7 +15,7 @@ trait ToApplicativePlusV0 {
 
 }
 
-trait ToApplicativePlusV extends ToApplicativePlusV0 with ToApplicativeV with ToEmptyV {
+trait ToApplicativePlusV extends ToApplicativePlusV0 with ToApplicativeV with ToPlusEmptyV {
   implicit def ToApplicativePlusV[F[_],A](v: F[A])(implicit F0: ApplicativePlus[F]) =
     new ApplicativePlusV[F,A] { def self = v; implicit def F: ApplicativePlus[F] = F0 }
 
@@ -24,7 +24,7 @@ trait ToApplicativePlusV extends ToApplicativePlusV0 with ToApplicativeV with To
   ////
 }
 
-trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with EmptySyntax[F] {
+trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusEmptySyntax[F] {
   implicit def ToApplicativePlusV[A](v: F[A])(implicit F0: ApplicativePlus[F]): ApplicativePlusV[F, A] = new ApplicativePlusV[F,A] { def self = v; implicit def F: ApplicativePlus[F] = F0 }
 
   ////

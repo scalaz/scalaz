@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Alternative[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -30,6 +30,7 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
+    def orElse[A](a: Option[A], b: => Option[A]) = a orElse b
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
@@ -121,9 +122,9 @@ trait OptionFunctions {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  final def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
+  final def orEmpty[A, M[_] : Pointed : PlusEmpty](oa: Option[A]): M[A] = oa match {
     case Some(a) => Pointed[M].point(a)
-    case None    => Empty[M].empty
+    case None    => PlusEmpty[M].empty
   }
 
   /**

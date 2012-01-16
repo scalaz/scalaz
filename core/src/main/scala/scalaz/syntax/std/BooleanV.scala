@@ -234,15 +234,15 @@ trait BooleanV extends SyntaxV[Boolean] {
   final def !?[A](a: => A)(implicit z: Monoid[A]): A = boolean.zeroOrValue(self)(a)
 
   trait GuardPrevent[M[_]] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A]
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A]
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: Empty[M]) = boolean.pointOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = boolean.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: Empty[M]) = boolean.emptyOrPure[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = boolean.emptyOrPure[M, A](self)(a)
   }
 }
 

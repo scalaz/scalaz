@@ -203,14 +203,14 @@ object ScalazProperties {
     }
   }
 
-  object empty {
-    def leftPlusIdentity[F[_], X](implicit f: Empty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+  object plusEmpty {
+    def leftPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(f.emptyLaw.leftPlusIdentity[X] _)
 
-    def rightPlusIdentity[F[_], X](implicit f: Empty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+    def rightPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(f.emptyLaw.rightPlusIdentity[X] _)
 
-    def laws[F[_]](implicit F: Empty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("empty") {
+    def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("plusEmpty") {
       include(plus.laws[F])
       include(monoid.laws[F[Int]](F.monoid[Int], implicitly, implicitly))
       property("left plus identity") = leftPlusIdentity[F, Int]
@@ -230,7 +230,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(monad.laws[F])
-      include(empty.laws[F])
+      include(plusEmpty.laws[F])
       property("empty map") = emptyMap[F, Int]
       property("left zero") = leftZero[F, Int]
       property("right zero") = rightZero[F, Int]

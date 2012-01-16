@@ -31,6 +31,8 @@ object TypeClass {
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val alternative = TypeClass("Alternative", *->*, extendsList = Seq(applicative))
+  lazy val alternativeEmpty = TypeClass("AlternativeEmpty", *->*, extendsList = Seq(alternative))
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
@@ -43,9 +45,9 @@ object TypeClass {
   lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
-  lazy val empty = TypeClass("Empty", *->*, extendsList = Seq(plus))
+  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
 
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, empty))
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
@@ -75,7 +77,7 @@ object TypeClass {
     show,
     order,
     metricSpace,
-    empty,
+    plusEmpty,
     each,
     index,
     functor,
@@ -84,6 +86,8 @@ object TypeClass {
     coPointed,
     apply,
     applicative,
+    alternative,
+    alternativeEmpty,
     bind,
     monad,
     coJoin,

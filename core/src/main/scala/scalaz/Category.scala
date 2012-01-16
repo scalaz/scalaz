@@ -10,7 +10,7 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 
-  def empty[A]: Empty[({type λ[α]=(α =>: α)})#λ] = new Empty[({type λ[α]=(α =>: α)})#λ] with ComposePlus[A] {
+  def empty[A]: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus[A] {
     def empty[A] = id
   }
   def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
