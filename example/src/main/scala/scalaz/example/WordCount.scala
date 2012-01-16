@@ -1,6 +1,7 @@
 package scalaz.example
 
-import scalaz.{StateT, Applicative}
+import scalaz.{Monoid, StateT, Applicative}
+
 
 /**
  * Character/Line/Word Count from "The Essense of the Iterator Pattern".
@@ -25,7 +26,7 @@ object WordCount {
 
     // To count, we traverse with a function returning 0 or 1, and sum the results
     // with Monoid[Int], packaged in a constant monoidal applicative functor.
-    val Count = Applicative.monoidalApplicative[Int]
+    val Count = Monoid[Int].applicative
 
     // Compose the applicative instance for [a]State[Int,a] with the Count applicative
     val WordCount = StateT.stateMonad[Int].compose[({type λ[α] = Int})#λ](Count)

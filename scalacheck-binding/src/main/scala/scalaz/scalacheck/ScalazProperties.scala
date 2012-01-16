@@ -237,6 +237,17 @@ object ScalazProperties {
     }
   }
 
+  object compose {
+    def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
+                                           cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
+      forAll(C.composeLaw.associative[A, B, C, D] _)
+
+    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("category") {
+      property("associative") = associative[=>:, Int, Int, Int, Int]
+      include(semigroup.laws[Int =>: Int](C.semigroup[Int], implicitly, implicitly))
+    }
+  }
+
   object category {
     def leftIdentity[=>:[_, _], A, B](implicit ab: Arbitrary[A =>: B], C: Category[=>:], E: Equal[A =>: B]) =
       forAll(C.categoryLaw.leftIdentity[A, B] _)
@@ -244,14 +255,11 @@ object ScalazProperties {
     def rightIdentity[=>:[_, _], A, B](implicit ab: Arbitrary[A =>: B], C: Category[=>:], E: Equal[A =>: B]) =
       forAll(C.categoryLaw.rightIdentity[A, B] _)
 
-    def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
-                                           cd: Arbitrary[C =>: D], C: Category[=>:], E: Equal[A =>: D]) =
-      forAll(C.categoryLaw.associative[A, B, C, D] _)
-
     def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("category") {
+      include(compose.laws[=>:])
       property("left identity") = leftIdentity[=>:, Int, Int]
       property("right identity") = rightIdentity[=>:, Int, Int]
-      property("associative") = associative[=>:, Int, Int, Int, Int]
+      include(monoid.laws[Int =>: Int](C.monoid[Int], implicitly, implicitly))
     }
   }
 

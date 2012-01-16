@@ -11,7 +11,7 @@ package scalaz
  *
  * Applicative instances come in a few flavours:
  *  - All [[scalaz.Monad]]s are also `Applicative`
- *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.MonoidalApplicative]])
+ *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.Monoid]]#applicative)
  *  - Zipping together corresponding elements of Naperian data structures (those of of a fixed, possibly infinite shape)
  *
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
@@ -73,25 +73,6 @@ object Applicative {
 
   ////
 
-  /**
-   * A monoidal applicative functor, that implements `point` and `ap` with the operations `zero` and `append` respectively
-   * from the provided [[scalaz.Monoid]]. Note that the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is discarded;
-   * it is a phantom type.
-   */
-  trait MonoidalApplicative[F] extends Applicative[({type λ[α]=F})#λ] {
-    implicit def F: Monoid[F]
-    def point[A](a: => A): F = F.zero
-    def ap[A, B](fa: => F)(f: => F): F = F.append(fa, f)
-  }
-
-  /**
-   * Create a monoidal applicative functor from the given [[scalaz.Monoid]].
-   *
-   * @see [[scalaz.Applicative.MonoidalApplicative]]
-   */
-  def monoidalApplicative[F](implicit F0: Monoid[F]): Applicative[({type λ[α]=F})#λ] = new MonoidalApplicative[F] {
-    implicit def F: Monoid[F] = F0
-  }
   ////
 }
 
