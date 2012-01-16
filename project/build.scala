@@ -13,7 +13,9 @@ object build extends Build {
     version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.1",
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-Ydependent-method-types"),
-    scaladocOptions in Compile <<= scalacOptions,
+    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
+      bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+    },
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {

@@ -28,7 +28,7 @@ class IterateeTTest extends Spec {
       def semigroup[X, E, F[_]: Bind, A] = Semigroup[EnumeratorT[X, E, F, A]]
       def monoid[X, E, F[_]: Monad, A] = Monoid[EnumeratorT[X, E, F, A]]
       def plus[X, E, F[_]: Bind, A] = Plus[({type λ[α]=EnumeratorT[X, E, F, α]})#λ]
-      def empty[X, E, F[_]: Monad, A] = Empty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ]
+      def empty[X, E, F[_]: Monad, A] = PlusEmpty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ]
     }
 
     object enumerator {
