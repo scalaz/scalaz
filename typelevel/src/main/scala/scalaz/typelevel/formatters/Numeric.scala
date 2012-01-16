@@ -5,7 +5,6 @@ import java.lang.Integer
 import java.math.BigInteger
 
 import typelevel.Formatter._
-import unified.UnionFormat.deunion
 
 trait Numeric {
   def decimalB(width: Int = 0,
@@ -15,7 +14,7 @@ trait Numeric {
                sign: Boolean = false,
                space: Boolean = false,
                brackets: Boolean = false): Format{type Source = Byte} =
-    deunion(unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets))
+    unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets).deunion
 
   def decimalS(width: Int = 0,
                left: Boolean = false,
@@ -24,7 +23,7 @@ trait Numeric {
                sign: Boolean = false,
                space: Boolean = false,
                brackets: Boolean = false): Format{type Source = Short} =
-    deunion(unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets))
+    unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets).deunion
 
   def decimalI(width: Int = 0,
                left: Boolean = false,
@@ -33,7 +32,7 @@ trait Numeric {
                sign: Boolean = false,
                space: Boolean = false,
                brackets: Boolean = false): Format{type Source = Integer} =
-    deunion(unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets))
+    unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets).deunion
 
   def decimalL(width: Int = 0,
                left: Boolean = false,
@@ -42,7 +41,7 @@ trait Numeric {
                sign: Boolean = false,
                space: Boolean = false,
                brackets: Boolean = false): Format{type Source = Long} =
-    deunion(unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets))
+    unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets).deunion
 
   def decimalBI(width: Int = 0,
                 left: Boolean = false,
@@ -51,98 +50,98 @@ trait Numeric {
                 sign: Boolean = false,
                 space: Boolean = false,
                 brackets: Boolean = false): Format{type Source = BigInteger} =
-    deunion(unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets))
+    unified.Numeric.decimal(width, left, padding, separators, sign, space, brackets).deunion
 
 
   def octalB(width: Int = 0,
              left: Boolean = false,
              padding: Boolean = false,
              indicator: Boolean = false): Format{type Source = Byte} =
-    deunion(unified.Numeric.octal(width, left, padding, indicator))
+    unified.Numeric.octal(width, left, padding, indicator).deunion
 
   def octalS(width: Int = 0,
              left: Boolean = false,
              padding: Boolean = false,
              indicator: Boolean = false): Format{type Source = Short} =
-    deunion(unified.Numeric.octal(width, left, padding, indicator))
+    unified.Numeric.octal(width, left, padding, indicator).deunion
 
   def octalI(width: Int = 0,
              left: Boolean = false,
              padding: Boolean = false,
              indicator: Boolean = false): Format{type Source = Integer} =
-    deunion(unified.Numeric.octal(width, left, padding, indicator))
+    unified.Numeric.octal(width, left, padding, indicator).deunion
 
   def octalL(width: Int = 0,
              left: Boolean = false,
              padding: Boolean = false,
              indicator: Boolean = false): Format{type Source = Long} =
-    deunion(unified.Numeric.octal(width, left, padding, indicator))
+    unified.Numeric.octal(width, left, padding, indicator).deunion
 
   def octalBI(width: Int = 0,
               left: Boolean = false,
               padding: Boolean = false,
               indicator: Boolean = false): Format{type Source = BigInteger} =
-    deunion(unified.Numeric.octal(width, left, padding, indicator))
+    unified.Numeric.octal(width, left, padding, indicator).deunion
 
   def hexDeciB(width: Int = 0,
                left: Boolean = false,
                padding: Boolean = false,
                indicator: Boolean = false): Format{type Source = Byte} =
-    deunion(unified.Numeric.hexDeci(width, left, padding, indicator))
+    unified.Numeric.hexDeci(width, left, padding, indicator).deunion
 
   def hexDeciS(width: Int = 0,
                left: Boolean = false,
                padding: Boolean = false,
                indicator: Boolean = false): Format{type Source = Short} =
-    deunion(unified.Numeric.hexDeci(width, left, padding, indicator))
+    unified.Numeric.hexDeci(width, left, padding, indicator).deunion
 
   def hexDeciI(width: Int = 0,
                left: Boolean = false,
                padding: Boolean = false,
                indicator: Boolean = false): Format{type Source = Integer} =
-    deunion(unified.Numeric.hexDeci(width, left, padding, indicator))
+    unified.Numeric.hexDeci(width, left, padding, indicator).deunion
 
   def hexDeciL(width: Int = 0,
                left: Boolean = false,
                padding: Boolean = false,
                indicator: Boolean = false): Format{type Source = Long} =
-    deunion(unified.Numeric.hexDeci(width, left, padding, indicator))
+    unified.Numeric.hexDeci(width, left, padding, indicator).deunion
 
   def hexDeciBI(width: Int = 0,
                 left: Boolean = false,
                 padding: Boolean = false,
                 indicator: Boolean = false): Format{type Source = BigInteger} =
-    deunion(unified.Numeric.hexDeci(width, left, padding, indicator))
+    unified.Numeric.hexDeci(width, left, padding, indicator).deunion
 
   def uHexDeciB(width: Int = 0,
                 left: Boolean = false,
                 padding: Boolean = false,
                 indicator: Boolean = false): Format{type Source = Byte} =
-    deunion(unified.Numeric.uHexDeci(width, left, padding, indicator))
+    unified.Numeric.uHexDeci(width, left, padding, indicator).deunion
 
   def uHexDeciS(width: Int = 0,
                 left: Boolean = false,
                 padding: Boolean = false,
                 indicator: Boolean = false): Format{type Source = Short} =
-    deunion(unified.Numeric.uHexDeci(width, left, padding, indicator))
+    unified.Numeric.uHexDeci(width, left, padding, indicator).deunion
 
   def uHexDeciI(width: Int = 0,
                 left: Boolean = false,
                 padding: Boolean = false,
                 indicator: Boolean = false): Format{type Source = Integer} =
-    deunion(unified.Numeric.uHexDeci(width, left, padding, indicator))
+    unified.Numeric.uHexDeci(width, left, padding, indicator).deunion
 
   def uHexDeciL(width: Int = 0,
                 left: Boolean = false,
                 padding: Boolean = false,
                 indicator: Boolean = false): Format{type Source = Long} =
-    deunion(unified.Numeric.uHexDeci(width, left, padding, indicator))
+    unified.Numeric.uHexDeci(width, left, padding, indicator).deunion
 
   def uHexDeciBI(width: Int = 0,
                  left: Boolean = false,
                  padding: Boolean = false,
                  indicator: Boolean = false): Format{type Source = BigInteger} =
-    deunion(unified.Numeric.uHexDeci(width, left, padding, indicator))
+    unified.Numeric.uHexDeci(width, left, padding, indicator).deunion
 
   def cScientificF(width: Int = 0,
                    precision: Int = 0,
@@ -153,7 +152,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def cScientificD(width: Int = 0,
                    precision: Int = 0,
@@ -164,7 +163,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def cScientificBD(width: Int = 0,
                     precision: Int = 0,
@@ -175,7 +174,7 @@ trait Numeric {
                     sign: Boolean = false,
                     space: Boolean = false,
                     brackets: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.cScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uCScientificF(width: Int = 0,
                     precision: Int = 0,
@@ -186,7 +185,7 @@ trait Numeric {
                     sign: Boolean = false,
                     space: Boolean = false,
                     brackets: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uCScientificD(width: Int = 0,
                     precision: Int = 0,
@@ -197,7 +196,7 @@ trait Numeric {
                     sign: Boolean = false,
                     space: Boolean = false,
                     brackets: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uCScientificBD(width: Int = 0,
                      precision: Int = 0,
@@ -208,7 +207,7 @@ trait Numeric {
                      sign: Boolean = false,
                      space: Boolean = false,
                      brackets: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uCScientific(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def scientificF(width: Int = 0,
                   magnitude: Int = 0,
@@ -219,7 +218,7 @@ trait Numeric {
                   sign: Boolean = false,
                   space: Boolean = false,
                   brackets: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def scientificD(width: Int = 0,
                   magnitude: Int = 0,
@@ -230,7 +229,7 @@ trait Numeric {
                   sign: Boolean = false,
                   space: Boolean = false,
                   brackets: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def scientificBD(width: Int = 0,
                    magnitude: Int = 0,
@@ -241,7 +240,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.scientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uScientificF(width: Int = 0,
                    magnitude: Int = 0,
@@ -252,7 +251,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uScientificD(width: Int = 0,
                    magnitude: Int = 0,
@@ -263,7 +262,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def uScientificBD(width: Int = 0,
                     magnitude: Int = 0,
@@ -274,7 +273,7 @@ trait Numeric {
                     sign: Boolean = false,
                     space: Boolean = false,
                     brackets: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.uScientific(width, magnitude, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def floatF(width: Int = 0,
              precision: Int = 0,
@@ -285,7 +284,7 @@ trait Numeric {
              sign: Boolean = false,
              space: Boolean = false,
              brackets: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def floatD(width: Int = 0,
              precision: Int = 0,
@@ -296,7 +295,7 @@ trait Numeric {
              sign: Boolean = false,
              space: Boolean = false,
              brackets: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def floatBD(width: Int = 0,
               precision: Int = 0,
@@ -307,7 +306,7 @@ trait Numeric {
               sign: Boolean = false,
               space: Boolean = false,
               brackets: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets))
+    unified.Numeric.float(width, precision, left, decimalPoint, padding, separators, sign, space, brackets).deunion
 
   def floatHexDeciF(width: Int = 0,
                     left: Boolean = false,
@@ -315,7 +314,7 @@ trait Numeric {
                     padding: Boolean = false,
                     sign: Boolean = false,
                     space: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 
   def floatHexDeciD(width: Int = 0,
                     left: Boolean = false,
@@ -323,7 +322,7 @@ trait Numeric {
                     padding: Boolean = false,
                     sign: Boolean = false,
                     space: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 
   def floatHexDeciBD(width: Int = 0,
                      left: Boolean = false,
@@ -331,7 +330,7 @@ trait Numeric {
                      padding: Boolean = false,
                      sign: Boolean = false,
                      space: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.floatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 
   def uFloatHexDeciF(width: Int = 0,
                      left: Boolean = false,
@@ -339,7 +338,7 @@ trait Numeric {
                      padding: Boolean = false,
                      sign: Boolean = false,
                      space: Boolean = false): Format{type Source = Float} =
-    deunion(unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 
   def uFloatHexDeciD(width: Int = 0,
                      left: Boolean = false,
@@ -347,7 +346,7 @@ trait Numeric {
                      padding: Boolean = false,
                      sign: Boolean = false,
                      space: Boolean = false): Format{type Source = Double} =
-    deunion(unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 
   def uFloatHexDeciBD(width: Int = 0,
                       left: Boolean = false,
@@ -355,7 +354,7 @@ trait Numeric {
                       padding: Boolean = false,
                       sign: Boolean = false,
                       space: Boolean = false): Format{type Source = BigDecimal} =
-    deunion(unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space))
+    unified.Numeric.uFloatHexDeci(width, left, decimalPoint, padding, sign, space).deunion
 }
 
 object Numeric extends Numeric

@@ -2,17 +2,16 @@ package scalaz
 package typelevel.formatters
 
 import typelevel.Formatter._
-import unified.UnionFormat._
 
 trait String {
   def charC(width: Int = 0, left: Boolean = false): Format{type Source = Char} =
-    deunion(unified.String.char(width, left))
+    unified.String.char(width, left).deunion
 
   def charB(width: Int = 0, left: Boolean = false): Format{type Source = Byte} =
-    deunion(unified.String.char(width, left))
+    unified.String.char(width, left).deunion
 
   def charS(width: Int = 0, left: Boolean = false): Format{type Source = Short} =
-    deunion(unified.String.char(width, left))
+    unified.String.char(width, left).deunion
 
   def subs(start: Int) = new Format {
     type Source = java.lang.String
