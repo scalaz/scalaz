@@ -8,14 +8,6 @@ import std.option.optionInstance
 final case class OptionT[F[_], A](run: F[Option[A]]) {
   self =>
 
-  def getOrElse(default: => A)(implicit F: Functor[F]): F[A] = mapO(_.getOrElse(default))
-
-  def isDefined(implicit F: Functor[F]): F[Boolean] = mapO(_.isDefined)
-
-  def isEmpty(implicit F: Functor[F]): F[Boolean] = mapO(_.isEmpty)
-
-  def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
-
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](mapO(_ map f))
 
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
@@ -46,6 +38,24 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
     OptionT(F.map2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
+
+  def isDefined(implicit F: Functor[F]): F[Boolean] = mapO(_.isDefined)
+
+  def isEmpty(implicit F: Functor[F]): F[Boolean] = mapO(_.isEmpty)
+
+  def fold[X](some: A => X, none: => X)(implicit F: Functor[F]): F[X] =
+    mapO {
+      case None => none
+      case Some(a) => some(a)
+    }
+
+  def getOrElse(default: => A)(implicit F: Functor[F]): F[A] = mapO(_.getOrElse(default))
+
+  def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
+
+  def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
+
+  def orElse(a: => Option[A])(implicit F: Functor[F]): OptionT[F, A] = OptionT(mapO(_.orElse(a)))
 
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
