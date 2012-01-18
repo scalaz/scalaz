@@ -53,7 +53,7 @@ sealed trait Free[S[+_], +A] {
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
       case Suspend(t) => Left(S.fmap(t, ((_: Free[S, Any]) >>= f)))
-      case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Free[S, A]).resume
+      case b Gosub g  => (Gosub(b, (x: Any) => g(x) >>= f): Free[S, A]).resume
     }
   }
 
