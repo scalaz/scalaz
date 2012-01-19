@@ -53,29 +53,50 @@ sealed trait Free[S[+_], +A] {
     case Suspend(t) => Left(t)
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
-      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) >>= f)))
-      case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Free[S, A]).resume
+      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) flatMap f)))
+      case b Gosub g  => (Gosub(b, (x: Any) => g(x) flatMap f): Free[S, A]).resume
     }
   }
 
-  /** Modifies the suspension with the given natural transformation. */
+  /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[+_]](f: S ~> T)(implicit S: Functor[S]): Free[T, A] =
     resume match {
       case Left(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
       case Right(r) => Return(r)
     }
 
+  /** Modifies the first suspension with the given natural transformation. */
+  final def mapFirstSuspension[T[+_]](f: S ~> S) = resume match {
+    case Left(s) => Left(f(s))
+    case Right(r) => Return(r)
+  }
+
+  /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
+  final def bounce(f: S[Free[S, A]] => Free[S, A]): Free[S, A] = resume match {
+    case Left(s) => f(s)
+    case Right(r) => Return(r)
+  }
+
+  /** Runs to completion, using a function that extracts the resumption from its suspension functor. */
+  @tailrec final def go(f: S[Free[S, A]] => Free[S, A]): Free[S, A] = resume match {
+    case Left(s) => f(s).go(f)
+    case Right(r) => Return(r)
+  }
+
+  /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
+  @tailrec final def foldRun[B](f: (B, S[Free[S, A]]) => (B, Free[S, A]), b: B): (B, A) = resume match {
+    case Left(s) => {
+      val (b1, s1) = f(b, s)
+      s1.foldRun(f, b1) 
+    }
+    case Right(r) => Return(b -> r)
+  }
+
   import Liskov._
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
-  def run[B >: A](implicit ev: Free[S, B] <~< Trampoline[B], S: Functor[S]): B = {
-    @tailrec def go(t: Trampoline[B]): B =
-      t.resume match {
-        case Left(s)  => go(s())
-        case Right(a) => a
-      }
-    go(ev(this))
-  }
+  def run[B >: A](implicit ev: Free[S, B] <~< Trampoline[B], S: Functor[S]): B =
+    ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
   def zipWith[B, C](tb: Free[S, B], f: (A, B) => C)(implicit S: Functor[S]): Free[S, C] = {
