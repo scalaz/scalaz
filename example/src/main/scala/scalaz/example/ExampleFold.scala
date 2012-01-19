@@ -34,14 +34,13 @@ object ExampleFold {
 
     // Checking for existence of an element that satisfies a predicate, using Stream Foldable,
     // which lazily handles the infinite Stream.
-    // TODO wrong type class instance seems to be found here, SOE ensues.
-    // (Stream.continually(1) ∃ (_ > 0)) assert_=== true
+    (Stream.continually(1) ∃ (_ > 0)) assert_=== true
 
     Set(1, 2, 3) ∃ { _ % 2 == 0 } assert_=== true
 
     // Checking if all elements satisfy a predicate, using Stream Foldable,
     // which lazily handles the infinite Stream.
-    // (Stream.continually(1) ∀ (_ == 0)) assert_=== false
+    (Stream.continually(1) ∀ (_ == 0)) assert_=== false
 
     // Counting the elements using Seq Foldable
     ("123".toSeq.asMA.count) assert_=== 3

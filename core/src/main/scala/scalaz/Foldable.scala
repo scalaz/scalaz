@@ -88,8 +88,11 @@ object Foldable extends FoldableLow {
   }
 
   implicit def StreamFoldable[A]: Foldable[Stream] = new Foldable[Stream] {
-    override def foldRight[A, B](t: Stream[A], z: => B, op: (A, => B) => B): B = 
-      t.foldRight(z)((a, b) => op(a, b))
+    override def foldRight[A, B](t: Stream[A], b: => B, f: (A, => B) => B): B =
+      if (t.isEmpty)
+        b
+      else
+        f(t.head, foldRight(t.tail, b, f))
 
     override def foldLeft[A, B](t: Stream[A], b: B, f: (B, A) => B): B = t.foldLeft(b)(f(_, _))
   }
