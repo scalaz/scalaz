@@ -121,8 +121,16 @@ object ScalazBuild extends Build {
         (compile in Compile) := inc.Analysis.Empty,
 
         // Include SXR in the Scaladoc Build to generated HTML annotated sources.
-        (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories, scalaVersion) map {
-          (bd, asd, sv) => if (sv.startsWith("2.10") || sv.startsWith("2.8")) Seq() else sxrOptions(bd, asd)
+        scalacOptions in (Compile, doc) <++= (baseDirectory, allSourceDirectories, scalaVersion, version, baseDirectory in LocalProject("scalaz")).map {
+          (bd, asd, sv, v, rootBase) =>
+            // No idea why these get lost from standardSettings and I need to duplicate them here.
+            val tagOrBranch = if (v.endsWith("-SNAPSHOT")) "master" else "v" + v
+            val docSourceUrl = "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala"
+            val docsourceOpts = Seq("-sourcepath", rootBase.getAbsolutePath, "-doc-source-url", docSourceUrl)
+
+            val sxrOpts = if (sv.startsWith("2.10") || sv.startsWith("2.8")) Seq() else sxrOptions(bd, asd)
+            docsourceOpts ++ sxrOpts
+
         },
 
         // Package an archive containing all artifacts, readme, licence, and documentation.
@@ -167,6 +175,12 @@ object ScalazBuild extends Build {
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
+    scalacOptions in(Compile, doc) <++= (version, baseDirectory in LocalProject("scalaz")).map {
+      (v, bd) =>
+        val tagOrBranch = if (v.endsWith("-SNAPSHOT")) "master" else "v" + v
+        val docSourceUrl = "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala"
+        Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", docSourceUrl)
+    },
 
     // TODO remove after deprecating Scala 2.9.0.1
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
