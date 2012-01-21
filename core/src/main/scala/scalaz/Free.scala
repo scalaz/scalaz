@@ -114,7 +114,7 @@ sealed trait Free[S[+_], +A] {
   def feed[E, C >: A](ss: Stream[E])(implicit ev: Free[S, C] <~< Sink[E, C], S: Functor[S]): C = {
     @tailrec def go(snk: Sink[E, C], rest: Stream[E]): C = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
-      case (Stream(), Left(f)) => go(f(sys.error("No more values.")), Stream())
+      case (Stream(), Left(f)) => go(f(error_("No more values.")), Stream())
       case (_, Right(r))       => r
     }
     go(ev(this), ss)
@@ -125,7 +125,7 @@ sealed trait Free[S[+_], +A] {
     @tailrec def go(src: Source[E, B], snk: Sink[E, C]): (C, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))
       case (Left((e, c)), Right(y)) => go(c, Sink.sinkMonad[E].pure(y))
-      case (Right(x), Left(f))      => sys.error("Not enough values in source.")
+      case (Right(x), Left(f))      => error_("Not enough values in source.")
       case (Right(x), Right(y))     => (y, x)
     }
     go(source, ev(this))
