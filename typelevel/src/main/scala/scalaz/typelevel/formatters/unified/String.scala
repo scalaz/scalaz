@@ -8,13 +8,12 @@ trait String {
 
   case class char(width: Int = 0, left: Boolean = false) extends UnionFormat[t[Char]#t[Byte]#t[Short]] {
     def apply(x: Union[t[Char]#t[Byte]#t[Short]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (width > 0) width else "") +
-        "c",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "c"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 

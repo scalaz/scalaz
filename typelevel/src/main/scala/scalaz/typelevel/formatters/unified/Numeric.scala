@@ -16,7 +16,7 @@ trait Numeric {
                      space: Boolean = false,
                      brackets: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
     def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (sign) "+" else "") +
@@ -25,9 +25,8 @@ trait Numeric {
         (if (separators) "," else "") +
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
-        "d",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "d"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -36,15 +35,14 @@ trait Numeric {
                    padding: Boolean = false,
                    indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
     def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (indicator) "#" else "") +
         (if (padding) "0" else "") +
         (if (width > 0) width else "") +
-        "o",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "o"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -53,15 +51,14 @@ trait Numeric {
                      padding: Boolean = false,
                      indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
     def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (indicator) "#" else "") +
         (if (padding) "0" else "") +
         (if (width > 0) width else "") +
-        "x",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "x"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -70,15 +67,14 @@ trait Numeric {
                       padding: Boolean = false,
                       indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
     def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (indicator) "#" else "") +
         (if (padding) "0" else "") +
         (if (width > 0) width else "") +
-        "X",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "X"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -92,7 +88,7 @@ trait Numeric {
                          space: Boolean = false,
                          brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -103,9 +99,8 @@ trait Numeric {
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
         (if (precision > 0) "."+precision else "") +
-        "e",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "e"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -119,7 +114,7 @@ trait Numeric {
                           space: Boolean = false,
                           brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -130,9 +125,8 @@ trait Numeric {
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
         (if (precision > 0) "."+precision else "") +
-        "E",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "E"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -146,7 +140,7 @@ trait Numeric {
                         space: Boolean = false,
                         brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -157,9 +151,8 @@ trait Numeric {
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
         (if (magnitude > 0) "."+magnitude else "") +
-        "g",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "g"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -173,7 +166,7 @@ trait Numeric {
                          space: Boolean = false,
                          brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -184,9 +177,8 @@ trait Numeric {
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
         (if (magnitude > 0) "."+magnitude else "") +
-        "G",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "G"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -200,7 +192,7 @@ trait Numeric {
                    space: Boolean = false,
                    brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -211,9 +203,8 @@ trait Numeric {
         (if (brackets) "(" else "") +
         (if (width > 0) width else "") +
         (if (precision > 0) "."+precision else "") +
-        "f",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "f"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -224,7 +215,7 @@ trait Numeric {
                           sign: Boolean = false,
                           space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -232,9 +223,8 @@ trait Numeric {
         (if (space) " " else "") +
         (if (padding) "0" else "") +
         (if (width > 0) width else "") +
-        "a",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "a"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 
@@ -245,7 +235,7 @@ trait Numeric {
                           sign: Boolean = false,
                           space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
     def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
-      javaFormatter.write(
+      (
         "%" +
         (if (left) "-" else "") +
         (if (decimalPoint) "#" else "") +
@@ -253,9 +243,8 @@ trait Numeric {
         (if (space) " " else "") +
         (if (padding) "0" else "") +
         (if (width > 0) width else "") +
-        "A",
-        x.value.asInstanceOf[java.lang.Object]
-      )
+        "A"
+      ) format x.value.asInstanceOf[java.lang.Object]
     }
   }
 

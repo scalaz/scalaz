@@ -46,11 +46,6 @@ trait Formatters {
     def apply(s: Source): String
   }
 
-  object javaFormatter {
-    def write(fmt: String, arg: Object): String =
-      fmt format arg
-  }
-
   def FNil: Formatter[HNil] = new Formatter[HNil] {
     def apply(params: HNil) = ""
   }
