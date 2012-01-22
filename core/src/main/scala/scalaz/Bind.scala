@@ -14,6 +14,12 @@ trait Bind[F[_]] extends Apply[F] { self =>
 
   def join[A](ffa: F[F[A]]) = bind(ffa)(a => a)
 
+  // derived functions
+  import Liskov._
+
+  def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] =
+    bind(value)(x => if (x) ifTrue else ifFalse)
+
   ////
   val bindSyntax = new scalaz.syntax.BindSyntax[F] {}
 }

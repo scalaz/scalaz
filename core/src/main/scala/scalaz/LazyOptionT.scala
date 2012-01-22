@@ -61,7 +61,7 @@ sealed trait LazyOptionT[F[_], A] {
 
 }
 
-object LazyOptionT extends LazyOptionTs {
+object LazyOptionT extends LazyOptionTFunctions with LazyOptionTInstances {
   def apply[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
     lazyOptionT(r)
 }
@@ -84,8 +84,9 @@ trait LazyOptionTInstances1 extends LazyOptionTInstances2 {
 
 trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApply[F] {
-      implicit def F: Apply[F] = F0
-    }
+    implicit def F: Apply[F] = F0
+  }
+  implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] = Equal.equalBy((_: LazyOptionT[F, A]).run)
 }
 
 trait LazyOptionTInstances extends LazyOptionTInstances0 {
@@ -94,9 +95,10 @@ trait LazyOptionTInstances extends LazyOptionTInstances0 {
   implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTMonad[F] {
     implicit def F: Monad[F] = F0
   }
+  implicit def lazyOptionOrder[F[_], A](implicit FA: Order[F[LazyOption[A]]]): Order[LazyOptionT[F, A]] = Order.orderBy((_: LazyOptionT[F, A]).run)
 }
 
-trait LazyOptionTs {
+trait LazyOptionTFunctions {
   def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] = new LazyOptionT[F, A] {
     val run = r
   }
@@ -147,4 +149,6 @@ private[scalaz] trait LazyOptionTMonadTrans extends MonadTrans[LazyOptionT] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = LazyOptionT[M, x]})#f ~> ({type f[x] = LazyOptionT[N, x]})#f) {
     def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
   }
+
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = LazyOptionT[G, α]})#λ] = LazyOptionT.lazyOptionTMonad[G]
 }

@@ -7,6 +7,7 @@ package scalaz
 ////
 trait CoJoin[F[_]]  { self =>
   ////
+  /** Also known as `duplicate` */
   def cojoin[A](a: F[A]): F[F[A]]
 
   // derived functions

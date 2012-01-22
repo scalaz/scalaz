@@ -70,6 +70,8 @@ sealed trait NonEmptyList[A] {
     case x :: xs => nel(x, xs)
   }
 
+  def size: Int = 1 + list.size
+
   override def toString: String = "NonEmpty" + (head :: tail)
 }
 
@@ -80,17 +82,26 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   // TODO Show, etc.
-  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] = new Traverse[NonEmptyList] with Monad[NonEmptyList] {
-    def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
-      fa traverse f
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with Each[NonEmptyList] =
+    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] with Each[NonEmptyList] {
+      def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
+        fa traverse f
 
-    def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+      def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
-    def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
+      def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
-    def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
-  }
-  
+      def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
+
+      def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
+
+      def copoint[A](p: NonEmptyList[A]): A = p.head
+
+      def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
+      
+      def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
+    }
+
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
     def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1.list <::: f2
   }

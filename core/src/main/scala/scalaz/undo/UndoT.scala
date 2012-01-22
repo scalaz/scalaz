@@ -162,4 +162,6 @@ private[scalaz] trait UndoTMonadTrans[S]
   def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): UndoT[G, S, A] = {
     UndoT[G, S, A](StateT(s => G.map(ga)(a => (a, s))))
   }
+
+  implicit def apply[G[_]: Monad]: Monad[({type λ[α] = UndoT[G, S, α]})#λ] = UndoT.undoTMonadState[S, G]
 }

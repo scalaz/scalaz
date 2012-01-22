@@ -10,9 +10,15 @@ trait IndexV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToIndexV  {
-  implicit def ToIndexV[FA](v: FA)(implicit F0: Unapply[Index, FA]) =
+trait ToIndexV0 {
+  implicit def ToIndexVUnapply[FA](v: FA)(implicit F0: Unapply[Index, FA]) =
     new IndexV[F0.M,F0.A] { def self = F0(v); implicit def F: Index[F0.M] = F0.TC }
+
+}
+
+trait ToIndexV extends ToIndexV0 {
+  implicit def ToIndexV[F[_],A](v: F[A])(implicit F0: Index[F]) =
+    new IndexV[F,A] { def self = v; implicit def F: Index[F] = F0 }
 
   ////
 

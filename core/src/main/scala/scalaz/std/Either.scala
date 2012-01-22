@@ -269,7 +269,6 @@ trait EitherInstances extends EitherInstances0 {
     implicit def X = MonoidX
   }
 
-
   implicit def eitherLastLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ Last] = new EitherLastLeftMonoid[A, X] {
     implicit def X = MonoidX
   }
@@ -297,9 +296,10 @@ private[scalaz] trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]
 
   def equal(a1: RightProjection[X, A], a2: RightProjection[X, A]) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
@@ -307,9 +307,10 @@ private[scalaz] trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] 
 
   def equal(a1: LeftProjection[A, X], a2: LeftProjection[A, X]) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[X, A] @@ First] {
@@ -317,9 +318,10 @@ private[scalaz] trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[
 
   def equal(a1: RightProjection[X, A] @@ First, a2: RightProjection[X, A] @@ First) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ First] {
@@ -327,9 +329,10 @@ private[scalaz] trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A,
 
   def equal(a1: LeftProjection[A, X] @@ First, a2: LeftProjection[A, X] @@ First) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 
@@ -338,9 +341,10 @@ private[scalaz] trait EitherLastRightEqual[X, A] extends Equal[RightProjection[X
 
   def equal(a1: RightProjection[X, A] @@ Last, a2: RightProjection[X, A] @@ Last) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ Last] {
@@ -348,9 +352,10 @@ private[scalaz] trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, 
 
   def equal(a1: LeftProjection[A, X] @@ Last, a2: LeftProjection[A, X] @@ Last) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None) => true
-    case _ => false
+    case (None, None)       => true
+    case _                  => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherEqual[A, B] extends Equal[Either[A, B]] {
@@ -358,10 +363,11 @@ private[scalaz] trait EitherEqual[A, B] extends Equal[Either[A, B]] {
   implicit def B: Equal[B]
 
   def equal(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
-    case (Left(a1), Left(a2)) => A.equal(a1, a2)
-    case (Right(b1), Right(b2)) => B.equal(b1, b2)
+    case (Left(a1), Left(a2))                      => A.equal(a1, a2)
+    case (Right(b1), Right(b2))                    => B.equal(b1, b2)
     case (Right(_), Left(_)) | (Left(_), Right(_)) => false
   }
+  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private[scalaz] trait EitherFirstLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ First] {
@@ -386,9 +392,9 @@ private[scalaz] trait EitherLeftSemigroup[A, X] extends Semigroup[LeftProjection
 
   def append(f1: LeftProjection[A, X], f2: => LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => Left(Semigroup[A].append(x, y)).left
-    case (None, Some(_)) => f2
-    case (Some(_), None) => f1
-    case (None, None) => Right(Monoid[X].zero).left
+    case (None, Some(_))    => f2
+    case (Some(_), None)    => f1
+    case (None, None)       => Right(Monoid[X].zero).left
   }
 }
 
@@ -398,9 +404,9 @@ private[scalaz] trait EitherRightSemigroup[X, A] extends Semigroup[RightProjecti
 
   def append(f1: RightProjection[X, A], f2: => RightProjection[X, A]) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => Right(Semigroup[A].append(x, y)).right
-    case (None, Some(_)) => f2
-    case (Some(_), None) => f1
-    case (None, None) => Left(Monoid[X].zero).right
+    case (None, Some(_))    => f2
+    case (Some(_), None)    => f1
+    case (None, None)       => Left(Monoid[X].zero).right
   }
 }
 
@@ -446,11 +452,12 @@ private[scalaz] trait EitherOrder[A, B] extends Order[Either[A, B]] {
   implicit def B: Order[B]
 
   import Ordering._
+
   def order(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
-    case (Left(x), Left(y)) => A.order(x, y)
+    case (Left(x), Left(y))   => A.order(x, y)
     case (Right(x), Right(y)) => B.order(x, y)
-    case (Left(_), Right(_)) => LT
-    case (Right(_), Left(_)) => GT
+    case (Left(_), Right(_))  => LT
+    case (Right(_), Left(_))  => GT
   }
 }
 
@@ -458,11 +465,12 @@ private[scalaz] trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] 
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: LeftProjection[A, X], f2: LeftProjection[A, X]) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }
 
@@ -470,11 +478,12 @@ private[scalaz] trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: RightProjection[X, A], f2: RightProjection[X, A]) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }
 
@@ -482,11 +491,12 @@ private[scalaz] trait EitherFirstLeftOrder[A, X] extends Order[LeftProjection[A,
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: LeftProjection[A, X] @@ First, f2: LeftProjection[A, X] @@ First) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }
 
@@ -494,11 +504,12 @@ private[scalaz] trait EitherFirstRightOrder[X, A] extends Order[RightProjection[
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: RightProjection[X, A] @@ First, f2: RightProjection[X, A] @@ First) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }
 
@@ -507,11 +518,12 @@ private[scalaz] trait EitherLastLeftOrder[A, X] extends Order[LeftProjection[A, 
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: LeftProjection[A, X] @@ Last, f2: LeftProjection[A, X] @@ Last) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }
 
@@ -519,10 +531,11 @@ private[scalaz] trait EitherLastRightOrder[X, A] extends Order[RightProjection[X
   implicit def A: Order[A]
 
   import Ordering._
+
   def order(f1: RightProjection[X, A] @@ Last, f2: RightProjection[X, A] @@ Last) = (f1.toOption, f2.toOption) match {
     case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))    => LT
+    case (Some(_), None)    => GT
+    case (None, None)       => EQ
   }
 }

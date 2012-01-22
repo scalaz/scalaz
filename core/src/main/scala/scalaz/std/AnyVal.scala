@@ -15,12 +15,16 @@ trait AnyValInstances {
     def inverse(f:Unit) = ()
 
     def order(x: Unit, y: Unit) = Ordering.EQ
+
+    override def equalIsNatural: Boolean = true
   }
 
   implicit object booleanInstance extends Order[Boolean] with Show[Boolean] {
     def show(f: Boolean) = f.toString.toList
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
 
     object conjunction extends Monoid[Boolean] {
       def append(f1: Boolean, f2: => Boolean) = f1 && f2
@@ -64,6 +68,8 @@ trait AnyValInstances {
 
     def order(x: Byte, y: Byte) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
+    override def equalIsNatural: Boolean = true
+
     object multiplication extends Monoid[Byte] {
       def append(f1: Byte, f2: => Byte) = (f1 * f2).toByte
 
@@ -81,6 +87,8 @@ trait AnyValInstances {
 
     def order(a1: Byte @@ Multiplication, a2: Byte @@ Multiplication) = Order[Byte].order(a1, a2)
 
+    override def equalIsNatural: Boolean = true
+
   }
 
   implicit val char: Monoid[Char] with Order[Char] with Show[Char] = new Monoid[Char] with Order[Char] with Show[Char] {
@@ -91,6 +99,8 @@ trait AnyValInstances {
     def zero: Char = 0
 
     def order(x: Char, y: Char) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Char] {
       def append(f1: Char, f2: => Char) = (f1 * f2).toChar
@@ -106,6 +116,8 @@ trait AnyValInstances {
     def zero: Char @@ Multiplication = Multiplication(1)
 
     def order(a1: Char @@ Multiplication, a2: Char @@ Multiplication) = Order[Char].order(a1, a2)
+
+    override def equalIsNatural: Boolean = true
   }
 
   implicit val shortInstance: Group[Short] with Order[Short] with Show[Short] = new Group[Short] with Order[Short] with Show[Short] {
@@ -118,6 +130,8 @@ trait AnyValInstances {
     def inverse(f:Short) = (-f).toShort
 
     def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Short] {
       def append(f1: Short, f2: => Short) = (f1 * f2).toShort
@@ -144,13 +158,22 @@ trait AnyValInstances {
 
     def inverse(f:Int) = -f
 
+    def distance(a: Int, b: Int): Int = b - a
+
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Int] {
       def append(f1: Int, f2: => Int) = f1 * f2
 
       def zero: Int = 1
     }
+  }
+
+  /** Warning: the triangle inequality will not hold if `b - a` overflows. */
+  implicit val intMetricSpace: MetricSpace[Int] = new MetricSpace[Int] {
+    def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
   }
 
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Order[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Order[Int @@ Multiplication] {
@@ -171,6 +194,8 @@ trait AnyValInstances {
     def inverse(f: Long) = -f
 
     def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Long] {
       def append(f1: Long, f2: => Long) = f1 * f2
@@ -197,6 +222,8 @@ trait AnyValInstances {
 
     def inverse(f: Float) = -f
 
+    override def equalIsNatural: Boolean = true
+
     def order(x: Float, y: Float) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
@@ -219,6 +246,8 @@ trait AnyValInstances {
     def inverse(f: Double) = -f
 
     def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    override def equalIsNatural: Boolean = true
   }
 
   implicit val doubleMultiplicationNewType: Group[Double @@ Multiplication] = new Group[Double @@ Multiplication] {
@@ -227,9 +256,7 @@ trait AnyValInstances {
     def zero: Double @@ Multiplication = Multiplication(1.0d)
 
     def inverse(f: Double @@ Multiplication) = Multiplication(1.0d/f)
-
   }
-
 }
 
 trait BooleanFunctions {
@@ -378,22 +405,22 @@ trait BooleanFunctions {
    * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
    * for `M`.
    */
-  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
     if (cond) M.point(a) else M0.empty
 
   /**
    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
    * for `M`.
    */
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: Empty[M]): M[A] =
+  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty(cond)(a)
     }
 
-  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: Empty[M]): (Id ~> M) =
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = emptyOrPure(cond)(a)
     }

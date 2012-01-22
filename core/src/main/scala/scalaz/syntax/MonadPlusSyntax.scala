@@ -5,13 +5,28 @@ package syntax
 trait MonadPlusV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: MonadPlus[F]
   ////
+  import Liskov._
+
+  def filter(f: A => Boolean) =
+    F.filter(self)(f)
+
+  def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
+    val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
+    F.unite[T, B](ftb)
+  }
 
   ////
 }
 
-trait ToMonadPlusV extends ToMonadV with ToApplicativePlusV {
-  implicit def ToMonadPlusV[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
+trait ToMonadPlusV0 {
+  implicit def ToMonadPlusVUnapply[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
     new MonadPlusV[F0.M,F0.A] { def self = F0(v); implicit def F: MonadPlus[F0.M] = F0.TC }
+
+}
+
+trait ToMonadPlusV extends ToMonadPlusV0 with ToMonadV with ToApplicativePlusV {
+  implicit def ToMonadPlusV[F[_],A](v: F[A])(implicit F0: MonadPlus[F]) =
+    new MonadPlusV[F,A] { def self = v; implicit def F: MonadPlus[F] = F0 }
 
   ////
 

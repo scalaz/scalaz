@@ -105,23 +105,31 @@ trait LazyOptionInstances {
     def point[A](a: => A): LazyOption[A] = lazySome(a)
     def empty[A]: LazyOption[A] = lazyNone
   }
+
+  implicit def lazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = {
+    import std.option._
+    Equal.equalBy(_.toOption)
+  }
+
   /* TODO
 implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
   Show[A].shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))
-
-implicit def LazyOptionEqual[A: Equal]: Equal[LazyOption[A]] =
-  Equal.equalBy(_.toOption)
 
 implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
   Order.orderBy(_.toOption)*/
 }
 
 trait LazyOptionFunctions {
-  def lazySome[A]: (=> A) => LazyOption[A] =
-    a => LazySome(() => a)
+  def lazySome[A](a: => A): LazyOption[A] =
+    LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =
     LazyNone()
+
+  def fromOption[A](oa: Option[A]): LazyOption[A] = oa match {
+    case Some(x) => lazySome(x)
+    case None    => lazyNone[A]
+  }
 
   /**
    * Returns the given argument in `lazySome` if this is `true`, `lazyNone` otherwise.

@@ -47,7 +47,7 @@ sealed trait Heap[A] {
     fold(None, (_, _, t) => Some((t.rootLabel.value, deleteMin)))
 
   /**Get the minimum key on the (nonempty) heap. O(1) */
-  def minimum: A = fold(sys.error("Heap.minimum: emptyEphemeralStream heap"), (_, _, t) => t.rootLabel.value)
+  def minimum: A = fold(sys.error("Heap.minimum: empty heap"), (_, _, t) => t.rootLabel.value)
 
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
@@ -84,6 +84,12 @@ sealed trait Heap[A] {
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B) = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
+
+  def forall(f: A => Boolean) = toStream.forall(f)
+
+  def exists(f: A => Boolean) = toStream.exists(f)
+
+  def foreach(f: A => Boolean) = toStream.foreach(f)
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
@@ -189,6 +195,8 @@ sealed trait Heap[A] {
       (g(x._1), g(x._2))
     })
   }
+
+  override def toString = "<heap>"
 }
 
 case class Ranked[A](rank: Int, value: A)
@@ -352,6 +360,10 @@ trait HeapInstances {
     def append(f1: Heap[A], f2: => Heap[A]) = f1 union f2
     def zero = Heap.Empty.apply
   }
+
+  import std.stream._
+
+  implicit def heapEqual[A: Equal]: Equal[Heap[A]] = Equal.equalBy((_: Heap[A]).toStream)
 }
 
 trait HeapFunctions {

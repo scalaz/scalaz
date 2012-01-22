@@ -5,13 +5,20 @@ package syntax
 trait CoPointedV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: CoPointed[F]
   ////
+  def copoint: A = F.copoint(self)
 
   ////
 }
 
-trait ToCoPointedV extends ToFunctorV {
-  implicit def ToCoPointedV[FA](v: FA)(implicit F0: Unapply[CoPointed, FA]) =
+trait ToCoPointedV0 {
+  implicit def ToCoPointedVUnapply[FA](v: FA)(implicit F0: Unapply[CoPointed, FA]) =
     new CoPointedV[F0.M,F0.A] { def self = F0(v); implicit def F: CoPointed[F0.M] = F0.TC }
+
+}
+
+trait ToCoPointedV extends ToCoPointedV0 with ToFunctorV {
+  implicit def ToCoPointedV[F[_],A](v: F[A])(implicit F0: CoPointed[F]) =
+    new CoPointedV[F,A] { def self = v; implicit def F: CoPointed[F] = F0 }
 
   ////
 

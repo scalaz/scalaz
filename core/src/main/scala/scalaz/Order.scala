@@ -1,12 +1,15 @@
 package scalaz
 
 ////
+import scala.math.{Ordering => SOrdering}
+
 /**
  *
  */
 ////
 trait Order[F] extends Equal[F] { self =>
   ////
+
   def order(x: F, y: F): Ordering 
   
   def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
@@ -28,6 +31,23 @@ trait Order[F] extends Equal[F] { self =>
     def order(b1: B, b2: B): Ordering = self.order(f(b1), f(b2))
   }
 
+  def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
+
+  trait OrderLaw extends EqualLaw {
+    import std.boolean.conditional
+
+    def transitiveOrder(f1: F, f2: F, f3: F): Boolean = {
+      val f1f2: Ordering = order(f1, f2)
+      conditional(Set(f1f2, Ordering.EQ)(order(f2, f3)), order(f1, f3) == f1f2)
+    }
+
+    def orderAndEqualConsistent(f1: F, f2: F): Boolean = {
+      conditional(equal(f1, f2), order(f1, f2) == Ordering.EQ)
+    }
+  }
+
+  def orderLaw = new OrderLaw {}
+
   ////
   val orderSyntax = new scalaz.syntax.OrderSyntax[F] {}
 }
@@ -39,6 +59,8 @@ object Order {
   implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
   }
+
+  def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
 
   implicit def orderMonoid[A] = new Monoid[Order[A]] {
     def zero: Order[A] = new Order[A] {

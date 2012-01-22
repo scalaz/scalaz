@@ -27,7 +27,9 @@ object ScalazArbitrary {
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arbArray[A])(ImmutableArray.fromArray[A](_))
 
-  implicit def IdentityArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Identity[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
+  implicit def ValueArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Value[A]] = Functor[Arbitrary].map(fa)(a => Value(a))
+  implicit def NameArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Name[A]] = Functor[Arbitrary].map(fa)(a => Name(a))
+  implicit def NeedArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Need[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
 
   implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
@@ -54,8 +56,7 @@ object ScalazArbitrary {
 
   implicit def LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] = Tag.subst(arb[Long])
 
-  // TODO Is Digit not available anymore?
-  // implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(digits))
+  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].map2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
@@ -156,6 +157,47 @@ object ScalazArbitrary {
   import Zipper._
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
     Apply[Arbitrary].map3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
+
+  implicit def KliesliArbitrary[M[_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
+    Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
+
+  implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
+    Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
+
+  implicit def optionTArb[F[_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
+    Functor[Arbitrary].map(A)(OptionT[F, A](_))
+
+  implicit def lazyOptionArb[F[_], A](implicit A: Arbitrary[Option[A]]): Arbitrary[LazyOption[A]] =
+    Functor[Arbitrary].map(A)(LazyOption.fromOption[A](_))
+
+  implicit def lazyOptionTArb[F[_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
+    Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
+
+  implicit def stateTArb[F[_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
+    Functor[Arbitrary].map(A)(StateT[F, S, A](_))
+
+  implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
+
+  implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
+    Applicative[Arbitrary].map2(A, B)(LazyTuple2(_, _))
+
+  implicit def lazyTuple3Arbitrary[A, B, C](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C]): Arbitrary[LazyTuple3[A, B, C]] =
+    Applicative[Arbitrary].map3(A, B, C)(LazyTuple3(_, _, _))
+
+  implicit def lazyTuple4Arbitrary[A, B, C, D](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C], D: Arbitrary[D]): Arbitrary[LazyTuple4[A, B, C, D]] =
+    Applicative[Arbitrary].map4(A, B, C, D)(LazyTuple4(_, _, _, _))
+
+  implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
+    import std.list._
+    Functor[Arbitrary].map(A)(as => Heap.fromData(as))
+  }
+
+  implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
+    Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
+
+  implicit def coStateTArb[F[_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[CoStateT[F, A, B]] = Functor[Arbitrary].map(A)(CoStateT(_))
+
+  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}

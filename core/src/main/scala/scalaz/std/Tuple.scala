@@ -2,11 +2,11 @@ package scalaz
 package std
 
 trait TupleInstances0 {
-  implicit def tuple2Instance[A1, A2] = new BiTraverse[Tuple2] {
-    override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D): (C, D) = (f(fab._1), g(fab._2))
-    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]): G[(C, D)] = {
+  implicit def tuple2BiTraverse[A1, A2] = new BiTraverse[Tuple2] {
+    override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
+      (f(fab._1), g(fab._2))
+    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
       Applicative[G].map2(f(fab._1), g(fab._2))((_, _))
-    }
   }
 
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]) = new Tuple1Semigroup[A1] {
@@ -61,8 +61,20 @@ trait TupleInstances0 {
     implicit def _7 = A7
     implicit def _8 = A8
   }
-  implicit def tuple1Functor: Functor[Tuple1] = new Tuple1Functor {}
-  implicit def tuple2Functor[A1]: Functor[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] {}
+  /** `Tuple1[A]` is isomorphic to `Id[X]` */
+  implicit def tuple1Instance: Monad[Tuple1] with CoMonad[Tuple1] = new Tuple1Monad with CoMonad[Tuple1] {
+    def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+    def copoint[A](p: Tuple1[A]) = p._1
+    def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
+  }
+
+  /** Product functor and comonad */
+  implicit def tuple2Instance[A1]: Functor[({type f[x] = (A1, x)})#f] with CoMonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with CoMonad[({type f[x] = (A1, x)})#f] {
+    def cojoin[A](a: (A1, A)) = (a._1, a)
+    def copoint[A](p: (A1, A)) = p._2
+    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  }
+
   implicit def tuple3Functor[A1, A2]: Functor[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
   implicit def tuple4Functor[A1, A2, A3]: Functor[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
   implicit def tuple5Functor[A1, A2, A3, A4]: Functor[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Functor[A1, A2, A3, A4] {}
@@ -283,8 +295,6 @@ trait TupleInstances1 extends TupleInstances0 {
     implicit def _8 = A8
   }
 
-  implicit def tuple1Monad: Monad[Tuple1] = new Tuple1Monad {}
-
   implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[({type f[x] = (A1, x)})#f] = new Tuple2Monad[A1] {
     implicit def _1 = A1
   }
@@ -389,7 +399,9 @@ trait TupleInstances2 extends TupleInstances1 {
 
 trait TupleInstances extends TupleInstances2
 
-object tuple extends TupleInstances
+object tuple extends TupleInstances {
+  object tupleSyntax extends scalaz.syntax.std.ToTupleV
+}
 
 private[scalaz] trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {
   implicit def _1 : Semigroup[A1]
@@ -532,12 +544,14 @@ private[scalaz] trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Functor[
 private[scalaz] trait Tuple1Equal[A1] extends Equal[Tuple1[A1]] {
   implicit def _1 : Equal[A1]
   override def equal(f1: Tuple1[A1], f2: Tuple1[A1]) = _1.equal(f1._1, f2._1)
+  override val equalIsNatural: Boolean = _1.equalIsNatural
 }
 private[scalaz] trait Tuple2Equal[A1, A2] extends Equal[(A1, A2)] {
   implicit def _1 : Equal[A1]
   implicit def _2 : Equal[A2]
   override def equal(f1: (A1, A2), f2: (A1, A2)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural
 }
 private[scalaz] trait Tuple3Equal[A1, A2, A3] extends Equal[(A1, A2, A3)] {
   implicit def _1 : Equal[A1]
@@ -545,6 +559,7 @@ private[scalaz] trait Tuple3Equal[A1, A2, A3] extends Equal[(A1, A2, A3)] {
   implicit def _3 : Equal[A3]
   override def equal(f1: (A1, A2, A3), f2: (A1, A2, A3)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural
 }
 private[scalaz] trait Tuple4Equal[A1, A2, A3, A4] extends Equal[(A1, A2, A3, A4)] {
   implicit def _1 : Equal[A1]
@@ -553,6 +568,7 @@ private[scalaz] trait Tuple4Equal[A1, A2, A3, A4] extends Equal[(A1, A2, A3, A4)
   implicit def _4 : Equal[A4]
   override def equal(f1: (A1, A2, A3, A4), f2: (A1, A2, A3, A4)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural
 }
 private[scalaz] trait Tuple5Equal[A1, A2, A3, A4, A5] extends Equal[(A1, A2, A3, A4, A5)] {
   implicit def _1 : Equal[A1]
@@ -562,6 +578,7 @@ private[scalaz] trait Tuple5Equal[A1, A2, A3, A4, A5] extends Equal[(A1, A2, A3,
   implicit def _5 : Equal[A5]
   override def equal(f1: (A1, A2, A3, A4, A5), f2: (A1, A2, A3, A4, A5)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural && _5.equalIsNatural
 }
 private[scalaz] trait Tuple6Equal[A1, A2, A3, A4, A5, A6] extends Equal[(A1, A2, A3, A4, A5, A6)] {
   implicit def _1 : Equal[A1]
@@ -572,6 +589,7 @@ private[scalaz] trait Tuple6Equal[A1, A2, A3, A4, A5, A6] extends Equal[(A1, A2,
   implicit def _6 : Equal[A6]
   override def equal(f1: (A1, A2, A3, A4, A5, A6), f2: (A1, A2, A3, A4, A5, A6)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural
 }
 private[scalaz] trait Tuple7Equal[A1, A2, A3, A4, A5, A6, A7] extends Equal[(A1, A2, A3, A4, A5, A6, A7)] {
   implicit def _1 : Equal[A1]
@@ -583,6 +601,7 @@ private[scalaz] trait Tuple7Equal[A1, A2, A3, A4, A5, A6, A7] extends Equal[(A1,
   implicit def _7 : Equal[A7]
   override def equal(f1: (A1, A2, A3, A4, A5, A6, A7), f2: (A1, A2, A3, A4, A5, A6, A7)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7, f2._7)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural && _7.equalIsNatural
 }
 private[scalaz] trait Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8] extends Equal[(A1, A2, A3, A4, A5, A6, A7, A8)] {
   implicit def _1 : Equal[A1]
@@ -595,6 +614,7 @@ private[scalaz] trait Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8] extends Equal[
   implicit def _8 : Equal[A8]
   override def equal(f1: (A1, A2, A3, A4, A5, A6, A7, A8), f2: (A1, A2, A3, A4, A5, A6, A7, A8)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7, f2._7) && _8.equal(f1._8, f2._8)
+  override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural && _7.equalIsNatural && _8.equalIsNatural
 }
 private[scalaz] trait Tuple1Show[A1] extends Show[Tuple1[A1]] {
   implicit def _1 : Show[A1]

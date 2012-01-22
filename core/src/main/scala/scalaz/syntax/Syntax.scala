@@ -19,7 +19,7 @@ trait Syntaxes {
 
   object metricSpace extends ToMetricSpaceV
 
-  object empty extends ToEmptyV
+  object plusEmpty extends ToPlusEmptyV
 
   object each extends ToEachV
 
@@ -36,6 +36,10 @@ trait Syntaxes {
   object apply extends ToApplyV
 
   object applicative extends ToApplicativeV
+  
+  object alternative extends ToAlternativeV
+
+  object alternativeEmpty extends ToAlternativeEmptyV
 
   object bind extends ToBindV
 
@@ -65,30 +69,33 @@ trait Syntaxes {
 
   object arrow extends ToArrowV
 
+  object id extends ToIdV
+
   object tree extends ToTreeV
 
   object reducer extends ToReducerV
-  
+
   object writer extends ToWriterV
-  
+
   object foldable extends ToFoldableV
-  
+
   object validation extends ToValidationV
-  
+
+
   object all extends ToAllTypeClassV with ToAllOtherV
 
 }
 
-trait ToAllOtherV extends ToTreeV with ToWriterV
+trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV with ToReducerV
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
-  with ToOrderV with ToMetricSpaceV with ToEmptyV with ToEachV with ToIndexV
+  with ToOrderV with ToMetricSpaceV with ToPlusEmptyV with ToEachV with ToIndexV
   with ToFunctorV with ToPointedV with ToContravariantV with ToCoPointedV with ToApplyV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToComposeV with ToCategoryV
-  with ToArrowV with ToFoldableV with ToValidationV with ToReducerV
+  with ToArrowV with ToFoldableV with ToAlternativeV with ToAlternativeEmptyV
 
 
 trait SyntaxV[A] {

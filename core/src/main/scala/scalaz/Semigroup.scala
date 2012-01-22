@@ -20,6 +20,18 @@ trait Semigroup[F]  { self =>
   def append(f1: F, f2: => F): F
 
   // derived functions
+  private[scalaz] trait SemigroupCompose extends Compose[({type λ[α, β]=F})#λ] {
+    def compose[A, B, C](f: F, g: F) = append(f, g)
+  }
+
+  final def compose: Compose[({type λ[α, β]=F})#λ] = new SemigroupCompose {}
+
+  private[scalaz] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
+    override def map[A, B](fa: F)(f: (A) => B) = fa
+    def ap[A, B](fa: => F)(f: => F) = append(fa, f)
+  }
+
+  final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply {}
 
   /**
    * A semigroup in type F must satisfy two laws:

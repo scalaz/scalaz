@@ -5,17 +5,35 @@ package scalaz
  *
  * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
  */
+// TODO
+//dabblego: I have another, sec, but it will require Enum
+//[06:57am] dabblego: can you please put a comment there while yer there?
+//[06:57am] dabblego: \p -> if p then succ else id -- for a start
+//[06:58am] dabblego: :t \f p -> evalStateT (StateT (\s -> do r <- f s; q <- p s; return (r, if q then succ s else s))) mempty
+//[06:58am] lambdabot: forall s (m :: * -> *) a. (Monad m, Enum s, Monoid s) => (s -> m a) -> (s -> m Bool) -> m a
+//
 trait StateT[F[_], S, A] { self =>
   /** Run and return the final value and state in the context of `F` */
   def apply(initial: S): F[(A, S)]
+
+  /** An alias for `apply` */
+  def run(initial: S): F[(A, S)] = apply(initial)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(initial: S)(implicit F: Functor[F]): F[A] =
     F.map(apply(initial))(_._1)
 
+  /** Calls `eval` using `Monoid[S].zero` as the initial state */
+  def evalZero(implicit F: Functor[F], S: Monoid[S]): F[A] =
+    eval(S.zero)
+
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(initial: S)(implicit F: Functor[F]): F[S] =
     F.map(apply(initial))(_._2)
+
+  /** Calls `exec` using `Monoid[S].zero` as the initial state */
+  def execZero(implicit F: Functor[F], S: Monoid[S]): F[S] =
+    exec(S.zero)
 
   def map[B](f: A => B)(implicit F: Functor[F]): StateT[F, S, B] = StateT(s => F.map(apply(s)) {
     case (a, s1) => (f(a), s1)
@@ -35,6 +53,12 @@ trait StateT[F[_], S, A] { self =>
   }
 
   def unliftId[M[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[α]})#λ, S, A]): State[S, A] = unlift[M, Id]
+
+  def rwst[W, R](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
+    (r, s) => F.map(self(s)) {
+      case (a, s) => (W.zero, a, s)
+    }
+  )
 }
 
 object StateT extends StateTFunctions with StateTInstances {
@@ -106,7 +130,7 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
 
-  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, s)))
+  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point(((), s)))
 }
 
 private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[g, S, a]})#f] {
@@ -122,4 +146,6 @@ private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] =
     def apply[A](action: StateT[M, S, A]) =
       StateT[N, S, A](s => f(action(s)))
   }
+
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StateT[G, S, α]})#λ] = StateT.stateTMonadState[S, G]
 }

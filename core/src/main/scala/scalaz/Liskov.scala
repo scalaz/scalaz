@@ -62,36 +62,21 @@ trait LiskovFunctions {
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
     g.subst[({type λ[-α]= α <~< C})#λ](f)
 
-  /**We can lift subtyping into any covariant type constructor */
-  def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
+  def inv[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
+    a.subst[({type λ[-α] = T[α] <~< T[A2]})#λ](refl)
+
+  /**We can lift subtyping into any invariant or covariant type constructor */
+  def co[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
     a.subst[({type λ[-α]= T[α] <~< T[A2]})#λ](refl)
 
-  def co1_2[T[+_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
+  def co2[T[_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
     a.subst[({type λ[-α]= T[α, B] <~< T[Z, B]})#λ](refl)
 
-  def co2_2[T[_, +_], Z, A, B](a: B <~< Z): T[A, B] <~< T[A, Z] =
-    a.subst[({type λ[-α]= T[A, α] <~< T[A, Z]})#λ](refl)
-
-  def co1_3[T[+_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
+  def co3[T[_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
     a.subst[({type λ[-α]= T[α, B, C] <~< T[Z, B, C]})#λ](refl)
 
-  def co2_3[T[_, +_, _], Z, A, B, C](a: B <~< Z): T[A, B, C] <~< T[A, Z, C] =
-    a.subst[({type λ[-α]=T[A, α, C] <~< T[A, Z, C]})#λ](refl)
-
-  def co3_3[T[_, _, +_], Z, A, B, C](a: C <~< Z): T[A, B, C] <~< T[A, B, Z] =
-    a.subst[({type λ[-α]=T[A, B, α] <~< T[A, B, Z]})#λ](refl)
-
-  def co1_4[T[+_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
+  def co4[T[_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
     a.subst[({type λ[-α]=T[α, B, C, D] <~< T[Z, B, C, D]})#λ](refl)
-
-  def co2_4[T[_, +_, _, _], Z, A, B, C, D](a: B <~< Z): T[A, B, C, D] <~< T[A, Z, C, D] =
-    a.subst[({type λ[-α]=T[A, α, C, D] <~< T[A, Z, C, D]})#λ](refl)
-
-  def co3_4[T[_, _, +_, _], Z, A, B, C, D](a: C <~< Z): T[A, B, C, D] <~< T[A, B, Z, D] =
-    a.subst[({type λ[-α]=T[A, B, α, D] <~< T[A, B, Z, D]})#λ](refl)
-
-  def co4_4[T[_, _, _, +_], Z, A, B, C, D](a: D <~< Z): T[A, B, C, D] <~< T[A, B, C, Z] =
-    a.subst[({type λ[-α]=T[A, B, C, α] <~< T[A, B, C, Z]})#λ](refl)
 
   /**lift2(a,b) = co1_2(a) compose co2_2(b) */
   def lift2[T[+_, +_], A, A2, B, B2](

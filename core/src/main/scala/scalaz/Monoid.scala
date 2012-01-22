@@ -22,6 +22,27 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def zero: F
 
   // derived functions
+  /**
+   * For `n = 0`, `zero`
+   * For `n = 1`, `append(zero, value)`
+   * For `n = 2`, `append(append(zero, value), value)`
+   *
+   * [[scalaz.Monoid]]`.replicate` generalizes this function.
+   */
+  final def multiply(value: F, n: Int): F = Monoid.replicate[Id, F](value)(n)(implicitly, this)
+
+  /** Every `Monoid` gives rise to a [[scalaz.Category]] */
+  final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
+    def id[A] = zero
+  }
+
+  /**
+   * A monoidal applicative functor, that implements `point` and `ap` with the operations `zero` and `append` respectively.
+   * Note that the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is discarded; it is a phantom type.
+   */
+  final def applicative: Applicative[({type λ[α]=F})#λ] = new Applicative[({type λ[α]=F})#λ] with SemigroupApply {
+    def point[A](a: => A) = zero
+  }
 
   /**
    * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:

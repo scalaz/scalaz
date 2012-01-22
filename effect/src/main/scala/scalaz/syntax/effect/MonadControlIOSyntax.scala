@@ -12,9 +12,15 @@ trait MonadControlIOV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToMonadControlIOV extends ToLiftControlIOV with ToMonadV {
-  implicit def ToMonadControlIOV[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]) =
+trait ToMonadControlIOV0 {
+  implicit def ToMonadControlIOVUnapply[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]) =
     new MonadControlIOV[F0.M,F0.A] { def self = F0(v); implicit def F: MonadControlIO[F0.M] = F0.TC }
+
+}
+
+trait ToMonadControlIOV extends ToMonadControlIOV0 with ToLiftControlIOV with ToMonadV {
+  implicit def ToMonadControlIOV[F[_],A](v: F[A])(implicit F0: MonadControlIO[F]) =
+    new MonadControlIOV[F,A] { def self = v; implicit def F: MonadControlIO[F] = F0 }
 
   ////
 

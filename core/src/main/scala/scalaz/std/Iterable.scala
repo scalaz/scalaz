@@ -19,27 +19,23 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableOrder[A: Order]: Order[Iterable[A]] = new Order[Iterable[A]] {
-    def order(a1: Iterable[A], a2: Iterable[A]) = {
+  /** Lexicographical ordering */
+  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] = new Order[Iterable[A]] {
+    def order(a1: Iterable[A], a2: Iterable[A]): Ordering = {
       import scalaz.Ordering._
       val i1 = a1.iterator
       val i2 = a2.iterator
-      var b = true
-      var r: Ordering = EQ
 
-      while (i1.hasNext && i2.hasNext && b) {
-        val a1 = i1.next
-        val a2 = i2.next
+      while (i1.hasNext && i2.hasNext) {
+        val a1 = i1.next()
+        val a2 = i2.next()
 
-        val o = Order[A].order(a1, a2)
+        val o = A.order(a1, a2)
         if (o != EQ) {
-          r = o
-          b = false
+          return o
         }
       }
-      if (i1.length == i2.length) r
-      else if (i1.hasNext) GT
-      else LT
+      anyVal.booleanInstance.order(i1.hasNext, i2.hasNext)
     }
   }
 

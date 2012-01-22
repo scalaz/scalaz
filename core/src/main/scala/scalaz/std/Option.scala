@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Alternative[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -30,6 +30,7 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
+    def orElse[A](a: Option[A], b: => Option[A]) = a orElse b
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
@@ -48,10 +49,10 @@ trait OptionInstances extends OptionInstances0 {
   }
 
   implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    def show(o1: Option[A]) = (o1 match {
-      case Some(a1) => "Some(" + Show[A].show(a1) + ")"
-      case None     => "None"
-    }).toList
+    def show(o1: Option[A]) = o1 match {
+      case Some(a1) => "Some(".toList ::: Show[A].show(a1) ::: ")".toList
+      case None     => "None".toList
+    }
   }
 
   import Tags.{First, Last}
@@ -121,9 +122,9 @@ trait OptionFunctions {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  final def orEmpty[A, M[_] : Pointed : Empty](oa: Option[A]): M[A] = oa match {
+  final def orEmpty[A, M[_] : Pointed : PlusEmpty](oa: Option[A]): M[A] = oa match {
     case Some(a) => Pointed[M].point(a)
-    case None    => Empty[M].empty
+    case None    => PlusEmpty[M].empty
   }
 
   /**
@@ -153,6 +154,9 @@ object option extends OptionInstances with OptionFunctions {
 
 trait OptionEqual[A] extends Equal[Option[A]] {
   implicit def A: Equal[A]
+
+  override def equalIsNatural: Boolean = A.equalIsNatural
+
   override def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
     case (Some(a1), Some(a2)) => A.equal(a1, a2)
     case (None, None)         => true

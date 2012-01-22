@@ -40,9 +40,15 @@ trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToApplyV extends ToFunctorV {
-  implicit def ToApplyV[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
+trait ToApplyV0 {
+  implicit def ToApplyVUnapply[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
     new ApplyV[F0.M,F0.A] { def self = F0(v); implicit def F: Apply[F0.M] = F0.TC }
+
+}
+
+trait ToApplyV extends ToApplyV0 with ToFunctorV {
+  implicit def ToApplyV[F[_],A](v: F[A])(implicit F0: Apply[F]) =
+    new ApplyV[F,A] { def self = v; implicit def F: Apply[F] = F0 }
 
   ////
 

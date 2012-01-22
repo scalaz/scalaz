@@ -16,6 +16,7 @@ import collection.SeqLike
  * * '''double-set''' `forall a b c. lens.set(lens.set(a,b),c) = lens.set(a,c)`
  *
  * See [[http://www.youtube.com/watch?v=efv0SQNde5Q&feature=related Lenses, a Functional Imperative]]
+ * See [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/colens.pdf Lenses, coalgebraically: View updates through the looking glass]]
  */
 sealed trait Lens[A, B] {
 
@@ -115,6 +116,14 @@ sealed trait Lens[A, B] {
 
   /** alias for `product` */
   def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] = product(that)
+
+  trait LensLaw {
+    def identity(a: A)(implicit A: Equal[A]): Boolean = A.equal(set(a, get(a)), a)
+    def retention(a: A, b: B)(implicit B: Equal[B]): Boolean = B.equal(get(set(a, b)), b)
+    def doubleSet(a: A, b1: B, b2: B)(implicit A: Equal[A]) = A.equal(set(set(a, b1), b2), set(a, b2))
+  }
+
+  def lensLaw = new LensLaw {}
 }
 
 object Lens extends LensFunctions with LensInstances {
@@ -126,6 +135,11 @@ trait LensInstances {
 
   import State._
   import Lens._
+
+  implicit def lensCategory: Category[Lens] = new Category[Lens] {
+    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
+    def id[A]: Lens[A, A] = Lens.lensId[A]
+  }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
   implicit def LensState[A, B](lens: Lens[A, B]): State[A, B] =
@@ -202,17 +216,17 @@ trait LensInstances {
     def |=(that: Set[K]): State[S, Set[K]] =
       lens %= (_ | that)
 
-    def +=(elem: K) =
+    def +=(elem: K): State[S, Set[K]] =
       lens %= (_ + elem)
 
-    def +=(elem1: K, elem2: K, elems: K*) =
+    def +=(elem1: K, elem2: K, elems: K*): State[S, Set[K]] =
       lens %= (_ + elem1 + elem2 ++ elems)
 
-    def ++=(xs: TraversableOnce[K]) =
+    def ++=(xs: TraversableOnce[K]): State[S, Set[K]] =
       lens %= (_ ++ xs)
 
-    def -=(elem: K): State[S, Set[K]]
-    = lens %= (_ - elem)
+    def -=(elem: K): State[S, Set[K]] =
+      lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): State[S, Set[K]] =
       lens %= (_ - elem1 - elem2 -- elems)
@@ -247,8 +261,8 @@ trait LensInstances {
     def update(key: K, value: V): State[S, Unit] =
       lens %== (_.updated(key, value))
 
-    def -=(elem: K): State[S, Map[K, V]]
-    = lens %= (_ - elem)
+    def -=(elem: K): State[S, Map[K, V]] =
+      lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): State[S, Map[K, V]] =
       lens %= (_ - elem1 - elem2 -- elems)
@@ -261,11 +275,11 @@ trait LensInstances {
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
   case class SeqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: Lens[S, Repr]) {
-    def sortWith(lt: (A, A) => Boolean): State[S, Unit]
-    = lens %== (_ sortWith lt)
+    def sortWith(lt: (A, A) => Boolean): State[S, Unit] =
+      lens %== (_ sortWith lt)
 
-    def sortBy[B: math.Ordering](f: A => B): State[S, Unit]
-    = lens %== (_ sortBy f)
+    def sortBy[B: math.Ordering](f: A => B): State[S, Unit] =
+      lens %== (_ sortBy f)
 
     def sort[B >: A](implicit ord: math.Ordering[B]) =
       lens %== (_.sorted[B]): State[S, Unit]

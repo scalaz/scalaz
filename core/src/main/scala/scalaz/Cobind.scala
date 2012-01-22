@@ -7,6 +7,7 @@ package scalaz
 ////
 trait CoBind[F[_]]  { self =>
   ////
+  /** Also know as `extend` */
   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]
 
   // derived functions

@@ -98,7 +98,7 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait ListTsLow1 {
+trait ListTInstances1 {
   implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = ListT[F, α]})#λ] = new ListTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
@@ -108,7 +108,7 @@ trait ListTsLow1 {
   }
 }
 
-trait ListTsLow0 extends ListTsLow1 {
+trait ListTInstances0 extends ListTInstances1 {
   implicit def listTPointedPlus[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] = new ListTPointed[F] {
     implicit def F: Pointed[F] = F0
   }
@@ -118,16 +118,30 @@ trait ListTsLow0 extends ListTsLow1 {
   }
 }
 
-trait ListTs extends ListTsLow0 {
+trait ListTInstances extends ListTInstances0 {
   implicit def listTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = ListT[F, α]})#λ] = new ListTMonad[F] {
     implicit def F: Monad[F] = F0
   }
+  implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
+  implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 }
 
-object ListT {
+object ListT extends ListTInstances {
   def apply[M[_], A](step: M[Step[A, ListT[M, A]]]): ListT[M, A] = new ListT[M, A](step)
 
   def empty[M[_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M point Done)
+
+  def fromList[M[_], A](mas: M[List[A]])(implicit M: Pointed[M]): ListT[M, A] = {
+    def yieldd(a: A, rest: ListT[M, A]): Step[A, ListT[M, A]] = Yield[A, ListT[M, A]](a, rest)
+    def done: Step[A, ListT[M, A]] = Done
+
+    def fromList1(as: List[A]): Step[A, ListT[M, A]] = as match {
+      case Nil => done
+      case head :: tail => yieldd(head, apply(M point fromList1(tail)))
+    }
+
+    apply[M, A](M.map(mas)(fromList1))
+  }
 
   abstract sealed class Step[+A, +S]
 

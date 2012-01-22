@@ -206,6 +206,8 @@ trait TreeLocInstances {
 
     def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = a.cojoin
   }
+
+  implicit def treeLocEqual[A](implicit A: Equal[A]): Equal[TreeLoc[A]] = Equal[Tree[A]].contramap((_: TreeLoc[A]).toTree)
 }
 
 trait TreeLocFunctions {

@@ -23,7 +23,7 @@
  *  - [[scalaz.Order]] extends [[scalaz.Equal]]
  *
  *  - [[scalaz.MetricSpace]]
- *  - [[scalaz.Empty]]
+ *  - [[scalaz.Plus]]
  *  - [[scalaz.Each]]
  *  - [[scalaz.Index]]
  *  - [[scalaz.Functor]]
@@ -32,12 +32,14 @@
  *  - [[scalaz.CoPointed]] extends [[scalaz.Functor]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]] with [[scalaz.Pointed]]
+ *  - [[scalaz.Alternative]] extends [[scalaz.Applicative]]
+ *  - [[scalaz.AlternativeEmpty]] extends [[scalaz.Alternative]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
  *  - [[scalaz.CoJoin]]
  *  - [[scalaz.CoBind]]
  *  - [[scalaz.CoMonad]] extends [[scalaz.CoPointed]] with [[scalaz.CoJoin]] with [[scalaz.CoBind]]
- *  - [[scalaz.Plus]] extends [[scalaz.Functor]] with [[scalaz.Empty]]
+ *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
  *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.Plus]]
  *  - [[scalaz.MonadPlus]] extends [[scalaz.Monad]] with [[scalaz.ApplicativePlus]]
  *  - [[scalaz.Foldable]]
@@ -105,9 +107,9 @@ package object scalaz {
    */
   type @@[T, Tag] = T with Tagged[Tag]
 
-  type ~>[F[_], G[_]] = NaturalTransformation[F, G]
-  type <~[F[_], G[_]] = NaturalTransformation[G, F]
-  type ~~>[F[_,_], G[_,_]] = BiNaturalTransformation[F, G]
+  type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
+  type <~[+F[_], -G[_]] = NaturalTransformation[G, F]
+  type ~~>[-F[_,_], +G[_,_]] = BiNaturalTransformation[F, G]
 
   type ⊥ = Nothing
   type ⊤ = Any
@@ -129,6 +131,14 @@ package object scalaz {
       def apply(s: S) = f(s)
     }
   }
+
+  type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[Identity, R, W, S, A]
+
+  type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
+
+  val RWST: ReaderWriterStateT.type = ReaderWriterStateT
+
+  type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
 
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.

@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- *
+ * Universally quantified [[scalaz.Semigroup]].
  */
 ////
-trait Plus[F[_]] extends Functor[F] { self =>
+trait Plus[F[_]]  { self =>
   ////
 
   def plus[A](a: F[A], b: => F[A]): F[A]
