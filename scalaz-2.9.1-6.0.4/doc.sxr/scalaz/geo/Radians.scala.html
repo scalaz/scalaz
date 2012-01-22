@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/geo/Radians.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> geo
+
+<span class="keyword">sealed</span> <span class="keyword">trait</span> <a title="trait Radians[A] extends java.lang.Object with ScalaObject" id="26884">Radians</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="26963">A</a><span class="delimiter">]</span> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="Geo.scala.html#26726" title="object scalaz.geo.Geo">Geo</a>._
+  
+  <span class="keyword">val</span> <a title="=&gt; A =&gt; Double" id="849723">toRadians</a>: A =&gt; Double
+  <span class="keyword">val</span> <a title="=&gt; Double =&gt; A" id="849724">fromRadians</a>: Double =&gt; A
+
+  <span class="keyword">def</span> <a title="[B](f: B =&gt; A, g: A =&gt; B)java.lang.Object with scalaz.geo.Radians[B]" id="849725">xmap</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="849727">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="B =&gt; A" id="858330">f</a>: B =&gt; A, <a title="A =&gt; B" id="858331">g</a>: A =&gt; B<span class="delimiter">)</span> = <a href="#858334" title="java.lang.Object with scalaz.geo.Radians[B]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Radians[B]" id="858334">Radians</a><span class="delimiter">[</span>B<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="B =&gt; Double" id="858336">toRadians</a> = <a href="#858330" title="B =&gt; A">f</a> <span title="(g: A =&gt; Double)B =&gt; Double">andThen</span> <a href="#26884" title="Radians.this.type">Radians</a>.<span class="keyword">this</span>.<a href="#849723" title="=&gt; A =&gt; Double">toRadians</a>
+    <span class="keyword">val</span> <a title="Double =&gt; B" id="858338">fromRadians</a> = <a href="#26884" title="Radians.this.type">Radians</a>.<span class="keyword">this</span>.<a href="#849724" title="=&gt; Double =&gt; A">fromRadians</a> <span title="(g: A =&gt; B)Double =&gt; B">andThen</span> <a href="#858331" title="A =&gt; B">g</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.geo.Radians" id="26885">Radians</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19508" title="object scalaz.Scalaz">Scalaz</a>._
+  <span class="keyword">import</span> <a href="Geo.scala.html#26726" title="object scalaz.geo.Geo">Geo</a>._  
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[Double]" id="849731">DoubleRadians</a>: <a href="#26884" title="scalaz.geo.Radians[Double]">Radians</a><span class="delimiter">[</span>Double<span class="delimiter">]</span> = <a href="#833785" title="(to: Double =&gt; Double, from: Double =&gt; Double)java.lang.Object with scalaz.geo.Radians[Double]">radians</a><span class="delimiter">(</span><a href="#858391" title="Double">_</a> <span title="(x: Double)Double">*</span> <a href="../Scalaz.scala.html#39872" title="=&gt; Double">π</a> <span title="(x: Int)Double">/</span> <span title="Int(180)" class="int">180</span>, <a href="#858401" title="Double">_</a> <span title="(x: Int)Double">*</span> <span title="Int(180)" class="int">180</span> <span title="(x: Double)Double">/</span> <a href="../Scalaz.scala.html#39872" title="=&gt; Double">π</a><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Latitude]" id="849733">LatitudeRadians</a>: <a href="#26884" title="scalaz.geo.Radians[scalaz.geo.Latitude]">Radians</a><span class="delimiter">[</span>Latitude<span class="delimiter">]</span> = <a href="#849731" title="=&gt; scalaz.geo.Radians[Double]">DoubleRadians</a> <a href="#849725" title="(f: java.lang.Object with scalaz.geo.Latitude =&gt; Double, g: Double =&gt; java.lang.Object with scalaz.geo.Latitude)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Latitude]">xmap</a> <span class="delimiter">(</span><a href="#858422" title="scalaz.geo.Latitude">_</a>.<a href="Latitude.scala.html#833833" title="=&gt; Double">value</a>, <a href="Latitude.scala.html#833773" title="(d: Double)java.lang.Object with scalaz.geo.Latitude">latitude</a><span class="delimiter">(</span><a href="#858424" title="Double">_</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Longitude]" id="849735">LongitudeRadians</a>: <a href="#26884" title="scalaz.geo.Radians[scalaz.geo.Longitude]">Radians</a><span class="delimiter">[</span>Longitude<span class="delimiter">]</span> = <a href="#849731" title="=&gt; scalaz.geo.Radians[Double]">DoubleRadians</a> <a href="#849725" title="(f: java.lang.Object with scalaz.geo.Longitude =&gt; Double, g: Double =&gt; java.lang.Object with scalaz.geo.Longitude)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Longitude]">xmap</a> <span class="delimiter">(</span><a href="#858435" title="scalaz.geo.Longitude">_</a>.<a href="Longitude.scala.html#833884" title="=&gt; Double">value</a>, <a href="Longitude.scala.html#833781" title="(d: Double)java.lang.Object with scalaz.geo.Longitude">longitude</a><span class="delimiter">(</span><a href="#858437" title="Double">_</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="keyword">implicit</span> <span class="keyword">val</span> <a title="scalaz.geo.Radians[scalaz.geo.Bearing]" id="849737">BearingRadians</a>: <a href="#26884" title="scalaz.geo.Radians[scalaz.geo.Bearing]">Radians</a><span class="delimiter">[</span>Bearing<span class="delimiter">]</span> = <a href="#849731" title="=&gt; scalaz.geo.Radians[Double]">DoubleRadians</a> <a href="#849725" title="(f: java.lang.Object with scalaz.geo.Bearing =&gt; Double, g: Double =&gt; java.lang.Object with scalaz.geo.Bearing)java.lang.Object with scalaz.geo.Radians[java.lang.Object with scalaz.geo.Bearing]">xmap</a> <span class="delimiter">(</span><a href="#858448" title="scalaz.geo.Bearing">_</a>.<a href="Bearing.scala.html#833986" title="=&gt; Double">value</a>, <a href="Bearing.scala.html#833727" title="(d: Double)java.lang.Object with scalaz.geo.Bearing">bearing</a><span class="delimiter">(</span><a href="#858450" title="Double">_</a><span class="delimiter">)</span><span class="delimiter">)</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait Radianss extends java.lang.Object with ScalaObject" id="26890">Radianss</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="[A](to: A =&gt; Double, from: Double =&gt; A)java.lang.Object with scalaz.geo.Radians[A]" id="833785">radians</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="833787">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="A =&gt; Double" id="858362">to</a>: A =&gt; Double, <a title="Double =&gt; A" id="858363">from</a>: Double =&gt; A<span class="delimiter">)</span> = <a href="#858366" title="java.lang.Object with scalaz.geo.Radians[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.geo.Radians[A]" id="858366">Radians</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="A =&gt; Double" id="858368">toRadians</a> = <a href="#858362" title="A =&gt; Double">to</a>
+    <span class="keyword">val</span> <a title="Double =&gt; A" id="858370">fromRadians</a> = <a href="#858363" title="Double =&gt; A">from</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

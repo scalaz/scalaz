@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/http/servlet/StreamStreamServletApplication.scala</title>
+        <script type="text/javascript" src="../../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+<span class="keyword">package</span> http
+<span class="keyword">package</span> servlet
+
+<span class="keyword">import</span> request.Request
+
+<span class="comment">/**
+ * A servlet web application with a request body and response body made up of a stream of bytes.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">trait</span> <a title="trait StreamStreamServletApplication extends java.lang.Object" id="27487">StreamStreamServletApplication</a> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="comment">/**
+   * The servlet web application.
+   */</span>
+  <span class="keyword">val</span> <a title="=&gt; scalaz.http.servlet.ServletApplication[Stream,Stream]" id="834756">application</a>: <a href="ServletApplication.scala.html#27460" title="scalaz.http.servlet.ServletApplication[Stream,Stream]">ServletApplication</a><span class="delimiter">[</span>Stream, Stream<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">import</span> <a href="../../Scalaz.scala.html#19508" title="object scalaz.Scalaz">Scalaz</a>._
+<span class="keyword">import</span> response.Response
+<span class="keyword">import</span> servlet.<a href="HttpServlet.scala.html#27314" title="object scalaz.http.servlet.HttpServlet">HttpServlet</a>._
+<span class="keyword">import</span> response.OK
+<span class="keyword">import</span> response.<a href="../response/StreamResponse.scala.html#28427" title="object scalaz.http.response.StreamResponse">StreamResponse</a>.<span class="delimiter">{</span>response, statusLine<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * A servlet web application with a request body and response body made up of a stream of bytes.
+ */</span>
+<span class="keyword">object</span> <a title="object scalaz.http.servlet.StreamStreamServletApplication" id="27488">StreamStreamServletApplication</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="comment">/**
+   * Constructs a stream/stream servlet web application from the given argument.
+   */</span>
+  <span class="keyword">def</span> <a title="(a: scalaz.http.servlet.ServletApplication[Stream,Stream])java.lang.Object with scalaz.http.servlet.StreamStreamServletApplication" id="901823">application</a><span class="delimiter">(</span><a title="scalaz.http.servlet.ServletApplication[Stream,Stream]" id="901826">a</a>: <a href="ServletApplication.scala.html#27460" title="scalaz.http.servlet.ServletApplication[Stream,Stream]">ServletApplication</a><span class="delimiter">[</span>Stream, Stream<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#901829" title="java.lang.Object with scalaz.http.servlet.StreamStreamServletApplication{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.http.servlet.StreamStreamServletApplication" id="901829">StreamStreamServletApplication</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="scalaz.http.servlet.ServletApplication[Stream,Stream]" id="901831">application</a> = <a href="#901826" title="scalaz.http.servlet.ServletApplication[Stream,Stream]">a</a>
+  <span class="delimiter">}</span>
+
+  <span class="comment">/**
+   * Handles a request in such a way that if the given function produces no response then return the given response.
+   */</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="implicit scalaz.http.servlet.StreamStreamServletApplication.resourceOr : (f: scalaz.http.request.Request[Stream] =&gt; Option[scalaz.http.response.Response[Stream]])java.lang.Object{def or(otherwise: scalaz.http.request.Request[Stream] =&gt; scalaz.http.response.Response[Stream]): scalaz.http.servlet.ServletApplication[Stream,Stream]}" id="901824">resourceOr</a><span class="delimiter">(</span><a title="scalaz.http.request.Request[Stream] =&gt; Option[scalaz.http.response.Response[Stream]]" id="901841">f</a>: Request<span class="delimiter">[</span>Stream<span class="delimiter">]</span> =&gt; Option<span class="delimiter">[</span>Response<span class="delimiter">[</span>Stream<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#901844" title="java.lang.Object{def or(otherwise: scalaz.http.request.Request[Stream] =&gt; scalaz.http.response.Response[Stream]): scalaz.http.servlet.ServletApplication[Stream,Stream]}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object" id="901844" class="delimiter">{</a>
+    <span class="keyword">def</span> <a title="(otherwise: scalaz.http.request.Request[Stream] =&gt; scalaz.http.response.Response[Stream])scalaz.http.servlet.ServletApplication[Stream,Stream]" id="901846">or</a><span class="delimiter">(</span><a title="scalaz.http.request.Request[Stream] =&gt; scalaz.http.response.Response[Stream]" id="901847">otherwise</a>: Request<span class="delimiter">[</span>Stream<span class="delimiter">]</span> =&gt; Response<span class="delimiter">[</span>Stream<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="ServletApplication.scala.html#27460" title="scalaz.http.servlet.ServletApplication[Stream,Stream]">ServletApplication</a><span class="delimiter">[</span>Stream, Stream<span class="delimiter">]</span> =
+      <a href="#901849" title="scalaz.http.servlet.ServletApplication[Stream,Stream]" class="keyword">new</a> <a title="anonymous class $anon extends scalaz.http.servlet.ServletApplication[Stream,Stream]" id="901849">ServletApplication</a><span class="delimiter">[</span>Stream, Stream<span class="delimiter">]</span> <span class="delimiter">{</span>
+      <span class="keyword">def</span> <a title="(implicit servlet: scalaz.http.servlet.HttpServlet, implicit servletRequest: scalaz.http.servlet.HttpServletRequest, implicit request: scalaz.http.request.Request[Stream])scalaz.http.response.Response[Stream]" id="901855">application</a><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.http.servlet.HttpServlet" id="901857">servlet</a>: <a href="HttpServlet.scala.html#27313" title="scalaz.http.servlet.HttpServlet">HttpServlet</a>, <a title="scalaz.http.servlet.HttpServletRequest" id="901858">servletRequest</a>: <a href="HttpServletRequest.scala.html#27373" title="scalaz.http.servlet.HttpServletRequest">HttpServletRequest</a>, <a title="scalaz.http.request.Request[Stream]" id="901859">request</a>: <a href="../request/Request.scala.html#27855" title="scalaz.http.request.Request[Stream]">Request</a><span class="delimiter">[</span>Stream<span class="delimiter">]</span><span class="delimiter">)</span> =
+        <a href="#901841" title="(v1: scalaz.http.request.Request[Stream])Option[scalaz.http.response.Response[Stream]]">f</a><a href="../../OptionW.scala.html#40773" title="(o: Option[scalaz.http.response.Response[Stream]])scalaz.OptionW[scalaz.http.response.Response[Stream]]" class="delimiter">(</a><a href="#901859" title="scalaz.http.request.Request[Stream]">request</a><span class="delimiter">)</span> <a href="../../OptionW.scala.html#44017" title="(a: =&gt; scalaz.http.response.Response[Stream])scalaz.http.response.Response[Stream]">|</a> <span class="delimiter">(</span><a href="#901859" title="scalaz.http.request.Request[Stream]">request</a>.<a href="HttpServlet.scala.html#834735" title="implicit scalaz.http.servlet.HttpServlets.Resource : (path: scalaz.NonEmptyList[Char])AnyRef{def ?[A](found: Iterator[Byte] =&gt; A,notFound: =&gt; A)(implicit s: scalaz.http.servlet.HttpServlet): A}">path</a> <a href="HttpServlet.scala.html#834926" title="(found: Iterator[Byte] =&gt; scalaz.http.response.Response[Stream], notFound: =&gt; scalaz.http.response.Response[Stream])(implicit s: scalaz.http.servlet.HttpServlet)scalaz.http.response.Response[Stream]">?</a> <span class="delimiter">(</span><a title="Iterator[Byte]" id="901940">in</a> =&gt; <a href="../response/StreamResponse.scala.html#898435" title="(l: scalaz.http.response.StatusLine, b: Stream[Byte])scalaz.http.response.Response[Stream]">response</a><span class="delimiter">(</span><a href="../response/StreamResponse.scala.html#898444" title="(status: scalaz.http.response.Status)(implicit req: scalaz.http.request.Request[Stream])scalaz.http.response.StatusLine">statusLine</a><a href="#901859" title="scalaz.http.request.Request[Stream]" class="delimiter">(</a><a href="../response/Status.scala.html#28238" title="object scalaz.http.response.OK">OK</a><span class="delimiter">)</span>, <a href="#901940" title="Iterator[Byte]">in</a>.<span title="=&gt; scala.collection.immutable.Stream[Byte]">toStream</span><span class="delimiter">)</span>, <a href="#901847" title="(v1: scalaz.http.request.Request[Stream])scalaz.http.response.Response[Stream]">otherwise</a><span class="delimiter">(</span><a href="#901859" title="scalaz.http.request.Request[Stream]">request</a><span class="delimiter">)</span><span class="delimiter">)</span><span class="delimiter">)</span>
+    <span class="delimiter">}</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

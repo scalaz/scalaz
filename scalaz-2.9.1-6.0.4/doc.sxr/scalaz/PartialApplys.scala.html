@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/PartialApplys.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/**
+ * Scala doesn't currently have a way to directly express a
+ * type function, such as `[A]Either[A, Int]`. Instead, we must
+ * pass type constructor and fixed types as arguments to one
+ * of the traits below. For example, the type function mentioned
+ * above is expressed as `PartialApply1Of2[Either, Int]#Flip`
+ *
+ * This can also be expressed as `({type λ[α]=Either[α, Int]})#λ`.
+*/</span>
+<span class="keyword">trait</span> <a title="trait PartialApply1Of2[T[_,_], A] extends java.lang.Object" id="18985">PartialApply1Of2</a><span class="delimiter">[</span><a title="[_, _]&gt;: Nothing &lt;: Any" id="22485">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302143">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302144">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22486">A</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[B]T[A,B]" id="49024">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="49025">B</a><span class="delimiter">]</span> = <a href="#22485" title="T[A,B]">T</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span>
+
+  <span class="keyword">type</span> <a title="[B]T[B,A]" id="49026">Flip</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="49027">B</a><span class="delimiter">]</span> = <a href="#22485" title="T[B,A]">T</a><span class="delimiter">[</span>B, A<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply1Of3[T[_,_,_], A] extends java.lang.Object" id="18988">PartialApply1Of3</a><span class="delimiter">[</span><a title="[_, _, _]&gt;: Nothing &lt;: Any" id="22487">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302149">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302150">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302151">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22488">A</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[B, C]T[A,B,C]" id="302146">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302147">B</a>,<a title="&gt;: Nothing &lt;: Any" id="302148">C</a><span class="delimiter">]</span> = <a href="#22487" title="T[A,B,C]">T</a><span class="delimiter">[</span>A, B, C<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply2Of3[T[_,_,_], A, B] extends java.lang.Object" id="18991">PartialApply2Of3</a><span class="delimiter">[</span><a title="[_, _, _]&gt;: Nothing &lt;: Any" id="22489">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302159">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302160">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302161">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22490">A</a>, <a title="&gt;: Nothing &lt;: Any" id="22491">B</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[C]T[A,B,C]" id="302153">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302154">C</a><span class="delimiter">]</span> = <a href="#22489" title="T[A,B,C]">T</a><span class="delimiter">[</span>A, B, C<span class="delimiter">]</span>
+
+  <span class="keyword">type</span> <a title="[C]T[A,C,B]" id="302155">ApplyB</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302156">C</a><span class="delimiter">]</span> = <a href="#22489" title="T[A,C,B]">T</a><span class="delimiter">[</span>A, C, B<span class="delimiter">]</span>
+
+  <span class="keyword">type</span> <a title="[C]T[C,A,B]" id="302157">ApplyA</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302158">C</a><span class="delimiter">]</span> = <a href="#22489" title="T[C,A,B]">T</a><span class="delimiter">[</span>C, A, B<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply3Of4[T[_,_,_,_], A, B, C] extends java.lang.Object" id="18994">PartialApply3Of4</a><span class="delimiter">[</span><a title="[_, _, _, _]&gt;: Nothing &lt;: Any" id="22492">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302165">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302166">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302167">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302168">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22493">A</a>, <a title="&gt;: Nothing &lt;: Any" id="22494">B</a>, <a title="&gt;: Nothing &lt;: Any" id="22495">C</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[D]T[A,B,C,D]" id="302163">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302164">D</a><span class="delimiter">]</span> = <a href="#22492" title="T[A,B,C,D]">T</a><span class="delimiter">[</span>A, B, C, D<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply4Of5[T[_,_,_,_,_], A, B, C, D] extends java.lang.Object" id="18997">PartialApply4Of5</a><span class="delimiter">[</span><a title="[_, _, _, _, _]&gt;: Nothing &lt;: Any" id="22496">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302172">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302173">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302174">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302175">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302176">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22497">A</a>, <a title="&gt;: Nothing &lt;: Any" id="22498">B</a>, <a title="&gt;: Nothing &lt;: Any" id="22499">C</a>, <a title="&gt;: Nothing &lt;: Any" id="22500">D</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[E]T[A,B,C,D,E]" id="302170">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302171">E</a><span class="delimiter">]</span> = <a href="#22496" title="T[A,B,C,D,E]">T</a><span class="delimiter">[</span>A, B, C, D, E<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply5Of6[T[_,_,_,_,_,_], A, B, C, D, E] extends java.lang.Object" id="19000">PartialApply5Of6</a><span class="delimiter">[</span><a title="[_, _, _, _, _, _]&gt;: Nothing &lt;: Any" id="22501">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302180">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302181">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302182">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302183">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302184">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302185">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22502">A</a>, <a title="&gt;: Nothing &lt;: Any" id="22503">B</a>, <a title="&gt;: Nothing &lt;: Any" id="22504">C</a>, <a title="&gt;: Nothing &lt;: Any" id="22505">D</a>, <a title="&gt;: Nothing &lt;: Any" id="22506">E</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[F]T[A,B,C,D,E,F]" id="302178">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302179">F</a><span class="delimiter">]</span> = <a href="#22501" title="T[A,B,C,D,E,F]">T</a><span class="delimiter">[</span>A, B, C, D, E, F<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApply6Of7[T[_,_,_,_,_,_,_], A, B, C, D, E, F] extends java.lang.Object" id="19003">PartialApply6Of7</a><span class="delimiter">[</span><a title="[_, _, _, _, _, _, _]&gt;: Nothing &lt;: Any" id="22507">T</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302189">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302190">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302191">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302192">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302193">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302194">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302195">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22508">A</a>, <a title="&gt;: Nothing &lt;: Any" id="22509">B</a>, <a title="&gt;: Nothing &lt;: Any" id="22510">C</a>, <a title="&gt;: Nothing &lt;: Any" id="22511">D</a>, <a title="&gt;: Nothing &lt;: Any" id="22512">E</a>, <a title="&gt;: Nothing &lt;: Any" id="22513">F</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[G]T[A,B,C,D,E,F,G]" id="302187">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302188">G</a><span class="delimiter">]</span> = <a href="#22507" title="T[A,B,C,D,E,F,G]">T</a><span class="delimiter">[</span>A, B, C, D, E, F, G<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApplyK[T[_[_],_,_], M[_]] extends java.lang.Object" id="19006">PartialApplyK</a><span class="delimiter">[</span><a title="[_[_], _, _]&gt;: Nothing &lt;: Any" id="22514">T</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="302200">_</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302203">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="302201">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302202">_</a><span class="delimiter">]</span>, <a title="[_]&gt;: Nothing &lt;: Any" id="22515">M</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302204">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[A, B]T[M,A,B]" id="302197">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302198">A</a>, <a title="&gt;: Nothing &lt;: Any" id="302199">B</a><span class="delimiter">]</span> = <a href="#22514" title="T[M,A,B]">T</a><span class="delimiter">[</span>M, A, B<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">trait</span> <a title="trait PartialApplyKA[T[_[_],_,_], M[_], A] extends java.lang.Object" id="19009">PartialApplyKA</a><span class="delimiter">[</span><a title="[_[_], _, _]&gt;: Nothing &lt;: Any" id="22516">T</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="302210">_</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302213">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="302211">_</a>, <a title="&gt;: Nothing &lt;: Any" id="302212">_</a><span class="delimiter">]</span>, <a title="[_]&gt;: Nothing &lt;: Any" id="22517">M</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302214">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="22518">A</a><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[B]T[M,A,B]" id="302206">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302207">B</a><span class="delimiter">]</span> = <a href="#22516" title="T[M,A,B]">T</a><span class="delimiter">[</span>M, A, B<span class="delimiter">]</span>
+
+  <span class="keyword">type</span> <a title="[B]T[M,B,A]" id="302208">Flip</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302209">B</a><span class="delimiter">]</span> = <a href="#22516" title="T[M,B,A]">T</a><span class="delimiter">[</span>M, B, A<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+<span class="comment">/**
+ * Applies one type argument of two where one of the type arguments has a kind * -&gt; *.
+ *
+ * @author &lt;a href=&quot;mailto:code@tmorris.net&quot;&gt;Tony Morris&lt;/a&gt;
+ */</span>
+<span class="keyword">trait</span> <a title="trait PartialType2[T[_[_],_], A[_]] extends java.lang.Object" id="19012">PartialType2</a><span class="delimiter">[</span><a title="[_[_], _]&gt;: Nothing &lt;: Any" id="22519">T</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="302218">_</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302220">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="302219">_</a><span class="delimiter">]</span>, <a title="[_]&gt;: Nothing &lt;: Any" id="22520">A</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302221">_</a><span class="delimiter">]</span><span class="delimiter">]</span> <span title="java.lang.Object" class="delimiter">{</span>
+  <span class="keyword">type</span> <a title="[B]T[A,B]" id="302216">Apply</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="302217">B</a><span class="delimiter">]</span> = <a href="#22519" title="T[A,B]">T</a><span class="delimiter">[</span>A, B<span class="delimiter">]</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

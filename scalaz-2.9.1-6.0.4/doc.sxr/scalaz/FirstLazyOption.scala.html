@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/FirstLazyOption.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="keyword">trait</span> <a title="trait FirstLazyOption[A] extends java.lang.Object with scalaz.NewType[scalaz.LazyOption[A]]" id="14338">FirstLazyOption</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="22218">A</a><span class="delimiter">]</span> <span class="keyword">extends</span> <a href="NewType.scala.html#18448" title="scalaz.NewType[scalaz.LazyOption[A]]">NewType</a><span class="delimiter">[</span>LazyOption<span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">]</span>
+
+<span class="keyword">trait</span> <a title="trait FirstLazyOptions extends java.lang.Object with ScalaObject" id="14344">FirstLazyOptions</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A](a: scalaz.LazyOption[A])scalaz.FirstLazyOption[A]" id="40015">LazyFirstOptionTo</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="40017">A</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="scalaz.LazyOption[A]" id="66489">a</a>: <a href="LazyOption.scala.html#16615" title="scalaz.LazyOption[A]">LazyOption</a><span class="delimiter">[</span>A<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#14338" title="scalaz.FirstLazyOption[A]">FirstLazyOption</a><span class="delimiter">[</span>A<span class="delimiter">]</span> = <a href="#176966" title="java.lang.Object with scalaz.FirstLazyOption[A]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.FirstLazyOption[A]" id="176966">FirstLazyOption</a><span class="delimiter">[</span>A<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="scalaz.LazyOption[A]" id="176970">value</a> = <a href="#66489" title="scalaz.LazyOption[A]">a</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

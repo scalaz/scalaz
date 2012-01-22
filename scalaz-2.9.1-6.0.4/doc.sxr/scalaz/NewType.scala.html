@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/NewType.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/**
+ * Sub class to create a wrapper type for `X` as documentation that the sub class is a wrapper type
+ * used in type class instances.
+ * &lt;p/&gt;
+ * The companion object provides an implicit conversion to unwrap `value`.
+ *
+ * @see scalaz.BooleanConjunction
+ */</span>
+<span class="keyword">trait</span> <a title="trait NewType[X] extends java.lang.Object with ScalaObject" id="18448">NewType</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="22457">X</a><span class="delimiter">]</span> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">val</span> <a title="=&gt; X" id="46801">value</a>: <a href="#22457" title="X">X</a>
+
+  <span class="keyword">override</span> <span class="keyword">def</span> <a title="()java.lang.String" id="46802">toString</a> =
+    <a href="#46801" title="=&gt; X">value</a>.<span title="()java.lang.String">toString</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.NewType" id="18449">NewType</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[X](n: scalaz.NewType[X])X" id="49346">UnwrapNewType</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="49348">X</a><span class="delimiter">]</span><span class="delimiter">(</span><a title="scalaz.NewType[X]" id="49350">n</a>: <a href="#18448" title="scalaz.NewType[X]">NewType</a><span class="delimiter">[</span>X<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#49348" title="X">X</a> = <a href="#49350" title="scalaz.NewType[X]">n</a>.<a href="#46801" title="=&gt; X">value</a>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

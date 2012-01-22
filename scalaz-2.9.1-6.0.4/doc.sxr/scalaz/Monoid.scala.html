@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/Monoid.scala</title>
+        <script type="text/javascript" src="../jquery-all.js"></script>
+        <script type="text/javascript" src="../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz
+
+<span class="comment">/**
+ * A categorical monoid.
+ *
+ * &lt;p&gt;
+ * All monoid instances must satisfy the semigroup law and 2 additional laws:
+ * &lt;ol&gt;
+ * &lt;li&gt;&lt;strong&gt;left identity&lt;/strong&gt;&lt;br/&gt;&lt;code&gt;forall a. append(zero, a) == a&lt;/code&gt;&lt;/li&gt;
+ * &lt;li&gt;&lt;strong&gt;right identity&lt;/strong&gt;&lt;br/&gt;&lt;code&gt;forall a. append(a, zero) == a&lt;/code&gt;&lt;/li&gt;
+ * &lt;/p&gt;
+ */</span>
+<span class="keyword">trait</span> <a title="trait Monoid[M] extends java.lang.Object with scalaz.Zero[M] with scalaz.Semigroup[M]" id="18205">Monoid</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="22441">M</a><span class="delimiter">]</span> <span class="keyword">extends</span> <a href="Zero.scala.html#21892" title="scalaz.Zero[M]">Zero</a><span class="delimiter">[</span>M<span class="delimiter">]</span> <span class="keyword">with</span> <a href="Semigroup.scala.html#19849" title="scalaz.Semigroup[M]">Semigroup</a><span class="delimiter">[</span>M<span class="delimiter">]</span>
+
+<span class="keyword">abstract</span> <span class="keyword">class</span> <a title="class MonoidLow extends java.lang.Object with ScalaObject" id="18211">MonoidLow</a> <a href="#18211" title="ScalaObject" class="delimiter">{</a>
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[M](implicit s: scalaz.Semigroup[M], implicit z: scalaz.Zero[M])scalaz.Monoid[M]" id="114275">monoid</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="114277">M</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Semigroup[M]" id="114675">s</a>: <a href="Semigroup.scala.html#19849" title="scalaz.Semigroup[M]">Semigroup</a><span class="delimiter">[</span>M<span class="delimiter">]</span>, <a title="scalaz.Zero[M]" id="114676">z</a>: <a href="Zero.scala.html#21892" title="scalaz.Zero[M]">Zero</a><span class="delimiter">[</span>M<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#18205" title="scalaz.Monoid[M]">Monoid</a><span class="delimiter">[</span>M<span class="delimiter">]</span> = <a href="#287690" title="java.lang.Object with scalaz.Monoid[M]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Monoid[M]" id="287690">Monoid</a><span class="delimiter">[</span>M<span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">def</span> <a title="(s1: M, s2: =&gt; M)M" id="287694">append</a><span class="delimiter">(</span><a title="M" id="287697">s1</a>: <a href="#114277" title="M">M</a>, <a title="=&gt; M" id="287698">s2</a>: =&gt; M<span class="delimiter">)</span> = <a href="#114675" title="scalaz.Semigroup[M]">s</a> <a href="Semigroup.scala.html#41943" title="(s1: M, s2: =&gt; M)M">append</a> <span class="delimiter">(</span><a href="#287697" title="M">s1</a>, <a href="#287698" title="=&gt; M">s2</a><span class="delimiter">)</span>
+
+    <span class="keyword">val</span> <a title="M" id="287695">zero</a> = <a href="#114676" title="scalaz.Zero[M]">z</a>.<a href="Zero.scala.html#41942" title="=&gt; M">zero</a>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+<span class="keyword">object</span> <a title="object scalaz.Monoid" id="18206">Monoid</a> <span title="ScalaObject" class="keyword">extends</span> <a href="#18211" title="scalaz.MonoidLow">MonoidLow</a> <span class="delimiter">{</span>
+  <span class="keyword">import</span> <a href="Semigroup.scala.html#19850" title="object scalaz.Semigroup">Semigroup</a>._
+  <span class="keyword">import</span> <a href="Zero.scala.html#21893" title="object scalaz.Zero">Zero</a>._
+
+  <span class="keyword">implicit</span> <span class="keyword">def</span> <a title="[A, B](implicit bz: scalaz.Zero[B])scalaz.Monoid[Either.LeftProjection[A,B]]" id="114281">EitherLeftMonoid</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="114284">A</a>, <a title="&gt;: Nothing &lt;: Any" id="114285">B</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Zero[B]" id="114672">bz</a>: <a href="Zero.scala.html#21892" title="scalaz.Zero[B]">Zero</a><span class="delimiter">[</span>B<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#114275" title="[M](implicit s: scalaz.Semigroup[M], implicit z: scalaz.Zero[M])scalaz.Monoid[M]">monoid</a><span title="(implicit s: scalaz.Semigroup[Either.LeftProjection[A,B]], implicit z: scalaz.Zero[Either.LeftProjection[A,B]])scalaz.Monoid[Either.LeftProjection[A,B]]" class="delimiter">[</span><span title="Either.LeftProjection[A,B]">Either</span>.LeftProjection<span class="delimiter">[</span>A, B<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">(</span><a href="Semigroup.scala.html#114369" title="scalaz.Semigroup[Either.LeftProjection[A,B]]">EitherLeftSemigroup</a>, <a href="Zero.scala.html#114520" title="[A, B](implicit bz: scalaz.Zero[B])scalaz.Zero[Either.LeftProjection[A,B]]">EitherLeftZero</a><span title="(implicit bz: scalaz.Zero[B])scalaz.Zero[Either.LeftProjection[A,B]]" class="delimiter">[</span><a href="#114284" title="A">A</a>, <a href="#114285" title="B">B</a><span class="delimiter">]</span><span class="delimiter">(</span><a href="#114672" title="scalaz.Zero[B]">bz</a><span class="delimiter">)</span><span class="delimiter">)</span>
+
+  <span class="comment">/** A monoid for sequencing Applicative effects. */</span>
+  <span class="keyword">def</span> <a title="[F[_], M](implicit m: scalaz.Monoid[M], implicit a: scalaz.Applicative[F])scalaz.Monoid[F[M]]" id="114286">liftMonoid</a><span class="delimiter">[</span><a title="[_]&gt;: Nothing &lt;: Any" id="114289">F</a><span class="delimiter">[</span><a title="&gt;: Nothing &lt;: Any" id="287712">_</a><span class="delimiter">]</span>, <a title="&gt;: Nothing &lt;: Any" id="114290">M</a><span class="delimiter">]</span><span class="delimiter">(</span><span class="keyword">implicit</span> <a title="scalaz.Monoid[M]" id="287710">m</a>: <a href="#18205" title="scalaz.Monoid[M]">Monoid</a><span class="delimiter">[</span>M<span class="delimiter">]</span>, <a title="scalaz.Applicative[F]" id="287711">a</a>: <a href="Applicative.scala.html#9577" title="scalaz.Applicative[F]">Applicative</a><span class="delimiter">[</span>F<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#18205" title="scalaz.Monoid[F[M]]">Monoid</a><span class="delimiter">[</span>F<span class="delimiter">[</span>M<span class="delimiter">]</span><span class="delimiter">]</span> = <a href="#287716" title="java.lang.Object with scalaz.Monoid[F[M]]{}" class="keyword">new</a> <a title="anonymous class $anon extends java.lang.Object with scalaz.Monoid[F[M]]" id="287716">Monoid</a><span class="delimiter">[</span>F<span class="delimiter">[</span>M<span class="delimiter">]</span><span class="delimiter">]</span> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="F[M]" id="287720">zero</a>: <a href="#114289" title="F[M]">F</a><span class="delimiter">[</span>M<span class="delimiter">]</span> = <a href="#287711" title="scalaz.Applicative[F]">a</a>.<a href="Pure.scala.html#39555" title="(a: =&gt; M)F[M]">pure</a><span class="delimiter">(</span><a href="#287710" title="scalaz.Monoid[M]">m</a>.<a href="Zero.scala.html#41942" title="=&gt; M">zero</a><span class="delimiter">)</span>
+    <span class="keyword">def</span> <a title="(x: F[M], y: =&gt; F[M])F[M]" id="287722">append</a><span class="delimiter">(</span><a title="F[M]" id="287723">x</a>: <a href="#114289" title="F[M]">F</a><span class="delimiter">[</span>M<span class="delimiter">]</span>, <a title="=&gt; F[M]" id="287724">y</a>: =&gt; F<span class="delimiter">[</span>M<span class="delimiter">]</span><span class="delimiter">)</span>: <a href="#114289" title="F[M]">F</a><span class="delimiter">[</span>M<span class="delimiter">]</span> = <a href="#287711" title="scalaz.Applicative[F]">a</a>.<a href="Applicative.scala.html#39541" title="(a: F[M], b: F[M], f: (M, M) =&gt; M)F[M]">liftA2</a><span class="delimiter">(</span><a href="#287723" title="F[M]">x</a>, <a href="#287724" title="=&gt; F[M]">y</a>, <span class="delimiter">(</span>m1: <a href="#114290" title="M">M</a>, m2: <a href="#114290" title="M">M</a><span class="delimiter">)</span> =&gt; <a href="#287710" title="scalaz.Monoid[M]">m</a>.<a href="Semigroup.scala.html#41943" title="(s1: M, s2: =&gt; M)M">append</a><span class="delimiter">(</span><a href="#287743" title="M">m1</a>, <a href="#287744" title="M">m2</a><span class="delimiter">)</span><span class="delimiter">)</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

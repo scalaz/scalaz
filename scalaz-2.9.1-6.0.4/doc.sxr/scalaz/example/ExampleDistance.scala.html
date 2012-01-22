@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" ></meta>
+        <title>scalaz/example/ExampleDistance.scala</title>
+        <script type="text/javascript" src="../../jquery-all.js"></script>
+        <script type="text/javascript" src="../../linked.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../style.css" title="Style"></link>
+    </head>
+    <body>
+        <pre>
+<span class="keyword">package</span> scalaz.example
+
+<span class="keyword">import</span> scalaz._
+
+<span class="comment">// Demonstrates the &lt;---&gt; method to compute edit distance using a metric space such as levenshtein</span>
+<span class="keyword">object</span> <a title="object scalaz.example.ExampleDistance" id="24118">ExampleDistance</a> <span title="ScalaObject" class="delimiter">{</span>
+  <span class="keyword">def</span> <a title="(args: Array[String])Unit" id="423055">main</a><span class="delimiter">(</span><a title="Array[String]" id="619117">args</a>: <span title="Array[String]">Array</span><span class="delimiter">[</span>String<span class="delimiter">]</span><span class="delimiter">)</span> = <a href="#423057" title="=&gt; Unit">run</a>
+
+  <span class="keyword">import</span> <a href="../Scalaz.scala.html#19508" title="object scalaz.Scalaz">Scalaz</a>._
+
+  <span class="keyword">def</span> <a title="=&gt; Unit" id="423057">run</a> <span class="delimiter">{</span>
+    <span class="keyword">val</span> <a title="Array[Char]" id="619120">j</a> = <span title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" class="string">&quot;algorithm&quot;</span> <span title="(implicit evidence$1: ClassManifest[Char])Array[Char]">toArray</span>
+    <span class="keyword">val</span> <a title="Array[Char]" id="619121">k</a> = <span title="implicit scala.Predef.augmentString : (x: String)scala.collection.immutable.StringOps" class="string">&quot;altruistic&quot;</span> <span title="(implicit evidence$1: ClassManifest[Char])Array[Char]">toArray</span>
+
+    <span class="comment">// Compute the edit distance between &quot;algorithm&quot; and &quot;altruistic&quot;</span>
+    <a href="../MAB.scala.html#40157" title="(a: Array[Char])scalaz.MA[Array,Char]">j</a> <a href="../Identity.scala.html#40089" title="(x: =&gt; Int)scalaz.Identity[Int]">&lt;---&gt;</a> <a href="#619121" title="Array[Char]">k</a> <a href="../Identity.scala.html#48593" title="(b: Int)(implicit e: scalaz.Equal[Int], implicit s: scalaz.Show[Int], implicit ev: &lt;:&lt;[Int,Int])Unit">assert_===</a> <span title="Int(6)" class="int">6</span>
+
+    <span class="keyword">val</span> <a title="List[scalaz.Digit]" id="619122">x</a> = <a href="../LongW.scala.html#40147" title="implicit scalaz.Longs.LongTo : (n: Long)scalaz.LongW" class="int">1638452297</a> <a href="../LongW.scala.html#66982" title="=&gt; List[scalaz.Digit]">digits</a>
+    <span class="keyword">val</span> <a title="List[scalaz.Digit]" id="619123">y</a> = <a href="../LongW.scala.html#40147" title="implicit scalaz.Longs.LongTo : (n: Long)scalaz.LongW" class="int">444488444</a> <a href="../LongW.scala.html#66982" title="=&gt; List[scalaz.Digit]">digits</a>
+
+    <span class="comment">// Compute the edit distance between two strings of digits</span>
+    <a href="../MAB.scala.html#40376" title="(l: List[scalaz.Digit])scalaz.MA[List,scalaz.Digit]">x</a> <a href="../Identity.scala.html#40089" title="(x: =&gt; Int)scalaz.Identity[Int]">&lt;---&gt;</a> <a href="#619123" title="List[scalaz.Digit]">y</a> <a href="../Identity.scala.html#48593" title="(b: Int)(implicit e: scalaz.Equal[Int], implicit s: scalaz.Show[Int], implicit ev: &lt;:&lt;[Int,Int])Unit">assert_===</a> <span title="Int(9)" class="int">9</span>
+  <span class="delimiter">}</span>
+<span class="delimiter">}</span>
+
+        </pre>
+    </body>
+</html>

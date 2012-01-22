@@ -1,0 +1,55 @@
+body { background: white; }
+
+pre, code {
+	font-family: Monaco, Consolas, monospace;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+/* syntax highlighting */
+.keyword { font-weight: bolder; }
+.string { color: red; }
+.symbol { color: red; font-weight: bolder;}
+.char { color: #FF00FF; }
+.double { color: blue; }
+.float { color: blue; }
+.long { color: #008080; }
+.int { color: #008080; }
+.comment { color: gray; font-style: italic; }
+
+/* to highlight a reference or definition */
+:target, .highlighted
+{
+	background: #FFaaaa;
+}
+
+body {
+	font-family: Helvetica, Arial;
+	font-size: 12px;
+}
+
+div.tool {
+	display: none;
+	position:  fixed;
+	bottom: 0;
+	background-color: rgb(48, 48, 48);
+	color: rgb(243, 243, 243);
+	padding: 5px;
+}
+
+div.tool a, div.tool a:visited, div.tool a:link {
+	color: white;
+	font-weight: bold;
+}
+
+div#export-control { right: 0; text-align: right; }
+div#export-control a { padding: 0 5px; }
+div#export { left: 0; width: 100%; }
+div#export code { display: block; padding-right: 60px; }
+
+div#pop-out { left: 0; width: 100%; }
+
+div#pop-out input {
+	margin-right: .75em;
+	vertical-align: middle;
+}

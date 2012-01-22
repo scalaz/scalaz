@@ -1,0 +1,693 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>scalaz.TreeLoc</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../lib/template.css" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../lib/trait_big.png" />
+        <p id="owner"><a name="scalaz" class="extype" href="package.html">scalaz</a></p>
+        <h1>TreeLoc</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <span class="name">TreeLoc</span>
+        <span class="tparams">[<span name="A">+A</span>]</span>
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+          <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>A rose-tree zipper. Represents a scalaz.Tree together with a position in that tree. Provides navigation, persistent update, insertion, and deletes.</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd><dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v6.0.4/core/src/main/scala/scalaz/TreeLoc.scala">TreeLoc.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="scalaz.TreeLoc" class="in"><span>TreeLoc</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+
+        
+
+        
+        
+        <div class="values members" id="values">
+              <h3>Abstract Value Members</h3>
+              <ol><li visbl="pub" name="scalaz.TreeLoc#lefts" data-isabs="true">
+      <a id="lefts:Stream[Tree[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">lefts</span>
+        
+        <span class="result">: Stream[<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The left siblings of the current node.</p><div class="fullcomment"><div class="comment cmt"><p>The left siblings of the current node.</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#parents" data-isabs="true">
+      <a id="parents:Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">parents</span>
+        
+        <span class="result">: Stream[(Stream[<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]], A, Stream[<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]])]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The parent contexts of the current node.</p><div class="fullcomment"><div class="comment cmt"><p>The parent contexts of the current node.</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#rights" data-isabs="true">
+      <a id="rights:Stream[Tree[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">rights</span>
+        
+        <span class="result">: Stream[<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The right siblings of the current node.</p><div class="fullcomment"><div class="comment cmt"><p>The right siblings of the current node.</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#tree" data-isabs="true">
+      <a id="tree:Tree[A]"></a>
+      <h4 class="signature">
+      <span class="kind">val</span>
+      <span class="symbol"> 
+        <span class="name">tree</span>
+        
+        <span class="result">: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The currently selected node.</p><div class="fullcomment"><div class="comment cmt"><p>The currently selected node.</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Concrete Value Members</h3>
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">##</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">clone</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#delete" data-isabs="false">
+      <a id="delete:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">delete</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Delete the current node and all its children.</p>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#find" data-isabs="false">
+      <a id="find((TreeLoc[A]) ⇒ Boolean):Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">find</span>
+        
+        <span class="params">(<span name="p">p: (<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the first descendant node of the current node that satisfies the given predicate.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#findChild" data-isabs="false">
+      <a id="findChild((Tree[A]) ⇒ Boolean):Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">findChild</span>
+        
+        <span class="params">(<span name="p">p: (<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the first immediate child of the current node that satisfies the given predicate.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#firstChild" data-isabs="false">
+      <a id="firstChild:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">firstChild</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the leftmost child of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#getChild" data-isabs="false">
+      <a id="getChild(Int):Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getChild</span>
+        
+        <span class="params">(<span name="n">n: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the nth child of the current node.</p>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#getLabel" data-isabs="false">
+      <a id="getLabel:A"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">getLabel</span>
+        
+        <span class="result">: A</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Get the label of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#hasChildren" data-isabs="false">
+      <a id="hasChildren:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hasChildren</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node has children.</p>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#insertDownAt" data-isabs="false">
+      <a id="insertDownAt[AA&gt;:A](Int,Tree[AA]):Option[TreeLoc[AA]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertDownAt</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="n">n: <span name="scala.Int" class="extype">Int</span></span>, <span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Insert the given node as the nth child of the current node and give it focus.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#insertDownFirst" data-isabs="false">
+      <a id="insertDownFirst[AA&gt;:A](Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertDownFirst</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Insert the given node as the first child of the current node and give it focus.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#insertDownLast" data-isabs="false">
+      <a id="insertDownLast[AA&gt;:A](Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertDownLast</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Insert the given node as the last child of the current node and give it focus.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#insertLeft" data-isabs="false">
+      <a id="insertLeft[AA&gt;:A](Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertLeft</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Insert the given node to the left of the current node and give it focus.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#insertRight" data-isabs="false">
+      <a id="insertRight[AA&gt;:A](Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">insertRight</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Insert the given node to the right of the current node and give it focus.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#isChild" data-isabs="false">
+      <a id="isChild:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isChild</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node is not the root node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#isFirst" data-isabs="false">
+      <a id="isFirst:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isFirst</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node has no left siblings.</p>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#isLast" data-isabs="false">
+      <a id="isLast:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isLast</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node has no right siblings.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#isLeaf" data-isabs="false">
+      <a id="isLeaf:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isLeaf</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node has no children.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#isRoot" data-isabs="false">
+      <a id="isRoot:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">isRoot</span>
+        
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">True if the current node is the root node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#lastChild" data-isabs="false">
+      <a id="lastChild:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">lastChild</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the rightmost child of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#left" data-isabs="false">
+      <a id="left:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">left</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the left sibling of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#modifyLabel" data-isabs="false">
+      <a id="modifyLabel[AA&gt;:A]((AA) ⇒ AA):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">modifyLabel</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="f">f: (AA) ⇒ AA</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Modify the label at the current node with the given function.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#modifyTree" data-isabs="false">
+      <a id="modifyTree[AA&gt;:A]((Tree[AA]) ⇒ Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">modifyTree</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="f">f: (<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]) ⇒ <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Modify the current node with the given function.</p>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notify</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#parent" data-isabs="false">
+      <a id="parent:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">parent</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the parent of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#path" data-isabs="false">
+      <a id="path:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">path</span>
+        
+        <span class="result">: Stream[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The path from the focus to the root.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#right" data-isabs="false">
+      <a id="right:Option[TreeLoc[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">right</span>
+        
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the right sibling of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#root" data-isabs="false">
+      <a id="root:TreeLoc[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">root</span>
+        
+        <span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Select the root node of the tree.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#setLabel" data-isabs="false">
+      <a id="setLabel[AA&gt;:A](AA):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">setLabel</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="a">a: AA</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Set the label of the current node.</p>
+    </li><li visbl="pub" name="scalaz.TreeLoc#setTree" data-isabs="false">
+      <a id="setTree[AA&gt;:A](Tree[AA]):TreeLoc[AA]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">setTree</span>
+        <span class="tparams">[<span name="AA">AA &gt;: A</span>]</span>
+        <span class="params">(<span name="t">t: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[AA]</span>)</span><span class="result">: <a name="scalaz.TreeLoc" class="extype" href="">TreeLoc</a>[AA]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Replace the current node with the given one.</p>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#toForest" data-isabs="false">
+      <a id="toForest:Stream[Tree[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toForest</span>
+        
+        <span class="result">: Stream[<a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Get the entire forest represented by this zipper.</p>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toString</span>
+        
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scalaz.TreeLoc#toTree" data-isabs="false">
+      <a id="toTree:Tree[A]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">toTree</span>
+        
+        <span class="result">: <a name="scalaz.Tree" class="extype" href="Tree.html">Tree</a>[A]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Get the entire tree represented by this zipper.</p>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div name="scala.AnyRef" class="parent">
+              <h3>Inherited from AnyRef</h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>
