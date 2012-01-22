@@ -167,7 +167,7 @@ object ScalazBuild extends Build {
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
-    version      := "6.0.4",
+    version      := "6.0.5-SNAPSHOT",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.9.1", "2.9.0-1", "2.8.1", "2.10.0-M1"),
     resolvers    += ScalaToolsSnapshots,
