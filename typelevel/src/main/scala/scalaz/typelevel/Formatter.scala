@@ -42,12 +42,9 @@ trait Formatter[Params <: HList] extends (Params => String) { self =>
 
 trait Formatters {
 
-  trait Format {
-    type Source
+  trait Fmt[Source] {
     def apply(s: Source): String
   }
-
-  type Fmt[T] = Format { type Source = T }
 
   object javaFormatter {
     def write(fmt: String, arg: Object): String =

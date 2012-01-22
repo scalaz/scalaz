@@ -4,16 +4,13 @@ package typelevel.formatters.unified
 import UnionTypes._
 import typelevel.Formatter._
 
-trait UnionFormat extends Format { self =>
+trait UnionFormat[Dis <: Disj] extends Fmt[Union[Dis]] { self =>
+  type D = Dis
 
-  type D <: Disj
-  type Source = Union[D]
-
-  def deunion[S](implicit ev: S ∈ D): Fmt[S] = new Format {
-    type Source = S
+  def deunion[S](implicit ev: S ∈ Dis): Fmt[S] = new Fmt[S] {
     def apply(s: S) = self.apply(s.union)
   }
 
-  def of[S](implicit ev: S ∈ D): Fmt[S] = deunion
+  def of[S](implicit ev: S ∈ Dis): Fmt[S] = deunion
 
 }

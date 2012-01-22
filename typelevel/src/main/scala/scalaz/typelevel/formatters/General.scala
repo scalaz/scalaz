@@ -5,9 +5,8 @@ import typelevel.Formatter._
 
 trait General {
 
-  def bool(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Format {
-    type Source = Any
-    def apply(x: Source) = {
+  def bool(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Fmt[Any] {
+    def apply(x: Any) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -19,9 +18,8 @@ trait General {
     }
   }
 
-  def hex(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Format {
-    type Source = Any
-    def apply(x: Source) = {
+  def hex(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Fmt[Any] {
+    def apply(x: Any) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -33,9 +31,8 @@ trait General {
     }
   }
 
-  def str(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Format {
-    type Source = Any
-    def apply(x: Source) = {
+  def str(width: Int = 0, maxLength: Int = 0, left: Boolean = false) = new Fmt[Any] {
+    def apply(x: Any) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +

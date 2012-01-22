@@ -14,9 +14,8 @@ trait Numeric {
                      separators: Boolean = false,
                      sign: Boolean = false,
                      space: Boolean = false,
-                     brackets: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
-    def apply(x: Union[D]) = {
+                     brackets: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
+    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -35,9 +34,8 @@ trait Numeric {
   case class octal(width: Int = 0,
                    left: Boolean = false,
                    padding: Boolean = false,
-                   indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
-    def apply(x: Union[D]) = {
+                   indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
+    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -53,9 +51,8 @@ trait Numeric {
   case class hexDeci(width: Int = 0,
                      left: Boolean = false,
                      padding: Boolean = false,
-                     indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
-    def apply(x: Union[D]) = {
+                     indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
+    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -71,9 +68,8 @@ trait Numeric {
   case class uHexDeci(width: Int = 0,
                       left: Boolean = false,
                       padding: Boolean = false,
-                      indicator: Boolean = false) extends UnionFormat {
-    type D = t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]
-    def apply(x: Union[D]) = {
+                      indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
+    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -94,9 +90,8 @@ trait Numeric {
                          separators: Boolean = false,
                          sign: Boolean = false,
                          space: Boolean = false,
-                         brackets: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                         brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -122,9 +117,8 @@ trait Numeric {
                           separators: Boolean = false,
                           sign: Boolean = false,
                           space: Boolean = false,
-                          brackets: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                          brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -150,9 +144,8 @@ trait Numeric {
                         separators: Boolean = false,
                         sign: Boolean = false,
                         space: Boolean = false,
-                        brackets: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                        brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -178,9 +171,8 @@ trait Numeric {
                          separators: Boolean = false,
                          sign: Boolean = false,
                          space: Boolean = false,
-                         brackets: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                         brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -206,9 +198,8 @@ trait Numeric {
                    separators: Boolean = false,
                    sign: Boolean = false,
                    space: Boolean = false,
-                   brackets: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                   brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -231,9 +222,8 @@ trait Numeric {
                           decimalPoint: Boolean = false,
                           padding: Boolean = false,
                           sign: Boolean = false,
-                          space: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                          space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +
@@ -253,9 +243,8 @@ trait Numeric {
                           decimalPoint: Boolean = false,
                           padding: Boolean = false,
                           sign: Boolean = false,
-                          space: Boolean = false) extends UnionFormat {
-    type D = t[Float]#t[Double]#t[BigDecimal]
-    def apply(x: Union[D]) = {
+                          space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
+    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
       javaFormatter.write(
         "%" +
         (if (left) "-" else "") +

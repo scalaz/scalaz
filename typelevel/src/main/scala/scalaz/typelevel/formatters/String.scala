@@ -5,9 +5,8 @@ import typelevel.Formatter._
 
 trait String {
 
-  def subs(start: Int) = new Format {
-    type Source = java.lang.String
-    def apply(s: Source) = s substring start
+  def subs(start: Int) = new Fmt[java.lang.String]{
+    def apply(s: java.lang.String) = s substring start
   }
 
 }
