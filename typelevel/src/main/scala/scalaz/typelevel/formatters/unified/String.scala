@@ -7,7 +7,7 @@ import typelevel.Formatter._
 trait String {
 
   case class char(width: Int = 0, left: Boolean = false) extends UnionFormat[t[Char]#t[Byte]#t[Short]] {
-    def apply(x: Union[t[Char]#t[Byte]#t[Short]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +

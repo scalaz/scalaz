@@ -15,7 +15,7 @@ trait Numeric {
                      sign: Boolean = false,
                      space: Boolean = false,
                      brackets: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
-    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -34,7 +34,7 @@ trait Numeric {
                    left: Boolean = false,
                    padding: Boolean = false,
                    indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
-    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -50,7 +50,7 @@ trait Numeric {
                      left: Boolean = false,
                      padding: Boolean = false,
                      indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
-    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -66,7 +66,7 @@ trait Numeric {
                       left: Boolean = false,
                       padding: Boolean = false,
                       indicator: Boolean = false) extends UnionFormat[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]] {
-    def apply(x: Union[t[Byte]#t[Short]#t[Int]#t[Long]#t[BigInteger]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -87,7 +87,7 @@ trait Numeric {
                          sign: Boolean = false,
                          space: Boolean = false,
                          brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -113,7 +113,7 @@ trait Numeric {
                           sign: Boolean = false,
                           space: Boolean = false,
                           brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -139,7 +139,7 @@ trait Numeric {
                         sign: Boolean = false,
                         space: Boolean = false,
                         brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -165,7 +165,7 @@ trait Numeric {
                          sign: Boolean = false,
                          space: Boolean = false,
                          brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -191,7 +191,7 @@ trait Numeric {
                    sign: Boolean = false,
                    space: Boolean = false,
                    brackets: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -214,7 +214,7 @@ trait Numeric {
                           padding: Boolean = false,
                           sign: Boolean = false,
                           space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
@@ -234,7 +234,7 @@ trait Numeric {
                           padding: Boolean = false,
                           sign: Boolean = false,
                           space: Boolean = false) extends UnionFormat[t[Float]#t[Double]#t[BigDecimal]] {
-    def apply(x: Union[t[Float]#t[Double]#t[BigDecimal]]) = {
+    def apply(x: Union[D]) = {
       (
         "%" +
         (if (left) "-" else "") +
