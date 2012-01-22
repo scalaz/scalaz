@@ -36,8 +36,18 @@ trait HLists extends HListsLow {
   type HCons[H, T <: HList] = GenericCons[Id, H, T]
   type HNil = GenericNil[Id]
 
-  def HNil: HNil = GenericNil[Id]
+  def HNil: HNil = GenericNil[Id]()
 
+  object HCons {
+
+    def apply[H, T <: HList](head: H, tail: T): HCons[H, T] = GenericCons[Id, H, T](head, tail)
+
+    def unapply[H, T <: HList](list: HCons[H, T]): Option[(H, T)] = Some(list.head, list.tail)
+
+  }
+
+  type ::[H, T <: HList] = HCons[H, T]
+  val :: = HCons
 
   // Kleisli proofs
 
