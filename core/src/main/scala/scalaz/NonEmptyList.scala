@@ -61,6 +61,15 @@ sealed trait NonEmptyList[+A] {
   }
 
   override def toString: String = "NonEmpty" + (head :: tail)
+  
+  override def equals(any: Any): Boolean =
+    any match {
+      case that: NonEmptyList[_] => this.list == that.list
+      case _ => false
+    }
+
+  override def hashCode: Int =
+    list.hashCode
 }
 
 trait NonEmptyLists {
