@@ -30,13 +30,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
 }
 
 trait EnumeratorTFunctions {
-  def enumerate[A, O](as: Stream[A]): Enumerator[Unit, A, O] =
-    i =>
-      as match {
-        case Stream.Empty => i
-        case x #:: xs     =>
-          i.fold(done = (_, _) => i, cont = k => enumerate(xs)(k(elInput(x)).value), err = e => err[Unit, A, Id, O](e).value)
-      }
+  def enumerate[E](as: Stream[E]): Enumerator[Unit, E] = enumStream[Unit, E, Id](as)
 
   /** 
    * An EnumeratorT that is at EOF

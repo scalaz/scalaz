@@ -19,19 +19,18 @@ package object iteratee {
     def apply[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] = iteratee(s)
   }
 
+  type Enumerator[X, E] =
+  EnumeratorT[X, E, Id]
+
+  type Enumeratee[X, O, I] = 
+  EnumerateeT[X, O, I, Id]
+
   type Iter[E, F[_], A] =
   IterateeT[Unit, E, F, A]
 
   type >@>[E, A] =
   Iteratee[Unit, E, A]
 
-  type Enumeratee[X, O, I, A] =
-  Step[X, I, A] => Iteratee[X, O, Step[X, I, A]]
-
-  type Enumerator[X, E, A] =
-  Step[X, E, A] => Step[X, E, A]
-
   type >@@>[E, A] =
-  Enumerator[Unit, E, A]
-
+  Enumerator[Unit, E]
 }
