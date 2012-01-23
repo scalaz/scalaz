@@ -33,11 +33,10 @@ sealed trait IterateeT[X, E, F[_], A] {
    * @param e A function to calculate a result in case of an Error.
    */
   def run(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
-    val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
-    F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
+    F.bind((this &= enumEofT[X, E, F]).value)((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
       , done = (a, _) => F.point(a)
-      , err = e
+      , err = x => e(x)
     ))
   }
 
@@ -103,12 +102,12 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 
   def joinI[I, B](implicit outer: IterateeT[X, E, F, A] =:= IterateeT[X, E, F, StepT[X, I, F, B]], M: Monad[F]): IterateeT[X, E, F, B] = {
-    val ITP = IterateeT.IterateeTMonad[X, E, F]
+    val M0 = IterateeT.IterateeTMonad[X, E, F]
     def check: StepT[X, I, F, B] => IterateeT[X, E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {
         s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
       }
-      , done = (a, _) => ITP.point(a)
+      , done = (a, _) => M0.point(a)
       , err = e => err(e)
     )
 
@@ -118,6 +117,8 @@ sealed trait IterateeT[X, E, F[_], A] {
   def %=[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
     (this >>== e).joinI[E, A]
   }
+
+  def &=(enum: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = >>==(enum[A] _)
 
   /**
    * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
@@ -158,7 +159,7 @@ sealed trait IterateeT[X, E, F[_], A] {
             }
         }
       , empty = cont(loop(x, y))
-      , eof = (x >>== enumEofT(e => err(e))) flatMap (a => (y >>== enumEofT(e => err(e))) map (b => (a, b)))
+      , eof = (x &= enumEofT[X, E, F]) flatMap (a => (y &= enumEofT[X, E, F]) map (b => (a, b)))
     )
     cont(loop(this, other))
   }
@@ -215,6 +216,20 @@ trait IterateeTFunctions {
   def putStrTo[X, E](os: java.io.OutputStream)(implicit s: Show[E]): IterateeT[X, E, IO, Unit] = {
     def write(e: E) = IO(os.write(s.shows(e).getBytes))
     foldM(())((_: Unit, e: E) => write(e))
+  }
+
+  /**
+   * An iteratee that consumes all of the input into something that is PlusEmpty and Pointed.
+   */
+  def consume[X, E, F[_]: Monad, A[_]: PlusEmpty : Pointed]: IterateeT[X, E, F, A[E]] = {
+    import scalaz.syntax.plus._
+    def step(e: Input[E]): IterateeT[X, E, F, A[E]] = 
+      e.fold(empty = cont(step)
+        , el = e => cont(step).map(a => Pointed[A].point(e) <+> a)
+        , eof = done(PlusEmpty[A].empty, eofInput[E])
+      )   
+
+    cont(step)
   }
 
   /**An iteratee that consumes the head of the input **/

@@ -33,12 +33,6 @@ package object iteratee {
   type Enumeratee[X, O, I, A] =
   Step[X, I, A] => Iteratee[X, O, Step[X, I, A]]
 
-  type EnumeratorT[X, E, F[_], A] =
-  StepT[X, E, F, A] => IterateeT[X, E, F, A]
-
-  // Instances are mixed in with the IterateeT object
-  object EnumeratorT extends EnumeratorTFunctions
-
   type Enumerator[X, E, A] =
   Step[X, E, A] => Step[X, E, A]
 

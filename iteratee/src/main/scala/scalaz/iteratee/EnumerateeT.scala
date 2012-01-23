@@ -48,5 +48,9 @@ trait EnumerateeTFunctions {
   def splitOn[X, E, F[_], G[_], A](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: CoPointed[G]): EnumerateeT[X, E, F[E], G, A] = {
     (takeWhile[X, E, F](p).up[G] flatMap (xs => drop[X, E, G](1).map(_ => xs))).sequenceI[A]
   }
+
+  def doneOr[X, O, I, F[_] : Pointed, A](f: (Input[I] => IterateeT[X, I, F, A]) => IterateeT[X, O, F, StepT[X, I, F, A]]): EnumerateeT[X, O, I, F, A] = {
+    (s: StepT[X, I, F, A]) => s.mapContOr(k => f(k), done(s, emptyInput))
+  }
 }
 
