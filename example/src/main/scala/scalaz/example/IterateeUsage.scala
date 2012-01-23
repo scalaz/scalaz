@@ -21,7 +21,7 @@ object IterateeUsage extends App {
   ((takeUntil[Unit, Int, List](_ > 5) &= (1 to 10).toStream).runOrZero) assert_=== (1 to 5).toList
 
   val readLn = takeWhile[Unit, Char, List](_ != '\n') flatMap (ln => drop[Unit, Char, Id](1).map(_ => ln))
-  ((collect[Unit, List[Char], List] %= readLn.sequenceI[List[List[Char]]] &= "Iteratees\nare\ncomposable".toStream).runOrZero) assert_=== List("Iteratees".toList, "are".toList, "composable".toList)
+  ((collect[Unit, List[Char], List] %= readLn.sequenceI &= "Iteratees\nare\ncomposable".toStream).runOrZero) assert_=== List("Iteratees".toList, "are".toList, "composable".toList)
 
   ((collect[Unit, List[Int], List] %= splitOn(_ % 3 != 0) &= (1 to 10).toStream).runOrZero) assert_=== List(List(1, 2), List(4, 5), List(7, 8), List(10))
 

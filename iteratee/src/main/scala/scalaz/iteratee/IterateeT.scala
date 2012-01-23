@@ -114,28 +114,31 @@ sealed trait IterateeT[X, E, F[_], A] {
     outer(this) flatMap check
   }
 
-  def %=[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
-    (this >>== e).joinI[E, A]
+  def %=[O](e: EnumerateeT[X, O, E, F])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
+    (this >>== e[A]).joinI[E, A]
   }
 
-  def &=(enum: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = >>==(enum[A] _)
+  def &=(enum: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = >>==(enum[A])
 
   /**
    * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
    * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
    */
-  def sequenceI[B](implicit m: Monad[F]): EnumerateeT[X, E, A, F, B] = {
-    def loop: EnumerateeT[X, E, A, F, B] = doneOr(checkEof)
-    def checkEof: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
-      isEof[X, E, F] flatMap {
-        eof =>
-          if (eof) done(scont(k), eofInput)
-          else step(k)
+  def sequenceI(implicit m: Monad[F]): EnumerateeT[X, E, A, F] = 
+    new EnumerateeT[X, E, A, F] {
+      def apply[B] = {
+        def loop = doneOr(checkEof)
+        def checkEof: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+          isEof[X, E, F] flatMap {
+            eof =>
+              if (eof) done(scont(k), eofInput)
+              else step(k)
+          }
+        def step: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+          flatMap (a => k(elInput(a)) >>== loop)
+        loop
       }
-    def step: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
-      this flatMap (a => k(elInput(a)) >>== loop)
-    loop
-  }
+    }
 
   def zip[B](other: IterateeT[X, E, F, B])(implicit F: Monad[F]): IterateeT[X, E, F, (A, B)] = {
     def step[Z](i: IterateeT[X, E, F, Z], in: Input[E]) =

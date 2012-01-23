@@ -11,3 +11,32 @@ trait MonadTrans[F[_[_], _]] {
 object MonadTrans {
   def apply[F[_[_], _]](implicit F: MonadTrans[F]): MonadTrans[F] = F
 }
+
+/**
+ * This trait establishes a partial order among monads. A "bigger" monad
+ * is one that does all of the effects of the "smaller" as part of its 
+ * execution.
+ */
+trait |>=|[M1[_], M2[_]] {
+  implicit def M1M: Monad[M1]
+  implicit def M2M: Monad[M2]
+
+  def promote[A](m2: M2[A]): M1[A]
+}
+
+object |>=| {
+  // the identity ordering
+  def apply[M1[_]: Monad]: |>=|[M1, M1] = 
+    new |>=|[M1, M1] {
+      val M1M = Monad[M1]
+      val M2M = Monad[M1]
+      def promote[A](m2: M1[A]) = m2
+    }
+
+  def apply[M1[_]: Monad, F[_[_], _]: MonadTrans]: |>=|[({ type λ[α] = F[M1, α] })#λ, M1] = 
+    new |>=|[({ type λ[α] = F[M1, α] })#λ, M1] {
+      val M1M = MonadTrans[F].apply[M1]
+      val M2M = Monad[M1]
+      def promote[A](m2: M1[A]) = MonadTrans[F].liftM(m2)
+    }
+}
