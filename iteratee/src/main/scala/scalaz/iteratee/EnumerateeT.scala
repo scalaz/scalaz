@@ -36,6 +36,25 @@ trait EnumerateeTFunctions {
       }
     }
 
+  def collect[X, O, I, F[_] : Pointed : Bind](pf: PartialFunction[O, I]): EnumerateeT[X, O, I, F] = collectErrorOr(pf andThen (i => Right(i)))
+
+  def collectErrorOr[X, O, I, F[_] : Pointed : Bind](pf: PartialFunction[O, Either[X, I]]): EnumerateeT[X, O, I, F] = 
+    new EnumerateeT[X, O, I, F] {
+      def apply[A] = {
+        def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
+        def step: (Input[I] => IterateeT[X, I, F, A]) => (Input[O] => IterateeT[X, O, F, StepT[X, I, F, A]]) = {
+          k => in =>
+            in(
+              el = e => if (pf.isDefinedAt(e)) pf(e).fold(err(_), i => k(elInput(i)) >>== doneOr(loop)) else cont(step(k))
+              , empty = cont(step(k))
+              , eof = done(scont(k), in)
+            )
+        }
+
+        doneOr(loop)
+      }
+    }
+
   def filter[X, E, F[_] : Pointed : Bind](p: E => Boolean): EnumerateeT[X, E, E, F] = 
     new EnumerateeT[X, E, E, F] {
       def apply[A] = {

@@ -5,17 +5,27 @@ import effect._
 
 import Iteratee._
 
-trait EnumeratorT[X, E, F[_]] {
+trait EnumeratorT[X, E, F[_]] { self =>
   def apply[A]: StepT[X, E, F, A] => IterateeT[X, E, F, A]
+
+  def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[X, B, F] = 
+    new EnumeratorT[X, B, F] {
+      def apply[A] = { (step: StepT[X, B, F, A]) => 
+        iterateeT((EnumerateeT.map[X, E, B, F](f).apply(step) &= self).run(x => err[X, B, F, A](x).value))
+      }
+    }
+
+  def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[X, B, F] = 
+    new EnumeratorT[X, B, F] {
+      def apply[A] = { (step: StepT[X, B, F, A]) => 
+        iterateeT((EnumerateeT.collect[X, E, B, F](pf).apply(step) &= self).run(x => err[X, B, F, A](x).value))
+      }
+    }
 }
 
 trait EnumeratorTInstances0 {
   implicit def enumeratorTSemigroup[X, E, F[_]](implicit F0: Bind[F]): Semigroup[EnumeratorT[X, E, F]] = new EnumeratorTSemigroup[X, E, F] {
     implicit def F = F0
-  }
-
-  implicit def enumeratorTFunctor[X, F[_]](implicit M0: Monad[F]): Functor[({type λ[α]=EnumeratorT[X, α, F]})#λ] = new EnumeratorTFunctor[X, F] {
-    implicit def M = M0
   }
 }
 
@@ -145,12 +155,7 @@ private[scalaz] trait EnumeratorTMonoid[X, E, F[_]] extends Monoid[EnumeratorT[X
 
 private[scalaz] trait EnumeratorTFunctor[X, F[_]] extends Functor[({type λ[α]=EnumeratorT[X, α, F]})#λ] {
   implicit def M: Monad[F]
-  def map[A, B](fa: EnumeratorT[X, A, F])(f: A => B): EnumeratorT[X, B, F] = 
-    new EnumeratorT[X, B, F] {
-      def apply[C] = { (step: StepT[X, B, F, C]) => 
-        iterateeT((EnumerateeT.map[X, A, B, F](f).apply(step) &= fa).run(x => err[X, B, F, C](x).value))
-      }
-    }
+  def map[A, B](fa: EnumeratorT[X, A, F])(f: A => B): EnumeratorT[X, B, F] = fa.map(f)
 }
 
 private[scalaz] trait EnumeratorTPointed[X, F[_]] extends Pointed[({type λ[α]=EnumeratorT[X, α, F]})#λ] with EnumeratorTFunctor[X, F] {
