@@ -17,26 +17,28 @@ object MonadTrans {
  * is one that does all of the effects of the "smaller" as part of its 
  * execution.
  */
-trait |>=|[M1[_], M2[_]] {
+trait MonadPartialOrder[M1[_], M2[_]] {
   implicit def M1M: Monad[M1]
   implicit def M2M: Monad[M2]
 
   def promote[A](m2: M2[A]): M1[A]
 }
 
-object |>=| {
+trait MonadPartialOrderFunctions {
   // the identity ordering
-  def apply[M1[_]: Monad]: |>=|[M1, M1] = 
-    new |>=|[M1, M1] {
+  implicit def identity[M1[_]: Monad]: MonadPartialOrder[M1, M1] = 
+    new MonadPartialOrder[M1, M1] {
       val M1M = Monad[M1]
       val M2M = Monad[M1]
       def promote[A](m2: M1[A]) = m2
     }
 
-  def apply[M1[_]: Monad, F[_[_], _]: MonadTrans]: |>=|[({ type λ[α] = F[M1, α] })#λ, M1] = 
-    new |>=|[({ type λ[α] = F[M1, α] })#λ, M1] {
+  implicit def transformer[M1[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M1] = 
+    new MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M1] {
       val M1M = MonadTrans[F].apply[M1]
       val M2M = Monad[M1]
       def promote[A](m2: M1[A]) = MonadTrans[F].liftM(m2)
     }
 }
+
+object MonadPartialOrder extends MonadPartialOrderFunctions
