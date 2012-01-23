@@ -55,7 +55,7 @@ trait EnumeratorTFunctions {
       def apply[A] = _.mapCont(_(elInput(e)))
     }
 
-  implicit def enumStream[X, E, F[_] : Monad](xs: Stream[E]): EnumeratorT[X, E, F] = 
+  def enumStream[X, E, F[_] : Monad](xs: Stream[E]): EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] {
       def apply[A] = (s: StepT[X, E, F, A]) => xs match {
         case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumStream(t).apply[A])
@@ -63,33 +63,33 @@ trait EnumeratorTFunctions {
       }
     }
 
-  implicit def enumIterator[X, E](x: Iterator[E]): EnumeratorT[X, E, IO] = 
+  def enumIterator[X, E](x: => Iterator[E]): EnumeratorT[X, E, IO] = 
     new EnumeratorT[X, E, IO] { 
+      lazy val iter = x
       def apply[A] = (s: StepT[X, E, IO, A]) => 
         s.mapCont(
           k =>
-            if (x.hasNext) {
-              val n = x.next()
+            if (iter.hasNext) {
+              val n = iter.next()
               k(elInput(n)) >>== apply[A]
             } else s.pointI
         )
     }
 
-  import java.io._
-
-  implicit def enumReader[X](r: Reader): EnumeratorT[X, IoExceptionOr[Char], IO] = 
+  def enumReader[X](r: => java.io.Reader): EnumeratorT[X, IoExceptionOr[Char], IO] = 
     new EnumeratorT[X, IoExceptionOr[Char], IO] { 
+      lazy val reader = r
       def apply[A] = (s: StepT[X, IoExceptionOr[Char], IO, A]) => 
         s.mapCont(
           k => {
-            val i = IoExceptionOr(r.read)
+            val i = IoExceptionOr(reader.read)
             if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== apply[A]
             else s.pointI
           }
         )
     }
 
-  implicit def enumArray[X, E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[X, E, F] = 
+  def enumArray[X, E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] {
       private val limit = max.getOrElse(a.length)
       def apply[A] = {

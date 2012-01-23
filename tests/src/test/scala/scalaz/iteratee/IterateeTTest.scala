@@ -3,17 +3,15 @@ package iteratee
 
 import std.AllInstances._
 import Iteratee._
-import EnumeratorT._
 import effect._
 
 class IterateeTTest extends Spec {
-
   "head" in {
-    (head[Unit, Int, Id] &= Stream(1, 2, 3)).runOrZero must be_===(Some(1))
+    (head[Unit, Int, Id] &= enumStream(Stream(1, 2, 3))).runOrZero must be_===(Some(1))
   }
 
   "consume" in {
-    (consume[Unit, Int, Id, List] &= Stream(1, 2, 3)).runOrZero must be_===(List(1, 2, 3))
+    (consume[Unit, Int, Id, List] &= enumStream(Stream(1, 2, 3))).runOrZero must be_===(List(1, 2, 3))
   }
 
   object instances {
