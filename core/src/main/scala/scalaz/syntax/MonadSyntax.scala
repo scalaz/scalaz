@@ -5,6 +5,8 @@ package syntax
 trait MonadV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Monad[F]
   ////
+  
+  def liftM[G[_[_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)
 
   ////
 }

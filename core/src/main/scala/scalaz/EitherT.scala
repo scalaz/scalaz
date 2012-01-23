@@ -206,6 +206,8 @@ trait EitherTInstances extends EitherTInstances0 {
     implicit def G = eitherTTraverse[F, L]
     def iso = EitherT.eitherTLeftProjectionEIso2[F, L]
   }
+  
+  implicit def eitherTMonadTrans[A]: MonadTrans[({type λ[α[_], β] = EitherT[α, A, β]})#λ] = new EitherTMonadTrans[A] {}
 }
 
 trait EitherTFunctions {
@@ -289,4 +291,14 @@ trait EitherTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = EitherT[F, 
   def bitraverse[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
                                                 (f: (A) => G[C], g: (B) => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
+}
+
+trait EitherTMonadTrans[A] extends MonadTrans[({type λ[α[_], β] = EitherT[α, A, β]})#λ] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
+    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
+  }
+
+  def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(Right[A, B](_)))
+
+  implicit def apply[M[_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
