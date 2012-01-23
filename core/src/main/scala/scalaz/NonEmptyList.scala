@@ -73,6 +73,15 @@ sealed trait NonEmptyList[A] {
   def size: Int = 1 + list.size
 
   override def toString: String = "NonEmpty" + (head :: tail)
+
+  override def equals(any: Any): Boolean =
+    any match {
+      case that: NonEmptyList[_] => this.list == that.list
+      case _                     => false
+    }
+
+  override def hashCode: Int =
+    list.hashCode
 }
 
 object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
@@ -81,7 +90,6 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 }
 
 trait NonEmptyListInstances {
-  // TODO Show, etc.
   implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with Each[NonEmptyList] =
     new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] with Each[NonEmptyList] {
       def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
