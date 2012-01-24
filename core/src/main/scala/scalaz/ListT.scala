@@ -29,10 +29,22 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
     case Skip(as) => Skip(as filter p)
     case Done => Done
   }
+  
+  def drop(n: Int)(implicit M: Functor[M]): ListT[M, A] = stepMap {
+    case Yield(a, as) => if (n > 0) Skip(as drop (n-1)) else Yield(a, as)
+    case Skip(as) => Skip(as drop n)
+    case Done => Done
+  }
 
   def dropWhile(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = stepMap {
     case Yield(a, as) => if (p(a)) Skip(as dropWhile p) else Yield(a, as)
     case Skip(as) => Skip(as dropWhile p)
+    case Done => Done
+  }
+  
+  def take(n: Int)(implicit M: Functor[M]): ListT[M, A] = stepMap {
+    case Yield(a, as) => if (n <= 0) Done else Yield(a, as take (n-1))
+    case Skip(as) => Skip(as take n)
     case Done => Done
   }
 
