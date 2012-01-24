@@ -31,6 +31,6 @@ package object iteratee {
   type >@>[E, A] =
   Iteratee[Unit, E, A]
 
-  type >@@>[E, A] =
+  type Enum[E] =
   Enumerator[Unit, E]
 }

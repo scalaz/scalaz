@@ -15,6 +15,27 @@ trait EnumeratorT[X, E, F[_]] { self =>
       }
     }
 
+  def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M0: Monad[F]) = 
+    new EnumeratorT[X, B, F] {
+      def apply[A] = {
+        def loop(step: StepT[X, B, F, A]): IterateeT[X, E, F, StepT[X, B, F, A]] = {
+          step.fold(
+            cont = contf => cont[X, E, F, StepT[X, B, F, A]] {
+              (_: Input[E]).map(e => f(e)).fold(
+                el    = en => en.apply(step) >>== loop,
+                empty = contf(emptyInput) >>== loop,
+                eof   = done(step, emptyInput)
+              )
+            },
+            done = (a, _) => done(sdone(a, emptyInput), emptyInput),
+            err  = x => err(x)
+          )
+        }
+
+        (step: StepT[X, B, F, A]) => iterateeT((loop(step) &= self).run(x => err[X, B, F, A](x).value))
+      }
+    }
+
   def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[X, B, F] = 
     new EnumeratorT[X, B, F] {
       def apply[A] = { (step: StepT[X, B, F, A]) => 
@@ -34,7 +55,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
     implicit def F = F0
   }
 
-  implicit def enumeratorTPointed[X, F[_]](implicit M0: Monad[F]): Pointed[({type λ[α]=EnumeratorT[X, α, F]})#λ] = new EnumeratorTPointed[X, F] {
+  implicit def enumeratorTMonad[X, F[_]](implicit M0: Monad[F]): Monad[({type λ[α]=EnumeratorT[X, α, F]})#λ] = new EnumeratorTMonad[X, F] {
     implicit def M = M0
   }
 }
@@ -155,9 +176,13 @@ private[scalaz] trait EnumeratorTMonoid[X, E, F[_]] extends Monoid[EnumeratorT[X
 
 private[scalaz] trait EnumeratorTFunctor[X, F[_]] extends Functor[({type λ[α]=EnumeratorT[X, α, F]})#λ] {
   implicit def M: Monad[F]
-  def map[A, B](fa: EnumeratorT[X, A, F])(f: A => B): EnumeratorT[X, B, F] = fa.map(f)
+  abstract override def map[A, B](fa: EnumeratorT[X, A, F])(f: A => B): EnumeratorT[X, B, F] = fa.map(f)
 }
 
 private[scalaz] trait EnumeratorTPointed[X, F[_]] extends Pointed[({type λ[α]=EnumeratorT[X, α, F]})#λ] with EnumeratorTFunctor[X, F] {
   def point[E](e: => E) = EnumeratorT.enumOne[X, E, F](e)
+}
+
+private [scalaz] trait EnumeratorTMonad[X, F[_]] extends Monad[({type λ[α]=EnumeratorT[X, α, F]})#λ] with EnumeratorTPointed[X, F] {
+  def bind[A, B](fa: EnumeratorT[X, A, F])(f: A => EnumeratorT[X, B, F]) = fa.flatMap(f)
 }
