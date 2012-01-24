@@ -89,7 +89,7 @@ trait OptionTInstances0 extends OptionTInstances1 {
 }
 
 trait OptionTInstances extends OptionTInstances0 {
-  implicit def optionTMonadTrans: MonadTrans[OptionT] = new OptionTMonadTrans {}
+  implicit def optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
   implicit def optionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonad[F] {
     implicit def F: Monad[F] = F0
@@ -156,7 +156,7 @@ trait OptionTAlternative[F[_]] extends Alternative[({type λ[α] = OptionT[F, α
   def orElse[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = OptionT(F.orElse(a.run, b.run))
 }
 
-private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {
+private[scalaz] trait OptionTHoist extends Hoist[OptionT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): OptionT[G, A] =
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => Some(a)))
 

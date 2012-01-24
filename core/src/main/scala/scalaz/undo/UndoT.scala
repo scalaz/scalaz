@@ -50,7 +50,7 @@ trait UndoTInstances0 extends UndoTInstances1 {
 }
 
 trait UndoTInstances extends UndoTInstances0 {
-  implicit def undoTMonadTrans[S]: MonadTrans[({type G[x[_], a] = UndoT[x, S, a]})#G] = new UndoTMonadTrans[S] {}
+  implicit def undoTMonadTrans[S]: Hoist[({type G[x[_], a] = UndoT[x, S, a]})#G] = new UndoTHoist[S] {}
 
   implicit def undoTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[F, S, Y]})#HS, S] = new UndoTMonadState[S, F] {
     implicit def F: Monad[F] = F0
@@ -146,14 +146,13 @@ private[scalaz] trait UndoTMonadState[S, F[_]]
   )
 }
 
-private[scalaz] trait UndoTMonadTrans[S]
-  extends MonadTrans[({type G[x[_], a] = UndoT[x, S, a]})#G] {
+private[scalaz] trait UndoTHoist[S] extends Hoist[({type G[x[_], a] = UndoT[x, S, a]})#G] {
 
   trait UndoTF[G[_], S] {
-    type f[x] = UndoT[G, S, x]
+    type λ[α] = UndoT[G, S, α]
   }
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (UndoTF[M, S]#f ~> UndoTF[N, S]#f) {
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (UndoTF[M, S]#λ ~> UndoTF[N, S]#λ) {
     def apply[A](fa: UndoT[M, S, A]): UndoT[N, S, A] = {
       UndoT[N, S,A](StateT(s => f(fa.hstate(s))))
     }
@@ -163,5 +162,5 @@ private[scalaz] trait UndoTMonadTrans[S]
     UndoT[G, S, A](StateT(s => G.map(ga)(a => (a, s))))
   }
 
-  implicit def apply[G[_]: Monad]: Monad[({type λ[α] = UndoT[G, S, α]})#λ] = UndoT.undoTMonadState[S, G]
+  implicit def apply[G[_]: Monad]: Monad[UndoTF[G, S]#λ] = UndoT.undoTMonadState[S, G]
 }

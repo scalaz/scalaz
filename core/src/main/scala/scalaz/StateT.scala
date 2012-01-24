@@ -88,7 +88,7 @@ trait StateTInstances0 extends StateTInstances1 {
     implicit def F: Monad[F] = F0
   }
 
-  implicit def StateMonadTrans[S]: MonadTrans[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTMonadTrans[S] {}
+  implicit def StateMonadTrans[S]: Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTHoist[S] {}
 }
 
 trait StateTInstances extends StateTInstances0 {
@@ -133,7 +133,7 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
   def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point(((), s)))
 }
 
-private[scalaz] trait StateTMonadTrans[S] extends MonadTrans[({type f[g[_], a] = StateT[g, S, a]})#f] {
+private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] {
 
   trait StateTF[G[_], S] {
     type f[x] = StateT[G, S, x]

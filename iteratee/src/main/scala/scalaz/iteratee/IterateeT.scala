@@ -181,16 +181,7 @@ trait IterateeTInstances0 {
 }
 
 trait IterateeTInstances extends IterateeTInstances0 {
-  implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
-    def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (({type f[x] = IterateeT[X, E, F, x]})#f ~> ({type f[x] = IterateeT[X, E, G, x]})#f) {
-      def apply[A](fa: IterateeT[X, E, F, A]): IterateeT[X, E, G, A] = fa mapI f
-    }
-
-    def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
-      iterateeT(Monad[G].map(ga)((x: A) => StepT.sdone[X, E, G, A](x, emptyInput)))
-
-    implicit def apply[G[_] : Monad]: Monad[({type λ[α] = IterateeT[X, E, G, α]})#λ] = IterateeT.IterateeTMonad[X, E, G]
-  }
+  implicit def IterateeTMonadTrans[X, E]: Hoist[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new IterateeTHoist[X, E] { }
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
     new IterateeTMonadIO[X, E, F] {
@@ -331,6 +322,21 @@ private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = I
   def point[A](a: => A) = StepT.sdone(a, emptyInput).pointI
   override def map[A, B](fa: IterateeT[X, E, F, A])(f: (A) => B): IterateeT[X, E, F, B] = fa map f
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
+}
+
+private[scalaz] trait IterateeTHoist[X, E] extends Hoist[({type λ[β[_], α] = IterateeT[X, E, β, α]})#λ] {
+  trait IterateeTF[F[_]] {
+    type λ[α] = IterateeT[X, E, F, α]
+  }
+
+  def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
+    def apply[A](fa: IterateeT[X, E, F, A]): IterateeT[X, E, G, A] = fa mapI f
+  }
+
+  def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
+    iterateeT(Monad[G].map(ga)(sdone[X, E, G, A](_, emptyInput)))
+
+  implicit def apply[G[_] : Monad]: Monad[IterateeTF[G]#λ] = IterateeT.IterateeTMonad[X, E, G]
 }
 
 private[scalaz] trait IterateeTMonadIO[X, E, F[_]] extends MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] with IterateeTMonad[X, E, F] {

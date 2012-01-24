@@ -106,7 +106,7 @@ trait KleisliInstances extends KleisliInstances0 {
   implicit def kleisliAlternativeEmpty[F[_], R](implicit F0: AlternativeEmpty[F]): AlternativeEmpty[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliAlternativeEmpty[F, R] {
     implicit def F: AlternativeEmpty[F] = F0
   }
-  implicit def kleisliMonadTrans[R]: MonadTrans[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] = new KleisliMonadTrans[R] {}
+  implicit def kleisliMonadTrans[R]: Hoist[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] = new KleisliHoist[R] {}
 }
 
 trait KleisliFunctions {
@@ -175,7 +175,7 @@ private[scalaz] trait KleisliMonadReader[F[_], R] extends MonadReader[({type f[s
   def local[A](f: (R) => R)(fa: Kleisli[F, R, A]): Kleisli[F, R, A] = Kleisli[F, R, A](r => fa.run(f(r)))
 }
 
-private[scalaz] trait KleisliMonadTrans[R] extends MonadTrans[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] {
+private[scalaz] trait KleisliHoist[R] extends Hoist[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): ({type f[x] = Kleisli[M, R, x]})#f ~> ({type f[x] = Kleisli[N, R, x]})#f =
     new (({type f[x] = Kleisli[M, R, x]})#f ~> ({type f[x] = Kleisli[N, R, x]})#f) {
       def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] = Kleisli[N, R, A](r => f(m(r)))
