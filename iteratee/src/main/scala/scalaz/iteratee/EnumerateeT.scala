@@ -13,13 +13,13 @@ trait EnumerateeTFunctions {
   /**
    * Applies a function to each input element and feeds the resulting outputs to the inner iteratee.
    */
-  def map[X, O, I, F[_] : Pointed : Bind](f: O => I): EnumerateeT[X, O, I, F] = mapErrorOr(o => Right(f(o)))
+  def map[X, O, I, F[_] : Monad](f: O => I): EnumerateeT[X, O, I, F] = mapErrorOr(o => Right(f(o)))
 
   /**
    * Applies a function to each input element and, if the result is a right feeds the resulting outputs to the inner
    * iteratee, otherwise throws an error.
    */
-  def mapErrorOr[X, O, I, F[_] : Pointed : Bind](f: O => Either[X, I]): EnumerateeT[X, O, I, F] = 
+  def mapErrorOr[X, O, I, F[_] : Monad](f: O => Either[X, I]): EnumerateeT[X, O, I, F] = 
     new EnumerateeT[X, O, I, F] {
       def apply[A] = {
         def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
@@ -36,9 +36,9 @@ trait EnumerateeTFunctions {
       }
     }
 
-  def collect[X, O, I, F[_] : Pointed : Bind](pf: PartialFunction[O, I]): EnumerateeT[X, O, I, F] = collectErrorOr(pf andThen (i => Right(i)))
+  def collect[X, O, I, F[_] : Monad](pf: PartialFunction[O, I]): EnumerateeT[X, O, I, F] = collectErrorOr(pf andThen (i => Right(i)))
 
-  def collectErrorOr[X, O, I, F[_] : Pointed : Bind](pf: PartialFunction[O, Either[X, I]]): EnumerateeT[X, O, I, F] = 
+  def collectErrorOr[X, O, I, F[_] : Monad](pf: PartialFunction[O, Either[X, I]]): EnumerateeT[X, O, I, F] = 
     new EnumerateeT[X, O, I, F] {
       def apply[A] = {
         def loop = step andThen cont[X, O, F, StepT[X, I, F, A]]
@@ -55,7 +55,7 @@ trait EnumerateeTFunctions {
       }
     }
 
-  def filter[X, E, F[_] : Pointed : Bind](p: E => Boolean): EnumerateeT[X, E, E, F] = 
+  def filter[X, E, F[_] : Monad](p: E => Boolean): EnumerateeT[X, E, E, F] = 
     new EnumerateeT[X, E, E, F] {
       def apply[A] = {
         def loop = step andThen cont[X, E, F, StepT[X, E, F, A]]

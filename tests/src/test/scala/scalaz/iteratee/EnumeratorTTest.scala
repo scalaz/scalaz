@@ -32,13 +32,13 @@ class EnumeratorTTest extends Spec {
   "map" in {
     val enum = enumStream[Unit, Int, Id](Stream(1, 2, 3))
     type EnumId[α] = EnumeratorT[Unit, α, Id]
-    (consume[Unit, Int, Id, List] &= enum.map(_ * 2)).run(_ => List.empty[Int]) must be_===(List(2, 4, 6))
+    (consume[Unit, Int, Id, List] &= enum.map(_ * 2)).runOrZero must be_===(List(2, 4, 6))
   }
   
   "flatMap" in {
     val enum = enumStream[Unit, Int, Id](Stream(1, 2, 3))
     type EnumId[α] = EnumeratorT[Unit, α, Id]
-    (consume[Unit, Int, Id, List] &= enum.flatMap(i => enum.map(_ + i))).run(_ => List.empty[Int]) must be_===(List(2, 3, 4, 3, 4, 5, 4, 5, 6))
+    (consume[Unit, Int, Id, List] &= enum.flatMap(i => enum.map(_ + i))).runOrZero must be_===(List(2, 3, 4, 3, 4, 5, 4, 5, 6))
   }
 
   //checkAll(functor.laws[Enum])
