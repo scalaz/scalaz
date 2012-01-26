@@ -19,11 +19,26 @@ trait Hoist[F[_[_], _]] extends MonadTrans[F] {
  * is one that does all of the effects of the "smaller" as part of its 
  * execution.
  */
-trait MonadPartialOrder[M1[_], M2[_]] {
+sealed trait MonadPartialOrder[M1[_], M2[_]] extends NaturalTransformation[M2, M1] { self =>
   implicit def M1M: Monad[M1]
   implicit def M2M: Monad[M2]
 
+  def apply[A](m2: M2[A]) = promote(m2)
   def promote[A](m2: M2[A]): M1[A]
+
+  def compose[M[_]](mo: MonadPartialOrder[M, M1]): MonadPartialOrder[M, M2] = 
+    new MonadPartialOrder[M, M2] {
+      val M1M = mo.M1M
+      val M2M = self.M2M
+      def promote[A](m2: M2[A]) = mo.promote(self.promote(m2))
+    }
+
+  def transform[F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M2] = 
+    new MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M2] {
+      val M1M = MonadTrans[F].apply[M1](self.M1M)
+      val M2M = self.M2M
+      def promote[A](m2: M2[A]) = MonadTrans[F].liftM(self.promote(m2))(self.M1M)
+    }
 }
 
 trait MonadPartialOrderFunctions {
@@ -35,20 +50,8 @@ trait MonadPartialOrderFunctions {
       def promote[A](m: M[A]) = m
     }
 
-  implicit def transformer[M2[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M2, α] })#λ, M2] = 
-    new MonadPartialOrder[({ type λ[α] = F[M2, α] })#λ, M2] {
-      val M1M = MonadTrans[F].apply[M2]
-      val M2M = Monad[M2]
-      def promote[A](m2: M2[A]) = MonadTrans[F].liftM(m2)
-    }
-
-  // can't be implicit, or else implicit search doesn't terminate
-  def transitive[M1[_], M2[_], M3[_]](implicit e1: MonadPartialOrder[M1, M2], e2: MonadPartialOrder[M2, M3]): MonadPartialOrder[M1, M3] = 
-    new MonadPartialOrder[M1, M3] {
-      val M1M = e1.M1M
-      val M2M = e2.M2M
-      def promote[A](m3: M3[A]) = e1.promote(e2.promote(m3))
-    }
+  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M, α] })#λ, M] = 
+    identity[M].transform[F]
 }
 
 object MonadPartialOrder extends MonadPartialOrderFunctions

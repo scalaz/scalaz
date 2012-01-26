@@ -41,6 +41,12 @@ class EnumeratorTTest extends Spec {
     (consume[Unit, Int, Id, List] &= enum.flatMap(i => enum.map(_ + i))).runOrZero must be_===(List(2, 3, 4, 3, 4, 5, 4, 5, 6))
   }
 
+  "allow for nesting of monads" in {
+    type OIO[α] = OptionT[IO, α]
+    val enum = enumIterator[Unit, Int, OIO](List(1, 2, 3).iterator)
+    (consume[Unit, Int, OIO, List] &= enum.map(_ * 2)).run(_ => sys.error("unexpected")).run.unsafePerformIO must be_===(Some(List(2, 4, 6)))
+  }
+
   //checkAll(functor.laws[Enum])
   //checkAll(pointed.laws[Enum])
   checkAll(monad.laws[Enum])
