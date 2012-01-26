@@ -28,18 +28,25 @@ trait MonadPartialOrder[M1[_], M2[_]] {
 
 trait MonadPartialOrderFunctions {
   // the identity ordering
-  implicit def identity[M1[_]: Monad]: MonadPartialOrder[M1, M1] = 
-    new MonadPartialOrder[M1, M1] {
-      val M1M = Monad[M1]
-      val M2M = Monad[M1]
-      def promote[A](m2: M1[A]) = m2
+  implicit def identity[M[_]: Monad]: MonadPartialOrder[M, M] = 
+    new MonadPartialOrder[M, M] {
+      val M1M = Monad[M]
+      val M2M = Monad[M]
+      def promote[A](m: M[A]) = m
     }
 
-  implicit def transformer[M1[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M1] = 
-    new MonadPartialOrder[({ type λ[α] = F[M1, α] })#λ, M1] {
-      val M1M = MonadTrans[F].apply[M1]
-      val M2M = Monad[M1]
-      def promote[A](m2: M1[A]) = MonadTrans[F].liftM(m2)
+  implicit def transformer[M2[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M2, α] })#λ, M2] = 
+    new MonadPartialOrder[({ type λ[α] = F[M2, α] })#λ, M2] {
+      val M1M = MonadTrans[F].apply[M2]
+      val M2M = Monad[M2]
+      def promote[A](m2: M2[A]) = MonadTrans[F].liftM(m2)
+    }
+
+  implicit def transitive[M1[_], M2[_], M3[_]](implicit e1: MonadPartialOrder[M1, M2], e2: MonadPartialOrder[M2, M3]): MonadPartialOrder[M1, M3] = 
+    new MonadPartialOrder[M1, M3] {
+      val M1M = e1.M1M
+      val M2M = e2.M2M
+      def promote[A](m3: M3[A]) = e1.promote(e2.promote(m3))
     }
 }
 
