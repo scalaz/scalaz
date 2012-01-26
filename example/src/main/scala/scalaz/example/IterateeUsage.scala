@@ -1,7 +1,7 @@
 package scalaz.example
 
 object IterateeUsage extends App {
-  import scalaz._, Scalaz._
+  import scalaz._, Scalaz._, MonadPartialOrder._
   import iteratee._, Iteratee._
   import effect._, IO._
 
@@ -12,12 +12,12 @@ object IterateeUsage extends App {
   ((peek[Unit, Int, Id]   &= stream123).runOrZero) assert_=== Some(1)
   ((head[Unit, Int, Id]   &= enumStream(Stream())) apply(_ => some(0))) assert_=== None
 
-  val iter123 = enumIterator[Unit, Int](Iterator(1, 2, 3))
+  val iter123 = enumIterator[Unit, Int, IO](Iterator(1, 2, 3))
 
   ((head[Unit, Int, IO]   &= iter123).runOrZero unsafePerformIO) assert_=== Some(1)
   ((length[Unit, Int, IO] &= iter123) apply(_ => IO(-1)) unsafePerformIO) assert_=== 3
   ((peek[Unit, Int, IO]   &= iter123).runOrZero unsafePerformIO) assert_=== Some(1)
-  ((head[Unit, Int, IO]   &= enumIterator(Iterator())) apply(_ => IO(Some(-1))) unsafePerformIO) assert_=== None
+  ((head[Unit, Int, IO]   &= enumIterator[Unit, Int, IO](Iterator())) apply(_ => IO(Some(-1))) unsafePerformIO) assert_=== None
 
   val stream1_10 = enumStream[Unit, Int, Id](1 to 10 toStream)
 
@@ -37,12 +37,12 @@ object IterateeUsage extends App {
 
   import java.io._
 
-  def r = enumReader[Unit](new StringReader("file contents"))
+  def r = enumReader[Unit, IO](new StringReader("file contents"))
 
   ((head[Unit, IoExceptionOr[Char], IO]   &= r) map (_ flatMap (_.toOption)) apply(_ => IO(none)) unsafePerformIO) assert_=== Some('f')
   ((length[Unit, IoExceptionOr[Char], IO] &= r) apply(_ => IO(-1)) unsafePerformIO) assert_=== 13
   ((peek[Unit, IoExceptionOr[Char], IO]   &= r) map (_ flatMap (_.toOption)) apply(_ => IO(none)) unsafePerformIO) assert_=== Some('f')
-  ((head[Unit, IoExceptionOr[Char], IO]   &= enumReader(new StringReader(""))) map (_ flatMap (_.toOption)) apply(_ => IO(Some('z'))) unsafePerformIO) assert_=== None
+  ((head[Unit, IoExceptionOr[Char], IO]   &= enumReader[Unit, IO](new StringReader(""))) map (_ flatMap (_.toOption)) apply(_ => IO(Some('z'))) unsafePerformIO) assert_=== None
 
   // As a monad
   val m1 = head[Unit, Int, Id] flatMap (b => head[Unit, Int, Id] map (b2 => (b pair b2)))

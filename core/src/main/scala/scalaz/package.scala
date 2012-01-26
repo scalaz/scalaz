@@ -114,6 +114,8 @@ package object scalaz {
   type ⊥ = Nothing
   type ⊤ = Any
 
+  type |>=|[G[_], F[_]] = MonadPartialOrder[G, F] 
+
   type ReaderT[F[_], E, A] = Kleisli[F, E, A]
   type Reader[E, A] = ReaderT[Id, E, A]
 

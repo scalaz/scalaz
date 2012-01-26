@@ -42,7 +42,8 @@ trait MonadPartialOrderFunctions {
       def promote[A](m2: M2[A]) = MonadTrans[F].liftM(m2)
     }
 
-  implicit def transitive[M1[_], M2[_], M3[_]](implicit e1: MonadPartialOrder[M1, M2], e2: MonadPartialOrder[M2, M3]): MonadPartialOrder[M1, M3] = 
+  // can't be implicit, or else implicit search doesn't terminate
+  def transitive[M1[_], M2[_], M3[_]](implicit e1: MonadPartialOrder[M1, M2], e2: MonadPartialOrder[M2, M3]): MonadPartialOrder[M1, M3] = 
     new MonadPartialOrder[M1, M3] {
       val M1M = e1.M1M
       val M2M = e2.M2M

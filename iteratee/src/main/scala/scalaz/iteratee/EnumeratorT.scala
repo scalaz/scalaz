@@ -92,10 +92,11 @@ trait EnumeratorTFunctions {
       }
     }
 
-  def enumIterator[X, E](x: => Iterator[E]): EnumeratorT[X, E, IO] = 
-    new EnumeratorT[X, E, IO] { 
+  def enumIterator[X, E, F[_]](x: => Iterator[E])(implicit MO: MonadPartialOrder[F, IO]) : EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] { 
+      import MO._
       lazy val iter = x
-      def apply[A] = (s: StepT[X, E, IO, A]) => 
+      def apply[A] = (s: StepT[X, E, F, A]) => 
         s.mapCont(
           k =>
             if (iter.hasNext) {
@@ -105,10 +106,11 @@ trait EnumeratorTFunctions {
         )
     }
 
-  def enumReader[X](r: => java.io.Reader): EnumeratorT[X, IoExceptionOr[Char], IO] = 
-    new EnumeratorT[X, IoExceptionOr[Char], IO] { 
+  def enumReader[X, F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[X, IoExceptionOr[Char], F] = 
+    new EnumeratorT[X, IoExceptionOr[Char], F] { 
+      import MO._
       lazy val reader = r
-      def apply[A] = (s: StepT[X, IoExceptionOr[Char], IO, A]) => 
+      def apply[A] = (s: StepT[X, IoExceptionOr[Char], F, A]) => 
         s.mapCont(
           k => {
             val i = IoExceptionOr(reader.read)
