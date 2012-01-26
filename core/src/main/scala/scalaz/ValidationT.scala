@@ -7,12 +7,8 @@ sealed trait ValidationT[F[_], E, A] {
 
   def run: F[Validation[E, A]]
   
-  def map[B](f: A => B)(implicit F: Functor[F]): ValidationT[F, E, B] = new ValidationT[F, E, B]{
-    def run = F.map(self.run) {
-      case Success(a) => Success(f(a))
-      case Failure(e) => Failure(e)
-    }
-  }
+  def map[B](f: A => B)(implicit F: Functor[F]): ValidationT[F, E, B] =
+    ValidationT(F.map(run)(_.map(f)))
   
   def flatMap[B](f: A => ValidationT[F, E, B])(implicit F: Monad[F]): ValidationT[F, E, B] = new ValidationT[F, E, B]{
     def run = F.bind(self.run) {
@@ -21,12 +17,8 @@ sealed trait ValidationT[F[_], E, A] {
     }
   }
   
-  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): ValidationT[F, E, B] = new ValidationT[F, E, B]{
-    def run = F.bind(self.run){
-      case Success(a) => F.map(f(a))(Success(_))
-      case Failure(e) => F.point(Failure(e))
-    }
-  }
+  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): ValidationT[F, E, B] =
+    ValidationT(F.bind(run)(_.traverse(f)))
   
   def either(implicit F: Functor[F]): EitherT[F, E, A] = EitherT(F.map(self.run)(_.either))
   
@@ -37,10 +29,7 @@ sealed trait ValidationT[F[_], E, A] {
   def toOption(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(self.run)(_.toOption))
   
   def append[EE >: E, AA >: A](x: ValidationT[F, EE, AA])(implicit F: Monad[F], es: Semigroup[EE], as: Semigroup[AA]): ValidationT[F, EE, AA] =
-    ValidationT(F.lift2[Validation[E, A], Validation[EE, AA], Validation[EE, AA]]((va, vx) => va >>*<< vx)(self.run, x.run))
-
-  def >>*<<[EE >: E, AA >: A](x: ValidationT[F, EE, AA])(implicit F: Monad[F], es: Semigroup[EE], as: Semigroup[AA]) =
-    self append x
+    ValidationT(F.lift2[Validation[E, A], Validation[EE, AA], Validation[EE, AA]](_ >>*<< _)(run, x.run))
   
   def fail: FailProjectionT[F, E, A] = new FailProjectionT[F, E, A] {
     val validationT = self
@@ -49,10 +38,7 @@ sealed trait ValidationT[F[_], E, A] {
   def toValidationTNel[EE >: E, AA >: A](implicit F: Functor[F]): ValidationTNEL[F, EE, AA] = fail.pointT[NonEmptyList, EE, AA]
 
   def |||[AA >: A](f: E => AA)(implicit F: Functor[F]): F[AA] =
-    F.map(self.run){
-      case Success(a) => a
-      case Failure(e) => f(e)
-    }
+    F.map(run)(_ ||| f)
   
   def orElse[EE >: E, AA >: A](that: => ValidationT[F, EE, AA])(implicit E: Semigroup[EE], F: Monad[F]): ValidationT[F, EE, AA] =
     ValidationT(F.bind(self.run){
@@ -68,16 +54,10 @@ sealed trait ValidationT[F[_], E, A] {
   def |[AA >: A](d: => AA)(implicit F: Functor[F]): F[AA] = getOrElse(d)
   
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run){
-      case Success(a) => f(a)
-      case _ => false
-    }
+    F.map(run)(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run){
-      case Success(a) => f(a)
-      case _ => true
-    }
+    F.map(run)(_.forall(f))
   
   def traverse[G[_], B, EE >: E](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F]): G[ValidationT[F, E, B]] =
     G.map(F.traverse(run)(_.traverse(f)))(ValidationT(_))
