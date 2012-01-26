@@ -23,6 +23,16 @@ class ListTTest extends Spec {
       val isEmpty = filtered.isEmpty
       !isEmpty.contains(true)
   }
+  
+  "drop" ! check {
+    (ass: Option[List[Int]], x: Int) =>
+      ListT.fromList(ass).drop(x).toList must be_===(ass.map(_.drop(x)))
+  }
+  
+  "take" ! check {
+    (ass: Option[List[Int]], x: Int) =>
+      ListT.fromList(ass).take(x).toList must be_===(ass.map(_.take(x)))
+  }
 
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
