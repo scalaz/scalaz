@@ -96,10 +96,7 @@ object ValidationT {
     def |[EE >: E](f: => EE)(implicit M: Functor[M]): M[EE] = getOrElse(f)
     
     def pointT[F[_], EE >: E, AA >: A](implicit M: Functor[M], P: Pointed[F]): ValidationT[M, F[EE], AA] =
-      ValidationT(M.map(validationT.run){
-        case Success(a) => Success(a)
-        case Failure(e) => (Failure(P.point(e)): Validation[F[EE], A])
-      })
+      ValidationT(M.map(validationT.run)(_.fail.point))
 
     def exists(f: E => Boolean)(implicit M: Functor[M]): M[Boolean] = 
       M.map(validationT.run)(_.fail.exists(f))
