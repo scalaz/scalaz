@@ -12,22 +12,22 @@ sealed trait Promise[A] {
   implicit val strategy: Strategy
   private val latch = new CountDownLatch(1)
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
-  @volatile private var v: Promise.State[A] = Promise.Unfulfilled
+  @volatile private var state: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
   lazy private[concurrent] val e = actor[Signal[A]](_.eval)
 
   def get = {
     latch.await()
-    v.get
+    state.get
   }
 
   def to(k: A => Unit): Unit = e ! new Cont(k, this)
 
   def fulfill(a: => A): Unit = e ! new Done(a, this)
 
-  def fulfilled: Boolean = v.fulfilled
+  def fulfilled: Boolean = state.fulfilled
 
-  def threw: Boolean = v.threw
+  def threw: Boolean = state.threw
 
   def broken = borked
 
@@ -44,7 +44,7 @@ sealed trait Promise[A] {
     val r = new Promise[B] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => f(a) to run[B](b => r fulfill b))
+    to(a => f(a) to Run[B](b => r fulfill b))
     r
   }
 
@@ -52,7 +52,7 @@ sealed trait Promise[A] {
     val r = new Promise[A] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => promise(p(a)) to run[Boolean](b => if (b) r fulfill a))
+    to(a => promise(p(a)) to Run[Boolean](b => if (b) r fulfill a))
     r
   }
 
@@ -112,13 +112,13 @@ object Promise extends PromiseFunctions with PromiseInstances {
     def fulfill[B](a: => B, promise: Promise[B]) {
       if (!promise.borked) {
         try {
-          promise.v = new Fulfilled(a)
+          promise.state = new Fulfilled(a)
           promise.latch.countDown()
           val as = promise.waiting
           while (!as.isEmpty) as.remove()(a)
         } catch {
           case e: Throwable => {
-            promise.v = new Thrown(e)
+            promise.state = new Thrown(e)
             promise.latch.countDown()
             promise.waiting.clear() // kill teh hordes
           }
@@ -142,20 +142,20 @@ object Promise extends PromiseFunctions with PromiseInstances {
 
   protected[concurrent] class Done[A](a: => A, promise: Promise[A]) extends Signal[A] {
     def eval {
-      promise.v.fulfill(a, promise)
+      promise.state.fulfill(a, promise)
     }
   }
 
   protected[concurrent] class Cont[A](k: A => Unit, promise: Promise[A]) extends Signal[A] {
     def eval {
-      if (promise.v.fulfilled) k(promise.v.get)
+      if (promise.state.fulfilled) k(promise.state.get)
       else promise.waiting.offer(k)
     }
   }
 
   protected[concurrent] class Break[A](promise: Promise[_]) extends Signal[A] {
     def eval {
-      promise.v.break(promise)
+      promise.state.break(promise)
     }
   }
 
