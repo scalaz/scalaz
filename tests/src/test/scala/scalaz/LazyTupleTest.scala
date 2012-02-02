@@ -1,5 +1,4 @@
 package scalaz
-package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
