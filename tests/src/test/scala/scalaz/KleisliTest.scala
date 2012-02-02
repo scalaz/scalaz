@@ -25,10 +25,11 @@ class KleisliTest extends Spec {
     }
   }
 
-  checkAll(plus.laws[KleisliOptInt])
+  checkAll(plusEmpty.laws[KleisliOptInt])
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monad.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
+  checkAll(alternativeEmpty.laws[KleisliOptInt])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]

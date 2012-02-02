@@ -7,10 +7,12 @@ import std.AllInstances._
 class OptionTTest extends Spec {
 
   type OptionTList[A] = OptionT[List, A]
+  type OptionTOption[A] = OptionT[Option, A]
 
   checkAll(equal.laws[OptionTList[Int]])
   checkAll(monad.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
+  checkAll(alternativeEmpty.laws[OptionTOption])
 
   object instances {
     def functor[F[_] : Functor] = Functor[({type λ[α] = OptionT[F, α]})#λ]
