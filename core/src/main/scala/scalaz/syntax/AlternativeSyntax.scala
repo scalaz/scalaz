@@ -5,11 +5,13 @@ package syntax
 trait AlternativeV[F[_],A] extends SyntaxV[F[A]] {
   implicit def F: Alternative[F]
   ////
-  final def orElse(a: F[A]): F[A] = F.orElse(self, a)
+  final def orElse(a: => F[A]): F[A] = F.orElse(self, a)
+
+  final def <|>(a: => F[A]): F[A] = F.orElse(self, a)
   
-  final def oneOrMore(fa: F[A]): F[List[A]] = F.oneOrMore(self)
+  final def oneOrMore: F[List[A]] = F.oneOrMore(self)
   
-  final def zeroOrMore(fa: F[A]): F[List[A]] = F.zeroOrMore(self)
+  final def zeroOrMore: F[List[A]] = F.zeroOrMore(self)
   ////
 }
 
