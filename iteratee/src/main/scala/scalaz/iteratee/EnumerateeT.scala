@@ -2,6 +2,7 @@ package scalaz
 package iteratee
 
 import Iteratee._
+import Ordering._
 
 trait EnumerateeT[X, O, I, F[_]] {
   def apply[A]: StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]]
@@ -71,6 +72,45 @@ trait EnumerateeTFunctions {
         }
 
         doneOr(loop)
+      }
+    }
+
+  /**
+   * Uniqueness filter. Assumes that the input enumerator is already sorted.
+   */
+  def uniq[X, E: Order, F[_]: Monad]: EnumerateeT[X, E, E, F] = 
+    new EnumerateeT[X, E, E, F] {
+      def apply[A] = {
+        def step(s: StepT[X, E, F, A], last: Input[E]): IterateeT[X, E, F, A] = 
+          s mapCont { k => 
+            cont { in =>
+              val inr = in.filter(e => last.forall(l => Order[E].order(e, l) != EQ))
+              k(inr) >>== (step(_, in))
+            }
+          }
+
+        s => step(s, emptyInput).map(sdone(_, emptyInput))
+      }
+    }
+    
+  /**
+   * Zips with the count of elements that have been encountered.
+   */
+  def zipWithIndex[X, E, F[_]: Monad]: EnumerateeT[X, E, (E, Long), F] = 
+    new EnumerateeT[X, E, (E, Long), F] {
+      def apply[A] = {
+        type StepEl = Input[(E, Long)] => IterateeT[X, (E, Long), F, A] 
+        def loop(i: Long) = (step(_: StepEl, i)) andThen (cont[X, E, F, StepT[X, (E, Long), F, A]])
+        def step(k: StepEl, i: Long): (Input[E] => IterateeT[X, E, F, StepT[X, (E, Long), F, A]]) = {
+          (in: Input[E]) =>
+            in.map(e => (e, i)).fold(
+              el = e => k(elInput(e)) >>== doneOr(loop(i + 1))
+              , empty = cont(step(k, i))
+              , eof = done(scont(k), in)
+            )
+        }
+
+        doneOr(loop(0))
       }
     }
 

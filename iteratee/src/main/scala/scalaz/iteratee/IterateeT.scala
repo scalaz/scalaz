@@ -177,11 +177,20 @@ trait IterateeTInstances0 {
   implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
+
   implicit def IterateeMonad[X, E]: Monad[({type λ[α] = Iteratee[X, E, α]})#λ] = IterateeTMonad[X, E, Id]
+
+  implicit def IterateeTMonadTransT[X, E, H[_[_], _]](implicit T0: MonadTrans[H]): MonadTrans[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] = new IterateeTMonadTransT[X, E, H] {
+    implicit def T = T0
+  }
 }
 
 trait IterateeTInstances extends IterateeTInstances0 {
   implicit def IterateeTMonadTrans[X, E]: Hoist[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new IterateeTHoist[X, E] { }
+
+  implicit def IterateeTHoistT[X, E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] = new IterateeTHoistT[X, E, H] {
+    implicit def T = T0
+  }
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
     new IterateeTMonadIO[X, E, F] {
@@ -221,6 +230,17 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Pointed[A].point(e) <+> a)
         , eof = done(PlusEmpty[A].empty, eofInput[E])
+      )   
+
+    cont(step)
+  }
+
+  def collectT[X, E, F[_], A[_]](implicit M: Monad[F], mae: Monoid[A[E]], pointed: Pointed[A]): IterateeT[X, E, F, A[E]] = {
+    import scalaz.syntax.semigroup._
+    def step(e: Input[E]): IterateeT[X, E, F, A[E]] = 
+      e.fold(empty = cont(step)
+        , el = e => cont(step).map(a => Pointed[A].point(e) |+| a)
+        , eof = done(Monoid[A[E]].zero, eofInput[E])
       )   
 
     cont(step)
@@ -310,6 +330,9 @@ trait IterateeTFunctions {
    * An iteratee that checks if the input is EOF.
    */
   def isEof[X, E, F[_] : Pointed]: IterateeT[X, E, F, Boolean] = cont(in => done(in.isEof, in))
+
+  def sum[X, E: Monoid, F[_]: Monad]: IterateeT[X, E, F, E] = 
+    foldM[X, E, F, E](Monoid[E].zero)((a, e) => Pointed[F].point(Monoid[E].append(a, e)))
 }
 
 //
@@ -344,3 +367,24 @@ private[scalaz] trait IterateeTMonadIO[X, E, F[_]] extends MonadIO[({type λ[α]
   
   def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(F.liftIO(ioa))
 }
+
+private[scalaz] trait IterateeTMonadTransT[X, E, H[_[_], _]] extends MonadTrans[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] {
+  implicit def T: MonadTrans[H]
+
+  def liftM[G[_]: Monad, A](ga: G[A]): IterateeT[X, E, ({type λ[α] = H[G, α]})#λ, A] = 
+    IterateeT.IterateeTMonadTrans[X, E].liftM[({type λ[α] = H[G, α]})#λ, A](T.liftM(ga))(T[G])
+
+  def apply[G[_]: Monad]: Monad[({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[G, α1]})#λ1, α0]})#λ0] = 
+    IterateeT.IterateeTMonad[X, E, ({type λ[α] = H[G, α]})#λ](T[G])
+}
+
+private[scalaz] trait IterateeTHoistT[X, E, H[_[_], _]] extends Hoist[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] with IterateeTMonadTransT[X, E, H] {
+  implicit def T: Hoist[H]
+
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[M, α1]})#λ1, α0]})#λ0 ~> ({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[N, α1]})#λ1, α0]})#λ0) {
+    def apply[A](fa: IterateeT[X, E, ({type λ[α] = H[M, α]})#λ, A]): IterateeT[X, E, ({type λ[α] = H[N, α]})#λ, A] = 
+      fa.mapI[({type λ[α] = H[N, α]})#λ](T.hoist[M, N](f))(T[M])
+  }
+}
+
+

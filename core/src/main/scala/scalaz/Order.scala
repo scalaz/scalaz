@@ -7,8 +7,9 @@ import scala.math.{Ordering => SOrdering}
  *
  */
 ////
-trait Order[F] extends Equal[F] { self =>
+trait Order[F] extends Equal[F] with ((F, F) => Ordering) { self =>
   ////
+  def apply(x: F, y: F): Ordering = order(x, y)
 
   def order(x: F, y: F): Ordering 
   
