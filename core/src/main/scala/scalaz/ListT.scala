@@ -170,7 +170,6 @@ object ListT extends ListTInstances {
   case class Skip[+S](s: S) extends Step[Nothing, S]
 
   case object Done extends Step[Nothing, Nothing]
-
 }
 
 //

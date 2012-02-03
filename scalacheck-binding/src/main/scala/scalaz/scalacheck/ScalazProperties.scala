@@ -205,16 +205,39 @@ object ScalazProperties {
 
   object plusEmpty {
     def leftPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.leftPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.leftPlusIdentity[X] _)
 
     def rightPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.rightPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.rightPlusIdentity[X] _)
 
     def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("plusEmpty") {
       include(plus.laws[F])
       include(monoid.laws[F[Int]](F.monoid[Int], implicitly, implicitly))
       property("left plus identity") = leftPlusIdentity[F, Int]
       property("right plus identity") = rightPlusIdentity[F, Int]
+    }
+  }
+
+  object alternative {
+    def associative[F[_], X](implicit f: Alternative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(f.alternativeLaw.associative[X] _)
+
+    def laws[F[_]](implicit F: Alternative[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]) = new Properties("alternative") {
+      property("associative") = associative[F, Int]
+    }
+  }
+
+  object alternativeEmpty {
+    def leftAlternativeIdentity[F[_], X](implicit f: AlternativeEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(f.alternativeEmptyLaw.leftOrElseIdentity[X] _)
+
+    def rightAlternativeIdentity[F[_], X](implicit f: AlternativeEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(f.alternativeEmptyLaw.rightOrElseIdentity[X] _)
+
+    def laws[F[_]](implicit F: AlternativeEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("alternativeEmpty") {
+      include(alternative.laws[F])
+      property("left orElse identity") = leftAlternativeIdentity[F, Int]
+      property("right orElse identity") = rightAlternativeIdentity[F, Int]
     }
   }
 

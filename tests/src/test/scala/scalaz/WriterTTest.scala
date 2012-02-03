@@ -31,5 +31,10 @@ class WriterTTest extends Spec {
     def traverse[F[_]: Traverse, W] = Traverse[({type λ[α]=WriterT[F, W, α]})#λ]
     def copointed[F[_]: CoPointed, W] = CoPointed[({type λ[α]=WriterT[F, W, α]})#λ]
     def comonad[W] = CoMonad[({type λ[α]=Writer[W, α]})#λ]
+
+    def functor[F[_]: Monad, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def pointed[F[_]: Monad, W: Monoid] = Pointed[({type λ[α]=WriterT[F, W, α]})#λ]
+    def apply[F[_]: Monad, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
+    def foldable[F[_]: Traverse, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
   }
 }

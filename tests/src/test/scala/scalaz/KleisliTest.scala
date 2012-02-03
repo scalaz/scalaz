@@ -25,10 +25,11 @@ class KleisliTest extends Spec {
     }
   }
 
-  checkAll(plus.laws[KleisliOptInt])
+  checkAll(plusEmpty.laws[KleisliOptInt])
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monad.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
+  checkAll(alternativeEmpty.laws[KleisliOptInt])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -52,5 +53,13 @@ class KleisliTest extends Spec {
     def readerArrId[A] = ArrId[Reader]
     def readerCategory[A] = ArrId[Reader]
     def readerArrow[A] = Arrow[Reader]
+
+    // checking absense of ambiguity
+    def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
+    def functor[F[_] : Monad, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
+    def apply[F[_] : Monad, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
+    def pointed[F[_] : Monad, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
+    def plus[F[_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
+    def empty[F[_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
   }
 }

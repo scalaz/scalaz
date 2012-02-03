@@ -5,7 +5,7 @@ package scalaz
  *
  * Example:
  * {{{
- * val x: Option[Either[Int, String]] = Some(Right(1))
+ * val x: Option[Either[String, Int]] = Some(Right(1))
  * EitherT(x).map(1+).run // Some(Right(2)
  * }}}
  * */
