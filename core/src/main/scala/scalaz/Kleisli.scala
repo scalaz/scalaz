@@ -23,8 +23,11 @@ sealed trait Kleisli[M[_], A, B] {
   def map[C](f: B => C)(implicit m: Functor[M]): Kleisli[M, A, C] =
     kleisli(a => m.fmap(apply(a), f))
 
-  def flatMap[C](f: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] =
+  def bind[C](f: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] =
     kleisli(a => m.bind(apply(a), f))
+
+  def flatMap[C](f: B => Kleisli[M, A, C])(implicit m: Monad[M]): Kleisli[M, A, C] =
+    kleisli(a => m.bind(apply(a), (x: B) => f(x)(a)))
 }
 
 trait Kleislis {
@@ -35,6 +38,9 @@ trait Kleislis {
   def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
 
   implicit def kleisliFn[M[_],A,B](k: Kleisli[M,A,B]): A => M[B] = (a: A) => k(a)
+
+  def liftKleisli[M[_],A,B](m: M[B]): Kleisli[M, A, B] =
+    kleisli(a => m)
 
   /** Pure Kleisli arrow */
   def ask[M[_]: Monad, A]: Kleisli[M, A, A] = kleisli(a => implicitly[Monad[M]].pure(a))
