@@ -25,9 +25,8 @@ class KleisliTest extends Spec {
     }
   }
 
-  checkAll(plusEmpty.laws[KleisliOptInt])
   checkAll(monoid.laws[KleisliOptInt[Int]])
-  checkAll(monad.laws[KleisliOptInt])
+  checkAll(monadPlus.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
   checkAll(alternativeEmpty.laws[KleisliOptInt])
 

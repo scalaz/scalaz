@@ -155,6 +155,7 @@ trait StreamTInstances extends StreamTInstances0 {
   }
   implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
   implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
+  implicit def StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
 }
 
 object StreamT extends StreamTInstances {
@@ -228,4 +229,21 @@ private[scalaz] trait StreamTMonad[F[_]] extends Monad[({type λ[α] = StreamT[F
 
 private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTMonad[F] {
   implicit def F: MonadPlus[F]
+}
+
+private[scalaz] trait StreamTHoist extends Hoist[StreamT] {
+  import StreamT._
+  
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StreamT[G, α]})#λ] = StreamTMonad[G]
+  
+  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(yieldd(_, empty)))
+  
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = StreamT[M, x]})#f ~> ({type f[x] = StreamT[N, x]})#f =
+    new (({type f[x] = StreamT[M, x]})#f ~> ({type f[x] = StreamT[N, x]})#f) {
+      def apply[A](a: StreamT[M, A]): StreamT[N, A] = StreamT[N, A](f(M.map(a.step)(
+        _( yieldd = (a, as) => yieldd(a, hoist(f) apply as)
+         , skip = as => skip(hoist(f) apply as)
+         , done = done
+         ))))
+    }
 }

@@ -36,7 +36,7 @@ class ListTTest extends Spec {
 
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
-  checkAll(monad.laws[ListTOpt])
+  checkAll(monadPlus.laws[ListTOpt])
   
   object instances {
     def semigroup[F[_]: Functor, A] = Semigroup[ListT[F, A]]
