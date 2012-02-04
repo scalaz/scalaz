@@ -74,7 +74,7 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def matchI[X, J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering): Enumeratee2T[X, J, K, (J, K), F] =
+  def joinI[X, J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering): Enumeratee2T[X, J, K, (J, K), F] =
     new Enumeratee2T[X, J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[X, (J, K), F, A]): StepT[X, Either3[J, (J, K), K], F, StepT[X, (J, K), F, A]] = step.fold(

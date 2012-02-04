@@ -15,15 +15,67 @@ trait ForallM[P[_[_]]] {
 abstract class EnumeratorP[X, E, F[_]] { self =>
   def apply[G[_]](implicit MO: MonadPartialOrder[G, F]): EnumeratorT[X, E, G]
 
+  def map[B](f: E => B): EnumeratorP[X, B, F] = 
+    new EnumeratorP[X, B, F] {
+      def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
+        import MO._
+        self[G].map(f)
+      }
+    }
+
+  def flatMap[B](f: E => EnumeratorP[X, B, F]) = 
+    new EnumeratorP[X, B, F] {
+      def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[X, B, G] = {
+        import MO._
+        self[G].flatMap(e => f(e).apply[G])
+      }
+    }
+
+  def collect[B](pf: PartialFunction[E, B]) = 
+    new EnumeratorP[X, B, F] {
+      def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[X, B, G] = {
+        import MO._
+        self[G].collect(pf)
+      }
+    }
+
+  def uniq(implicit ord: Order[E]) = 
+    new EnumeratorP[X, E, F] {
+      def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[X, E, G] = {
+        import MO._
+        self[G].uniq
+      }
+    }
+
+  def zipWithIndex = 
+    new EnumeratorP[X, (E, Long), F] {
+      def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[X, (E, Long), G] = {
+        import MO._
+        self[G].zipWithIndex
+      }
+    }
+
+  def :^[B](other: EnumeratorP[X, B, F]): EnumeratorP[X, (E, B), F] = 
+    new EnumeratorP[X, (E, B), F] {
+      def apply[G[_]](implicit MO: G |>=| F) = {
+        import MO._
+        cross(self[G], other[G])
+      }
+    }
+
+  def ^:[B](other: EnumeratorP[X, B, F]): EnumeratorP[X, (E, B), F] = 
+    new EnumeratorP[X, (E, B), F] {
+      def apply[G[_]](implicit MO: G |>=| F) = {
+        import MO._
+        cross(self[G], other[G])
+      }
+    }
+
+  def join(other: EnumeratorP[X, E, F])(implicit order: Order[E], m: Monad[F]): EnumeratorP[X, (E, E), F] =
+    EnumeratorP.joinE[X, E, E, F].apply(self, other)
+
   def merge(other: EnumeratorP[X, E, F])(implicit ord: Order[E], m: Monad[F]) = 
     EnumeratorP.mergeE[X, E, F].apply(self, other)
-
-  def map[B](f: E => B): EnumeratorP[X, B, F] = new EnumeratorP[X, B, F] {
-    def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
-      import MO._
-      self[G].map(f)
-    }
-  }
 }
 
 trait EnumeratorPFunctions {
@@ -37,7 +89,7 @@ trait EnumeratorPFunctions {
   def enumPStream[X, E, F[_]: Monad](xs : Stream[E]): EnumeratorP[X, E, F] = new EnumeratorP[X, E, F] {
     def apply[G[_]](implicit MO: MonadPartialOrder[G, F]): EnumeratorT[X, E, G] = {
       import MO._
-      Iteratee.enumStream[X, E, G](xs)
+      enumStream[X, E, G](xs)
     }
   }
 
@@ -63,9 +115,9 @@ trait EnumeratorPFunctions {
     }
   }
 
-  def matchE[X, J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering) = liftE2[X, J, K, (J, K), F] { 
+  def joinE[X, J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering) = liftE2[X, J, K, (J, K), F] { 
     new ForallM[({type λ[β[_]] = Enumeratee2T[X, J, K, (J, K), β]})#λ] {
-      def apply[G[_]: Monad] = matchI[X, J, K, G]
+      def apply[G[_]: Monad] = joinI[X, J, K, G]
     }
   }
 

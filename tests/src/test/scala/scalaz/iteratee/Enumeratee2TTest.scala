@@ -7,14 +7,14 @@ import Enumeratee2T._
 import effect._
 
 class Enumeratee2TTest extends Spec {
-  "match equal pairs" in {
+  "join equal pairs" in {
     implicit val v = IterateeT.IterateeTMonad[Unit, Int, Id]
     type IterateeM[A] = IterateeT[Unit, Int, Id, A]
 
     val enum  = enumStream[Unit, Int, IterateeM](Stream(1, 3, 5, 7)) 
     val enum2 = enumStream[Unit, Int, Id](Stream(2, 3, 4, 5, 6)) 
 
-    val outer = matchI[Unit, Int, Int, Id].apply(consume[Unit, (Int, Int), Id, List].value) &= enum
+    val outer = joinI[Unit, Int, Int, Id].apply(consume[Unit, (Int, Int), Id, List].value) &= enum
     val inner = outer.run(_ => sys.error("...")) &= enum2
 
     inner.run(_ => sys.error("...")).pointI.run(_ => sys.error("...")) must be_===(List((3, 3), (5, 5)))
@@ -76,7 +76,7 @@ class Enumeratee2TTest extends Spec {
     ))
   }
 
-  "match the first element with all of the second iteratee's elements, which compare equal" in {
+  "join the first element with all of the second iteratee's elements, which compare equal" in {
     val enum1p = new EnumeratorP[Unit, Int, Id] {
       def apply[F[_]](implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Unit, Int, F] = {
         import ord._
@@ -92,7 +92,7 @@ class Enumeratee2TTest extends Spec {
     }
 
     val consumer = consume[Unit, (Int, Int), Id, List]
-    val producer = matchE[Unit, Int, Int, Id].apply(enum1p, enum2p).apply[Id]
+    val producer = joinE[Unit, Int, Int, Id].apply(enum1p, enum2p).apply[Id]
     (consumer &= producer).run(_ => sys.error("...")) must be_===(List(
       (1, 1), (1, 1), (1, 1)
     ))
