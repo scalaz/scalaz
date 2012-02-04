@@ -41,6 +41,40 @@ class EnumeratorTTest extends Spec {
     (consume[Unit, Int, Id, List] &= enum.flatMap(i => enum.map(_ + i))).runOrZero must be_===(List(2, 3, 4, 3, 4, 5, 4, 5, 6))
   }
 
+  "uniq" in {
+    val enum = enumStream[Unit, Int, Id](Stream(1, 1, 2, 2, 2, 3, 3))
+    type EnumId[α] = EnumeratorT[Unit, α, Id]
+    (consume[Unit, Int, Id, List] &= enum.uniq).runOrZero must be_===(List(1, 2, 3))
+  }
+
+  "zipWithIndex" in {
+    val enum = enumStream[Unit, Int, Id](Stream(3, 4, 5))
+    type EnumId[α] = EnumeratorT[Unit, α, Id]
+    (consume[Unit, (Int, Long), Id, List] &= enum.zipWithIndex).runOrZero must be_===(List((3, 0L), (4, 1L), (5, 2L)))
+  }
+
+  "zipWithIndex" in {
+    val enum = enumStream[Unit, Int, Id](Stream(3, 4, 5))
+    type EnumId[α] = EnumeratorT[Unit, α, Id]
+    (consume[Unit, (Int, Long), Id, List] &= enum.zipWithIndex).runOrZero must be_===(List((3, 0L), (4, 1L), (5, 2L)))
+  }
+
+  "zipWithIndex in combination with another function" in {
+    val enum = enumStream[Unit, Int, Id](Stream(3, 4, 4, 5))
+    type EnumId[α] = EnumeratorT[Unit, α, Id]
+    (consume[Unit, (Int, Long), Id, List] &= enum.uniq.zipWithIndex).runOrZero must be_===(List((3, 0L), (4, 1L), (5, 2L)))
+  }
+
+  "lift" in {
+    val enum = EnumeratorT.enumeratorTMonadTrans[Unit].liftM(List(1, 2, 3))
+    (collectT[Unit, Int, List, Id] &= enum.map(_ * 2)).runOrZero must be_===(List(2, 4, 6))
+  }
+
+  "enumerate an array" in {
+    val enum = enumArray[Unit, Int, Id](Array(1, 2, 3, 4, 5), 0, Some(3))
+    (consume[Unit, Int, Id, List] &= enum).runOrZero must be_===(List(1, 2, 3))
+  }
+
   "allow for nesting of monads" in {
     type OIO[α] = OptionT[IO, α]
     val enum = enumIterator[Unit, Int, OIO](List(1, 2, 3).iterator)
@@ -55,6 +89,8 @@ class EnumeratorTTest extends Spec {
     //def functor[F[_] : Functor] = Functor[({type λ[α] = EnumeratorT[Unit, α, F]})#λ]
     //def pointed[F[_] : Pointed] = Pointed[({type λ[α] = EnumeratorT[Unit, α, F]})#λ]
     def monad[F[_] : Monad]     = Monad[({type λ[α] = EnumeratorT[Unit, α, F]})#λ]
+    def semigroup[X, E, F[_]: Bind] = Semigroup[EnumeratorT[X, E, F]]
+    def monoid[X, E, F[_]: Monad] = Monoid[EnumeratorT[X, E, F]]
   }
 }
 

@@ -159,6 +159,11 @@ sealed trait Validation[+E, +A] {
     case Failure(a) => Applicative[G].map(f(a))(Failure(_))
     case Success(b) => Applicative[G].map(g(b))(Success(_))
   }
+
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
+    case succ @ Success(a) => if (f(a)) succ else Failure(onFailure)
+    case failure => failure
+  }
 }
 
 final case class Success[E, A](a: A) extends Validation[E, A]

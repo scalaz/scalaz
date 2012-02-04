@@ -12,6 +12,7 @@ package object iteratee {
     extends IterateeFunctions
     with IterateeTFunctions
     with EnumeratorTFunctions
+    with EnumeratorPFunctions
     with EnumerateeTFunctions
     with StepTFunctions
     with InputFunctions {

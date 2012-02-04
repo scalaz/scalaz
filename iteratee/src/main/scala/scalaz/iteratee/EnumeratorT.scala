@@ -2,8 +2,8 @@ package scalaz
 package iteratee
 
 import effect._
-
 import Iteratee._
+import Ordering._
 
 trait EnumeratorT[X, E, F[_]] { self =>
   def apply[A]: StepT[X, E, F, A] => IterateeT[X, E, F, A]
@@ -42,6 +42,16 @@ trait EnumeratorT[X, E, F[_]] { self =>
         iterateeT((EnumerateeT.collect[X, E, B, F](pf).apply(step) &= self).run(x => err[X, B, F, A](x).value))
       }
     }
+
+  def uniq(implicit ord: Order[E], M: Monad[F]): EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] {
+      def apply[A] = s => EnumerateeT.uniq[X, E, F].apply(s).joinI[E, A] &= self
+    }
+
+  def zipWithIndex(implicit M: Monad[F]): EnumeratorT[X, (E, Long), F] = 
+    new EnumeratorT[X, (E, Long), F] {
+      def apply[A] = s => iterateeT((EnumerateeT.zipWithIndex[X, E, F].apply(s) &= self).run(x => err[X, (E, Long), F, A](x).value))
+    }
 }
 
 trait EnumeratorTInstances0 {
@@ -70,6 +80,11 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
 
 trait EnumeratorTFunctions {
   def enumerate[E](as: Stream[E]): Enumerator[Unit, E] = enumStream[Unit, E, Id](as)
+
+  def empty[X, E, F[_]: Pointed]: EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] { 
+      def apply[A] = _.pointI
+    }
 
   /** 
    * An EnumeratorT that is at EOF
@@ -120,15 +135,18 @@ trait EnumeratorTFunctions {
         )
     }
 
+  /**
+   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+   */
   def enumArray[X, E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] {
-      private val limit = max.getOrElse(a.length)
+      private val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
         def loop(pos : Int): StepT[X, E, F, A] => IterateeT[X, E, F, A] = {
           s => 
             s.mapCont(
-              k => if (pos == limit) s.pointI
-                   else              k(elInput(a(pos))) >>== loop(pos + 1)
+              k => if (limit > pos) k(elInput(a(pos))) >>== loop(pos + 1)
+                   else             s.pointI
             )   
         }
 
@@ -156,6 +174,29 @@ trait EnumeratorTFunctions {
         }
 
         checkCont1(contFactory => state => k => k(elInput(e)) >>== contFactory(f(state)), e)
+      }
+    }
+    
+  def cross[X, E1, E2, F[_]: Monad](e1: EnumeratorT[X, E1, F], e2: EnumeratorT[X, E2, F]): EnumeratorT[X, (E1, E2), F] =
+    new EnumeratorT[X, (E1, E2), F] {
+      def apply[A] = (step: StepT[X, (E1, E2), F, A]) => {
+        def outerLoop(step: StepT[X, (E1, E2), F, A]): IterateeT[X, E1, F, StepT[X, (E1, E2), F, A]] =
+          for {
+            outerOpt   <- head[X, E1, F]
+            sa         <- outerOpt match {
+                            case Some(e) => 
+                              val pairingIteratee = EnumerateeT.map[X, E2, (E1, E2), F]((a: E2) => (e, a)).apply(step)
+                              val nextStep = (pairingIteratee &= e2).run(x => err[X, (E1, E2), F, A](x).value)
+                              iterateeT[X, (E1, E2), F, A](nextStep) >>== outerLoop
+
+                            case None    => 
+                              done[X, E1, F, StepT[X, (E1, E2), F, A]](step, eofInput) 
+                          }
+          } yield sa
+
+        iterateeT[X, (E1, E2), F, A] {
+          (outerLoop(step) &= e1).run(x => err[X, (E1, E2), F, A](x).value)
+        }
       }
     }
 }
