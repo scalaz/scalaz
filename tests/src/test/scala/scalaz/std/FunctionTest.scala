@@ -49,7 +49,7 @@ class FunctionTest extends Spec {
     def group[A, R: Group] = Group[A => R]
     def comonad[A: Monoid, R] = CoMonad[({type λ[α]=A => α})#λ]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def semigroup[A, R: Group] = Semigroup[A => R]
     def monoid[A, R: Group] = Semigroup[A => R]
   }

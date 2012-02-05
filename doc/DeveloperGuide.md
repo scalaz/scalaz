@@ -231,7 +231,7 @@ set of the imports.
 
 ### Type Parameters
 
-In the absense of a context specific name for the type parameters, use these:
+In the absence of a context specific name for the type parameters, use these:
 
  * Use `A`, `B`, `C`, `X` for kind `*`
  * Use `F`, `G` for kind `* -> *`.

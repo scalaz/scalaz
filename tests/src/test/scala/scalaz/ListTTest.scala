@@ -44,7 +44,7 @@ class ListTTest extends Spec {
     def monad[F[_]: Monad, A] = Monad[({type λ[α]=ListT[F, α]})#λ]
     def functor[F[_]: Functor, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
     def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
     def functor[F[_]: Monad, A] = Functor[({type λ[α]=ListT[F, α]})#λ]

@@ -71,7 +71,7 @@ class ValidationTest extends Spec {
     def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
     def bitraverse = BiTraverse[Validation]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def equal[E: Order, A: Order] = Equal[Validation[E, A]]
     def pointed[E: Semigroup] = Pointed[({type λ[α] = Validation[E, α]})#λ]
 
@@ -86,7 +86,7 @@ class ValidationTest extends Spec {
       def plus[E: Semigroup] = Plus[({type λ[α]=FailProjection[E, α]})#λ]
       def bitraverse = BiTraverse[FailProjection]
 
-      // checking absense of ambiguity
+      // checking absence of ambiguity
       def equal[E: Order, A: Order] = Equal[FailProjection[E, A]]
       def pointed[E: Semigroup] = Pointed[({type λ[α]=FailProjection[E, α]})#λ]
     }

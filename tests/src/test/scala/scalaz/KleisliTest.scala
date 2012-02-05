@@ -53,7 +53,7 @@ class KleisliTest extends Spec {
     def readerCategory[A] = ArrId[Reader]
     def readerArrow[A] = Arrow[Reader]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def functor[F[_] : Monad, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
     def apply[F[_] : Monad, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]

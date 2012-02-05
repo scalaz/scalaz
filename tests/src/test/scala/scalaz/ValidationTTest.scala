@@ -24,7 +24,7 @@ class ValidationTTest extends Spec {
     def foldable[F[_] : Foldable, E] = Foldable[({type λ[α] = ValidationT[F, E, α]})#λ]
     def traverse[F[_] : Traverse, E] = Traverse[({type λ[α] = ValidationT[F, E, α]})#λ]
 
-    // check for absense of ambiguity
+    // check for absence of ambiguity
     def functor[F[_] : Monad, E] = Functor[({type λ[α] = ValidationT[F, E, α]})#λ]
     def pointed[F[_] : Monad, E] = Pointed[({type λ[α] = ValidationT[F, E, α]})#λ]
     def apply[F[_] : Monad, E: Semigroup] = Apply[({type λ[α] = ValidationT[F, E, α]})#λ]
