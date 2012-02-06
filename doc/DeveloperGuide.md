@@ -140,7 +140,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
       // pass the type class instances into the type class implemetatation trait as members.
       // We need to choose different names for the parameters and the members to avoid shadowing.
       // Usually we suffix the parameter name with '0', in this case '_' is used for better readibility.
-      implicit def tuple2Semigroup[A1, A2](implicit A1_ : Semigroup[A1], A2_ : Semigroup[A2]) = new Tuple2Semigroup[A1, A2] {
+      implicit def tuple2Semigroup[A1, A2](implicit A1_ : Semigroup[A1], A2_ : Semigroup[A2]): Semigroup[(A1, A2)] = new Tuple2Semigroup[A1, A2] {
         // WARNING: It's really easy to write `def A1 = A1` here!!
         implicit def A1 = A1_
         implicit def A2 = A2_
@@ -150,7 +150,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
     trait TupleInstances extends TupleInstances0 {
       // In a subtype of tuple2Monoid. The order doesn't matter, but by convention we follow the subtyping
       // relationship of the type classes.
-      implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]) = new Tuple2Monoid[A1, A2] {
+      implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] = new Tuple2Monoid[A1, A2] {
         implicit def A1: Monoid[A1] = A1_
         implicit def A2: Monoid[A2] = A2_
       }
@@ -231,7 +231,7 @@ set of the imports.
 
 ### Type Parameters
 
-In the absense of a context specific name for the type parameters, use these:
+In the absence of a context specific name for the type parameters, use these:
 
  * Use `A`, `B`, `C`, `X` for kind `*`
  * Use `F`, `G` for kind `* -> *`.

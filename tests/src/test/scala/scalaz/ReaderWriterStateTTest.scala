@@ -34,7 +34,7 @@ class ReaderWriterStateTTest extends Spec {
     def monadReader[F[_]: Monad, R, W: Monoid, S] = MonadReader[({type λ[r, α]=RWST[F, r, W, S, α]})#λ, R]
     def monadState[F[_]: Monad, R, W: Monoid, S] = MonadState[({type λ[s, α]=RWST[F, R, W, s, α]})#λ, S]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def functor[F[_]: Monad, R, W: Monoid, S] = Functor[({type λ[α]=RWST[F, R, W, S, α]})#λ]
   }
 }

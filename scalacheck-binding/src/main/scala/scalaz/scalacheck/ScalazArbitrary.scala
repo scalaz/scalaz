@@ -176,6 +176,9 @@ object ScalazArbitrary {
   implicit def stateTArb[F[_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
+  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[Either[A, B]]]): Arbitrary[EitherT[F, A, B]] =
+      Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
+
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =

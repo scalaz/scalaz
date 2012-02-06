@@ -69,6 +69,26 @@ sealed trait IterateeT[X, E, F[_], A] {
     flatMap(a => StepT.sdone[X, E, F, B](f(a), emptyInput).pointI)
   }
 
+  def contramap[EE](f: EE => E)(implicit F: Monad[F]): IterateeT[X, EE, F, A] = {
+    def step(s: StepT[X, E, F, A]): IterateeT[X, EE, F, A] = s.fold[IterateeT[X, EE, F, A]](
+      cont = k => cont((in: Input[EE]) => k(in.map(i => f(i))) >>== step),
+      done = (a, i) => done(a, if (i.isEof) eofInput else emptyInput),
+      err  = ee => err(ee)
+    )
+
+    this >>== step
+  }
+
+  /**
+   * A generalization of >>== that allows a step function which returns its result in a different, "bigger" monad.
+   * The monad for G must perform all the effects of F as part of its evaluation; in the trivial case, of course
+   * F and G will have the same monad.
+   */
+  def advance[EE, AA, G[_]](f: StepT[X, E, F, A] => IterateeT[X, EE, G, AA])(implicit MO: G |>=| F): IterateeT[X, EE, G, AA] = {
+    import MO._
+    iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
+  }
+
   /**
    * Combine this Iteratee with an Enumerator-like function.
    *
@@ -83,6 +103,12 @@ sealed trait IterateeT[X, E, F[_], A] {
    */
   def >>==[EE, AA](f: StepT[X, E, F, A] => IterateeT[X, EE, F, AA])(implicit F: Bind[F]): IterateeT[X, EE, F, AA] =
     iterateeT(F.bind(value)(s => f(s).value))
+
+  def %=[O](e: EnumerateeT[X, O, E, F])(implicit m: Monad[F]): IterateeT[X, O, F, A] = 
+    (this >>== e[A]).joinI[E, A]
+
+  def &=(e: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = 
+    this >>== e[A] 
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[X, E, G, A] = {
     def step: StepT[X, E, F, A] => StepT[X, E, G, A] =
@@ -113,12 +139,6 @@ sealed trait IterateeT[X, E, F[_], A] {
 
     outer(this) flatMap check
   }
-
-  def %=[O](e: EnumerateeT[X, O, E, F])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
-    (this >>== e[A]).joinI[E, A]
-  }
-
-  def &=(enum: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = >>==(enum[A])
 
   /**
    * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
@@ -196,6 +216,11 @@ trait IterateeTInstances extends IterateeTInstances0 {
     new IterateeTMonadIO[X, E, F] {
       implicit def F = M0
       implicit def G = M0
+    }
+
+  implicit def IterateeTContravariant[X, F[_]: Monad, A]: Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] =
+    new Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] {
+      def contramap[E, EE](r: IterateeT[X, E, F, A])(f: EE => E) = r.contramap(f)
     }
 }
 

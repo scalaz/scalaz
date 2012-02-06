@@ -21,4 +21,17 @@ class OptionTest extends Spec {
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
   checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
   checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
+
+  object instances {
+    def equal[A: Equal] = Equal[Option[A]]
+    def order[A: Order] = Order[Option[A]]
+    def semigroup[A: Semigroup] = Monoid[Option[A]]
+    def monad[A] = Monad[Option]
+
+    def monoidFirst[A] = Monoid[Option[A] @@ First]
+    def monoidLast[A] = Monoid[Option[A] @@ Last]
+
+    // checking absence of ambiguity
+    def equal[A: Order] = Equal[Option[A]]
+  }
 }

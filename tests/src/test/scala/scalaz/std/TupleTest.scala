@@ -74,7 +74,7 @@ class TupleTest extends Spec {
       def monad = Monad[Tuple1]
       def comonad = CoMonad[Tuple1]
 
-      // checking absense of ambiguity
+      // checking absence of ambiguity
       def equal[A: Order] = Equal[Tuple1[A]]
       def semigroup[A: Monoid] = Semigroup[Tuple1[A]]
     }
@@ -90,7 +90,7 @@ class TupleTest extends Spec {
       def functor = Functor[({type λ[α] = (B, α)})#λ]
       def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
 
-      // checking absense of ambiguity
+      // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]
       def semigroup[A: Group, B: Group] = Semigroup[(A, B)]
       def monoid[A: Group, B: Group] = Monoid[(A, B)]

@@ -21,7 +21,7 @@ class CoStateTTest extends Spec {
     def cobind[F[_] : CoBind] = CoBind[({type λ[α] = CoStateT[F, A, α]})#λ]
     def comonad[F[_] : CoMonad] = CoMonad[({type λ[α] = CoStateT[F, A, α]})#λ]
 
-    // checking absense of ambiguity
+    // checking absence of ambiguity
     def functor[F[_] : CoMonad] = Functor[({type λ[α] = CoStateT[F, A, α]})#λ]
     def copointed[F[_] : CoMonad] = CoPointed[({type λ[α] = CoStateT[F, A, α]})#λ]
     def cobind[F[_] : CoMonad] = CoBind[({type λ[α] = CoStateT[F, A, α]})#λ]
