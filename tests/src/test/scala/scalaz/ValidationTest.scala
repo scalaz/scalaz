@@ -59,6 +59,26 @@ class ValidationTest extends Spec {
     val x = "0".parseBoolean.fail.fpair
     ok
   }
+  
+  "ap2" should {
+    "accumulate failures in order" in {
+      import syntax.show._
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
+      val f = (_:Int) + (_:Int)
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
+    }
+  }
+
+  "map2" should {
+    "accumulate failures in order" in {
+      import syntax.show._
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
+      val f = (_:Int) + (_:Int)
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("Failure([1,2])")
+    }
+  }
 
   object instances {
     def show[E: Show, A: Show] = Show[Validation[E, A]]
