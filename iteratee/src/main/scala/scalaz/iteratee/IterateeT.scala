@@ -69,6 +69,16 @@ sealed trait IterateeT[X, E, F[_], A] {
     flatMap(a => StepT.sdone[X, E, F, B](f(a), emptyInput).pointI)
   }
 
+  def contramap[EE](f: EE => E)(implicit F: Monad[F]): IterateeT[X, EE, F, A] = {
+    def step(s: StepT[X, E, F, A]): IterateeT[X, EE, F, A] = s.fold[IterateeT[X, EE, F, A]](
+      cont = k => cont((in: Input[EE]) => k(in.map(i => f(i))) >>== step),
+      done = (a, i) => done(a, if (i.isEof) eofInput else emptyInput),
+      err  = ee => err(ee)
+    )
+
+    this >>== step
+  }
+
   /**
    * Combine this Iteratee with an Enumerator-like function.
    *
@@ -83,6 +93,13 @@ sealed trait IterateeT[X, E, F[_], A] {
    */
   def >>==[EE, AA](f: StepT[X, E, F, A] => IterateeT[X, EE, F, AA])(implicit F: Bind[F]): IterateeT[X, EE, F, AA] =
     iterateeT(F.bind(value)(s => f(s).value))
+
+  def bindThrough[EE, AA, G[_]](f: StepT[X, E, F, A] => IterateeT[X, EE, G, AA])(implicit MO: G |>=| F): IterateeT[X, EE, G, AA] = {
+    import MO._
+
+    iterateeT(MO.MG.bind(MO.promote(value))(step => f(step).value))
+  }
+    
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[X, E, G, A] = {
     def step: StepT[X, E, F, A] => StepT[X, E, G, A] =
@@ -196,6 +213,11 @@ trait IterateeTInstances extends IterateeTInstances0 {
     new IterateeTMonadIO[X, E, F] {
       implicit def F = M0
       implicit def G = M0
+    }
+
+  implicit def IterateeTContravariant[X, F[_]: Monad, A]: Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] =
+    new Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] {
+      def contramap[E, EE](r: IterateeT[X, E, F, A])(f: EE => E) = r.contramap(f)
     }
 }
 
