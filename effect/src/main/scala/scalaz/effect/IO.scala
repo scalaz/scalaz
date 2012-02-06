@@ -19,14 +19,14 @@ sealed trait IO[A] {
    * Runs I/O and performs side-effects. An unsafe operation.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(realWorld).run._2
+  def unsafePerformIO(): A = apply(realWorld).run._2
 
   /**
    * Constructs an IO action whose steps may be interleaved with another.
    * An unsafe operation, since it exposes a trampoline that allows one to
    * step through the components of the IO action.
    */
-  def unsafeInterleaveIO: IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
+  def unsafeInterleaveIO(): IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
 
   /**
    * Interleaves the steps of this IO action with the steps of another,
