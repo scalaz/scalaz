@@ -35,7 +35,7 @@ class Enumeratee2TTest extends Spec {
       val enum2 = enumStream[Unit, Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8)) 
 
       val consumer = consume[Unit, E3I, Id, List]
-      val outer = consumer.bindThrough[Int, StepT[Unit, E3I, Id, E3LI], IterateeM](cogroupI[Unit, Int, Int, Id].apply[E3LI])(mpo)
+      val outer = consumer.advance[Int, StepT[Unit, E3I, Id, E3LI], IterateeM](cogroupI[Unit, Int, Int, Id].apply[E3LI])(mpo)
       val outer2 = outer &= enum
       val inner = outer2.run(_ => sys.error("...")) &= enum2
       
