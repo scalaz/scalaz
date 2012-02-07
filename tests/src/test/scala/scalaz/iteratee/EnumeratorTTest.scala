@@ -81,6 +81,11 @@ class EnumeratorTTest extends Spec {
     (consume[Unit, Int, OIO, List] &= enum.map(_ * 2)).run(_ => sys.error("unexpected")).run.unsafePerformIO must be_===(Some(List(2, 4, 6)))
   }
 
+  "drain" in {
+    val enum = enumStream[Unit, Int, Id](Stream(1, 2, 3))
+    enum.drainTo[List] must be_===(List(1, 2, 3))
+  }
+
   //checkAll(functor.laws[Enum])
   //checkAll(pointed.laws[Enum])
   checkAll(monad.laws[Enum])

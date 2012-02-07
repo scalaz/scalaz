@@ -52,6 +52,9 @@ trait EnumeratorT[X, E, F[_]] { self =>
     new EnumeratorT[X, (E, Long), F] {
       def apply[A] = s => iterateeT((EnumerateeT.zipWithIndex[X, E, F].apply(s) &= self).run(x => err[X, (E, Long), F, A](x).value))
     }
+
+  def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Pointed[M]): F[M[E]] =
+    (IterateeT.consume[X, E, F, M] &= this).run(_ => M.point(P.empty)) 
 }
 
 trait EnumeratorTInstances0 {

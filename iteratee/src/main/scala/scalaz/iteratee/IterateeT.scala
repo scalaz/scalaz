@@ -89,6 +89,11 @@ sealed trait IterateeT[X, E, F[_], A] {
     iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
   }
 
+  def advanceT[EE, AA, G[_]](f: StepT[X, E, F, A] => G[StepT[X, EE, F, AA]])(implicit MO: G |>=| F): G[StepT[X, EE, F, AA]] = {
+    import MO._
+    MO.MG.bind(MO.promote(value))(s => f(s))
+  }
+
   /**
    * Combine this Iteratee with an Enumerator-like function.
    *
