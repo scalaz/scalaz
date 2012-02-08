@@ -24,11 +24,15 @@ class KleisliTest extends Spec {
       M.equal(mb1, mb2)
     }
   }
+  
+  "mapK" ! check {
+    (f: Int => Option[Int], a: Int) => 
+      Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must be_===(f(a).toList.map(_.toString))
+  }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monadPlus.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
-  checkAll(alternativeEmpty.laws[KleisliOptInt])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]

@@ -218,29 +218,6 @@ object ScalazProperties {
     }
   }
 
-  object alternative {
-    def associative[F[_], X](implicit f: Alternative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.alternativeLaw.associative[X] _)
-
-    def laws[F[_]](implicit F: Alternative[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]) = new Properties("alternative") {
-      property("associative") = associative[F, Int]
-    }
-  }
-
-  object alternativeEmpty {
-    def leftAlternativeIdentity[F[_], X](implicit f: AlternativeEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.alternativeEmptyLaw.leftOrElseIdentity[X] _)
-
-    def rightAlternativeIdentity[F[_], X](implicit f: AlternativeEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.alternativeEmptyLaw.rightOrElseIdentity[X] _)
-
-    def laws[F[_]](implicit F: AlternativeEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("alternativeEmpty") {
-      include(alternative.laws[F])
-      property("left orElse identity") = leftAlternativeIdentity[F, Int]
-      property("right orElse identity") = rightAlternativeIdentity[F, Int]
-    }
-  }
-
   object monadPlus {
     def emptyMap[F[_], X](implicit f: MonadPlus[F], afx: Arbitrary[X => X], ef: Equal[F[X]]) =
       forAll(f.monadPlusLaw.emptyMap[X] _)

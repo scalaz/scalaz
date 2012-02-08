@@ -84,9 +84,6 @@ trait OptionTInstances1 extends OptionTInstances2 {
 }
 
 trait OptionTInstances0 extends OptionTInstances1 {
-  implicit def optionTAlternativeEmpty[F[_]](implicit F0: Monad[F]): AlternativeEmpty[({type λ[α] = OptionT[F, α]})#λ] = new OptionTAlternativeEmpty[F] {
-    implicit def F: Monad[F] = F0
-  }
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
   }
@@ -152,18 +149,6 @@ private[scalaz] trait OptionTTraverse[F[_]] extends Traverse[({type λ[α] = Opt
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: (A) => G[B]): G[OptionT[F, B]] = fa traverse f
-}
-
-trait OptionTAlternative[F[_]] extends Alternative[({type λ[α] = OptionT[F, α]})#λ] with OptionTApply[F] with OptionTPointed[F] {
-  implicit def F: Monad[F]
-  
-  def orElse[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
-}
-
-trait OptionTAlternativeEmpty[F[_]] extends AlternativeEmpty[({type λ[α] = OptionT[F, α]})#λ] with OptionTAlternative[F] {
-  implicit def F: Monad[F]
-  
-  def empty[A]: OptionT[F, A] = OptionT(F.point(None))
 }
 
 private[scalaz] trait OptionTHoist extends Hoist[OptionT] {

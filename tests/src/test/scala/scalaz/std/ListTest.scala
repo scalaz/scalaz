@@ -9,7 +9,6 @@ class ListTest extends Spec {
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.laws[List])
   checkAll(traverse.laws[List])
-  checkAll(alternative.laws[List])
   
   import std.list.listSyntax._
   import syntax.monad._
@@ -60,10 +59,5 @@ class ListTest extends Spec {
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
     actual must be_===("/abc/def/hij")
-  }
-
-  "alternative" in {
-    Alternative[List].orElse(List(), List(0)) must be_===(List(0))
-    Alternative[List].orElse(List(0), List(1)) must be_===(List(0, 1))
   }
 }
