@@ -26,5 +26,9 @@ class StateTTest extends Spec {
     def functor[S] = Functor[({type λ[α] = State[S, α]})#λ]
     def pointed[S] = Pointed[({type λ[α] = State[S, α]})#λ]
     def monadState[S] = MonadState[({type λ[α, β]=State[α, β]})#λ, S]
+
+    // checking absence of ambiguity
+    def functor[S, F[_] : Monad] = Functor[({type λ[α] = StateT[F, S, α]})#λ]
+    def pointed[S, F[_] : Monad] = Pointed[({type λ[α] = StateT[F, S, α]})#λ]
   }
 }

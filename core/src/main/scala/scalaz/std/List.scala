@@ -4,7 +4,7 @@ package std
 import annotation.tailrec
 
 trait ListInstances {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Alternative[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -43,8 +43,6 @@ trait ListInstances {
       }
     }
     
-    def orElse[A](a: List[A], b: => List[A]) = a ++ b
-
     override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
       State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]

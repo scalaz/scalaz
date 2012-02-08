@@ -55,7 +55,11 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
 
-  def orElse(a: => Option[A])(implicit F: Functor[F]): OptionT[F, A] = OptionT(mapO(_.orElse(a)))
+  def orElse(a: => OptionT[F, A])(implicit F: Monad[F]): OptionT[F, A] =
+    OptionT(F.bind(run) {
+      case None => a.run
+      case x@Some(_) => F.point(x)
+    })
 
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
@@ -80,16 +84,13 @@ trait OptionTInstances1 extends OptionTInstances2 {
 }
 
 trait OptionTInstances0 extends OptionTInstances1 {
-  implicit def optionTAlternative[F[_]](implicit F0: Alternative[F]): Alternative[({type λ[α] = OptionT[F, α]})#λ] = new OptionTAlternative[F] {
-    implicit def F: Alternative[F] = F0
-  }
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
   }
 }
 
 trait OptionTInstances extends OptionTInstances0 {
-  implicit def optionTMonadTrans: MonadTrans[OptionT] = new OptionTMonadTrans {}
+  implicit def optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
   implicit def optionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonad[F] {
     implicit def F: Monad[F] = F0
@@ -150,13 +151,7 @@ private[scalaz] trait OptionTTraverse[F[_]] extends Traverse[({type λ[α] = Opt
   def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: (A) => G[B]): G[OptionT[F, B]] = fa traverse f
 }
 
-trait OptionTAlternative[F[_]] extends Alternative[({type λ[α] = OptionT[F, α]})#λ] with OptionTApply[F] with OptionTPointed[F] {
-  implicit def F: Alternative[F]
-  
-  def orElse[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = OptionT(F.orElse(a.run, b.run))
-}
-
-private[scalaz] trait OptionTMonadTrans extends MonadTrans[OptionT] {
+private[scalaz] trait OptionTHoist extends Hoist[OptionT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): OptionT[G, A] =
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => Some(a)))
 

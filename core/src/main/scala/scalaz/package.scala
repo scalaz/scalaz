@@ -114,6 +114,8 @@ package object scalaz {
   type ⊥ = Nothing
   type ⊤ = Any
 
+  type |>=|[G[_], F[_]] = MonadPartialOrder[G, F] 
+
   type ReaderT[F[_], E, A] = Kleisli[F, E, A]
   type Reader[E, A] = ReaderT[Id, E, A]
 
@@ -146,6 +148,8 @@ package object scalaz {
    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
    */
   type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
+  
+  type ValidationTNEL[M[_], E, X] = ValidationT[M, NonEmptyList[E], X]
 
   type FirstOption[A] = Option[A] @@ Tags.First
   type LastOption[A] = Option[A] @@ Tags.Last

@@ -37,10 +37,6 @@ trait Syntaxes {
 
   object applicative extends ToApplicativeV
   
-  object alternative extends ToAlternativeV
-
-  object alternativeEmpty extends ToAlternativeEmptyV
-
   object bind extends ToBindV
 
   object monad extends ToMonadV
@@ -95,7 +91,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
   with ToBiTraverseV with ToArrIdV with ToComposeV with ToCategoryV
-  with ToArrowV with ToFoldableV with ToAlternativeV with ToAlternativeEmptyV
+  with ToArrowV with ToFoldableV
 
 
 trait SyntaxV[A] {

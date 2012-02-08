@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Alternative[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with ApplicativePlus[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -30,7 +30,6 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
-    def orElse[A](a: Option[A], b: => Option[A]) = a orElse b
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {

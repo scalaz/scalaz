@@ -15,6 +15,12 @@ object TypelevelUsage {
     val _hlist1: HCons[Int, HNil] = hlist1
     val _hlist2: HCons[String, HCons[Int, HNil]] = hlist2
 
+    hlist2 match {
+      case str :: n :: _ =>
+        val _str: String = str
+        val _n: Int = n
+    }
+
   }
 
   object KLists {
@@ -147,7 +153,17 @@ object TypelevelUsage {
 
   }
 
+  object Classes {
 
+    val composed = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
+
+    assert(List(Some(5)) === composed.point(5))
+
+    val prod = Applicative[List] *: Applicative[Option] *: Applicative.product
+
+    assert(List("1") :: Option("2") :: HNil == prod.map(List(1) :: Option(2) :: HNil)(_.toString))
+
+  }
 
 }
 

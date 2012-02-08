@@ -33,11 +33,10 @@ sealed trait IterateeT[X, E, F[_], A] {
    * @param e A function to calculate a result in case of an Error.
    */
   def run(e: (=> X) => F[A])(implicit F: Monad[F]): F[A] = {
-    val lifte: (=> X) => IterateeT[X, E, F, A] = x => MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(e(x))
-    F.bind(>>==(enumEofT(lifte)).value)((s: StepT[X, E, F, A]) => s.fold(
+    F.bind((this &= enumEofT[X, E, F]).value)((s: StepT[X, E, F, A]) => s.fold(
       cont = _ => sys.error("diverging iteratee")
       , done = (a, _) => F.point(a)
-      , err = e
+      , err = x => e(x)
     ))
   }
 
@@ -70,6 +69,31 @@ sealed trait IterateeT[X, E, F[_], A] {
     flatMap(a => StepT.sdone[X, E, F, B](f(a), emptyInput).pointI)
   }
 
+  def contramap[EE](f: EE => E)(implicit F: Monad[F]): IterateeT[X, EE, F, A] = {
+    def step(s: StepT[X, E, F, A]): IterateeT[X, EE, F, A] = s.fold[IterateeT[X, EE, F, A]](
+      cont = k => cont((in: Input[EE]) => k(in.map(i => f(i))) >>== step),
+      done = (a, i) => done(a, if (i.isEof) eofInput else emptyInput),
+      err  = ee => err(ee)
+    )
+
+    this >>== step
+  }
+
+  /**
+   * A generalization of >>== that allows a step function which returns its result in a different, "bigger" monad.
+   * The monad for G must perform all the effects of F as part of its evaluation; in the trivial case, of course
+   * F and G will have the same monad.
+   */
+  def advance[EE, AA, G[_]](f: StepT[X, E, F, A] => IterateeT[X, EE, G, AA])(implicit MO: G |>=| F): IterateeT[X, EE, G, AA] = {
+    import MO._
+    iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
+  }
+
+  def advanceT[EE, AA, G[_]](f: StepT[X, E, F, A] => G[StepT[X, EE, F, AA]])(implicit MO: G |>=| F): G[StepT[X, EE, F, AA]] = {
+    import MO._
+    MO.MG.bind(MO.promote(value))(s => f(s))
+  }
+
   /**
    * Combine this Iteratee with an Enumerator-like function.
    *
@@ -84,6 +108,12 @@ sealed trait IterateeT[X, E, F[_], A] {
    */
   def >>==[EE, AA](f: StepT[X, E, F, A] => IterateeT[X, EE, F, AA])(implicit F: Bind[F]): IterateeT[X, EE, F, AA] =
     iterateeT(F.bind(value)(s => f(s).value))
+
+  def %=[O](e: EnumerateeT[X, O, E, F])(implicit m: Monad[F]): IterateeT[X, O, F, A] = 
+    (this >>== e[A]).joinI[E, A]
+
+  def &=(e: EnumeratorT[X, E, F])(implicit F: Bind[F]): IterateeT[X, E, F, A] = 
+    this >>== e[A] 
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[X, E, G, A] = {
     def step: StepT[X, E, F, A] => StepT[X, E, G, A] =
@@ -103,38 +133,37 @@ sealed trait IterateeT[X, E, F[_], A] {
   }
 
   def joinI[I, B](implicit outer: IterateeT[X, E, F, A] =:= IterateeT[X, E, F, StepT[X, I, F, B]], M: Monad[F]): IterateeT[X, E, F, B] = {
-    val ITP = IterateeT.IterateeTMonad[X, E, F]
+    val M0 = IterateeT.IterateeTMonad[X, E, F]
     def check: StepT[X, I, F, B] => IterateeT[X, E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {
         s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
       }
-      , done = (a, _) => ITP.point(a)
+      , done = (a, _) => M0.point(a)
       , err = e => err(e)
     )
 
     outer(this) flatMap check
   }
 
-  def %=[O](e: EnumerateeT[X, O, E, F, A])(implicit m: Monad[F]): IterateeT[X, O, F, A] = {
-    (this >>== e).joinI[E, A]
-  }
-
   /**
    * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
    * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
    */
-  def sequenceI[B](implicit m: Monad[F]): EnumerateeT[X, E, A, F, B] = {
-    def loop: EnumerateeT[X, E, A, F, B] = doneOr(checkEof)
-    def checkEof: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
-      isEof[X, E, F] flatMap {
-        eof =>
-          if (eof) done(scont(k), eofInput)
-          else step(k)
+  def sequenceI(implicit m: Monad[F]): EnumerateeT[X, E, A, F] = 
+    new EnumerateeT[X, E, A, F] {
+      def apply[B] = {
+        def loop = doneOr(checkEof)
+        def checkEof: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+          isEof[X, E, F] flatMap {
+            eof =>
+              if (eof) done(scont(k), eofInput)
+              else step(k)
+          }
+        def step: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
+          flatMap (a => k(elInput(a)) >>== loop)
+        loop
       }
-    def step: (Input[A] => IterateeT[X, A, F, B]) => IterateeT[X, E, F, StepT[X, A, F, B]] = k =>
-      this flatMap (a => k(elInput(a)) >>== loop)
-    loop
-  }
+    }
 
   def zip[B](other: IterateeT[X, E, F, B])(implicit F: Monad[F]): IterateeT[X, E, F, (A, B)] = {
     def step[Z](i: IterateeT[X, E, F, Z], in: Input[E]) =
@@ -158,7 +187,7 @@ sealed trait IterateeT[X, E, F[_], A] {
             }
         }
       , empty = cont(loop(x, y))
-      , eof = (x >>== enumEofT(e => err(e))) flatMap (a => (y >>== enumEofT(e => err(e))) map (b => (a, b)))
+      , eof = (x &= enumEofT[X, E, F]) flatMap (a => (y &= enumEofT[X, E, F]) map (b => (a, b)))
     )
     cont(loop(this, other))
   }
@@ -173,25 +202,30 @@ trait IterateeTInstances0 {
   implicit def IterateeTMonad[X, E, F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ] = new IterateeTMonad[X, E, F] {
     implicit def F = F0
   }
+
   implicit def IterateeMonad[X, E]: Monad[({type λ[α] = Iteratee[X, E, α]})#λ] = IterateeTMonad[X, E, Id]
+
+  implicit def IterateeTMonadTransT[X, E, H[_[_], _]](implicit T0: MonadTrans[H]): MonadTrans[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] = new IterateeTMonadTransT[X, E, H] {
+    implicit def T = T0
+  }
 }
 
 trait IterateeTInstances extends IterateeTInstances0 {
-  implicit def IterateeTMonadTrans[X, E]: MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] {
-    def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (({type f[x] = IterateeT[X, E, F, x]})#f ~> ({type f[x] = IterateeT[X, E, G, x]})#f) {
-      def apply[A](fa: IterateeT[X, E, F, A]): IterateeT[X, E, G, A] = fa mapI f
-    }
+  implicit def IterateeTMonadTrans[X, E]: Hoist[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ] = new IterateeTHoist[X, E] { }
 
-    def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
-      iterateeT(Monad[G].map(ga)((x: A) => StepT.sdone[X, E, G, A](x, emptyInput)))
-
-    implicit def apply[G[_] : Monad]: Monad[({type λ[α] = IterateeT[X, E, G, α]})#λ] = IterateeT.IterateeTMonad[X, E, G]
+  implicit def IterateeTHoistT[X, E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] = new IterateeTHoistT[X, E, H] {
+    implicit def T = T0
   }
 
   implicit def IterateeTMonadIO[X, E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] =
     new IterateeTMonadIO[X, E, F] {
       implicit def F = M0
       implicit def G = M0
+    }
+
+  implicit def IterateeTContravariant[X, F[_]: Monad, A]: Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] =
+    new Contravariant[({ type λ[α] = IterateeT[X, α, F, A] })#λ] {
+      def contramap[E, EE](r: IterateeT[X, E, F, A])(f: EE => E) = r.contramap(f)
     }
 }
 
@@ -215,6 +249,31 @@ trait IterateeTFunctions {
   def putStrTo[X, E](os: java.io.OutputStream)(implicit s: Show[E]): IterateeT[X, E, IO, Unit] = {
     def write(e: E) = IO(os.write(s.shows(e).getBytes))
     foldM(())((_: Unit, e: E) => write(e))
+  }
+
+  /**
+   * An iteratee that consumes all of the input into something that is PlusEmpty and Pointed.
+   */
+  def consume[X, E, F[_]: Monad, A[_]: PlusEmpty : Pointed]: IterateeT[X, E, F, A[E]] = {
+    import scalaz.syntax.plus._
+    def step(e: Input[E]): IterateeT[X, E, F, A[E]] = 
+      e.fold(empty = cont(step)
+        , el = e => cont(step).map(a => Pointed[A].point(e) <+> a)
+        , eof = done(PlusEmpty[A].empty, eofInput[E])
+      )   
+
+    cont(step)
+  }
+
+  def collectT[X, E, F[_], A[_]](implicit M: Monad[F], mae: Monoid[A[E]], pointed: Pointed[A]): IterateeT[X, E, F, A[E]] = {
+    import scalaz.syntax.semigroup._
+    def step(e: Input[E]): IterateeT[X, E, F, A[E]] = 
+      e.fold(empty = cont(step)
+        , el = e => cont(step).map(a => Pointed[A].point(e) |+| a)
+        , eof = done(Monoid[A[E]].zero, eofInput[E])
+      )   
+
+    cont(step)
   }
 
   /**An iteratee that consumes the head of the input **/
@@ -301,6 +360,9 @@ trait IterateeTFunctions {
    * An iteratee that checks if the input is EOF.
    */
   def isEof[X, E, F[_] : Pointed]: IterateeT[X, E, F, Boolean] = cont(in => done(in.isEof, in))
+
+  def sum[X, E: Monoid, F[_]: Monad]: IterateeT[X, E, F, E] = 
+    foldM[X, E, F, E](Monoid[E].zero)((a, e) => Pointed[F].point(Monoid[E].append(a, e)))
 }
 
 //
@@ -315,8 +377,44 @@ private[scalaz] trait IterateeTMonad[X, E, F[_]] extends Monad[({type λ[α] = I
   def bind[A, B](fa: IterateeT[X, E, F, A])(f: A => IterateeT[X, E, F, B]): IterateeT[X, E, F, B] = fa flatMap f
 }
 
+private[scalaz] trait IterateeTHoist[X, E] extends Hoist[({type λ[β[_], α] = IterateeT[X, E, β, α]})#λ] {
+  trait IterateeTF[F[_]] {
+    type λ[α] = IterateeT[X, E, F, α]
+  }
+
+  def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
+    def apply[A](fa: IterateeT[X, E, F, A]): IterateeT[X, E, G, A] = fa mapI f
+  }
+
+  def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[X, E, G, A] =
+    iterateeT(Monad[G].map(ga)(sdone[X, E, G, A](_, emptyInput)))
+
+  implicit def apply[G[_] : Monad]: Monad[IterateeTF[G]#λ] = IterateeT.IterateeTMonad[X, E, G]
+}
+
 private[scalaz] trait IterateeTMonadIO[X, E, F[_]] extends MonadIO[({type λ[α] = IterateeT[X, E, F, α]})#λ] with IterateeTMonad[X, E, F] {
   implicit def F: MonadIO[F]
   
   def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[X, E, α, β]})#λ].liftM(F.liftIO(ioa))
 }
+
+private[scalaz] trait IterateeTMonadTransT[X, E, H[_[_], _]] extends MonadTrans[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] {
+  implicit def T: MonadTrans[H]
+
+  def liftM[G[_]: Monad, A](ga: G[A]): IterateeT[X, E, ({type λ[α] = H[G, α]})#λ, A] = 
+    IterateeT.IterateeTMonadTrans[X, E].liftM[({type λ[α] = H[G, α]})#λ, A](T.liftM(ga))(T[G])
+
+  def apply[G[_]: Monad]: Monad[({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[G, α1]})#λ1, α0]})#λ0] = 
+    IterateeT.IterateeTMonad[X, E, ({type λ[α] = H[G, α]})#λ](T[G])
+}
+
+private[scalaz] trait IterateeTHoistT[X, E, H[_[_], _]] extends Hoist[({type λ0[α[_], β] = IterateeT[X, E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] with IterateeTMonadTransT[X, E, H] {
+  implicit def T: Hoist[H]
+
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[M, α1]})#λ1, α0]})#λ0 ~> ({type λ0[α0] = IterateeT[X, E, ({type λ1[α1] = H[N, α1]})#λ1, α0]})#λ0) {
+    def apply[A](fa: IterateeT[X, E, ({type λ[α] = H[M, α]})#λ, A]): IterateeT[X, E, ({type λ[α] = H[N, α]})#λ, A] = 
+      fa.mapI[({type λ[α] = H[N, α]})#λ](T.hoist[M, N](f))(T[M])
+  }
+}
+
+

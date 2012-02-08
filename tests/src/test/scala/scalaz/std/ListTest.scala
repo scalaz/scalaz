@@ -7,9 +7,9 @@ import scalaz.scalacheck.ScalazProperties._
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
-  checkAll(monadPlus.laws[Option])
-  checkAll(traverse.laws[Option])
-
+  checkAll(monadPlus.laws[List])
+  checkAll(traverse.laws[List])
+  
   import std.list.listSyntax._
   import syntax.monad._
 

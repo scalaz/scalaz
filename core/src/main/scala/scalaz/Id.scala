@@ -50,7 +50,7 @@ trait IdInstances {
 
     override def lift5[A, B, C, D, E, R](f: (A, B, C, D, E) => R): (Id[A], Id[B], Id[C], Id[D], Id[E]) => Id[R] = f*/
 
-    override def compose[G[_]](G0: Applicative[G]): Applicative[G] = G0
+    override def compose[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
 
     // TODO Fun compiler bug? "can't existentially abstract over parameterized type G"
     // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0

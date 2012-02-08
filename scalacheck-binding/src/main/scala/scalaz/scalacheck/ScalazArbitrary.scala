@@ -176,6 +176,9 @@ object ScalazArbitrary {
   implicit def stateTArb[F[_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
+  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[Either[A, B]]]): Arbitrary[EitherT[F, A, B]] =
+      Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
+
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
@@ -199,6 +202,11 @@ object ScalazArbitrary {
 
   implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
+  implicit def validationTArb[F[_], A, B](implicit FA: Arbitrary[F[Validation[A, B]]]): Arbitrary[ValidationT[F, A, B]] =
+    Functor[Arbitrary].map(FA)(ValidationT[F, A, B](_))
+
+  implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Pointed[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
+  
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 }

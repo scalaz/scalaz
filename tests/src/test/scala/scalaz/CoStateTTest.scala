@@ -1,5 +1,4 @@
 package scalaz
-package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
@@ -13,7 +12,7 @@ class CoStateTTest extends Spec {
     }
   }
 
-  checkAll(comonad.laws[({type λ[α]=CoStateT[Tuple1, Int, α]})#λ])
+  checkAll(comonad.laws[({type λ[α] = CoStateT[Tuple1, Int, α]})#λ])
 
   object instances {
     type A = Int
@@ -21,5 +20,11 @@ class CoStateTTest extends Spec {
     def copointed[F[_] : CoPointed] = CoPointed[({type λ[α] = CoStateT[F, A, α]})#λ]
     def cobind[F[_] : CoBind] = CoBind[({type λ[α] = CoStateT[F, A, α]})#λ]
     def comonad[F[_] : CoMonad] = CoMonad[({type λ[α] = CoStateT[F, A, α]})#λ]
+
+    // checking absence of ambiguity
+    def functor[F[_] : CoMonad] = Functor[({type λ[α] = CoStateT[F, A, α]})#λ]
+    def copointed[F[_] : CoMonad] = CoPointed[({type λ[α] = CoStateT[F, A, α]})#λ]
+    def cobind[F[_] : CoMonad] = CoBind[({type λ[α] = CoStateT[F, A, α]})#λ]
   }
+
 }

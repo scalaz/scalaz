@@ -205,10 +205,10 @@ object ScalazProperties {
 
   object plusEmpty {
     def leftPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.leftPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.leftPlusIdentity[X] _)
 
     def rightPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.rightPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.rightPlusIdentity[X] _)
 
     def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("plusEmpty") {
       include(plus.laws[F])

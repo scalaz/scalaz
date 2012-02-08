@@ -22,7 +22,7 @@ trait Functor[F[_]]  { self =>
   def fpair[A](fa: F[A]): F[(A, A)] = map(fa)(a => (a, a))
 
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
-  def compose[G[_]](G0: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
+  def compose[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
     implicit def F = self
 
     implicit def G = G0

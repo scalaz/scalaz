@@ -20,6 +20,8 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 
   def head(implicit M: Monad[M]) = M.map(uncons)(_.get._1)
 
+  def headOption(implicit M: Monad[M]) = M.map(uncons)(_.map(_._1))
+  
   def tailM(implicit M: Monad[M]): M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = stepMap {
@@ -27,10 +29,22 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
     case Skip(as) => Skip(as filter p)
     case Done => Done
   }
+  
+  def drop(n: Int)(implicit M: Functor[M]): ListT[M, A] = stepMap {
+    case Yield(a, as) => if (n > 0) Skip(as drop (n-1)) else Yield(a, as)
+    case Skip(as) => Skip(as drop n)
+    case Done => Done
+  }
 
   def dropWhile(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = stepMap {
     case Yield(a, as) => if (p(a)) Skip(as dropWhile p) else Yield(a, as)
     case Skip(as) => Skip(as dropWhile p)
+    case Done => Done
+  }
+  
+  def take(n: Int)(implicit M: Functor[M]): ListT[M, A] = stepMap {
+    case Yield(a, as) => if (n <= 0) Done else Yield(a, as take (n-1))
+    case Skip(as) => Skip(as take n)
     case Done => Done
   }
 
@@ -98,7 +112,7 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait ListTInstances1 {
+trait ListTInstances2 {
   implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = ListT[F, α]})#λ] = new ListTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
@@ -108,7 +122,7 @@ trait ListTInstances1 {
   }
 }
 
-trait ListTInstances0 extends ListTInstances1 {
+trait ListTInstances1 extends ListTInstances2 {
   implicit def listTPointedPlus[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] = new ListTPointed[F] {
     implicit def F: Pointed[F] = F0
   }
@@ -118,12 +132,20 @@ trait ListTInstances0 extends ListTInstances1 {
   }
 }
 
-trait ListTInstances extends ListTInstances0 {
+trait ListTInstances0 extends ListTInstances1 {
   implicit def listTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = ListT[F, α]})#λ] = new ListTMonad[F] {
     implicit def F: Monad[F] = F0
   }
+}
+
+trait ListTInstances extends ListTInstances0 {
+  implicit def listTMonadPlus[F[_]](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
+    implicit def F: MonadPlus[F] = F0
+  }
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
   implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
+
+  implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
 }
 
 object ListT extends ListTInstances {
@@ -150,7 +172,6 @@ object ListT extends ListTInstances {
   case class Skip[+S](s: S) extends Step[Nothing, S]
 
   case object Done extends Step[Nothing, Nothing]
-
 }
 
 //
@@ -189,4 +210,25 @@ private[scalaz] trait ListTMonad[F[_]] extends Monad[({type λ[α] = ListT[F, α
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
+}
+
+private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTMonad[F] {
+  implicit def F: MonadPlus[F]
+}
+
+private[scalaz] trait ListTHoist extends Hoist[ListT] {
+  import ListT._
+  
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = ListT[G, α]})#λ] = listTMonad[G]
+  
+  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] = ListT[G, A](G.map(a)(Yield(_, empty)))
+  
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f =
+    new (({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f) {
+      def apply[A](a: ListT[M, A]): ListT[N, A] = ListT[N, A](f(M.map(a.step)(_ match {
+        case Yield(a, as) => Yield(a, hoist(f) apply as)
+        case Skip(as) => Skip(hoist(f) apply as)
+        case Done => Done
+      })))
+    }
 }
