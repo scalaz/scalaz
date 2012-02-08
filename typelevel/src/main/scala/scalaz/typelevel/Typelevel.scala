@@ -6,6 +6,7 @@ object Typelevel extends Typelevels
 trait Typelevels
   extends GenericLists
   with HLists
+  with KLists
   with TypeClasses
   with Numerals
 
