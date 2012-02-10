@@ -135,23 +135,38 @@ object Enum {
       , max = true
     )
 
-  implicit val OrderingEnum: Enum[Ordering] =
+  implicit val OrderingEnum: Enum[Ordering] = {
+    val s: Ordering => Ordering = {
+      case Ordering.LT => Ordering.EQ
+      case Ordering.EQ => Ordering.GT
+      case Ordering.GT => Ordering.LT
+    }
+    val p: Ordering => Ordering = {
+      case Ordering.GT => Ordering.EQ
+      case Ordering.EQ => Ordering.LT
+      case Ordering.LT => Ordering.GT
+    }
     boundedEnum(
-      succ = {
-        case Ordering.LT => Ordering.EQ
-        case Ordering.EQ => Ordering.GT
-        case Ordering.GT => Ordering.LT
-      }
-      , pred = {
-        case Ordering.GT => Ordering.EQ
-        case Ordering.EQ => Ordering.LT
-        case Ordering.LT => Ordering.GT
-      }
-      , succn = a => b => error("")
-      , predn = a => b => error("")
+        succ = s
+      , pred = p
+      , succn = a => b =>
+          if(a % 3 == 0)
+            b
+          else if(a % 3 == 1)
+            s(b)
+          else
+            s(s(b))
+      , predn = a => b =>
+          if(a % 3 == 0)
+            b
+          else if(a % 3 == 1)
+            p(b)
+          else
+            p(p(b))
       , min = Ordering.LT
       , max = Ordering.GT
     )
+  }
 
   implicit val IntEnum: Enum[Int] =
     boundedEnum(
