@@ -82,8 +82,6 @@ object TypeClass {
     coPointed,
     apply,
     applicative,
-    alternative,
-    alternativeEmpty,
     bind,
     monad,
     coJoin,
