@@ -1,5 +1,15 @@
 package scalaz
 
+/*
+Laws
+
+1) succ(pred(x)) === x
+2) pred(succ(x)) === x
+3) min forall (n => max forall (x => pred(n) === x))
+4) min forall (n => max forall (x => succ(x) === n))
+5) succn(1) === succ
+6) predn(1) === pred
+*/
 sealed trait Enum[A] extends Order[A] {
   val succ: A => A
   val pred: A => A
