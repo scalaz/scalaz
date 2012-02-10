@@ -105,13 +105,51 @@ object Enum {
       , Some(max)
     )
 
+  implicit val UnitEnum: Enum[Unit] =
+    boundedEnum(
+      succ = _ => ()
+      , pred = _ => ()
+      , succn = _ => _ => ()
+      , predn = _ => _ => ()
+      , min = ()
+      , max = ()
+    )
+
+  implicit val BooleanEnum: Enum[Boolean] =
+    boundedEnum(
+      succ = !_
+      , pred = !_
+      , succn = a => b => if(a % 2 == 0) b else !b
+      , predn = a => b => if(a % 2 == 0) b else !b
+      , min = false
+      , max = true
+    )
+
+  implicit val OrderingEnum: Enum[Ordering] =
+    boundedEnum(
+      succ = {
+        case Ordering.LT => Ordering.EQ
+        case Ordering.EQ => Ordering.GT
+        case Ordering.GT => Ordering.LT
+      }
+      , pred = {
+        case Ordering.GT => Ordering.EQ
+        case Ordering.EQ => Ordering.LT
+        case Ordering.LT => Ordering.GT
+      }
+      , succn = a => b => error("")
+      , predn = a => b => error("")
+      , min = Ordering.LT
+      , max = Ordering.GT
+    )
+
   implicit val IntEnum: Enum[Int] =
     boundedEnum(
       succ = 1+
-    , pred = 1-
-    , succn = a => b => b + a
-    , predn = a => b => b - a
-    , min = Int.MinValue
-    , max = Int.MaxValue
+      , pred = 1-
+      , succn = a => b => b + a
+      , predn = a => b => b - a
+      , min = Int.MinValue
+      , max = Int.MaxValue
     )
 }
