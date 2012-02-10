@@ -4,7 +4,7 @@ package std.java.math
 import java.math.BigInteger
 
 trait BigIntegerInstances {
-  implicit val bigIntegerInstance: Group[BigInteger] with Order[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Order[BigInteger] with Show[BigInteger] {
+  implicit val bigIntegerInstance: Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
     def show(f: BigInteger) = f.toString.toList
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
@@ -12,6 +12,13 @@ trait BigIntegerInstances {
     def zero = BigInteger.ZERO
 
     def inverse(f: BigInteger) = f.negate()
+
+    def succ = (b: BigInteger) => b add BigInteger.ONE
+    def pred = (b: BigInteger) => b subtract BigInteger.ONE
+    override def succn = (a: Int) => (b: BigInteger) => b add BigInteger.valueOf(a)
+    override def predn = (a: Int) => (b: BigInteger) => b subtract BigInteger.valueOf(a)
+    override def min = None
+    override def max = None
 
     def order(x: BigInteger, y: BigInteger) = x.compareTo(y) match {
       case x if x < 0   => Ordering.LT

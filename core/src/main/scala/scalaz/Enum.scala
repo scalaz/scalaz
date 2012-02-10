@@ -9,8 +9,8 @@ Laws
 4) min forall (n => max forall (x => succ(x) === n))
 5) succn(1)(x) === succ(x)
 6) predn(1)(x) === pred(x)
-7) compare(succ(x), x) != LT
-8) compare(pred(x), x) != GT
+7) order(succ(x), x) != LT
+8) order(pred(x), x) != GT
 */
 trait Enum[A] extends Order[A] {
   def succ: A => A
