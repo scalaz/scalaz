@@ -6,7 +6,6 @@ package scalaz
  */
 ////
 trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
-
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 
@@ -36,5 +35,8 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
 
 object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
+
+  ////
+  ////
 }
 
