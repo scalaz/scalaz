@@ -5,7 +5,7 @@ import scalaz._
 
 trait AnyValInstances {
 
-  implicit val unitInstance: Group[Unit] with Order[Unit] with Show[Unit] = new Group[Unit] with Order[Unit] with Show[Unit] {
+  implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] {
     def show(f: Unit) = ().toString.toList
 
     def append(f1: Unit, f2: => Unit) = ()
@@ -16,13 +16,37 @@ trait AnyValInstances {
 
     def order(x: Unit, y: Unit) = Ordering.EQ
 
+    def succ = (_: Unit) => ()
+
+    def pred = (_: Unit) => ()
+
+    override def succn = (_: Int) => (_: Unit) => ()
+
+    override def predn = (_: Int) => (_: Unit) => ()
+
+    override def min = Some(())
+
+    override def max = Some(())
+
     override def equalIsNatural: Boolean = true
   }
 
-  implicit object booleanInstance extends Order[Boolean] with Show[Boolean] {
+  implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
     def show(f: Boolean) = f.toString.toList
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Boolean) => !b
+
+    def pred = (b: Boolean) => !b
+
+    override def succn = (n: Int) => (b: Boolean) => if(n % 2 == 0) b else !b
+
+    override def predn = (n: Int) => (b: Boolean) => if(n % 2 == 0) b else !b
+
+    override def min = Some(false)
+
+    override def max = Some(true)
 
     override def equalIsNatural: Boolean = true
 
@@ -59,7 +83,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val byteInstance: Monoid[Byte] with Order[Byte] with Show[Byte] = new Monoid[Byte] with Order[Byte] with Show[Byte] {
+  implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
     def show(f: Byte) = f.toString.toList
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
@@ -67,6 +91,13 @@ trait AnyValInstances {
     def zero: Byte = 0
 
     def order(x: Byte, y: Byte) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Byte) => (b + 1).toByte
+    def pred = (b: Byte) => (b - 1).toByte
+    override def succn = (a: Int) => (b: Byte) => (b + a).toByte
+    override def predn = (a: Int) => (b: Byte) => (b - a).toByte
+    override def min = Some(Byte.MinValue)
+    override def max = Some(Byte.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -91,7 +122,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val char: Monoid[Char] with Order[Char] with Show[Char] = new Monoid[Char] with Order[Char] with Show[Char] {
+  implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
     def show(f: Char) = f.toString.toList
 
     def append(f1: Char, f2: => Char) = (f1 + f2).toChar
@@ -99,6 +130,13 @@ trait AnyValInstances {
     def zero: Char = 0
 
     def order(x: Char, y: Char) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Char) => (b + 1).toChar
+    def pred = (b: Char) => (b - 1).toChar
+    override def succn = (a: Int) => (b: Char) => (b + a).toChar
+    override def predn = (a: Int) => (b: Char) => (b - a).toChar
+    override def min = Some(Char.MinValue)
+    override def max = Some(Char.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -120,7 +158,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortInstance: Group[Short] with Order[Short] with Show[Short] = new Group[Short] with Order[Short] with Show[Short] {
+  implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
     def show(f: Short) = f.toString.toList
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
@@ -130,6 +168,13 @@ trait AnyValInstances {
     def inverse(f:Short) = (-f).toShort
 
     def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Short) => (b + 1).toShort
+    def pred = (b: Short) => (b - 1).toShort
+    override def succn = (a: Int) => (b: Short) => (b + a).toShort
+    override def predn = (a: Int) => (b: Short) => (b - a).toShort
+    override def min = Some(Short.MinValue)
+    override def max = Some(Short.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -149,7 +194,7 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
-  implicit val intInstance: Group[Int] with Order[Int] with Show[Int] = new Group[Int] with Order[Int] with Show[Int] {
+  implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
     def show(f: Int) = f.toString.toList
 
     def append(f1: Int, f2: => Int) = f1 + f2
@@ -161,6 +206,13 @@ trait AnyValInstances {
     def distance(a: Int, b: Int): Int = b - a
 
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Int) => b + 1
+    def pred = (b: Int) => b - 1
+    override def succn = (a: Int) => (b: Int) => b + a
+    override def predn = (a: Int) => (b: Int) => b - a
+    override def min = Some(Int.MinValue)
+    override def max = Some(Int.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -184,7 +236,7 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
-  implicit val longInstance: Group[Long] with Order[Long] with Show[Long] = new Group[Long] with Order[Long] with Show[Long] {
+  implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
     def show(f: Long) = f.toString.toList
 
     def append(f1: Long, f2: => Long) = f1 + f2
@@ -194,6 +246,13 @@ trait AnyValInstances {
     def inverse(f: Long) = -f
 
     def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Long) => b + 1
+    def pred = (b: Long) => b - 1
+    override def succn = (a: Int) => (b: Long) => b + a
+    override def predn = (a: Int) => (b: Long) => b - a
+    override def min = Some(Long.MinValue)
+    override def max = Some(Long.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -213,7 +272,7 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit val floatInstance: Group[Float] with Order[Float] with Show[Float] = new Group[Float] with Order[Float] with Show[Float] {
+  implicit val floatInstance: Group[Float] with Enum[Float] with Show[Float] = new Group[Float] with Enum[Float] with Show[Float] {
     def show(f: Float) = f.toString.toList
 
     def append(f1: Float, f2: => Float) = f1 + f2
@@ -221,6 +280,13 @@ trait AnyValInstances {
     def zero: Float = 0f
 
     def inverse(f: Float) = -f
+
+    def succ = (b: Float) => b + 1
+    def pred = (b: Float) => b - 1
+    override def succn = (a: Int) => (b: Float) => b + a
+    override def predn = (a: Int) => (b: Float) => b - a
+    override def min = Some(Float.MinValue)
+    override def max = Some(Float.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -236,7 +302,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val doubleInstance: Group[Double] with Order[Double] with Show[Double] = new Group[Double] with Order[Double] with Show[Double] {
+  implicit val doubleInstance: Group[Double] with Enum[Double] with Show[Double] = new Group[Double] with Enum[Double] with Show[Double] {
     def show(f: Double) = f.toString.toList
 
     def append(f1: Double, f2: => Double) = f1 + f2
@@ -246,6 +312,13 @@ trait AnyValInstances {
     def inverse(f: Double) = -f
 
     def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+
+    def succ = (b: Double) => b + 1
+    def pred = (b: Double) => b - 1
+    override def succn = (a: Int) => (b: Double) => b + a
+    override def predn = (a: Int) => (b: Double) => b - a
+    override def min = Some(Double.MinValue)
+    override def max = Some(Double.MaxValue)
 
     override def equalIsNatural: Boolean = true
   }
