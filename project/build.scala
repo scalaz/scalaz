@@ -4,6 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
+import com.jsuereth.pgp.GpgPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -42,7 +43,49 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
     credentialsSetting,
-    publishSetting
+    useGpg := true,
+    useGpgAgent := true,
+    publishSetting,
+    publishArtifact in Test := false,
+    pomIncludeRepository := {
+      x => false
+    },
+    pomExtra := (
+      <url>http://scalaz.org</url>
+        <licenses>
+          <license>
+            <name>BSD-style</name>
+            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+            <distribution>repo</distribution>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:scalaz/scalaz.git</url>
+          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
+        </scm>
+        <developers>
+          {
+          Seq(
+            ("runarorama", "Runar Bjarnason"),
+            ("pchiusano", "Paul Chiusano"),
+            ("tonymorris", "Tony Morris"),
+            ("retronym", "Jason Zaugg"),
+            ("ekmett", "Edward Kmett"),
+            ("alexeyr", "Alexey Romanov"),
+            ("copumpkin", "Daniel Peebles"),
+            ("rwallace", "Richard Wallace"),
+            ("nuttycom", "Kris Nuttycombe")
+          ).map {
+            case (id, name) =>
+              <developer>
+                <id>{id}</id>
+                <name>{name}</name>
+                <url>http://github.com/{name}</url>
+              </developer>
+          }
+        }
+        </developers>
+      )
   )
 
   lazy val scalaz = Project(
@@ -135,17 +178,18 @@ object build extends Build {
   )
 
   lazy val publishSetting = publishTo <<= (version).apply{
-    version: String =>
-      def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
-      val isSnapshot = version.trim.endsWith("SNAPSHOT")
-      val repoName = if (isSnapshot) "snapshots" else "releases"
-      Some(repo(repoName))
+    v =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {
     Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
+        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
       case _                           =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
