@@ -25,7 +25,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
-    def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
+    override def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
   }
 
   implicit def function0Equal[R: Equal] = new Equal[() => R] {

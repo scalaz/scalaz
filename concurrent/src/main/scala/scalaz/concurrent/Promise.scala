@@ -172,7 +172,7 @@ trait PromiseInstances {
     def copoint[A](p: Promise[A]): A = p.get
     def traverseImpl[G[_] : Applicative, A, B](fa: Promise[A])(f: (A) => G[B]): G[Promise[B]] =
       Applicative[G].map(f(fa.get))(promise(_: B)(fa.strategy))
-    def foldRight[A, B](fa: Promise[A], z: => B)(f: (A, => B) => B): B = f(fa.get, z)
+    override def foldRight[A, B](fa: Promise[A], z: => B)(f: (A, => B) => B): B = f(fa.get, z)
     def bind[A, B](fa: Promise[A])(f: (A) => Promise[B]): Promise[B] = fa flatMap f
   }
 }

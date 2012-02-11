@@ -26,7 +26,7 @@ trait OptionInstances extends OptionInstances0 {
       fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
     def empty[A]: Option[A] = None
     def plus[A](a: Option[A], b: => Option[A]) = a orElse b
-    def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
+    override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
       case Some(a) => f(a, z)
       case None    => z
     }

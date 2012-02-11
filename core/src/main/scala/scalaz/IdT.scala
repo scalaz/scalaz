@@ -97,7 +97,7 @@ private[scalaz] trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#
 private[scalaz] trait IdTFoldable[F[_]] extends Foldable.FromFoldr[({type λ[α] = IdT[F, α]})#λ] {
   implicit def F: Foldable[F]
 
-  def foldRight[A, B](fa: IdT[F, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+  override def foldRight[A, B](fa: IdT[F, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
 private[scalaz] trait IdTTraverse[F[_]] extends Traverse[({type λ[α] = IdT[F, α]})#λ] with IdTFoldable[F] with IdTFunctor[F]{

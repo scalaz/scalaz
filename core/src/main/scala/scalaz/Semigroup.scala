@@ -28,7 +28,7 @@ trait Semigroup[F]  { self =>
 
   private[scalaz] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
     override def map[A, B](fa: F)(f: (A) => B) = fa
-    def ap[A, B](fa: => F)(f: => F) = append(fa, f)
+    def ap[A, B](fa: => F)(f: => F) = append(f, fa)
   }
 
   final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply {}

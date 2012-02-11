@@ -28,7 +28,7 @@ trait StreamInstances {
       k
     }
 
-    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
+    override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
