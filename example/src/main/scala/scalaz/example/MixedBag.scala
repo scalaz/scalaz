@@ -83,13 +83,13 @@ object MixedBag extends App {
     type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]
 
-    def leaf[A](a: A): Tree[A] = Return(a)
-    def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Suspend[Pair, A](l -> r)
-
     implicit val pairFunctor: Functor[Pair] = new Functor[Pair] {
       def map[A, B](as: Pair[A])(f: A => B) =
         f(as._1) -> f(as._2)
     }
+
+    def leaf[A](a: A): Tree[A] = Return(a)
+    def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Suspend[Pair, A](l -> r)
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {

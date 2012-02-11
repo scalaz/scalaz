@@ -13,6 +13,7 @@ class Enumeratee2TTest extends Spec {
   implicit val v = IterateeT.IterateeTMonad[Unit, Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Unit, Int]
   implicit val mpo = MonadPartialOrder.transformer[Id, ({ type λ[β[_], α] = IterateeT[Unit, Int, β, α] })#λ]
+  implicit val intO = Order[Int].order _
 
   type StepM[A] = StepT[Unit, Int, Id, A]
   type IterateeM[A] = IterateeT[Unit, Int, Id, A]
