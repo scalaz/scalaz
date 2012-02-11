@@ -139,9 +139,10 @@ trait ListTInstances0 extends ListTInstances1 {
 }
 
 trait ListTInstances extends ListTInstances0 {
-  implicit def listTMonadPlus[F[_]](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
-    implicit def F: MonadPlus[F] = F0
-  }
+  // TODO Doen't satisfy PlusEmpty laws.
+//  implicit def listTMonadPlus[F[_]](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
+//    implicit def F: MonadPlus[F] = F0
+//  }
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
   implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
