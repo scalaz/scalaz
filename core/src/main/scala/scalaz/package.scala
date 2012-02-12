@@ -1,5 +1,3 @@
-import annotation.unchecked.uncheckedVariance
-
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *

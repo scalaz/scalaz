@@ -1,7 +1,5 @@
 package scalaz.example
 
-import annotation.unchecked.uncheckedVariance
-
 object TrampolineUsage extends App {
 
   import scalaz._, Scalaz._, Free._
