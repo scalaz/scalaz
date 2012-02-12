@@ -14,8 +14,8 @@ object TrampolineUsage extends App {
           Nil
         }
       case x :: tail =>
-        val (left, right) = tail.partition(_ < x)
         suspend {
+          val (left, right) = tail.partition(_ < x)
           for {
             ls <- quickSort[F, T](left)
             rs <- quickSort[F, T](right)
@@ -40,6 +40,17 @@ object TrampolineUsage extends App {
   {
     // Use the stack.
     val sorted = runQuickSort[Id, Int](xs)
+    println(sorted)
+  }
+
+  {
+    // Run in parallel.
+
+    import scalaz.concurrent._
+    import annotation.unchecked.uncheckedVariance
+    type PromiseCov[+A] = Promise[A @uncheckedVariance]
+
+    val sorted = runQuickSort[PromiseCov, Int](xs)
     println(sorted)
   }
 }

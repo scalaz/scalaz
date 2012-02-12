@@ -64,6 +64,8 @@ sealed trait Promise[A] {
       promise(f(a))
     }))
   }
+
+  override def toString = "<promise>"
 }
 
 object Promise extends PromiseFunctions with PromiseInstances {
