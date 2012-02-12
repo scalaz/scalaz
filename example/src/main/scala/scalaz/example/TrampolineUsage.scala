@@ -4,9 +4,6 @@ object TrampolineUsage extends App {
 
   import scalaz._, Scalaz._, Free._
 
-  def runQuickSort[F[+ _], T](xs: List[T])(implicit FP: Pointed[F], FC: CoPointed[F], T: Order[T]): List[T] =
-    quickSort[F, T](xs).go(f => FC.copoint(f))
-
   def quickSort[F[+ _] : Pointed, T: Order](xs: List[T]): Free[F, List[T]] = {
     xs match {
       case Nil =>
@@ -23,6 +20,9 @@ object TrampolineUsage extends App {
         }
     }
   }
+
+  def runQuickSort[F[+ _] : Pointed : CoPointed, T: Order](xs: List[T]): List[T] =
+    quickSort[F, T](xs).go(f => CoPointed[F].copoint(f))
 
   val xs = List.fill(32)(util.Random.nextInt())
 
@@ -43,14 +43,52 @@ object TrampolineUsage extends App {
     println(sorted)
   }
 
+  import scalaz.concurrent._
+  import annotation.unchecked.uncheckedVariance
+
+  type PromiseCov[+A] = Promise[A@uncheckedVariance]
+
   {
     // Run in parallel.
-
-    import scalaz.concurrent._
-    import annotation.unchecked.uncheckedVariance
-    type PromiseCov[+A] = Promise[A @uncheckedVariance]
-
     val sorted = runQuickSort[PromiseCov, Int](xs)
+    println(sorted)
+  }
+
+
+  /**Run using `F1` as a binding for lists longer than `threshold`, and `F2` otherwise. */
+  def quickSort2[F[+ _] : Pointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): Free[F, List[T]] = {
+    def qs(as: List[T]): Free[F, List[T]] =
+      if (as.lengthCompare(threshold) < 0) {
+        val free: Free[F2, List[T]] = quickSort2[F2, F2, T](as, NaturalTransformation.refl[F2], threshold)
+        free.mapSuspension(nat)
+      } else quickSort2[F, F2, T](as, nat, threshold)
+
+    xs match {
+      case Nil =>
+        return_ {
+          Nil
+        }
+      case x :: tail =>
+        suspend {
+          val (left, right) = tail.partition(_ < x)
+          for {
+            ls <- qs(left)
+            rs <- qs(right)
+          } yield ls ::: (x :: rs)
+        }
+    }
+  }
+
+  def runQuickSort2[F[+ _] : Pointed : CoPointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
+    quickSort2[F, F2, T](xs, nat, threshold).go(f => CoPointed[F].copoint(f))
+
+
+  {
+    // mixed binding
+    val promise2Id = new (Id ~> PromiseCov) { def apply[A](a: A) = Promise(a)}
+
+    // run in parallel for lists larger then 8 elements, and on the stack for lists smaller.
+    val sorted = runQuickSort2[PromiseCov, Id, Int](xs, promise2Id, 8)
     println(sorted)
   }
 }
