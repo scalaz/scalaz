@@ -1,3 +1,5 @@
+import annotation.unchecked.uncheckedVariance
+
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *
@@ -77,7 +79,7 @@ package object scalaz {
   /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
    *  runtime representation.
    */
-  type Id[X] = X
+  type Id[+X] = X
 
   /**
    * Type class instance for the strict identity type constructor
