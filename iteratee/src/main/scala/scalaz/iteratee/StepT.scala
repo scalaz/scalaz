@@ -108,30 +108,53 @@ sealed trait StepT[X, E, F[_], A] {
 }
 
 // object StepT is in the implicit scope for EnumeratorT, so we mix in EnumeratorTInstances here.
-object StepT extends StepTFunctions with EnumeratorTInstances
+object StepT extends StepTFunctions with EnumeratorTInstances {
+  private[this] val ToNone: ((=> Any) => None.type) = x => None
+  private[this] val ToNone1: (Any => None.type) = x => None
+  private[this] val ToNone2: ((=> Any, => Any) => None.type) = (x, y) => None
+
+  object Cont {
+    def apply[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
+      def fold[Z](
+                   cont: (Input[E] => IterateeT[X, E, F, A]) => Z
+                   , done: (=> A, => Input[E]) => Z
+                   , err: (=> X) => Z
+                   ) = cont(c)
+    }
+
+    def unapply[X, E, F[_], A](s: StepT[X, E, F, A]): Option[Input[E] => IterateeT[X, E, F, A]] =
+      s.fold(f => Some(f), ToNone2, ToNone)
+  }
+
+  object Done {
+    def apply[X, E, F[_], A](d: => A, r: => Input[E]) = new StepT[X, E, F, A] {
+      def fold[Z](
+                   cont: (Input[E] => IterateeT[X, E, F, A]) => Z
+                   , done: (=> A, => Input[E]) => Z
+                   , err: (=> X) => Z
+                   ) = done(d, r)
+    }
+
+    def unapply[X, E, F[_], A](s: StepT[X, E, F, A]): Option[(A, Input[E])] =
+      s.fold(ToNone1, (a, ie) => Some((a, ie)), ToNone)
+  }
+
+  object Err {
+    def apply[X, E, F[_], A](e: => X): StepT[X, E, F, A] = new StepT[X, E, F, A] {
+      def fold[Z](
+                   cont: (Input[E] => IterateeT[X, E, F, A]) => Z
+                   , done: (=> A, => Input[E]) => Z
+                   , err: (=> X) => Z
+                   ) = err(e)
+    }
+
+    def unapply[X, E, F[_], A](s: StepT[X, E, F, A]): Option[X] =
+      s.fold(ToNone1, ToNone2, Some(_))
+  }
+}
 
 trait StepTFunctions {
-  def scont[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
-    def fold[Z](
-                 cont: (Input[E] => IterateeT[X, E, F, A]) => Z
-                 , done: (=> A, => Input[E]) => Z
-                 , err: (=> X) => Z
-                 ) = cont(c)
-  }
-
-  def sdone[X, E, F[_], A](d: => A, r: => Input[E]): StepT[X, E, F, A] = new StepT[X, E, F, A] {
-    def fold[Z](
-                 cont: (Input[E] => IterateeT[X, E, F, A]) => Z
-                 , done: (=> A, => Input[E]) => Z
-                 , err: (=> X) => Z
-                 ) = done(d, r)
-  }
-
-  def serr[X, E, F[_], A](e: => X): StepT[X, E, F, A] = new StepT[X, E, F, A] {
-    def fold[Z](
-                 cont: (Input[E] => IterateeT[X, E, F, A]) => Z
-                 , done: (=> A, => Input[E]) => Z
-                 , err: (=> X) => Z
-                 ) = err(e)
-  }
+  def scont[X, E, F[_], A](c: Input[E] => IterateeT[X, E, F, A]): StepT[X, E, F, A] = StepT.Cont(c)
+  def sdone[X, E, F[_], A](d: => A, r: => Input[E]): StepT[X, E, F, A] = StepT.Done(d, r)
+  def serr[X, E, F[_], A](e: => X): StepT[X, E, F, A] = StepT.Err(e)
 }

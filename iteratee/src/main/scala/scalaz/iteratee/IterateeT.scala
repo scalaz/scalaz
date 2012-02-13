@@ -14,7 +14,7 @@ import Iteratee._
  * @tparam X The type of the error (mnemonic: e'''X'''ception type)
  * @tparam E The type of the input data (mnemonic: '''E'''lement type)
  * @tparam F The type constructor representing an effect.
- *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Step]].
+ *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Iteratee]].
  * @tparam A The type of the calculated result
  */
 sealed trait IterateeT[X, E, F[_], A] {
@@ -416,5 +416,3 @@ private[scalaz] trait IterateeTHoistT[X, E, H[_[_], _]] extends Hoist[({type λ0
       fa.mapI[({type λ[α] = H[N, α]})#λ](T.hoist[M, N](f))(T[M])
   }
 }
-
-
