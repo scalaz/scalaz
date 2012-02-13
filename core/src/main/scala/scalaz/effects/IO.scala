@@ -4,7 +4,7 @@ package effects
 import Scalaz._
 import Free._
 
-sealed trait IO[A] {
+sealed trait IO[+A] {
   private[effects] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
   /**
    * Runs I/O and performs side-effects. An unsafe operation.
@@ -40,14 +40,14 @@ sealed trait IO[A] {
     })
 
   /** Executes the handler if an exception is raised. */
-  def except(handler: Throwable => IO[A]): IO[A] = 
+  def except[B >: A](handler: Throwable => IO[B]): IO[B] = 
     IO(rw => try { Return(this(rw).run) } catch { case e => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
    * Other exceptions are rethrown.
    */
-  def catchSome[B](p: Throwable => Option[B], handler: B => IO[A]): IO[A] =
+  def catchSome[B, C >: A](p: Throwable => Option[B], handler: B => IO[C]): IO[C] =
     except(e => p(e) cata (handler, throw e))
 
   /**
