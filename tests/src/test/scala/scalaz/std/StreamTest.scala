@@ -7,6 +7,6 @@ import scalaz.scalacheck.ScalazProperties._
 class StreamTest extends Spec {
   checkAll(equal.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
-  checkAll(monadPlus.laws[Stream])
+  checkAll(monadPlus.strongLaws[Stream])
   checkAll(traverse.laws[Stream])
 }

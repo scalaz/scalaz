@@ -13,7 +13,7 @@ class OptionTest extends Spec {
   checkAll("Option @@ Last", order.laws[Option[Int] @@ Last])
 
   checkAll("Option", monoid.laws[Option[Int]])
-  checkAll("Option", monadPlus.laws[Option])
+  checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   
   checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])

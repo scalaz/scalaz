@@ -31,7 +31,7 @@ class KleisliTest extends Spec {
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
-  checkAll(monadPlus.laws[KleisliOptInt])
+  checkAll(monadPlus.strongLaws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
