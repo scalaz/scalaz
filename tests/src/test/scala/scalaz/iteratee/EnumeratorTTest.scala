@@ -86,6 +86,21 @@ class EnumeratorTTest extends Spec {
     enum.drainTo[List] must be_===(List(1, 2, 3))
   }
 
+  "perform an interleaved effect" in {
+    import scalaz.syntax.monoid._
+    var v: Int = 0
+    val enum = enumStream[Unit, Int, IO](Stream(1, 2))
+    val effect = EnumeratorT.perform[Unit, Int, IO, Unit](IO(v = 1))
+    val enum2 = enumStream[Unit, Int, IO](Stream(3, 4))
+
+    val testIter = IterateeT.fold[Unit, Int, IO, Boolean](true) {
+      case (false, _) => false
+      case (true, i) => if (i <= 2) v == 0 else v == 1
+    }
+
+    (testIter &= (enum |+| effect |+| enum2)).run(_ => sys.error("unexpected")).unsafePerformIO must be_===(true)
+  }
+
   //checkAll(functor.laws[Enum])
   //checkAll(pointed.laws[Enum])
   checkAll(monad.laws[Enum])

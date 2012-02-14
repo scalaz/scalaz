@@ -97,6 +97,14 @@ trait EnumeratorTFunctions {
       def apply[A] = _.mapCont(_(eofInput))
     }
 
+  /**
+   * An enumerator that forces the evaulation of an effect in the F monad when it is consumed.
+   */
+  def perform[X, E, F[_]: Monad, B](f: F[B]): EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] { 
+      def apply[A] = s => iterateeT(Monad[F].bind(s.pointI.value) { step => Monad[F].map(f)(_ => step) })
+    }
+
   def enumOne[X, E, F[_]: Pointed](e: E): EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] {
       def apply[A] = _.mapCont(_(elInput(e)))

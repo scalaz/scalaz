@@ -86,6 +86,13 @@ trait EnumeratorPFunctions {
     }
   }
 
+  def perform[X, E, F[_], B](f: F[B]): EnumeratorP[X, E, F] = new EnumeratorP[X, E, F] {
+    def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
+      import MO._
+      EnumeratorT.perform[X, E, G, B](MO.promote(f))
+    }
+  }
+
   def enumPStream[X, E, F[_]: Monad](xs : Stream[E]): EnumeratorP[X, E, F] = new EnumeratorP[X, E, F] {
     def apply[G[_]](implicit MO: MonadPartialOrder[G, F]): EnumeratorT[X, E, G] = {
       import MO._
