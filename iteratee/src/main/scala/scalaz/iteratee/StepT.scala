@@ -39,14 +39,14 @@ sealed trait StepT[X, E, F[_], A] {
   def contOr(k: => Input[E] => IterateeT[X, E, F, A]): Input[E] => IterateeT[X, E, F, A] =
     cont getOrElse k
 
-  def mapContOr[Z](k: (Input[E] => IterateeT[X, E, F, A]) => Z, z: => Z) =
+  def mapContOr[Z](k: (Input[E] => IterateeT[X, E, F, A]) => Z, z: => Z): Z =
     fold(
       k(_)
       , (_, _) => z
       , _ => z
     )
 
-  def mapCont(k: (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit F: Pointed[F]) =
+  def mapCont(k: (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit F: Pointed[F]): IterateeT[X, E, F, A] =
     mapContOr[IterateeT[X, E, F, A]](k, pointI)
 
   def doneValue: LazyOption[A] =
