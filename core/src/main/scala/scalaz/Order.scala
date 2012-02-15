@@ -148,11 +148,10 @@ object Order {
       }
     }
 
-    if (i1.hasNext)
-      if (i2.hasNext)
-        r
-      else
-        GT
+    if (i1.hasNext == i2.hasNext)
+      r
+    else if (i1.hasNext)
+      GT
     else
       LT
   })
