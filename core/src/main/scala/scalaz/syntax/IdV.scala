@@ -7,7 +7,7 @@ import scalaz.{Pointed, Monoid, NonEmptyList}
 trait IdV[A] extends SyntaxV[A] {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
-    if (self == null) self else d
+    if (self == null) d else self
 
   /**Applies `self` to the provided function */
   final def |>[B](f: A => B): B =
