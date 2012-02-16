@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList}
+import scalaz.{Pointed, Monoid, NonEmptyList, Enum, Equal}
 
 
 trait IdV[A] extends SyntaxV[A] {
@@ -61,6 +61,23 @@ trait IdV[A] extends SyntaxV[A] {
     if (p isDefinedAt self) p(self)
     else Pointed[F].point(self)
 
+  def succ(implicit e: scalaz.Enum[A]): A =
+    e succ self
+
+  def -+-(n: Int)(implicit e: scalaz.Enum[A]): A =
+    e.succn(n)(self)
+
+  def succx(implicit e: scalaz.Enum[A], q: scalaz.Equal[A]): Option[A] =
+    e.succx.apply(self)
+
+  def pred(implicit e: scalaz.Enum[A]): A =
+    e pred self
+
+  def ---(n: Int)(implicit e: scalaz.Enum[A]): A =
+    e.predn(n)(self)
+
+  def predx(implicit e: scalaz.Enum[A], q: scalaz.Equal[A]): Option[A] =
+    e.predx.apply(self)
 }
 
 trait ToIdV {
