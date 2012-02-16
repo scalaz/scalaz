@@ -152,4 +152,36 @@ trait Enum[A] extends Order[A] {
   def predStateMax[X, Y](f: A => X, k: X => Y): Option[Y] =
     predStateMaxM(f, (a: X) => State.state[A, Y](k(a)))
 
+  def from(a: A): EphemeralStream[A] =
+    EphemeralStream.cons(a, from(succ(a)))
+
+  def fromStep(n: Int, a: A): EphemeralStream[A] =
+    EphemeralStream.cons(a, from(succn(n)(a)))
+
+  def fromTo(a: A, z: A): EphemeralStream[A] = {
+    lazy val op = if(lessThan(a, z)) succ else pred
+    EphemeralStream.cons(a,
+      if(equal(a, z))
+        EphemeralStream.emptyEphemeralStream
+      else
+        fromTo(op(a), z)
+    )
+  }
+
+  def fromStepTo(n: Int, a: A, z: A): EphemeralStream[A] = {
+    lazy val cmp =
+      if(n > 0)
+        greaterThan(_, _)
+      else if(n < 0)
+        lessThan(_, _)
+      else
+        (_: A, _: A) => false
+    EphemeralStream.cons(a, {
+      val k = succn(n)(a)
+      if(cmp(k, z))
+        EphemeralStream.emptyEphemeralStream
+      else
+        fromStepTo(n, k, z)
+    })
+  }
 }

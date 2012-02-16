@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList, Enum, Equal}
+import scalaz.{Pointed, Monoid, NonEmptyList, Enum, EphemeralStream, Equal}
 
 
 trait IdV[A] extends SyntaxV[A] {
@@ -61,23 +61,35 @@ trait IdV[A] extends SyntaxV[A] {
     if (p isDefinedAt self) p(self)
     else Pointed[F].point(self)
 
-  def succ(implicit e: scalaz.Enum[A]): A =
+  def succ(implicit e: Enum[A]): A =
     e succ self
 
-  def -+-(n: Int)(implicit e: scalaz.Enum[A]): A =
+  def -+-(n: Int)(implicit e: Enum[A]): A =
     e.succn(n)(self)
 
-  def succx(implicit e: scalaz.Enum[A]): Option[A] =
+  def succx(implicit e: Enum[A]): Option[A] =
     e.succx.apply(self)
 
-  def pred(implicit e: scalaz.Enum[A]): A =
+  def pred(implicit e: Enum[A]): A =
     e pred self
 
-  def ---(n: Int)(implicit e: scalaz.Enum[A]): A =
+  def ---(n: Int)(implicit e: Enum[A]): A =
     e.predn(n)(self)
 
-  def predx(implicit e: scalaz.Enum[A]): Option[A] =
+  def predx(implicit e: Enum[A]): Option[A] =
     e.predx.apply(self)
+
+  def from(implicit e: Enum[A]): EphemeralStream[A] =
+    e.from(self)
+
+  def fromStep(step: Int)(implicit e: Enum[A]): EphemeralStream[A] =
+    e.fromStep(step, self)
+
+  def |=>(to: A)(implicit e: Enum[A]): EphemeralStream[A] =
+    e.fromTo(self, to)
+
+  def |==>(step: Int, to: A)(implicit e: Enum[A]): EphemeralStream[A] =
+    e.fromStepTo(step, self, to)
 }
 
 trait ToIdV {
