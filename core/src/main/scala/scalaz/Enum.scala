@@ -47,40 +47,113 @@ trait Enum[A] extends Order[A] {
     None
   def max: Option[A] =
     None
-}
 
-object Enum extends EnumFunctions
+  /**
+   * Moves to the successor, unless at the maximum.
+   *
+   * @param e The equality test for determining if at the maximum.
+   */
+  def succx(implicit e: Equal[A]): Kleisli[Option, A, A] =
+    Kleisli(a => if(max forall (e.equal(a, _))) None else Some(succ(a)))
 
-trait EnumFunctions {
+  /**
+   * Moves to the predecessor, unless at the minimum.
+   *
+   * @param e The equality test for determining if at the minimum.
+   */
+  def predx(implicit e: Equal[A]): Kleisli[Option, A, A] =
+    Kleisli(a => if(min forall (e.equal(a, _))) None else Some(pred(a)))
 
   /**
    * Produce a state value that executes the successor (`succ`) on each spin and executing the given function on the current value. This is useful to implement incremental looping. Evaluating the state value requires a beginning to increment from.
    *
    * @param f The function to execute on each spin of the state value.
-   * @param e The implementation of the successor function.
    */
-  def succState[S, A](f: S => A)(implicit e: Enum[S]): State[S, A] =
-    State((s: S) => (f(s), e succ s))
+  def succState[X](f: A => X): State[A, X] =
+    State((s: A) => (f(s), succ(s)))
 
   /**
-   * Produce a value that starts at a zero (`Monoid.zero`) and increments through a state value with the given binding function. This is useful to implement incremental looping.
+   * Produce a value that starts at zero (`Monoid.zero`) and increments through a state value with the given binding function. This is useful to implement incremental looping.
    *
    * @param f The function to execute on each spin of the state value.
    * @param k The binding function.
-   * @param e The implementation of the successor function.
    * @param m The implementation of the zero function from which to start.
    */
-  def succStateZeroM[S, A, B](f: S => A, k: A => State[S, B])(implicit e: Enum[S], m: Monoid[S]): B =
-    (succState(f) flatMap k).eval(m.zero)
+  def succStateZeroM[X, Y](f: A => X, k: X => State[A, Y])(implicit m: Monoid[A]): Y =
+    (succState(f) flatMap k) eval m.zero
 
   /**
-   * Produce a value that starts at a zero (`Monoid.zero`) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
+   * Produce a value that starts at zero (`Monoid.zero`) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
    *
    * @param f The function to execute on each spin of the state value.
    * @param k The mapping function.
-   * @param e The implementation of the successor function.
    * @param m The implementation of the zero function from which to start.
    */
-  def succStateZero[S, A, B](f: S => A, k: A => B)(implicit e: Enum[S], m: Monoid[S]): B =
-    succStateZeroM(f, (a: A) => State.state[S, B](k(a)))
+  def succStateZero[X, Y](f: A => X, k: X => Y)(implicit m: Monoid[A]): Y =
+    succStateZeroM(f, (a: X) => State.state[A, Y](k(a)))
+
+  /**
+   * Produce a value that starts at the minimum (if it exists) and increments through a state value with the given binding function. This is useful to implement incremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The binding function.
+   */
+  def succStateMinM[X, Y](f: A => X, k: X => State[A, Y]): Option[Y] =
+    min map ((succState(f) flatMap k) eval _)
+
+  /**
+   * Produce a value that starts at the minimum (if it exists) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The mapping function.
+   */
+  def succStateMin[X, Y](f: A => X, k: X => Y): Option[Y] =
+    succStateMinM(f, (a: X) => State.state[A, Y](k(a)))
+
+  /**
+   * Produce a state value that executes the predecessor (`pred`) on each spin and executing the given function on the current value. This is useful to implement decremental looping. Evaluating the state value requires a beginning to decrement from.
+   *
+   * @param f The function to execute on each spin of the state value.
+   */
+  def predState[X](f: A => X): State[A, X] =
+    State((s: A) => (f(s), pred(s)))
+
+  /**
+   * Produce a value that starts at zero (`Monoid.zero`) and decrements through a state value with the given binding function. This is useful to implement decremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The binding function.
+   * @param m The implementation of the zero function from which to start.
+   */
+  def predStateZeroM[X, Y](f: A => X, k: X => State[A, Y])(implicit m: Monoid[A]): Y =
+    (predState(f) flatMap k) eval m.zero
+
+  /**
+   * Produce a value that starts at zero (`Monoid.zero`) and decrements through a state value with the given mapping function. This is useful to implement decremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The mapping function.
+   * @param m The implementation of the zero function from which to start.
+   */
+  def predStateZero[X, Y](f: A => X, k: X => Y)(implicit m: Monoid[A]): Y =
+    predStateZeroM(f, (a: X) => State.state[A, Y](k(a)))
+
+  /**
+   * Produce a value that starts at the maximum (if it exists) and decrements through a state value with the given binding function. This is useful to implement decremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The binding function.
+   */
+  def predStateMaxM[X, Y](f: A => X, k: X => State[A, Y]): Option[Y] =
+    max map ((predState(f) flatMap k) eval _)
+
+  /**
+   * Produce a value that starts at the maximum (if it exists) and decrements through a state value with the given mapping function. This is useful to implement decremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The mapping function.
+   */
+  def predStateMax[X, Y](f: A => X, k: X => Y): Option[Y] =
+    predStateMaxM(f, (a: X) => State.state[A, Y](k(a)))
+
 }
