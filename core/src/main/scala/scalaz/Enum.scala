@@ -70,6 +70,17 @@ trait EnumFunctions {
    * @param e The implementation of the successor function.
    * @param m The implementation of the zero function from which to start.
    */
-  def succStateZero[S, A, B](f: S => A, k: A => State[S, B])(implicit e: Enum[S], m: Monoid[S]): B =
+  def succStateZeroM[S, A, B](f: S => A, k: A => State[S, B])(implicit e: Enum[S], m: Monoid[S]): B =
     (succState(f) flatMap k).eval(m.zero)
+
+  /**
+   * Produce a value that starts at a zero (`Monoid.zero`) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The mapping function.
+   * @param e The implementation of the successor function.
+   * @param m The implementation of the zero function from which to start.
+   */
+  def succStateZero[S, A, B](f: S => A, k: A => B)(implicit e: Enum[S], m: Monoid[S]): B =
+    succStateZeroM(f, (a: A) => State.state[S, B](k(a)))
 }
