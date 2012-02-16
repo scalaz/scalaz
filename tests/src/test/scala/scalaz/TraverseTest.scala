@@ -67,7 +67,7 @@ class TraverseTest extends Spec {
 
       val as = Stream.range(0, 100000)
       val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => State((s: Int) => (IO(a - s), a)))
-      state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
+      state.eval(0).unsafePerformIO().take(3) must be_===(Stream(0, 1, 1))
     }
   }
 

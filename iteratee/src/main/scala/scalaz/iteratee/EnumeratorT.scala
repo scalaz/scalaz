@@ -15,6 +15,12 @@ trait EnumeratorT[X, E, F[_]] { self =>
       }
     }
 
+  def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[X, E, F] = {
+    new EnumeratorT[X, E, F] {
+      def apply[A] = _.mapCont(_(elInput(e))) &= self
+    }
+  }
+
   def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M0: Monad[F]) = 
     new EnumeratorT[X, B, F] {
       def apply[A] = {
@@ -36,6 +42,22 @@ trait EnumeratorT[X, E, F[_]] { self =>
       }
     }
 
+  def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[X, B, F] = {
+    import MO._
+    flatMap(e => EnumeratorT.enumeratorTMonadTrans[X].liftM(MO.promote(ev(e))))
+  }
+
+  def bindM[B, G[_]](f: E => G[EnumeratorT[X, B, F]])(implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[X, B, F]]] = {
+    import scalaz.syntax.semigroup._
+    val iter = fold[X, G[EnumeratorT[X, B, F]], F, G[EnumeratorT[X, B, F]]](G.point(EnumeratorT.empty[X, B, F])) {
+      case (acc, concat) => G.bind(acc) { en => 
+                              G.map(concat) { append => en |+| append } 
+                            }
+    }   
+
+    (iter &= self.map(f)).run(x => F.point(G.point(pointErr[X, B, F](x))))
+  }
+
   def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[X, B, F] = 
     new EnumeratorT[X, B, F] {
       def apply[A] = { (step: StepT[X, B, F, A]) => 
@@ -54,7 +76,22 @@ trait EnumeratorT[X, E, F[_]] { self =>
     }
 
   def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Pointed[M]): F[M[E]] =
-    (IterateeT.consume[X, E, F, M] &= this).run(_ => M.point(P.empty)) 
+    (IterateeT.consume[X, E, F, M] &= self).run(_ => M.point(P.empty)) 
+
+  def reduced[B](b: B)(f: (B, E) => B)(implicit M: Monad[F]): EnumeratorT[X, B, F] = 
+    new EnumeratorT[X, B, F] {
+      def apply[A] = (step: StepT[X, B, F, A]) => {
+        def check(s: StepT[X, E, F, B]): IterateeT[X, B, F, A] = s.fold(
+          cont = k => k(eofInput) >>== {
+            s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
+          }
+          , done = (a, _) => step.mapCont(f => f(elInput(a)))
+          , err  = x => err(x)
+        )
+
+        iterateeT(M.bind((IterateeT.fold[X, E, F, B](b)(f) &= self).value) { s => check(s).value })
+      }
+    }
 }
 
 trait EnumeratorTInstances0 {
@@ -89,12 +126,25 @@ trait EnumeratorTFunctions {
       def apply[A] = _.pointI
     }
 
+  def pointErr[X, E, F[_]: Pointed](x: X): EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] { 
+      def apply[A] = _ => err[X, E, F, A](x)
+    }
+
   /** 
    * An EnumeratorT that is at EOF
    */
   def enumEofT[X, E, F[_] : Pointed]: EnumeratorT[X, E, F] =
     new EnumeratorT[X, E, F] { 
       def apply[A] = _.mapCont(_(eofInput))
+    }
+
+  /**
+   * An enumerator that forces the evaulation of an effect in the F monad when it is consumed.
+   */
+  def perform[X, E, F[_]: Monad, B](f: F[B]): EnumeratorT[X, E, F] = 
+    new EnumeratorT[X, E, F] { 
+      def apply[A] = s => iterateeT(Monad[F].bind(s.pointI.value) { step => Monad[F].map(f)(_ => step) })
     }
 
   def enumOne[X, E, F[_]: Pointed](e: E): EnumeratorT[X, E, F] = 

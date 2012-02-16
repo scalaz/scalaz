@@ -8,7 +8,7 @@ trait IdInstances {
     def cojoin[A](a: Id[A]): A = a
     def copoint[A](p: Id[A]): A = p
     def traverseImpl[G[_]: Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
-    def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
+    override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
     // Overrides for efficiency.
 

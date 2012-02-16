@@ -130,7 +130,7 @@ trait LazyEitherInstances {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: (A) => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
-    def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
 
     def bind[A, B](fa: LazyEither[E, A])(f: (A) => LazyEither[E, B]): LazyEither[E, B] =

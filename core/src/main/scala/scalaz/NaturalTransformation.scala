@@ -18,6 +18,10 @@ trait NaturalTransformations {
     def apply[A](a: A) = a
   }
 
+  def refl[F[_]] = new (F ~> F) {
+    def apply[A](fa: F[A]) = fa
+  }
+
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
 

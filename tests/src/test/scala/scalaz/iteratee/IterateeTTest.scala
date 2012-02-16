@@ -15,6 +15,11 @@ class IterateeTTest extends Spec {
     (consume[Unit, Int, Id, List] &= enumStream(Stream(1, 2, 3))).runOrZero must be_===(List(1, 2, 3))
   }
 
+  "fold in constant stack space" in {
+    skipped("TODO")
+    (fold[Unit, Int, Id, Int](0){ case (a,v) => a + v } &= enumStream[Unit, Int, Id](Stream.fill(10000)(1))).runOrZero must be_===(10000)
+  }
+
   object instances {
     object iterateet {
       def monad[F[_]: Monad, X, E] = Monad[({type λ[α] = IterateeT[X, E, F, α]})#λ]

@@ -87,7 +87,7 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
-  final def foldRun[B, AA >: A](f: (B, S[Free[S, AA]]) => (B, Free[S, AA]), b: B): (B, AA) = {
+  final def foldRun[B, AA >: A](b: B)(f: (B, S[Free[S, AA]]) => (B, Free[S, AA])): (B, AA) = {
     @tailrec def foldRun2(t: Free[S, AA], z: B): (B, AA) = t.resume match {
       case Left(s) => {
         val (b1, s1) = f(z, s)

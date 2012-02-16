@@ -15,6 +15,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class EnumeratorPTest extends Spec {
+  implicit val intO = Order[Int].order _
   "cogroupE" should {
     "work the same as directly using the nested iteratee " in {
       val enum  = enumPStream[Unit, Int, Id](Stream(1, 3, 3, 5, 7, 8, 8)) 

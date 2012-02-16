@@ -48,14 +48,15 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
 
-  // TODO can we provide a default impl of foldR in terms of traverseImpl?
-
   def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (F[Unit], B) = 
     runTraverseS(fa, z)(a => State(b => ((), f(b,a))))
 
   override def foldLeft[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
 
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2
+
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
+    foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
 
   def reverse[A](fa: F[A]): F[A] = { 
     val (shape, as) = foldLShape(fa, scala.List[A]())((t,h) => h :: t)

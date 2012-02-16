@@ -98,7 +98,7 @@ trait LazyOptionInstances {
 
   implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] = new Traverse[LazyOption] with MonadPlus[LazyOption] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyOption[A])(f: (A) => G[B]): G[LazyOption[B]] =  fa traverse (a => f(a))
-    def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+    override def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f
     def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = a orElse b
     def bind[A, B](fa: LazyOption[A])(f: (A) => LazyOption[B]): LazyOption[B] = fa flatMap (a => f(a))

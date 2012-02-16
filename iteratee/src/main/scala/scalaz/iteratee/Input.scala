@@ -51,6 +51,32 @@ sealed trait Input[E] {
 object Input extends InputFunctions with InputInstances {
   def apply[E](e: => E): Input[E] =
     elInput(e)
+
+  object Empty {
+    def apply[E]: Input[E] = new Input[E] {
+      def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) = empty
+    }
+
+    def unapply[E](i: Input[E]): Boolean = i.fold(true, _ => false, false)
+  }
+
+
+  object Element {
+    def apply[E](e: => E): Input[E] = new Input[E] {
+      def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) = el(e)
+    }
+
+    def unapply[E](i: Input[E]): Option[E] = i.fold(None, Some(_), None)
+  }
+
+  object Eof {
+    def apply[E]: Input[E] = new Input[E] {
+      def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) = eof
+    }
+
+    def unapply[E](i: Input[E]): Boolean = i.fold(false, _ => false, true)
+  }
+
 }
 
 trait InputInstances {
@@ -68,7 +94,7 @@ trait InputInstances {
        , el = x => Applicative[G].map(f(x))(b => elInput(b))
        , eof = Applicative[G].point(eofInput[B])
      )
-     def foldRight[A, B](fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
+    override def foldRight[A, B](fa: Input[A], z: => B)(f: (A, => B) => B): B = fa.fold(
        empty = z
        , el = a => f(a, z)
        , eof = z
@@ -119,18 +145,7 @@ trait InputInstances {
 }
 
 trait InputFunctions {
-  def emptyInput[E]: Input[E] = new Input[E] {
-    def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
-      empty
-  }
-
-  def elInput[E](e: => E): Input[E] = new Input[E] {
-    def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
-      el(e)
-  }
-
-  def eofInput[E]: Input[E] = new Input[E] {
-    def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
-      eof
-  }
+  def emptyInput[E]: Input[E] = Input.Empty[E]
+  def elInput[E](e: => E): Input[E] = Input.Element(e)
+  def eofInput[E]: Input[E] = Input.Eof[E]
 }

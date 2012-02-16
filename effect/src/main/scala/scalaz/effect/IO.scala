@@ -10,7 +10,7 @@ import Kleisli._
 import Free._
 import std.function._
 
-sealed trait IO[A] {
+sealed trait IO[+A] {
   private[effect] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
 
   import IO._
@@ -19,22 +19,22 @@ sealed trait IO[A] {
    * Runs I/O and performs side-effects. An unsafe operation.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO: A = apply(realWorld).run._2
+  def unsafePerformIO(): A = apply(realWorld).run._2
 
   /**
    * Constructs an IO action whose steps may be interleaved with another.
    * An unsafe operation, since it exposes a trampoline that allows one to
    * step through the components of the IO action.
    */
-  def unsafeInterleaveIO: IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
+  def unsafeInterleaveIO(): IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
 
   /**
    * Interleaves the steps of this IO action with the steps of another,
    * consuming the results of both with the given function.
    */
   def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => C): IO[C] = (for {
-    a <- unsafeInterleaveIO
-    b <- iob.unsafeInterleaveIO
+    a <- unsafeInterleaveIO()
+    b <- iob.unsafeInterleaveIO()
     c <- io(rw => a zipWith (b, (x: A, y: B) => (rw -> f(x, y))))
   } yield c)
 
@@ -63,18 +63,18 @@ sealed trait IO[A] {
     })
 
   /** Lift this action to a given IO-like monad. */
-  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
+  def liftIO[M[+_]](implicit m: MonadIO[M]): M[A] =
     m.liftIO(this)
 
   /** Executes the handler if an exception is raised. */
-  def except(handler: Throwable => IO[A]): IO[A] = 
+  def except[B >: A](handler: Throwable => IO[B]): IO[B] = 
     io(rw => try { Return(this(rw).run) } catch { case e => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
    * Other exceptions are rethrown.
    */
-  def catchSome[B](p: Throwable => Option[B], handler: B => IO[A]): IO[A] =
+  def catchSome[B,C >: A](p: Throwable => Option[B], handler: B => IO[C]): IO[C] =
     except(e => p(e) match {
       case Some(z) => handler(z)
       case None => throw e
@@ -228,7 +228,7 @@ trait IOFunctions extends IOStd {
    * Register a finalizer in the current region. When the region terminates,
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
-  def onExit[S, P[_] : MonadIO](finalizer: IO[Unit]):
+  def onExit[S, P[+_] : MonadIO](finalizer: IO[Unit]):
   RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)

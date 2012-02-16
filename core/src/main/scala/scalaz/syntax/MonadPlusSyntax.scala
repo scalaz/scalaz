@@ -9,6 +9,9 @@ trait MonadPlusV[F[_],A] extends SyntaxV[F[A]] {
 
   def filter(f: A => Boolean) =
     F.filter(self)(f)
+  
+  def withFilter(f: A => Boolean) =
+    filter(f)
 
   def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
     val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)

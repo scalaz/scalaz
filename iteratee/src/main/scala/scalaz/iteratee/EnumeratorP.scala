@@ -7,6 +7,7 @@ import Enumeratee2T._
 import scala.annotation.tailrec
 import scalaz.syntax.Syntax.bind._
 import scalaz.syntax.Syntax.order._
+import scalaz.syntax.Syntax.semigroup._
 
 trait ForallM[P[_[_]]] {
   def apply[F[_]: Monad]: P[F]
@@ -72,7 +73,7 @@ abstract class EnumeratorP[X, E, F[_]] { self =>
     }
 
   def join(other: EnumeratorP[X, E, F])(implicit order: Order[E], m: Monad[F]): EnumeratorP[X, (E, E), F] =
-    EnumeratorP.joinE[X, E, E, F].apply(self, other)
+    EnumeratorP.joinE[X, E, E, F](m, order.order).apply(self, other)
 
   def merge(other: EnumeratorP[X, E, F])(implicit ord: Order[E], m: Monad[F]) = 
     EnumeratorP.mergeE[X, E, F].apply(self, other)
@@ -83,6 +84,13 @@ trait EnumeratorPFunctions {
     def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
       import MO._
       EnumeratorT.empty[X, E, G]
+    }
+  }
+
+  def perform[X, E, F[_], B](f: F[B]): EnumeratorP[X, E, F] = new EnumeratorP[X, E, F] {
+    def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
+      import MO._
+      EnumeratorT.perform[X, E, G, B](MO.promote(f))
     }
   }
 
@@ -140,6 +148,19 @@ trait EnumeratorPFunctions {
   }
 }
 
-object EnumeratorP extends EnumeratorPFunctions
+trait EnumeratorPInstances {
+  implicit def enumeratorPMonoid[X, E, F[_]]: Monoid[EnumeratorP[X, E, F]] = new Monoid[EnumeratorP[X, E, F]] {
+    def zero = EnumeratorP.empty[X, E, F]
+    def append(f1: EnumeratorP[X, E, F], f2: => EnumeratorP[X, E, F]) = 
+      new EnumeratorP[X, E, F] {
+        def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
+          import MO._
+          EnumeratorT.enumeratorTMonoid[X, E, G].append(f1[G], f2[G])
+        }
+      }
+  }
+}
+
+object EnumeratorP extends EnumeratorPFunctions with EnumeratorPInstances
 
 // vim: set ts=4 sw=4 et:

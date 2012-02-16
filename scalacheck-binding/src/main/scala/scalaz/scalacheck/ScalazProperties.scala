@@ -226,13 +226,16 @@ object ScalazProperties {
       forAll(F.monadPlusLaw.leftZero[X] _)
 
     def rightZero[F[_], X](implicit F: MonadPlus[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(F.monadPlusLaw.rightZero[X] _)
+      forAll(F.strongMonadPlusLaw.rightZero[X] _)
 
     def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(monad.laws[F])
       include(plusEmpty.laws[F])
       property("empty map") = emptyMap[F, Int]
       property("left zero") = leftZero[F, Int]
+    }
+    def strongLaws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
+      include(laws[F])
       property("right zero") = rightZero[F, Int]
     }
   }
