@@ -10,8 +10,6 @@ package scalaz
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
-  import State.state
-
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
   class Traversal[G[_]](implicit G: Applicative[G]) { 

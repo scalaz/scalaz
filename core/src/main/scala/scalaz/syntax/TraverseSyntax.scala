@@ -7,7 +7,6 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   ////
 
   import Leibniz.===
-  import State.state
 
   final def tmap[B](f: A => B) =
     F.map(self)(f)

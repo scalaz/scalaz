@@ -48,3 +48,28 @@ trait Enum[A] extends Order[A] {
   def max: Option[A] =
     None
 }
+
+object Enum extends EnumFunctions
+
+trait EnumFunctions {
+
+  /**
+   * Produce a state value that executes the successor (`succ`) on each spin and executing the given function on the current value. This is useful to implement incremental looping. Evaluating the state value requires a beginning to increment from.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param e The implementation of the successor function.
+   */
+  def succState[S, A](f: S => A)(implicit e: Enum[S]): State[S, A] =
+    State((s: S) => (f(s), e succ s))
+
+  /**
+   * Produce a value that starts at a zero (`Monoid.zero`) and increments through a state value with the given binding function. This is useful to implement incremental looping.
+   *
+   * @param f The function to execute on each spin of the state value.
+   * @param k The binding function.
+   * @param e The implementation of the successor function.
+   * @param m The implementation of the zero function from which to start.
+   */
+  def succStateZero[S, A, B](f: S => A, k: A => State[S, B])(implicit e: Enum[S], m: Monoid[S]): B =
+    (succState(f) flatMap k).eval(m.zero)
+}
