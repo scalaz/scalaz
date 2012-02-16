@@ -3,10 +3,10 @@ package syntax
 package std
 
 trait Function1V[T, R] extends SyntaxV[T => R] {
-  def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
-
   import NonEmptyList._
   import Validation._
+
+  def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 
   def arrow[A[_, _]](implicit a: Arrow[A]): A[T, R] =
     a.arr(self)
