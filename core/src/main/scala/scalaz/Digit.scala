@@ -134,7 +134,7 @@ trait DigitInstances {
       case Digit._3 => Digit._2
       case Digit._4 => Digit._3
       case Digit._5 => Digit._4
-      case Digit._6 => Digit._7
+      case Digit._6 => Digit._5
       case Digit._7 => Digit._6
       case Digit._8 => Digit._7
       case Digit._9 => Digit._8

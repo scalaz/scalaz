@@ -20,29 +20,30 @@ trait Enum[A] extends Order[A] {
       var w = n
       var z = a
       while(w < 0) {
-        z = pred(a)
+        z = pred(z)
         w = w + 1
       }
       while(w > 0) {
-        z = succ(a)
+        z = succ(z)
         w = w - 1
       }
       z
     }
-  def predn: Int => A => A =
+  def predn: Int => A => A = {
     n => a => {
       var w = n
       var z = a
       while(w < 0) {
-        z = succ(a)
+        z = succ(z)
         w = w + 1
       }
       while(w > 0) {
-        z = pred(a)
+        z = pred(z)
         w = w - 1
       }
       z
     }
+  }
   def min: Option[A] =
     None
   def max: Option[A] =
