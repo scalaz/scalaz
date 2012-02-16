@@ -60,18 +60,4 @@ trait Function1V[T, R] extends SyntaxV[T => R] {
   def predStateMax[Y](k: R => Y)(implicit e: Enum[T]): Option[Y] =
     e.predStateMax(self, k)
 
-/*
-
-
-
-  def predState[X](f: A => X): State[A, X] =
-
-  def predStateZeroM[X, Y](f: A => X, k: X => State[A, Y])(implicit m: Monoid[A]): Y =
-
-  def predStateZero[X, Y](f: A => X, k: X => Y)(implicit m: Monoid[A]): Y =
-
-  def predStateMaxM[X, Y](f: A => X, k: X => State[A, Y]): Option[Y] =
-
-  def predStateMax[X, Y](f: A => X, k: X => Y): Option[Y] =
-  */
 }
