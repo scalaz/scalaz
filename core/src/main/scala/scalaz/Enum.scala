@@ -50,19 +50,15 @@ trait Enum[A] extends Order[A] {
 
   /**
    * Moves to the successor, unless at the maximum.
-   *
-   * @param e The equality test for determining if at the maximum.
    */
-  def succx(implicit e: Equal[A]): Kleisli[Option, A, A] =
-    Kleisli(a => if(max forall (e.equal(a, _))) None else Some(succ(a)))
+  def succx: Kleisli[Option, A, A] =
+    Kleisli(a => if(max forall (equal(a, _))) None else Some(succ(a)))
 
   /**
    * Moves to the predecessor, unless at the minimum.
-   *
-   * @param e The equality test for determining if at the minimum.
    */
-  def predx(implicit e: Equal[A]): Kleisli[Option, A, A] =
-    Kleisli(a => if(min forall (e.equal(a, _))) None else Some(pred(a)))
+  def predx: Kleisli[Option, A, A] =
+    Kleisli(a => if(min forall (equal(a, _))) None else Some(pred(a)))
 
   /**
    * Produce a state value that executes the successor (`succ`) on each spin and executing the given function on the current value. This is useful to implement incremental looping. Evaluating the state value requires a beginning to increment from.

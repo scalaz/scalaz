@@ -67,7 +67,7 @@ trait IdV[A] extends SyntaxV[A] {
   def -+-(n: Int)(implicit e: scalaz.Enum[A]): A =
     e.succn(n)(self)
 
-  def succx(implicit e: scalaz.Enum[A], q: scalaz.Equal[A]): Option[A] =
+  def succx(implicit e: scalaz.Enum[A]): Option[A] =
     e.succx.apply(self)
 
   def pred(implicit e: scalaz.Enum[A]): A =
@@ -76,7 +76,7 @@ trait IdV[A] extends SyntaxV[A] {
   def ---(n: Int)(implicit e: scalaz.Enum[A]): A =
     e.predn(n)(self)
 
-  def predx(implicit e: scalaz.Enum[A], q: scalaz.Equal[A]): Option[A] =
+  def predx(implicit e: scalaz.Enum[A]): Option[A] =
     e.predx.apply(self)
 }
 
