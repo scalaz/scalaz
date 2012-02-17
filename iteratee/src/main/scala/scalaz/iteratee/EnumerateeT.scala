@@ -4,8 +4,14 @@ package iteratee
 import Iteratee._
 import Ordering._
 
-trait EnumerateeT[X, O, I, F[_]] {
+trait EnumerateeT[X, O, I, F[_]] { self =>
   def apply[A]: StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]]
+
+  def run(enum: EnumeratorT[X, O, F])(implicit M: Monad[F]): EnumeratorT[X, I, F] = {
+    new EnumeratorT[X, I, F] {
+      def apply[A] = (s: StepT[X, I, F, A]) => iterateeT((self[A](s) &= enum).run(x => err[X, I, F, A](x).value))
+    }
+  }
 }
 
 object EnumerateeT extends EnumerateeTFunctions
@@ -34,6 +40,27 @@ trait EnumerateeTFunctions {
         }
 
         doneOr(loop)
+      }
+    }
+
+  def flatMap[X, O, I, F[_]: Monad](f: O => EnumeratorT[X, I, F]): EnumerateeT[X, O, I, F] = 
+    new EnumerateeT[X, O, I, F] {
+      def apply[A] = {
+        def loop(step: StepT[X, I, F, A]): IterateeT[X, O, F, StepT[X, I, F, A]] = {
+          step.fold(
+            cont = contf => cont[X, O, F, StepT[X, I, F, A]] {
+              (_: Input[O]).map(e => f(e)).fold(
+                el    = en => en.apply(step) >>== loop,
+                empty = contf(emptyInput) >>== loop,
+                eof   = done(step, emptyInput)
+              )
+            },
+            done = (a, _) => done(sdone(a, emptyInput), emptyInput),
+            err  = x => err(x)
+          )
+        }
+
+        loop
       }
     }
 
