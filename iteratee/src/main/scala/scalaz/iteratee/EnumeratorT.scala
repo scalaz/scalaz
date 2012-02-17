@@ -144,7 +144,7 @@ trait EnumeratorTFunctions {
    */
   def perform[X, E, F[_]: Monad, B](f: F[B]): EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] { 
-      def apply[A] = s => iterateeT(Monad[F].bind(s.pointI.value) { step => Monad[F].map(f)(_ => step) })
+      def apply[A] = s => iterateeT(Monad[F].bind(f) { _ => s.pointI.value })
     }
 
   def enumOne[X, E, F[_]: Pointed](e: E): EnumeratorT[X, E, F] = 
