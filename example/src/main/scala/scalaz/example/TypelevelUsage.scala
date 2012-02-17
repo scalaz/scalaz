@@ -100,12 +100,20 @@ object TypelevelUsage extends App {
 
     val ares1 = aplist(Option(func.curried))
     val ares2 = aplist.applyP(func.curried)
+    val ares3 = aplist.applyP(x => y => z => {
+      typed[Nothing](x)
+      typed[Int](y)
+      typed[String](z)
+      2.0
+    })
 
     typed[Option[Double]](ares1)
     typed[Option[Double]](ares2)
+    typed[Option[Double]](ares3)
 
     assert(ares1 === None)
     assert(ares2 === None)
+    assert(ares3 === None)
 
   }
 
