@@ -20,6 +20,9 @@ sealed trait GenericList[+M[_]] {
   def apply[N[X] >: M[X] : Apply, R](f: N[Function[R]]): N[R]
   def down: Down
 
+  final def applyP[N[X] >: M[X] : Apply : Pointed, R](f: Function[R]): N[R] =
+    apply[N, R](Pointed[N].point(f))
+
   final def coerce[N[X] >: M[X]]: Transformed[N] = {
     val t = new (M ~> N) {
       def apply[A](ma: M[A]): N[A] = ma
