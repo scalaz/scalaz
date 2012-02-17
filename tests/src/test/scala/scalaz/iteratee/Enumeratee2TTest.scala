@@ -73,7 +73,7 @@ class Enumeratee2TTest extends Spec {
     val enum2 = enumStream[Unit, Int, Id](Stream(2, 3, 4)) 
 
     val consumer = consume[Unit, (Int, Int), Id, List]
-    val producer = cross[Unit, Int, Int, Id](enum1, enum2)
+    val producer = enum1 cross enum2
     (consumer &= producer).run(_ => sys.error("...")) must be_===(List(
       (1, 2), (1, 3), (1, 4), (3, 2), (3, 3), (3, 4), (5, 2), (5, 3), (5, 4)
     ))

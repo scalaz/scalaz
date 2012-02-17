@@ -19,7 +19,7 @@ trait EnumeratorT[X, E, F[_]] { self =>
     }
   }
 
-  def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M0: Monad[F]) = 
+  def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M1: Monad[F]) = 
     EnumerateeT.flatMap(f) run self
 
   def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[X, B, F] = {
@@ -64,6 +64,9 @@ trait EnumeratorT[X, E, F[_]] { self =>
         iterateeT(M.bind((IterateeT.fold[X, E, F, B](b)(f) &= self).value) { s => check(s).value })
       }
     }
+    
+  def cross[E2](e2: EnumeratorT[X, E2, F])(implicit M: Monad[F]): EnumeratorT[X, (E, E2), F] =
+    EnumerateeT.cross[X, E, E2, F](e2) run self
 }
 
 trait EnumeratorTInstances0 {
@@ -199,29 +202,6 @@ trait EnumeratorTFunctions {
         }
 
         checkCont1(contFactory => state => k => k(elInput(e)) >>== contFactory(f(state)), e)
-      }
-    }
-    
-  def cross[X, E1, E2, F[_]: Monad](e1: EnumeratorT[X, E1, F], e2: EnumeratorT[X, E2, F]): EnumeratorT[X, (E1, E2), F] =
-    new EnumeratorT[X, (E1, E2), F] {
-      def apply[A] = (step: StepT[X, (E1, E2), F, A]) => {
-        def outerLoop(step: StepT[X, (E1, E2), F, A]): IterateeT[X, E1, F, StepT[X, (E1, E2), F, A]] =
-          for {
-            outerOpt   <- head[X, E1, F]
-            sa         <- outerOpt match {
-                            case Some(e) => 
-                              val pairingIteratee = EnumerateeT.map[X, E2, (E1, E2), F]((a: E2) => (e, a)).apply(step)
-                              val nextStep = (pairingIteratee &= e2).run(x => err[X, (E1, E2), F, A](x).value)
-                              iterateeT[X, (E1, E2), F, A](nextStep) >>== outerLoop
-
-                            case None    => 
-                              done[X, E1, F, StepT[X, (E1, E2), F, A]](step, eofInput) 
-                          }
-          } yield sa
-
-        iterateeT[X, (E1, E2), F, A] {
-          (outerLoop(step) &= e1).run(x => err[X, (E1, E2), F, A](x).value)
-        }
       }
     }
 }

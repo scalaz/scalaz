@@ -60,7 +60,7 @@ abstract class EnumeratorP[X, E, F[_]] { self =>
     new EnumeratorP[X, (E, B), F] {
       def apply[G[_]](implicit MO: G |>=| F) = {
         import MO._
-        cross(self[G], other[G])
+        self[G].cross(other[G])
       }
     }
 
@@ -68,7 +68,7 @@ abstract class EnumeratorP[X, E, F[_]] { self =>
     new EnumeratorP[X, (E, B), F] {
       def apply[G[_]](implicit MO: G |>=| F) = {
         import MO._
-        cross(self[G], other[G])
+        self[G].cross(other[G])
       }
     }
 
