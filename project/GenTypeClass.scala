@@ -22,6 +22,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
+  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val length = TypeClass("Length", *->*)
@@ -72,6 +73,7 @@ object TypeClass {
     length,
     show,
     order,
+    enum,
     metricSpace,
     plusEmpty,
     each,

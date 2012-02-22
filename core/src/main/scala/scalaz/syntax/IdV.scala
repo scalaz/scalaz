@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList, Enum, EphemeralStream, Equal}
+import scalaz.{Pointed, Monoid, NonEmptyList}
 
 
 trait IdV[A] extends SyntaxV[A] {
@@ -60,36 +60,6 @@ trait IdV[A] extends SyntaxV[A] {
   def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
     else Pointed[F].point(self)
-
-  def succ(implicit e: Enum[A]): A =
-    e succ self
-
-  def -+-(n: Int)(implicit e: Enum[A]): A =
-    e.succn(n)(self)
-
-  def succx(implicit e: Enum[A]): Option[A] =
-    e.succx.apply(self)
-
-  def pred(implicit e: Enum[A]): A =
-    e pred self
-
-  def ---(n: Int)(implicit e: Enum[A]): A =
-    e.predn(n)(self)
-
-  def predx(implicit e: Enum[A]): Option[A] =
-    e.predx.apply(self)
-
-  def from(implicit e: Enum[A]): EphemeralStream[A] =
-    e.from(self)
-
-  def fromStep(step: Int)(implicit e: Enum[A]): EphemeralStream[A] =
-    e.fromStep(step, self)
-
-  def |=>(to: A)(implicit e: Enum[A]): EphemeralStream[A] =
-    e.fromTo(self, to)
-
-  def |==>(step: Int, to: A)(implicit e: Enum[A]): EphemeralStream[A] =
-    e.fromStepTo(step, self, to)
 }
 
 trait ToIdV {
