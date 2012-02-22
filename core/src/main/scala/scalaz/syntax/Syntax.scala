@@ -17,6 +17,8 @@ trait Syntaxes {
 
   object order extends ToOrderV
 
+  object enum extends ToEnumV
+
   object metricSpace extends ToMetricSpaceV
 
   object plusEmpty extends ToPlusEmptyV
@@ -86,7 +88,7 @@ trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV w
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
-  with ToOrderV with ToMetricSpaceV with ToPlusEmptyV with ToEachV with ToIndexV
+  with ToOrderV with ToEnumV with ToMetricSpaceV with ToPlusEmptyV with ToEachV with ToIndexV
   with ToFunctorV with ToPointedV with ToContravariantV with ToCoPointedV with ToApplyV
   with ToApplicativeV with ToBindV with ToMonadV with ToCoJoinV with ToCoMonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV

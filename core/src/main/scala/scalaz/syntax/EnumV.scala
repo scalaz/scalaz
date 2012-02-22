@@ -34,3 +34,20 @@ trait EnumV[F] extends SyntaxV[F] {
   final def |==>(step: Int, to: F): EphemeralStream[F] =
     F.fromStepTo(step, self, to)
 }
+
+trait ToEnumV extends ToOrderV {
+  implicit def ToEnumV[F](v: F)(implicit F0: Enum[F]) =
+    new EnumV[F] { def self = v; implicit def F: Enum[F] = F0 }
+
+  ////
+
+  ////
+}
+
+trait EnumSyntax[F] extends OrderSyntax[F] {
+  implicit def ToEnumV(v: F)(implicit F0: Enum[F]): EnumV[F] = new EnumV[F] { def self = v; implicit def F: Enum[F] = F0 }
+
+  ////
+
+  ////
+}
