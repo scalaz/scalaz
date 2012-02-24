@@ -14,4 +14,7 @@ object EnumUsage extends App {
   assert((14 |==> (-2, 7)).toList === List(14, 12, 10, 8))
   assert((14 |--> (-2, 7)) === List(14, 12, 10, 8))
 
+  assert(((_4: Digit) |-> _9) === List(_4, _5, _6, _7, _8, _9))
+  assert(('m' |=> 'u').toList === List('m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u'))
+
 }
