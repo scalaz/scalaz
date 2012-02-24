@@ -162,12 +162,6 @@ trait Enum[A] extends Order[A] {
   def fromStep(n: Int, a: A): EphemeralStream[A] =
     EphemeralStream.cons(a, fromStep(n, succn(n)(a)))
 
-  def fromStepL(n: Int, a: A): List[A] = {
-    def fromStepLT(a: A): Trampoline[List[A]] =
-      fromStepLT(succn(n)(a)) map (a :: _)
-    fromStepLT(a).run
-  }
-
   def fromTo(a: A, z: A): EphemeralStream[A] = {
     lazy val op = if(lessThan(a, z)) succ else pred
     EphemeralStream.cons(a,
