@@ -153,11 +153,26 @@ trait Enum[A] extends Order[A] {
   def predStateMax[X, Y](f: A => X, k: X => Y): Option[Y] =
     predStateMaxM(f, (a: X) => State.state[A, Y](k(a)))
 
+  import Free._
+  import std.function._
+
   def from(a: A): EphemeralStream[A] =
     EphemeralStream.cons(a, from(succ(a)))
 
+  def fromL(a: A): List[A] = {
+    def fromLT(a: A): Trampoline[List[A]] =
+      fromLT(succ(a)) map (a :: _)
+    fromLT(a).run
+  }
+
   def fromStep(n: Int, a: A): EphemeralStream[A] =
-    EphemeralStream.cons(a, from(succn(n)(a)))
+    EphemeralStream.cons(a, fromStep(n, succn(n)(a)))
+
+  def fromStepL(n: Int, a: A): List[A] = {
+    def fromStepLT(a: A): Trampoline[List[A]] =
+      fromStepLT(succn(n)(a)) map (a :: _)
+    fromStepLT(a).run
+  }
 
   def fromTo(a: A, z: A): EphemeralStream[A] = {
     lazy val op = if(lessThan(a, z)) succ else pred
@@ -167,6 +182,17 @@ trait Enum[A] extends Order[A] {
       else
         fromTo(op(a), z)
     )
+  }
+
+  def fromToL(a: A, z: A): List[A] = {
+    def fromToLT(a: A, z: A): Trampoline[List[A]] = {
+      lazy val op = if(lessThan(a, z)) succ else pred
+      if(equal(a, z))
+        Return(List(a))
+      else
+        fromToLT(op(a), z) map (a :: _)
+    }
+    fromToLT(a, z).run
   }
 
   def fromStepTo(n: Int, a: A, z: A): EphemeralStream[A] = {
@@ -184,5 +210,23 @@ trait Enum[A] extends Order[A] {
       else
         fromStepTo(n, k, z)
     })
+  }
+
+  def fromStepToL(n: Int, a: A, z: A): List[A] = {
+    def fromStepToLT(n: Int, a: A, z: A): Trampoline[List[A]] = {
+      lazy val cmp =
+       if(n > 0)
+         greaterThan(_, _)
+       else if(n < 0)
+         lessThan(_, _)
+       else
+         (_: A, _: A) => false
+      val k = succn(n)(a)
+      if(cmp(k, z))
+        Return(List(a))
+      else
+        fromStepToLT(n, k, z) map (a :: _)
+    }
+    fromStepToLT(n, a, z).run
   }
 }

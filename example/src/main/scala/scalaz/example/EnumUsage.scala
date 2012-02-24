@@ -10,6 +10,8 @@ object EnumUsage extends App {
   assert((_8: Digit) --- 6 === _2)
 
   assert((7 |==> (2, 14)).toList === List(7, 9, 11, 13))
+  assert((7 |--> (2, 14)) === List(7, 9, 11, 13))
   assert((14 |==> (-2, 7)).toList === List(14, 12, 10, 8))
+  assert((14 |--> (-2, 7)) === List(14, 12, 10, 8))
 
 }

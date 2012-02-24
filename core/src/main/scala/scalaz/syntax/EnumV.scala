@@ -25,14 +25,26 @@ trait EnumV[F] extends SyntaxV[F] {
   final def from: EphemeralStream[F] =
     F.from(self)
 
+  final def fromL: List[F] =
+    F.fromL(self)
+
   final def fromStep(step: Int): EphemeralStream[F] =
     F.fromStep(step, self)
+
+  final def fromStepL(step: Int): List[F] =
+    F.fromStepL(step, self)
 
   final def |=>(to: F): EphemeralStream[F] =
     F.fromTo(self, to)
 
+  final def |->(to: F): List[F] =
+    F.fromToL(self, to)
+
   final def |==>(step: Int, to: F): EphemeralStream[F] =
     F.fromStepTo(step, self, to)
+
+  final def |-->(step: Int, to: F): List[F] =
+    F.fromStepToL(step, self, to)
 }
 
 trait ToEnumV extends ToOrderV {
