@@ -25,9 +25,6 @@ trait EnumV[F] extends SyntaxV[F] {
   final def from: EphemeralStream[F] =
     F.from(self)
 
-  final def fromL: List[F] =
-    F.fromL(self)
-
   final def fromStep(step: Int): EphemeralStream[F] =
     F.fromStep(step, self)
 

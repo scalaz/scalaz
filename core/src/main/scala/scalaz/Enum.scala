@@ -159,12 +159,6 @@ trait Enum[A] extends Order[A] {
   def from(a: A): EphemeralStream[A] =
     EphemeralStream.cons(a, from(succ(a)))
 
-  def fromL(a: A): List[A] = {
-    def fromLT(a: A): Trampoline[List[A]] =
-      fromLT(succ(a)) map (a :: _)
-    fromLT(a).run
-  }
-
   def fromStep(n: Int, a: A): EphemeralStream[A] =
     EphemeralStream.cons(a, fromStep(n, succn(n)(a)))
 
