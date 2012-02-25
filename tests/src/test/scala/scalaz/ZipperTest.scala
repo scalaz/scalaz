@@ -26,6 +26,48 @@ object ZipperSpec extends Properties("Zipper") {
               zn.rights.length === z.rights.length + 1) getOrElse (xs.length < 2)
   })
 
+  property("DeleteRight Affects Lengths") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.toZipper;
+          zn <- z.deleteRight)
+    yield zn.rights.length === z.rights.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteRightC Affects Lengths") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.toZipper;
+          zn <- z.deleteRightC)
+    yield zn.rights.length === z.rights.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteRight Affects Lengths and Moves Left if at end") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.zipperEnd;
+          zn <- z.deleteRight)
+    yield zn.lefts.length === z.lefts.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteLeft Affects Lengths") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.zipperEnd;
+          zn <- z.deleteLeft)
+    yield zn.lefts.length === z.lefts.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteLeftC Affects Lengths") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.zipperEnd;
+          zn <- z.deleteLeftC)
+    yield zn.lefts.length === z.lefts.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteLeft Affects Lengths and Moves Right if at start") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.toZipper;
+          zn <- z.deleteLeft)
+    yield zn.rights.length === z.rights.length - 1) getOrElse (xs.length < 2)
+  })
+
+  property("DeleteRightC Affects Lengths and Cycles to Start if at end") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.zipperEnd;
+          zn <- z.deleteRightC)
+    yield zn.rights.length === z.lefts.length - 1) getOrElse (xs.length < 2)
+  })
+  property("DeleteLeftC Affects Lengths and Cycles to end if at start") = forAll((xs: Stream[Int]) => {
+    (for (z <- xs.toZipper;
+          zn <- z.deleteLeftC)
+    yield zn.lefts.length === z.rights.length - 1) getOrElse (xs.length < 2)
+  })
+
   property("Move") = forAll((xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
     (zipper(xs, f, ys).move(n) map ((z: Zipper[Int]) =>
       z.lefts.length === xs.length + n &&
