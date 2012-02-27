@@ -32,24 +32,24 @@ trait OrderingInstances {
 
     def zero: Ordering = Ordering.EQ
 
-    def succ = (b: Ordering) => b match {
+    def succ(b: Ordering) = b match {
       case Ordering.LT => Ordering.EQ
       case Ordering.EQ => Ordering.GT
       case Ordering.GT => Ordering.LT
     }
-    def pred = (b: Ordering) => b match {
+    def pred(b: Ordering) = b match {
       case Ordering.GT => Ordering.EQ
       case Ordering.EQ => Ordering.LT
       case Ordering.LT => Ordering.GT
     }
-    override def succn = (a: Int) => (b: Ordering) =>
+    override def succn(a: Int, b: Ordering) =
       if(a % 3 == 0)
         b
       else if(a % 3 == 1)
         succ(b)
       else
         succ(succ(b))
-    override def predn = (a: Int) => (b: Ordering) =>
+    override def predn(a: Int, b: Ordering) =
       if(a % 3 == 0)
         b
       else if(a % 3 == 1)

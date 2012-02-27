@@ -14,10 +14,10 @@ trait BigInts {
 
     def order(x: BigInt, y: BigInt): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: BigInt) => b + 1
-    def pred = (b: BigInt) => b - 1
-    override def succn = (a: Int) => (b: BigInt) => b + a
-    override def predn = (a: Int) => (b: BigInt) => b - a
+    def succ(b: BigInt) = b + 1
+    def pred(b: BigInt) = b - 1
+    override def succn(a: Int, b: BigInt) = b + a
+    override def predn(a: Int, b: BigInt) = b - a
     override def min = None
     override def max = None
 

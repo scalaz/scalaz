@@ -13,36 +13,33 @@ Laws
 8) order(pred(x), x) != GT
 */
 trait Enum[A] extends Order[A] {
-  def succ: A => A
-  def pred: A => A
-  def succn: Int => A => A =
-    n => a => {
-      var w = n
-      var z = a
-      while(w < 0) {
-        z = pred(z)
-        w = w + 1
-      }
-      while(w > 0) {
-        z = succ(z)
-        w = w - 1
-      }
-      z
+  def succ(a: A): A
+  def pred(a: A): A
+  def succn(n: Int, a: A): A = {
+    var w = n
+    var z = a
+    while(w < 0) {
+      z = pred(z)
+      w = w + 1
     }
-  def predn: Int => A => A = {
-    n => a => {
-      var w = n
-      var z = a
-      while(w < 0) {
-        z = succ(z)
-        w = w + 1
-      }
-      while(w > 0) {
-        z = pred(z)
-        w = w - 1
-      }
-      z
+    while(w > 0) {
+      z = succ(z)
+      w = w - 1
     }
+    z
+  }
+  def predn(n: Int, a: A): A = {
+    var w = n
+    var z = a
+    while(w < 0) {
+      z = succ(z)
+      w = w + 1
+    }
+    while(w > 0) {
+      z = pred(z)
+      w = w - 1
+    }
+    z
   }
   def min: Option[A] =
     None
@@ -160,26 +157,22 @@ trait Enum[A] extends Order[A] {
     EphemeralStream.cons(a, from(succ(a)))
 
   def fromStep(n: Int, a: A): EphemeralStream[A] =
-    EphemeralStream.cons(a, fromStep(n, succn(n)(a)))
+    EphemeralStream.cons(a, fromStep(n, succn(n, a)))
 
-  def fromTo(a: A, z: A): EphemeralStream[A] = {
-    lazy val op = if(lessThan(a, z)) succ else pred
+  def fromTo(a: A, z: A): EphemeralStream[A] =
     EphemeralStream.cons(a,
       if(equal(a, z))
         EphemeralStream.emptyEphemeralStream
       else
-        fromTo(op(a), z)
+        fromTo(if(lessThan(a, z)) succ(a) else pred(a), z)
     )
-  }
 
   def fromToL(a: A, z: A): List[A] = {
-    def fromToLT(a: A, z: A): Trampoline[List[A]] = {
-      lazy val op = if(lessThan(a, z)) succ else pred
+    def fromToLT(a: A, z: A): Trampoline[List[A]] =
       if(equal(a, z))
         Return(List(a))
       else
-        fromToLT(op(a), z) map (a :: _)
-    }
+        fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _)
     fromToLT(a, z).run
   }
 
@@ -192,7 +185,7 @@ trait Enum[A] extends Order[A] {
       else
         (_: A, _: A) => false
     EphemeralStream.cons(a, {
-      val k = succn(n)(a)
+      val k = succn(n, a)
       if(cmp(k, z))
         EphemeralStream.emptyEphemeralStream
       else
@@ -209,7 +202,7 @@ trait Enum[A] extends Order[A] {
          lessThan(_, _)
        else
          (_: A, _: A) => false
-      val k = succn(n)(a)
+      val k = succn(n, a)
       if(cmp(k, z))
         Return(List(a))
       else

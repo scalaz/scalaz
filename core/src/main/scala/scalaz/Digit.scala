@@ -114,7 +114,7 @@ trait DigitInstances {
 
     import std.anyVal._
 
-    def succ = {
+    def succ(d: Digit) = d match {
       case Digit._0 => Digit._1
       case Digit._1 => Digit._2
       case Digit._2 => Digit._3
@@ -127,7 +127,7 @@ trait DigitInstances {
       case Digit._9 => Digit._0
     }
 
-    def pred = {
+    def pred(d: Digit) = d match {
       case Digit._0 => Digit._9
       case Digit._1 => Digit._0
       case Digit._2 => Digit._1
@@ -140,11 +140,11 @@ trait DigitInstances {
       case Digit._9 => Digit._8
     }
 
-    override def succn = n =>
-      super.succn(n % 10)
+    override def succn(n: Int, a: Digit) =
+      super.succn(n % 10, a)
 
-    override def predn = n =>
-      super.predn(n % 10)
+    override def predn(n: Int, a: Digit) =
+      super.predn(n % 10, a)
 
     override def min = Some(Digit._0)
 

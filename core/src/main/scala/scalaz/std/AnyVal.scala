@@ -16,13 +16,13 @@ trait AnyValInstances {
 
     def order(x: Unit, y: Unit) = Ordering.EQ
 
-    def succ = (_: Unit) => ()
+    def succ(u: Unit) = ()
 
-    def pred = (_: Unit) => ()
+    def pred(u: Unit) = ()
 
-    override def succn = (_: Int) => (_: Unit) => ()
+    override def succn(a: Int, b: Unit) = ()
 
-    override def predn = (_: Int) => (_: Unit) => ()
+    override def predn(a: Int, b: Unit) = ()
 
     override def min = Some(())
 
@@ -36,13 +36,13 @@ trait AnyValInstances {
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Boolean) => !b
+    def succ(b: Boolean) = !b
 
-    def pred = (b: Boolean) => !b
+    def pred(b: Boolean) = !b
 
-    override def succn = (n: Int) => (b: Boolean) => if(n % 2 == 0) b else !b
+    override def succn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
 
-    override def predn = (n: Int) => (b: Boolean) => if(n % 2 == 0) b else !b
+    override def predn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
 
     override def min = Some(false)
 
@@ -92,10 +92,10 @@ trait AnyValInstances {
 
     def order(x: Byte, y: Byte) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Byte) => (b + 1).toByte
-    def pred = (b: Byte) => (b - 1).toByte
-    override def succn = (a: Int) => (b: Byte) => (b + a).toByte
-    override def predn = (a: Int) => (b: Byte) => (b - a).toByte
+    def succ(b: Byte) = (b + 1).toByte
+    def pred(b: Byte) = (b - 1).toByte
+    override def succn(a: Int, b: Byte) = (b + a).toByte
+    override def predn(a: Int, b: Byte) = (b - a).toByte
     override def min = Some(Byte.MinValue)
     override def max = Some(Byte.MaxValue)
 
@@ -131,10 +131,10 @@ trait AnyValInstances {
 
     def order(x: Char, y: Char) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Char) => (b + 1).toChar
-    def pred = (b: Char) => (b - 1).toChar
-    override def succn = (a: Int) => (b: Char) => (b + a).toChar
-    override def predn = (a: Int) => (b: Char) => (b - a).toChar
+    def succ(b: Char) = (b + 1).toChar
+    def pred(b: Char) = (b - 1).toChar
+    override def succn(a: Int, b: Char) = (b + a).toChar
+    override def predn(a: Int, b: Char) = (b - a).toChar
     override def min = Some(Char.MinValue)
     override def max = Some(Char.MaxValue)
 
@@ -169,10 +169,10 @@ trait AnyValInstances {
 
     def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Short) => (b + 1).toShort
-    def pred = (b: Short) => (b - 1).toShort
-    override def succn = (a: Int) => (b: Short) => (b + a).toShort
-    override def predn = (a: Int) => (b: Short) => (b - a).toShort
+    def succ(b: Short) = (b + 1).toShort
+    def pred(b: Short) = (b - 1).toShort
+    override def succn(a: Int, b: Short) = (b + a).toShort
+    override def predn(a: Int, b: Short) = (b - a).toShort
     override def min = Some(Short.MinValue)
     override def max = Some(Short.MaxValue)
 
@@ -207,10 +207,10 @@ trait AnyValInstances {
 
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Int) => b + 1
-    def pred = (b: Int) => b - 1
-    override def succn = (a: Int) => (b: Int) => b + a
-    override def predn = (a: Int) => (b: Int) => b - a
+    def succ(b: Int) = b + 1
+    def pred(b: Int) = b - 1
+    override def succn(a: Int, b: Int) = b + a
+    override def predn(a: Int, b: Int) = b - a
     override def min = Some(Int.MinValue)
     override def max = Some(Int.MaxValue)
 
@@ -247,10 +247,10 @@ trait AnyValInstances {
 
     def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Long) => b + 1
-    def pred = (b: Long) => b - 1
-    override def succn = (a: Int) => (b: Long) => b + a
-    override def predn = (a: Int) => (b: Long) => b - a
+    def succ(b: Long) = b + 1
+    def pred(b: Long) = b - 1
+    override def succn(a: Int, b: Long) = b + a
+    override def predn(a: Int, b: Long) = b - a
     override def min = Some(Long.MinValue)
     override def max = Some(Long.MaxValue)
 
@@ -281,10 +281,10 @@ trait AnyValInstances {
 
     def inverse(f: Float) = -f
 
-    def succ = (b: Float) => b + 1
-    def pred = (b: Float) => b - 1
-    override def succn = (a: Int) => (b: Float) => b + a
-    override def predn = (a: Int) => (b: Float) => b - a
+    def succ(b: Float) = b + 1
+    def pred(b: Float) = b - 1
+    override def succn(a: Int, b: Float) = b + a
+    override def predn(a: Int, b: Float) = b - a
     override def min = Some(Float.MinValue)
     override def max = Some(Float.MaxValue)
 
@@ -313,10 +313,10 @@ trait AnyValInstances {
 
     def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: Double) => b + 1
-    def pred = (b: Double) => b - 1
-    override def succn = (a: Int) => (b: Double) => b + a
-    override def predn = (a: Int) => (b: Double) => b - a
+    def succ(b: Double) = b + 1
+    def pred(b: Double) = b - 1
+    override def succn(a: Int, b: Double) = b + a
+    override def predn(a: Int, b: Double) = b - a
     override def min = Some(Double.MinValue)
     override def max = Some(Double.MaxValue)
 

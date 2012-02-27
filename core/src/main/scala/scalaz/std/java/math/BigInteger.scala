@@ -13,10 +13,10 @@ trait BigIntegerInstances {
 
     def inverse(f: BigInteger) = f.negate()
 
-    def succ = (b: BigInteger) => b add BigInteger.ONE
-    def pred = (b: BigInteger) => b subtract BigInteger.ONE
-    override def succn = (a: Int) => (b: BigInteger) => b add BigInteger.valueOf(a)
-    override def predn = (a: Int) => (b: BigInteger) => b subtract BigInteger.valueOf(a)
+    def succ(b: BigInteger) = b add BigInteger.ONE
+    def pred(b: BigInteger) = b subtract BigInteger.ONE
+    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a)
+    override def predn(a: Int, b: BigInteger) = b subtract BigInteger.valueOf(a)
     override def min = None
     override def max = None
 

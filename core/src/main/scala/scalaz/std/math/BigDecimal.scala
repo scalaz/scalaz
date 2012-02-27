@@ -12,10 +12,10 @@ trait BigDecimalInstances {
 
     def order(x: BigDecimal, y: BigDecimal) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ = (b: BigDecimal) => b + 1
-    def pred = (b: BigDecimal) => b - 1
-    override def succn = (a: Int) => (b: BigDecimal) => b + a
-    override def predn = (a: Int) => (b: BigDecimal) => b - a
+    def succ(b: BigDecimal) = b + 1
+    def pred(b: BigDecimal) = b - 1
+    override def succn(a: Int, b: BigDecimal) = b + a
+    override def predn(a: Int, b: BigDecimal) = b - a
     override def min = None
     override def max = None
 

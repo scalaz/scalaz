@@ -8,7 +8,7 @@ trait EnumV[F] extends SyntaxV[F] {
     F succ self
 
   final def -+-(n: Int): F =
-    F.succn(n)(self)
+    F.succn(n, self)
 
   final def succx: Option[F] =
     F.succx.apply(self)
@@ -17,7 +17,7 @@ trait EnumV[F] extends SyntaxV[F] {
     F pred self
 
   final def ---(n: Int): F =
-    F.predn(n)(self)
+    F.predn(n, self)
 
   final def predx: Option[F] =
     F.predx.apply(self)
