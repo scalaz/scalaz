@@ -388,15 +388,14 @@ trait LensInstances {
 
 trait LensFunctions {
 
-  import StateT._
-  import State._
+  import CoStateT._
 
   /** The sunglasses operator, an alias for `Lens` */
   type @-@[A, B] =
   Lens[A, B]
 
   def lens[A, B](r: A => CoState[B, A]): Lens[A, B] = new Lens[A, B] {
-    def run(a: A): CoStateT.CoState[B, A] = r(a)
+    def run(a: A): CoState[B, A] = r(a)
   }
 
   def lensG[A, B](get: A => B, set: A => B => A): Lens[A, B] =
