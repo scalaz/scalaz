@@ -117,6 +117,14 @@ sealed trait Lens[A, B] {
   /** alias for `product` */
   def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] = product(that)
 
+  /** A homomorphism of lens categories */
+  def partial: PLens[A, B] =
+    PLens.plens(a => Some(run(a)))
+
+  /** alias for `partial` */
+  def unary_~ : PLens[A, B] =
+    partial
+
   trait LensLaw {
     def identity(a: A)(implicit A: Equal[A]): Boolean = A.equal(set(a, get(a)), a)
     def retention(a: A, b: B)(implicit B: Equal[B]): Boolean = B.equal(get(set(a, b)), b)
