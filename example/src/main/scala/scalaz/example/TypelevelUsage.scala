@@ -95,13 +95,25 @@ object TypelevelUsage extends App {
 
     import KLists._
 
-    val aplist = klist1.coerce[Option]
+    val aplist = klist1
     val func: (Nothing, Int, String) => Double = { (x, y, z) => 2.0 }
 
-    val afunc = Option(func.curried)
+    val ares1 = aplist(Option(func.curried))
+    val ares2 = aplist.applyP(func.curried)
+    val ares3 = aplist.applyP(x => y => z => {
+      typed[Nothing](x)
+      typed[Int](y)
+      typed[String](z)
+      2.0
+    })
 
-    assert(klist1(afunc) === None)
-    assert(aplist(afunc) === None)
+    typed[Option[Double]](ares1)
+    typed[Option[Double]](ares2)
+    typed[Option[Double]](ares3)
+
+    assert(ares1 === None)
+    assert(ares2 === None)
+    assert(ares3 === None)
 
   }
 
@@ -111,7 +123,7 @@ object TypelevelUsage extends App {
 
     val downed = aplist.down
 
-    typed[Option[Nothing] :: Option[Int] :: Option[String] :: HNil](downed)
+    typed[Option[Nothing] :: Option[Int] :: Some[String] :: HNil](downed)
 
     assert(downed == aplist)
 

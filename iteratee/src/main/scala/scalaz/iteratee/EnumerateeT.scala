@@ -4,8 +4,14 @@ package iteratee
 import Iteratee._
 import Ordering._
 
-trait EnumerateeT[X, O, I, F[_]] {
+trait EnumerateeT[X, O, I, F[_]] { self =>
   def apply[A]: StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]]
+
+  def run(enum: EnumeratorT[X, O, F])(implicit M: Monad[F]): EnumeratorT[X, I, F] = {
+    new EnumeratorT[X, I, F] {
+      def apply[A] = (s: StepT[X, I, F, A]) => iterateeT((self[A](s) &= enum).run(x => err[X, I, F, A](x).value))
+    }
+  }
 }
 
 object EnumerateeT extends EnumerateeTFunctions
@@ -34,6 +40,27 @@ trait EnumerateeTFunctions {
         }
 
         doneOr(loop)
+      }
+    }
+
+  def flatMap[X, O, I, F[_]: Monad](f: O => EnumeratorT[X, I, F]): EnumerateeT[X, O, I, F] = 
+    new EnumerateeT[X, O, I, F] {
+      def apply[A] = {
+        def loop(step: StepT[X, I, F, A]): IterateeT[X, O, F, StepT[X, I, F, A]] = {
+          step.fold(
+            cont = contf => cont[X, O, F, StepT[X, I, F, A]] {
+              (_: Input[O]).map(e => f(e)).fold(
+                el    = en => en.apply(step) >>== loop,
+                empty = contf(emptyInput) >>== loop,
+                eof   = done(step, emptyInput)
+              )
+            },
+            done = (a, _) => done(sdone(a, emptyInput), emptyInput),
+            err  = x => err(x)
+          )
+        }
+
+        loop
       }
     }
 
@@ -126,6 +153,27 @@ trait EnumerateeTFunctions {
       }
     }
 
+  def cross[X, E1, E2, F[_]: Monad](e2: EnumeratorT[X, E2, F]): EnumerateeT[X, E1, (E1, E2), F] = 
+    new EnumerateeT[X, E1, (E1, E2), F] {
+      def apply[A] = {
+        def outerLoop(step: StepT[X, (E1, E2), F, A]): IterateeT[X, E1, F, StepT[X, (E1, E2), F, A]] =
+          for {
+            outerOpt   <- head[X, E1, F]
+            sa         <- outerOpt match {
+                            case Some(e) => 
+                              val pairingIteratee = EnumerateeT.map[X, E2, (E1, E2), F]((a: E2) => (e, a)).apply(step)
+                              val nextStep = (pairingIteratee &= e2).run(x => err[X, (E1, E2), F, A](x).value)
+                              iterateeT[X, (E1, E2), F, A](nextStep) >>== outerLoop
+
+                            case None    => 
+                              done[X, E1, F, StepT[X, (E1, E2), F, A]](step, eofInput) 
+                          }
+          } yield sa
+
+        outerLoop
+      }
+    }
+    
 
   def doneOr[X, O, I, F[_] : Pointed, A](f: (Input[I] => IterateeT[X, I, F, A]) => IterateeT[X, O, F, StepT[X, I, F, A]]): StepT[X, I, F, A] => IterateeT[X, O, F, StepT[X, I, F, A]] = {
     (s: StepT[X, I, F, A]) => s.mapContOr(k => f(k), done(s, emptyInput))

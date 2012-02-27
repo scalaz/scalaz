@@ -19,7 +19,7 @@ trait Hoist[F[_[_], _]] extends MonadTrans[F] {
  * is one that does all of the effects of the "smaller" as part of its 
  * execution.
  */
-sealed trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =>
+trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =>
   implicit val MG: Monad[G]
   implicit val MF: Monad[F]
 
@@ -54,7 +54,7 @@ trait MonadPartialOrderFunctions extends MonadPartialOrderFunctions1 {
       val MF = Monad[M]
       def promote[A](m: M[A]) = m
     }
-
+  
   implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[({ type λ[α] = F[M, α] })#λ, M] = 
     id[M].transform[F]
 }

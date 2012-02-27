@@ -8,12 +8,10 @@ import Ordering._
 trait EnumeratorT[X, E, F[_]] { self =>
   def apply[A]: StepT[X, E, F, A] => IterateeT[X, E, F, A]
 
+  def mapE[I](et: EnumerateeT[X, E, I, F])(implicit M: Monad[F]): EnumeratorT[X, I, F] = et run self
+
   def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[X, B, F] = 
-    new EnumeratorT[X, B, F] {
-      def apply[A] = { (step: StepT[X, B, F, A]) => 
-        iterateeT((EnumerateeT.map[X, E, B, F](f).apply(step) &= self).run(x => err[X, B, F, A](x).value))
-      }
-    }
+    EnumerateeT.map[X, E, B, F](f) run self
 
   def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[X, E, F] = {
     new EnumeratorT[X, E, F] {
@@ -21,26 +19,8 @@ trait EnumeratorT[X, E, F[_]] { self =>
     }
   }
 
-  def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M0: Monad[F]) = 
-    new EnumeratorT[X, B, F] {
-      def apply[A] = {
-        def loop(step: StepT[X, B, F, A]): IterateeT[X, E, F, StepT[X, B, F, A]] = {
-          step.fold(
-            cont = contf => cont[X, E, F, StepT[X, B, F, A]] {
-              (_: Input[E]).map(e => f(e)).fold(
-                el    = en => en.apply(step) >>== loop,
-                empty = contf(emptyInput) >>== loop,
-                eof   = done(step, emptyInput)
-              )
-            },
-            done = (a, _) => done(sdone(a, emptyInput), emptyInput),
-            err  = x => err(x)
-          )
-        }
-
-        (step: StepT[X, B, F, A]) => iterateeT((loop(step) &= self).run(x => err[X, B, F, A](x).value))
-      }
-    }
+  def flatMap[B](f: E => EnumeratorT[X, B, F])(implicit M1: Monad[F]) = 
+    EnumerateeT.flatMap(f) run self
 
   def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[X, B, F] = {
     import MO._
@@ -59,21 +39,13 @@ trait EnumeratorT[X, E, F[_]] { self =>
   }
 
   def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[X, B, F] = 
-    new EnumeratorT[X, B, F] {
-      def apply[A] = { (step: StepT[X, B, F, A]) => 
-        iterateeT((EnumerateeT.collect[X, E, B, F](pf).apply(step) &= self).run(x => err[X, B, F, A](x).value))
-      }
-    }
+    EnumerateeT.collect[X, E, B, F](pf) run self
 
   def uniq(implicit ord: Order[E], M: Monad[F]): EnumeratorT[X, E, F] = 
-    new EnumeratorT[X, E, F] {
-      def apply[A] = s => EnumerateeT.uniq[X, E, F].apply(s).joinI[E, A] &= self
-    }
+    EnumerateeT.uniq[X, E, F] run self
 
   def zipWithIndex(implicit M: Monad[F]): EnumeratorT[X, (E, Long), F] = 
-    new EnumeratorT[X, (E, Long), F] {
-      def apply[A] = s => iterateeT((EnumerateeT.zipWithIndex[X, E, F].apply(s) &= self).run(x => err[X, (E, Long), F, A](x).value))
-    }
+    EnumerateeT.zipWithIndex[X, E, F] run self
 
   def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Pointed[M]): F[M[E]] =
     (IterateeT.consume[X, E, F, M] &= self).run(_ => M.point(P.empty)) 
@@ -92,6 +64,9 @@ trait EnumeratorT[X, E, F[_]] { self =>
         iterateeT(M.bind((IterateeT.fold[X, E, F, B](b)(f) &= self).value) { s => check(s).value })
       }
     }
+    
+  def cross[E2](e2: EnumeratorT[X, E2, F])(implicit M: Monad[F]): EnumeratorT[X, (E, E2), F] =
+    EnumerateeT.cross[X, E, E2, F](e2) run self
 }
 
 trait EnumeratorTInstances0 {
@@ -144,7 +119,7 @@ trait EnumeratorTFunctions {
    */
   def perform[X, E, F[_]: Monad, B](f: F[B]): EnumeratorT[X, E, F] = 
     new EnumeratorT[X, E, F] { 
-      def apply[A] = s => iterateeT(Monad[F].bind(s.pointI.value) { step => Monad[F].map(f)(_ => step) })
+      def apply[A] = s => iterateeT(Monad[F].bind(f) { _ => s.pointI.value })
     }
 
   def enumOne[X, E, F[_]: Pointed](e: E): EnumeratorT[X, E, F] = 
@@ -227,29 +202,6 @@ trait EnumeratorTFunctions {
         }
 
         checkCont1(contFactory => state => k => k(elInput(e)) >>== contFactory(f(state)), e)
-      }
-    }
-    
-  def cross[X, E1, E2, F[_]: Monad](e1: EnumeratorT[X, E1, F], e2: EnumeratorT[X, E2, F]): EnumeratorT[X, (E1, E2), F] =
-    new EnumeratorT[X, (E1, E2), F] {
-      def apply[A] = (step: StepT[X, (E1, E2), F, A]) => {
-        def outerLoop(step: StepT[X, (E1, E2), F, A]): IterateeT[X, E1, F, StepT[X, (E1, E2), F, A]] =
-          for {
-            outerOpt   <- head[X, E1, F]
-            sa         <- outerOpt match {
-                            case Some(e) => 
-                              val pairingIteratee = EnumerateeT.map[X, E2, (E1, E2), F]((a: E2) => (e, a)).apply(step)
-                              val nextStep = (pairingIteratee &= e2).run(x => err[X, (E1, E2), F, A](x).value)
-                              iterateeT[X, (E1, E2), F, A](nextStep) >>== outerLoop
-
-                            case None    => 
-                              done[X, E1, F, StepT[X, (E1, E2), F, A]](step, eofInput) 
-                          }
-          } yield sa
-
-        iterateeT[X, (E1, E2), F, A] {
-          (outerLoop(step) &= e1).run(x => err[X, (E1, E2), F, A](x).value)
-        }
       }
     }
 }

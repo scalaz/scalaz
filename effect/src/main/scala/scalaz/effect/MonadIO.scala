@@ -15,7 +15,16 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] {}
 }
 
-object MonadIO {
+trait MonadIOInstances {
+  implicit def ioPartialOrder[M[_]: MonadIO]: MonadPartialOrder[M, IO] = 
+    new MonadPartialOrder[M, IO] {
+      val MG = MonadIO[M]
+      val MF = Monad[IO]
+      def promote[A](m: IO[A]) = MG.liftIO(m)
+    }
+}
+
+object MonadIO extends MonadIOInstances {
   @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
 
   ////
