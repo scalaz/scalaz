@@ -1,17 +1,5 @@
 package scalaz
 
-/*
-Laws
-
-1) succ(pred(x)) === x
-2) pred(succ(x)) === x
-3) min forall (n => max forall (x => pred(n) === x))
-4) min forall (n => max forall (x => succ(x) === n))
-5) succn(1)(x) === succ(x)
-6) predn(1)(x) === pred(x)
-7) order(succ(x), x) != LT
-8) order(pred(x), x) != GT
-*/
 trait Enum[A] extends Order[A] {
   def succ(a: A): A
   def pred(a: A): A
@@ -210,4 +198,47 @@ trait Enum[A] extends Order[A] {
     }
     fromStepToLT(n, a, z).run
   }
+
+  trait EnumLaw extends OrderLaw {
+    import std.boolean.conditional
+    /*
+    Laws
+
+    1) succ(pred(x)) === x
+    2) pred(succ(x)) === x
+    3) min forall (n => max forall (x => pred(n) === x))
+    4) min forall (n => max forall (x => succ(x) === n))
+    5) succn(1)(x) === succ(x)
+    6) predn(1)(x) === pred(x)
+    7) order(succ(x), x) != LT
+    8) order(pred(x), x) != GT
+    */
+
+    def succpred(x: A): Boolean =
+      equal(succ(pred(x)), x)
+
+    def predsucc(x: A): Boolean =
+      equal(pred(succ(x)), x)
+
+    def minmaxpred: Boolean =
+      min forall (x => max forall (y => equal(pred(x), y)))
+
+    def minmaxsucc: Boolean =
+      min forall (x => max forall (y => equal(succ(y), x)))
+
+    def succn1(x: A): Boolean =
+      equal(succn(1, x), succ(x))
+
+    def predn1(x: A): Boolean =
+      equal(predn(1, x), pred(x))
+
+    def succorder(x: A): Boolean =
+      greaterThanOrEqual(succ(x), x)
+
+    def predorder(x: A): Boolean =
+      lessThanOrEqual(pred(x), x)
+  }
+
+  def enumLaw = new EnumLaw {}
+
 }
