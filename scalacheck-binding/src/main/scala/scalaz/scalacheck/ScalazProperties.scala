@@ -43,6 +43,36 @@ object ScalazProperties {
     }
   }
 
+  object enum {
+    def succpred[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succpred _)
+
+    def predsucc[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predsucc _)
+
+    def minmaxpred[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxpred
+
+    def minmaxsucc[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxsucc
+
+    def succn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succn1 _)
+
+    def predn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predn1 _)
+
+    def succorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succorder _)
+
+    def predorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predorder _)
+
+    def laws[A](implicit A: Enum[A], arb: Arbitrary[A]) = new Properties("enum") {
+      include(order.laws[A])
+      property("predecessor then successor is identity") = succpred[A]
+      property("successor then predecessor is identity") = predsucc[A]
+      property("predecessor of the min is the max") = minmaxpred[A]
+      property("successor of the max is the min") = minmaxsucc[A]
+      property("n-successor once is successor") = succn1[A]
+      property("n-predecessor once is predecessor") = predn1[A]
+      property("successor is greater than or equal to") = succn1[A]
+      property("predecessor is less than or equal to") = predn1[A]
+    }
+  }
+
   object semigroup {
     def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _)
 

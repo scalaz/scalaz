@@ -227,6 +227,4 @@ trait Enum[A] extends Order[A] {
 
   def enumLaw = new EnumLaw {}
 
-  val enumSyntax = new scalaz.syntax.EnumSyntax[A] {}
-
 }
