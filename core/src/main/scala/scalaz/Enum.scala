@@ -200,20 +200,6 @@ trait Enum[A] extends Order[A] {
   }
 
   trait EnumLaw extends OrderLaw {
-    import std.boolean.conditional
-    /*
-    Laws
-
-    1) succ(pred(x)) === x
-    2) pred(succ(x)) === x
-    3) min forall (n => max forall (x => pred(n) === x))
-    4) min forall (n => max forall (x => succ(x) === n))
-    5) succn(1)(x) === succ(x)
-    6) predn(1)(x) === pred(x)
-    7) order(succ(x), x) != LT
-    8) order(pred(x), x) != GT
-    */
-
     def succpred(x: A): Boolean =
       equal(succ(pred(x)), x)
 
@@ -240,5 +226,7 @@ trait Enum[A] extends Order[A] {
   }
 
   def enumLaw = new EnumLaw {}
+
+  val enumSyntax = new scalaz.syntax.EnumSyntax[A] {}
 
 }
