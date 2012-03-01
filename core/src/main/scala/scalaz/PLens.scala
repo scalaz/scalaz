@@ -14,6 +14,53 @@ sealed trait PLens[A, B] {
       t <- run(s.pos)
     } yield coState(x => s.put(t.put(x)), t.pos))
 
+  def get(a: A): Option[B] =
+    run(a) map (_.pos)
+
+  /** If the PartialLens is null, then return the given default value. */
+  def getOr(a: A, b: => B): B =
+    get(a) getOrElse b
+
+  /** (Monadic) If the PartialLens is null, then return the given default value. Only the first effect is run. */
+  def getOrM[F[_]](a: F[A], b: => F[B])(implicit M: Monad[F]): F[B] =
+    M.bind(a)(r => get(r) match {
+      case None => b
+      case Some(c) => M.point(c)
+    })
+
+  /** If the PartialLens is null, then return the target object, otherwise run the function on its projection. */
+  def as(f: B => A, a: A): A =
+    get(a) match {
+      case None => a
+      case Some(w) => f(w)
+    }
+
+  def is(a: A): Boolean =
+    get(a).isDefined
+
+  def isNot(a: A): Boolean =
+    !is(a)
+
+  def exists(p: B => Boolean, a: A): Boolean =
+    get(a) exists p
+
+  def forall(p: B => Boolean, a: A): Boolean =
+    get(a) forall p
+
+  def trySet(a: A): Option[B => A] =
+    run(a) map (c => c.put(_))
+
+  def set(b: B, a: A): A =
+    run(a) match {
+      case None => a
+      case Some(w) => w put b
+    }
+
+  def mod(f: B => B, a: A): A =
+    run(a) match {
+      case None => a
+      case Some(w) => w.puts(f)
+    }
 }
 
 object PLens extends PLensFunctions with PLensInstances {
@@ -47,4 +94,8 @@ trait PLensFunctions {
   /** The identity partial lens for a given object */
   def plensId[A]: PLens[A, A] =
     implicitly[Category[Lens]].id.partial
+
+  /** The always-null partial lens */
+  def nil[A, B]: PLens[A, B] =
+    plens(_ => None)
 }
