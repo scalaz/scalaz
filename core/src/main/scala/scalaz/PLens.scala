@@ -118,6 +118,37 @@ trait PLensInstances {
     def id[A]: PLens[A, A] =
       plensId[A]
   }
+
+  /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
+  implicit def PlensState[A, B](lens: PLens[A, B]): PState[A, B] =
+    lens.st
+
+  def optionPLens[A]: Option[A] @-? A =
+    plens(_ map (z => coState(Some(_), z)))
+
+  def leftPLens[A, B]: Either[A, B] @-? A =
+    plens {
+      case Left(a) => Some(coState(Left(_), a))
+      case Right(_) => None
+    }
+
+  def rightPLens[A, B]: Either[A, B] @-? B =
+    plens {
+      case Right(b) => Some(coState(Right(_), b))
+      case Left(_) => None
+    }
+
+  def headPLens[A]: List[A] @-? A =
+    plens {
+      case Nil => None
+      case h::t => Some(coState(_::t, h))
+    }
+
+  def tailPLens[A]: List[A] @-? List[A] =
+    plens {
+      case Nil => None
+      case h::t => Some(coState(h::_, t))
+    }
 }
 
 trait PLensFunctions {
