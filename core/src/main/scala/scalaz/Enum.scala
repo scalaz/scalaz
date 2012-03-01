@@ -228,3 +228,7 @@ trait Enum[A] extends Order[A] {
   def enumLaw = new EnumLaw {}
 
 }
+
+object Enum {
+  @inline def apply[A](implicit F: Enum[A]): Enum[A] = F
+}
