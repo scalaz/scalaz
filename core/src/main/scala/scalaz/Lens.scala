@@ -42,8 +42,6 @@ sealed trait Lens[A, B] {
   def modf[F[_]](a: A, f: B => F[B])(implicit F: Functor[F]): F[A] =
     F.map(f(get(a)))(set(a, _))
 
-  import State._
-
   def st: State[A, B] =
     State(s => (get(s), s))
 

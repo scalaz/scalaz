@@ -50,7 +50,7 @@ sealed trait PLens[A, B] {
   def trySet(a: A): Option[B => A] =
     run(a) map (c => c.put(_))
 
-  def set(b: B, a: A): A =
+  def set(a: A, b: B): A =
     run(a) match {
       case None => a
       case Some(w) => w put b
@@ -61,6 +61,47 @@ sealed trait PLens[A, B] {
       case None => a
       case Some(w) => w.puts(f)
     }
+
+  def st: PState[A, B] =
+    State.init map (get(_))
+
+  def :=(b: => B): PState[A, B] =
+    %=(_ => b)
+
+  def %=(f: B => B): PState[A, B] =
+    State(a => run(a) match {
+      case None => (None, a)
+      case Some(w) => {
+        val r = f(w.pos)
+        (Some(r), w put r)
+      }
+    })
+
+  def %==(f: B => B): State[A, Unit] =
+    State(a => ((), mod(f, a)))
+
+  def %%=[C](s: State[B, C]): PState[A, C] =
+    State(a => run(a) match {
+      case None => (None, a)
+      case Some(w) => {
+        val r = s.run(w.pos): (C, B)
+        (Some(r._1), w put r._2)
+      }
+    })
+
+  def >-[C](f: B => C): PState[A, C] =
+    State(a => (get(a) map f, a))
+
+  def >>-[C](f: B => State[A, C]): PState[A, C] =
+    State(a =>
+      get(a) map f match {
+        case None => (None, a)
+        case Some(w) => (Some(w.apply(a)._1), a)
+      })
+
+  def ->>-[C](f: => State[A, C]): PState[A, C] =
+    >>-(_ => f)
+
 }
 
 object PLens extends PLensFunctions with PLensInstances {
@@ -86,6 +127,9 @@ trait PLensFunctions {
   /** The eye-patch operator, an alias for `PLens` */
   type @-?[A, B] =
   PLens[A, B]
+
+  type PState[A, B] =
+  State[A, Option[B]]
 
   def plens[A, B](r: A => Option[CoState[B, A]]): PLens[A, B] = new PLens[A, B] {
     def run(a: A) = r(a)
