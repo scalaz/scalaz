@@ -153,8 +153,6 @@ trait PLensInstances {
 
 trait PLensFunctions {
 
-  import CoStateT._
-
   /** The eye-patch operator, an alias for `PLens` */
   type @-?[A, B] =
   PLens[A, B]
