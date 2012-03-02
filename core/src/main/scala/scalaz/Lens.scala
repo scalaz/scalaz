@@ -454,8 +454,9 @@ trait LensFunctions {
     lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
 
   def nelHeadLens[A]: NonEmptyList[A] @-@ A =
-    lens(l => coState(_ <:: l.tail, l.head))
+    lens(l => coState(NonEmptyList.nel(_, l.tail), l.head))
 
   def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
-    lens(l => coState(l.head <:: _, l.tail))
+    lens(l => coState(NonEmptyList.nel(l.head, _), l.tail))
+
 }
