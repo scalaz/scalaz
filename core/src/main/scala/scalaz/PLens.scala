@@ -6,7 +6,7 @@ sealed trait PLens[A, B] {
   import PLens._
   import CoStateT._
 
-  def run(a: A): Option[CoState[B, A]]
+  def run(a: A): Option[A |--> B]
 
   def compose[C](that: PLens[C, A]): PLens[C, B] =
     plens(a => for {
@@ -120,7 +120,7 @@ trait PLensInstances {
   }
 
   /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def PLensState[A, B](lens: PLens[A, B]): PState[A, B] =
+  implicit def PLensState[A, B](lens: A @-? B): PState[A, B] =
     lens.st
 
 }
@@ -134,7 +134,7 @@ trait PLensFunctions {
   type PState[A, B] =
   State[A, Option[B]]
 
-  def plens[A, B](r: A => Option[CoState[B, A]]): PLens[A, B] = new PLens[A, B] {
+  def plens[A, B](r: A => Option[A |--> B]): A @-? B = new PLens[A, B] {
     def run(a: A) = r(a)
   }
 
