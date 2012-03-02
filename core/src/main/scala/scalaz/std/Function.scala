@@ -34,7 +34,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-  implicit def function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
+  implicit def function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] with Split[Function1] {
     def arr[A, B](f: A => B) = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
@@ -47,6 +47,11 @@ trait FunctionInstances extends FunctionInstances0 {
       case Left(a) => f(a)
       case Right(b) => g(b)
     }
+    
+    def split[A, B, C, D](f: A => B, g: C => D): ((A,  C)) => (B, D) = {
+      case (a, c) => (f(a), g(c))
+    }
+    
   }
 
   implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {

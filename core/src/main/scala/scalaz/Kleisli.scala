@@ -211,6 +211,16 @@ private[scalaz] trait KleisliChoice[F[_]] extends Choice[({type λ[α, β] = Kle
     }
 }
 
+private[scalaz] trait KleisliSplit[F[_]] extends Split[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+  implicit def F: Monad[F]
+
+  def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A,  C), (B, D)] =
+    Kleisli {
+      case (a, c) =>
+        F.bind(f run a)(b => F.map(g run c)(d => (b, d)))
+    }
+}
+
 private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliArrIdArr[F] {
   implicit def F: Monad[F]
 

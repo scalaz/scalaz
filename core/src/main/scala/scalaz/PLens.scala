@@ -153,7 +153,7 @@ object PLens extends PLensFunctions with PLensInstances {
 trait PLensInstances {
   import PLens._
 
-  implicit def plensCategory: Category[PLens] with Choice[PLens] = new Category[PLens] with Choice[PLens] {
+  implicit def plensCategory: Category[PLens] with Choice[PLens] with Split[PLens] = new Category[PLens] with Choice[PLens] with Split[PLens] {
     def compose[A, B, C](f: B @-? C, g: A @-? B): A @-? C =
       f compose g
     def id[A]: A @-? A =
@@ -165,6 +165,8 @@ trait PLensInstances {
         case Right(b) =>
           g.run(b) map (y => coState(w => Right(y put w), y.pos))
       }
+    def split[A, B, C, D](f: A @-? B, g: C @-? D): (A,  C) @-? (B, D) =
+      f *** g    
   }
 
   /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
