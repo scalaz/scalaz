@@ -266,15 +266,45 @@ trait PLensFunctions {
       case Left(_) => None
     }
 
-  def headPLens[A]: List[A] @-? A =
+  def listHeadPLens[A]: List[A] @-? A =
     plens {
       case Nil => None
-      case h::t => Some(coState(_::t, h))
+      case h :: t => Some(coState(_ :: t, h))
     }
 
-  def tailPLens[A]: List[A] @-? List[A] =
+  def listTailPLens[A]: List[A] @-? List[A] =
     plens {
       case Nil => None
-      case h::t => Some(coState(h::_, t))
+      case h :: t => Some(coState(h :: _, t))
     }
+
+  def listNthPLens[A](n: Int): List[A] @-? A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      listHeadPLens
+    else
+      listNthPLens(n - 1) compose listTailPLens
+
+  import Stream._
+
+  def streamHeadPLens[A]: Stream[A] @-? A =
+    plens {
+      case Empty => None
+      case h #:: t => Some(coState(_ #:: t, h))
+    }
+
+  def streamTailPLens[A]: Stream[A] @-? Stream[A] =
+    plens {
+      case Empty => None
+      case h #:: t => Some(coState(h #:: _, t))
+    }
+
+  def streamNthPLens[A](n: Int): Stream[A] @-? A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      streamHeadPLens
+    else
+      streamNthPLens(n - 1) compose streamTailPLens
 }
