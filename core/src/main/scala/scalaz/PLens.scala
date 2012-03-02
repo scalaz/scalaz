@@ -8,12 +8,6 @@ sealed trait PLens[A, B] {
 
   def run(a: A): Option[A |--> B]
 
-  def compose[C](that: C @-? A): C @-? B =
-    plens(a => for {
-      s <- that run a
-      t <- run(s.pos)
-    } yield coState(x => s.put(t.put(x)), t.pos))
-
   def get(a: A): Option[B] =
     run(a) map (_.pos)
 
@@ -102,6 +96,44 @@ sealed trait PLens[A, B] {
   def ->>-[C](f: => State[A, C]): PState[A, C] =
     >>-(_ => f)
 
+  def compose[C](that: C @-? A): C @-? B =
+    plens(a => for {
+      s <- that run a
+      t <- run(s.pos)
+    } yield coState(x => s.put(t.put(x)), t.pos))
+
+  /** alias for `compose` */
+  def >=>[C](that: C @-? A): C @-? B = compose(that)
+
+  def andThen[C](that: B @-? C): A @-? C =
+    that compose this
+
+  /** alias for `andThen` */
+  def <=<[C](that: B @-? C): A @-? C = andThen(that)
+
+  /** Two partial lenses that view a value of the same type can be joined */
+  def sum[C](that: C @-? B): Either[A, C] @-? B =
+    plens {
+      case Left(a) =>
+        run(a) map (x => coState(w => Left(x put w), x.pos))
+      case Right(b) =>
+        that.run(b) map (y => coState(w => Right(y put w), y.pos))
+    }
+
+  /** Alias for `sum` */
+  def |||[C](that: C @-? B): Either[A, C] @-? B= sum(that)
+  
+  /** Two disjoint partial lenses can be paired */
+  def product[C, D](that: C @-? D): (A, C) @-? (B, D) =
+    plens {
+      case (a, c) => for {
+        x <- run(a)
+        y <- that run c
+      } yield coState(bd => (x put bd._1, y put bd._2), (x.pos, y.pos))
+    }
+
+  /** alias for `product` */
+  def ***[C, D](that: C @-? D): (A, C) @-? (B, D) = product(that)
 }
 
 object PLens extends PLensFunctions with PLensInstances {
@@ -137,10 +169,24 @@ trait PLensFunctions {
   def plens[A, B](r: A => Option[A |--> B]): A @-? B = new PLens[A, B] {
     def run(a: A) = r(a)
   }
-
+             
+  def plensG[A, B](get: A => Option[B], set: A => Option[B => A]): A @-? B =
+    plens(a => for {
+      g <- get(a)
+      s <- set(a)
+    } yield coState(s, g))
+             
   /** The identity partial lens for a given object */
   def plensId[A]: A @-? A =
     implicitly[Category[Lens]].id.partial
+            
+  /** The trivial partial lens that can retrieve Unit from anything */
+  def trivialPLens[A]: A @-? Unit =
+    plensG[A, Unit](_ => Some(()), a => Some(_ => a))
+
+  /** A lens that discards the choice of Right or Left from Either */
+  def codiagPLens[A]: PLens[Either[A, A], A] =
+    plensId[A] ||| plensId[A]
 
   /** The always-null partial lens */
   def nil[A, B]: A @-? B =
