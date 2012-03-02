@@ -444,4 +444,12 @@ trait LensFunctions {
   /** Access the second field of a tuple */
   def secondLens[A, B]: Lens[(A, B), B] =
     lensG[(A, B), B](_._2, ab => b => (ab._1, b))
+
+  /** Access the first field of a lazy tuple */
+  def lazyFirstLens[A, B]: Lens[LazyTuple2[A, B], A] =
+    lensG[LazyTuple2[A, B], A](_._1, ab => a => LazyTuple2(a, ab._2))
+
+  /** Access the second field of a lazy tuple */
+  def lazySecondLens[A, B]: Lens[LazyTuple2[A, B], B] =
+    lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
 }

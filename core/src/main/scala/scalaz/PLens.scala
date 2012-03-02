@@ -266,6 +266,19 @@ trait PLensFunctions {
       case Left(_) => None
     }
 
+  import LazyOption._
+
+  def lazyOptionPLens[A]: LazyOption[A] @-? A =
+    plens(_.fold(z => Some(coState(lazySome(_), z)), None))
+
+  import LazyEither._
+
+  def lazyLeftPLens[A, B]: LazyEither[A, B] @-? A =
+    plens(_.fold(a => Some(coState(lazyLeft(_), a)), _ => None))
+
+  def lazyRightPLens[A, B]: LazyEither[A, B] @-? B =
+    plens(_.fold(_ => None, b => Some(coState(lazyRight(_), b))))
+
   def listHeadPLens[A]: List[A] @-? A =
     plens {
       case Nil => None
