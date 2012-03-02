@@ -120,8 +120,31 @@ trait PLensInstances {
   }
 
   /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def PlensState[A, B](lens: PLens[A, B]): PState[A, B] =
+  implicit def PLensState[A, B](lens: PLens[A, B]): PState[A, B] =
     lens.st
+
+}
+
+trait PLensFunctions {
+
+  /** The eye-patch operator, an alias for `PLens` */
+  type @-?[A, B] =
+  PLens[A, B]
+
+  type PState[A, B] =
+  State[A, Option[B]]
+
+  def plens[A, B](r: A => Option[CoState[B, A]]): PLens[A, B] = new PLens[A, B] {
+    def run(a: A) = r(a)
+  }
+
+  /** The identity partial lens for a given object */
+  def plensId[A]: PLens[A, A] =
+    implicitly[Category[Lens]].id.partial
+
+  /** The always-null partial lens */
+  def nil[A, B]: PLens[A, B] =
+    plens(_ => None)
 
   def optionPLens[A]: Option[A] @-? A =
     plens(_ map (z => coState(Some(_), z)))
@@ -149,26 +172,4 @@ trait PLensInstances {
       case Nil => None
       case h::t => Some(coState(h::_, t))
     }
-}
-
-trait PLensFunctions {
-
-  /** The eye-patch operator, an alias for `PLens` */
-  type @-?[A, B] =
-  PLens[A, B]
-
-  type PState[A, B] =
-  State[A, Option[B]]
-
-  def plens[A, B](r: A => Option[CoState[B, A]]): PLens[A, B] = new PLens[A, B] {
-    def run(a: A) = r(a)
-  }
-
-  /** The identity partial lens for a given object */
-  def plensId[A]: PLens[A, A] =
-    implicitly[Category[Lens]].id.partial
-
-  /** The always-null partial lens */
-  def nil[A, B]: PLens[A, B] =
-    plens(_ => None)
 }
