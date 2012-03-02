@@ -82,6 +82,18 @@ trait CoKleisliArrId[F[_]] extends ArrId[({type λ[α, β] = CoKleisli[F, α, β
   override def id[A] = CoKleisli(F.copoint)
 }
 
+trait CoKleisliChoice[F[_]] extends Choice[({type λ[α, β] = CoKleisli[F, α, β]})#λ] {
+  implicit def F: CoMonad[F]
+
+  def choice[A, B, C](f: => CoKleisli[F, A, C], g: => CoKleisli[F, B, C]): CoKleisli[F, Either[A, B], C] =
+  // def apply[F[_], A, B](f: F[A] => B): CoKleisli[F, A, B]
+  //   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]
+
+    CoKleisli(e => error(""))
+      
+      // error(""): F[Either[A,  B]] => C)
+}
+
 trait CoKleisliCompose[F[_]] extends Compose[({type λ[α, β] = CoKleisli[F, α, β]})#λ] {
   implicit def F: CoJoin[F] with Functor[F]
 

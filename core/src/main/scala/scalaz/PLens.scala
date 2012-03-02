@@ -121,7 +121,7 @@ sealed trait PLens[A, B] {
   def <=<[C](that: B @-? C): A @-? C = andThen(that)
 
   /** Two partial lenses that view a value of the same type can be joined */
-  def sum[C](that: C @-? B): Either[A, C] @-? B =
+  def sum[C](that: => C @-? B): Either[A, C] @-? B =
     plens {
       case Left(a) =>
         run(a) map (x => coState(w => Left(x put w), x.pos))
@@ -130,7 +130,7 @@ sealed trait PLens[A, B] {
     }
 
   /** Alias for `sum` */
-  def |||[C](that: C @-? B): Either[A, C] @-? B= sum(that)
+  def |||[C](that: => C @-? B): Either[A, C] @-? B= sum(that)
   
   /** Two disjoint partial lenses can be paired */
   def product[C, D](that: C @-? D): (A, C) @-? (B, D) =
@@ -153,11 +153,18 @@ object PLens extends PLensFunctions with PLensInstances {
 trait PLensInstances {
   import PLens._
 
-  implicit def plensCategory: Category[PLens] = new Category[PLens] {
+  implicit def plensCategory: Category[PLens] with Choice[PLens] = new Category[PLens] with Choice[PLens] {
     def compose[A, B, C](f: B @-? C, g: A @-? B): A @-? C =
       f compose g
     def id[A]: A @-? A =
       plensId[A]
+    def choice[A, B, C](f: => A @-? C, g: => B @-? C): Either[A,  B] @-? C =
+      plens {
+        case Left(a) =>
+          f.run(a) map (x => coState(w => Left(x put w), x.pos))
+        case Right(b) =>
+          g.run(b) map (y => coState(w => Right(y put w), y.pos))
+      }
   }
 
   /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */

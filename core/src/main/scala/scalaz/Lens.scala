@@ -92,7 +92,7 @@ sealed trait Lens[A, B] {
   def <=<[C](that: Lens[B, C]): Lens[A, C] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C](that: Lens[C, B]): Lens[Either[A, C], B] =
+  def sum[C](that: => Lens[C, B]): Lens[Either[A, C], B] =
     lensGG[Either[A, C], B](
     {
       case Left(a)  => get(a)
@@ -103,7 +103,7 @@ sealed trait Lens[A, B] {
     })
 
   /** Alias for `sum` */
-  def |||[C](that: Lens[C, B]): Lens[Either[A, C], B]= sum(that)
+  def |||[C](that: => Lens[C, B]): Lens[Either[A, C], B]= sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] =
@@ -142,9 +142,20 @@ trait LensInstances {
   import State._
   import Lens._
 
-  implicit def lensCategory: Category[Lens] = new Category[Lens] {
+  implicit def lensCategory: Category[Lens] with Choice[Lens] = new Category[Lens] with Choice[Lens] {
     def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
     def id[A]: Lens[A, A] = Lens.lensId[A]
+    def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[Either[A,  B], C] =
+      Lens {
+        case Left(a) => {
+          val x = f run a
+          coState(w => Left(x put w), x.pos)
+        }
+        case Right(b) => {
+          val y = g run b
+          coState(w => Right(y put w), y.pos)
+        }
+      }
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */

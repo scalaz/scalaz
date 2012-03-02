@@ -34,7 +34,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-  implicit def function1Instance = new Arrow[Function1] with Category[Function1]{
+  implicit def function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
     def arr[A, B](f: A => B) = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
@@ -42,6 +42,11 @@ trait FunctionInstances extends FunctionInstances0 {
     def compose[A, B, C](f: (B) => C, g: (A) => B) = f compose g
 
     def id[A]: (A) => A = a => a
+
+    def choice[A, B, C](f: => A => C, g: => B => C): Either[A,  B] => C = {
+      case Left(a) => f(a)
+      case Right(b) => g(b)
+    }
   }
 
   implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {
