@@ -10,6 +10,12 @@ sealed trait PLens[A, B] {
 
   def get(a: A): Option[B] =
     run(a) map (_.pos)
+  
+  def getK: A =?> B =
+    Kleisli(get(_))
+  
+  def setK: A =?> (B => A) =
+    Kleisli(set(_))
 
   /** If the PartialLens is null, then return the given default value. */
   def getOr(a: A, b: => B): B =
@@ -44,7 +50,10 @@ sealed trait PLens[A, B] {
   def trySet(a: A): Option[B => A] =
     run(a) map (c => c.put(_))
 
-  def set(a: A, b: B): A =
+  def set(a: A): Option[B => A] =
+    run(a) map (w => w.put(_))
+
+  def setI(a: A, b: B): A =
     run(a) match {
       case None => a
       case Some(w) => w put b
