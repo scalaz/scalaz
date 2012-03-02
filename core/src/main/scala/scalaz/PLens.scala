@@ -176,6 +176,44 @@ trait PLensInstances {
   implicit def PLensState[A, B](lens: A @-? B): PState[A, B] =
     lens.st
 
+  implicit def eitherLens[S, A, B](l: S @-? Either[A, B]): (S @-? A, S @-? B) =
+    (
+      leftPLens compose l
+    , rightPLens compose l
+    )
+
+  /** Allow the illusion of imperative updates to numbers viewed through a partial lens */
+  case class NumericPLens[S, N: Numeric](lens: PLens[S, N], num: Numeric[N]) {
+    def +=(that: N): PState[S, N] =
+      lens %= (num.minus(_, that))
+
+    def -=(that: N): PState[S, N] =
+      lens %= (num.minus(_, that))
+
+    def *=(that: N): PState[S, N] =
+      lens %= (num.times(_, that))
+  }
+
+  implicit def numericPLens[S, N: Numeric](lens: S @-? N) =
+    NumericPLens[S, N](lens, implicitly[Numeric[N]])
+
+  /** Allow the illusion of imperative updates to numbers viewed through a partial lens */
+  case class FractionalPLens[S, F](lens: S @-? F, frac: Fractional[F]) {
+    def /=(that: F): PState[S, F] =
+      lens %= (frac.div(_, that))
+  }
+
+  implicit def fractionalPLens[S, F: Fractional](lens: S @-? F) =
+    FractionalPLens[S, F](lens, implicitly[Fractional[F]])
+
+  /** Allow the illusion of imperative updates to numbers viewed through a partial lens */
+  case class IntegralPLens[S, I](lens: S @-? I, ig: Integral[I]) {
+    def %=(that: I): PState[S, I] =
+      lens %= (ig.quot(_, that))
+  }
+
+  implicit def integralPLens[S, I: Integral](lens: S @-? I) =
+    IntegralPLens[S, I](lens, implicitly[Integral[I]])
 }
 
 trait PLensFunctions {
