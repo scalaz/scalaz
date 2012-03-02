@@ -142,7 +142,7 @@ trait LensInstances {
   import State._
   import Lens._
 
-  implicit def lensCategory: Category[Lens] with Choice[Lens] with Split[Lens] = new Category[Lens] with Choice[Lens] with Split[Lens]{
+  implicit def lensCategory: Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] = new Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] {
     def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
     def id[A]: Lens[A, A] = Lens.lensId[A]
     def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[Either[A,  B], C] =
@@ -158,6 +158,8 @@ trait LensInstances {
       }
     def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
       f *** g
+    def codiagonal[A]: Lens[Either[A,  A], A] =
+      codiagLens
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */

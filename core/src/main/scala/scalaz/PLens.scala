@@ -10,10 +10,10 @@ sealed trait PLens[A, B] {
 
   def get(a: A): Option[B] =
     run(a) map (_.pos)
-  
+
   def getK: A =?> B =
     Kleisli(get(_))
-  
+
   def setK: A =?> (B => A) =
     Kleisli(set(_))
 
@@ -131,7 +131,7 @@ sealed trait PLens[A, B] {
 
   /** Alias for `sum` */
   def |||[C](that: => C @-? B): Either[A, C] @-? B= sum(that)
-  
+
   /** Two disjoint partial lenses can be paired */
   def product[C, D](that: C @-? D): (A, C) @-? (B, D) =
     plens {
@@ -153,7 +153,7 @@ object PLens extends PLensFunctions with PLensInstances {
 trait PLensInstances {
   import PLens._
 
-  implicit def plensCategory: Category[PLens] with Choice[PLens] with Split[PLens] = new Category[PLens] with Choice[PLens] with Split[PLens] {
+  implicit def plensCategory: Category[PLens] with Choice[PLens] with Split[PLens] with Codiagonal[PLens] = new Category[PLens] with Choice[PLens] with Split[PLens] with Codiagonal[PLens] {
     def compose[A, B, C](f: B @-? C, g: A @-? B): A @-? C =
       f compose g
     def id[A]: A @-? A =
@@ -166,7 +166,10 @@ trait PLensInstances {
           g.run(b) map (y => coState(w => Right(y put w), y.pos))
       }
     def split[A, B, C, D](f: A @-? B, g: C @-? D): (A,  C) @-? (B, D) =
-      f *** g    
+      f *** g
+    def codiagonal[A]: Either[A,  A] @-? A =
+      codiagPLens
+
   }
 
   /** Partial lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
@@ -187,17 +190,17 @@ trait PLensFunctions {
   def plens[A, B](r: A => Option[A |--> B]): A @-? B = new PLens[A, B] {
     def run(a: A) = r(a)
   }
-             
+
   def plensG[A, B](get: A => Option[B], set: A => Option[B => A]): A @-? B =
     plens(a => for {
       g <- get(a)
       s <- set(a)
     } yield coState(s, g))
-             
+
   /** The identity partial lens for a given object */
   def plensId[A]: A @-? A =
     implicitly[Category[Lens]].id.partial
-            
+
   /** The trivial partial lens that can retrieve Unit from anything */
   def trivialPLens[A]: A @-? Unit =
     plensG[A, Unit](_ => Some(()), a => Some(_ => a))
