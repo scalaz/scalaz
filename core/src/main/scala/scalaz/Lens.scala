@@ -452,4 +452,10 @@ trait LensFunctions {
   /** Access the second field of a lazy tuple */
   def lazySecondLens[A, B]: Lens[LazyTuple2[A, B], B] =
     lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
+
+  def nelHeadLens[A]: NonEmptyList[A] @-@ A =
+    lens(l => coState(_ <:: l.tail, l.head))
+
+  def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
+    lens(l => coState(l.head <:: _, l.tail))
 }

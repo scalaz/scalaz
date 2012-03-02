@@ -321,6 +321,30 @@ trait PLensFunctions {
     else
       streamNthPLens(n - 1) compose streamTailPLens
 
+  def ephemeralStreamHeadPLens[A]: EphemeralStream[A] @-? A =
+    plens(s =>
+      if(s.isEmpty)
+        None
+      else
+        Some(coState(EphemeralStream.cons(_, s.tail()), s.head()))
+    )
+
+  def ephemeralStreamTailPLens[A]: EphemeralStream[A] @-? EphemeralStream[A] =
+    plens(s =>
+      if(s.isEmpty)
+        None
+      else
+        Some(coState(EphemeralStream.cons(s.head(), _), s.tail()))
+    )
+
+  def ephemeralStreamNthPLens[A](n: Int): EphemeralStream[A] @-? A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      ephemeralStreamHeadPLens
+    else
+      ephemeralStreamNthPLens(n - 1) compose ephemeralStreamTailPLens
+
   import util.parsing.json._
 
   def scalaJSONObjectPLens[A]: JSONType @-? Map[String, Any] =
