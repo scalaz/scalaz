@@ -105,7 +105,7 @@ sealed trait PLens[A, B] {
 }
 
 object PLens extends PLensFunctions with PLensInstances {
-  def apply[A, B](r: A => Option[CoState[B, A]]): PLens[A, B] =
+  def apply[A, B](r: A => Option[A |--> B]): A @-? B =
     plens(r)
 }
 
@@ -113,9 +113,9 @@ trait PLensInstances {
   import PLens._
 
   implicit def plensCategory: Category[PLens] = new Category[PLens] {
-    def compose[A, B, C](f: PLens[B, C], g: PLens[A, B]): PLens[A, C] =
+    def compose[A, B, C](f: B @-? C, g: A @-? B): A @-? C =
       f compose g
-    def id[A]: PLens[A, A] =
+    def id[A]: A @-? A =
       plensId[A]
   }
 
@@ -139,11 +139,11 @@ trait PLensFunctions {
   }
 
   /** The identity partial lens for a given object */
-  def plensId[A]: PLens[A, A] =
+  def plensId[A]: A @-? A =
     implicitly[Category[Lens]].id.partial
 
   /** The always-null partial lens */
-  def nil[A, B]: PLens[A, B] =
+  def nil[A, B]: A @-? B =
     plens(_ => None)
 
   def optionPLens[A]: Option[A] @-? A =
