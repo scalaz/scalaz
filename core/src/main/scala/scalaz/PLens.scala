@@ -8,7 +8,7 @@ sealed trait PLens[A, B] {
 
   def run(a: A): Option[A |--> B]
 
-  def compose[C](that: PLens[C, A]): PLens[C, B] =
+  def compose[C](that: C @-? A): C @-? B =
     plens(a => for {
       s <- that run a
       t <- run(s.pos)
