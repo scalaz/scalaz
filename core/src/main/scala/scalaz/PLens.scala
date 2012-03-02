@@ -320,4 +320,18 @@ trait PLensFunctions {
       streamHeadPLens
     else
       streamNthPLens(n - 1) compose streamTailPLens
+
+  import util.parsing.json._
+
+  def scalaJSONObjectPLens[A]: JSONType @-? Map[String, Any] =
+    plens {
+      case JSONObject(m) => Some(coState(JSONObject(_), m))
+      case _             => None
+    }
+
+  def scalaJSONArrayPLens[A]: JSONType @-? List[Any] =
+    plens {
+      case JSONArray(a) => Some(coState(JSONArray(_), a))
+      case _             => None
+    }
 }
