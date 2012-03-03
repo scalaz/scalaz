@@ -3,7 +3,13 @@ package std
 
 import annotation.tailrec
 
-trait ListInstances {
+trait ListInstances0 {
+  implicit def listEqual[A](implicit A0: Equal[A]) = new ListEqual[A] {
+    implicit def A = A0
+  }
+}
+
+trait ListInstances extends ListInstances0 {
   implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
@@ -85,9 +91,10 @@ trait ListInstances {
     }
   }
 
-  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
-    def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
+  implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
+    implicit def A = A0
   }
+
 }
 
 trait ListFunctions {
@@ -232,4 +239,31 @@ trait ListFunctions {
 
 object list extends ListInstances with ListFunctions {
   object listSyntax extends scalaz.syntax.std.ToListV
+}
+
+
+trait ListEqual[A] extends Equal[List[A]] {
+  implicit def A: Equal[A]
+
+  override def equalIsNatural: Boolean = A.equalIsNatural
+
+  override def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
+}
+
+trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
+  implicit def A: Order[A]
+
+  import Ordering._
+
+  def order(a1: List[A], a2: List[A]) =
+    (a1, a2) match {
+      case (Nil, Nil)     => EQ
+      case (Nil, _::_)    => LT
+      case (_::_, Nil)    => GT
+      case (a::as, b::bs) => Order[A].order(a, b) match {
+        case EQ => order(as, bs)
+        case x  => x
+      }
+    }
+
 }
