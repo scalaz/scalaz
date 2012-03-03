@@ -376,7 +376,7 @@ trait LensInstances {
   /** Allow the illusion of imperative updates to numbers viewed through a lens */
   case class NumericLens[S, N: Numeric](lens: Lens[S, N], num: Numeric[N]) {
     def +=(that: N): State[S, N] =
-      lens %= (num.minus(_, that))
+      lens %= (num.plus(_, that))
 
     def -=(that: N): State[S, N] =
       lens %= (num.minus(_, that))

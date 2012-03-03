@@ -25,4 +25,15 @@ class LensTest extends Spec {
   checkAll("Map.member", lens.laws(Lens.lensId[Map[Boolean, Int]].member(true)))
   checkAll("sum", lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
 
+  "NumericLens" ^
+    "+=" ! {
+      check((i: Int) => (Lens.lensId[Int] += i).run(1) must be_=== ((i + 1) -> (i + 1)))
+    }^
+    "-=" ! {
+      check((i: Int) => (Lens.lensId[Int] -= i).run(1) must be_=== ((1 - i) -> (1 - i)))
+    }^
+    "*=" ! {
+      check((i: Int) => (Lens.lensId[Int] *= i).run(2) must be_=== ((i * 2) -> (i * 2)))
+    }
+
 }
