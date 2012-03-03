@@ -12,7 +12,7 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
     F.second(self)
 
   final def ***[C, D](k: F[C, D]): F[(A, C), (B, D)] =
-    F.split(self, k)
+    F.splitA(self, k)
 
   final def &&&[C](k: F[A, C]): F[A, (B, C)] =
     F.combine(self, k)

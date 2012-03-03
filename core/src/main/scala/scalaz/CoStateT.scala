@@ -12,6 +12,9 @@ sealed trait CoStateT[F[_], A, B] {
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
 
+  def puts(f: A => A)(implicit F: Functor[F]): F[B] =
+    put(f(pos))
+
   def pos: A =
     run._2
 

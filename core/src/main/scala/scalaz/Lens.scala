@@ -42,8 +42,6 @@ sealed trait Lens[A, B] {
   def modf[F[_]](a: A, f: B => F[B])(implicit F: Functor[F]): F[A] =
     F.map(f(get(a)))(set(a, _))
 
-  import State._
-
   def st: State[A, B] =
     State(s => (get(s), s))
 
@@ -94,7 +92,7 @@ sealed trait Lens[A, B] {
   def <=<[C](that: Lens[B, C]): Lens[A, C] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C](that: Lens[C, B]): Lens[Either[A, C], B] =
+  def sum[C](that: => Lens[C, B]): Lens[Either[A, C], B] =
     lensGG[Either[A, C], B](
     {
       case Left(a)  => get(a)
@@ -105,7 +103,7 @@ sealed trait Lens[A, B] {
     })
 
   /** Alias for `sum` */
-  def |||[C](that: Lens[C, B]): Lens[Either[A, C], B]= sum(that)
+  def |||[C](that: => Lens[C, B]): Lens[Either[A, C], B]= sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] =
@@ -116,6 +114,14 @@ sealed trait Lens[A, B] {
 
   /** alias for `product` */
   def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] = product(that)
+
+  /** A homomorphism of lens categories */
+  def partial: PLens[A, B] =
+    PLens.plens(a => Some(run(a)))
+
+  /** alias for `partial` */
+  def unary_~ : PLens[A, B] =
+    partial
 
   trait LensLaw {
     def identity(a: A)(implicit A: Equal[A]): Boolean = A.equal(set(a, get(a)), a)
@@ -136,9 +142,24 @@ trait LensInstances {
   import State._
   import Lens._
 
-  implicit def lensCategory: Category[Lens] = new Category[Lens] {
+  implicit def lensCategory: Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] = new Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] {
     def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
     def id[A]: Lens[A, A] = Lens.lensId[A]
+    def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[Either[A,  B], C] =
+      Lens {
+        case Left(a) => {
+          val x = f run a
+          coState(w => Left(x put w), x.pos)
+        }
+        case Right(b) => {
+          val y = g run b
+          coState(w => Right(y put w), y.pos)
+        }
+      }
+    def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
+      f *** g
+    def codiagonal[A]: Lens[Either[A,  A], A] =
+      codiagLens
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
@@ -423,4 +444,19 @@ trait LensFunctions {
   /** Access the second field of a tuple */
   def secondLens[A, B]: Lens[(A, B), B] =
     lensG[(A, B), B](_._2, ab => b => (ab._1, b))
+
+  /** Access the first field of a lazy tuple */
+  def lazyFirstLens[A, B]: Lens[LazyTuple2[A, B], A] =
+    lensG[LazyTuple2[A, B], A](_._1, ab => a => LazyTuple2(a, ab._2))
+
+  /** Access the second field of a lazy tuple */
+  def lazySecondLens[A, B]: Lens[LazyTuple2[A, B], B] =
+    lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
+
+  def nelHeadLens[A]: NonEmptyList[A] @-@ A =
+    lens(l => coState(NonEmptyList.nel(_, l.tail), l.head))
+
+  def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
+    lens(l => coState(NonEmptyList.nel(l.head, _), l.tail))
+
 }

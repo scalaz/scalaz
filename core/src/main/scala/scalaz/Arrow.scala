@@ -34,15 +34,15 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
   }
 
   // ***
-  def split[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
+  def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
       >>>(first[A, B, C](fab), second[C, D, B](fcd))
 
   def product[A, B](fab: (A =>: B)): ((A, A) =>: (B, B)) =
-    split(fab, fab)
+    splitA(fab, fab)
 
   // &&&
   def combine[A, B, C](fab: (A =>: B), fac: (A =>: C)): (A =>: (B, C)) =
-      >>>(arr((a: A) => (a, a)), split(fab, fac))
+      >>>(arr((a: A) => (a, a)), splitA(fab, fac))
 
   def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B) =
     >>>[C, A, B](arr(f), fab)
