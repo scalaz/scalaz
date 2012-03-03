@@ -128,7 +128,7 @@ trait Tokens {
   }
 
   // why can't I import std.function._? compiler -> StackOverflowError
-  implicit val Function0Functor: Functor[Function0] = new Functor[Function0] {
+  private[xml] implicit val Function0Functor: Functor[Function0] = new Functor[Function0] {
     def map[A, B](fa: Function0[A])(f: A => B) =
       () => f(fa())
   }
