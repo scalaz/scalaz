@@ -209,4 +209,7 @@ object ScalazArbitrary {
   
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
+
+  implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] = 
+    Functor[Arbitrary].map(A0)(CaseInsensitive(_))
 }

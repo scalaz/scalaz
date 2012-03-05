@@ -145,10 +145,20 @@ object build extends Build {
     dependencies = Seq(core)
   )
 
+  lazy val xml = Project(
+    id = "xml",
+    base = file("xml"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-xml",
+      typeClasses := TypeClass.xml
+    ),
+    dependencies = Seq(core)
+  )
+
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent, typelevel),
+    dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example"
     )
