@@ -57,11 +57,23 @@ sealed trait NonEmptyList[+A] {
   })
 
   def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
-    case x :: xs => nel(x, xs) 
+    case x :: xs => nel(x, xs)
   }
 
+  def min[B >: A](implicit cmp: scala.Ordering[B]): A =
+    tail.foldLeft(head) { (a, b) ⇒ if (cmp.lteq(a, b)) a else b }
+
+  def max[B >: A](implicit cmp: scala.Ordering[B]): A =
+    tail.foldLeft(head) { (a, b) ⇒ if (cmp.gteq(a, b)) a else b }
+
+  def minBy[B](f: A ⇒ B)(implicit cmp: scala.Ordering[B]): A =
+    tail.foldLeft(head) { (a, b) ⇒ if (cmp.lteq(f(a), f(b))) a else b }
+
+  def maxBy[B](f: A ⇒ B)(implicit cmp: scala.Ordering[B]): A =
+    tail.foldLeft(head) { (a, b) ⇒ if (cmp.gteq(f(a), f(b))) a else b }
+
   override def toString: String = "NonEmpty" + (head :: tail)
-  
+
   override def equals(any: Any): Boolean =
     any match {
       case that: NonEmptyList[_] => this.list == that.list
