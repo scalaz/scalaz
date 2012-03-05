@@ -34,6 +34,10 @@ trait Order[F] extends Equal[F] { self =>
 
   def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
 
+  final def reverseOrder = new Order[F] {
+    def order(x: F, y: F): Ordering = self.order(y, x)
+  }
+
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional
 
