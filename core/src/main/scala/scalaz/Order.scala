@@ -34,6 +34,15 @@ trait Order[F] extends Equal[F] { self =>
 
   def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
 
+  def reverse: Order[F] = {
+    val self = this
+    new Order[F] {
+      def order(x: F, y: F) = self.order(y, x)
+
+      override def reverse = self
+    }
+  }
+
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional
 
@@ -44,6 +53,14 @@ trait Order[F] extends Equal[F] { self =>
 
     def orderAndEqualConsistent(f1: F, f2: F): Boolean = {
       conditional(equal(f1, f2), order(f1, f2) == Ordering.EQ)
+    }
+    
+    def reverseConsistentWithFlip(f1: F, f2: F): Boolean = {
+      order(f1, f2) == reverse(f2, f1)
+    }
+    
+    def doubleReverseIsIdentity(f1: F, f2: F): Boolean = {
+      order(f1, f2) == reverse.reverse(f1, f2)
     }
   }
 
