@@ -111,8 +111,6 @@ final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B]) {
                           ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(t.fmap(a, f.curried), b), c), d), e), ff), g), h), i), j), k), l), n)
 
                         def tupled(implicit t: Functor[M], ap: Apply[M]): M[(A, B, C, D, E, F, G, H, I, J, K, L, N)] = apply(Tuple13.apply)
-
-                        }
                       }
                     }
                   }
