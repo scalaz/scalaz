@@ -18,6 +18,25 @@ sealed trait IterV[E, A] {
           cont = k => runCont(k(EOF[E])).getOrElse(error_("Diverging iteratee!")))
   }
   def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
+  def feed(e: Input[E]): IterV[E, A] = fold((_, _) => this, k => k(e))
+  def mapInput(f: Input[E] => Input[E]): IterV[E, A] =
+    fold((a, e) => Done(a, f(e)), (k => Cont(i => k(f(i)))))
+  def filterInput(p: E => Boolean): IterV[E, A] =
+    mapInput {
+      case i@El(e) => if (p(e)) i else Empty.apply
+      case x => x
+    }
+  def zipWith[B, C](eb: IterV[E, B], f: (A, B) => C): IterV[E, C] = {
+    (this, eb) match {
+      case (Cont(k), Cont(l)) => Cont(ie => k(ie).zipWith(l(ie), f))
+      case (Cont(k), b) => Cont(ie => k(ie).zipWith(b, f))
+      case (a, Cont(k)) => Cont(ie => a.zipWith(k(ie), f))
+      case (Done(a, e), Done(b, _)) => Done(f(a, b), e)
+    }
+  }
+
+  /** An iteratee that sends itself the EOF signal after `n` inputs. */
+  def take(n: Int): IterV[E, A] = fold((a, i) => Done(a, i), k => if (n <= 0) k(EOF.apply) else Cont(i => k(i).take(n - 1)))
 }
 
 /** Monadic Iteratees */
@@ -190,6 +209,17 @@ object IterV {
   def reversed[A, F[_]](implicit r: Reducer[A, F[A]]): IterV[A, F[A]] = {
     def step(acc: F[A])(s: Input[A]): IterV[A, F[A]] =
         s(el = e => Cont(step(r.cons(e, acc))),
+          empty = Cont(step(acc)),
+          eof = Done(acc, EOF.apply))
+    Cont(step(r.monoid.zero))
+  }
+
+  /**
+   * Iteratee that sums the inputs with a given reducer.
+   */
+  def sum[A, B](implicit r: Reducer[A, B]): IterV[A, B] = {
+    def step(acc: B)(s: Input[A]): IterV[A, B] =
+        s(el = e => Cont(step(r.snoc(acc, e))),
           empty = Cont(step(acc)),
           eof = Done(acc, EOF.apply))
     Cont(step(r.monoid.zero))
