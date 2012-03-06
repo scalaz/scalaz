@@ -112,15 +112,6 @@ final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B]) {
 
                         def tupled(implicit t: Functor[M], ap: Apply[M]): M[(A, B, C, D, E, F, G, H, I, J, K, L, N)] = apply(Tuple13.apply)
 
-                        def ⊛[O](o: M[O]) = new ApplicativeBuilder14[O](o)
-
-                        def |@|[O](o: M[O]) = new ApplicativeBuilder14[O](o)
-
-                        final class ApplicativeBuilder14[O](o: M[O]) {
-                          def apply[MM](f: (A, B, C, D, E, F, G, H, I, J, K, L, N, O) => MM)(implicit t: Functor[M], ap: Apply[M]): M[MM] = 
-                            ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(ap(t.fmap(a, f.curried), b), c), d), e), ff), g), h), i), j), k), l), n), o)
-
-                          def tupled(implicit t: Functor[M], ap: Apply[M]): M[(A, B, C, D, E, F, G, H, I, J, K, L, N, O)] = apply(Tuple14.apply)
                         }
                       }
                     }
