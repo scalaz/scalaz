@@ -54,7 +54,7 @@ trait FunctionInstances extends FunctionInstances0 {
     
   }
 
-  implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)

@@ -76,7 +76,7 @@ sealed trait ValidationT[F[_], E, A] {
 }
 
 object ValidationT extends ValidationTFunctions with ValidationTInstances {
-  def apply[F[_], E, A](m: F[Validation[E, A]]) = validationT(m)
+  def apply[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = validationT(m)
 
   sealed trait FailProjectionT[F[_], E, A] {
     self =>
@@ -118,7 +118,7 @@ object FailProjectionT extends FailProjectionTFunctions {
 }
 
 trait ValidationTFunctions {
-  def validationT[F[_], E, A](m: F[Validation[E, A]]) = new ValidationT[F, E, A] {
+  def validationT[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = new ValidationT[F, E, A] {
     def run = m
   }
 
