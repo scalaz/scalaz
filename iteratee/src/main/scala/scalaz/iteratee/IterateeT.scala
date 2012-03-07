@@ -243,6 +243,12 @@ trait IterateeTFunctions {
   def err[X, E, F[_] : Pointed, A](e: => X): IterateeT[X, E, F, A] =
     StepT.serr(e).pointI
 
+  def tryIO[A, F[_], B](io: IO[B])(implicit MIO: MonadIO[F]): IterateeT[Throwable, A, F, B] = 
+    IterateeT(MIO.map(MIO.liftIO(io.catchLeft))(_ match {
+      case Right(a) => StepT.sdone(a, emptyInput)
+      case Left(err) => StepT.serr(err)
+    }))
+    
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
    */

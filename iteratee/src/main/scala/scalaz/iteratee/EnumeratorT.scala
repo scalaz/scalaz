@@ -163,6 +163,16 @@ trait EnumeratorTFunctions {
         )
     }
 
+  
+  def enumBufferedReaderLines[F[_]](r: => java.io.BufferedReader)(implicit MIO: MonadIO[F]): EnumeratorT[Throwable, String, F] = 
+    new EnumeratorT[Throwable, String, F] {
+      lazy val reader = r
+      
+      def apply[A] = (s: StepT[Throwable, String, F, A]) => 
+        s.mapCont(k => tryIO(IO(reader.readLine)) flatMap (l => 
+          if (l == null) s.pointI else k(Input(l)) >>== apply[A]))
+    }
+
   /**
    * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
    */
