@@ -73,14 +73,15 @@ Define type class instances in the same files as the data structure. Type class 
     // described separately.
     trait MyDataStructureInstances {
        import MyDataStructure._
+       type MDS[X] = MyDataStructure
 
        implicit object mdsMonad extends Monad[MDS] {
-          def point[A](a: => A) = MyDataStructure(a)
+          def point[A](a: => A) = MDS(a)
 
-          def bind[A, B](fa: F[A])(f: A => B) = fa flatMap f // delegate
+          def bind[A, B](fa: MDS[A])(f: A => MDS[B]) = fa flatMap f // delegate
 
           // override to use directly call map
-          override def map[A, B](fa: F[A])(f: A => B) = fa map f // delegate
+          override def map[A, B](fa: MDS[A])(f: A => B) = fa map f // delegate
        }
     }
 
