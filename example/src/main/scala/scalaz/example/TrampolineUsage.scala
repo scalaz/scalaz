@@ -91,4 +91,25 @@ object TrampolineUsage extends App {
     val sorted = runQuickSort2[PromiseCov, Id, Int](xs, promise2Id, 8)
     println(sorted)
   }
+
+  // Ackermann function. Blows the stack for very small inputs.
+  def ack(m: Int, n: Int): Int =
+    if (m <= 0)
+      n + 1
+    else if (n <= 0)
+      ack(m - 1, 1)
+    else ack(m - 1, ack(m, n - 1))
+
+  // Trampolined ackermann function. Never blows the stack, even for large inputs.
+  def ackermann(m: Int, n: Int): Trampoline[Int] =
+    if (m <= 0)
+      return_(n + 1)
+    else if (n <= 0)
+      suspend(ackermann(m - 1, 1))
+    else for {
+      a <- suspend(ackermann(m, n - 1))
+      b <- suspend(ackermann(m - 1, a))
+    } yield b
+
+
 }

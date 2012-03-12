@@ -54,7 +54,7 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
       case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) flatMap f)))
-      case b Gosub g  => (Gosub(b, (x: Any) => g(x) flatMap f): Free[S, A]).resume
+      case b Gosub g  => b.flatMap((x: Any) => g(x) flatMap f).resume
     }
   }
 
