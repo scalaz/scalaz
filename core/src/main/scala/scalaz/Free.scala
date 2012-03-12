@@ -10,14 +10,17 @@ import std.tuple._
 object Free extends FreeFunctions with FreeInstances {
 
   /** Return from the computation with the given value. */
-  case class Fill[S[+_]: Functor, +A](a: A) extends Free[S, A]
+  case class Return[S[+_]: Functor, +A](a: A) extends Free[S, A]
 
-  /** Delimit the computation with the given suspension. */
-  case class Roll[S[+_]: Functor, +A](a: S[Free[S, A]]) extends Free[S, A]
+  /** Suspend the computation with the given suspension. */
+  case class Suspend[S[+_]: Functor, +A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  case class FlatMap[S[+_]: Functor, A, +B](a: Free[S, A],
+  case class Gosub[S[+_]: Functor, A, +B](a: Free[S, A],
                                  f: A => Free[S, B]) extends Free[S, B]
+
+  /** A computation that can be stepped through, suspended, and paused */
+  type Trampoline[+A] = Free[Function0, A]
 
   /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
   type Source[A, +B] = Free[({type f[+x] = (A, x)})#f, B]
@@ -28,13 +31,11 @@ object Free extends FreeFunctions with FreeInstances {
   type Sink[A, +B] = Free[({type f[+x] = (=> A) => x})#f, B]
 }
 
-/** 
- * A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
- * allowing tail-call elimination. 
- */
+/** A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
+  * allowing tail-call elimination. */
 sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   final def map[B](f: A => B): Free[S, B] =
-    flatMap(a => Fill(f(a)))
+    flatMap(a => Return(f(a)))
 
   /** Alias for `flatMap` */
   final def >>=[B](f: A => Free[S, B]): Free[S, B] = this flatMap f
@@ -42,38 +43,38 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   /** Binds the given continuation to the result of this computation.
     * All left-associated binds are reassociated to the right. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] = this match {
-    case FlatMap(a, g) => FlatMap(a, (x: Any) => FlatMap(g(x), f))
-    case a             => FlatMap(a, f)
+    case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(g(x), f))
+    case a           => Gosub(a, f)
   }
 
   /** Evaluates a single layer of the free monad. */
   @tailrec final def resume: Either[S[Free[S, A]], A] = this match {
-    case Fill(a)   => Right(a)
-    case Roll(t)  => Left(t)
-    case a FlatMap f => a match {
-      case Fill(a)   => f(a).resume
-      case Roll(t)  => Left(S.map(t)(((_: Free[S, Any]) flatMap f)))
-      case b FlatMap g => b.flatMap((x: Any) => g(x) flatMap f).resume
+    case Return(a)  => Right(a)
+    case Suspend(t) => Left(t)
+    case a Gosub f  => a match {
+      case Return(a)  => f(a).resume
+      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) flatMap f)))
+      case b Gosub g  => (Gosub(b, (x: Any) => g(x) flatMap f): Free[S, A]).resume
     }
   }
 
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[+_]:Functor](f: S ~> T): Free[T, A] =
     resume match {
-      case Left(s)  => Roll(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
-      case Right(r) => Fill(r)
+      case Left(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
+      case Right(r) => Return(r)
     }
 
   /** Modifies the first suspension with the given natural transformation. */
   final def mapFirstSuspension(f: S ~> S): Free[S, A] = resume match {
-    case Left(s) => Roll(f(s))
-    case Right(r) => Fill(r)
+    case Left(s) => Suspend(f(s))
+    case Right(r) => Return(r)
   }
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
   final def bounce[AA >: A](f: S[Free[S, A]] => Free[S, AA]): Free[S, AA] = resume match {
     case Left(s) => f(s)
-    case Right(r) => Fill(r)
+    case Right(r) => Return(r)
   }
 
   /** Runs to completion, using a function that extracts the resumption from its suspension functor. */
@@ -106,10 +107,10 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   /** Interleave this computation with another, combining the results with the given function. */
   def zipWith[B, C](tb: Free[S, B], f: (A, B) => C): Free[S, C] = {
     (resume, tb.resume) match {
-      case (Left(a), Left(b))   => Roll(S.map(a)(x => Roll(S.map(b)(y => x zipWith(y, f)))))
-      case (Left(a), Right(b))  => Roll(S.map(a)(x => x zipWith(Fill(b), f)))
-      case (Right(a), Left(b))  => Roll(S.map(b)(y => Fill(a)(S) zipWith(y, f)))
-      case (Right(a), Right(b)) => Fill(f(a, b))
+      case (Left(a), Left(b))   => Suspend(S.map(a)(x => Suspend(S.map(b)(y => x zipWith(y, f)))))
+      case (Left(a), Right(b))  => Suspend(S.map(a)(x => x zipWith(Return(b), f)))
+      case (Right(a), Left(b))  => Suspend(S.map(b)(y => Return(a)(S) zipWith(y, f)))
+      case (Right(a), Right(b)) => Return(f(a, b))
     }
   }
 
@@ -176,8 +177,8 @@ trait SinkInstances {
   implicit def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] =
     new Monad[({type f[x] = Sink[S, x]})#f] {
       def point[A](a: => A) =
-        Roll[({type f[+x] = (=> S) => x})#f, A](s =>
-          Fill[({type f[+x] = (=> S) => x})#f, A](a))
+        Suspend[({type f[+x] = (=> S) => x})#f, A](s =>
+          Return[({type f[+x] = (=> S) => x})#f, A](a))
       def bind[A, B](s: Sink[S, A])(f: A => Sink[S, B]) = s flatMap f
     }
 }
@@ -187,7 +188,7 @@ object Source extends SourceInstances
 trait SourceInstances {
   implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] =
     new Monad[({type f[x] = Source[S, x]})#f] {
-      override def point[A](a: => A) = Fill[({type f[+x] = (S, x)})#f, A](a)
+      override def point[A](a: => A) = Return[({type f[+x] = (S, x)})#f, A](a)
       def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f
     }
 }
@@ -197,20 +198,22 @@ trait SourceInstances {
 trait FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[+_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
-      def point[A](a: => A) = Fill(a)
+      def point[A](a: => A) = Return(a)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 }
 
 trait FreeFunctions {
+  /** Collapse a trampoline to a single step. */
+  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
 
-  /** Roll the given computation in a single step. */
-  def returnFree[S[+_], A](value: => A)(implicit S: Pointed[S]): Free[S, A] =
-    Roll[S, A](S.point(Fill[S, A](value)))
+  /** Suspend the given computation in a single step. */
+  def return_[S[+_], A](value: => A)(implicit S: Pointed[S]): Free[S, A] =
+    Suspend[S, A](S.point(Return[S, A](value)))
 
   def suspend[S[+_], A](value: => Free[S, A])(implicit S: Pointed[S]): Free[S, A] =
-    Roll[S, A](S.point(value))
+    Suspend[S, A](S.point(value))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
@@ -218,10 +221,10 @@ trait FreeFunctions {
 
   /** A source that produces the given value. */
   def produce[A](a: A): Source[A, Unit] =
-    Roll[({type f[+x] = (A, x)})#f, Unit](a -> Fill[({type f[+x] = (A, x)})#f, Unit](()))
+    Suspend[({type f[+x] = (A, x)})#f, Unit](a -> Return[({type f[+x] = (A, x)})#f, Unit](()))
 
   /** A sink that waits for a single value and returns it. */
   def await[A]: Sink[A, A] =
-    Roll[({type f[+x] = (=> A) => x})#f, A](a => Fill[({type f[+x] = (=> A) => x})#f, A](a))
+    Suspend[({type f[+x] = (=> A) => x})#f, A](a => Return[({type f[+x] = (=> A) => x})#f, A](a))
 }
 
