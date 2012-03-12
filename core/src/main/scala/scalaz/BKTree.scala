@@ -24,7 +24,10 @@ import BKTree._
  */
 sealed trait BKTree[A] {
   def isEmpty: Boolean =
-    this == BKTreeEmpty
+    this match {
+      case BKTreeEmpty()       => true
+      case BKTreeNode(_, _, _) => false
+    }
 
   def map[B](f: A => B): BKTree[B] =
     this match {
