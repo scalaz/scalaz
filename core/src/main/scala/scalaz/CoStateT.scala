@@ -15,6 +15,9 @@ sealed trait CoStateT[F[_], A, B] {
   def puts(f: A => A)(implicit F: Functor[F]): F[B] =
     put(f(pos))
 
+  def set: F[A => B] =
+    run._1
+
   def pos: A =
     run._2
 
@@ -81,7 +84,7 @@ trait CoStateTInstances extends CoStateTInstances0 {
 
 trait CoStateTFunctor[F[_], A0] extends Functor[({type λ[α]=CoStateT[F, A0, α]})#λ]{
   implicit def F: Functor[F]
-  def map[A, B](fa: CoStateT[F, A0, A])(f: (A) => B): CoStateT[F, A0, B] = fa map f
+  override def map[A, B](fa: CoStateT[F, A0, A])(f: (A) => B): CoStateT[F, A0, B] = fa map f
 }
 
 trait CoStateTCoPointed[F[_], A0] extends CoPointed[({type λ[α]=CoStateT[F, A0, α]})#λ] with CoStateTFunctor[F, A0] {
@@ -92,9 +95,23 @@ trait CoStateTCoPointed[F[_], A0] extends CoPointed[({type λ[α]=CoStateT[F, A0
 trait CoStateTCoBind[F[_], A0] extends CoBind[({type λ[α]=CoStateT[F, A0, α]})#λ] {
   implicit def F: CoBind[F]
   def cobind[A, B](fa: CoStateT[F, A0, A])(f: (CoStateT[F, A0, A]) => B) = fa cobind f
+  override def map[A, B](fa: CoStateT[F, A0, A])(f: (A) => B): CoStateT[F, A0, B] = fa map f
 }
 
 trait CoStateTCoMonad[F[_], A0] extends CoMonad[({type λ[α]=CoStateT[F, A0, α]})#λ] with CoStateTCoBind[F, A0] with CoStateTCoPointed[F, A0]{
   implicit def F: CoMonad[F]
   def cojoin[A](a: CoStateT[F, A0, A]) = a.duplicate
+}
+
+trait CoStateTCoHoist[S] extends CoHoist[({type f[g[_], a] = CoStateT[g, S, a]})#f] {
+  def lower[G[_] : CoBind, A](a: CoStateT[G, S, A]) =
+    implicitly[CoBind[G]].map(a.run._1)((z: S => A) => z(a.run._2))
+
+  def cohoist[M[_], N[_]: CoMonad](f: M ~> N) =
+    new (({type f[x] = CoStateT[M, S, x]})#f ~> ({type f[x] = CoStateT[N, S, x]})#f) {
+      def apply[A](c: CoStateT[M, S, A]) = {
+        val r = c.run
+        CoStateT(f(r._1), r._2)
+      }
+    }
 }
