@@ -21,7 +21,7 @@ object CoJoin {
 
   ////
   /** Define `CoJoin` in terms of `CoBind` */
-  trait FromCoBind[F[_]] {
+  trait FromCoBind[F[_]] extends CoJoin[F] {
     self: CoBind[F] =>
 
     def cojoin[A](fa: F[A]): F[F[A]] = cobind(fa)(fa => fa)
