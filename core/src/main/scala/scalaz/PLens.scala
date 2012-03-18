@@ -65,6 +65,19 @@ sealed trait PLens[A, B] {
       case Some(w) => w.puts(f)
     }
 
+  def =>=(f: B => B): A => A =
+    mod(f, _)
+
+  def modE(f: Endo[B]): Endo[A] =
+    Endo(=>=(f.run))
+
+  /** Modify the value viewed through the lens, a functor full of results */
+  def modf[F[_]](f: B => F[B], a: A)(implicit F: Pointed[F]): F[A] =
+    run(a) match {
+      case None => F.point(a)
+      case Some(w) => F.map(f(w.pos))(w.set)
+    }
+
   def st: PState[A, B] =
     State.init map (get(_))
 

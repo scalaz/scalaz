@@ -38,8 +38,14 @@ sealed trait Lens[A, B] {
   def mod(f: B => B, a: A): A =
     set(a, f(get(a)))
 
+  def =>=(f: B => B): A => A =
+    mod(f, _)
+
+  def modE(f: Endo[B]): Endo[A] =
+    Endo(=>=(f.run))
+
   /** Modify the value viewed through the lens, a functor full of results */
-  def modf[F[_]](a: A, f: B => F[B])(implicit F: Functor[F]): F[A] =
+  def modf[F[_]](f: B => F[B], a: A)(implicit F: Functor[F]): F[A] =
     F.map(f(get(a)))(set(a, _))
 
   def st: State[A, B] =
