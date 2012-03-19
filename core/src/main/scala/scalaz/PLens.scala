@@ -17,17 +17,9 @@ sealed trait PLens[A, B] {
   def setK: A =?> (B => A) =
     Kleisli(set(_))
 
-  def getj(o: Option[A]): Option[B] =
-    o flatMap (get(_))
-
-  def getjOr(o: Option[A], b: => B): B =
-    getj(o) getOrElse b
-
-  def setj(o: Option[A], b: B): Option[A] =
-    o flatMap (set(_) map (_(b)))
-
-  def setjOr(o: Option[A], b: B, a: => A): A =
-    setj(o, b) getOrElse a
+  /** Lift the lens into `Option` */
+  def option: PLens[Option[A], B] =
+    PLens(_ flatMap (run(_) map (c => coState(b => Some(c.put(b)), c.pos))))
 
   /** If the PartialLens is null, then return the given default value. */
   def getOr(a: A, b: => B): B =
