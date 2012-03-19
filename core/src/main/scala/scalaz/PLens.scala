@@ -14,8 +14,11 @@ sealed trait PLens[A, B] {
   def getK: A =?> B =
     Kleisli(get(_))
 
-  def setK: A =?> (B => A) =
-    Kleisli(set(_))
+  def trySetK: A =?> (B => A) =
+    Kleisli(trySet(_))
+
+  def setK(a: A): B =?> A =
+    Kleisli(set(a, _))
 
   /** Lift the lens into `Option` */
   def option: Option[A] @-? B =
@@ -44,7 +47,7 @@ sealed trait PLens[A, B] {
     }
 
   def is(a: A): Boolean =
-    get(a).isDefined
+    run(a).isDefined
 
   def isNot(a: A): Boolean =
     !is(a)
@@ -58,14 +61,14 @@ sealed trait PLens[A, B] {
   def trySet(a: A): Option[B => A] =
     run(a) map (c => c.put(_))
 
-  def set(a: A): Option[B => A] =
-    run(a) map (w => w.put(_))
+  def trySetOr(a: A, d: => B => A): B => A =
+    trySet(a) getOrElse d
 
-  def setI(a: A, b: B): A =
-    run(a) match {
-      case None => a
-      case Some(w) => w put b
-    }
+  def set(a: A, b: B): Option[A] =
+    trySet(a) map (_(b))
+
+  def setOr(a: A, b: B, d: => A): A =
+    set(a, b) getOrElse d
 
   def mod(f: B => B, a: A): A =
     run(a) match {
