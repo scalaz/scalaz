@@ -154,7 +154,8 @@ sealed trait PLens[A, B] {
     }
 
   /** Alias for `sum` */
-  def |||[C](that: => C @-? B): Either[A, C] @-? B= sum(that)
+  def |||[C](that: => C @-? B): Either[A, C] @-? B =
+    sum(that)
 
   /** Two disjoint partial lenses can be paired */
   def product[C, D](that: C @-? D): (A, C) @-? (B, D) =
@@ -275,7 +276,7 @@ trait PLensFunctions {
   def nil[A, B]: A @-? B =
     plens(_ => None)
 
-  def optionPLens[A]: Option[A] @-? A =
+  def somePLens[A]: Option[A] @-? A =
     plens(_ map (z => coState(Some(_), z)))
 
   def leftPLens[A, B]: Either[A, B] @-? A =
@@ -292,7 +293,7 @@ trait PLensFunctions {
 
   import LazyOption._
 
-  def lazyOptionPLens[A]: LazyOption[A] @-? A =
+  def lazySomePLens[A]: LazyOption[A] @-? A =
     plens(_.fold(z => Some(coState(lazySome(_), z)), None))
 
   import LazyEither._
@@ -380,6 +381,6 @@ trait PLensFunctions {
   def scalaJSONArrayPLens[A]: JSONType @-? List[Any] =
     plens {
       case JSONArray(a) => Some(coState(JSONArray(_), a))
-      case _             => None
+      case _            => None
     }
 }
