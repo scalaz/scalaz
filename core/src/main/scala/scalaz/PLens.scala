@@ -18,8 +18,12 @@ sealed trait PLens[A, B] {
     Kleisli(set(_))
 
   /** Lift the lens into `Option` */
-  def option: PLens[Option[A], B] =
+  def option: Option[A] @-? B =
     PLens(_ flatMap (run(_) map (c => coState(b => Some(c.put(b)), c.pos))))
+
+  /** An alias for `option`. */
+  def unary_! : Option[A] @-? B =
+    option
 
   /** If the PartialLens is null, then return the given default value. */
   def getOr(a: A, b: => B): B =
