@@ -35,8 +35,10 @@ sealed trait Lens[A, B] {
     run(a).put(b)
 
   /** Modify the value viewed through the lens */
-  def mod(f: B => B, a: A): A =
-    set(a, f(get(a)))
+  def mod(f: B => B, a: A): A = {
+    val (p, q) = run(a).run
+    p(f(q))    
+  }
 
   def =>=(f: B => B): A => A =
     mod(f, _)
