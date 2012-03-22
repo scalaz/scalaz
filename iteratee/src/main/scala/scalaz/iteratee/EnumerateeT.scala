@@ -141,12 +141,12 @@ trait EnumerateeTFunctions {
       }
     }
 
-  def group[X, E, F[_], G[_]](n: Int)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: CoPointed[G]): EnumerateeT[X, E, F[E], G] = 
+  def group[X, E, F[_], G[_]](n: Int)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: Copointed[G]): EnumerateeT[X, E, F[E], G] =
     new EnumerateeT[X, E, F[E], G] {
       def apply[A] = take[X, E, F](n).up[G].sequenceI.apply[A]
     }
 
-  def splitOn[X, E, F[_], G[_]](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: CoPointed[G]): EnumerateeT[X, E, F[E], G] = 
+  def splitOn[X, E, F[_], G[_]](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G], G1: Copointed[G]): EnumerateeT[X, E, F[E], G] =
     new EnumerateeT[X, E, F[E], G] {
       def apply[A] = {
         (takeWhile[X, E, F](p).up[G] flatMap (xs => drop[X, E, G](1).map(_ => xs))).sequenceI.apply[A]

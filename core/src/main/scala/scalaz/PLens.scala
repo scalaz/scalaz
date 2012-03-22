@@ -1,10 +1,10 @@
 package scalaz
 
-import CoStateT._
+import CostateT._
 
 sealed trait PLens[A, B] {
   import PLens._
-  import CoStateT._
+  import CostateT._
 
   def run(a: A): Option[A |--> B]
 
@@ -22,7 +22,7 @@ sealed trait PLens[A, B] {
 
   /** Lift the lens into `Option` */
   def option: Option[A] @-? B =
-    PLens(_ flatMap (run(_) map (c => coState(b => Some(c.put(b)), c.pos))))
+    PLens(_ flatMap (run(_) map (c => costate(b => Some(c.put(b)), c.pos))))
 
   /** An alias for `option`. */
   def unary_! : Option[A] @-? B =
@@ -133,7 +133,7 @@ sealed trait PLens[A, B] {
     plens(a => for {
       s <- that run a
       t <- run(s.pos)
-    } yield coState(x => s.put(t.put(x)), t.pos))
+    } yield costate(x => s.put(t.put(x)), t.pos))
 
   /** alias for `compose` */
   def >=>[C](that: C @-? A): C @-? B = compose(that)
@@ -148,9 +148,9 @@ sealed trait PLens[A, B] {
   def sum[C](that: => C @-? B): Either[A, C] @-? B =
     plens {
       case Left(a) =>
-        run(a) map (x => coState(w => Left(x put w), x.pos))
+        run(a) map (x => costate(w => Left(x put w), x.pos))
       case Right(b) =>
-        that.run(b) map (y => coState(w => Right(y put w), y.pos))
+        that.run(b) map (y => costate(w => Right(y put w), y.pos))
     }
 
   /** Alias for `sum` */
@@ -163,7 +163,7 @@ sealed trait PLens[A, B] {
       case (a, c) => for {
         x <- run(a)
         y <- that run c
-      } yield coState(bd => (x put bd._1, y put bd._2), (x.pos, y.pos))
+      } yield costate(bd => (x put bd._1, y put bd._2), (x.pos, y.pos))
     }
 
   /** alias for `product` */
@@ -186,9 +186,9 @@ trait PLensInstances {
     def choice[A, B, C](f: => A @-? C, g: => B @-? C): Either[A,  B] @-? C =
       plens {
         case Left(a) =>
-          f.run(a) map (x => coState(w => Left(x put w), x.pos))
+          f.run(a) map (x => costate(w => Left(x put w), x.pos))
         case Right(b) =>
-          g.run(b) map (y => coState(w => Right(y put w), y.pos))
+          g.run(b) map (y => costate(w => Right(y put w), y.pos))
       }
     def split[A, B, C, D](f: A @-? B, g: C @-? D): (A,  C) @-? (B, D) =
       f *** g
@@ -258,7 +258,7 @@ trait PLensFunctions {
     plens(a => for {
       g <- get(a)
       s <- set(a)
-    } yield coState(s, g))
+    } yield costate(s, g))
 
   /** The identity partial lens for a given object */
   def plensId[A]: A @-? A =
@@ -277,43 +277,43 @@ trait PLensFunctions {
     plens(_ => None)
 
   def somePLens[A]: Option[A] @-? A =
-    plens(_ map (z => coState(Some(_), z)))
+    plens(_ map (z => costate(Some(_), z)))
 
   def leftPLens[A, B]: Either[A, B] @-? A =
     plens {
-      case Left(a) => Some(coState(Left(_), a))
+      case Left(a) => Some(costate(Left(_), a))
       case Right(_) => None
     }
 
   def rightPLens[A, B]: Either[A, B] @-? B =
     plens {
-      case Right(b) => Some(coState(Right(_), b))
+      case Right(b) => Some(costate(Right(_), b))
       case Left(_) => None
     }
 
   import LazyOption._
 
   def lazySomePLens[A]: LazyOption[A] @-? A =
-    plens(_.fold(z => Some(coState(lazySome(_), z)), None))
+    plens(_.fold(z => Some(costate(lazySome(_), z)), None))
 
   import LazyEither._
 
   def lazyLeftPLens[A, B]: LazyEither[A, B] @-? A =
-    plens(_.fold(a => Some(coState(lazyLeft(_), a)), _ => None))
+    plens(_.fold(a => Some(costate(lazyLeft(_), a)), _ => None))
 
   def lazyRightPLens[A, B]: LazyEither[A, B] @-? B =
-    plens(_.fold(_ => None, b => Some(coState(lazyRight(_), b))))
+    plens(_.fold(_ => None, b => Some(costate(lazyRight(_), b))))
 
   def listHeadPLens[A]: List[A] @-? A =
     plens {
       case Nil => None
-      case h :: t => Some(coState(_ :: t, h))
+      case h :: t => Some(costate(_ :: t, h))
     }
 
   def listTailPLens[A]: List[A] @-? List[A] =
     plens {
       case Nil => None
-      case h :: t => Some(coState(h :: _, t))
+      case h :: t => Some(costate(h :: _, t))
     }
 
   def listNthPLens[A](n: Int): List[A] @-? A =
@@ -329,13 +329,13 @@ trait PLensFunctions {
   def streamHeadPLens[A]: Stream[A] @-? A =
     plens {
       case Empty => None
-      case h #:: t => Some(coState(_ #:: t, h))
+      case h #:: t => Some(costate(_ #:: t, h))
     }
 
   def streamTailPLens[A]: Stream[A] @-? Stream[A] =
     plens {
       case Empty => None
-      case h #:: t => Some(coState(h #:: _, t))
+      case h #:: t => Some(costate(h #:: _, t))
     }
 
   def streamNthPLens[A](n: Int): Stream[A] @-? A =
@@ -351,7 +351,7 @@ trait PLensFunctions {
       if(s.isEmpty)
         None
       else
-        Some(coState(EphemeralStream.cons(_, s.tail()), s.head()))
+        Some(costate(EphemeralStream.cons(_, s.tail()), s.head()))
     )
 
   def ephemeralStreamTailPLens[A]: EphemeralStream[A] @-? EphemeralStream[A] =
@@ -359,7 +359,7 @@ trait PLensFunctions {
       if(s.isEmpty)
         None
       else
-        Some(coState(EphemeralStream.cons(s.head(), _), s.tail()))
+        Some(costate(EphemeralStream.cons(s.head(), _), s.tail()))
     )
 
   def ephemeralStreamNthPLens[A](n: Int): EphemeralStream[A] @-? A =
@@ -374,13 +374,13 @@ trait PLensFunctions {
 
   def scalaJSONObjectPLens[A]: JSONType @-? Map[String, Any] =
     plens {
-      case JSONObject(m) => Some(coState(JSONObject(_), m))
+      case JSONObject(m) => Some(costate(JSONObject(_), m))
       case _             => None
     }
 
   def scalaJSONArrayPLens[A]: JSONType @-? List[Any] =
     plens {
-      case JSONArray(a) => Some(coState(JSONArray(_), a))
+      case JSONArray(a) => Some(costate(JSONArray(_), a))
       case _            => None
     }
 }

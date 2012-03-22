@@ -1,6 +1,6 @@
 package scalaz
 
-import CoStateT._
+import CostateT._
 import collection.immutable.Stack
 import collection.SeqLike
 
@@ -20,9 +20,9 @@ import collection.SeqLike
  */
 sealed trait Lens[A, B] {
 
-  def run(a: A): CoState[B, A] // (B => A, A)
+  def run(a: A): Costate[B, A] // (B => A, A)
 
-  def apply(a: A): CoState[B, A] =
+  def apply(a: A): Costate[B, A] =
     run(a)
 
   import StateT._
@@ -87,7 +87,7 @@ sealed trait Lens[A, B] {
     lens[C, B](c => {
       val (ac, a) = that.run(c).run
       val (ba, b) = run(a).run
-      coState[B, C](ac compose ba, b)
+      costate[B, C](ac compose ba, b)
     })
 
   /** alias for `compose` */
@@ -141,7 +141,7 @@ sealed trait Lens[A, B] {
 }
 
 object Lens extends LensFunctions with LensInstances {
-  def apply[A, B](r: A => CoState[B, A]): Lens[A, B] =
+  def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
     lens(r)
 }
 
@@ -157,11 +157,11 @@ trait LensInstances {
       Lens {
         case Left(a) => {
           val x = f run a
-          coState(w => Left(x put w), x.pos)
+          costate(w => Left(x put w), x.pos)
         }
         case Right(b) => {
           val y = g run b
-          coState(w => Right(y put w), y.pos)
+          costate(w => Right(y put w), y.pos)
         }
       }
     def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
@@ -417,18 +417,18 @@ trait LensInstances {
 
 trait LensFunctions {
 
-  import CoStateT._
+  import CostateT._
 
   /** The sunglasses operator, an alias for `Lens` */
   type @-@[A, B] =
   Lens[A, B]
 
-  def lens[A, B](r: A => CoState[B, A]): Lens[A, B] = new Lens[A, B] {
-    def run(a: A): CoState[B, A] = r(a)
+  def lens[A, B](r: A => Costate[B, A]): Lens[A, B] = new Lens[A, B] {
+    def run(a: A): Costate[B, A] = r(a)
   }
 
   def lensG[A, B](get: A => B, set: A => B => A): Lens[A, B] =
-    lens(a => coState((set(a), get(a))))
+    lens(a => costate((set(a), get(a))))
 
   def lensGG[A, B](get: A => B, set: (A, B) => A): Lens[A, B] =
     lensG(get, a => b => set(a, b))
@@ -462,9 +462,9 @@ trait LensFunctions {
     lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
 
   def nelHeadLens[A]: NonEmptyList[A] @-@ A =
-    lens(l => coState(NonEmptyList.nel(_, l.tail), l.head))
+    lens(l => costate(NonEmptyList.nel(_, l.tail), l.head))
 
   def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
-    lens(l => coState(NonEmptyList.nel(l.head, _), l.tail))
+    lens(l => costate(NonEmptyList.nel(l.head, _), l.tail))
 
 }

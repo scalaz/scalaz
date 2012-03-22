@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait CoBind[F[_]] extends Functor[F]  { self =>
+trait Cobind[F[_]] extends Functor[F]  { self =>
   ////
   /** Also know as `extend` */
   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]
@@ -13,20 +13,19 @@ trait CoBind[F[_]] extends Functor[F]  { self =>
   // derived functions
 
   ////
-  val coBindSyntax = new scalaz.syntax.CoBindSyntax[F] {}
+  val cobindSyntax = new scalaz.syntax.CobindSyntax[F] {}
 }
 
-object CoBind {
-  @inline def apply[F[_]](implicit F: CoBind[F]): CoBind[F] = F
+object Cobind {
+  @inline def apply[F[_]](implicit F: Cobind[F]): Cobind[F] = F
 
   ////
-  /** Define `CoBind` in terms of `CoJoin` and `Functor` */
-  trait FromCoJoin[F[_]] extends CoBind[F]{
-    self: CoJoin[F] =>
+  /** Define `Cobind` in terms of `Cojoin` and `Functor` */
+  trait FromCojoin[F[_]] extends Cobind[F]{
+    self: Cojoin[F] =>
 
-    def cobind[A, B](fa: F[A])(f: (F[A]) => B): F[B] =
-       map(cojoin(fa))(f)
+    def cobind[A, B](fa: F[A])(f: (F[A]) => B): F[B] = map(cojoin(fa))(f)
   }
+
   ////
 }
-

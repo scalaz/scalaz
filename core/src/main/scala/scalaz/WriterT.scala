@@ -121,7 +121,7 @@ trait WriterTInstances0 extends WriterTInstances1 {
     implicit def F = F0
     implicit def W = W0
   }
-  implicit def writerTCoPointed[F[_], W](implicit F0: CoPointed[F]) = new WriterTCoPointed[F, W] {
+  implicit def writerTCopointed[F[_], W](implicit F0: Copointed[F]) = new WriterTCopointed[F, W] {
     implicit def F = F0
   }
   implicit def writerTFoldable[F[_], W](implicit F0: Foldable[F]) = new WriterTFoldable[F, W] {
@@ -134,7 +134,7 @@ trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTBiTraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBiTraverse[F] {
     implicit def F = F0
   }
-  implicit def writerCoMonad[W] = new WriterCoMonad[W] {
+  implicit def writerComonad[W] = new WriterComonad[W] {
     implicit def F = implicitly
   }
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {
@@ -242,13 +242,13 @@ trait WriterTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β]=WriterT[F, α
     fab.bitraverse(f, g)
 }
 
-trait WriterTCoPointed[F[_], W] extends CoPointed[({type λ[α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
-  implicit def F: CoPointed[F]
+trait WriterTCopointed[F[_], W] extends Copointed[({type λ[α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
+  implicit def F: Copointed[F]
 
   def copoint[A](p: WriterT[F, W, A]): A = F.copoint(p.over)
 }
 
-trait WriterCoMonad[W] extends CoMonad[({type λ[α] = Writer[W, α]})#λ] with WriterTCoPointed[Id, W] {
+trait WriterComonad[W] extends Comonad[({type λ[α] = Writer[W, α]})#λ] with WriterTCopointed[Id, W] {
 
   override def cojoin[A](fa: Writer[W, A]): Writer[W, Writer[W, A]] =
     Writer(fa.written, fa)

@@ -198,7 +198,7 @@ object ScalazArbitrary {
   implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
     Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
 
-  implicit def coStateTArb[F[_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[CoStateT[F, A, B]] = Functor[Arbitrary].map(A)(CoStateT(_))
+  implicit def costateTArb[F[_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[CostateT[F, A, B]] = Functor[Arbitrary].map(A)(CostateT(_))
 
   implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 

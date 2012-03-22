@@ -111,7 +111,7 @@ object Tree extends TreeFunctions with TreeInstances {
 }
 
 trait TreeInstances {
-  implicit val treeInstance: Traverse[Tree] with Monad[Tree] with CoMonad[Tree] = new Traverse[Tree] with Monad[Tree] with CoMonad[Tree] with CoBind.FromCoJoin[Tree] {
+  implicit val treeInstance: Traverse[Tree] with Monad[Tree] with Comonad[Tree] = new Traverse[Tree] with Monad[Tree] with Comonad[Tree] with Cobind.FromCojoin[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
     def copoint[A](p: Tree[A]): A = p.rootLabel

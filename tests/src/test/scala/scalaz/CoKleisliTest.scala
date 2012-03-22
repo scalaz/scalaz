@@ -15,13 +15,13 @@ class CoKleisliTest extends Spec {
 
   object instances {
     def monad[F[_], W] = Monad[({type λ[α] = CoKleisli[F, W, α]})#λ]
-    def arrId[F[_] : CoPointed, W] = ArrId[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
-    def compose[F[_], W](implicit F: CoJoin[F] with Functor[F]) = Compose[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
-    def arrow[F[_] : CoMonad, W] = Arrow[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
+    def arrId[F[_] : Copointed, W] = ArrId[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
+    def compose[F[_], W](implicit F: Cojoin[F] with Functor[F]) = Compose[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
+    def arrow[F[_] : Comonad, W] = Arrow[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
-    def arrId[F[_] : CoMonad, W] = ArrId[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
-    def compose[F[_], W](implicit F: CoMonad[F]) = Compose[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
+    def arrId[F[_] : Comonad, W] = ArrId[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
+    def compose[F[_], W](implicit F: Comonad[F]) = Compose[({type λ[α, β] = CoKleisli[F, α, β]})#λ]
   }
 
 }

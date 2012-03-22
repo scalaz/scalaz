@@ -351,33 +351,33 @@ trait Ops {
 
 object Op extends Ops {
   import PLens._
-  import CoStateT._
+  import CostateT._
 
   val choiceSucceedOpPL: Op @-? History =
-    plens(_.choiceSucceed map (e => coState(choiceSucceedOp(_), e)))
+    plens(_.choiceSucceed map (e => costate(choiceSucceedOp(_), e)))
 
   val choiceSwitchOpPL: Op @-? (History, History) =
-    plens(_.choiceSwitch map (e => coState(h => choiceSwitchOp(h._1, h._2), e)))
+    plens(_.choiceSwitch map (e => costate(h => choiceSwitchOp(h._1, h._2), e)))
 
   val findLeftOpPL: Op @-? CPredicate =
-    plens(_.findLeft map (e => coState(findLeftOp(_), e)))
+    plens(_.findLeft map (e => costate(findLeftOp(_), e)))
 
   val findRightOpPL: Op @-? CPredicate =
-    plens(_.findRight map (e => coState(findRightOp(_), e)))
+    plens(_.findRight map (e => costate(findRightOp(_), e)))
 
   val findChildOpPL: Op @-? CPredicate =
-    plens(_.findChild map (e => coState(findChildOp(_), e)))
+    plens(_.findChild map (e => costate(findChildOp(_), e)))
 
   val findRecOpPL: Op @-? CPredicate =
-    plens(_.findRec map (e => coState(findRecOp(_), e)))
+    plens(_.findRec map (e => costate(findRecOp(_), e)))
 
   val nthChildOpPL: Op @-? Int =
-    plens(_.nthChild map (e => coState(nthChildOp(_), e)))
+    plens(_.nthChild map (e => costate(nthChildOp(_), e)))
 
   val succeedingOpPL: Op @-? (Cursor => Cursor, OpDescription) =
-    plens(_.succeeding map (e => coState(x => succeedingOp(x._1, x._2), e)))
+    plens(_.succeeding map (e => costate(x => succeedingOp(x._1, x._2), e)))
 
   val genericOpPL: Op @-? (Cursor => Option[Cursor], OpDescription) =
-    plens(_.generic map (e => coState(x => genericOp(x._1, x._2), e)))
+    plens(_.generic map (e => costate(x => genericOp(x._1, x._2), e)))
 
 }

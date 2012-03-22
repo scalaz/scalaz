@@ -90,8 +90,8 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 }
 
 trait NonEmptyListInstances {
-  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with Each[NonEmptyList] =
-    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] with Each[NonEmptyList] {
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] =
+    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] {
       def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse f
 

@@ -364,7 +364,7 @@ object Zipper extends ZipperFunctions with ZipperInstances {
 trait ZipperInstances {
   import Zipper._
 
-  implicit def zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with CoMonad[Zipper] with CoBind.FromCoJoin[Zipper] {
+  implicit def zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with Comonad[Zipper] with Cobind.FromCojoin[Zipper] {
     def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
     def copoint[A](p: Zipper[A]): A =
