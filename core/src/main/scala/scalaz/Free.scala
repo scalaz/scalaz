@@ -71,6 +71,14 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     case Right(r) => Return(r)
   }
 
+  /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
+  final def zap[G[+_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Duality[S, G]): C =
+    Duality.monadComonadDuality.zap(this, bs)(f)
+
+  /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
+  final def smash[G[+_], B](fs: Cofree[G, A => B])(implicit G: Functor[G], d: Duality[S, G]): B =
+    zap(fs)((a, f) => f(a))
+
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
   final def bounce[AA >: A](f: S[Free[S, A]] => Free[S, AA]): Free[S, AA] = resume match {
     case Left(s) => f(s)
