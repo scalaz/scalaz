@@ -33,6 +33,20 @@ class ListWTest extends Specification with Sugar with ScalaCheck {
     (a: List[Int], b: List[Int]) => (a.intercalate(b) ≟ intercalate(a, b))
   }
 
+  "groupNelBy produces NonEmptyLists of the correct number of elements" verifies {
+    (ss: List[String]) =>  {
+      val grouped = ss.groupNelBy(_.length)
+      grouped.values.foldMap(_.count) === ss.length
+    }
+  }
+
+  "groupNelBy produces NonEmptyLists of the correct elements" verifies {
+    (ss: List[String]) =>  {
+      val grouped = ss.groupNelBy(_.length)
+      grouped.values.map(_.list).flatten.toSet === ss.toSet
+    }
+  }
+
   "groupByM joined (in Identity) produces the same list" verifies {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupByM[Identity]((a, b) => p(a, b).η[Identity]).value.join === a
