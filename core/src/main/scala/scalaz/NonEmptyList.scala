@@ -72,6 +72,10 @@ sealed trait NonEmptyList[+A] {
   def maxBy[B](f: A ⇒ B)(implicit cmp: scala.Ordering[B]): A =
     tail.foldLeft(head) { (a, b) ⇒ if (cmp.gteq(f(a), f(b))) a else b }
 
+  def foldl1Nel[B >: A](f : (B, A) => B) : B = ((head : B) /: tail) { f }
+
+  def sumNel[B >: A](implicit s : Semigroup[B]) : B = foldl1Nel[B]( (a1, a2) => s.append(a1, a2) )
+
   override def toString: String = "NonEmpty" + (head :: tail)
 
   override def equals(any: Any): Boolean =
