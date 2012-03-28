@@ -150,8 +150,8 @@ trait StreamTInstances0 extends StreamTInstances1 {
 }
 
 trait StreamTInstances extends StreamTInstances0 {
-  implicit def StreamTMonadPlus[F[_]](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = StreamT[F, α]})#λ] = new StreamTMonadPlus[F] {
-    implicit def F: MonadPlus[F] = F0
+  implicit def StreamTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = StreamT[F, α]})#λ] = new StreamTMonadPlus[F] {
+    implicit def F: Monad[F] = F0
   }
   implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
   implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
@@ -228,7 +228,7 @@ private[scalaz] trait StreamTMonad[F[_]] extends Monad[({type λ[α] = StreamT[F
 }
 
 private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTMonad[F] {
-  implicit def F: MonadPlus[F]
+  implicit def F: Monad[F]
 }
 
 private[scalaz] trait StreamTHoist extends Hoist[StreamT] {

@@ -79,12 +79,13 @@ trait Syntaxes {
 
   object validation extends ToValidationV
 
+  object kleisli extends ToKleisliV
 
   object all extends ToAllTypeClassV with ToAllOtherV
 
 }
 
-trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV with ToReducerV
+trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV with ToReducerV with ToKleisliV
 
 trait ToAllTypeClassV
   extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV

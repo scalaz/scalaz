@@ -42,6 +42,9 @@ sealed trait Kleisli[M[_], A, B] { self =>
       b => (W.zero, b, s)
     }
   )
+
+  def liftMK[T[_[_], _]](implicit T: MonadTrans[T], M: Monad[M]): Kleisli[({type l[a] = T[M, a]})#l, A, B] =
+    compose[({type l[a] = T[M, a]})#l](ma => T.liftM(ma))
 }
 
 //
