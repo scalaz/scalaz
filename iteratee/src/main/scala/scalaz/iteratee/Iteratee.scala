@@ -72,4 +72,15 @@ trait IterateeFunctions {
    */
   def takeUntil[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[A, F[A]] =
     takeWhile(!p(_))
+
+  /**
+   * Produces chunked output split by the given predicate.
+   */
+  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pointed[F]): Iteratee[A, F[A]] = {
+    Iteratee.peek[A, Id] flatMap {
+      case None => done(Monoid[F[A]].zero, Input.Empty[A])
+      case Some(h) => takeWhile(pred(_, h))
+    }
+  }
+
 }
