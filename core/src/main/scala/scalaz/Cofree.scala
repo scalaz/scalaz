@@ -12,6 +12,12 @@ case class Cofree[S[+_], +A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor
   final def extend[B](f: Cofree[S, A] => B): Cofree[S, B] =
     applyTail(f(this), _ extend f)
 
+  /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
+  def scanr[B](g: (A, S[Cofree[S, B]]) => B): Cofree[S, B] = {
+    lazy val qs = S.map(tail)(_ scanr g)
+    Cofree(g(head, qs), qs)
+  }
+
   /** Redecorates the structure with values representing entire substructures. */
   final def duplicate: Cofree[S, Cofree[S, A]] = 
     applyTail(this, _.duplicate)
@@ -40,11 +46,21 @@ case class Cofree[S[+_], +A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor
     apply(x => b, g)
 
   /** Applies a function `f` to a value in this comonad and a corresponding value in the dual monad, annihilating both. */
-  final def zap[G[+_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Duality[S, G]): C =
-    Duality.comonadMonadDuality.zap(this, bs)(f)
+  final def zapWith[G[+_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+    Zap.comonadMonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a monad to the corresponding value in this comonad, annihilating both. */
-  final def smash[G[+_], B](fs: Free[G, A => B])(implicit G: Functor[G], d: Duality[S, G]): B =
-    zap(fs)((a, f) => f(a))
+  final def zap[G[+_], B](fs: Free[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+    zapWith(fs)((a, f) => f(a))
 }
+
+trait CofreeFunctions {
+
+  /** Cofree corecursion. */
+  def unfoldC[F[+_], A](a: A)(f: A => F[A])(implicit F: Functor[F]): Cofree[F, A] =
+    Cofree(a, F.map(f(a))(unfoldC(_)(f)))
+
+}
+
+object Cofree extends CofreeFunctions
 
