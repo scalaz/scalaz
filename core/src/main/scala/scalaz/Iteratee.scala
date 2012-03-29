@@ -15,7 +15,7 @@ sealed trait IterV[E, A] {
   def run: A = {
     def runCont(i: IterV[E, A]) = i.fold(done = (x, _) => Some(x), cont = _ => None)
     fold(done = (x, _) => x,
-          cont = k => runCont(k(EOF[E])).getOrElse(error_("Diverging iteratee!")))
+          cont = k => runCont(k(EOF[E])).getOrElse(sys.error_("Diverging iteratee!")))
   }
   def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
   def feed(e: Input[E]): IterV[E, A] = fold((_, _) => this, k => k(e))
@@ -46,21 +46,25 @@ sealed trait IterVM[M[_], E, A] {
 }
 
 case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[IterVM[M, E, A]]] {
-  def apply(es: StreamT[M, E])(M: Monad[M]): M[A] = for {
+  import IterV._
+
+  def apply(es: StreamT[M, E])(implicit M: Monad[M]): M[A] = for {
     i <- value
-    p <- es.unapply
-    v <- value.fold((a, e) => M.pure(a),
-                    k => p match {
-                      case Some((h, t)) => k(h).flatMap(_.apply(t))
-                      case None => k(EOF[E])
-                    })
-  }
-  def lower(f: M ~> Id): M[IterV[E, A]] = for {
+    p <- es.uncons
+    v <- i.fold((a, e) => M.pure(a),
+                k => p match {
+                  case Some((h, t)) => k(El(h))(t)
+                  case None => k(EOF[E]).value.map(
+                    _.fold((a, e) => a, _ => error("Diverging Iteratee")))
+                })
+  } yield v
+
+  def lower(f: M ~> Id)(implicit M: Monad[M]): M[IterV[E, A]] = for {
     v <- value
-    a <- v match {
-      case DoneM((a, e)) => Done(a, e)
-      case ContM(k) => Done(e => f(k(e).unsafeLower))
-    }
+    a <- M.pure(v match {
+      case DoneM(a, e) => Done(a, e)
+      case ContM(k) => Cont((e: Input[E]) => f(k(e).lower(f)))
+    })
   } yield a
 }
 
