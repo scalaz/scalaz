@@ -242,6 +242,39 @@ trait IterateeTFunctions {
     cont(step)
   }
 
+  /**
+   * Produces chunked output split by the given predicate.
+   */
+  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pointed[F]): Iteratee[A, F[A]] = {
+    Iteratee.peek[A, Id] flatMap {
+      case None => done(Monoid[F[A]].zero, Input.Empty[A])
+      case Some(h) => takeWhile(pred(_, h))
+    }
+  }
+
+  /**
+   * Repeats the given iteratee by appending with the given monoid.
+   */
+  def repeat[E, A, F[_]](iter: Iteratee[E,A])(implicit mon: Monoid[F[A]], pr: Pointed[F]): Iteratee[E, F[A]] = {
+    def step(acc: F[A])(s: Input[E]): Iteratee[E, F[A]] =
+      s(
+        el = e => iter.foldT(
+                      k => k(Input.Element(e)).foldT(
+                        k2 => cont((in: Input[E]) => for {
+                            h <- k2(in)
+                            t <- repeat(iter)
+                          } yield mon.append(mon.append(acc, pr.point(h)), t)
+                        ) 
+                      , (a, _) => cont(step(mon.append(acc, pr.point(a))))
+                      )
+                    , (a, _) => cont(step(mon.append(acc, pr.point(a))))
+                    )
+      , empty = cont(step(acc))
+      , eof = done(acc, Input.Eof.apply)
+      ) 
+    cont(step(Monoid[F[A]].zero))
+  }
+
   def collectT[E, F[_], A[_]](implicit M: Monad[F], mae: Monoid[A[E]], pointed: Pointed[A]): IterateeT[E, F, A[E]] = {
     import scalaz.syntax.semigroup._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
