@@ -3,10 +3,10 @@ package syntax
 
 trait KleisliIdV[A] extends SyntaxV[A] {
   /** Lift the value into a Kleisli */
-  def liftKleisli[R]: Kleisli[Id, R, A] = Kleisli[Id, R, A](_ => self)
+  def liftKleisliId[R]: Kleisli[Id, R, A] = Kleisli[Id, R, A](_ => self)
 
-  /** Lift the value into a Reader. Alias for liftKleisli */
-  def liftReader[R]: Reader[R, A] = liftKleisli
+  /** Lift the value into a Reader. Alias for liftKleisliId */
+  def liftReader[R]: Reader[R, A] = liftKleisliId
 }
 
 trait KleisliFAV[F[_], A] extends SyntaxV[F[A]] {
