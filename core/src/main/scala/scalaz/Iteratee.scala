@@ -45,7 +45,24 @@ sealed trait IterVM[M[_], E, A] {
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 
-case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[IterVM[M, E, A]]]
+case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[IterVM[M, E, A]]] {
+  def apply(es: StreamT[M, E])(M: Monad[M]): M[A] = for {
+    i <- value
+    p <- es.unapply
+    v <- value.fold((a, e) => M.pure(a),
+                    k => p match {
+                      case Some((h, t)) => k(h).flatMap(_.apply(t))
+                      case None => k(EOF[E])
+                    })
+  }
+  def lower(f: M ~> Id): M[IterV[E, A]] = for {
+    v <- value
+    a <- v match {
+      case DoneM((a, e)) => Done(a, e)
+      case ContM(k) => Done(e => f(k(e).unsafeLower))
+    }
+  } yield a
+}
 
 /** An Enumerator[F] feeds data from an F to an iteratee */
 trait Enumerator[F[_]] {
