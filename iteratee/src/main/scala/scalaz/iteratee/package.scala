@@ -2,11 +2,11 @@ package scalaz
 
 package object iteratee {
 
-  type Step[X, E, A] =
-  StepT[X, E, Id, A]
+  type Step[E, A] =
+  StepT[E, Id, A]
 
-  type Iteratee[X, E, A] =
-  IterateeT[X, E, Id, A]
+  type Iteratee[E, A] =
+  IterateeT[E, Id, A]
 
   object Iteratee
     extends IterateeFunctions
@@ -17,21 +17,16 @@ package object iteratee {
     with StepTFunctions
     with InputFunctions {
 
-    def apply[X, E, A](s: Step[X, E, A]): Iteratee[X, E, A] = iteratee(s)
+    def apply[E, A](s: Step[E, A]): Iteratee[E, A] = iteratee(s)
   }
 
-  type Enumerator[X, E] =
-  EnumeratorT[X, E, Id]
+  type Enumerator[E] =
+  EnumeratorT[E, Id]
 
-  type Enumeratee[X, O, I] = 
-  EnumerateeT[X, O, I, Id]
-
-  type Iter[E, F[_], A] =
-  IterateeT[Unit, E, F, A]
+  type Enumeratee[O, I] =
+  EnumerateeT[O, I, Id]
 
   type >@>[E, A] =
-  Iteratee[Unit, E, A]
+  Iteratee[E, A]
 
-  type Enum[E] =
-  Enumerator[Unit, E]
 }
