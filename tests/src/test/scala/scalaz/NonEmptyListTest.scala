@@ -1,9 +1,9 @@
 package scalaz
 
-import org.specs.Specification
+import org.specs.{Sugar, Specification, ScalaCheck}
 import Scalaz._
 
-class NonEmptyListTest extends Specification {
+class NonEmptyListTest extends Specification with Sugar with ScalaCheck {
 
   "non empty list" should {
     "support min" in {
@@ -38,5 +38,16 @@ class NonEmptyListTest extends Specification {
         nel("foo", "a", "scalaz", "scala").maxBy(_.size) must_== "scalaz"
       }
     }
+    "sumNel produces sum of NonEmptyList" verifies {
+      (is: List[Int]) => {
+        !(is.toNel map (_.sumNel === is.sum) exists (x => !x))
+      }
+    }
+    "fold1Nel produces fold of NonEmptyList" verifies {
+      (is: List[Int]) => {
+        !(is.toNel map (_.foldl1Nel(_ + _) === is.sum) exists (x => !x))
+      }
+    }
   }
+
 }
