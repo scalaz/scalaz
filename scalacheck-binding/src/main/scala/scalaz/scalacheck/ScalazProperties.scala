@@ -330,4 +330,5 @@ object ScalazProperties {
       property("triangleInequality") = triangleInequality[F]
     }
   }
+
 }
