@@ -112,5 +112,14 @@ trait AdjunctionInstances {
     override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): B = f(() => a)
     override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
   }
+
+  implicit def writerReaderAdjunction[E]: Adjunction[({type λ[α] = Writer[E, α]})#λ, ({type λ[α] = Reader[E, α]})#λ] = new Adjunction[({type λ[α] = Writer[E, α]})#λ, ({type λ[α] = Reader[E, α]})#λ] {
+    override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
+      Reader(e => f(Writer(e, a)))
+    override def rightAdjunct[A, B](w: Writer[E, A])(f: A => Reader[E, B]): B = {
+      val (e, a) = w.run
+      f(a)(e)
+    }
+  }
 }
 
