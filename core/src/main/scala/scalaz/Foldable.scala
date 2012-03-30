@@ -23,6 +23,14 @@ trait Foldable[F[_]]  { self =>
     foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
   }
 
+  /**Right-associative, monadic fold of a structure. */
+  def foldRightM[G[_], A, B](fa: F[A], z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] =
+    foldLeft[A, B => G[B]](fa, M.point(_))((b, a) => w => M.bind(f(a, w))(b))(z)
+
+  /**Left-associative, monadic fold of a structure. */
+  def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
+    foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
+  
   // derived functions
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
     import std.option._
@@ -37,6 +45,14 @@ trait Foldable[F[_]]  { self =>
 
   /**Curred version of `foldLeft` */
   final def foldL[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+
+  /**Curried version of `foldRightM` */
+  final def foldRM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
+    foldRightM(fa, z)((a, b) => f(a)(b))
+
+  /**Curried version of `foldLeftM` */
+  final def foldLM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
+    foldLeftM(fa, z)((b, a) => f(b)(a))
 
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def foldR1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldR(fa, None: Option[A])(a => o => o.map(f(a)(_)) orElse Some(a))
