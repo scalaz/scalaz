@@ -5,6 +5,8 @@ import Scalaz._
 /** The input to an iteratee. */
 sealed trait Input[E] {
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
+  def map[D](f: E => D): Input[D] =
+    apply(IterV.Empty.apply[D], e => IterV.El(f(e)), IterV.EOF.apply[D])
 }
 
 /** A pure iteratee computation which is either done or needs more input */
@@ -66,6 +68,13 @@ case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[Ite
       case ContM(k) => Cont((e: Input[E]) => f(k(e).lower(f)))
     })
   } yield a
+
+  def xmap[D](f: D => E, g: E => D)(implicit M: Monad[M]): Iteratee[M, D, A] = Iteratee[M, D, A](for {
+    v <- value
+    h <- M.pure(v.fold((a, e) => DoneM[M, D, A](a, e map g),
+                k => ContM[M, D, A]((d: Input[D]) =>
+                  k(d map f).xmap(f, g))))
+  } yield h)
 }
 
 /** An Enumerator[F] feeds data from an F to an iteratee */
