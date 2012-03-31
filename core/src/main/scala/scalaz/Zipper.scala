@@ -131,7 +131,9 @@ sealed trait Zipper[+A] {
   def withFocus: Zipper[(A, Boolean)] = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
 
   /**
-   * Moves focus to the nth element of the zipper, or None if there is no such element.
+   * Moves focus n elements in the zipper, or None if there is no such element.
+   * 
+   * @param  n  number of elements to move (positive is forward, negative is backwards)
    */
   def move(n: Int): Option[Zipper[A]] = {
     @tailrec
