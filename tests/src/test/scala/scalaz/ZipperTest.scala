@@ -76,6 +76,10 @@ object ZipperSpec extends Properties("Zipper") {
             getOrElse(xs.length < (-n) || ys.length < n)
     )
 
+  property("Update Modifies Zipper Correctly") = forAll((xs: Stream[Int], ys: Stream[Int], f: Int, u: Int) =>
+    zipper(xs, f, ys).update(u) === zipper(xs, u, ys)
+  )
+
   property("Start") = forAll((xs: Stream[Int], ys: Stream[Int], f: Int) => {
     val zo = zipper(xs, f, ys)
     val z = zo.start
