@@ -197,7 +197,7 @@ sealed trait Zipper[A] {
    * Moves focus to the start of the zipper.
    */
   def start: Zipper[A] = {
-    val rights = this.lefts ++ focus #:: this.rights
+    val rights = this.lefts.reverse ++ focus #:: this.rights
     this.copy(Stream.Empty, rights.head, rights.tail)
   }
 
@@ -205,8 +205,8 @@ sealed trait Zipper[A] {
    * Moves focus to the end of the zipper.
    */
   def end: Zipper[A] = {
-    val lefts = this.lefts ++ focus #:: this.rights
-    this.copy(lefts.init, lefts.last, Stream.empty)
+    val lefts = this.rights.reverse ++ focus #:: this.lefts
+    this.copy(lefts.tail, lefts.head, Stream.empty)
   }
 
   /**

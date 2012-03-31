@@ -46,8 +46,24 @@ class ZipperTest extends Spec {
       ((zipper(xs, f, ys).findZ(p)) map (z =>
         p(z.focus)) getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
     })
-  }
 
+    property("Start") = forAll((xs: Stream[Int], ys: Stream[Int], f: Int) => {
+      val zo = zipper(xs, f, ys)
+      val z = zo.start
+      z.lefts.length === 0 &&
+          z.rights.length === z.length - 1 &&
+          z === zo.move(-xs.length).get &&
+          z.move(xs.length).map(_ === zo).getOrElse(false)
+    })
+    property("End") = forAll((xs: Stream[Int], ys: Stream[Int], f: Int) => {
+      val zo = zipper(xs, f, ys)
+      val z = zo.end
+      z.lefts.length === z.length - 1 &&
+          z.rights.length === 0 &&
+          z === zo.move(ys.length).get &&
+          z.move(-ys.length).map(_ === zo).getOrElse(z.length == 0)
+    })
+  }
 
   checkAll("Zipper", props)
   checkAll("Zipper", equal.laws[Zipper[Int]])
