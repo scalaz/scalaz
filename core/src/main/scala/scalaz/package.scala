@@ -122,6 +122,10 @@ package object scalaz {
 
   type Writer[W, A] = WriterT[Id, W, A]
 
+  object Reader {
+    def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
+  }
+
   object Writer {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
   }
