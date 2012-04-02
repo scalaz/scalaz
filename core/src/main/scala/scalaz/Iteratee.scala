@@ -77,7 +77,7 @@ case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[Ite
   } yield h)
 
   def map[B](f: A => B)(implicit M: Functor[M]): Iteratee[M, E, B] =
-    Iteratee[M, E, B](M.fmap(value, _.fold((a, e) => DoneM[M, E, B](f(a), e), k => ContM[M, E, B](e => k(e).map(f)))))
+    Iteratee[M, E, B](M.fmap(value, (x: IterVM[M, E, A]) => x.fold((a, e) => DoneM[M, E, B](f(a), e), k => ContM[M, E, B](e => k(e).map(f)))))
 }
 
 /** An Enumerator[F] feeds data from an F to an iteratee */
