@@ -37,6 +37,18 @@ sealed trait Kleisli[M[_], A, B] { self =>
   def flatMap[C](f: B => Kleisli[M, A, C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli((r: A) => M.bind[B, C](run(r))(((b: B) => f(b).run(r))))
 
+  def lift[L[_]: Pointed]: Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] = new Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] {
+    def run(a: A) = Pointed[L].point(self(a))
+  }
+        
+  import Liskov._
+  def unlift[M[_], FF[_]](implicit M: Copointed[M], ev: this.type <~< Kleisli[({type λ[α] = M[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] = new Kleisli[FF, A, B] {
+    def run(a: A) = Copointed[M].copoint(ev(self) run a)
+  }
+
+  def unliftId[M[_]](implicit M: Copointed[M], ev: this.type <~< Kleisli[({type λ[α] = M[α]})#λ, A, B]): Reader[A, B] =
+    unlift[M, Id]
+
   def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, B] = ReaderWriterStateT(
     (r, s) => M.map(self(r)) {
       b => (W.zero, b, s)
@@ -75,7 +87,7 @@ trait KleisliInstances2 extends KleisliInstances3 {
     implicit def F: Applicative[F] = F0
   }
   implicit def kleisliIdApplicative[R]: Applicative[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApplicative[Id, R]
-  implicit def kleislPlus[F[_], A](implicit F0: Plus[F]) = new KleisliPlus[F, A] {
+  implicit def kleisliPlus[F[_], A](implicit F0: Plus[F]) = new KleisliPlus[F, A] {
     implicit def F = F0
   }
 }
