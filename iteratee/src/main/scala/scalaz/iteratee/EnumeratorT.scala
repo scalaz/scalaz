@@ -129,6 +129,14 @@ trait EnumeratorTFunctions {
       }
     }
 
+  def enumList[E, F[_] : Monad](xs: List[E]): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = (s: StepT[E, F, A]) => xs match {
+        case h :: t => s.mapCont(k => k(elInput(h)) >>== enumList(t).apply[A])
+        case Nil    => s.pointI
+      }
+    }
+
   def enumIterator[E, F[_]](x: => Iterator[E])(implicit MO: MonadPartialOrder[F, IO]) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       import MO._
