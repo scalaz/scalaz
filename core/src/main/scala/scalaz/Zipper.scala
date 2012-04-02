@@ -131,7 +131,9 @@ sealed trait Zipper[+A] {
   def withFocus: Zipper[(A, Boolean)] = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
 
   /**
-   * Moves focus to the nth element of the zipper, or None if there is no such element.
+   * Moves focus n elements in the zipper, or None if there is no such element.
+   * 
+   * @param  n  number of elements to move (positive is forward, negative is backwards)
    */
   def move(n: Int): Option[Zipper[A]] = {
     @tailrec
@@ -149,7 +151,7 @@ sealed trait Zipper[+A] {
    * Moves focus to the start of the zipper.
    */
   def start: Zipper[A] = {
-    val rights = this.lefts ++ focus #:: this.rights
+    val rights = this.lefts.reverse ++ focus #:: this.rights
     this.copy(Stream.Empty, rights.head, rights.tail)
   }
 
@@ -157,8 +159,8 @@ sealed trait Zipper[+A] {
    * Moves focus to the end of the zipper.
    */
   def end: Zipper[A] = {
-    val lefts = this.lefts ++ focus #:: this.rights
-    this.copy(lefts.init, lefts.last, Stream.empty)
+    val lefts = this.rights.reverse ++ focus #:: this.lefts
+    this.copy(lefts.tail, lefts.head, Stream.empty)
   }
 
   /**
