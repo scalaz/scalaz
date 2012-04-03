@@ -2,6 +2,8 @@ package scalaz
 package effects
 
 import Scalaz._
+import Free._
+
 
 private[effects] case class World[A]()
 sealed trait RealWorld
@@ -14,10 +16,12 @@ class STRef[S, A](a: A) {
   def read: ST[S, A] = returnST(value)
 
   /** Modifies the value at this reference with the given function. */
-  def mod[B](f: A => A): ST[S, STRef[S, A]] = ST((s: World[S]) => {value = f(value); (s, this)})
+  def mod[B](f: A => A): ST[S, STRef[S, A]] = ST((s: World[S]) =>
+    Suspend(() => {value = f(value); Return((s, this))}))
 
   /** Associates this reference with the given value. */
-  def write(a: => A): ST[S, STRef[S, A]] = ST((s: World[S]) => {value = a; (s, this)})
+  def write(a: => A): ST[S, STRef[S, A]] = ST((s: World[S]) =>
+    Suspend(() => {value = a; Return((s, this))}))
 
   /** Swap the value at this reference with the value at another. */
   def swap(that: STRef[S, A]): ST[S, Unit] = for {
@@ -36,10 +40,12 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
   def read(i: Int): ST[S, A] = returnST(value(i))
 
   /** Writes the given value to the array, at the given offset. */
-  def write(i: Int, a: A): ST[S, STArray[S, A]] = ST(s => {value(i) = a; (s, this)})
+  def write(i: Int, a: A): ST[S, STArray[S, A]] =
+    ST(s => Suspend(() => {value(i) = a; Return((s, this))}))
 
   /** Turns a mutable array into an immutable one which is safe to return. */
-  def freeze: ST[S, ImmutableArray[A]] = ST(s => (s, ImmutableArray.fromArray(value)))
+  def freeze: ST[S, ImmutableArray[A]] =
+    ST(s => Return((s, ImmutableArray.fromArray(value))))
 
   /** Fill this array from the given association list. */
   def fill[F[_]: Foldable, B](f: (A, B) => A, xs: F[(Int, B)]): ST[S, Unit] = 
@@ -59,15 +65,15 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
  * Based on JL and SPJ's paper "Lazy Functional State Threads"
  */
 sealed trait ST[S, A] {
-  private[effects] def apply(s: World[S]): (World[S], A)
+  private[effects] def apply(s: World[S]): Trampoline[(World[S], A)]
   def flatMap[B](g: A => ST[S, B]): ST[S, B] =
-    ST(s => apply(s) match { case (ns, a) => g(a)(ns) })
+    ST(s => apply(s) flatMap { case (ns, a) => Suspend(() => g(a)(ns)) })
   def map[B](g: A => B): ST[S, B] =
-    ST(s => apply(s) match { case (ns, a) => (ns, g(a)) })
+    ST(s => apply(s) flatMap { case (ns, a) => Suspend(() => Return((ns, g(a)))) })
 }
 
 object ST {
-  def apply[S, A](f: World[S] => (World[S], A)) = new ST[S, A] {
+  def apply[S, A](f: World[S] => Trampoline[(World[S], A)]) = new ST[S, A] {
     private[effects] def apply(s: World[S]) = f(s)
   }
 

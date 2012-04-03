@@ -5,15 +5,16 @@ import java.io._
 package object effects {
 
   import Scalaz._
+  import Free._
   
   private[effects] val realWorld = World[RealWorld]()
 
   /** Put a value in a state thread */
-  def returnST[S, A](a: => A): ST[S, A] = ST(s => (s, a))
+  def returnST[S, A](a: => A): ST[S, A] = ST(s => Return((s, a)))
 
   /** Run a state thread */
   def runST[A](f: Forall[({type λ[S] = ST[S, A]})#λ]): A =
-    f.apply.apply(realWorld)._2
+    f.apply.apply(realWorld).run._2
 
   /** Allocates a fresh mutable reference. */
   def newVar[S, A](a: A): ST[S, STRef[S, A]] =
@@ -25,9 +26,11 @@ package object effects {
 
   /** Allows the result of a state transformer computation to be used lazily inside the computation. */
   def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = ST(s => {
-    lazy val ans: (World[S], A) = k(r)(s)
-    lazy val (_, r) = ans
-    ans
+    lazy val ans: Trampoline[(World[S], A)] =
+      Suspend(() => r flatMap (x => k(x)(s)))
+    lazy val r: Trampoline[A] =
+      ans.map(_._2)
+    Suspend(() => ans)
   })
 
   /** Accumulates an integer-associated list into an immutable array. */
@@ -58,10 +61,8 @@ package object effects {
   }
 
   // Implicit conversions between IO and ST
-  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => {
-    Free.return_(st(s))
-  })
-  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s).run)
+  implicit def stToIO[A](st: ST[RealWorld, A]): IO[A] = IO(s => st(s))
+  implicit def ioToST[A](io: IO[A]): ST[RealWorld, A] = ST(s => io(s))
  
   /** Perform the given side-effect in an IO action */
   def io[A](a: => A) = IO.ioPure pure a
