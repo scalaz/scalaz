@@ -92,7 +92,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ Unidoc.settings,
-    aggregate = Seq(core, concurrent, effect, iteratee, example, scalacheckBinding, tests)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   lazy val core = Project(
