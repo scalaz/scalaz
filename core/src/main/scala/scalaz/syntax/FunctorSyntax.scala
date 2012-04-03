@@ -10,6 +10,7 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
   final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
   final def fpair: F[(A, A)] = F.fpair(self)
+  final def void: F[Unit] = F.void(self)
   final def fpoint[G[_]: Pointed]: F[G[A]] = F.map(self)(a => Pointed[G].point(a))
   final def >|[B](b: B): F[B] = F.map(self)(_ => b)
   ////
