@@ -5,7 +5,7 @@ import scalaz._
 
 trait AnyValInstances {
 
-  implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] with Order[Unit] {
+  implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] {
     def show(f: Unit) = ().toString.toList
 
     def append(f1: Unit, f2: => Unit) = ()
@@ -31,7 +31,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] with Order[Boolean] {
+  implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
     def show(f: Boolean) = f.toString.toList
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -66,7 +66,7 @@ trait AnyValInstances {
 
   import Tags.{Conjunction, Disjunction}
 
-  implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Order[Boolean @@ Disjunction] {
+  implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(f1 || f2)
 
     def zero: Boolean @@ Disjunction = Disjunction(false)
@@ -87,7 +87,7 @@ trait AnyValInstances {
     
   }
 
-  implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] with Order[Boolean @@ Conjunction] {
+  implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
     def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Conjunction(f1 && f2)
 
     def zero: Boolean @@ Conjunction = Conjunction(true)
@@ -108,7 +108,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] with Order[Byte] {
+  implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
     def show(f: Byte) = f.toString.toList
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
@@ -136,7 +136,7 @@ trait AnyValInstances {
 
   import Tags.{Multiplication}
 
-  implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] with Order[Byte @@ Multiplication] {
+  implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((f1 * f2).toByte)
 
     def zero: Byte @@ Multiplication = Multiplication(1)
@@ -185,7 +185,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] with Order[Char @@ Multiplication] {
+  implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) = Multiplication((f1 * f2).toChar)
 
     def zero: Char @@ Multiplication = Multiplication(1)
@@ -207,7 +207,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] with Order[Short] {
+  implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
     def show(f: Short) = f.toString.toList
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
@@ -235,7 +235,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] with Order[Short @@ Multiplication] {
+  implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) = Multiplication((f1 * f2).toShort)
 
     def zero: Short @@ Multiplication = Multiplication(1)
@@ -255,7 +255,7 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
-  implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] with Order[Int] {
+  implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
     def show(f: Int) = f.toString.toList
 
     def append(f1: Int, f2: => Int) = f1 + f2
@@ -289,7 +289,7 @@ trait AnyValInstances {
     def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
   }
 
-  implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] with Order[Int @@ Multiplication] {
+  implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) = Multiplication(f1 * f2)
 
     def zero: Int @@ Multiplication = Multiplication(1)
@@ -309,7 +309,7 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
-  implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] with Order[Long] {
+  implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
     def show(f: Long) = f.toString.toList
 
     def append(f1: Long, f2: => Long) = f1 + f2
@@ -337,7 +337,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] with Order[Long @@ Multiplication] {
+  implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) = Multiplication(f1 * f2)
 
     def zero: Long @@ Multiplication = Multiplication(1)
