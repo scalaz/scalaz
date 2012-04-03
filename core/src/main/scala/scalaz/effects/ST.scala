@@ -42,16 +42,13 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
   def freeze: ST[S, ImmutableArray[A]] = ST(s => (s, ImmutableArray.fromArray(value)))
 
   /** Fill this array from the given association list. */
-  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] = xs match {
-    case Nil => returnST(())
-    case ((i, v) :: ivs) => for {
-      _ <- update(f, i, v)
-      _ <- fill(f, ivs)
-    } yield ()
-  }
+  def fill[F[_]: Foldable, B](f: (A, B) => A, xs: F[(Int, B)]): ST[S, Unit] = 
+    xs.traverse_[({type λ[α] = ST[S, α]})#λ, Unit] {
+      case (i, v) => update(f, i, v)
+    }
 
   /** Combine the given value with the value at the given index, using the given function. */
-  def update[B](f: (A, B) => A, i: Int, v: B) = for {
+  def update[B](f: (A, B) => A, i: Int, v: B): ST[S, Unit] = for {
     x <- read(i)
     _ <- write(i, f(x, v))
   } yield ()
