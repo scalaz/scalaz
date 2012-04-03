@@ -64,7 +64,11 @@ trait ListInstances extends ListInstances0 {
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
       var r = z
-      while (!s.isEmpty) {r = f(s.pop, r)}
+      while (!s.isEmpty) {
+        // force and copy the value of r to ensure correctness
+        val w = r
+        r = f(s.pop, w)
+      }
       r
     }
 
