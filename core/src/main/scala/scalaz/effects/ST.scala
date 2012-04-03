@@ -67,9 +67,9 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
 sealed trait ST[S, A] {
   private[effects] def apply(s: World[S]): Trampoline[(World[S], A)]
   def flatMap[B](g: A => ST[S, B]): ST[S, B] =
-    ST(s => apply(s) flatMap { case (ns, a) => Suspend(() => g(a)(ns)) })
+    ST(s => Suspend(() => apply(s) flatMap { case (ns, a) => Suspend(() => g(a)(ns)) }))
   def map[B](g: A => B): ST[S, B] =
-    ST(s => apply(s) flatMap { case (ns, a) => Suspend(() => Return((ns, g(a)))) })
+    ST(s => Suspend(() => apply(s) flatMap { case (ns, a) => Suspend(() => Return((ns, g(a)))) }))
 }
 
 object ST {
