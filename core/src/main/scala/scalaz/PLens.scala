@@ -324,6 +324,17 @@ trait PLensFunctions {
     else
       listNthPLens(n - 1) compose listTailPLens
 
+  def vectorHeadPLens[A]: Vector[A] @-? A =
+    vectorNthPLens(0)
+
+  def vectorNthPLens[A](n: Int): Vector[A] @-? A =
+    plens(v =>
+      v.lift(n) map (a => costate(x => v patch (n, Vector(x), 1), a)))
+
+  def vectorLastPLens[A]: Vector[A] @-? A =
+    plens(v =>
+      v.lastOption map (a => costate(x => v patch (v.length - 1, Vector(x), 1), a)))
+
   import Stream._
 
   def streamHeadPLens[A]: Stream[A] @-? A =
