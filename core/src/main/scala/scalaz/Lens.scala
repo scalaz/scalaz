@@ -467,4 +467,11 @@ trait LensFunctions {
   def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
     lens(l => costate(NonEmptyList.nel(l.head, _), l.tail))
 
+  /** Access the value at a particular key of a Map **/
+  def mapVLens[K, V](k: K): Map[K, V] @-@ Option[V] =
+    lensG(_ get k, m => {
+      case None => m - k
+      case Some(v) => m.updated(k, v)
+    })
+
 }
