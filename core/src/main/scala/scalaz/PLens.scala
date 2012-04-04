@@ -381,6 +381,11 @@ trait PLensFunctions {
     else
       ephemeralStreamNthPLens(n - 1) compose ephemeralStreamTailPLens
 
+  import Lens.mapVLens
+
+  def mapVPLens[K, V](k: K): Map[K, V] @-? V =
+    somePLens compose ~mapVLens[K, V](k)
+
   import util.parsing.json._
 
   def scalaJSONObjectPLens[A]: JSONType @-? Map[String, Any] =
