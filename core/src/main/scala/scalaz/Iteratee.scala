@@ -39,6 +39,11 @@ sealed trait IterV[E, A] {
 
   /** An iteratee that sends itself the EOF signal after `n` inputs. */
   def take(n: Int): IterV[E, A] = fold((a, i) => Done(a, i), k => if (n <= 0) k(EOF.apply) else Cont(i => k(i).take(n - 1)))
+
+  /** Lift into a monadic iteratee, in the Id monad. */
+  def lift: Iteratee[Id, E, A] =
+    fold(done = (a, e) => Iteratee[Id, E, A](DoneM(a, e)),
+         cont = k => Iteratee[Id, E, A](ContM(i => k(i).lift)))
 }
 
 /** Monadic Iteratees */

@@ -17,11 +17,11 @@ class STRef[S, A](a: A) {
 
   /** Modifies the value at this reference with the given function. */
   def mod[B](f: A => A): ST[S, STRef[S, A]] = ST((s: World[S]) =>
-    Suspend(() => {value = f(value); Return((s, this))}))
+    {value = f(value); Return((s, this))})
 
   /** Associates this reference with the given value. */
   def write(a: => A): ST[S, STRef[S, A]] = ST((s: World[S]) =>
-    Suspend(() => {value = a; Return((s, this))}))
+    {value = a; Return((s, this))})
 
   /** Swap the value at this reference with the value at another. */
   def swap(that: STRef[S, A]): ST[S, Unit] = for {
@@ -41,7 +41,7 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
 
   /** Writes the given value to the array, at the given offset. */
   def write(i: Int, a: A): ST[S, STArray[S, A]] =
-    ST(s => Suspend(() => {value(i) = a; Return((s, this))}))
+    ST(s => {value(i) = a; Return((s, this))})
 
   /** Turns a mutable array into an immutable one which is safe to return. */
   def freeze: ST[S, ImmutableArray[A]] =
@@ -49,15 +49,20 @@ class STArray[S, A:Manifest](val size: Int, z: A) {
 
   /** Fill this array from the given association list. */
   def fill[F[_]: Foldable, B](f: (A, B) => A, xs: F[(Int, B)]): ST[S, Unit] = 
-    xs.traverse_[({type λ[α] = ST[S, α]})#λ, Unit] {
-      case (i, v) => update(f, i, v)
-    }
+    ST(s => {
+        xs.foldl(())((_, b) => {
+          val x = b._1
+          value(x) = f(value(x), b._2)
+        })
+        Return((s, ()))})
 
   /** Combine the given value with the value at the given index, using the given function. */
-  def update[B](f: (A, B) => A, i: Int, v: B): ST[S, Unit] = for {
-    x <- read(i)
-    _ <- write(i, f(x, v))
-  } yield ()
+  def update[B](f: (A, B) => A, i: Int, v: B): ST[S, Unit] =
+    ST(s => Return({value(i) = f(value(i), v); (s, ())}))
+
+  /** Fill this array from the given immutable array. */
+  def copyFromArray(as: ImmutableArray[A]): ST[S, Unit] =
+    ST(s => Return((s, as.copyToArray(value, 0, size))))
 }
 
 /** 
@@ -76,6 +81,4 @@ object ST {
   def apply[S, A](f: World[S] => Trampoline[(World[S], A)]) = new ST[S, A] {
     private[effects] def apply(s: World[S]) = f(s)
   }
-
 }
-
