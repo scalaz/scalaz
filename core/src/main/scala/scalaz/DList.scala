@@ -16,7 +16,7 @@ import std.function._
  */
 trait DList[A] {
   import DList._
-  def apply(xs: List[A]): Trampoline[List[A]]
+  def apply(xs: => List[A]): Trampoline[List[A]]
 
   /** Convert to a normal list. */
   def toList: List[A] = apply(List()).run
@@ -84,7 +84,7 @@ trait DListInstances {
 trait DListFunctions {
   def mkDList[A](f: (=> List[A]) => Trampoline[List[A]]): DList[A] =
     new DList[A] {
-      def apply(xs: List[A]) = f(xs)
+      def apply(xs: => List[A]) = f(xs)
     }
   def DL[A](f: (=> List[A]) => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
   def fromList[A](as: => List[A]): DList[A] =
