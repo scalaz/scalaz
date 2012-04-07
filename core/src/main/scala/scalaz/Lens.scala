@@ -474,4 +474,25 @@ trait LensFunctions {
       case Some(v) => m.updated(k, v)
     })
 
+  def factorL[A, B, C]: Either[(A, B), (A, C)] @-@ (A, Either[B, C]) =
+    lens(e => costate({
+      case (a, Left(b)) => Left(a, b)
+      case (a, Right(c)) => Right(a, c)
+    }, e match {
+      case Left((a, b)) => (a, Left(b))
+      case Right((a, c)) => (a, Right(c))
+    }))
+
+  def distributeL[A, B, C]: (A, Either[B, C]) @-@ Either[(A, B), (A, C)] =
+    lens {
+      case (a, e) => costate({
+        case Left((aa, bb)) => (aa, Left(bb))
+        case Right((aa, cc)) => (aa, Right(cc))
+      }, e match {
+        case Left(b) => Left(a, b)
+        case Right(c) => Right(a, c)
+
+      })
+    }
+
 }

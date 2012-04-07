@@ -386,6 +386,12 @@ trait PLensFunctions {
   def mapVPLens[K, V](k: K): Map[K, V] @-? V =
     somePLens compose ~mapVLens[K, V](k)
 
+  def factorPL[A, B, C]: Either[(A, B), (A, C)] @-? (A, Either[B, C]) =
+    ~Lens.factorL
+
+  def distributePL[A, B, C]: (A, Either[B, C]) @-? Either[(A, B), (A, C)] =
+    ~Lens.distributeL
+
   import util.parsing.json._
 
   def scalaJSONObjectPLens[A]: JSONType @-? Map[String, Any] =
