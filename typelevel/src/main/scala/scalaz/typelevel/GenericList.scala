@@ -5,6 +5,8 @@ import scalaz.{Apply, Kleisli}
 
 object GenericList {
 
+  // index-based access via implicits
+
   import Nats._
 
   object IndexProof {
@@ -27,6 +29,9 @@ object GenericList {
   sealed trait IndexProof[M[_], E, N <: Nat, -T <: GenericList[M]] {
     def apply(list: T): M[E]
   }
+
+
+  // special operations on `M` == `Id`
 
   import HLists._
 

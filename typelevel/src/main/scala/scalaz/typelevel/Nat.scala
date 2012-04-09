@@ -3,9 +3,15 @@ package typelevel
 
 sealed trait Nat {
 
+  type Unapplied[Z, P[_ <: Nat]]
+
+  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P]
+
+
   type Folded[U, F <: NFold[U]] <: U
 
   def fold[U, F <: NFold[U]](f: F): Folded[U, F]
+
 
   final def foldU[U](f: NFold[U]): Folded[U, f.type] = fold[U, f.type](f)
 
@@ -15,7 +21,12 @@ sealed trait Nat {
 
 case object Zero extends Nat {
 
-  type Folded[U, F <: NFold[U]] = F#Zero
+  override type Unapplied[Z, P[_ <: Nat]] = Z
+
+  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifZero
+
+
+  override type Folded[U, F <: NFold[U]] = F#Zero
 
   def fold[U, F <: NFold[U]](f: F): Folded[U, F] = f.zero
 
@@ -23,7 +34,12 @@ case object Zero extends Nat {
 
 case class Succ[N <: Nat](predecessor: N) extends Nat {
 
-  type Folded[U, F <: NFold[U]] = F#Succ[predecessor.Folded[U, F]]
+  override type Unapplied[Z, P[_ <: Nat]] = P[N]
+
+  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifSucc(predecessor)
+
+
+  override type Folded[U, F <: NFold[U]] = F#Succ[predecessor.Folded[U, F]]
 
   def fold[U, F <: NFold[U]](f: F): Folded[U, F] = f.succ(predecessor.fold[U, F](f))
 
