@@ -13,7 +13,7 @@ trait NFold[U] {
 
 object NFold {
 
-  final class ToInt extends NFold[Int] {
+  object ToInt extends NFold[Int] {
 
     type Zero = Int
     def zero = 0
@@ -23,9 +23,6 @@ object NFold {
 
   }
 
-  def toInt = new ToInt()
-
 }
 
 // vim: expandtab:ts=2:sw=2
-

@@ -45,10 +45,12 @@ sealed trait GenericList[+M[_]] {
   type Down <: GenericList[Id]
 
   def transform[N[_]](trans: M ~> N): Transformed[N]
-  def fold[N[X] >: M[X], U, F <: HFold[N, U]](fold: F): Folded[N, U, F]
+  def fold[N[X] >: M[X], U, F <: HFold[N, U]](f: F): Folded[N, U, F]
   def append[N[X] >: M[X], L <: GenericList[N]](list: L): Appended[N, L]
   def apply[N[X] >: M[X] : Apply, R](f: N[Function[R]]): N[R]
   def down: Down
+
+  final def foldU[N[X] >: M[X], U](f: HFold[N, U]): Folded[N, U, f.type] = fold[N, U, f.type](f)
 
   final def applyP[N[X] >: M[X] : Apply : Pointed, R](f: Function[R]): N[R] =
     apply[N, R](Pointed[N].point(f))
@@ -95,7 +97,7 @@ case class GenericNil[M[_]]() extends GenericList[M] {
   override type Down = GenericNil[Id]
 
   def transform[N[_]](trans: M ~> N) = GenericNil()
-  def fold[N[X] >: M[X], U, F <: HFold[N, U]](fold: F): Folded[N, U, F] = fold.init
+  def fold[N[X] >: M[X], U, F <: HFold[N, U]](f: F): Folded[N, U, F] = f.init
   def append[N[X] >: M[X], L <: GenericList[N]](list: L) = list
   def apply[N[X] >: M[X] : Apply, R](f: N[Function[R]]): N[R] = f
   def down: Down = GenericNil[Id]()

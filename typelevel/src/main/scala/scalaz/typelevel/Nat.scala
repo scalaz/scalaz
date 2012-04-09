@@ -7,7 +7,9 @@ sealed trait Nat {
 
   def fold[U, F <: NFold[U]](f: F): Folded[U, F]
 
-  final def value = fold[Int, NFold.ToInt](NFold.toInt)
+  final def foldU[U](f: NFold[U]): Folded[U, f.type] = fold[U, f.type](f)
+
+  final def toInt = foldU(NFold.ToInt)
 
 }
 

@@ -145,7 +145,7 @@ object TypelevelUsage extends App {
 
     import Nats._
 
-    assert(_3.value === 3)
+    assert(_3.toInt === 3)
 
     val hlist = "foo" :: 3 :: 'a :: HNil
 
