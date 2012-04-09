@@ -1,7 +1,7 @@
 package scalaz
 package typelevel
 
-import Typelevel._
+import syntax.HLists._
 
 sealed trait TCList {
   type λ[α] <: HList
@@ -19,4 +19,3 @@ sealed trait TCNil extends TCList {
 }
 
 // vim: expandtab:ts=2:sw=2
-

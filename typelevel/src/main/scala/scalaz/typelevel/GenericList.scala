@@ -1,12 +1,42 @@
 package scalaz
 package typelevel
 
-import annotation.implicitNotFound
 import scalaz.{Apply, Kleisli}
+
+object GenericList {
+
+  import Nats._
+
+  object IndexProof {
+
+    implicit def zeroIndexProof[M[_], H, T <: GenericList[M]]: IndexProof[M, H, _0, GenericCons[M, H, T]] =
+      new IndexProof[M, H, _0, GenericCons[M, H, T]] {
+        def apply(list: GenericCons[M, H, T]) = list.head
+      }
+
+    implicit def succIndexProof[M[_], H, E, N <: Nat, T <: GenericList[M]](
+      implicit ev: IndexProof[M, E, N, T]
+    ): IndexProof[M, E, Succ[N], GenericCons[M, H, T]] =
+      new IndexProof[M, E, Succ[N], GenericCons[M, H, T]] {
+        def apply(list: GenericCons[M, H, T]) = ev(list.tail)
+      }
+
+  }
+
+  @annotation.implicitNotFound(msg = "Could not access element at index ${N} in ${T}")
+  sealed trait IndexProof[M[_], E, N <: Nat, -T <: GenericList[M]] {
+    def apply(list: T): M[E]
+  }
+
+  import HLists._
+
+  implicit def mkIdOps[T <: HList](list: T): IdOps[T] = new IdOps(list)
+
+}
 
 sealed trait GenericList[+M[_]] {
 
-  import Typelevel._
+  import GenericList._
 
   type Transformed[N[_]] <: GenericList[N]
   type Folded[N[X] >: M[X], U, F <: HFold[N, U]] <: U
@@ -72,32 +102,4 @@ case class GenericNil[M[_]]() extends GenericList[M] {
 
 }
 
-trait GenericLists {
-
-  // Index access proofs
-
-  import Typelevel._
-
-  @implicitNotFound(msg = "Could not access element at index ${N} in ${T}")
-  sealed trait IndexProof[M[_], E, N <: Nat, -T <: GenericList[M]] {
-    def apply(list: T): M[E]
-  }
-
-  implicit def zeroIndexProof[M[_], H, T <: GenericList[M]]: IndexProof[M, H, _0, GenericCons[M, H, T]] = 
-    new IndexProof[M, H, _0, GenericCons[M, H, T]] {
-      def apply(list: GenericCons[M, H, T]) = list.head
-    }
-
-  implicit def succIndexProof[M[_], H, E, N <: Nat, T <: GenericList[M]](
-    implicit ev: IndexProof[M, E, N, T]
-  ): IndexProof[M, E, Succ[N], GenericCons[M, H, T]] = 
-    new IndexProof[M, E, Succ[N], GenericCons[M, H, T]] {
-      def apply(list: GenericCons[M, H, T]) = ev(list.tail)
-    }
-
-
-
-}
-
 // vim: expandtab:ts=2:sw=2
-

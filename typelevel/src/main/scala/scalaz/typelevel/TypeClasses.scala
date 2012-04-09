@@ -1,7 +1,7 @@
 package scalaz
 package typelevel
 
-import Typelevel._
+import syntax.HLists._
 
 trait TypeClass[C[_[_]]] {
 
@@ -120,13 +120,7 @@ object TypeClass {
 
   }
 
-}
-
-trait TypeClasses {
-
   // TypeClass instances
-
-  import TypeClass._
 
   implicit object FunctorClass extends TypeClass[Functor] with Empty {
 
@@ -158,21 +152,6 @@ trait TypeClasses {
 
   }
 
-  // Unpack wrappers
-
-  import TypeClass._
-
-  implicit def unpackProduct[C[_[_]], T <: TCList](wrapper: WrappedProduct[C, T]) = wrapper.instance
-
-  implicit def unpackComposition[C[_[_]], T <: TCList](wrapper: WrappedComposition[C, T]) = wrapper.instance
-
-  // Wrap companions
-
-  implicit def wrapFunctor(functor: Functor.type) = new TypeClassCompanion[Functor]
-  implicit def wrapPointed(pointed: Pointed.type) = new TypeClassCompanion[Pointed]
-  implicit def wrapApplicative(applicative: Applicative.type) = new TypeClassCompanion[Applicative]
-
 }
 
 // vim: expandtab:ts=2:sw=2
-

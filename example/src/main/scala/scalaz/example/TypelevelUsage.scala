@@ -3,13 +3,14 @@ package scalaz.example
 import scalaz._
 import Scalaz._
 import typelevel._
-import Typelevel._
 
 object TypelevelUsage extends App {
 
   def typed[T](t: T) = ()
 
   object HLists {
+
+    import typelevel.syntax.HLists._
 
     val hlist1 = 3 :: HNil
     val hlist2 = "foo" :: hlist1
@@ -119,6 +120,7 @@ object TypelevelUsage extends App {
 
   object Downed {
 
+    import typelevel.syntax.HLists._
     import ALists._
 
     val downed = aplist.down
@@ -140,6 +142,8 @@ object TypelevelUsage extends App {
   }
 
   object Naturals {
+
+    import Nats._
 
     assert(_3.value === 3)
 
@@ -171,6 +175,8 @@ object TypelevelUsage extends App {
   }
 
   object Classes {
+
+    import typelevel.syntax.TypeClasses._
 
     val composed = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
 

@@ -1,9 +1,16 @@
 package scalaz
-package typelevel
 
-import Typelevel._
+package object typelevel {
 
-trait KLists {
+  type HList = GenericList[Id]
+  type HCons[H, T <: HList] = GenericCons[Id, H, T]
+  type HNil = GenericNil[Id]
+
+  def HNil: HNil = GenericNil[Id]()
+
+  import HLists._
+
+  implicit def mkIdOps[T <: HList](list: T): IdOps[T] = new IdOps(list)
 
   type KList[M[_]] = GenericList[M]
   type KCons[M[_], H, +T <: KList[M]] = GenericCons[M, H, T]
@@ -21,4 +28,3 @@ trait KLists {
 }
 
 // vim: expandtab:ts=2:sw=2
-
