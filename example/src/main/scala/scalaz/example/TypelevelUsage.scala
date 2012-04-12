@@ -172,6 +172,24 @@ object TypelevelUsage extends App {
 
     assert(f0 === Some(3))
 
+    // Alternative approach to index-based access
+
+    val wrapSome = new (Id ~> Some) { def apply[T](t: T) = Some(t) }
+
+    val stream = (hlist transform wrapSome) +: (HStream const None)
+
+    val g0 = stream(_0).x
+    val g1 = stream(_1).x
+    val g2 = stream(_2).x // caveat: `stream(_2)` on its own does not compile
+
+    typed[String](g0)
+    typed[Int](g1)
+    typed[Symbol](g2)
+
+    assert(g0 == "foo")
+    assert(g1 == 3)
+    assert(g2 == 'a)
+
   }
 
   object Classes {
