@@ -89,6 +89,9 @@ sealed trait PLens[A, B] {
       case Some(w) => F.map(f(w.pos))(w.set)
     }
 
+  def orZero(a: A)(implicit M: Monoid[B]): B =
+    get(a) getOrElse M.zero
+
   def st: PState[A, B] =
     State.init map (get(_))
 
