@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait BiTraverse[F[_, _]] extends BiFunctor[F] { self =>
+trait Bitraverse[F[_, _]] extends Bifunctor[F] { self =>
   ////
   def bitraverse[G[_] : Applicative, A, B, C, D](fab: F[A, B])(f: A => G[C], g: B => G[D]): G[F[C, D]]
 
@@ -21,11 +21,11 @@ trait BiTraverse[F[_, _]] extends BiFunctor[F] { self =>
   def bisequence[G[_] : Applicative, A, B](x: F[G[A], G[B]]): G[F[A, B]] = bitraverse(x)(fa => fa, fb => fb)
 
   ////
-  val biTraverseSyntax = new scalaz.syntax.BiTraverseSyntax[F] {}
+  val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] {}
 }
 
-object BiTraverse {
-  @inline def apply[F[_, _]](implicit F: BiTraverse[F]): BiTraverse[F] = F
+object Bitraverse {
+  @inline def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F
 
   ////
 

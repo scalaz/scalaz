@@ -171,16 +171,16 @@ object Content extends Contents {
   import PLens._
   import CostateT._
 
-  val elemContentPL: Content @-? Element =
+  val elemContentPL: Content @?> Element =
     plens(_.elem map (e => costate(elem(_), e)))
 
-  val textContentPL: Content @-? CData =
+  val textContentPL: Content @?> CData =
     plens(_.text map (c => costate(text(_), c)))
 
-  val crefContentPL: Content @-? Str =
+  val crefContentPL: Content @?> Str =
     plens(_.cref map (e => costate(cref(_), e)))
 
-  val commentContentPL: Content @-? Str =
+  val commentContentPL: Content @?> Str =
     plens(_.comment map (e => costate(comment(_), e)))
 
 }

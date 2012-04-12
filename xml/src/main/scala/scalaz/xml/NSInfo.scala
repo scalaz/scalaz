@@ -173,10 +173,10 @@ object NSInfo extends NSInfos {
   import Lens._
   import CostateT._
 
-  val prefixesNSInfoL: NSInfo @-@ List[(Str, Str)] =
+  val prefixesNSInfoL: NSInfo @> List[(Str, Str)] =
     lens(x => costate(b => nsInfo(b, x.uri), x.prefixes))
 
-  val uriNSInfoL: NSInfo @-@ Option[Str] =
+  val uriNSInfoL: NSInfo @> Option[Str] =
     lens(x => costate(b => nsInfo(x.prefixes, b), x.uri))
 
 }
