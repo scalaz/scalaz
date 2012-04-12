@@ -32,6 +32,8 @@ object TypeClass {
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val zip = TypeClass("Zip", *->*)
+  lazy val cozip = TypeClass("Cozip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
@@ -49,8 +51,8 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
-  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, extendsList = Seq(biFunctor))
+  lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
+  lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor))
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
@@ -86,6 +88,8 @@ object TypeClass {
     copointed,
     apply,
     applicative,
+    zip,
+    cozip,
     bind,
     monad,
     cojoin,
@@ -96,8 +100,8 @@ object TypeClass {
     monadPlus,
     foldable,
     traverse,
-    biFunctor,
-    biTraverse,
+    bifunctor,
+    bitraverse,
     arrId,
     compose,
     category,

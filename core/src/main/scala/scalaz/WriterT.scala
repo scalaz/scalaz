@@ -114,7 +114,7 @@ trait WriterTInstances1 extends WriterTInstances2 {
 }
 
 trait WriterTInstances0 extends WriterTInstances1 {
-  implicit def writerTBiFunctor[F[_]](implicit F0: Functor[F]) = new WriterTBiFunctor[F] {
+  implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]) = new WriterTBifunctor[F] {
     implicit def F = F0
   }
   implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]) = new WriterTMonad[F, W] {
@@ -131,7 +131,7 @@ trait WriterTInstances0 extends WriterTInstances1 {
 }
 
 trait WriterTInstances extends WriterTInstances0 {
-  implicit def writerTBiTraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBiTraverse[F] {
+  implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBitraverse[F] {
     implicit def F = F0
   }
   implicit def writerComonad[W] = new WriterComonad[W] {
@@ -228,14 +228,14 @@ trait WriterTTraverse[F[_], W] extends Traverse[({type λ[α]=WriterT[F, W, α]}
   def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
 }
 
-trait WriterTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] {
+trait WriterTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: WriterT[F, A, B])(f: (A) => C, g: (B) => D) =
     fab.bimap(f, g)
 }
 
-trait WriterTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] with WriterTBiFunctor[F] {
+trait WriterTBitraverse[F[_]] extends Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverse[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =

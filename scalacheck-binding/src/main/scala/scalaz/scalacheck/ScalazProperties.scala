@@ -297,7 +297,7 @@ object ScalazProperties {
   }
 
   object bifunctor {
-    def laws[F[_, _]](implicit F: BiFunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
+    def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
       include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
       include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
@@ -305,6 +305,7 @@ object ScalazProperties {
   }
 
   object lens {
+    import LensT._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)

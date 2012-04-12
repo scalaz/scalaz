@@ -86,7 +86,7 @@ class TupleTest extends Spec {
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
       def group[A: Group, B: Group] = Group[(A, B)]
       
-      def bitraverse = BiTraverse[Tuple2]
+      def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[({type λ[α] = (B, α)})#λ]
       def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
 

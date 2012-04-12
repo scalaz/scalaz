@@ -12,6 +12,13 @@ trait Apply[F[_]] extends Functor[F] { self =>
   // derived functions
 
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
+  def zip[A,B]: Zip[F] =
+    new Zip[F] {
+      def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
+        map2(a, b) {
+          case (a, b) => (a, b)
+        }
+    }
 
   def ap2[A,B,C](fa: => F[A], fb: => F[B])(f: F[(A,B) => C]): F[C] =
     ap(fb)(ap(fa)(map(f)(_.curried)))
