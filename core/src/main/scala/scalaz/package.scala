@@ -45,8 +45,8 @@
  *  - [[scalaz.Foldable]]
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *
- *  - [[scalaz.BiFunctor]]
- *  - [[scalaz.BiTraverse]] extends [[scalaz.BiFunctor]]
+ *  - [[scalaz.Bifunctor]]
+ *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]]
  *  - [[scalaz.ArrId]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Category]] extends [[scalaz.ArrId]] with [[scalaz.Compose]]

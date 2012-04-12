@@ -283,10 +283,10 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
       implicit def G = Validation.validationApplicative
     }
 
-  implicit def failProjectionBiTraverse =
-    new IsomorphismBiTraverse[FailProjection, Validation] {
+  implicit def failProjectionBitraverse =
+    new IsomorphismBitraverse[FailProjection, Validation] {
       def iso = FailProjectionBiIso
-      implicit def G = Validation.validationBiTraverse
+      implicit def G = Validation.validationBitraverse
     }
 }
 
@@ -312,7 +312,7 @@ trait FailProjectionFunctions {
   }
 
   /** The FailProjection type constructor is isomorphic to Validation */
-  implicit def FailProjectionBiIso[A] = new IsoBiFunctorTemplate[FailProjection, Validation] {
+  implicit def FailProjectionBiIso[A] = new IsoBifunctorTemplate[FailProjection, Validation] {
     def to[A, B](fa: FailProjection[A, B]): Validation[A, B] = fa.validation
     def from[A, B](ga: Validation[A, B]): FailProjection[A, B] = ga.fail
   }
@@ -353,7 +353,7 @@ trait ValidationInstances extends ValidationInstances0 {
 
   def validationNelApplicative[E] = validationApplicative[NonEmptyList[E]]
 
-  implicit def validationBiTraverse = new BiTraverse[Validation] {
+  implicit def validationBitraverse = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
 
     def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)

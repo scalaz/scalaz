@@ -53,6 +53,9 @@ sealed trait LazyEither[A, B] {
   def map[C](f: (=> B) => C): LazyEither[A, C] =
     fold(lazyLeft(_), b => lazyRight(f(b)))
 
+  def bimap[C, D](f: (=> A) => C, g: (=> B) => D): LazyEither[C, D] =
+    fold(a => lazyLeft(f(a)), b => lazyRight(g(b)))
+
   def foreach(f: (=> B) => Unit): Unit =
     fold(_ => (), f)
 
@@ -126,7 +129,7 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
 // TODO more instances
 trait LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] {
+  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: (A) => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
@@ -141,9 +144,18 @@ trait LazyEitherInstances {
 
     def point[A](a: => A): LazyEither[E, A] =
       LazyEither.lazyRight(a)
+
+    def cozip[A, B](a: LazyEither[E, Either[A, B]]) =
+      a.fold(
+        e => Left(LazyEither.lazyLeft(e))
+      , {
+          case Left(a) => Left(LazyEither.lazyRight(a))
+          case Right(b) => Right(LazyEither.lazyRight(b))
+        }
+      )
   }
 
-  implicit def lazyEitherBiTraverse: BiTraverse[LazyEither] = new BiTraverse[LazyEither] {
+  implicit def lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
 
