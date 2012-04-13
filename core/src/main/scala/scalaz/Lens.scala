@@ -49,7 +49,7 @@ sealed trait LensT[F[_], A, B] {
   def %=(f: B => B)(implicit F: Functor[F]): StateT[F, A, B] =
     StateT(a =>
       F.map(run(a))(c => {
-        val b = c.pos
+        val b = f(c.pos)
         (b, c put b)
       }))
 
@@ -143,6 +143,11 @@ sealed trait LensT[F[_], A, B] {
 object LensT extends LensTFunctions with LensTInstances {
   def apply[F[_], A, B](r: A => F[Costate[B, A]]): LensT[F, A, B] =
     lensT(r)
+}
+
+object Lens extends LensTFunctions with LensTInstances {
+  def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
+    lens(r)
 }
 
 trait LensTFunctions {

@@ -213,6 +213,11 @@ object PLensT extends PLensTFunctions with PLensTInstances {
     plensT(r)
 }
 
+object PLens extends PLensTFunctions with PLensTInstances {
+  def apply[A, B](r: A => Option[Costate[B, A]]): PLens[A, B] =
+    plens(r)
+}
+
 trait PLensTFunctions {
 
   import CostateT._
