@@ -267,7 +267,7 @@ Similarly, use these as defaults for parameters:
 
 ### Using type classes
 
- * Do not use `scalaz.syntax._` to implement `scalaz.syntax._`. Instead use the type classes directly.
+ * Do not use `scalaz.syntax._` to implement `scalaz._`. Instead use the type classes directly.
    Every type class companion object has an `apply` method to obtain an instance: use `Monad[M].bind` instead of
    `implicitly[Monad[M]].bind`
 
