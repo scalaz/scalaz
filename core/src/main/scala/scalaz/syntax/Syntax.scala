@@ -55,9 +55,9 @@ trait Syntaxes {
 
   object traverse extends ToTraverseV
 
-  object biFunctor extends ToBiFunctorV
+  object bifunctor$ extends ToBifunctorV
 
-  object biTraverse extends ToBiTraverseV
+  object bitraverse extends ToBitraverseV
 
   object compose extends ToComposeV
 
@@ -92,8 +92,8 @@ trait ToAllTypeClassV
   with ToOrderV with ToEnumV with ToMetricSpaceV with ToPlusEmptyV with ToEachV with ToIndexV
   with ToFunctorV with ToPointedV with ToContravariantV with ToCopointedV with ToApplyV
   with ToApplicativeV with ToBindV with ToMonadV with ToCojoinV with ToComonadV
-  with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBiFunctorV
-  with ToBiTraverseV with ToArrIdV with ToComposeV with ToCategoryV
+  with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBifunctorV
+  with ToBitraverseV with ToArrIdV with ToComposeV with ToCategoryV
   with ToArrowV with ToFoldableV
 
 

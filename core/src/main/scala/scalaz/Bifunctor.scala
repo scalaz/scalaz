@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait BiFunctor[F[_, _]]  { self =>
+trait Bifunctor[F[_, _]]  { self =>
   ////
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
 
@@ -25,11 +25,11 @@ trait BiFunctor[F[_, _]]  { self =>
   def umap[A, B](faa: F[A, A])(f: A => B): F[B, B] =
     bimap(faa)(f, f)
   ////
-  val biFunctorSyntax = new scalaz.syntax.BiFunctorSyntax[F] {}
+  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] {}
 }
 
-object BiFunctor {
-  @inline def apply[F[_, _]](implicit F: BiFunctor[F]): BiFunctor[F] = F
+object Bifunctor {
+  @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 
   ////
 

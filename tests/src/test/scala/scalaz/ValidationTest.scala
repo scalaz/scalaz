@@ -89,7 +89,7 @@ class ValidationTest extends Spec {
     def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
     def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
     def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
-    def bitraverse = BiTraverse[Validation]
+    def bitraverse = Bitraverse[Validation]
 
     // checking absence of ambiguity
     def equal[E: Order, A: Order] = Equal[Validation[E, A]]
@@ -104,7 +104,7 @@ class ValidationTest extends Spec {
       def applicative[E: Semigroup] = Applicative[({type λ[α]=FailProjection[E, α]})#λ]
       def traverse[E: Semigroup] = Traverse[({type λ[α]=FailProjection[E, α]})#λ]
       def plus[E: Semigroup] = Plus[({type λ[α]=FailProjection[E, α]})#λ]
-      def bitraverse = BiTraverse[FailProjection]
+      def bitraverse = Bitraverse[FailProjection]
 
       // checking absence of ambiguity
       def equal[E: Order, A: Order] = Equal[FailProjection[E, A]]

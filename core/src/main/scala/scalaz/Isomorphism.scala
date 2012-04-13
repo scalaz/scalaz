@@ -67,7 +67,7 @@ trait Isomorphisms extends IsomorphismsLow0{
   /**Natural isomorphism between functors */
   type IsoFunctor[F[_], G[_]] = Iso2[NaturalTransformation, F, G]
 
-  type IsoBiFunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
+  type IsoBifunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
 
   /**Alias for IsoSet */
   type <=>[A, B] = IsoSet[A, B]
@@ -88,11 +88,11 @@ trait Isomorphisms extends IsomorphismsLow0{
     def from[A](ga: G[A]): F[A]
   }
 
-  /**Alias for IsoBiFunctor */
-  type <~~>[F[_, _], G[_, _]] = IsoBiFunctor[F, G]
+  /**Alias for IsoBifunctor */
+  type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
 
   /**Convenience template trait to implement `<~~>` */
-  trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBiFunctor[F, G] {
+  trait IsoBifunctorTemplate[F[_, _], G[_, _]] extends IsoBifunctor[F, G] {
     final val to: BiNaturalTransformation[F, G] = new (F ~~> G) {
       def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
     }
@@ -283,17 +283,17 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldab
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
 }
 
-trait IsomorphismBiFunctor[F[_, _], G[_, _]] extends BiFunctor[F] {
+trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
   def iso: F <~~> G
 
-  implicit def G: BiFunctor[G]
+  implicit def G: Bifunctor[G]
 
   override def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] =
     iso.from(G.bimap(iso.to(fab))(f, g))
 }
 
-trait IsomorphismBiTraverse[F[_, _], G[_, _]] extends BiTraverse[F] with IsomorphismBiFunctor[F, G] {
-  implicit def G: BiTraverse[G]
+trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] {
+  implicit def G: Bitraverse[G]
 
   def bitraverse[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverse(iso.to(fab))(f, g))(iso.from.apply)
