@@ -13,7 +13,12 @@ trait ZipV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToZipV {
+trait ToZipV0 {
+  implicit def ToZipVUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]) =
+    new ZipV[F0.M,F0.A] { def self = F0(v); implicit def F: Zip[F0.M] = F0.TC }
+}
+
+trait ToZipV extends ToZipV0 {
   implicit def ToZipV[F[_],A](v: F[A])(implicit F0: Zip[F]) =
     new ZipV[F,A] { def self = v; implicit def F: Zip[F] = F0 }
 
