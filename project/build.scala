@@ -12,7 +12,11 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
-    scalaVersion := "2.9.1",
+    scalaVersion := "2.9.2",
+    scalaVersion in update <<= (scalaVersion) {
+      case "2.9.2" => "2.9.1"
+      case x => x
+    },
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
