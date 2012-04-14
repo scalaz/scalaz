@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 import sbt.Package._
 import java.util.jar.Attributes.Name._
+import com.jsuereth.pgp.GpgPlugin._
 
 
 object ScalazBuild extends Build {
@@ -121,9 +122,9 @@ object ScalazBuild extends Build {
         (compile in Compile) := inc.Analysis.Empty,
 
         // Include SXR in the Scaladoc Build to generated HTML annotated sources.
-        (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories, scalaVersion) map {
-          (bd, asd, sv) => if (sv.startsWith("2.10") || sv.startsWith("2.8")) Seq() else sxrOptions(bd, asd)
-        },
+        // (scaladocOptions in Compile) <++= (baseDirectory, allSourceDirectories, scalaVersion) map {
+        //   (bd, asd, sv) => if (sv.startsWith("2.10") || sv.startsWith("2.8")) Seq() else sxrOptions(bd, asd)
+        // },
 
         // Package an archive containing all artifacts, readme, licence, and documentation.
         // Use `LocalProject("scalaz")` rather than `scalaz` to avoid a circular reference.
@@ -140,6 +141,7 @@ object ScalazBuild extends Build {
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
       case "2.10.0-SNAPSHOT" => "2.9.0-1"
       case "2.9.1" => "2.9.0-1"
+      case "2.9.2" => "2.9.0-1"
       case x => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
@@ -160,10 +162,10 @@ object ScalazBuild extends Build {
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
     version      := "6.0.2",
-    scalaVersion := "2.9.1",
-    crossScalaVersions := Seq("2.9.1", "2.9.0-1", "2.8.1"),
+    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.8.1"),
     resolvers    += ScalaToolsSnapshots,
-  
+
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
@@ -178,22 +180,65 @@ object ScalazBuild extends Build {
       (IMPLEMENTATION_URL,    "http://code.google.com/p/scalaz"),
       (IMPLEMENTATION_VENDOR, "The Scalaz Project"),
       (SEALED, "true"))
-    )
+    ),
+    useGpg := true,
+    useGpgAgent := true,
+    publishSetting,
+    publishArtifact in Test := false,
+    pomIncludeRepository := {
+      x => false
+    },
+    pomExtra := (
+      <url>http://scalaz.org</url>
+        <licenses>
+          <license>
+            <name>BSD-style</name>
+            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+            <distribution>repo</distribution>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:scalaz/scalaz.git</url>
+          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
+        </scm>
+        <developers>
+          {
+          Seq(
+            ("runarorama", "Runar Bjarnason"),
+            ("pchiusano", "Paul Chiusano"),
+            ("tonymorris", "Tony Morris"),
+            ("retronym", "Jason Zaugg"),
+            ("ekmett", "Edward Kmett"),
+            ("alexeyr", "Alexey Romanov"),
+            ("copumpkin", "Daniel Peebles"),
+            ("rwallace", "Richard Wallace"),
+            ("nuttycom", "Kris Nuttycombe")
+          ).map {
+            case (id, name) =>
+              <developer>
+                <id>{id}</id>
+                <name>{name}</name>
+                <url>http://github.com/{name}</url>
+              </developer>
+          }
+        }
+        </developers>)
   )
-  
-  lazy val publishSetting = publishTo <<= (version) {
-    version: String =>
-      def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
-      val isSnapshot = version.trim.endsWith("SNAPSHOT")
-      val repoName   = if(isSnapshot) "snapshots" else "releases"
-      Some(repo(repoName))
+
+  lazy val publishSetting = publishTo <<= (version).apply{
+    v =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {
     Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
-      case _ =>
+        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+      case _                           =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
