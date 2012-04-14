@@ -1,5 +1,7 @@
 package scalaz
 
+import PLens._
+
 trait Zip[F[_]] { self =>
   def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)]
 
@@ -7,6 +9,12 @@ trait Zip[F[_]] { self =>
     F.map(zip(fa, fb)) {
       case (a, b) => f(a, b)
     }
+
+  def apzip[A, B](f: => F[A] => F[B], a: => F[A]): F[(A, B)] =
+    zip(a, f(a))
+
+  def apzipPL[A, B](f: => F[A] @?> F[B], a: => F[A])(implicit M: Monoid[F[B]]): F[(A, B)] =
+    apzip(f.getOrZ(_), a)
 
   def ap(implicit F: Functor[F]): Apply[F] =
     new Apply[F] {
@@ -17,6 +25,11 @@ trait Zip[F[_]] { self =>
     }
 }
 
-object Zip {
+object Zip extends ZipFunctions {
   @inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F
+}
+
+trait ZipFunctions {
+  def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
+    F.zip(t._1, t._2)
 }

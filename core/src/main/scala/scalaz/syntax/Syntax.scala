@@ -94,7 +94,7 @@ trait ToAllTypeClassV
   with ToApplicativeV with ToBindV with ToMonadV with ToCojoinV with ToComonadV
   with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBifunctorV
   with ToBitraverseV with ToArrIdV with ToComposeV with ToCategoryV
-  with ToArrowV with ToFoldableV
+  with ToArrowV with ToFoldableV with ToChoiceV with ToSplitV with ToZipV with ToUnzipV
 
 
 trait SyntaxV[A] {

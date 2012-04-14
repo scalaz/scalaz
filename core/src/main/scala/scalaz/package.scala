@@ -121,6 +121,7 @@ package object scalaz {
   type Reader[E, A] = ReaderT[Id, E, A]
 
   type Writer[W, A] = WriterT[Id, W, A]
+  type Unwriter[W, A] = UnwriterT[Id, W, A]
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
@@ -128,6 +129,10 @@ package object scalaz {
 
   object Writer {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+  }
+
+  object Unwriter {
+    def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
   /** A state transition, representing a function `S => (A, S)`. */

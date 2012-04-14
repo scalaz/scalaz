@@ -15,6 +15,9 @@ sealed trait PLensT[F[_], A, B] {
   import PLensT._
   import BijectionT._
 
+  def kleisli: Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Costate[B, A]] =
+    Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Costate[B, A]](runO(_))
+
   def mapC[C](f: Costate[B, A] => Costate[C, A])(implicit F: Functor[F]): PLensT[F, A, C] =
     plensT(a => F.map(run(a))(_ map f))
 

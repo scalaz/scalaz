@@ -12,6 +12,9 @@ sealed trait LensT[F[_], A, B] {
   import LensT._
   import BijectionT._
 
+  def kleisli: Kleisli[F, A, Costate[B, A]] =
+    Kleisli(run(_))
+
   def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
     lensT(x => F.map(run(g(x)))(_ map f))
 
