@@ -19,12 +19,10 @@ trait Apply[F[_]] extends Functor[F] { self =>
   }
 
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
-  def zip[A,B]: Zip[F] =
+  def zip: Zip[F] =
     new Zip[F] {
       def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
-        map2(a, b) {
-          case (a, b) => (a, b)
-        }
+        map2(a, b)((x, y) => (x, y))
     }
 
   def ap2[A,B,C](fa: => F[A], fb: => F[B])(f: F[(A,B) => C]): F[C] =
