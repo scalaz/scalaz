@@ -3,6 +3,15 @@ package typelevel
 
 import syntax.HLists._
 
+/**
+ * A type class abstracting over the `product` and `compose` operations of type
+ * classes.
+ *
+ * There are instances for [[scalaz.Functor]], [[scalaz.Pointed]] and
+ * [[scalaz.Applicative]].
+ *
+ * @see [[scalaz.typelevel.syntax.TypeClasses]]
+ */
 trait TypeClass[C[_[_]]] {
 
   import TypeClass._
@@ -51,7 +60,7 @@ object TypeClass {
 
     def <<:[F[_]](F: C[F]) = new WrappedComposition[C, TCCons[F, T]](typeClass.compose[F, T](F, instance), typeClass)
 
-    def >>[F[_]](F: C[F]) = F <<: this
+    def :>>[F[_]](F: C[F]) = F <<: this
 
     def composeInto[F[_]](F: C[F]) = F <<: this
 

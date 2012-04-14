@@ -9,11 +9,20 @@ object HLists {
 
   final class IdOps[T <: HList](list: T) {
 
+    /** Prepends a value to this list. */
     def ::[A](elem: A): HCons[A, T] = GenericCons[Id, A, T](elem, list)
 
+    /**
+     * Composes a list of functions of the shape `A => F[B]` using
+     * [[scalaz.Kleisli]]. This operation can be seen as a fold with `compose`.
+     */
     def compose[M[_], H, R](implicit ev: KleisliProof[Forward, M, H, R, T], b: Bind[M]): Kleisli[M, H, R] =
       ev(list)
 
+    /**
+     * Composes a list of functions of the shape `A => F[B]` using
+     * [[scalaz.Kleisli]]. This operation can be seen as a fold with `andThen`.
+     */
     def reverseCompose[M[_], H, R](implicit ev: KleisliProof[Reverse, M, H, R, T], b: Bind[M]): Kleisli[M, H, R] =
       ev(list)
 

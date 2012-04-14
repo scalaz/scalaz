@@ -13,7 +13,7 @@ object HStream {
 
 }
 
-trait AbstractHStream {
+private[scalaz] trait AbstractHStream {
 
   type Prepended[A] <: AbstractHStream
 
@@ -28,6 +28,9 @@ trait AbstractHStream {
 
 }
 
+/**
+ * An infinite sequence of elements with different types.
+ */
 trait HStream[T[_ <: Nat]] extends AbstractHStream { self =>
 
   import HFold._
