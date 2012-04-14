@@ -7,9 +7,9 @@ trait ZipV[F[_],A, B] extends SyntaxV[F[A]] {
   ////
   final def fzip(b: => F[B]): F[(A, B)] = F.zip(self, b)
   final def fzipWith[C](b: => F[B])(f: (A, B) => C)(implicit T: Functor[F]): F[C] = F.zipWith(self, b)(f)
-  final def apzip[C](b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
+  final def apzip(b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
   // alias for apzip
-  final def <*|*>[C](b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
+  final def <*|*>(b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
   ////
 }
 
