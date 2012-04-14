@@ -50,3 +50,14 @@ private[scalaz] trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ
     F.foldLeft(fa, z)((b, a) => G.foldLeft(a, b)(f))
 
 }
+
+private[scalaz] trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G[α]]})#λ] {
+  implicit def T: Functor[F]
+
+  implicit def F: Zip[F]
+
+  implicit def G: Zip[G]
+
+  def zip[A, B](a: => F[G[A]], b: => F[G[B]]): F[G[(A, B)]] =
+    F.zipWith(a, b)(G.zip(_, _))
+}

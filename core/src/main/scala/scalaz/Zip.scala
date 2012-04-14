@@ -5,6 +5,15 @@ import PLens._
 trait Zip[F[_]] { self =>
   def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)]
 
+  /**The composition of Zip `F` and `G`, `[x]F[G[x]]`, is a Zip (if F is a Functor) */
+  def compose[G[_]](implicit T0: Functor[F], G0: Zip[G]): Zip[({type λ[α] = F[G[α]]})#λ] = new CompositionZip[F, G] {
+    implicit def T = T0
+
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def zipWith[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C)(implicit F: Functor[F]): F[C] =
     F.map(zip(fa, fb)) {
       case (a, b) => f(a, b)
