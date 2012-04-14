@@ -72,6 +72,15 @@ sealed trait NonEmptyList[A] {
 
   def size: Int = 1 + list.size
 
+  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
+    nel((head, b.head), tail zip b.tail)
+
+  def unzip[X, Y](implicit ev: A =:= (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
+    val (a, b) = head: (X, Y)
+    val (aa, bb) = tail.unzip: (List[X], List[Y])
+    (nel(a, aa), nel(b, bb))
+  }
+
   override def toString: String = "NonEmpty" + (head :: tail)
 
   override def equals(any: Any): Boolean =
@@ -91,7 +100,7 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] =
-    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] {
+    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] {
       def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse f
 
@@ -108,6 +117,10 @@ trait NonEmptyListInstances {
       def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
       
       def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
+
+      def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
+
+      def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
