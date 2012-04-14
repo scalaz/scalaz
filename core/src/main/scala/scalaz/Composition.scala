@@ -16,6 +16,15 @@ private[scalaz] trait CompositionPointed[F[_], G[_]] extends Pointed[({type λ[�
   def point[A](a: => A): F[G[A]] = F.point(G.point(a))
 }
 
+private[scalaz] trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
+  implicit def F: Apply[F]
+
+  implicit def G: Apply[G]
+
+  def ap[A, B](fa: => F[G[A]])(f: => F[G[A => B]]): F[G[B]] =
+    F.map2(f, fa)((ff, ga) => G.ap(ga)(ff))
+}
+
 private[scalaz] trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[α] = F[G[α]]})#λ] with CompositionPointed[F, G] with CompositionFunctor[F, G] {
   implicit def F: Applicative[F]
 

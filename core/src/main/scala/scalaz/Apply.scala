@@ -11,6 +11,13 @@ trait Apply[F[_]] extends Functor[F] { self =>
 
   // derived functions
 
+  /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
+  def compose[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = F[G[α]]})#λ] = new CompositionApply[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
   def zip[A,B]: Zip[F] =
     new Zip[F] {
