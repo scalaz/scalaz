@@ -196,9 +196,13 @@ object TypelevelUsage extends App {
 
     import typelevel.syntax.TypeClasses._
 
-    val composed = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
+    // with syntax
+    val composed1 = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
+    // without syntax
+    val composed2 = Applicative[List] <<: Applicative[Option] <<: TypeClass[Applicative].idCompose
 
-    assert(List(Some(5)) === composed.point(5))
+    assert(List(Some(5)) === composed1.point(5))
+    assert(List(Some(5)) === composed2.point(5))
 
     val prod = Applicative[List] *: Applicative[Option] *: Applicative.product
 
