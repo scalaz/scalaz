@@ -49,14 +49,24 @@ private[scalaz] trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ
 
   implicit def G: Foldable[G]
 
-  def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
+  override def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
     F.foldRight(fa, z)((a, b) => G.foldRight(a, b)(f))
 
-  def foldMap[A,B](fa: F[G[A]])(f: A => B)(implicit M: Monoid[B]): B =
+  override def foldMap[A,B](fa: F[G[A]])(f: A => B)(implicit M: Monoid[B]): B =
     F.foldMap(fa)(G.foldMap(_)(f))
 
   override def foldLeft[A, B](fa: F[G[A]], z: B)(f: (B, A) => B): B =
     F.foldLeft(fa, z)((b, a) => G.foldLeft(a, b)(f))
+
+}
+
+private[scalaz] trait CompositionTraverse[F[_], G[_]] extends Traverse[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] with CompositionFoldable[F, G] {
+  implicit def F: Traverse[F]
+
+  implicit def G: Traverse[G]
+
+  def traverseImpl[X[_]:Applicative, A, B](a: F[G[A]])(f: A => X[B]): X[F[G[B]]] =
+    F.traverse(a)(G.traverse(_)(f))
 
 }
 
