@@ -257,7 +257,7 @@ trait WriterTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=WriterT[F, α, 
 trait WriterTBitraverse[F[_]] extends Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
     fab.bitraverse(f, g)
 }
 

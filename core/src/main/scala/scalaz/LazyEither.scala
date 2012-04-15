@@ -159,7 +159,7 @@ trait LazyEitherInstances {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
 
-    def bitraverse[G[_] : Applicative, A, B, C, D](fab: LazyEither[A, B])
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: LazyEither[A, B])
                                                   (f: (A) => G[C], g: (B) => G[D]): G[LazyEither[C, D]] =
       fab.fold(
         a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),

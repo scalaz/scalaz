@@ -63,7 +63,7 @@ trait EitherInstances extends EitherInstances0 {
       case Right(b) => Right(g(b))
     }
 
-    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Either[A, B])
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Either[A, B])
                                                   (f: (A) => G[C], g: (B) => G[D]) = fab match {
       case Left(a)  => Applicative[G].map(f(a))(b => Left(b))
       case Right(b) => Applicative[G].map(g(b))(d => Right(d))

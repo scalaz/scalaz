@@ -277,7 +277,7 @@ trait ValidationTBifunctor[F[_]] extends Bifunctor[({type λ[α, β] = Validatio
 trait ValidationTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = ValidationT[F, α, β]})#λ] with ValidationTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_] : Applicative, A, B, C, D](fab: ValidationT[F, A, B])
+  def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: ValidationT[F, A, B])
                                                 (f: (A) => G[C], g: (B) => G[D]): G[ValidationT[F, C, D]] =
     fab.bitraverse(f, g)
 }

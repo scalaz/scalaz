@@ -295,6 +295,6 @@ trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
 trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] {
   implicit def G: Bitraverse[G]
 
-  def bitraverse[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
-    Applicative[H].map(G.bitraverse(iso.to(fab))(f, g))(iso.from.apply)
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
+    Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

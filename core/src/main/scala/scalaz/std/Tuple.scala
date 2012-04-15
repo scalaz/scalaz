@@ -5,7 +5,7 @@ trait TupleInstances0 {
   implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
       (f(fab._1), g(fab._2))
-    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
       Applicative[G].map2(f(fab._1), g(fab._2))((_, _))
   }
 

@@ -291,6 +291,6 @@ trait LazyEitherTBifunctor[F[_]] extends Bifunctor[({type λ[α, β] = LazyEithe
 trait LazyEitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyEitherT[F, C, D]] =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyEitherT[F, C, D]] =
     Applicative[G].map(F.traverse(fab.run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
 }

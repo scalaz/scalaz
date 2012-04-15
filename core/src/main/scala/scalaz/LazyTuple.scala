@@ -81,7 +81,7 @@ trait LazyTupleFunctions {
 trait LazyTuple2Instances1 {
   implicit def lazyTuple2Instance[A1, A2] = new Bitraverse[LazyTuple2] {
     override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(f: (A) => C, g: (B) => D): LazyTuple2[C, D] = LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
-    def bitraverse[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyTuple2[C, D]] = {
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyTuple2[C, D]] = {
       Applicative[G].map2(f(fab._1), g(fab._2))(LazyTuple.lazyTuple2(_, _))
     }
   }

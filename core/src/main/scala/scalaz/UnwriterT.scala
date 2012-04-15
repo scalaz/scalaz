@@ -213,7 +213,7 @@ trait UnwriterTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=UnwriterT[F, 
 trait UnwriterTBitraverse[F[_]] extends Bitraverse[({type λ[α, β]=UnwriterT[F, α, β]})#λ] with UnwriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_]: Applicative, A, B, C, D](fab: UnwriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: UnwriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
     fab.bitraverse(f, g)
 }
 

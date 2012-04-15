@@ -306,7 +306,7 @@ trait EitherTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, 
 trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
+  def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
                                                 (f: (A) => G[C], g: (B) => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
 }
