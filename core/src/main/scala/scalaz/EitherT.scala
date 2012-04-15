@@ -67,7 +67,7 @@ sealed trait EitherT[F[_], A, B] {
 
   def bitraverse[G[_], C, D](f: (A) => G[C], g: (B) => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] = {
     import std.either.eitherInstance
-    Applicative[G].map(F.traverse(run)(BiTraverse[Either].bitraverseF(f, g)))(EitherT.eitherT(_: F[Either[C, D]]))
+    Applicative[G].map(F.traverse(run)(Bitraverse[Either].bitraverseF(f, g)))(EitherT.eitherT(_: F[Either[C, D]]))
   }
 
   def traverse[G[_], C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] = {
@@ -89,6 +89,9 @@ sealed trait EitherT[F[_], A, B] {
   def left: LeftProjectionT[F, A, B] = new LeftProjectionT[F, A, B]() {
     val eitherT = EitherT.this
   }
+
+  def cozip(implicit Z: Cozip[F]): Either[F[A], F[B]] =
+    Z.cozipT(this)
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
@@ -175,11 +178,11 @@ trait EitherTInstances1 extends EitherTInstances2 {
 }
 
 trait EitherTInstances0 extends EitherTInstances1 {
-  implicit def eitherTBiFunctor[F[_]](implicit F0: Functor[F]) = new EitherTBiFunctor[F] {
+  implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
     implicit def F = F0
   }
-  implicit def eitherTLeftProjectionBiFunctor[F[_]](implicit F0: Functor[F]) = new IsomorphismBiFunctor[({type λ[α, β]=EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β]=EitherT[F, α, β]})#λ] {
-    implicit def G = eitherTBiFunctor[F]
+  implicit def eitherTLeftProjectionBifunctor[F[_]](implicit F0: Functor[F]) = new IsomorphismBifunctor[({type λ[α, β]=EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β]=EitherT[F, α, β]})#λ] {
+    implicit def G = eitherTBifunctor[F]
     def iso = EitherT.eitherTLeftProjectionIso2[F]
   }
 
@@ -197,11 +200,11 @@ trait EitherTInstances0 extends EitherTInstances1 {
 
 // TODO more instances
 trait EitherTInstances extends EitherTInstances0 {
-  implicit def eitherTBiTraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBiTraverse[F] {
+  implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def eitherTLeftProjectionBiTraverse[F[_]](implicit F0: Traverse[F]) = new IsomorphismBiTraverse[({type λ[α, β] = EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β] = EitherT[F, α, β]})#λ] {
-    implicit def G = eitherTBiTraverse[F]
+  implicit def eitherTLeftProjectionBitraverse[F[_]](implicit F0: Traverse[F]) = new IsomorphismBitraverse[({type λ[α, β] = EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β] = EitherT[F, α, β]})#λ] {
+    implicit def G = eitherTBitraverse[F]
     def iso = EitherT.eitherTLeftProjectionIso2[F]
   }
 
@@ -236,13 +239,13 @@ trait EitherTFunctions {
   def fromEither[F[_], A, B](e: A \/ B)(implicit F: Pointed[F]): EitherT[F, A, B] =
     eitherT(F.point(e.run))
 
-  import Isomorphism.{IsoFunctorTemplate, IsoBiFunctorTemplate}
+  import Isomorphism.{IsoFunctorTemplate, IsoBifunctorTemplate}
 
   implicit def eitherTLeftProjectionEIso2[F[_], E] = new IsoFunctorTemplate[({type λ[α] = EitherT.LeftProjectionT[F, E, α]})#λ, ({type λ[α] = EitherT[F, E, α]})#λ] {
     def to[A](fa: EitherT.LeftProjectionT[F, E, A]): EitherT[F, E, A] = fa.eitherT
     def from[A](ga: EitherT[F, E, A]): EitherT.LeftProjectionT[F, E, A] = ga.left
   }
-  implicit def eitherTLeftProjectionIso2[F[_]] = new IsoBiFunctorTemplate[({type λ[α, β]=EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β]=EitherT[F, α, β]})#λ] {
+  implicit def eitherTLeftProjectionIso2[F[_]] = new IsoBifunctorTemplate[({type λ[α, β]=EitherT.LeftProjectionT[F, α, β]})#λ, ({type λ[α, β]=EitherT[F, α, β]})#λ] {
     def to[A, B](fa: EitherT.LeftProjectionT[F, A, B]): EitherT[F, A, B] = fa.eitherT
     def from[A, B](ga: EitherT[F, A, B]): EitherT.LeftProjectionT[F, A, B] = ga.left
   }
@@ -294,16 +297,16 @@ trait EitherTTraverse[F[_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]}
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: (A) => G[B]): G[EitherT[F, E, B]] = fa traverse f
 }
 
-trait EitherTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
+trait EitherTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: (A) => C, g: (B) => D): EitherT[F, C, D] = fab.bimap(f, g)
 }
 
-trait EitherTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBiFunctor[F] {
+trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
+  def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
                                                 (f: (A) => G[C], g: (B) => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
 }

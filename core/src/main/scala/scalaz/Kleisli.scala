@@ -8,17 +8,24 @@ sealed trait Kleisli[M[_], A, B] { self =>
 
   import Kleisli._
 
-  // TODO provide non-symbolic aliases.
+  def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = kleisli((a: A) => b.bind(this(a))(k(_)))
-
-  def >=>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(kleisli(k))
-
+  /** alias for `compose` */
   def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
-  def <=<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = kleisli(k) >=> this
+  def andThen[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] =
+    k >=> this
 
-  def compose[N[_]](f: M[B] => N[B]): Kleisli[N, A, B] = kleisli((a: A) => f(this(a)))
+  /** alias for `andThen` */
+  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = kleisli((a: A) => b.bind(this(a))(k(_)))
+
+  def composeK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >==>(k)
+
+  def >==>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(kleisli(k))
+
+  def andThenK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = <==<(k)
+
+  def <==<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = kleisli(k) >=> this
 
   def traverse[F[_], AA <: A](f: F[AA])(implicit M: Applicative[M], F: Traverse[F]): M[F[B]] =
     F.traverse(f)(Kleisli.this(_))
@@ -42,12 +49,12 @@ sealed trait Kleisli[M[_], A, B] { self =>
   }
         
   import Liskov._
-  def unlift[M[_], FF[_]](implicit M: Copointed[M], ev: this.type <~< Kleisli[({type λ[α] = M[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] = new Kleisli[FF, A, B] {
-    def run(a: A) = Copointed[M].copoint(ev(self) run a)
+  def unlift[N[_], FF[_]](implicit M: Copointed[N], ev: this.type <~< Kleisli[({type λ[α] = N[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] = new Kleisli[FF, A, B] {
+    def run(a: A) = Copointed[N].copoint(ev(self) run a)
   }
 
-  def unliftId[M[_]](implicit M: Copointed[M], ev: this.type <~< Kleisli[({type λ[α] = M[α]})#λ, A, B]): Reader[A, B] =
-    unlift[M, Id]
+  def unliftId[N[_]](implicit M: Copointed[N], ev: this.type <~< Kleisli[({type λ[α] = N[α]})#λ, A, B]): Reader[A, B] =
+    unlift[N, Id]
 
   def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, B] = ReaderWriterStateT(
     (r, s) => M.map(self(r)) {
@@ -56,7 +63,7 @@ sealed trait Kleisli[M[_], A, B] { self =>
   )
 
   def liftMK[T[_[_], _]](implicit T: MonadTrans[T], M: Monad[M]): Kleisli[({type l[a] = T[M, a]})#l, A, B] =
-    compose[({type l[a] = T[M, a]})#l](ma => T.liftM(ma))
+    mapK[({type l[a] = T[M, a]})#l, B](ma => T.liftM(ma))
 }
 
 //

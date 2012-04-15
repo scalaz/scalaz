@@ -5,6 +5,13 @@ sealed trait WriterT[F[_], W, A] { self =>
 
   import WriterT._
 
+  def off: UnwriterT[F, W, A] =
+    UnwriterT(run)
+
+  /** alias for `off` */
+  def unary_- : UnwriterT[F, W, A] =
+    UnwriterT(run)
+
   def mapValue[X, B](f: ((W, A)) => (X, B))(implicit F: Functor[F]): WriterT[F, X, B] =
     writerT(F.map(run)(f))
 
@@ -14,7 +21,7 @@ sealed trait WriterT[F[_], W, A] { self =>
   def written(implicit F: Functor[F]): F[W] =
     F.map(run)(_._1)
 
-  def over(implicit F: Functor[F]): F[A] =
+  def value(implicit F: Functor[F]): F[A] =
     F.map(run)(_._2)
 
   def swap(implicit F: Functor[F]): WriterT[F, A, W] =
@@ -47,7 +54,7 @@ sealed trait WriterT[F[_], W, A] { self =>
     }
   }
 
-  def flatMap[B](f: A => WriterT[F, W, B])(implicit F: Monad[F], s: Semigroup[W]): WriterT[F, W, B] =
+  def flatMap[B](f: A => WriterT[F, W, B])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] =
     writerT(F.bind(run){wa =>
       val z = f(wa._2).run
       F.map(z)(wb => (s.append(wa._1, wb._1), wb._2))
@@ -114,7 +121,7 @@ trait WriterTInstances1 extends WriterTInstances2 {
 }
 
 trait WriterTInstances0 extends WriterTInstances1 {
-  implicit def writerTBiFunctor[F[_]](implicit F0: Functor[F]) = new WriterTBiFunctor[F] {
+  implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]) = new WriterTBifunctor[F] {
     implicit def F = F0
   }
   implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]) = new WriterTMonad[F, W] {
@@ -131,7 +138,7 @@ trait WriterTInstances0 extends WriterTInstances1 {
 }
 
 trait WriterTInstances extends WriterTInstances0 {
-  implicit def writerTBiTraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBiTraverse[F] {
+  implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBitraverse[F] {
     implicit def F = F0
   }
   implicit def writerComonad[W] = new WriterComonad[W] {
@@ -156,6 +163,8 @@ trait WriterTFunctions {
     val run = v
   }
 
+  import CostateT._
+
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)
 
@@ -167,6 +176,16 @@ trait WriterTFunctions {
   /** Puts the written value that is produced by applying the given function into a writer transformer and associates with `value` */
   def putWith[F[_], W, A](value: F[A])(w: A => W)(implicit F: Functor[F]): WriterT[F, W, A] =
     WriterT(F.map(value)(a => (w(a), a)))
+
+  def writerWL[F[_], W, A](implicit M: Pointed[F]): LensT[F, WriterT[F, W, A], W] =
+    LensT(x => M.map(x.run) {
+      case (w, a) => costate((ww: W) => WriterT(M.point(ww, a)), w)
+    })
+
+  def writerAL[F[_], W, A](implicit M: Pointed[F]): LensT[F, WriterT[F, W, A], A] =
+    LensT(x => M.map(x.run) {
+      case (w, a) => costate((aa: A) => WriterT(M.point(w, aa)), a)
+    })
 }
 
 //
@@ -207,7 +226,7 @@ trait WriterTEach[F[_], W] extends Each[({type λ[α]=WriterT[F, W, α]})#λ] {
 
 // TODO does Index it make sense for F other than Id?
 trait WriterTIndex[W] extends Index[({type λ[α]=WriterT[Id, W, α]})#λ] {
-  def index[A](fa: WriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.over) else None
+  def index[A](fa: WriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.value) else None
 }
 
 trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] with WriterTPointed[F, W] {
@@ -228,24 +247,24 @@ trait WriterTTraverse[F[_], W] extends Traverse[({type λ[α]=WriterT[F, W, α]}
   def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
 }
 
-trait WriterTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] {
+trait WriterTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: WriterT[F, A, B])(f: (A) => C, g: (B) => D) =
     fab.bimap(f, g)
 }
 
-trait WriterTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] with WriterTBiFunctor[F] {
+trait WriterTBitraverse[F[_]] extends Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
     fab.bitraverse(f, g)
 }
 
 trait WriterTCopointed[F[_], W] extends Copointed[({type λ[α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
   implicit def F: Copointed[F]
 
-  def copoint[A](p: WriterT[F, W, A]): A = F.copoint(p.over)
+  def copoint[A](p: WriterT[F, W, A]): A = F.copoint(p.value)
 }
 
 trait WriterComonad[W] extends Comonad[({type λ[α] = Writer[W, α]})#λ] with WriterTCopointed[Id, W] {

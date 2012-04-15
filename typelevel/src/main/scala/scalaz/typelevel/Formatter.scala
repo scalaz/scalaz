@@ -3,8 +3,7 @@ package typelevel
 
 import java.{lang => jl, util => ju}
 
-import syntax.semigroup._
-import Typelevel._
+import scalaz.syntax.semigroup._
 import UnionTypes._
 
 trait Formatter[Params <: HList, R] extends (Params => R) { self =>

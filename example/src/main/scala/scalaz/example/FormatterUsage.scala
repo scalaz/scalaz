@@ -4,7 +4,6 @@ import scalaz._
 import std.string._
 import UnionTypes._
 import typelevel._
-import Typelevel._
 import Formatter.all._
 
 object FormatterUsage extends App {
