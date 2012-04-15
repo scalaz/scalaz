@@ -80,3 +80,13 @@ private[scalaz] trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G
   def zip[A, B](a: => F[G[A]], b: => F[G[B]]): F[G[(A, B)]] =
     F.zipWith(a, b)(G.zip(_, _))
 }
+
+private[scalaz] trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {
+  implicit def F: Bifunctor[F]
+
+  implicit def G: Bifunctor[G]
+
+  def bimap[A, B, C, D](fab: F[G[A, B], G[A, B]])(f: A => C, g: B => D): F[G[C, D], G[C, D]] =
+    F.bimap(fab)(G.bimap(_)(f, g), G.bimap(_)(f, g))
+}
+
