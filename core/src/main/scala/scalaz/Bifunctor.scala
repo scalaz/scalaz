@@ -9,7 +9,7 @@ trait Bifunctor[F[_, _]]  { self =>
   ////
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
 
-  /**The composition of Biunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
+  /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
   def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] = new CompositionBifunctor[F, G] {
     implicit def F = self
 

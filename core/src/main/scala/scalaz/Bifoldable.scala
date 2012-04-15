@@ -8,6 +8,13 @@ trait Bifoldable[F[_, _]] { self =>
     bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]]) apply z
   }
 
+  /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
+  def compose[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] = new CompositionBifoldable[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   // derived functions
   def bifoldMap1[A,B,M](fa: F[A,B])(f: A => M)(g: B => M)(implicit F: Semigroup[M]): Option[M] = {
     import std.option._
