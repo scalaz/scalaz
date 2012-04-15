@@ -32,6 +32,7 @@ trait FoldableV[F[_],A] extends SyntaxV[F[A]] {
   final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)
   final def splitWith(p: A => Boolean): List[List[A]] = F.splitWith(self)(p)
   final def selectSplit(p: A => Boolean): List[List[A]] = F.selectSplit(self)(p)
+  final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
 
   ////
 }

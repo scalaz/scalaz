@@ -1,239 +1,315 @@
 package scalaz
 
 import CostateT._
-import collection.immutable.Stack
-import collection.SeqLike
 
-/**
- * `Lens[A, B]` provides a reference to a field of type `B` within `A`, that allows:
- *   * access: extraction of the `B`
- *   * update: creation of a new `A` with field replaced by a provided `B`
- *
- * Lenses are required to satisfy the following three laws and to be side-effect free.
- *
- * * '''identity''' `forall a b. lens.set(a,lens(a)) = a`
- * * '''retention''' `forall a b. lens(lens.set(a,b)) = b`
- * * '''double-set''' `forall a b c. lens.set(lens.set(a,b),c) = lens.set(a,c)`
- *
- * See [[http://www.youtube.com/watch?v=efv0SQNde5Q&feature=related Lenses, a Functional Imperative]]
- * See [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/colens.pdf Lenses, coalgebraically: View updates through the looking glass]]
- */
-sealed trait Lens[A, B] {
+sealed trait LensT[F[_], A, B] {
+  def run(a: A): F[Costate[B, A]]
 
-  def run(a: A): Costate[B, A] // (B => A, A)
-
-  def apply(a: A): Costate[B, A] =
+  def apply(a: A): F[Costate[B, A]] =
     run(a)
 
   import StateT._
-  import Lens._
+  import LensT._
+  import BijectionT._
 
-  def get(a: A): B =
-    run(a).pos
+  def kleisli: Kleisli[F, A, Costate[B, A]] =
+    Kleisli(run(_))
 
-  def set(a: A, b: B): A =
-    run(a).put(b)
+  def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
+    lensT(x => F.map(run(g(x)))(_ map f))
+
+  def xmapbA[X](b: Bijection[A, X])(implicit F: Functor[F]): LensT[F, X, B] =
+    xmapA(b to _, b fr _)
+
+  def xmapB[X](f: B => X, g: X => B)(implicit F: Functor[F]): LensT[F, A, X] =
+    lensT(a => F.map(run(a))(_ xmap (f, g)))
+
+  def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): LensT[F, A, X] =
+    xmapB(b to _, b fr _)
+
+  def lift[G[_]](implicit P: Pointed[G], ev: F[Costate[B, A]] =:= Id[Costate[B, A]]): LensT[G, A, B] =
+    lensT(a => P.point(run(a): Id[Costate[B, A]]))
+
+  def get(a: A)(implicit F: Functor[F]): F[B] =
+    F.map(run(a))(_.pos)
+
+  def set(a: A, b: B)(implicit F: Functor[F]): F[A] =
+    F.map(run(a))(_.put(b))
 
   /** Modify the value viewed through the lens */
-  def mod(f: B => B, a: A): A = {
-    val (p, q) = run(a).run
-    p(f(q))    
-  }
+  def mod(f: B => B, a: A)(implicit F: Functor[F]): F[A] =
+    F.map(run(a))(c => {
+      val (p, q) = c.run
+      p(f(q))
+    })
 
-  def =>=(f: B => B): A => A =
+  def =>=(f: B => B)(implicit F: Functor[F]): A => F[A] =
     mod(f, _)
 
-  def modE(f: Endo[B]): Endo[A] =
-    Endo(=>=(f.run))
+  def st(implicit F: Functor[F]): StateT[F, A, B] =
+    StateT(s => F.map(get(s))((_, s)))
 
-  /** Modify the value viewed through the lens, a functor full of results */
-  def modf[F[_]](f: B => F[B], a: A)(implicit F: Functor[F]): F[A] =
-    F.map(f(get(a)))(set(a, _))
+  def %=(f: B => B)(implicit F: Functor[F]): StateT[F, A, B] =
+    StateT(a =>
+      F.map(run(a))(c => {
+        val b = f(c.pos)
+        (b, c put b)
+      }))
 
-  def st: State[A, B] =
-    State(s => (get(s), s))
-
-  def :=(b: => B): State[A, B] =
+  def :=(b: => B)(implicit F: Functor[F]): StateT[F, A, B] =
     %=(_ => b)
 
-  def %=(f: B => B): State[A, B] =
-    State[A, B](a => {
-      val b = f(get(a))
-      (b, set(a, b))
-    })
+  def %==(f: B => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
+    StateT(a =>
+      F.map(mod(f, a))(((), _)))
 
-  def %==(f: B => B): State[A, Unit] =
-    State[A, Unit](a => {
-      ((), mod(f, a))
-    })
+  def %%=[C](s: StateT[F, B, C])(implicit M: Bind[F]): StateT[F, A, C] =
+    StateT(a => M.bind(run(a))(x =>
+      M.map(s(x.pos)){
+        case (c, b) => (c, x put b)
+      }))
 
-  def %%=[C](s: State[B, C]): State[A, C] =
-    State[A, C](a => {
-      val (c, b) = s(get(a))
-      (c, set(a, b))
-    })
+  def >-[C](f: B => C)(implicit F: Functor[F]): StateT[F, A, C] =
+    StateT(a => F.map(get(a))(x => (f(x), a)))
 
-  def >-[C](f: B => C): State[A, C] =
-    State[A, C](a => (f(get(a)), a))
+  def >>-[C](f: B => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] =
+    StateT(a => F.bind(get(a))(x => f(x)(a)))
 
-  def >>-[C](f: B => State[A, C]): State[A, C] =
-    State[A, C](a => f(get(a)).apply(a))
-
-  def ->>-[C](f: => State[A, C]): State[A, C] =
+  def ->>-[C](f: => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] =
     >>-(_ => f)
 
   /** Lenses can be composed */
-  def compose[C](that: Lens[C, A]): Lens[C, B] =
-    lens[C, B](c => {
-      val (ac, a) = that.run(c).run
-      val (ba, b) = run(a).run
-      costate[B, C](ac compose ba, b)
-    })
+  def compose[C](that: LensT[F, C, A])(implicit F: Bind[F]): LensT[F, C, B] =
+    lensT(c =>
+      F.bind(that run c)(x => {
+        val (ac, a) = x.run
+        F.map(run(a))(y => {
+          val (ba, b) = y.run
+          costate(ac compose ba, b)
+        })
+      }))
 
   /** alias for `compose` */
-  def >=>[C](that: Lens[C, A]): Lens[C, B] = compose(that)
+  def <=<[C](that: LensT[F, C, A])(implicit F: Bind[F]): LensT[F, C, B] = compose(that)
 
-  def andThen[C](that: Lens[B, C]): Lens[A, C] =
+  def andThen[C](that: LensT[F, B, C])(implicit F: Bind[F]): LensT[F, A, C] =
     that compose this
 
   /** alias for `andThen` */
-  def <=<[C](that: Lens[B, C]): Lens[A, C] = andThen(that)
+  def >=>[C](that: LensT[F, B, C])(implicit F: Bind[F]): LensT[F, A, C] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C](that: => Lens[C, B]): Lens[Either[A, C], B] =
-    lensGG[Either[A, C], B](
-    {
-      case Left(a)  => get(a)
-      case Right(b) => that.get(b)
-    }, {
-      case (Left(a), b)  => Left(set(a, b))
-      case (Right(c), b) => Right(that.set(c, b))
-    })
+  def sum[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, Either[A, C], B] =
+    lensT{
+      case Left(a) =>
+        F.map(run(a))(_ map (Left(_)))
+      case Right(c) =>
+        F.map(that run c)(_ map (Right(_)))
+    }
 
   /** Alias for `sum` */
-  def |||[C](that: => Lens[C, B]): Lens[Either[A, C], B]= sum(that)
+  def |||[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, Either[A, C], B] = sum(that)
 
   /** Two disjoint lenses can be paired */
-  def product[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] =
-    lensGG[(A, C), (B, D)](
-      ac => (get(ac._1), that.get(ac._2)),
-      (ac, bd) => (set(ac._1, bd._1), that.set(ac._2, bd._2))
-    )
+  def product[C, D](that: LensT[F, C, D])(implicit F: Bind[F]): LensT[F, (A, C), (B, D)] =
+    lensT {
+      case (a, c) => F.map2(run(a), that run c)(_ *** _)
+    }
 
   /** alias for `product` */
-  def ***[C, D](that: Lens[C, D]): Lens[(A, C), (B, D)] = product(that)
-
-  /** A homomorphism of lens categories */
-  def partial: PLens[A, B] =
-    PLens.plens(a => Some(run(a)))
-
-  /** alias for `partial` */
-  def unary_~ : PLens[A, B] =
-    partial
+  def ***[C, D](that: LensT[F, C, D])(implicit F: Bind[F]): LensT[F, (A, C), (B, D)] = product(that)
 
   trait LensLaw {
-    def identity(a: A)(implicit A: Equal[A]): Boolean = A.equal(set(a, get(a)), a)
-    def retention(a: A, b: B)(implicit B: Equal[B]): Boolean = B.equal(get(set(a, b)), b)
-    def doubleSet(a: A, b1: B, b2: B)(implicit A: Equal[A]) = A.equal(set(set(a, b1), b2), set(a, b2))
+    def identity(a: A)(implicit A: Equal[A], ev: F[Costate[B, A]] =:= Id[Costate[B, A]]): Boolean = {
+      val c = run(a)
+      A.equal(c.put(c.pos), a)
+    }
+    def retention(a: A, b: B)(implicit B: Equal[B], ev: F[Costate[B, A]] =:= Id[Costate[B, A]]): Boolean =
+      B.equal(run(run(a) put b).pos, b)
+    def doubleSet(a: A, b1: B, b2: B)(implicit A: Equal[A], ev: F[Costate[B, A]] =:= Id[Costate[B, A]]) = {
+      val r = run(a)
+      A.equal(run(r put b1) put b2, r put b2)
+    }
   }
 
   def lensLaw = new LensLaw {}
+
+  /** A homomorphism of lens categories */
+  def partial(implicit F: Functor[F]): PLensT[F, A, B] =
+    PLensT.plensT(a => F.map(run(a))(Some(_)))
+
+  /** alias for `partial` */
+  def unary_~(implicit F: Functor[F]) : PLensT[F, A, B] =
+    partial
 }
 
-object Lens extends LensFunctions with LensInstances {
+object LensT extends LensTFunctions with LensTInstances {
+  def apply[F[_], A, B](r: A => F[Costate[B, A]]): LensT[F, A, B] =
+    lensT(r)
+}
+
+object Lens extends LensTFunctions with LensTInstances {
   def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
     lens(r)
 }
 
-trait LensInstances {
+trait LensTFunctions {
 
-  import State._
-  import Lens._
+  import CostateT._
 
-  implicit def lensCategory: Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] = new Category[Lens] with Choice[Lens] with Split[Lens] with Codiagonal[Lens] {
-    def compose[A, B, C](f: Lens[B, C], g: Lens[A, B]): Lens[A, C] = f compose g
-    def id[A]: Lens[A, A] = Lens.lensId[A]
-    def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[Either[A,  B], C] =
-      Lens {
-        case Left(a) => {
-          val x = f run a
-          costate(w => Left(x put w), x.pos)
-        }
-        case Right(b) => {
-          val y = g run b
-          costate(w => Right(y put w), y.pos)
-        }
-      }
-    def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
-      f *** g
-    def codiagonal[A]: Lens[Either[A,  A], A] =
-      codiagLens
+  type Lens[A, B] =
+  LensT[Id, A, B]
+
+  type @>[A, B] =
+  Lens[A, B]
+
+  def lensT[F[_], A, B](r: A => F[Costate[B, A]]): LensT[F, A, B] = new LensT[F, A, B] {
+    def run(a: A): F[Costate[B, A]] = r(a)
+  }
+
+  def lens[A, B](r: A => Costate[B, A]): Lens[A, B] =
+    lensT[Id, A, B](r)
+
+  def lensp[F[_], A, B](r: A => Costate[B, A])(implicit P: Pointed[F]): LensT[F, A, B] =
+    lensT(a => P.point(r(a)))
+
+  def lensgT[F[_], A, B](set: A => F[B => A], get: A => F[B])(implicit M: Bind[F]): LensT[F, A, B] =
+    lensT(a => M.map2(set(a), get(a))(costate(_, _)))
+
+  def lensg[A, B](set: A => B => A, get: A => B): Lens[A, B] =
+    lensgT[Id, A, B](set, get)
+
+  def lensu[A, B](set: (A, B) => A, get: A => B): Lens[A, B] =
+    lensg(set.curried, get)
+
+  /** The identity lens for a given object */
+  def lensId[F[_], A](implicit P: Pointed[F]): LensT[F, A, A] =
+    lensp(costate(identity, _))
+
+  /** The trivial lens that can retrieve Unit from anything */
+  def trivialLens[F[_], A](implicit P: Pointed[F]): LensT[F, A, Unit] =
+    lensp[F, A, Unit](a => costate(_ => a, ()))
+  //lensp[F, A, Unit](_ => (), a => _ => a)
+
+  /** A lens that discards the choice of Right or Left from Either */
+  def codiagLens[F[_]: Pointed, A]: LensT[F, Either[A, A], A] =
+    lensId[F, A] ||| lensId[F, A]
+
+  /** Access the first field of a tuple */
+  def firstLens[A, B]: (A, B) @> A =
+    lens {
+      case (a, b) => costate(x => (x, b), a)
+    }
+
+  /** Access the second field of a tuple */
+  def secondLens[A, B]: (A, B) @> B =
+    lens {
+      case (a, b) => costate(x => (a, x), b)
+    }
+
+  /** Access the first field of a tuple */
+  def lazyFirstLens[A, B]: LazyTuple2[A, B] @> A =
+    lens(z => costate(x => LazyTuple2(x, z._2), z._1))
+
+  /** Access the second field of a tuple */
+  def lazySecondLens[A, B]: LazyTuple2[A, B] @> B =
+    lens(z => costate(x => LazyTuple2(z._1, x), z._2))
+
+  def nelHeadLens[A]: NonEmptyList[A] @> A =
+    lens(l => costate(NonEmptyList.nel(_, l.tail), l.head))
+
+  def nelTailLens[A]: NonEmptyList[A] @> List[A] =
+    lens(l => costate(NonEmptyList.nel(l.head, _), l.tail))
+
+  /** Access the value at a particular key of a Map **/
+  def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
+    lensg(m => {
+      case None => m - k
+      case Some(v) => m.updated(k, v)
+    }, _ get k)
+
+  def factorL[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
+    lens(e => costate({
+      case (a, Left(b)) => Left(a, b)
+      case (a, Right(c)) => Right(a, c)
+    }, e match {
+      case Left((a, b)) => (a, Left(b))
+      case Right((a, c)) => (a, Right(c))
+    }))
+
+  def distributeL[A, B, C]: (A, Either[B, C]) @> Either[(A, B), (A, C)] =
+    lens {
+      case (a, e) => costate({
+        case Left((aa, bb)) => (aa, Left(bb))
+        case Right((aa, cc)) => (aa, Right(cc))
+      }, e match {
+        case Left(b) => Left(a, b)
+        case Right(c) => Right(a, c)
+
+      })
+    }
+
+}
+
+trait LensTInstances {
+  import LensT._
+  import BijectionT._
+  import collection.immutable.Stack
+  import collection.SeqLike
+  import collection.immutable.Queue
+
+  implicit def lensTCategory[F[_]](implicit F0: Monad[F]) = new LensTCategory[F] {
+    implicit def F: Monad[F] = F0
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def LensState[A, B](lens: Lens[A, B]): State[A, B] =
+  implicit def LensState[F[_], A, B](lens: LensT[F, A, B])(implicit F: Functor[F]): StateT[F, A, B] =
     lens.st
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple2Lens[S, A, B](lens: Lens[S, (A, B)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s))
-    )
+  implicit def LensTUnzip[F[_], S](implicit F: Functor[F]): Unzip[({type λ[α] = LensT[F, S, α]})#λ] =
+    new Unzip[({type λ[α] = LensT[F, S, α]})#λ] {
+      def unzip[A, B](a: LensT[F, S, (A, B)]) =
+        (
+          LensT(x => F.map(a run x)(c => {
+            val (p, q) = c.pos
+            costate(a => c.put((a, q)), p)
+          }))
+          , LensT(x => F.map(a run x)(c => {
+          val (p, q) = c.pos
+          costate(a => c.put((p, a)), q)
+        }))
+          )
+    }
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple3Lens[S, A, B, C](lens: Lens[S, (A, B, C)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s)),
-    lensG[S, C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a), s))
-    )
+  implicit def Tuple2Lens[F[_]: Functor, S, A, B](lens: LensT[F, S, (A, B)]):
+  (LensT[F, S, A], LensT[F, S, B]) =
+    LensTUnzip[F, S].unzip(lens)
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple4Lens[S, A, B, C, D](lens: Lens[S, (A, B, C, D)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s)),
-    lensG[S, C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a), s)),
-    lensG[S, D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a), s))
-    )
+  implicit def Tuple3Lens[F[_]: Functor, S, A, B, C](lens: LensT[F, S, (A, B, C)]):
+  (LensT[F, S, A], LensT[F, S, B], LensT[F, S, C]) =
+    LensTUnzip[F, S].unzip3(lens.xmapbB(tuple3B))
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple5Lens[S, A, B, C, D, E](lens: Lens[S, (A, B, C, D, E)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s)),
-    lensG[S, C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a), s)),
-    lensG[S, D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a), s)),
-    lensG[S, E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a), s))
-    )
+  implicit def Tuple4Lens[F[_]: Functor, S, A, B, C, D](lens: LensT[F, S, (A, B, C, D)]):
+  (LensT[F, S, A], LensT[F, S, B], LensT[F, S, C], LensT[F, S, D]) =
+    LensTUnzip[F, S].unzip4(lens.xmapbB(tuple4B))
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple6Lens[S, A, B, C, D, E, F](lens: Lens[S, (A, B, C, D, E, F)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s)),
-    lensG[S, C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a), s)),
-    lensG[S, D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a), s)),
-    lensG[S, E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a), s)),
-    lensG[S, F](s => lens.get(s)._6, s => a => lens.mod(t => t copy (_6 = a), s))
-    )
+  implicit def Tuple5Lens[F[_]: Functor, S, A, B, C, D, E](lens: LensT[F, S, (A, B, C, D, E)]):
+  (LensT[F, S, A], LensT[F, S, B], LensT[F, S, C], LensT[F, S, D], LensT[F, S, E]) =
+    LensTUnzip[F, S].unzip5(lens.xmapbB(tuple5B))
 
-  /** Enriches lenses that view tuples with field accessors */
-  implicit def tuple7Lens[S, A, B, C, D, E, F, G](lens: Lens[S, (A, B, C, D, E, F, G)]) = (
-    lensG[S, A](s => lens.get(s)._1, s => a => lens.mod(t => t copy (_1 = a), s)),
-    lensG[S, B](s => lens.get(s)._2, s => a => lens.mod(t => t copy (_2 = a), s)),
-    lensG[S, C](s => lens.get(s)._3, s => a => lens.mod(t => t copy (_3 = a), s)),
-    lensG[S, D](s => lens.get(s)._4, s => a => lens.mod(t => t copy (_4 = a), s)),
-    lensG[S, E](s => lens.get(s)._5, s => a => lens.mod(t => t copy (_5 = a), s)),
-    lensG[S, F](s => lens.get(s)._6, s => a => lens.mod(t => t copy (_6 = a), s)),
-    lensG[S, G](s => lens.get(s)._7, s => a => lens.mod(t => t copy (_7 = a), s))
-    )
+  implicit def Tuple6Lens[F[_]: Functor, S, A, B, C, D, E, G](lens: LensT[F, S, (A, B, C, D, E, G)]):
+  (LensT[F, S, A], LensT[F, S, B], LensT[F, S, C], LensT[F, S, D], LensT[F, S, E], LensT[F, S, G]) =
+    LensTUnzip[F, S].unzip6(lens.xmapbB(tuple6B))
 
-  /** A lens that views a Set can provide the appearance of in place mutation */
-  implicit def setLens[S, K](lens: Lens[S, Set[K]]) =
-    SetLens[S, K](lens)
+  implicit def Tuple7Lens[F[_]: Functor, S, A, B, C, D, E, G, H](lens: LensT[F, S, (A, B, C, D, E, G, H)]):
+  (LensT[F, S, A], LensT[F, S, B], LensT[F, S, C], LensT[F, S, D], LensT[F, S, E], LensT[F, S, G], LensT[F, S, H]) =
+    LensTUnzip[F, S].unzip7(lens.xmapbB(tuple7B))
 
   case class SetLens[S, K](lens: Lens[S, Set[K]]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
-    def contains(key: K) = lensG[S, Boolean](
-      s => lens.get(s).contains(key),
+    def contains(key: K) = LensT.lensg[S, Boolean](
       s => b => lens.mod(m => if (b) m + key else m - key, s)
+      , s => lens.get(s).contains(key)
     )
 
     def &=(that: Set[K]): State[S, Set[K]] =
@@ -264,19 +340,23 @@ trait LensInstances {
       lens %= (_ -- xs)
   }
 
+  /** A lens that views a Set can provide the appearance of in place mutation */
+  implicit def setLens[S, K](lens: Lens[S, Set[K]]) =
+    SetLens[S, K](lens)
+
   /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */
   case class MapLens[S, K, V](lens: Lens[S, Map[K, V]]) {
     /** Allows both viewing and setting the value of a member of the map */
-    def member(k: K): Lens[S, Option[V]] = lensG[S, Option[V]](
-      s => lens.get(s).get(k),
+    def member(k: K): Lens[S, Option[V]] = lensg[S, Option[V]](
       s => opt => lens.mod(m => opt match {
         case Some(v) => m + (k -> v)
         case None    => m - k
-      }, s))
+      }, s)
+      , s => lens.get(s).get(k))
 
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k: K): Lens[S, V] =
-      lensG[S, V](lens.get(_)(k), s => v => lens.mod(_ + (k -> v), s))
+      lensg[S, V](s => v => lens.mod(_ + (k -> v), s), lens.get(_) apply k)
 
     def +=(elem1: (K, V), elem2: (K, V), elems: (K, V)*): State[S, Map[K, V]] =
       lens %= (_ + elem1 + elem2 ++ elems)
@@ -300,7 +380,8 @@ trait LensInstances {
       lens %= (_ -- xs)
   }
 
-  implicit def mapLens[S, K, V](lens: Lens[S, Map[K, V]]) = MapLens[S, K, V](lens)
+  implicit def mapLens[S, K, V](lens: Lens[S, Map[K, V]]) =
+    MapLens[S, K, V](lens)
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
   case class SeqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: Lens[S, Repr]) {
@@ -344,9 +425,6 @@ trait LensInstances {
   implicit def stackLens[S, A](lens: Lens[S, Stack[A]]) =
     StackLens[S, A](lens)
 
-
-  import collection.immutable.Queue
-
   /** Provide an imperative-seeming API for queues viewed through a lens */
   case class QueueLens[S, A](lens: Lens[S, Queue[A]]) {
     def enqueue(elem: A): State[S, Unit] =
@@ -365,13 +443,13 @@ trait LensInstances {
   /** Provide an imperative-seeming API for arrays viewed through a lens */
   case class ArrayLens[S, A](lens: Lens[S, Array[A]]) {
     def at(n: Int): (Lens[S, A]) =
-      lensG[S, A](
-        s => lens.get(s)(n),
+      lensg[S, A](
         s => v => lens.mod(array => {
           val copy = array.clone()
           copy.update(n, v)
           copy
         }, s)
+        , s => lens.get(s) apply n
       )
 
     def length: State[S, Int] =
@@ -415,84 +493,29 @@ trait LensInstances {
     IntegralLens[S, I](lens, implicitly[Integral[I]])
 }
 
-trait LensFunctions {
+private[scalaz] trait LensTCategory[F[_]] extends
+Category[({type λ[α, β] = LensT[F, α, β]})#λ] with
+Choice[({type λ[α, β] = LensT[F, α, β]})#λ] with
+Split[({type λ[α, β] = LensT[F, α, β]})#λ] with
+Codiagonal[({type λ[α, β] = LensT[F, α, β]})#λ] {
+  implicit def F: Monad[F]
 
-  import CostateT._
+  def compose[A, B, C](bc: LensT[F, B, C], ab: LensT[F, A, B]): LensT[F, A, C] = ab >=> bc
 
-  /** The sunglasses operator, an alias for `Lens` */
-  type @-@[A, B] =
-  Lens[A, B]
+  def id[A] = LensT.lensId
 
-  def lens[A, B](r: A => Costate[B, A]): Lens[A, B] = new Lens[A, B] {
-    def run(a: A): Costate[B, A] = r(a)
-  }
-
-  def lensG[A, B](get: A => B, set: A => B => A): Lens[A, B] =
-    lens(a => costate((set(a), get(a))))
-
-  def lensGG[A, B](get: A => B, set: (A, B) => A): Lens[A, B] =
-    lensG(get, a => b => set(a, b))
-
-  /** The identity lens for a given object */
-  def lensId[A]: Lens[A, A] =
-    lensG(z => z, _ => z => z)
-
-  /** The trivial lens that can retrieve Unit from anything */
-  def trivialLens[A]: Lens[A, Unit] =
-    lensG[A, Unit](_ => (), a => _ => a)
-
-  /** A lens that discards the choice of Right or Left from Either */
-  def codiagLens[A]: Lens[Either[A, A], A] =
-    lensId[A] ||| lensId[A]
-
-  /** Access the first field of a tuple */
-  def firstLens[A, B]: Lens[(A, B), A] =
-    lensG[(A, B), A](_._1, ab => a => (a, ab._2))
-
-  /** Access the second field of a tuple */
-  def secondLens[A, B]: Lens[(A, B), B] =
-    lensG[(A, B), B](_._2, ab => b => (ab._1, b))
-
-  /** Access the first field of a lazy tuple */
-  def lazyFirstLens[A, B]: Lens[LazyTuple2[A, B], A] =
-    lensG[LazyTuple2[A, B], A](_._1, ab => a => LazyTuple2(a, ab._2))
-
-  /** Access the second field of a lazy tuple */
-  def lazySecondLens[A, B]: Lens[LazyTuple2[A, B], B] =
-    lensG[LazyTuple2[A, B], B](_._2, ab => b => LazyTuple2(ab._1, b))
-
-  def nelHeadLens[A]: NonEmptyList[A] @-@ A =
-    lens(l => costate(NonEmptyList.nel(_, l.tail), l.head))
-
-  def nelTailLens[A]: NonEmptyList[A] @-@ List[A] =
-    lens(l => costate(NonEmptyList.nel(l.head, _), l.tail))
-
-  /** Access the value at a particular key of a Map **/
-  def mapVLens[K, V](k: K): Map[K, V] @-@ Option[V] =
-    lensG(_ get k, m => {
-      case None => m - k
-      case Some(v) => m.updated(k, v)
-    })
-
-  def factorL[A, B, C]: Either[(A, B), (A, C)] @-@ (A, Either[B, C]) =
-    lens(e => costate({
-      case (a, Left(b)) => Left(a, b)
-      case (a, Right(c)) => Right(a, c)
-    }, e match {
-      case Left((a, b)) => (a, Left(b))
-      case Right((a, c)) => (a, Right(c))
-    }))
-
-  def distributeL[A, B, C]: (A, Either[B, C]) @-@ Either[(A, B), (A, C)] =
-    lens {
-      case (a, e) => costate({
-        case Left((aa, bb)) => (aa, Left(bb))
-        case Right((aa, cc)) => (aa, Right(cc))
-      }, e match {
-        case Left(b) => Left(a, b)
-        case Right(c) => Right(a, c)
-
-      })
+  def choice[A, B, C](f: => LensT[F, A, C], g: => LensT[F, B, C]): LensT[F, Either[A, B], C] =
+    LensT.lensT {
+      case Left(a) =>
+        F.map(f run a)(_ map (Left(_)))
+      case Right(b) =>
+        F.map(g run b)(_ map (Right(_)))
     }
+
+  def split[A, B, C, D](f: LensT[F, A, B], g: LensT[F, C, D]): LensT[F, (A,  C), (B, D)] =
+    f *** g
+
+  def codiagonal[A]: LensT[F, Either[A,  A], A] =
+    LensT.codiagLens[F, A]
 
 }

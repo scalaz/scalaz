@@ -52,10 +52,10 @@ object Attr extends Attrs {
   import Lens._
   import CostateT._
 
-  val keyAttrL: Attr @-@ QName =
+  val keyAttrL: Attr @> QName =
     lens(x => costate(b => attr(b, x.value), x.key))
 
-  val valueAttrL: Attr @-@ Str =
+  val valueAttrL: Attr @> Str =
     lens(x => costate(b => attr(x.key, b), x.value))
 
 }

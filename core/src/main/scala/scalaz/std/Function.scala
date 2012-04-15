@@ -54,14 +54,20 @@ trait FunctionInstances extends FunctionInstances0 {
     
   }
 
-  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)
+
+    def zip[A, B](a: => T => A, b: => T => B) =
+      t => (a(t), b(t))
+
+    def unzip[A, B](a: T => (A, B)) =
+      (a(_)._1, a(_)._2)
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
-    def contramap[A, B](r: (A) => R)(f: (B) => A) = null
+    def contramap[A, B](r: (A) => R)(f: (B) => A) = r compose f
   }
 
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {

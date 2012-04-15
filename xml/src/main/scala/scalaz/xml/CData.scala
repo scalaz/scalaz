@@ -70,13 +70,13 @@ object CData extends CDatas {
   import Lens._
   import CostateT._
 
-  val verbatimCDataL: CData @-@ CDataKind =
+  val verbatimCDataL: CData @> CDataKind =
     lens(x => costate(b => cdata(b, x.data, x.line), x.verbatim))
 
-  val dataCDataL: CData @-@ Str =
+  val dataCDataL: CData @> Str =
     lens(x => costate(b => cdata(x.verbatim, b, x.line), x.data))
 
-  val lineCDataL: CData @-@ Option[Line] =
+  val lineCDataL: CData @> Option[Line] =
     lens(x => costate(b => cdata(x.verbatim, x.data, b), x.line))
 
 }
