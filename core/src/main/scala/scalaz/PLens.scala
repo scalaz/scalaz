@@ -33,8 +33,27 @@ sealed trait PLensT[F[_], A, B] {
   def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): PLensT[F, A, X] =
     xmapB(b to _, b fr _)
 
-  def lift[G[_]](implicit P: Pointed[G], ev: F[Option[Costate[B, A]]] =:= Id[Option[Costate[B, A]]]): PLensT[G, A, B] =
-    plensT(a => P.point(run(a): Id[Option[Costate[B, A]]]))
+  def lift[G[_]](implicit P: Pointed[G], F: Functor[F]): PLensT[({type λ[α] = F[G[α]]})#λ, A, B] =
+    plensT[({type λ[α] = F[G[α]]})#λ, A, B](a => F.map(run(a))(P.point(_)))
+
+  def wlift[W](implicit F: Functor[F], M: Monoid[W]): PLenswT[F, W, A, B] =
+    plensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B](a =>
+          WriterT(F.map(run(a))((M.zero, _))))
+
+  def wliftC[W](z: (A, Option[Costate[B, A]]) => W)(implicit F: Functor[F]): PLenswT[F, W, A, B] =
+    plensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B](a =>
+          WriterT(F.map(run(a))(x => (z(a, x), x))))
+
+  /** alias for `wliftC` */
+  def !|![W](z: (A, Option[Costate[B, A]]) => W)(implicit F: Functor[F]): PLenswT[F, W, A, B] =
+    wliftC(z)
+
+  def wliftG[W](z: Option[(A, B)] => W)(implicit F: Functor[F]): PLenswT[F, W, A, B] =
+    wliftC((a, c) => z(c map (x => (a, x.pos))))
+
+  /** alias for `wliftG` */
+  def !![W](z: Option[(A, B)] => W)(implicit F: Functor[F]): PLenswT[F, W, A, B] =
+    wliftG(z)
 
   def get(a: A)(implicit F: Functor[F]): F[Option[B]] =
     F.map(run(a))(_ map (_.pos))
@@ -230,6 +249,12 @@ trait PLensTFunctions {
 
   type @?>[A, B] =
   PLens[A, B]
+
+  type PLenswT[F[_], W, A, B] =
+    PLensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B]
+
+  type PLensw[W, A, B] =
+    PLenswT[Id, W, A, B]
 
   type PStateT[F[_], A, B] =
   StateT[F, A, Option[B]]

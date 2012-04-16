@@ -146,7 +146,7 @@ trait WriterTInstances extends WriterTInstances0 {
   implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def writerComonad[W] = new WriterComonad[W] {
+  implicit def writerTComonad[W] = new WriterComonad[W] {
     implicit def F = implicitly
   }
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {

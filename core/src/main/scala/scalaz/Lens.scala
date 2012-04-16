@@ -11,6 +11,7 @@ sealed trait LensT[F[_], A, B] {
   import StateT._
   import LensT._
   import BijectionT._
+  import WriterT._
 
   def kleisli: Kleisli[F, A, Costate[B, A]] =
     Kleisli(run(_))
@@ -27,8 +28,27 @@ sealed trait LensT[F[_], A, B] {
   def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): LensT[F, A, X] =
     xmapB(b to _, b fr _)
 
-  def lift[G[_]](implicit P: Pointed[G], ev: F[Costate[B, A]] =:= Id[Costate[B, A]]): LensT[G, A, B] =
-    lensT(a => P.point(run(a): Id[Costate[B, A]]))
+  def lift[G[_]](implicit P: Pointed[G], F: Functor[F]): LensT[({type λ[α] = F[G[α]]})#λ, A, B] =
+    lensT[({type λ[α] = F[G[α]]})#λ, A, B](a => F.map(run(a))(P.point(_)))
+
+  def wlift[W](implicit F: Functor[F], M: Monoid[W]): LenswT[F, W, A, B] =
+    lensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B](a =>
+          WriterT(F.map(run(a))((M.zero, _))))
+
+  def wliftC[W](z: (A, Costate[B, A]) => W)(implicit F: Functor[F]): LenswT[F, W, A, B] =
+    lensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B](a =>
+          WriterT(F.map(run(a))(x => (z(a, x), x))))
+
+  /** alias for `wliftC` */
+  def !|![W](z: (A, Costate[B, A]) => W)(implicit F: Functor[F]): LenswT[F, W, A, B] =
+    wliftC(z)
+
+  def wliftG[W](z: (A, B) => W)(implicit F: Functor[F]): LenswT[F, W, A, B] =
+    wliftC((a, c) => z(a, c.pos))
+
+  /** alias for `wliftG` */
+  def !![W](z: (A, B) => W)(implicit F: Functor[F]): LenswT[F, W, A, B] =
+    wliftG(z)
 
   def get(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run(a))(_.pos)
@@ -162,6 +182,12 @@ trait LensTFunctions {
 
   type @>[A, B] =
   Lens[A, B]
+
+  type LenswT[F[_], W, A, B] =
+    LensT[({type λ[α] = WriterT[F, W, α]})#λ, A, B]
+
+  type Lensw[W, A, B] =
+    LenswT[Id, W, A, B]
 
   def lensT[F[_], A, B](r: A => F[Costate[B, A]]): LensT[F, A, B] = new LensT[F, A, B] {
     def run(a: A): F[Costate[B, A]] = r(a)
