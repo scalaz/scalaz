@@ -72,6 +72,11 @@ sealed trait UnwriterT[F[_], U, A] { self =>
     G.map(F.traverse[G, (U, A), (C, D)](run) {
       case (a, b) => G.map2(f(a), g(b))((_, _))
     })(unwriterT(_))
+
+  def wpoint[G[_]](implicit F: Functor[F], P: Pointed[G]): UnwriterT[F, G[U], A] =
+    unwriterT(F.map(self.run) {
+      case (u, a) => (P.point(u), a)
+    })
 }
 
 object UnwriterT extends UnwriterTFunctions with UnwriterTInstances {
