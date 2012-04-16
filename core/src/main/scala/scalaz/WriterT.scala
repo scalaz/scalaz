@@ -86,6 +86,11 @@ sealed trait WriterT[F[_], W, A] { self =>
       case (w, a) => (w, a, s)
     }
   )
+
+  def wpoint[G[_]](implicit F: Functor[F], P: Pointed[G]): WriterT[F, G[W], A] =
+    writerT(F.map(self.run) {
+      case (w, a) => (P.point(w), a)
+    })
 }
 
 object WriterT extends WriterTFunctions with WriterTInstances {
