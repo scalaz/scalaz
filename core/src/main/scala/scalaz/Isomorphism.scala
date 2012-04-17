@@ -67,7 +67,7 @@ trait Isomorphisms extends IsomorphismsLow0{
   /**Natural isomorphism between functors */
   type IsoFunctor[F[_], G[_]] = Iso2[NaturalTransformation, F, G]
 
-  type IsoBiFunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
+  type IsoBifunctor[F[_, _], G[_, _]] = Iso3[~~>, F, G]
 
   /**Alias for IsoSet */
   type <=>[A, B] = IsoSet[A, B]
@@ -88,11 +88,11 @@ trait Isomorphisms extends IsomorphismsLow0{
     def from[A](ga: G[A]): F[A]
   }
 
-  /**Alias for IsoBiFunctor */
-  type <~~>[F[_, _], G[_, _]] = IsoBiFunctor[F, G]
+  /**Alias for IsoBifunctor */
+  type <~~>[F[_, _], G[_, _]] = IsoBifunctor[F, G]
 
   /**Convenience template trait to implement `<~~>` */
-  trait IsoBiFunctorTemplate[F[_, _], G[_, _]] extends IsoBiFunctor[F, G] {
+  trait IsoBifunctorTemplate[F[_, _], G[_, _]] extends IsoBifunctor[F, G] {
     final val to: BiNaturalTransformation[F, G] = new (F ~~> G) {
       def apply[A, B](fab: F[A, B]): G[A, B] = to[A, B](fab)
     }
@@ -200,8 +200,8 @@ trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
   def contramap[A, B](r: F[A])(f: B => A): F[B] = iso.from(G.contramap(iso.to(r))(f))
 }
 
-trait IsomorphismCoPointed[F[_], G[_]] extends CoPointed[F] {
-  implicit def G: CoPointed[G]
+trait IsomorphismCopointed[F[_], G[_]] extends Copointed[F] {
+  implicit def G: Copointed[G]
 
   def iso: F <~> G
 
@@ -230,16 +230,16 @@ trait IsomorphismMonad[F[_], G[_]] extends IsomorphismApplicative[F, G] with Iso
   implicit def G: Monad[G]
 }
 
-trait IsomorphismCoJoin[F[_], G[_]] extends CoJoin[F] {
-  implicit def G: CoJoin[G] with Functor[G]
+trait IsomorphismCojoin[F[_], G[_]] extends Cojoin[F] {
+  implicit def G: Cojoin[G] with Functor[G]
 
   def iso: F <~> G
 
   def cojoin[A](a: F[A]): F[F[A]] = iso.from(G.map(G.cojoin(iso.to(a)))(iso.from.apply))
 }
 
-trait IsomorphismCoMonad[F[_], G[_]] extends CoMonad[F] with IsomorphismCoJoin[F, G] with IsomorphismCoPointed[F, G] {
-  implicit def G: CoMonad[G] with Functor[G] with CoPointed[G]
+trait IsomorphismComonad[F[_], G[_]] extends Comonad[F] with IsomorphismCojoin[F, G] with IsomorphismCopointed[F, G] {
+  implicit def G: Comonad[G] with Functor[G] with Copointed[G]
 }
 
 trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
@@ -283,18 +283,18 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldab
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
 }
 
-trait IsomorphismBiFunctor[F[_, _], G[_, _]] extends BiFunctor[F] {
+trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
   def iso: F <~~> G
 
-  implicit def G: BiFunctor[G]
+  implicit def G: Bifunctor[G]
 
   override def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] =
     iso.from(G.bimap(iso.to(fab))(f, g))
 }
 
-trait IsomorphismBiTraverse[F[_, _], G[_, _]] extends BiTraverse[F] with IsomorphismBiFunctor[F, G] {
-  implicit def G: BiTraverse[G]
+trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] {
+  implicit def G: Bitraverse[G]
 
-  def bitraverse[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
-    Applicative[H].map(G.bitraverse(iso.to(fab))(f, g))(iso.from.apply)
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
+    Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

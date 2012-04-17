@@ -164,24 +164,24 @@ object ScalazProperties {
 
 
   object copointed {
-    def laws[M[_]](implicit a: CoPointed[M], am: Arbitrary[M[Int]],
+    def laws[M[_]](implicit a: Copointed[M], am: Arbitrary[M[Int]],
                    af: Arbitrary[Int => Int], e: Equal[M[Int]]) = new Properties("copointed") {
       include(functor.laws[M])
     }
   }
 
   object comonad {
-    def cobindLeftIdentity[F[_], A](implicit F: CoMonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
-      forAll(F.coMonadLaw.cobindLeftIdentity[A] _)
+    def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
+      forAll(F.comonadLaw.cobindLeftIdentity[A] _)
 
-    def cobindRightIdentity[F[_], A, B](implicit F: CoMonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
-      forAll(F.coMonadLaw.cobindRightIdentity[A, B] _)
+    def cobindRightIdentity[F[_], A, B](implicit F: Comonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
+      forAll(F.comonadLaw.cobindRightIdentity[A, B] _)
 
-    def cobindAssociative[F[_], A, B, C, D](implicit F: CoMonad[F], D: Equal[D], fa: Arbitrary[F[A]],
+    def cobindAssociative[F[_], A, B, C, D](implicit F: Comonad[F], D: Equal[D], fa: Arbitrary[F[A]],
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
-      forAll(F.coMonadLaw.cobindAssociative[A, B, C, D] _)
+      forAll(F.comonadLaw.cobindAssociative[A, B, C, D] _)
 
-    def laws[F[_]](implicit a: CoMonad[F], am: Arbitrary[F[Int]],
+    def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
       include(copointed.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
@@ -297,7 +297,7 @@ object ScalazProperties {
   }
 
   object bifunctor {
-    def laws[F[_, _]](implicit F: BiFunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
+    def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
       include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
       include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
@@ -305,6 +305,7 @@ object ScalazProperties {
   }
 
   object lens {
+    import LensT._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)
@@ -330,4 +331,5 @@ object ScalazProperties {
       property("triangleInequality") = triangleInequality[F]
     }
   }
+
 }

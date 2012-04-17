@@ -10,7 +10,7 @@ class OptionTTest extends Spec {
   type OptionTOption[A] = OptionT[Option, A]
 
   checkAll(equal.laws[OptionTList[Int]])
-  checkAll(monad.laws[OptionTList])
+  checkAll(monadPlus.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
 
   object instances {

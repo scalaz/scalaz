@@ -1,31 +1,31 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `CoMonad` */
-trait CoMonadV[F[_],A] extends SyntaxV[F[A]] {
-  implicit def F: CoMonad[F]
+/** Wraps a value `self` and provides methods related to `Comonad` */
+trait ComonadV[F[_],A] extends SyntaxV[F[A]] {
+  implicit def F: Comonad[F]
   ////
 
   ////
 }
 
-trait ToCoMonadV0 {
-  implicit def ToCoMonadVUnapply[FA](v: FA)(implicit F0: Unapply[CoMonad, FA]) =
-    new CoMonadV[F0.M,F0.A] { def self = F0(v); implicit def F: CoMonad[F0.M] = F0.TC }
+trait ToComonadV0 {
+  implicit def ToComonadVUnapply[FA](v: FA)(implicit F0: Unapply[Comonad, FA]) =
+    new ComonadV[F0.M,F0.A] { def self = F0(v); implicit def F: Comonad[F0.M] = F0.TC }
 
 }
 
-trait ToCoMonadV extends ToCoMonadV0 with ToCoPointedV with ToCoJoinV with ToCoBindV {
-  implicit def ToCoMonadV[F[_],A](v: F[A])(implicit F0: CoMonad[F]) =
-    new CoMonadV[F,A] { def self = v; implicit def F: CoMonad[F] = F0 }
+trait ToComonadV extends ToComonadV0 with ToCopointedV with ToCojoinV with ToCobindV {
+  implicit def ToComonadV[F[_],A](v: F[A])(implicit F0: Comonad[F]) =
+    new ComonadV[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
 
   ////
 
   ////
 }
 
-trait CoMonadSyntax[F[_]] extends CoPointedSyntax[F] with CoJoinSyntax[F] with CoBindSyntax[F] {
-  implicit def ToCoMonadV[A](v: F[A])(implicit F0: CoMonad[F]): CoMonadV[F, A] = new CoMonadV[F,A] { def self = v; implicit def F: CoMonad[F] = F0 }
+trait ComonadSyntax[F[_]] extends CopointedSyntax[F] with CojoinSyntax[F] with CobindSyntax[F] {
+  implicit def ToComonadV[A](v: F[A])(implicit F0: Comonad[F]): ComonadV[F, A] = new ComonadV[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
 
   ////
 

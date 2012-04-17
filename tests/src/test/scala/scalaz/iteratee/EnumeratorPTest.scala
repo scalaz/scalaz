@@ -18,13 +18,13 @@ class EnumeratorPTest extends Spec {
   implicit val intO = Order[Int].order _
   "cogroupE" should {
     "work the same as directly using the nested iteratee " in {
-      val enum  = enumPStream[Unit, Int, Id](Stream(1, 3, 3, 5, 7, 8, 8)) 
-      val enum2 = enumPStream[Unit, Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8)) 
+      val enum  = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))
+      val enum2 = enumPStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
-      val cf = cogroupE[Unit, Int, Int, Id]
+      val cf = cogroupE[Int, Int, Id]
       val enumR = cf(enum, enum2)
 
-      (consume[Unit, Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id]).run(_ => Nil) must be_===(List(
+      (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id]).run must be_===(List(
         left3(1),
         right3(2),
         middle3((3, 3)),
@@ -42,14 +42,14 @@ class EnumeratorPTest extends Spec {
     }
   
     "compose" in {
-      val enum  = enumPStream[Unit, Int, Id](Stream(1, 3, 3, 5, 7, 8, 8)) 
-      val enum2 = enumPStream[Unit, Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8)) 
-      val enum3 = enumPStream[Unit, Int, Id](Stream(3, 5, 8)) 
+      val enum  = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))
+      val enum2 = enumPStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
+      val enum3 = enumPStream[Int, Id](Stream(3, 5, 8))
 
-      val cf = cogroupE[Unit, Int, Int, Id]
+      val cf = cogroupE[Int, Int, Id]
       val enumR = cf(cf(enum, enum2) map { _.fold(identity[Int], _._1, identity[Int]) }, enum3)
 
-      (consume[Unit, Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id]).run(_ => Nil) must be_===(List(
+      (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id]).run must be_===(List(
         left3(1),
         left3(2),
         middle3((3, 3)),
@@ -68,10 +68,10 @@ class EnumeratorPTest extends Spec {
   }
 
   "mergeAll" in {
-    val enum1 = enumPStream[Unit, Int, Id](Stream(1, 5, 9))
-    val enum2 = enumPStream[Unit, Int, Id](Stream(2, 3, 6))
-    val enum3 = enumPStream[Unit, Int, Id](Stream(4, 7, 8))
-    (consume[Unit, Int, Id, List] &= mergeAll(enum1, enum2, enum3).apply[Id]).runOrZero must be_===(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
+    val enum1 = enumPStream[Int, Id](Stream(1, 5, 9))
+    val enum2 = enumPStream[Int, Id](Stream(2, 3, 6))
+    val enum3 = enumPStream[Int, Id](Stream(4, 7, 8))
+    (consume[Int, Id, List] &= mergeAll(enum1, enum2, enum3).apply[Id]).run must be_===(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
   }
 }
 

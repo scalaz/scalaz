@@ -41,6 +41,13 @@ trait TraverseV[F[_],A] extends SyntaxV[F[A]] {
   final def traverseSTrampoline[G[_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
     F.traverseSTrampoline[S, G, A, B](self)(f)
 
+  /**
+   * A version of `traverse` specialized for `Kleisli[G, S, B]` that internally uses a `Trampoline`
+   * to avoid stack-overflow.
+   */
+  final def traverseKTrampoline[G[_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
+    F.traverseKTrampoline[S, G, A, B](self)(f)
+
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =
     F.runTraverseS(self, s)(f)
 

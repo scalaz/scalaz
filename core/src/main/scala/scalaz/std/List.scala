@@ -10,7 +10,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] with Zip[List] with Unzip[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -30,6 +30,9 @@ trait ListInstances extends ListInstances0 {
     def empty[A] = scala.List()
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
+
+    def zip[A, B](a: => List[A], b: => List[B]) = a zip b
+    def unzip[A, B](a: List[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       // implementation with `foldRight` leads to SOE in:
@@ -64,7 +67,11 @@ trait ListInstances extends ListInstances0 {
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
       var r = z
-      while (!s.isEmpty) {r = f(s.pop, r)}
+      while (!s.isEmpty) {
+        // force and copy the value of r to ensure correctness
+        val w = r
+        r = f(s.pop, w)
+      }
       r
     }
 

@@ -71,6 +71,14 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     case Right(r) => Return(r)
   }
 
+  /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
+  final def zapWith[G[+_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+    Zap.monadComonadZap.zapWith(this, bs)(f)
+
+  /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
+  final def zap[G[+_], B](fs: Cofree[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+    zapWith(fs)((a, f) => f(a))
+
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
   final def bounce[AA >: A](f: S[Free[S, A]] => Free[S, AA]): Free[S, AA] = resume match {
     case Left(s) => f(s)
@@ -161,7 +169,7 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
 object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
-  implicit val trampolineMonad: Monad[Trampoline] with CoPointed[Trampoline] = new Monad[Trampoline] with CoPointed[Trampoline] {
+  implicit val trampolineMonad: Monad[Trampoline] with Copointed[Trampoline] = new Monad[Trampoline] with Copointed[Trampoline] {
     override def point[A](a: => A) = return_[Function0, A](a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
     def copoint[A](p: Free.Trampoline[A]): A = {

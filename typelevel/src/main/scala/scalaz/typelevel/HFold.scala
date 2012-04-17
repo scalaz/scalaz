@@ -47,7 +47,16 @@ object HFold {
 
   }
 
+  final class PrependToHStream[M[_], T[_ <: Nat]](list: HStream[T]) extends HFold[M, AbstractHStream] {
+
+    type Init = HStream[T]
+    def init = list
+
+    type Apply[E, A <: AbstractHStream] = A#Prepended[M[E]]
+    def apply[E, A <: AbstractHStream](elem: M[E], acc: A): Apply[E, A] = elem :: acc
+
+  }
+
 }
 
 // vim: expandtab:ts=2:sw=2
-

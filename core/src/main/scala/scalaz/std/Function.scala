@@ -11,13 +11,13 @@ trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
     implicit def R = R0
   }
-  implicit def function1CoMonad[A, R](implicit A0: Monoid[A]) = new Function1CoMonad[A, R] {
+  implicit def function1Comonad[A, R](implicit A0: Monoid[A]) = new Function1Comonad[A, R] {
     implicit def M = A0
   }
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with CoPointed[Function0] {
+  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] {
     def point[A](a: => A) = () => a
 
     def copoint[A](p: () => A) = p()
@@ -54,14 +54,20 @@ trait FunctionInstances extends FunctionInstances0 {
     
   }
 
-  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)
+
+    def zip[A, B](a: => T => A, b: => T => B) =
+      t => (a(t), b(t))
+
+    def unzip[A, B](a: T => (A, B)) =
+      (a(_)._1, a(_)._2)
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
-    def contramap[A, B](r: (A) => R)(f: (B) => A) = null
+    def contramap[A, B](r: (A) => R)(f: (B) => A) = r compose f
   }
 
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
@@ -128,7 +134,7 @@ trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R]
   def zero = a => R.zero
 }
 
-trait Function1CoMonad[M, R] extends CoMonad[({type λ[α]=(M => α)})#λ] {
+trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] {
   implicit def M: Monoid[M]
   def cojoin[A](a: (M) => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
   def copoint[A](p: (M) => A) = p(M.zero)

@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait CoJoin[F[_]]  { self =>
+trait Cojoin[F[_]] extends Functor[F]  { self =>
   ////
   /** Also known as `duplicate` */
   def cojoin[A](a: F[A]): F[F[A]]
@@ -13,16 +13,16 @@ trait CoJoin[F[_]]  { self =>
   // derived functions
 
   ////
-  val coJoinSyntax = new scalaz.syntax.CoJoinSyntax[F] {}
+  val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] {}
 }
 
-object CoJoin {
-  @inline def apply[F[_]](implicit F: CoJoin[F]): CoJoin[F] = F
+object Cojoin {
+  @inline def apply[F[_]](implicit F: Cojoin[F]): Cojoin[F] = F
 
   ////
-  /** Define `CoJoin` in terms of `CoBind` */
-  trait FromCoBind[F[_]] extends CoJoin[F] {
-    self: CoBind[F] =>
+  /** Define `Cojoin` in terms of `Cobind` */
+  trait FromCobind[F[_]] extends Cojoin[F] {
+    self: Cobind[F] =>
 
     def cojoin[A](fa: F[A]): F[F[A]] = cobind(fa)(fa => fa)
   }

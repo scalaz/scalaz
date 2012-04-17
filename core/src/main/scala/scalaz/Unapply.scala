@@ -171,7 +171,7 @@ trait Unapply_0 extends Unapply_1 {
 }
 
 object Unapply extends Unapply_0 {
-  /** Unpack a value of ty pe `M0[A0]` into types `M0` and `A9`, given a instance of `TC` */
+  /** Unpack a value of type `M0[A0]` into types `M0` and `A0`, given a instance of `TC` */
   implicit def unapplyMA[TC[_[_]], M0[_], A0](implicit TC0: TC[M0]): Unapply[TC, M0[A0]] {
     type M[X] = M0[X]
     type A = A0

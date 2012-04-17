@@ -1,6 +1,6 @@
 package scalaz
 
-import std.option.optionInstance
+import std.option.{optionInstance,none}
 
 /**
  * OptionT monad transformer.
@@ -92,7 +92,7 @@ trait OptionTInstances0 extends OptionTInstances1 {
 trait OptionTInstances extends OptionTInstances0 {
   implicit def optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
-  implicit def optionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonad[F] {
+  implicit def optionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonadPlus[F] {
     implicit def F: Monad[F] = F0
   }
 
@@ -159,5 +159,12 @@ private[scalaz] trait OptionTHoist extends Hoist[OptionT] {
     def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.run))
   }
 
-  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = OptionT[G, α]})#λ] = OptionT.optionTMonad[G]
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = OptionT[G, α]})#λ] = OptionT.optionTMonadPlus[G]
+}
+
+private[scalaz] trait OptionTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = OptionT[F, α]})#λ] with OptionTMonad[F] {
+  implicit def F: Monad[F]
+
+  def empty[A]: OptionT[F, A] = OptionT(F point none[A])
+  def plus[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
 }

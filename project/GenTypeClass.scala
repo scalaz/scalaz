@@ -32,16 +32,18 @@ object TypeClass {
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val zip = TypeClass("Zip", *->*)
+  lazy val cozip = TypeClass("Cozip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor))
-  lazy val coJoin = TypeClass("CoJoin", *->*)
-  lazy val coBind = TypeClass("CoBind", *->*)
-  lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
+  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor))
+  lazy val cojoin = TypeClass("Cojoin", *->*)
+  lazy val cobind = TypeClass("Cobind", *->*)
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
@@ -49,8 +51,8 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
-  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, extendsList = Seq(biFunctor))
+  lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
+  lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor))
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
@@ -83,21 +85,23 @@ object TypeClass {
     functor,
     pointed,
     contravariant,
-    coPointed,
+    copointed,
     apply,
     applicative,
+    zip,
+    cozip,
     bind,
     monad,
-    coJoin,
-    coBind,
-    coMonad,
+    cojoin,
+    cobind,
+    comonad,
     plus,
     applicativePlus,
     monadPlus,
     foldable,
     traverse,
-    biFunctor,
-    biTraverse,
+    bifunctor,
+    bitraverse,
     arrId,
     compose,
     category,

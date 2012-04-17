@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait PartialFunctionInstances {
-  val partialFunctionInstance = new Arrow[PartialFunction] with Category[PartialFunction] with Choice[PartialFunction] with Split[PartialFunction] {
+  implicit val partialFunctionInstance = new Arrow[PartialFunction] with Category[PartialFunction] with Choice[PartialFunction] with Split[PartialFunction] {
     def arr[A, B](f: (A) => B) = {
       case a => f(a)
     }

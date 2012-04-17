@@ -48,11 +48,11 @@ trait StateT[F[_], S, A] { self =>
   }
 
   import Liskov._
-  def unlift[M[_], FF[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[FF[α]]})#λ, S, A]): StateT[FF, S, A] = new StateT[FF, S, A] {
-    def apply(initial: S): FF[(A, S)] = CoPointed[M].copoint(ev(self)(initial))
+  def unlift[M[_], FF[_]](implicit M: Copointed[M], ev: this.type <~< StateT[({type λ[α] = M[FF[α]]})#λ, S, A]): StateT[FF, S, A] = new StateT[FF, S, A] {
+    def apply(initial: S): FF[(A, S)] = Copointed[M].copoint(ev(self)(initial))
   }
 
-  def unliftId[M[_]](implicit M: CoPointed[M], ev: this.type <~< StateT[({type λ[α] = M[α]})#λ, S, A]): State[S, A] = unlift[M, Id]
+  def unliftId[M[_]](implicit M: Copointed[M], ev: this.type <~< StateT[({type λ[α] = M[α]})#λ, S, A]): State[S, A] = unlift[M, Id]
 
   def rwst[W, R](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
     (r, s) => F.map(self(s)) {

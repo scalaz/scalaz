@@ -29,24 +29,24 @@
  *  - [[scalaz.Functor]]
  *  - [[scalaz.Pointed]] extends [[scalaz.Functor]]
  *  - [[scalaz.Contravariant]]
- *  - [[scalaz.CoPointed]] extends [[scalaz.Functor]]
+ *  - [[scalaz.Copointed]] extends [[scalaz.Functor]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]] with [[scalaz.Pointed]]
  *  - [[scalaz.Alternative]] extends [[scalaz.Applicative]]
  *  - [[scalaz.AlternativeEmpty]] extends [[scalaz.Alternative]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
- *  - [[scalaz.CoJoin]]
- *  - [[scalaz.CoBind]]
- *  - [[scalaz.CoMonad]] extends [[scalaz.CoPointed]] with [[scalaz.CoJoin]] with [[scalaz.CoBind]]
+ *  - [[scalaz.Cojoin]]
+ *  - [[scalaz.Cobind]]
+ *  - [[scalaz.Comonad]] extends [[scalaz.Copointed]] with [[scalaz.Cojoin]] with [[scalaz.Cobind]]
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
  *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.Plus]]
  *  - [[scalaz.MonadPlus]] extends [[scalaz.Monad]] with [[scalaz.ApplicativePlus]]
  *  - [[scalaz.Foldable]]
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *
- *  - [[scalaz.BiFunctor]]
- *  - [[scalaz.BiTraverse]] extends [[scalaz.BiFunctor]]
+ *  - [[scalaz.Bifunctor]]
+ *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]]
  *  - [[scalaz.ArrId]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Category]] extends [[scalaz.ArrId]] with [[scalaz.Compose]]
@@ -121,9 +121,18 @@ package object scalaz {
   type Reader[E, A] = ReaderT[Id, E, A]
 
   type Writer[W, A] = WriterT[Id, W, A]
+  type Unwriter[W, A] = UnwriterT[Id, W, A]
+
+  object Reader {
+    def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
+  }
 
   object Writer {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+  }
+
+  object Unwriter {
+    def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
   /** A state transition, representing a function `S => (A, S)`. */
@@ -142,6 +151,8 @@ package object scalaz {
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
 
   type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
+
+  type Alternative[F[_]] = ApplicativePlus[F]
 
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.

@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList}
+import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Id, Reader}
 
 
 trait IdV[A] extends SyntaxV[A] {
@@ -60,6 +60,12 @@ trait IdV[A] extends SyntaxV[A] {
   def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
     else Pointed[F].point(self)
+
+  def liftKleisli[R]: Kleisli[Id, R, A] =
+    Kleisli[Id, R, A](_ => self)
+
+  def liftReader[R]: Reader[R, A] =
+    liftKleisli
 }
 
 trait ToIdV {

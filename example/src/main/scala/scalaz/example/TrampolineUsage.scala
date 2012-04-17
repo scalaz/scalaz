@@ -21,8 +21,8 @@ object TrampolineUsage extends App {
     }
   }
 
-  def runQuickSort[F[+ _] : Pointed : CoPointed, T: Order](xs: List[T]): List[T] =
-    quickSort[F, T](xs).go(f => CoPointed[F].copoint(f))
+  def runQuickSort[F[+ _] : Pointed : Copointed, T: Order](xs: List[T]): List[T] =
+    quickSort[F, T](xs).go(f => Copointed[F].copoint(f))
 
   val xs = List.fill(32)(util.Random.nextInt())
 
@@ -79,8 +79,8 @@ object TrampolineUsage extends App {
     }
   }
 
-  def runQuickSort2[F[+ _] : Pointed : CoPointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
-    quickSort2[F, F2, T](xs, nat, threshold).go(f => CoPointed[F].copoint(f))
+  def runQuickSort2[F[+ _] : Pointed : Copointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
+    quickSort2[F, F2, T](xs, nat, threshold).go(f => Copointed[F].copoint(f))
 
 
   {

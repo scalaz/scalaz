@@ -12,6 +12,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
+  /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
+  def compose[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = F[G[α]]})#λ] = new CompositionTraverse[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   class Traversal[G[_]](implicit G: Applicative[G]) { 
     def run[A,B](fa: F[A])(f: A => G[B]): G[F[B]] = traverseImpl[G,A,B](fa)(f)
   }
@@ -34,6 +41,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline]
+  }
+
+  /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
+  def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
+    import Free._
+    implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
+    Kleisli(traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).unliftId[Trampoline] run _)
   }
 
   // derived functions

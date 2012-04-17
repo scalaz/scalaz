@@ -260,18 +260,18 @@ trait Elements {
 object Element extends Elements {
 
   import Lens._
-  import CoStateT._
+  import CostateT._
 
-  val nameElementL: Element @-@ QName =
-    lens(x => coState(b => element(b, x.attribs, x.content, x.line), x.name))
+  val nameElementL: Element @> QName =
+    lens(x => costate(b => element(b, x.attribs, x.content, x.line), x.name))
 
-  val attribsElementL: Element @-@ List[Attr] =
-    lens(x => coState(b => element(x.name, b, x.content, x.line), x.attribs))
+  val attribsElementL: Element @> List[Attr] =
+    lens(x => costate(b => element(x.name, b, x.content, x.line), x.attribs))
 
-  val contentElementL: Element @-@ List[Content] =
-    lens(x => coState(b => element(x.name, x.attribs, b, x.line), x.content))
+  val contentElementL: Element @> List[Content] =
+    lens(x => costate(b => element(x.name, x.attribs, b, x.line), x.content))
 
-  val lineElementL: Element @-@ Option[Line] =
-    lens(x => coState(b => element(x.name, x.attribs, x.content, b), x.line))
+  val lineElementL: Element @> Option[Line] =
+    lens(x => costate(b => element(x.name, x.attribs, x.content, b), x.line))
 
 }
