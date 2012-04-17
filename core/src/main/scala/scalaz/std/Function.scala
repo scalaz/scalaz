@@ -54,7 +54,7 @@ trait FunctionInstances extends FunctionInstances0 {
     
   }
 
-  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)
@@ -64,6 +64,10 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def unzip[A, B](a: T => (A, B)) =
       (a(_)._1, a(_)._2)
+
+    def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => T => B): T => G[B] =
+      t => implicitly[Functor[G]].map(fa)(a => f(a)(t))
+
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
