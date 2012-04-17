@@ -81,6 +81,20 @@ private[scalaz] trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G
     F.zipWith(a, b)(G.zip(_, _))
 }
 
+private[scalaz] trait CompositionUnzip[F[_], G[_]] extends Unzip[({type λ[α] = F[G[α]]})#λ] {
+  implicit def T: Functor[F]
+
+  implicit def F: Unzip[F]
+
+  implicit def G: Unzip[G]
+
+  def unzip[A, B](a: => F[G[(A, B)]]): (F[G[A]], F[G[B]]) = {
+    val f = T.map(a)(G.firsts(_))
+    val g = T.map(a)(G.seconds(_))
+    (f, g)
+  }
+}
+
 private[scalaz] trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {
   implicit def F: Bifunctor[F]
 
