@@ -57,14 +57,6 @@ object CostateT extends CostateTFunctions with CostateTInstances {
 }
 
 trait CostateTFunctions {
-  type Costate[A, B] =
-  CostateT[Id, A, B]
-  // Costate is also known as Store
-  type Store[A, B] =
-  Costate[A, B]
-  // flipped
-  type |-->[A, B] =
-  Costate[B, A]
 
   def costateT[F[_], A, B](r: (F[A => B], A)): CostateT[F, A, B] = new CostateT[F, A, B] {
     val run = r

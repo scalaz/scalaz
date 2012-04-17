@@ -144,6 +144,12 @@ package object scalaz {
     }
   }
 
+  type Costate[A, B] = CostateT[Id, A, B]
+  // Costate is also known as Store
+  type Store[A, B] = Costate[A, B]
+  // flipped
+  type |-->[A, B] = Costate[B, A]
+
   type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[Identity, R, W, S, A]
 
   type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
