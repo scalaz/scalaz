@@ -88,7 +88,7 @@ private[scalaz] trait CompositionUnzip[F[_], G[_]] extends Unzip[({type λ[α] =
 
   implicit def G: Unzip[G]
 
-  def unzip[A, B](a: => F[G[(A, B)]]): (F[G[A]], F[G[B]]) = {
+  def unzip[A, B](a: F[G[(A, B)]]): (F[G[A]], F[G[B]]) = {
     val f = T.map(a)(G.firsts(_))
     val g = T.map(a)(G.seconds(_))
     (f, g)

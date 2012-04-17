@@ -15,6 +15,13 @@ trait Bifoldable[F[_, _]] { self =>
     implicit def G = G0
   }
 
+  /**The product of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
+  def product[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBifoldable[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   // derived functions
   def bifoldMap1[A,B,M](fa: F[A,B])(f: A => M)(g: B => M)(implicit F: Semigroup[M]): Option[M] = {
     import std.option._

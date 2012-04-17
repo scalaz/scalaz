@@ -15,6 +15,13 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     implicit def G = G0
   }
 
+  /**The product of ApplicativePlus `F` and `G`, `[x](F[x], G[x]])`, is a ApplicativePlus */
+  def product[G[_]](implicit G0: ApplicativePlus[G]): ApplicativePlus[({type λ[α] = (F[α], G[α])})#λ] = new ProductApplicativePlus[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def some[A](a: F[A]): F[List[A]] = {
     lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
     lazy val z: Free.Trampoline[F[List[A]]] = y map (map2(a, _)(_ :: _))

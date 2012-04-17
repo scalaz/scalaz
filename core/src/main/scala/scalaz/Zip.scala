@@ -14,6 +14,13 @@ trait Zip[F[_]] { self =>
     implicit def G = G0
   }
 
+  /**The product of Zips `F` and `G`, `[x](F[x], G[x]])`, is a Zip */
+  def product[G[_]](implicit G0: Zip[G]): Zip[({type λ[α] = (F[α], G[α])})#λ] = new ProductZip[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def zipWith[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C)(implicit F: Functor[F]): F[C] =
     F.map(zip(fa, fb)) {
       case (a, b) => f(a, b)

@@ -20,6 +20,13 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
+  /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
+  def product[G[_]](implicit G0: Foldable[G]): Foldable[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   //  /**Right-associative fold of a structure. */
 //  def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
 //    foldMap(fa)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z

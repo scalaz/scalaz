@@ -19,6 +19,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     implicit def G = G0
   }
 
+  /**The product of Traverses `F` and `G`, `[x](F[x], G[x]])`, is a Traverse */
+  def product[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = (F[α], G[α])})#λ] = new ProductTraverse[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   class Traversal[G[_]](implicit G: Applicative[G]) { 
     def run[A,B](fa: F[A])(f: A => G[B]): G[F[B]] = traverseImpl[G,A,B](fa)(f)
   }

@@ -6,6 +6,22 @@ trait Unzip[F[_]] { self =>
   def firsts[A, B](a: F[(A, B)]): F[A] = unzip(a)._1
   def seconds[A, B](a: F[(A, B)]): F[B] = unzip(a)._2
 
+  /**The composition of Unzips `F` and `G`, `[x]F[G[x]]`, is a Unzip */
+  def compose[G[_]](implicit T0: Functor[F], G0: Unzip[G]): Unzip[({type λ[α] = F[G[α]]})#λ] = new CompositionUnzip[F, G] {
+    implicit def F = self
+
+    implicit def T = T0
+
+    implicit def G = G0
+  }
+
+  /**The product of Unzips `F` and `G`, `[x](F[x], G[x]])`, is a Unzip */
+  def product[G[_]](implicit G0: Unzip[G]): Unzip[({type λ[α] = (F[α], G[α])})#λ] = new ProductUnzip[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def unzip3[A, B, C](x: F[(A, (B, C))]): (F[A], F[B], F[C]) = {
     val (a, bc) = unzip(x)
     val (b, c) = unzip(bc)
