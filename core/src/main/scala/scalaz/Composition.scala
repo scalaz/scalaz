@@ -70,6 +70,16 @@ private[scalaz] trait CompositionTraverse[F[_], G[_]] extends Traverse[({type λ
 
 }
 
+private[scalaz] trait CompositionDistributive[F[_], G[_]] extends Distributive[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
+  implicit def F: Distributive[F]
+
+  implicit def G: Distributive[G]
+
+  def distributeImpl[X[_]:Functor, A, B](a: X[A])(f: A => F[G[B]]): F[G[X[B]]] =
+    F.map(F.distribute(a)(f))(G.cosequence(_))
+
+}
+
 private[scalaz] trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G[α]]})#λ] {
   implicit def T: Functor[F]
 
