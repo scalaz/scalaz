@@ -16,7 +16,7 @@ import std.function._
  */
 trait DList[A] {
   import DList._
-  def apply(xs: List[A]): Trampoline[List[A]]
+  def apply(xs: => List[A]): Trampoline[List[A]]
 
   /** Convert to a normal list. */
   def toList: List[A] = apply(List()).run
@@ -39,10 +39,10 @@ trait DList[A] {
     }).run
 
   /** Get the first element of the list. */
-  def head: A = uncons(sys.error("DList.head: empty list"), (x, y) => x)
+  def head: A = uncons(sys.error("DList.head: empty list"), (x, _) => x)
 
   /** Get the tail of the list. */
-  def tail: DList[A] = uncons(sys.error("DList.tail: empty list"), (x, y) => y) 
+  def tail: DList[A] = uncons(sys.error("DList.tail: empty list"), (_, y) => y)
 
   /** Fold over a difference list. */
   def foldr[B](z: => B)(f: (A, => B) => B): B = {
@@ -84,7 +84,7 @@ trait DListInstances {
 trait DListFunctions {
   def mkDList[A](f: (=> List[A]) => Trampoline[List[A]]): DList[A] =
     new DList[A] {
-      def apply(xs: List[A]) = f(xs)
+      def apply(xs: => List[A]) = f(xs)
     }
   def DL[A](f: (=> List[A]) => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
   def fromList[A](as: => List[A]): DList[A] =

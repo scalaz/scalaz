@@ -2,12 +2,17 @@ package scalaz
 
 /** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
 trait IdInstances {
-  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] = new Traverse[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] {
+  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] = new Traverse[Id] with Distributive[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
     def point[A](a: => A): A = a
     def bind[A,B](a: A)(f: A => B): B = f(a)
     def cojoin[A](a: Id[A]): A = a
     def copoint[A](p: Id[A]): A = p
+    def zip[A, B](a: => Id[A], b: => Id[B]): (A, B) = (a, b)
+    def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
+    def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
     def traverseImpl[G[_]: Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
+    def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = implicitly[Functor[G]].map(fa)(f)
+
     override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
     // Overrides for efficiency.

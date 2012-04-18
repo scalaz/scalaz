@@ -461,16 +461,16 @@ object Cursor extends Cursors {
   import Lens._
   import CostateT._
 
-  val currentCursorL: Cursor @-@ Content =
+  val currentCursorL: Cursor @> Content =
     lens(x => costate(b => cursor(b, x.lefts, x.rights, x.parents), x.current))
 
-  val leftsCursorL: Cursor @-@ List[Content] =
+  val leftsCursorL: Cursor @> List[Content] =
     lens(x => costate(b => cursor(x.current, b, x.rights, x.parents), x.lefts))
 
-  val rightsCursorL: Cursor @-@ List[Content] =
+  val rightsCursorL: Cursor @> List[Content] =
     lens(x => costate(b => cursor(x.current, x.lefts, b, x.parents), x.rights))
 
-  val parentsCursorL: Cursor @-@ Path =
+  val parentsCursorL: Cursor @> Path =
     lens(x => costate(b => cursor(x.current, x.lefts, x.rights, b), x.parents))
 
 }

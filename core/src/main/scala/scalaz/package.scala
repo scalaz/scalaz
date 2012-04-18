@@ -45,8 +45,8 @@
  *  - [[scalaz.Foldable]]
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *
- *  - [[scalaz.BiFunctor]]
- *  - [[scalaz.BiTraverse]] extends [[scalaz.BiFunctor]]
+ *  - [[scalaz.Bifunctor]]
+ *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]]
  *  - [[scalaz.ArrId]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Category]] extends [[scalaz.ArrId]] with [[scalaz.Compose]]
@@ -121,6 +121,7 @@ package object scalaz {
   type Reader[E, A] = ReaderT[Id, E, A]
 
   type Writer[W, A] = WriterT[Id, W, A]
+  type Unwriter[W, A] = UnwriterT[Id, W, A]
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
@@ -128,6 +129,10 @@ package object scalaz {
 
   object Writer {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+  }
+
+  object Unwriter {
+    def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
   /** A state transition, representing a function `S => (A, S)`. */
@@ -139,6 +144,12 @@ package object scalaz {
     }
   }
 
+  type Costate[A, B] = CostateT[Id, A, B]
+  // Costate is also known as Store
+  type Store[A, B] = Costate[A, B]
+  // flipped
+  type |-->[A, B] = Costate[B, A]
+
   type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[Identity, R, W, S, A]
 
   type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
@@ -146,6 +157,8 @@ package object scalaz {
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
 
   type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
+
+  type Alternative[F[_]] = ApplicativePlus[F]
 
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.

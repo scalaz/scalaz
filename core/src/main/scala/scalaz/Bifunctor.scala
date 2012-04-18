@@ -5,9 +5,23 @@ package scalaz
  *
  */
 ////
-trait BiFunctor[F[_, _]]  { self =>
+trait Bifunctor[F[_, _]]  { self =>
   ////
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
+
+  /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
+  def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] = new CompositionBifunctor[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
+  /**The product of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
+  def product[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBifunctor[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
 
   def leftFunctor[X]: Functor[({type λ[α] = F[α, X]})#λ] = new Functor[({type λ[α] = F[α, X]})#λ] {
     def map[A, C](fax: F[A, X])(f: A => C): F[C, X] = bimap(fax)(f, z => z)
@@ -25,11 +39,11 @@ trait BiFunctor[F[_, _]]  { self =>
   def umap[A, B](faa: F[A, A])(f: A => B): F[B, B] =
     bimap(faa)(f, f)
   ////
-  val biFunctorSyntax = new scalaz.syntax.BiFunctorSyntax[F] {}
+  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] {}
 }
 
-object BiFunctor {
-  @inline def apply[F[_, _]](implicit F: BiFunctor[F]): BiFunctor[F] = F
+object Bifunctor {
+  @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 
   ////
 

@@ -8,6 +8,13 @@ sealed trait CostateT[F[_], A, B] {
   def run: (F[A => B], A)
 
   import CostateT._
+  import BijectionT._
+
+  def xmap[X](f: A => X, g: X => A)(implicit F: Functor[F]): CostateT[F, X, B] =
+    costateT(F.map(set)(_ compose g), f(pos))
+
+  def bmap[X](b: Bijection[A, X])(implicit F: Functor[F]): CostateT[F, X, B] =
+    xmap(b to _, b fr _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
@@ -33,6 +40,13 @@ sealed trait CostateT[F[_], A, B] {
   def cobind[C](f: CostateT[F, A, B] => C)(implicit c: Cobind[F]): CostateT[F, A, C] =
     costateT((Cobind[F].cobind(run._1)(ff => (a: A) => f(costateT[F, A, B]((ff, a)))), pos))
 
+  /** Two disjoint lenses can be paired */
+  def product[C, D](that: CostateT[F, C, D])(implicit M: Bind[F]): CostateT[F, (A, C), (B, D)] =
+    CostateT(M.bind(set)(s => M.map(that.set)(t => { case (a, c) => (s(a), t(c)) })), (pos, that.pos))
+
+  /** alias for `product` */
+  def ***[C, D](that: CostateT[F, C, D])(implicit M: Bind[F]): CostateT[F, (A, C), (B, D)] = product(that)
+
   private def mapRunT[C](f: (A => B) => C)(implicit F: Functor[F]): (F[C], A) =
     (F.map(run._1)(f), run._2)
 }
@@ -43,14 +57,6 @@ object CostateT extends CostateTFunctions with CostateTInstances {
 }
 
 trait CostateTFunctions {
-  type Costate[A, B] =
-  CostateT[Id, A, B]
-  // Costate is also known as Store
-  type Store[A, B] =
-  Costate[A, B]
-  // flipped
-  type |-->[A, B] =
-  Costate[B, A]
 
   def costateT[F[_], A, B](r: (F[A => B], A)): CostateT[F, A, B] = new CostateT[F, A, B] {
     val run = r

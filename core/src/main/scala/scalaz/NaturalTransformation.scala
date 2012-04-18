@@ -53,9 +53,9 @@ trait DiNaturalTransformation[F[_,_], G[_,_]] {
 // TODO needed, or just use type lambdas?
 //type Thunk[A] = () => A
 //
-//trait Konst[A] {
-//  type Apply[B] = A
-//}
+trait Konst[A] {
+  type Apply[B] = A
+}
 //
 //trait Biff[P[_,_], F[_], G[_]] {
 //  type Apply[A, B] = P[F[A], G[B]]
