@@ -116,6 +116,10 @@ trait WriterTInstances2 extends WriterTInstances3 {
     implicit def F = F0
     implicit def W = W0
   }
+  implicit def writerTBind[F[_], W](implicit W0: Semigroup[W], F0: Bind[F]) = new WriterTBind[F, W] {
+    implicit def F = F0
+    implicit def W = W0
+  }
 }
 
 trait WriterTInstances1 extends WriterTInstances2 {
@@ -223,6 +227,13 @@ trait WriterTApplicative[F[_], W] extends Applicative[({type λ[α]=WriterT[F, W
   implicit def W: Monoid[W]
 }
 
+trait WriterTBind[F[_], W] extends Bind[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] {
+  implicit def F: Bind[F]
+  implicit def W: Semigroup[W]
+
+  def bind[A, B](fa: WriterT[F, W, A])(f: (A) => WriterT[F, W, B]) = fa flatMap f
+}
+
 trait WriterTEach[F[_], W] extends Each[({type λ[α]=WriterT[F, W, α]})#λ] {
   implicit def F: Each[F]
 
@@ -234,10 +245,8 @@ trait WriterTIndex[W] extends Index[({type λ[α]=WriterT[Id, W, α]})#λ] {
   def index[A](fa: WriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.value) else None
 }
 
-trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] with WriterTPointed[F, W] {
+trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTBind[F, W] with WriterTPointed[F, W] {
   implicit def F: Monad[F]
-
-  def bind[A, B](fa: WriterT[F, W, A])(f: (A) => WriterT[F, W, B]) = fa flatMap f
 }
 
 trait WriterTFoldable[F[_], W] extends Foldable.FromFoldr[({type λ[α]=WriterT[F, W, α]})#λ] {
