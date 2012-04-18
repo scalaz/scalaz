@@ -1,5 +1,8 @@
 package scalaz
 
+import Free._
+import std.function._
+
 package object coroutine {
 
   /** A sink can always produce an answer of type `B`, and it can always receive a value of type `A`.
@@ -18,7 +21,7 @@ package object coroutine {
   type Pipe[A, B, C] = Free[({type λ[α] = Either[A => α, () => (B, α)]})#λ, C]
 
   /** Produces values of types `A` and `B`, indefinitely. Can be used to drive an iteratee. */
-  type Coiteratee[A, B] = Cofree[({type λ[α] = () => (A, α)}), B]
+  type Coiteratee[A, B] = Cofree[({type λ[α] = () => (A, α)})#λ, B]
 
   /** Produces a `C` at every step, and either requests an `A` or produces a `B`. */
   type Conduit[A, B, C] = Cofree[({type λ[α] = Either[A => α, (B, α)]})#λ, C]
@@ -32,20 +35,20 @@ package object coroutine {
    */
   implicit def pipeSink[A, B, C, E](pipe: Pipe[A, B, E],
                                     sink: Sink[B, C])(f: (E, C) => C): Sink[A, C] =
-    (pipe.resume, sink) match {
+    pipe.resume match {
       // This pipe has terminated. Return a sink that produces the same answer even if you keep feeding it.
-      case (Left(e), Cofree(c, k)) => {
-        val r: Sink[A, C] = Cofree(f(e, c), a => r)
+      case Right(e) => {
+        val r: Sink[A, C] = new Sink(f(e, sink.head), (a: A) => r)
         r
       }
       // The pipe has produced a value. Drain the pipe into the sink.
-      case (Right(Right(h)), Cofree(_, k)) => {
+      case Left(Right(h)) => {
         val (b, n) = h()
-        val m = k(b)
-        Cofree(m.head, a => pipeSink(n, m.tail(a)))
+        val m = sink.tail(b)
+        Cofree(m.head, (a: A) => pipeSink(n, m.tail(a)))
       }
       // The pipe requests more input. Return a sink whose input feeds into the pipe.
-      case (Right(Left(h)), m@Cofree(d, _)) =>
+      case (Left(Left(h)), m@Cofree(d, _)) =>
         Cofree(d, a => pipeSink(h(a), m))
     }
 
@@ -56,14 +59,14 @@ package object coroutine {
   implicit def pipeSource[A, B, E: Semigroup](source: Source[A, E],
                                               pipe: Pipe[A, B, E]): Source[B, E] =
     (source.resume, pipe.resume) match {
-      (Left(e1), Left(e2)) => return_(e1 |+| e2)
-      (_, Left(e)) => Return(e)
-      (Left(e), _) => Return(e)
-      (r, Right(Right(k))) => Suspend(() => {
+      case (Left(e1), Left(e2)) => return_(e1 |+| e2)
+      case (_, Left(e)) => Return(e)
+      case (Left(e), _) => Return(e)
+      case (r, Right(Right(k))) => Suspend(() => {
         val (b, n) = k()
         (b, pipeSource(r, n))
       })
-      (Right(h), Right(Left(k))) => {
+      case (Right(h), Right(Left(k))) => {
         val (a, n) = h()
         pipeSource(n, k(a))
       }
@@ -83,11 +86,11 @@ package object coroutine {
             val (z, n) = h()
             (z, Suspend(Left(x => compose(n, k(x)))))
           }))
-          case (Right(Right(h)), m) => Suspend(Right(() => 
+          case (Right(Right(h)), m) => Suspend(Right(() => {
             val (z, n) = h()
             (z, compose(n, m))
           }))
-          case (n, Right(Left(k))) => Suspend(Left(x => compose(n, k(x)))
+          case (n, Right(Left(k))) => Suspend(Left(x => compose(n, k(x))))
         }
     }
 }
