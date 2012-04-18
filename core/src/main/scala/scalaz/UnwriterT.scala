@@ -152,15 +152,16 @@ trait UnwriterTFunctions {
   def unputWith[F[_], W, A](value: F[A])(w: A => W)(implicit F: Functor[F]): UnwriterT[F, W, A] =
     UnwriterT(F.map(value)(a => (w(a), a)))
 
-  def unwriterUL[F[_], W, A](implicit M: Pointed[F]): LensT[F, UnwriterT[F, W, A], W] =
-    LensT(x => M.map(x.run) {
-      case (w, a) => costate((ww: W) => UnwriterT(M.point(ww, a)), w)
+  def unwriterUL[F[_], G[_], W, A](implicit MF: Pointed[F], MG: Pointed[G]): LensT[F, G, UnwriterT[F, W, A], W] =
+    LensT(x => MF.map(x.run) {
+      case (w, a) => costate((ww: W) => MG.point(UnwriterT(MF.point(ww, a))), w)
     })
 
-  def unwriterAL[F[_], W, A](implicit M: Pointed[F]): LensT[F, UnwriterT[F, W, A], A] =
-    LensT(x => M.map(x.run) {
-      case (w, a) => costate((aa: A) => UnwriterT(M.point(w, aa)), a)
+  def unwriterAL[F[_], G[_], W, A](implicit MF: Pointed[F], MG: Pointed[G]): LensT[F, G, UnwriterT[F, W, A], A] =
+    LensT(x => MF.map(x.run) {
+      case (w, a) => costate((aa: A) => MG.point(UnwriterT(MF.point(w, aa))), a)
     })
+
 }
 
 //
