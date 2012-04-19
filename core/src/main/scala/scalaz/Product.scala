@@ -104,7 +104,7 @@ private[scalaz] trait ProductBifunctor[F[_, _], G[_, _]] extends Bifunctor[({typ
 
   implicit def G: Bifunctor[G]
 
-  def bimap[A, B, C, D](fab: (F[A, B], G[A, B]))(f: A => C, g: B => D): (F[C, D], G[C, D]) =
+  override def bimap[A, B, C, D](fab: (F[A, B], G[A, B]))(f: A => C, g: B => D): (F[C, D], G[C, D]) =
     (F.bimap(fab._1)(f, g), G.bimap(fab._2)(f, g))
 }
 
@@ -122,11 +122,13 @@ private[scalaz] trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({t
 
 }
 
-private[scalaz] trait ProductBitraverse[F[_, _], G[_, _]] extends Bitraverse[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
+private[scalaz] trait ProductBitraverse[F[_, _], G[_, _]]
+  extends Bitraverse[({type λ[α, β]=(F[α, β], G[α, β])})#λ] with ProductBifunctor[F, G] with ProductBifoldable[F, G] {
+
   implicit def F: Bitraverse[F]
 
   implicit def G: Bitraverse[G]
 
   def bitraverseImpl[X[_] : Applicative, A, B, C, D](x: (F[A, B], G[A, B]))(f: A => X[C], g: B => X[D]): X[(F[C, D], G[C, D])] =
-    implicitly[Applicative[X]].map2(F.bitraverse(x._1)(f)(g), G.bitraverse(x._2)(f)(g))((a, b) => (a, b))
+    Applicative[X].map2(F.bitraverse(x._1)(f)(g), G.bitraverse(x._2)(f)(g))((a, b) => (a, b))
 }
