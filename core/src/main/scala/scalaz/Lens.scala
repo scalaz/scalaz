@@ -70,6 +70,12 @@ sealed trait LensT[F[_], G[_], A, B] {
   def =>=(f: B => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): A => F[A] =
     mod(f, _)
 
+  def modf[X[_]](f: B => X[B], a: A)(implicit F: Functor[F], XF: Functor[X], ev: G[A] =:= Id[A]): F[X[A]] =
+    F.map(run(a))(c => XF.map(f(c.pos))(c put _))
+
+  def =>>=[X[_]](f: B => X[B])(implicit F: Functor[F], XF: Functor[X], ev: G[A] =:= Id[A]): A => F[X[A]] =
+    modf(f, _)
+
   def st(implicit F: Functor[F]): StateT[F, A, B] =
     StateT(s => F.map(get(s))((_, s)))
 
