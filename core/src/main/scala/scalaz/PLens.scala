@@ -40,6 +40,24 @@ sealed trait PLensT[F[_], G[_], A, B] {
     plensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B](a =>
           WriterT(FF.map(run(a))(e => (MV.zero, e map (_ map (q => WriterT(GF.map(q)((MW.zero, _)))))))))
 
+  def wrunlift[V, W](getV: (A, Option[B]) => V, set: (A, B, A) => W)(implicit FF: Functor[F], GF: Functor[G]): PLenswT[F, G, V, W, A, B] =
+    plensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B](a =>
+      WriterT(FF.map(run(a))(e =>
+        (getV(a, e map (_.pos)), e map (z => costate(x => WriterT(GF.map(z put x)(q => (set(a, x, q), q))), z.pos)))
+      )))
+
+  def wrunliftg[V, W](getV: (A, Option[B]) => V)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): PLenswT[F, G, V, W, A, B] =
+    wrunlift(getV, (_, _, _) => MW.zero)
+
+  def !![W](getV: (A, Option[B]) => W)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): PLenswT[F, G, W, W, A, B] =
+    wrunliftg(getV)
+
+  def wrunlifts[V, W](setV: (A, B, A) => W)(implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V]): PLenswT[F, G, V, W, A, B] =
+    wrunlift((_, _) => MV.zero, setV)
+
+  def !|![V](setV: (A, B, A) => V)(implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V]): PLenswT[F, G, V, V, A, B] =
+    wrunlifts(setV)
+
   def get(a: A)(implicit F: Functor[F]): F[Option[B]] =
     F.map(run(a))(_ map (_.pos))
 
