@@ -17,7 +17,7 @@ import scala.annotation._
  *
  * // Indirect lookup of the Applicative instance
  * // Requires -Ydep-method-types or Scala trunk circa Oct 2011
- * def traverseI[GB](f: A => GB)(implicit G: Instance[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
+ * def traverseI[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
  *   G.TC.traverse(self)(a => G(f(a)))
  * }
  *
@@ -134,7 +134,7 @@ trait Unapply_1 extends Unapply_2 {
     def apply(ma: M0[A0, B0, C0, D0]) = ma
   }
 
-  /**Unpack a value of type `M0[A0, B0, C0]` into types `[c]M0[A0, B0, C]` and `C0`, given an instance of `TC` */
+  /**Unpack a value of type `M0[A0, B0, C0]` into types `[c]M0[A0, B0, c]` and `C0`, given an instance of `TC` */
   implicit def unapplyMABC3[TC[_[_]], M0[_, _, _], A0, B0, C0](implicit TC0: TC[({type λ[α] = M0[A0, B0, α]})#λ]): Unapply[TC, M0[A0, B0, C0]] {
     type M[X] = M0[A0, B0, X]
     type A = C0
@@ -147,7 +147,7 @@ trait Unapply_1 extends Unapply_2 {
 }
 
 trait Unapply_0 extends Unapply_1 {
-  /**Unpack a value of type `M0[A0, B0]` into types `[a]M0[A, B0]` and `A`, given an instance of `TC` */
+  /**Unpack a value of type `M0[A0, B0]` into types `[a]M0[a, B0]` and `A`, given an instance of `TC` */
   implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[α, B0]})#λ]): Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
     type A = A0
