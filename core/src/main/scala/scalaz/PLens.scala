@@ -449,11 +449,11 @@ trait PLensTFunctions extends PLensTInstances {
   def mapVPLens[K, V](k: K): Map[K, V] @?> V =
     somePLens compose ~mapVLens[K, V](k)
 
-  def factorPL[A, B, C]: Either[(A, B), (A, C)] @?> (A, Either[B, C]) =
-    ~LensT.factorL
+  def factorPLens[A, B, C]: Either[(A, B), (A, C)] @?> (A, Either[B, C]) =
+    ~LensT.factorLens
 
-  def distributePL[A, B, C]: (A, Either[B, C]) @?> Either[(A, B), (A, C)] =
-    ~LensT.distributeL
+  def distributePLens[A, B, C]: (A, Either[B, C]) @?> Either[(A, B), (A, C)] =
+    ~LensT.distributeLens
 
   import util.parsing.json._
 

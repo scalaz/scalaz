@@ -291,7 +291,7 @@ trait LensTFunctions extends LensTInstances {
       case Some(v) => m.updated(k, v)
     }, _ get k)
 
-  def factorL[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
+  def factorLens[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
     lens(e => costate({
       case (a, Left(b)) => Left(a, b)
       case (a, Right(c)) => Right(a, c)
@@ -300,7 +300,7 @@ trait LensTFunctions extends LensTInstances {
       case Right((a, c)) => (a, Right(c))
     }))
 
-  def distributeL[A, B, C]: (A, Either[B, C]) @> Either[(A, B), (A, C)] =
+  def distributeLens[A, B, C]: (A, Either[B, C]) @> Either[(A, B), (A, C)] =
     lens {
       case (a, e) => costate({
         case Left((aa, bb)) => (aa, Left(bb))
@@ -311,6 +311,15 @@ trait LensTFunctions extends LensTInstances {
 
       })
     }
+
+  def lensSetJoin[F[_], A, B](lens: LensT[F, F, A, B], b: B, a: A)(implicit F: Bind[F]): F[A] =
+    F.bind(lens run a)(_ put b)
+
+  def lensSetLiftF[T[_[_], _], F[_], A, B](lens: LensT[F, ({type λ[α] = T[F, α]})#λ, A, B], b: B, a: A)(implicit F: Monad[F], G: Bind[({type λ[α] = T[F, α]})#λ], T: MonadTrans[T]): T[F, A] =
+    G.bind(T liftM (lens run a))(_ put b)
+
+  def lensSetLiftG[T[_[_], _], F[_], A, B](lens: LensT[({type λ[α] = T[F, α]})#λ, F, A, B], b: B, a: A)(implicit F: Monad[F], G: Bind[({type λ[α] = T[F, α]})#λ], T: MonadTrans[T]): T[F, A] =
+    G.bind(lens run a)(x => T liftM (x put b: F[A]))
 
 }
 
