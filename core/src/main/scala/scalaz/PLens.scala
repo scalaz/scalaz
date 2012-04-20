@@ -245,9 +245,10 @@ object PLens extends PLensTFunctions with PLensTInstances {
     plens(r)
 }
 
-trait PLensTFunctions {
+trait PLensTFunctions extends PLensTInstances {
 
   import CostateT._
+  import BijectionT._
 
   type PLens[A, B] =
   PLensT[Id, Id, A, B]
@@ -322,6 +323,36 @@ trait PLensTFunctions {
       case Right(b) => Some(costate(Right(_), b))
       case Left(_) => None
     }
+
+  def tuple2PLens[F[_]: Functor, G[_]: Functor, S, A, B](lens: PLensT[F, G, S, (A, B)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B]) =
+    PLensTUnzip[F, G, S].unzip(lens)
+
+  def tuple3PLens[F[_]: Functor, G[_]: Functor, S, A, B, C](lens: PLensT[F, G, S, (A, B, C)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C]) =
+    PLensTUnzip[F, G, S].unzip3(lens.xmapbB(tuple3B))
+
+  def tuple4PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D](lens: PLensT[F, G, S, (A, B, C, D)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D]) =
+    PLensTUnzip[F, G, S].unzip4(lens.xmapbB(tuple4B))
+
+  def tuple5PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E](lens: PLensT[F, G, S, (A, B, C, D, E)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E]) =
+    PLensTUnzip[F, G, S].unzip5(lens.xmapbB(tuple5B))
+
+  def tuple6PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H](lens: PLensT[F, G, S, (A, B, C, D, E, H)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H]) =
+    PLensTUnzip[F, G, S].unzip6(lens.xmapbB(tuple6B))
+
+  def tuple7PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H, I](lens: PLensT[F, G, S, (A, B, C, D, E, H, I)]):
+  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H], PLensT[F, G, S, I]) =
+    PLensTUnzip[F, G, S].unzip7(lens.xmapbB(tuple7B))
+
+  def eitherLens[S, A, B](l: S @?> Either[A, B]): (S @?> A, S @?> B) =
+    (
+    leftPLens compose l
+    , rightPLens compose l
+    )
 
   import LazyOption._
 
@@ -441,7 +472,6 @@ trait PLensTFunctions {
 
 trait PLensTInstances {
   import PLensT._
-  import BijectionT._
 
   implicit def plensTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new PLensTCategory[F, G] {
     implicit def F: Monad[F] = F0
@@ -466,36 +496,6 @@ trait PLensTInstances {
         })))
           )
     }
-
-  implicit def Tuple2PLens[F[_]: Functor, G[_]: Functor, S, A, B](lens: PLensT[F, G, S, (A, B)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B]) =
-    PLensTUnzip[F, G, S].unzip(lens)
-
-  implicit def Tuple3PLens[F[_]: Functor, G[_]: Functor, S, A, B, C](lens: PLensT[F, G, S, (A, B, C)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C]) =
-    PLensTUnzip[F, G, S].unzip3(lens.xmapbB(tuple3B))
-
-  implicit def Tuple4PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D](lens: PLensT[F, G, S, (A, B, C, D)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D]) =
-    PLensTUnzip[F, G, S].unzip4(lens.xmapbB(tuple4B))
-
-  implicit def Tuple5PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E](lens: PLensT[F, G, S, (A, B, C, D, E)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E]) =
-    PLensTUnzip[F, G, S].unzip5(lens.xmapbB(tuple5B))
-
-  implicit def Tuple6PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H](lens: PLensT[F, G, S, (A, B, C, D, E, H)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H]) =
-    PLensTUnzip[F, G, S].unzip6(lens.xmapbB(tuple6B))
-
-  implicit def Tuple7PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H, I](lens: PLensT[F, G, S, (A, B, C, D, E, H, I)]):
-  (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H], PLensT[F, G, S, I]) =
-    PLensTUnzip[F, G, S].unzip7(lens.xmapbB(tuple7B))
-
-  implicit def eitherLens[S, A, B](l: S @?> Either[A, B]): (S @?> A, S @?> B) =
-    (
-      leftPLens compose l
-      , rightPLens compose l
-      )
 
   /** Allow the illusion of imperative updates to numbers viewed through a partial lens */
   case class NumericPLens[S, N: Numeric](lens: S @?> N, num: Numeric[N]) {
