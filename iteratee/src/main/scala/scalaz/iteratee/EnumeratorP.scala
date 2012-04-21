@@ -5,9 +5,9 @@ import Iteratee._
 import Enumeratee2T._
 
 import scala.annotation.tailrec
-import scalaz.syntax.Syntax.bind._
-import scalaz.syntax.Syntax.order._
-import scalaz.syntax.Syntax.semigroup._
+import scalaz.syntax.bind._
+import scalaz.syntax.order._
+import scalaz.syntax.semigroup._
 
 trait ForallM[P[_[_]]] {
   def apply[F[_]: Monad]: P[F]

@@ -2,6 +2,9 @@ package scalaz
 package syntax
 
 trait Syntaxes {
+  //
+  // Type classes over * -> *
+  //
 
   object semigroup extends ToSemigroupOps
 
@@ -38,14 +41,18 @@ trait Syntaxes {
   object apply extends ToApplyOps
 
   object applicative extends ToApplicativeOps
-  
+
   object bind extends ToBindOps
 
   object monad extends ToMonadOps
 
+  object codiagonal extends ToCodiagonalOps
+
   object cojoin extends ToCojoinOps
 
   object comonad extends ToComonadOps
+
+  object cozip extends ToCozipOps
 
   object plus extends ToPlusOps
 
@@ -55,7 +62,17 @@ trait Syntaxes {
 
   object traverse extends ToTraverseOps
 
+  object zip extends ToZipOps
+
+  object unzip extends ToUnzipOps
+
+  //
+  // Type classes over * * -> *
+  //
+
   object bifunctor extends ToBifunctorOps
+
+  object bifoldable extends ToBifoldableOps
 
   object bitraverse extends ToBitraverseOps
 
@@ -66,6 +83,14 @@ trait Syntaxes {
   object arrId extends ToArrIdOps
 
   object arrow extends ToArrowOps
+
+  object choice extends ToChoiceOps
+
+  object split extends ToSplitOps
+
+  //
+  // Data
+  //
 
   object id extends ToIdOps
 
@@ -81,25 +106,22 @@ trait Syntaxes {
 
   object kleisli extends ToKleisliOps
 
-  object all extends ToAllTypeClassOps with ToAllOtherOps
+  //
+  // Mixed
+  //
+
+  object all extends ToTypeClassOps with ToDataOps
 
 }
 
-trait ToAllOtherOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
+trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
 
-trait ToAllTypeClassOps
+trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToGroupOps with ToEqualOps with ToLengthOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToPointedOps with ToContravariantOps with ToCopointedOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
+  with ToCodiagonalOps with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps
-
-
-trait Ops[A] {
-  def self: A
-}
-
-/**The members of this object are also offered in the package object [[scalaz.syntax]] */
-object Syntax extends Syntaxes
