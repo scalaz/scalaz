@@ -6,6 +6,7 @@ trait Syntaxes {
   // Type classes over * -> *
   //
 
+
   object semigroup extends ToSemigroupOps
 
   object monoid extends ToMonoidOps
@@ -45,8 +46,6 @@ trait Syntaxes {
   object bind extends ToBindOps
 
   object monad extends ToMonadOps
-
-  object codiagonal extends ToCodiagonalOps
 
   object cojoin extends ToCojoinOps
 
@@ -121,7 +120,7 @@ trait ToTypeClassOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToPointedOps with ToContravariantOps with ToCopointedOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
-  with ToCodiagonalOps with ToBifoldableOps with ToCozipOps
+  with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps

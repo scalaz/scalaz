@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait Split[=>:[_, _]]  { self =>
+trait Split[=>:[_, _]] extends Category[=>:] { self =>
   ////
   def split[A, B, C, D](f: A =>: B, g: C =>: D): (A,  C) =>: (B, D)
 

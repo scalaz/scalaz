@@ -59,8 +59,8 @@ object TypeClass {
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
-  lazy val choice = TypeClass("Choice", *^*->*)
-  lazy val split = TypeClass("Split", *^*->*)
+  lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
+  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val first = TypeClass("First", *^*->*)
   lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category))
 
@@ -99,7 +99,6 @@ object TypeClass {
     cojoin,
     cobind,
     comonad,
-    codiagonal,
     plus,
     applicativePlus,
     monadPlus,
