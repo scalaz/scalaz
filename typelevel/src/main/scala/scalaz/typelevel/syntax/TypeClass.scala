@@ -4,7 +4,7 @@ package syntax
 
 trait TypeClasses {
 
-  import TypeClass._
+  import KTypeClass._
 
   // Unpack wrapper
 
@@ -12,7 +12,7 @@ trait TypeClasses {
 
   // Instance syntax
 
-  implicit def wrapProduct[C[_[_]] : TypeClass, F[_]](instance: C[F]) = instance *: TypeClass[C].emptyProduct
+  implicit def wrapProduct[C[_[_]] : KTypeClass, F[_]](instance: C[F]) = instance *: KTypeClass[C].emptyProduct
 
 }
 

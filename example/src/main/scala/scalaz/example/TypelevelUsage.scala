@@ -199,7 +199,7 @@ object TypelevelUsage extends App {
     // with syntax
     val prod1 = Applicative[List] *: Applicative[Option]
     // without syntax
-    val prod2 = Applicative[List] *: Applicative[Option] *: TypeClass[Applicative].emptyProduct
+    val prod2 = Applicative[List] *: Applicative[Option] *: KTypeClass[Applicative].emptyProduct
 
     assert(List("1") :: Option("2") :: HNil == prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
     assert(List("1") :: Option("2") :: HNil == prod2.map(List(1) :: Option(2) :: HNil)(_.toString))

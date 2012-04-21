@@ -4,7 +4,8 @@ package typelevel
 import syntax.HLists._
 
 /**
- * A type class abstracting over the `product` operation of type classes.
+ * A type class abstracting over the `product` operation of type classes over
+ * types of kind `* -> *`.
  *
  * It serves as a replacement for the various `Product*` classes in
  * [[scalaz]].
@@ -16,16 +17,16 @@ import syntax.HLists._
  * @see [[scalaz.typelevel.syntax.TypeClasses]]
  * @see [[scalaz.typelevel.TCList]]
  */
-trait TypeClass[C[_[_]]] {
+trait KTypeClass[C[_[_]]] {
 
-  import TypeClass._
+  import KTypeClass._
 
   /**
    * Given a type class instance for `F`, and a type class instance for a
    * product, produce a type class instance for the product prepended with `F`.
    *
    * @note Users of this class should start with `emptyProduct` and use the
-   * functions on [[scalaz.typelevel.TypeClass.WrappedProduct]], which greatly
+   * functions on [[scalaz.typelevel.KTypeClass.WrappedProduct]], which greatly
    * improves type inference.
    */
   def product[F[_], T <: TCList](FHead: C[F], FTail: C[T#Product]): C[TCCons[F, T]#Product]
@@ -36,19 +37,19 @@ trait TypeClass[C[_[_]]] {
   /**
    * The empty product.
    *
-   * @return an instance of [[scalaz.typelevel.TypeClass.WrappedProduct]]
+   * @return an instance of [[scalaz.typelevel.KTypeClass.WrappedProduct]]
    * representing an empty product
    */
   final def emptyProduct = new WrappedProduct[C, TCNil](_emptyProduct, this)
 
 }
 
-object TypeClass {
+object KTypeClass {
 
-  @inline def apply[C[_[_]]](implicit C: TypeClass[C]) = C
+  @inline def apply[C[_[_]]](implicit C: KTypeClass[C]) = C
 
   /** Wrapping the computation of a product. */
-  class WrappedProduct[C[_[_]], T <: TCList](val instance: C[T#Product], typeClass: TypeClass[C]) {
+  class WrappedProduct[C[_[_]], T <: TCList](val instance: C[T#Product], typeClass: KTypeClass[C]) {
 
     def *:[F[_]](F: C[F]) = new WrappedProduct[C, TCCons[F, T]](typeClass.product(F, instance), typeClass)
 
@@ -221,64 +222,64 @@ object TypeClass {
 
   }
 
-  // TypeClass instances
+  // KTypeClass instances
 
-  implicit def FunctorI: TypeClass[Functor] = new TypeClass[Functor] with Empty {
+  implicit def FunctorI: KTypeClass[Functor] = new KTypeClass[Functor] with Empty {
     def product[F[_], T <: TCList](FH: Functor[F], FT: Functor[T#Product]) =
       new ProductFunctor[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def PointedI: TypeClass[Pointed] = new TypeClass[Pointed] with Empty {
+  implicit def PointedI: KTypeClass[Pointed] = new KTypeClass[Pointed] with Empty {
     def product[F[_], T <: TCList](FH: Pointed[F], FT: Pointed[T#Product]) =
       new ProductPointed[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def ApplyI: TypeClass[Apply] = new TypeClass[Apply] with Empty {
+  implicit def ApplyI: KTypeClass[Apply] = new KTypeClass[Apply] with Empty {
     def product[F[_], T <: TCList](FH: Apply[F], FT: Apply[T#Product]) =
       new ProductApply[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def ApplicativeI: TypeClass[Applicative] = new TypeClass[Applicative] with Empty {
+  implicit def ApplicativeI: KTypeClass[Applicative] = new KTypeClass[Applicative] with Empty {
     def product[F[_], T <: TCList](FH: Applicative[F], FT: Applicative[T#Product]) =
       new ProductApplicative[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def PlusI: TypeClass[Plus] = new TypeClass[Plus] with Empty {
+  implicit def PlusI: KTypeClass[Plus] = new KTypeClass[Plus] with Empty {
     def product[F[_], T <: TCList](FH: Plus[F], FT: Plus[T#Product]) =
       new ProductPlus[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def PlusEmptyI: TypeClass[PlusEmpty] = new TypeClass[PlusEmpty] with Empty {
+  implicit def PlusEmptyI: KTypeClass[PlusEmpty] = new KTypeClass[PlusEmpty] with Empty {
     def product[F[_], T <: TCList](FH: PlusEmpty[F], FT: PlusEmpty[T#Product]) =
       new ProductPlusEmpty[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def ApplicativePlusI: TypeClass[ApplicativePlus] = new TypeClass[ApplicativePlus] with Empty {
+  implicit def ApplicativePlusI: KTypeClass[ApplicativePlus] = new KTypeClass[ApplicativePlus] with Empty {
     def product[F[_], T <: TCList](FH: ApplicativePlus[F], FT: ApplicativePlus[T#Product]) =
       new ProductApplicativePlus[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def FoldableI: TypeClass[Foldable] = new TypeClass[Foldable] with Empty {
+  implicit def FoldableI: KTypeClass[Foldable] = new KTypeClass[Foldable] with Empty {
     def product[F[_], T <: TCList](FH: Foldable[F], FT: Foldable[T#Product]) =
       new ProductFoldable[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def TraverseI: TypeClass[Traverse] = new TypeClass[Traverse] with Empty {
+  implicit def TraverseI: KTypeClass[Traverse] = new KTypeClass[Traverse] with Empty {
     def product[F[_], T <: TCList](FH: Traverse[F], FT: Traverse[T#Product]) =
       new ProductTraverse[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def DistributiveI: TypeClass[Distributive] = new TypeClass[Distributive] with Empty {
+  implicit def DistributiveI: KTypeClass[Distributive] = new KTypeClass[Distributive] with Empty {
     def product[F[_], T <: TCList](FH: Distributive[F], FT: Distributive[T#Product]) =
       new ProductDistributive[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def ZipI: TypeClass[Zip] = new TypeClass[Zip] with Empty {
+  implicit def ZipI: KTypeClass[Zip] = new KTypeClass[Zip] with Empty {
     def product[F[_], T <: TCList](FH: Zip[F], FT: Zip[T#Product]) =
       new ProductZip[F, T] { def FHead = FH; def FTail = FT }
   }
 
-  implicit def UnzipI: TypeClass[Unzip] = new TypeClass[Unzip] with Empty {
+  implicit def UnzipI: KTypeClass[Unzip] = new KTypeClass[Unzip] with Empty {
     def product[F[_], T <: TCList](FH: Unzip[F], FT: Unzip[T#Product]) =
       new ProductUnzip[F, T] { def FHead = FH; def FTail = FT }
   }
