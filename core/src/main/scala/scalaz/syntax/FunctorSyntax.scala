@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Functor` */
-trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
+trait FunctorOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Functor[F]
   ////
   import Leibniz.===
@@ -21,28 +21,28 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToFunctorV0 {
-  implicit def ToFunctorVUnapply[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
-    new FunctorV[F0.M,F0.A] { def self = F0(v); implicit def F: Functor[F0.M] = F0.TC }
+trait ToFunctorOps0 {
+  implicit def ToFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
+    new FunctorOps[F0.M,F0.A] { def self = F0(v); implicit def F: Functor[F0.M] = F0.TC }
 
 }
 
-trait ToFunctorV extends ToFunctorV0 {
-  implicit def ToFunctorV[F[_],A](v: F[A])(implicit F0: Functor[F]) =
-    new FunctorV[F,A] { def self = v; implicit def F: Functor[F] = F0 }
+trait ToFunctorOps extends ToFunctorOps0 {
+  implicit def ToFunctorOps[F[_],A](v: F[A])(implicit F0: Functor[F]) =
+    new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = F0 }
 
   ////
 
   implicit def ToLiftV[F[_], A, B](v: A => B) = new LiftV[F, A, B] { def self = v }
 
   // TODO Duplication
-  trait LiftV[F[_], A, B] extends SyntaxV[A => B] {
+  trait LiftV[F[_], A, B] extends Ops[A => B] {
     def lift(implicit F: Functor[F]) = F(self)
   }
 
   implicit def ToFunctorIdV[A](v: A) = new FunctorIdV[A] { def self = v }
 
-  trait FunctorIdV[A] extends SyntaxV[A] {
+  trait FunctorIdV[A] extends Ops[A] {
     def mapply[F[_], B](f: F[A => B])(implicit F: Functor[F]): F[B] =
       F.map(f)(fab => fab(self))
   }
@@ -50,14 +50,14 @@ trait ToFunctorV extends ToFunctorV0 {
 }
 
 trait FunctorSyntax[F[_]]  {
-  implicit def ToFunctorV[A](v: F[A])(implicit F0: Functor[F]): FunctorV[F, A] = new FunctorV[F,A] { def self = v; implicit def F: Functor[F] = F0 }
+  implicit def ToFunctorOps[A](v: F[A])(implicit F0: Functor[F]): FunctorOps[F, A] = new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = F0 }
 
   ////
   implicit def ToLiftV[A, B](v: A => B): LiftV[A, B] = new LiftV[A, B] {
     def self = v
   }
 
-  trait LiftV[A,B] extends SyntaxV[A => B] {
+  trait LiftV[A,B] extends Ops[A => B] {
     def lift(implicit F: Functor[F]) = F(self)
   }
   ////

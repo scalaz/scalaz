@@ -2,11 +2,11 @@ package scalaz
 package syntax
 
 package object std {
-  object booleanV extends ToBooleanV
-  object listV extends ToListV
-  object streamV extends ToStreamV
-  object function2V extends ToFunction2V
-  object allV extends ToAllStdV
-  object stringV extends ToStringV
-  object optionV extends ToOptionV with ToOptionIdV
+  object booleanV extends ToBooleanOps
+  object listV extends ToListOps
+  object streamV extends ToStreamOps
+  object function2V extends ToFunction2Ops
+  object allV extends ToAllStdOps
+  object stringV extends ToStringOps
+  object optionV extends ToOptionOps with ToOptionIdOps
 }

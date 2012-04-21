@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Equal` */
-trait EqualV[F] extends SyntaxV[F] {
+trait EqualOps[F] extends Ops[F] {
   implicit def F: Equal[F]
   ////
 
@@ -17,9 +17,9 @@ trait EqualV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToEqualV  {
-  implicit def ToEqualV[F](v: F)(implicit F0: Equal[F]) =
-    new EqualV[F] { def self = v; implicit def F: Equal[F] = F0 }
+trait ToEqualOps  {
+  implicit def ToEqualOps[F](v: F)(implicit F0: Equal[F]) =
+    new EqualOps[F] { def self = v; implicit def F: Equal[F] = F0 }
 
   ////
 
@@ -27,7 +27,7 @@ trait ToEqualV  {
 }
 
 trait EqualSyntax[F]  {
-  implicit def ToEqualV(v: F)(implicit F0: Equal[F]): EqualV[F] = new EqualV[F] { def self = v; implicit def F: Equal[F] = F0 }
+  implicit def ToEqualOps(v: F)(implicit F0: Equal[F]): EqualOps[F] = new EqualOps[F] { def self = v; implicit def F: Equal[F] = F0 }
 
   ////
 

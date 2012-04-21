@@ -1,8 +1,19 @@
 package scalaz
 
-trait Bifoldable[F[_, _]] { self =>
+////
+/**
+ *
+ */
+////
+trait Bifoldable[F[_, _]]  { self =>
+  ////
+
   def bifoldMap[A,B,M](fa: F[A, B])(f: A => M)(g: B => M)(implicit F: Monoid[M]): M
+
   def bifoldRight[A,B,C](fa: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C
+
+  // derived functions
+
   def bifoldLeft[A,B,C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C = {
     import Dual._, Endo._, syntax.std.allV._
     bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]]) apply z
@@ -36,6 +47,8 @@ trait Bifoldable[F[_, _]] { self =>
   final def bifoldL[A, B, C](fa: F[A, B], z: C)(f: C => A => C)(g: C => B => C): C =
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
+  ////
+  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] {}
 }
 
 object Bifoldable {
@@ -60,3 +73,4 @@ object Bifoldable {
 
   ////
 }
+

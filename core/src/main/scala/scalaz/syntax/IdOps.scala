@@ -4,7 +4,7 @@ import annotation.tailrec
 import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Id, Reader}
 
 
-trait IdV[A] extends SyntaxV[A] {
+trait IdOps[A] extends Ops[A] {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
     if (self == null) d else self
@@ -68,8 +68,8 @@ trait IdV[A] extends SyntaxV[A] {
     liftKleisli
 }
 
-trait ToIdV {
-  implicit def ToIdV[A](a: A): IdV[A] = new IdV[A] {
+trait ToIdOps {
+  implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps[A] {
     def self: A = a
   }
 }

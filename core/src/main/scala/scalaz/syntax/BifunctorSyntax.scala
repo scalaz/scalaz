@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bifunctor` */
-trait BifunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+trait BifunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Bifunctor[F]
   ////
   import Liskov.<~<
@@ -15,16 +15,16 @@ trait BifunctorV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToBifunctorV0 {
-    implicit def ToBifunctorVUnapply[FA](v: FA)(implicit F0: Unapply2[Bifunctor, FA]) =
-      new BifunctorV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bifunctor[F0.M] = F0.TC }
+trait ToBifunctorOps0 {
+    implicit def ToBifunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bifunctor, FA]) =
+      new BifunctorOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bifunctor[F0.M] = F0.TC }
   
 }
 
-trait ToBifunctorV extends ToBifunctorV0 {
+trait ToBifunctorOps extends ToBifunctorOps0 {
   
-  implicit def ToBifunctorV[F[_, _],A, B](v: F[A, B])(implicit F0: Bifunctor[F]) =
-      new BifunctorV[F,A, B] { def self = v; implicit def F: Bifunctor[F] = F0 }
+  implicit def ToBifunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bifunctor[F]) =
+      new BifunctorOps[F,A, B] { def self = v; implicit def F: Bifunctor[F] = F0 }
   
 
   ////
@@ -33,7 +33,7 @@ trait ToBifunctorV extends ToBifunctorV0 {
 }
 
 trait BifunctorSyntax[F[_, _]]  {
-  implicit def ToBifunctorV[A, B](v: F[A, B])(implicit F0: Bifunctor[F]): BifunctorV[F, A, B] = new BifunctorV[F, A, B] { def self = v; implicit def F: Bifunctor[F] = F0 }
+  implicit def ToBifunctorOps[A, B](v: F[A, B])(implicit F0: Bifunctor[F]): BifunctorOps[F, A, B] = new BifunctorOps[F, A, B] { def self = v; implicit def F: Bifunctor[F] = F0 }
 
   ////
 

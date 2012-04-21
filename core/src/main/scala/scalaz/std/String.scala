@@ -85,5 +85,5 @@ trait StringFunctions {
 }
 
 object string extends StringInstances with StringFunctions {
-  object stringSyntax extends scalaz.syntax.std.ToStringV
+  object stringSyntax extends scalaz.syntax.std.ToStringOps
 }

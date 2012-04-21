@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.string
 
-trait StringV extends SyntaxV[String]{
+trait StringOps extends Ops[String]{
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
@@ -45,8 +45,8 @@ trait StringV extends SyntaxV[String]{
   def parseDouble: Validation[NumberFormatException, Double] = string.parseDouble(self)
 }
 
-trait ToStringV {
-  implicit def ToStringVFromString(a:String): StringV = new StringV{
+trait ToStringOps {
+  implicit def ToStringOpsFromString(a:String): StringOps = new StringOps{
     def self = a
   }
 }

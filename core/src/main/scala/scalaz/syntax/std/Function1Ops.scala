@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-trait Function1V[T, R] extends SyntaxV[T => R] {
+trait Function1Ops[T, R] extends Ops[T => R] {
   import NonEmptyList._
   import Validation._
 
@@ -60,4 +60,10 @@ trait Function1V[T, R] extends SyntaxV[T => R] {
   def predStateMax[Y](k: R => Y)(implicit e: Enum[T]): Option[Y] =
     e.predStateMax(self, k)
 
+}
+
+trait ToFunctions1Ops {
+  implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] = new Function1Ops[A, B] {
+    val self = f
+  }
 }

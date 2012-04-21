@@ -245,7 +245,7 @@ trait ListFunctions {
 }
 
 object list extends ListInstances with ListFunctions {
-  object listSyntax extends scalaz.syntax.std.ToListV
+  object listSyntax extends scalaz.syntax.std.ToListOps
 }
 
 

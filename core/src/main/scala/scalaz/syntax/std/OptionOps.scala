@@ -5,7 +5,7 @@ package std
 import scalaz.std.option
 import scalaz.Tags.{Last, First}
 
-trait OptionV[A] extends SyntaxV[Option[A]] {
+trait OptionOps[A] extends Ops[Option[A]] {
   final def cata[X](some: A => X, none: => X): X = option.cata(self)(some, none)
   final def fold[X](some: A => X, none: => X): X = cata(some, none)
 
@@ -89,8 +89,8 @@ trait OptionV[A] extends SyntaxV[Option[A]] {
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = option.foldLiftOpt[A, B](self)(b, k)
 }
 
-trait ToOptionV {
-  implicit def ToOptionVFromOption[A](a: Option[A]): OptionV[A] = new OptionV[A] {
+trait ToOptionOps {
+  implicit def ToOptionOpsFromOption[A](a: Option[A]): OptionOps[A] = new OptionOps[A] {
     val self = a
   }
 }

@@ -257,7 +257,7 @@ object build extends Build {
       }
 
       val pimp = """|
-          |trait Tuple%dV[%s] extends SyntaxV[Tuple%d[%s]] {
+          |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
           |  val value = self
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
@@ -267,17 +267,17 @@ object build extends Build {
         mapallTParams, mapallParams, mapallTParams, mapallApply
       )
 
-      val conv = """implicit def ToTuple%dV[%s](t: (%s)): Tuple%dV[%s] = new { val self = t } with Tuple%dV[%s]
+      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new { val self = t } with Tuple%dOps[%s]
           |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
       (pimp, conv)
     }
 
     val source = "package scalaz\npackage syntax\npackage std\n\n" +
       tuples.map(_._1).mkString("\n") +
-      "\n\ntrait ToTupleV {\n" +
+      "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +
       "}"
-    writeFileScalazPackage("TupleV.scala", source)
+    writeFileScalazPackage("TupleOps.scala", source)
   }
 
 }

@@ -5,7 +5,7 @@ package std
 import scalaz.std.list
 
 
-trait ListV[A] extends SyntaxV[List[A]] {
+trait ListOps[A] extends Ops[List[A]] {
 
   final def intersperse(a: A): List[A] = list.intersperse(self, a)
 
@@ -50,8 +50,8 @@ trait ListV[A] extends SyntaxV[List[A]] {
   final def adjacentPairs: List[(A, A)] = list.adjacentPairs(self)
 }
 
-trait ToListV {
-  implicit def ToListVFromList[A](a: List[A]): ListV[A] = new ListV[A] {
+trait ToListOps {
+  implicit def ToListOpsFromList[A](a: List[A]): ListOps[A] = new ListOps[A] {
     val self = a
   }
 }

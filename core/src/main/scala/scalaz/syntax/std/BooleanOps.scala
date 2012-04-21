@@ -7,7 +7,7 @@ import scalaz.std.anyVal._
 import scalaz.Tags.Conjunction
 
 
-trait BooleanV extends SyntaxV[Boolean] {
+trait BooleanOps extends Ops[Boolean] {
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
@@ -246,8 +246,8 @@ trait BooleanV extends SyntaxV[Boolean] {
   }
 }
 
-trait ToBooleanV {
-  implicit def ToBooleanVFromBoolean(a: Boolean): BooleanV = new BooleanV {
+trait ToBooleanOps {
+  implicit def ToBooleanOpsFromBoolean(a: Boolean): BooleanOps = new BooleanOps {
     val self = a
   }
 }

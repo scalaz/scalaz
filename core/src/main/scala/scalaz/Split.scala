@@ -1,7 +1,18 @@
 package scalaz
 
-trait Split[=>:[_, _]] { self =>
+////
+/**
+ *
+ */
+////
+trait Split[=>:[_, _]]  { self =>
+  ////
   def split[A, B, C, D](f: A =>: B, g: C =>: D): (A,  C) =>: (B, D)
+
+  // derived functions
+
+  ////
+  val splitSyntax = new scalaz.syntax.SplitSyntax[=>:] {}
 }
 
 object Split {
@@ -10,3 +21,4 @@ object Split {
   ////
   ////
 }
+

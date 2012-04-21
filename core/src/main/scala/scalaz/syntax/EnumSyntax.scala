@@ -1,9 +1,10 @@
 package scalaz
 package syntax
 
-trait EnumV[F] extends SyntaxV[F] {
+/** Wraps a value `self` and provides methods related to `Enum` */
+trait EnumOps[F] extends Ops[F] {
   implicit def F: Enum[F]
-  
+  ////
   final def succ: F =
     F succ self
 
@@ -39,11 +40,13 @@ trait EnumV[F] extends SyntaxV[F] {
 
   final def |-->(step: Int, to: F): List[F] =
     F.fromStepToL(step, self, to)
+
+  ////
 }
 
-trait ToEnumV extends ToOrderV {
-  implicit def ToEnumV[F](v: F)(implicit F0: Enum[F]) =
-    new EnumV[F] { def self = v; implicit def F: Enum[F] = F0 }
+trait ToEnumOps extends ToOrderOps {
+  implicit def ToEnumOps[F](v: F)(implicit F0: Enum[F]) =
+    new EnumOps[F] { def self = v; implicit def F: Enum[F] = F0 }
 
   ////
 
@@ -51,7 +54,7 @@ trait ToEnumV extends ToOrderV {
 }
 
 trait EnumSyntax[F] extends OrderSyntax[F] {
-  implicit def ToEnumV(v: F)(implicit F0: Enum[F]): EnumV[F] = new EnumV[F] { def self = v; implicit def F: Enum[F] = F0 }
+  implicit def ToEnumOps(v: F)(implicit F0: Enum[F]): EnumOps[F] = new EnumOps[F] { def self = v; implicit def F: Enum[F] = F0 }
 
   ////
 
