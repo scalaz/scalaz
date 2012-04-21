@@ -6,17 +6,13 @@ trait TypeClasses {
 
   import TypeClass._
 
-  // Unpack wrappers
+  // Unpack wrapper
 
   implicit def unpackProduct[C[_[_]], T <: TCList](wrapper: WrappedProduct[C, T]) = wrapper.instance
 
-  implicit def unpackComposition[C[_[_]], T <: TCList](wrapper: WrappedComposition[C, T]) = wrapper.instance
+  // Instance syntax
 
-  // Wrap companions
-
-  implicit def wrapFunctor(functor: Functor.type) = new TypeClassCompanion[Functor]
-  implicit def wrapPointed(pointed: Pointed.type) = new TypeClassCompanion[Pointed]
-  implicit def wrapApplicative(applicative: Applicative.type) = new TypeClassCompanion[Applicative]
+  implicit def wrapProduct[C[_[_]] : TypeClass, F[_]](instance: C[F]) = instance *: TypeClass[C].emptyProduct
 
 }
 
