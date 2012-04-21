@@ -34,7 +34,6 @@ object TypeClass {
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
-  lazy val cozip = TypeClass("Cozip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
@@ -45,6 +44,8 @@ object TypeClass {
   lazy val cojoin = TypeClass("Cojoin", *->*)
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
+  lazy val cozip = TypeClass("Cozip", *->*)
+  lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
@@ -98,6 +99,7 @@ object TypeClass {
     cojoin,
     cobind,
     comonad,
+    codiagonal,
     plus,
     applicativePlus,
     monadPlus,
@@ -180,7 +182,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrId, arrow, category, choice, split, compose)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrId, arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {

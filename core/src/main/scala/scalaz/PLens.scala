@@ -531,6 +531,7 @@ trait PLensTInstances {
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 }
 
+// TODO break this up, so that we can provide instances when less than Monad[F]/Monad[G] is available.
 private[scalaz] trait PLensTCategory[F[_], G[_]] extends
 Category[({type λ[α, β] = PLensT[F, G, α, β]})#λ] with
 Choice[({type λ[α, β] = PLensT[F, G, α, β]})#λ] with
@@ -544,7 +545,7 @@ Codiagonal[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
   def id[A] = PLensT.plensId
 
   def choice[A, B, C](f: => PLensT[F, G, A, C], g: => PLensT[F, G, B, C]): PLensT[F, G, Either[A, B], C] =
-    PLensT.plensT {
+    PLensT.plensT[F, G, Either[A, B], C] {
       case Left(a) =>
         F.map(f run a)(_ map (_ map (G.map(_)(Left(_)))))
       case Right(b) =>

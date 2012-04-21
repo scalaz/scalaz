@@ -1,7 +1,16 @@
 package scalaz
 
-trait Codiagonal[=>:[_, _]] { self =>
+////
+/**
+ *
+ */
+////
+trait Codiagonal[=>:[_, _]]  { self =>
+  ////
   def codiagonal[A]: Either[A,  A] =>: A
+
+  ////
+  val codiagonalSyntax = new scalaz.syntax.CodiagonalSyntax[=>:] {}
 }
 
 object Codiagonal {
@@ -10,3 +19,4 @@ object Codiagonal {
   ////
   ////
 }
+
