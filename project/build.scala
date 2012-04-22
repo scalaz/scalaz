@@ -167,7 +167,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent),
+    dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
