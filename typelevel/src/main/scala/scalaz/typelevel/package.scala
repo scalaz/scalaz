@@ -42,6 +42,10 @@ package object typelevel {
 
   def :^: = GenericCons
 
+  /** The empty [[scalaz.typelevel.Formatter]]. */
+  def FNil[R : Monoid] =
+    Formatter[HNil, R](_ => Monoid[R].zero)
+
 }
 
 // vim: expandtab:ts=2:sw=2
