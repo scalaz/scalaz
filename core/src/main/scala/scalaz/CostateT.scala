@@ -42,7 +42,7 @@ sealed trait CostateT[F[_], A, B] {
 
   /** Two disjoint lenses can be paired */
   def product[C, D](that: CostateT[F, C, D])(implicit M: Bind[F]): CostateT[F, (A, C), (B, D)] =
-    CostateT(M.bind(set)(s => M.map(that.set)(t => { case (a, c) => (s(a), t(c)) })), (pos, that.pos))
+    CostateT(M.bind(set) { s => M.map(that.set)(t => { (ac: (A, C)) => (s(ac._1), t(ac._2))})}, (pos, that.pos))
 
   /** alias for `product` */
   def ***[C, D](that: CostateT[F, C, D])(implicit M: Bind[F]): CostateT[F, (A, C), (B, D)] = product(that)

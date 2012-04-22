@@ -289,10 +289,10 @@ trait LensTFunctions extends LensTInstances {
 
   /** Access the value at a particular key of a Map **/
   def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
-    lensg(m => {
+    lensg(m => ({
       case None => m - k
       case Some(v) => m.updated(k, v)
-    }, _ get k)
+    }: Option[V] => Map[K, V]), _ get k)
 
   def factorLens[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
     lens(e => costate({
@@ -406,10 +406,10 @@ trait LensTInstances {
   case class MapLens[S, K, V](lens: Lens[S, Map[K, V]]) {
     /** Allows both viewing and setting the value of a member of the map */
     def member(k: K): Lens[S, Option[V]] = lensg[S, Option[V]](
-      s => opt => lens.mod(m => opt match {
+      s => opt => lens.mod((m: Map[K, V]) => (opt match {
         case Some(v) => m + (k -> v)
         case None    => m - k
-      }, s): Id[S]
+      }): Map[K, V], s): Id[S]
       , s => lens.get(s).get(k))
 
     /** This lens has undefined behavior when accessing an element not present in the map! */
