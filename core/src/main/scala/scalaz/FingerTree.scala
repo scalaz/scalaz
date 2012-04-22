@@ -1300,7 +1300,7 @@ sealed trait OrdSeq[A] extends Ops[FingerTree[FirstOption[A], A]] {
 object OrdSeq {
   private def ordSeq[A: Order](t: FingerTree[FirstOption[A], A]): OrdSeq[A] = new OrdSeq[A] {
     val self = t
-    val ord = implicitly[Order[A]]
+    val ord = Order[A]
   }
 
   implicit def unwrap[A](t: OrdSeq[A]): FingerTree[FirstOption[A], A] = t.self

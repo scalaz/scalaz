@@ -93,7 +93,7 @@ sealed trait Tree[A] {
   }
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Tree[B]] = {
-    val G = implicitly[Applicative[G]]
+    val G = Applicative[G]
     import std.stream._
     G.apF(G.map(f(rootLabel))((x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, xs)))(Traverse[Stream].traverse[G, Tree[A], Tree[B]](subForest)((_: Tree[A]).traverse[G, B](f)))
   }

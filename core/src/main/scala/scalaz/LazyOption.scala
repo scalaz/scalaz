@@ -130,7 +130,7 @@ trait LazyOptionInstances {
 
   /* TODO
 implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
-  Show[A].shows(_ map (implicitly[Show[A]].shows(_)) fold ("~Some(" + _ + ")", "~None"))
+  Show[A].shows(_ map (Show[A].shows(_)) fold ("~Some(" + _ + ")", "~None"))
 
 implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
   Order.orderBy(_.toOption)*/

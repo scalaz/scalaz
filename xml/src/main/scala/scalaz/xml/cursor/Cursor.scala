@@ -448,7 +448,7 @@ trait Cursors {
 
   implicit val CursorShow: Show[Cursor] = new Show[Cursor] {
     def show(c: Cursor) =
-      ("Cursor{current=" + implicitly[Show[Content]].shows(c.current) + ",lefts=" + implicitly[Show[List[Content]]].shows(c.lefts) + ",rights=" + implicitly[Show[List[Content]]].shows(c.rights) + ",parents=" + implicitly[Show[Path]].shows(c.parents)).toList
+      ("Cursor{current=" + Show[Content].shows(c.current) + ",lefts=" + Show[List[Content]].shows(c.lefts) + ",rights=" + Show[List[Content]].shows(c.rights) + ",parents=" + Show[Path].shows(c.parents)).toList
   }
 
   implicit val CursorEqual: Equal[Cursor] =

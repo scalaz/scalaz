@@ -111,7 +111,7 @@ trait CostateTComonad[F[_], A0] extends Comonad[({type λ[α]=CostateT[F, A0, α
 
 trait CostateTCohoist[S] extends Cohoist[({type f[g[_], a] = CostateT[g, S, a]})#f] {
   def lower[G[_] : Cobind, A](a: CostateT[G, S, A]) =
-    implicitly[Cobind[G]].map(a.run._1)((z: S => A) => z(a.run._2))
+    Cobind[G].map(a.run._1)((z: S => A) => z(a.run._2))
 
   def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
     new (({type f[x] = CostateT[M, S, x]})#f ~> ({type f[x] = CostateT[N, S, x]})#f) {

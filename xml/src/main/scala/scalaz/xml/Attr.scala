@@ -30,7 +30,7 @@ trait Attrs {
 
   /// lookupAttr
   def lookup(n: QName, as: List[Attr]): Option[Str] =
-    lookupBy(implicitly[Equal[QName]].equal(n, _), as)
+    lookupBy(Equal[QName].equal(n, _), as)
 
   import std.AllInstances._
 
@@ -42,7 +42,7 @@ trait Attrs {
 
   implicit val AttrShow: Show[Attr] = new Show[Attr] {
     def show(c: Attr) =
-      ("Attr{key=" + implicitly[Show[QName]].shows(c.key) + ",value=" + c.value.mkString + "}").toList
+      ("Attr{key=" + Show[QName].shows(c.key) + ",value=" + c.value.mkString + "}").toList
   }
 
 }

@@ -36,7 +36,7 @@ trait Historys {
 
   implicit val HistoryShow: Show[History] = new Show[History] {
     def show(h: History) =
-      implicitly[Show[List[Op]]].show(h.value.toList).toList
+      Show[List[Op]].show(h.value.toList).toList
   }
 
   implicit val HistoryEqual: Equal[History] =

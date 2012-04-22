@@ -70,13 +70,13 @@ trait Tokens {
     def show(t: Token) =
       t.fold(
         start = l => q => a => e =>
-          "StartToken{line=" + l + ",qname=" + implicitly[Show[QName]].shows(q) + ",attributes=" + implicitly[Show[List[Attr]]].shows(a) + ",empty=" + e + "}"
+          "StartToken{line=" + l + ",qname=" + Show[QName].shows(q) + ",attributes=" + Show[List[Attr]].shows(a) + ",empty=" + e + "}"
         , end = l => q =>
-          "EndToken{line=" + l + ",qname=" + implicitly[Show[QName]].shows(q) + "}"
+          "EndToken{line=" + l + ",qname=" + Show[QName].shows(q) + "}"
         , cref = s =>
-          "CRefToken{str=" + implicitly[Show[Str]].shows(s) + "}"
+          "CRefToken{str=" + Show[Str].shows(s) + "}"
         , text = d =>
-          "CDataToken{data=" + implicitly[Show[CData]].shows(d) + "}"
+          "CDataToken{data=" + Show[CData].shows(d) + "}"
         , comment = s =>
           "CommentToken{str=" + s.mkString + "}"
       ).toList

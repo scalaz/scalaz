@@ -57,7 +57,7 @@ trait CDatas {
 
   implicit val CDataShow: Show[CData] = new Show[CData] {
     def show(c: CData) =
-      ("CData{verbatim=" + implicitly[Show[CDataKind]].shows(c.verbatim) + ",data=" + c.data.mkString + (c.line match {
+      ("CData{verbatim=" + Show[CDataKind].shows(c.verbatim) + ",data=" + c.data.mkString + (c.line match {
         case None => ""
         case Some(l) => ",line=" + l
       }) + "}").toList

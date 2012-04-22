@@ -43,7 +43,7 @@ trait Tags {
 
   implicit val TagShow: Show[Tag] = new Show[Tag] {
     def show(t: Tag) =
-      ("Tag{name=" + implicitly[Show[QName]].shows(t.name) + ",attribs=" + implicitly[Show[List[Attr]]].shows(t.attribs) + (t.line match {
+      ("Tag{name=" + Show[QName].shows(t.name) + ",attribs=" + Show[List[Attr]].shows(t.attribs) + (t.line match {
         case None => ""
         case Some(l) => ",line=" + l
       }) + "}").toList

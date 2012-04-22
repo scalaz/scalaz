@@ -11,7 +11,7 @@ trait IdInstances {
     def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
     def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
     def traverseImpl[G[_]: Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
-    def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = implicitly[Functor[G]].map(fa)(f)
+    def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
 
     override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
