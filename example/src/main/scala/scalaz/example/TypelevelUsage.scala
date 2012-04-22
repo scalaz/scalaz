@@ -195,14 +195,21 @@ object TypelevelUsage extends App {
   object Classes {
 
     import typelevel.syntax.TypeClasses._
+    import typelevel.syntax.HLists._
 
     // with syntax
     val prod1 = Applicative[List] *: Applicative[Option]
     // without syntax
     val prod2 = Applicative[List] *: Applicative[Option] *: KTypeClass[Applicative].emptyProduct
 
-    assert(List("1") :: Option("2") :: HNil == prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
-    assert(List("1") :: Option("2") :: HNil == prod2.map(List(1) :: Option(2) :: HNil)(_.toString))
+    // derive `Equal` instance
+    // TODO this should work implicitly
+
+    implicit val eq = Equal[List[String]] *: Equal[Option[String]] *: TypeClass[Equal].emptyProduct
+    typed[Equal[List[String] :: Option[String] :: HNil]](eq)
+
+    assert(List("1") :: Option("2") :: HNil === prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
+    assert(List("1") :: Option("2") :: HNil === prod2.map(List(1) :: Option(2) :: HNil)(_.toString))
 
   }
 
