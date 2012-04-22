@@ -11,7 +11,7 @@ import CostateT._
  *
  * If `F` and `G` as taken to be [[scalaz.Id]], the structure simplifies to the partial lens presented in the paper.
  *
- * The term ''field'' should not be intepreted restricively to mean a member of a class. For example, a partial lens
+ * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a partial lens
  * can address the nth element of a `List`.
  *
  * @see [[scalaz.LensT]]

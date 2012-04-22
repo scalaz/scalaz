@@ -9,10 +9,10 @@ import CostateT._
  * This structure is more general than the one described in [[http://days2012.scala-lang.org/sites/days2012/files/morris_lenses.pdf]]
  * as it abstracts over a type constructor `F`, used to address the field, and `G`, used to wrap the value of the field.
  *
- * If `F` and `G` as taken to be [[scalaz.Id]], the structure simplifies to the partial lens presented in the paper. A type alias
- * `scalaz.Lens` is provided to reflect this less general version.
+ * If `F` and `G` as taken to be [[scalaz.Id]], the structure simplifies to the lens presented in the paper. A type alias
+ * `scalaz.Lens` is provided to reflect this less general version. Similarly, where `F`=`Option`, this is akin to a partial lens presented in the paper.
  *
- * The term ''field'' should not be interpreted restricively to mean a member of a class. For example, a lens
+ * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a lens
  * can address membership of a `Set`.
  *
  * @see [[scalaz.PLensT]]
