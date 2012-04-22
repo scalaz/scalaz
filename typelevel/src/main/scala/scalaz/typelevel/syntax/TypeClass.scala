@@ -2,14 +2,8 @@ package scalaz
 package typelevel
 package syntax
 
-trait TCOps[C[_], T <: HList] {
-
-  def instance: TypeClass[C]
-
-  def typeClass: C[T]
-
-  def *:[F](F: C[F]): C[F :: T] = instance.product(F, typeClass)
-
+final class TCOps[C[_], T <: HList](typeClass: TypeClass[C], instance: C[T]) {
+  def *:[F](F: C[F]): C[F :: T] = typeClass.product(F, instance)
 }
 
 /*
@@ -30,11 +24,7 @@ trait TypeClasses /* extends TypeClasses0 */ {
 
   // Kind *
 
-  implicit def ToTCOpsCons[C[_] : TypeClass, F, T <: HList](tc: C[T]): TCOps[C, T] = new TCOps[C, T] {
-    val instance = TypeClass[C]
-    val typeClass = tc
-  }
-
+  implicit def ToTCOpsCons[C[_] : TypeClass, F, T <: HList](instance: C[T]): TCOps[C, T] = new TCOps[C, T](TypeClass[C], instance)
 
   // Kind * -> *
 

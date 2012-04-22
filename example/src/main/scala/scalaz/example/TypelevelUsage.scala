@@ -20,8 +20,8 @@ object TypelevelUsage extends App {
 
     hlist2 match {
       case str :: n :: _ =>
-        val _str: String = str
-        val _n: Int = n
+        typed[String](str)
+        typed[Int](n)
     }
 
   }
@@ -186,8 +186,8 @@ object TypelevelUsage extends App {
     typed[Int](g1)
     typed[Symbol](g2)
 
-    assert(g0 == "foo")
-    assert(g1 == 3)
+    assert(g0 === "foo")
+    assert(g1 === 3)
     assert(g2 == 'a)
 
   }
@@ -226,4 +226,3 @@ object TypelevelUsage extends App {
 }
 
 // vim: expandtab:ts=2:sw=2
-
