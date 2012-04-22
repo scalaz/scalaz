@@ -323,6 +323,13 @@ trait LensTFunctions extends LensTInstances {
 
 }
 
+trait LensTInstances0 {
+  implicit def lensTArrId[F[_], G[_]](implicit F0: Pointed[F], G0: Pointed[G]): ArrId[({type λ[α, β] = LensT[F, G, α, β]})#λ] = new LensTArrId[F, G] {
+    implicit def F = F0
+    implicit def G = G0
+  }
+}
+
 trait LensTInstances {
   import LensT._
   import collection.immutable.Stack
@@ -330,8 +337,8 @@ trait LensTInstances {
   import collection.immutable.Queue
 
   implicit def lensTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new LensTCategory[F, G] {
-    implicit def F: Monad[F] = F0
-    implicit def G: Monad[G] = G0
+    implicit def F = F0
+    implicit def G = G0
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
@@ -542,17 +549,24 @@ trait LensTInstances {
 
 }
 
-private[scalaz] trait LensTCategory[F[_], G[_]] extends
-Category[({type λ[α, β] = LensT[F, G, α, β]})#λ] with
-Choice[({type λ[α, β] = LensT[F, G, α, β]})#λ] with
-Split[({type λ[α, β] = LensT[F, G, α, β]})#λ] with
-Codiagonal[({type λ[α, β] = LensT[F, G, α, β]})#λ] {
+private[scalaz] trait LensTArrId[F[_], G[_]]
+  extends ArrId[({type λ[α, β] = LensT[F, G, α, β]})#λ]{
+
+  implicit def F: Pointed[F]
+  implicit def G: Pointed[G]
+
+  def id[A] = LensT.lensId
+}
+
+private[scalaz] trait LensTCategory[F[_], G[_]]
+  extends Choice[({type λ[α, β] = LensT[F, G, α, β]})#λ]
+  with Split[({type λ[α, β] = LensT[F, G, α, β]})#λ]
+  with LensTArrId[F, G] {
+
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 
   def compose[A, B, C](bc: LensT[F, G, B, C], ab: LensT[F, G, A, B]): LensT[F, G, A, C] = ab >=> bc
-
-  def id[A] = LensT.lensId
 
   def choice[A, B, C](f: => LensT[F, G, A, C], g: => LensT[F, G, B, C]): LensT[F, G, Either[A, B], C] =
     LensT.lensT {
@@ -564,8 +578,4 @@ Codiagonal[({type λ[α, β] = LensT[F, G, α, β]})#λ] {
 
   def split[A, B, C, D](f: LensT[F, G, A, B], g: LensT[F, G, C, D]): LensT[F, G, (A,  C), (B, D)] =
     f *** g
-
-  def codiagonal[A]: LensT[F, G, Either[A,  A], A] =
-    LensT.codiagLens[F, G, A]
-
 }

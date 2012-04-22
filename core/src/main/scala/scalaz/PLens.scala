@@ -470,12 +470,19 @@ trait PLensTFunctions extends PLensTInstances {
     }
 }
 
-trait PLensTInstances {
+trait PLensTInstance0 {
+  implicit def plensTArrId[F[_], G[_]](implicit F0: Pointed[F], G0: Pointed[G]) = new PLensTArrId[F, G] {
+    implicit def F = F0
+    implicit def G = G0
+  }
+}
+
+trait PLensTInstances extends PLensTInstance0 {
   import PLensT._
 
   implicit def plensTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new PLensTCategory[F, G] {
-    implicit def F: Monad[F] = F0
-    implicit def G: Monad[G] = G0
+    implicit def F = F0
+    implicit def G = G0
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
@@ -531,18 +538,22 @@ trait PLensTInstances {
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 }
 
-// TODO break this up, so that we can provide instances when less than Monad[F]/Monad[G] is available.
-private[scalaz] trait PLensTCategory[F[_], G[_]] extends
-Category[({type λ[α, β] = PLensT[F, G, α, β]})#λ] with
-Choice[({type λ[α, β] = PLensT[F, G, α, β]})#λ] with
-Split[({type λ[α, β] = PLensT[F, G, α, β]})#λ] with
-Codiagonal[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
+private[scalaz] trait PLensTArrId[F[_], G[_]] extends ArrId[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
+  implicit def F: Pointed[F]
+  implicit def G: Pointed[G]
+
+  def id[A]: PLensT[F, G, A, A] = PLensT.plensId
+}
+
+private[scalaz] trait PLensTCategory[F[_], G[_]]
+  extends Choice[({type λ[α, β] = PLensT[F, G, α, β]})#λ]
+  with Split[({type λ[α, β] = PLensT[F, G, α, β]})#λ]
+  with PLensTArrId[F, G] {
+
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 
   def compose[A, B, C](bc: PLensT[F, G, B, C], ab: PLensT[F, G, A, B]): PLensT[F, G, A, C] = ab >=> bc
-
-  def id[A] = PLensT.plensId
 
   def choice[A, B, C](f: => PLensT[F, G, A, C], g: => PLensT[F, G, B, C]): PLensT[F, G, Either[A, B], C] =
     PLensT.plensT[F, G, Either[A, B], C] {
@@ -554,8 +565,4 @@ Codiagonal[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
 
   def split[A, B, C, D](f: PLensT[F, G, A, B], g: PLensT[F, G, C, D]): PLensT[F, G, (A,  C), (B, D)] =
     f *** g
-
-  def codiagonal[A]: PLensT[F, G, Either[A,  A], A] =
-    PLensT.codiagPLens[F, G, A]
-
 }

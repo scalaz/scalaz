@@ -110,7 +110,6 @@ trait KleisliInstances1 extends KleisliInstances2 {
   implicit def kleisliArrId[F[_]](implicit F0: Pointed[F]) = new KleisliArrIdArr[F] {
     implicit def F: Pointed[F] = F0
   }
-  implicit def kleisliChoice[F[_]] = new KleisliChoice[F] {}
   implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]) = new KleisliSemigroup[F, A, B] {
     implicit def FB = FB0
   }
@@ -236,25 +235,12 @@ private[scalaz] trait KleisliArrIdArr[F[_]] extends ArrId[({type λ[α, β] = Kl
   def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
 }
 
-private[scalaz] trait KleisliChoice[F[_]] extends Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
-  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, Either[A, B], C] =
-    Kleisli {
-      case Left(a) => f run a
-      case Right(b) => g run b
-    }
-}
+private[scalaz] trait KleisliArrow[F[_]]
+  extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ]
+  with KleisliArrIdArr[F]
+  with Split[({type λ[α, β] = Kleisli[F, α, β]})#λ]
+  with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
 
-private[scalaz] trait KleisliSplit[F[_]] extends Split[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
-  implicit def F: Monad[F]
-
-  def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A,  C), (B, D)] =
-    Kleisli {
-      case (a, c) =>
-        F.bind(f run a)(b => F.map(g run c)(d => (b, d)))
-    }
-}
-
-private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliArrIdArr[F] {
   implicit def F: Monad[F]
 
   def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
@@ -262,6 +248,18 @@ private[scalaz] trait KleisliArrow[F[_]] extends Arrow[({type λ[α, β] = Kleis
   def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))
   }
+
+  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, Either[A, B], C] =
+    Kleisli {
+      case Left(a) => f run a
+      case Right(b) => g run b
+    }
+
+  def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
+    Kleisli {
+      case (a, c) =>
+        F.bind(f run a)(b => F.map(g run c)(d => (b, d)))
+    }
 }
 
 private[scalaz] trait KleisliSemigroup[F[_], A, B] extends Semigroup[Kleisli[F, A, B]] {
