@@ -2,6 +2,26 @@ package scalaz
 
 import CostateT._
 
+/**
+ * A Lens, offering a purely functional means to access and retrieve
+ * an field of type `B` in a record of type `A`.
+ *
+ * This structure is more general than the one described in [[http://days2012.scala-lang.org/sites/days2012/files/morris_lenses.pdf]]
+ * as it abstracts over a type constructor `F`, used to address the field, and `G`, used to wrap the value of the field.
+ *
+ * If `F` and `G` as taken to be [[scalaz.Id]], the structure simplifies to the partial lens presented in the paper. A type alias
+ * `scalaz.Lens` is provided to reflect this less general version.
+ *
+ * The term ''field'' should not be interpreted restricively to mean a member of a class. For example, a lens
+ * can address membership of a `Set`.
+ *
+ * @see [[scalaz.PLensT]]
+ *
+ * @tparam F Type constructor used to address the field
+ * @tparam G Type constructor used to wrap the value
+ * @tparam A The type of the record
+ * @tparam B The type of the field
+ */
 sealed trait LensT[F[_], G[_], A, B] {
   def run(a: A): F[Costate[B, G[A]]]
 
@@ -181,27 +201,10 @@ object LensT extends LensTFunctions with LensTInstances {
     lensT(r)
 }
 
-object Lens extends LensTFunctions with LensTInstances {
-  def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
-    lens(r)
-}
-
 trait LensTFunctions extends LensTInstances {
 
   import CostateT._
   import BijectionT._
-
-  type Lens[A, B] =
-  LensT[Id, Id, A, B]
-
-  type @>[A, B] =
-  Lens[A, B]
-
-  type LenswT[F[_], G[_], V, W, A, B] =
-    LensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
-
-  type Lensw[V, W, A, B] =
-    LenswT[Id, Id, V, W, A, B]
 
   def lensT[F[_], G[_], A, B](r: A => F[Costate[B, G[A]]]): LensT[F, G, A, B] = new LensT[F, G, A, B] {
     def run(a: A): F[Costate[B, G[A]]] = r(a)

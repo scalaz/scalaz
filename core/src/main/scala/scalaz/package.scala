@@ -1,3 +1,4 @@
+
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *
@@ -138,6 +139,7 @@ package object scalaz {
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, A] = StateT[Id, S, A]
 
+  // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object State extends StateFunctions {
     def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
       def apply(s: S) = f(s)
@@ -171,4 +173,43 @@ package object scalaz {
 
   type FirstOption[A] = Option[A] @@ Tags.First
   type LastOption[A] = Option[A] @@ Tags.Last
+
+  //
+  // Lens type aliases
+  //
+
+  type Lens[A, B] = LensT[Id, Id, A, B]
+
+  // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object Lens extends LensTFunctions with LensTInstances {
+    def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
+      lens(r)
+  }
+
+  type @>[A, B] = LensT[Id, Id, A, B]
+
+  type LenswT[F[_], G[_], V, W, A, B] =
+    LensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
+
+  type Lensw[V, W, A, B] = LenswT[Id, Id, V, W, A, B]
+
+
+  type PLens[A, B] = PLensT[Id, Id, A, B]
+
+  // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object PLens extends PLensTFunctions with PLensTInstances {
+    def apply[A, B](r: A => Option[Costate[B, A]]): PLens[A, B] =
+      plens(r)
+  }
+
+  type @?>[A, B] = PLensT[Id, Id, A, B]
+
+  type PLenswT[F[_], G[_], V, W, A, B] =
+    PLensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
+
+  type PLensw[V, W, A, B] = PLenswT[Id, Id, V, W, A, B]
+
+  type PStateT[F[_], A, B] = StateT[F, A, Option[B]]
+
+  type PState[A, B] = StateT[Id, A, Option[B]]
 }
