@@ -4,7 +4,7 @@ import CostateT._
 
 /**
  * A Lens, offering a purely functional means to access and retrieve
- * an field of type `B` in a record of type `A`.
+ * a field of type `B` in a record of type `A`.
  *
  * This structure is more general than the one described in [[http://days2012.scala-lang.org/sites/days2012/files/morris_lenses.pdf]]
  * as it abstracts over a type constructor `F`, used to address the field, and `G`, used to wrap the value of the field.

@@ -14,7 +14,7 @@ employ the implicit scope.
 
 ### At a glance
 
-* scalaz.{concurrent, effect, iteratee} split to separate sub-projects.
+* `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects.
 * Refined and expanded the type class heirarchy.
 * Type class instances are no longer defined in the companion objects of the type class.
   Instances for standard library types are defined under `scalaz.std`, and instances for
@@ -58,7 +58,7 @@ def foo[M: Monad] = bar
 
 ### Type Class Instance Definition
 
-* 'Constructive' implicits, which create a type class instance automatically based on instances of
+* *Constructive* implicits, which create a type class instance automatically based on instances of
   all parent type classes, are removed. These led to subtle errors with ambiguous implicits, such as
   this problem with [FunctorBindApply](http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
