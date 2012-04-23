@@ -38,7 +38,13 @@ sealed trait IterV[E, A] {
   }
 
   /** An iteratee that sends itself the EOF signal after `n` inputs. */
-  def take(n: Int): IterV[E, A] = fold((a, i) => Done(a, i), k => if (n <= 0) k(EOF.apply) else Cont(i => k(i).take(n - 1)))
+  def take(n: Int): IterV[E, A] =
+    fold((a, i) => Done(a, i),
+         k => if (n <= 0) k(EOF.apply) else Cont(i => i(
+           k(i).take(n),
+           e => k(i).take(n - 1),
+           k(i)
+         )))
 
   /** Lift into a monadic iteratee, in the Id monad. */
   def lift: Iteratee[Id, E, A] =
@@ -83,6 +89,17 @@ case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[Ite
 
   def map[B](f: A => B)(implicit M: Functor[M]): Iteratee[M, E, B] =
     Iteratee[M, E, B](M.fmap(value, (x: IterVM[M, E, A]) => x.fold((a, e) => DoneM[M, E, B](f(a), e), k => ContM[M, E, B](e => k(e).map(f)))))
+
+  def run(implicit M: Monad[M]): M[A] = {
+    def runCont(i: Iteratee[M, E, A]) = for {
+      v <- i.value
+    } yield v.fold(done = (x, _) => Some(x), cont = _ => None)
+    for {
+      v <- value
+      t <- v.fold(done = (x, _) => Some(x).pure[M],
+                  cont = k => runCont(k(EOF[E])))
+    } yield t.getOrElse(sys.error("Diverging iteratee!"))
+  }
 }
 
 /** An Enumerator[F] feeds data from an F to an iteratee */

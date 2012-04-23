@@ -74,7 +74,10 @@ object Foldable extends FoldableLow {
       val s = new ArrayStack[A]
       t.foreach(a => s += a)
       var r = z
-      while (!s.isEmpty) {r = op(s.pop, r)}
+      while (!s.isEmpty) {
+        val tmp = r
+        r = op(s.pop, tmp)
+      }
       r
     }
   }
