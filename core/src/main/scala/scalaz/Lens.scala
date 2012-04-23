@@ -62,6 +62,13 @@ sealed trait LensT[F[_], G[_], A, B] {
             (getV(a, z), costate(x => WriterT(GF.map(e put x)(q => (set(a, x, q), q))), z))
           })))
 
+  def hlift(implicit FF: Functor[F], GF: Functor[G]): LenshT[F, G, A, B] =
+    wrunlift((t, g) => new LensGetHistory[A, B] {
+      val history = DList((t, g))
+    }, (t, s, r) => new LensSetHistory[A, B] {
+      val history = DList((t, s, r))
+    })
+
   def wrunliftg[V, W](getV: (A, B) => V)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): LenswT[F, G, V, W, A, B] =
     wrunlift(getV, (_, _, _) => MW.zero)
 
@@ -581,4 +588,72 @@ private[scalaz] trait LensTCategory[F[_], G[_]]
 
   def split[A, B, C, D](f: LensT[F, G, A, B], g: LensT[F, G, C, D]): LensT[F, G, (A,  C), (B, D)] =
     f *** g
+
+}
+
+sealed trait LensGetHistory[A, B] {
+  val history: DList[(A, B)]
+
+  def targets: DList[A] =
+    history map (_._1)
+
+  def gets: DList[B] =
+    history map (_._2)
+
+  def historyList: List[(A, B)] =
+    history.toList
+}
+
+object LensGetHistory extends LensGetHistoryInstances
+
+trait LensGetHistoryInstances {
+  import DList._
+  implicit def lensGetHistoryMonoid[A, B]: Monoid[LensGetHistory[A, B]] = new Monoid[LensGetHistory[A, B]] {
+    val zero = new LensGetHistory[A, B] {
+      val history = DList[(A, B)]()
+    }
+    def append(a: LensGetHistory[A, B], b: => LensGetHistory[A, B]) = new LensGetHistory[A, B] {
+      val history = a.history ++ b.history
+    }
+  }
+  implicit def lensGetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[LensGetHistory[A, B]] = {
+    import std.tuple._
+    Equal[DList[(A, B)]].contramap((_: LensGetHistory[A, B]).history)
+  }
+
+}
+
+sealed trait LensSetHistory[A, B] {
+  val history: DList[(A, B, A)]
+
+  def targets: DList[A] =
+    history map (_._1)
+
+  def sets: DList[B] =
+    history map (_._2)
+
+  def results: DList[A] =
+    history map (_._3)
+
+  def historyList: List[(A, B, A)] =
+    history.toList
+}
+
+object LensSetHistory extends LensSetHistoryInstances
+
+trait LensSetHistoryInstances {
+  import DList._
+  implicit def lensSetHistoryMonoid[A, B]: Monoid[LensSetHistory[A, B]] = new Monoid[LensSetHistory[A, B]] {
+    val zero = new LensSetHistory[A, B] {
+      val history = DList[(A, B, A)]()
+    }
+    def append(a: LensSetHistory[A, B], b: => LensSetHistory[A, B]) = new LensSetHistory[A, B] {
+      val history = a.history ++ b.history
+    }
+  }
+  implicit def lensSetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[LensSetHistory[A, B]] = {
+    import std.tuple._
+    Equal[DList[(A, B, A)]].contramap((_: LensSetHistory[A, B]).history)
+  }
+
 }

@@ -193,6 +193,10 @@ package object scalaz {
 
   type Lensw[V, W, A, B] = LenswT[Id, Id, V, W, A, B]
 
+  type LenshT[F[_], G[_], A, B] =
+  LenswT[F, G, LensGetHistory[A, B], LensSetHistory[A, B], A, B]
+
+  type Lensh[A, B] = LenshT[Id, Id, A, B]
 
   type PLens[A, B] = PLensT[Id, Id, A, B]
 
@@ -208,6 +212,11 @@ package object scalaz {
     PLensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
 
   type PLensw[V, W, A, B] = PLenswT[Id, Id, V, W, A, B]
+
+  type PLenshT[F[_], G[_], A, B] =
+  PLenswT[F, G, PLensGetHistory[A, B], PLensSetHistory[A, B], A, B]
+
+  type PLensh[A, B] = PLenshT[Id, Id, A, B]
 
   type PStateT[F[_], A, B] = StateT[F, A, Option[B]]
 

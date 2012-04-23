@@ -65,6 +65,13 @@ sealed trait PLensT[F[_], G[_], A, B] {
         (getV(a, e map (_.pos)), e map (z => costate(x => WriterT(GF.map(z put x)(q => (set(a, x, q), q))), z.pos)))
       )))
 
+  def hlift(implicit FF: Functor[F], GF: Functor[G]): PLenshT[F, G, A, B] =
+    wrunlift((t, g) => new PLensGetHistory[A, B] {
+      val history = DList((t, g))
+    }, (t, s, r) => new PLensSetHistory[A, B] {
+      val history = DList((t, s, r))
+    })
+
   def wrunliftg[V, W](getV: (A, Option[B]) => V)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): PLenswT[F, G, V, W, A, B] =
     wrunlift(getV, (_, _, _) => MW.zero)
 
@@ -562,3 +569,71 @@ private[scalaz] trait PLensTCategory[F[_], G[_]]
   def split[A, B, C, D](f: PLensT[F, G, A, B], g: PLensT[F, G, C, D]): PLensT[F, G, (A,  C), (B, D)] =
     f *** g
 }
+
+sealed trait PLensGetHistory[A, B] {
+   val history: DList[(A, Option[B])]
+
+   def targets: DList[A] =
+     history map (_._1)
+
+   def gets: DList[Option[B]] =
+     history map (_._2)
+
+   def historyList: List[(A, Option[B])] =
+     history.toList
+ }
+
+object PLensGetHistory extends PLensGetHistoryInstances
+
+ trait PLensGetHistoryInstances {
+   import DList._
+   implicit def plensGetHistoryMonoid[A, B]: Monoid[PLensGetHistory[A, B]] = new Monoid[PLensGetHistory[A, B]] {
+     val zero = new PLensGetHistory[A, B] {
+       val history = DList[(A, Option[B])]()
+     }
+     def append(a: PLensGetHistory[A, B], b: => PLensGetHistory[A, B]) = new PLensGetHistory[A, B] {
+       val history = a.history ++ b.history
+     }
+   }
+   implicit def plensGetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[PLensGetHistory[A, B]] = {
+     import std.tuple._
+     import std.option._
+     Equal[DList[(A, Option[B])]].contramap((_: PLensGetHistory[A, B]).history)
+   }
+
+ }
+
+ sealed trait PLensSetHistory[A, B] {
+   val history: DList[(A, B, A)]
+
+   def targets: DList[A] =
+     history map (_._1)
+
+   def sets: DList[B] =
+     history map (_._2)
+
+   def results: DList[A] =
+     history map (_._3)
+
+   def historyList: List[(A, B, A)] =
+     history.toList
+ }
+
+ object PLensSetHistory extends PLensSetHistoryInstances
+
+ trait PLensSetHistoryInstances {
+   import DList._
+   implicit def plensSetHistoryMonoid[A, B]: Monoid[PLensSetHistory[A, B]] = new Monoid[PLensSetHistory[A, B]] {
+     val zero = new PLensSetHistory[A, B] {
+       val history = DList[(A, B, A)]()
+     }
+     def append(a: PLensSetHistory[A, B], b: => PLensSetHistory[A, B]) = new PLensSetHistory[A, B] {
+       val history = a.history ++ b.history
+     }
+   }
+   implicit def plensSetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[PLensSetHistory[A, B]] = {
+     import std.tuple._
+     Equal[DList[(A, B, A)]].contramap((_: PLensSetHistory[A, B]).history)
+   }
+
+ }
