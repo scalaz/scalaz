@@ -382,6 +382,28 @@ trait PLensTFunctions extends PLensTInstances {
       case h :: t => Some(costate(h :: _, t))
     }
 
+  def listFindByPLens[A](p: A => Boolean): List[A] @?> A = {
+    case class Z(lefts: List[A], focus: A, rights: List[A]) {
+      @annotation.tailrec
+      final def find: Option[Z] =
+        if(p(focus)) Some(this)
+        else rights match {
+          case Nil => None
+          case h::t => Z(focus::lefts, h, t).find
+        }
+      final def list: List[A] =
+        lefts.reverse:::focus::rights
+    }
+    plens {
+      case Nil => None
+      case h::t =>
+        Z(Nil, h, t).find.map (w => costate((b => w.copy(focus = b).list, w.focus)))
+    }
+  }
+
+  def listFindPLens[A: Equal](a: A): List[A] @?> A =
+    listFindByPLens(Equal[A].equal(a, _))
+
   def listNthPLens[A](n: Int): List[A] @?> A =
     if(n < 0)
       nil
@@ -438,6 +460,23 @@ trait PLensTFunctions extends PLensTInstances {
       else
         Some(costate(EphemeralStream.cons(s.head(), _), s.tail()))
     )
+
+  def ephemeralStreamFindByPLens[A](p: A => Boolean): EphemeralStream[A] @?> A = {
+    case class Z(lefts: EphemeralStream[A], focus: A, rights: EphemeralStream[A]) {
+      @annotation.tailrec
+      final def find: Option[Z] =
+        if(p(focus)) Some(this)
+        else if(rights.isEmpty) None else Z(EphemeralStream.cons(focus, lefts), rights.head(), rights.tail()).find
+
+      final def stream: EphemeralStream[A] =
+        lefts.reverse ++ EphemeralStream.cons(focus, rights)
+    }
+
+    plens(x => if(x.isEmpty) None else Z(EphemeralStream.emptyEphemeralStream, x.head(), x.tail()).find.map (w => costate((b => w.copy(focus = b).stream, w.focus))))
+  }
+
+  def ephemeralStreamFindPLens[A: Equal](a: A): EphemeralStream[A] @?> A =
+    ephemeralStreamFindByPLens(Equal[A].equal(a, _))
 
   def ephemeralStreamNthPLens[A](n: Int): EphemeralStream[A] @?> A =
     if(n < 0)
