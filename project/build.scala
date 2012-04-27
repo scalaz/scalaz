@@ -92,7 +92,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ Unidoc.settings,
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   lazy val core = Project(
@@ -132,6 +132,15 @@ object build extends Build {
     base = file("iteratee"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-iteratee"
+    ),
+    dependencies = Seq(effect)
+  )
+
+  lazy val iterv = Project(
+    id = "iterv",
+    base = file("iterv"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-iterv"
     ),
     dependencies = Seq(effect)
   )
