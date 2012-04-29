@@ -40,13 +40,13 @@ sealed trait LensT[F[_], G[_], A, B] {
     lensT(x => FF.map(run(g(x)))(_ map (GF.map(_)(f))))
 
   def xmapbA[X](b: Bijection[A, X])(implicit FF: Functor[F], GF: Functor[G]): LensT[F, G, X, B] =
-    xmapA(b to _, b fr _)
+    xmapA(b to _, b from _)
 
   def xmapB[X](f: B => X, g: X => B)(implicit FF: Functor[F], GF: Functor[G]): LensT[F, G, A, X] =
     lensT(a => FF.map(run(a))(_ xmap (f, g)))
 
   def xmapbB[X](b: Bijection[B, X])(implicit FF: Functor[F], GF: Functor[G]): LensT[F, G, A, X] =
-    xmapB(b to _, b fr _)
+    xmapB(b to _, b from _)
 
   def lift[X[_]](implicit P: Pointed[X], FF: Functor[F], GF: Functor[G]): LensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B] =
     lensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B](a => FF.map(run(a))(c => P.point(c map (GF.map(_)(P.point(_))))))
@@ -208,10 +208,9 @@ object LensT extends LensTFunctions with LensTInstances {
     lensT(r)
 }
 
-trait LensTFunctions extends LensTInstances {
+trait LensTFunctions {
 
   import CostateT._
-  import BijectionT._
 
   def lensT[F[_], G[_], A, B](r: A => F[Costate[B, G[A]]]): LensT[F, G, A, B] = new LensT[F, G, A, B] {
     def run(a: A): F[Costate[B, G[A]]] = r(a)
@@ -255,30 +254,6 @@ trait LensTFunctions extends LensTInstances {
     lens {
       case (a, b) => costate(x => (a, x), b)
     }
-
-  implicit def tuple2Lens[F[_]: Functor, G[_]: Functor, S, A, B](lens: LensT[F, G, S, (A, B)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B]) =
-    LensTUnzip[F, G, S].unzip(lens)
-
-  implicit def tuple3Lens[F[_]: Functor, G[_]: Functor, S, A, B, C](lens: LensT[F, G, S, (A, B, C)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C]) =
-    LensTUnzip[F, G, S].unzip3(lens.xmapbB(tuple3B))
-
-  implicit def tuple4Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D](lens: LensT[F, G, S, (A, B, C, D)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D]) =
-    LensTUnzip[F, G, S].unzip4(lens.xmapbB(tuple4B))
-
-  implicit def tuple5Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E](lens: LensT[F, G, S, (A, B, C, D, E)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E]) =
-    LensTUnzip[F, G, S].unzip5(lens.xmapbB(tuple5B))
-
-  implicit def tuple6Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H](lens: LensT[F, G, S, (A, B, C, D, E, H)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E], LensT[F, G, S, H]) =
-    LensTUnzip[F, G, S].unzip6(lens.xmapbB(tuple6B))
-
-  implicit def tuple7Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H, I](lens: LensT[F, G, S, (A, B, C, D, E, H, I)]):
-  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E], LensT[F, G, S, H], LensT[F, G, S, I]) =
-    LensTUnzip[F, G, S].unzip7(lens.xmapbB(tuple7B))
 
   /** Access the first field of a tuple */
   def lazyFirstLens[A, B]: LazyTuple2[A, B] @> A =
@@ -345,6 +320,7 @@ trait LensTInstances {
   import collection.immutable.Stack
   import collection.SeqLike
   import collection.immutable.Queue
+  import BijectionT._
 
   implicit def lensTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new LensTCategory[F, G] {
     implicit def F = F0
@@ -557,6 +533,29 @@ trait LensTInstances {
   implicit def integralLens[S, I: Integral](lens: Lens[S, I]) =
     IntegralLens[S, I](lens, implicitly[Integral[I]])
 
+  implicit def tuple2Lens[F[_]: Functor, G[_]: Functor, S, A, B](lens: LensT[F, G, S, (A, B)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B]) =
+    LensTUnzip[F, G, S].unzip(lens)
+
+  implicit def tuple3Lens[F[_]: Functor, G[_]: Functor, S, A, B, C](lens: LensT[F, G, S, (A, B, C)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C]) =
+    LensTUnzip[F, G, S].unzip3(lens.xmapbB(tuple3B))
+
+  implicit def tuple4Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D](lens: LensT[F, G, S, (A, B, C, D)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D]) =
+    LensTUnzip[F, G, S].unzip4(lens.xmapbB(tuple4B))
+
+  implicit def tuple5Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E](lens: LensT[F, G, S, (A, B, C, D, E)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E]) =
+    LensTUnzip[F, G, S].unzip5(lens.xmapbB(tuple5B))
+
+  implicit def tuple6Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H](lens: LensT[F, G, S, (A, B, C, D, E, H)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E], LensT[F, G, S, H]) =
+    LensTUnzip[F, G, S].unzip6(lens.xmapbB(tuple6B))
+
+  implicit def tuple7Lens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H, I](lens: LensT[F, G, S, (A, B, C, D, E, H, I)]):
+  (LensT[F, G, S, A], LensT[F, G, S, B], LensT[F, G, S, C], LensT[F, G, S, D], LensT[F, G, S, E], LensT[F, G, S, H], LensT[F, G, S, I]) =
+    LensTUnzip[F, G, S].unzip7(lens.xmapbB(tuple7B))
 }
 
 private[scalaz] trait LensTArrId[F[_], G[_]]
