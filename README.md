@@ -24,7 +24,8 @@ res4: Option[List[Int]] = Some(List(1, 2, 3))
 ```
 
 Use of the `Ops` classes, defined under `scalaz.syntax`.
-```
+
+```scala
 scala> import scalaz._
 import scalaz._
 
@@ -214,7 +215,7 @@ types with a syntax of your choosing.
 * Derived methods, based on the abstract methods in a type class, are defined in the type class itself.
 * Each type class companion object is fitted with a convenient `apply` method to obtain an instance of the type class.
 
-```
+```scala
     // Equivalent to `implicitly[Monad[Option]]`
     val O = Monad[Option]
 
@@ -232,7 +233,7 @@ types with a syntax of your choosing.
 Type class instances may depend on other instances. In simple cases, this is as straightforward as adding an implicit
 parameter (or, equivalently, a context bound), to the implicit method.
 
-```
+```scala
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]): Option[A] = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
