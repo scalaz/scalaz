@@ -33,7 +33,7 @@ trait Foldable[F[_]]  { self =>
 
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
-    import Dual._, Endo._, syntax.std.allV._
+    import Dual._, Endo._, syntax.std.all._
     foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
   }
 

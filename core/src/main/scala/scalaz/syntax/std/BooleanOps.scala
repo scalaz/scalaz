@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.boolean
+import scalaz.std.{boolean => b}
 import scalaz.std.anyVal._
 import scalaz.Tags.Conjunction
 
@@ -26,7 +26,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  1
    * }}}
    */
-  final def ∧(q: => Boolean) = boolean.conjunction(self, q)
+  final def ∧(q: => Boolean) = b.conjunction(self, q)
 
   /**
    * Conjunction. (AND)
@@ -53,7 +53,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  1
    * }}}
    */
-  final def ∨(q: => Boolean): Boolean = boolean.disjunction(self, q)
+  final def ∨(q: => Boolean): Boolean = b.disjunction(self, q)
 
   /**
    * Disjunction. (OR)
@@ -79,7 +79,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def !&&(q: => Boolean) = boolean.nor(self, q)
+  final def !&&(q: => Boolean) = b.nor(self, q)
 
   /**
    * Negation of Disjunction. (NAND)
@@ -92,7 +92,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def !||(q: => Boolean) = boolean.nand(self, q)
+  final def !||(q: => Boolean) = b.nand(self, q)
 
   /**
    * Conditional.
@@ -105,7 +105,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  1
    * }}}
    */
-  final def -->(q: => Boolean) = boolean.conditional(self, q)
+  final def -->(q: => Boolean) = b.conditional(self, q)
 
   /**
    * Inverse Conditional.
@@ -118,7 +118,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  1
    * }}}
    */
-  final def <--(q: => Boolean) = boolean.inverseConditional(self, q)
+  final def <--(q: => Boolean) = b.inverseConditional(self, q)
 
   /**
    * Negational of Conditional.
@@ -131,7 +131,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def ⇏(q: => Boolean) = boolean.negConditional(self, q)
+  final def ⇏(q: => Boolean) = b.negConditional(self, q)
 
   /**
    * Negational of Conditional.
@@ -144,7 +144,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def -/>(q: => Boolean) = boolean.negConditional(self, q)
+  final def -/>(q: => Boolean) = b.negConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
@@ -157,7 +157,7 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def ⇍(q: => Boolean) = boolean.negInverseConditional(self, q)
+  final def ⇍(q: => Boolean) = b.negInverseConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
@@ -170,22 +170,22 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def <\-(q: => Boolean) = boolean.negInverseConditional(self, q)
+  final def <\-(q: => Boolean) = b.negInverseConditional(self, q)
 
   /**
    * Executes the given side-effect if this boolean value is `false`.
    */
-  final def unless(f: => Unit) = boolean.unless(self)(f)
+  final def unless(f: => Unit) = b.unless(self)(f)
 
   /**
    * Executes the given side-effect if this boolean value is `true`.
    */
-  final def when(f: => Unit) = boolean.when(self)(f)
+  final def when(f: => Unit) = b.when(self)(f)
 
   /**
    * @return `t` if true, `f` otherwise
    */
-  final def fold[A](t: => A, f: => A): A = boolean.fold(self, t, f)
+  final def fold[A](t: => A, f: => A): A = b.fold(self, t, f)
 
   trait Conditional[X] {
     def |(f: => X): X
@@ -201,7 +201,7 @@ trait BooleanOps extends Ops[Boolean] {
   /**
    * Returns the given argument in `Some` if this is `lazySome`, `lazySome` otherwise.
    */
-  final def option[A](a: => A): Option[A] = boolean.option(self, a)
+  final def option[A](a: => A): Option[A] = b.option(self, a)
 
   /**
    * Returns the given argument in `lazySome` if this is `Left`, `Left` otherwise.
@@ -225,24 +225,24 @@ trait BooleanOps extends Ops[Boolean] {
    * Returns the given argument if this is `true`, otherwise, the zero element for the type of the given
    * argument.
    */
-  final def ??[A](a: => A)(implicit z: Monoid[A]): A = boolean.valueOrZero(self)(a)
+  final def ??[A](a: => A)(implicit z: Monoid[A]): A = b.valueOrZero(self)(a)
 
   /**
    * Returns the given argument if this is `false`, otherwise, the zero element for the type of the given
    * argument.
    */
-  final def !?[A](a: => A)(implicit z: Monoid[A]): A = boolean.zeroOrValue(self)(a)
+  final def !?[A](a: => A)(implicit z: Monoid[A]): A = b.zeroOrValue(self)(a)
 
   trait GuardPrevent[M[_]] {
     def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A]
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = boolean.pointOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = b.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = boolean.emptyOrPure[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = b.emptyOrPure[M, A](self)(a)
   }
 }
 

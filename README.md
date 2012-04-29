@@ -6,6 +6,61 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
+## Quick Start
+
+```scala
+scala> import scalaz._
+import scalaz._
+
+scala> import std.option._, std.list._ // functions and type class instances for Option and List
+import std.option._
+import std.list._
+
+scala> Apply[Option].map2(some(1), some(2))((a, b) => a + b)
+res3: Option[Int] = Some(3)
+
+scala> Traverse[List].traverse(List(1, 2, 3))(i => some(i))
+res4: Option[List[Int]] = Some(List(1, 2, 3))
+```
+
+Use of the `Ops` classes, defined under `scalaz.syntax`.
+```
+scala> import scalaz._
+import scalaz._
+
+scala> import std.list._ // type class instances for List
+import std.list._
+
+scala> import syntax.bind._ // syntax for the Bind type class (and its parents)
+import syntax.bind._
+
+scala> List(List(1)).join
+res3: List[Int] = List(1)
+
+scala> List(true, false).ifM(List(0, 1), List(2, 3))
+res4: List[Int] = List(0, 1, 2, 3)
+
+```
+
+We've gone to great lengths to give you an *a-la-carte* importing experience, but if you prefer an all-you-can-eat
+buffet, you're in luck:
+
+```scala
+scala> import scalaz._, Scalaz._
+import scalaz._
+import Scalaz._
+
+scala> NonEmptyList(1, 2, 3).cojoin
+res6: scalaz.NonEmptyList[scalaz.NonEmptyList[Int]] = NonEmptyList(NonEmptyList(1, 2, 3), NonEmptyList(2, 3), NonEmptyList(3))
+
+scala> 1.node(2.leaf, 3.node(4.leaf))
+res7: scalaz.Tree[Int] = <tree>
+
+scala> List(some(1), none).suml
+res10: Option[Int] = Some(1)
+
+```
+
 ## Changes in Version 7
 
 Scalaz 7 represents a major reorganization of the library. We have taken a fresh look
@@ -70,7 +125,7 @@ def foo[M: Monad] = bar
 
 Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
 
-```
+```scala
   implicit val option = new Traverse[Option] with MonadPlus[Option] {
     def point[A](a: => A) = Some(a)
     def bind[A, B](fa: Option[A])(f: A => Option[B]): Option[B] = fa flatMap f
@@ -88,7 +143,7 @@ Here is an instance definition for `Option`. Notice that the method `map` has be
 
 To use this, one would:
 
-```
+```scala
 import scalaz.std.option.optionInstance
 // or, importing all instances en-masse
 // import scalaz.Scalaz._
@@ -103,6 +158,7 @@ We co-opt the term *syntax* to refer to the way we allow the functionality of Sc
 called in the `object.method(args)` form, which can be easier to read, and, given that type inference
 in Scala flows from left-to-right, can require fewer type annotations.
 
+* No more `Identity`, `MA`, or `MAB` from Scalaz 6.
 * Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
 * All Scalaz functionality is available *without* using the provided syntax, by directly calling methods
   on the type class or it's companion object.
@@ -218,21 +274,27 @@ implicitly[Functor[OptionTList]]
 
 ### Transformers and Identity
 
-A stronger emphasis has been placed on transformer data structures (aka Monad Transformers).
+A stronger emphasis has been placed on transformer data structures (aka Monad Transformers). For example `State` is now
+a type alias for `StateT[Id, A, B]`.
 
-### Deriving Type Class Instances through Isomorphisms
+`Id` is defined in the `scalaz` package object as:
+
+```scala
+type Id[A] = A
+```
+
+### Type Class Derivation
+
+Type classes can be derived based on an isomorphism. For example, the functor type class instance
+for Validation could be derived from the instance for Either.
 
 https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Isomorphism.scala
 
-### Deriving Type Class Instances through Composition / Product
+Type classes can also be derived based on the composition and product of data types:
 
 https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Composition.scala
 
 https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Product.scala
-
-### Unboxed Tagged Types
-
-https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/std/AnyVal.scala#L35
 
 ## Contributing
 

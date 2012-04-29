@@ -15,7 +15,7 @@ trait Bifoldable[F[_, _]]  { self =>
   // derived functions
 
   def bifoldLeft[A,B,C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C = {
-    import Dual._, Endo._, syntax.std.allV._
+    import Dual._, Endo._, syntax.std.all._
     bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]]) apply z
   }
 

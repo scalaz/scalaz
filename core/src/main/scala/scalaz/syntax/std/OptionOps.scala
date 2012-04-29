@@ -2,11 +2,11 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.option
+import scalaz.std.{option => o}
 import scalaz.Tags.{Last, First}
 
 trait OptionOps[A] extends Ops[Option[A]] {
-  final def cata[X](some: A => X, none: => X): X = option.cata(self)(some, none)
+  final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
   final def fold[X](some: A => X, none: => X): X = cata(some, none)
 
   sealed trait Fold[X] {
@@ -21,7 +21,7 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * <p/>
    * Example:
    * <code>
-   * option.some(_ * 2).none(0)
+   * o.some(_ * 2).none(0)
    * </code>
    */
   final def some[X](s: A => X): Fold[X] = new Fold[X] {
@@ -74,19 +74,19 @@ trait OptionOps[A] extends Ops[Option[A]] {
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 
-  final def toSuccess[E](e: => E): Validation[E, A] = option.toSuccess(self)(e)
+  final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
-  final def toFailure[B](b: => B): Validation[A, B] = option.toFailure(self)(b)
+  final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
 
   final def first: Option[A] @@ First = Tag(self)
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_] : Pointed : PlusEmpty]: M[A] = option.orEmpty[A, M](self)
+  final def orEmpty[M[_] : Pointed : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
 
-  final def foldLift[F[_] : Pointed, B](b: => B, k: F[A] => B): B = option.foldLift(self)(b, k)
+  final def foldLift[F[_] : Pointed, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
 
-  final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = option.foldLiftOpt[A, B](self)(b, k)
+  final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
 }
 
 trait ToOptionOps {
