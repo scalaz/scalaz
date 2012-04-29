@@ -14,7 +14,7 @@ employ the implicit scope.
 
 ### At a glance
 
-* `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects.
+* `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
 * Refined and expanded the type class heirarchy.
 * Type class instances are no longer defined in the companion objects of the type class.
   Instances for standard library types are defined under `scalaz.std`, and instances for
@@ -38,15 +38,16 @@ Scalaz has been been modularised.
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
+* **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
+* **scalaz-iteratee**: Experimental new Iteratee implementation
 * **scalaz-xml**: Error-correcting XML parser
-* **scalaz-iteratee**: Iteratee implementation (experimental)
 
 ### Type Class Hierarchy
 
 * Type classes form an inheritance hierarchy, as in Scalaz 6. This is convenient both at the call site and at the
   type class instance definition. Considering for now the call site, it ensures the following code is valid:
 
-```
+```scala
 def bar[M: Functor] = ()
 
 def foo[M: Monad] = bar
