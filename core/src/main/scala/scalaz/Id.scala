@@ -2,62 +2,48 @@ package scalaz
 
 /** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
 trait IdInstances {
-  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] = new Traverse[Id] with Distributive[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
-    def point[A](a: => A): A = a
-    def bind[A,B](a: A)(f: A => B): B = f(a)
-    def cojoin[A](a: Id[A]): A = a
-    def copoint[A](p: Id[A]): A = p
-    def zip[A, B](a: => Id[A], b: => Id[B]): (A, B) = (a, b)
-    def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
-    def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
-    def traverseImpl[G[_]: Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
-    def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
+  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+    new Traverse[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+      def point[A](a: => A): A = a
 
-    override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
+      def bind[A, B](a: A)(f: A => B): B = f(a)
 
-    // Overrides for efficiency.
+      def cojoin[A](a: Id[A]): A = a
 
-    override def apply[A, B](f: (A) => B): Id[A] => Id[B] = f
+      def copoint[A](p: Id[A]): A = p
 
-    // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `ffa: A` is identical.
-    override def join[A](ffa: A) = ffa
+      def zip[A, B](a: => Id[A], b: => Id[B]): (A, B) = (a, b)
 
-    override def traverse[A, G[_], B](value: G[A])(f: A => Id[B])(implicit G: Traverse[G]): Id[G[B]] = G.map(value)(f)
+      def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
 
-    override def sequence[A, G[_]: Traverse](as: G[Id[A]]): Id[G[A]] = as
+      def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
 
-    override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
+      def traverseImpl[G[_] : Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
 
-    /*TODO Bring back after Apply is remodelled.
-    override def ap2[A, B, C](fa: Id[A], fb: Id[B])(f: Id[(A, B) => C]): Id[C] = f(fa, fb)
+      def distributeImpl[G[_] : Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
 
-    override def ap3[A, B, C, D](fa: Id[A], fb: Id[B], fc: Id[C])(f: Id[(A, B, C) => D]): Id[D] = f(fa, fb, fc)
+      override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
-    override def ap4[A, B, C, D, E](fa: Id[A], fb: Id[B], fc: Id[C], fd: Id[D])(f: Id[(A, B, C, D) => E]): Id[E] = f(fa, fb, fc, fd)
+      // Overrides for efficiency.
 
-    override def ap5[A, B, C, D, E, R](fa: Id[A], fb: Id[B], fc: Id[C], fd: Id[D], fe: Id[E])(f: Id[(A, B, C, D, E) => R]): Id[R] = f(fa, fb, fc, fd, fe)
+      override def apply[A, B](f: (A) => B): Id[A] => Id[B] = f
 
-    override def map[A, B](fa: Id[A])(f: (A) => B) = f(fa)
+      // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `ffa: A` is identical.
+      override def join[A](ffa: A) = ffa
 
-    override def map2[A, B, C](fa: Id[A], fb: Id[B])(f: (A, B) => C): Id[C] = f(fa, fb)
+      override def traverse[A, G[_], B](value: G[A])(f: A => Id[B])(implicit G: Traverse[G]): Id[G[B]] = G.map(value)(f)
 
-    override def map3[A, B, C, D](fa: Id[A], fb: Id[B], fc: Id[C])(f: (A, B, C) => D): Id[D] = f(fa, fb, fc)
+      override def sequence[A, G[_] : Traverse](as: G[Id[A]]): Id[G[A]] = as
 
-    override def map4[A, B, C, D, E](fa: Id[A], fb: Id[B], fc: Id[C], fd: Id[D])(f: (A, B, C, D) => E): Id[E] = f(fa, fb, fc, fd)
+      override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
-    override def map5[A, B, C, D, E, R](fa: Id[A], fb: Id[B], fc: Id[C], fd: Id[D], fe: Id[E])(f: (A, B, C, D, E) => R): Id[R] = f(fa, fb, fc, fd, fe)
+      def each[A](fa: scalaz.Id[A])(f: (A) => Unit) {
+        f(fa)
+      }
 
-    override def lift2[A, B, C](f: (A, B) => C): (Id[A], Id[B]) => Id[C] = f
+      override def compose[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
 
-    override def lift3[A, B, C, D](f: (A, B, C) => D): (Id[A], Id[B], Id[C]) => Id[D] = f
-
-    override def lift4[A, B, C, D, E](f: (A, B, C, D) => E): (Id[A], Id[B], Id[C], Id[D]) => Id[E] = f
-
-    override def lift5[A, B, C, D, E, R](f: (A, B, C, D, E) => R): (Id[A], Id[B], Id[C], Id[D], Id[E]) => Id[R] = f*/
-
-    override def compose[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
-
-    // TODO Fun compiler bug? "can't existentially abstract over parameterized type G"
-    // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
-  }
+      // TODO Fun compiler bug? "can't existentially abstract over parameterized type G"
+      // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
+    }
 }
