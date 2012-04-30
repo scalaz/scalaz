@@ -101,12 +101,13 @@ Scalaz has been been modularised.
 ### Type Class Hierarchy
 
 * Type classes form an inheritance hierarchy, as in Scalaz 6. This is convenient both at the call site and at the
-  type class instance definition. Considering for now the call site, it ensures the following code is valid:
+  type class instance definition. At the call site, it ensures that you can call a method requiring a more general
+  type class with an instance of a more specific type class:
 
 ```scala
 def bar[M: Functor] = ()
 
-def foo[M: Monad] = bar
+def foo[M: Monad] = bar // Monad[M] is a subtype of Functor[M]
 ```
 
 * The hierarchy itself is largely the same as in Scalaz 6. However, there have been a few
@@ -203,7 +204,7 @@ oi.join
 
 For some degree of backwards compability with Scalaz 6, the über-import of `import scalaz.Scalaz._`
 will import *all* implicit conversions that provide syntax (as well as type class instances and other
-functions). However, it is recommended to review usage of this and replace with more focussed imports.
+functions). However, we recommend to review usage of this and replace with more focussed imports.
 
 ### Standalone Type Class Usage
 
@@ -254,8 +255,9 @@ val ot = OptionT(List(Some(1), None))
 ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 ```
 
-The `OptionT#map` requires `Functor[F]`, whereas `OptionT#flatMap` requires `Monad[F]`. The capabilities of
-`OptionT` increase with those of `F`. We need to encode this into the type class instances for `[a]OptionT[F[A]]`.
+The method `OptionT#map` requires an implicit parameter of type `Functor[F]`, whereas `OptionT#flatMap`
+requires one of type `Monad[F]`. The capabilities of `OptionT` increase with those of `F`. We need to encode
+this into the type class instances for `[a]OptionT[F[A]]`.
 
 This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L59)
 and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L23).
@@ -270,7 +272,7 @@ implicitly[Functor[OptionTList]]
 // Candidates:
 // 1. OptionT.OptionTFunctor[List](implicitly[Functor[List]])
 // 2. OptionT.OptionTMonad[List](implicitly[Functor[List]])
-// #2 is defined in a subclass, so is preferred (although, either would have sufficed).
+// #2 is defined in a subclass of of the enclosing class of #1, so is preferred.
 ```
 
 ### Transformers and Identity
