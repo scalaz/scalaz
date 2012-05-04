@@ -44,13 +44,13 @@ sealed trait PLensT[F[_], G[_], A, B] {
     plensO(x => runO(g(x)) map (_ map (GF.map(_)(f))))
 
   def xmapbA[X](b: Bijection[A, X])(implicit FF: Functor[F], GF: Functor[G]): PLensT[F, G, X, B] =
-    xmapA(b to _, b fr _)
+    xmapA(b to _, b from _)
 
   def xmapB[X](f: B => X, g: X => B)(implicit FF: Functor[F], GF: Functor[G]): PLensT[F, G, A, X] =
     plensO(a => runO(a) map (_ xmap (f, g)))
 
   def xmapbB[X](b: Bijection[B, X])(implicit FF: Functor[F], GF: Functor[G]): PLensT[F, G, A, X] =
-    xmapB(b to _, b fr _)
+    xmapB(b to _, b from _)
 
   def lift[X[_]](implicit P: Pointed[X], FF: Functor[F], GF: Functor[G]): PLensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B] =
     plensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B](a => FF.map(run(a))(c => P.point(c map (_ map (GF.map(_)(P.point(_)))))))

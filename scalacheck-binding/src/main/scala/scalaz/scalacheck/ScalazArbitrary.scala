@@ -15,7 +15,7 @@ object ScalazArbitrary {
   import Arbitrary._
   import Gen._
   import ScalaCheckBinding._
-  import syntax.std.booleanV._
+  import syntax.std.boolean._
   import std.java.util.concurrent.callable._
   import syntax.functor._
 

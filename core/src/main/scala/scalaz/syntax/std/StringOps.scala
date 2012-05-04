@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.string
+import scalaz.std.{string => s}
 
 trait StringOps extends Ops[String]{
   /**
@@ -10,39 +10,39 @@ trait StringOps extends Ops[String]{
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
    * is appended.
    */
-  def plural(n: Long): String = string.plural(self, n)
+  def plural(n: Long): String = s.plural(self, n)
 
-  def encode(implicit c: CharSet): Array[Byte] = string.encode(self)
+  def encode(implicit c: CharSet): Array[Byte] = s.encode(self)
 
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def charsNel : Option[NonEmptyList[Char]] = string.charsNel(self)
+  def charsNel : Option[NonEmptyList[Char]] = s.charsNel(self)
 
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
    */
-  def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = string.charsNel(self, e)
+  def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = s.charsNel(self, e)
 
-  def charsNelErr(message: => String): NonEmptyList[Char] = string.charsNelErr(self, message)
+  def charsNelErr(message: => String): NonEmptyList[Char] = s.charsNelErr(self, message)
 
-  def unsafeCharsNel : NonEmptyList[Char] = string.unsafeCharsNel(self)
+  def unsafeCharsNel : NonEmptyList[Char] = s.unsafeCharsNel(self)
 
   // Parsing functions.
 
-  def parseBoolean: Validation[NumberFormatException, Boolean] = string.parseBoolean(self)
+  def parseBoolean: Validation[NumberFormatException, Boolean] = s.parseBoolean(self)
 
-  def parseByte: Validation[NumberFormatException, Byte] = string.parseByte(self)
+  def parseByte: Validation[NumberFormatException, Byte] = s.parseByte(self)
 
-  def parseShort: Validation[NumberFormatException, Short] = string.parseShort(self)
+  def parseShort: Validation[NumberFormatException, Short] = s.parseShort(self)
 
-  def parseInt: Validation[NumberFormatException, Int] = string.parseInt(self)
+  def parseInt: Validation[NumberFormatException, Int] = s.parseInt(self)
 
-  def parseLong: Validation[NumberFormatException, Long] = string.parseLong(self)
+  def parseLong: Validation[NumberFormatException, Long] = s.parseLong(self)
 
-  def parseFloat: Validation[NumberFormatException, Float] = string.parseFloat(self)
+  def parseFloat: Validation[NumberFormatException, Float] = s.parseFloat(self)
 
-  def parseDouble: Validation[NumberFormatException, Double] = string.parseDouble(self)
+  def parseDouble: Validation[NumberFormatException, Double] = s.parseDouble(self)
 }
 
 trait ToStringOps {

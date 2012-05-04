@@ -1,20 +1,26 @@
 package scalaz
 
-sealed trait BijectionT[F[_], G[_], A, B] {
+sealed trait BijectionT[F[_], G[_], A, B] { self =>
   def to(a: A): F[B]
-  def fr(b: B): G[A]
+  def from(b: B): G[A]
 
   import BijectionT._
   import std.AllInstances._
 
+  def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A] {
+    def to(a: B): G[A] = self.from(a)
+
+    def from(b: A): F[B] = self.to(b)
+  }
+
   def toK: Kleisli[F, A, B] =
     Kleisli(to(_))
 
-  def frK: Kleisli[G, B, A] =
-    Kleisli(fr(_))
+  def fromK: Kleisli[G, B, A] =
+    Kleisli(from(_))
 
   def lens(implicit FF: Functor[F]): LensT[F, G, A, B] =
-    LensT(a => FF.map(to(a))(CostateT((fr(_)): Id[B => G[A]], _)))
+    LensT(a => FF.map(to(a))(CostateT((from(_)): Id[B => G[A]], _)))
 
   def partial(implicit FF: Functor[F]): PLensT[F, G, A, B] =
     lens.partial
@@ -26,7 +32,7 @@ sealed trait BijectionT[F[_], G[_], A, B] {
   def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(
       F.bimap(_)(to(_), g.to(_)): Id[X[B, D]]
-    , F.bimap(_)(fr(_), g.fr(_)): Id[X[A, C]]
+    , F.bimap(_)(from(_), g.from(_)): Id[X[A, C]]
     )
 
   def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
@@ -38,7 +44,7 @@ sealed trait BijectionT[F[_], G[_], A, B] {
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
       (toK <=< g.toK) run _
-    , (frK >=> g.frK) run _
+    , (fromK >=> g.fromK) run _
     )
 
   /** alias for `compose` */
@@ -57,7 +63,7 @@ trait BijectionTFunctions {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B] {
       def to(a: A) = t(a)
-      def fr(b: B) = f(b)
+      def from(b: B) = f(b)
     }
 
   import std.AllInstances._
@@ -107,12 +113,10 @@ trait BijectionTFunctions {
 }
 
 trait BijectionTInstances {
-
   implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new BijectionTCategory[F, G] {
     implicit def F: Monad[F] = F0
     implicit def G: Monad[G] = G0
   }
-
 }
 
 private[scalaz] trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {

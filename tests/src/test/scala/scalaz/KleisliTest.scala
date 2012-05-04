@@ -48,15 +48,6 @@ class KleisliTest extends Spec {
     def category[F[_]: Monad, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def arrow[F[_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
-    // F = Id
-    def readerFunctor[A] = Functor[({type λ[α]=Reader[A, α]})#λ]
-    def readerApply[A] = Apply[({type λ[α]=Reader[A, α]})#λ]
-    def readerPointed[A] = Pointed[({type λ[α]=Reader[A, α]})#λ]
-    def readerMonadReader[A] = MonadReader[({type f[s, a] = Reader[s, a]})#f, A]
-    def readerArrId[A] = ArrId[Reader]
-    def readerCategory[A] = ArrId[Reader]
-    def readerArrow[A] = Arrow[Reader]
-
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def functor[F[_] : Monad, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
@@ -64,5 +55,16 @@ class KleisliTest extends Spec {
     def pointed[F[_] : Monad, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
+
+    object reader {
+      // F = Id
+      def readerFunctor[A] = Functor[({type λ[α] = Reader[A, α]})#λ]
+      def readerApply[A] = Apply[({type λ[α] = Reader[A, α]})#λ]
+      def readerPointed[A] = Pointed[({type λ[α] = Reader[A, α]})#λ]
+      def readerMonadReader[A] = MonadReader[({type f[s, a] = Reader[s, a]})#f, A]
+      def readerArrId[A] = ArrId[Reader]
+      def readerCategory[A] = ArrId[Reader]
+      def readerArrow[A] = Arrow[Reader]
+    }
   }
 }

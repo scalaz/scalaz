@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait MapInstances {
-  import syntax.std.function2V._
+  import syntax.std.function2._
   
   implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new Monoid[Map[K, V]] {
     def zero = Map[K, V]()

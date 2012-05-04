@@ -14,7 +14,7 @@ sealed trait CostateT[F[_], A, B] {
     costateT(F.map(set)(_ compose g), f(pos))
 
   def bmap[X](b: Bijection[A, X])(implicit F: Functor[F]): CostateT[F, X, B] =
-    xmap(b to _, b fr _)
+    xmap(b to _, b from _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))

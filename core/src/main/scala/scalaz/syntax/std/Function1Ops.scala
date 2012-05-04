@@ -62,7 +62,7 @@ trait Function1Ops[T, R] extends Ops[T => R] {
 
 }
 
-trait ToFunctions1Ops {
+trait ToFunction1Ops {
   implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] = new Function1Ops[A, B] {
     val self = f
   }
