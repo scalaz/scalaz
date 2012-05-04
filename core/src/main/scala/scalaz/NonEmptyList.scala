@@ -1,5 +1,6 @@
 package scalaz
 
+/** A singly-linked list that is guaranteed to be non-empty. */
 sealed trait NonEmptyList[A] {
   val head: A
   val tail: List[A]
@@ -21,6 +22,9 @@ sealed trait NonEmptyList[A] {
   }
 
   def :::>(bs: List[A]): NonEmptyList[A] = nel(head, tail ::: bs)
+
+  /** Append one nonempty list to another. */
+  def append(f2: NonEmptyList[A]): NonEmptyList[A] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
@@ -124,7 +128,7 @@ trait NonEmptyListInstances {
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
-    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1.list <::: f2
+    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = new Show[NonEmptyList[A]] {

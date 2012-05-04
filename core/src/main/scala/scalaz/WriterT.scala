@@ -67,7 +67,7 @@ sealed trait WriterT[F[_], W, A] { self =>
   }
 
   def foldRight[B](z: => B)(f: (A, => B) => B)(implicit F: Foldable[F]) =
-    F.foldR(run, z) { a => b =>
+    F.foldr(run, z) { a => b =>
       f(a._2, b)
     }
 

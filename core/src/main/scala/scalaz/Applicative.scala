@@ -73,6 +73,11 @@ object Applicative {
 
   ////
 
+  def applicative[F[_]](p: Pointed[F], a: Apply[F]): Applicative[F] = new Applicative[F] {
+    def point[A](a: => A): F[A] = p.point(a)
+    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] = a.ap(fa)(f)
+  }
+
   ////
 }
 

@@ -19,7 +19,7 @@ trait Generators {
 
   def FoldrGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
     override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Foldable[F].foldR(c, r.zero)(a => b => r.cons(a, b))
+      Foldable[F].foldr(c, r.zero)(a => b => r.cons(a, b))
   }
 
   def FoldlGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {

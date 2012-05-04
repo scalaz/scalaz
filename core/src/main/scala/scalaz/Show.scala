@@ -26,6 +26,13 @@ object Show {
     def show(f: A): List[Char] = f.toString.toList
   }
 
+  /** For compatibility with Scalaz 6 */
+  def showA[A]: Show[A] = showFromToString[A]
+
+  def show[A](f: A => List[Char]): Show[A] = new Show[A] {
+    def show(a: A): List[Char] = f(a)
+  }
+
   implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
     def contramap[A, B](r: Show[A])(f: (B) => A): Show[B] = new Show[B] {
       def show(b: B): List[Char] = r.show(f(b))

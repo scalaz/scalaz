@@ -15,7 +15,7 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
     G.traverse(self)(f)
 
   /** A version of `traverse` that infers the type constructor `G` */
-  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
+  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
     G.TC.traverse(self)(a => G(f(a)))
   }
 

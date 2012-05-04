@@ -386,7 +386,7 @@ trait HeapFunctions {
     Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
 
   def fromCodata[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldR(as, Empty[A])(x => y => y insert x)
+    Foldable[F].foldr(as, Empty[A])(x => y => y insert x)
 
   def fromDataWith[F[_] : Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))

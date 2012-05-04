@@ -18,7 +18,17 @@ trait MapInstances {
       }
     }
   }
-  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new Equal[Map[K, V]] {
+
+  implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] {
+    def order(x: Map[K, V], y: Map[K, V]): Ordering = {
+      import list._
+      import tuple._
+      Order[List[(K, V)]].order(x.toList, y.toList)
+    }
+  }
+
+  // TODO: Make this a lower-priority instance
+  /*implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new Equal[Map[K, V]] {
     def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
@@ -29,7 +39,7 @@ trait MapInstances {
       }
     }
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
-  }
+  }*/
 }
 
 object map extends MapInstances
