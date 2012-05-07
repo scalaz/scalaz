@@ -99,7 +99,7 @@ object WriterT extends WriterTFunctions with WriterTInstances {
 }
 
 trait WriterTInstances13 {
-  implicit def writerFunctor[W] = new WriterTFunctor[Id, W] {
+  implicit def writerFunctor[W]: WriterTFunctor[Id, W] = new WriterTFunctor[Id, W] {
     implicit def F = idInstance
   }
 }
@@ -197,13 +197,13 @@ trait WriterTInstances1 extends WriterTInstances2 {
 }
 
 trait WriterTInstances0 extends WriterTInstances1 {
-  implicit def writerBitraverse = new WriterTBitraverse[Id] {
+  implicit def writerBitraverse: WriterTBitraverse[Id] = new WriterTBitraverse[Id] {
     implicit def F = idInstance
   }
-  implicit def writerTraverse[W] = new WriterTTraverse[Id, W] {
+  implicit def writerTraverse[W]: WriterTTraverse[Id, W] = new WriterTTraverse[Id, W] {
     implicit def F = idInstance
   }
-  implicit def writerEach[W] = new WriterTEach[Id, W] {
+  implicit def writerEach[W]: WriterTEach[Id, W] = new WriterTEach[Id, W] {
     implicit def F = idInstance
   }
 }

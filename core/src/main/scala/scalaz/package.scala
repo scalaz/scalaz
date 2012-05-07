@@ -87,7 +87,7 @@ package object scalaz {
    * `StateT[Id, A, B]`.
    */
   // WARNING: Don't mix this instance in via a trait. https://issues.scala-lang.org/browse/SI-5268
-  implicit val idInstance = Id.id
+  implicit val idInstance: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] = Id.id
 
   object Id extends IdInstances {
   }

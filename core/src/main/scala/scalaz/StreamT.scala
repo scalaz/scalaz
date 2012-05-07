@@ -107,6 +107,12 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     def addOne(c: => Int, a: => A) = 1 + c
     foldLeft(0)(addOne _)
   }
+
+  def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step) {
+    case Yield(a,s) => M.bind(f(a))(_ => s().foreach(f))
+    case Skip(s) => s().foreach(f)
+    case Done => M.pure(())
+  }
   
   private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
 
@@ -184,11 +190,21 @@ object StreamT extends StreamTInstances {
     def stepper(b: Iterable[A]): Option[(A,Iterable[A])] = if (b.isEmpty) None else Some((b.head, b.tail))
     unfold(s)(stepper)
   }
+
+  def wrapEffect[M[_]:Functor,A](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(Functor[M].map(m)(Skip(_)))
   
   abstract sealed class Step[+A, +S] {
     def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z): Z
   }
 
+  def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S): StreamT[Id,A] =
+    StreamT[Id,A]({
+      val (sa, s1) = stream.step(s0)
+      sa((a, as) => Yield(a, runStreamT(as, s1)),
+         as => Skip(runStreamT(as, s1)),
+         Done)
+    })
+  
   object Yield {
     def apply[A, S](a: A, s: => S): Step[A, S] = new Step[A, S] {
       def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z) = yieldd(a, s)

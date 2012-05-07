@@ -2,8 +2,8 @@ package scalaz
 
 /** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
 trait IdInstances {
-  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
-    new Traverse[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+  implicit val id: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+    new Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
