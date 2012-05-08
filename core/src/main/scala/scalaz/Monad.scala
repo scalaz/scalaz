@@ -2,6 +2,9 @@ package scalaz
 
 ////
 /**
+ * Monad, an [[scalaz.Applicative]] that also support [[scalaz.Bind]],
+ * circumscribed by the monad laws.
+ *
  * @see [[scalaz.Monad.MonadLaw]]
  */
 ////
