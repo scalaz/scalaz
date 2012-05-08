@@ -5,6 +5,7 @@ import Keys._
 import GenTypeClass._
 import Project.Setting
 //import com.jsuereth.pgp.GpgPlugin._
+import com.typesafe.sbtosgi.OsgiPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -86,6 +87,10 @@ object build extends Build {
         }
         </developers>
       )
+  ) ++ osgiSettings ++ Seq[Sett](
+    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package"),
+    packagedArtifact in (Compile, packageBin) <<= (artifact in (Compile, packageBin), OsgiKeys.bundle).identityMap,
+    artifact in (Compile, packageBin) ~= { _.copy(`type` = "bundle") }
   )
 
   lazy val scalaz = Project(
@@ -103,7 +108,9 @@ object build extends Build {
       typeClasses := TypeClass.core,
       (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
-      }
+      },
+      OsgiKeys.exportPackage := Seq("scalaz.*;version=${Bundle-Version}"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
   )
 
@@ -112,7 +119,9 @@ object build extends Build {
     base = file("concurrent"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-concurrent",
-      typeClasses := TypeClass.concurrent
+      typeClasses := TypeClass.concurrent,
+      OsgiKeys.exportPackage := Seq("scalaz.concurrent.*;version=${Bundle-Version}"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
     dependencies = Seq(core)
   )
@@ -122,7 +131,8 @@ object build extends Build {
     base = file("effect"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-effect",
-      typeClasses := TypeClass.effect
+      typeClasses := TypeClass.effect,
+      OsgiKeys.exportPackage := Seq("scalaz.effect;version=${Bundle-Version}", "scalaz.std.effect.*;version=${Bundle-Version}", "scalaz.syntax.effect;version=${Bundle-Version}")
     ),
     dependencies = Seq(core)
   )
@@ -131,7 +141,8 @@ object build extends Build {
     id = "iteratee",
     base = file("iteratee"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iteratee"
+      name := "scalaz-iteratee",
+      OsgiKeys.exportPackage := Seq("scalaz.iteratee.*;version=${Bundle-Version}")
     ),
     dependencies = Seq(effect)
   )
@@ -149,7 +160,8 @@ object build extends Build {
     id = "typelevel",
     base = file("typelevel"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-typelevel"
+      name := "scalaz-typelevel",
+      OsgiKeys.exportPackage := Seq("scalaz.typelevel.*;version=${Bundle-Version}")
     ),
     dependencies = Seq(core)
   )
@@ -159,7 +171,8 @@ object build extends Build {
     base = file("xml"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-xml",
-      typeClasses := TypeClass.xml
+      typeClasses := TypeClass.xml,
+      OsgiKeys.exportPackage := Seq("scalaz.xml.*;version=${Bundle-Version}")
     ),
     dependencies = Seq(core)
   )
@@ -169,7 +182,8 @@ object build extends Build {
     base = file("example"),
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-example"
+      name := "scalaz-example",
+      OsgiKeys.exportPackage := Seq("scalaz.example.*;version=${Bundle-Version}")
     )
   )
 
@@ -179,7 +193,8 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
+      libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9",
+      OsgiKeys.exportPackage := Seq("scalaz.scalacheck;version=${Bundle-Version}")
     )
   )
 
