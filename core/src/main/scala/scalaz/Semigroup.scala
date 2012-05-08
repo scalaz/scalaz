@@ -2,7 +2,9 @@ package scalaz
 
 ////
 /**
- * An associative binary operation.
+ * An associative binary operation, circumscribed by type and the
+ * semigroup laws.  Unlike [[scalaz.Monoid]], there is not necessarily
+ * a zero.
  *
  * @see [[scalaz.Semigroup.SemigroupLaw]]
  * @see [[scalaz.syntax.SemigroupV]]
@@ -54,10 +56,12 @@ object Semigroup {
   @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
   ////
+  /** A purely left-biased semigroup. */
   def firstSemigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = f1
   }
 
+  /** A purely right-biased semigroup. */
   def lastSemigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = f2
   }
