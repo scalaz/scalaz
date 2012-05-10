@@ -16,15 +16,15 @@ class CostateTTest extends Spec {
 
   object instances {
     type A = Int
-    def functor[F[_] : Functor] = Functor[({type λ[α] = CostateT[F, A, α]})#λ]
-    def copointed[F[_] : Copointed] = Copointed[({type λ[α] = CostateT[F, A, α]})#λ]
-    def cobind[F[_] : Cobind] = Cobind[({type λ[α] = CostateT[F, A, α]})#λ]
-    def comonad[F[_] : Comonad] = Comonad[({type λ[α] = CostateT[F, A, α]})#λ]
+    def functor[F[+_] : Functor] = Functor[({type λ[+α] = CostateT[F, A, α]})#λ]
+    def copointed[F[+_] : Copointed] = Copointed[({type λ[+α] = CostateT[F, A, α]})#λ]
+    def cobind[F[+_] : Cobind] = Cobind[({type λ[+α] = CostateT[F, A, α]})#λ]
+    def comonad[F[+_] : Comonad] = Comonad[({type λ[+α] = CostateT[F, A, α]})#λ]
 
     // checking absence of ambiguity
-    def functor[F[_] : Comonad] = Functor[({type λ[α] = CostateT[F, A, α]})#λ]
-    def copointed[F[_] : Comonad] = Copointed[({type λ[α] = CostateT[F, A, α]})#λ]
-    def cobind[F[_] : Comonad] = Cobind[({type λ[α] = CostateT[F, A, α]})#λ]
+    def functor[F[+_] : Comonad] = Functor[({type λ[+α] = CostateT[F, A, α]})#λ]
+    def copointed[F[+_] : Comonad] = Copointed[({type λ[+α] = CostateT[F, A, α]})#λ]
+    def cobind[F[+_] : Comonad] = Cobind[({type λ[+α] = CostateT[F, A, α]})#λ]
   }
 
 }

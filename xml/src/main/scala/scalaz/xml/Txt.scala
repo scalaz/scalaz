@@ -65,9 +65,9 @@ object Txt extends Txts {
   import CostateT._
 
   val is_txtTxtL: Txt @> Boolean =
-    lens(x => costate(b => if(b) txtBit(x.str) else crefBit(x.str), x.isTxt))
+    lens(x => costate(x.isTxt)(b => if(b) txtBit(x.str) else crefBit(x.str)))
 
   val strTxtL: Txt @> Str =
-    lens(x => costate(b => if(x.isTxt) txtBit(b) else crefBit(b), x.str))
+    lens(x => costate(x.str)(b => if(x.isTxt) txtBit(b) else crefBit(b)))
 
 }

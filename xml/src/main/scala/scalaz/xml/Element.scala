@@ -263,15 +263,15 @@ object Element extends Elements {
   import CostateT._
 
   val nameElementL: Element @> QName =
-    lens(x => costate(b => element(b, x.attribs, x.content, x.line), x.name))
+    lens(x => costate(x.name)(b => element(b, x.attribs, x.content, x.line)))
 
   val attribsElementL: Element @> List[Attr] =
-    lens(x => costate(b => element(x.name, b, x.content, x.line), x.attribs))
+    lens(x => costate(x.attribs)(b => element(x.name, b, x.content, x.line)))
 
   val contentElementL: Element @> List[Content] =
-    lens(x => costate(b => element(x.name, x.attribs, b, x.line), x.content))
+    lens(x => costate(x.content)(b => element(x.name, x.attribs, b, x.line)))
 
   val lineElementL: Element @> Option[Line] =
-    lens(x => costate(b => element(x.name, x.attribs, x.content, b), x.line))
+    lens(x => costate(x.line)(b => element(x.name, x.attribs, x.content, b)))
 
 }

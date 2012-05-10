@@ -2,8 +2,6 @@
 package scalaz
 import Scalaz._
 
-import Id._
-
 /** The input to an iteratee. */
 sealed trait Input[E] {
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
