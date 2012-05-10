@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /** Functors that annihilate each other. */
 trait Zap[F[_], G[_]] { self =>
   def zapWith[A, B, C](fa: F[A], gb: G[B])(f: (A, B) => C): C

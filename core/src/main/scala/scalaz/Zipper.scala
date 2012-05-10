@@ -9,7 +9,7 @@ import annotation.tailrec
  * <p/>
  * Based on the pointedlist library by Jeff Wheeler.
  */
-sealed trait Zipper[A] {
+sealed trait Zipper[+A] {
   val focus: A
   val lefts: Stream[A]
   val rights: Stream[A]
@@ -62,7 +62,7 @@ sealed trait Zipper[A] {
   /**
    * Possibly moves to next element to the right of focus.
    */
-  def nextOr(z: => Zipper[A]): Zipper[A] =
+  def nextOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     next getOrElse z
 
   /**
@@ -81,7 +81,7 @@ sealed trait Zipper[A] {
   /**
    * Possibly moves to previous element to the right of focus.
    */
-  def previousOr(z: => Zipper[A]): Zipper[A] =
+  def previousOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     previous getOrElse z
 
   /**
@@ -92,17 +92,17 @@ sealed trait Zipper[A] {
   /**
    * An alias for insertRight
    */
-  def insert: (A => Zipper[A]) = insertRight(_: A)
+  def insert[AA >: A]: (AA => Zipper[AA]) = insertRight(_: AA)
 
   /**
    * Inserts an element to the left of focus and focuses on the new element.
    */
-  def insertLeft(y: A): Zipper[A] = zipper(lefts, y, focus #:: rights)
+  def insertLeft[AA >: A](y: AA): Zipper[AA] = zipper(lefts, y, focus #:: rights)
 
   /**
    * Inserts an element to the right of focus and focuses on the new element.
    */
-  def insertRight(y: A): Zipper[A] = zipper(focus #:: lefts, y, rights)
+  def insertRight[AA >: A](y: AA): Zipper[AA] = zipper(focus #:: lefts, y, rights)
 
   /**
    * An alias for deleteRight
@@ -125,7 +125,7 @@ sealed trait Zipper[A] {
    * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
    * focus is moved to the right.
    */
-  def deleteLeftOr(z: => Zipper[A]): Zipper[A] =
+  def deleteLeftOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteLeft getOrElse z
 
   /**
@@ -144,7 +144,7 @@ sealed trait Zipper[A] {
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
    * focus is moved to the left.
    */
-  def deleteRightOr(z: => Zipper[A]): Zipper[A] =
+  def deleteRightOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteRight getOrElse z
 
   /**
@@ -212,7 +212,7 @@ sealed trait Zipper[A] {
   /**
    * Moves focus to the nth element of the zipper, or the default if there is no such element.
    */
-  def moveOr(n: Int, z: => Zipper[A]): Zipper[A] =
+  def moveOr[AA >: A](n: Int, z: => Zipper[AA]): Zipper[AA] =
     move(n) getOrElse z
 
   /**
@@ -230,13 +230,13 @@ sealed trait Zipper[A] {
    * Moves focus to the nearest element matching the given predicate, preferring the left,
    * or the default if no element matches.
    */
-  def findZor(p: A => Boolean, z: => Zipper[A]): Zipper[A] =
+  def findZor[AA >: A](p: A => Boolean, z: => Zipper[AA]): Zipper[AA] =
     findZ(p) getOrElse z
 
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
    */
-  def findBy(f: Zipper[A] => Option[Zipper[A]])(p: A => Boolean): Option[Zipper[A]] = {
+  def findBy[AA >: A](f: Zipper[AA] => Option[Zipper[AA]])(p: AA => Boolean): Option[Zipper[AA]] = {
     f(this) flatMap (x => if (p(x.focus)) Some(x) else x.findBy(f)(p))
   }
 
@@ -307,7 +307,7 @@ sealed trait Zipper[A] {
    * Deletes the focused element and moves focus to the left. If the focus was on the first element,
    * focus is moved to the last element.
    */
-  def deleteLeftCOr(z: => Zipper[A]): Zipper[A] =
+  def deleteLeftCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteLeftC getOrElse z
 
   /**
@@ -328,7 +328,7 @@ sealed trait Zipper[A] {
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
    * focus is moved to the first element.
    */
-  def deleteRightCOr(z: => Zipper[A]): Zipper[A] =
+  def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteRightC getOrElse z
 
   /**

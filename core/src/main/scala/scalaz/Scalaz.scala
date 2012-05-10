@@ -7,3 +7,4 @@ object Scalaz
   with std.AllInstances         // Type class instances for the standard library types
   with std.AllFunctions         // Functions related to standard library types
   with syntax.std.ToAllStdOps   // syntax associated with standard library types
+  with IdInstances              // Identity type and instances

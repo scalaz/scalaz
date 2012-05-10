@@ -75,25 +75,9 @@
  *  - [[scalaz.EitherT]] Represents computations of type `F[Either[A, B]]`
  */
 package object scalaz {
-  /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
-   *  runtime representation.
-   */
-  type Id[+X] = X
+  import Id._
 
-  /**
-   * Type class instance for the strict identity type constructor
-   *
-   * This is important when using aliases like `State[A, B]`, which is a type alias for
-   * `StateT[Id, A, B]`.
-   */
-  // WARNING: Don't mix this instance in via a trait. https://issues.scala-lang.org/browse/SI-5268
   implicit val idInstance: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] = Id.id
-
-  object Id extends IdInstances {
-  }
-
-  // TODO Review!
-  type Identity[X] = Need[X]
 
   type Tagged[T] = {type Tag = T}
 
@@ -117,7 +101,7 @@ package object scalaz {
 
   type |>=|[G[_], F[_]] = MonadPartialOrder[G, F] 
 
-  type ReaderT[F[_], E, A] = Kleisli[F, E, A]
+  type ReaderT[F[+_], E, A] = Kleisli[F, E, A]
   type =?>[E, A] = Kleisli[Option, E, A]
   type Reader[E, A] = ReaderT[Id, E, A]
 
@@ -137,7 +121,7 @@ package object scalaz {
   }
 
   /** A state transition, representing a function `S => (A, S)`. */
-  type State[S, A] = StateT[Id, S, A]
+  type State[S, +A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object State extends StateFunctions {
@@ -152,13 +136,13 @@ package object scalaz {
   // flipped
   type |-->[A, B] = Costate[B, A]
 
-  type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[Identity, R, W, S, A]
+  type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Identity, R, W, S, A]
 
-  type RWST[F[_], R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
+  type RWST[F[+_], -R, +W, S, +A] = ReaderWriterStateT[F, R, W, S, A]
 
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
 
-  type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
+  type RWS[-R, +W, S, +A] = ReaderWriterState[R, W, S, A]
 
   type Alternative[F[_]] = ApplicativePlus[F]
 
@@ -177,7 +161,6 @@ package object scalaz {
   //
   // Lens type aliases
   //
-
   type Lens[A, B] = LensT[Id, Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
@@ -186,14 +169,14 @@ package object scalaz {
       lens(r)
   }
 
-  type @>[A, B] = LensT[Id, Id, A, B]
+  type @>[A, B] = Lens[A, B]
 
-  type LenswT[F[_], G[_], V, W, A, B] =
-    LensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
+  type LenswT[F[+_], G[+_], V, W, A, B] =
+    LensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B]
 
   type Lensw[V, W, A, B] = LenswT[Id, Id, V, W, A, B]
 
-  type LenshT[F[_], G[_], A, B] =
+  type LenshT[F[+_], G[+_], A, B] =
   LenswT[F, G, LensGetHistory[A, B], LensSetHistory[A, B], A, B]
 
   type Lensh[A, B] = LenshT[Id, Id, A, B]
@@ -208,17 +191,17 @@ package object scalaz {
 
   type @?>[A, B] = PLensT[Id, Id, A, B]
 
-  type PLenswT[F[_], G[_], V, W, A, B] =
-    PLensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B]
+  type PLenswT[F[+_], G[+_], V, W, A, B] =
+    PLensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B]
 
   type PLensw[V, W, A, B] = PLenswT[Id, Id, V, W, A, B]
 
-  type PLenshT[F[_], G[_], A, B] =
+  type PLenshT[F[+_], G[+_], A, B] =
   PLenswT[F, G, PLensGetHistory[A, B], PLensSetHistory[A, B], A, B]
 
   type PLensh[A, B] = PLenshT[Id, Id, A, B]
 
-  type PStateT[F[_], A, B] = StateT[F, A, Option[B]]
+  type PStateT[F[+_], A, B] = StateT[F, A, Option[B]]
 
   type PState[A, B] = StateT[Id, A, Option[B]]
 }

@@ -4,6 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary
 import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, _}
 import std.AllInstances._
+import Id._
 
 class StateTTest extends Spec {
 

@@ -270,3 +270,32 @@ object UnapplyProduct {
     def _2(mb: MB0) = iso.from(U2(mb))
   }
 }
+
+/** Unapply a covariant type constructor, maintaining the covariance */
+trait UnapplyCo[TC[_[_]], MA] {
+
+  /** The type constructor */
+  type M[+_]
+
+  /** The type that `M` was applied to */
+  type A
+
+  /** The instance of the type class */
+  def TC: TC[M]
+
+  /** Evidence that MA =:= M[A] */
+  def apply(ma: MA): M[A]
+}
+
+object UnapplyCo {
+  implicit def unapplyMA[TC[_[_]], M0[+_], A0](implicit TC0: TC[M0]): UnapplyCo[TC, M0[A0]] {
+    type M[+X] = M0[X]
+    type A = A0
+  } = new UnapplyCo[TC, M0[A0]] {
+    type M[+X] = M0[X]
+    type A = A0
+    def TC = TC0
+    def apply(ma: M0[A0]) = ma
+  }
+}
+

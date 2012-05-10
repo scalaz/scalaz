@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 ////
 /**
  * Idiomatic traversal of a structure, as described in
@@ -44,17 +46,17 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traverseS(fa)(f)(s)
 
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
-  def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
+  def traverseSTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
-    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline]
+    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline, G[F[B]]]
   }
 
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
-  def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
+  def traverseKTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
     implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
-    Kleisli(traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).unliftId[Trampoline] run _)
+    Kleisli(traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).unliftId[Trampoline, S, G[F[B]]] run _)
   }
 
   // derived functions

@@ -244,7 +244,7 @@ trait IOFunctions extends IOStd {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegionT[P[_] : MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
+  def runRegionT[P[+_] : MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
     def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {

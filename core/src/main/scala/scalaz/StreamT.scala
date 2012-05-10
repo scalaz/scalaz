@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * StreamT monad transformer.
  */

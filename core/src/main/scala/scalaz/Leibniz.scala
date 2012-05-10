@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Leibnizian equality: a better `=:=`
  *
@@ -74,6 +76,8 @@ trait LeibnizFunctions {
    */
   implicit def witness[A, B](f: A === B): A => B =
     f.subst[({type λ[X] = A => X})#λ](identity)
+
+  implicit def subst[A, B](a: A)(implicit f: A === B): B = f.subst[Id](a)
 
   /** Equality is transitive */
   def trans[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](

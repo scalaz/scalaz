@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Type-level data structures in '''Scalaz'''.
  *
