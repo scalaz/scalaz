@@ -3,6 +3,8 @@ package syntax
 
 import Id._
 
+import UnapplyCo._
+
 trait KleisliIdOps[A] extends Ops[A] {
   /** Lift the value into a Kleisli */
   def liftKleisliId[R]: Kleisli[Id, R, A] = Kleisli[Id, R, A](_ => self)
@@ -19,7 +21,12 @@ trait KleisliFAOps[F[+_], A] extends Ops[F[A]] {
   def liftReaderT[R]: ReaderT[F, R, A] = liftKleisli
 }
 
-trait ToKleisliOps {
+trait ToKleisliOps0 {
+  implicit def ToKleisliOpsUnapply[FA](v: FA)(implicit F0: UnapplyCo[Monad, FA]) =
+    new KleisliFAOps[F0.M, F0.A] { def self = F0(v) }
+}
+
+trait ToKleisliOps extends ToKleisliOps0 {
   implicit def ToKleisliIdOps[A](a: A) = new KleisliIdOps[A]{ def self = a }
   implicit def ToKleisliFAOps[F[+_], A](fa: F[A]) = new KleisliFAOps[F, A] { def self = fa }
 }
