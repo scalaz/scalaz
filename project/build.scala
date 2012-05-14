@@ -154,7 +154,8 @@ object build extends Build {
     id = "iterv",
     base = file("iterv"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iterv"
+      name := "scalaz-iterv",
+      OsgiKeys.fragmentHost := Some("org.scalaz.core")
     ),
     dependencies = Seq(effect)
   )
