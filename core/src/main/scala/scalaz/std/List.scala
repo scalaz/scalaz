@@ -242,6 +242,16 @@ trait ListFunctions {
     case Nil      => Nil
     case (_ :: t) => as zip t
   }
+
+  /* Create a list of `Some` values from a list of `Option`. */
+  final def catOptions[A](as: List[Option[A]]): List[A] = for {
+    Some(a) <- as
+  } yield a
+
+  /* Create a list of `Success` values from a list of `Validation`. */
+  final def catValidations[A, B](as: List[Validation[A, B]]): List[B] = for {
+    Success(a) <- as
+  } yield a
 }
 
 object list extends ListInstances with ListFunctions {
