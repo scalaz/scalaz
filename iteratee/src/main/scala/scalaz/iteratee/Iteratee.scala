@@ -2,6 +2,7 @@ package scalaz
 package iteratee
 
 import Iteratee._
+import Id._
 
 trait IterateeFunctions {
   def iteratee[E, A](s: Step[E, A]): Iteratee[E, A] =

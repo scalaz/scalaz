@@ -60,9 +60,17 @@ trait Order[F] extends Equal[F] { self =>
 object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
+  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
+    def order(a1: A, a2: A) = f(a1, a2)
+  }
+
   ////
   implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
+  }
+
+  implicit def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
+    def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
   }
 
   def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f

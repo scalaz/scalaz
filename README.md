@@ -163,8 +163,8 @@ in Scala flows from left-to-right, can require fewer type annotations.
 * No more `Identity`, `MA`, or `MAB` from Scalaz 6.
 * Syntax is segregated from rest of the library, in a sub-package `scalaz.syntax`.
 * All Scalaz functionality is available *without* using the provided syntax, by directly calling methods
-  on the type class or it's companion object.
-* Syntax is available *a-la-carte*. You can import the syntax for working with a particular
+  on the type class or its companion object.
+* Syntax is available *a-la-carte*. You can import the syntax for working with particular
   type classes where you need it. This avoids flooding the autocompletion in your IDE with
   every possible extension method. This should also help compiler performance,
   by reducing the implicit search space.

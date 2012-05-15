@@ -75,7 +75,7 @@ sealed trait LazyEitherT[F[_], A, B] {
   }
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z = {
-    F.foldR[LazyEither[A, B], Z](run, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
+    F.foldr[LazyEither[A, B], Z](run, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
   }
 
   def ap[C](f: => LazyEitherT[F, A, B => C])(implicit F: Applicative[F]): LazyEitherT[F, A, C] = {

@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 trait NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]

@@ -99,6 +99,8 @@ trait Syntaxes {
 
   object writer extends ToWriterOps
 
+  object state extends ToStateOps
+
   object foldable extends ToFoldableOps
 
   object validation extends ToValidationOps

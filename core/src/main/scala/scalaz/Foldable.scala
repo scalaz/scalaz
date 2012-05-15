@@ -54,23 +54,27 @@ trait Foldable[F[_]]  { self =>
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
+  /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */  
+  def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
+    foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
+
   /**Curried version of `foldRight` */
-  final def foldR[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
+  final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
 
   /**Curred version of `foldLeft` */
-  final def foldL[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+  final def foldl[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
 
   /**Curried version of `foldRightM` */
-  final def foldRM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
+  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
     foldRightM(fa, z)((a, b) => f(a)(b))
 
   /**Curried version of `foldLeftM` */
-  final def foldLM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
+  final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
-  def foldR1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldR(fa, None: Option[A])(a => o => o.map(f(a)(_)) orElse Some(a))
-  def foldL1[A](fa: F[A])(f: (A => (=> A) => A)): Option[A] = foldL(fa, None: Option[A])(o => a => o.map(f(a)(_)) orElse Some(a))
+  def foldr1[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, o) => o.map(f(a, _)) orElse Some(a))
+  def foldl1[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((o, a) => o.map(f(a, _)) orElse Some(a))
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
@@ -80,8 +84,8 @@ trait Foldable[F[_]]  { self =>
   def any[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, false)(p(_) || _)
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
   import Ordering.{GT, LT}
-  def maximum[A: Order](fa: F[A]): Option[A] = foldL1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
-  def minimum[A: Order](fa: F[A]): Option[A] = foldL1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
+  def maximum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == GT) x else y)
+  def minimum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == LT) x else y)
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
@@ -212,7 +216,7 @@ object Foldable {
    * Example:
    * {{{
    * new Foldable[Option] with Foldable.FromFoldr[Option] {
-   *   def foldR[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B) = fa match {
+   *   def foldr[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B) = fa match {
    *     case Some(a) => f(a)(z)
    *     case None => z
    *   }
@@ -221,7 +225,7 @@ object Foldable {
    */
   trait FromFoldr[F[_]] extends Foldable[F] {
     override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) =
-        foldR[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
+        foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
   }
 
   ////

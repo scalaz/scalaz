@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse` */
-trait TraverseOps[F[_],A] extends Ops[F[A]] {
+trait TraverseOps[F[_], A] extends Ops[F[A]] {
   implicit def F: Traverse[F]
   ////
 
@@ -15,7 +15,7 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
     G.traverse(self)(f)
 
   /** A version of `traverse` that infers the type constructor `G` */
-  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
+  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
     G.TC.traverse(self)(a => G(f(a)))
   }
 
@@ -38,14 +38,14 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
    * A version of `traverse` specialized for `State[S, G[B]]` that internally uses a `Trampoline`
    * to avoid stack-overflow.
    */
-  final def traverseSTrampoline[G[_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
+  final def traverseSTrampoline[G[+_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
     F.traverseSTrampoline[S, G, A, B](self)(f)
 
   /**
    * A version of `traverse` specialized for `Kleisli[G, S, B]` that internally uses a `Trampoline`
    * to avoid stack-overflow.
    */
-  final def traverseKTrampoline[G[_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
+  final def traverseKTrampoline[G[+_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
     F.traverseKTrampoline[S, G, A, B](self)(f)
 
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =
@@ -69,7 +69,7 @@ trait ToTraverseOps0 {
 }
 
 trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
-  implicit def ToTraverseOps[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
+  implicit def ToTraverseOps[F[+_],A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
 
   ////

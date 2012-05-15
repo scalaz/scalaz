@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Represents a computation of type `F[Either[A, B]]`.
  *

@@ -86,7 +86,7 @@ trait StreamInstances {
   }
 
 
-  // TODO show, equal, order, ...
+  // TODO order, ...
 }
 
 trait StreamFunctions {

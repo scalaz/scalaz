@@ -79,9 +79,9 @@ object HCursor extends HCursors {
   import CostateT._
 
   val historyHCursorL: HCursor @> History =
-    lens(x => costate(b => hcursor(b, x.cursor), x.history))
+    lens(x => costate(x.history)(b => hcursor(b, x.cursor)))
 
   val cursorHCursorL: HCursor @> Option[Cursor] =
-    lens(x => costate(b => hcursor(x.history, b), x.cursor))
+    lens(x => costate(x.cursor)(b => hcursor(x.history, b)))
 
 }

@@ -60,12 +60,12 @@ object Tag extends Tags {
   import CostateT._
 
   val nameTagL: Tag @> QName =
-    lens(x => costate(b => tag(b, x.attribs, x.line), x.name))
+    lens(x => costate(x.name)(b => tag(b, x.attribs, x.line)))
 
   val attribsTagL: Tag @> List[Attr] =
-    lens(x => costate(b => tag(x.name, b, x.line), x.attribs))
+    lens(x => costate(x.attribs)(b => tag(x.name, b, x.line)))
 
   val lineTagL: Tag @> Option[Line] =
-    lens(x => costate(b => tag(x.name, x.attribs, b), x.line))
+    lens(x => costate(x.line)(b => tag(x.name, x.attribs, b)))
 
 }

@@ -25,6 +25,7 @@ trait ToPointedOps extends ToPointedOps0 with ToFunctorOps {
 
   trait PointedIdV[A] extends Ops[A] {
     def point[F[_] : Pointed]: F[A] = Pointed[F].point(self)
+    def pure[F[_] : Pointed]: F[A] = Pointed[F].point(self)
   }
   ////
 }
@@ -35,12 +36,18 @@ trait PointedSyntax[F[_]] extends FunctorSyntax[F] {
   ////
   def point[A](a: => A)(implicit F: Pointed[F]): F[A] = F.point(a)
 
+  /** Alias for `point` */
+  def pure[A](a: => A)(implicit F: Pointed[F]): F[A] = F.point(a)
+
   implicit def PointedIdV[A](v: => A) = new PointedIdV[A] {
     lazy val self = v
   }
 
   trait PointedIdV[A] extends Ops[A] {
     def point(implicit F: Pointed[F]): F[A] = Pointed[F].point(self)
+
+    /** Alias for `point` */
+    def pure(implicit F: Pointed[F]): F[A] = Pointed[F].point(self)
   }
   ////
 }

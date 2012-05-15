@@ -136,12 +136,12 @@ object QName extends QNames {
   import CostateT._
 
   val nameQNameL: QName @> Str =
-    lens(x => costate(b => qname(b, x.uri, x.prefix), x.name))
+    lens(x => costate(x.name)(b => qname(b, x.uri, x.prefix)))
 
   val uriQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, b, x.prefix), x.uri))
+    lens(x => costate(x.uri)(b => qname(x.name, b, x.prefix)))
 
   val prefixQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, x.uri, b), x.prefix))
+    lens(x => costate(x.prefix)(b => qname(x.name, x.uri, b)))
 
 }

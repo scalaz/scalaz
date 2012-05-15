@@ -1,7 +1,5 @@
-/** Legacy implementation of iteratees, for compatibility with Scalaz 6 */
-
+// Legacy implementation of iteratees, for compatibility with Scalaz 6 */
 package scalaz
-
 import Scalaz._
 
 /** The input to an iteratee. */

@@ -67,9 +67,9 @@ object Predicate extends Predicates {
   import CostateT._
 
   def predPredicateL[A]: Predicate[A] @> (A => Boolean) =
-    lens(x => costate(b => predicate(b, x.name), x.pred))
+    lens(x => costate(x.pred)(b => predicate(b, x.name)))
 
   def namePredicateL[A]: Predicate[A] @> Option[List[Char]] =
-    lens(x => costate(b => predicate(x.pred, b), x.name))
+    lens(x => costate(x.name)(b => predicate(x.pred, b)))
 
 }

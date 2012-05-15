@@ -1,6 +1,8 @@
 package scalaz
 
 import CostateT._
+import Leibniz._
+import Id._
 
 /**
  * Partial Lens, offering a purely functional means to access and retrieve
@@ -21,7 +23,7 @@ import CostateT._
  * @tparam A The type of the record
  * @tparam B The type of the optional field
  */
-sealed trait PLensT[F[_], G[_], A, B] {
+sealed trait PLensT[F[+_], G[+_], A, B] {
   def run(a: A): F[Option[Costate[B, G[A]]]]
 
   def apply(a: A): F[Option[Costate[B, G[A]]]] =
@@ -34,8 +36,8 @@ sealed trait PLensT[F[_], G[_], A, B] {
   import PLensT._
   import BijectionT._
 
-  def kleisli: Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Costate[B, G[A]]] =
-    Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Costate[B, G[A]]](runO(_))
+  def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Costate[B, G[A]]] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Costate[B, G[A]]](runO(_))
 
   def mapC[C](f: Costate[B, G[A]] => Costate[C, G[A]])(implicit FF: Functor[F]): PLensT[F, G, A, C] =
     plensT(a => FF.map(run(a))(_ map f))
@@ -52,17 +54,17 @@ sealed trait PLensT[F[_], G[_], A, B] {
   def xmapbB[X](b: Bijection[B, X])(implicit FF: Functor[F], GF: Functor[G]): PLensT[F, G, A, X] =
     xmapB(b to _, b from _)
 
-  def lift[X[_]](implicit P: Pointed[X], FF: Functor[F], GF: Functor[G]): PLensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B] =
-    plensT[({type λ[α] = F[X[α]]})#λ, ({type λ[α] = G[X[α]]})#λ, A, B](a => FF.map(run(a))(c => P.point(c map (_ map (GF.map(_)(P.point(_)))))))
+  def lift[X[+_]](implicit P: Pointed[X], FF: Functor[F], GF: Functor[G]): PLensT[({type λ[+α] = F[X[α]]})#λ, ({type λ[+α] = G[X[α]]})#λ, A, B] =
+    plensT[({type λ[+α] = F[X[α]]})#λ, ({type λ[+α] = G[X[α]]})#λ, A, B](a => FF.map(run(a))(c => P.point(c map (_ map (GF.map(_)(P.point(_)))))))
 
   def wlift[V, W](implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V], MW: Monoid[W]): PLenswT[F, G, V, W, A, B] =
-    plensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B](a =>
+    plensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B](a =>
           WriterT(FF.map(run(a))(e => (MV.zero, e map (_ map (q => WriterT(GF.map(q)((MW.zero, _)))))))))
 
   def wrunlift[V, W](getV: (A, Option[B]) => V, set: (A, B, A) => W)(implicit FF: Functor[F], GF: Functor[G]): PLenswT[F, G, V, W, A, B] =
-    plensT[({type λ[α] = WriterT[F, V, α]})#λ, ({type λ[α] = WriterT[G, W, α]})#λ, A, B](a =>
+    plensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B](a =>
       WriterT(FF.map(run(a))(e =>
-        (getV(a, e map (_.pos)), e map (z => costate(x => WriterT(GF.map(z put x)(q => (set(a, x, q), q))), z.pos)))
+        (getV(a, e map (_.pos)), e map (z => costate(z.pos)(x => WriterT(GF.map(z put x)(q => (set(a, x, q), q))))))
       )))
 
   def hlift(implicit FF: Functor[F], GF: Functor[G]): PLenshT[F, G, A, B] =
@@ -90,8 +92,8 @@ sealed trait PLensT[F[_], G[_], A, B] {
   def getO(a: A)(implicit F: Functor[F]): OptionT[F, B] =
     OptionT(get(a))
 
-  def getK(implicit F: Functor[F]): Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, B] =
-    Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, B](getO(_))
+  def getK(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, B] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, B](getO(_))
 
   /** If the PartialLens is null, then return the given default value. */
   def getOr(a: A, b: => B)(implicit F: Functor[F]): F[B] =
@@ -106,8 +108,8 @@ sealed trait PLensT[F[_], G[_], A, B] {
   def setO(a: A, b: B)(implicit F: Functor[F]): OptionT[F, G[A]] =
     OptionT(set(a, b))
 
-  def setK(a: A)(implicit F: Functor[F]): Kleisli[({type λ[α] = OptionT[F, α]})#λ, B, G[A]] =
-    Kleisli[({type λ[α] = OptionT[F, α]})#λ, B, G[A]](setO(a, _))
+  def setK(a: A)(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, B, G[A]] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, B, G[A]](setO(a, _))
 
   def setOr(a: A, b: B, d: => G[A])(implicit F: Functor[F]): F[G[A]] =
     F.map(set(a, b))(_ getOrElse d)
@@ -121,8 +123,8 @@ sealed trait PLensT[F[_], G[_], A, B] {
   def trySetO(a: A)(implicit F: Functor[F]): OptionT[F, Kleisli[G, B, A]] =
     OptionT(trySet(a))
 
-  def trySetK(implicit F: Functor[F]): Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Kleisli[G, B, A]] =
-    Kleisli[({type λ[α] = OptionT[F, α]})#λ, A, Kleisli[G, B, A]](trySetO(_))
+  def trySetK(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Kleisli[G, B, A]] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Kleisli[G, B, A]](trySetO(_))
 
   def trySetOr(a: A, d: => Kleisli[G, B, A])(implicit F: Functor[F]): F[Kleisli[G, B, A]] =
     F.map(trySet(a))(_ getOrElse d)
@@ -160,47 +162,47 @@ sealed trait PLensT[F[_], G[_], A, B] {
     option
 
   /** Modify the value viewed through the lens */
-  def mod(f: B => B, a: A)(implicit F: Functor[F], ev: G[A] =:= Id[A]): F[A] =
+  def mod(f: B => B, a: A)(implicit F: Functor[F], ev: G[A] === Id[A]): F[A] =
     F.map(run(a)){
       case None => a
-      case Some(w) => w puts f
+      case Some(w) => ev.subst[Id](w puts f)
     }
 
-  def =>=(f: B => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): A => F[A] =
+  def =>=(f: B => B)(implicit F: Functor[F], ev: G[A] === Id[A]): A => F[A] =
     mod(f, _)
 
   def st(implicit F: Functor[F]): PStateT[F, A, B] =
     StateT(s => F.map(get(s))((_, s)))
 
-  def %=(f: B => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): PStateT[F, A, B] =
+  def %=(f: B => B)(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, B] =
     StateT(a => F.map(run(a))(_ match {
       case None => (None, a)
       case Some(w) => {
         val r = f(w.pos)
-        (Some(r), w put r)
+        (Some(r), ev.subst[Id](w put r))
       }
     }))
 
-  def :=(b: => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): PStateT[F, A, B] =
+  def :=(b: => B)(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, B] =
     %=(_ => b)
 
-  def %==(f: B => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): StateT[F, A, Unit] =
+  def %==(f: B => B)(implicit F: Functor[F], ev: G[A] === Id[A]): StateT[F, A, Unit] =
     StateT(a =>
       F.map(mod(f, a))(((), _)))
 
-  def %%=[C](s: State[B, C])(implicit F: Functor[F], ev: G[A] =:= Id[A]): PStateT[F, A, C] =
+  def %%=[C](s: State[B, C])(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     StateT(a => F.map(run(a))(_ match {
       case None => (None, a)
       case Some(w) => {
         val r = s.run(w.pos): (C, B)
-        (Some(r._1), w put r._2)
+        (Some(r._1), ev.subst[Id](w put r._2))
       }
     }))
 
-  def >-[C](f: B => C)(implicit F: Functor[F], ev: G[A] =:= Id[A]): PStateT[F, A, C] =
+  def >-[C](f: B => C)(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     StateT(a => F.map(get(a))(x => (x map f, a)))
 
-  def >>-[C](f: B => StateT[F, A, C])(implicit F: Monad[F], ev: G[A] =:= Id[A]): PStateT[F, A, C] =
+  def >>-[C](f: B => StateT[F, A, C])(implicit F: Monad[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     StateT(a => F.bind(get(a))(_ match {
       case None => F.point((None, a))
       case Some(w) =>
@@ -209,7 +211,7 @@ sealed trait PLensT[F[_], G[_], A, B] {
         }
     }))
 
-  def ->>-[C](f: => StateT[F, A, C])(implicit F: Monad[F], ev: G[A] =:= Id[A]): PStateT[F, A, C] =
+  def ->>-[C](f: => StateT[F, A, C])(implicit F: Monad[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     >>-(_ => f)
 
   /** Lenses can be composed */
@@ -219,7 +221,7 @@ sealed trait PLensT[F[_], G[_], A, B] {
         val (ac, a) = x.run
         runO(a) map (y => {
           val (ba, b) = y.run
-          costate(x => GF.bind(ba(x))(ac), b)
+          Costate(x => GF.bind(ba(x))(ac), b)
         })
       }))
 
@@ -262,7 +264,7 @@ sealed trait PLensT[F[_], G[_], A, B] {
 }
 
 object PLensT extends PLensTFunctions with PLensTInstances {
-  def apply[F[_], G[_], A, B](r: A => F[Option[Costate[B, G[A]]]]): PLensT[F, G, A, B] =
+  def apply[F[+_], G[+_], A, B](r: A => F[Option[Costate[B, G[A]]]]): PLensT[F, G, A, B] =
     plensT(r)
 }
 
@@ -271,83 +273,83 @@ trait PLensTFunctions extends PLensTInstances {
   import CostateT._
   import BijectionT._
 
-  def plensT[F[_], G[_], A, B](r: A => F[Option[Costate[B, G[A]]]]): PLensT[F, G, A, B] = new PLensT[F, G, A, B] {
+  def plensT[F[+_], G[+_], A, B](r: A => F[Option[Costate[B, G[A]]]]): PLensT[F, G, A, B] = new PLensT[F, G, A, B] {
     def run(a: A): F[Option[Costate[B, G[A]]]] = r(a)
   }
 
-  def plensO[F[_], G[_], A, B](r: A => OptionT[F, Costate[B, G[A]]]): PLensT[F, G, A, B] =
+  def plensO[F[+_], G[+_], A, B](r: A => OptionT[F, Costate[B, G[A]]]): PLensT[F, G, A, B] =
     plensT(a => r(a).run)
 
   def plens[A, B](r: A => Option[Costate[B, A]]): PLens[A, B] =
     plensT[Id, Id, A, B](r)
 
-  def plensp[F[_], G[_], A, B](r: A => Option[Costate[B, A]])(implicit PF: Pointed[F], PG: Pointed[G]): PLensT[F, G, A, B] =
+  def plensp[F[+_], G[+_], A, B](r: A => Option[Costate[B, A]])(implicit PF: Pointed[F], PG: Pointed[G]): PLensT[F, G, A, B] =
     plensT(a => PF.point(r(a) map (_ map  (PG.point(_)))))
 
-  def plensgT[F[_], G[_], A, B](set: A => F[Option[B => G[A]]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensT[F, G, A, B] =
+  def plensgT[F[+_], G[+_], A, B](set: A => F[Option[B => G[A]]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensT[F, G, A, B] =
     plensT(a => M.map2(set(a), get(a))((q, r) => for {
       w <- q
       x <- r
-    } yield costate(w, x)))
+    } yield Costate(w, x)))
 
-  def plensgO[F[_], G[_], A, B](set: A => OptionT[F, B => G[A]], get: A => OptionT[F, B])(implicit M: Bind[F]): PLensT[F, G, A, B] =
+  def plensgO[F[+_], G[+_], A, B](set: A => OptionT[F, B => G[A]], get: A => OptionT[F, B])(implicit M: Bind[F]): PLensT[F, G, A, B] =
     plensgT(a => set(a).run, a => get(a).run)
 
   def plensg[A, B](set: A => Option[B => A], get: A => Option[B]): PLens[A, B] =
     plensgT[Id, Id, A, B](set, get)
 
   /** The identity partial lens for a given object */
-  def plensId[F[_], G[_], A](implicit FF: Pointed[F], GF: Pointed[G]): PLensT[F, G, A, A] =
+  def plensId[F[+_], G[+_], A](implicit FF: Pointed[F], GF: Pointed[G]): PLensT[F, G, A, A] =
     LensT.lensId[F, G, A].partial
 
   /** The trivial partial lens that can retrieve Unit from anything */
-  def trivialPLens[F[_], G[_], A](implicit FF: Pointed[F], GF: Pointed[G]): PLensT[F, G, A, Unit] =
+  def trivialPLens[F[+_], G[+_], A](implicit FF: Pointed[F], GF: Pointed[G]): PLensT[F, G, A, Unit] =
     LensT.trivialLens[F, G, A].partial
 
   /** A lens that discards the choice of Right or Left from Either */
-  def codiagPLens[F[_]: Pointed, G[_]: Pointed, A]: PLensT[F, G, Either[A, A], A] =
+  def codiagPLens[F[+_]: Pointed, G[+_]: Pointed, A]: PLensT[F, G, Either[A, A], A] =
     plensId[F, G, A] ||| plensId[F, G, A]
 
   /** The always-null partial lens */
-  def nil[F[_]: Pointed, G[_]: Pointed, A, B]: PLensT[F, G, A, B] =
+  def nil[F[+_]: Pointed, G[+_]: Pointed, A, B]: PLensT[F, G, A, B] =
     plensp(_ => None)
 
   def somePLens[A]: Option[A] @?> A =
-    plens(_ map (z => costate(Some(_), z)))
+    plens(_ map (z => Costate(Some(_), z)))
 
   def leftPLens[A, B]: Either[A, B] @?> A =
     plens {
-      case Left(a) => Some(costate(Left(_), a))
+      case Left(a) => Some(Costate(Left(_), a))
       case Right(_) => None
     }
 
   def rightPLens[A, B]: Either[A, B] @?> B =
     plens {
-      case Right(b) => Some(costate(Right(_), b))
+      case Right(b) => Some(Costate(Right(_), b))
       case Left(_) => None
     }
 
-  def tuple2PLens[F[_]: Functor, G[_]: Functor, S, A, B](lens: PLensT[F, G, S, (A, B)]):
+  def tuple2PLens[F[+_]: Functor, G[+_]: Functor, S, A, B](lens: PLensT[F, G, S, (A, B)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B]) =
     PLensTUnzip[F, G, S].unzip(lens)
 
-  def tuple3PLens[F[_]: Functor, G[_]: Functor, S, A, B, C](lens: PLensT[F, G, S, (A, B, C)]):
+  def tuple3PLens[F[+_]: Functor, G[+_]: Functor, S, A, B, C](lens: PLensT[F, G, S, (A, B, C)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C]) =
     PLensTUnzip[F, G, S].unzip3(lens.xmapbB(tuple3B))
 
-  def tuple4PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D](lens: PLensT[F, G, S, (A, B, C, D)]):
+  def tuple4PLens[F[+_]: Functor, G[+_]: Functor, S, A, B, C, D](lens: PLensT[F, G, S, (A, B, C, D)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D]) =
     PLensTUnzip[F, G, S].unzip4(lens.xmapbB(tuple4B))
 
-  def tuple5PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E](lens: PLensT[F, G, S, (A, B, C, D, E)]):
+  def tuple5PLens[F[+_]: Functor, G[+_]: Functor, S, A, B, C, D, E](lens: PLensT[F, G, S, (A, B, C, D, E)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E]) =
     PLensTUnzip[F, G, S].unzip5(lens.xmapbB(tuple5B))
 
-  def tuple6PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H](lens: PLensT[F, G, S, (A, B, C, D, E, H)]):
+  def tuple6PLens[F[+_]: Functor, G[+_]: Functor, S, A, B, C, D, E, H](lens: PLensT[F, G, S, (A, B, C, D, E, H)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H]) =
     PLensTUnzip[F, G, S].unzip6(lens.xmapbB(tuple6B))
 
-  def tuple7PLens[F[_]: Functor, G[_]: Functor, S, A, B, C, D, E, H, I](lens: PLensT[F, G, S, (A, B, C, D, E, H, I)]):
+  def tuple7PLens[F[+_]: Functor, G[+_]: Functor, S, A, B, C, D, E, H, I](lens: PLensT[F, G, S, (A, B, C, D, E, H, I)]):
   (PLensT[F, G, S, A], PLensT[F, G, S, B], PLensT[F, G, S, C], PLensT[F, G, S, D], PLensT[F, G, S, E], PLensT[F, G, S, H], PLensT[F, G, S, I]) =
     PLensTUnzip[F, G, S].unzip7(lens.xmapbB(tuple7B))
 
@@ -360,26 +362,26 @@ trait PLensTFunctions extends PLensTInstances {
   import LazyOption._
 
   def lazySomePLens[A]: LazyOption[A] @?> A =
-    plens(_.fold(z => Some(costate(lazySome(_), z)), None))
+    plens(_.fold(z => Some(Costate(lazySome(_), z)), None))
 
   import LazyEither._
 
   def lazyLeftPLens[A, B]: LazyEither[A, B] @?> A =
-    plens(_.fold(a => Some(costate(lazyLeft(_), a)), _ => None))
+    plens(_.fold(a => Some(Costate(lazyLeft(_), a)), _ => None))
 
   def lazyRightPLens[A, B]: LazyEither[A, B] @?> B =
-    plens(_.fold(_ => None, b => Some(costate(lazyRight(_), b))))
+    plens(_.fold(_ => None, b => Some(Costate(lazyRight(_), b))))
 
   def listHeadPLens[A]: List[A] @?> A =
     plens {
       case Nil => None
-      case h :: t => Some(costate(_ :: t, h))
+      case h :: t => Some(Costate(_ :: t, h))
     }
 
   def listTailPLens[A]: List[A] @?> List[A] =
     plens {
       case Nil => None
-      case h :: t => Some(costate(h :: _, t))
+      case h :: t => Some(Costate(h :: _, t))
     }
 
   def listFindByPLens[A](p: A => Boolean): List[A] @?> A = {
@@ -397,7 +399,7 @@ trait PLensTFunctions extends PLensTInstances {
     plens {
       case Nil => None
       case h::t =>
-        Z(Nil, h, t).find.map (w => costate((b => w.copy(focus = b).list, w.focus)))
+        Z(Nil, h, t).find.map (w => Costate(b => w.copy(focus = b).list, w.focus))
     }
   }
 
@@ -417,24 +419,24 @@ trait PLensTFunctions extends PLensTInstances {
 
   def vectorNthPLens[A](n: Int): Vector[A] @?> A =
     plens(v =>
-      v.lift(n) map (a => costate(x => v patch (n, Vector(x), 1), a)))
+      v.lift(n) map (a => Costate(x => v patch (n, Vector(x), 1), a)))
 
   def vectorLastPLens[A]: Vector[A] @?> A =
     plens(v =>
-      v.lastOption map (a => costate(x => v patch (v.length - 1, Vector(x), 1), a)))
+      v.lastOption map (a => Costate(x => v patch (v.length - 1, Vector(x), 1), a)))
 
   import Stream._
 
   def streamHeadPLens[A]: Stream[A] @?> A =
     plens {
       case Empty => None
-      case h #:: t => Some(costate(_ #:: t, h))
+      case h #:: t => Some(Costate(_ #:: t, h))
     }
 
   def streamTailPLens[A]: Stream[A] @?> Stream[A] =
     plens {
       case Empty => None
-      case h #:: t => Some(costate(h #:: _, t))
+      case h #:: t => Some(Costate(h #:: _, t))
     }
 
   def streamNthPLens[A](n: Int): Stream[A] @?> A =
@@ -450,7 +452,7 @@ trait PLensTFunctions extends PLensTInstances {
       if(s.isEmpty)
         None
       else
-        Some(costate(EphemeralStream.cons(_, s.tail()), s.head()))
+        Some(Costate(EphemeralStream.cons(_, s.tail()), s.head()))
     )
 
   def ephemeralStreamTailPLens[A]: EphemeralStream[A] @?> EphemeralStream[A] =
@@ -458,7 +460,7 @@ trait PLensTFunctions extends PLensTInstances {
       if(s.isEmpty)
         None
       else
-        Some(costate(EphemeralStream.cons(s.head(), _), s.tail()))
+        Some(Costate(EphemeralStream.cons(s.head(), _), s.tail()))
     )
 
   def ephemeralStreamFindByPLens[A](p: A => Boolean): EphemeralStream[A] @?> A = {
@@ -472,7 +474,7 @@ trait PLensTFunctions extends PLensTInstances {
         lefts.reverse ++ EphemeralStream.cons(focus, rights)
     }
 
-    plens(x => if(x.isEmpty) None else Z(EphemeralStream.emptyEphemeralStream, x.head(), x.tail()).find.map (w => costate((b => w.copy(focus = b).stream, w.focus))))
+    plens(x => if(x.isEmpty) None else Z(EphemeralStream.emptyEphemeralStream, x.head(), x.tail()).find.map (w => Costate(b => w.copy(focus = b).stream, w.focus)))
   }
 
   def ephemeralStreamFindPLens[A: Equal](a: A): EphemeralStream[A] @?> A =
@@ -501,19 +503,19 @@ trait PLensTFunctions extends PLensTInstances {
 
   def scalaJSONObjectPLens[A]: JSONType @?> Map[String, Any] =
     plens {
-      case JSONObject(m) => Some(costate(JSONObject(_), m))
+      case JSONObject(m) => Some(Costate(JSONObject(_), m))
       case _             => None
     }
 
   def scalaJSONArrayPLens[A]: JSONType @?> List[Any] =
     plens {
-      case JSONArray(a) => Some(costate(JSONArray(_), a))
+      case JSONArray(a) => Some(Costate(JSONArray(_), a))
       case _            => None
     }
 }
 
 trait PLensTInstance0 {
-  implicit def plensTArrId[F[_], G[_]](implicit F0: Pointed[F], G0: Pointed[G]) = new PLensTArrId[F, G] {
+  implicit def plensTArrId[F[+_], G[+_]](implicit F0: Pointed[F], G0: Pointed[G]) = new PLensTArrId[F, G] {
     implicit def F = F0
     implicit def G = G0
   }
@@ -522,26 +524,26 @@ trait PLensTInstance0 {
 trait PLensTInstances extends PLensTInstance0 {
   import PLensT._
 
-  implicit def plensTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]) = new PLensTCategory[F, G] {
+  implicit def plensTCategory[F[+_], G[+_]](implicit F0: Monad[F], G0: Monad[G]) = new PLensTCategory[F, G] {
     implicit def F = F0
     implicit def G = G0
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def PLensState[F[_], G[_], A, B](plens: PLensT[F, G, A, B])(implicit F: Functor[F]): PStateT[F, A, B] =
+  implicit def PLensState[F[+_], G[+_], A, B](plens: PLensT[F, G, A, B])(implicit F: Functor[F]): PStateT[F, A, B] =
     plens.st
 
-  implicit def PLensTUnzip[F[_], G[_], S](implicit FF: Functor[F], GF: Functor[G]): Unzip[({type λ[α] = PLensT[F, G, S, α]})#λ] =
+  implicit def PLensTUnzip[F[+_], G[+_], S](implicit FF: Functor[F], GF: Functor[G]): Unzip[({type λ[α] = PLensT[F, G, S, α]})#λ] =
     new Unzip[({type λ[α] = PLensT[F, G, S, α]})#λ] {
       def unzip[A, B](a: PLensT[F, G, S, (A, B)]) =
         (
           PLensT(x => FF.map(a run x)(_ map (c => {
             val (p, q) = c.pos
-            costate(a => c.put((a, q)): G[S], p)
+            Costate(a => c.put((a, q)): G[S], p)
           })))
           , PLensT(x => FF.map(a run x)(_ map (c => {
           val (p, q) = c.pos
-          costate(a => c.put((p, a)): G[S], q)
+          Costate(a => c.put((p, a)): G[S], q)
         })))
           )
     }
@@ -580,14 +582,14 @@ trait PLensTInstances extends PLensTInstance0 {
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 }
 
-private[scalaz] trait PLensTArrId[F[_], G[_]] extends ArrId[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
+private[scalaz] trait PLensTArrId[F[+_], G[+_]] extends ArrId[({type λ[α, β] = PLensT[F, G, α, β]})#λ] {
   implicit def F: Pointed[F]
   implicit def G: Pointed[G]
 
   def id[A]: PLensT[F, G, A, A] = PLensT.plensId
 }
 
-private[scalaz] trait PLensTCategory[F[_], G[_]]
+private[scalaz] trait PLensTCategory[F[+_], G[+_]]
   extends Choice[({type λ[α, β] = PLensT[F, G, α, β]})#λ]
   with Split[({type λ[α, β] = PLensT[F, G, α, β]})#λ]
   with PLensTArrId[F, G] {

@@ -3,6 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import Id._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])

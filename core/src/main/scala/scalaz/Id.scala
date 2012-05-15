@@ -1,9 +1,20 @@
 package scalaz
 
-/** Mixed into object `scalaz.Id` in the package object [[scalaz]]. */
+/** Mixed into object `Id` in the package object [[scalaz]]. */
 trait IdInstances {
-  implicit val id: Traverse[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
-    new Traverse[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Each[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+
+  // Declaring here instead of the scalaz package object in order to avoid compiler crash in 2.9.2.
+
+  /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
+   *  runtime representation.
+   */
+  type Id[+X] = X
+
+  // TODO Review!
+  type Identity[+X] = Need[X]
+
+  val id: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+    new Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
@@ -22,7 +33,7 @@ trait IdInstances {
 
       def distributeImpl[G[_] : Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
 
-      override def foldRight[A, B](fa: scalaz.Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
+      override def foldRight[A, B](fa: Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
       // Overrides for efficiency.
 
@@ -37,7 +48,7 @@ trait IdInstances {
 
       override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
-      def each[A](fa: scalaz.Id[A])(f: (A) => Unit) {
+      def each[A](fa: Id[A])(f: (A) => Unit) {
         f(fa)
       }
 
@@ -47,3 +58,5 @@ trait IdInstances {
       // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
     }
 }
+
+object Id extends IdInstances

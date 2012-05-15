@@ -174,9 +174,9 @@ object NSInfo extends NSInfos {
   import CostateT._
 
   val prefixesNSInfoL: NSInfo @> List[(Str, Str)] =
-    lens(x => costate(b => nsInfo(b, x.uri), x.prefixes))
+    lens(x => costate(x.prefixes)(b => nsInfo(b, x.uri)))
 
   val uriNSInfoL: NSInfo @> Option[Str] =
-    lens(x => costate(b => nsInfo(x.prefixes, b), x.uri))
+    lens(x => costate(x.uri)(b => nsInfo(x.prefixes, b)))
 
 }

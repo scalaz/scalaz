@@ -354,30 +354,30 @@ object Op extends Ops {
   import CostateT._
 
   val choiceSucceedOpPL: Op @?> History =
-    plens(_.choiceSucceed map (e => costate(choiceSucceedOp(_), e)))
+    plens(_.choiceSucceed map (e => costate(e)(choiceSucceedOp(_))))
 
   val choiceSwitchOpPL: Op @?> (History, History) =
-    plens(_.choiceSwitch map (e => costate(h => choiceSwitchOp(h._1, h._2), e)))
+    plens(_.choiceSwitch map (e => costate(e)(h => choiceSwitchOp(h._1, h._2))))
 
   val findLeftOpPL: Op @?> CPredicate =
-    plens(_.findLeft map (e => costate(findLeftOp(_), e)))
+    plens(_.findLeft map (e => costate(e)(findLeftOp(_))))
 
   val findRightOpPL: Op @?> CPredicate =
-    plens(_.findRight map (e => costate(findRightOp(_), e)))
+    plens(_.findRight map (e => costate(e)(findRightOp(_))))
 
   val findChildOpPL: Op @?> CPredicate =
-    plens(_.findChild map (e => costate(findChildOp(_), e)))
+    plens(_.findChild map (e => costate(e)(findChildOp(_))))
 
   val findRecOpPL: Op @?> CPredicate =
-    plens(_.findRec map (e => costate(findRecOp(_), e)))
+    plens(_.findRec map (e => costate(e)(findRecOp(_))))
 
   val nthChildOpPL: Op @?> Int =
-    plens(_.nthChild map (e => costate(nthChildOp(_), e)))
+    plens(_.nthChild map (e => costate(e)(nthChildOp(_))))
 
   val succeedingOpPL: Op @?> (Cursor => Cursor, OpDescription) =
-    plens(_.succeeding map (e => costate(x => succeedingOp(x._1, x._2), e)))
+    plens(_.succeeding map (e => costate(e)(x => succeedingOp(x._1, x._2))))
 
   val genericOpPL: Op @?> (Cursor => Option[Cursor], OpDescription) =
-    plens(_.generic map (e => costate(x => genericOp(x._1, x._2), e)))
+    plens(_.generic map (e => costate(e)(x => genericOp(x._1, x._2))))
 
 }

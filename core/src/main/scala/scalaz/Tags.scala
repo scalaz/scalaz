@@ -6,7 +6,6 @@ package scalaz
  * @see [[scalaz.Tag]] and, `@@` in the package object [[scalaz]] .
  */
 object Tags {
-
   /** Type tag to choose a [[scalaz.Monoid]] instance that selects the first operand to append */
   sealed trait First
 

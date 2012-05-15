@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 ////
 /**
  * Provides an identity element (`zero`) to the binary `append` operation in [[scalaz.Semigroup]].
