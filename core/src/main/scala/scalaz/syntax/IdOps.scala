@@ -61,12 +61,6 @@ trait IdOps[A] extends Ops[A] {
   def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
     else Pointed[F].point(self)
-
-  def liftKleisli[R]: Kleisli[Id, R, A] =
-    Kleisli[Id, R, A](_ => self)
-
-  def liftReader[R]: Reader[R, A] =
-    liftKleisli
 }
 
 trait ToIdOps {
