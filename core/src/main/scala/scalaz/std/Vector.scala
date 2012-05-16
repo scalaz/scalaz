@@ -12,18 +12,7 @@ trait VectorInstances0 {
 trait VectorInstances extends VectorInstances0 {
   implicit val vectorInstance = new Traverse[Vector] with MonadPlus[Vector] with Each[Vector] with Index[Vector] with Length[Vector] with ApplicativePlus[Vector] with Zip[Vector] with Unzip[Vector] {
     def each[A](fa: Vector[A])(f: (A) => Unit) = fa foreach f
-    def index[A](fa: Vector[A], i: Int) = {
-      var n = 0
-      var k: Option[A] = None
-      val it = fa.iterator
-      while (it.hasNext && k.isEmpty) {
-        val z = it.next()
-        if (n == i) k = Some(z)
-        n = n + 1
-      }
-
-      k
-    }
+    def index[A](fa: Vector[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
     def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = scala.Vector(a)
     def bind[A, B](fa: Vector[A])(f: A => Vector[B]) = fa flatMap f
@@ -42,9 +31,9 @@ trait VectorInstances extends VectorInstances0 {
     
     override def traverseS[S,A,B](v: Vector[A])(f: A => State[S,B]): State[S,Vector[B]] =
       State((s: S) => 
-        v.foldLeft((Vector[B](), s))((acc, a) => {
-          val bs = f(a)(acc._2)
-          (acc._1 :+ bs._1, bs._2)
+        v.foldLeft((s, Vector[B]()))((acc, a) => {
+          val bs = f(a)(acc._1)
+          (bs._1, acc._2 :+ bs._2)
         }))
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {

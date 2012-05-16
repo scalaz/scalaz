@@ -42,7 +42,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traversal[G].run(fa)(f)
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] = 
     traversalS[S].run(fa)(f)
-  def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (F[B], S) =
+  def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (S, F[B]) =
     traverseS(fa)(f)(s)
 
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
@@ -69,27 +69,32 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
 
-  def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (F[Unit], B) = 
-    runTraverseS(fa, z)(a => State(b => ((), f(b,a))))
+  def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (B, F[Unit]) = 
+    runTraverseS(fa, z)(a => State.modify(f(_, a)))
 
-  override def foldLeft[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._2
+  override def foldLeft[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._1
 
-  def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._2
+  def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._1
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
     foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
 
   def reverse[A](fa: F[A]): F[A] = { 
-    val (shape, as) = foldLShape(fa, scala.List[A]())((t,h) => h :: t)
-    runTraverseS(shape, as)(_ => State(e => (e.head, e.tail)))._1
+    val (as, shape) = foldLShape(fa, scala.List[A]())((t,h) => h :: t)
+    runTraverseS(shape, as)(_ => for {
+      e <- State.get
+      _ <- State.put(e.tail)
+    } yield e.head)._2
   }
 
-  def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (F[C], List[B]) = 
-    runTraverseS(fa, toList(fb))(a =>
-      State(bs => (f(a,bs.headOption), if (bs.isEmpty) bs else bs.tail)))
+  def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) = 
+    runTraverseS(fa, toList(fb))(a => for {
+      bs <- State.get
+      _ <- State.put(if (bs.isEmpty) bs else bs.tail)
+    } yield f(a, bs.headOption))
 
-  def zipWithL[A,B,C](fa: F[A], fb: F[B])(f: (A,Option[B]) => C): F[C] = zipWith(fa, fb)(f)._1
-  def zipWithR[A,B,C](fa: F[A], fb: F[B])(f: (Option[A],B) => C): F[C] = zipWith(fb, fa)((b,oa) => f(oa,b))._1
+  def zipWithL[A,B,C](fa: F[A], fb: F[B])(f: (A,Option[B]) => C): F[C] = zipWith(fa, fb)(f)._2
+  def zipWithR[A,B,C](fa: F[A], fb: F[B])(f: (Option[A],B) => C): F[C] = zipWith(fb, fa)((b,oa) => f(oa,b))._2
 
   def zipL[A,B](fa: F[A], fb: F[B]): F[(A, Option[B])] = zipWithL(fa, fb)((_,_))
   def zipR[A,B](fa: F[A], fb: F[B]): F[(Option[A], B)] = zipWithR(fa, fb)((_,_))

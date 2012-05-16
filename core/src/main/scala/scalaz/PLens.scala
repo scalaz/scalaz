@@ -172,14 +172,14 @@ sealed trait PLensT[F[+_], G[+_], A, B] {
     mod(f, _)
 
   def st(implicit F: Functor[F]): PStateT[F, A, B] =
-    StateT(s => F.map(get(s))((_, s)))
+    StateT(s => F.map(get(s))((s, _)))
 
   def %=(f: B => B)(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, B] =
     StateT(a => F.map(run(a))(_ match {
-      case None => (None, a)
+      case None => (a, None)
       case Some(w) => {
         val r = f(w.pos)
-        (Some(r), ev.subst[Id](w put r))
+        (ev.subst[Id](w put r), Some(r))
       }
     }))
 
@@ -188,26 +188,26 @@ sealed trait PLensT[F[+_], G[+_], A, B] {
 
   def %==(f: B => B)(implicit F: Functor[F], ev: G[A] === Id[A]): StateT[F, A, Unit] =
     StateT(a =>
-      F.map(mod(f, a))(((), _)))
+      F.map(mod(f, a))((_, ())))
 
   def %%=[C](s: State[B, C])(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     StateT(a => F.map(run(a))(_ match {
-      case None => (None, a)
+      case None => (a, None)
       case Some(w) => {
-        val r = s.run(w.pos): (C, B)
-        (Some(r._1), ev.subst[Id](w put r._2))
+        val r = s.run(w.pos): (B, C)
+        (ev.subst[Id](w put r._1), Some(r._2))
       }
     }))
 
   def >-[C](f: B => C)(implicit F: Functor[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
-    StateT(a => F.map(get(a))(x => (x map f, a)))
+    StateT(a => F.map(get(a))(x => (a, x map f)))
 
   def >>-[C](f: B => StateT[F, A, C])(implicit F: Monad[F], ev: G[A] === Id[A]): PStateT[F, A, C] =
     StateT(a => F.bind(get(a))(_ match {
-      case None => F.point((None, a))
+      case None => F.point((a, None))
       case Some(w) =>
         F.map(f(w) apply a) {
-          case (x, y) => (Some(x), y)
+          case (y, x) => (y, Some(x))
         }
     }))
 

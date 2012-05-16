@@ -125,7 +125,7 @@ package object scalaz {
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object State extends StateFunctions {
-    def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
+    def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
       def apply(s: S) = f(s)
     }
   }

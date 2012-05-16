@@ -48,12 +48,12 @@ trait TraverseOps[F[_], A] extends Ops[F[A]] {
   final def traverseKTrampoline[G[+_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
     F.traverseKTrampoline[S, G, A, B](self)(f)
 
-  final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (F[B], S) =
+  final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (S, F[B]) =
     F.runTraverseS(self, s)(f)
 
   final def reverse: F[A] = F.reverse(self)
 
-  final def zipWith[B, C](fb: F[B])(f: (A, Option[B]) => C): (F[C], List[B]) = F.zipWith(self, fb)(f)
+  final def zipWith[B, C](fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) = F.zipWith(self, fb)(f)
   final def zipWithL[B, C](fb: F[B])(f: (A, Option[B]) => C): F[C] = F.zipWithL(self, fb)(f)
   final def zipWithR[B, C](fb: F[B])(f: (Option[A], B) => C): F[C] = F.zipWithR(self, fb)(f)
   final def zipL[B](fb: F[B]): F[(A, Option[B])] = F.zipL(self, fb)

@@ -75,7 +75,7 @@ sealed trait LensT[F[+_], G[+_], A, B] {
     F.map(run(a))(_.put(b))
 
   def st(implicit F: Functor[F]): StateT[F, A, B] =
-    StateT(s => F.map(get(s))((_, s)))
+    StateT(s => F.map(get(s))((s, _)))
 
   /** Modify the value viewed through the lens */
   def mod(f: B => B, a: A)(implicit F: Functor[F], ev: G[A] =:= Id[A]): F[A] =
@@ -97,7 +97,7 @@ sealed trait LensT[F[+_], G[+_], A, B] {
     StateT(a =>
       FF.map(run(a))(c => {
         val b = f(c.pos)
-        (b, c put b)
+        (c put b, b)
       }))
 
   def :=(b: => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): StateT[F, A, B] =
@@ -105,16 +105,16 @@ sealed trait LensT[F[+_], G[+_], A, B] {
 
   def %==(f: B => B)(implicit F: Functor[F], ev: G[A] =:= Id[A]): StateT[F, A, Unit] =
     StateT(a =>
-      F.map(mod(f, a))(((), _)))
+      F.map(mod(f, a))((_, ())))
 
   def %%=[C](s: StateT[F, B, C])(implicit M: Bind[F], ev: G[A] =:= Id[A]): StateT[F, A, C] =
     StateT(a => M.bind(run(a))(x =>
       M.map(s(x.pos)){
-        case (c, b) => (c, x put b)
+        case (b, c) => (x put b, c)
       }))
 
   def >-[C](f: B => C)(implicit F: Functor[F], ev: G[A] =:= Id[A]): StateT[F, A, C] =
-    StateT(a => F.map(get(a))(x => (f(x), a)))
+    StateT(a => F.map(get(a))(x => (a, f(x))))
 
   def >>-[C](f: B => StateT[F, A, C])(implicit F: Bind[F], ev: G[A] =:= Id[A]): StateT[F, A, C] =
     StateT(a => F.bind(get(a))(x => f(x)(a)))
@@ -504,7 +504,7 @@ trait LensTInstances {
       lens %== (_ pop)
 
     def pop2: State[S, A] =
-      lens %%= (State(_.pop2))
+      lens %%= State(_.pop2.swap)
 
     def top: State[S, A] =
       lens >- (_.top)
@@ -522,7 +522,7 @@ trait LensTInstances {
       lens %== (_ enqueue elem)
 
     def dequeue: State[S, A] =
-      lens %%= (State(_.dequeue))
+      lens %%= (State(_.dequeue.swap))
 
     def length: State[S, Int] =
       lens >- (_.length)
