@@ -17,7 +17,7 @@ object Free extends FreeFunctions with FreeInstances {
 
   /** Call a subroutine and continue with the given function. */
   case class Gosub[S[+_]: Functor, A, +B](a: Free[S, A],
-                                 f: A => Free[S, B]) extends Free[S, B]
+                                          f: A => Free[S, B]) extends Free[S, B]
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[+A] = Free[Function0, A]

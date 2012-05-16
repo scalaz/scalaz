@@ -33,15 +33,13 @@
  *  - [[scalaz.Copointed]] extends [[scalaz.Functor]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]] with [[scalaz.Pointed]]
- *  - [[scalaz.Alternative]] extends [[scalaz.Applicative]]
- *  - [[scalaz.AlternativeEmpty]] extends [[scalaz.Alternative]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
  *  - [[scalaz.Cojoin]]
  *  - [[scalaz.Cobind]]
  *  - [[scalaz.Comonad]] extends [[scalaz.Copointed]] with [[scalaz.Cojoin]] with [[scalaz.Cobind]]
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
- *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.Plus]]
+ *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.PlusEmpty]]
  *  - [[scalaz.MonadPlus]] extends [[scalaz.Monad]] with [[scalaz.ApplicativePlus]]
  *  - [[scalaz.Foldable]]
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
@@ -63,7 +61,7 @@
  *  - [[scalaz.Endo]] Represents functions from `A => A`.
  *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
  *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
- *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
+ *  - [[scalaz.LensT]] Composable, functional alternative to getters and setters
  *  - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
  *  - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
  *  - [[scalaz.Zipper]] A functional cursor over a List.
