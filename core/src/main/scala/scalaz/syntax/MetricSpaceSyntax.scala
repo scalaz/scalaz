@@ -2,16 +2,16 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MetricSpace` */
-trait MetricSpaceV[F] extends SyntaxV[F] {
+trait MetricSpaceOps[F] extends Ops[F] {
   implicit def F: MetricSpace[F]
   ////
   final def <===>(a: F): Int = F.distance(self, a)
   ////
 }
 
-trait ToMetricSpaceV  {
-  implicit def ToMetricSpaceV[F](v: F)(implicit F0: MetricSpace[F]) =
-    new MetricSpaceV[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
+trait ToMetricSpaceOps  {
+  implicit def ToMetricSpaceOps[F](v: F)(implicit F0: MetricSpace[F]) =
+    new MetricSpaceOps[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
 
   ////
 
@@ -19,7 +19,7 @@ trait ToMetricSpaceV  {
 }
 
 trait MetricSpaceSyntax[F]  {
-  implicit def ToMetricSpaceV(v: F)(implicit F0: MetricSpace[F]): MetricSpaceV[F] = new MetricSpaceV[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
+  implicit def ToMetricSpaceOps(v: F)(implicit F0: MetricSpace[F]): MetricSpaceOps[F] = new MetricSpaceOps[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
 
   ////
 

@@ -86,7 +86,7 @@ trait StreamInstances {
   }
 
 
-  // TODO show, equal, order, ...
+  // TODO order, ...
 }
 
 trait StreamFunctions {
@@ -152,5 +152,5 @@ trait StreamFunctions {
 }
 
 object stream extends StreamInstances with StreamFunctions {
-  object streamSyntax extends scalaz.syntax.std.ToStreamV
+  object streamSyntax extends scalaz.syntax.std.ToStreamOps
 }

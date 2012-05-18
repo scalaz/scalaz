@@ -66,7 +66,7 @@ trait FunctionInstances extends FunctionInstances0 {
       (a(_)._1, a(_)._2)
 
     def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => T => B): T => G[B] =
-      t => implicitly[Functor[G]].map(fa)(a => f(a)(t))
+      t => Functor[G].map(fa)(a => f(a)(t))
 
   }
 

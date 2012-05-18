@@ -2,104 +2,127 @@ package scalaz
 package syntax
 
 trait Syntaxes {
+  //
+  // Type classes over * -> *
+  //
 
-  object semigroup extends ToSemigroupV
 
-  object monoid extends ToMonoidV
+  object semigroup extends ToSemigroupOps
 
-  object group extends ToGroupV
+  object monoid extends ToMonoidOps
 
-  object equal extends ToEqualV
+  object group extends ToGroupOps
 
-  object length extends ToLengthV
+  object equal extends ToEqualOps
 
-  object show extends ToShowV
+  object length extends ToLengthOps
 
-  object order extends ToOrderV
+  object show extends ToShowOps
 
-  object enum extends ToEnumV
+  object order extends ToOrderOps
 
-  object metricSpace extends ToMetricSpaceV
+  object enum extends ToEnumOps
 
-  object plusEmpty extends ToPlusEmptyV
+  object metricSpace extends ToMetricSpaceOps
 
-  object each extends ToEachV
+  object plusEmpty extends ToPlusEmptyOps
 
-  object index extends ToIndexV
+  object each extends ToEachOps
 
-  object functor extends ToFunctorV
+  object index extends ToIndexOps
 
-  object pointed extends ToPointedV
+  object functor extends ToFunctorOps
 
-  object contravariant extends ToContravariantV
+  object pointed extends ToPointedOps
 
-  object copointed extends ToCopointedV
+  object contravariant extends ToContravariantOps
 
-  object apply extends ToApplyV
+  object copointed extends ToCopointedOps
 
-  object applicative extends ToApplicativeV
-  
-  object bind extends ToBindV
+  object apply extends ToApplyOps
 
-  object monad extends ToMonadV
+  object applicative extends ToApplicativeOps
 
-  object cojoin extends ToCojoinV
+  object bind extends ToBindOps
 
-  object comonad extends ToComonadV
+  object monad extends ToMonadOps
 
-  object plus extends ToPlusV
+  object cojoin extends ToCojoinOps
 
-  object applicativePlus extends ToApplicativePlusV
+  object comonad extends ToComonadOps
 
-  object monadPlus extends ToMonadPlusV
+  object cozip extends ToCozipOps
 
-  object traverse extends ToTraverseV
+  object plus extends ToPlusOps
 
-  object bifunctor$ extends ToBifunctorV
+  object applicativePlus extends ToApplicativePlusOps
 
-  object bitraverse extends ToBitraverseV
+  object monadPlus extends ToMonadPlusOps
 
-  object compose extends ToComposeV
+  object traverse extends ToTraverseOps
 
-  object category extends ToCategoryV
+  object zip extends ToZipOps
 
-  object arrId extends ToArrIdV
+  object unzip extends ToUnzipOps
 
-  object arrow extends ToArrowV
+  //
+  // Type classes over * * -> *
+  //
 
-  object id extends ToIdV
+  object bifunctor extends ToBifunctorOps
 
-  object tree extends ToTreeV
+  object bifoldable extends ToBifoldableOps
 
-  object reducer extends ToReducerV
+  object bitraverse extends ToBitraverseOps
 
-  object writer extends ToWriterV
+  object compose extends ToComposeOps
 
-  object foldable extends ToFoldableV
+  object category extends ToCategoryOps
 
-  object validation extends ToValidationV
+  object arrId extends ToArrIdOps
 
-  object kleisli extends ToKleisliV
+  object arrow extends ToArrowOps
 
-  object all extends ToAllTypeClassV with ToAllOtherV
+  object choice extends ToChoiceOps
+
+  object split extends ToSplitOps
+
+  //
+  // Data
+  //
+
+  object id extends ToIdOps
+
+  object tree extends ToTreeOps
+
+  object reducer extends ToReducerOps
+
+  object writer extends ToWriterOps
+
+  object state extends ToStateOps
+
+  object foldable extends ToFoldableOps
+
+  object validation extends ToValidationOps
+
+  object kleisli extends ToKleisliOps
+
+  //
+  // Mixed
+  //
+
+  object all extends ToTypeClassOps with ToDataOps
 
 }
 
-trait ToAllOtherV extends ToIdV with ToTreeV with ToWriterV with ToValidationV with ToReducerV with ToKleisliV
+trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
 
-trait ToAllTypeClassV
-  extends ToSemigroupV with ToMonoidV with ToGroupV with ToEqualV with ToLengthV with ToShowV
-  with ToOrderV with ToEnumV with ToMetricSpaceV with ToPlusEmptyV with ToEachV with ToIndexV
-  with ToFunctorV with ToPointedV with ToContravariantV with ToCopointedV with ToApplyV
-  with ToApplicativeV with ToBindV with ToMonadV with ToCojoinV with ToComonadV
-  with ToPlusV with ToApplicativePlusV with ToMonadPlusV with ToTraverseV with ToBifunctorV
-  with ToBitraverseV with ToArrIdV with ToComposeV with ToCategoryV
-  with ToArrowV with ToFoldableV with ToChoiceV with ToSplitV with ToZipV with ToUnzipV
-
-
-trait SyntaxV[A] {
-  def self: A
-}
-
-/**The members of this object are also offered in the package object [[scalaz.syntax]] */
-object Syntax extends Syntaxes
+trait ToTypeClassOps
+  extends ToSemigroupOps with ToMonoidOps with ToGroupOps with ToEqualOps with ToLengthOps with ToShowOps
+  with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
+  with ToFunctorOps with ToPointedOps with ToContravariantOps with ToCopointedOps with ToApplyOps
+  with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
+  with ToBifoldableOps with ToCozipOps
+  with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
+  with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
+  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps

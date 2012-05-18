@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /** 
  * An adjunction formed by two functors `F` and `G` such that `F` is left-adjoint to `G`.
  * The composite functor GF is a monad and the composite functor FG is a comonad.

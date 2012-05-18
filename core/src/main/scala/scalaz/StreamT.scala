@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * StreamT monad transformer.
  */
@@ -14,7 +16,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        , done = M.point(None)
        ))
   
-  def ::(a: => A)(implicit M: Pointed[M]): StreamT[M, A] = StreamT[M, A](M.point(yieldd(a, this)))
+  def ::(a: => A)(implicit M: Pointed[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
     
   def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(_.isDefined)
 
@@ -25,65 +27,65 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => if (p(a)) yieldd(a, as filter p) else skip(as filter p)
-     , skip = as => skip(as filter p)
-     , done = done
+    _( yieldd = (a, as) => if (p(a)) Yield(a, as filter p) else Skip(as filter p)
+     , skip = as => Skip(as filter p)
+     , done = Done
      )
   }
 
   def drop(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => if (n > 0) skip(as drop (n-1)) else yieldd(a, as)
-     , skip = as => skip(as drop n)
-     , done = done
+    _( yieldd = (a, as) => if (n > 0) Skip(as drop (n-1)) else Yield(a, as)
+     , skip = as => Skip(as drop n)
+     , done = Done
      )
   }
   
   def dropWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => if (p(a)) skip(as dropWhile p) else yieldd(a, as)
-     , skip = as => skip(as dropWhile p)
-     , done = done
+    _( yieldd = (a, as) => if (p(a)) Skip(as dropWhile p) else Yield(a, as)
+     , skip = as => Skip(as dropWhile p)
+     , done = Done
      )
   }
   
   def take(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => if (n <= 0) done else yieldd(a, as take (n-1))
-     , skip = as => skip(as take n)
-     , done = done
+    _( yieldd = (a, as) => if (n <= 0) Done else Yield(a, as take (n-1))
+     , skip = as => Skip(as take n)
+     , done = Done
      )
   }
   
   def takeWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => if (p(a)) yieldd(a, as takeWhile p) else done
-     , skip = as => skip(as takeWhile p)
-     , done = done
+    _( yieldd = (a, as) => if (p(a)) Yield(a, as takeWhile p) else Done
+     , skip = as => Skip(as takeWhile p)
+     , done = Done
      )
   }
       
   def ++(bs: => StreamT[M, A])(implicit m: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, as) => yieldd(a, as ++ bs)
-     , skip = as => skip(as ++ bs)
-     , done = skip(bs)
+    _( yieldd = (a, as) => Yield(a, as ++ bs)
+     , skip = as => Skip(as ++ bs)
+     , done = Skip(bs)
      )
   }
 
   def flatMap[B](f: A => StreamT[M, B])(implicit m: Functor[M]): StreamT[M, B] = stepMap {
-    _( yieldd = (a, s) => skip(f(a) ++ (s flatMap f))
-     , skip = s => skip(s flatMap f)
-     , done = done
+    _( yieldd = (a, s) => Skip(f(a) ++ (s flatMap f))
+     , skip = s => Skip(s flatMap f)
+     , done = Done
      )
   }
       
   def map[B](f: A => B)(implicit m: Functor[M]): StreamT[M, B] = stepMap {
-    _( yieldd = (a, s) => yieldd(f(a), s map f)
-     , skip = s => skip(s map f)
-     , done = done
+    _( yieldd = (a, s) => Yield(f(a), s map f)
+     , skip = s => Skip(s map f)
+     , done = Done
      )
   }
       
   /**Don't use iteratively! */
   def tail(implicit m: Functor[M]): StreamT[M, A] = stepMap {
-    _( yieldd = (a, s) => skip(s)
-     , skip = s => skip(s.tail)
+    _( yieldd = (a, s) => Skip(s)
+     , skip = s => Skip(s.tail)
      , done = sys.error("tail: empty StreamT")
      )
   }
@@ -106,6 +108,12 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def length(implicit m: Monad[M]): M[Int] = {
     def addOne(c: => Int, a: => A) = 1 + c
     foldLeft(0)(addOne _)
+  }
+
+  def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step) {
+    case Yield(a,s) => M.bind(f(a))(_ => s().foreach(f))
+    case Skip(s) => s().foreach(f)
+    case Done => M.pure(())
   }
   
   private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
@@ -161,31 +169,63 @@ trait StreamTInstances extends StreamTInstances0 {
 object StreamT extends StreamTInstances {
   def apply[M[_], A](step: M[Step[A, StreamT[M, A]]]): StreamT[M, A] = new StreamT[M, A](step)
 
-  def empty[M[_], A](implicit M: Pointed[M]): StreamT[M, A] = new StreamT[M, A](M point done)
+  def empty[M[_], A](implicit M: Pointed[M]): StreamT[M, A] = new StreamT[M, A](M point Done)
 
   def fromStream[M[_], A](mas: M[Stream[A]])(implicit M: Pointed[M]): StreamT[M, A] = {
     def loop(as: Stream[A]): Step[A, StreamT[M, A]] = as match {
-      case head #:: tail => yieldd(head, apply(M.point(loop(tail))))
-      case _ => done
+      case head #:: tail => Yield(head, apply(M.point(loop(tail))))
+      case _ => Done
     }
 
     apply[M, A](M.map(mas)(loop))
   }
+
+  def unfoldM[M[_],A,B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Functor[M]): StreamT[M,A] =
+    StreamT[M,A](M.map(f(start)) {
+      case Some((a, b)) => Yield(a, unfoldM(b)(f))
+      case None => Done
+    })
+
+  def unfold[A,B](b: B)(f: B => Option[(A,B)]): StreamT[Id,A] = unfoldM[Id,A,B](b)(f)
+
+  def fromIterable[A](s: Iterable[A]): StreamT[Id,A] = {
+    def stepper(b: Iterable[A]): Option[(A,Iterable[A])] = if (b.isEmpty) None else Some((b.head, b.tail))
+    unfold(s)(stepper)
+  }
+
+  def wrapEffect[M[_]:Functor,A](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(Functor[M].map(m)(Skip(_)))
   
   abstract sealed class Step[+A, +S] {
     def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z): Z
   }
+
+  def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S): StreamT[Id,A] =
+    StreamT[Id,A]({
+      val (s1, sa) = stream.step(s0)
+      sa((a, as) => Yield(a, runStreamT(as, s1)),
+         as => Skip(runStreamT(as, s1)),
+         Done)
+    })
   
-  def yieldd[A, S](a: A, s: => S): Step[A, S] = new Step[A, S] {
-    def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z) = yieldd(a, s)
+  object Yield {
+    def apply[A, S](a: A, s: => S): Step[A, S] = new Step[A, S] {
+      def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z) = yieldd(a, s)
+    }
+    def unapply[A, S](s: Step[A, S]): Option[(A, () => S)] =
+      s((aa, sa) => Some((aa, () => sa)), _ => None, None)
   }
   
-  def skip[S](s: => S): Step[Nothing, S] = new Step[Nothing, S] {
-    def apply[Z](yieldd: (Nothing, => S) => Z, skip: => S => Z, done: => Z) = skip(s)
+  object Skip {
+    def apply[S](s: => S): Step[Nothing, S] = new Step[Nothing, S] {
+      def apply[Z](yieldd: (Nothing, => S) => Z, skip: => S => Z, done: => Z) = skip(s)
+    }
+    def unapply[A, S](s: Step[A, S]): Option[(() => S)] =
+      s((_, _) => None, s => Some(() => s), None)
   }
 
-  def done: Step[Nothing, Nothing] = new Step[Nothing, Nothing] {
+  object Done extends Step[Nothing, Nothing] {
     def apply[Z](yieldd: (Nothing, => Nothing) => Z, skip: => Nothing => Z, done: => Z) = done
+    def unapply[A, S](s: Step[A, S]): Boolean = s((_, _) => false, _ => false, true)
   }
 }
 
@@ -236,14 +276,14 @@ private[scalaz] trait StreamTHoist extends Hoist[StreamT] {
   
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StreamT[G, α]})#λ] = StreamTMonad[G]
   
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(yieldd(_, empty)))
+  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
   
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = StreamT[M, x]})#f ~> ({type f[x] = StreamT[N, x]})#f =
     new (({type f[x] = StreamT[M, x]})#f ~> ({type f[x] = StreamT[N, x]})#f) {
       def apply[A](a: StreamT[M, A]): StreamT[N, A] = StreamT[N, A](f(M.map(a.step)(
-        _( yieldd = (a, as) => yieldd(a, hoist(f) apply as)
-         , skip = as => skip(hoist(f) apply as)
-         , done = done
+        _( yieldd = (a, as) => Yield(a, hoist(f) apply as)
+         , skip = as => Skip(hoist(f) apply as)
+         , done = Done
          ))))
     }
 }

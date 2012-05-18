@@ -1,7 +1,15 @@
 package scalaz
 
-trait Unzip[F[_]] { self =>
+////
+/**
+ *
+ */
+////
+trait Unzip[F[_]]  { self =>
+  ////
   def unzip[A, B](a: F[(A, B)]): (F[A], F[B])
+
+  // derived functions
 
   def firsts[A, B](a: F[(A, B)]): F[A] = unzip(a)._1
   def seconds[A, B](a: F[(A, B)]): F[B] = unzip(a)._2
@@ -52,10 +60,14 @@ trait Unzip[F[_]] { self =>
     (a, b, c, d, e, g, h)
   }
 
+  ////
   val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] {}
-
 }
 
 object Unzip {
   @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
+
+  ////
+  ////
 }
+

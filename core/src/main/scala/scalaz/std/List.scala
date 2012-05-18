@@ -56,8 +56,8 @@ trait ListInstances extends ListInstances0 {
       State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]
         var cur = s
-        l.foreach { a => val bs = f(a)(cur); buf += bs._1; cur = bs._2 } 
-        (buf.toList, cur)
+        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 } 
+        (cur, buf.toList)
       })
     }
 
@@ -245,7 +245,7 @@ trait ListFunctions {
 }
 
 object list extends ListInstances with ListFunctions {
-  object listSyntax extends scalaz.syntax.std.ToListV
+  object listSyntax extends scalaz.syntax.std.ToListOps
 }
 
 

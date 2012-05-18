@@ -4,5 +4,5 @@ package effect
 object Effect extends Effects
 
 trait Effects
-  extends syntax.effect.ToAllEffectTypeClassV
+  extends syntax.effect.ToAllEffectTypeClassOps
   with std.effect.AllEffectInstances

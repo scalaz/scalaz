@@ -4,7 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
-import com.jsuereth.pgp.GpgPlugin._
+//import com.jsuereth.pgp.GpgPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -43,8 +43,8 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
     credentialsSetting,
-    useGpg := true,
-    useGpgAgent := true,
+    // useGpg := false,
+    // useGpgAgent := false,
     publishSetting,
     publishArtifact in Test := false,
     pomIncludeRepository := {
@@ -92,7 +92,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ Unidoc.settings,
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   lazy val core = Project(
@@ -136,6 +136,15 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
+  lazy val iterv = Project(
+    id = "iterv",
+    base = file("iterv"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-iterv"
+    ),
+    dependencies = Seq(effect)
+  )
+
   lazy val typelevel = Project(
     id = "typelevel",
     base = file("typelevel"),
@@ -167,7 +176,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent),
+    dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
@@ -257,7 +266,7 @@ object build extends Build {
       }
 
       val pimp = """|
-          |trait Tuple%dV[%s] extends SyntaxV[Tuple%d[%s]] {
+          |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
           |  val value = self
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
@@ -267,17 +276,17 @@ object build extends Build {
         mapallTParams, mapallParams, mapallTParams, mapallApply
       )
 
-      val conv = """implicit def ToTuple%dV[%s](t: (%s)): Tuple%dV[%s] = new { val self = t } with Tuple%dV[%s]
+      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new { val self = t } with Tuple%dOps[%s]
           |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
       (pimp, conv)
     }
 
     val source = "package scalaz\npackage syntax\npackage std\n\n" +
       tuples.map(_._1).mkString("\n") +
-      "\n\ntrait ToTupleV {\n" +
+      "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +
       "}"
-    writeFileScalazPackage("TupleV.scala", source)
+    writeFileScalazPackage("TupleOps.scala", source)
   }
 
 }

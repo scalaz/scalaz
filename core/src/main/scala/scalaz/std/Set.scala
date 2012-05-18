@@ -30,14 +30,27 @@ trait SetInstances {
     }
   }
 
+  import Ordering._
+
   /**
    * We could derive set equality from `Equal[A]`, but it would be `O(n^2)`.
    * Instead, we require `Order[A]`, reducing the complexity to `O(log n)`
    *
    * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
    */
-  implicit def setEqual[A: Order]: Equal[Set[A]] = new Equal[Set[A]] {
-    def equal(a1: Set[A], a2: Set[A]) = {
+  implicit def setOrder[A: Order]: Order[Set[A]] = new Order[Set[A]] {
+    def order(a1: Set[A], a2: Set[A]) = {
+      import anyVal._
+      import scala.math.Ordering.Implicits._
+      implicit val o = Order[A].toScalaOrdering
+      implicit val so = Order.fromScalaOrdering(seqDerivedOrdering[Seq, A])
+      Order[Int].order(a1.size, a2.size) match {
+        case EQ => Order.orderBy((s: Set[A]) => s.toSeq.sorted).order(a1, a2)
+        case x => x
+      } 
+    }
+
+    override def equal(a1: Set[A], a2: Set[A]) = {
       if (equalIsNatural) a1 == a2
       else {
         implicit val x = Order[A].toScalaOrdering
@@ -54,6 +67,23 @@ trait SetInstances {
     def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
     def zero: Set[A] = Set[A]()
   }
+
+  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
+    def show(as: Set[A]) = {
+      val i = as.iterator
+      val k = new collection.mutable.ListBuffer[Char]
+      k ++= "Set(".toList
+      while (i.hasNext) {
+        val n = i.next
+        k ++= Show[A].show(n)
+        if (i.hasNext)
+          k += ','
+      }
+      k += ')'
+      k.toList
+    }
+  }
+
 }
 
 trait SetFunctions

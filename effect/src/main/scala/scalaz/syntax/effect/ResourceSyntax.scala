@@ -5,7 +5,7 @@ package effect
 import scalaz.effect.Resource
 
 /** Wraps a value `self` and provides methods related to `Resource` */
-trait ResourceV[F] extends SyntaxV[F] {
+trait ResourceOps[F] extends Ops[F] {
   implicit def F: Resource[F]
   ////
 
@@ -14,9 +14,9 @@ trait ResourceV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToResourceV  {
-  implicit def ToResourceV[F](v: F)(implicit F0: Resource[F]) =
-    new ResourceV[F] { def self = v; implicit def F: Resource[F] = F0 }
+trait ToResourceOps  {
+  implicit def ToResourceOps[F](v: F)(implicit F0: Resource[F]) =
+    new ResourceOps[F] { def self = v; implicit def F: Resource[F] = F0 }
 
   ////
 
@@ -24,7 +24,7 @@ trait ToResourceV  {
 }
 
 trait ResourceSyntax[F]  {
-  implicit def ToResourceV(v: F)(implicit F0: Resource[F]): ResourceV[F] = new ResourceV[F] { def self = v; implicit def F: Resource[F] = F0 }
+  implicit def ToResourceOps(v: F)(implicit F0: Resource[F]): ResourceOps[F] = new ResourceOps[F] { def self = v; implicit def F: Resource[F] = F0 }
 
   ////
 

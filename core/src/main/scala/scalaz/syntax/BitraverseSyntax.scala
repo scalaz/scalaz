@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bitraverse` */
-trait BitraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+trait BitraverseOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Bitraverse[F]
   ////
   final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =
@@ -20,16 +20,16 @@ trait BitraverseV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToBitraverseV0 {
-    implicit def ToBitraverseVUnapply[FA](v: FA)(implicit F0: Unapply2[Bitraverse, FA]) =
-      new BitraverseV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bitraverse[F0.M] = F0.TC }
+trait ToBitraverseOps0 {
+    implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bitraverse, FA]) =
+      new BitraverseOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bitraverse[F0.M] = F0.TC }
   
 }
 
-trait ToBitraverseV extends ToBitraverseV0 with ToBifunctorV {
+trait ToBitraverseOps extends ToBitraverseOps0 with ToBifunctorOps with ToBifoldableOps {
   
-  implicit def ToBitraverseV[F[_, _],A, B](v: F[A, B])(implicit F0: Bitraverse[F]) =
-      new BitraverseV[F,A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
+  implicit def ToBitraverseOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bitraverse[F]) =
+      new BitraverseOps[F,A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
   
 
   ////
@@ -37,8 +37,8 @@ trait ToBitraverseV extends ToBitraverseV0 with ToBifunctorV {
   ////
 }
 
-trait BitraverseSyntax[F[_, _]] extends BifunctorSyntax[F] {
-  implicit def ToBitraverseV[A, B](v: F[A, B])(implicit F0: Bitraverse[F]): BitraverseV[F, A, B] = new BitraverseV[F, A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
+trait BitraverseSyntax[F[_, _]] extends BifunctorSyntax[F] with BifoldableSyntax[F] {
+  implicit def ToBitraverseOps[A, B](v: F[A, B])(implicit F0: Bitraverse[F]): BitraverseOps[F, A, B] = new BitraverseOps[F, A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
 
   ////
 

@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Type-level data structures in '''Scalaz'''.
  *
@@ -41,6 +43,10 @@ package object typelevel {
   val KNil: _KNil.type = _KNil
 
   def :^: = GenericCons
+
+  /** The empty [[scalaz.typelevel.Formatter]]. */
+  def FNil[R : Monoid] =
+    Formatter[HNil, R](_ => Monoid[R].zero)
 
 }
 

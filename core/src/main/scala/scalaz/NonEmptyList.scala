@@ -1,18 +1,19 @@
 package scalaz
 
-sealed trait NonEmptyList[A] {
+/** A singly-linked list that is guaranteed to be non-empty. */
+sealed trait NonEmptyList[+A] {
   val head: A
   val tail: List[A]
 
   import NonEmptyList._
   import Zipper._
 
-  def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
+  def <::[AA >: A](b: AA): NonEmptyList[AA] = nel(b, head :: tail)
 
   import collection.mutable.ListBuffer
 
-  def <:::(bs: List[A]): NonEmptyList[A] = {
-    val b = new ListBuffer[A]
+  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = {
+    val b = new ListBuffer[AA]
     b ++= bs
     b += head
     b ++= tail
@@ -20,7 +21,10 @@ sealed trait NonEmptyList[A] {
     nel(bb.head, bb.tail)
   }
 
-  def :::>(bs: List[A]): NonEmptyList[A] = nel(head, tail ::: bs)
+  def :::>[AA >: A](bs: List[AA]): NonEmptyList[AA] = nel(head, tail ::: bs)
+
+  /** Append one nonempty list to another. */
+  def append[AA >: A](f2: NonEmptyList[AA]): NonEmptyList[AA] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
@@ -75,7 +79,7 @@ sealed trait NonEmptyList[A] {
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
     nel((head, b.head), tail zip b.tail)
 
-  def unzip[X, Y](implicit ev: A =:= (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
+  def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
     val (a, b) = head: (X, Y)
     val (aa, bb) = tail.unzip: (List[X], List[Y])
     (nel(a, aa), nel(b, bb))
@@ -124,7 +128,7 @@ trait NonEmptyListInstances {
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
-    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1.list <::: f2
+    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = new Show[NonEmptyList[A]] {

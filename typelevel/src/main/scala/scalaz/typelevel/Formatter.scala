@@ -71,9 +71,6 @@ class SimpleUnionFormat[D <: Disj, R](f: Any => R) extends UnionFormat[D, R] {
 
 trait Formatters {
 
-  def FNil[R : Monoid] =
-    Formatter[HNil, R](_ => Monoid[R].zero)
-
   implicit def format2Formatter[T, R : Semigroup](f: Format[T, R]) =
     Formatter[HCons[_ <: T, HNil], R](params => f(params.head))
 

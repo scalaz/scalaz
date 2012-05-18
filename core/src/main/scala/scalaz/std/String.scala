@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait StringInstances {
-  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String]{
+  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] {
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
     def show(f: String) = f.toList
@@ -85,5 +85,5 @@ trait StringFunctions {
 }
 
 object string extends StringInstances with StringFunctions {
-  object stringSyntax extends scalaz.syntax.std.ToStringV
+  object stringSyntax extends scalaz.syntax.std.ToStringOps
 }

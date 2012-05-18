@@ -110,7 +110,7 @@ private[scalaz] trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[(
 
   implicit def G: Bifunctor[G]
 
-  def bimap[A, B, C, D](fab: F[G[A, B], G[A, B]])(f: A => C, g: B => D): F[G[C, D], G[C, D]] =
+  override def bimap[A, B, C, D](fab: F[G[A, B], G[A, B]])(f: A => C, g: B => D): F[G[C, D], G[C, D]] =
     F.bimap(fab)(G.bimap(_)(f, g), G.bimap(_)(f, g))
 }
 
@@ -127,7 +127,10 @@ private[scalaz] trait CompositionBifoldable[F[_, _], G[_, _]] extends Bifoldable
     F.bifoldLeft(fa, z)((b, a) => G.bifoldLeft(a, b)(f)(g))((b, a) => G.bifoldLeft(a, b)(f)(g))
 }
 
-private[scalaz] trait CompositionBitraverse[F[_, _], G[_, _]] extends Bitraverse[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {
+private[scalaz] trait CompositionBitraverse[F[_, _], G[_, _]]
+  extends Bitraverse[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ]
+  with CompositionBifunctor[F, G] with CompositionBifoldable[F, G]{
+
   implicit def F: Bitraverse[F]
 
   implicit def G: Bitraverse[G]

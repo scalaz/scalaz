@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait Cobind[F[_]] extends Functor[F]  { self =>
+trait Cobind[F[_]] extends Functor[F] { self =>
   ////
   /** Also know as `extend` */
   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]
@@ -29,3 +29,4 @@ object Cobind {
 
   ////
 }
+

@@ -66,7 +66,7 @@ trait CoKleisliFunctions {
 //    Cokleisli[A, Identity, B](a => r(a.value))
 //
 //  def ksa[F[_] : Copointed, A]: Cokleisli[A, F, A] =
-//    Cokleisli(a => implicitly[Copointed[F]].copoint(a))
+//    Cokleisli(a => Copointed[F].copoint(a))
 }
 
 trait CoKleisliMonad[F[_], R] extends Monad[({type λ[α] = CoKleisli[F, R, α]})#λ] {

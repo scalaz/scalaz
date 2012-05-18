@@ -95,7 +95,7 @@ sealed trait NSInfo {
           }
         , end = p => t => {
             val t1 = annotName(t)
-            ps span (q => !implicitly[Equal[QName]].equal(q, t1)) match {
+            ps span (q => !Equal[QName].equal(q, t1)) match {
               case (as, _::_) => Return[Function0, (List[Content], List[QName], List[Token])](Nil, as, u)
               case (_, Nil) => {
                 nodesT(ps, u) map {
@@ -121,7 +121,7 @@ sealed trait NSInfo {
                   case Nil =>
                     (Nil, es)
                   case w::ws =>
-                    w.text filter (cd => implicitly[Equal[CDataKind]].equal(cd.verbatim, txt.verbatim)) match {
+                    w.text filter (cd => Equal[CDataKind].equal(cd.verbatim, txt.verbatim)) match {
                       case Some(cd) => (cd.data, ws)
                       case None => (Nil, es)
                     }
@@ -157,7 +157,7 @@ trait NSInfos {
 
   implicit val NSInfoShow: Show[NSInfo] = new Show[NSInfo] {
     def show(n: NSInfo) =
-      ("NSInfo{prefixes=" + implicitly[Show[List[(Str, Str)]]].shows(n.prefixes) + (n.uri match {
+      ("NSInfo{prefixes=" + Show[List[(Str, Str)]].shows(n.prefixes) + (n.uri match {
         case None => ""
         case Some(u) => ",uri=" + u
       }) + "}").toList
@@ -174,9 +174,9 @@ object NSInfo extends NSInfos {
   import CostateT._
 
   val prefixesNSInfoL: NSInfo @> List[(Str, Str)] =
-    lens(x => costate(b => nsInfo(b, x.uri), x.prefixes))
+    lens(x => costate(x.prefixes)(b => nsInfo(b, x.uri)))
 
   val uriNSInfoL: NSInfo @> Option[Str] =
-    lens(x => costate(b => nsInfo(x.prefixes, b), x.uri))
+    lens(x => costate(x.uri)(b => nsInfo(x.prefixes, b)))
 
 }

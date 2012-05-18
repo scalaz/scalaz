@@ -4,6 +4,7 @@ package iteratee
 import std.AllInstances._
 import Iteratee._
 import effect._
+import Id._
 
 class IterateeTTest extends Spec {
   "head" in {
