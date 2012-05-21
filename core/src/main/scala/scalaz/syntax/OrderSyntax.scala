@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Order` */
-trait OrderV[F] extends SyntaxV[F] {
+trait OrderOps[F] extends Ops[F] {
   implicit def F: Order[F]
   ////
   final def <(other: F): Boolean = F.lessThan(self, other)
@@ -19,9 +19,9 @@ trait OrderV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToOrderV extends ToEqualV {
-  implicit def ToOrderV[F](v: F)(implicit F0: Order[F]) =
-    new OrderV[F] { def self = v; implicit def F: Order[F] = F0 }
+trait ToOrderOps extends ToEqualOps {
+  implicit def ToOrderOps[F](v: F)(implicit F0: Order[F]) =
+    new OrderOps[F] { def self = v; implicit def F: Order[F] = F0 }
 
   ////
 
@@ -29,7 +29,7 @@ trait ToOrderV extends ToEqualV {
 }
 
 trait OrderSyntax[F] extends EqualSyntax[F] {
-  implicit def ToOrderV(v: F)(implicit F0: Order[F]): OrderV[F] = new OrderV[F] { def self = v; implicit def F: Order[F] = F0 }
+  implicit def ToOrderOps(v: F)(implicit F0: Order[F]): OrderOps[F] = new OrderOps[F] { def self = v; implicit def F: Order[F] = F0 }
 
   ////
 

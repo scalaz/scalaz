@@ -36,7 +36,7 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
     traverse(as)(a => a)
 
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
-  def compose[G[_]](G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
+  def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
     implicit def F = self
 
     implicit def G = G0
@@ -72,6 +72,13 @@ object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   ////
+
+  def applicative[F[_]](p: Pointed[F], a: Apply[F]): Applicative[F] = new Applicative[F] {
+    def point[A](a: => A): F[A] = p.point(a)
+    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] = a.ap(fa)(f)
+  }
+
+  implicit def monoidApplicative[M:Monoid]: Applicative[({type λ[α] = M})#λ] = Monoid[M].applicative
 
   ////
 }

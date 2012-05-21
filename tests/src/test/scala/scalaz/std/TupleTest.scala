@@ -72,7 +72,11 @@ class TupleTest extends Spec {
       def monoid[A: Monoid] = Monoid[Tuple1[A]]
       
       def monad = Monad[Tuple1]
-      def comonad = CoMonad[Tuple1]
+      def comonad = Comonad[Tuple1]
+
+      // checking absence of ambiguity
+      def equal[A: Order] = Equal[Tuple1[A]]
+      def semigroup[A: Monoid] = Semigroup[Tuple1[A]]
     }
     object tuple2 {
       def show[A: Show, B: Show] = Show[(A, B)]
@@ -82,9 +86,15 @@ class TupleTest extends Spec {
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
       def group[A: Group, B: Group] = Group[(A, B)]
       
-      def bitraverse = BiTraverse[Tuple2]
+      def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[({type λ[α] = (B, α)})#λ]
       def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
+
+      // checking absence of ambiguity
+      def equal[A: Order, B: Order] = Equal[(A, B)]
+      def semigroup[A: Group, B: Group] = Semigroup[(A, B)]
+      def monoid[A: Group, B: Group] = Monoid[(A, B)]
+      def functor[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
     }
     object tuple3 {
       def show[A: Show, B: Show, C: Show] = Show[(A, B, C)]

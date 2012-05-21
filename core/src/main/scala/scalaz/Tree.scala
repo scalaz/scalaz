@@ -54,7 +54,7 @@ sealed trait Tree[A] {
   /** Pre-order traversal. */
   def flatten: Stream[A] = {
     def squish(tree: Tree[A], xs: Stream[A]): Stream[A] =
-      Stream.cons(tree.rootLabel, Foldable[Stream].foldR[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
+      Stream.cons(tree.rootLabel, Foldable[Stream].foldr[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
 
     squish(this, Stream.Empty)
   }
@@ -93,7 +93,7 @@ sealed trait Tree[A] {
   }
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Tree[B]] = {
-    val G = implicitly[Applicative[G]]
+    val G = Applicative[G]
     import std.stream._
     G.apF(G.map(f(rootLabel))((x: B) => (xs: Stream[Tree[B]]) => Tree.node(x, xs)))(Traverse[Stream].traverse[G, Tree[A], Tree[B]](subForest)((_: Tree[A]).traverse[G, B](f)))
   }
@@ -111,14 +111,14 @@ object Tree extends TreeFunctions with TreeInstances {
 }
 
 trait TreeInstances {
-  implicit val treeInstance: Traverse[Tree] with Monad[Tree] with CoMonad[Tree] = new Traverse[Tree] with Monad[Tree] with CoMonad[Tree] with CoBind.FromCoJoin[Tree] {
+  implicit val treeInstance: Traverse[Tree] with Monad[Tree] with Comonad[Tree] = new Traverse[Tree] with Monad[Tree] with Comonad[Tree] with Cobind.FromCojoin[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
     def copoint[A](p: Tree[A]): A = p.rootLabel
     override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
     def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
     def traverseImpl[G[_]: Applicative, A, B](fa: Tree[A])(f: (A) => G[B]): G[Tree[B]] = fa traverse f
-    def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+    override def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def foldMap[A, B](fa: Tree[A])(f: (A) => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
 

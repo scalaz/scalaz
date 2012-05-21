@@ -4,6 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
+//import com.jsuereth.pgp.GpgPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -11,8 +12,8 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
-    scalaVersion := "2.9.1",
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-Ydependent-method-types"),
+    scalaVersion := "2.9.2",
+    scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
     },
@@ -42,14 +43,56 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
     credentialsSetting,
-    publishSetting
+    // useGpg := false,
+    // useGpgAgent := false,
+    publishSetting,
+    publishArtifact in Test := false,
+    pomIncludeRepository := {
+      x => false
+    },
+    pomExtra := (
+      <url>http://scalaz.org</url>
+        <licenses>
+          <license>
+            <name>BSD-style</name>
+            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+            <distribution>repo</distribution>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:scalaz/scalaz.git</url>
+          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
+        </scm>
+        <developers>
+          {
+          Seq(
+            ("runarorama", "Runar Bjarnason"),
+            ("pchiusano", "Paul Chiusano"),
+            ("tonymorris", "Tony Morris"),
+            ("retronym", "Jason Zaugg"),
+            ("ekmett", "Edward Kmett"),
+            ("alexeyr", "Alexey Romanov"),
+            ("copumpkin", "Daniel Peebles"),
+            ("rwallace", "Richard Wallace"),
+            ("nuttycom", "Kris Nuttycombe")
+          ).map {
+            case (id, name) =>
+              <developer>
+                <id>{id}</id>
+                <name>{name}</name>
+                <url>http://github.com/{name}</url>
+              </developer>
+          }
+        }
+        </developers>
+      )
   )
 
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ Unidoc.settings,
-    aggregate = Seq(core, concurrent, effect, iteratee, example, scalacheckBinding, tests)
+    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   lazy val core = Project(
@@ -93,6 +136,15 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
+  lazy val iterv = Project(
+    id = "iterv",
+    base = file("iterv"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-iterv"
+    ),
+    dependencies = Seq(effect)
+  )
+
   lazy val typelevel = Project(
     id = "typelevel",
     base = file("typelevel"),
@@ -102,10 +154,20 @@ object build extends Build {
     dependencies = Seq(core)
   )
 
+  lazy val xml = Project(
+    id = "xml",
+    base = file("xml"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-xml",
+      typeClasses := TypeClass.xml
+    ),
+    dependencies = Seq(core)
+  )
+
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent, typelevel),
+    dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example"
     )
@@ -114,10 +176,10 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent),
+    dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.9"
+      libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
     )
   )
 
@@ -128,24 +190,25 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.6.1" % "test",
-        "org.scala-tools.testing" %% "scalacheck" % "1.9" % "test"
+        "org.specs2" % "specs2_2.9.1" % "1.6.1" % "test",
+        "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9" % "test"
       )
     )
   )
 
   lazy val publishSetting = publishTo <<= (version).apply{
-    version: String =>
-      def repo(name: String) = name at "http://nexus-direct.scala-tools.org/content/repositories/" + name
-      val isSnapshot = version.trim.endsWith("SNAPSHOT")
-      val repoName = if (isSnapshot) "snapshots" else "releases"
-      Some(repo(repoName))
+    v =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {
     Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "nexus-direct.scala-tools.org", user, pass)
+        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
       case _                           =>
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
@@ -203,7 +266,7 @@ object build extends Build {
       }
 
       val pimp = """|
-          |trait Tuple%dV[%s] extends SyntaxV[Tuple%d[%s]] {
+          |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
           |  val value = self
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
@@ -213,17 +276,17 @@ object build extends Build {
         mapallTParams, mapallParams, mapallTParams, mapallApply
       )
 
-      val conv = """implicit def ToTuple%dV[%s](t: (%s)): Tuple%dV[%s] = new { val self = t } with Tuple%dV[%s]
+      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new { val self = t } with Tuple%dOps[%s]
           |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
       (pimp, conv)
     }
 
     val source = "package scalaz\npackage syntax\npackage std\n\n" +
       tuples.map(_._1).mkString("\n") +
-      "\n\ntrait ToTupleV {\n" +
+      "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +
       "}"
-    writeFileScalazPackage("TupleV.scala", source)
+    writeFileScalazPackage("TupleOps.scala", source)
   }
 
 }

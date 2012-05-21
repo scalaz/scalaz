@@ -7,6 +7,6 @@ import org.scalacheck.Prop.forAll
 
 class SetTest extends Spec {
   checkAll(equal.laws[Set[Int]])
-  checkAll(monadPlus.laws[Option])
+  checkAll(monadPlus.strongLaws[Option])
   checkAll(traverse.laws[Option])
 }

@@ -1,18 +1,19 @@
 package scalaz
 
-sealed trait NonEmptyList[A] {
+/** A singly-linked list that is guaranteed to be non-empty. */
+sealed trait NonEmptyList[+A] {
   val head: A
   val tail: List[A]
 
   import NonEmptyList._
   import Zipper._
 
-  def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
+  def <::[AA >: A](b: AA): NonEmptyList[AA] = nel(b, head :: tail)
 
   import collection.mutable.ListBuffer
 
-  def <:::(bs: List[A]): NonEmptyList[A] = {
-    val b = new ListBuffer[A]
+  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = {
+    val b = new ListBuffer[AA]
     b ++= bs
     b += head
     b ++= tail
@@ -20,7 +21,10 @@ sealed trait NonEmptyList[A] {
     nel(bb.head, bb.tail)
   }
 
-  def :::>(bs: List[A]): NonEmptyList[A] = nel(head, tail ::: bs)
+  def :::>[AA >: A](bs: List[AA]): NonEmptyList[AA] = nel(head, tail ::: bs)
+
+  /** Append one nonempty list to another. */
+  def append[AA >: A](f2: NonEmptyList[AA]): NonEmptyList[AA] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
@@ -72,7 +76,25 @@ sealed trait NonEmptyList[A] {
 
   def size: Int = 1 + list.size
 
+  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
+    nel((head, b.head), tail zip b.tail)
+
+  def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
+    val (a, b) = head: (X, Y)
+    val (aa, bb) = tail.unzip: (List[X], List[Y])
+    (nel(a, aa), nel(b, bb))
+  }
+
   override def toString: String = "NonEmpty" + (head :: tail)
+
+  override def equals(any: Any): Boolean =
+    any match {
+      case that: NonEmptyList[_] => this.list == that.list
+      case _                     => false
+    }
+
+  override def hashCode: Int =
+    list.hashCode
 }
 
 object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
@@ -81,13 +103,12 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 }
 
 trait NonEmptyListInstances {
-  // TODO Show, etc.
-  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with Each[NonEmptyList] =
-    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with CoMonad[NonEmptyList] with CoBind.FromCoJoin[NonEmptyList] with Each[NonEmptyList] {
+  implicit val nonEmptyList: Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] =
+    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] {
       def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse f
 
-      def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+      override def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
       def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
@@ -100,10 +121,14 @@ trait NonEmptyListInstances {
       def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
       
       def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
+
+      def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
+
+      def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
-    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1.list <::: f2
+    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = new Show[NonEmptyList[A]] {

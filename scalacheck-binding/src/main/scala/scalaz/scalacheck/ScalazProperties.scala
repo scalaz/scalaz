@@ -43,6 +43,36 @@ object ScalazProperties {
     }
   }
 
+  object enum {
+    def succpred[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succpred _)
+
+    def predsucc[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predsucc _)
+
+    def minmaxpred[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxpred
+
+    def minmaxsucc[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxsucc
+
+    def succn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succn1 _)
+
+    def predn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predn1 _)
+
+    def succorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succorder _)
+
+    def predorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predorder _)
+
+    def laws[A](implicit A: Enum[A], arb: Arbitrary[A]) = new Properties("enum") {
+      include(order.laws[A])
+      property("predecessor then successor is identity") = succpred[A]
+      property("successor then predecessor is identity") = predsucc[A]
+      property("predecessor of the min is the max") = minmaxpred[A]
+      property("successor of the max is the min") = minmaxsucc[A]
+      property("n-successor once is successor") = succn1[A]
+      property("n-predecessor once is predecessor") = predn1[A]
+      property("successor is greater than or equal to") = succn1[A]
+      property("predecessor is less than or equal to") = predn1[A]
+    }
+  }
+
   object semigroup {
     def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.semigroupLaw.associative _)
 
@@ -134,24 +164,24 @@ object ScalazProperties {
 
 
   object copointed {
-    def laws[M[_]](implicit a: CoPointed[M], am: Arbitrary[M[Int]],
+    def laws[M[_]](implicit a: Copointed[M], am: Arbitrary[M[Int]],
                    af: Arbitrary[Int => Int], e: Equal[M[Int]]) = new Properties("copointed") {
       include(functor.laws[M])
     }
   }
 
   object comonad {
-    def cobindLeftIdentity[F[_], A](implicit F: CoMonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
-      forAll(F.coMonadLaw.cobindLeftIdentity[A] _)
+    def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
+      forAll(F.comonadLaw.cobindLeftIdentity[A] _)
 
-    def cobindRightIdentity[F[_], A, B](implicit F: CoMonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
-      forAll(F.coMonadLaw.cobindRightIdentity[A, B] _)
+    def cobindRightIdentity[F[_], A, B](implicit F: Comonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
+      forAll(F.comonadLaw.cobindRightIdentity[A, B] _)
 
-    def cobindAssociative[F[_], A, B, C, D](implicit F: CoMonad[F], D: Equal[D], fa: Arbitrary[F[A]],
+    def cobindAssociative[F[_], A, B, C, D](implicit F: Comonad[F], D: Equal[D], fa: Arbitrary[F[A]],
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
-      forAll(F.coMonadLaw.cobindAssociative[A, B, C, D] _)
+      forAll(F.comonadLaw.cobindAssociative[A, B, C, D] _)
 
-    def laws[F[_]](implicit a: CoMonad[F], am: Arbitrary[F[Int]],
+    def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
       include(copointed.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
@@ -205,10 +235,10 @@ object ScalazProperties {
 
   object plusEmpty {
     def leftPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.leftPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.leftPlusIdentity[X] _)
 
     def rightPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.emptyLaw.rightPlusIdentity[X] _)
+      forAll(f.plusEmptyLaw.rightPlusIdentity[X] _)
 
     def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]) = new Properties("plusEmpty") {
       include(plus.laws[F])
@@ -226,13 +256,16 @@ object ScalazProperties {
       forAll(F.monadPlusLaw.leftZero[X] _)
 
     def rightZero[F[_], X](implicit F: MonadPlus[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(F.monadPlusLaw.rightZero[X] _)
+      forAll(F.strongMonadPlusLaw.rightZero[X] _)
 
     def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(monad.laws[F])
       include(plusEmpty.laws[F])
       property("empty map") = emptyMap[F, Int]
       property("left zero") = leftZero[F, Int]
+    }
+    def strongLaws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
+      include(laws[F])
       property("right zero") = rightZero[F, Int]
     }
   }
@@ -264,7 +297,7 @@ object ScalazProperties {
   }
 
   object bifunctor {
-    def laws[F[_, _]](implicit F: BiFunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
+    def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
       include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
       include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
@@ -272,6 +305,7 @@ object ScalazProperties {
   }
 
   object lens {
+    import LensT._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)
@@ -297,4 +331,5 @@ object ScalazProperties {
       property("triangleInequality") = triangleInequality[F]
     }
   }
+
 }

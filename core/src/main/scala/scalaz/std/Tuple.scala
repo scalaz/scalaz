@@ -2,10 +2,10 @@ package scalaz
 package std
 
 trait TupleInstances0 {
-  implicit def tuple2BiTraverse[A1, A2] = new BiTraverse[Tuple2] {
+  implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
       (f(fab._1), g(fab._2))
-    def bitraverse[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
       Applicative[G].map2(f(fab._1), g(fab._2))((_, _))
   }
 
@@ -62,14 +62,14 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit def tuple1Instance: Monad[Tuple1] with CoMonad[Tuple1] = new Tuple1Monad with CoMonad[Tuple1] {
+  implicit def tuple1Instance: Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Comonad[Tuple1] {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
   /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Functor[({type f[x] = (A1, x)})#f] with CoMonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with CoMonad[({type f[x] = (A1, x)})#f] {
+  implicit def tuple2Instance[A1]: Functor[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
     def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
@@ -400,7 +400,7 @@ trait TupleInstances2 extends TupleInstances1 {
 trait TupleInstances extends TupleInstances2
 
 object tuple extends TupleInstances {
-  object tupleSyntax extends scalaz.syntax.std.ToTupleV
+  object tupleSyntax extends scalaz.syntax.std.ToTupleOps
 }
 
 private[scalaz] trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {

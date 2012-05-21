@@ -2,161 +2,246 @@ package scalaz
 package iteratee
 
 import effect._
-
 import Iteratee._
+import Ordering._
+import Id._
+
+trait EnumeratorT[E, F[_]] { self =>
+  def apply[A]: StepT[E, F, A] => IterateeT[E, F, A]
+
+  def mapE[I](et: EnumerateeT[E, I, F])(implicit M: Monad[F]): EnumeratorT[I, F] = et run self
+
+  def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[B, F] =
+    EnumerateeT.map[E, B, F](f) run self
+
+  def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
+    new EnumeratorT[E, F] {
+      def apply[A] = _.mapCont(_(elInput(e))) &= self
+    }
+  }
+
+  def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]) =
+    EnumerateeT.flatMap(f) run self
+
+  def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[B, F] = {
+    import MO._
+    flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(MO.promote(ev(e))))
+  }
+
+  def bindM[B, G[_]](f: E => G[EnumeratorT[B, F]])(implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[B, F]]] = {
+    import scalaz.syntax.semigroup._
+    val iter = fold[G[EnumeratorT[B, F]], F, G[EnumeratorT[B, F]]](G.point(EnumeratorT.empty[B, F])) {
+      case (acc, concat) => G.bind(acc) { en => 
+                              G.map(concat) { append => en |+| append } 
+                            }
+    }   
+
+    (iter &= self.map(f)).run
+  }
+
+  def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[B, F] =
+    EnumerateeT.collect[E, B, F](pf) run self
+
+  def uniq(implicit ord: Order[E], M: Monad[F]): EnumeratorT[E, F] =
+    EnumerateeT.uniq[E, F] run self
+
+  def zipWithIndex(implicit M: Monad[F]): EnumeratorT[(E, Long), F] =
+    EnumerateeT.zipWithIndex[E, F] run self
+
+  def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Pointed[M]): F[M[E]] =
+    (IterateeT.consume[E, F, M] &= self).run
+
+  def reduced[B](b: B)(f: (B, E) => B)(implicit M: Monad[F]): EnumeratorT[B, F] =
+    new EnumeratorT[B, F] {
+      def apply[A] = (step: StepT[B, F, A]) => {
+        def check(s: StepT[E, F, B]): IterateeT[B, F, A] = s.fold(
+          cont = k => k(eofInput) >>== {
+            s => s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
+          }
+          , done = (a, _) => step.mapCont(f => f(elInput(a)))
+        )
+
+        iterateeT(M.bind((IterateeT.fold[E, F, B](b)(f) &= self).value) { s => check(s).value })
+      }
+    }
+    
+  def cross[E2](e2: EnumeratorT[E2, F])(implicit M: Monad[F]): EnumeratorT[(E, E2), F] =
+    EnumerateeT.cross[E, E2, F](e2) run self
+}
 
 trait EnumeratorTInstances0 {
-  implicit def enumeratorTSemigroup[X, E, F[_], A](implicit F0: Bind[F]): Semigroup[EnumeratorT[X, E, F, A]] = new EnumeratorTSemigroup[X, E, F, A] {
-    implicit def F = F0
-  }
-  implicit def enumeratorTPlus[X, E, F[_]](implicit F0: Bind[F]): Plus[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] = new EnumeratorTPlus[X, E, F] {
+  implicit def enumeratorTSemigroup[E, F[_]](implicit F0: Bind[F]): Semigroup[EnumeratorT[E, F]] = new EnumeratorTSemigroup[E, F] {
     implicit def F = F0
   }
 }
 
 trait EnumeratorTInstances extends EnumeratorTInstances0 {
-  implicit def enumeratorTMonoid[X, E, F[_], A](implicit F0: Monad[F]): Monoid[EnumeratorT[X, E, F, A]] = new EnumeratorTMonoid[X, E, F, A] {
+  implicit def enumeratorTMonoid[E, F[_]](implicit F0: Monad[F]): Monoid[EnumeratorT[E, F]] = new EnumeratorTMonoid[E, F] {
     implicit def F = F0
   }
-  implicit def enumeratorTPlusEmpty[X, E, F[_]](implicit F0: Monad[F]): PlusEmpty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] = new EnumeratorTPlusEmpty[X, E, F] {
-    implicit def F = F0
+
+  implicit def enumeratorTMonad[F[_]](implicit M0: Monad[F]): Monad[({type λ[α]=EnumeratorT[α, F]})#λ] = new EnumeratorTMonad[F] {
+    implicit def M = M0
   }
-  implicit def enumeratorMonoid[X, E, A]: Monoid[Enumerator[X, E, A]] = new Monoid[Enumerator[X, E, A]] {
-    def append(f1: (Step[X, E, A]) => Step[X, E, A], f2: => (Step[X, E, A]) => Step[X, E, A]): Step[X, E, A] => Step[X, E, A] = f1 andThen f2
-    def zero: (Step[X, E, A]) => Step[X, E, A] = x => x
+
+  implicit def enumeratorTMonadTrans: MonadTrans[({ type λ[β[_], α] = EnumeratorT[α, β] })#λ] = new MonadTrans[({ type λ[β[_], α] = EnumeratorT[α, β] })#λ] {
+    def liftM[G[_]: Monad, E](ga: G[E]): EnumeratorT[E, G] = new EnumeratorT[E, G] {
+      def apply[A] = (s: StepT[E, G, A]) => iterateeT(Monad[G].bind(ga) { e => s.mapCont(k => k(elInput(e))).value })
+    }
+
+    implicit def apply[G[_]: Monad]: Monad[({type λ[α] = EnumeratorT[α, G]})#λ] = enumeratorTMonad[G]
   }
 }
 
 trait EnumeratorTFunctions {
-  def enumEofT[X, E, F[_] : Monad, A](e: (=> X) => IterateeT[X, E, F, A]): EnumeratorT[X, E, F, A] =
-    j => {
-      j.fold(
-        cont = k =>
-          k(eofInput) >>== (s =>
-            s >-(
-              sys.error("diverging iteratee")
-              , enumEofT(e) apply s
-              , enumEofT(e) apply s
-              ))
-        , done = (a, _) =>
-          StepT.sdone[X, E, F, A](a, eofInput).pointI
-        , err = e(_)
-      )
+  def enumerate[E](as: Stream[E]): Enumerator[E] = enumStream[E, Id](as)
+
+  def empty[E, F[_]: Pointed]: EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = _.pointI
     }
 
-  def enumerate[A, O](as: Stream[A]): Enumerator[Unit, A, O] =
-    i =>
-      as match {
-        case Stream.Empty => i
-        case x #:: xs     =>
-          i.fold(done = (_, _) => i, cont = k => enumerate(xs)(k(elInput(x)).value), err = e => err[Unit, A, Id, O](e).value)
-      }
+  /** 
+   * An EnumeratorT that is at EOF
+   */
+  def enumEofT[E, F[_] : Pointed]: EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = _.mapCont(_(eofInput))
+    }
 
-  implicit def enumStream[X, E, F[_] : Monad, A](xs: Stream[E]): EnumeratorT[X, E, F, A] = {
-    s =>
-      xs match {
-        case h #:: t => s.mapCont(_(elInput(h)) >>== enumStream(t))
+  /**
+   * An enumerator that forces the evaulation of an effect in the F monad when it is consumed.
+   */
+  def perform[E, F[_]: Monad, B](f: F[B]): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = s => iterateeT(Monad[F].bind(f) { _ => s.pointI.value })
+    }
+
+  def enumOne[E, F[_]: Pointed](e: E): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = _.mapCont(_(elInput(e)))
+    }
+
+  def enumStream[E, F[_] : Monad](xs: Stream[E]): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = (s: StepT[E, F, A]) => xs match {
+        case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumStream(t).apply[A])
         case _       => s.pointI
       }
-  }
+    }
 
-  implicit def enumIterator[X, E, A](x: Iterator[E]): EnumeratorT[X, E, IO, A] = {
-    def loop: EnumeratorT[X, E, IO, A] = {
-      s =>
+  def enumList[E, F[_] : Monad](xs: List[E]): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = (s: StepT[E, F, A]) => xs match {
+        case h :: t => s.mapCont(k => k(elInput(h)) >>== enumList(t).apply[A])
+        case Nil    => s.pointI
+      }
+    }
+
+  def enumIterator[E, F[_]](x: => Iterator[E])(implicit MO: MonadPartialOrder[F, IO]) : EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      import MO._
+      lazy val iter = x
+      def apply[A] = (s: StepT[E, F, A]) =>
         s.mapCont(
           k =>
-            if (x.hasNext) {
-              val n = x.next()
-              k(elInput(n)) >>== loop
+            if (iter.hasNext) {
+              val n = iter.next()
+              k(elInput(n)) >>== apply[A]
             } else s.pointI
         )
     }
-    loop
-  }
 
-  import java.io._
-
-  implicit def enumReader[X, A](r: Reader): EnumeratorT[X, IoExceptionOr[Char], IO, A] = {
-    def loop: EnumeratorT[X, IoExceptionOr[Char], IO, A] = {
-      s =>
+  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] =
+    new EnumeratorT[IoExceptionOr[Char], F] {
+      import MO._
+      lazy val reader = r
+      def apply[A] = (s: StepT[IoExceptionOr[Char], F, A]) =>
         s.mapCont(
           k => {
-            val i = IoExceptionOr(r.read)
-            if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== loop
+            val i = IoExceptionOr(reader.read)
+            if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== apply[A]
             else s.pointI
           }
         )
     }
-    loop
-  }
 
-  def checkCont0[X, E, F[_], A](z: EnumeratorT[X, E, F, A] => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A])(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
-    def step: EnumeratorT[X, E, F, A] = {
-      s =>
-        s.mapCont(
-          k => z(step)(k)
-        )
+  /**
+   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+   */
+  def enumArray[E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      private val limit = max.map(_ min (a.length)).getOrElse(a.length)
+      def apply[A] = {
+        def loop(pos : Int): StepT[E, F, A] => IterateeT[E, F, A] = {
+          s => 
+            s.mapCont(
+              k => if (limit > pos) k(elInput(a(pos))) >>== loop(pos + 1)
+                   else             s.pointI
+            )   
+        }
+
+        loop(min)
+      }
     }
-    step
-  }
 
-  def checkCont1[S, X, E, F[_], A](z: (S => EnumeratorT[X, E, F, A]) => S => (Input[E] => IterateeT[X, E, F, A]) => IterateeT[X, E, F, A], t: S)(implicit p: Pointed[F]): EnumeratorT[X, E, F, A] = {
-    def step: S => EnumeratorT[X, E, F, A] = {
-      o => s =>
-        s.mapCont(
-          k => z(step)(o)(k)
-        )
+  def repeat[E, F[_] : Monad](e: E): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A] = (s: StepT[E, F, A]) => s.mapCont(_(elInput(e)) >>== apply[A])
     }
-    step(t)
-  }
 
-  def iterate[X, E, F[_] : Monad, A](f: E => E, e: E): EnumeratorT[X, E, F, A] = {
-    checkCont1[E, X, E, F, A](s => t => k => k(elInput(e)) >>== s(f(t)), e)
-  }
+  def iterate[E, F[_] : Monad](f: E => E, e: E): EnumeratorT[E, F] =
+    new EnumeratorT[E, F] {
+      def apply[A]: StepT[E, F, A] => IterateeT[E, F, A] = {
+        type StepM = StepT[E, F, A]
+        type IterateeM = IterateeT[E, F, A]
 
-  def repeat[X, E, F[_] : Monad, A](e: E): EnumeratorT[X, E, F, A] = {
-    checkCont0[X, E, F, A](s => k => k(elInput(e)) >>== s)
-  }
+        def checkCont1(z: (E => (StepM => IterateeM)) => E => (Input[E] => IterateeM) => IterateeM, lastState: E): (StepM => IterateeM) = {
+          def step: E => (StepM => IterateeM) = {
+            state => _.mapCont(k => z(step)(state)(k))
+          }
 
-  def doneOr[X, O, I, F[_] : Pointed, A](f: (Input[I] => IterateeT[X, I, F, A]) => IterateeT[X, O, F, StepT[X, I, F, A]]): EnumerateeT[X, O, I, F, A] = {
-    s =>
-      def d: IterateeT[X, O, F, StepT[X, I, F, A]] = done(s, emptyInput)
-      s.fold(
-        cont = k => f(k)
-        , done = (_, _) => d
-        , err = _ => d
-      )
-  }
+          step(lastState)
+        }
+
+        checkCont1(contFactory => state => k => k(elInput(e)) >>== contFactory(f(state)), e)
+      }
+    }
 }
+
+// Instances are mixed in with the IterateeT object
+object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
 
 //
 // Type class implementation traits
 //
 
-private[scalaz] trait EnumeratorTSemigroup[X, E, F[_], A] extends Semigroup[EnumeratorT[X, E, F, A]] {
+private[scalaz] trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[EnumeratorT[E, F]] {
   implicit def F: Bind[F]
 
-  def append(f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A],
-             f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] =
-    s => f1(s) >>== f2
+  def append(f1: EnumeratorT[E, F], f2: => EnumeratorT[E, F]) =
+    new EnumeratorT[E, F] {
+      def apply[A] = (s: StepT[E, F, A]) => f1[A](s) >>== f2[A]
+    }
 }
 
-private[scalaz] trait EnumeratorTMonoid[X, E, F[_], A] extends Monoid[EnumeratorT[X, E, F, A]] with EnumeratorTSemigroup[X, E, F, A] {
+private[scalaz] trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F]] with EnumeratorTSemigroup[E, F] {
   implicit def F: Monad[F]
 
-  def zero: (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = _.pointI
+  def zero = new EnumeratorT[E, F] {
+    def apply[A] = (s: StepT[E, F, A]) => s.pointI
+  }
 }
 
-private[scalaz] trait EnumeratorTPlus[X, E, F[_]] extends Plus[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] {
-  implicit def F: Bind[F]
-
-  def plus[A](f1: (StepT[X, E, F, A]) => IterateeT[X, E, F, A],
-              f2: => (StepT[X, E, F, A]) => IterateeT[X, E, F, A]): (StepT[X, E, F, A]) => IterateeT[X, E, F, A] =
-    s => f1(s) >>== f2
+private[scalaz] trait EnumeratorTFunctor[F[_]] extends Functor[({type λ[α]=EnumeratorT[α, F]})#λ] {
+  implicit def M: Monad[F]
+  abstract override def map[A, B](fa: EnumeratorT[A, F])(f: A => B): EnumeratorT[B, F] = fa.map(f)
 }
 
-private[scalaz] trait EnumeratorTPlusEmpty[X, E, F[_]] extends PlusEmpty[({type λ[α]=EnumeratorT[X, E, F, α]})#λ] with EnumeratorTPlus[X, E, F] {
-  implicit def F: Monad[F]
+private[scalaz] trait EnumeratorTPointed[F[_]] extends Pointed[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTFunctor[F] {
+  def point[E](e: => E) = EnumeratorT.enumOne[E, F](e)
+}
 
-  def empty[A]: (StepT[X, E, F, A]) => IterateeT[X, E, F, A] = _.pointI
+private [scalaz] trait EnumeratorTMonad[F[_]] extends Monad[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTPointed[F] {
+  def bind[A, B](fa: EnumeratorT[A, F])(f: A => EnumeratorT[B, F]) = fa.flatMap(f)
 }

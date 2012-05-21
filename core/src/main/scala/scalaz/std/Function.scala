@@ -11,28 +11,30 @@ trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
     implicit def R = R0
   }
-  implicit def function1CoMonad[A, R](implicit A0: Monoid[A]) = new Function1CoMonad[A, R] {
+  implicit def function1Comonad[A, R](implicit A0: Monoid[A]) = new Function1Comonad[A, R] {
     implicit def M = A0
   }
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] {
+  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] {
     def point[A](a: => A) = () => a
+
+    def copoint[A](p: () => A) = p()
 
     def bind[A, B](fa: () => A)(f: (A) => () => B) = f(fa())
 
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
-    def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
+    override def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
   }
 
   implicit def function0Equal[R: Equal] = new Equal[() => R] {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-  implicit def function1Instance = new Arrow[Function1] with Category[Function1]{
+  implicit def function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] with Split[Function1] {
     def arr[A, B](f: A => B) = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
@@ -40,16 +42,36 @@ trait FunctionInstances extends FunctionInstances0 {
     def compose[A, B, C](f: (B) => C, g: (A) => B) = f compose g
 
     def id[A]: (A) => A = a => a
+
+    def choice[A, B, C](f: => A => C, g: => B => C): Either[A,  B] => C = {
+      case Left(a) => f(a)
+      case Right(b) => g(b)
+    }
+    
+    def split[A, B, C, D](f: A => B, g: C => D): ((A,  C)) => (B, D) = {
+      case (a, c) => (f(a), g(c))
+    }
+    
   }
 
-  implicit def function1Covariant[T] = new Monad[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)
+
+    def zip[A, B](a: => T => A, b: => T => B) =
+      t => (a(t), b(t))
+
+    def unzip[A, B](a: T => (A, B)) =
+      (a(_)._1, a(_)._2)
+
+    def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => T => B): T => G[B] =
+      t => Functor[G].map(fa)(a => f(a)(t))
+
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
-    def contramap[A, B](r: (A) => R)(f: (B) => A) = null
+    def contramap[A, B](r: (A) => R)(f: (B) => A) = r compose f
   }
 
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
@@ -116,7 +138,7 @@ trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R]
   def zero = a => R.zero
 }
 
-trait Function1CoMonad[M, R] extends CoMonad[({type λ[α]=(M => α)})#λ] {
+trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] {
   implicit def M: Monoid[M]
   def cojoin[A](a: (M) => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
   def copoint[A](p: (M) => A) = p(M.zero)

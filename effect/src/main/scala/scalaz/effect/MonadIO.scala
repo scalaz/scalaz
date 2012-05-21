@@ -21,8 +21,8 @@ object MonadIO {
   ////
 
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
-  implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
-    new MonadIO[({type λ[α] = RegionT[S, M, α]})#λ] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
+  implicit def regionTMonadIO[S, M[+_]](implicit M0: MonadIO[M]) =
+    new MonadIO[({type λ[+α] = RegionT[S, M, α]})#λ] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
       implicit def M = M0
       implicit def L = M0
     }

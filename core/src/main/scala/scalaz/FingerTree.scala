@@ -4,7 +4,7 @@ import collection.Iterator
 import syntax.semigroup._
 import syntax.reducer._
 import std.option.optionSyntax._
-import syntax.SyntaxV
+import syntax.Ops
 
 
 /**View of the left end of a sequence.*/
@@ -731,6 +731,42 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
   }
 
+  /**
+   * Like traverse, but with a more constraint type: we need the additional measure to construct the new tree.
+   */
+  def traverseTree[F[_], V2, B](f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[FingerTree[V2, B]] = {
+    def mkDeep(pr: Finger[V2, B])(m: FingerTree[V2, Node[V2, B]])(sf: Finger[V2, B]): FingerTree[V2, B] = deep(pr, m, sf)
+    fold(_ => F.pure(FingerTree.empty[V2, B]),
+         (v, a) => F.map(f(a))(a => single(ms.unit(a), a)),
+         (v, pr, m, sf) => {
+           //F.ap(traverseFinger(sf)(f))(F.ap(m.traverseTree(n => traverseNode(n)(f)))(F.map(traverseFinger(pr)(f))(pr => mkDeep(pr)_)))
+           //the implementation below seems most efficient. The straightforward implementation using F.map3 leads to an explosion of traverseTree calls
+           val fmap2 = F.map2(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b)_)
+           F.ap(traverseFinger(sf)(f))(fmap2)
+        })
+  }
+
+  private def traverseNode[F[_], V2, B](node: Node[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Node[V2, B]] = {
+    def mkNode(x: B)(y: B)(z: B): Node[V2, B] = node3(x, y, z)
+    node.fold((v, a, b) => F.map2(f(a), f(b))((x, y) => node2(x, y)),
+        (v, a, b, c) =>  {
+          F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkNode(x)_)))
+        }
+    )
+  }
+
+  private def traverseFinger[F[_], A, B, V2](digit: Finger[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Finger[V2, B]] = {
+    def mkTwo(x: B)(y: B): Finger[V2, B] = two(x, y)
+    def mkThree(x: B)(y: B)(z: B): Finger[V2, B] = three(x, y, z)
+    def mkFour(w: B)(x: B)(y: B)(z: B): Finger[V2, B] = four(w, x, y, z)
+    digit match {
+      case One(v, a) => F.map(f(a))(x => one(x))
+      case Two(v, a, b) => F.ap(f(b))(F.map(f(a))(x => mkTwo(x)_))
+      case Three(v, a, b, c) => F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkThree(x)_)))
+      case Four(v, a, b, c, d) => F.ap(f(d))(F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkFour(x)_))))
+    }
+  }
+
   /** Execute the provided side effect for each element in the tree. */
   def foreach(f: A => Unit) {
     fold(
@@ -750,6 +786,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     _ => Iterator.empty,
     (_, x) => Iterator.single(x),
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
+
+
 
   import scala.collection.immutable.Stream
   import scala.collection.immutable.Stream._
@@ -970,7 +1008,7 @@ trait FingerTreeFunctions {
      * @see [[http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf]]
      */
     sealed class Rope[A : ClassManifest](val self: FingerTreeIntPlus[ImmutableArray[A]])
-             extends SyntaxV[FingerTreeIntPlus[ImmutableArray[A]]] {
+             extends Ops[FingerTreeIntPlus[ImmutableArray[A]]] {
       import Rope._
       implicit def sizer = UnitReducer((arr: ImmutableArray[A]) => arr.length)
 
@@ -1068,7 +1106,7 @@ trait FingerTreeFunctions {
     def rope[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)
 
     sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
-        extends SyntaxV[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
+        extends Ops[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
       import Rope._
 
       def apply(i: Int): A = self(i)
@@ -1160,7 +1198,7 @@ trait FingerTreeFunctions {
       }
     }
 
-    sealed class RopeCharW(val self: Rope[Char]) extends SyntaxV[Rope[Char]] {
+    sealed class RopeCharW(val self: Rope[Char]) extends Ops[Rope[Char]] {
       def asString = {
         val stringBuilder = new StringBuilder(self.length)
         appendTo(stringBuilder)
@@ -1184,7 +1222,7 @@ object FingerTree extends FingerTreeInstances with FingerTreeFunctions
  *
  * The measure is the count of the preceding elements, provided by `UnitReducer((e: Int) => 1)`.
  */
-sealed trait IndSeq[A] extends SyntaxV[FingerTree[Int, A]] {
+sealed trait IndSeq[A] extends Ops[FingerTree[Int, A]] {
 
   import std.anyVal._
   import IndSeq.indSeq
@@ -1236,7 +1274,7 @@ object IndSeq {
  * operation favours the first argument. Accordingly, the measuer of a node is the
  * item with the highest priority contained recursively below that node.
  */
-sealed trait OrdSeq[A] extends SyntaxV[FingerTree[FirstOption[A], A]] {
+sealed trait OrdSeq[A] extends Ops[FingerTree[FirstOption[A], A]] {
   import syntax.arrow._
   import std.function._
   import syntax.order._
@@ -1262,7 +1300,7 @@ sealed trait OrdSeq[A] extends SyntaxV[FingerTree[FirstOption[A], A]] {
 object OrdSeq {
   private def ordSeq[A: Order](t: FingerTree[FirstOption[A], A]): OrdSeq[A] = new OrdSeq[A] {
     val self = t
-    val ord = implicitly[Order[A]]
+    val ord = Order[A]
   }
 
   implicit def unwrap[A](t: OrdSeq[A]): FingerTree[FirstOption[A], A] = t.self
@@ -1275,3 +1313,6 @@ object OrdSeq {
     as.foldLeft(z)((x, y) => x insert y)
   }
 }
+
+
+

@@ -22,6 +22,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
+  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val length = TypeClass("Length", *->*)
@@ -31,18 +32,20 @@ object TypeClass {
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
-  lazy val alternative = TypeClass("Alternative", *->*, extendsList = Seq(applicative))
-  lazy val alternativeEmpty = TypeClass("AlternativeEmpty", *->*, extendsList = Seq(alternative))
+  lazy val zip = TypeClass("Zip", *->*)
+  lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val coPointed = TypeClass("CoPointed", *->*, extendsList = Seq(functor))
-  lazy val coJoin = TypeClass("CoJoin", *->*)
-  lazy val coBind = TypeClass("CoBind", *->*)
-  lazy val coMonad = TypeClass("CoMonad", *->*, extendsList = Seq(coPointed, coJoin, coBind))
+  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor))
+  lazy val cojoin = TypeClass("Cojoin", *->*)
+  lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
+  lazy val cozip = TypeClass("Cozip", *->*)
+  lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
@@ -50,15 +53,16 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val biFunctor = TypeClass("BiFunctor", *^*->*)
-  lazy val biTraverse = TypeClass("BiTraverse", *^*->*, extendsList = Seq(biFunctor))
+  lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
+  lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
+  lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
+  lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
+  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val first = TypeClass("First", *^*->*)
   lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category))
-
-  lazy val run = TypeClass("Run", *, pack = Seq("scalaz", "concurrent"))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -76,6 +80,7 @@ object TypeClass {
     length,
     show,
     order,
+    enum,
     metricSpace,
     plusEmpty,
     each,
@@ -83,29 +88,34 @@ object TypeClass {
     functor,
     pointed,
     contravariant,
-    coPointed,
+    copointed,
     apply,
     applicative,
-    alternative,
-    alternativeEmpty,
+    zip,
+    unzip,
+    cozip,
     bind,
     monad,
-    coJoin,
-    coBind,
-    coMonad,
+    cojoin,
+    cobind,
+    comonad,
     plus,
     applicativePlus,
     monadPlus,
     foldable,
     traverse,
-    biFunctor,
-    biTraverse,
+    bifunctor,
+    bifoldable,
+    bitraverse,
     arrId,
     compose,
     category,
+    choice,
+    split,
     arrow
   )
-  lazy val concurrent = Seq(run)
+  lazy val concurrent = Seq[TypeClass]()
+  lazy val xml = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
 }
 
@@ -171,7 +181,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrId, arrow, category, compose)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrId, arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
@@ -189,14 +199,14 @@ object GenTypeClass {
     }
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
-        "extends To" + typeClassName + "V0" + (extendsList match {
+        "extends To" + typeClassName + "Ops0" + (extendsList match {
           case Seq() => ""
-          case es    => es.map(n => "To" + n + "V").mkString(" with ", " with ", "")
+          case es    => es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
         })
       case _    =>
         extendsList match {
           case Seq() => ""
-          case es    => es.map(n => "To" + n + "V").mkString("extends ", " with ", "")
+          case es    => es.map(n => "To" + n + "Ops").mkString("extends ", " with ", "")
         }
     }
     val extendsLikeList = extendsListText("")
@@ -240,16 +250,16 @@ object %s {
         """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sV[F] extends SyntaxV[F] {
+trait %sOps[F] extends Ops[F] {
   implicit def F: %s[F]
   ////
 
   ////
 }
 
-trait To%sV %s {
-  implicit def To%sV[F](v: F)(implicit F0: %s[F]) =
-    new %sV[F] { def self = v; implicit def F: %s[F] = F0 }
+trait To%sOps %s {
+  implicit def To%sOps[F](v: F)(implicit F0: %s[F]) =
+    new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
@@ -257,7 +267,7 @@ trait To%sV %s {
 }
 
 trait %sSyntax[F] %s {
-  implicit def To%sV(v: F)(implicit F0: %s[F]): %sV[F] = new %sV[F] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps(v: F)(implicit F0: %s[F]): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
@@ -273,29 +283,29 @@ trait %sSyntax[F] %s {
     )
     case Kind.*->* =>
       val ToVUnapply =
-"""  implicit def To%sVUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
-    new %sV[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
+"""  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
+    new %sOps[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
 """.format(Seq.fill(4)(typeClassName): _*)
       val ToVMA =
-"""  implicit def To%sV[F[_],A](v: F[A])(implicit F0: %s[F]) =
-    new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
+"""  implicit def To%sOps[F[_],A](v: F[A])(implicit F0: %s[F]) =
+    new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
 """.format(Seq.fill(4)(typeClassName) :_*)
 
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sV[F[_],A] extends SyntaxV[F[A]] {
+trait %sOps[F[_],A] extends Ops[F[A]] {
   implicit def F: %s[F]
   ////
 
   ////
 }
 
-trait To%sV0 {
+trait To%sOps0 {
 %s
 }
 
-trait To%sV %s {
+trait To%sOps %s {
 %s
   ////
 
@@ -303,7 +313,7 @@ trait To%sV %s {
 }
 
 trait %sSyntax[F[_]] %s {
-  implicit def To%sV[A](v: F[A])(implicit F0: %s[F]): %sV[F, A] = new %sV[F,A] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps[A](v: F[A])(implicit F0: %s[F]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 
@@ -322,31 +332,31 @@ trait %sSyntax[F[_]] %s {
       case Kind.*^*->* =>
 
         val ToVUnapply =
-  """  implicit def To%sVUnapply[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
-      new %sV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
+  """  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
+      new %sOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
   """.format(Seq.fill(4)(typeClassName): _*)
        val ToVFAB =
   """
-  implicit def To%sV[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
-      new %sV[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
+      new %sOps[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
   """.format(Seq.fill(4)(typeClassName) :_*)
 
 
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+trait %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: %s[F]
   ////
 
   ////
 }
 
-trait To%sV0 {
+trait To%sOps0 {
   %s
 }
 
-trait To%sV %s {
+trait To%sOps %s {
   %s
 
   ////
@@ -355,7 +365,7 @@ trait To%sV %s {
 }
 
 trait %sSyntax[F[_, _]] %s {
-  implicit def To%sV[A, B](v: F[A, B])(implicit F0: %s[F]): %sV[F, A, B] = new %sV[F, A, B] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps[A, B](v: F[A, B])(implicit F0: %s[F]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = F0 }
 
   ////
 

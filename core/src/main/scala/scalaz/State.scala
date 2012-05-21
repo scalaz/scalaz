@@ -3,18 +3,20 @@ package scalaz
 
 trait StateFunctions {
   def constantState[S, A](a: A, s: => S): State[S, A] =
-    State((_: S) => (a, s))
+    State((_: S) => (s, a))
 
   def state[S, A](a: A): State[S, A] =
-    State((a, _: S))
+    State((_ : S, a))
 
   def init[S]: State[S, S] = State(s => (s, s))
 
-  def put[S](s: S): State[S, S] = State(_ => (s, s))
+  def get[S]: State[S, S] = init
 
-  def modify[S](f: S => S): State[S, S] = State(s => {
+  def put[S](s: S): State[S, Unit] = State(_ => (s, ()))
+
+  def modify[S](f: S => S): State[S, Unit] = State(s => {
     val r = f(s);
-    (r, r)
+    (r, ())
   })
 
   /**

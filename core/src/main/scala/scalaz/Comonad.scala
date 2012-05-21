@@ -5,11 +5,11 @@ package scalaz
  *
  */
 ////
-trait CoMonad[F[_]] extends CoPointed[F] with CoJoin[F] with CoBind[F] { self =>
+trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
   ////
 
   // derived functions
-  trait CoMonadLaws {
+  trait ComonadLaws {
     def cobindLeftIdentity[A](fa: F[A])(implicit F: Equal[F[A]]): Boolean =
       F.equal(cobind(fa)(copoint), fa)
     def cobindRightIdentity[A, B](fa: F[A], f: F[A] => B)(implicit F: Equal[B]): Boolean =
@@ -23,14 +23,14 @@ trait CoMonad[F[_]] extends CoPointed[F] with CoJoin[F] with CoBind[F] { self =>
 
   }
 
-  def coMonadLaw = new CoMonadLaws {}
+  def comonadLaw = new ComonadLaws {}
 
   ////
-  val coMonadSyntax = new scalaz.syntax.CoMonadSyntax[F] {}
+  val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] {}
 }
 
-object CoMonad {
-  @inline def apply[F[_]](implicit F: CoMonad[F]): CoMonad[F] = F
+object Comonad {
+  @inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 
   ////
 

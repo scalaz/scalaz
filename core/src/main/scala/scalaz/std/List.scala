@@ -3,8 +3,14 @@ package std
 
 import annotation.tailrec
 
-trait ListInstances {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Alternative[List] {
+trait ListInstances0 {
+  implicit def listEqual[A](implicit A0: Equal[A]) = new ListEqual[A] {
+    implicit def A = A0
+  }
+}
+
+trait ListInstances extends ListInstances0 {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] with Zip[List] with Unzip[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -25,6 +31,9 @@ trait ListInstances {
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
+    def zip[A, B](a: => List[A], b: => List[B]) = a zip b
+    def unzip[A, B](a: List[(A, B)]) = a.unzip
+
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       // implementation with `foldRight` leads to SOE in:
       //
@@ -43,14 +52,12 @@ trait ListInstances {
       }
     }
     
-    def orElse[A](a: List[A], b: => List[A]) = a ++ b
-
     override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
       State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]
         var cur = s
-        l.foreach { a => val bs = f(a)(cur); buf += bs._1; cur = bs._2 } 
-        (buf.toList, cur)
+        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 } 
+        (cur, buf.toList)
       })
     }
 
@@ -60,7 +67,11 @@ trait ListInstances {
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
       var r = z
-      while (!s.isEmpty) {r = f(s.pop, r)}
+      while (!s.isEmpty) {
+        // force and copy the value of r to ensure correctness
+        val w = r
+        r = f(s.pop, w)
+      }
       r
     }
 
@@ -87,9 +98,10 @@ trait ListInstances {
     }
   }
 
-  implicit def listEqual[A: Equal]: Equal[List[A]] = new Equal[List[A]] {
-    def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
+  implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
+    implicit def A = A0
   }
+
 }
 
 trait ListFunctions {
@@ -233,5 +245,32 @@ trait ListFunctions {
 }
 
 object list extends ListInstances with ListFunctions {
-  object listSyntax extends scalaz.syntax.std.ToListV
+  object listSyntax extends scalaz.syntax.std.ToListOps
+}
+
+
+trait ListEqual[A] extends Equal[List[A]] {
+  implicit def A: Equal[A]
+
+  override def equalIsNatural: Boolean = A.equalIsNatural
+
+  override def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
+}
+
+trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
+  implicit def A: Order[A]
+
+  import Ordering._
+
+  def order(a1: List[A], a2: List[A]) =
+    (a1, a2) match {
+      case (Nil, Nil)     => EQ
+      case (Nil, _::_)    => LT
+      case (_::_, Nil)    => GT
+      case (a::as, b::bs) => Order[A].order(a, b) match {
+        case EQ => order(as, bs)
+        case x  => x
+      }
+    }
+
 }

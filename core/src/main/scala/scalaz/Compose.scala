@@ -36,5 +36,8 @@ trait Compose[=>:[_, _]]  { self =>
 
 object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
+
+  ////
+  ////
 }
 

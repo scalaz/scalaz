@@ -59,6 +59,26 @@ class ValidationTest extends Spec {
     val x = "0".parseBoolean.fail.fpair
     ok
   }
+  
+  "ap2" should {
+    "accumulate failures in order" in {
+      import syntax.show._
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
+      val f = (_:Int) + (_:Int)
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
+    }
+  }
+
+  "map2" should {
+    "accumulate failures in order" in {
+      import syntax.show._
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
+      val f = (_:Int) + (_:Int)
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("Failure([1,2])")
+    }
+  }
 
   object instances {
     def show[E: Show, A: Show] = Show[Validation[E, A]]
@@ -69,7 +89,12 @@ class ValidationTest extends Spec {
     def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
     def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
     def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
-    def bitraverse = BiTraverse[Validation]
+    def bitraverse = Bitraverse[Validation]
+
+    // checking absence of ambiguity
+    def equal[E: Order, A: Order] = Equal[Validation[E, A]]
+    def pointed[E: Semigroup] = Pointed[({type λ[α] = Validation[E, α]})#λ]
+
     object failProjection {
       def show[E: Show, A: Show] = Show[FailProjection[E, A]]
       def equal[E: Equal, A: Equal] = Equal[FailProjection[E, A]]
@@ -79,7 +104,11 @@ class ValidationTest extends Spec {
       def applicative[E: Semigroup] = Applicative[({type λ[α]=FailProjection[E, α]})#λ]
       def traverse[E: Semigroup] = Traverse[({type λ[α]=FailProjection[E, α]})#λ]
       def plus[E: Semigroup] = Plus[({type λ[α]=FailProjection[E, α]})#λ]
-      def bitraverse = BiTraverse[FailProjection]
+      def bitraverse = Bitraverse[FailProjection]
+
+      // checking absence of ambiguity
+      def equal[E: Order, A: Order] = Equal[FailProjection[E, A]]
+      def pointed[E: Semigroup] = Pointed[({type λ[α]=FailProjection[E, α]})#λ]
     }
   }
 }

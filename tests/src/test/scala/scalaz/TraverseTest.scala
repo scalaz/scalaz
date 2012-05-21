@@ -66,8 +66,11 @@ class TraverseTest extends Spec {
       import scalaz.effect._
 
       val as = Stream.range(0, 100000)
-      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => State((s: Int) => (IO(a - s), a)))
-      state.eval(0).unsafePerformIO.take(3) must be_===(Stream(0, 1, 1))
+      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => for {
+        s <- State.get[Int]
+        _ <- State.put(a)
+      } yield IO(a - s))
+      state.eval(0).unsafePerformIO().take(3) must be_===(Stream(0, 1, 1))
     }
   }
 
@@ -77,9 +80,12 @@ class TraverseTest extends Spec {
       List(some(1), some(2)).sequence must be_===(some(List(1, 2)))
       List(some(1), none[Int]).sequence must be_===(none)
 
-      val states: List[State[Int, Int]] = List(State((s: Int) => (0, s + 1)), State((s: Int) => (s, s + 1)))
+      val states: List[State[Int, Int]] = List(State.modify[Int](_ + 1).map(_ => 0), for {
+          i <- State.get[Int]
+          _ <- State.put(i + 1)
+        } yield i)
       val state: State[Int, List[Int]] = states.sequenceU
-      state.run(0) must be_===((List(0, 1), 2))
+      state.run(0) must be_===(2, (List(0, 1)))
     }
 
     "reverse" in {

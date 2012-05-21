@@ -1,13 +1,8 @@
 package scalaz
 package typelevel
 
-object Typelevel extends Typelevels
-
-trait Typelevels
-  extends GenericLists
-  with HLists
-  with TypeClasses
-  with Numerals
+object Typelevel
+  extends syntax.Syntax
+  with Nats
 
 // vim: expandtab:ts=2:sw=2
-

@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Represents either:
  *  - `Success(a)`, or
@@ -147,7 +149,7 @@ sealed trait Validation[+E, +A] {
     case (Success(a), Success(f))   => Success(f(a))
     case (Failure(e), Success(_))   => Failure(e)
     case (Success(f), Failure(e))   => Failure(e)
-    case (Failure(e1), Failure(e2)) => Failure(E.append(e1, e2))
+    case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
   def bimap[C, D](f: (E) => C, g: (A) => D): Validation[C, D] = this match {
@@ -158,6 +160,11 @@ sealed trait Validation[+E, +A] {
   def bitraverse[G[_] : Applicative, C, D](f: (E) => G[C], g: (A) => G[D]): G[Validation[C, D]] = this match {
     case Failure(a) => Applicative[G].map(f(a))(Failure(_))
     case Success(b) => Applicative[G].map(g(b))(Success(_))
+  }
+
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
+    case succ @ Success(a) => if (f(a)) succ else Failure(onFailure)
+    case failure => failure
   }
 }
 
@@ -278,10 +285,10 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
       implicit def G = Validation.validationApplicative
     }
 
-  implicit def failProjectionBiTraverse =
-    new IsomorphismBiTraverse[FailProjection, Validation] {
+  implicit def failProjectionBitraverse =
+    new IsomorphismBitraverse[FailProjection, Validation] {
       def iso = FailProjectionBiIso
-      implicit def G = Validation.validationBiTraverse
+      implicit def G = Validation.validationBitraverse
     }
 }
 
@@ -307,7 +314,7 @@ trait FailProjectionFunctions {
   }
 
   /** The FailProjection type constructor is isomorphic to Validation */
-  implicit def FailProjectionBiIso[A] = new IsoBiFunctorTemplate[FailProjection, Validation] {
+  implicit def FailProjectionBiIso[A] = new IsoBifunctorTemplate[FailProjection, Validation] {
     def to[A, B](fa: FailProjection[A, B]): Validation[A, B] = fa.validation
     def from[A, B](ga: Validation[A, B]): FailProjection[A, B] = ga.fail
   }
@@ -339,7 +346,7 @@ trait ValidationInstances extends ValidationInstances0 {
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+    override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def ap[A, B](fa: => Validation[E, A])(f: => Validation[E, A => B]): Validation[E, B] = fa ap f
 
@@ -348,10 +355,10 @@ trait ValidationInstances extends ValidationInstances0 {
 
   def validationNelApplicative[E] = validationApplicative[NonEmptyList[E]]
 
-  implicit def validationBiTraverse = new BiTraverse[Validation] {
+  implicit def validationBitraverse = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
 
-    def bitraverse[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
   }
 
   implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
@@ -364,7 +371,7 @@ trait ValidationInstances extends ValidationInstances0 {
 
     def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
-    def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+    override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
     def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }

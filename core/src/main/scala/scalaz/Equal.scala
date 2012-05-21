@@ -56,6 +56,11 @@ object Equal {
   def equalContravariant: Contravariant[Equal] = new Contravariant[Equal] {
     def contramap[A, B](r: Equal[A])(f: (B) => A) = r.contramap(f)
   }
+
+  def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
+    def equal(a1: A, a2: A) = f(a1, a2)
+  }
+
   ////
 }
 

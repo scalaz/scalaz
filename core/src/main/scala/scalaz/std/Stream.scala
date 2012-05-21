@@ -4,8 +4,8 @@ package std
 import annotation.tailrec
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] {
-    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]) = {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] {
+    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
@@ -28,7 +28,7 @@ trait StreamInstances {
       k
     }
 
-    def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
+    override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
@@ -37,6 +37,9 @@ trait StreamInstances {
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
     def point[A](a: => A) = scala.Stream(a)
+    def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
+    def unzip[A, B](a: Stream[(A, B)]) = a.unzip
+
   }
 
   import Tags.Zip
@@ -83,7 +86,7 @@ trait StreamInstances {
   }
 
 
-  // TODO show, equal, order, ...
+  // TODO order, ...
 }
 
 trait StreamFunctions {
@@ -149,5 +152,5 @@ trait StreamFunctions {
 }
 
 object stream extends StreamInstances with StreamFunctions {
-  object streamSyntax extends scalaz.syntax.std.ToStreamV
+  object streamSyntax extends scalaz.syntax.std.ToStreamOps
 }

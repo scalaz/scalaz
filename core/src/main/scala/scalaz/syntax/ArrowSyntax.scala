@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Arrow` */
-trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+trait ArrowOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Arrow[F]
   ////
   final def first[C]: F[(A, C), (B, C)] =
@@ -12,7 +12,7 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
     F.second(self)
 
   final def ***[C, D](k: F[C, D]): F[(A, C), (B, D)] =
-    F.split(self, k)
+    F.splitA(self, k)
 
   final def &&&[C](k: F[A, C]): F[A, (B, C)] =
     F.combine(self, k)
@@ -29,16 +29,16 @@ trait ArrowV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToArrowV0 {
-    implicit def ToArrowVUnapply[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
-      new ArrowV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Arrow[F0.M] = F0.TC }
+trait ToArrowOps0 {
+    implicit def ToArrowOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
+      new ArrowOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Arrow[F0.M] = F0.TC }
   
 }
 
-trait ToArrowV extends ToArrowV0 with ToCategoryV {
+trait ToArrowOps extends ToArrowOps0 with ToCategoryOps {
   
-  implicit def ToArrowV[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
-      new ArrowV[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
+  implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
+      new ArrowOps[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
   
 
   ////
@@ -47,7 +47,7 @@ trait ToArrowV extends ToArrowV0 with ToCategoryV {
 }
 
 trait ArrowSyntax[F[_, _]] extends CategorySyntax[F] {
-  implicit def ToArrowV[A, B](v: F[A, B])(implicit F0: Arrow[F]): ArrowV[F, A, B] = new ArrowV[F, A, B] { def self = v; implicit def F: Arrow[F] = F0 }
+  implicit def ToArrowOps[A, B](v: F[A, B])(implicit F0: Arrow[F]): ArrowOps[F, A, B] = new ArrowOps[F, A, B] { def self = v; implicit def F: Arrow[F] = F0 }
 
   ////
 

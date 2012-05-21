@@ -1,9 +1,9 @@
 package scalaz.example
 
 import scalaz._
+import std.string._
 import UnionTypes._
 import typelevel._
-import Typelevel._
 import Formatter.all._
 
 object FormatterUsage extends App {
@@ -45,15 +45,15 @@ object FormatterUsage extends App {
   }
 
   def test10() {
-    println ((char() :: FNil)('c'.union[char#D] :: HNil))
+    println ((char() :: FNil)('c'.union[char#T] :: HNil))
   }
 
   def test11() {
-    println ((char() :: char() :: FNil)('c'.union[char#D] :: 's'.union[char#D] :: HNil))
+    println ((char() :: char() :: FNil)('c'.union[char#T] :: 's'.union[char#T] :: HNil))
   }
 
   def test12() {
-    println ((char() :: "#" :: char() :: "#" :: char() :: FNil)('c'.union[char#D] :: (65.toByte).union[char#D] :: (68.toShort).union[char#D] :: HNil))
+    println ((char() :: "#" :: char() :: "#" :: char() :: FNil)('c'.union[char#T] :: (65.toByte).union[char#T] :: (68.toShort).union[char#T] :: HNil))
   }
 
   def test13() {

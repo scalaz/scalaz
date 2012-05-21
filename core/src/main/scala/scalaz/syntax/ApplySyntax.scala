@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Apply` */
-trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
+trait ApplyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Apply[F]
   ////
   final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
@@ -40,15 +40,15 @@ trait ApplyV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToApplyV0 {
-  implicit def ToApplyVUnapply[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
-    new ApplyV[F0.M,F0.A] { def self = F0(v); implicit def F: Apply[F0.M] = F0.TC }
+trait ToApplyOps0 {
+  implicit def ToApplyOpsUnapply[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
+    new ApplyOps[F0.M,F0.A] { def self = F0(v); implicit def F: Apply[F0.M] = F0.TC }
 
 }
 
-trait ToApplyV extends ToApplyV0 with ToFunctorV {
-  implicit def ToApplyV[F[_],A](v: F[A])(implicit F0: Apply[F]) =
-    new ApplyV[F,A] { def self = v; implicit def F: Apply[F] = F0 }
+trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
+  implicit def ToApplyOps[F[_],A](v: F[A])(implicit F0: Apply[F]) =
+    new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
 
   ////
 
@@ -56,7 +56,7 @@ trait ToApplyV extends ToApplyV0 with ToFunctorV {
 }
 
 trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToApplyV[A](v: F[A])(implicit F0: Apply[F]): ApplyV[F, A] = new ApplyV[F,A] { def self = v; implicit def F: Apply[F] = F0 }
+  implicit def ToApplyOps[A](v: F[A])(implicit F0: Apply[F]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
 
   ////
 

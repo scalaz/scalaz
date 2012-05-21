@@ -11,7 +11,26 @@ trait Apply[F[_]] extends Functor[F] { self =>
 
   // derived functions
 
+  /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
+  def compose[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = F[G[α]]})#λ] = new CompositionApply[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
+  /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
+  def product[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = (F[α], G[α])})#λ] = new ProductApply[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
+  def zip: Zip[F] =
+    new Zip[F] {
+      def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
+        map2(a, b)((x, y) => (x, y))
+    }
 
   def ap2[A,B,C](fa: => F[A], fb: => F[B])(f: F[(A,B) => C]): F[C] =
     ap(fb)(ap(fa)(map(f)(_.curried)))
@@ -27,7 +46,6 @@ trait Apply[F[_]] extends Functor[F] { self =>
     ap3(fe, ff, fg)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G) => f(a,b,c,d,e,ff,g)))))
   def ap8[A,B,C,D,E,FF,G,H,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: F[(A,B,C,D,E,FF,G,H) => R]): F[R] =
     ap4(fe, ff, fg, fh)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G, h: H) => f(a,b,c,d,e,ff,g,h)))))
-
 
   def map2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = ap(fb)(map(fa)(f.curried))
 

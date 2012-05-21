@@ -10,14 +10,14 @@ import std.tuple._
 object Free extends FreeFunctions with FreeInstances {
 
   /** Return from the computation with the given value. */
-  case class Return[S[+_], +A](a: A) extends Free[S, A]
+  case class Return[S[+_]: Functor, +A](a: A) extends Free[S, A]
 
   /** Suspend the computation with the given suspension. */
-  case class Suspend[S[+_], +A](a: S[Free[S, A]]) extends Free[S, A]
+  case class Suspend[S[+_]: Functor, +A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  case class Gosub[S[+_], A, +B](a: Free[S, A],
-                                 f: A => Free[S, B]) extends Free[S, B]
+  case class Gosub[S[+_]: Functor, A, +B](a: Free[S, A],
+                                          f: A => Free[S, B]) extends Free[S, B]
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[+A] = Free[Function0, A]
@@ -33,7 +33,7 @@ object Free extends FreeFunctions with FreeInstances {
 
 /** A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
   * allowing tail-call elimination. */
-sealed trait Free[S[+_], +A] {
+sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   final def map[B](f: A => B): Free[S, B] =
     flatMap(a => Return(f(a)))
 
@@ -48,48 +48,82 @@ sealed trait Free[S[+_], +A] {
   }
 
   /** Evaluates a single layer of the free monad. */
-  @tailrec final def resume(implicit S: Functor[S]): Either[S[Free[S, A]], A] = this match {
+  @tailrec final def resume: Either[S[Free[S, A]], A] = this match {
     case Return(a)  => Right(a)
     case Suspend(t) => Left(t)
     case a Gosub f  => a match {
       case Return(a)  => f(a).resume
-      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) >>= f)))
-      case b Gosub g  => (Gosub(b, (x: Any) => Gosub(g(x), f)): Free[S, A]).resume
+      case Suspend(t) => Left(S.map(t)(((_: Free[S, Any]) flatMap f)))
+      case b Gosub g  => b.flatMap((x: Any) => g(x) flatMap f).resume
     }
   }
 
-  /** Modifies the suspension with the given natural transformation. */
-  final def mapSuspension[T[+_]](f: S ~> T)(implicit S: Functor[S]): Free[T, A] =
+  /** Changes the suspension functor by the given natural transformation. */
+  final def mapSuspension[T[+_]:Functor](f: S ~> T): Free[T, A] =
     resume match {
       case Left(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
       case Right(r) => Return(r)
     }
 
+  /** Modifies the first suspension with the given natural transformation. */
+  final def mapFirstSuspension(f: S ~> S): Free[S, A] = resume match {
+    case Left(s) => Suspend(f(s))
+    case Right(r) => Return(r)
+  }
+
+  /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
+  final def zapWith[G[+_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+    Zap.monadComonadZap.zapWith(this, bs)(f)
+
+  /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
+  final def zap[G[+_], B](fs: Cofree[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+    zapWith(fs)((a, f) => f(a))
+
+  /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
+  final def bounce[AA >: A](f: S[Free[S, A]] => Free[S, AA]): Free[S, AA] = resume match {
+    case Left(s) => f(s)
+    case Right(r) => Return(r)
+  }
+
+  /** Runs to completion, using a function that extracts the resumption from its suspension functor. */
+  final def go[AA >: A](f: S[Free[S, AA]] => Free[S, AA]): AA = {
+    @tailrec def go2(t: Free[S, AA]): AA = t.resume match {
+      case Left(s) => go2(f(s))
+      case Right(r) => r
+    }
+    go2(this)
+  }
+
+  /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
+  final def foldRun[B, AA >: A](b: B)(f: (B, S[Free[S, AA]]) => (B, Free[S, AA])): (B, AA) = {
+    @tailrec def foldRun2(t: Free[S, AA], z: B): (B, AA) = t.resume match {
+      case Left(s) => {
+        val (b1, s1) = f(z, s)
+        foldRun2(s1, b1) 
+      }
+      case Right(r) => (z, r)
+    }
+    foldRun2(this, b)
+  }
+
   import Liskov._
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
-  def run[B >: A](implicit ev: Free[S, B] <~< Trampoline[B], S: Functor[S]): B = {
-    @tailrec def go(t: Trampoline[B]): B =
-      t.resume match {
-        case Left(s)  => go(s())
-        case Right(a) => a
-      }
-    go(ev(this))
-  }
+  def run[B >: A](implicit ev: Free[S, B] <~< Trampoline[B]): B =
+    ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
-  def zipWith[B, C](tb: Free[S, B], f: (A, B) => C)(implicit S: Functor[S]): Free[S, C] = {
+  def zipWith[B, C](tb: Free[S, B], f: (A, B) => C): Free[S, C] = {
     (resume, tb.resume) match {
       case (Left(a), Left(b))   => Suspend(S.map(a)(x => Suspend(S.map(b)(y => x zipWith(y, f)))))
       case (Left(a), Right(b))  => Suspend(S.map(a)(x => x zipWith(Return(b), f)))
-      case (Right(a), Left(b))  => Suspend(S.map(b)(y => Return(a) zipWith(y, f)))
+      case (Right(a), Left(b))  => Suspend(S.map(b)(y => Return(a)(S) zipWith(y, f)))
       case (Right(a), Right(b)) => Return(f(a, b))
     }
   }
 
   /** Runs a `Source` all the way to the end, tail-recursively, collecting the produced values. */
-  def collect[B, C >: A](implicit ev: Free[S, C] <~< Source[B, C],
-                 S: Functor[S]): (Vector[B], C) = {
+  def collect[B, C >: A](implicit ev: Free[S, C] <~< Source[B, C]): (Vector[B], C) = {
     @tailrec def go(c: Source[B, C], v: Vector[B] = Vector()): (Vector[B], C) =
       c.resume match {
         case Left((b, cont)) => go(cont, v :+ b)
@@ -99,7 +133,7 @@ sealed trait Free[S[+_], +A] {
   }
 
   /** Drive this `Source` with the given Sink. */
-  def drive[E, B, C >: A](sink: Sink[Option[E], B])(implicit ev: Free[S, C] <~< Source[E, C], S: Functor[S]): (C, B) = {
+  def drive[E, B, C >: A](sink: Sink[Option[E], B])(implicit ev: Free[S, C] <~< Source[E, C]): (C, B) = {
     @tailrec def go(src: Source[E, C], snk: Sink[Option[E], B]): (C, B) =
       (src.resume, snk.resume) match {
         case (Left((e, c)), Left(f))  => go(c, f(Some(e)))
@@ -111,7 +145,7 @@ sealed trait Free[S[+_], +A] {
   }
 
   /** Feed the given stream to this `Source`. */
-  def feed[E, C >: A](ss: Stream[E])(implicit ev: Free[S, C] <~< Sink[E, C], S: Functor[S]): C = {
+  def feed[E, C >: A](ss: Stream[E])(implicit ev: Free[S, C] <~< Sink[E, C]): C = {
     @tailrec def go(snk: Sink[E, C], rest: Stream[E]): C = (rest, snk.resume) match {
       case (x #:: xs, Left(f)) => go(f(x), xs)
       case (Stream(), Left(f)) => go(f(sys.error("No more values.")), Stream())
@@ -121,7 +155,7 @@ sealed trait Free[S[+_], +A] {
   }
 
   /** Feed the given source to this `Sink`. */
-  def drain[E, B, C >: A](source: Source[E, B])(implicit ev: Free[S, C] <~< Sink[E, C], S: Functor[S]): (C, B) = {
+  def drain[E, B, C >: A](source: Source[E, B])(implicit ev: Free[S, C] <~< Sink[E, C]): (C, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, C]): (C, B) = (src.resume, snk.resume) match {
       case (Left((e, c)), Left(f))  => go(c, f(e))
       case (Left((e, c)), Right(y)) => go(c, Sink.sinkMonad[E].pure(y))
@@ -135,7 +169,7 @@ sealed trait Free[S[+_], +A] {
 object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
-  implicit val trampolineMonad: Monad[Trampoline] with CoPointed[Trampoline] = new Monad[Trampoline] with CoPointed[Trampoline] {
+  implicit val trampolineMonad: Monad[Trampoline] with Copointed[Trampoline] = new Monad[Trampoline] with Copointed[Trampoline] {
     override def point[A](a: => A) = return_[Function0, A](a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
     def copoint[A](p: Free.Trampoline[A]): A = {
@@ -170,7 +204,7 @@ trait SourceInstances {
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
 trait FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
-  implicit def freeMonad[S[+_]]: Monad[({type f[x] = Free[S, x]})#f] =
+  implicit def freeMonad[S[+_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f

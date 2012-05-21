@@ -3,36 +3,46 @@ package scalaz.example
 import scalaz._
 import Scalaz._
 import typelevel._
-import Typelevel._
 
-object TypelevelUsage {
+object TypelevelUsage extends App {
+
+  def typed[T](t: T) = ()
 
   object HLists {
+
+    import typelevel.syntax.HLists._
 
     val hlist1 = 3 :: HNil
     val hlist2 = "foo" :: hlist1
     
-    val _hlist1: HCons[Int, HNil] = hlist1
-    val _hlist2: HCons[String, HCons[Int, HNil]] = hlist2
+    typed[Int :: HNil](hlist1)
+    typed[String :: Int :: HNil](hlist2)
 
     hlist2 match {
       case str :: n :: _ =>
-        val _str: String = str
-        val _n: Int = n
+        typed[String](str)
+        typed[Int](n)
     }
 
   }
 
   object KLists {
 
-    val klist1 = None :^: Option(3) :^: Some("foo") :^: GenericNil[Some]
+    val klist1 = None :^: Option(3) :^: Some("foo") :^: KNil
     val klist2 = klist1.append(klist1)
+
+    klist1 match {
+      case optionInt1 :^: optionInt2 :^: someString :^: KNil =>
+        typed[Option[Int]](optionInt1)
+        typed[Option[Int]](optionInt2)
+        typed[Some[String]](someString)
+    }
     
     val klist3 = klist1.fold[Option, GenericList[Option], HFold.Append[Option, klist1.type]](new HFold.Append[Option, klist1.type](klist1))
 
-    val _klist1: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]] = klist1
-    val _klist2: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]]]]] = klist2
-    val _klist3: GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Some]]]]]]] = klist3
+    typed[GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Nothing]]]]](klist1)
+    typed[GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Nothing]]]]]]]](klist2)
+    typed[GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Option, String, GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Nothing]]]]]]]](klist3)
 
   }
 
@@ -47,9 +57,8 @@ object TypelevelUsage {
     val kleislist2 = f2 :: f1 :: HNil
     val fCompose = kleislist2.compose
 
-    val _frc: Kleisli[Option, Int, Float] = fReverseCompose
-    val _fc: Kleisli[Option, Int, Float] = fCompose
-
+    typed[Kleisli[Option, Int, Float]](fReverseCompose)
+    typed[Kleisli[Option, Int, Float]](fCompose)
 
     val f3: Int => String = { _.toString }
     val f4: String => Float = { _.toFloat }
@@ -57,7 +66,7 @@ object TypelevelUsage {
     val kleislist3 = f3 :: f4 :: HNil
     val fIdReverseCompose = kleislist3.reverseCompose
 
-    val _fidr: Kleisli[Id, Int, Float] = fIdReverseCompose
+    typed[Kleisli[Id, Int, Float]](fIdReverseCompose)
 
   }
 
@@ -87,23 +96,36 @@ object TypelevelUsage {
 
     import KLists._
 
-    val aplist = klist1.coerce[Option]
+    val aplist = klist1
     val func: (Nothing, Int, String) => Double = { (x, y, z) => 2.0 }
 
-    val afunc = Option(func.curried)
+    val ares1 = aplist(Option(func.curried))
+    val ares2 = aplist.applyP(func.curried)
+    val ares3 = aplist.applyP(x => y => z => {
+      typed[Nothing](x)
+      typed[Int](y)
+      typed[String](z)
+      2.0
+    })
 
-    assert(klist1(afunc) === None)
-    assert(aplist(afunc) === None)
+    typed[Option[Double]](ares1)
+    typed[Option[Double]](ares2)
+    typed[Option[Double]](ares3)
+
+    assert(ares1 === None)
+    assert(ares2 === None)
+    assert(ares3 === None)
 
   }
 
   object Downed {
 
+    import typelevel.syntax.HLists._
     import ALists._
 
     val downed = aplist.down
 
-    val _downed: HCons[Option[Nothing], HCons[Option[Int], HCons[Option[String], HNil]]] = downed
+    typed[Option[Nothing] :: Option[Int] :: Some[String] :: HNil](downed)
 
     assert(downed == aplist)
 
@@ -115,13 +137,15 @@ object TypelevelUsage {
 
     val rev = klist1.fold[Option, GenericList[Option], HFold.Reverse[Option]](new HFold.Reverse[Option])
 
-    val _rev: GenericCons[Option, String, GenericCons[Option, Int, GenericCons[Option, Nothing, GenericNil[Option]]]] = rev
+    typed[GenericCons[Option, String, GenericCons[Option, Int, GenericCons[Option, Nothing, GenericNil[Option]]]]](rev)
 
   }
 
   object Naturals {
 
-    assert(_3.value === 3)
+    import Nats._
+
+    assert(_3.toInt === 3)
 
     val hlist = "foo" :: 3 :: 'a :: HNil
 
@@ -129,43 +153,76 @@ object TypelevelUsage {
     val e1 = hlist.at(_1)
     val e2 = hlist.at(_2)
 
-    val _e0: String = e0
-    val _e1: Int = e1
-    val _e2: Symbol = e2
+    typed[String](e0)
+    typed[Int](e1)
+    typed[Symbol](e2)
 
-    assert(_e0 == "foo")
-    assert(_e1 == 3)
-    assert(_e2 == 'a)
+    assert(e0 == "foo")
+    assert(e1 == 3)
+    assert(e2 == 'a)
 
     import KLists._
 
-    // Compiling the following snippets takes excessively long, so try to
-    // avoid access by index.
+    // Compiling the following snippets takes quite long, so try to avoid access
+    // by index. It gets even worse if you use an index greater than _4.
 
     val f0 = klist2.at(_4)
-    // val f1 = klist3.at(_4)
 
-    val _f0: Option[Int] = f0
-    // val _f1: Option[Int] = f1
+    typed[Option[Int]](f0)
 
-    assert(_f0 == Some(3))
-    // assert(_f1 == Some(3))
+    assert(f0 === Some(3))
+
+    // Alternative approach to index-based access
+
+    val wrapSome = new (Id ~> Some) { def apply[T](t: T) = Some(t) }
+
+    val stream = (hlist transform wrapSome) +: (HStream const None)
+
+    val g0 = stream(_0).x
+    val g1 = stream(_1).x
+    val g2 = stream(_2).x // caveat: `stream(_2)` on its own does not compile
+
+    typed[String](g0)
+    typed[Int](g1)
+    typed[Symbol](g2)
+
+    assert(g0 === "foo")
+    assert(g1 === 3)
+    assert(g2 == 'a)
 
   }
 
   object Classes {
 
-    val composed = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
+    import typelevel.syntax.TypeClasses._
+    import typelevel.syntax.HLists._
 
-    assert(List(Some(5)) === composed.point(5))
+    // with syntax
+    val prod1 = Applicative[List] *: Applicative[Option]
+    // without syntax
+    val prod2 = Applicative[List] *: Applicative[Option] *: KTypeClass[Applicative].emptyProduct
 
-    val prod = Applicative[List] *: Applicative[Option] *: Applicative.product
+    // derive `Equal` instance
+    // TODO this should work implicitly
 
-    assert(List("1") :: Option("2") :: HNil == prod.map(List(1) :: Option(2) :: HNil)(_.toString))
+    implicit val eq = Equal[List[String]] *: Equal[Option[String]] *: TypeClass[Equal].emptyProduct
+    typed[Equal[List[String] :: Option[String] :: HNil]](eq)
+
+    assert(List("1") :: Option("2") :: HNil === prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
+    assert(List("1") :: Option("2") :: HNil === prod2.map(List(1) :: Option(2) :: HNil)(_.toString))
 
   }
+
+  HLists
+  KLists
+  Kleislists
+  Folding
+  ALists
+  Downed
+  Reversed
+  Naturals
+  Classes
 
 }
 
 // vim: expandtab:ts=2:sw=2
-

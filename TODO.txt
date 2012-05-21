@@ -12,6 +12,4 @@
   - json parser, zipper, etc. based on scalaz.parser
 - scalaz.sql
   - iteratee/monad-based JDBC
-- scalaz.xml
-  - pseudo-SGML parser with zipper, etc. (already written -- awaiting open-source release)
 

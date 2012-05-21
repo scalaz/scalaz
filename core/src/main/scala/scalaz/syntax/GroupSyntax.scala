@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Group` */
-trait GroupV[F] extends SyntaxV[F] {
+trait GroupOps[F] extends Ops[F] {
   implicit def F: Group[F]
   ////
   final def |-|(other: => F): F = F.minus(self, other)
@@ -11,9 +11,9 @@ trait GroupV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToGroupV extends ToMonoidV {
-  implicit def ToGroupV[F](v: F)(implicit F0: Group[F]) =
-    new GroupV[F] { def self = v; implicit def F: Group[F] = F0 }
+trait ToGroupOps extends ToMonoidOps {
+  implicit def ToGroupOps[F](v: F)(implicit F0: Group[F]) =
+    new GroupOps[F] { def self = v; implicit def F: Group[F] = F0 }
 
   ////
 
@@ -21,7 +21,7 @@ trait ToGroupV extends ToMonoidV {
 }
 
 trait GroupSyntax[F] extends MonoidSyntax[F] {
-  implicit def ToGroupV(v: F)(implicit F0: Group[F]): GroupV[F] = new GroupV[F] { def self = v; implicit def F: Group[F] = F0 }
+  implicit def ToGroupOps(v: F)(implicit F0: Group[F]): GroupOps[F] = new GroupOps[F] { def self = v; implicit def F: Group[F] = F0 }
 
   ////
 

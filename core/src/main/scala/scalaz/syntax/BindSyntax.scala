@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bind` */
-trait BindV[F[_],A] extends SyntaxV[F[A]] {
+trait BindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Bind[F]
   ////
   import Liskov.<~<
@@ -23,15 +23,15 @@ trait BindV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToBindV0 {
-  implicit def ToBindVUnapply[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
-    new BindV[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
+trait ToBindOps0 {
+  implicit def ToBindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
+    new BindOps[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
 
 }
 
-trait ToBindV extends ToBindV0 with ToApplyV {
-  implicit def ToBindV[F[_],A](v: F[A])(implicit F0: Bind[F]) =
-    new BindV[F,A] { def self = v; implicit def F: Bind[F] = F0 }
+trait ToBindOps extends ToBindOps0 with ToApplyOps {
+  implicit def ToBindOps[F[_],A](v: F[A])(implicit F0: Bind[F]) =
+    new BindOps[F,A] { def self = v; implicit def F: Bind[F] = F0 }
 
   ////
 
@@ -39,7 +39,7 @@ trait ToBindV extends ToBindV0 with ToApplyV {
 }
 
 trait BindSyntax[F[_]] extends ApplySyntax[F] {
-  implicit def ToBindV[A](v: F[A])(implicit F0: Bind[F]): BindV[F, A] = new BindV[F,A] { def self = v; implicit def F: Bind[F] = F0 }
+  implicit def ToBindOps[A](v: F[A])(implicit F0: Bind[F]): BindOps[F, A] = new BindOps[F,A] { def self = v; implicit def F: Bind[F] = F0 }
 
   ////
 

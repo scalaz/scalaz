@@ -23,8 +23,8 @@ trait Spec
     def apply[S <: T](actual: Expectable[S]): MatchResult[S] = {
       val actualT = actual.value.asInstanceOf[T]
       def test = Equal[T].equal(expected, actualT)
-      def koMessage = "%s != %s".format(Show[T].shows(expected), Show[T].shows(actualT))
-      def okMessage = "%s == %s".format(Show[T].shows(expected), Show[T].shows(actualT))
+      def koMessage = "%s !== %s".format(Show[T].shows(actualT), Show[T].shows(expected))
+      def okMessage = "%s === %s".format(Show[T].shows(actualT), Show[T].shows(expected))
       Matcher.result(test, okMessage, koMessage, actual)
     }
   }

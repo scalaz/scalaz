@@ -63,6 +63,20 @@ sealed trait EphemeralStream[A] {
       val hh = head()
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
+
+  def reverse: EphemeralStream[A] =
+    foldLeft(EphemeralStream.emptyEphemeralStream[A])(a => b => EphemeralStream.cons(b, a))
+
+  def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
+    if(isEmpty && b.isEmpty)
+      emptyEphemeralStream
+    else
+      cons((head(), b.head()), tail() zip b.tail())
+
+  def unzip[X, Y](implicit ev: A =:= (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
+    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
+      (cons(q._1, r._1), cons(q._2, r._2)))
+
 }
 
 object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInstances {
@@ -77,11 +91,13 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
 
 trait EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] = new MonadPlus[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
     def bind[A, B](fa: EphemeralStream[A])(f: (A) => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
     def empty[A] = EphemeralStream()
+    def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
+    def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
   }
 }
 

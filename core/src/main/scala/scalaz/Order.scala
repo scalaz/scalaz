@@ -9,6 +9,7 @@ import scala.math.{Ordering => SOrdering}
 ////
 trait Order[F] extends Equal[F] { self =>
   ////
+  def apply(x: F, y: F): Ordering = order(x, y)
 
   def order(x: F, y: F): Ordering 
   
@@ -33,6 +34,10 @@ trait Order[F] extends Equal[F] { self =>
 
   def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
 
+  final def reverseOrder = new Order[F] {
+    def order(x: F, y: F): Ordering = self.order(y, x)
+  }
+
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional
 
@@ -55,9 +60,17 @@ trait Order[F] extends Equal[F] { self =>
 object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
+  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
+    def order(a1: A, a2: A) = f(a1, a2)
+  }
+
   ////
   implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
+  }
+
+  implicit def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
+    def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
   }
 
   def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f

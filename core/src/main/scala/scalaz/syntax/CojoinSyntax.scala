@@ -1,31 +1,31 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `CoJoin` */
-trait CoJoinV[F[_],A] extends SyntaxV[F[A]] {
-  implicit def F: CoJoin[F]
+/** Wraps a value `self` and provides methods related to `Cojoin` */
+trait CojoinOps[F[_],A] extends Ops[F[A]] {
+  implicit def F: Cojoin[F]
   ////
   final def cojoin: F[F[A]] = F.cojoin(self)
   ////
 }
 
-trait ToCoJoinV0 {
-  implicit def ToCoJoinVUnapply[FA](v: FA)(implicit F0: Unapply[CoJoin, FA]) =
-    new CoJoinV[F0.M,F0.A] { def self = F0(v); implicit def F: CoJoin[F0.M] = F0.TC }
+trait ToCojoinOps0 {
+  implicit def ToCojoinOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cojoin, FA]) =
+    new CojoinOps[F0.M,F0.A] { def self = F0(v); implicit def F: Cojoin[F0.M] = F0.TC }
 
 }
 
-trait ToCoJoinV extends ToCoJoinV0 {
-  implicit def ToCoJoinV[F[_],A](v: F[A])(implicit F0: CoJoin[F]) =
-    new CoJoinV[F,A] { def self = v; implicit def F: CoJoin[F] = F0 }
+trait ToCojoinOps extends ToCojoinOps0 {
+  implicit def ToCojoinOps[F[_],A](v: F[A])(implicit F0: Cojoin[F]) =
+    new CojoinOps[F,A] { def self = v; implicit def F: Cojoin[F] = F0 }
 
   ////
 
   ////
 }
 
-trait CoJoinSyntax[F[_]]  {
-  implicit def ToCoJoinV[A](v: F[A])(implicit F0: CoJoin[F]): CoJoinV[F, A] = new CoJoinV[F,A] { def self = v; implicit def F: CoJoin[F] = F0 }
+trait CojoinSyntax[F[_]]  {
+  implicit def ToCojoinOps[A](v: F[A])(implicit F0: Cojoin[F]): CojoinOps[F, A] = new CojoinOps[F,A] { def self = v; implicit def F: Cojoin[F] = F0 }
 
   ////
 

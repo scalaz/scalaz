@@ -110,9 +110,45 @@ trait DigitFunctions {
 }
 
 trait DigitInstances {
-  implicit def digitInstances: Order[Digit] with Show[Digit] with Monoid[Digit] = new Order[Digit] with Show[Digit] with Monoid[Digit] {
+  implicit def digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] = new Enum[Digit] with Show[Digit] with Monoid[Digit] {
 
     import std.anyVal._
+
+    def succ(d: Digit) = d match {
+      case Digit._0 => Digit._1
+      case Digit._1 => Digit._2
+      case Digit._2 => Digit._3
+      case Digit._3 => Digit._4
+      case Digit._4 => Digit._5
+      case Digit._5 => Digit._6
+      case Digit._6 => Digit._7
+      case Digit._7 => Digit._8
+      case Digit._8 => Digit._9
+      case Digit._9 => Digit._0
+    }
+
+    def pred(d: Digit) = d match {
+      case Digit._0 => Digit._9
+      case Digit._1 => Digit._0
+      case Digit._2 => Digit._1
+      case Digit._3 => Digit._2
+      case Digit._4 => Digit._3
+      case Digit._5 => Digit._4
+      case Digit._6 => Digit._5
+      case Digit._7 => Digit._6
+      case Digit._8 => Digit._7
+      case Digit._9 => Digit._8
+    }
+
+    override def succn(n: Int, a: Digit) =
+      super.succn(n % 10, a)
+
+    override def predn(n: Int, a: Digit) =
+      super.predn(n % 10, a)
+
+    override def min = Some(Digit._0)
+
+    override def max = Some(Digit._9)
 
     def show(f: Digit): List[Char] = List(f.toChar)
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)

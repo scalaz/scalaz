@@ -1,32 +1,32 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `CoPointed` */
-trait CoPointedV[F[_],A] extends SyntaxV[F[A]] {
-  implicit def F: CoPointed[F]
+/** Wraps a value `self` and provides methods related to `Copointed` */
+trait CopointedOps[F[_],A] extends Ops[F[A]] {
+  implicit def F: Copointed[F]
   ////
   def copoint: A = F.copoint(self)
 
   ////
 }
 
-trait ToCoPointedV0 {
-  implicit def ToCoPointedVUnapply[FA](v: FA)(implicit F0: Unapply[CoPointed, FA]) =
-    new CoPointedV[F0.M,F0.A] { def self = F0(v); implicit def F: CoPointed[F0.M] = F0.TC }
+trait ToCopointedOps0 {
+  implicit def ToCopointedOpsUnapply[FA](v: FA)(implicit F0: Unapply[Copointed, FA]) =
+    new CopointedOps[F0.M,F0.A] { def self = F0(v); implicit def F: Copointed[F0.M] = F0.TC }
 
 }
 
-trait ToCoPointedV extends ToCoPointedV0 with ToFunctorV {
-  implicit def ToCoPointedV[F[_],A](v: F[A])(implicit F0: CoPointed[F]) =
-    new CoPointedV[F,A] { def self = v; implicit def F: CoPointed[F] = F0 }
+trait ToCopointedOps extends ToCopointedOps0 with ToFunctorOps {
+  implicit def ToCopointedOps[F[_],A](v: F[A])(implicit F0: Copointed[F]) =
+    new CopointedOps[F,A] { def self = v; implicit def F: Copointed[F] = F0 }
 
   ////
 
   ////
 }
 
-trait CoPointedSyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToCoPointedV[A](v: F[A])(implicit F0: CoPointed[F]): CoPointedV[F, A] = new CoPointedV[F,A] { def self = v; implicit def F: CoPointed[F] = F0 }
+trait CopointedSyntax[F[_]] extends FunctorSyntax[F] {
+  implicit def ToCopointedOps[A](v: F[A])(implicit F0: Copointed[F]): CopointedOps[F, A] = new CopointedOps[F,A] { def self = v; implicit def F: Copointed[F] = F0 }
 
   ////
 

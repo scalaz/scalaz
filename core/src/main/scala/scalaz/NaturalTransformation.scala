@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 trait NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
@@ -16,6 +18,10 @@ trait NaturalTransformations {
   /**A universally quantified identity function */
   def id = new (Id ~> Id) {
     def apply[A](a: A) = a
+  }
+
+  def refl[F[_]] = new (F ~> F) {
+    def apply[A](fa: F[A]) = fa
   }
 
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
@@ -49,9 +55,9 @@ trait DiNaturalTransformation[F[_,_], G[_,_]] {
 // TODO needed, or just use type lambdas?
 //type Thunk[A] = () => A
 //
-//trait Konst[A] {
-//  type Apply[B] = A
-//}
+trait Konst[A] {
+  type Apply[B] = A
+}
 //
 //trait Biff[P[_,_], F[_], G[_]] {
 //  type Apply[A, B] = P[F[A], G[B]]

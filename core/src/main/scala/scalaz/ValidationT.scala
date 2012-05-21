@@ -76,7 +76,8 @@ sealed trait ValidationT[F[_], E, A] {
 }
 
 object ValidationT extends ValidationTFunctions with ValidationTInstances {
-  def apply[F[_], E, A](m: F[Validation[E, A]]) = validationT(m)
+
+  def apply[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = validationT(m)
 
   sealed trait FailProjectionT[F[_], E, A] {
     self =>
@@ -94,7 +95,7 @@ object ValidationT extends ValidationTFunctions with ValidationTInstances {
     def |[EE >: E](f: => EE)(implicit M: Functor[F]): F[EE] = getOrElse(f)
 
     def pointT[G[_], EE >: E, AA >: A](implicit M: Functor[F], G: Pointed[G]): ValidationT[F, G[EE], AA] =
-      ValidationT(M.map(validationT.run)(_.fail.point))
+      ValidationT(M.map(validationT.run)(_.fail.point[G, EE]))
 
     def exists(f: E => Boolean)(implicit M: Functor[F]): F[Boolean] =
       M.map(validationT.run)(_.fail.exists(f))
@@ -118,7 +119,8 @@ object FailProjectionT extends FailProjectionTFunctions {
 }
 
 trait ValidationTFunctions {
-  def validationT[F[_], E, A](m: F[Validation[E, A]]) = new ValidationT[F, E, A] {
+
+  def validationT[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = new ValidationT[F, E, A] {
     def run = m
   }
 
@@ -155,7 +157,8 @@ trait FailProjectionTFunctions {
     def from[E](ga: ValidationT[F, E, A]) = ga.fail
   }
 
-  implicit def FailProjectionTBiIso[F[_]] = new IsoBiFunctorTemplate[({type λ[α, β] = FailProjectionT[F, α, β]})#λ, ({type λ[α, β] = ValidationT[F, α, β]})#λ] {
+  implicit def FailProjectionTBiIso[F[_]] = new IsoBifunctorTemplate[({type λ[α, β] = FailProjectionT[F, α, β]})#λ, ({type λ[α, β] = ValidationT[F, α, β]})#λ] {
+
     def to[E, A](fa: FailProjectionT[F, E, A]): ValidationT[F, E, A] = fa.validationT
 
     def from[E, A](ga: ValidationT[F, E, A]): FailProjectionT[F, E, A] = ga.fail
@@ -167,44 +170,52 @@ trait ValidationTInstances0 {
     def equal(a1: ValidationT[F, E, A], a2: ValidationT[F, E, A]) = F.equal(a1.run, a2.run)
   }
 
-  implicit def validationBiTraverse[F[_]](implicit F0: Traverse[F]) = new ValidationTBiTraverse[F] {
+  implicit def validationBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β] = ValidationT[F, α, β]})#λ] = new ValidationTBitraverse[F] {
+    implicit def F = F0
+  }
+  
+  implicit def validationTFunctor[F[_], E](implicit F0: Functor[F]): Functor[({type λ[α] = ValidationT[F, E, α]})#λ] = new ValidationTFunctor[F, E] {
     implicit def F = F0
   }
 }
 
-trait ValidationTInstances extends ValidationTInstances0 {
-  implicit def validationTFunctor[F[_], E](implicit F0: Functor[F]) = new ValidationTFunctor[F, E] {
-    implicit def F = F0
-  }
-  
-  implicit def validationTApply[F[_], E](implicit F0: Apply[F], E0: Semigroup[E]) = new ValidationTApply[F, E] {
+trait ValidationTInstances1 extends ValidationTInstances0 {
+  implicit def validationTApply[F[_], E](implicit F0: Apply[F], E0: Semigroup[E]): Apply[({type λ[α] = ValidationT[F, E, α]})#λ] = new ValidationTApply[F, E] {
     implicit def F = F0
     implicit def E = E0
   }
 
+  implicit def validationTFoldable[F[_], E](implicit F0: Foldable[F]) = new ValidationTFoldable[F, E] {
+    implicit def F = F0
+  }
+}
+
+trait ValidationTInstances2 extends ValidationTInstances1 {
   implicit def validationTPointed[F[_], E](implicit F0: Pointed[F]) = new ValidationTPointed[F, E] {
     implicit def F = F0
   }
+}
 
+trait ValidationTInstances3 extends ValidationTInstances2 {
+  implicit def validationTTraverse[F[_], E](implicit F0: Traverse[F]) = new ValidationTTraverse[F, E] {
+    implicit def F = F0
+  }
+}
+
+trait ValidationTInstances4 extends ValidationTInstances3 {
+  implicit def validationTMonad[F[_], E](implicit F0: Monad[F]) = new ValidationTMonad[F, E] {
+    implicit def F = F0
+  }
+}
+
+trait ValidationTInstances extends ValidationTInstances4 {
   implicit def validationTApplicative[F[_], E](implicit F0: Applicative[F], E0: Semigroup[E]) = new ValidationTApplicative[F, E] {
     implicit def F = F0
 
     implicit def E = E0
   }
 
-  implicit def validationTMonad[F[_], E](implicit F0: Monad[F]) = new ValidationTMonad[F, E] {
-    implicit def F = F0
-  }
-
-  implicit def validationTFoldable[F[_], E](implicit F0: Foldable[F]) = new ValidationTFoldable[F, E] {
-    implicit def F = F0
-  }
-
-  implicit def validationTTraverse[F[_], E](implicit F0: Traverse[F]) = new ValidationTTraverse[F, E] {
-    implicit def F = F0
-  }
-
-  implicit def validationTBiFunctor[F[_]](implicit F0: Functor[F]) = new ValidationTBiFunctor[F] {
+  implicit def validationTBifunctor[F[_]](implicit F0: Functor[F]) = new ValidationTBifunctor[F] {
     implicit def F = F0
   }
 
@@ -260,16 +271,16 @@ trait ValidationTTraverse[F[_], E] extends Traverse[({type λ[α] = ValidationT[
   def traverseImpl[G[_] : Applicative, A, B](fa: ValidationT[F, E, A])(f: (A) => G[B]): G[ValidationT[F, E, B]] = fa traverse f
 }
 
-trait ValidationTBiFunctor[F[_]] extends BiFunctor[({type λ[α, β] = ValidationT[F, α, β]})#λ] {
+trait ValidationTBifunctor[F[_]] extends Bifunctor[({type λ[α, β] = ValidationT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: ValidationT[F, A, B])(f: (A) => C, g: (B) => D): ValidationT[F, C, D] = fab.bimap(f, g)
 }
 
-trait ValidationTBiTraverse[F[_]] extends BiTraverse[({type λ[α, β] = ValidationT[F, α, β]})#λ] with ValidationTBiFunctor[F] {
+trait ValidationTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = ValidationT[F, α, β]})#λ] with ValidationTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverse[G[_] : Applicative, A, B, C, D](fab: ValidationT[F, A, B])
+  def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: ValidationT[F, A, B])
                                                 (f: (A) => G[C], g: (B) => G[D]): G[ValidationT[F, C, D]] =
     fab.bitraverse(f, g)
 }
