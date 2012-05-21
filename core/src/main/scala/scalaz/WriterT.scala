@@ -342,3 +342,15 @@ trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with
   override def cobind[A, B](fa: Writer[W, A])(f: (Writer[W, A]) => B): Writer[W, B] =
     Writer(fa.written, f(fa))
 }
+
+trait WriterMonadWriter[F[+_], W] extends MonadWriter[({type f[+w, +a] = WriterT[F, w, a]})#f, W] with WriterTPointed[F, W] {
+  implicit def F: Monad[F]
+  
+  def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]): WriterT[F, W, B] = fa flatMap f
+  
+  def listen[A](fa: WriterT[F, W, A]): WriterT[F, W, (A, W)] =
+    WriterT(F.bind(fa.run){ case (w, a) => F.point((w, (a, w))) })
+    
+  def pass[A](fa: WriterT[F, W, (A, W => W)]): WriterT[F, W, A] = 
+    WriterT(F.bind(fa.run){ case (w, (a, f)) => F.point((f(w), a)) })
+}
