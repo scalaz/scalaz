@@ -316,13 +316,16 @@ private[scalaz] trait ValidationTMonadWriter[F[_,_], E, W] extends MonadWriter[(
     ValidationT[({type f[x] = F[W, x]})#f, E, B](tmp)
   }
 
-  override def writer[A](w: (W, A)): ValidationT[({type f[x] = F[W, x]})#f, E, A] =
+  def writer[A](w: (W, A)): ValidationT[({type f[x] = F[W, x]})#f, E, A] =
     liftM[({type f[x] = F[W, x]})#f, A](MW.writer(w))   
   
+  def tell(w: W): ValidationT[({type f[x] = F[W, x]})#f, E, Unit] = 
+    liftM[({type f[x] = F[W, x]})#f, Unit](MW.tell(w)) 
+
   def listen[A](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A]): ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)] = {
-    val tmp = MW.bind[Validation[E, A], Validation[E, (A, W)]](fa.run){
-      case Failure(e) => MW.point(Failure(e))
-      case Success(a) => MW.map(MW.listen(MW.point(a)))(x => Success[E, (A, W)](x))
+    val tmp = MW.bind[(Validation[E, A], W), Validation[E, (A, W)]](MW.listen(fa.run)){
+      case (Failure(e), _) => MW.point(Failure(e))
+      case (Success(a), w) => MW.point(Success((a, w)))
     }
     
     ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)](tmp)
@@ -337,7 +340,7 @@ private[scalaz] trait ValidationTMonadWriter[F[_,_], E, W] extends MonadWriter[(
     ValidationT[({type f[x] = F[W, x]})#f, E, A](tmp)
   }
 
-  def failureT[A](e:  => E): ValidationT[({type m[x] = F[W, x]})#m, E, A] = ValidationT.failureT[({type m[x] = F[W, x]})#m, E, A](e)
+  def failureT[A](e: => E): ValidationT[({type m[x] = F[W, x]})#m, E, A] = ValidationT.failureT[({type m[x] = F[W, x]})#m, E, A](e)
 
   def successT[A](v: => A): ValidationT[({type m[x] = F[W, x]})#m, E, A] = point[A](v)
 }

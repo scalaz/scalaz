@@ -360,8 +360,10 @@ private[scalaz] trait WriterMonadWriter[F[+_], W] extends MonadWriter[({type f[+
   
   def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]): WriterT[F, W, B] = fa flatMap f
 
-  override def writer[A](v: (W, A)): WriterT[F, W, A] = WriterT.writerT(F.point(v))
+  def writer[A](v: (W, A)): WriterT[F, W, A] = WriterT.writerT(F.point(v))
   
+  def tell(w: W): WriterT[F, W, Unit] = writer((w, ()))
+
   def listen[A](fa: WriterT[F, W, A]): WriterT[F, W, (A, W)] =
     WriterT(F.bind(fa.run){ case (w, a) => F.point((w, (a, w))) })
     
