@@ -132,6 +132,10 @@ trait ValidationTFunctions {
 
   def fromEitherT[F[_], E, A](e: EitherT[F, E, A])(implicit F: Functor[F]): ValidationT[F, E, A] =
     validationT(F.map(e.run)(Validation.fromEither(_)))
+
+  def validationTMonadWriter[F[_, _], E, W](implicit MW0: MonadWriter[F, W]) = new ValidationTMonadWriter[F, E, W]{
+    implicit def MW = MW0
+  } 
 }
 
 trait FailProjectionTFunctions {
@@ -293,4 +297,47 @@ trait ValidationTMonadTrans[A] extends MonadTrans[({type λ[α[_], β] = Validat
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): ValidationT[M, A, B] = ValidationT(M.map(mb)(Success[A, B](_)))
 
   implicit def apply[M[_] : Monad]: Monad[({type λ[α] = ValidationT[M, A, α]})#λ] = ValidationT.validationTMonad[M, A]
+}
+
+private[scalaz] trait ValidationTMonadWriter[F[_,_], E, W] extends MonadWriter[({type f[w, a] = ValidationT[({type m[b] = F[w, b]})#m, E, a]})#f, W] with ValidationTPointed[({type f[x] = F[W, x]})#f, E] with ValidationTMonadTrans[E] {
+  implicit def MW: MonadWriter[F, W]
+  implicit def F: Monad[({type f[x] = F[W, x]})#f] = MW
+  implicit def W: Monoid[W] = MW.W
+  
+  override def map[A, B](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A])(f: A => B): ValidationT[({type f[x] = F[W, x]})#f, E, B] =
+    fa map f
+  
+  def bind[A, B](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A])(f: A => ValidationT[({type f[x] = F[W, x]})#f, E, B]): ValidationT[({type f[x] = F[W, x]})#f, E, B] = { 
+    val tmp = MW.bind[Validation[E, A], Validation[E, B]](fa.run){
+      case Failure(e) => MW.point(Failure(e))
+      case Success(a) => f(a).run
+    }
+    
+    ValidationT[({type f[x] = F[W, x]})#f, E, B](tmp)
+  }
+
+  override def writer[A](w: (W, A)): ValidationT[({type f[x] = F[W, x]})#f, E, A] =
+    liftM[({type f[x] = F[W, x]})#f, A](MW.writer(w))   
+  
+  def listen[A](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A]): ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)] = {
+    val tmp = MW.bind[Validation[E, A], Validation[E, (A, W)]](fa.run){
+      case Failure(e) => MW.point(Failure(e))
+      case Success(a) => MW.map(MW.listen(MW.point(a)))(x => Success[E, (A, W)](x))
+    }
+    
+    ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)](tmp)
+  }
+  
+  def pass[A](fa: ValidationT[({type f[x] = F[W, x]})#f, E, (A, W => W)]): ValidationT[({type f[x] = F[W, x]})#f, E, A] = {
+    val tmp = MW.bind[Validation[E, ((A, W => W), W)], Validation[E, A]](listen(fa).run){
+      case Failure(e) => MW.point(Failure(e))
+      case Success(((a, f), w)) => MW.map(MW.writer((f(w), a)))(x => Success[E, A](x))
+    }
+    
+    ValidationT[({type f[x] = F[W, x]})#f, E, A](tmp)
+  }
+
+  def failureT[A](e:  => E): ValidationT[({type m[x] = F[W, x]})#m, E, A] = ValidationT.failureT[({type m[x] = F[W, x]})#m, E, A](e)
+
+  def successT[A](v: => A): ValidationT[({type m[x] = F[W, x]})#m, E, A] = point[A](v)
 }
