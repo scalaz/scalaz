@@ -87,6 +87,10 @@ trait Syntaxes {
 
   object split extends ToSplitOps
 
+  object monadWriter extends ToMonadWriterOps
+
+  object listenableMonadWriter extends ToListenableMonadWriterOps
+
   //
   // Data
   //
@@ -125,4 +129,5 @@ trait ToTypeClassOps
   with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
-  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps
+  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadWriterOps with ToListenableMonadWriterOps
+

@@ -76,6 +76,7 @@ sealed trait ValidationT[F[_], E, A] {
 }
 
 object ValidationT extends ValidationTFunctions with ValidationTInstances {
+
   def apply[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = validationT(m)
 
   sealed trait FailProjectionT[F[_], E, A] {
@@ -118,6 +119,7 @@ object FailProjectionT extends FailProjectionTFunctions {
 }
 
 trait ValidationTFunctions {
+
   def validationT[F[_], E, A](m: F[Validation[E, A]]): ValidationT[F, E, A] = new ValidationT[F, E, A] {
     def run = m
   }
@@ -130,6 +132,14 @@ trait ValidationTFunctions {
 
   def fromEitherT[F[_], E, A](e: EitherT[F, E, A])(implicit F: Functor[F]): ValidationT[F, E, A] =
     validationT(F.map(e.run)(Validation.fromEither(_)))
+
+  def monadWriter[F[_, _], E, W](implicit MW0: MonadWriter[F, W]) = new ValidationTMonadWriter[F, E, W]{
+    implicit def MW = MW0
+  } 
+
+  def listenableMonadWriter[F[_, _], E, W](implicit LMW0: ListenableMonadWriter[F, W]) = new ValidationTListenableMonadWriter[F, E, W]{
+    implicit def LMW = LMW0
+  }
 }
 
 trait FailProjectionTFunctions {
@@ -156,6 +166,7 @@ trait FailProjectionTFunctions {
   }
 
   implicit def FailProjectionTBiIso[F[_]] = new IsoBifunctorTemplate[({type λ[α, β] = FailProjectionT[F, α, β]})#λ, ({type λ[α, β] = ValidationT[F, α, β]})#λ] {
+
     def to[E, A](fa: FailProjectionT[F, E, A]): ValidationT[F, E, A] = fa.validationT
 
     def from[E, A](ga: ValidationT[F, E, A]): FailProjectionT[F, E, A] = ga.fail
@@ -291,3 +302,41 @@ trait ValidationTMonadTrans[A] extends MonadTrans[({type λ[α[_], β] = Validat
 
   implicit def apply[M[_] : Monad]: Monad[({type λ[α] = ValidationT[M, A, α]})#λ] = ValidationT.validationTMonad[M, A]
 }
+
+private[scalaz] trait ValidationTMonadWriter[F[_,_], E, W] extends MonadWriter[({type f[w, a] = ValidationT[({type m[b] = F[w, b]})#m, E, a]})#f, W] with ValidationTPointed[({type f[x] = F[W, x]})#f, E] with ValidationTMonadTrans[E] {
+  implicit def MW: MonadWriter[F, W]
+  implicit def F: Monad[({type f[x] = F[W, x]})#f] = MW
+  implicit def W: Monoid[W] = MW.W
+  
+  override def map[A, B](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A])(f: A => B): ValidationT[({type f[x] = F[W, x]})#f, E, B] =
+    fa map f
+  
+  def bind[A, B](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A])(f: A => ValidationT[({type f[x] = F[W, x]})#f, E, B]): ValidationT[({type f[x] = F[W, x]})#f, E, B] = 
+    fa flatMap f
+
+  def writer[A](w: (W, A)): ValidationT[({type f[x] = F[W, x]})#f, E, A] =
+    liftM[({type f[x] = F[W, x]})#f, A](MW.writer(w))   
+  
+  override def tell(w: W): ValidationT[({type f[x] = F[W, x]})#f, E, Unit] = 
+    liftM[({type f[x] = F[W, x]})#f, Unit](MW.tell(w)) 
+
+  def failureT[A](e: => E): ValidationT[({type m[x] = F[W, x]})#m, E, A] = ValidationT.failureT[({type m[x] = F[W, x]})#m, E, A](e)
+
+  def successT[A](v: => A): ValidationT[({type m[x] = F[W, x]})#m, E, A] = point[A](v)
+}
+
+private[scalaz] trait ValidationTListenableMonadWriter[F[_, _], E, W] extends ListenableMonadWriter[({type f[w, a] = ValidationT[({type m[x] = F[w, x]})#m, E, a ]})#f, W] with ValidationTMonadWriter[F, E, W] {
+   implicit def LMW: ListenableMonadWriter[F, W]
+   implicit def MW = LMW
+
+   def listen[A](fa: ValidationT[({type f[x] = F[W, x]})#f, E, A]): ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)] = {
+    val tmp = MW.bind[(Validation[E, A], W), Validation[E, (A, W)]](MW.listen(fa.run)){
+      case (Failure(e), _) => MW.point(Failure(e))
+      case (Success(a), w) => MW.point(Success((a, w)))
+    }
+    
+    ValidationT[({type f[x] = F[W, x]})#f, E, (A, W)](tmp)
+  }
+
+}
+
