@@ -363,6 +363,25 @@ trait PLensTFunctions extends PLensTInstances {
     else
       listNthPLens(n - 1) compose listTailPLens
 
+  def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (List[(K, V)], (K, V), List[(K, V)])): Option[(List[(K, V)], (K, V), List[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k) => Some(t)
+        case (_, _     , Nil)       => None
+        case (l, x     , r::rs)     => lookupr(x::l, r, rs)
+      }
+    plens {
+      case Nil => None
+      case h :: t => lookupr(Nil, h, t) map {
+        case (l, (k, v), r) => Costate(w => l.reverse ::: (k, w) :: r, v)
+      }
+    }
+  }
+
+  def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
+    listLookupByPLens(Equal[K].equal(k, _))
+
   def vectorHeadPLens[A]: Vector[A] @?> A =
     vectorNthPLens(0)
 
@@ -396,6 +415,25 @@ trait PLensTFunctions extends PLensTInstances {
     else
       streamNthPLens(n - 1) compose streamTailPLens
 
+  def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (Stream[(K, V)], (K, V), Stream[(K, V)])): Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)    => Some(t)
+        case (_, _     , Stream.Empty) => None
+        case (l, x     , r #:: rs)     => lookupr(x #:: l, r, rs)
+      }
+    plens {
+      case Stream.Empty => None
+      case h #:: t => lookupr(Stream.empty, h, t) map {
+        case (l, (k, v), r) => Costate(w => l.reverse #::: (k, w) #:: r, v)
+      }
+    }
+  }
+
+  def streamLookupPLens[K: Equal, V](k: K): Stream[(K, V)] @?> V =
+    streamLookupByPLens(Equal[K].equal(k, _))
+
   def ephemeralStreamHeadPLens[A]: EphemeralStream[A] @?> A =
     plens(s =>
       if(s.isEmpty)
@@ -419,6 +457,32 @@ trait PLensTFunctions extends PLensTInstances {
       ephemeralStreamHeadPLens
     else
       ephemeralStreamNthPLens(n - 1) compose ephemeralStreamTailPLens
+
+  def ephemeralStreamLookupByPLens[K, V](p: K => Boolean): EphemeralStream[(K, V)] @?> V = {
+    import EphemeralStream.cons
+
+    @annotation.tailrec
+    def lookupr(t: (EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)])): Option[(EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)    => Some(t)
+        case (l, x     , s) =>
+            if(s.isEmpty)
+              None
+            else
+              lookupr((cons(x, l), s.head(), s.tail()))
+      }
+    plens(s =>
+      if(s.isEmpty)
+        None
+      else
+        lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
+          case (l, (k, v), r) => Costate(w => l.reverse ++ cons((k, w), r), v)
+        }
+    )
+  }
+
+  def ephemeralStreamLookupPLens[K: Equal, V](k: K): EphemeralStream[(K, V)] @?> V =
+    ephemeralStreamLookupByPLens(Equal[K].equal(k, _))
 
   import LensT.mapVLens
 
