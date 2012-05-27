@@ -25,25 +25,27 @@ This is the directory structure of the build.
 	|          - build.properties                Version of SBT
 	|
 	|- <mod N> +
-		   |-src   +
-		   |       |-main +
-		   |       |      |-scala            Source files
-		   |       |
-		   |       |-test +
-		   |              |-scala            Test source files
-		   |
-		   |-target +
-			    | - <scala version M>    All built artifacts (classes, jars, scaladoc) for module N
-						     built for version M of Scala.
+	           |-src   +
+	           |       |-main +
+	           |       |      |-scala            Source files
+	           |       |
+	           |       |-test +
+	           |              |-scala            Test source files
+	           |
+	           |-target +
+	                    | - <scala version M>    All built artifacts (classes, jars, scaladoc) for module N
+	                                             built for version M of Scala.
 
 IDE Support
 -----------
 
 To generate IntelliJ Project Files:
 
-	./sbt
-	> add-sbt-idea // unless already installed in ~/.sbt/plugins/build.sbt
-	[info] Reapplying settings...
-	[info] Set current project to scalaz (in build file:/Users/jason/code/scalaz/)
-	> gen-idea
+```bash
+./sbt
+> add-sbt-idea // unless already installed in ~/.sbt/plugins/build.sbt
+[info] Reapplying settings...
+[info] Set current project to scalaz (in build file:/Users/jason/code/scalaz/)
+> gen-idea
+```
 
