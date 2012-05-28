@@ -1,8 +1,12 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazArbitrary._
+import scalacheck.ScalazArbitrary._
+import scalacheck.ScalazProperties._
+import std.AllInstances._
 
 class InsertionMapTest extends Spec {
+  checkAll(equal.laws[InsertionMap[Int, String]])
+  checkAll(monoid.laws[InsertionMap[Int, String]])
 
   "isEmpty == keys.isEmpty" ! check {
     (a: InsertionMap[Int, String]) => a.isEmpty == a.keys.isEmpty
@@ -24,6 +28,15 @@ class InsertionMapTest extends Spec {
   "insert in order" ! check {
     (k: Int, v: String, a: InsertionMap[Int, String]) =>
       (a ^+^ (k, v)).keys.head == k
+  }
+
+  "append keeps order" ! check {
+    (a: InsertionMap[Int, String], b: InsertionMap[Int, String]) => {
+      val aa = a.toList filter {
+        case (k, _) => !(b contains k)
+      }
+      (a ++ b).toList == (b.toList ++ aa)
+    }
   }
 
   "double insert in order" ! check {
