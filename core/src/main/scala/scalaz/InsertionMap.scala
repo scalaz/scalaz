@@ -97,7 +97,7 @@ trait InsertionMapFunctions {
     build(Map.empty, 0L)
 
   def apply[K, V](x: (K, V)*): InsertionMap[K, V] =
-    x.foldLeft(empty[K, V]) {
+    x.reverse.foldLeft(empty[K, V]) {
       case (a, (k, v)) => a ^+^ (k, v)
     }
 
