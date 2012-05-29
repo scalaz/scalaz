@@ -205,15 +205,15 @@ object TypelevelUsage extends App {
     // derive `Equal` instance
     // TODO this should work implicitly
 
-    implicit val eq1 = Equal[List[String]] *: Equal[Option[String]] *: TypeClass[Equal].emptyProduct
-    // or
-    val eq2 = TypeClass[Equal].product2[List[String], Option[String]]
+    // with syntax
+    implicit val eq1 = Equal[List[String]] *: Equal[Option[String]]
+    // without syntax
+    val eq2 = Equal[List[String]] *: Equal[Option[String]] *: TypeClass[Equal].emptyProduct
 
     typed[Equal[List[String] :: Option[String] :: HNil]](eq1)
     typed[Equal[List[String] :: Option[String] :: HNil]](eq2)
 
     assert(List("1") :: Option("2") :: HNil === prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
-    assert(List("1") :: Option("2") :: HNil === prod2.map(List(1) :: Option(2) :: HNil)(_.toString))
 
   }
 
