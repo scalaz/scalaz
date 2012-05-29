@@ -79,7 +79,7 @@ sealed trait Zipper[+A] {
   }
 
   /**
-   * Possibly moves to previous element to the right of focus.
+   * Possibly moves to previous element to the left of focus.
    */
   def previousOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     previous getOrElse z
@@ -391,7 +391,7 @@ trait ZipperInstances {
       streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
   }
 
-  implicit def zipperShow[A: Show] = new Show[Zipper[A]]{
+  implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]]{
     import std.stream._
 
     def show(f: Zipper[A]): List[Char] =
