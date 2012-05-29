@@ -96,6 +96,7 @@ Scalaz has been been modularised.
 * **scalaz-concurrent**: Actor and Promise implementation
 * **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
 * **scalaz-iteratee**: Experimental new Iteratee implementation
+* **scalaz-typelevel**: Type-level data structures, type-safe printf
 * **scalaz-xml**: Error-correcting XML parser
 
 ### Type Class Hierarchy

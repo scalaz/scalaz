@@ -57,35 +57,6 @@ sealed trait PLensT[F[+_], G[+_], A, B] {
   def lift[X[+_]](implicit P: Pointed[X], FF: Functor[F], GF: Functor[G]): PLensT[({type λ[+α] = F[X[α]]})#λ, ({type λ[+α] = G[X[α]]})#λ, A, B] =
     plensT[({type λ[+α] = F[X[α]]})#λ, ({type λ[+α] = G[X[α]]})#λ, A, B](a => FF.map(run(a))(c => P.point(c map (_ map (GF.map(_)(P.point(_)))))))
 
-  def wlift[V, W](implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V], MW: Monoid[W]): PLenswT[F, G, V, W, A, B] =
-    plensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B](a =>
-          WriterT(FF.map(run(a))(e => (MV.zero, e map (_ map (q => WriterT(GF.map(q)((MW.zero, _)))))))))
-
-  def wrunlift[V, W](getV: (A, Option[B]) => V, set: (A, B, A) => W)(implicit FF: Functor[F], GF: Functor[G]): PLenswT[F, G, V, W, A, B] =
-    plensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B](a =>
-      WriterT(FF.map(run(a))(e =>
-        (getV(a, e map (_.pos)), e map (z => costate(z.pos)(x => WriterT(GF.map(z put x)(q => (set(a, x, q), q))))))
-      )))
-
-  def hlift(implicit FF: Functor[F], GF: Functor[G]): PLenshT[F, G, A, B] =
-    wrunlift((t, g) => new PLensGetHistory[A, B] {
-      val history = DList((t, g))
-    }, (t, s, r) => new PLensSetHistory[A, B] {
-      val history = DList((t, s, r))
-    })
-
-  def wrunliftg[V, W](getV: (A, Option[B]) => V)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): PLenswT[F, G, V, W, A, B] =
-    wrunlift(getV, (_, _, _) => MW.zero)
-
-  def !![W](getV: (A, Option[B]) => W)(implicit FF: Functor[F], GF: Functor[G], MW: Monoid[W]): PLenswT[F, G, W, W, A, B] =
-    wrunliftg(getV)
-
-  def wrunlifts[V, W](setV: (A, B, A) => W)(implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V]): PLenswT[F, G, V, W, A, B] =
-    wrunlift((_, _) => MV.zero, setV)
-
-  def !|![V](setV: (A, B, A) => V)(implicit FF: Functor[F], GF: Functor[G], MV: Monoid[V]): PLenswT[F, G, V, V, A, B] =
-    wrunlifts(setV)
-
   def get(a: A)(implicit F: Functor[F]): F[Option[B]] =
     F.map(run(a))(_ map (_.pos))
 
@@ -384,28 +355,6 @@ trait PLensTFunctions extends PLensTInstances {
       case h :: t => Some(Costate(h :: _, t))
     }
 
-  def listFindByPLens[A](p: A => Boolean): List[A] @?> A = {
-    case class Z(lefts: List[A], focus: A, rights: List[A]) {
-      @annotation.tailrec
-      final def find: Option[Z] =
-        if(p(focus)) Some(this)
-        else rights match {
-          case Nil => None
-          case h::t => Z(focus::lefts, h, t).find
-        }
-      final def list: List[A] =
-        lefts.reverse:::focus::rights
-    }
-    plens {
-      case Nil => None
-      case h::t =>
-        Z(Nil, h, t).find.map (w => Costate(b => w.copy(focus = b).list, w.focus))
-    }
-  }
-
-  def listFindPLens[A: Equal](a: A): List[A] @?> A =
-    listFindByPLens(Equal[A].equal(a, _))
-
   def listNthPLens[A](n: Int): List[A] @?> A =
     if(n < 0)
       nil
@@ -413,6 +362,25 @@ trait PLensTFunctions extends PLensTInstances {
       listHeadPLens
     else
       listNthPLens(n - 1) compose listTailPLens
+
+  def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (List[(K, V)], (K, V), List[(K, V)])): Option[(List[(K, V)], (K, V), List[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k) => Some(t)
+        case (_, _     , Nil)       => None
+        case (l, x     , r::rs)     => lookupr(x::l, r, rs)
+      }
+    plens {
+      case Nil => None
+      case h :: t => lookupr(Nil, h, t) map {
+        case (l, (k, v), r) => Costate(w => l.reverse ::: (k, w) :: r, v)
+      }
+    }
+  }
+
+  def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
+    listLookupByPLens(Equal[K].equal(k, _))
 
   def vectorHeadPLens[A]: Vector[A] @?> A =
     vectorNthPLens(0)
@@ -447,6 +415,25 @@ trait PLensTFunctions extends PLensTInstances {
     else
       streamNthPLens(n - 1) compose streamTailPLens
 
+  def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (Stream[(K, V)], (K, V), Stream[(K, V)])): Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)    => Some(t)
+        case (_, _     , Stream.Empty) => None
+        case (l, x     , r #:: rs)     => lookupr(x #:: l, r, rs)
+      }
+    plens {
+      case Stream.Empty => None
+      case h #:: t => lookupr(Stream.empty, h, t) map {
+        case (l, (k, v), r) => Costate(w => l.reverse #::: (k, w) #:: r, v)
+      }
+    }
+  }
+
+  def streamLookupPLens[K: Equal, V](k: K): Stream[(K, V)] @?> V =
+    streamLookupByPLens(Equal[K].equal(k, _))
+
   def ephemeralStreamHeadPLens[A]: EphemeralStream[A] @?> A =
     plens(s =>
       if(s.isEmpty)
@@ -463,23 +450,6 @@ trait PLensTFunctions extends PLensTInstances {
         Some(Costate(EphemeralStream.cons(s.head(), _), s.tail()))
     )
 
-  def ephemeralStreamFindByPLens[A](p: A => Boolean): EphemeralStream[A] @?> A = {
-    case class Z(lefts: EphemeralStream[A], focus: A, rights: EphemeralStream[A]) {
-      @annotation.tailrec
-      final def find: Option[Z] =
-        if(p(focus)) Some(this)
-        else if(rights.isEmpty) None else Z(EphemeralStream.cons(focus, lefts), rights.head(), rights.tail()).find
-
-      final def stream: EphemeralStream[A] =
-        lefts.reverse ++ EphemeralStream.cons(focus, rights)
-    }
-
-    plens(x => if(x.isEmpty) None else Z(EphemeralStream.emptyEphemeralStream, x.head(), x.tail()).find.map (w => Costate(b => w.copy(focus = b).stream, w.focus)))
-  }
-
-  def ephemeralStreamFindPLens[A: Equal](a: A): EphemeralStream[A] @?> A =
-    ephemeralStreamFindByPLens(Equal[A].equal(a, _))
-
   def ephemeralStreamNthPLens[A](n: Int): EphemeralStream[A] @?> A =
     if(n < 0)
       nil
@@ -487,6 +457,32 @@ trait PLensTFunctions extends PLensTInstances {
       ephemeralStreamHeadPLens
     else
       ephemeralStreamNthPLens(n - 1) compose ephemeralStreamTailPLens
+
+  def ephemeralStreamLookupByPLens[K, V](p: K => Boolean): EphemeralStream[(K, V)] @?> V = {
+    import EphemeralStream.cons
+
+    @annotation.tailrec
+    def lookupr(t: (EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)])): Option[(EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)    => Some(t)
+        case (l, x     , s) =>
+            if(s.isEmpty)
+              None
+            else
+              lookupr((cons(x, l), s.head(), s.tail()))
+      }
+    plens(s =>
+      if(s.isEmpty)
+        None
+      else
+        lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
+          case (l, (k, v), r) => Costate(w => l.reverse ++ cons((k, w), r), v)
+        }
+    )
+  }
+
+  def ephemeralStreamLookupPLens[K: Equal, V](k: K): EphemeralStream[(K, V)] @?> V =
+    ephemeralStreamLookupByPLens(Equal[K].equal(k, _))
 
   import LensT.mapVLens
 
@@ -610,71 +606,3 @@ private[scalaz] trait PLensTCategory[F[+_], G[+_]]
   def split[A, B, C, D](f: PLensT[F, G, A, B], g: PLensT[F, G, C, D]): PLensT[F, G, (A,  C), (B, D)] =
     f *** g
 }
-
-sealed trait PLensGetHistory[A, B] {
-   val history: DList[(A, Option[B])]
-
-   def targets: DList[A] =
-     history map (_._1)
-
-   def gets: DList[Option[B]] =
-     history map (_._2)
-
-   def historyList: List[(A, Option[B])] =
-     history.toList
- }
-
-object PLensGetHistory extends PLensGetHistoryInstances
-
- trait PLensGetHistoryInstances {
-   import DList._
-   implicit def plensGetHistoryMonoid[A, B]: Monoid[PLensGetHistory[A, B]] = new Monoid[PLensGetHistory[A, B]] {
-     val zero = new PLensGetHistory[A, B] {
-       val history = DList[(A, Option[B])]()
-     }
-     def append(a: PLensGetHistory[A, B], b: => PLensGetHistory[A, B]) = new PLensGetHistory[A, B] {
-       val history = a.history ++ b.history
-     }
-   }
-   implicit def plensGetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[PLensGetHistory[A, B]] = {
-     import std.tuple._
-     import std.option._
-     Equal[DList[(A, Option[B])]].contramap((_: PLensGetHistory[A, B]).history)
-   }
-
- }
-
- sealed trait PLensSetHistory[A, B] {
-   val history: DList[(A, B, A)]
-
-   def targets: DList[A] =
-     history map (_._1)
-
-   def sets: DList[B] =
-     history map (_._2)
-
-   def results: DList[A] =
-     history map (_._3)
-
-   def historyList: List[(A, B, A)] =
-     history.toList
- }
-
- object PLensSetHistory extends PLensSetHistoryInstances
-
- trait PLensSetHistoryInstances {
-   import DList._
-   implicit def plensSetHistoryMonoid[A, B]: Monoid[PLensSetHistory[A, B]] = new Monoid[PLensSetHistory[A, B]] {
-     val zero = new PLensSetHistory[A, B] {
-       val history = DList[(A, B, A)]()
-     }
-     def append(a: PLensSetHistory[A, B], b: => PLensSetHistory[A, B]) = new PLensSetHistory[A, B] {
-       val history = a.history ++ b.history
-     }
-   }
-   implicit def plensSetHistoryMonoidEqual[A: Equal, B: Equal]: Equal[PLensSetHistory[A, B]] = {
-     import std.tuple._
-     Equal[DList[(A, B, A)]].contramap((_: PLensSetHistory[A, B]).history)
-   }
-
- }
