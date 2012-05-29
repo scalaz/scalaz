@@ -24,6 +24,14 @@ trait TypeClass[C[_]] {
    */
   def emptyProduct: C[HNil]
 
+  /** The product containing one element. */
+  final def product1[F](implicit F: C[F]): C[F :: HNil] =
+    product(F, emptyProduct)
+
+  /**The product containing two elements. */
+  final def product2[F, G](implicit F: C[F], G: C[G]): C[F :: G :: HNil] =
+    product(F, product(G, emptyProduct))
+
 }
 
 object TypeClass {
@@ -36,7 +44,11 @@ object TypeClass {
   private trait Empty {
 
     def emptyProduct = new Equal[HNil]
-      with Show[HNil] {
+      with Show[HNil] with Monoid[HNil] {
+
+      def zero = HNil
+
+      def append(f1: HNil, f2: => HNil) = HNil
 
       def equal(a1: HNil, a2: HNil) = true
 
@@ -45,6 +57,34 @@ object TypeClass {
       override def shows(f: HNil) = "HNil"
 
     }
+
+  }
+
+  // The following classes are in place mostly to avoid repetition of methods
+  // of type classes which are inherited from some other ones.
+
+  private trait Product[+C[_], F, T <: HList] {
+    def FHead: C[F]
+    def FTail: C[T]
+
+    type λ = F :: T
+  }
+
+  private trait ProductSemigroup[F, T <: HList]
+    extends Semigroup[F :: T]
+    with Product[Semigroup, F, T] {
+
+    def append(f1: λ, f2: => λ) =
+      FHead.append(f1.head, f2.head) :: FTail.append(f1.tail, f2.tail)
+
+  }
+
+  private trait ProductMonoid[F, T <: HList]
+    extends ProductSemigroup[F, T]
+    with Monoid[F :: T]
+    with Product[Monoid, F, T] {
+
+    def zero = FHead.zero :: FTail.zero
 
   }
 
@@ -68,6 +108,16 @@ object TypeClass {
       override def shows(f: F :: T) = (Strings.show[String] :: " :: " :: Strings.show[String] :: FNil) format (FHead.shows(f.head) :: FTail.shows(f.tail) :: HNil)
     }
 
+  }
+
+  implicit def SemigroupI: TypeClass[Semigroup] = new TypeClass[Semigroup] with Empty {
+    def product[F, T <: HList](FH: Semigroup[F], FT: Semigroup[T]): Semigroup[F :: T] =
+      new ProductSemigroup[F, T] { def FHead = FH; def FTail = FT }
+  }
+
+  implicit def MonoidI: TypeClass[Monoid] = new TypeClass[Monoid] with Empty {
+    def product[F, T <: HList](FH: Monoid[F], FT: Monoid[T]): Monoid[F :: T] =
+      new ProductMonoid[F, T] { def FHead = FH; def FTail = FT }
   }
 
 }

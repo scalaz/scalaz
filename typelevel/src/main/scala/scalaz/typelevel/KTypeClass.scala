@@ -222,7 +222,7 @@ object KTypeClass {
 
   }
 
-  // KTypeClass instances
+  // Instances
 
   implicit def FunctorI: KTypeClass[Functor] = new KTypeClass[Functor] with Empty {
     def product[F[_], T <: TCList](FH: Functor[F], FT: Functor[T#Product]) =
