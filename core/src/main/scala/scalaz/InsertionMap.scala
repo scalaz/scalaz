@@ -114,6 +114,8 @@ trait InsertionMapFunctions {
 
 trait InsertionMapInstances {
   import std.AllInstances._
+  import std.map._
+  import Scalaz._
 
   implicit def insertionMap[K]: Functor[({type λ[α]=InsertionMap[K, α]})#λ] =
     new Functor[({type λ[α]=InsertionMap[K, α]})#λ] {
@@ -122,7 +124,19 @@ trait InsertionMapInstances {
     }
 
   implicit def insertionMapEqual[K: Equal, V: Equal]: Equal[InsertionMap[K, V]] =
-    Equal[List[(K, V)]] contramap (_.toList)
+    Equal.equal {
+      case (m, n) => {
+        val r =
+          m forall {
+            case (k, v) => n.get(k) === Some(v)
+          }
+        val s =
+          n forall {
+            case (k, v) => m.get(k) === Some(v)
+          }
+        r && s
+      }
+    }
 
   implicit def insertionMapShow[K: Show, V: Show]: Show[InsertionMap[K, V]] =
     Show.show(q =>
