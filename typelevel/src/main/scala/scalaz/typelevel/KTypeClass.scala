@@ -42,6 +42,18 @@ trait KTypeClass[C[_[_]]] {
    */
   final def emptyProduct = new WrappedProduct[C, TCNil](_emptyProduct, this)
 
+  /** The unwrapped product containing one element. */
+  final def product1[F[_]](implicit F: C[F]): C[TCCons[F, TCNil]#Product] =
+    (emptyProduct prodLeft F).instance
+
+  /**The unwrapped product containing two elements. */
+  final def product2[F[_], G[_]](implicit F: C[F], G: C[G]): C[TCCons[F, TCCons[G, TCNil]]#Product] =
+    (emptyProduct prodLeft G prodLeft F).instance
+
+  /**The unwrapped product containing three elements. */
+  final def product3[F[_], G[_], H[_]](implicit F: C[F], G: C[G], H: C[H]): C[TCCons[F, TCCons[G, TCCons[H, TCNil]]]#Product] =
+    (emptyProduct prodLeft H prodLeft G prodLeft F).instance
+
 }
 
 object KTypeClass {
