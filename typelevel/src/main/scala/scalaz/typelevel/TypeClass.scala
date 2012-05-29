@@ -32,6 +32,9 @@ trait TypeClass[C[_]] {
   final def product2[F, G](implicit F: C[F], G: C[G]): C[F :: G :: HNil] =
     product(F, product(G, emptyProduct))
 
+  /**The product containing three elements. */
+  final def product3[F, G, H](implicit F: C[F], G: C[G], H: C[H]): C[F :: G :: H :: HNil] =
+    product(F, product(G, product(H, emptyProduct)))
 }
 
 object TypeClass {
