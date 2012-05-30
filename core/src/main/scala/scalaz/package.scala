@@ -159,7 +159,7 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  type Lens[A, B] = LensT[Id, Id, A, B]
+  type Lens[A, B] = LensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object Lens extends LensTFunctions with LensTInstances {
@@ -169,7 +169,7 @@ package object scalaz {
 
   type @>[A, B] = Lens[A, B]
 
-  type PLens[A, B] = PLensT[Id, Id, A, B]
+  type PLens[A, B] = PLensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object PLens extends PLensTFunctions with PLensTInstances {
@@ -177,7 +177,7 @@ package object scalaz {
       plens(r)
   }
 
-  type @?>[A, B] = PLensT[Id, Id, A, B]
+  type @?>[A, B] = PLens[A, B]
 
   type PStateT[F[+_], A, B] = StateT[F, A, Option[B]]
 
