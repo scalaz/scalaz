@@ -126,21 +126,6 @@ trait InsertionMapInstances {
         a map f
     }
 
-  implicit def insertionMapEqual[K: Equal, V: Equal]: Equal[InsertionMap[K, V]] =
-    Equal.equal {
-      case (m, n) => {
-        val r =
-          m forall {
-            case (k, v) => n.get(k) === Some(v)
-          }
-        val s =
-          n forall {
-            case (k, v) => m.get(k) === Some(v)
-          }
-        r && s
-      }
-    }
-
   implicit def insertionMapShow[K: Show, V: Show]: Show[InsertionMap[K, V]] =
     Show.show(q =>
       "InsertionMap(" + (q.toList map (Show[(K, V)] shows _) mkString ", ") + ")" toList)
