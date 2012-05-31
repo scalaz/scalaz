@@ -20,14 +20,6 @@ sealed trait InsertionMap[K, V] {
   def ^+^(k: K, v: V): InsertionMap[K, V] =
     InsertionMap.build(assoc + ((k, (v, next))), next + 1L)
 
-  def ++(q: InsertionMap[K, V]): InsertionMap[K, V] = {
-    val s = q.assoc.toList sortWith {
-      case ((_, (_, n)), (_, (_, o))) => n < o
-    }
-
-    s.foldLeft(this){ case (m, (k, (v, _))) => m ^+^ (k, v) }
-  }
-
   def @-(k: K): (Option[V], InsertionMap[K, V]) =
     assoc get k match {
       case None => (None, this)
@@ -80,7 +72,7 @@ sealed trait InsertionMap[K, V] {
 
   override def equals(a: Any): Boolean =
     a.isInstanceOf[InsertionMap[_, _]] &&
-      assoc == a.asInstanceOf[InsertionMap[_, _]]
+      assoc == a.asInstanceOf[InsertionMap[_, _]].assoc
 
   override def hashCode: Int =
     assoc.hashCode
@@ -126,14 +118,11 @@ trait InsertionMapInstances {
         a map f
     }
 
+  implicit def insertionMapEqual[K, V]: Equal[InsertionMap[K, V]] =
+    Equal.equalA
+
   implicit def insertionMapShow[K: Show, V: Show]: Show[InsertionMap[K, V]] =
     Show.show(q =>
       "InsertionMap(" + (q.toList map (Show[(K, V)] shows _) mkString ", ") + ")" toList)
-
-  implicit def insertionMapMonoid[K, V]: Monoid[InsertionMap[K, V]] =
-    new Monoid[InsertionMap[K, V]] {
-      def append(f1: InsertionMap[K, V], f2: => InsertionMap[K, V]) = f1 ++ f2
-      def zero = InsertionMap.empty
-    }
 
 }
