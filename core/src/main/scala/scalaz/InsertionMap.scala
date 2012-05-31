@@ -78,10 +78,15 @@ sealed trait InsertionMap[K, V] {
       case (v, n) => (f(v), n)
     }, next)
 
+  override def equals(a: Any): Boolean =
+    a.isInstanceOf[InsertionMap[_, _]] &&
+      assoc == a.asInstanceOf[InsertionMap[_, _]]
+
+  override def hashCode: Int =
+    assoc.hashCode
 
   override def toString: String =
     "InsertionMap(" + (toList mkString ", ") + ")"
-
 }
 
 object InsertionMap extends InsertionMapFunctions with InsertionMapInstances
@@ -113,8 +118,6 @@ trait InsertionMapFunctions {
 }
 
 trait InsertionMapInstances {
-  import std.AllInstances._
-  import std.map._
   import Scalaz._
 
   implicit def insertionMap[K]: Functor[({type λ[α]=InsertionMap[K, α]})#λ] =
