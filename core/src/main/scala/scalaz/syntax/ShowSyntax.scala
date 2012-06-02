@@ -9,6 +9,8 @@ trait ShowOps[F] extends Ops[F] {
   final def shows: String = F.show(self).mkString
   final def print: Unit = Console.print(shows)
   final def println: Unit = Console.println(shows)
+  final def eprint: Unit = Console.err.print(shows)
+  final def eprintln: Unit = Console.err.println(shows)
   ////
 }
 

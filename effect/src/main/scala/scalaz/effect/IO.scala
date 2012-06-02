@@ -190,6 +190,18 @@ trait IOStd {
     ()
   }))
 
+  /** Writes a string to standard error. */
+  def ePutStr(s: String): IO[Unit] = io(rw => return_(rw -> {
+    Console.err print s;
+    ()
+  }))
+
+  /** Writes a string to standard error, followed by a newline.*/
+  def ePutStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
+    Console.err println s;
+    ()
+  }))
+
   /** Reads a line of standard input. */
   def readLn: IO[String] = IO(readLine())
 
