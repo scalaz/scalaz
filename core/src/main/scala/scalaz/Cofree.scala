@@ -64,6 +64,9 @@ case class Cofree[S[+_], +A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor
     zapWith(fs)((a, f) => f(a))
 }
 
+object Cofree extends CofreeFunctions
+
+
 trait CofreeFunctions {
 
   /** Cofree corecursion. */
@@ -72,5 +75,20 @@ trait CofreeFunctions {
 
 }
 
-object Cofree extends CofreeFunctions
+trait CofreeInstances {
+  implicit def cofreeComonad[S[+_]](implicit S0: Functor[S]): Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {
+    implicit def S = S0
+  }
+}
 
+private[scalaz] trait CofreeComonad[S[+_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
+  implicit def S: Functor[S]
+
+  def copoint[A](p: Cofree[S, A]) = p.head
+
+  def cojoin[A](a: Cofree[S, A]) = a.duplicate
+
+  def map[A, B](fa: Cofree[S, A])(f: (A) => B) = fa map f
+
+  def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa extend f
+}

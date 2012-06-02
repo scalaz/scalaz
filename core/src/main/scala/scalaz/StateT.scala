@@ -16,14 +16,14 @@ import Id._
 //
 trait StateT[F[+_], S, +A] { self =>
   /** Run and return the final value and state in the context of `F` */
-  def apply(initial: S): F[(A, S)]
+  def apply(initial: S): F[(S, A)]
 
   /** An alias for `apply` */
-  def run(initial: S): F[(A, S)] = apply(initial)
+  def run(initial: S): F[(S, A)] = apply(initial)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(initial: S)(implicit F: Functor[F]): F[A] =
-    F.map(apply(initial))(_._1)
+    F.map(apply(initial))(_._2)
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
   def evalZero(implicit F: Functor[F], S: Monoid[S]): F[A] =
@@ -31,40 +31,40 @@ trait StateT[F[+_], S, +A] { self =>
 
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(initial: S)(implicit F: Functor[F]): F[S] =
-    F.map(apply(initial))(_._2)
+    F.map(apply(initial))(_._1)
 
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
   def execZero(implicit F: Functor[F], S: Monoid[S]): F[S] =
     exec(S.zero)
 
   def map[B](f: A => B)(implicit F: Functor[F]): StateT[F, S, B] = StateT(s => F.map(apply(s)) {
-    case (a, s1) => (f(a), s1)
+    case (s1, a) => (s1, f(a))
   })
 
   def flatMap[B](f: A => StateT[F, S, B])(implicit F: Bind[F]): StateT[F, S, B] = StateT(s => F.bind(apply(s)) {
-    case (a, s1) => f(a)(s1)
+    case (s1, a) => f(a)(s1)
   })
 
   def lift[M[_]: Pointed]: StateT[({type λ[+α]=M[F[α]]})#λ, S, A] = new StateT[({type λ[+α]=M[F[α]]})#λ, S, A] {
-    def apply(initial: S): M[F[(A, S)]] = Pointed[M].point(self(initial))
+    def apply(initial: S): M[F[(S, A)]] = Pointed[M].point(self(initial))
   }
 
   import Liskov._
   def unlift[M[+_], FF[+_], AA >: A](implicit M: Copointed[M], ev: this.type <~< StateT[({type λ[+α] = M[FF[α]]})#λ, S, AA]): StateT[FF, S, AA] = new StateT[FF, S, AA] {
-    def apply(initial: S): FF[(AA, S)] = Copointed[M].copoint(ev(self)(initial))
+    def apply(initial: S): FF[(S, AA)] = Copointed[M].copoint(ev(self)(initial))
   }
 
   def unliftId[M[+_], AA >: A](implicit M: Copointed[M], ev: this.type <~< StateT[M, S, AA]): State[S, AA] = unlift[M, Id, AA]
 
   def rwst[W, R](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
     (r, s) => F.map(self(s)) {
-      case (a, s) => (W.zero, a, s)
+      case (s, a) => (W.zero, a, s)
     }
   )
 }
 
 object StateT extends StateTFunctions with StateTInstances {
-  def apply[F[+_], S, A](f: S => F[(A, S)]): StateT[F, S, A] = new StateT[F, S, A] {
+  def apply[F[+_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
     def apply(s: S) = f(s)
   }
 }
@@ -100,10 +100,10 @@ trait StateTInstances extends StateTInstances0 {
 
 trait StateTFunctions {
   def constantStateT[F[+_], A, S](a: A)(s: => S)(implicit F: Pointed[F]): StateT[F, S, A] =
-    StateT((_: S) => F.point((a, s)))
+    StateT((_: S) => F.point((s, a)))
 
   def stateT[F[+_], A, S](a: A)(implicit F: Pointed[F]): StateT[F, S, A] =
-    StateT(s => F.point((a, s)))
+    StateT(s => F.point((s, a)))
 }
 
 //
@@ -121,7 +121,7 @@ private[scalaz] trait StateTPointed[S, F[+_]] extends Pointed[({type f[+a] = Sta
 
   def point[A](a: => A): StateT[F, S, A] = {
     lazy val aa = a
-    StateT(s => F.point(aa, s))
+    StateT(s => F.point(s, aa))
   }
 }
 
@@ -132,7 +132,7 @@ private[scalaz] trait StateTMonadState[S, F[+_]] extends MonadState[({type f[s, 
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
 
-  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point(((), s)))
+  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, ())))
 }
 
 private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[+_], +a] = StateT[g, S, a]})#f] {
@@ -142,7 +142,7 @@ private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[+_], +a] = StateT[
   }
 
   def liftM[G[+_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
-    StateT(s => G.map(ga)(a => (a, s)))
+    StateT(s => G.map(ga)(a => (s, a)))
 
   def hoist[M[+_]: Monad, N[+_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
     def apply[A](action: StateT[M, S, A]) =

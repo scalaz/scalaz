@@ -21,7 +21,7 @@ object StateTUsage extends App {
   }
 
   def state() {
-    val state: State[String, Int] = State((x: String) => (0, x + 1))
+    val state: State[String, Int] = State((x: String) => (x + 1, 0))
     val eval: Int = state.eval("")
     state.flatMap(_ => state)
   }

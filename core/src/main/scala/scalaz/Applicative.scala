@@ -78,6 +78,8 @@ object Applicative {
     def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] = a.ap(fa)(f)
   }
 
+  implicit def monoidApplicative[M:Monoid]: Applicative[({type λ[α] = M})#λ] = Monoid[M].applicative
+
   ////
 }
 

@@ -23,6 +23,8 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
+  final def allM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.allM(self)(p)
+  final def anyM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.anyM(self)(p)
   final def any(p: A => Boolean): Boolean = F.any(self)(p)
   final def count: Int = F.count(self)
   final def maximum(implicit A: Order[A]): Option[A] = F.maximum(self)
@@ -34,6 +36,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def selectSplit(p: A => Boolean): List[List[A]] = F.selectSplit(self)(p)
   final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)
+  final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
 
   ////
 }

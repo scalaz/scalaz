@@ -33,15 +33,13 @@
  *  - [[scalaz.Copointed]] extends [[scalaz.Functor]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]] with [[scalaz.Pointed]]
- *  - [[scalaz.Alternative]] extends [[scalaz.Applicative]]
- *  - [[scalaz.AlternativeEmpty]] extends [[scalaz.Alternative]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
  *  - [[scalaz.Cojoin]]
  *  - [[scalaz.Cobind]]
  *  - [[scalaz.Comonad]] extends [[scalaz.Copointed]] with [[scalaz.Cojoin]] with [[scalaz.Cobind]]
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
- *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.Plus]]
+ *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.PlusEmpty]]
  *  - [[scalaz.MonadPlus]] extends [[scalaz.Monad]] with [[scalaz.ApplicativePlus]]
  *  - [[scalaz.Foldable]]
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
@@ -63,7 +61,7 @@
  *  - [[scalaz.Endo]] Represents functions from `A => A`.
  *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
  *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
- *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
+ *  - [[scalaz.LensT]] Composable, functional alternative to getters and setters
  *  - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
  *  - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
  *  - [[scalaz.Zipper]] A functional cursor over a List.
@@ -125,7 +123,7 @@ package object scalaz {
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object State extends StateFunctions {
-    def apply[S, A](f: S => (A, S)): State[S, A] = new StateT[Id, S, A] {
+    def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
       def apply(s: S) = f(s)
     }
   }
@@ -161,7 +159,7 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  type Lens[A, B] = LensT[Id, Id, A, B]
+  type Lens[A, B] = LensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object Lens extends LensTFunctions with LensTInstances {
@@ -171,17 +169,7 @@ package object scalaz {
 
   type @>[A, B] = Lens[A, B]
 
-  type LenswT[F[+_], G[+_], V, W, A, B] =
-    LensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B]
-
-  type Lensw[V, W, A, B] = LenswT[Id, Id, V, W, A, B]
-
-  type LenshT[F[+_], G[+_], A, B] =
-  LenswT[F, G, LensGetHistory[A, B], LensSetHistory[A, B], A, B]
-
-  type Lensh[A, B] = LenshT[Id, Id, A, B]
-
-  type PLens[A, B] = PLensT[Id, Id, A, B]
+  type PLens[A, B] = PLensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object PLens extends PLensTFunctions with PLensTInstances {
@@ -189,17 +177,7 @@ package object scalaz {
       plens(r)
   }
 
-  type @?>[A, B] = PLensT[Id, Id, A, B]
-
-  type PLenswT[F[+_], G[+_], V, W, A, B] =
-    PLensT[({type λ[+α] = WriterT[F, V, α]})#λ, ({type λ[+α] = WriterT[G, W, α]})#λ, A, B]
-
-  type PLensw[V, W, A, B] = PLenswT[Id, Id, V, W, A, B]
-
-  type PLenshT[F[+_], G[+_], A, B] =
-  PLenswT[F, G, PLensGetHistory[A, B], PLensSetHistory[A, B], A, B]
-
-  type PLensh[A, B] = PLenshT[Id, Id, A, B]
+  type @?>[A, B] = PLens[A, B]
 
   type PStateT[F[+_], A, B] = StateT[F, A, Option[B]]
 

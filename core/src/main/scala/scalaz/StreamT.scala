@@ -201,7 +201,7 @@ object StreamT extends StreamTInstances {
 
   def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S): StreamT[Id,A] =
     StreamT[Id,A]({
-      val (sa, s1) = stream.step(s0)
+      val (s1, sa) = stream.step(s0)
       sa((a, as) => Yield(a, runStreamT(as, s1)),
          as => Skip(runStreamT(as, s1)),
          Done)
