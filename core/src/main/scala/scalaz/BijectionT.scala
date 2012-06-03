@@ -82,35 +82,44 @@ trait BijectionTFunctions {
   def bijectionId[F[+_], G[+_], A](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, A, A] =
     liftBijection(x => x, x => x)
 
-  def curryB[F[+_]: Pointed, G[+_]: Pointed, A, B, C]: BijectionT[F, G, (A, B) => C, A => B => C] =
-    liftBijection(_.curried, Function.uncurried(_))
+  def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =
+    bijection[Id, Id, (A, B) => C, A => B => C](_.curried, Function.uncurried(_))
 
-  def zipB[F[+_], G[+_], X[_], A, B](implicit PF: Pointed[F], PG: Pointed[G], Z: Zip[X], U: Unzip[X]): BijectionT[F, G, (X[A], X[B]), X[(A, B)]] =
-    liftBijection(x => Z.zip(x._1, x._2), U.unzip(_))
+  // Left is true, Right is false
+  def eitherB[A]: Bijection[Either[A, A], (Boolean, A)] =
+    bijection[Id, Id, Either[A, A], (Boolean, A)](_ match {
+      case Left(a) => (true, a)
+      case Right(a) => (false, a)
+    }, {
+      case (p, a) => if(p) Left(a) else Right(a)
+    })
 
-  def zipListB[F[+_], G[+_], A, B](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, (List[A], List[B]), List[(A, B)]] =
-    zipB[F, G, List, A, B]
+  def zipB[X[_], A, B](implicit Z: Zip[X], U: Unzip[X]): Bijection[(X[A], X[B]), X[(A, B)]] =
+    bijection[Id, Id, (X[A], X[B]), X[(A, B)]](x => Z.zip(x._1, x._2), U.unzip(_))
 
-  def zipEndoB[F[+_], G[+_], A, B](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, (Endo[A], Endo[B]), Endo[(A, B)]] =
-    zipB[F, G, Endo, A, B]
+  def zipListB[A, B]: Bijection[(List[A], List[B]), List[(A, B)]] =
+    zipB[List, A, B]
 
-  def zipReaderB[F[+_], G[+_], T, A, B](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, (T => A, T => B), T => (A, B)] =
-    zipB[F, G, ({type l[a] = (T => a)})#l, A, B]
+  def zipEndoB[A, B]: Bijection[(Endo[A], Endo[B]), Endo[(A, B)]] =
+    zipB[Endo, A, B]
 
-  def tuple3B[F[+_]: Pointed, G[+_]: Pointed, A, B, C]: BijectionT[F, G, (A, B, C), (A, (B, C))] =
-    liftBijection({ case (a, b, c) => (a, (b, c)) }, { case (a, (b, c)) => (a, b, c) })
+  def zipReaderB[T, A, B]: Bijection[(T => A, T => B), T => (A, B)] =
+    zipB[({type l[a] = (T => a)})#l, A, B]
 
-  def tuple4B[F[+_]: Pointed, G[+_]: Pointed, A, B, C, D]: BijectionT[F, G, (A, B, C, D), (A, (B, (C, D)))] =
-    liftBijection({ case (a, b, c, d) => (a, (b, (c, d))) }, { case (a, (b, (c, d))) => (a, b, c, d) })
+  def tuple3B[A, B, C]: Bijection[(A, B, C), (A, (B, C))] =
+    bijection({ case (a, b, c) => (a, (b, c)) }, { case (a, (b, c)) => (a, b, c) })
 
-  def tuple5B[F[+_]: Pointed, G[+_]: Pointed, A, B, C, D, E]: BijectionT[F, G, (A, B, C, D, E), (A, (B, (C, (D, E))))] =
-    liftBijection({ case (a, b, c, d, e) => (a, (b, (c, (d, e)))) }, { case (a, (b, (c, (d, e)))) => (a, b, c, d, e) })
+  def tuple4B[ A, B, C, D]: Bijection[(A, B, C, D), (A, (B, (C, D)))] =
+    bijection({ case (a, b, c, d) => (a, (b, (c, d))) }, { case (a, (b, (c, d))) => (a, b, c, d) })
 
-  def tuple6B[F[+_]: Pointed, G[+_]: Pointed, A, B, C, D, E, H]: BijectionT[F, G, (A, B, C, D, E, H), (A, (B, (C, (D, (E, H)))))] =
-    liftBijection({ case (a, b, c, d, e, h) => (a, (b, (c, (d, (e, h))))) }, { case (a, (b, (c, (d, (e, h))))) => (a, b, c, d, e, h) })
+  def tuple5B[ A, B, C, D, E]: Bijection[(A, B, C, D, E), (A, (B, (C, (D, E))))] =
+    bijection({ case (a, b, c, d, e) => (a, (b, (c, (d, e)))) }, { case (a, (b, (c, (d, e)))) => (a, b, c, d, e) })
 
-  def tuple7B[F[+_]: Pointed, G[+_]: Pointed, A, B, C, D, E, H, I]: BijectionT[F, G, (A, B, C, D, E, H, I), (A, (B, (C, (D, (E, (H, I))))))] =
-    liftBijection({ case (a, b, c, d, e, h, i) => (a, (b, (c, (d, (e, (h, i)))))) }, { case (a, (b, (c, (d, (e, (h, i)))))) => (a, b, c, d, e, h, i) })
+  def tuple6B[ A, B, C, D, E, H]: Bijection[(A, B, C, D, E, H), (A, (B, (C, (D, (E, H)))))] =
+    bijection({ case (a, b, c, d, e, h) => (a, (b, (c, (d, (e, h))))) }, { case (a, (b, (c, (d, (e, h))))) => (a, b, c, d, e, h) })
+
+  def tuple7B[ A, B, C, D, E, H, I]: Bijection[(A, B, C, D, E, H, I), (A, (B, (C, (D, (E, (H, I))))))] =
+    bijection({ case (a, b, c, d, e, h, i) => (a, (b, (c, (d, (e, (h, i)))))) }, { case (a, (b, (c, (d, (e, (h, i)))))) => (a, b, c, d, e, h, i) })
 
 }
 
