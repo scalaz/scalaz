@@ -32,7 +32,7 @@ sealed trait InsertionMap[K, V] {
   /** Returns a list with keys in the order of their insertion. */
   def toList: List[(K, V)] =
     assoc.toList sortWith {
-      case ((_, (_, n)), (_, (_, o))) => n > o
+      case ((_, (_, n)), (_, (_, o))) => n < o
     } map {
       case (k, (v, _)) => (k, v)
     }
@@ -94,7 +94,7 @@ trait InsertionMapFunctions {
     build(Map.empty, 0L)
 
   def apply[K, V](x: (K, V)*): InsertionMap[K, V] =
-    x.reverse.foldLeft(empty[K, V]) {
+    x.foldLeft(empty[K, V]) {
       case (a, (k, v)) => a ^+^ (k, v)
     }
 
