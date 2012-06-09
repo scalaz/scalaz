@@ -26,16 +26,16 @@ class InsertionMapTest extends Spec {
 
   "insert in order" ! check {
     (k: Int, v: String, a: InsertionMap[Int, String]) =>
-      (a ^+^ (k, v)).keys.head == k
+      (a ^+^ (k, v)).keys.last == k
   }
 
   "double insert in order" ! check {
     (k1: Int, v1: String, k2: Int, v2: String, a: InsertionMap[Int, String]) => {
       val q = (a ^+^ (k1, v1) ^+^ (k2, v2)).toList
       if (k1 == k2)
-        q.head == (k2, v2)
+        q.last == (k2, v2)
       else
-        q match {
+        q.reverse match {
           case r::s::_ => r == (k2, v2) && s == (k1, v1)
           case _ => false
         }

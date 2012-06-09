@@ -229,6 +229,23 @@ trait LensTFunctions {
       case Some(v) => m.updated(k, v)
     }: Option[V] => Map[K, V]), _ get k)
 
+  def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Costate[A, B] @> B =
+    lens(q => {
+      lazy val x = q.pos
+      lazy val y = q put x
+      Costate(b =>
+        Costate(w => if(e equal (x, w)) b else y, x), y)
+    })
+
+  def predicateLens[A]: Costate[A, Boolean] @> Either[A, A] =
+    Lens(q => Costate(_ match {
+      case Left(l) => Costate(_ => true, l)
+      case Right(r) => Costate(_ => false, r)
+    }, {
+      val x = q.pos
+      if(q put x) Left(x) else Right(x)
+    }))
+
   def factorLens[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
     lens(e => Costate({
       case (a, Left(b)) => Left(a, b)
