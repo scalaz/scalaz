@@ -11,6 +11,9 @@ trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   final def ⋘[C](x: F[C, A]): F[C, B] =
     <<<(x)
 
+  final def ∘[C](x: F[C, A]): F[C, B] = 
+    <<<(x)
+
   final def >>>[C](x: F[B, C]): F[A, C] =
     F.compose(x, self)
 

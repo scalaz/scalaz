@@ -11,7 +11,6 @@ trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
   final def distribute[G[_], B](f: A => G[B])(implicit D: Distributive[G]): G[F[B]] = D.distribute(self)(f)
   final def cosequence[G[_], B](implicit ev: A === G[B], D: Distributive[G]): G[F[B]] = D.distribute(self)(ev(_))
   final def cotraverse[G[_], B, C](f: F[B] => C)(implicit ev: A === G[B], D: Distributive[G]): G[C] = D.map(cosequence)(f)
-  final def ∘[B](f: A => B): F[B] = F.map(self)(f)
   final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
   final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
   final def fpair: F[(A, A)] = F.fpair(self)
