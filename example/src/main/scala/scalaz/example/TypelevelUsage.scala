@@ -20,8 +20,8 @@ object TypelevelUsage extends App {
 
     hlist2 match {
       case str :: n :: _ =>
-        val _str: String = str
-        val _n: Int = n
+        typed[String](str)
+        typed[Int](n)
     }
 
   }
@@ -186,8 +186,8 @@ object TypelevelUsage extends App {
     typed[Int](g1)
     typed[Symbol](g2)
 
-    assert(g0 == "foo")
-    assert(g1 == 3)
+    assert(g0 === "foo")
+    assert(g1 === 3)
     assert(g2 == 'a)
 
   }
@@ -195,18 +195,25 @@ object TypelevelUsage extends App {
   object Classes {
 
     import typelevel.syntax.TypeClasses._
+    import typelevel.syntax.HLists._
 
     // with syntax
-    val composed1 = Applicative[List] <<: Applicative[Option] <<: Applicative.compose
+    val prod1 = Applicative[List] *: Applicative[Option]
     // without syntax
-    val composed2 = Applicative[List] <<: Applicative[Option] <<: TypeClass[Applicative].idCompose
+    val prod2 = Applicative[List] *: Applicative[Option] *: KTypeClass[Applicative].emptyProduct
 
-    assert(List(Some(5)) === composed1.point(5))
-    assert(List(Some(5)) === composed2.point(5))
+    // derive `Equal` instance
+    // TODO this should work implicitly
 
-    val prod = Applicative[List] *: Applicative[Option] *: Applicative.product
+    // with syntax
+    implicit val eq1 = Equal[List[String]] *: Equal[Option[String]]
+    // without syntax
+    val eq2 = Equal[List[String]] *: Equal[Option[String]] *: TypeClass[Equal].emptyProduct
 
-    assert(List("1") :: Option("2") :: HNil == prod.map(List(1) :: Option(2) :: HNil)(_.toString))
+    typed[Equal[List[String] :: Option[String] :: HNil]](eq1)
+    typed[Equal[List[String] :: Option[String] :: HNil]](eq2)
+
+    assert(List("1") :: Option("2") :: HNil === prod1.map(List(1) :: Option(2) :: HNil)(_.toString))
 
   }
 
@@ -223,4 +230,3 @@ object TypelevelUsage extends App {
 }
 
 // vim: expandtab:ts=2:sw=2
-

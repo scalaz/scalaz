@@ -1,5 +1,7 @@
 package scalaz.example
 
+import scalaz.Id._
+
 class TraverseUsage {
   import scalaz._
 

@@ -7,6 +7,8 @@ trait Strings {
 
   def subs(start: Int) = Format((s: String) => s substring start)
 
+  def show[T : Show] = Format(Show[T].shows)
+
 }
 
 object Strings extends Strings

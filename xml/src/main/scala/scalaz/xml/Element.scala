@@ -98,7 +98,7 @@ sealed trait Element {
 
   /// findElements
   def findElements(n: QName): List[Element] =
-    filterElementsQname(implicitly[Equal[QName]].equal(n, _))
+    filterElementsQname(Equal[QName].equal(n, _))
 
   /// findElement
   def findElement(n: QName): Option[Element] =
@@ -173,19 +173,19 @@ sealed trait Element {
     withAttribs(_ filter p)
 
   def filterAttrs(a: Attr): Element =
-    filterAttrsBy(implicitly[Equal[Attr]].equal(a, _))
+    filterAttrsBy(Equal[Attr].equal(a, _))
 
   def filterAttrsKeyBy(p: QName => Boolean): Element =
     filterAttrsBy(a => p(a.key))
 
   def filterAttrsKey(k: QName): Element =
-    filterAttrsKeyBy(implicitly[Equal[QName]].equal(k, _))
+    filterAttrsKeyBy(Equal[QName].equal(k, _))
 
   def filterAttrsKeyNameBy(p: Str => Boolean): Element =
     filterAttrsKeyBy(q => p(q.name))
 
   def filterAttrsKeyName(s: Str): Element =
-    filterAttrsKeyNameBy(w => implicitly[Equal[Str]].equal(w, s))
+    filterAttrsKeyNameBy(w => Equal[Str].equal(w, s))
 
   def filterAttrsKeySnameBy(p: String => Boolean): Element =
     filterAttrsKeyBy(q => p(q.sname))
@@ -197,19 +197,19 @@ sealed trait Element {
     withAttribs(_ filter (a => !p(a)))
 
   def removeAttrs(a: Attr): Element =
-    removeAttrsBy(implicitly[Equal[Attr]].equal(a, _))
+    removeAttrsBy(Equal[Attr].equal(a, _))
 
   def removeAttrsKeyBy(p: QName => Boolean): Element =
     removeAttrsBy(a => p(a.key))
 
   def removeAttrsKey(k: QName): Element =
-    removeAttrsKeyBy(implicitly[Equal[QName]].equal(k, _))
+    removeAttrsKeyBy(Equal[QName].equal(k, _))
 
   def removeAttrsKeyNameBy(p: Str => Boolean): Element =
     removeAttrsKeyBy(q => p(q.name))
 
   def removeAttrsKeyName(s: Str): Element =
-    removeAttrsKeyNameBy(w => implicitly[Equal[Str]].equal(w, s))
+    removeAttrsKeyNameBy(w => Equal[Str].equal(w, s))
 
   def removeAttrsKeySnameBy(p: String => Boolean): Element =
     removeAttrsKeyBy(q => p(q.sname))
@@ -242,9 +242,9 @@ trait Elements {
 
   implicit val ElementShow: Show[Element] = new Show[Element] {
     def show(e: Element) =
-      ("Element{name=" + implicitly[Show[QName]].shows(e.name) +
-        ",attribs=" + implicitly[Show[List[Attr]]].shows(e.attribs) +
-        ",content=" + implicitly[Show[List[Content]]].shows(e.content) +
+      ("Element{name=" + Show[QName].shows(e.name) +
+        ",attribs=" + Show[List[Attr]].shows(e.attribs) +
+        ",content=" + Show[List[Content]].shows(e.content) +
         (e.line match {
           case None => ""
           case Some(l) => ",line=" + l
@@ -263,15 +263,15 @@ object Element extends Elements {
   import CostateT._
 
   val nameElementL: Element @> QName =
-    lens(x => costate(b => element(b, x.attribs, x.content, x.line), x.name))
+    lens(x => costate(x.name)(b => element(b, x.attribs, x.content, x.line)))
 
   val attribsElementL: Element @> List[Attr] =
-    lens(x => costate(b => element(x.name, b, x.content, x.line), x.attribs))
+    lens(x => costate(x.attribs)(b => element(x.name, b, x.content, x.line)))
 
   val contentElementL: Element @> List[Content] =
-    lens(x => costate(b => element(x.name, x.attribs, b, x.line), x.content))
+    lens(x => costate(x.content)(b => element(x.name, x.attribs, b, x.line)))
 
   val lineElementL: Element @> Option[Line] =
-    lens(x => costate(b => element(x.name, x.attribs, x.content, b), x.line))
+    lens(x => costate(x.line)(b => element(x.name, x.attribs, x.content, b)))
 
 }

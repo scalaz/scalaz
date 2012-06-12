@@ -2,13 +2,13 @@ package scalaz.syntax.effect
 
 trait EffectSyntaxes {
 
-  object resource extends ToResourceV
+  object resource extends ToResourceOps
   
-  object all extends ToAllEffectTypeClassV
+  object all extends ToAllEffectTypeClassOps
 }
 
-trait ToAllEffectTypeClassV
-    extends ToResourceV
+trait ToAllEffectTypeClassOps
+    extends ToResourceOps
 
 /**The members of this object are also offered in the package object [[scalaz.syntax.effect]] */
 object EffectSyntax extends EffectSyntaxes

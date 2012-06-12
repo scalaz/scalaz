@@ -57,7 +57,7 @@ trait CDatas {
 
   implicit val CDataShow: Show[CData] = new Show[CData] {
     def show(c: CData) =
-      ("CData{verbatim=" + implicitly[Show[CDataKind]].shows(c.verbatim) + ",data=" + c.data.mkString + (c.line match {
+      ("CData{verbatim=" + Show[CDataKind].shows(c.verbatim) + ",data=" + c.data.mkString + (c.line match {
         case None => ""
         case Some(l) => ",line=" + l
       }) + "}").toList
@@ -71,12 +71,12 @@ object CData extends CDatas {
   import CostateT._
 
   val verbatimCDataL: CData @> CDataKind =
-    lens(x => costate(b => cdata(b, x.data, x.line), x.verbatim))
+    lens(x => costate(x.verbatim)(b => cdata(b, x.data, x.line)))
 
   val dataCDataL: CData @> Str =
-    lens(x => costate(b => cdata(x.verbatim, b, x.line), x.data))
+    lens(x => costate(x.data)(b => cdata(x.verbatim, b, x.line)))
 
   val lineCDataL: CData @> Option[Line] =
-    lens(x => costate(b => cdata(x.verbatim, x.data, b), x.line))
+    lens(x => costate(x.line)(b => cdata(x.verbatim, x.data, b)))
 
 }

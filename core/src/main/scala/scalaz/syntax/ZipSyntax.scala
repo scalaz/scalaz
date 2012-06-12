@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Zip` */
-trait ZipV[F[_],A] extends SyntaxV[F[A]] {
+trait ZipOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Zip[F]
   ////
   final def fzip[B](b: => F[B]): F[(A, B)] = F.zip(self, b)
@@ -13,22 +13,23 @@ trait ZipV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToZipV0 {
-  implicit def ToZipVUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]) =
-    new ZipV[F0.M,F0.A] { def self = F0(v); implicit def F: Zip[F0.M] = F0.TC }
+trait ToZipOps0 {
+  implicit def ToZipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]) =
+    new ZipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Zip[F0.M] = F0.TC }
+
 }
 
-trait ToZipV extends ToZipV0 {
-  implicit def ToZipV[F[_],A](v: F[A])(implicit F0: Zip[F]) =
-    new ZipV[F,A] { def self = v; implicit def F: Zip[F] = F0 }
+trait ToZipOps extends ToZipOps0 {
+  implicit def ToZipOps[F[_],A](v: F[A])(implicit F0: Zip[F]) =
+    new ZipOps[F,A] { def self = v; implicit def F: Zip[F] = F0 }
 
   ////
 
   ////
 }
 
-trait ZipSyntax[F[_]] {
-  implicit def ToZipV[A](v: F[A])(implicit F0: Zip[F]): ZipV[F, A] = new ZipV[F, A] { def self = v; implicit def F: Zip[F] = F0 }
+trait ZipSyntax[F[_]]  {
+  implicit def ToZipOps[A](v: F[A])(implicit F0: Zip[F]): ZipOps[F, A] = new ZipOps[F,A] { def self = v; implicit def F: Zip[F] = F0 }
 
   ////
 

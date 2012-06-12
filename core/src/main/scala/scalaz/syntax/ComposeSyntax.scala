@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Compose` */
-trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
+trait ComposeOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Compose[F]
   ////
   final def <<<[C](x: F[C, A]): F[C, B] =
@@ -22,28 +22,28 @@ trait ComposeV[F[_, _],A, B] extends SyntaxV[F[A, B]] {
   ////
 }
 
-trait ToComposeV0 {
-    implicit def ToComposeVUnapply[FA](v: FA)(implicit F0: Unapply2[Compose, FA]) =
-      new ComposeV[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Compose[F0.M] = F0.TC }
+trait ToComposeOps0 {
+    implicit def ToComposeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Compose, FA]) =
+      new ComposeOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Compose[F0.M] = F0.TC }
   
 }
 
-trait ToComposeV extends ToComposeV0 {
+trait ToComposeOps extends ToComposeOps0 {
   
-  implicit def ToComposeV[F[_, _],A, B](v: F[A, B])(implicit F0: Compose[F]) =
-      new ComposeV[F,A, B] { def self = v; implicit def F: Compose[F] = F0 }
+  implicit def ToComposeOps[F[_, _],A, B](v: F[A, B])(implicit F0: Compose[F]) =
+      new ComposeOps[F,A, B] { def self = v; implicit def F: Compose[F] = F0 }
   
 
   ////
   // TODO Roll this back into gen-type-class to add to all type classes classifying * * -> *
   implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ComposeV[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Compose[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+        new ComposeOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Compose[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
 
   ////
 }
 
 trait ComposeSyntax[F[_, _]]  {
-  implicit def ToComposeV[A, B](v: F[A, B])(implicit F0: Compose[F]): ComposeV[F, A, B] = new ComposeV[F, A, B] { def self = v; implicit def F: Compose[F] = F0 }
+  implicit def ToComposeOps[A, B](v: F[A, B])(implicit F0: Compose[F]): ComposeOps[F, A, B] = new ComposeOps[F, A, B] { def self = v; implicit def F: Compose[F] = F0 }
 
   ////
 

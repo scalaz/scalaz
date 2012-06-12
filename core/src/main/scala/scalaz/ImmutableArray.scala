@@ -4,7 +4,7 @@ import reflect.ClassManifest
 import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
 import collection.IndexedSeqOptimized
-import syntax.SyntaxV
+import syntax.Ops
 
 /**
  * An immutable wrapper for arrays
@@ -272,7 +272,7 @@ object ImmutableArray extends ImmutableArrayFunctions {
     }
   }
 
-  sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends SyntaxV[ImmutableArray[Char]] {
+  sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends Ops[ImmutableArray[Char]] {
     def asString = self match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString

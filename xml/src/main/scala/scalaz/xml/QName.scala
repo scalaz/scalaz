@@ -55,7 +55,7 @@ sealed trait QName {
 
   /// findChildren
   def findChildren(e: Element): List[Element] =
-    e filterChildren (q => implicitly[Equal[QName]].equal(q.name, this))
+    e filterChildren (q => Equal[QName].equal(q.name, this))
 
   /// findChild
   def findChild(e: Element): Option[Element] =
@@ -112,8 +112,8 @@ trait QNames {
   implicit val QNameOrder: Order[QName] = new Order[QName] {
     def order(q1: QName, q2: QName) =
       (q1.uri, q2.uri) match {
-        case (None, None) => implicitly[Order[Option[Str]]].order(q1.prefix, q2.prefix)
-        case (u1, u2) => implicitly[Order[Option[Str]]].order(u1, u2)
+        case (None, None) => Order[Option[Str]].order(q1.prefix, q2.prefix)
+        case (u1, u2) => Order[Option[Str]].order(u1, u2)
       }
   }
 
@@ -136,12 +136,12 @@ object QName extends QNames {
   import CostateT._
 
   val nameQNameL: QName @> Str =
-    lens(x => costate(b => qname(b, x.uri, x.prefix), x.name))
+    lens(x => costate(x.name)(b => qname(b, x.uri, x.prefix)))
 
   val uriQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, b, x.prefix), x.uri))
+    lens(x => costate(x.uri)(b => qname(x.name, b, x.prefix)))
 
   val prefixQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, x.uri, b), x.prefix))
+    lens(x => costate(x.prefix)(b => qname(x.name, x.uri, b)))
 
 }

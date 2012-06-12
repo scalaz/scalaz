@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Index` */
-trait IndexV[F[_],A] extends SyntaxV[F[A]] {
+trait IndexOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Index[F]
   ////
   final def index(n: Int): Option[A] = F.index(self, n)
@@ -10,15 +10,15 @@ trait IndexV[F[_],A] extends SyntaxV[F[A]] {
   ////
 }
 
-trait ToIndexV0 {
-  implicit def ToIndexVUnapply[FA](v: FA)(implicit F0: Unapply[Index, FA]) =
-    new IndexV[F0.M,F0.A] { def self = F0(v); implicit def F: Index[F0.M] = F0.TC }
+trait ToIndexOps0 {
+  implicit def ToIndexOpsUnapply[FA](v: FA)(implicit F0: Unapply[Index, FA]) =
+    new IndexOps[F0.M,F0.A] { def self = F0(v); implicit def F: Index[F0.M] = F0.TC }
 
 }
 
-trait ToIndexV extends ToIndexV0 {
-  implicit def ToIndexV[F[_],A](v: F[A])(implicit F0: Index[F]) =
-    new IndexV[F,A] { def self = v; implicit def F: Index[F] = F0 }
+trait ToIndexOps extends ToIndexOps0 {
+  implicit def ToIndexOps[F[_],A](v: F[A])(implicit F0: Index[F]) =
+    new IndexOps[F,A] { def self = v; implicit def F: Index[F] = F0 }
 
   ////
 
@@ -26,7 +26,7 @@ trait ToIndexV extends ToIndexV0 {
 }
 
 trait IndexSyntax[F[_]]  {
-  implicit def ToIndexV[A](v: F[A])(implicit F0: Index[F]): IndexV[F, A] = new IndexV[F,A] { def self = v; implicit def F: Index[F] = F0 }
+  implicit def ToIndexOps[A](v: F[A])(implicit F0: Index[F]): IndexOps[F, A] = new IndexOps[F,A] { def self = v; implicit def F: Index[F] = F0 }
 
   ////
 

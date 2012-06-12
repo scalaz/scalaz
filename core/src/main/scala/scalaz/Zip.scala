@@ -1,9 +1,18 @@
 package scalaz
 
+////
 import PLens._
 
-trait Zip[F[_]] { self =>
+
+/**
+ *
+ */
+////
+trait Zip[F[_]]  { self =>
+  ////
   def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)]
+
+  // derived functions
 
   /**The composition of Zip `F` and `G`, `[x]F[G[x]]`, is a Zip (if F is a Functor) */
   def compose[G[_]](implicit T0: Functor[F], G0: Zip[G]): Zip[({type λ[α] = F[G[α]]})#λ] = new CompositionZip[F, G] {
@@ -39,13 +48,18 @@ trait Zip[F[_]] { self =>
       def map[A, B](fa: F[A])(f: A => B) =
         F.map(fa)(f)
     }
+
+  ////
+  val zipSyntax = new scalaz.syntax.ZipSyntax[F] {}
 }
 
-object Zip extends ZipFunctions {
+object Zip {
   @inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F
+
+  ////
+
+  def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
+      F.zip(t._1, t._2)
+  ////
 }
 
-trait ZipFunctions {
-  def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
-    F.zip(t._1, t._2)
-}

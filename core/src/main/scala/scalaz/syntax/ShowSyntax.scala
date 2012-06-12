@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Show` */
-trait ShowV[F] extends SyntaxV[F] {
+trait ShowOps[F] extends Ops[F] {
   implicit def F: Show[F]
   ////
   final def show: List[Char] = F.show(self)
@@ -12,9 +12,9 @@ trait ShowV[F] extends SyntaxV[F] {
   ////
 }
 
-trait ToShowV  {
-  implicit def ToShowV[F](v: F)(implicit F0: Show[F]) =
-    new ShowV[F] { def self = v; implicit def F: Show[F] = F0 }
+trait ToShowOps  {
+  implicit def ToShowOps[F](v: F)(implicit F0: Show[F]) =
+    new ShowOps[F] { def self = v; implicit def F: Show[F] = F0 }
 
   ////
 
@@ -22,7 +22,7 @@ trait ToShowV  {
 }
 
 trait ShowSyntax[F]  {
-  implicit def ToShowV(v: F)(implicit F0: Show[F]): ShowV[F] = new ShowV[F] { def self = v; implicit def F: Show[F] = F0 }
+  implicit def ToShowOps(v: F)(implicit F0: Show[F]): ShowOps[F] = new ShowOps[F] { def self = v; implicit def F: Show[F] = F0 }
 
   ////
 
