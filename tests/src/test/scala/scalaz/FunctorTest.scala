@@ -11,7 +11,7 @@ class FunctorTest extends Spec {
   }
 
   "map" in {
-    (some(1) ∘ (1+)) must be_===(some(2))
+    (some(1) fmap (1+)) must be_===(some(2))
   }
 
   "strength" in {
