@@ -11,9 +11,6 @@ trait ComposeOps[F[_, _],A, B] extends Ops[F[A, B]] {
   final def ⋘[C](x: F[C, A]): F[C, B] =
     <<<(x)
 
-  final def ∘[C](x: F[C, A]): F[C, B] = 
-    <<<(x)
-
   final def >>>[C](x: F[B, C]): F[A, C] =
     F.compose(x, self)
 
