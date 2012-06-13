@@ -7,7 +7,7 @@ package scalaz
 ////
 trait Show[F]  { self =>
   ////
-  def show(f: F): List[Char]
+  def show(f: F): List[Char] 
   def shows(f: F): String = show(f).mkString
 
   def xmlText(f: F): scala.xml.Text = scala.xml.Text(shows(f))

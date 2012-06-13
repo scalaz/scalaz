@@ -26,6 +26,9 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
+  def trans[N[_]](t: M ~> N)(implicit M: Monad[M], N: Functor[N]): StreamT[N, A] =
+    StreamTHoist.hoist(t).apply(this)
+
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => if (p(a)) Yield(a, as filter p) else Skip(as filter p)
      , skip = as => Skip(as filter p)

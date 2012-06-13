@@ -26,6 +26,13 @@ object Monad {
 
   ////
 
+  /** Performs the action  */
+  def replicateM[F[_], G[_], A](a: F[A], n: Int)(implicit F: Monad[F], G: Traverse[G], P: Pointed[G], M: Monoid[G[F[A]]]): F[G[A]] =
+    G.sequence(Monoid.replicate[G, F[A]](a)(n))
+
+  def replicateM_[F[_], A](a: F[A], n: Int)(implicit F: Monad[F]): F[Unit] =
+    if (n <= 0) F.point(()) else if (n == 1) F.point(a) else F.bind(F.point(a))(_ => replicateM_(a, n - 1))
+
   ////
 }
 

@@ -273,9 +273,9 @@ object IterV {
   /**
    * Iteratee that collects all inputs with the given monoid.
    */
-  def collect[A, F[_]](implicit mon: Monoid[F[A]], pr: Pointed[F]): IterV[A, F[A]] = {
+  def collect[A, F[_]](implicit r: Reducer[A, F[A]]): IterV[A, F[A]] = {
     def step(acc: F[A])(s: Input[A]): IterV[A, F[A]] =
-        s(el = e => Cont(step(acc |+| pr.point(e))),
+        s(el = e => Cont(step(r.cons(acc, pr.point(e)))),
           empty = Cont(step(acc)),
           eof = Done(acc, EOF.apply))
     Cont(step(mzero[F[A]]))
