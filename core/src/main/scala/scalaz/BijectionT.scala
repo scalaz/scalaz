@@ -22,7 +22,7 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
     Kleisli(from(_))
 
   def lens[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): LensT[H, A, B] =
-    LensT(a => FF.map(to(a))(x => Costate(from(_), x)))
+    LensT(a => FF.map(to(a))(x => Store(from(_), x)))
 
   def partial[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): PLensT[H, A, B] =
     lens[H].partial

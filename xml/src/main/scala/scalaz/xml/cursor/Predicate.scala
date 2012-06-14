@@ -64,12 +64,12 @@ trait Predicates {
 object Predicate extends Predicates {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   def predPredicateL[A]: Predicate[A] @> (A => Boolean) =
-    lens(x => costate(x.pred)(b => predicate(b, x.name)))
+    lens(x => store(x.pred)(b => predicate(b, x.name)))
 
   def namePredicateL[A]: Predicate[A] @> Option[List[Char]] =
-    lens(x => costate(x.name)(b => predicate(x.pred, b)))
+    lens(x => store(x.name)(b => predicate(x.pred, b)))
 
 }

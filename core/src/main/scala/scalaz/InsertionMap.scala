@@ -99,7 +99,7 @@ trait InsertionMapFunctions {
     }
 
   def insertionMapL[K, V](k: K): InsertionMap[K, V] @> Option[V] =
-    Lens(q => Costate(_ match {
+    Lens(q => Store(_ match {
       case None => q ^-^ k
       case Some(v) => q ^+^ (k, v)
     }, q get k))

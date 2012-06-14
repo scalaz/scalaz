@@ -229,7 +229,7 @@ trait WriterTFunctions {
     val run = v
   }
 
-  import CostateT._
+  import StoreT._
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)
@@ -245,12 +245,12 @@ trait WriterTFunctions {
 
   def writerWL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, WriterT[F, W, A], W] =
     LensT(x => MF.map(x.run) {
-      case (w, a) => Costate((ww: W) => WriterT(MF.point(ww, a)), w)
+      case (w, a) => Store((ww: W) => WriterT(MF.point(ww, a)), w)
     })
 
   def writerAL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, WriterT[F, W, A], A] =
     LensT(x => MF.map(x.run) {
-      case (w, a) => Costate((aa: A) => WriterT(MF.point(w, aa)), a)
+      case (w, a) => Store((aa: A) => WriterT(MF.point(w, aa)), a)
     })
 
 }

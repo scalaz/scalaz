@@ -1,6 +1,6 @@
 package scalaz
 
-import CostateT._
+import StoreT._
 import Leibniz._
 import Id._
 
@@ -23,22 +23,22 @@ import Id._
  * @tparam B The type of the optional field
  */
 sealed trait PLensT[F[+_], A, B] {
-  def run(a: A): F[Option[Costate[B, A]]]
+  def run(a: A): F[Option[Store[B, A]]]
 
-  def apply(a: A): F[Option[Costate[B, A]]] =
+  def apply(a: A): F[Option[Store[B, A]]] =
     run(a)
 
-  def runO(a: A): OptionT[F, Costate[B, A]] =
+  def runO(a: A): OptionT[F, Store[B, A]] =
     OptionT(run(a))
 
   import StateT._
   import PLensT._
   import BijectionT._
 
-  def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Costate[B, A]] =
-    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Costate[B, A]](runO(_))
+  def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Store[B, A]] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Store[B, A]](runO(_))
 
-  def mapC[C](f: Costate[B, A] => Costate[C, A])(implicit F: Functor[F]): PLensT[F, A, C] =
+  def mapC[C](f: Store[B, A] => Store[C, A])(implicit F: Functor[F]): PLensT[F, A, C] =
     plensT(a => F.map(run(a))(_ map f))
 
   def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): PLensT[F, X, B] =
@@ -178,7 +178,7 @@ sealed trait PLensT[F[+_], A, B] {
         val (ac, a) = x.run
         runO(a) map (y => {
           val (ba, b) = y.run
-          Costate(ac compose ba, b)
+          Store(ac compose ba, b)
         })
       }))
 
@@ -219,33 +219,33 @@ sealed trait PLensT[F[+_], A, B] {
 }
 
 object PLensT extends PLensTFunctions with PLensTInstances {
-  def apply[F[+_], A, B](r: A => F[Option[Costate[B, A]]]): PLensT[F, A, B] =
+  def apply[F[+_], A, B](r: A => F[Option[Store[B, A]]]): PLensT[F, A, B] =
     plensT(r)
 }
 
 trait PLensTFunctions extends PLensTInstances {
 
-  import CostateT._
+  import StoreT._
   import BijectionT._
 
-  def plensT[F[+_], A, B](r: A => F[Option[Costate[B, A]]]): PLensT[F, A, B] = new PLensT[F, A, B] {
-    def run(a: A): F[Option[Costate[B, A]]] = r(a)
+  def plensT[F[+_], A, B](r: A => F[Option[Store[B, A]]]): PLensT[F, A, B] = new PLensT[F, A, B] {
+    def run(a: A): F[Option[Store[B, A]]] = r(a)
   }
 
-  def plensO[F[+_], A, B](r: A => OptionT[F, Costate[B, A]]): PLensT[F, A, B] =
+  def plensO[F[+_], A, B](r: A => OptionT[F, Store[B, A]]): PLensT[F, A, B] =
     plensT(a => r(a).run)
 
-  def plens[A, B](r: A => Option[Costate[B, A]]): PLens[A, B] =
+  def plens[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
     plensT[Id, A, B](r)
 
-  def plensp[F[+_], A, B](r: A => Option[Costate[B, A]])(implicit PF: Pointed[F]): PLensT[F, A, B] =
+  def plensp[F[+_], A, B](r: A => Option[Store[B, A]])(implicit PF: Pointed[F]): PLensT[F, A, B] =
     plensT(a => PF.point(r(a)))
 
   def plensgT[F[+_], A, B](set: A => F[Option[B => A]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensT[F, A, B] =
     plensT(a => M.map2(set(a), get(a))((q, r) => for {
       w <- q
       x <- r
-    } yield Costate(w, x)))
+    } yield Store(w, x)))
 
   def plensgO[F[+_], A, B](set: A => OptionT[F, B => A], get: A => OptionT[F, B])(implicit M: Bind[F]): PLensT[F, A, B] =
     plensgT(a => set(a).run, a => get(a).run)
@@ -270,17 +270,17 @@ trait PLensTFunctions extends PLensTInstances {
     plensp(_ => None)
 
   def somePLens[A]: Option[A] @?> A =
-    plens(_ map (z => Costate(Some(_), z)))
+    plens(_ map (z => Store(Some(_), z)))
 
   def leftPLens[A, B]: Either[A, B] @?> A =
     plens {
-      case Left(a) => Some(Costate(Left(_), a))
+      case Left(a) => Some(Store(Left(_), a))
       case Right(_) => None
     }
 
   def rightPLens[A, B]: Either[A, B] @?> B =
     plens {
-      case Right(b) => Some(Costate(Right(_), b))
+      case Right(b) => Some(Store(Right(_), b))
       case Left(_) => None
     }
 
@@ -317,26 +317,26 @@ trait PLensTFunctions extends PLensTInstances {
   import LazyOption._
 
   def lazySomePLens[A]: LazyOption[A] @?> A =
-    plens(_.fold(z => Some(Costate(lazySome(_), z)), None))
+    plens(_.fold(z => Some(Store(lazySome(_), z)), None))
 
   import LazyEither._
 
   def lazyLeftPLens[A, B]: LazyEither[A, B] @?> A =
-    plens(_.fold(a => Some(Costate(lazyLeft(_), a)), _ => None))
+    plens(_.fold(a => Some(Store(lazyLeft(_), a)), _ => None))
 
   def lazyRightPLens[A, B]: LazyEither[A, B] @?> B =
-    plens(_.fold(_ => None, b => Some(Costate(lazyRight(_), b))))
+    plens(_.fold(_ => None, b => Some(Store(lazyRight(_), b))))
 
   def listHeadPLens[A]: List[A] @?> A =
     plens {
       case Nil => None
-      case h :: t => Some(Costate(_ :: t, h))
+      case h :: t => Some(Store(_ :: t, h))
     }
 
   def listTailPLens[A]: List[A] @?> List[A] =
     plens {
       case Nil => None
-      case h :: t => Some(Costate(h :: _, t))
+      case h :: t => Some(Store(h :: _, t))
     }
 
   def listNthPLens[A](n: Int): List[A] @?> A =
@@ -358,7 +358,7 @@ trait PLensTFunctions extends PLensTInstances {
     plens {
       case Nil => None
       case h :: t => lookupr(Nil, h, t) map {
-        case (l, (k, v), r) => Costate(w => l.reverse ::: (k, w) :: r, v)
+        case (l, (k, v), r) => Store(w => l.reverse ::: (k, w) :: r, v)
       }
     }
   }
@@ -371,24 +371,24 @@ trait PLensTFunctions extends PLensTInstances {
 
   def vectorNthPLens[A](n: Int): Vector[A] @?> A =
     plens(v =>
-      v.lift(n) map (a => Costate(x => v patch (n, Vector(x), 1), a)))
+      v.lift(n) map (a => Store(x => v patch (n, Vector(x), 1), a)))
 
   def vectorLastPLens[A]: Vector[A] @?> A =
     plens(v =>
-      v.lastOption map (a => Costate(x => v patch (v.length - 1, Vector(x), 1), a)))
+      v.lastOption map (a => Store(x => v patch (v.length - 1, Vector(x), 1), a)))
 
   import Stream._
 
   def streamHeadPLens[A]: Stream[A] @?> A =
     plens {
       case Empty => None
-      case h #:: t => Some(Costate(_ #:: t, h))
+      case h #:: t => Some(Store(_ #:: t, h))
     }
 
   def streamTailPLens[A]: Stream[A] @?> Stream[A] =
     plens {
       case Empty => None
-      case h #:: t => Some(Costate(h #:: _, t))
+      case h #:: t => Some(Store(h #:: _, t))
     }
 
   def streamNthPLens[A](n: Int): Stream[A] @?> A =
@@ -410,7 +410,7 @@ trait PLensTFunctions extends PLensTInstances {
     plens {
       case Stream.Empty => None
       case h #:: t => lookupr(Stream.empty, h, t) map {
-        case (l, (k, v), r) => Costate(w => l.reverse #::: (k, w) #:: r, v)
+        case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
       }
     }
   }
@@ -423,7 +423,7 @@ trait PLensTFunctions extends PLensTInstances {
       if(s.isEmpty)
         None
       else
-        Some(Costate(EphemeralStream.cons(_, s.tail()), s.head()))
+        Some(Store(EphemeralStream.cons(_, s.tail()), s.head()))
     )
 
   def ephemeralStreamTailPLens[A]: EphemeralStream[A] @?> EphemeralStream[A] =
@@ -431,7 +431,7 @@ trait PLensTFunctions extends PLensTInstances {
       if(s.isEmpty)
         None
       else
-        Some(Costate(EphemeralStream.cons(s.head(), _), s.tail()))
+        Some(Store(EphemeralStream.cons(s.head(), _), s.tail()))
     )
 
   def ephemeralStreamNthPLens[A](n: Int): EphemeralStream[A] @?> A =
@@ -460,7 +460,7 @@ trait PLensTFunctions extends PLensTInstances {
         None
       else
         lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
-          case (l, (k, v), r) => Costate(w => l.reverse ++ cons((k, w), r), v)
+          case (l, (k, v), r) => Store(w => l.reverse ++ cons((k, w), r), v)
         }
     )
   }
@@ -483,13 +483,13 @@ trait PLensTFunctions extends PLensTInstances {
 
   def scalaJSONObjectPLens[A]: JSONType @?> Map[String, Any] =
     plens {
-      case JSONObject(m) => Some(Costate(JSONObject(_), m))
+      case JSONObject(m) => Some(Store(JSONObject(_), m))
       case _             => None
     }
 
   def scalaJSONArrayPLens[A]: JSONType @?> List[Any] =
     plens {
-      case JSONArray(a) => Some(Costate(JSONArray(_), a))
+      case JSONArray(a) => Some(Store(JSONArray(_), a))
       case _            => None
     }
 }
@@ -517,11 +517,11 @@ trait PLensTInstances extends PLensTInstance0 {
         (
           PLensT(x => F.map(a run x)(_ map (c => {
             val (p, q) = c.pos
-            Costate(a => c.put((a, q)): S, p)
+            Store(a => c.put((a, q)): S, p)
           })))
           , PLensT(x => F.map(a run x)(_ map (c => {
           val (p, q) = c.pos
-          Costate(a => c.put((p, a)): S, q)
+          Store(a => c.put((p, a)): S, q)
         })))
           )
     }
