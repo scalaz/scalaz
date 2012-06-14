@@ -68,15 +68,15 @@ trait CDatas {
 object CData extends CDatas {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val verbatimCDataL: CData @> CDataKind =
-    lens(x => costate(x.verbatim)(b => cdata(b, x.data, x.line)))
+    lens(x => store(x.verbatim)(b => cdata(b, x.data, x.line)))
 
   val dataCDataL: CData @> Str =
-    lens(x => costate(x.data)(b => cdata(x.verbatim, b, x.line)))
+    lens(x => store(x.data)(b => cdata(x.verbatim, b, x.line)))
 
   val lineCDataL: CData @> Option[Line] =
-    lens(x => costate(x.line)(b => cdata(x.verbatim, x.data, b)))
+    lens(x => store(x.line)(b => cdata(x.verbatim, x.data, b)))
 
 }

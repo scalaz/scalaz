@@ -128,11 +128,9 @@ package object scalaz {
     }
   }
 
-  type Costate[A, B] = CostateT[Id, A, B]
-  // Costate is also known as Store
-  type Store[A, B] = Costate[A, B]
+  type Store[A, B] = StoreT[Id, A, B]
   // flipped
-  type |-->[A, B] = Costate[B, A]
+  type |-->[A, B] = Store[B, A]
 
   type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Identity, R, W, S, A]
 
@@ -163,7 +161,7 @@ package object scalaz {
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object Lens extends LensTFunctions with LensTInstances {
-    def apply[A, B](r: A => Costate[B, A]): Lens[A, B] =
+    def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
   }
 
@@ -173,7 +171,7 @@ package object scalaz {
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object PLens extends PLensTFunctions with PLensTInstances {
-    def apply[A, B](r: A => Option[Costate[B, A]]): PLens[A, B] =
+    def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
   }
 

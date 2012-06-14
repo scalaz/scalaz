@@ -171,12 +171,12 @@ trait NSInfos {
 object NSInfo extends NSInfos {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val prefixesNSInfoL: NSInfo @> List[(Str, Str)] =
-    lens(x => costate(x.prefixes)(b => nsInfo(b, x.uri)))
+    lens(x => store(x.prefixes)(b => nsInfo(b, x.uri)))
 
   val uriNSInfoL: NSInfo @> Option[Str] =
-    lens(x => costate(x.uri)(b => nsInfo(x.prefixes, b)))
+    lens(x => store(x.uri)(b => nsInfo(x.prefixes, b)))
 
 }

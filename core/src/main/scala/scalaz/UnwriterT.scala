@@ -140,7 +140,7 @@ trait UnwriterTFunctions {
     val run = v
   }
 
-  import CostateT._
+  import StoreT._
 
   def unwriter[W, A](v: (W, A)): Unwriter[W, A] =
     unwriterT[Id, W, A](v)
@@ -156,12 +156,12 @@ trait UnwriterTFunctions {
 
   def unwriterUL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, UnwriterT[F, W, A], W] =
     LensT(x => MF.map(x.run) {
-      case (w, a) => Costate((ww: W) => UnwriterT(MF.point(ww, a)), w)
+      case (w, a) => Store((ww: W) => UnwriterT(MF.point(ww, a)), w)
     })
 
   def unwriterAL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, UnwriterT[F, W, A], A] =
     LensT(x => MF.map(x.run) {
-      case (w, a) => Costate((aa: A) => UnwriterT(MF.point(w, aa)), a)
+      case (w, a) => Store((aa: A) => UnwriterT(MF.point(w, aa)), a)
     })
 
 }
