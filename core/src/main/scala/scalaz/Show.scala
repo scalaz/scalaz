@@ -33,6 +33,10 @@ object Show {
     def show(a: A): List[Char] = f(a)
   }
 
+  def shows[A](f: A => String): Show[A] = new Show[A] {
+    def show(a: A): List[Char] = f(a).toList
+  }
+
   implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
     def contramap[A, B](r: Show[A])(f: (B) => A): Show[B] = new Show[B] {
       def show(b: B): List[Char] = r.show(f(b))
