@@ -98,7 +98,7 @@ object Zero {
 
   // Not implicit to ensure implicitly[Zero[NodeSeq]].zero === NodeSeqZero.zero
   def ElemZero: Zero[Elem] = new Zero[Elem] {
-    val zero = new Elem(null, null, scala.xml.Null, xml.TopScope, Nil: _*)
+    val zero = new Elem(null, null, scala.xml.Null, xml.TopScope)
   }
 
   implicit def ZipStreamZero[A]: Zero[ZipStream[A]] = zero(zip(Stream.Empty))
