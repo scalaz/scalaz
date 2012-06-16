@@ -131,6 +131,10 @@ package object scalaz {
   type Store[A, B] = StoreT[Id, A, B]
   // flipped
   type |-->[A, B] = Store[B, A]
+  object Store {
+    def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
+  }
+
 
   type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Identity, R, W, S, A]
 
