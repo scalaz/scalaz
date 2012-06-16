@@ -4,7 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
-//import com.jsuereth.pgp.GpgPlugin._
+import com.jsuereth.pgp.sbtplugin.PgpPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
