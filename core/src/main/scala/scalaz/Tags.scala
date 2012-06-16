@@ -16,6 +16,16 @@ object Tags {
 
   def Last[A](a: A): A @@ Last = Tag[A, Last](a)
 
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the lesser of two operands */
+  sealed trait Min
+
+  def Min[A](a: A): A @@ Min = Tag[A, Min](a)
+
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the greater of two operands */
+  sealed trait Max
+
+  def Max[A](a: A): A @@ Max = Tag[A, Max](a)
+
   /** Type tag to choose a [[scalaz.Monoid]] instance for a numeric type that performs multiplication,
    *  rather than the default monoid for these types which by convention performs addition. */
   sealed trait Multiplication

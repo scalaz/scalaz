@@ -26,6 +26,9 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
+  def trans[N[_]](t: M ~> N)(implicit M: Monad[M], N: Functor[N]): StreamT[N, A] =
+    StreamTHoist.hoist(t).apply(this)
+
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => if (p(a)) Yield(a, as filter p) else Skip(as filter p)
      , skip = as => Skip(as filter p)
@@ -201,7 +204,7 @@ object StreamT extends StreamTInstances {
 
   def runStreamT[S,A](stream : StreamT[({type λ[X] = State[S,X]})#λ,A], s0: S): StreamT[Id,A] =
     StreamT[Id,A]({
-      val (sa, s1) = stream.step(s0)
+      val (s1, sa) = stream.step(s0)
       sa((a, as) => Yield(a, runStreamT(as, s1)),
          as => Skip(runStreamT(as, s1)),
          Done)

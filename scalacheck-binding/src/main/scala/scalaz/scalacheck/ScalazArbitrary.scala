@@ -173,7 +173,7 @@ object ScalazArbitrary {
   implicit def lazyOptionTArb[F[_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
     Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
 
-  implicit def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(A, S)]]): Arbitrary[StateT[F, S, A]] =
+  implicit def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
   implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[Either[A, B]]]): Arbitrary[EitherT[F, A, B]] =
@@ -195,10 +195,15 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
+  implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
+    import std.list._
+    Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
+  }
+
   implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
     Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
 
-  implicit def costateTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[CostateT[F, A, B]] = Functor[Arbitrary].map(A)(CostateT(_))
+  implicit def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = Functor[Arbitrary].map(A)(StoreT(_))
 
   implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 

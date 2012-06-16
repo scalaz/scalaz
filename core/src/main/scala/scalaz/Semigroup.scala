@@ -62,6 +62,14 @@ object Semigroup {
     def append(f1: A, f2: => A): A = f2
   }
 
+  def minSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
+    def append(f1: A, f2: => A): A = o.min(f1, f2)
+  }
+
+  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
+    def append(f1: A, f2: => A): A = o.max(f1, f2)
+  }
+
   def repeat[F[_], A](a: A)(implicit F: Pointed[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), repeat[F, A](a))
 

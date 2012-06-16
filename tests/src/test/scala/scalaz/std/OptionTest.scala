@@ -5,6 +5,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
+import org.scalacheck.Prop._
 
 class OptionTest extends Spec {
 
@@ -20,6 +21,9 @@ class OptionTest extends Spec {
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
   checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
   checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
+
+  "None is less than anything else" in {
+    check { forAll { x: Option[Int] => Order[Option[Int]].greaterThanOrEqual(x, None) }}}
 
   object instances {
     def equal[A: Equal] = Equal[Option[A]]

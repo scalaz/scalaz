@@ -6,7 +6,7 @@ sealed trait ReaderWriterStateT[F[+_], -R, +W, S, +A] {
 
   def state(r: R)(implicit F: Functor[F]): StateT[F, S, A] =
     StateT((s: S) => F.map(run(r, s)) {
-      case (w, a, s1) => (a, s1)
+      case (w, a, s1) => (s1, a)
     })
 
   def map[B, RR <: R, WW >: W](f: A => B)(implicit F: Functor[F]): ReaderWriterStateT[F, RR, WW, S, B] = new ReaderWriterStateT[F, RR, WW, S, B] {

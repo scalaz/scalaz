@@ -91,6 +91,11 @@ class FingerTreeTest extends Specification with ScalaCheck {
     }
 
   }
+
+  "OrdSeq is ordered" in { check {
+    forAll { xs: List[Int] => OrdSeq(xs:_*).toList == xs.sorted }
+  }}
+
   // TODO reinstate
 //  "viewl works correctly" ! check {(tree: SequenceTree[Int]) =>
 //    val asStream = tree.toStream

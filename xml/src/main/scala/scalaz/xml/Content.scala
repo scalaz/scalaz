@@ -169,18 +169,18 @@ trait Contents {
 object Content extends Contents {
 
   import PLens._
-  import CostateT._
+  import StoreT._
 
   val elemContentPL: Content @?> Element =
-    plens(_.elem map (e => costate(e)(elem(_))))
+    plens(_.elem map (e => store(e)(elem(_))))
 
   val textContentPL: Content @?> CData =
-    plens(_.text map (c => costate(c)(text(_))))
+    plens(_.text map (c => store(c)(text(_))))
 
   val crefContentPL: Content @?> Str =
-    plens(_.cref map (e => costate(e)(cref(_))))
+    plens(_.cref map (e => store(e)(cref(_))))
 
   val commentContentPL: Content @?> Str =
-    plens(_.comment map (e => costate(e)(comment(_))))
+    plens(_.comment map (e => store(e)(comment(_))))
 
 }
