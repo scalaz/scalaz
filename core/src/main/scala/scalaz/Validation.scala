@@ -365,7 +365,13 @@ trait ValidationInstances extends ValidationInstances0 {
     def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
   }
 
-  // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
+  /**
+   * An alternative type class instance for Validation, treating it as a right-biased Either with fail-fast
+   * semantics. Intentionally non-implicit, as accidental use of this could be dangerous when you are after
+   * `Applicative[[a]Validation[E, A]]` for some `Semigroup[E]` for which errors are accumulated.
+   *
+   * This is a convenience to avoid converting to and from `Either`.
+   */
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
