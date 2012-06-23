@@ -11,24 +11,23 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   import Kleisli._
 
-  def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
+  /** alias for `andThen` */
+  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k(_)))
+
+  def andThen[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >=> k
+
+  def >==>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >=> kleisli(k)
+
+  def andThenK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >==> k
 
   /** alias for `compose` */ 
   def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
-  def andThen[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] =
-    k >=> this
-
-  /** alias for `andThen` */
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = kleisli((a: A) => b.bind(this(a))(k(_)))
-
-  def composeK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >==>(k)
-
-  def >==>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(kleisli(k))
-
-  def andThenK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = <==<(k)
+  def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
   def <==<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = kleisli(k) >=> this
+
+  def composeK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = this <==< k
 
   def traverse[F[_], AA <: A, BB >: B](f: F[AA])(implicit M: Applicative[M], F: Traverse[F]): M[F[BB]] =
     F.traverse(f)(Kleisli.this(_))
