@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait LazyEither[A, B] {
+sealed trait LazyEither[+A, +B] {
 
   import LazyOption._
   import LazyEither._
@@ -26,7 +26,7 @@ sealed trait LazyEither[A, B] {
   def toEither: Either[A, B] =
     fold(Left(_), Right(_))
 
-  def getOrElse(default: => B): B =
+  def getOrElse[BB >: B](default: => BB): BB =
     fold(_ => default, z => z)
 
   def exists(f: (=> B) => Boolean): Boolean =
@@ -35,7 +35,7 @@ sealed trait LazyEither[A, B] {
   def forall(f: (=> B) => Boolean): Boolean =
     fold(_ => true, f)
 
-  def orElse(x: => LazyEither[A, B]): LazyEither[A, B] =
+  def orElse[AA >: A, BB >: B](x: => LazyEither[AA, BB]): LazyEither[AA, BB] =
     ?(x, this)
 
   def toLazyOption: LazyOption[B] =
@@ -59,10 +59,10 @@ sealed trait LazyEither[A, B] {
   def foreach(f: (=> B) => Unit): Unit =
     fold(_ => (), f)
 
-  def flatMap[C](f: (=> B) => LazyEither[A, C]): LazyEither[A, C] =
+  def flatMap[AA >: A, C](f: (=> B) => LazyEither[AA, C]): LazyEither[AA, C] =
     fold(lazyLeft(_), f)
 
-  def traverse[G[_]: Applicative, C](f: (B) => G[C]): G[LazyEither[A, C]] =
+  def traverse[G[_]: Applicative, AA >: A, C](f: (B) => G[C]): G[LazyEither[AA, C]] =
     fold(
       left = x => Applicative[G].point(LazyEither.lazyLeft[C](x)),
       right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
@@ -71,7 +71,7 @@ sealed trait LazyEither[A, B] {
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
     fold(left = _ => z, right = a => f(a, z))
 
-  def ap[C](f: => LazyEither[A, B => C]): LazyEither[A, C] =
+  def ap[AA >: A, C](f: => LazyEither[AA, B => C]): LazyEither[AA, C] =
     f flatMap (k => map(k apply _))
 
   def left = new LeftProjection[A, B]() {
@@ -86,12 +86,12 @@ private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
 object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
-  sealed trait LeftProjection[A, B] {
+  sealed trait LeftProjection[+A, +B] {
     def e: LazyEither[A, B]
 
     import LazyOption._
 
-    def getOrElse(default: => A): A =
+    def getOrElse[AA >: A](default: => AA): AA =
       e.fold(z => z, _ => default)
 
     def exists(f: (=> A) => Boolean): Boolean =
@@ -100,7 +100,7 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
     def forall(f: (=> A) => Boolean): Boolean =
       e.fold(f, _ => true)
 
-    def orElse(x: => LazyEither[A, B]): LazyEither[A, B] =
+    def orElse[AA >: A, BB >: B](x: => LazyEither[AA, BB]): LazyEither[AA, BB] =
       e.?(e, x)
 
     def toLazyOption: LazyOption[A] =
@@ -121,7 +121,7 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
     def foreach(f: (=> A) => Unit): Unit =
       e.fold(f, _ => ())
 
-    def flatMap[C](f: (=> A) => LazyEither[C, B]): LazyEither[C, B] =
+    def flatMap[BB >: B, C](f: (=> A) => LazyEither[C, BB]): LazyEither[C, BB] =
       e.fold(f, lazyRight(_))
   }
 
