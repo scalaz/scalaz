@@ -60,12 +60,12 @@ sealed trait IterV[E, A] {
 }
 
 /** Monadic Iteratees */
-sealed trait IterVM[M[_], E, A] {
+sealed trait IterVM[M[+_], E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 
-case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) {
+case class Iteratee[M[+_], E, A](value: M[IterVM[M, E, A]]) {
   import IterV._
 
   def apply(es: StreamT[M, E])(implicit M: Monad[M]): M[A] = for {
@@ -163,22 +163,22 @@ object IterV {
 
   /** A monadic computation that has finished */
   object DoneM {
-    def apply[M[_], E, A](a: => A, i: => Input[E]): IterVM[M, E, A] = new IterVM[M, E, A] {
+    def apply[M[+_], E, A](a: => A, i: => Input[E]): IterVM[M, E, A] = new IterVM[M, E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = done(a, i)
     }
-    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[(A, Input[E])] =
+    def unapply[M[+_], E, A](r: IterVM[M, E, A]): Option[(A, Input[E])] =
       r.fold[Option[(A, Input[E])]](
         done = (a, i) => Some((a, i)),
         cont = f => None)
   }
 
   object ContM {
-    def apply[M[_], E, A](f: Input[E] => Iteratee[M, E, A]): IterVM[M, E, A] = new IterVM[M, E, A] {
+    def apply[M[+_], E, A](f: Input[E] => Iteratee[M, E, A]): IterVM[M, E, A] = new IterVM[M, E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = cont(f)
     }
-    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[Input[E] => Iteratee[M, E, A]] =
+    def unapply[M[+_], E, A](r: IterVM[M, E, A]): Option[Input[E] => Iteratee[M, E, A]] =
       r.fold[Option[Input[E] => Iteratee[M, E, A]]](
         done = (a, i) => None,
         cont = f => Some(f))
