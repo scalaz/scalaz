@@ -3,7 +3,7 @@ package syntax
 
 trait StateV[A] extends Ops[A] {
   def state[S]: State[S, A] = State.state(self)
-  def stateT[F[+_]:Pointed, S]: StateT[F, S, A] = StateT.stateT[F, A, S](self)
+  def stateT[F[+_]:Pointed, S]: StateT[F, S, A] = StateT.stateT[F, S, A](self)
 }
 
 trait ToStateOps {
