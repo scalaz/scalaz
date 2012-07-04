@@ -147,8 +147,7 @@ object ScalazBuild extends Build {
     // SBT's built in '%%' is not flexible enough. When we build with a snapshot version of the compiler,
     // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
     def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
-      case "2.10.0-SNAPSHOT" | "2.10.0-M1" => "2.9.0-1"
-      case "2.9.1" => "2.9.0-1"
+      case "2.10.0-SNAPSHOT" | "2.10.0-M4" => "2.9.2"
       case x => x
     }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
@@ -158,9 +157,15 @@ object ScalazBuild extends Build {
         case "2.8.1" => "1.8"
         case _ => "1.9"
       }
-      "org.scala-tools.testing" % "scalacheck_%s".format(scalaVersion) % version
+      "org.scalacheck" % "scalacheck_%s".format(scalaVersion) % version
     }
-    def Specs(scalaVersion: String) = "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % "1.6.8" % "test"
+    def Specs(scalaVersion: String) = {
+      val version = scalaVersion match {
+        case "2.8.1" | "2.8.2" | "2.9.0-1" => "1.6.8"
+        case _ => "1.6.9"
+      }
+      "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % version % "test"
+    }
   }
 
   val dependencyScalaVersionTranslator = SettingKey[(String => String)]("dependency-scala-version-translator", "Function to translate the current scala version to the version used for dependency resolution")
@@ -172,7 +177,10 @@ object ScalazBuild extends Build {
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.8.1", "2.10.0-M4"),
     crossVersion := CrossVersion.full,
-    resolvers    += ScalaToolsSnapshots,
+    resolvers    ++= Seq(
+      "snapshotsResolver" at "http://oss.sonatype.org/content/repositories/snapshots",
+      "releasesResolver"  at "http://oss.sonatype.org/content/repositories/releases"
+    ),
 
     dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
     dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
