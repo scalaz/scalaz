@@ -17,7 +17,7 @@ sealed trait IterV[E, A] {
   def run: A = {
     def runCont(i: IterV[E, A]) = i.fold(done = (x, _) => Some(x), cont = _ => None)
     fold(done = (x, _) => x,
-          cont = k => runCont(k(EOF[E])).getOrElse(sys.error("Diverging iteratee!")))
+          cont = k => runCont(k(EOF[E])).getOrElse(error_("Diverging iteratee!")))
   }
   def drop1First: IterV[E, A] = drop(1) flatMap (_ => this)
   def feed(e: Input[E]): IterV[E, A] = fold((_, _) => this, k => k(e))
@@ -68,7 +68,7 @@ case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[Ite
                 k => p match {
                   case Some((h, t)) => k(El(h))(t)
                   case None => k(EOF[E]).value.map(
-                    _.fold((a, e) => a, _ => sys.error("Diverging Iteratee")))
+                    _.fold((a, e) => a, _ => error_("Diverging Iteratee")))
                 })
   } yield v
 
@@ -98,7 +98,7 @@ case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) extends NewType[M[Ite
       v <- value
       t <- v.fold(done = (x, _) => Some(x).pure[M],
                   cont = k => runCont(k(EOF[E])))
-    } yield t.getOrElse(sys.error("Diverging iteratee!"))
+    } yield t.getOrElse(error_("Diverging iteratee!"))
   }
 }
 
