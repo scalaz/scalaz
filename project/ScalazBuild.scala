@@ -195,7 +195,7 @@ object ScalazBuild extends Build {
       (IMPLEMENTATION_VENDOR, "The Scalaz Project"),
       (SEALED, "true"))
     ),
-    useGpg := true
+    useGpg := true,
     useGpgAgent := false,
     publishSetting,
     publishArtifact in Test := false,
