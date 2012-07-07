@@ -45,21 +45,22 @@ object MVarUsage extends App {
   }
 
   def pingpong() {
-    def pong(mvar: MVar[String]) =
+    def pong(c: MVar[String], p: MVar[String]) =
       for {
-        _ <- mvar.take flatMap putStrLn
-        _ <- mvar.put("pong")
-        _ <- mvar.take flatMap putStrLn
-        _ <- mvar.put("pong")
+        _ <- c.take flatMap (s => putStrLn("c: " + s))
+        _ <- p.put("pong")
+        _ <- c.take flatMap (s => putStrLn("c: " + s))
+        _ <- p.put("pong")
       } yield ()
 
     def io = 
       for {
-        mvar <- newMVar("ping")
-        _    <- forkIO(pong(mvar))
-        _    <- mvar.take flatMap putStrLn
-        _    <- mvar.put("ping")
-        _    <- mvar.take flatMap putStrLn
+        c <- newMVar("ping")
+        p <- newEmptyMVar[String]
+        _ <- forkIO(pong(c, p))
+        _ <- p.take flatMap (s => putStrLn("p: " + s))
+        _ <- c.put("ping")
+        _ <- p.take flatMap (s => putStrLn("p: " + s))
       } yield ()
     io.unsafePerformIO
   }

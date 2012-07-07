@@ -7,29 +7,22 @@ import effect._
 import IO._
 import concurrent._
 import Chan._
+import std.anyVal._
+import syntax.equal._
 
 object ChanUsage extends App {
   def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f unsafePerformIO); () }
 
   def calc(chan: Chan[Int], a: Int) = 
-    for {
-      _ <- putStrLn("summing 1 to " + a)
-      val s = (1 to a).sum
-      _ <- putStrLn("done summing 1 to " + a)
-      _ <- chan.write(s)
-      _ <- putStrLn("wrote sum")
-    } yield ()
+    chan.write((1 to a).sum)
 
   val io =
     for {
       chan <- newChan[Int]
       _ <- forkIO(calc(chan, 100))
       _ <- forkIO(calc(chan, 200))
-      _ <- putStrLn("reading first result")
       a <- chan.read
-      _ <- putStrLn("reading second result")
       b <- chan.read
-      _ <- putStrLn("total: " + (a + b))
-    } yield ()
-  io.unsafePerformIO
+    } yield a + b
+  assert(io.unsafePerformIO === 25150)
 }

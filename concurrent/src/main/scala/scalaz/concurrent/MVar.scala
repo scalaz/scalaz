@@ -43,12 +43,13 @@ trait MVarFunctions {
 }
 
 private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch, writeLatch: PhasedLatch) extends MVar[A] {
-  def take = read(None, for {
-    a <- value.getAndSet(None)
-    _ <- writeLatch.release()
+  def take = read(
+    for {
+      a <- value.getAndSet(None)
+      _ <- writeLatch.release()
     } yield a
   )
-      
+     
   def put(a: => A) = write(a, value.get)
       
 //  def tryTake =
@@ -56,18 +57,21 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
 //   
 //  def tryPut(a: Promise[A]) = value.get.map(_ => false)
       
-  def read(init: Option[A], reader: => IO[Option[A]]) = {
-    def read_(r: Option[A]): IO[A] = readLatch.currentPhase flatMap { p =>
-      r match {
-        case Some(a) => IO(a)
-        case None => 
-          for {
-            _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
-            a <- reader flatMap read_    // someone has put a value so now we try to read it
-          } yield a
-      }
-    }
-    read_(init)
+  def read(reader: => IO[Option[A]]) = {
+    def read_ : IO[A] = 
+      for {
+        p <- readLatch.currentPhase
+        r <- reader
+        a <- r match {
+          case Some(a) => IO(a)
+          case None => 
+            for {
+              _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
+              a <- read_    // someone has put a value so now we try to read it
+            } yield a
+        }
+      } yield a
+    read_
   }
       
   def write(a: => A, read: => IO[Option[A]]): IO[Unit] = writeLatch.currentPhase flatMap { p =>

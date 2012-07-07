@@ -32,9 +32,9 @@ sealed trait PhasedLatch {
 object PhasedLatch extends PhasedLatches
 
 trait PhasedLatches {
-  import Ordering._
   private[this] lazy val phaseOrder = Order.order[Int] { (a, b) =>
-    (a - b) match {
+    import Ordering._
+    (b - a) match {
       case 0 => EQ
       case x if x > 0 => GT
       case y if y < 0 => LT
@@ -49,15 +49,14 @@ trait PhasedLatches {
     val sync = new AbstractQueuedSynchronizer {
       def currentPhase = getState
   
-      
       override def tryAcquireShared(waitingFor: Int) =
-        if (phaseOrder.lessThan(waitingFor, currentPhase)) 1
+        if (phaseOrder.lessThan(currentPhase, waitingFor)) 1
         else -1
   
       @annotation.tailrec
       override def tryReleaseShared(ignore: Int) = {
-        val state = getState
-        if (compareAndSetState(state, state + 1)) true
+        val phase = currentPhase
+        if (compareAndSetState(phase, phase + 1)) true
         else tryReleaseShared(ignore)
       }
     }
