@@ -65,6 +65,8 @@ trait Syntaxes {
 
   object unzip extends ToUnzipOps
 
+  object sorter extends ToSorterOps
+
   //
   // Type classes over * * -> *
   //
@@ -122,7 +124,7 @@ trait ToTypeClassOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToPointedOps with ToContravariantOps with ToCopointedOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
-  with ToBifoldableOps with ToCozipOps
+  with ToBifoldableOps with ToCozipOps with ToSorterOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps
