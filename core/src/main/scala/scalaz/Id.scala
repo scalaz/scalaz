@@ -13,8 +13,8 @@ trait IdInstances {
   // TODO Review!
   type Identity[+X] = Need[X]
 
-  val id: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
-    new Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+  val id: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip2[Id] =
+    new Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip2[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
@@ -27,7 +27,7 @@ trait IdInstances {
 
       def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
 
-      def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
+      def cozip[A, B](a: Id[A \/ B]): (A \/ B) = a
 
       def traverseImpl[G[_] : Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
 

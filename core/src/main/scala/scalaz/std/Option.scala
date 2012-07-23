@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with ApplicativePlus[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with ApplicativePlus[Option] with Cozip2[Option] with Zip[Option] with Unzip[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -30,12 +30,12 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
-    def cozip[A, B](a: Option[Either[A, B]]) =
+    def cozip[A, B](a: Option[A \/ B]) =
       a match {
-        case None => Left(None)
+        case None => -\/(None)
         case Some(e) => e match {
-          case Left(a) => Left(Some(a))
-          case Right(b) => Right(Some(b))
+          case -\/(a) => -\/(Some(a))
+          case \/-(b) => \/-(Some(b))
         }
       }
     def zip[A, B](a: => Option[A], b: => Option[B]) =

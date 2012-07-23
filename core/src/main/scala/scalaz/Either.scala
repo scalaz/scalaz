@@ -210,7 +210,7 @@ trait Instances1_\/ extends Instances2_\/ {
 }
 
 trait Instances2_\/ extends Instances3_\/ {
-  implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
+  implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip2[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip2[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
@@ -229,12 +229,12 @@ trait Instances2_\/ extends Instances3_\/ {
         case \/-(a) => f(a, z)
       }
 
-    def cozip[A, B](x: L \/ Either[A, B]) =
+    def cozip[A, B](x: L \/ (A \/ B)) =
       x match {
-        case -\/(l) => Left(-\/(l))
+        case -\/(l) => -\/(-\/(l))
         case \/-(e) => e match {
-          case Left(a) => Left(\/-(a))
-          case Right(b) => Right(\/-(b))
+          case -\/(a) => -\/(\/-(a))
+          case \/-(b) => \/-(\/-(b))
         }
       }
   }
@@ -451,7 +451,7 @@ trait Instances1_\\/ extends Instances2_\\/ {
 }
 
 trait Instances2_\\/ extends  Instances3_\\/ {
-  implicit def Instances1_\\/[L]: Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip[({type l[a] = a \\/ L})#l] = new Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip[({type l[a] = a \\/ L})#l] {
+  implicit def Instances1_\\/[L]: Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip2[({type l[a] = a \\/ L})#l] = new Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip2[({type l[a] = a \\/ L})#l] {
     def bind[A, B](fa: A \\/ L)(f: A => B \\/ L) =
       fa flatMap f
 
@@ -464,12 +464,12 @@ trait Instances2_\\/ extends  Instances3_\\/ {
         case \/-(b) => Applicative[G].point(\/-(b).left)
       }
 
-    def cozip[A, B](x: Either[A, B] \\/ L): Either[A \\/ L, B \\/ L] =
+    def cozip[A, B](x: (A \/ B) \\/ L): ((A \\/ L) \/ (B \\/ L)) =
       x.right match {
-        case \/-(l) => Right(\/-(l).left)
+        case \/-(l) => \/-(\/-(l).left)
         case -\/(e) => e match {
-          case Left(a) => Left(-\/(a).left)
-          case Right(b) => Right(-\/(b).left)
+          case -\/(a) => -\/(-\/(a).left)
+          case \/-(b) => \/-(-\/(b).left)
         }
       }
 

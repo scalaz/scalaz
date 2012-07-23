@@ -129,7 +129,7 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
 // TODO more instances
 trait LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] {
+  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip2[({type λ[α]=LazyEither[E, α]})#λ] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: (A) => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
@@ -145,12 +145,12 @@ trait LazyEitherInstances {
     def point[A](a: => A): LazyEither[E, A] =
       LazyEither.lazyRight(a)
 
-    def cozip[A, B](a: LazyEither[E, Either[A, B]]) =
+    def cozip[A, B](a: LazyEither[E, A \/ B]) =
       a.fold(
-        e => Left(LazyEither.lazyLeft(e))
+        e => -\/(LazyEither.lazyLeft(e))
       , {
-          case Left(a) => Left(LazyEither.lazyRight(a))
-          case Right(b) => Right(LazyEither.lazyRight(b))
+          case -\/(a) => -\/(LazyEither.lazyRight(a))
+          case \/-(b) => \/-(LazyEither.lazyRight(b))
         }
       )
   }
