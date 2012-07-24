@@ -117,7 +117,7 @@ object build extends Build {
       name := "scalaz-concurrent",
       typeClasses := TypeClass.concurrent
     ),
-    dependencies = Seq(core)
+    dependencies = Seq(core, effect)
   )
 
   lazy val effect = Project(
