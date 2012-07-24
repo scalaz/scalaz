@@ -54,10 +54,10 @@ sealed trait Validation[+E, +A] {
     case Failure(e) => Failure(e)
   }
 
-  /** Convert to a `scala.Either`. `Success` is converted to `scala.Right`, and `Failure` to `scala.Left`. */
-  def either: Either[E, A] = this match {
-    case Success(a) => Right(a)
-    case Failure(e) => Left(e)
+  /** Convert to a `scalaz.\/`. `Success` is converted to `scalaz.\/-`, and `Failure` to `scalaz.-\/`. */
+  def either: (E \/ A) = this match {
+    case Success(a) => \/-(a)
+    case Failure(e) => -\/(e)
   }
 
   def isSuccess: Boolean = this match {
@@ -405,7 +405,7 @@ trait ValidationFunctions {
 
   def failure[E, A](e: E): Validation[E, A] = Failure(e)
 
-  def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
+  def fromEither[E, A](e: (E \/ A)): Validation[E, A] =
     e.fold(e => Failure(e), a => Success(a))
 
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {

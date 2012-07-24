@@ -5,7 +5,7 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   import LazyEither._
   import LazyEitherT._
-  import EitherT.{LeftProjectionT => _, _}
+  import EitherT._
   import OptionT._
   import LazyOptionT._
 
@@ -20,9 +20,6 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   def swap(implicit F: Functor[F]): F[LazyEither[B, A]] =
     F.map(run)(_.swap)
-
-  def toEither(implicit F: Functor[F]): EitherT[F, A, B] =
-    eitherT(F.map(run)(_.toEither))
 
   def getOrElse[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
     F.map(run)(_ getOrElse default)
