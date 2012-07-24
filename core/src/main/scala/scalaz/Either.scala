@@ -1,6 +1,20 @@
 package scalaz
 
 sealed trait \/[+A, +B] {
+  sealed trait Switching_\/[X] {
+    def r: X
+    def <<?:(left: => X): X =
+      \/.this match {
+        case -\/(_) => left
+        case \/-(_) => r
+      }
+  }
+
+  def :?>>[X](right: => X): Switching_\/[X] =
+    new Switching_\/[X] {
+      def r = right
+    }
+
   def isLeft: Boolean =
     this match {
       case -\/(_) => true
@@ -25,13 +39,14 @@ sealed trait \/[+A, +B] {
       case \/-(b) => -\/(b)
     }
 
-  def left: (A \\/ B) =
-    new (A \\/ B) {
-      val right = \/.this
-    }
+  def unary_~ : (B \/ A) =
+    swap
 
-  def unary_- : (A \\/ B) =
-    left
+  def swapped[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
+    k(swap).swap
+
+  def ~[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
+    swapped(k)
 
   def bimap[C, D](f: A => C, g: B => D): (C \/ D) =
     this match {
@@ -61,6 +76,12 @@ sealed trait \/[+A, +B] {
     this match {
       case -\/(a) => -\/(a)
       case \/-(b) => g(b)
+    }
+
+  def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
+    this match {
+      case -\/(_) => z
+      case \/-(a) => f(a, z)
     }
 
   def filter[BB >: B](p: BB => Boolean)(implicit M: Monoid[BB]): (A \/ BB) =
@@ -217,17 +238,11 @@ trait Instances2_\/ extends Instances3_\/ {
     def point[A](a: => A) =
       \/-(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: L \/ A)(f: (A) => G[B]) =
-      fa match {
-        case -\/(x)  => Applicative[G].point(-\/(x))
-        case \/-(x) => Applicative[G].map(f(x))(\/-(_))
-      }
+    def traverseImpl[G[+_] : Applicative, A, B](fa: L \/ A)(f: (A) => G[B]) =
+      fa.traverse(f)
 
     override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
-      fa match {
-        case -\/(_) => z
-        case \/-(a) => f(a, z)
-      }
+      fa.foldRight(z)(f)
 
     def cozip[A, B](x: L \/ (A \/ B)) =
       x match {
@@ -246,247 +261,8 @@ trait Instances3_\/ {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
+    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
-      fab match {
-        case -\/(a) => Functor[G].map(f(a))(-\/(_))
-        case \/-(b) => Functor[G].map(g(b))(\/-(_))
-      }
+      fab.bitraverse(f, g)
   }
 }
-
-sealed trait \\/[+A, +B] {
-  val right: A \/ B
-
-  def unary_+ : A \/ B=
-    right
-
-  def isLeft: Boolean =
-    right.isLeft
-
-  def isRight: Boolean =
-    right.isRight
-
-  def fold[X](l: A => X, r: B => X): X =
-    right.fold(l, r)
-
-  def swap: (B \\/ A) =
-    right.swap.left
-
-  def left: (A \\/ B) =
-    this
-
-  def unary_- : (A \\/ B) =
-    left
-
-  def bimap[C, D](f: A => C, g: B => D): (C \\/ D) =
-    right.bimap(f, g).left
-
-  def bitraverse[F[_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \\/ D] =
-    right match {
-      case -\/(a) => Functor[F].map(f(a))(-\/(_).left)
-      case \/-(b) => Functor[F].map(g(b))(\/-(_).left)
-    }
-
-  def map[C](f: A => C): (C \\/ B) =
-    bimap(f, identity)
-
-  def traverse[F[+_]: Applicative, C](f: A => F[C]): F[C \\/ B] =
-    right match {
-      case -\/(a) => Functor[F].map(f(a))(-\/(_).left)
-      case \/-(b) => Applicative[F].point(\/-(b).left)
-    }
-
-  def foreach(f: A => Unit): Unit =
-    right.bimap(f, _ => ())
-
-  def flatMap[BB >: B, C](f: A => (C \\/ BB)): (C \\/ BB) =
-    right match {
-      case -\/(a) => f(a)
-      case \/-(b) => \/-(b).left
-    }
-
-  def filter[AA >: A](p: AA => Boolean)(implicit M: Monoid[AA]): (AA \\/ B) =
-    (right match {
-      case -\/(a) => -\/(if(p(a)) a else M.zero)
-      case \/-(b) => \/-(b)
-    }).left
-
-  def exists[AA >: A](p: AA => Boolean): Boolean =
-    right match {
-      case -\/(a) => p(a)
-      case \/-(_) => false
-    }
-
-  def forall[AA >: A](p: AA => Boolean): Boolean =
-    right match {
-      case -\/(a) => p(a)
-      case \/-(_) => true
-    }
-
-  def toList: List[A] =
-    right match {
-      case -\/(a) => List(a)
-      case \/-(_) => Nil
-    }
-
-  def toStream: Stream[A] =
-    right match {
-      case -\/(a) => Stream(a)
-      case \/-(_) => Stream()
-    }
-
-  def toOption: Option[A] =
-    right match {
-      case -\/(a) => Some(a)
-      case \/-(_) => None
-    }
-
-  def toEither: Either.LeftProjection[A, B] =
-    (right match {
-      case -\/(a) => Left(a)
-      case \/-(b) => Right(b)
-    }).left
-
-  def getOrElse[AA >: A](x: => AA): AA =
-    toOption getOrElse x
-
-  def ?[AA >: A](x: => AA): AA =
-    getOrElse(x)
-
-  def valueOr[AA >: A](x: B => AA): AA =
-    right match {
-      case -\/(a) => a
-      case \/-(b) => x(b)
-    }
-
-  def orElse[AA >: A, BB >: B](x: => AA \\/ BB): AA \\/ BB =
-    right match {
-      case -\/(_) => this
-      case \/-(_) => x
-    }
-
-  def |||[AA >: A, BB >: B](x: => AA \\/ BB): AA \\/ BB =
-    orElse(x)
-
-  def ++[AA >: A, BB >: B](x: => AA \\/ BB)(implicit M: Semigroup[AA]): AA \\/ BB =
-    right match {
-      case \/-(_) => this
-      case -\/(a1) => {
-        val xx = x
-        xx.right match {
-          case \/-(_) => xx
-          case -\/(a2) => -\/(M.append(a1, a2)).left
-        }
-      }
-    }
-
-  def ===[AA >: A, BB >: B](x: AA \\/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
-    right === x.right
-
-  def compare[AA >: A, BB >: B](x: AA \\/ BB)(implicit EA: Order[AA], EB: Order[BB]): Ordering =
-    right match {
-      case -\/(a1) => x.right match {
-        case -\/(a2) => Order[AA].apply(a1, a2)
-        case \/-(_) => Ordering.GT
-      }
-      case \/-(b1) => x.right match {
-        case \/-(b2) => Order[BB].apply(b1, b2)
-        case -\/(_) => Ordering.LT
-      }
-    }
-  
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): List[Char] =
-    right match {
-      case -\/(a) => List('-', '\\', '\\', '/', '(') ::: SA.show(a) ::: List(')')
-      case \/-(b) => List('\\', '\\', '/', '-', '(') ::: SB.show(b) ::: List(')')
-    }
-}
-
-object \\/ extends Instances_\\/
-
-object \\/- {
-  def apply[B](b: B): B \\/ Nothing =
-    \\/-(b).left
-}
-
-object -\\/ {
-  def apply[A](a: A): Nothing \\/ A =
-    -\\/(a).left
-}
-
-trait Instances_\\/ extends Instances0_\\/
-
-trait Instances0_\\/ extends Instances1_\/ {
-  implicit def Order_\\/[A: Order, B: Order]: Order[A \\/ B] =
-    new Order[A \\/ B] {
-      def order(a1: A \\/ B, a2: A \\/ B) =
-        a1 compare a2
-    }
-
-  implicit def Monoid_\\/[A: Monoid, B: Semigroup]: Monoid[A \\/ B] =
-    new Monoid[A \\/ B] {
-      def append(a1: A \\/ B, a2: => A \\/ B) =
-        a1 ++ a2
-      def zero =
-        -\/(Monoid[A].zero).left
-    }
-}
-
-trait Instances1_\\/ extends Instances2_\\/ {
-  implicit def Equal_\\/[A: Equal, B: Equal]: Equal[A \\/ B] =
-    new Equal[A \\/ B] {
-      def equal(a1: A \\/ B, a2: A \\/ B) =
-        a1 === a2
-    }
-
-  implicit def Show_\\/[A: Show, B: Show]: Show[A \\/ B] =
-    Show.show(_.show)
-
-  implicit def Semigroup_\\/[A: Semigroup, B]: Semigroup[A \\/ B] =
-    new Semigroup[A \\/ B] {
-      def append(a1: A \\/ B, a2: => A \\/ B) =
-        a1 ++ a2
-    }
-}
-
-trait Instances2_\\/ extends  Instances3_\\/ {
-  implicit def Instances1_\\/[L]: Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip2[({type l[a] = a \\/ L})#l] = new Traverse[({type l[a] = a \\/ L})#l] with Monad[({type l[a] = a \\/ L})#l] with Cozip2[({type l[a] = a \\/ L})#l] {
-    def bind[A, B](fa: A \\/ L)(f: A => B \\/ L) =
-      fa flatMap f
-
-    def point[A](a: => A) =
-      -\/(a).left
-
-    def traverseImpl[G[_] : Applicative, A, B](fa: A \\/ L)(f: A => G[B]) =
-      fa.right match {
-        case -\/(a) => Functor[G].map(f(a))(-\/(_).left)
-        case \/-(b) => Applicative[G].point(\/-(b).left)
-      }
-
-    def cozip[A, B](x: (A \/ B) \\/ L): ((A \\/ L) \/ (B \\/ L)) =
-      x.right match {
-        case \/-(l) => \/-(\/-(l).left)
-        case -\/(e) => e match {
-          case -\/(a) => -\/(-\/(a).left)
-          case \/-(b) => \/-(-\/(b).left)
-        }
-      }
-
-  }
-
-}
-
-trait Instances3_\\/ {
-  implicit def Instances0_\\/ : Bitraverse[\\/] = new Bitraverse[\\/] {
-    override def bimap[A, B, C, D](fab: A \\/ B)
-                                  (f: A => C, g: B => D) = fab bimap (f, g)
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \\/ B)
-                                                  (f: A => G[C], g: B => G[D]) =
-      fab.right match {
-        case -\/(a) => Functor[G].map(f(a))(-\/(_).left)
-        case \/-(b) => Functor[G].map(g(b))(\/-(_).left)
-      }
-  }
-}
-
