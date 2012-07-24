@@ -15,9 +15,6 @@ object ScalazArbitrary {
   import Arbitrary._
   import Gen._
   import ScalaCheckBinding._
-  import syntax.std.boolean._
-  import std.java.util.concurrent.callable._
-  import syntax.functor._
 
   // todo report and/or work around compilation error: "scalaz is not an enclosing class"
   // implicit def ShowPretty[A: Show](a: A): Pretty = Pretty { _ => a.show }
@@ -149,10 +146,10 @@ object ScalazArbitrary {
 
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Pointed[Callable].point(x))
 
-  import concurrent.Promise
-  import concurrent.Promise._
+  import scalaz.concurrent.Promise
+  import scalaz.concurrent.Promise._
 
-  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => promise(x))
+  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
   import Zipper._
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =

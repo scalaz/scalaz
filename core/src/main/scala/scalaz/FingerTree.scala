@@ -1029,7 +1029,7 @@ trait FingerTreeFunctions {
         else
           rope(
             self.viewr.fold(
-              single(chunk),
+              single(chunk)(sizer),
               (_, last) =>
                 if (last.length + chunk.length <= baseChunkLength)
                   self :-| (last ++ chunk)
@@ -1045,7 +1045,7 @@ trait FingerTreeFunctions {
         else
           rope(
             self.viewl.fold(
-              single(chunk),
+              single(chunk)(sizer),
               (head, _) =>
                 if (chunk.length + head.length <= baseChunkLength)
                   (chunk ++ head) |-: self

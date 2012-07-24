@@ -4,7 +4,6 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
-// import com.jsuereth.pgp.sbtplugin.PgpPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -13,8 +12,9 @@ object build extends Build {
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.0-M4"),
+    crossScalaVersions := Seq("2.9.2", "2.10.0-M5"),
     crossVersion := CrossVersion.full,
+    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
@@ -182,7 +182,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full
     )
   )
 
@@ -193,8 +193,8 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" % "specs2_2.9.1" % "1.6.1" % "test",
-        "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9" % "test"
+        "org.specs2" %% "specs2" % "1.11" % "test" cross CrossVersion.full,
+        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test" cross CrossVersion.full
       )
     )
   )
