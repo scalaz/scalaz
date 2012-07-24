@@ -231,7 +231,7 @@ trait Instances1_\/ extends Instances2_\/ {
 }
 
 trait Instances2_\/ extends Instances3_\/ {
-  implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip2[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip2[({type l[a] = L \/ a})#l] {
+  implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 

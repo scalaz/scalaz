@@ -125,7 +125,7 @@ sealed trait EitherT[F[+_], +A, +B] {
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[List[Char]] =
     F.map(run)(_.show[AA, BB])
 
-  def cozip(implicit Z: Cozip2[F]): (F[A] \/ F[B]) =
+  def cozip(implicit Z: Cozip[F]): (F[A] \/ F[B]) =
     Z.cozip(run)
 }
 
