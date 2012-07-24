@@ -8,7 +8,7 @@ import Project.Setting
 object build extends Build {
   type Sett = Project.Setting[_]
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.2",
