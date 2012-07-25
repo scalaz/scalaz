@@ -266,7 +266,7 @@ Usage: $script_name [options]
   .sbtopts      if file is in sbt root, it is prepended to the args given to **sbt**
   -Dkey=val     pass -Dkey=val directly to the jvm
   -J-X          pass option -X directly to the jvm (-J is stripped)
-  -S-X          add -X to sbt's scalacOptions (-J is stripped)
+  -S-X          add -X to sbt's scalacOptions (-S is stripped)
 
 In the case of duplicated or conflicting options, the order above
 shows precedence: JAVA_OPTS lowest, command line options highest.
