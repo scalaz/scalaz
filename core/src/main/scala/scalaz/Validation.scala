@@ -34,31 +34,20 @@ sealed trait Validation[+E, +A] {
 
   import Validation._
 
-  def fold[X](failure: E => X, success: A => X): X = this match {
-    case Success(x) => success(x)
-    case Failure(x) => failure(x)
+  sealed trait SwitchingValidation[X] {
+    def s: X
+    def <<?:(fail: => X): X =
+      Validation.this match {
+        case Failure(_) => fail
+        case Success(_) => s
+      }
   }
 
-  def map[B](f: A => B): Validation[E, B] = this match {
-    case Success(a) => Success(f(a))
-    case Failure(e) => Failure(e)
-  }
-
-  def foreach[U](f: A => U): Unit = this match {
-    case Success(a) => f(a)
-    case Failure(e) =>
-  }
-
-  def flatMap[B, EE >: E](f: A => Validation[EE, B]): Validation[EE, B] = this match {
-    case Success(a) => f(a)
-    case Failure(e) => Failure(e)
-  }
-
-  /** Convert to a `scalaz.\/`. `Success` is converted to `scalaz.\/-`, and `Failure` to `scalaz.-\/`. */
-  def either: (E \/ A) = this match {
-    case Success(a) => \/-(a)
-    case Failure(e) => -\/(e)
-  }
+  /** If this validation is success, return the given X value, otherwise, return the X value given to the return value. */
+  def :?>>[X](success: => X): SwitchingValidation[X] =
+    new SwitchingValidation[X] {
+      def s = success
+    }
 
   def isSuccess: Boolean = this match {
     case Success(_) => true
@@ -67,10 +56,123 @@ sealed trait Validation[+E, +A] {
 
   def isFailure: Boolean = !isSuccess
 
-  /** Returns the contents of this validation, in an `Some`, if it is a `Success`, otherwise `None` */
-  def toOption: Option[A] = this match {
-    case Success(a) => Some(a)
-    case Failure(_) => None
+  def fold[X](failure: E => X, success: A => X): X = this match {
+    case Success(x) => success(x)
+    case Failure(x) => failure(x)
+  }
+
+  /** Flip the faikure/success values in this validation. Alias for `swap` */
+  def swap: Validation[A, E] =
+    this match {
+      case Failure(a) => Success(a)
+      case Success(b) => Failure(b)
+    }
+
+  /** Flip the faikure/success values in this validation. Alias for `unary_~` */
+  def unary_~ : Validation[A, E] =
+    swap
+
+  /** Run the given function on this swapped value. Alias for `~` */
+  def swapped[EE >: E, AA >: A](k: Validation[A, E] => Validation[AA, EE]): Validation[EE, AA] =
+    k(swap).swap
+
+  /** Run the given function on this swapped value. Alias for `swapped` */
+  def ~[EE >: E, AA >: A](k: Validation[A, E] => Validation[AA, EE]): Validation[EE, AA] =
+    swapped(k)
+
+  /** Binary functor map on this validation. */
+  def bimap[C, D](f: E => C, g: A => D): Validation[C, D] =
+    this match {
+      case Failure(a) => Failure(f(a))
+      case Success(b) => Success(g(b))
+    }
+
+  /** Binary functor traverse on this validation. */
+  def bitraverse[G[+_] : Applicative, C, D](f: (E) => G[C], g: (A) => G[D]): G[Validation[C, D]] = this match {
+    case Failure(a) => Applicative[G].map(f(a))(Failure(_))
+    case Success(b) => Applicative[G].map(g(b))(Success(_))
+  }
+
+  /** Map on the success of this disjunction. */
+  def map[B](f: A => B): Validation[E, B] = this match {
+    case Success(a) => Success(f(a))
+    case Failure(e) => Failure(e)
+  }
+
+  def traverse[G[+_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
+    case Success(a) => Applicative[G].map(f(a))(Success(_))
+    case Failure(e) => Applicative[G].point(Failure(e))
+  }
+
+  def foreach[U](f: A => U): Unit = this match {
+    case Success(a) => f(a)
+    case Failure(e) =>
+  }
+
+  /** Apply a function in the environment of the success of this validation, accumulating errors. */
+  def ap[B, EE >: E](f: => Validation[EE, A => B])(implicit E: Semigroup[EE]): Validation[EE, B] = (this, f) match {
+    case (Success(a), Success(f))   => Success(f(a))
+    case (Failure(e), Success(_))   => Failure(e)
+    case (Success(f), Failure(e))   => Failure(e)
+    case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
+  }
+
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Success(a) => f(a, z)
+    case Failure(e) => z
+  }
+
+  /** Filter on the success of this validation. */
+  def filter[AA >: A](p: AA => Boolean)(implicit M: Monoid[AA]): Validation[E, AA] =
+    this match {
+      case Failure(a) => Failure(a)
+      case Success(b) => Success(if(p(b)) b else M.zero)
+    }
+
+  def exists(f: A => Boolean): Boolean = this match {
+    case Success(a) => f(a)
+    case Failure(_) => false
+  }
+
+  def forall(f: A => Boolean): Boolean = this match {
+    case Success(a) => f(a)
+    case Failure(_) => true
+  }
+
+  /** Return an empty list or list with one element on the success of this validation. */
+  def toList: List[A] =
+    this match {
+      case Failure(_) => Nil
+      case Success(b) => List(b)
+    }
+
+  /** Return an empty stream or stream with one element on the success of this validation. */
+  def toStream: Stream[A] =
+    this match {
+      case Failure(_) => Stream()
+      case Success(b) => Stream(b)
+    }
+
+  /** Return an empty option or option with one element on the success of this validation. Useful to sweep errors under the carpet. */
+  def toOption: Option[A] =
+    this match {
+      case Failure(_) => None
+      case Success(b) => Some(b)
+    }
+
+  /** Convert to a core `scala.Either` at your own peril. */
+  def toEither: Either[E, A] =
+    this match {
+      case Success(a) => Right(a)
+      case Failure(e) => Left(e)
+    }
+
+
+
+  /** Convert to a `scalaz.\/`. `Success` is converted to `scalaz.\/-`, and `Failure` to `scalaz.-\/`. */
+  def either: (E \/ A) = this match {
+    case Success(a) => \/-(a)
+    case Failure(e) => -\/(e)
   }
 
   /** If `this` and `that` are both `Success`, or both a `Failure`, combine them with the provided `Semigroup. Otherwise, return the `Success`. */
@@ -125,47 +227,23 @@ sealed trait Validation[+E, +A] {
   /** An alias for `getOrElse` */
   def |[AA >: A](f: => AA): AA = getOrElse(f)
 
-  def exists(f: A => Boolean): Boolean = this match {
-    case Success(a) => f(a)
-    case Failure(_) => false
-  }
-
-  def forall(f: A => Boolean): Boolean = this match {
-    case Success(a) => f(a)
-    case Failure(_) => true
-  }
-
-  def traverse[G[_] : Applicative, B, EE >: E](f: A => G[B]): G[Validation[EE, B]] = this match {
-    case Success(a) => Applicative[G].map(f(a))(Success(_))
-    case Failure(e) => Applicative[G].point(Failure(e))
-  }
-
-  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
-    case Success(a) => f(a, z)
-    case Failure(e) => z
-  }
-
-  def ap[B, EE >: E](f: => Validation[EE, A => B])(implicit E: Semigroup[EE]): Validation[EE, B] = (this, f) match {
-    case (Success(a), Success(f))   => Success(f(a))
-    case (Failure(e), Success(_))   => Failure(e)
-    case (Success(f), Failure(e))   => Failure(e)
-    case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
-  }
-
-  def bimap[C, D](f: (E) => C, g: (A) => D): Validation[C, D] = this match {
-    case Failure(a) => Failure(f(a))
-    case Success(b) => Success(g(b))
-  }
-
-  def bitraverse[G[_] : Applicative, C, D](f: (E) => G[C], g: (A) => G[D]): G[Validation[C, D]] = this match {
-    case Failure(a) => Applicative[G].map(f(a))(Failure(_))
-    case Success(b) => Applicative[G].map(g(b))(Success(_))
-  }
-
   def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
     case succ @ Success(a) => if (f(a)) succ else Failure(onFailure)
     case failure => failure
   }
+
+
+  /** Convert to a disjunction. */
+  def disjunction: (E \/ A) =
+    this match {
+      case Success(a) => \/-(a)
+      case Failure(e) => -\/(e)
+    }
+
+  /** Run a disjunction function and back to validation again. */
+  def disjunctioned[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
+    k(disjunction).validation
+
 }
 
 final case class Success[E, A](a: A) extends Validation[E, A]
@@ -251,17 +329,6 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
     }
   }
 
-  /** Intentionally non-implicit */
-  def failProjectionMonad[E] = {
-    type F[a] = FailProjection[E, a]
-    type G[a] = Validation[E, a]
-
-    new IsomorphismPointed[F, G] with IsomorphismTraverse[F, G] with IsomorphismMonad[F, G] {
-      def iso = FailProjectionEIso2[E]
-      implicit def G = Validation.validationMonad
-    }
-  }
-
   implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailProjection[E, A]] = new IsomorphismSemigroup[FailProjection[E, A], Validation[E, A]] {
     def iso = FailProjectionIso
     implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
@@ -344,7 +411,7 @@ trait ValidationInstances extends ValidationInstances0 {
     with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
+    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
 
     override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
@@ -358,28 +425,11 @@ trait ValidationInstances extends ValidationInstances0 {
   implicit def validationBitraverse = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
+    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
   }
 
   implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
     def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
-  }
-
-  /**
-   * An alternative type class instance for Validation, treating it as a right-biased Either with fail-fast
-   * semantics. Intentionally non-implicit, as accidental use of this could be dangerous when you are after
-   * `Applicative[[a]Validation[E, A]]` for some `Semigroup[E]` for which errors are accumulated.
-   *
-   * This is a convenience to avoid converting to and from `Either`.
-   */
-  def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
-    def point[A](a: => A): Validation[E, A] = Success(a)
-
-    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
-
-    override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-
-    def bind[A, B](fa: Validation[E, A])(f: A => Validation[E, B]): Validation[E, B] = fa flatMap f
   }
 
   implicit def validationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
