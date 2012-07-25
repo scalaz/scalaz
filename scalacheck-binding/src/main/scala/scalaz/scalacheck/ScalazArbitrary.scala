@@ -83,8 +83,8 @@ object ScalazArbitrary {
   import Validation._
   implicit def Arbitrary_\/[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
-      case Left(a) => -\/(a)
-      case Right(b) => \/-(b)
+      case Left(a) => \/.left(a)
+      case Right(b) => \/.right(b)
     }
 
   implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =

@@ -187,10 +187,16 @@ sealed trait \/[+A, +B] {
     }
 
 }
-case class -\/[+A](a: A) extends (A \/ Nothing)
-case class \/-[+B](b: B) extends (Nothing \/ B)
+private case class -\/[+A](a: A) extends (A \/ Nothing)
+private case class \/-[+B](b: B) extends (Nothing \/ B)
 
-object \/ extends Instances_\/
+object \/ extends Instances_\/ {
+  def left[A, B](a: A): A \/ B =
+    -\/(a)
+
+  def right[A, B](b: B): A \/ B =
+    \/-(b)
+}
 
 trait Instances_\/ extends Instances0_\/ {
   type GlorifiedTuple[+A, +B] =
