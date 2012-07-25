@@ -96,7 +96,7 @@ sealed trait EitherT[F[+_], +A, +B] {
   def getOrElse[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
     F.map(run)(_ getOrElse default)
 
-  def ?[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
+  def |[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
     getOrElse(default)
 
   def valueOr[BB >: B](x: A => BB)(implicit F: Functor[F]): F[BB] =
