@@ -166,15 +166,18 @@ sealed trait \/[+A, +B] {
       case \/-(b) => b
     }
 
+  /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
     this match {
       case -\/(_) => x
       case \/-(_) => this
     }
 
+  /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
   def |||[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
     orElse(x)
 
+  /** Return the first right or they are both right, sum them and return that right. */
   def ++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M: Semigroup[BB]): AA \/ BB =
     this match {
       case -\/(_) => this
@@ -184,6 +187,7 @@ sealed trait \/[+A, +B] {
       }
     }
 
+  /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: AA \/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
     this match {
       case -\/(a1) => x match {
@@ -196,6 +200,7 @@ sealed trait \/[+A, +B] {
       }
     }
 
+  /** Compare two disjunction values for ordering. */
   def compare[AA >: A, BB >: B](x: AA \/ BB)(implicit EA: Order[AA], EB: Order[BB]): Ordering =
     this match {
       case -\/(a1) => x match {
@@ -208,6 +213,7 @@ sealed trait \/[+A, +B] {
       }
     }
 
+  /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): List[Char] = 
     this match {
       case -\/(a) => List('-', '\\', '/', '(') ::: SA.show(a) ::: List(')')
@@ -219,14 +225,17 @@ private case class -\/[+A](a: A) extends (A \/ Nothing)
 private case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends Instances_\/ {
+  /** Construct a left disjunction value. */
   def left[A, B](a: A): A \/ B =
     -\/(a)
 
+  /** Construct a right disjunction value. */
   def right[A, B](b: B): A \/ B =
     \/-(b)
 }
 
 trait Instances_\/ extends Instances0_\/ {
+  /** Turns out that Either is just a glorified tuple; who knew? */
   type GlorifiedTuple[+A, +B] =
   A \/ B
 }
