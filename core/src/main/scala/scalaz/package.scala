@@ -70,7 +70,7 @@
  *  - [[scalaz.StateT]] Computations that modify state.
  *  - [[scalaz.WriterT]] Computations that log a value
  *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
- *  - [[scalaz.EitherT]] Represents computations of type `F[Either[A, B]]`
+ *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
   import Id._

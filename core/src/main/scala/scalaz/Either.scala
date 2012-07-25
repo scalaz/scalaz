@@ -1,5 +1,8 @@
 package scalaz
 
+/**
+ * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias
+ */
 sealed trait \/[+A, +B] {
   sealed trait Switching_\/[X] {
     def r: X
