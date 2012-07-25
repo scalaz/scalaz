@@ -210,9 +210,6 @@ object ScalazArbitrary {
 
   implicit def listTArb[F[+_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
-  implicit def validationTArb[F[+_], A, B](implicit FA: Arbitrary[F[Validation[A, B]]]): Arbitrary[ValidationT[F, A, B]] =
-    Functor[Arbitrary].map(FA)(ValidationT[F, A, B](_))
-
   implicit def streamTArb[F[+_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Pointed[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
   
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
