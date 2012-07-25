@@ -23,10 +23,10 @@ trait Functor[F[_]]  { self =>
 
   def void[A](fa: F[A]): F[Unit] = map(fa)(_ => ())
 
-  def counzip[A, B](a: Either[F[A], F[B]]): F[Either[A, B]] =
+  def counzip[A, B](a: F[A] \/ F[B]): F[(A \/ B)] =
     a match {
-      case Left(x) => map(x)(Left(_))
-      case Right(x) => map(x)(Right(_))
+      case -\/(x) => map(x)(-\/(_))
+      case \/-(x) => map(x)(\/-(_))
     }
 
 //  def counzipT[A, B](a: Either[F[A], F[B]]): EitherT[F, A, B] =
