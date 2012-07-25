@@ -288,9 +288,10 @@ paths are exercised).
 To maintain the OSGi metadata, the OsgiKeys.* settings should be updated appropriately as new packages are created or existing packages
 are removed or renamed.  Further, care should be taken to ensure each package is wholly contained by a single JAR.
 
-If a new project is added, the exported packages must be defined by declaring an OsgiKeys.exportedPackages setting:
+If a new project is added, the exported packages must be defined by declaring an OsgiKeys.exportedPackages setting, typically via
+the osgiExport method:
 
-    OsgiKeys.exportPackage := Seq("scalaz.newproject.*;version=${Bundle-Version}")
+    osgiExport("scalaz.newproject")
 
 
 ## How can I help?
