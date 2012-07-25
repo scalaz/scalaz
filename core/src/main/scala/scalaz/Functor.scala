@@ -29,9 +29,6 @@ trait Functor[F[_]]  { self =>
       case \/-(x) => map(x)(\/-(_))
     }
 
-//  def counzipT[A, B](a: Either[F[A], F[B]]): EitherT[F, A, B] =
-//    EitherT(counzip(a))
-
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
   def compose[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
     implicit def F = self

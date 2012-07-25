@@ -81,7 +81,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
 
   import Validation._
-  implicit def Arbitrary_\/[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
+  implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => \/.left(a)
       case Right(b) => \/.right(b)

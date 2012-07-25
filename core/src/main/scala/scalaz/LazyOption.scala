@@ -39,11 +39,11 @@ sealed trait LazyOption[+A] {
   def toLazyLeft[X](right: => X): LazyEither[A, X] =
     fold(lazyLeft(_), lazyRight(right))
 
-  def toRight[X](left: => X): Either[X, A] =
-    fold(Right(_), Left(left))
+  def toRight[X](left: => X): (X \/ A) =
+    fold(\/-(_), -\/(left))
 
-  def toLeft[X](right: => X): Either[A, X] =
-    fold(Left(_), Right(right))
+  def toLeft[X](right: => X): (A \/ X) =
+    fold(-\/(_), \/-(right))
 
   def toList: List[A] =
     fold(List(_), Nil)

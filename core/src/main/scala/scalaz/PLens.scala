@@ -261,7 +261,7 @@ trait PLensTFunctions extends PLensTInstances {
   def trivialPLens[F[+_], A](implicit FF: Pointed[F]): PLensT[F, A, Unit] =
     LensT.trivialLens[F, A].partial
 
-  /** A lens that discards the choice of Right or Left from Either */
+  /** A lens that discards the choice of right or left from disjunction */
   def codiagPLens[F[+_]: Pointed, A]: PLensT[F, A \/ A, A] =
     plensId[F, A] ||| plensId[F, A]
 

@@ -234,7 +234,7 @@ trait LensTFunctions {
   def trivialLens[F[+_], A](implicit P: Pointed[F]): LensT[F, A, Unit] =
     lensp[F, A, Unit](a => Store(_ => a, ()))
 
-  /** A lens that discards the choice of Right or Left from Either */
+  /** A lens that discards the choice of right or left from disjunction */
   def codiagLens[F[+_]: Pointed, A]: LensT[F, A \/ A, A] =
     lensId[F, A] ||| lensId[F, A]
 
