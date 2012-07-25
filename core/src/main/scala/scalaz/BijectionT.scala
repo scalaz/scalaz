@@ -40,8 +40,8 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
     bimap[C, Tuple2, D](g)
 
-  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[Either[A, C], Either[B, D]] =
-    bimap[C, Either, D](g)
+  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[A \/ C, B \/ D] =
+    bimap[C, \/, D](g)
 
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
