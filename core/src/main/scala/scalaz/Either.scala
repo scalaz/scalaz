@@ -224,6 +224,17 @@ sealed trait \/[+A, +B] {
       case \/-(b) => List('\\', '/', '-', '(') ::: SB.show(b) ::: List(')')
     }
 
+  /** Convert to a validation. */
+  def validation: Validation[A, B] =
+    this match {
+      case -\/(a) => Failure(a)
+      case \/-(b) => Success(b)
+    }
+
+  /** Run a validation function and back to disjunction again. */
+  def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
+    k(validation).either
+
 }
 private case class -\/[+A](a: A) extends (A \/ Nothing)
 private case class \/-[+B](b: B) extends (Nothing \/ B)

@@ -158,6 +158,15 @@ sealed trait EitherT[F[+_], +A, +B] {
   /** Cozip this disjunction on its functor. */
   def cozip(implicit Z: Cozip[F]): (F[A] \/ F[B]) =
     Z.cozip(run)
+
+  /** Convert to a validation. */
+  def validation(implicit F: Functor[F]): F[Validation[A, B]] =
+    F.map(run)(_.validation)
+
+  /** Run a validation function and back to disjunction again. */
+  def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
+    EitherT(F.map(run)(_ validationed k))
+
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
