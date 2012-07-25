@@ -9,9 +9,8 @@ import com.typesafe.sbtosgi.OsgiPlugin._
 object build extends Build {
   type Sett = Project.Setting[_]
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
-    version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0-M5"),
     crossVersion := CrossVersion.full,
@@ -126,7 +125,7 @@ object build extends Build {
       OsgiKeys.exportPackage := Seq("scalaz.concurrent.*;version=${Bundle-Version}"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
-    dependencies = Seq(core)
+    dependencies = Seq(core, effect)
   )
 
   lazy val effect = Project(
