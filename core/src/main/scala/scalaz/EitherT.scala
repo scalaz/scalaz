@@ -24,84 +24,109 @@ sealed trait EitherT[F[+_], +A, +B] {
       }
   }
 
+  /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](right: => X): Switching_\/[X] =
     new Switching_\/[X] {
       def r = right
     }
 
+  /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isLeft)
 
+  /** Return `true` if this disjunction is right. */
   def isRight(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isRight)
 
+  /** Flip the left/right values in this disjunction. Alias for `swap` */
   def swap(implicit F: Functor[F]): EitherT[F, B, A] =
     EitherT(F.map(run)(_.swap))
 
+  /** Flip the left/right values in this disjunction. Alias for `unary_~` */
   def unary_~(implicit F: Functor[F]): EitherT[F, B, A] =
     swap
 
+  /** Run the given function on this swapped value. Alias for `~` */
   def swapped[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ swapped k))
 
+  /** Run the given function on this swapped value. Alias for `swapped` */
   def ~[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
     swapped(k)
 
+  /** Binary functor map on this disjunction. */
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): EitherT[F, C, D] =
     EitherT(F.map(run)(_.bimap(f, g)))
 
+  /** Binary functor traverse on this disjunction. */
   def bitraverse[G[_], C, D](f: (A) => G[C], g: (B) => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
     Applicative[G].map(F.traverse(run)(Bitraverse[\/].bitraverseF(f, g)))(EitherT(_: F[C \/ D]))
 
+  /** Map on the right of this disjunction. */
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
     EitherT(F.map(run)(_.map(f)))
 
+  /** Traverse on the right of this disjunction. */
   def traverse[G[_], AA >: A, C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (AA \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
+  /** Run the side-effect on the right of this disjunction. */
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
     F.each(run)(_ foreach f)
 
+  /** Apply a function in the environment of the right of this disjunction. */
   def ap[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
     EitherT(F.map2(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
 
+  /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, C](f: B => EitherT[F, AA, C])(implicit F: Monad[F]): EitherT[F, AA, C] =
     EitherT(F.bind(run)(_.fold(a => F.point(-\/(a): (AA \/ C)), b => f(b).run)))
 
-  def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z = {
+  /** Fold on the right of this disjunction. */
+  def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
-  }
 
+  /** Filter on the right of this disjunction. */
   def filter[BB >: B](p: BB => Boolean)(implicit M: Monoid[BB], F: Functor[F]): EitherT[F, A, BB] =
     EitherT(F.map(run)(_ filter p))
 
+  /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_ exists f)
 
+  /** Return `true` if this disjunction is a left value or the right value satisfies the given predicate. */
   def forall(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_ forall f)
 
+  /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.fold(_ => Nil, List(_)))
 
+  /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
     F.map(run)((_: (A \/ B)).fold(_ => Stream(), Stream(_)))
 
+  /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
     optionT[F](F.map(run)((_: (A \/ B)).toOption))
 
+  /** Convert to a core `scala.Either` at your own peril. */
   def toEither(implicit F: Functor[F]): F[Either[A, B]] =
     F.map(run)(_.toEither)
 
+  /** Return the right value of this disjunction or the given default if left. Alias for `|` */
   def getOrElse[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
     F.map(run)(_ getOrElse default)
 
+  /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
     getOrElse(default)
 
+  /** Return the right value of this disjunction or run the given function on the left. */
   def valueOr[BB >: B](x: A => BB)(implicit F: Functor[F]): F[BB] =
     F.map(run)(_ valueOr x)
 
+  /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] = {
     val g = run
     EitherT(F.bind(g) {
@@ -110,28 +135,43 @@ sealed trait EitherT[F[+_], +A, +B] {
     })
   }
 
+  /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
   def |||[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] =
     |||(x)
 
+  /** Return the first right or they are both right, sum them and return that right. */
   def ++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M: Semigroup[BB], F: Apply[F]): EitherT[F, AA, BB] =
     EitherT(F.map2(run, x.run)(_ ++ _))
 
+  /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
     F.map2(run, x.run)(_ == _)
 
+  /** Compare two disjunction values for ordering. */
   def compare[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Order[AA], EB: Order[BB], F: Apply[F]): F[Ordering] =
     F.map2(run, x.run)(_ compare _)
 
+  /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[List[Char]] =
     F.map(run)(_.show[AA, BB])
 
+  /** Cozip this disjunction on its functor. */
   def cozip(implicit Z: Cozip[F]): (F[A] \/ F[B]) =
     Z.cozip(run)
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
+  /** Construct a disjunction value. */
   def apply[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] =
     eitherT[F, A, B](a)
+
+  /** Construct a left disjunction value. */
+  def left[F[+_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
+    apply(F.map(a)(\/.left(_)))
+
+  /** Construct a right disjunction value. */
+  def right[F[+_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
+    apply(F.map(b)(\/.right(_)))
 }
 
 trait EitherTInstances4 {

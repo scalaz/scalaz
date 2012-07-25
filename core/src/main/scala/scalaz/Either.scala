@@ -19,14 +19,14 @@ sealed trait \/[+A, +B] {
       def r = right
     }
 
-  /** Return `true` if this disjunctionis left. */
+  /** Return `true` if this disjunction is left. */
   def isLeft: Boolean =
     this match {
       case -\/(_) => true
       case \/-(_) => false
     }
 
-  /** Return `true` if this disjunctionis right. */
+  /** Return `true` if this disjunction is right. */
   def isRight: Boolean =
     this match {
       case -\/(_) => false
@@ -87,6 +87,10 @@ sealed trait \/[+A, +B] {
   /** Run the side-effect on the right of this disjunction. */
   def foreach(g: B => Unit): Unit =
     bimap(_ => (), g)
+
+  /** Apply a function in the environment of the right of this disjunction. */
+  def ap[AA >: A, C](f: => AA \/ (B => C)): (AA \/ C) =
+    f flatMap (ff => map(ff(_)))
 
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
