@@ -7,7 +7,7 @@ object UnapplyInference extends App {
   def eitherTBifunctor() {
     import scalaz._, Scalaz._
 
-    val either: Either[Int, Int] = Right(1)
+    val either: (Int \/ Int) = \/-(1)
     val eitherT = EitherT(some(either))
 
     println((eitherT :-> (_ - 1)).run) // Some(Right(0))
@@ -18,7 +18,7 @@ object UnapplyInference extends App {
     import std.list._, std.option._
     import syntax.all._
 
-    val either: Either[List[Int], List[Int]] = Right(List(1))
+    val either: (List[Int] \/ List[Int]) = \/-(List(1))
     val eitherT: EitherT[Option, List[Int], List[Int]] = EitherT(some(either))
 
     val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]

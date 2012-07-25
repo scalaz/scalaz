@@ -192,16 +192,16 @@ sealed trait PLensT[F[+_], A, B] {
   def >=>[C](that: PLensT[F, B, C])(implicit FF: Monad[F]): PLensT[F, A, C] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C](that: => PLensT[F, C, B])(implicit F: Functor[F]): PLensT[F, Either[A, C], B] =
+  def sum[C](that: => PLensT[F, C, B])(implicit F: Functor[F]): PLensT[F, A \/ C, B] =
     plensT{
-      case Left(a) =>
-        F.map(run(a))(_ map (_ map (Left(_))))
-      case Right(c) =>
-        F.map(that run c)(_ map (_ map (Right(_))))
+      case -\/(a) =>
+        F.map(run(a))(_ map (_ map (-\/(_))))
+      case \/-(c) =>
+        F.map(that run c)(_ map (_ map (\/-(_))))
     }
 
   /** Alias for `sum` */
-  def |||[C](that: => PLensT[F, C, B])(implicit F: Functor[F]): PLensT[F, Either[A, C], B] = sum(that)
+  def |||[C](that: => PLensT[F, C, B])(implicit F: Functor[F]): PLensT[F, A \/ C, B] = sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C, D](that: PLensT[F, C, D])(implicit FF: Apply[F]): PLensT[F, (A, C), (B, D)] =
@@ -262,7 +262,7 @@ trait PLensTFunctions extends PLensTInstances {
     LensT.trivialLens[F, A].partial
 
   /** A lens that discards the choice of Right or Left from Either */
-  def codiagPLens[F[+_]: Pointed, A]: PLensT[F, Either[A, A], A] =
+  def codiagPLens[F[+_]: Pointed, A]: PLensT[F, A \/ A, A] =
     plensId[F, A] ||| plensId[F, A]
 
   /** The always-null partial lens */
@@ -272,16 +272,16 @@ trait PLensTFunctions extends PLensTInstances {
   def somePLens[A]: Option[A] @?> A =
     plens(_ map (z => Store(Some(_), z)))
 
-  def leftPLens[A, B]: Either[A, B] @?> A =
+  def leftPLens[A, B]: (A \/ B) @?> A =
     plens {
-      case Left(a) => Some(Store(Left(_), a))
-      case Right(_) => None
+      case -\/(a) => Some(Store(-\/(_), a))
+      case \/-(_) => None
     }
 
-  def rightPLens[A, B]: Either[A, B] @?> B =
+  def rightPLens[A, B]: (A \/ B) @?> B =
     plens {
-      case Right(b) => Some(Store(Right(_), b))
-      case Left(_) => None
+      case \/-(b) => Some(Store(\/-(_), b))
+      case -\/(_) => None
     }
 
   def tuple2PLens[F[+_]: Functor, S, A, B](lens: PLensT[F, S, (A, B)]):
@@ -308,7 +308,7 @@ trait PLensTFunctions extends PLensTInstances {
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C], PLensT[F, S, D], PLensT[F, S, E], PLensT[F, S, H], PLensT[F, S, I]) =
     PLensTUnzip[F, S].unzip7(lens.xmapbB(tuple7B))
 
-  def eitherLens[S, A, B](l: S @?> Either[A, B]): (S @?> A, S @?> B) =
+  def eitherLens[S, A, B](l: S @?> (A \/ B)): (S @?> A, S @?> B) =
     (
     leftPLens compose l
     , rightPLens compose l
@@ -473,10 +473,10 @@ trait PLensTFunctions extends PLensTInstances {
   def mapVPLens[K, V](k: K): Map[K, V] @?> V =
     somePLens compose ~mapVLens[K, V](k)
 
-  def factorPLens[A, B, C]: Either[(A, B), (A, C)] @?> (A, Either[B, C]) =
+  def factorPLens[A, B, C]: ((A, B) \/ (A, C)) @?> (A, B \/ C) =
     ~LensT.factorLens
 
-  def distributePLens[A, B, C]: (A, Either[B, C]) @?> Either[(A, B), (A, C)] =
+  def distributePLens[A, B, C]: (A, B \/ C) @?> ((A, B) \/ (A, C)) =
     ~LensT.distributeLens
 
   import util.parsing.json._
@@ -574,12 +574,12 @@ private[scalaz] trait PLensTCategory[F[+_]]
 
   def compose[A, B, C](bc: PLensT[F, B, C], ab: PLensT[F, A, B]): PLensT[F, A, C] = ab >=> bc
 
-  def choice[A, B, C](f: => PLensT[F, A, C], g: => PLensT[F, B, C]): PLensT[F, Either[A, B], C] =
-    PLensT.plensT[F, Either[A, B], C] {
-      case Left(a) =>
-        F.map(f run a)(_ map (_ map (Left(_))))
-      case Right(b) =>
-        F.map(g run b)(_ map (_ map (Right(_))))
+  def choice[A, B, C](f: => PLensT[F, A, C], g: => PLensT[F, B, C]): PLensT[F, A \/ B, C] =
+    PLensT.plensT[F, A \/ B, C] {
+      case -\/(a) =>
+        F.map(f run a)(_ map (_ map (-\/(_))))
+      case \/-(b) =>
+        F.map(g run b)(_ map (_ map (\/-(_))))
     }
 
   def split[A, B, C, D](f: PLensT[F, A, B], g: PLensT[F, C, D]): PLensT[F, (A,  C), (B, D)] =

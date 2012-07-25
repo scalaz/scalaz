@@ -152,16 +152,16 @@ sealed trait LensT[F[+_], A, B] {
   def >=>[C](that: LensT[F, B, C])(implicit F: Bind[F]): LensT[F, A, C] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, Either[A, C], B] =
+  def sum[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, A \/ C, B] =
     lensT{
-      case Left(a) =>
-        F.map(run(a))(_ map (Left(_)))
-      case Right(c) =>
-        F.map(that run c)(_ map (Right(_)))
+      case -\/(a) =>
+        F.map(run(a))(_ map (-\/(_)))
+      case \/-(c) =>
+        F.map(that run c)(_ map (\/-(_)))
     }
 
   /** Alias for `sum` */
-  def |||[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, Either[A, C], B] = sum(that)
+  def |||[C](that: => LensT[F, C, B])(implicit F: Functor[F]): LensT[F, A \/ C, B] = sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C, D](that: LensT[F, C, D])(implicit F: Apply[F]): LensT[F, (A, C), (B, D)] =
@@ -235,7 +235,7 @@ trait LensTFunctions {
     lensp[F, A, Unit](a => Store(_ => a, ()))
 
   /** A lens that discards the choice of Right or Left from Either */
-  def codiagLens[F[+_]: Pointed, A]: LensT[F, Either[A, A], A] =
+  def codiagLens[F[+_]: Pointed, A]: LensT[F, A \/ A, A] =
     lensId[F, A] ||| lensId[F, A]
 
   /** Access the first field of a tuple */
@@ -279,32 +279,32 @@ trait LensTFunctions {
         Store(w => if(e equal (x, w)) b else y, x), y)
     })
 
-  def predicateLens[A]: Store[A, Boolean] @> Either[A, A] =
+  def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =
     Lens(q => Store(_ match {
-      case Left(l) => Store(_ => true, l)
-      case Right(r) => Store(_ => false, r)
+      case -\/(l) => Store(_ => true, l)
+      case \/-(r) => Store(_ => false, r)
     }, {
       val x = q.pos
-      if(q put x) Left(x) else Right(x)
+      if(q put x) -\/(x) else \/-(x)
     }))
 
-  def factorLens[A, B, C]: Either[(A, B), (A, C)] @> (A, Either[B, C]) =
+  def factorLens[A, B, C]: ((A, B) \/ (A, C)) @> (A, B \/ C) =
     lens(e => Store({
-      case (a, Left(b)) => Left(a, b)
-      case (a, Right(c)) => Right(a, c)
+      case (a, -\/(b)) => -\/(a, b)
+      case (a, \/-(c)) => \/-(a, c)
     }, e match {
-      case Left((a, b)) => (a, Left(b))
-      case Right((a, c)) => (a, Right(c))
+      case -\/((a, b)) => (a, -\/(b))
+      case \/-((a, c)) => (a, \/-(c))
     }))
 
-  def distributeLens[A, B, C]: (A, Either[B, C]) @> Either[(A, B), (A, C)] =
+  def distributeLens[A, B, C]: (A, B \/ C) @> ((A, B) \/ (A, C)) =
     lens {
       case (a, e) => Store({
-        case Left((aa, bb)) => (aa, Left(bb))
-        case Right((aa, cc)) => (aa, Right(cc))
+        case -\/((aa, bb)) => (aa, -\/(bb))
+        case \/-((aa, cc)) => (aa, \/-(cc))
       }, e match {
-        case Left(b) => Left(a, b)
-        case Right(c) => Right(a, c)
+        case -\/(b) => -\/(a, b)
+        case \/-(c) => \/-(a, c)
 
       })
     }
@@ -576,12 +576,12 @@ private[scalaz] trait LensTCategory[F[+_]]
 
   def compose[A, B, C](bc: LensT[F, B, C], ab: LensT[F, A, B]): LensT[F, A, C] = ab >=> bc
 
-  def choice[A, B, C](f: => LensT[F, A, C], g: => LensT[F, B, C]): LensT[F, Either[A, B], C] =
+  def choice[A, B, C](f: => LensT[F, A, C], g: => LensT[F, B, C]): LensT[F, A \/ B, C] =
     LensT.lensT {
-      case Left(a) =>
-        F.map(f run a)(_ map (Left(_)))
-      case Right(b) =>
-        F.map(g run b)(_ map (Right(_)))
+      case -\/(a) =>
+        F.map(f run a)(_ map (-\/(_)))
+      case \/-(b) =>
+        F.map(g run b)(_ map (\/-(_)))
     }
 
   def split[A, B, C, D](f: LensT[F, A, B], g: LensT[F, C, D]): LensT[F, (A,  C), (B, D)] =

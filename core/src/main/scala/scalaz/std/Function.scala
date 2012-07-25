@@ -43,9 +43,9 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def id[A]: (A) => A = a => a
 
-    def choice[A, B, C](f: => A => C, g: => B => C): Either[A,  B] => C = {
-      case Left(a) => f(a)
-      case Right(b) => g(b)
+    def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
+      case -\/(a) => f(a)
+      case \/-(b) => g(b)
     }
     
     def split[A, B, C, D](f: A => B, g: C => D): ((A,  C)) => (B, D) = {
