@@ -34,7 +34,7 @@ object Simple {
           // Create a cursor and advance it to the first child that is a comment
           comment <- +c findChild (_.current.isComment)
           // Convert the contents of the comment to upper-case
-          val u = comment -->> (_ usingComment (_ map (_.toUpper)))
+          u = comment -->> (_ usingComment (_ map (_.toUpper)))
           // Move the cursor back to the parent
           p <- u.^
           // Move the cursor to the first child element named <body>
@@ -44,7 +44,7 @@ object Simple {
           // Move the cursor to the first child element named <a>
           anchor <- h findChildElementName ("a" == _)
           // Update the element with new attributes
-          val a = anchor -->> (_ usingElem (_ *** ("id" -=- "modified_href", "href" -=- "http://yahoo.com/")))
+          a = anchor -->> (_ usingElem (_ *** ("id" -=- "modified_href", "href" -=- "http://yahoo.com/")))
         } yield -a
       )
 
