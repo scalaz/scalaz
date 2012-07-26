@@ -74,7 +74,7 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
-  def size: Int = 1 + list.size
+  def size: Int = 1 + tail.size
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
     nel((head, b.head), tail zip b.tail)
