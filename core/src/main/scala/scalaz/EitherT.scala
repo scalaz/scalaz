@@ -143,6 +143,10 @@ sealed trait EitherT[F[+_], +A, +B] {
   def ++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M: Semigroup[BB], F: Apply[F]): EitherT[F, AA, BB] =
     EitherT(F.map2(run, x.run)(_ ++ _))
 
+  /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
+  def ensure[AA >: A](onLeft: => AA)(f: B => Boolean)(implicit F: Functor[F]): EitherT[F, AA, B] =
+    EitherT(F.map(run)(_.ensure(onLeft)(f)))
+
   /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
     F.map2(run, x.run)(_ == _)

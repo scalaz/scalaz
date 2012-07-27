@@ -191,6 +191,12 @@ sealed trait \/[+A, +B] {
       }
     }
 
+  /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
+  def ensure[AA >: A](onLeft: => AA)(f: B => Boolean): (AA \/ B) = this match {
+    case \/-(b) => if (f(b)) this else -\/(onLeft)
+    case -\/(_) => this
+  }
+
   /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: AA \/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
     this match {
@@ -233,7 +239,7 @@ sealed trait \/[+A, +B] {
 
   /** Run a validation function and back to disjunction again. */
   def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
-    k(validation).either
+    k(validation).disjunction
 
 }
 private case class -\/[+A](a: A) extends (A \/ Nothing)

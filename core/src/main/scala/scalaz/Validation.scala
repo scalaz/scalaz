@@ -117,6 +117,12 @@ sealed trait Validation[+E, +A] {
     case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
+  def bind[B, EE >: E](f: A => Validation[EE, B]): Validation[EE, B] =
+    this match {
+      case Success(a) => f(a)
+      case Failure(e) => Failure(e)
+    }
+
   def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
     case Success(a) => f(a, z)
     case Failure(e) => z
@@ -167,23 +173,90 @@ sealed trait Validation[+E, +A] {
       case Failure(e) => Left(e)
     }
 
+  /** Return the success value of this validation or the given default if failure. Alias for `|` */
+  def getOrElse[AA >: A](x: => AA): AA =
+    toOption getOrElse x
 
+  /** Return the success value of this validation or the given default if failure. Alias for `getOrElse` */
+  def |[AA >: A](x: => AA): AA =
+    getOrElse(x)
 
-  /** Convert to a `scalaz.\/`. `Success` is converted to `scalaz.\/-`, and `Failure` to `scalaz.-\/`. */
-  def either: (E \/ A) = this match {
-    case Success(a) => \/-(a)
-    case Failure(e) => -\/(e)
+  /** Return the success value of this validation or run the given function on the failure. */
+  def valueOr[AA >: A](x: E => AA): AA =
+    this match {
+      case Failure(a) => x(a)
+      case Success(b) => b
+    }
+
+  /** Return this if it is a success, otherwise, return the given value. Alias for `|||` */
+  def orElse[EE >: E, AA >: A](x: => Validation[EE, AA]): Validation[EE, AA] =
+    this match {
+      case Failure(_) => x
+      case Success(_) => this
+    }
+
+  /** Return this if it is a success, otherwise, return the given value. Alias for `orElse` */
+  def |||[EE >: E, AA >: A](x: => Validation[EE, AA]): Validation[EE, AA] =
+    orElse(x)
+
+  /** Return the first success or they are both success, sum them and return that success. */
+  def ++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M: Semigroup[AA]): Validation[EE, AA] =
+    this match {
+      case Failure(_) => this
+      case Success(b1) => x match {
+        case Failure(a2) => Failure(a2)
+        case Success(b2) => Success(M.append(b1, b2))
+      }
+    }
+
+  /** Ensures that the success value of this validation satisfies the given predicate, or fails with the given value. */
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
+    case Success(a) => if (f(a)) this else Failure(onFailure)
+    case Failure(_) => this
   }
 
-  /** If `this` and `that` are both `Success`, or both a `Failure`, combine them with the provided `Semigroup. Otherwise, return the `Success`. */
+  /** Compare two validation values for equality. */
+  def ===[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
+    this match {
+      case Failure(e1) => x match {
+        case Failure(e2) => Equal[EE].equal(e1, e2)
+        case Success(_) => false
+      }
+      case Success(a1) => x match {
+        case Success(a2) => Equal[AA].equal(a1, a2)
+        case Failure(_) => false
+      }
+    }
+
+  /** Compare two validation values for ordering. */
+  def compare[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Order[EE], EA: Order[AA]): Ordering =
+    this match {
+      case Failure(e1) => x match {
+        case Failure(e2) => Order[EE].apply(e1, e2)
+        case Success(_) => Ordering.LT
+      }
+      case Success(a1) => x match {
+        case Success(a2) => Order[AA].apply(a1, a2)
+        case Failure(_) => Ordering.GT
+      }
+    }
+
+  /** Show for a validation value. */
+  def show[EE >: E, AA >: A](implicit SE: Show[EE], SA: Show[AA]): List[Char] =
+    this match {
+      case Failure(e) => "Failure(".toList ::: Show[EE].show(e) ::: ")".toList
+      case Success(a) => "Success(".toList ::: Show[AA].show(a) ::: ")".toList
+    }
+
+  /** If `this` and `that` are both `Success`, or both a `Failure`, combine them with the provided `Semigroup. Otherwise, return the `Success`. Alias for `>>*<<` */
   def append[EE >: E, AA >: A](that: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = (this, that) match {
     case (Success(a1), Success(a2))   => Success(as.append(a1, a2))
-    case (v1@Success(a1), Failure(_)) => v1
+    case (v1@Success(_), Failure(_)) => v1
     case (Failure(_), v2@Success(a2)) => v2
     case (Failure(e1), Failure(e2))   => Failure(es.append(e1, e2))
   }
 
-  /** An alias for `append` */
+  /** If `this` and `that` are both `Success`, or both a `Failure`, combine them with the provided `Semigroup. Otherwise, return the `Success`. Alias for `append` */
   def >>*<<[EE >: E, AA >: A](x: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = append(x)
 
   /** A view of this validation from the `Failure` side. */
@@ -191,47 +264,8 @@ sealed trait Validation[+E, +A] {
     val validation = Validation.this
   }
 
-  /** Wrap the success value in `M`. */
-  def pointSuccess[M[_] : Pointed, AA >: A]: Validation[E, M[AA]] = this match {
-    case Success(a) => Success(Pointed[M].point(a: AA))
-    case Failure(e) => Failure(e)
-  }
-
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
   def toValidationNel[EE >: E, AA >: A]: ValidationNEL[EE, AA] = fail.point[NonEmptyList, EE]
-
-  /**
-   * Returns the contents of this `Validation` if it is a `Success`, otherwise applies to the contents of the `Failure`
-   * to the provided function
-   */
-  def |||[AA >: A](f: E => AA): AA = this match {
-    case Success(a) => a
-    case Failure(e) => f(e)
-  }
-
-  /**
-   * Returns `this` if it is a `Success`, or `that` if it is a `Success`, otherwise a `Failure` containing
-   * the contents of the two `Failure`s, appended with the provided `Semigroup`.
-   */
-  def orElse[EE >: E, AA >: A](that: => Validation[EE, AA])(implicit E: Semigroup[EE]): Validation[EE, AA] = this match {
-    case v1@Success(a1) => v1
-    case Failure(e1)    => that match {
-      case v2@Success(a2) => v2
-      case Failure(e2)    => Failure(E.append(e1, e2))
-    }
-  }
-
-  /** Returns the contents of this `Validation` it if is a `Success`, otherwise the provided value. */
-  def getOrElse[AA >: A](f: => AA): AA = |||(_ => f)
-
-  /** An alias for `getOrElse` */
-  def |[AA >: A](f: => AA): AA = getOrElse(f)
-
-  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
-    case succ @ Success(a) => if (f(a)) succ else Failure(onFailure)
-    case failure => failure
-  }
-
 
   /** Convert to a disjunction. */
   def disjunction: (E \/ A) =
