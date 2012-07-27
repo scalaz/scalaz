@@ -17,4 +17,7 @@ object CaseInsensitiveUsage extends App {
     assert(nums(CI("one")))
     assert(nums(CI("TWO")))
   }
+
+  maps()
+  sets()
 }
