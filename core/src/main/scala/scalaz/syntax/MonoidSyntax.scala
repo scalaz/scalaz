@@ -27,6 +27,7 @@ trait ToMonoidOps extends ToSemigroupOps {
   }
 
   def mzero[F](implicit F: Monoid[F]): F = F.zero
+  def ∅[F](implicit F: Monoid[F]): F = F.zero
   ////
 }
 
@@ -35,5 +36,6 @@ trait MonoidSyntax[F] extends SemigroupSyntax[F] {
 
   ////
   def mzero(implicit F: Monoid[F]): F = F.zero
+  def ∅(implicit F: Monoid[F]): F = F.zero
   ////
 }
