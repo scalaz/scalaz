@@ -5,7 +5,7 @@ package scalaz
  * An associative binary operation.
  *
  * @see [[scalaz.Semigroup.SemigroupLaw]]
- * @see [[scalaz.syntax.SemigroupV]]
+ * @see [[scalaz.syntax.SemigroupOps]]
  * @see [[http://mathworld.wolfram.com/Semigroup.html]]
  */
 ////
