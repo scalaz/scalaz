@@ -27,6 +27,7 @@ trait IdOps[A] extends Ops[A] {
     NonEmptyList(self)
 
   /**
+
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */
   def matchOrZero[B: Monoid](pf: PartialFunction[A, B]): B =

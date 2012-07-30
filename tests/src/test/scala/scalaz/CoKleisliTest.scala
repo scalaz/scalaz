@@ -10,7 +10,7 @@ class CoKleisliTest extends Spec {
     val ck = CoKleisli((a: NonEmptyList[Int]) => a.size)
     val ck1 = ck compose ck
     val run: Int = ck1.run(NonEmptyList(0, 0))
-    run must be_===(3)
+    run must be_===(2)
   }
 
   object instances {

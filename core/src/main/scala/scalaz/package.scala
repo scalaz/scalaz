@@ -131,6 +131,10 @@ package object scalaz {
   type Store[A, B] = StoreT[Id, A, B]
   // flipped
   type |-->[A, B] = Store[B, A]
+  object Store {
+    def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
+  }
+
 
   type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Identity, R, W, S, A]
 
@@ -147,12 +151,14 @@ package object scalaz {
    *
    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
    */
-  type ValidationNEL[E, X] = Validation[NonEmptyList[E], X]
+  type ValidationNEL[+E, +X] = Validation[NonEmptyList[E], X]
   
-  type ValidationTNEL[M[_], E, X] = ValidationT[M, NonEmptyList[E], X]
+  type ValidationTNEL[M[+_], +E, +X] = ValidationT[M, NonEmptyList[E], X]
 
   type FirstOption[A] = Option[A] @@ Tags.First
   type LastOption[A] = Option[A] @@ Tags.Last
+  type MinOption[A] = Option[A] @@ Tags.Min
+  type MaxOption[A] = Option[A] @@ Tags.Max
 
   //
   // Lens type aliases

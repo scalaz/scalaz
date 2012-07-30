@@ -57,10 +57,6 @@ object StoreT extends StoreTFunctions with StoreTInstances {
     storeT(r)
 }
 
-object Store {
-  def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
-}
-
 trait StoreTFunctions {
 
   def storeT[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] = new StoreT[F, A, B] {

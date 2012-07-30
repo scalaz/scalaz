@@ -57,40 +57,79 @@ sealed trait LensT[F[+_], A, B] {
   def =>=(f: B => B)(implicit F: Functor[F]): A => F[A] =
     mod(f, _)
 
+  /** Modify the value viewed through the lens, returning a functor `X` full of results. */
   def modf[X[_]](f: B => X[B], a: A)(implicit F: Functor[F], XF: Functor[X]): F[X[A]] =
     F.map(run(a))(c => XF.map(f(c.pos))(c put _))
 
   def =>>=[X[_]](f: B => X[B])(implicit F: Functor[F], XF: Functor[X]): A => F[X[A]] =
     modf(f, _)
 
-  def %=(f: B => B)(implicit F: Functor[F]): StateT[F, A, B] =
+  /** Modify the value viewed through the lens, returning a `C` on the side.  */
+  def modp[C](f: B => F[(B, C)], a: A)(implicit F: Bind[F]): F[(A, C)] = F.bind(
+    get(a))(x => F.bind(
+    f(x)){
+      case (b, c) => F.map(set(a, b))((_, c))
+    })
+
+  /** Modify the portion of the state viewed through the lens and return its new value. */
+  def mods(f: B => B)(implicit F: Functor[F]): StateT[F, A, B] =
     StateT(a =>
       F.map(run(a))(c => {
         val b = f(c.pos)
         (c put b, b)
       }))
 
-  def :=(b: => B)(implicit F: Functor[F]): StateT[F, A, B] =
-    %=(_ => b)
+  /** Modify the portion of the state viewed through the lens and return its new value. */
+  def %=(f: B => B)(implicit F: Functor[F]): StateT[F, A, B] =
+    mods(f)
 
-  def %==(f: B => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
+  /** Set the portion of the state viewed through the lens and return its new value. */
+  def assign(b: => B)(implicit F: Functor[F]): StateT[F, A, B] =
+    mods(_ => b)
+
+  /** Set the portion of the state viewed through the lens and return its new value. */
+  def :=(b: => B)(implicit F: Functor[F]): StateT[F, A, B] =
+    assign(b)
+
+  /** Modify the portion of the state viewed through the lens, but do not return its new value. */
+  def mods_(f: B => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
     StateT(a =>
       F.map(mod(f, a))((_, ())))
 
-  def %%=[C](s: StateT[F, B, C])(implicit M: Bind[F]): StateT[F, A, C] =
-    StateT(a => M.bind(run(a))(x =>
-      M.map(s(x.pos)){
-        case (b, c) => (x put b, c)
-      }))
+  /** Modify the portion of the state viewed through the lens, but do not return its new value. */
+  def %==(f: B => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
+    mods_(f)
 
-  def >-[C](f: B => C)(implicit F: Functor[F]): StateT[F, A, C] =
+  /** Contravariantly map a state action through a lens. */
+  def lifts[C](s: StateT[F, B, C])(implicit M: Bind[F]): StateT[F, A, C] =
+    StateT(a => modp(s(_), a))
+
+  def %%=[C](s: StateT[F, B, C])(implicit M: Bind[F]): StateT[F, A, C] =
+    lifts(s)
+
+  /** Map the function `f` over the lens as a state action. */
+  def map[C](f: B => C)(implicit F: Functor[F]): StateT[F, A, C] =
     StateT(a => F.map(get(a))(x => (a, f(x))))
 
-  def >>-[C](f: B => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] =
+  /** Map the function `f` over the value under the lens, as a state action. */
+  def >-[C](f: B => C)(implicit F: Functor[F]): StateT[F, A, C] = map(f)
+
+  /** Bind the function `f` over the value under the lens, as a state action. */
+  def flatMap[C](f: B => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] =
     StateT(a => F.bind(get(a))(x => f(x)(a)))
 
+  /** Bind the function `f` over the value under the lens, as a state action. */
+  def >>-[C](f: B => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] = flatMap(f)
+
+  /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
   def ->>-[C](f: => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] =
     >>-(_ => f)
+
+  /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
+  def liftsNT(implicit F: Bind[F]): ({type m[x] = StateT[F,B,x]})#m ~> ({type n[x] = StateT[F,A,x]})#n =
+    new (({type m[x] = StateT[F,B,x]})#m ~> ({type n[x] = StateT[F,A,x]})#n) {
+      def apply[C](s : StateT[F,B,C]): StateT[F,A,C] = StateT[F,A,C](a => modp(s(_), a))
+    }
 
   /** Lenses can be composed */
   def compose[C](that: LensT[F, C, A])(implicit F: Bind[F]): LensT[F, C, B] =
@@ -187,6 +226,9 @@ trait LensTFunctions {
   /** The identity lens for a given object */
   def lensId[F[+_], A](implicit P: Pointed[F]): LensT[F, A, A] =
     lensp(Store(identity, _))
+
+  /** The identity lens through the Id functor */
+  def self[A]: Lens[A, A] = lensId[Id, A]
 
   /** The trivial lens that can retrieve Unit from anything */
   def trivialLens[F[+_], A](implicit P: Pointed[F]): LensT[F, A, Unit] =

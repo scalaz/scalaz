@@ -3,7 +3,7 @@ package scalaz
 /**
  * ListT monad transformer.
  */
-sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
+sealed class ListT[M[+_], +A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 
   import ListT._
 
@@ -14,7 +14,7 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
       case Done => M.point(None)
     }
 
-  def ::(a: A)(implicit M: Pointed[M]): ListT[M, A] = ListT[M, A](M point (Yield(a, this)))
+  def ::[AA >: A](a: AA)(implicit M: Pointed[M]): ListT[M, AA] = ListT[M, AA](M point (Yield(a, this)))
 
   def isEmpty(implicit M: Monad[M]) = M.map(uncons)(_.isDefined)
 
@@ -86,10 +86,10 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
       case Done => M point z
     }
 
-  def toList(implicit M: Monad[M]): M[List[A]] = M.map(rev(Nil))(_.reverse)
+  def toList(implicit M: Monad[M]): M[List[A]] = M.map(rev)(_.reverse)
 
   def foldRight[B](z: => B)(f: (=> A, => B) => B)(implicit M: Monad[M]): M[B] =
-    M.map(rev(Nil)) {
+    M.map(rev) {
       _.foldLeft(z)((a, b) => f(b, a))
     }
 
@@ -100,12 +100,15 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 
   private def stepMap[B](f: Step[A, ListT[M, A]] => Step[B, ListT[M, B]])(implicit M: Functor[M]): ListT[M, B] = ListT[M, B](M.map(step)(f))
 
-  private def rev(xs: List[A])(implicit M: Monad[M]): M[List[A]] =
-    M.bind(step) {
-      case Yield(a, s) => s rev (a :: xs)
-      case Skip(s) => s rev xs
-      case Done => M point xs
-    }
+  private def rev(implicit M: Monad[M]): M[List[A]] = {
+    def loop(xs: ListT[M, A], ys: List[A]): M[List[A]] =
+      M.bind(xs.step) {
+        case Yield(a, s) => loop(s, a :: ys)
+        case Skip(s) => loop(s, ys)
+        case Done => M point ys
+      }
+    loop(this, Nil)
+  }
 }
 
 //
@@ -113,41 +116,41 @@ sealed class ListT[M[_], A](val step: M[ListT.Step[A, ListT[M, A]]]) {
 //
 
 trait ListTInstances2 {
-  implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = ListT[F, α]})#λ] = new ListTFunctor[F] {
+  implicit def listTFunctor[F[+_]](implicit F0: Functor[F]): Functor[({type λ[α] = ListT[F, α]})#λ] = new ListTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 
-  implicit def listTSemigroup[F[_], A](implicit F0: Functor[F]): Semigroup[ListT[F, A]] = new ListTSemigroup[F, A] {
+  implicit def listTSemigroup[F[+_], A](implicit F0: Functor[F]): Semigroup[ListT[F, A]] = new ListTSemigroup[F, A] {
     implicit def F: Functor[F] = F0
   }
 }
 
 trait ListTInstances1 extends ListTInstances2 {
-  implicit def listTPointedPlus[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] = new ListTPointedPlusEmpty[F] {
+  implicit def listTPointedPlus[F[+_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] = new ListTPointedPlusEmpty[F] {
     implicit def F: Pointed[F] = F0
   }
 
-  implicit def listTMonoid[F[_], A](implicit F0: Pointed[F]): Monoid[ListT[F, A]] = new ListTMonoid[F, A] {
+  implicit def listTMonoid[F[+_], A](implicit F0: Pointed[F]): Monoid[ListT[F, A]] = new ListTMonoid[F, A] {
     implicit def F: Pointed[F] = F0
   }
 }
 
 trait ListTInstances extends ListTInstances1 {
-  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
+  implicit def listTMonadPlus[F[+_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
     implicit def F: Monad[F] = F0
   }
-  implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
-  implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
+  implicit def listTEqual[F[+_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
+  implicit def listTShow[F[+_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
   implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
 }
 
 object ListT extends ListTInstances {
-  def apply[M[_], A](step: M[Step[A, ListT[M, A]]]): ListT[M, A] = new ListT[M, A](step)
+  def apply[M[+_], A](step: M[Step[A, ListT[M, A]]]): ListT[M, A] = new ListT[M, A](step)
 
-  def empty[M[_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M point Done)
+  def empty[M[+_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M point Done)
 
-  def fromList[M[_], A](mas: M[List[A]])(implicit M: Pointed[M]): ListT[M, A] = {
+  def fromList[M[+_], A](mas: M[List[A]])(implicit M: Pointed[M]): ListT[M, A] = {
     def yieldd(a: A, rest: ListT[M, A]): Step[A, ListT[M, A]] = Yield[A, ListT[M, A]](a, rest)
     def done: Step[A, ListT[M, A]] = Done
 
@@ -172,25 +175,25 @@ object ListT extends ListTInstances {
 // Implementation traits for type class instances
 //
 
-private[scalaz] trait ListTFunctor[F[_]] extends Functor[({type λ[α] = ListT[F, α]})#λ] {
+private[scalaz] trait ListTFunctor[F[+_]] extends Functor[({type λ[α] = ListT[F, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa map f
 }
 
-private[scalaz] trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
+private[scalaz] trait ListTSemigroup[F[+_], A] extends Semigroup[ListT[F, A]] {
   implicit def F: Functor[F]
 
   def append(f1: ListT[F, A], f2: => ListT[F, A]): ListT[F, A] = f1 ++ f2
 }
 
-private[scalaz] trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
+private[scalaz] trait ListTMonoid[F[+_], A] extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
   implicit def F: Pointed[F]
 
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
-private[scalaz] trait ListTPointedPlusEmpty[F[_]] extends Pointed[({type λ[α] = ListT[F, α]})#λ] with PlusEmpty[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
+private[scalaz] trait ListTPointedPlusEmpty[F[+_]] extends Pointed[({type λ[α] = ListT[F, α]})#λ] with PlusEmpty[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
@@ -200,7 +203,7 @@ private[scalaz] trait ListTPointedPlusEmpty[F[_]] extends Pointed[({type λ[α] 
   def plus[A](a: ListT[F, A], b: => ListT[F, A]): ListT[F, A] = a ++ b
 }
 
-private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTPointedPlusEmpty[F] {
+private[scalaz] trait ListTMonadPlus[F[+_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTPointedPlusEmpty[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
@@ -209,11 +212,11 @@ private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = Lis
 private[scalaz] trait ListTHoist extends Hoist[ListT] {
   import ListT._
   
-  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = ListT[G, α]})#λ] = listTMonadPlus[G]
+  implicit def apply[G[+_] : Monad]: Monad[({type λ[α] = ListT[G, α]})#λ] = listTMonadPlus[G]
   
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] = ListT[G, A](G.map(a)(Yield(_, empty)))
+  def liftM[G[+_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] = ListT[G, A](G.map(a)(Yield(_, empty)))
   
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f =
+  def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f =
     new (({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f) {
       def apply[A](a: ListT[M, A]): ListT[N, A] = ListT[N, A](f(M.map(a.step)(_ match {
         case Yield(a, as) => Yield(a, hoist(f) apply as)

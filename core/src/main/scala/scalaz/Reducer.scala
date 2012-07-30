@@ -86,6 +86,11 @@ trait ReducerInstances {
     unitReducer((_: C) => ())
   }
 
+  implicit def VectorReducer[C]: Reducer[C, Vector[C]] = {
+    import std.vector._
+    unitReducer(c => Vector(c))
+  }
+
   implicit def AnyReducer: Reducer[Boolean, Boolean] = {
     implicit val B = std.anyVal.booleanInstance.disjunction
     unitReducer(x => x)

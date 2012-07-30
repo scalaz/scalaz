@@ -99,10 +99,10 @@ trait StateTInstances extends StateTInstances0 {
 }
 
 trait StateTFunctions {
-  def constantStateT[F[+_], A, S](a: A)(s: => S)(implicit F: Pointed[F]): StateT[F, S, A] =
+  def constantStateT[F[+_], S, A](a: A)(s: => S)(implicit F: Pointed[F]): StateT[F, S, A] =
     StateT((_: S) => F.point((s, a)))
 
-  def stateT[F[+_], A, S](a: A)(implicit F: Pointed[F]): StateT[F, S, A] =
+  def stateT[F[+_], S, A](a: A)(implicit F: Pointed[F]): StateT[F, S, A] =
     StateT(s => F.point((s, a)))
 }
 

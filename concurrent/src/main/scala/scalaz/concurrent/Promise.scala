@@ -181,6 +181,7 @@ trait PromiseInstances {
 
 trait PromiseFunctions {
 
+
   def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
     val p = new Promise[A] {
       implicit val strategy = s

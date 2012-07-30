@@ -562,7 +562,6 @@ trait PLensTInstances extends PLensTInstance0 {
 
 private[scalaz] trait PLensTArrId[F[+_]] extends ArrId[({type λ[α, β] = PLensT[F, α, β]})#λ] {
   implicit def F: Pointed[F]
-1
   def id[A]: PLensT[F, A, A] = PLensT.plensId
 }
 

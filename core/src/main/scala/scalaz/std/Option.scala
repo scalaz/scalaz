@@ -73,7 +73,7 @@ trait OptionInstances extends OptionInstances0 {
     }
   }
 
-  import Tags.{First, Last}
+  import Tags.{First, Last, Min, Max}
 
   implicit def optionFirst[A] = new Monoid[Option[A] @@ First] {
     def zero: Option[A] @@ First = Tag(None)
@@ -106,6 +106,38 @@ trait OptionInstances extends OptionInstances0 {
     def point[A](a: => A): (Option[A] @@ Tags.Last) = Tag(Some(a))
     override def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(fa map f)
     def bind[A, B](fa: (Option[A] @@ Tags.Last))(f: (A) => (Option[B] @@ Tags.Last)): (Option[B] @@ Tags.Last) = Tag(fa flatMap f)
+  }
+
+  implicit def optionMin[A](implicit o: Order[A]) = new Monoid[Option[A] @@ Min] {
+    def zero: Option[A] @@ Min = Tag(None)
+
+    def append(f1: Option[A] @@ Min, f2: => Option[A] @@ Min) = Tag(Order[Option[A]].min(f1, f2))
+  }
+
+  implicit def optionMinShow[A: Show]: Show[Option[A] @@ Min] = Tag.subst(Show[Option[A]])
+
+  implicit def optionMinOrder[A: Order]: Order[Option[A] @@ Min] = Tag.subst(Order[Option[A]])
+
+  implicit def optionMinMonad[A]: Monad[({type f[x] = Option[x] @@ Min})#f] = new Monad[({type f[x] = Option[x] @@ Min})#f] {
+    def point[A](a: => A): (Option[A] @@ Tags.Min) = Tag(Some(a))
+    override def map[A, B](fa: Option[A] @@ Min)(f: (A) => B) = Tag(fa map f)
+    def bind[A, B](fa: (Option[A] @@ Tags.Min))(f: (A) => (Option[B] @@ Tags.Min)): (Option[B] @@ Tags.Min) = Tag(fa flatMap f)
+  }
+
+  implicit def optionMax[A](implicit o: Order[A]) = new Monoid[Option[A] @@ Max] {
+    def zero: Option[A] @@ Max = Tag(None)
+
+    def append(f1: Option[A] @@ Max, f2: => Option[A] @@ Max) = Tag(Order[Option[A]].max(f1, f2))
+  }
+
+  implicit def optionMaxShow[A: Show]: Show[Option[A] @@ Max] = Tag.subst(Show[Option[A]])
+
+  implicit def optionMaxOrder[A: Order]: Order[Option[A] @@ Max] = Tag.subst(Order[Option[A]])
+
+  implicit def optionMaxMonad[A]: Monad[({type f[x] = Option[x] @@ Max})#f] = new Monad[({type f[x] = Option[x] @@ Max})#f] {
+    def point[A](a: => A): (Option[A] @@ Tags.Max) = Tag(Some(a))
+    override def map[A, B](fa: Option[A] @@ Max)(f: (A) => B) = Tag(fa map f)
+    def bind[A, B](fa: (Option[A] @@ Tags.Max))(f: (A) => (Option[B] @@ Tags.Max)): (Option[B] @@ Tags.Max) = Tag(fa flatMap f)
   }
 }
 
@@ -191,8 +223,8 @@ trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
 
   def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
     case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
-    case (None, Some(_))      => GT
-    case (Some(_), None)      => LT
+    case (None, Some(_))      => LT
+    case (Some(_), None)      => GT
     case (None, None)         => EQ
   }
 }
