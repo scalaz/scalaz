@@ -241,6 +241,7 @@ sealed trait \/[+A, +B] {
   def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
     k(validation).disjunction
 
+
 }
 private case class -\/[+A](a: A) extends (A \/ Nothing)
 private case class \/-[+B](b: B) extends (Nothing \/ B)
