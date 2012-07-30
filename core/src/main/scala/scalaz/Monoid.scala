@@ -13,7 +13,7 @@ import Id._
  * References:
  *  - [[http://mathworld.wolfram.com/Monoid.html]]
  *
- * @see [[scalaz.syntax.MonoidV]]
+ * @see [[scalaz.syntax.MonoidOps]]
  * @see [[scalaz.Monoid.MonoidLaw]]
  *
  */

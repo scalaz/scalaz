@@ -8,7 +8,7 @@ package scalaz
  * - [[http://en.wikipedia.org/wiki/Group_(mathematics) Group on Wikipedia]]
  * - [[http://mathworld.wolfram.com/Group.html]]
  *
- * @see [[scalaz.syntax.GroupV]]
+ * @see [[scalaz.syntax.GroupOps]]
  * @see [[scalaz.Group.GroupLaw]]
  */
 ////
