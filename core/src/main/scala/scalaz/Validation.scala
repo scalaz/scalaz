@@ -7,7 +7,7 @@ import Id._
  *  - `Success(a)`, or
  *  - `Failure(e)`.
  *
- * Isomorphic to `scala.Either`. The motivation for a `Validation` is to provide the instance
+ * Isomorphic to `scala.Either` and `scalaz.\/`. The motivation for a `Validation` is to provide the instance
  * `Applicative[[a]Validation[E, a]]` that accumulate failures through a [[scalaz.Semigroup]]`[E]`.
  *
  * [[scalaz.NonEmptyList]] is commonly chosen as a type constructor for the type `E`. As a convenience,
