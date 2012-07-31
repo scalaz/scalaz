@@ -149,6 +149,21 @@ trait StreamFunctions {
 
     mapM(as, unfoldTreeM)
   }
+
+  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
+  final def intersperse[A](as: Stream[A], a: A): Stream[A] = {
+    def loop(rest: Stream[A]): Stream[A] = rest match {
+      case Stream.Empty => Stream.empty
+      case h #:: t      => a #:: h #:: loop(t)
+    }
+    as match {
+      case Stream.Empty => Stream.empty
+      case h #:: t      => h #:: loop(t)
+    }
+  }
+
+  final def intercalate[A](as1: Stream[Stream[A]], as2: Stream[A]): Stream[A] =
+    intersperse(as1, as2).flatten
 }
 
 object stream extends StreamInstances with StreamFunctions {
