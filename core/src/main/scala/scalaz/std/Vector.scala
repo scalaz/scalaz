@@ -76,13 +76,7 @@ trait VectorFunctions {
     intersperse0(Vector(), as).reverse
   }
 
-  final def intercalate[A](as1: Vector[A], as2: Vector[A]): Vector[A] = {
-    val asr = as2.reverse
-    @tailrec
-    def intercalate0(accum: Vector[A], rest: Vector[A]): Vector[A] = 
-      if (rest.isEmpty) accum else if (rest.tail.isEmpty) rest.head +: accum else intercalate0(asr ++ (rest.head +: accum), rest.tail)
-    intercalate0(Vector(), as1).reverse
-  }
+  final def intercalate[A](as1: Vector[Vector[A]], as2: Vector[A]): Vector[A] = intersperse(as1, as2).flatten
 
   final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] = 
     if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
