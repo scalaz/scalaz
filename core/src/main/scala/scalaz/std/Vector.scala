@@ -67,104 +67,11 @@ trait VectorInstances extends VectorInstances0 {
 
 }
 
-trait VectorFunctions {
-  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
-  final def intersperse[A](as: Vector[A], a: A): Vector[A] = {
-    @tailrec
-    def intersperse0(accum: Vector[A], rest: Vector[A]): Vector[A] =
-      if (rest.isEmpty) accum else if (rest.tail.isEmpty) rest.head +: accum else intersperse0(a +: rest.head +: accum, rest.tail)
-    intersperse0(Vector(), as).reverse
-  }
-
-  final def intercalate[A](as1: Vector[Vector[A]], as2: Vector[A]): Vector[A] = intersperse(as1, as2).flatten
-
-  final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] = 
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
-
-  final def toZipper[A](as: Vector[A]): Option[Zipper[A]] =
-    stream.toZipper(as.toStream)
-
-  final def zipperEnd[A](as: Vector[A]): Option[Zipper[A]] =
-    stream.zipperEnd(as.toStream)
-
-  /**
-   * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
-   */
-  final def <^>[A, B: Monoid](as: Vector[A])(f: NonEmptyList[A] => B): B =
-    if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
-
-  final def takeWhileM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Vector[A]] =
-    if (as.isEmpty) Monad[M].point(Vector()) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].map(takeWhileM(as.tail)(p))((tt: Vector[A]) => as.head +: tt) else Monad[M].point(Vector()))
-
-  final def takeUntilM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Vector[A]] =
-    takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
-
-  final def filterM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Vector[A]] =
-    if (as.isEmpty) Monad[M].point(Vector()) else {
-      def g = filterM(as.tail)(p)
-      Monad[M].bind(p(as.head))(b => if (b) Monad[M].map(g)(tt => as.head +: tt) else g)
-    }
-  
-  final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Option[A]] =
-    if (as.isEmpty) Monad[M].point(None: Option[A]) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].point(Some(as.head): Option[A]) else findM(as.tail)(p))
-
-  final def powerset[A](as: Vector[A]): Vector[Vector[A]] = {
-    import vector.vectorInstance
-
-    filterM(as)(_ => Vector(true, false))
-  }
-
-  final def partitionM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
-    if (as.isEmpty) Monad[M].point(Vector[A](), Vector[A]()) else
-      Monad[M].bind(p(as.head))(b =>
-        Monad[M].map(partitionM(as.tail)(p)) {
-          case (x, y) => if (b) (as.head +: x, y) else (x, as.head +: y)
-        }
-      )
-
-  final def spanM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
-    if (as.isEmpty) Monad[M].point(Vector(), Vector()) else
-      Monad[M].bind(p(as.head))(b =>
-        if (b) Monad[M].map(spanM(as.tail)(p))((k: (Vector[A], Vector[A])) => (as.head +: k._1, k._2))
-        else Monad[M].point(Vector(), as))
-
-  final def breakM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
-    spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
-
-  final def groupByM[A, M[_] : Monad](as: Vector[A])(p: (A, A) => M[Boolean]): M[Vector[Vector[A]]] =
-    if (as.isEmpty) Monad[M].point(Vector()) else
-      Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
-        case (x, y) =>
-          Monad[M].map(groupByM(y)(p))((g: Vector[Vector[A]]) => (as.head +: x) +: g)
-      }
-
-  final def mapAccumLeft[A, B, C](as: Vector[A])(c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
-    if (as.isEmpty) (c, Vector()) else {
-      val (i, j) = f(c, as.head)
-      val (k, v) = mapAccumLeft(as.tail)(i, f)
-      (k, j +: v)
-    }
-
-  final def mapAccumRight[A, B, C](as: Vector[A])(c: C, f: (C, A) => (C, B)): (C, Vector[B]) =
-    if (as.isEmpty) (c, Vector()) else {
-      val (i, j) = mapAccumRight(as.tail)(c, f)
-      val (k, v) = f(i, as.head)
-      (k, v +: j)
-    }
-
-  final def tailz[A](as: Vector[A]): Vector[Vector[A]] =
-    if (as.isEmpty) Vector(Vector()) else as +: tailz(as.tail)
-
-  final def initz[A](as: Vector[A]): Vector[Vector[A]] =
-    if (as.isEmpty) Vector(Vector()) else Vector() +: (initz(as.tail) map (as.head +: _))
-
-  final def allPairs[A](as: Vector[A]): Vector[(A, A)] =
-    tailz(as).tail flatMap (as zip _)
-
-  final def adjacentPairs[A](as: Vector[A]): Vector[(A, A)] =
-    if (as.isEmpty) Vector() else as zip as.tail
+trait VectorFunctions extends IndexedSeqSubFunctions {
+  type IxSq[+A] = Vector[A]
+  protected def buildIxSq[A, B] = implicitly
+  protected def monad = vector.vectorInstance
+  protected def empty[A] = Vector()
 }
 
 object vector extends VectorInstances with VectorFunctions {

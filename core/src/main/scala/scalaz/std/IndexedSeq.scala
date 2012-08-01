@@ -2,6 +2,8 @@ package scalaz
 package std
 
 import annotation.tailrec
+import collection.IndexedSeqLike
+import collection.generic.{CanBuildFrom, GenericTraversableTemplate}
 
 trait IndexedSeqInstances0 {
   implicit def indexedSeqEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A] {
@@ -67,104 +69,116 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 
 }
 
-trait IndexedSeqFunctions {
+trait IndexedSeqSubFunctions {
+  type IxSq[+A] <: IndexedSeq[A] with GenericTraversableTemplate[A, IxSq] with IndexedSeqLike[A, IxSq[A]]
+  protected implicit def buildIxSq[A, B]: CanBuildFrom[IxSq[A], B, IxSq[B]]
+  protected def monad: Monad[IxSq]
+  protected def empty[A]: IxSq[A]
+
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
-  final def intersperse[A](as: IndexedSeq[A], a: A): IndexedSeq[A] = {
+  final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
     @tailrec
-    def intersperse0(accum: IndexedSeq[A], rest: IndexedSeq[A]): IndexedSeq[A] =
+    def intersperse0(accum: IxSq[A], rest: IxSq[A]): IxSq[A] =
       if (rest.isEmpty) accum else if (rest.tail.isEmpty) rest.head +: accum else intersperse0(a +: rest.head +: accum, rest.tail)
-    intersperse0(IndexedSeq(), as).reverse
+    intersperse0(empty, as).reverse
   }
 
-  final def intercalate[A](as1: IndexedSeq[IndexedSeq[A]], as2: IndexedSeq[A]): IndexedSeq[A] = intersperse(as1, as2).flatten
+  final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
 
-  final def toNel[A](as: IndexedSeq[A]): Option[NonEmptyList[A]] = 
+  final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] = 
     if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
 
-  final def toZipper[A](as: IndexedSeq[A]): Option[Zipper[A]] =
+  final def toZipper[A](as: IxSq[A]): Option[Zipper[A]] =
     stream.toZipper(as.toStream)
 
-  final def zipperEnd[A](as: IndexedSeq[A]): Option[Zipper[A]] =
+  final def zipperEnd[A](as: IxSq[A]): Option[Zipper[A]] =
     stream.zipperEnd(as.toStream)
 
   /**
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
    */
-  final def <^>[A, B: Monoid](as: IndexedSeq[A])(f: NonEmptyList[A] => B): B =
+  final def <^>[A, B: Monoid](as: IxSq[A])(f: NonEmptyList[A] => B): B =
     if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
 
-  final def takeWhileM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[IndexedSeq[A]] =
-    if (as.isEmpty) Monad[M].point(IndexedSeq()) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].map(takeWhileM(as.tail)(p))((tt: IndexedSeq[A]) => as.head +: tt) else Monad[M].point(IndexedSeq()))
+  final def takeWhileM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
+    if (as.isEmpty) Monad[M].point(empty) else Monad[M].bind(p(as.head))(b =>
+      if (b) Monad[M].map(takeWhileM(as.tail)(p))((tt: IxSq[A]) => as.head +: tt) else Monad[M].point(empty))
 
-  final def takeUntilM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[IndexedSeq[A]] =
+  final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[IndexedSeq[A]] =
-    if (as.isEmpty) Monad[M].point(IndexedSeq()) else {
+  final def filterM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
+    if (as.isEmpty) Monad[M].point(empty) else {
       def g = filterM(as.tail)(p)
       Monad[M].bind(p(as.head))(b => if (b) Monad[M].map(g)(tt => as.head +: tt) else g)
     }
   
-  final def findM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[Option[A]] =
+  final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
     if (as.isEmpty) Monad[M].point(None: Option[A]) else Monad[M].bind(p(as.head))(b =>
       if (b) Monad[M].point(Some(as.head): Option[A]) else findM(as.tail)(p))
 
-  final def powerset[A](as: IndexedSeq[A]): IndexedSeq[IndexedSeq[A]] = {
-    import indexedSeq.indexedSeqInstance
-
-    filterM(as)(_ => IndexedSeq(true, false))
+  final def powerset[A](as: IxSq[A]): IxSq[IxSq[A]] = {
+    implicit val indexedSeqInstance = monad
+    val tf = empty[Boolean] :+ true :+ false
+    filterM(as)(_ => tf)
   }
 
-  final def partitionM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] =
-    if (as.isEmpty) Monad[M].point(IndexedSeq[A](), IndexedSeq[A]()) else
+  final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
+    if (as.isEmpty) Monad[M].point(empty[A], empty[A]) else
       Monad[M].bind(p(as.head))(b =>
         Monad[M].map(partitionM(as.tail)(p)) {
           case (x, y) => if (b) (as.head +: x, y) else (x, as.head +: y)
         }
       )
 
-  final def spanM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] =
-    if (as.isEmpty) Monad[M].point(IndexedSeq(), IndexedSeq()) else
+  final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
+    if (as.isEmpty) Monad[M].point(empty, empty) else
       Monad[M].bind(p(as.head))(b =>
-        if (b) Monad[M].map(spanM(as.tail)(p))((k: (IndexedSeq[A], IndexedSeq[A])) => (as.head +: k._1, k._2))
-        else Monad[M].point(IndexedSeq(), as))
+        if (b) Monad[M].map(spanM(as.tail)(p))((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
+        else Monad[M].point(empty, as))
 
-  final def breakM[A, M[_] : Monad](as: IndexedSeq[A])(p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] =
+  final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
-  final def groupByM[A, M[_] : Monad](as: IndexedSeq[A])(p: (A, A) => M[Boolean]): M[IndexedSeq[IndexedSeq[A]]] =
-    if (as.isEmpty) Monad[M].point(IndexedSeq()) else
+  final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
+    if (as.isEmpty) Monad[M].point(empty) else
       Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
         case (x, y) =>
-          Monad[M].map(groupByM(y)(p))((g: IndexedSeq[IndexedSeq[A]]) => (as.head +: x) +: g)
+          Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
-  final def mapAccumLeft[A, B, C](as: IndexedSeq[A])(c: C, f: (C, A) => (C, B)): (C, IndexedSeq[B]) =
-    if (as.isEmpty) (c, IndexedSeq()) else {
+  final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
+    if (as.isEmpty) (c, empty) else {
       val (i, j) = f(c, as.head)
       val (k, v) = mapAccumLeft(as.tail)(i, f)
       (k, j +: v)
     }
 
-  final def mapAccumRight[A, B, C](as: IndexedSeq[A])(c: C, f: (C, A) => (C, B)): (C, IndexedSeq[B]) =
-    if (as.isEmpty) (c, IndexedSeq()) else {
+  final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
+    if (as.isEmpty) (c, empty) else {
       val (i, j) = mapAccumRight(as.tail)(c, f)
       val (k, v) = f(i, as.head)
       (k, v +: j)
     }
 
-  final def tailz[A](as: IndexedSeq[A]): IndexedSeq[IndexedSeq[A]] =
-    if (as.isEmpty) IndexedSeq(IndexedSeq()) else as +: tailz(as.tail)
+  final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
+    if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
-  final def initz[A](as: IndexedSeq[A]): IndexedSeq[IndexedSeq[A]] =
-    if (as.isEmpty) IndexedSeq(IndexedSeq()) else IndexedSeq() +: (initz(as.tail) map (as.head +: _))
+  final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] =
+    empty +: (if (as.isEmpty) empty else (initz(as.tail) map (as.head +: _)))
 
-  final def allPairs[A](as: IndexedSeq[A]): IndexedSeq[(A, A)] =
+  final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     tailz(as).tail flatMap (as zip _)
 
-  final def adjacentPairs[A](as: IndexedSeq[A]): IndexedSeq[(A, A)] =
-    if (as.isEmpty) IndexedSeq() else as zip as.tail
+  final def adjacentPairs[A](as: IxSq[A]): IxSq[(A, A)] =
+    if (as.isEmpty) empty else as zip as.tail
+}
+
+trait IndexedSeqFunctions extends IndexedSeqSubFunctions {
+  type IxSq[+A] = IndexedSeq[A]
+  protected def buildIxSq[A, B] = implicitly
+  protected def monad = indexedSeq.indexedSeqInstance
+  protected def empty[A] = IndexedSeq()
 }
 
 object indexedSeq extends IndexedSeqInstances with IndexedSeqFunctions {
