@@ -49,6 +49,14 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
     implicit def G = G0
   }
 
+  /** An `Applicative` for `F` in which effects happen in the opposite order. */
+  def flip: Applicative[F] = new Applicative[F] {
+    val F = Applicative.this
+    def point[A](a: => A) = F.point(a)
+    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
+      F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
+  }
+
   trait ApplicativeLaw extends FunctorLaw {
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(ap(fa)(point((a: A) => a)), fa)
