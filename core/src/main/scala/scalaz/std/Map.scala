@@ -42,4 +42,25 @@ trait MapInstances {
   }*/
 }
 
-object map extends MapInstances
+trait MapFunctions {
+  final def intersectWithKey[K,A,B,C](m1: Map[K, A], m2: Map[K, B])(f: (K, A, B) => C): Map[K, C] = m1 collect {
+    case (k, v) if m2 contains k => k -> f(k, v, m2(k))
+  }
+
+  final def intersectWith[K,A,B,C](m1: Map[K, A], m2: Map[K, B])(f: (A, B) => C): Map[K, C] =
+    intersectWithKey(m1, m2)((_, x, y) => f(x, y))
+
+  final def unionWithKey[K,A](m1: Map[K, A], m2: Map[K, A])(f: (K, A, A) => A): Map[K, A] = {
+    val diff = m2 -- m1.keySet
+    val aug = m1 map {
+      case (k, v) => if (m2 contains k) k -> f(k, v, m2(k)) else (k, v)
+    }
+    aug ++ diff
+  }
+
+  final def unionWith[K,A](m1: Map[K, A], m2: Map[K, A])(f: (A, A) => A): Map[K, A] =
+    unionWithKey(m1, m2)((_, x, y) => f(x, y))
+}
+
+object map extends MapInstances with MapFunctions
+
