@@ -8,6 +8,7 @@ package object std {
   object vector extends ToVectorOps
   object function1 extends ToFunction1Ops
   object function2 extends ToFunction2Ops
+  object tuple extends ToTupleOps
   object string extends ToStringOps
   object option extends ToOptionOps with ToOptionIdOps
 
