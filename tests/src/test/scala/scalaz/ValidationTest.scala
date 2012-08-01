@@ -7,10 +7,10 @@ class ValidationTest extends Spec {
   import std.AllInstances._
 
   checkAll("Validation", order.laws[Validation[Int, Int]])
-  checkAll("FailProjection", order.laws[FailProjection[Int, Int]])
+  checkAll("FailureProjection", order.laws[FailureProjection[Int, Int]])
 
   type ValidationInt[A] = Validation[Int, A]
-  type FailProjectionInt[A] = FailProjection[Int, A]
+  type FailureProjectionInt[A] = FailureProjection[Int, A]
 
   checkAll("Validation", semigroup.laws[ValidationInt[Int]])
   checkAll("Validation", plus.laws[ValidationInt])
@@ -18,12 +18,12 @@ class ValidationTest extends Spec {
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
 
-  checkAll("FailProjection", semigroup.laws[FailProjectionInt[Int]])
-  checkAll("FailProjection", plus.laws[FailProjectionInt])
-  checkAll("FailProjection", applicative.laws[FailProjectionInt])
-  checkAll("FailProjection", traverse.laws[FailProjectionInt])
+  checkAll("FailureProjection", semigroup.laws[FailureProjectionInt[Int]])
+  checkAll("FailureProjection", plus.laws[FailureProjectionInt])
+  checkAll("FailureProjection", applicative.laws[FailureProjectionInt])
+  checkAll("FailureProjection", traverse.laws[FailureProjectionInt])
 
-  checkAll("FailProjection", bifunctor.laws[FailProjection])
+  checkAll("FailureProjection", bifunctor.laws[FailureProjection])
 
   "fpoint and point" in {
 
@@ -34,7 +34,7 @@ class ValidationTest extends Spec {
 
     val vi = success[String, Int](0)
 
-    val voi: Validation[String, Option[Int]] = vi.pointSuccess[Option, Int]
+    val voi: Validation[String, Option[Int]] = vi map (Some(_))
     val ovi: Option[Validation[String, Int]] = vi.point[Option]
     voi must be_===(success[String, Option[Int]](Some(0)))
     ovi must be_===(Some(vi))
@@ -56,15 +56,15 @@ class ValidationTest extends Spec {
     import std.AllInstances._
     import syntax.functor._
     import std.string.stringSyntax._
-    val x = "0".parseBoolean.fail.fpair
+    val x = "0".parseBoolean.failure.fpair
     ok
   }
   
   "ap2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNel
-      val fail2 = Failure("2").toValidationNel
+      val fail1 = Failure("1").toValidationNEL
+      val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
       Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
     }
@@ -73,8 +73,8 @@ class ValidationTest extends Spec {
   "map2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNel
-      val fail2 = Failure("2").toValidationNel
+      val fail1 = Failure("1").toValidationNEL
+      val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
       Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("Failure([1,2])")
     }
@@ -96,19 +96,19 @@ class ValidationTest extends Spec {
     def pointed[E: Semigroup] = Pointed[({type λ[α] = Validation[E, α]})#λ]
 
     object failProjection {
-      def show[E: Show, A: Show] = Show[FailProjection[E, A]]
-      def equal[E: Equal, A: Equal] = Equal[FailProjection[E, A]]
-      def order[E: Order, A: Order] = Order[FailProjection[E, A]]
-      def pointed[E] = Pointed[({type λ[α]=FailProjection[E, α]})#λ]
-      def semigroup[E: Semigroup, A] = Semigroup[FailProjection[E, A]]
-      def applicative[E: Semigroup] = Applicative[({type λ[α]=FailProjection[E, α]})#λ]
-      def traverse[E: Semigroup] = Traverse[({type λ[α]=FailProjection[E, α]})#λ]
-      def plus[E: Semigroup] = Plus[({type λ[α]=FailProjection[E, α]})#λ]
-      def bitraverse = Bitraverse[FailProjection]
+      def show[E: Show, A: Show] = Show[FailureProjection[E, A]]
+      def equal[E: Equal, A: Equal] = Equal[FailureProjection[E, A]]
+      def order[E: Order, A: Order] = Order[FailureProjection[E, A]]
+      def pointed[E] = Pointed[({type λ[α]=FailureProjection[E, α]})#λ]
+      def semigroup[E: Semigroup, A] = Semigroup[FailureProjection[E, A]]
+      def applicative[E: Semigroup] = Applicative[({type λ[α]=FailureProjection[E, α]})#λ]
+      def traverse[E: Semigroup] = Traverse[({type λ[α]=FailureProjection[E, α]})#λ]
+      def plus[E: Semigroup] = Plus[({type λ[α]=FailureProjection[E, α]})#λ]
+      def bitraverse = Bitraverse[FailureProjection]
 
       // checking absence of ambiguity
-      def equal[E: Order, A: Order] = Equal[FailProjection[E, A]]
-      def pointed[E: Semigroup] = Pointed[({type λ[α]=FailProjection[E, α]})#λ]
+      def equal[E: Order, A: Order] = Equal[FailureProjection[E, A]]
+      def pointed[E: Semigroup] = Pointed[({type λ[α]=FailureProjection[E, α]})#λ]
     }
   }
 }
