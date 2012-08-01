@@ -3,7 +3,7 @@ package std
 
 trait MapInstances {
   import syntax.std.function2._
-  
+
   implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new Monoid[Map[K, V]] {
     def zero = Map[K, V]()
     def append(m1: Map[K, V], m2: => Map[K, V]) = {
@@ -60,6 +60,9 @@ trait MapFunctions {
 
   final def unionWith[K,A](m1: Map[K, A], m2: Map[K, A])(f: (A, A) => A): Map[K, A] =
     unionWithKey(m1, m2)((_, x, y) => f(x, y))
+
+  final def insertWith[K,A](m1: Map[K, A], k: K, v: A)(f: (A, A) => A): Map[K, A] =
+    if(m1 contains k) m1 + (k -> f(m1(k), v)) else m1 + (k -> v)
 }
 
 object map extends MapInstances with MapFunctions
