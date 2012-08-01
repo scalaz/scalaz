@@ -107,10 +107,10 @@ sealed trait \/[+A, +B] {
     }
 
   /** Filter on the right of this disjunction. */
-  def filter[BB >: B](p: BB => Boolean)(implicit M: Monoid[BB]): (A \/ BB) =
+  def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA]): (AA \/ B) =
     this match {
       case -\/(a) => -\/(a)
-      case \/-(b) => \/-(if(p(b)) b else M.zero)
+      case \/-(b) => if(p(b)) \/-(b) else -\/(M.zero)
     }
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */

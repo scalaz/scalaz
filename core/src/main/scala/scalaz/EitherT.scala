@@ -87,8 +87,8 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
 
   /** Filter on the right of this disjunction. */
-  def filter[BB >: B](p: BB => Boolean)(implicit M: Monoid[BB], F: Functor[F]): EitherT[F, A, BB] =
-    EitherT(F.map(run)(_ filter p))
+  def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
+    EitherT(F.map(run)(_.filter[AA](p)))
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =

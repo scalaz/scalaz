@@ -129,10 +129,10 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Filter on the success of this validation. */
-  def filter[AA >: A](p: AA => Boolean)(implicit M: Monoid[AA]): Validation[E, AA] =
+  def filter[EE >: E](p: A => Boolean)(implicit M: Monoid[EE]): Validation[EE, A] =
     this match {
       case Failure(a) => Failure(a)
-      case Success(e) => Success(if(p(e)) e else M.zero)
+      case Success(e) => if(p(e)) Success(e) else Failure(M.zero)
     }
 
   def exists(f: A => Boolean): Boolean = this match {
@@ -385,10 +385,10 @@ sealed trait FailProjection[+E, +A] {
     }
 
   /** Filter on the success of this validation. */
-  def filter[EE >: E](p: EE => Boolean)(implicit M: Monoid[EE]): FailProjection[EE, A] =
+  def filter[AA >: A](p: E => Boolean)(implicit M: Monoid[AA]): FailProjection[E, AA] =
     (success match {
       case Success(a) => Success(a)
-      case Failure(e) => Failure(if(p(e)) e else M.zero)
+      case Failure(e) => if(p(e)) Failure(e) else Success(M.zero)
     }).fail
 
   def exists(f: E => Boolean): Boolean =
