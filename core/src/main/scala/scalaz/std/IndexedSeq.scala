@@ -26,33 +26,45 @@ trait IndexedSeqInstances0 {
 }
 
 trait IndexedSeqInstances extends IndexedSeqInstances0 {
-  implicit val indexedSeqInstance = new Traverse[IndexedSeq] with MonadPlus[IndexedSeq] with Each[IndexedSeq] with Index[IndexedSeq] with Length[IndexedSeq] with ApplicativePlus[IndexedSeq] with Zip[IndexedSeq] with Unzip[IndexedSeq] {
-    def each[A](fa: IndexedSeq[A])(f: (A) => Unit) = fa foreach f
-    def index[A](fa: IndexedSeq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
-    def length[A](fa: IndexedSeq[A]) = fa.length
-    def point[A](a: => A) = scala.IndexedSeq(a)
-    def bind[A, B](fa: IndexedSeq[A])(f: A => IndexedSeq[B]) = fa flatMap f
-    def empty[A] = scala.IndexedSeq()
-    def plus[A](a: IndexedSeq[A], b: => IndexedSeq[A]) = a ++ b
-    override def map[A, B](v: IndexedSeq[A])(f: A => B) = v map f
+  object generic extends IndexedSeqSubIndexedSeq with IndexedSeqSubInstances
 
-    def zip[A, B](a: => IndexedSeq[A], b: => IndexedSeq[B]) = a zip b
-    def unzip[A, B](a: IndexedSeq[(A, B)]) = a.unzip
+  implicit val indexedSeqInstance = generic.ixSqInstance
 
-    def traverseImpl[F[_], A, B](v: IndexedSeq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      DList.fromList(v.toList).foldr(F.point(IndexedSeq[B]())) {
+  implicit def indexedSeqMonoid[A]: Monoid[IndexedSeq[A]] = generic.ixSqMonoid
+
+  implicit def indexedSeqShow[A: Show]: Show[IndexedSeq[A]] = generic.ixSqShow
+
+  implicit def indexedSeqOrder[A](implicit A0: Order[A]): Order[IndexedSeq[A]] = generic.ixSqOrder
+}
+
+trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with ApplicativePlus[IxSq] with Zip[IxSq] with Unzip[IxSq] {
+    def each[A](fa: IxSq[A])(f: (A) => Unit) = fa foreach f
+    def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
+    def length[A](fa: IxSq[A]) = fa.length
+    def point[A](a: => A) = empty :+ a
+    def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f
+    def empty[A] = self.empty[A]
+    def plus[A](a: IxSq[A], b: => IxSq[A]) = a ++ b
+    override def map[A, B](v: IxSq[A])(f: A => B) = v map f
+
+    def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b
+    def unzip[A, B](a: IxSq[(A, B)]) = a.unzip
+
+    def traverseImpl[F[_], A, B](v: IxSq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      DList.fromList(v.toList).foldr(F.point(empty[B])) {
          (a, fbs) => F.map2(f(a), fbs)(_ +: _)
       }
     }
     
-    override def traverseS[S,A,B](v: IndexedSeq[A])(f: A => State[S,B]): State[S,IndexedSeq[B]] =
+    override def traverseS[S,A,B](v: IxSq[A])(f: A => State[S,B]): State[S,IxSq[B]] =
       State((s: S) => 
-        v.foldLeft((s, IndexedSeq[B]()))((acc, a) => {
+        v.foldLeft((s, empty[B]))((acc, a) => {
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
         }))
 
-    override def foldRight[A, B](fa: IndexedSeq[A], z: => B)(f: (A, => B) => B) = {
+    override def foldRight[A, B](fa: IxSq[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
@@ -67,17 +79,17 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 
   }
 
-  implicit def indexedSeqMonoid[A]: Monoid[IndexedSeq[A]] = new Monoid[IndexedSeq[A]] {
-    def append(f1: IndexedSeq[A], f2: => IndexedSeq[A]) = f1 ++ f2
-    def zero: IndexedSeq[A] = IndexedSeq()
+  implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
+    def append(f1: IxSq[A], f2: => IxSq[A]) = f1 ++ f2
+    def zero: IxSq[A] = empty
   }
 
-  implicit def indexedSeqShow[A: Show]: Show[IndexedSeq[A]] = new Show[IndexedSeq[A]] {
-    def show(as: IndexedSeq[A]) =
+  implicit def ixSqShow[A: Show]: Show[IxSq[A]] = new Show[IxSq[A]] {
+    def show(as: IxSq[A]) =
       (List('[') +: (indexedSeq.intersperse(as.map(Show[A].show(_)), List(',')) :+ List(']'))).flatten.toList
   }
 
-  implicit def indexedSeqOrder[A](implicit A0: Order[A]): Order[IndexedSeq[A]] = new IndexedSeqOrder[A] {
+  implicit def ixSqOrder[A](implicit A0: Order[A]): Order[IxSq[A]] = new IndexedSeqSubOrder[A, IxSq[A]] {
     implicit def A = A0
   }
 
@@ -183,9 +195,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     if (as.isEmpty) empty else as zip as.tail
 }
 
-trait IndexedSeqFunctions extends IndexedSeqSubFunctions with IndexedSeqSubIndexedSeq
-
-object indexedSeq extends IndexedSeqInstances with IndexedSeqFunctions {
+object indexedSeq extends IndexedSeqInstances with IndexedSeqSubFunctions with IndexedSeqSubIndexedSeq {
   object indexedSeqSyntax extends scalaz.syntax.std.ToIndexedSeqOps
 }
 
@@ -197,12 +207,12 @@ trait IndexedSeqEqual[A, Coll <: IndexedSeq[A]] extends Equal[Coll] {
   override def equal(a1: Coll, a2: Coll) = (a1 corresponds a2)(Equal[A].equal)
 }
 
-trait IndexedSeqOrder[A] extends Order[IndexedSeq[A]] with IndexedSeqEqual[A, IndexedSeq[A]] {
+trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] extends Order[Coll] with IndexedSeqEqual[A, Coll] {
   implicit def A: Order[A]
 
   import Ordering._
 
-  def order(a1: IndexedSeq[A], a2: IndexedSeq[A]) =
+  def order(a1: Coll, a2: Coll): Ordering =
     (a1, a2) match {
       case (IndexedSeq(), IndexedSeq()) => EQ
       case (IndexedSeq(), y)        => LT
