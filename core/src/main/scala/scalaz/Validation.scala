@@ -517,10 +517,7 @@ sealed trait FailProjection[+E, +A] {
 
 }
 
-object FailProjection extends FailProjectionFunctions with FailProjectionInstances {
-  def apply[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
-    Validation.failureNT[A]
-}
+object FailProjection extends FailProjectionFunctions with FailProjectionInstances
 
 trait FailProjectionInstances0 {
   import FailProjection._
@@ -603,7 +600,7 @@ trait FailProjectionFunctions {
   }
 
   /** The FailProjection type constructor is isomorphic to Validation */
-  implicit def FailProjectionBiIso[A] = new IsoBifunctorTemplate[FailProjection, Validation] {
+  implicit def FailProjectionBiIso = new IsoBifunctorTemplate[FailProjection, Validation] {
     def to[A, B](fa: FailProjection[A, B]): Validation[A, B] = fa.success
     def from[A, B](ga: Validation[A, B]): FailProjection[A, B] = ga.fail
   }
@@ -677,22 +674,9 @@ trait ValidationFunctions {
 
   def failure[E, A](e: E): Validation[E, A] = Failure(e)
 
-  def fromEither[E, A](e: (E \/ A)): Validation[E, A] =
-    e.fold(e => Failure(e), a => Success(a))
-
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
     case e => failure(e)
   }
-
-  def successNT[E]: (Id ~> ({type λ[α] = Validation[E, α]})#λ) =
-    new (Id ~> ({type λ[α] = Validation[E, α]})#λ) {
-      def apply[A](a: A) = Success(a)
-    }
-
-  def failureNT[A]: (Id ~> ({type λ[α] = Validation[α, A]})#λ) =
-    new (Id ~> ({type λ[α] = Validation[α, A]})#λ) {
-      def apply[E](e: E) = Failure(e)
-    }
 }
