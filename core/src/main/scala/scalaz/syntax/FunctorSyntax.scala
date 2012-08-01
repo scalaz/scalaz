@@ -18,6 +18,7 @@ trait FunctorOps[F[_],A] extends Ops[F[A]] {
   final def void: F[Unit] = F.void(self)
   final def fpoint[G[_]: Pointed]: F[G[A]] = F.map(self)(a => Pointed[G].point(a))
   final def >|[B](b: B): F[B] = F.map(self)(_ => b)
+  final def as[B](b: B): F[B] = F.map(self)(_ => b)
   ////
 }
 

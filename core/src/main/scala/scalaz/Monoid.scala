@@ -28,10 +28,9 @@ trait Monoid[F] extends Semigroup[F] { self =>
    * For `n = 0`, `zero`
    * For `n = 1`, `append(zero, value)`
    * For `n = 2`, `append(append(zero, value), value)`
-   *
-   * [[scalaz.Monoid]]`.replicate` generalizes this function.
    */
-  def multiply(value: F, n: Int): F = Monoid.replicate[Id, F](value)(n)(implicitly, this)
+  def multiply(value: F, n: Int): F =
+    Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
 
   /** Every `Monoid` gives rise to a [[scalaz.Category]] */
   final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
@@ -89,20 +88,6 @@ object Monoid {
   def liftMonoid[F[_], M](implicit F0: Applicative[F], M0: Monoid[M]): Monoid[F[M]] = new ApplicativeMonoid[F, M] {
     implicit def F: Applicative[F] = F0
     implicit def M: Monoid[M] = M0
-  }
-
-  def unfold[F[_], A, B](seed: A)(f: A => Option[(B, A)])(implicit F: Pointed[F], FB: Monoid[F[B]]): F[B] =
-    f(seed) match {
-      case None         => FB.zero
-      case Some((b, a)) => FB.append(F.point(b), unfold[F, A, B](a)(f))
-    }
-
-  def replicate[F[_], A](a: A)(n: Int, f: A => A = (a: A) => a)(implicit P: Pointed[F], FA: Monoid[F[A]]): F[A] = {
-    @tailrec
-    def replicate0(accum: F[A], n: Int, a: A): F[A] =
-      if (n > 0) replicate0(FA.append(accum, P.point(a)), n - 1, f(a)) else accum
-
-    replicate0(FA.zero, n, a)
   }
 
   ////
