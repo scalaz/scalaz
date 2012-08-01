@@ -45,7 +45,8 @@ trait Foldable[F[_]]  { self =>
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
   
-  // derived functions
+  /** Alias for `foldMap` where `F` is summed with `None` to form a
+    * Monoid. */
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
     import std.option._
     foldMap(fa)(a => some(f(a)))
@@ -76,6 +77,7 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
+  /** Unbiased sum of monoidal values. */
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def foldr1[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, o) => o.map(f(a, _)) orElse Some(a))
   def foldl1[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((o, a) => o.map(f(a, _)) orElse Some(a))
@@ -84,18 +86,27 @@ trait Foldable[F[_]]  { self =>
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
 
+  /** Whether all `A`s in `fa` yield true from `p`. */
   def all[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, true)(p(_) && _)
+  /** `all` with monadic traversal. */
   def allM[G[_], A](fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(true))((a, b) => G.bind(p(a))(q => if(q) b else G.point(false)))
+  /** Whether any `A`s in `fa` yield true from `p`. */
   def any[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, false)(p(_) || _)
+  /** `any` with monadic traversal. */
   def anyM[G[_], A](fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
+  /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
   import Ordering.{GT, LT}
+  /** The greatest element of `fa`, or None if `fa` is empty. */
   def maximum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == GT) x else y)
+  /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == LT) x else y)
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
+  /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
+  /** Whether `a` is an element of `fa`. */
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
 
   /**
