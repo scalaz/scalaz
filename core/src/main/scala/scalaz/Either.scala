@@ -246,7 +246,7 @@ sealed trait \/[+A, +B] {
 private case class -\/[+A](a: A) extends (A \/ Nothing)
 private case class \/-[+B](b: B) extends (Nothing \/ B)
 
-object \/ extends Instances_\/ {
+object \/ extends DisjunctionInstances {
   /** Construct a left disjunction value. */
   def left[A, B](a: A): A \/ B =
     -\/(a)
@@ -256,13 +256,13 @@ object \/ extends Instances_\/ {
     \/-(b)
 }
 
-trait Instances_\/ extends Instances0_\/ {
+trait DisjunctionInstances extends DisjunctionInstances0 {
   /** Turns out that Either is just a glorified tuple; who knew? */
   type GlorifiedTuple[+A, +B] =
   A \/ B
 }
 
-trait Instances0_\/ extends Instances1_\/ {
+trait DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def Order_\/[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
@@ -278,7 +278,7 @@ trait Instances0_\/ extends Instances1_\/ {
     }
 }
 
-trait Instances1_\/ extends Instances2_\/ {
+trait DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def Equal_\/[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
@@ -295,7 +295,7 @@ trait Instances1_\/ extends Instances2_\/ {
     }
 }
 
-trait Instances2_\/ extends Instances3_\/ {
+trait DisjunctionInstances2 extends DisjunctionInstances3 {
   implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
@@ -321,7 +321,7 @@ trait Instances2_\/ extends Instances3_\/ {
 
 }
 
-trait Instances3_\/ {
+trait DisjunctionInstances3 {
   implicit def Instances0_\/ : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
