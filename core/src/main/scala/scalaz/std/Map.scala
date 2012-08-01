@@ -50,6 +50,13 @@ trait MapFunctions {
   final def intersectWith[K,A,B,C](m1: Map[K, A], m2: Map[K, B])(f: (A, B) => C): Map[K, C] =
     intersectWithKey(m1, m2)((_, x, y) => f(x, y))
 
+  /** Exchange keys of `m` according to `f`.  Result may be smaller if
+    * `f` maps two or more `K`s to the same `K2`, in which case the
+    * resulting associated value is an arbitrary choice.
+    */
+  final def mapKeys[K, K2, A](m: Map[K, A])(f: K => K2): Map[K2, A] =
+    m map {case (k, v) => f(k) -> v}
+
   final def unionWithKey[K,A](m1: Map[K, A], m2: Map[K, A])(f: (K, A, A) => A): Map[K, A] = {
     val diff = m2 -- m1.keySet
     val aug = m1 map {
