@@ -57,15 +57,15 @@ trait Tags {
 object Tag extends Tags {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val nameTagL: Tag @> QName =
-    lens(x => costate(b => tag(b, x.attribs, x.line), x.name))
+    lens(x => store(x.name)(b => tag(b, x.attribs, x.line)))
 
   val attribsTagL: Tag @> List[Attr] =
-    lens(x => costate(b => tag(x.name, b, x.line), x.attribs))
+    lens(x => store(x.attribs)(b => tag(x.name, b, x.line)))
 
   val lineTagL: Tag @> Option[Line] =
-    lens(x => costate(b => tag(x.name, x.attribs, b), x.line))
+    lens(x => store(x.line)(b => tag(x.name, x.attribs, b)))
 
 }

@@ -17,16 +17,10 @@ class RopeTest extends Specification with ScalaCheck {
 
   import Rope._
 
-  def beTheSameRopeSeq[A : ClassManifest] = containInOrder(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
+  // def beTheSameRopeSeq[A : ClassManifest] = containInOrder(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
   import scala.Predef.{implicitly => ?}
 
   override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 25))
-
-  //workaround, as contains(List(1,2,3):_*).inOrder gives a compilation error.
-  // Should be fixed in the next specs version, see https://github.com/etorreborre/specs2/commit/5edb654ff8eb9bf46bdaf806f43739035671c356
-  implicit def seqToLazyParam[T](t: Seq[T]): Seq[LazyParameter[T]] = t.map(value => new LazyParameter(() => value))
-
-  def containInOrder[T](t: Seq[LazyParameter[T]]): ContainInOrderMatcher[T] = new ContainInOrderMatcher(t:_*)
 
   def m[A](implicit man: ClassManifest[A]) = man
 

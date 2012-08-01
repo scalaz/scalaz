@@ -3,6 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import Id._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
@@ -13,7 +14,7 @@ class ListTest extends Spec {
   import std.list.listSyntax._
   import syntax.monad._
 
-  "intercalate empty list is identity" ! check((a: List[Int]) => a.intercalate(Nil) must be_===(a))
+  "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 
   "intersperse then remove odd items is identity" ! check {
     (a: List[Int], b: Int) =>
@@ -21,9 +22,9 @@ class ListTest extends Spec {
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
   }
 
-  "intercalate single element lists the same as intersperse" ! check  {
-    (a: List[Int], b: Int) =>
-      a.intercalate(List(b)) must be_===(a.intersperse(b))
+  "intercalate is same as a.intersperse(b).flatten" ! check  {
+    (a: List[List[Int]], b: List[Int]) =>
+      a.intercalate(b) must be_===(a.intersperse(b).flatten)
   }
 
   "intersperse vs benchmark" ! check  {
@@ -33,15 +34,6 @@ class ListTest extends Spec {
       case h :: t   => h :: a :: intersperse(t, a)
     }
     (a: List[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
-  }
-
-  "intercalate vs benchmark" ! check  {
-    def intercalate[A](value: List[A], as: List[A]): List[A] = value match {
-      case Nil      => Nil
-      case x :: Nil => x :: Nil
-      case h :: t   => h :: as ::: intercalate(t, as)
-    }
-    (a: List[Int], b: List[Int]) => (a.intercalate(b) must be_===(intercalate(a, b)))
   }
 
   "groupByM[Id].flatten is identity" ! check {
@@ -54,7 +46,7 @@ class ListTest extends Spec {
       i =>
         val j = i + (if (f(a)) 0 else 1)
         val done = j >= n
-        (!done, j)
+        (j, !done)
     }).evalZero
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString

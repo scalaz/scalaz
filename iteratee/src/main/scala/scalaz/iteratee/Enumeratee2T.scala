@@ -85,7 +85,7 @@ trait Enumeratee2TFunctions {
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[(J, K), F, A]) => cogroupI.apply(cstep(step)) flatMap { endStep[J, K, (J, K), F, A] }
+        (step: StepT[(J, K), F, A]) => cogroupI[J, K, F].apply(cstep(step)) flatMap { endStep[J, K, (J, K), F, A] }
       }
     }
 
@@ -138,7 +138,7 @@ trait Enumeratee2TFunctions {
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[J, F, A]) => cogroupI.apply(cstep(step)) flatMap { endStep[J, K, J, F, A] }
+        (step: StepT[J, F, A]) => cogroupI[J, K, F].apply(cstep(step)) flatMap { endStep[J, K, J, F, A] }
       }
     }
 

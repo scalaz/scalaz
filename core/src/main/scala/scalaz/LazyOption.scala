@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait LazyOption[A] {
+sealed trait LazyOption[+A] {
 
   import LazyOption._
   import LazyEither._
@@ -21,7 +21,7 @@ sealed trait LazyOption[A] {
   def isEmpty =
     !isDefined
 
-  def getOrElse(default: => A): A =
+  def getOrElse[AA >: A](default: => AA): AA =
     fold(a => a, default)
 
   def exists(f: (=> A) => Boolean): Boolean =
@@ -48,7 +48,7 @@ sealed trait LazyOption[A] {
   def toList: List[A] =
     fold(List(_), Nil)
 
-  def orElse(a: => LazyOption[A]): LazyOption[A] =
+  def orElse[AA >: A](a: => LazyOption[AA]): LazyOption[AA] =
     fold(_ => this, a)
 
 /* TODO
@@ -92,7 +92,7 @@ sealed trait LazyOption[A] {
       y <- b
     } yield (x, y)
 
-  def unzip[X, Y](implicit ev: A =:= (X, Y)): (LazyOption[X], LazyOption[Y]) =
+  def unzip[X, Y](implicit ev: A <:< (X, Y)): (LazyOption[X], LazyOption[Y]) =
     fold(xy => (lazySome(xy._1), lazySome(xy._2)), (lazyNone, lazyNone))
 
 }

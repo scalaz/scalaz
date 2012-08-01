@@ -62,7 +62,7 @@ trait Enum[F] extends Order[F] { self =>
    * @param f The function to execute on each spin of the state value.
    */
   def succState[X](f: F => X): State[F, X] =
-    State((s: F) => (f(s), succ(s)))
+    State((s: F) => (succ(s), f(s)))
 
   /**
    * Produce a value that starts at zero (`Monoid.zero`) and increments through a state value with the given binding function. This is useful to implement incremental looping.
@@ -108,7 +108,7 @@ trait Enum[F] extends Order[F] { self =>
    * @param f The function to execute on each spin of the state value.
    */
   def predState[X](f: F => X): State[F, X] =
-    State((s: F) => (f(s), pred(s)))
+    State((s: F) => (pred(s), f(s)))
 
   /**
    * Produce a value that starts at zero (`Monoid.zero`) and decrements through a state value with the given binding function. This is useful to implement decremental looping.

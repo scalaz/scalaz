@@ -6,6 +6,8 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
+[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=scalaz-seven)](http://travis-ci.org/scalaz/scalaz)
+
 ## Quick Start
 
 ```scala
@@ -96,6 +98,7 @@ Scalaz has been been modularised.
 * **scalaz-concurrent**: Actor and Promise implementation
 * **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
 * **scalaz-iteratee**: Experimental new Iteratee implementation
+* **scalaz-typelevel**: Type-level data structures, type-safe printf
 * **scalaz-xml**: Error-correcting XML parser
 
 ### Type Class Hierarchy

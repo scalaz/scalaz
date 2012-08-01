@@ -13,6 +13,7 @@ import syntax.functor._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import Id._
 
 class EnumeratorPTest extends Spec {
   implicit val intO = Order[Int].order _

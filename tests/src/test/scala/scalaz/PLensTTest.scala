@@ -14,13 +14,13 @@ class PLensTTest extends Spec {
   }
 
   object instances {
-    def arrId[F[_] : Pointed, G[_]: Pointed] = ArrId[({type λ[α, β]=PLensT[F, G, α, β]})#λ]
-    def category[F[_] : Monad, G[_]: Monad] = Category[({type λ[α, β]=PLensT[F, G, α, β]})#λ]
-    def choice[F[_] : Monad, G[_]: Monad] = Choice[({type λ[α, β]=PLensT[F, G, α, β]})#λ]
-    def split[F[_] : Monad, G[_]: Monad] = Split[({type λ[α, β]=PLensT[F, G, α, β]})#λ]
+    def arrId[F[+_] : Pointed] = ArrId[({type λ[α, β]=PLensT[F, α, β]})#λ]
+    def category[F[+_] : Monad] = Category[({type λ[α, β]=PLensT[F, α, β]})#λ]
+    def choice[F[+_] : Monad] = Choice[({type λ[α, β]=PLensT[F, α, β]})#λ]
+    def split[F[+_] : Monad] = Split[({type λ[α, β]=PLensT[F, α, β]})#λ]
 
     // checking absence of ambiguity
-    def arrId[F[_] : Monad, G[_]: Monad] = ArrId[({type λ[α, β]=PLensT[F, G, α, β]})#λ]
+    def arrId[F[+_] : Monad] = ArrId[({type λ[α, β]=PLensT[F, α, β]})#λ]
   }
 
 }

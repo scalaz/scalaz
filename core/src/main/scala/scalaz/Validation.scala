@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Represents either:
  *  - `Success(a)`, or
@@ -245,7 +247,7 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
 
     new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G] {
       def iso = FailProjectionEIso2[E]
-      implicit def G = Validation.validationApplicative(E)
+      implicit def G = Validation.validationTraverseApplicativePlus(E)
     }
   }
 
@@ -262,7 +264,7 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
 
   implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailProjection[E, A]] = new IsomorphismSemigroup[FailProjection[E, A], Validation[E, A]] {
     def iso = FailProjectionIso
-    implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
+    implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroupFail
   }
 
   implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
@@ -280,7 +282,7 @@ trait FailProjectionInstances extends FailProjectionInstances0 {
       IsomorphismTraverse[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
       IsomorphismPlus[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
       def iso = FailProjectionEIso2
-      implicit def G = Validation.validationApplicative
+      implicit def G = Validation.validationTraverseApplicativePlus
     }
 
   implicit def failProjectionBitraverse =
@@ -338,7 +340,7 @@ trait ValidationInstances0 {
 
 trait ValidationInstances extends ValidationInstances0 {
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
-  implicit def validationApplicative[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
+  implicit def validationTraverseApplicativePlus[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
     with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 
@@ -351,7 +353,7 @@ trait ValidationInstances extends ValidationInstances0 {
     def plus[A](a: Validation[E, A], b: => Validation[E, A]): Validation[E, A] = a orElse b
   }
 
-  def validationNelApplicative[E] = validationApplicative[NonEmptyList[E]]
+  def validationNelApplicative[E] = validationTraverseApplicativePlus[NonEmptyList[E]]
 
   implicit def validationBitraverse = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
@@ -359,11 +361,21 @@ trait ValidationInstances extends ValidationInstances0 {
     def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
   }
 
-  implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
+  def validationSemigroupFail[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
     def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
   }
 
-  // Intentionally non-implicit to avoid accidentally using this where Applicative is preferred
+  implicit def validationSemigroup[E : Semigroup, A : Semigroup]: Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
+    def append(f1: Validation [E, A], f2: => Validation[E, A]): Validation[E, A] = f1 append f2
+  }
+
+  /**
+   * An alternative type class instance for Validation, treating it as a right-biased Either with fail-fast
+   * semantics. Intentionally non-implicit, as accidental use of this could be dangerous when you are after
+   * `Applicative[[a]Validation[E, A]]` for some `Semigroup[E]` for which errors are accumulated.
+   *
+   * This is a convenience to avoid converting to and from `Either`.
+   */
   def validationMonad[E] = new Traverse[({type λ[α] = Validation[E, α]})#λ] with Monad[({type λ[α] = Validation[E, α]})#λ] {
     def point[A](a: => A): Validation[E, A] = Success(a)
 

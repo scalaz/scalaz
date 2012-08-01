@@ -133,15 +133,15 @@ trait QNames {
 object QName extends QNames {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val nameQNameL: QName @> Str =
-    lens(x => costate(b => qname(b, x.uri, x.prefix), x.name))
+    lens(x => store(x.name)(b => qname(b, x.uri, x.prefix)))
 
   val uriQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, b, x.prefix), x.uri))
+    lens(x => store(x.uri)(b => qname(x.name, b, x.prefix)))
 
   val prefixQNameL: QName @> Option[Str] =
-    lens(x => costate(b => qname(x.name, x.uri, b), x.prefix))
+    lens(x => store(x.prefix)(b => qname(x.name, x.uri, b)))
 
 }

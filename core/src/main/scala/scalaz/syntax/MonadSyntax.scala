@@ -8,6 +8,12 @@ trait MonadOps[F[_],A] extends Ops[F[A]] {
   
   def liftM[G[_[_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)
 
+  final def replicateM[G[_]](n: Int)(implicit G: Traverse[G], P: Pointed[G], N: Monoid[G[F[A]]]): F[G[A]] =
+    Monad.replicateM[F, G, A](self, n)
+
+  final def replicateM_(n: Int): F[Unit] =
+    Monad.replicateM_[F, A](self, n)
+
   ////
 }
 

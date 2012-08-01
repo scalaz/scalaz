@@ -10,6 +10,7 @@ trait AllInstances
   with scalaz.std.java.util.MapInstances
   with scalaz.std.java.math.BigIntegerInstances
   with scalaz.std.java.util.concurrent.CallableInstances
+  with NodeSeqInstances
   // Intentionally omitted: IterableInstances
 
 object AllInstances extends AllInstances

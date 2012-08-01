@@ -44,6 +44,19 @@ class ProductTest extends Spec {
   checkAll("Two-element product", plusEmpty.laws[TCCons[Option, TCCons[List, TCNil]]#Product])
   checkAll("Two-element product", traverse.laws[TCCons[Option, TCCons[List, TCNil]]#Product])
 
+
+  checkAll("Empty product", group.laws[HNil](
+    TypeClass[Group].emptyProduct, TypeClass[Equal].emptyProduct, TypeClass[Arbitrary].emptyProduct
+  ))
+
+  checkAll("One-element product", group.laws[Int :: HNil](
+    TypeClass[Group].product1[Int], TypeClass[Equal].product1[Int], TypeClass[Arbitrary].product1[Int]
+  ))
+
+  checkAll("Two-element product", group.laws[Int :: Int :: HNil](
+    TypeClass[Group].product2[Int, Int], TypeClass[Equal].product2[Int, Int], TypeClass[Arbitrary].product2[Int, Int]
+  ))
+
 }
 
 // vim: expandtab:ts=2:sw=2

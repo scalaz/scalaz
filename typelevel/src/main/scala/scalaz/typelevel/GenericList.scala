@@ -3,6 +3,8 @@ package typelevel
 
 import scalaz.{Apply, Kleisli}
 
+import scalaz.Id._
+
 object GenericList {
 
   // index-based access via implicits

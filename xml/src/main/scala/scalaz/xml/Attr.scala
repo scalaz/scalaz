@@ -50,12 +50,12 @@ trait Attrs {
 object Attr extends Attrs {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val keyAttrL: Attr @> QName =
-    lens(x => costate(b => attr(b, x.value), x.key))
+    lens(x => store(x.key)(b => attr(b, x.value)))
 
   val valueAttrL: Attr @> Str =
-    lens(x => costate(b => attr(x.key, b), x.value))
+    lens(x => store(x.value)(b => attr(x.key, b)))
 
 }

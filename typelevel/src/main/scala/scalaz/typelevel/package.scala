@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Type-level data structures in '''Scalaz'''.
  *
@@ -20,7 +22,15 @@ package object typelevel {
    * [[scalaz.typelevel.syntax.HLists]]
    */
   type HCons[H, T <: HList] = GenericCons[Id, H, T]
+
   type HNil = GenericNil[Id]
+
+  object HCons {
+
+    def apply[H, T <: HList](head: H, tail: T): HCons[H, T] = GenericCons[Id, H, T](head, tail)
+
+    def unapply[H, T <: HList](list: HCons[H, T]): Option[(H, T)] = Some(list.head, list.tail)
+  }
 
   def HNil: HNil = GenericNil[Id]()
 

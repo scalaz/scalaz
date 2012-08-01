@@ -7,6 +7,7 @@ import Enumeratee2T._
 import effect._
 import Either3._
 import MonadPartialOrder._
+import Id._
 
 class Enumeratee2TTest extends Spec {
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]

@@ -1,11 +1,13 @@
 package scalaz
 
-sealed abstract class Ordering(val toInt: Int, val name: String)
+sealed abstract class Ordering(val toInt: Int, val name: String) {
+  def complement: Ordering
+}
 
 object Ordering extends OrderingFunctions with OrderingInstances {
-  case object LT extends Ordering(-1, "LT")
-  case object EQ extends Ordering(0, "EQ")
-  case object GT extends Ordering(1, "GT")
+  case object LT extends Ordering(-1, "LT") { val complement = GT }
+  case object EQ extends Ordering(0,  "EQ") { val complement = EQ }
+  case object GT extends Ordering(1,  "GT") { val complement = LT }
 }
 
 trait OrderingInstances {

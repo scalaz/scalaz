@@ -76,12 +76,12 @@ trait HCursors {
 object HCursor extends HCursors {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val historyHCursorL: HCursor @> History =
-    lens(x => costate(b => hcursor(b, x.cursor), x.history))
+    lens(x => store(x.history)(b => hcursor(b, x.cursor)))
 
   val cursorHCursorL: HCursor @> Option[Cursor] =
-    lens(x => costate(b => hcursor(x.history, b), x.cursor))
+    lens(x => store(x.cursor)(b => hcursor(x.history, b)))
 
 }

@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 ////
 /**
  * Provides an identity element (`zero`) to the binary `append`
@@ -12,7 +14,7 @@ package scalaz
  * References:
  *  - [[http://mathworld.wolfram.com/Monoid.html]]
  *
- * @see [[scalaz.syntax.MonoidV]]
+ * @see [[scalaz.syntax.MonoidOps]]
  * @see [[scalaz.Monoid.MonoidLaw]]
  *
  */

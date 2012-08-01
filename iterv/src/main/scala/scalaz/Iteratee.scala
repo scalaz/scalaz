@@ -1,4 +1,4 @@
-/** Legacy implementation of iteratees, for compatibility with Scalaz 6 */
+// Legacy implementation of iteratees, for compatibility with Scalaz 6 */
 package scalaz
 import Scalaz._
 
@@ -60,12 +60,12 @@ sealed trait IterV[E, A] {
 }
 
 /** Monadic Iteratees */
-sealed trait IterVM[M[_], E, A] {
+sealed trait IterVM[M[+_], E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 
-case class Iteratee[M[_], E, A](value: M[IterVM[M, E, A]]) {
+case class Iteratee[M[+_], E, A](value: M[IterVM[M, E, A]]) {
   import IterV._
 
   def apply(es: StreamT[M, E])(implicit M: Monad[M]): M[A] = for {
@@ -163,22 +163,22 @@ object IterV {
 
   /** A monadic computation that has finished */
   object DoneM {
-    def apply[M[_], E, A](a: => A, i: => Input[E]): IterVM[M, E, A] = new IterVM[M, E, A] {
+    def apply[M[+_], E, A](a: => A, i: => Input[E]): IterVM[M, E, A] = new IterVM[M, E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = done(a, i)
     }
-    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[(A, Input[E])] =
+    def unapply[M[+_], E, A](r: IterVM[M, E, A]): Option[(A, Input[E])] =
       r.fold[Option[(A, Input[E])]](
         done = (a, i) => Some((a, i)),
         cont = f => None)
   }
 
   object ContM {
-    def apply[M[_], E, A](f: Input[E] => Iteratee[M, E, A]): IterVM[M, E, A] = new IterVM[M, E, A] {
+    def apply[M[+_], E, A](f: Input[E] => Iteratee[M, E, A]): IterVM[M, E, A] = new IterVM[M, E, A] {
       def fold[Z](done: (=> A, => Input[E]) => Z,
                   cont: (Input[E] => Iteratee[M, E, A]) => Z): Z = cont(f)
     }
-    def unapply[M[_], E, A](r: IterVM[M, E, A]): Option[Input[E] => Iteratee[M, E, A]] =
+    def unapply[M[+_], E, A](r: IterVM[M, E, A]): Option[Input[E] => Iteratee[M, E, A]] =
       r.fold[Option[Input[E] => Iteratee[M, E, A]]](
         done = (a, i) => None,
         cont = f => Some(f))
@@ -273,9 +273,10 @@ object IterV {
   /**
    * Iteratee that collects all inputs with the given monoid.
    */
-  def collect[A, F[_]](implicit mon: Monoid[F[A]], pr: Pointed[F]): IterV[A, F[A]] = {
+  def collect[A, F[_]](implicit r: Reducer[A, F[A]]): IterV[A, F[A]] = {
+    import r._
     def step(acc: F[A])(s: Input[A]): IterV[A, F[A]] =
-        s(el = e => Cont(step(acc |+| pr.point(e))),
+        s(el = e => Cont(step(snoc(acc, e))),
           empty = Cont(step(acc)),
           eof = Done(acc, EOF.apply))
     Cont(step(mzero[F[A]]))
@@ -305,7 +306,7 @@ object IterV {
     Cont(step(r.monoid.zero))
   }
 
-  /** Input that has a value available */
+  /** Input that has no values available */
   object Empty {
     def apply[E] : Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = empty
@@ -317,7 +318,7 @@ object IterV {
           eof = Left(EOF[E])).fold(x => false, x => x)
   }
 
-  /** Input that has no values available  */
+  /** Input that has a value available  */
   object El {
     def apply[E](e0: => E): Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = el(e0)

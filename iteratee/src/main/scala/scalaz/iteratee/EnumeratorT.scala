@@ -4,6 +4,7 @@ package iteratee
 import effect._
 import Iteratee._
 import Ordering._
+import Id._
 
 trait EnumeratorT[E, F[_]] { self =>
   def apply[A]: StepT[E, F, A] => IterateeT[E, F, A]
@@ -124,7 +125,7 @@ trait EnumeratorTFunctions {
   def enumStream[E, F[_] : Monad](xs: Stream[E]): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = (s: StepT[E, F, A]) => xs match {
-        case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumStream(t).apply[A])
+        case h #:: t => s.mapCont(k => k(elInput(h)) >>== enumStream[E, F](t).apply[A])
         case _       => s.pointI
       }
     }
@@ -132,7 +133,7 @@ trait EnumeratorTFunctions {
   def enumList[E, F[_] : Monad](xs: List[E]): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = (s: StepT[E, F, A]) => xs match {
-        case h :: t => s.mapCont(k => k(elInput(h)) >>== enumList(t).apply[A])
+        case h :: t => s.mapCont(k => k(elInput(h)) >>== enumList[E, F](t).apply[A])
         case Nil    => s.pointI
       }
     }

@@ -7,7 +7,7 @@ package scalaz
 ////
 trait Show[F]  { self =>
   ////
-  def show(f: F): List[Char]
+  def show(f: F): List[Char] 
   def shows(f: F): String = show(f).mkString
 
   def xmlText(f: F): scala.xml.Text = scala.xml.Text(shows(f))
@@ -31,6 +31,10 @@ object Show {
 
   def show[A](f: A => List[Char]): Show[A] = new Show[A] {
     def show(a: A): List[Char] = f(a)
+  }
+
+  def shows[A](f: A => String): Show[A] = new Show[A] {
+    def show(a: A): List[Char] = f(a).toList
   }
 
   implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
