@@ -4,6 +4,13 @@ package std
 trait MapInstances {
   import syntax.std.function2._
 
+  implicit def mapInstance[K] = new Traverse[({type F[V] = Map[K,V]})#F] {
+    def traverseImpl[G[_],A,B](m: Map[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[Map[K,B]] = {
+      import G.functorSyntax._
+      list.listInstance.traverseImpl(m.toList)({ case (k, v) => f(v) map (k -> _) }) map (_.toMap)
+    }
+  }
+
   implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new Monoid[Map[K, V]] {
     def zero = Map[K, V]()
     def append(m1: Map[K, V], m2: => Map[K, V]) = {
