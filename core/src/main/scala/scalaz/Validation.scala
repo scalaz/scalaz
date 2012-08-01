@@ -248,7 +248,7 @@ sealed trait Validation[+E, +A] {
       case Success(a) => "Success(".toList ::: Show[AA].show(a) ::: ")".toList
     }
 
-  /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `>>*<<` */
+  /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `+|+` */
   def append[EE >: E, AA >: A](that: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = (this, that) match {
     case (Success(a1), Success(a2))   => Success(as.append(a1, a2))
     case (Success(_), Failure(_)) => this
@@ -257,7 +257,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `append` */
-  def >>*<<[EE >: E, AA >: A](x: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = append(x)
+  def +|+[EE >: E, AA >: A](x: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = append(x)
 
   /** A view of this validation from the `Failure` side. */
   def fail: FailProjection[E, A] = new FailProjection[E, A] {
@@ -486,7 +486,7 @@ sealed trait FailProjection[+E, +A] {
     success.show[EE, AA]
 
 
-  /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the failure. Alias for `>>*<<` */
+  /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the failure. Alias for `+|+` */
   def append[EE >: E, AA >: A](that: FailProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailProjection[EE, AA] =
     (success, that.success) match {
       case (Success(a1), Success(a2))   => Success(as.append(a1, a2)).fail
@@ -496,7 +496,7 @@ sealed trait FailProjection[+E, +A] {
     }
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `append` */
-  def >>*<<[EE >: E, AA >: A](x: FailProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailProjection[EE, AA] =
+  def +|+[EE >: E, AA >: A](x: FailProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailProjection[EE, AA] =
     append(x)
 
   /** Wraps the success value in a [[scalaz.NonEmptyList]] */
