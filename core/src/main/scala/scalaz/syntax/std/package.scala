@@ -6,6 +6,7 @@ package object std {
   object list extends ToListOps
   object stream extends ToStreamOps
   object vector extends ToVectorOps
+  object indexedSeq extends ToIndexedSeqOps
   object function1 extends ToFunction1Ops
   object function2 extends ToFunction2Ops
   object tuple extends ToTupleOps
