@@ -1,24 +1,34 @@
 package scalaz
 
+/** Endomorphisms.  They have special properties among functions, so
+  * are captured in this newtype. */
 sealed trait Endo[A] {
+  /** The captured function. */
   def run: A => A
 
   final def apply(a: A): A = run(a)
 
+  /** `run(run(run(...` */
   final def fix: A = apply(fix)
 
+  /** Do `other`, than call myself with its result. */
   final def compose(other: Endo[A]): Endo[A] = Endo.endo(run compose other.run)
 
+  /** Call `other` with my result. */
   final def andThen(other: Endo[A]): Endo[A] = other compose this
 }
 
 object Endo extends EndoFunctions with EndoInstances {
+  /** Wrap a function. */
   def apply[A](f: A => A): Endo[A] = new Endo[A] {
     val run = f
   }
 }
 
 trait EndoInstances {
+
+  /** Endo forms a monoid where `zero` is the identity endomorphism
+    * and `append` composes the underlying functions. */
   implicit def endoInstance[A]: Monoid[Endo[A]] = new Monoid[Endo[A]] {
     def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
     def zero = Endo.idEndo
@@ -36,12 +46,15 @@ trait EndoInstances {
 }
 
 trait EndoFunctions {
+  /** Alias for `Endo.apply`. */
   final def endo[A](f: A => A): Endo[A] = new Endo[A] {
     val run = f
   }
 
+  /** Always yield `a`. */
   final def constantEndo[A](a: => A): Endo[A] = endo[A](_ => a)
 
+  /** Alias for `Monoid[Endo[A]].zero`. */
   final def idEndo[A]: Endo[A] = endo[A](a => a)
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}

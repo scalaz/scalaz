@@ -4,7 +4,8 @@ import Id._
 
 ////
 /**
- * Provides an identity element (`zero`) to the binary `append` operation in [[scalaz.Semigroup]].
+ * Provides an identity element (`zero`) to the binary `append`
+ * operation in [[scalaz.Semigroup]], subject to the monoid laws.
  *
  * Example instances:
  *  - `Monoid[Int]`: `zero` and `append` are `0` and `Int#+` respectively
@@ -38,8 +39,11 @@ trait Monoid[F] extends Semigroup[F] { self =>
   }
 
   /**
-   * A monoidal applicative functor, that implements `point` and `ap` with the operations `zero` and `append` respectively.
-   * Note that the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is discarded; it is a phantom type.
+   * A monoidal applicative functor, that implements `point` and `ap`
+   * with the operations `zero` and `append` respectively.  Note that
+   * the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is
+   * discarded; it is a phantom type.  As such, the functor cannot
+   * support [[scalaz.Bind]].
    */
   final def applicative: Applicative[({type λ[α]=F})#λ] = new Applicative[({type λ[α]=F})#λ] with SemigroupApply {
     def point[A](a: => A) = zero
