@@ -5,8 +5,22 @@ import annotation.tailrec
 import collection.IndexedSeqLike
 import collection.generic.{CanBuildFrom, GenericTraversableTemplate}
 
+trait IndexedSeqSub {
+  type IxSq[+A] <: IndexedSeq[A] with GenericTraversableTemplate[A, IxSq] with IndexedSeqLike[A, IxSq[A]]
+  protected implicit def buildIxSq[A, B]: CanBuildFrom[IxSq[A], B, IxSq[B]]
+  protected def monad: Monad[IxSq]
+  protected def empty[A]: IxSq[A]
+}
+
+trait IndexedSeqSubIndexedSeq extends IndexedSeqSub {
+  type IxSq[+A] = IndexedSeq[A]
+  protected final def buildIxSq[A, B] = implicitly
+  protected final def monad = indexedSeq.indexedSeqInstance
+  protected final def empty[A] = IndexedSeq()
+}
+
 trait IndexedSeqInstances0 {
-  implicit def indexedSeqEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A] {
+  implicit def indexedSeqEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, IndexedSeq[A]] {
     implicit def A = A0
   }
 }
@@ -69,12 +83,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 
 }
 
-trait IndexedSeqSubFunctions {
-  type IxSq[+A] <: IndexedSeq[A] with GenericTraversableTemplate[A, IxSq] with IndexedSeqLike[A, IxSq[A]]
-  protected implicit def buildIxSq[A, B]: CanBuildFrom[IxSq[A], B, IxSq[B]]
-  protected def monad: Monad[IxSq]
-  protected def empty[A]: IxSq[A]
-
+trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
     @tailrec
@@ -174,26 +183,21 @@ trait IndexedSeqSubFunctions {
     if (as.isEmpty) empty else as zip as.tail
 }
 
-trait IndexedSeqFunctions extends IndexedSeqSubFunctions {
-  type IxSq[+A] = IndexedSeq[A]
-  protected def buildIxSq[A, B] = implicitly
-  protected def monad = indexedSeq.indexedSeqInstance
-  protected def empty[A] = IndexedSeq()
-}
+trait IndexedSeqFunctions extends IndexedSeqSubFunctions with IndexedSeqSubIndexedSeq
 
 object indexedSeq extends IndexedSeqInstances with IndexedSeqFunctions {
   object indexedSeqSyntax extends scalaz.syntax.std.ToIndexedSeqOps
 }
 
-trait IndexedSeqEqual[A] extends Equal[IndexedSeq[A]] {
+trait IndexedSeqEqual[A, Coll <: IndexedSeq[A]] extends Equal[Coll] {
   implicit def A: Equal[A]
 
   override def equalIsNatural: Boolean = A.equalIsNatural
 
-  override def equal(a1: IndexedSeq[A], a2: IndexedSeq[A]) = (a1 corresponds a2)(Equal[A].equal)
+  override def equal(a1: Coll, a2: Coll) = (a1 corresponds a2)(Equal[A].equal)
 }
 
-trait IndexedSeqOrder[A] extends Order[IndexedSeq[A]] with IndexedSeqEqual[A] {
+trait IndexedSeqOrder[A] extends Order[IndexedSeq[A]] with IndexedSeqEqual[A, IndexedSeq[A]] {
   implicit def A: Order[A]
 
   import Ordering._

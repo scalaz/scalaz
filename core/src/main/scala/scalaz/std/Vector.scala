@@ -4,7 +4,7 @@ package std
 import annotation.tailrec
 
 trait VectorInstances0 {
-  implicit def vectorEqual[A](implicit A0: Equal[A]) = new VectorEqual[A] {
+  implicit def vectorEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, Vector[A]] {
     implicit def A = A0
   }
 }
@@ -78,15 +78,7 @@ object vector extends VectorInstances with VectorFunctions {
   object vectorSyntax extends scalaz.syntax.std.ToVectorOps
 }
 
-trait VectorEqual[A] extends Equal[Vector[A]] {
-  implicit def A: Equal[A]
-
-  override def equalIsNatural: Boolean = A.equalIsNatural
-
-  override def equal(a1: Vector[A], a2: Vector[A]) = (a1 corresponds a2)(Equal[A].equal)
-}
-
-trait VectorOrder[A] extends Order[Vector[A]] with VectorEqual[A] {
+trait VectorOrder[A] extends Order[Vector[A]] with IndexedSeqEqual[A, Vector[A]] {
   implicit def A: Order[A]
 
   import Ordering._
