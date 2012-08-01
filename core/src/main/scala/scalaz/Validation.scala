@@ -260,7 +260,7 @@ sealed trait Validation[+E, +A] {
   def +|+[EE >: E, AA >: A](x: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = append(x)
 
   /** A view of this validation from the `Failure` side. */
-  def fail: FailProjection[E, A] = new FailProjection[E, A] {
+  def failure: FailureProjection[E, A] = new FailureProjection[E, A] {
     val success = Validation.this
   }
 
@@ -287,23 +287,23 @@ sealed trait Validation[+E, +A] {
 private final case class Success[E, A](a: A) extends Validation[E, A]
 private final case class Failure[E, A](e: E) extends Validation[E, A]
 
-sealed trait FailProjection[+E, +A] {
+sealed trait FailureProjection[+E, +A] {
 
   val success: Validation[E, A]
 
-  sealed trait SwitchingFail[X] {
-    def fail: X
+  sealed trait SwitchingFailure[X] {
+    def failure: X
     def <<?:(s: => X): X =
       success match {
-        case Failure(_) => fail
+        case Failure(_) => failure
         case Success(_) => s
       }
   }
 
   /** If this validation is failure, return the given X value, otherwise, return the X value given to the return value. */
-  def :?>>[X](f: => X): SwitchingFail[X] =
-    new SwitchingFail[X] {
-      def fail = f
+  def :?>>[X](f: => X): SwitchingFailure[X] =
+    new SwitchingFailure[X] {
+      def failure = f
     }
 
   def isSuccess: Boolean =
@@ -317,44 +317,44 @@ sealed trait FailProjection[+E, +A] {
     case Failure(x) => fail(x)
   }
 
-  /** Flip the failure/success values in this fail projection. Alias for `unary_~` */
-  def swap: FailProjection[A, E] =
+  /** Flip the failure/success values in this failure projection. Alias for `unary_~` */
+  def swap: FailureProjection[A, E] =
     (success match {
       case Failure(a) => Success(a)
       case Success(b) => Failure(b)
-    }).fail
+    }).failure
 
-  /** Flip the failure/success values in this fail projection. Alias for `swap` */
-  def unary_~ : FailProjection[A, E] =
+  /** Flip the failure/success values in this failure projection. Alias for `swap` */
+  def unary_~ : FailureProjection[A, E] =
     swap
 
   /** Run the given function on this swapped value. Alias for `~` */
-  def swapped[EE >: E, AA >: A](k: FailProjection[A, E] => FailProjection[AA, EE]): FailProjection[EE, AA] =
+  def swapped[EE >: E, AA >: A](k: FailureProjection[A, E] => FailureProjection[AA, EE]): FailureProjection[EE, AA] =
     k(swap).swap
 
   /** Run the given function on this swapped value. Alias for `swapped` */
-  def ~[EE >: E, AA >: A](k: FailProjection[A, E] => FailProjection[AA, EE]): FailProjection[EE, AA] =
+  def ~[EE >: E, AA >: A](k: FailureProjection[A, E] => FailureProjection[AA, EE]): FailureProjection[EE, AA] =
     swapped(k)
 
-  /** Binary functor map on this fail projection. */
-  def bimap[C, D](f: A => D, g: E => C): FailProjection[C, D] =
-    success.bimap(g, f).fail
+  /** Binary functor map on this failure projection. */
+  def bimap[C, D](f: A => D, g: E => C): FailureProjection[C, D] =
+    success.bimap(g, f).failure
 
-  /** Binary functor traverse on this fail projection. */
-  def bitraverse[G[+_] : Applicative, C, D](f: A => G[D], g: E => G[C]): G[FailProjection[C, D]] =
-    implicitly[Functor[G]].map(success.bitraverse(g, f))(_.fail)
+  /** Binary functor traverse on this failure projection. */
+  def bitraverse[G[+_] : Applicative, C, D](f: A => G[D], g: E => G[C]): G[FailureProjection[C, D]] =
+    implicitly[Functor[G]].map(success.bitraverse(g, f))(_.failure)
 
   /** Map on the failure of this project. */
-  def map[X](f: E => X): FailProjection[X, A] =
+  def map[X](f: E => X): FailureProjection[X, A] =
     (success match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(f(e))
-    }).fail
+    }).failure
 
-  def traverse[G[+_] : Applicative, X](f: E => G[X]): G[FailProjection[X, A]] =
+  def traverse[G[+_] : Applicative, X](f: E => G[X]): G[FailureProjection[X, A]] =
     success match {
-      case Failure(e) => Applicative[G].map(f(e))(Failure(_).fail)
-      case Success(a) => Applicative[G].point(Success(a).fail)
+      case Failure(e) => Applicative[G].map(f(e))(Failure(_).failure)
+      case Success(a) => Applicative[G].point(Success(a).failure)
     }
 
   def foreach[U](f: E => U): Unit = success match {
@@ -362,18 +362,18 @@ sealed trait FailProjection[+E, +A] {
     case Failure(e) => f(e)
   }
 
-  /** Apply a function in the environment of the failure of this fail projection, accumulating values. */
-  def ap[AA >: A, X](x: => FailProjection[E => X, AA])(implicit E: Semigroup[AA]): FailProjection[X, AA] =
+  /** Apply a function in the environment of the failure of this failure projection, accumulating values. */
+  def ap[AA >: A, X](x: => FailureProjection[E => X, AA])(implicit E: Semigroup[AA]): FailureProjection[X, AA] =
     ((success, x.success) match {
       case (Failure(a), Failure(f))   => Failure(f(a))
       case (Success(e), Failure(_))   => Success(e)
       case (Failure(f), Success(a))   => Success(a)
       case (Success(a1), Success(a2)) => Success(E.append(a2, a1))
-    }).fail
+    }).failure
 
-  def bind[AA >: A, X](f: E => FailProjection[X, AA]): FailProjection[X, AA] =
+  def bind[AA >: A, X](f: E => FailureProjection[X, AA]): FailureProjection[X, AA] =
     success match {
-      case Success(a) => Success(a).fail
+      case Success(a) => Success(a).failure
       case Failure(e) => f(e)
     }
 
@@ -384,11 +384,11 @@ sealed trait FailProjection[+E, +A] {
     }
 
   /** Filter on the success of this validation. */
-  def filter[AA >: A](p: E => Boolean)(implicit M: Monoid[AA]): FailProjection[E, AA] =
+  def filter[AA >: A](p: E => Boolean)(implicit M: Monoid[AA]): FailureProjection[E, AA] =
     (success match {
       case Success(a) => Success(a)
       case Failure(e) => if(p(e)) Failure(e) else Success(M.zero)
-    }).fail
+    }).failure
 
   def exists(f: E => Boolean): Boolean =
     success match {
@@ -402,21 +402,21 @@ sealed trait FailProjection[+E, +A] {
       case Failure(e) => f(e)
     }
 
-  /** Return an empty list or list with one element on the failure of this fail projection. */
+  /** Return an empty list or list with one element on the failure of this failure projection. */
   def toList: List[E] =
     success match {
       case Failure(e) => List(e)
       case Success(_) => Nil
     }
 
-  /** Return an empty stream or stream with one element on the failure of this fail projection. */
+  /** Return an empty stream or stream with one element on the failure of this failure projection. */
   def toStream: Stream[E] =
     success match {
       case Failure(e) => Stream(e)
       case Success(_) => Stream()
     }
 
-  /** Return an empty option or option with one element on the failure of this fail projection. Useful to sweep errors under the carpet. */
+  /** Return an empty option or option with one element on the failure of this failure projection. Useful to sweep errors under the carpet. */
   def toOption: Option[E] =
     success match {
       case Failure(e) => Some(e)
@@ -430,15 +430,15 @@ sealed trait FailProjection[+E, +A] {
       case Failure(e) => Right(e)
     }
 
-  /** Return the failure value of this fail projection or the given default if success. Alias for `|` */
+  /** Return the failure value of this failure projection or the given default if success. Alias for `|` */
   def getOrElse[EE >: E](x: => EE): EE =
     toOption getOrElse x
 
-  /** Return the failure value of this fail projection or the given default if success. Alias for `getOrElse` */
+  /** Return the failure value of this failure projection or the given default if success. Alias for `getOrElse` */
   def |[EE >: E](x: => EE): EE =
     getOrElse(x)
 
-  /** Return the failure value of this fail projection or run the given function on the success. */
+  /** Return the failure value of this failure projection or run the given function on the success. */
   def valueOr[EE >: E](x: A => EE): EE =
     success match {
       case Failure(e) => e
@@ -446,162 +446,162 @@ sealed trait FailProjection[+E, +A] {
     }
 
   /** Return this if it is a failure, otherwise, return the given value. Alias for `|||` */
-  def orElse[EE >: E, AA >: A](x: => FailProjection[EE, AA]): FailProjection[EE, AA] =
+  def orElse[EE >: E, AA >: A](x: => FailureProjection[EE, AA]): FailureProjection[EE, AA] =
     success match {
       case Failure(_) => this
       case Success(_) => x
     }
 
   /** Return this if it is a failure, otherwise, return the given value. Alias for `orElse` */
-  def |||[EE >: E, AA >: A](x: => FailProjection[EE, AA]): FailProjection[EE, AA] =
+  def |||[EE >: E, AA >: A](x: => FailureProjection[EE, AA]): FailureProjection[EE, AA] =
     orElse(x)
 
   /** Return the first failure or if they are both failure, sum them and return that failure. */
-  def ++[EE >: E, AA >: A](x: => FailProjection[EE, AA])(implicit M: Semigroup[EE]): FailProjection[EE, AA] =
+  def ++[EE >: E, AA >: A](x: => FailureProjection[EE, AA])(implicit M: Semigroup[EE]): FailureProjection[EE, AA] =
     success match {
       case Success(_) => this
       case Failure(b1) => (x.success match {
         case Success(a2) => Success(a2)
         case Failure(b2) => Failure(M.append(b1, b2))
-      }).fail
+      }).failure
     }
 
-  /** Ensures that the failure value of this fail projection satisfies the given predicate, or succeeds with the given value. */
-  def ensure[AA >: A](onSuccess: => AA)(f: E => Boolean): FailProjection[E, AA] =
+  /** Ensures that the failure value of this failure projection satisfies the given predicate, or succeeds with the given value. */
+  def ensure[AA >: A](onSuccess: => AA)(f: E => Boolean): FailureProjection[E, AA] =
     success match {
       case Success(_) => this
-      case Failure(e) => if (f(e)) this else Success(onSuccess).fail
+      case Failure(e) => if (f(e)) this else Success(onSuccess).failure
     }
 
-  /** Compare two fail projections values for equality. */
-  def ===[EE >: E, AA >: A](x: => FailProjection[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
+  /** Compare two failure projections values for equality. */
+  def ===[EE >: E, AA >: A](x: => FailureProjection[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
     success === x.success
 
-  /** Compare two fail projections values for ordering. */
-  def compare[EE >: E, AA >: A](x: => FailProjection[EE, AA])(implicit EE: Order[EE], EA: Order[AA]): Ordering =
+  /** Compare two failure projections values for ordering. */
+  def compare[EE >: E, AA >: A](x: => FailureProjection[EE, AA])(implicit EE: Order[EE], EA: Order[AA]): Ordering =
     success compare x.success
 
-  /** Show for a fail projection value. */
+  /** Show for a failure projection value. */
   def show[EE >: E, AA >: A](implicit SE: Show[EE], SA: Show[AA]): List[Char] =
     success.show[EE, AA]
 
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the failure. Alias for `+|+` */
-  def append[EE >: E, AA >: A](that: FailProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailProjection[EE, AA] =
+  def append[EE >: E, AA >: A](that: FailureProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailureProjection[EE, AA] =
     (success, that.success) match {
-      case (Success(a1), Success(a2))   => Success(as.append(a1, a2)).fail
+      case (Success(a1), Success(a2))   => Success(as.append(a1, a2)).failure
       case (Success(_), Failure(_)) => that
       case (Failure(_), Success(_)) => this
-      case (Failure(e1), Failure(e2))   => Failure(es.append(e1, e2)).fail
+      case (Failure(e1), Failure(e2))   => Failure(es.append(e1, e2)).failure
     }
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `append` */
-  def +|+[EE >: E, AA >: A](x: FailProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailProjection[EE, AA] =
+  def +|+[EE >: E, AA >: A](x: FailureProjection[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): FailureProjection[EE, AA] =
     append(x)
 
   /** Wraps the success value in a [[scalaz.NonEmptyList]] */
-  def toValidationNel[EE >: E, AA >: A]: FailProjection[EE, NonEmptyList[AA]] =
+  def toValidationNel[EE >: E, AA >: A]: FailureProjection[EE, NonEmptyList[AA]] =
     (success match {
       case Success(a) => Success(NonEmptyList(a))
       case Failure(e) => Failure(e)
-    }).fail
+    }).failure
 
   /** Convert to a disjunction. */
   def disjunction: (E \/ A) =
     success.disjunction
 
-  /** Run a disjunction function and back to fail projection again. */
-  def disjunctioned[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): FailProjection[EE, AA] =
-    success.disjunctioned(k).fail
+  /** Run a disjunction function and back to failure projection again. */
+  def disjunctioned[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): FailureProjection[EE, AA] =
+    success.disjunctioned(k).failure
 
 }
 
-object FailProjection extends FailProjectionFunctions with FailProjectionInstances
+object FailureProjection extends FailureProjectionFunctions with FailureProjectionInstances
 
-trait FailProjectionInstances0 {
-  import FailProjection._
+trait FailureProjectionInstances0 {
+  import FailureProjection._
 
-  implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailProjection[E, X], Validation[E, X]] {
-    def iso = FailProjectionIso
+  implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailureProjection[E, X], Validation[E, X]] {
+    def iso = FailureProjectionIso
     implicit def G = Validation.validationEqual
   }
 
-  /**Derive the type class instance for `FailProjection` from `Validation`. */
-  implicit def failProjectionPointed[E] = new IsomorphismPointed[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
-    def iso = FailProjectionEIso2[E]
+  /**Derive the type class instance for `FailureProjection` from `Validation`. */
+  implicit def failProjectionPointed[E] = new IsomorphismPointed[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
+    def iso = FailureProjectionEIso2[E]
     implicit def G = Validation.validationPointed[E]
   }
 }
 
-trait FailProjectionInstances extends FailProjectionInstances0 {
-  import FailProjection._
+trait FailureProjectionInstances extends FailureProjectionInstances0 {
+  import FailureProjection._
 
-  /**Derive the type class instance for `FailProjection` from `Validation`. */
+  /**Derive the type class instance for `FailureProjection` from `Validation`. */
   implicit def failProjectionApplicative[E](implicit E: Semigroup[E]) = {
-    type F[a] = FailProjection[E, a]
+    type F[a] = FailureProjection[E, a]
     type G[a] = Validation[E, a]
 
     new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G] {
-      def iso = FailProjectionEIso2[E]
+      def iso = FailureProjectionEIso2[E]
       implicit def G = Validation.validationTraverseApplicativePlus(E)
     }
   }
 
-  implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailProjection[E, A]] = new IsomorphismSemigroup[FailProjection[E, A], Validation[E, A]] {
-    def iso = FailProjectionIso
+  implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailureProjection[E, A]] = new IsomorphismSemigroup[FailureProjection[E, A], Validation[E, A]] {
+    def iso = FailureProjectionIso
     implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
   }
 
-  implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailProjection[E, X], Validation[E, X]] {
-    def iso = FailProjectionIso
+  implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailureProjection[E, X], Validation[E, X]] {
+    def iso = FailureProjectionIso
     implicit def G = Validation.validationOrder
   }
 
-  implicit def failProjectionShow[E: Show, X: Show] = new IsomorphismShow[FailProjection[E, X], Validation[E, X]] {
-    def iso = FailProjectionIso
+  implicit def failProjectionShow[E: Show, X: Show] = new IsomorphismShow[FailureProjection[E, X], Validation[E, X]] {
+    def iso = FailureProjectionIso
     implicit def G = Validation.validationShow
   }
 
   implicit def failProjectionApplicativeTraversePlus[E: Semigroup] =
-    new IsomorphismApplicative[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
-      IsomorphismTraverse[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
-      IsomorphismPlus[({type λ[α] = FailProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
-      def iso = FailProjectionEIso2
+    new IsomorphismApplicative[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
+      IsomorphismTraverse[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
+      IsomorphismPlus[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
+      def iso = FailureProjectionEIso2
       implicit def G = Validation.validationTraverseApplicativePlus
     }
 
   implicit def failProjectionBitraverse =
-    new IsomorphismBitraverse[FailProjection, Validation] {
-      def iso = FailProjectionBiIso
+    new IsomorphismBitraverse[FailureProjection, Validation] {
+      def iso = FailureProjectionBiIso
       implicit def G = Validation.validationBitraverse
     }
 }
 
-trait FailProjectionFunctions {
+trait FailureProjectionFunctions {
   import Isomorphism._
 
-  /** FailProjection is isomorphic to Validation */
-  implicit def FailProjectionIso[E, A] = new (FailProjection[E, A] <=> Validation[E, A]) {
-    def to: (FailProjection[E, A]) => Validation[E, A] = _.success
-    def from: (Validation[E, A]) => FailProjection[E, A] = _.fail
+  /** FailureProjection is isomorphic to Validation */
+  implicit def FailureProjectionIso[E, A] = new (FailureProjection[E, A] <=> Validation[E, A]) {
+    def to: (FailureProjection[E, A]) => Validation[E, A] = _.success
+    def from: (Validation[E, A]) => FailureProjection[E, A] = _.failure
   }
 
-  /** FailProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
-  implicit def FailProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α]=FailProjection[E, α]})#λ, ({type λ[α]=Validation[E, α]})#λ] {
-    def to[A](fa: FailProjection[E, A]) = fa.success
-    def from[A](ga: Validation[E, A]) = ga.fail
+  /** FailureProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
+  implicit def FailureProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α]=FailureProjection[E, α]})#λ, ({type λ[α]=Validation[E, α]})#λ] {
+    def to[A](fa: FailureProjection[E, A]) = fa.success
+    def from[A](ga: Validation[E, A]) = ga.failure
   }
 
-  /** FailProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
-  implicit def FailProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α]=FailProjection[α, A]})#λ, ({type λ[α]=Validation[α, A]})#λ] {
-    def to[E](fa: FailProjection[E, A]) = fa.success
-    def from[E](ga: Validation[E, A]) = ga.fail
+  /** FailureProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
+  implicit def FailureProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α]=FailureProjection[α, A]})#λ, ({type λ[α]=Validation[α, A]})#λ] {
+    def to[E](fa: FailureProjection[E, A]) = fa.success
+    def from[E](ga: Validation[E, A]) = ga.failure
   }
 
-  /** The FailProjection type constructor is isomorphic to Validation */
-  implicit def FailProjectionBiIso = new IsoBifunctorTemplate[FailProjection, Validation] {
-    def to[A, B](fa: FailProjection[A, B]): Validation[A, B] = fa.success
-    def from[A, B](ga: Validation[A, B]): FailProjection[A, B] = ga.fail
+  /** The FailureProjection type constructor is isomorphic to Validation */
+  implicit def FailureProjectionBiIso = new IsoBifunctorTemplate[FailureProjection, Validation] {
+    def to[A, B](fa: FailureProjection[A, B]): Validation[A, B] = fa.success
+    def from[A, B](ga: Validation[A, B]): FailureProjection[A, B] = ga.failure
   }
 }
 

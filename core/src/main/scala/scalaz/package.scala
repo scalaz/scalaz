@@ -52,7 +52,7 @@
  *  - [[scalaz.Arrow]] extends [[scalaz.Category]]
  *
  *  '''Data Structures Index'''
- *  - [[scalaz.Validation]] Represent computations that may success or fail, accumulating multiple errors.
+ *  - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
  *  - [[scalaz.NonEmptyList]] A list containing at least one element.
  *  - [[scalaz.DList]] A difference list, supporting efficient append and prepend.
  *  - [[scalaz.EphemeralStream]] A stream that holds weak references to its elements, and recomputes them if needed
