@@ -4,7 +4,7 @@ package scalaz
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
 sealed trait \/[+A, +B] {
-  sealed trait Switching_\/[X] {
+  sealed trait SwitchingDisjunction[X] {
     def r: X
     def <<?:(left: => X): X =
       \/.this match {
@@ -14,8 +14,8 @@ sealed trait \/[+A, +B] {
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
-  def :?>>[X](right: => X): Switching_\/[X] =
-    new Switching_\/[X] {
+  def :?>>[X](right: => X): SwitchingDisjunction[X] =
+    new SwitchingDisjunction[X] {
       def r = right
     }
 
@@ -263,13 +263,13 @@ trait DisjunctionInstances extends DisjunctionInstances0 {
 }
 
 trait DisjunctionInstances0 extends DisjunctionInstances1 {
-  implicit def Order_\/[A: Order, B: Order]: Order[A \/ B] =
+  implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
         a1 compare a2
     }
 
-  implicit def Monoid_\/[A: Monoid, B: Semigroup]: Monoid[A \/ B] =
+  implicit def DisjunctionMonoid[A: Monoid, B: Semigroup]: Monoid[A \/ B] =
     new Monoid[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 ++ a2
@@ -279,16 +279,16 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 trait DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def Equal_\/[A: Equal, B: Equal]: Equal[A \/ B] =
+  implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
         a1 === a2
     }
 
-  implicit def Show_\/[A: Show, B: Show]: Show[A \/ B] =
+  implicit def DisjunctionShow[A: Show, B: Show]: Show[A \/ B] =
     Show.show(_.show)
 
-  implicit def Semigroup_\/[A, B: Semigroup]: Semigroup[A \/ B] =
+  implicit def DisjunctionSemigroup[A, B: Semigroup]: Semigroup[A \/ B] =
     new Semigroup[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 ++ a2
@@ -296,7 +296,7 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
 }
 
 trait DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def Instances1_\/[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
+  implicit def DisjunctionInstances1[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
@@ -322,7 +322,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 trait DisjunctionInstances3 {
-  implicit def Instances0_\/ : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit def DisjunctionInstances0 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
