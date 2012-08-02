@@ -128,7 +128,7 @@ sealed trait Element {
 
   def ?(n: QName): Boolean =
     (this ! n).isDefined
-  
+
   def findAttrOr(n: QName, s: => Str): Str =
     findAttr(n) getOrElse s
 
@@ -241,7 +241,7 @@ trait Elements {
   import std.AllInstances._
 
   implicit val ElementShow: Show[Element] = new Show[Element] {
-    def show(e: Element) =
+    override def shows(e: Element) =
       ("Element{name=" + Show[QName].shows(e.name) +
         ",attribs=" + Show[List[Attr]].shows(e.attribs) +
         ",content=" + Show[List[Content]].shows(e.content) +
@@ -249,7 +249,7 @@ trait Elements {
           case None => ""
           case Some(l) => ",line=" + l
         }) +
-        "}").toList
+        "}")
   }
 
   implicit val ElementEqual: Equal[Element] =

@@ -802,7 +802,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   override def toString = {
     import syntax.show._
     def showA[A] = new Show[A] {
-      def show(a: A) = a.toString.toList
+      override def shows(a: A) = a.toString
     }
     implicit val v = showA[V]
     implicit val a = showA[A]
@@ -867,13 +867,15 @@ trait FingerTreeInstances {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
   }
 
-  implicit def fingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
+  implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
     import syntax.show._
     import std.iterable._
-    def show(t: FingerTree[V,A]) = t.fold(
-      empty = v => (v + " []").toList,
-      single = (v, x) => v.show ++ (" [" + x.shows + "]").toList,
-      deep = (v, pf, m, sf) => v.show ++ (" [" + pf.toList.shows + ", ?, " + sf.toList.shows + "]").toList
+    val AS = Show[List[A]]
+    import Cord._
+    override def show(t: FingerTree[V,A]) = t.fold(
+      empty = v => Cord(V.show(v), " []"),
+      single = (v, x) => Cord(V.show(v), " [", A.show(x), "]"),
+      deep = (v, pf, m, sf) => Cord(V.show(v), " [", AS.show(pf.toList), ", ?, ", AS.show(sf.toList), "]")
     )
   }
 

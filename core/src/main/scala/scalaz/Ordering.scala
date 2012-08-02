@@ -25,7 +25,7 @@ trait OrderingInstances {
       case (GT, GT)      => EQ
     }
 
-    def show(f: Ordering): List[Char] = f.name.toList
+    override def shows(f: Ordering) = f.name
 
     def append(f1: Ordering, f2: => Ordering): Ordering = f1 match {
       case Ordering.EQ => f2

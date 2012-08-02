@@ -35,8 +35,8 @@ trait Historys {
   import std.AllInstances._
 
   implicit val HistoryShow: Show[History] = new Show[History] {
-    def show(h: History) =
-      Show[List[Op]].show(h.value.toList).toList
+    override def show(h: History) =
+      Show[List[Op]].show(h.value.toList)
   }
 
   implicit val HistoryEqual: Equal[History] =

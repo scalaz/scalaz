@@ -61,11 +61,11 @@ trait HCursors {
   import std.AllInstances._
 
   implicit val HCursorShow: Show[HCursor] = new Show[HCursor] {
-    def show(c: HCursor) =
+    override def show(c: HCursor) =
       ("HCursor{history=" + Show[History].shows(c.history) + (c.cursor match {
         case None => ""
         case Some(q) => ",cursor=" + Show[Cursor].shows(q)
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val HCursorEqual: Equal[HCursor] =

@@ -51,12 +51,12 @@ trait ListInstances extends ListInstances0 {
          (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       }
     }
-    
+
     override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
       State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]
         var cur = s
-        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 } 
+        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
         (cur, buf.toList)
       })
     }
@@ -83,19 +83,7 @@ trait ListInstances extends ListInstances0 {
   }
 
   implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    def show(as: List[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k += '['
-      while (i.hasNext) {
-        val n = i.next
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ']'
-      k.toList
-    }
+    override def show(as: List[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show):_*) :+ "]"
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {

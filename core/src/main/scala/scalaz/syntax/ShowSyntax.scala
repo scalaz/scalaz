@@ -5,8 +5,8 @@ package syntax
 trait ShowOps[F] extends Ops[F] {
   implicit def F: Show[F]
   ////
-  final def show: List[Char] = F.show(self)
-  final def shows: String = F.show(self).mkString
+  final def show: Cord = F.show(self)
+  final def shows: String = F.shows(self)
   final def print: Unit = Console.print(shows)
   final def println: Unit = Console.println(shows)
   ////
