@@ -50,11 +50,11 @@ trait Predicates {
   import std.AllInstances._
 
   implicit def PredicateShow[A]: Show[Predicate[A]] = new Show[Predicate[A]] {
-    def show(p: Predicate[A]) =
+    override def shows(p: Predicate[A]) =
       ("Predicate{" + (p.name match {
         case None => "<no name>}"
         case Some(n) => "name=" + n.mkString + "}"
-      })).toList
+      }))
   }
 
   implicit def PreciateEqual[A]: Equal[Predicate[A]] =

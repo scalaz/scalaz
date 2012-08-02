@@ -236,7 +236,7 @@ sealed trait Cursor {
   /// toTree
   def toTree: Content =
     root.current
-  
+
   /// toForest
   def toForest: List[Content] = {
     val r = root
@@ -447,8 +447,8 @@ trait Cursors {
   import std.AllInstances._
 
   implicit val CursorShow: Show[Cursor] = new Show[Cursor] {
-    def show(c: Cursor) =
-      ("Cursor{current=" + Show[Content].shows(c.current) + ",lefts=" + Show[List[Content]].shows(c.lefts) + ",rights=" + Show[List[Content]].shows(c.rights) + ",parents=" + Show[Path].shows(c.parents)).toList
+    override def show(c: Cursor) =
+      ("Cursor{current=" + Show[Content].shows(c.current) + ",lefts=" + Show[List[Content]].shows(c.lefts) + ",rights=" + Show[List[Content]].shows(c.rights) + ",parents=" + Show[Path].shows(c.parents))
   }
 
   implicit val CursorEqual: Equal[Cursor] =

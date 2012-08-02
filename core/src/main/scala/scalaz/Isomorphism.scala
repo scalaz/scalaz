@@ -151,7 +151,7 @@ trait IsomorphismShow[F, G] extends Show[F] {
 
   def iso: F <=> G
 
-  def show(f: F): List[Char] = G.show(iso.to(f))
+  override def show(f: F): Cord = G.show(iso.to(f))
 }
 
 trait IsomorphismOrder[F, G] extends Order[F] {

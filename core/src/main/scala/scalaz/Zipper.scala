@@ -178,7 +178,7 @@ sealed trait Zipper[+A] {
 
   /**
    * Moves focus n elements in the zipper, or None if there is no such element.
-   * 
+   *
    * @param  n  number of elements to move (positive is forward, negative is backwards)
    */
   def move(n: Int): Option[Zipper[A]] = {
@@ -394,11 +394,11 @@ trait ZipperInstances {
   implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]]{
     import std.stream._
 
-    def show(f: Zipper[A]): List[Char] =
-      "Zipper(".toList :::
-        Show[Stream[A]].show(f.lefts) ::: ", ".toList :::
-        Show[A].show(f.focus) ::: ", ".toList :::
-        Show[Stream[A]].show(f.rights) ::: ")".toList
+    override def show(f: Zipper[A]) =
+      Cord("Zipper(",
+        Show[Stream[A]].show(f.lefts), ", ",
+        Show[A].show(f.focus), ", ",
+        Show[Stream[A]].show(f.rights), ")")
   }
 }
 

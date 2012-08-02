@@ -42,11 +42,11 @@ trait Tags {
   import std.AllInstances._
 
   implicit val TagShow: Show[Tag] = new Show[Tag] {
-    def show(t: Tag) =
+    override def shows(t: Tag) =
       ("Tag{name=" + Show[QName].shows(t.name) + ",attribs=" + Show[List[Attr]].shows(t.attribs) + (t.line match {
         case None => ""
         case Some(l) => ",line=" + l
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val TagEqual: Equal[Tag] =

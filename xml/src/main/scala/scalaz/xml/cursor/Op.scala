@@ -223,7 +223,7 @@ trait Ops {
   import std.AllInstances._
 
   implicit val OpShow: Show[Op] = new Show[Op] {
-    def show(x: Op) =
+    override def shows(x: Op) =
       (x match {
         case ChoiceSucceed(h) => "choice-succeed" + Show[History].shows(h)
         case ChoiceSwitch(o, n) => Show[History].shows(o) + " >choice-switch< " + Show[History].shows(n)
@@ -257,7 +257,7 @@ trait Ops {
         case NthChild(n) => "nth-child{" + n() + "}"
         case Succeeding(_, d) => "succeeding{description=" + d + "}"
         case Generic(_, d) => "generic{description=" + d + "}"
-      }).toList
+      })
   }
 
   implicit val OpEqual: Equal[Op] = new Equal[Op] {

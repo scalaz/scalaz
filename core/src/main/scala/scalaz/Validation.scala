@@ -397,9 +397,9 @@ trait ValidationInstances extends ValidationInstances0 {
   }
 
   implicit def validationShow[E: Show, A: Show]: Show[Validation[E, A]] = new Show[Validation[E, A]] {
-    def show(f: Validation[E, A]): List[Char] = f match {
-      case Success(a) => "Success(".toList ::: Show[A].show(a) ::: ")".toList
-      case Failure(e) => "Failure(".toList ::: Show[E].show(e) ::: ")".toList
+    override def show(f: Validation[E, A]) = f match {
+      case Success(a) => Cord("Success(", Show[A].show(a), ")")
+      case Failure(e) => Cord("Failure(", Show[E].show(e), ")")
     }
   }
 }

@@ -150,7 +150,7 @@ trait DigitInstances {
 
     override def max = Some(Digit._9)
 
-    def show(f: Digit): List[Char] = List(f.toChar)
+    override def shows(f: Digit) = f.toChar.toString
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)
     override def equal(x: Digit, y: Digit): Boolean = x == y
     def append(f1: Digit, f2: => Digit): Digit = Digit.mod10Digit(f2.toInt + f2.toInt)

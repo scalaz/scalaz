@@ -41,8 +41,8 @@ trait Attrs {
     Order.orderBy[Attr, (QName, Str)](c => (c.key, c.value))
 
   implicit val AttrShow: Show[Attr] = new Show[Attr] {
-    def show(c: Attr) =
-      ("Attr{key=" + Show[QName].shows(c.key) + ",value=" + c.value.mkString + "}").toList
+    override def shows(c: Attr) =
+      ("Attr{key=" + Show[QName].shows(c.key) + ",value=" + c.value.mkString + "}")
   }
 
 }

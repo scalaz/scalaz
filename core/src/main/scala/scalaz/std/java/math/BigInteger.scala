@@ -5,7 +5,7 @@ import java.math.BigInteger
 
 trait BigIntegerInstances {
   implicit val bigIntegerInstance: Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
-    def show(f: BigInteger) = f.toString.toList
+    override def shows(f: BigInteger) = f.toString
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
 
@@ -36,7 +36,7 @@ trait BigIntegerInstances {
   import Tags.Multiplication
 
   implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
-    def show(f: scalaz.@@[BigInteger, Multiplication]) = f.toString.toList
+    override def shows(f: scalaz.@@[BigInteger, Multiplication]) = f.toString
 
     def append(f1: BigInteger @@ Multiplication, f2: => BigInteger @@ Multiplication) = Multiplication(f1 multiply f2)
 

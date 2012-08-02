@@ -130,8 +130,9 @@ trait InsertionMapInstances {
   implicit def insertionMapEqual[K, V]: Equal[InsertionMap[K, V]] =
     Equal.equalA
 
+  import Cord._
+
   implicit def insertionMapShow[K: Show, V: Show]: Show[InsertionMap[K, V]] =
-    Show.show(q =>
-      "InsertionMap(" + (q.toList map (Show[(K, V)] shows _) mkString ", ") + ")" toList)
+    Show.show(q => Cord("InsertionMap(", Cord.mkCord(", ", q.toList.map(Show[(K, V)] show _):_*), ")"))
 
 }

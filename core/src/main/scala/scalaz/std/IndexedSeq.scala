@@ -56,9 +56,9 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
          (a, fbs) => F.map2(f(a), fbs)(_ +: _)
       }
     }
-    
+
     override def traverseS[S,A,B](v: IxSq[A])(f: A => State[S,B]): State[S,IxSq[B]] =
-      State((s: S) => 
+      State((s: S) =>
         v.foldLeft((s, empty[B]))((acc, a) => {
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
@@ -85,8 +85,9 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
   }
 
   implicit def ixSqShow[A: Show]: Show[IxSq[A]] = new Show[IxSq[A]] {
-    def show(as: IxSq[A]) =
-      (List('[') +: (indexedSeq.intersperse(as.map(Show[A].show(_)), List(',')) :+ List(']'))).flatten.toList
+    import Cord._
+    override def show(as: IxSq[A]) =
+      Cord("[", mkCord(",", as.map(Show[A].show(_)):_*), "]")
   }
 
   implicit def ixSqOrder[A](implicit A0: Order[A]): Order[IxSq[A]] = new IndexedSeqSubOrder[A, IxSq[A]] {
@@ -106,7 +107,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
 
   final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
 
-  final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] = 
+  final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] =
     if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
 
   final def toZipper[A](as: IxSq[A]): Option[Zipper[A]] =
@@ -133,7 +134,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       def g = filterM(as.tail)(p)
       Monad[M].bind(p(as.head))(b => if (b) Monad[M].map(g)(tt => as.head +: tt) else g)
     }
-  
+
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
     if (as.isEmpty) Monad[M].point(None: Option[A]) else Monad[M].bind(p(as.head))(b =>
       if (b) Monad[M].point(Some(as.head): Option[A]) else findM(as.tail)(p))
