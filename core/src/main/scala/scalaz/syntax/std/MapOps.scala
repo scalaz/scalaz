@@ -10,6 +10,7 @@ trait MapOps[K, A] extends Ops[Map[K, A]] {
   final def mapKeys[K2](f: K => K2) = dict.mapKeys(self)(f)
   final def unionWithKey(m: Map[K, A])(f: (K, A, A) => A): Map[K, A] = dict.unionWithKey(self, m)(f)
   final def unionWith(m: Map[K, A])(f: (A, A) => A): Map[K, A] = dict.unionWith(self, m)(f)
+  final def insertWith(k: K, v: A)(f: (A, A) => A): Map[K, A] = dict.insertWith(self, k, v)(f)
 }
 
 trait ToMapOps {
