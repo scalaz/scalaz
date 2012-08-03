@@ -55,6 +55,11 @@ trait Semigroup[F]  { self =>
 object Semigroup {
   @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
+  /** Make an append function into an instance. */
+  def instance[A](f: (A, => A) => A): Semigroup[A] = new Semigroup[A] {
+    def append(f1: A, f2: => A): A = f(f1, f2)
+  }
+
   ////
   /** A purely left-biased semigroup. */
   def firstSemigroup[A] = new Semigroup[A] {
