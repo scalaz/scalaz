@@ -321,23 +321,12 @@ object Validation extends ValidationFunctions with ValidationInstances {
 
 }
 
-trait ValidationInstances0 {
-  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
-    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
-      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
-      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
-      case _                          => false
-    }
-  }
-
-  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
-    def point[A](a: => A): Validation[E, A] = Success(a)
-
-    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
-  }
-}
 
 trait ValidationInstances extends ValidationInstances0 {
+  type \?/[+E, +A] =
+  Validation[E, A]
+
+  /*
   /**Validation is an Applicative Functor, if the error type forms a Semigroup */
   implicit def validationTraverseApplicativePlus[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
     with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
@@ -379,6 +368,95 @@ trait ValidationInstances extends ValidationInstances0 {
       case Success(a) => "Success(".toList ::: Show[A].show(a) ::: ")".toList
       case Failure(e) => "Failure(".toList ::: Show[E].show(e) ::: ")".toList
     }
+  }
+  */
+}
+
+trait ValidationInstances0 extends ValidationInstances1 {
+
+  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
+    def order(f1: Validation[E, A], f2: Validation[E, A]) =
+      f1 compare f2
+  }
+
+  implicit def ValidationMonoid[E: Monoid, A: Semigroup]: Monoid[Validation[E, A]] =
+    new Monoid[Validation[E, A]] {
+      def append(a1: Validation[E, A], a2: => Validation[E, A]) =
+        a1 ++ a2
+      def zero =
+        Failure(Monoid[E].zero)
+    }
+
+  /*
+  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
+    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
+      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
+      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
+      case _                          => false
+    }
+  }
+
+  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
+    def point[A](a: => A): Validation[E, A] = Success(a)
+
+    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
+  }
+  */
+}
+
+trait ValidationInstances1 extends ValidationInstances2 {
+  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
+      new Equal[Validation[E, A]] {
+        def equal(a1: Validation[E, A], a2: Validation[E, A]) =
+          a1 === a2
+      }
+
+    implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
+      Show.show(_.show)
+
+    implicit def ValidationSemigroup[E, A: Semigroup]: Semigroup[Validation[E, A]] =
+      new Semigroup[Validation[E, A]] {
+        def append(a1: Validation[E, A], a2: => Validation[E, A]) =
+          a1 ++ a2
+      }
+}
+
+trait ValidationInstances2 extends ValidationInstances3 {
+  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] {
+
+      def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
+        fa.traverse(f)
+
+      override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
+        fa.foldRight(z)(f)
+
+      def cozip[A, B](x: Validation[L, A \/ B]) =
+        x match {
+          case Failure(l) => -\/(Failure(l))
+          case Success(e) => e match {
+            case -\/(a) => -\/(Success(a))
+            case \/-(b) => \/-(Success(b))
+          }
+        }
+    }
+
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+    def point[A](a: => A) =
+      Success(a)
+
+    def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
+      fa ap f
+  }
+}
+
+trait ValidationInstances3 {
+  implicit def ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
+    override def bimap[A, B, C, D](fab: Validation[A, B])
+                                  (f: A => C, g: B => D) = fab bimap (f, g)
+
+    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: Validation[A, B])
+                                                  (f: A => G[C], g: B => G[D]) =
+      fab.bitraverse(f, g)
   }
 }
 
@@ -628,6 +706,7 @@ sealed trait FailureProjection[+E, +A] {
 object FailureProjection extends FailureProjectionFunctions with FailureProjectionInstances
 
 trait FailureProjectionInstances0 {
+  /*
   import FailureProjection._
 
   implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailureProjection[E, X], Validation[E, X]] {
@@ -640,9 +719,11 @@ trait FailureProjectionInstances0 {
     def iso = FailureProjectionEIso2[E]
     implicit def G = Validation.validationPointed[E]
   }
+  */
 }
 
 trait FailureProjectionInstances extends FailureProjectionInstances0 {
+  /*
   import FailureProjection._
 
   /**Derive the type class instance for `FailureProjection` from `Validation`. */
@@ -684,9 +765,11 @@ trait FailureProjectionInstances extends FailureProjectionInstances0 {
       def iso = FailureProjectionBiIso
       implicit def G = Validation.validationBitraverse
     }
+    */
 }
 
 trait FailureProjectionFunctions {
+  /*
   import Isomorphism._
 
   /** FailureProjection is isomorphic to Validation */
@@ -712,4 +795,5 @@ trait FailureProjectionFunctions {
     def to[A, B](fa: FailureProjection[A, B]): Validation[A, B] = fa.success
     def from[A, B](ga: Validation[A, B]): FailureProjection[A, B] = ga.failure
   }
+  */
 }

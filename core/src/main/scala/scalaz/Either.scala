@@ -320,14 +320,14 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
 }
 
 trait DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def DisjunctionInstances1[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
+  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
     def point[A](a: => A) =
       \/-(a)
 
-    def traverseImpl[G[+_] : Applicative, A, B](fa: L \/ A)(f: (A) => G[B]) =
+    def traverseImpl[G[+_] : Applicative, A, B](fa: L \/ A)(f: A => G[B]) =
       fa.traverse(f)
 
     override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
@@ -346,7 +346,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 trait DisjunctionInstances3 {
-  implicit def DisjunctionInstances0 : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit def DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
