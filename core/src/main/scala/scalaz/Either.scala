@@ -245,9 +245,13 @@ sealed trait \/[+A, +B] {
       case \/-(b) => Success(b)
     }
 
-  /** Run a validation function and back to disjunction again. */
+  /** Run a validation function and back to disjunction again. Alias for `@\?/` */
   def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
     k(validation).disjunction
+
+  /** Run a validation function and back to disjunction again. Alias for `validationed` */
+  def @\?/[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
+    validationed(k)
 
 
 }

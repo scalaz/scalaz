@@ -49,13 +49,16 @@ sealed trait Validation[+E, +A] {
       def s = success
     }
 
+  /** Return `true` if this validation is success. */
   def isSuccess: Boolean = this match {
     case Success(_) => true
     case Failure(_) => false
   }
 
+  /** Return `true` if this validation is failure. */
   def isFailure: Boolean = !isSuccess
 
+  /** Catamorphism. Run the first given function if failure, otherwise, the second given function. */
   def fold[X](fail: E => X, succ: A => X): X = this match {
     case Success(x) => succ(x)
     case Failure(x) => fail(x)
@@ -101,17 +104,19 @@ sealed trait Validation[+E, +A] {
     case Success(b) => Applicative[G].map(g(b))(Success(_))
   }
 
-  /** Map on the success of this disjunction. */
+  /** Map on the success of this validation. */
   def map[B](f: A => B): Validation[E, B] = this match {
     case Success(a) => Success(f(a))
     case Failure(e) => Failure(e)
   }
 
+  /** Traverse on the success of this validation. */
   def traverse[G[+_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
     case Success(a) => Applicative[G].map(f(a))(Success(_))
     case Failure(e) => Applicative[G].point(Failure(e))
   }
 
+  /** Run the side-effect on the success of this validation. */
   def foreach[U](f: A => U): Unit = this match {
     case Success(a) => f(a)
     case Failure(_) =>
@@ -125,12 +130,14 @@ sealed trait Validation[+E, +A] {
     case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
+  /** Bind through the success of this validation. */
   def bind[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
       case Failure(e) => Failure(e)
     }
 
+  /** Fold on the success of this validation. */
   def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
     case Success(a) => f(a, z)
     case Failure(_) => z
@@ -143,11 +150,13 @@ sealed trait Validation[+E, +A] {
       case Success(e) => if(p(e)) Success(e) else Failure(M.zero)
     }
 
+  /** Return `true` if this validation is a success value satisfying the given predicate. */
   def exists(f: A => Boolean): Boolean = this match {
     case Success(a) => f(a)
     case Failure(_) => false
   }
 
+  /** Return `true` if this validation is a success value or the failure value satisfies the given predicate. */
   def forall(f: A => Boolean): Boolean = this match {
     case Success(a) => f(a)
     case Failure(_) => true
@@ -286,9 +295,13 @@ sealed trait Validation[+E, +A] {
       case Failure(e) => -\/(e)
     }
 
-  /** Run a disjunction function and back to validation again. */
+  /** Run a disjunction function and back to validation again. Alias for `@\/` */
   def disjunctioned[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     k(disjunction).validation
+
+  /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
+  def @\/[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
+    disjunctioned(k)
 
 }
 
@@ -400,12 +413,15 @@ trait ValidationInstances3 {
 }
 
 trait ValidationFunctions {
+  /** Construct a success validation value. */
   def success[E, A]: A => Validation[E, A] =
     Success(_)
 
+  /** Construct a success failure value. */
   def failure[E, A]: E => Validation[E, A] =
     Failure(_)
 
+  /** Evaluate the given value, which might throw an exception. */
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
@@ -426,18 +442,21 @@ sealed trait FailureProjection[+E, +A] {
       }
   }
 
-  /** If this validation is failure, return the given X value, otherwise, return the X value given to the return value. */
+  /** If this failure projection is failure, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](f: => X): SwitchingFailure[X] =
     new SwitchingFailure[X] {
       def failure = f
     }
 
+  /** Return `true` if this failure projection is failure. */
   def isSuccess: Boolean =
     success.isSuccess
 
+  /** Return `true` if this failure projection is success. */
   def isFailure: Boolean =
     success.isFailure
 
+  /** Catamorphism. Run the first given function if success, otherwise, the second given function. */
   def fold[X](succ: A => X, fail: E => X): X = success match {
     case Success(x) => succ(x)
     case Failure(x) => fail(x)
@@ -485,12 +504,14 @@ sealed trait FailureProjection[+E, +A] {
       case Failure(e) => Failure(f(e))
     }).failure
 
+  /** Traverse on the failure of this failure projection. */
   def traverse[G[+_] : Applicative, X](f: E => G[X]): G[FailureProjection[X, A]] =
     success match {
       case Failure(e) => Applicative[G].map(f(e))(Failure(_).failure)
       case Success(a) => Applicative[G].point(Success(a).failure)
     }
 
+  /** Run the side-effect on the failure of this failure projection. */
   def foreach[U](f: E => U): Unit = success match {
     case Success(_) =>
     case Failure(e) => f(e)
@@ -505,12 +526,14 @@ sealed trait FailureProjection[+E, +A] {
       case (Success(a1), Success(a2)) => Success(E.append(a2, a1))
     }).failure
 
+  /** Bind through the failure of this failure projection. */
   def bind[AA >: A, X](f: E => FailureProjection[X, AA]): FailureProjection[X, AA] =
     success match {
       case Success(a) => Success(a).failure
       case Failure(e) => f(e)
     }
 
+  /** Fold on the failure of this failure projection. */
   def foldRight[X](z: => X)(f: (E, => X) => X): X =
     success match {
       case Success(_) => z
@@ -524,12 +547,14 @@ sealed trait FailureProjection[+E, +A] {
       case Failure(e) => if(p(e)) Failure(e) else Success(M.zero)
     }).failure
 
+  /** Return `true` if this failure projection is a failure value satisfying the given predicate. */
   def exists(f: E => Boolean): Boolean =
     success match {
       case Success(_) => false
       case Failure(e) => f(e)
     }
 
+  /** Return `true` if this failure projection is a failure value or the success value satisfies the given predicate. */
   def forall(f: E => Boolean): Boolean =
     success match {
       case Success(_) => true
@@ -644,9 +669,13 @@ sealed trait FailureProjection[+E, +A] {
   def disjunction: (E \/ A) =
     success.disjunction
 
-  /** Run a disjunction function and back to failure projection again. */
+  /** Run a disjunction function and back to failure projection again. Alias for `@\/` */
   def disjunctioned[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): FailureProjection[EE, AA] =
     success.disjunctioned(k).failure
+
+  /** Run a disjunction function and back to failure projection again. Alias for `disjunctioned` */
+  def @\/[EE >: E, AA >: A](k: (E \/ A) => (EE \/ AA)): FailureProjection[EE, AA] =
+    disjunctioned(k)
 
 }
 
