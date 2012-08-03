@@ -61,6 +61,14 @@ sealed trait Validation[+E, +A] {
     case Failure(x) => fail(x)
   }
 
+  /** Spin in tail-position on the success value of this validation. */
+  def loopSuccess[EE >: E, AA >: A, X](success: AA => X \/ Validation[EE, AA], failure: EE => X): X =
+    Validation.loopSuccess(this, success, failure)
+
+  /** Spin in tail-position on the failure value of this validation. */
+  def loopFailure[EE >: E, AA >: A, X](success: AA => X, failure: EE => X \/ Validation[EE, AA]): X =
+    Validation.loopFailure(this, success, failure)
+
   /** Flip the failure/success values in this validation. Alias for `unary_~` */
   def swap: Validation[A, E] =
     this match {
@@ -286,6 +294,107 @@ sealed trait Validation[+E, +A] {
 
 private final case class Success[E, A](a: A) extends Validation[E, A]
 private final case class Failure[E, A](e: E) extends Validation[E, A]
+
+object Validation extends ValidationFunctions with ValidationInstances {
+
+  /** Spin in tail-position on the success value of the given validation. */
+  @annotation.tailrec
+  final def loopSuccess[E, A, X](d: Validation[E, A], success: A => X \/ Validation[E, A], failure: E => X): X =
+    d match {
+      case Failure(e) => failure(e)
+      case Success(a) => success(a) match {
+        case -\/(x) => x
+        case \/-(q) => loopSuccess(q, success, failure)
+      }
+    }
+
+  /** Spin in tail-position on the failure value of the given validation. */
+  @annotation.tailrec
+  final def loopFailure[E, A, X](d: Validation[E, A], success: A => X, failure: E => X \/ Validation[E, A]): X =
+    d match {
+      case Failure(e) => failure(e) match {
+        case -\/(x) => x
+        case \/-(q) => loopFailure(q, success, failure)
+      }
+      case Success(a) => success(a)
+    }
+
+}
+
+trait ValidationInstances0 {
+  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
+    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
+      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
+      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
+      case _                          => false
+    }
+  }
+
+  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
+    def point[A](a: => A): Validation[E, A] = Success(a)
+
+    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
+  }
+}
+
+trait ValidationInstances extends ValidationInstances0 {
+  /**Validation is an Applicative Functor, if the error type forms a Semigroup */
+  implicit def validationTraverseApplicativePlus[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
+    with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
+    def point[A](a: => A): Validation[E, A] = Success(a)
+
+    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
+
+    override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+
+    def ap[A, B](fa: => Validation[E, A])(f: => Validation[E, A => B]): Validation[E, B] = fa ap f
+
+    def plus[A](a: Validation[E, A], b: => Validation[E, A]): Validation[E, A] = a orElse b
+  }
+
+  def validationNelApplicative[E] = validationTraverseApplicativePlus[NonEmptyList[E]]
+
+  implicit def validationBitraverse = new Bitraverse[Validation] {
+    override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
+
+    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
+  }
+
+  implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
+    def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
+  }
+
+  implicit def validationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
+    import Ordering._
+    def order(f1: Validation[E, A], f2: Validation[E, A]) = (f1, f2) match {
+      case (Success(x), Success(y)) => Order[A].order(x, y)
+      case (Failure(x), Failure(y)) => Order[E].order(x, y)
+      case (Failure(_), Success(_)) => LT
+      case (Success(_), Failure(_)) => GT
+    }
+  }
+
+  implicit def validationShow[E: Show, A: Show]: Show[Validation[E, A]] = new Show[Validation[E, A]] {
+    def show(f: Validation[E, A]): List[Char] = f match {
+      case Success(a) => "Success(".toList ::: Show[A].show(a) ::: ")".toList
+      case Failure(e) => "Failure(".toList ::: Show[E].show(e) ::: ")".toList
+    }
+  }
+}
+
+trait ValidationFunctions {
+  def success[E, A]: A => Validation[E, A] =
+    Success(_)
+
+  def failure[E, A]: E => Validation[E, A] =
+    Failure(_)
+
+  def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
+    success(a)
+  } catch {
+    case e => failure(e)
+  }
+}
 
 sealed trait FailureProjection[+E, +A] {
 
@@ -602,80 +711,5 @@ trait FailureProjectionFunctions {
   implicit def FailureProjectionBiIso = new IsoBifunctorTemplate[FailureProjection, Validation] {
     def to[A, B](fa: FailureProjection[A, B]): Validation[A, B] = fa.success
     def from[A, B](ga: Validation[A, B]): FailureProjection[A, B] = ga.failure
-  }
-}
-
-object Validation extends ValidationFunctions with ValidationInstances
-
-trait ValidationInstances0 {
-  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
-    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
-      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
-      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
-      case _                          => false
-    }
-  }
-
-  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
-    def point[A](a: => A): Validation[E, A] = Success(a)
-
-    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
-  }
-}
-
-trait ValidationInstances extends ValidationInstances0 {
-  /**Validation is an Applicative Functor, if the error type forms a Semigroup */
-  implicit def validationTraverseApplicativePlus[E](implicit E: Semigroup[E]) = new Traverse[({type λ[α] = Validation[E, α]})#λ]
-    with Applicative[({type λ[α] = Validation[E, α]})#λ] with Plus[({type λ[α] = Validation[E, α]})#λ] {
-    def point[A](a: => A): Validation[E, A] = Success(a)
-
-    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[E, A])(f: A => G[B]): G[Validation[E, B]] = fa traverse f
-
-    override def foldRight[A, B](fa: Validation[E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-
-    def ap[A, B](fa: => Validation[E, A])(f: => Validation[E, A => B]): Validation[E, B] = fa ap f
-
-    def plus[A](a: Validation[E, A], b: => Validation[E, A]): Validation[E, A] = a orElse b
-  }
-
-  def validationNelApplicative[E] = validationTraverseApplicativePlus[NonEmptyList[E]]
-
-  implicit def validationBitraverse = new Bitraverse[Validation] {
-    override def bimap[A, B, C, D](fab: Validation[A, B])(f: A => C, g: B => D): Validation[C, D] = fab.bimap(f, g)
-
-    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: Validation[A, B])(f: (A) => G[C], g: (B) => G[D]) = fab.bitraverse[G, C, D](f, g)
-  }
-
-  implicit def validationSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[Validation[E, A]] = new Semigroup[Validation[E, A]] {
-    def append(f1: Validation[E, A], f2: => Validation[E, A]): Validation[E, A] = f1 orElse f2
-  }
-
-  implicit def validationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
-    import Ordering._
-    def order(f1: Validation[E, A], f2: Validation[E, A]) = (f1, f2) match {
-      case (Success(x), Success(y)) => Order[A].order(x, y)
-      case (Failure(x), Failure(y)) => Order[E].order(x, y)
-      case (Failure(_), Success(_)) => LT
-      case (Success(_), Failure(_)) => GT
-    }
-  }
-
-  implicit def validationShow[E: Show, A: Show]: Show[Validation[E, A]] = new Show[Validation[E, A]] {
-    def show(f: Validation[E, A]): List[Char] = f match {
-      case Success(a) => "Success(".toList ::: Show[A].show(a) ::: ")".toList
-      case Failure(e) => "Failure(".toList ::: Show[E].show(e) ::: ")".toList
-    }
-  }
-}
-
-trait ValidationFunctions {
-  def success[E, A](a: A): Validation[E, A] = Success(a)
-
-  def failure[E, A](e: E): Validation[E, A] = Failure(e)
-
-  def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
-    success(a)
-  } catch {
-    case e => failure(e)
   }
 }

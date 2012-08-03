@@ -254,14 +254,7 @@ sealed trait \/[+A, +B] {
 private case class -\/[+A](a: A) extends (A \/ Nothing)
 private case class \/-[+B](b: B) extends (Nothing \/ B)
 
-object \/ extends DisjunctionInstances {
-  /** Construct a left disjunction value. */
-  def left[A, B](a: A): A \/ B =
-    -\/(a)
-
-  /** Construct a right disjunction value. */
-  def right[A, B](b: B): A \/ B =
-    \/-(b)
+object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec
@@ -361,4 +354,15 @@ trait DisjunctionInstances3 {
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
+}
+
+trait DisjunctionFunctions {
+  /** Construct a left disjunction value. */
+  def left[A, B]: A => A \/ B =
+    -\/(_)
+
+  /** Construct a right disjunction value. */
+  def right[A, B]: B => A \/ B =
+    \/-(_)
+
 }
