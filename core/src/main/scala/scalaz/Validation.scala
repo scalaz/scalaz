@@ -386,22 +386,6 @@ trait ValidationInstances0 extends ValidationInstances1 {
       def zero =
         Failure(Monoid[E].zero)
     }
-
-  /*
-  implicit def validationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = new Equal[Validation[E, A]] {
-    def equal(v1: Validation[E, A], v2: Validation[E, A]): Boolean = (v1, v2) match {
-      case (Success(a1), Success(a2)) => Equal[A].equal(a1, a2)
-      case (Failure(e1), Failure(e2)) => Equal[E].equal(e1, e2)
-      case _                          => false
-    }
-  }
-
-  implicit def validationPointed[E]: Pointed[({type λ[α] = Validation[E, α]})#λ] = new Pointed[({type λ[α] = Validation[E, α]})#λ] {
-    def point[A](a: => A): Validation[E, A] = Success(a)
-
-    def map[A, B](fa: Validation[E, A])(f: A => B): Validation[E, B] = fa map f
-  }
-  */
 }
 
 trait ValidationInstances1 extends ValidationInstances2 {
