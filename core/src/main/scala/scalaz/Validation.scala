@@ -443,6 +443,14 @@ sealed trait FailureProjection[+E, +A] {
     case Failure(x) => fail(x)
   }
 
+  /** Spin in tail-position on the success value of this failure projection. */
+  def loopSuccess[EE >: E, AA >: A, X](success: AA => X \/ FailureProjection[EE, AA], failure: EE => X): X =
+    FailureProjection.loopSuccess(this, success, failure)
+
+  /** Spin in tail-position on the failure value of this failure projection. */
+  def loopFailure[EE >: E, AA >: A, X](success: AA => X, failure: EE => X \/ FailureProjection[EE, AA]): X =
+    FailureProjection.loopFailure(this, success, failure)
+
   /** Flip the failure/success values in this failure projection. Alias for `unary_~` */
   def swap: FailureProjection[A, E] =
     (success match {
@@ -642,97 +650,93 @@ sealed trait FailureProjection[+E, +A] {
 
 }
 
-object FailureProjection extends FailureProjectionFunctions with FailureProjectionInstances
+object FailureProjection extends FailureProjectionFunctions with FailureProjectionInstances {
 
-trait FailureProjectionInstances0 {
-  /*
-  import FailureProjection._
+  /** Spin in tail-position on the success value of the given failure projection. */
+  final def loopSuccess[E, A, X](d: FailureProjection[E, A], success: A => X \/ FailureProjection[E, A], failure: E => X): X =
+    d.success.loopSuccess(success(_: A) map (_.success), failure)
 
-  implicit def failProjectionEqual[E: Equal, X: Equal] = new IsomorphismEqual[FailureProjection[E, X], Validation[E, X]] {
-    def iso = FailureProjectionIso
-    implicit def G = Validation.validationEqual
-  }
+  /** Spin in tail-position on the failure value of the given failure projection. */
+  final def loopFailure[E, A, X](d: FailureProjection[E, A], success: A => X, failure: E => X \/ FailureProjection[E, A]): X =
+    d.success.loopFailure(success, failure(_: E) map (_.success))
 
-  /**Derive the type class instance for `FailureProjection` from `Validation`. */
-  implicit def failProjectionPointed[E] = new IsomorphismPointed[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
-    def iso = FailureProjectionEIso2[E]
-    implicit def G = Validation.validationPointed[E]
-  }
-  */
 }
 
 trait FailureProjectionInstances extends FailureProjectionInstances0 {
-  /*
-  import FailureProjection._
+  implicit def FailureProjectionOrder[E: Order, A: Order]: Order[FailureProjection[E, A]] = new Order[FailureProjection[E, A]] {
+     def order(f1: FailureProjection[E, A], f2: FailureProjection[E, A]) =
+       f1 compare f2
+   }
 
-  /**Derive the type class instance for `FailureProjection` from `Validation`. */
-  implicit def failProjectionApplicative[E](implicit E: Semigroup[E]) = {
-    type F[a] = FailureProjection[E, a]
-    type G[a] = Validation[E, a]
+   implicit def FailureProjectionMonoid[E: Monoid, A: Semigroup]: Monoid[FailureProjection[E, A]] =
+     new Monoid[FailureProjection[E, A]] {
+       def append(a1: FailureProjection[E, A], a2: => FailureProjection[E, A]) =
+         a1 ++ a2
+       def zero =
+         Failure(Monoid[E].zero).failure
+     }
+}
 
-    new IsomorphismTraverse[F, G] with IsomorphismApplicative[F, G] {
-      def iso = FailureProjectionEIso2[E]
-      implicit def G = Validation.validationTraverseApplicativePlus(E)
-    }
-  }
-
-  implicit def failProjectionSemigroup[E, A](implicit E0: Semigroup[E]): Semigroup[FailureProjection[E, A]] = new IsomorphismSemigroup[FailureProjection[E, A], Validation[E, A]] {
-    def iso = FailureProjectionIso
-    implicit def G: Semigroup[Validation[E, A]] = Validation.validationSemigroup
-  }
-
-  implicit def failProjectionOrder[E: Order, X: Order] = new IsomorphismOrder[FailureProjection[E, X], Validation[E, X]] {
-    def iso = FailureProjectionIso
-    implicit def G = Validation.validationOrder
-  }
-
-  implicit def failProjectionShow[E: Show, X: Show] = new IsomorphismShow[FailureProjection[E, X], Validation[E, X]] {
-    def iso = FailureProjectionIso
-    implicit def G = Validation.validationShow
-  }
-
-  implicit def failProjectionApplicativeTraversePlus[E: Semigroup] =
-    new IsomorphismApplicative[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
-      IsomorphismTraverse[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] with
-      IsomorphismPlus[({type λ[α] = FailureProjection[E, α]})#λ, ({type λ[α] = Validation[E, α]})#λ] {
-      def iso = FailureProjectionEIso2
-      implicit def G = Validation.validationTraverseApplicativePlus
+trait FailureProjectionInstances0 extends FailureProjectionInstances1 {
+  implicit def FailureProjectionEqual[E: Equal, A: Equal]: Equal[FailureProjection[E, A]] =
+    new Equal[FailureProjection[E, A]] {
+      def equal(a1: FailureProjection[E, A], a2: FailureProjection[E, A]) =
+        a1 === a2
     }
 
-  implicit def failProjectionBitraverse =
-    new IsomorphismBitraverse[FailureProjection, Validation] {
-      def iso = FailureProjectionBiIso
-      implicit def G = Validation.validationBitraverse
+  implicit def FailureProjectionShow[E: Show, A: Show]: Show[FailureProjection[E, A]] =
+    Show.show(_.show)
+
+  implicit def FailureProjectionSemigroup[E: Semigroup, A]: Semigroup[FailureProjection[E, A]] =
+    new Semigroup[FailureProjection[E, A]] {
+      def append(a1: FailureProjection[E, A], a2: => FailureProjection[E, A]) =
+        a1 ++ a2
     }
-    */
+}
+
+trait FailureProjectionInstances1 extends FailureProjectionInstances2 {
+  implicit def FailureProjectionInstances1[L]: Traverse[({type l[a] = FailureProjection[a, L]})#l] with Cozip[({type l[a] = FailureProjection[a, L]})#l] = new Traverse[({type l[a] = FailureProjection[a, L]})#l] with Cozip[({type l[a] = FailureProjection[a, L]})#l] {
+
+    def traverseImpl[G[+_] : Applicative, A, B](fa: FailureProjection[A, L])(f: A => G[B]) =
+      fa.traverse(f)
+
+    override def foldRight[A, B](fa: FailureProjection[A, L], z: => B)(f: (A, => B) => B) =
+      fa.foldRight(z)(f)
+
+    def cozip[A, B](x: FailureProjection[A \/ B, L])  =
+      x.success match {
+        case Success(l) => \/-(Success(l).failure)
+        case Failure(e) => e match {
+          case -\/(a) => -\/(Failure(a).failure)
+          case \/-(b) => \/-(Failure(b).failure)
+        }
+      }
+  }
+
+  implicit def FailureProjectionApplicative[L: Semigroup]: Applicative[({type l[a] = FailureProjection[a, L]})#l] = new Applicative[({type l[a] = FailureProjection[a, L]})#l] {
+    def point[A](a: => A) =
+      Failure(a).failure
+
+    def ap[A, B](fa: => FailureProjection[A, L])(f: => FailureProjection[A => B, L]) =
+      fa ap f
+  }
+}
+
+trait FailureProjectionInstances2 {
+  implicit def ValidationInstances0 : Bitraverse[FailureProjection] = new Bitraverse[FailureProjection] {
+    override def bimap[A, B, C, D](fab: FailureProjection[A, B])
+                                  (f: A => C, g: B => D) = fab bimap (g, f)
+
+    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: FailureProjection[A, B])
+                                                       (f: A => G[C], g: B => G[D]) =
+      fab.bitraverse(g, f)
+ }
 }
 
 trait FailureProjectionFunctions {
-  /*
-  import Isomorphism._
+  def successF[E, A]: A => FailureProjection[E, A] =
+    Success(_).failure
 
-  /** FailureProjection is isomorphic to Validation */
-  implicit def FailureProjectionIso[E, A] = new (FailureProjection[E, A] <=> Validation[E, A]) {
-    def to: (FailureProjection[E, A]) => Validation[E, A] = _.success
-    def from: (Validation[E, A]) => FailureProjection[E, A] = _.failure
-  }
-
-  /** FailureProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
-  implicit def FailureProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α]=FailureProjection[E, α]})#λ, ({type λ[α]=Validation[E, α]})#λ] {
-    def to[A](fa: FailureProjection[E, A]) = fa.success
-    def from[A](ga: Validation[E, A]) = ga.failure
-  }
-
-  /** FailureProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
-  implicit def FailureProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α]=FailureProjection[α, A]})#λ, ({type λ[α]=Validation[α, A]})#λ] {
-    def to[E](fa: FailureProjection[E, A]) = fa.success
-    def from[E](ga: Validation[E, A]) = ga.failure
-  }
-
-  /** The FailureProjection type constructor is isomorphic to Validation */
-  implicit def FailureProjectionBiIso = new IsoBifunctorTemplate[FailureProjection, Validation] {
-    def to[A, B](fa: FailureProjection[A, B]): Validation[A, B] = fa.success
-    def from[A, B](ga: Validation[A, B]): FailureProjection[A, B] = ga.failure
-  }
-  */
+  def failureF[E, A]: E => FailureProjection[E, A] =
+    Failure(_).failure
 }
