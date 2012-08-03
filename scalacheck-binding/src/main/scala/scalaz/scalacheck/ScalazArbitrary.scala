@@ -90,9 +90,6 @@ object ScalazArbitrary {
   implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =
     Functor[Arbitrary].map(arb[A \/ B])(_.validation)
 
-  implicit def FailureProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[FailureProjection[A, B]] =
-    Functor[Arbitrary].map(arb[Validation[A, B]])(_.failure)
-
 //  implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
   implicit def Tuple1Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tuple1[A]] = Functor[Arbitrary].map(arb[A])(Tuple1(_))

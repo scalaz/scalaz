@@ -7,7 +7,6 @@ class ValidationTest extends Spec {
   import std.AllInstances._
 
   checkAll("Validation", order.laws[Validation[Int, Int]])
-  checkAll("FailureProjection", order.laws[FailureProjection[Int, Int]])
 
   type ValidationInt[A] = Validation[Int, A]
   type FailureProjectionInt[A] = FailureProjection[Int, A]
@@ -94,21 +93,5 @@ class ValidationTest extends Spec {
     // checking absence of ambiguity
     def equal[E: Order, A: Order] = Equal[Validation[E, A]]
     def pointed[E: Semigroup] = Pointed[({type λ[α] = Validation[E, α]})#λ]
-
-    object failProjection {
-      def show[E: Show, A: Show] = Show[FailureProjection[E, A]]
-      def equal[E: Equal, A: Equal] = Equal[FailureProjection[E, A]]
-      def order[E: Order, A: Order] = Order[FailureProjection[E, A]]
-      def pointed[E] = Pointed[({type λ[α]=FailureProjection[E, α]})#λ]
-      def semigroup[E: Semigroup, A] = Semigroup[FailureProjection[E, A]]
-      def applicative[E: Semigroup] = Applicative[({type λ[α]=FailureProjection[E, α]})#λ]
-      def traverse[E: Semigroup] = Traverse[({type λ[α]=FailureProjection[E, α]})#λ]
-      def plus[E: Semigroup] = Plus[({type λ[α]=FailureProjection[E, α]})#λ]
-      def bitraverse = Bitraverse[FailureProjection]
-
-      // checking absence of ambiguity
-      def equal[E: Order, A: Order] = Equal[FailureProjection[E, A]]
-      def pointed[E: Semigroup] = Pointed[({type λ[α]=FailureProjection[E, α]})#λ]
-    }
   }
 }
