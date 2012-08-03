@@ -36,7 +36,7 @@ object FibStateExample extends App {
   val initialState = (0, 1)
 
   val (nextFib: State[(Int, Int), Int]) = for {
-    s <- init:State[(Int, Int), (Int, Int)] 
+    s <- init:State[(Int, Int), (Int, Int)]
     val (a,b) = s
     val n = a + b
     _ <- put (b, n)
@@ -44,7 +44,7 @@ object FibStateExample extends App {
             // yield b instead to get (1,1,2,3...)
 
   def getNFibs(k: Int): State[(Int, Int), List[Int]] = {
-    nextFib.replicateM[List](k) 
+    nextFib.replicateM(k)
   }
 
   def getNthFib(k:Int): State[(Int, Int), Int] = {
@@ -53,15 +53,15 @@ object FibStateExample extends App {
     else
       getNthFib(k - 1) >> nextFib
   }
-  
+
   // run two examples through the magic of App
   println( getNthFib(5).eval( initialState ) )
   println( getNFibs(10).eval( initialState ) )
 }
 
-/** Simple call-by-need (i.e. lazy) interpreter for Lambda Calculus based off of 
+/** Simple call-by-need (i.e. lazy) interpreter for Lambda Calculus based off of
   * John Launchbury's "A Natural Semantics for Lazy Evaluation"
-  * Uses the "Barendregt convention": All variable names are globally unique 
+  * Uses the "Barendregt convention": All variable names are globally unique
   * (i.e. you cannot shadow variable names), and renames variables after substitution
   * to maintain this invariant.
   */
@@ -78,8 +78,8 @@ object LaunchburyInterpreter extends App {
   val S = scalaz.StateT.stateMonad[ReduceState]
   import S.monadSyntax._
   import scalaz.State._
-  
-  /** Simple lambda calculus Abstract Syntax Tree.  
+
+  /** Simple lambda calculus Abstract Syntax Tree.
     * Note that that apply applies a let-bound argument to an Expr.
     * This is to make sharing easier, by ensuring that arguments are in the heap.
     */
@@ -89,7 +89,7 @@ object LaunchburyInterpreter extends App {
   case class Var(name: String) extends Expr
   case class Let(bindings: Map[String, Expr], term: Expr) extends Expr
 
-  // \x.x 
+  // \x.x
   val example1 = Lambda("x", Var("x"))
   // let z = \y.y in (\x.x) z
   val example2 = Let( HashMap( "z" -> Lambda("y", Var("y")) )
@@ -100,7 +100,7 @@ object LaunchburyInterpreter extends App {
                         , freshVars: Stream[String]
                         )
 
-  private val initialState = ReduceState( HashMap() 
+  private val initialState = ReduceState( HashMap()
                                         , Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
                                         )
   // Substitute new variable names in
@@ -118,11 +118,11 @@ object LaunchburyInterpreter extends App {
 
 
   // replaces every bound variable with a new, "fresh" variable
-  // e.g. freshen(Lambda("x", Var("x"))).eval(initialState) => Lambda("$1", Var("$1")) 
+  // e.g. freshen(Lambda("x", Var("x"))).eval(initialState) => Lambda("$1", Var("$1"))
   private def freshen(e: Expr): State[ReduceState, Expr] = {
     val getFreshVar = for { s <- init: State[ReduceState,ReduceState]
                             val ReduceState(_, f #:: fs) = s
-                            _ <- modify((s:ReduceState) => s.copy(freshVars = fs)) 
+                            _ <- modify((s:ReduceState) => s.copy(freshVars = fs))
                           } yield f
     // Lambda and Let define new bound variables, so we substitute fresh variables into them
     // Var and Apply just recursively traverse the AST
@@ -132,9 +132,9 @@ object LaunchburyInterpreter extends App {
                                 } yield Lambda(y, e3)
       case Apply(e2, x)  => freshen(e2) >>= (e3 => pure(Apply(e3, x)))
       case Var(_)        => pure(e)
-      case Let(bs, e2)   => for { fs <- getFreshVar.replicateM[List](bs.size)
+      case Let(bs, e2)   => for { fs <- getFreshVar.replicateM(bs.size)
                                   // Seq[((originalVar, Expr), freshVar)]
-                                  val newBindings = bs.toSeq.zip(fs) 
+                                  val newBindings = bs.toSeq.zip(fs)
                                   // sub(Map(originalVar -> freshVar))
                                   val subs = sub( newBindings.map(tpl => tpl.copy(_1 = tpl._1._1)).toMap ) _
                                   // List[freshVar, Expr] - change to map when dolio's done
@@ -142,17 +142,17 @@ object LaunchburyInterpreter extends App {
                                   e3 <- freshen( subs(e2) )
                                   freshendBs <- bs2.traverseS{case (x,e) => freshen( subs(e) ).map((x,_))}.map(_.toMap)
                                 } yield Let(freshendBs, e3)
- 
+
     }
   }
 
-  /** performs "big-step" reduction: a single call maps a term to its final result 
+  /** performs "big-step" reduction: a single call maps a term to its final result
     * reduces lambda-terms to whnf or "weak head normal form".  For our purposes,
     * whnf means a lambda term (generally, it also refers to primitives and constructors,
     * which we've ommitted).
-    */ 
+    */
   private def reduce(e:Expr): State[ReduceState, Expr] = {
-  
+
     e match {
       case Lambda(x, e2) => pure(e) // as defined above, a Lambda is already in whnf
       case Apply(e2, x)  => reduce(e2) >>= { case Lambda(y, e3) => reduce( sub(HashMap(y -> x))(e3) )
@@ -165,7 +165,7 @@ object LaunchburyInterpreter extends App {
                                   _ <- modify((s:ReduceState) => s.copy(heap = s.heap + ((x, e3))))
                                   freshendE <- freshen(e3)
                                 } yield freshendE
-     case Let(bs, e2)   => { val heapAdd = ((binding:(String, Expr)) => 
+     case Let(bs, e2)   => { val heapAdd = ((binding:(String, Expr)) =>
                                               modify((s:ReduceState) => s.copy(heap = s.heap + binding)))
                              bs.toList.traverseS(heapAdd) >> reduce(e2)
                            }
