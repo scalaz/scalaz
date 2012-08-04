@@ -2,15 +2,20 @@ package scalaz
 
 ////
 /**
- *
+ * A category supporting all ordinary functions, as well as combining
+ * arrows product-wise.  Every Arrow forms a [[scalaz.Contravariant]]
+ * in one type parameter, and a [[scalaz.Functor]] in the other, just
+ * as with ordinary functions.
  */
 ////
 trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
   ////
   def id[A]: A =>: A
 
+  /** Lift an ordinary function. */
   def arr[A, B](f: A => B): A =>: B
 
+  /** Pass `C` through untouched. */
   def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
 
   def applyInstance[C]: Apply[({type λ[α] = (C =>: α)})#λ] =
@@ -44,9 +49,11 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
   def combine[A, B, C](fab: (A =>: B), fac: (A =>: C)): (A =>: (B, C)) =
       >>>(arr((a: A) => (a, a)), splitA(fab, fac))
 
+  /** Contramap on `A`. */
   def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B) =
     >>>[C, A, B](arr(f), fab)
 
+  /** Functor map on `B`. */
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
   ////
