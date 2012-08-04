@@ -105,6 +105,8 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     intersperse0(empty, as).reverse
   }
 
+  /** Intersperse the elements of `as2` between every adjacent `as1`
+    * pair. */
   final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
 
   final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] =
@@ -145,6 +147,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     filterM(as)(_ => tf)
   }
 
+  /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     if (as.isEmpty) Monad[M].point(empty[A], empty[A]) else
       Monad[M].bind(p(as.head))(b =>
@@ -153,12 +156,15 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         }
       )
 
+  /** A pair of the longest prefix of passing `as` against `p`, and
+    * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     if (as.isEmpty) Monad[M].point(empty, empty) else
       Monad[M].bind(p(as.head))(b =>
         if (b) Monad[M].map(spanM(as.tail)(p))((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
         else Monad[M].point(empty, as))
 
+  /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
@@ -169,6 +175,8 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     if (as.isEmpty) (c, empty) else {
       val (i, j) = f(c, as.head)
@@ -176,6 +184,8 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       (k, j +: v)
     }
 
+  /** All of the `B`s, in order `as`-wise, and the final `C` acquired
+    * by a stateful right fold over `as`. */
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     if (as.isEmpty) (c, empty) else {
       val (i, j) = mapAccumRight(as.tail)(c, f)
@@ -183,15 +193,19 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       (k, v +: j)
     }
 
+  /** `[as, as.tail, as.tail.tail, ..., `empty IxSq`]` */
   final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
+  /** `[`empty IxSq`, as take 1, as take 2, ..., as]` */
   final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     empty +: (if (as.isEmpty) empty else (initz(as.tail) map (as.head +: _)))
 
+  /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     tailz(as).tail flatMap (as zip _)
 
+  /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     if (as.isEmpty) empty else as zip as.tail
 }

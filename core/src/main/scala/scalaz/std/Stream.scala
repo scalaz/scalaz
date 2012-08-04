@@ -150,6 +150,8 @@ trait StreamFunctions {
     }
   }
 
+  /** Intersperse the elements of `as2` between every adjacent `as1`
+    * pair. */
   final def intercalate[A](as1: Stream[Stream[A]], as2: Stream[A]): Stream[A] =
     intersperse(as1, as2).flatten
 

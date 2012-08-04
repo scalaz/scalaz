@@ -104,6 +104,8 @@ trait ListFunctions {
     intersperse0(Nil, as).reverse
   }
 
+  /** Intersperse the elements of `as2` between every adjacent `as1`
+    * pair. */
   final def intercalate[A](as1: List[List[A]], as2: List[A]): List[A] = intersperse(as1, as2).flatten
 
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
@@ -154,6 +156,7 @@ trait ListFunctions {
     filterM(as)(_ => scala.List(true, false))
   }
 
+  /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil    => Monad[M].point(Nil: List[A], Nil: List[A])
     case h :: t =>
@@ -164,6 +167,8 @@ trait ListFunctions {
       )
   }
 
+  /** A pair of the longest prefix of passing `as` against `p`, and
+    * the remainder. */
   final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil    => Monad[M].point(Nil, Nil)
     case h :: t =>
@@ -173,6 +178,7 @@ trait ListFunctions {
 
   }
 
+  /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
@@ -186,6 +192,8 @@ trait ListFunctions {
     }
   }
 
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {
@@ -195,6 +203,8 @@ trait ListFunctions {
     }
   }
 
+  /** All of the `B`s, in order `as`-wise, and the final `C` acquired
+    * by a stateful right fold over `as`. */
   final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {
@@ -204,19 +214,23 @@ trait ListFunctions {
     }
   }
 
+  /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {
     case Nil           => scala.List(Nil)
     case xxs@(_ :: xs) => xxs :: tailz(xs)
   }
 
+  /** `[Nil, as take 1, as take 2, ..., as]` */
   final def initz[A](as: List[A]): List[List[A]] = as match {
     case Nil           => scala.List(Nil)
     case xxs@(x :: xs) => Nil :: (initz(xs) map (x :: _))
   }
 
+  /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: List[A]): List[(A, A)] =
     tailz(as).tail flatMap (as zip _)
 
+  /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: List[A]): List[(A, A)] = as match {
     case Nil      => Nil
     case (_ :: t) => as zip t
