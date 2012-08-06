@@ -118,14 +118,14 @@ trait QNames {
   }
 
   implicit val QNameShow: Show[QName] = new Show[QName] {
-    def show(q: QName) =
+    override def shows(q: QName) =
       ("QName{name=" + q.name.mkString + (q.uri match {
         case None => ""
         case Some(u) => ",uri=" + u.mkString
       }) + (q.prefix match {
         case None => ""
         case Some(p) => ",prefix=" + p.mkString
-      }) + "}").toList
+      }) + "}")
   }
 
 }

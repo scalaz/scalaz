@@ -156,7 +156,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.map2(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[List[Char]] =
+  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[Cord] =
     F.map(run)(_.show[AA, BB])
 
   /** Cozip this disjunction on its functor. */

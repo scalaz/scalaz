@@ -156,11 +156,11 @@ trait NSInfos {
   import std.AllInstances._
 
   implicit val NSInfoShow: Show[NSInfo] = new Show[NSInfo] {
-    def show(n: NSInfo) =
+    override def shows(n: NSInfo) =
       ("NSInfo{prefixes=" + Show[List[(Str, Str)]].shows(n.prefixes) + (n.uri match {
         case None => ""
         case Some(u) => ",uri=" + u
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val NSInfoEqual: Equal[NSInfo] =

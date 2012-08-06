@@ -154,6 +154,8 @@ trait KleisliFunctions {
 
   /**Pure Kleisli arrow */
   def ask[M[+_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
+
+  def local[M[+_] : Monad, A, R](f: (R) => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
 }
 
 object Kleisli extends KleisliFunctions with KleisliInstances {

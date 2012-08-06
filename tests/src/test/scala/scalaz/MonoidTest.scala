@@ -13,27 +13,10 @@ class MonoidTest extends Spec {
   }
 
   "unfold" in {
-    val ss = Monoid.unfold[List, Int, String](1) {
+    val ss = std.stream.unfold(1) {
       case x if x < 10 => Some((x.toString, x * 2))
       case _           => None
     }
-    ss must be_===(List("1", "2", "4", "8"))
-  }
-
-  "unfold (syntax)" in {
-    import syntax.monoid._
-
-    val ss = 1.unfold[List] {
-      case x if x < 10 => Some((x.toString, x * 2))
-      case _           => None
-    }
-    ss must be_===(List("1", "2", "4", "8"))
-  }
-
-  "replicate" in {
-    import syntax.monoid._
-
-    1.replicate[Stream](3) must be_===(Stream(1, 1, 1))
-    1.replicate[List](3, _ + 1) must be_===(List(1, 2, 3))
+    ss.toList must be_===(List("1", "2", "4", "8"))
   }
 }

@@ -8,7 +8,7 @@ trait VectorOps[A] extends Ops[Vector[A]] {
 
   final def intersperse(a: A): Vector[A] = v.intersperse(self, a)
 
-  final def intercalate(other: Vector[A]): Vector[A] = v.intercalate(self, other)
+  final def intercalate[B](other: Vector[B])(implicit ev: Vector[A] =:= Vector[Vector[B]]): Vector[B] = v.intercalate(self, other)
 
   final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
 

@@ -232,10 +232,10 @@ sealed trait \/[+A, +B] {
     }
 
   /** Show for a disjunction value. */
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): List[Char] = 
+  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
     this match {
-      case -\/(a) => List('-', '\\', '/', '(') ::: SA.show(a) ::: List(')')
-      case \/-(b) => List('\\', '/', '-', '(') ::: SB.show(b) ::: List(')')
+      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a)// :- ')'
+      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b)// :- ')'
     }
 
   /** Convert to a validation. */

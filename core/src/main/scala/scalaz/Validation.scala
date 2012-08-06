@@ -260,10 +260,10 @@ sealed trait Validation[+E, +A] {
     }
 
   /** Show for a validation value. */
-  def show[EE >: E, AA >: A](implicit SE: Show[EE], SA: Show[AA]): List[Char] =
+  def show[EE >: E, AA >: A](implicit SE: Show[EE], SA: Show[AA]): Cord =
     this match {
-      case Failure(e) => "Failure(".toList ::: Show[EE].show(e) ::: ")".toList
-      case Success(a) => "Success(".toList ::: Show[AA].show(a) ::: ")".toList
+      case Failure(e) => ("Failure(": Cord) ++ Show[EE].show(e) :- ')'
+      case Success(a) => ("Success(": Cord) ++ Show[AA].show(a) :- ')'
     }
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `+|+` */

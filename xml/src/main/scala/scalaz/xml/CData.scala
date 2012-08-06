@@ -56,11 +56,11 @@ trait CDatas {
     Equal.equalBy[CData, (CDataKind, Str, Option[Line])](c => (c.verbatim, c.data, c.line))
 
   implicit val CDataShow: Show[CData] = new Show[CData] {
-    def show(c: CData) =
+    override def shows(c: CData) =
       ("CData{verbatim=" + Show[CDataKind].shows(c.verbatim) + ",data=" + c.data.mkString + (c.line match {
         case None => ""
         case Some(l) => ",line=" + l
-      }) + "}").toList
+      }) + "}")
   }
 
 }

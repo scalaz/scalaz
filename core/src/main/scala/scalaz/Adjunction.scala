@@ -2,7 +2,7 @@ package scalaz
 
 import Id._
 
-/** 
+/**
  * An adjunction formed by two functors `F` and `G` such that `F` is left-adjoint to `G`.
  * The composite functor GF is a monad and the composite functor FG is a comonad.
  *
@@ -12,16 +12,16 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
 
   /** Puts a value into the monad. */
   def unit[A](a: => A): G[F[A]] = leftAdjunct(a)(x => x)
-  
+
   /** Extracts a value out of the comonad. */
   def counit[A](a: F[G[A]]): A = rightAdjunct(a)(x => x)
 
   /** Every `F`-algebra maps to a `G`-coalgebra. */
   def leftAdjunct[A, B](a: => A)(f: F[A] => B): G[B] = G.map(unit(a))(f)
-  
+
   /** Every `G`-coalgebra maps to an `F`-algebra. */
   def rightAdjunct[A, B](a: F[A])(f: A => G[B]): B = counit(F.map(a)(f))
-  
+
   /** Adjoint functors annihilate each other. */
   implicit val zapFG: Zap[F, G] = new Zap[F, G] {
     def zapWith[A, B, C](a: F[A], b: G[B])(f: (A, B) => C): C =
@@ -52,7 +52,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
     def cobind[A,B](a: F[G[A]])(f: F[G[A]] => B): F[G[B]] = F.map(a)(leftAdjunct(_)(f))
     def map[A,B](a: F[G[A]])(f: A => B) = cobind(a)(x => f(counit(x)))
     def cojoin[A](a: F[G[A]]) = cobind(a)(x => x)
-  } 
+  }
 
   import Adjunction.-|
 
