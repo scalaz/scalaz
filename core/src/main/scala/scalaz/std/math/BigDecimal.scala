@@ -4,7 +4,7 @@ package math
 
 trait BigDecimalInstances {
   implicit val bigDecimalInstance: Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] {
-    def show(f: BigDecimal) = f.toString.toList
+    override def shows(f: BigDecimal) = f.toString
 
     def append(f1: BigDecimal, f2: => BigDecimal) = f1 + f2
 

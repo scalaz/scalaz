@@ -67,7 +67,7 @@ trait Tokens {
   import std.AllInstances._
 
   implicit def TokenShow: Show[Token] = new Show[Token] {
-    def show(t: Token) =
+    override def shows(t: Token) =
       t.fold(
         start = l => q => a => e =>
           "StartToken{line=" + l + ",qname=" + Show[QName].shows(q) + ",attributes=" + Show[List[Attr]].shows(a) + ",empty=" + e + "}"
@@ -79,7 +79,7 @@ trait Tokens {
           "CDataToken{data=" + Show[CData].shows(d) + "}"
         , comment = s =>
           "CommentToken{str=" + s.mkString + "}"
-      ).toList
+      )
   }
 
   /// break'

@@ -209,7 +209,7 @@ trait BooleanOps extends Ops[Boolean] {
   final def lazyOption[A](a: => A): LazyOption[A] = LazyOption.condLazyOption(self, a)
 
   trait ConditionalEither[A] {
-    def or[B](b: => B): Either[A, B]
+    def or[B](b: => B): A \/ B
   }
 
   /**
@@ -218,7 +218,7 @@ trait BooleanOps extends Ops[Boolean] {
    */
   final def either[A, B](a: => A) = new ConditionalEither[A] {
     def or[B](b: => B) =
-      if (self) Left(a) else Right(b)
+      if (self) -\/(a) else \/-(b)
   }
 
   /**

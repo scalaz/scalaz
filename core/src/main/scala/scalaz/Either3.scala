@@ -10,16 +10,16 @@ sealed trait Either3[+A, +B, +C] {
     case Right3(c)  => right(c)
   }
 
-  def eitherLeft:  Either[Either[A, B], C] = this match {
-    case Left3(a)   => Left(Left(a))
-    case Middle3(b) => Left(Right(b))
-    case Right3(c)  => Right(c)
+  def eitherLeft: (A \/ B) \/ C = this match {
+    case Left3(a)   => -\/(-\/(a))
+    case Middle3(b) => -\/(\/-(b))
+    case Right3(c)  => \/-(c)
   }
 
-  def eitherRight: Either[A, Either[B, C]] = this match {
-    case Left3(a)   => Left(a)
-    case Middle3(b) => Right(Left(b))
-    case Right3(c)  => Right(Right(c))
+  def eitherRight: A \/ (B \/ C) = this match {
+    case Left3(a)   => -\/(a)
+    case Middle3(b) => \/-(-\/(b))
+    case Right3(c)  => \/-(\/-(c))
   }
 
   def leftOr[Z](z: => Z)(f: A => Z)   = fold(f, _ => z, _ => z)
@@ -46,14 +46,13 @@ object Either3 {
   }
 
   implicit def show[A: Show, B: Show, C: Show]: Show[Either3[A, B, C]] = new Show[Either3[A, B, C]] {
-    def show(v: Either3[A, B, C]) = shows(v).toCharArray.toList
-    override def shows(v: Either3[A, B, C]) = v match {
-      case Left3(a)   => "Left3(" + a.shows + ")"
-      case Middle3(b) => "Middle3(" + b.shows + ")"
-      case Right3(c)  => "Right3(" + c.shows + ")"
+    override def show(v: Either3[A, B, C]) = v match {
+      case Left3(a)   => Cord("Left3(", a.shows, ")")
+      case Middle3(b) => Cord("Middle3(", b.shows, ")")
+      case Right3(c)  => Cord("Right3(", c.shows, ")")
     }
   }
 }
-    
+
 
 // vim: set ts=4 sw=4 et:

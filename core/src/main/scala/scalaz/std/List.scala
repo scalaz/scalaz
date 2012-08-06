@@ -51,12 +51,12 @@ trait ListInstances extends ListInstances0 {
          (a, fbs) => F.map2(f(a), fbs)(_ :: _)
       }
     }
-    
+
     override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
       State((s: S) => {
         val buf = new collection.mutable.ListBuffer[B]
         var cur = s
-        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 } 
+        l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
         (cur, buf.toList)
       })
     }
@@ -83,19 +83,7 @@ trait ListInstances extends ListInstances0 {
   }
 
   implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    def show(as: List[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k += '['
-      while (i.hasNext) {
-        val n = i.next
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ']'
-      k.toList
-    }
+    override def show(as: List[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show):_*) :+ "]"
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
@@ -116,16 +104,7 @@ trait ListFunctions {
     intersperse0(Nil, as).reverse
   }
 
-  final def intercalate[A](as1: List[A], as2: List[A]): List[A] = {
-    val asr = as2.reverse
-    @tailrec
-    def intercalate0(accum: List[A], rest: List[A]): List[A] = rest match {
-      case Nil      => accum
-      case x :: Nil => x :: accum
-      case h :: t   => intercalate0(asr ::: h :: accum, t)
-    }
-    intercalate0(Nil, as1).reverse
-  }
+  final def intercalate[A](as1: List[List[A]], as2: List[A]): List[A] = intersperse(as1, as2).flatten
 
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None

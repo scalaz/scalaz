@@ -65,7 +65,7 @@ object ScalazArbitrary {
   import scalaz.Tree._
     def tree(n: Int): Gen[Tree[A]] = n match {
       case 0 => arbitrary[A] map (leaf(_))
-      case n => {
+      case _ => {
         val nextSize = n.abs / 2
         Apply[Gen].map2(arbitrary[A], resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
       }
@@ -81,11 +81,14 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
 
   import Validation._
-  implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =
-    Functor[Arbitrary].map(arb[Either[A, B]])(fromEither _)
+  implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
+    Functor[Arbitrary].map(arb[Either[A, B]]) {
+      case Left(a) => \/.left(a)
+      case Right(b) => \/.right(b)
+    }
 
-  implicit def FailProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[FailProjection[A, B]] =
-    Functor[Arbitrary].map(arb[Validation[A, B]])(_.fail)
+  implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =
+    Functor[Arbitrary].map(arb[A \/ B])(_.validation)
 
 //  implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
@@ -173,7 +176,7 @@ object ScalazArbitrary {
   implicit def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))
 
-  implicit def eitherTArb[F[+_], A, B](implicit A: Arbitrary[F[Either[A, B]]]): Arbitrary[EitherT[F, A, B]] =
+  implicit def eitherTArb[F[+_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
@@ -203,9 +206,6 @@ object ScalazArbitrary {
   implicit def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = Functor[Arbitrary].map(A)(StoreT(_))
 
   implicit def listTArb[F[+_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
-
-  implicit def validationTArb[F[+_], A, B](implicit FA: Arbitrary[F[Validation[A, B]]]): Arbitrary[ValidationT[F, A, B]] =
-    Functor[Arbitrary].map(FA)(ValidationT[F, A, B](_))
 
   implicit def streamTArb[F[+_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Pointed[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
   

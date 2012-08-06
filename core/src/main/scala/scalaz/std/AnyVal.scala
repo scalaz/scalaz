@@ -7,7 +7,7 @@ import Id._
 trait AnyValInstances {
 
   implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] {
-    def show(f: Unit) = ().toString.toList
+    override def shows(f: Unit) = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
 
@@ -33,7 +33,7 @@ trait AnyValInstances {
   }
 
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
-    def show(f: Boolean) = f.toString.toList
+    override def shows(f: Boolean) = f.toString
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -73,7 +73,7 @@ trait AnyValInstances {
     def zero: Boolean @@ Disjunction = Disjunction(false)
 
     def order(a1: Boolean @@ Disjunction, a2: Boolean @@ Disjunction) = Order[Boolean].order(a1, a2)
-    
+
     def succ(b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].succ(b))
 
     def pred(b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].pred(b))
@@ -85,7 +85,7 @@ trait AnyValInstances {
     override def min = Enum[Boolean].min map (Disjunction(_))
 
     override def max = Enum[Boolean].max map (Disjunction(_))
-    
+
   }
 
   implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
@@ -110,7 +110,7 @@ trait AnyValInstances {
   }
 
   implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
-    def show(f: Byte) = f.toString.toList
+    override def shows(f: Byte) = f.toString
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
 
@@ -161,7 +161,7 @@ trait AnyValInstances {
   }
 
   implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
-    def show(f: Char) = f.toString.toList
+    override def shows(f: Char) = f.toString
 
     def append(f1: Char, f2: => Char) = (f1 + f2).toChar
 
@@ -209,7 +209,7 @@ trait AnyValInstances {
   }
 
   implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
-    def show(f: Short) = f.toString.toList
+    override def shows(f: Short) = f.toString
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
 
@@ -257,7 +257,7 @@ trait AnyValInstances {
   }
 
   implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
-    def show(f: Int) = f.toString.toList
+    override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
 
@@ -311,7 +311,7 @@ trait AnyValInstances {
   }
 
   implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
-    def show(f: Long) = f.toString.toList
+    override def shows(f: Long) = f.toString
 
     def append(f1: Long, f2: => Long) = f1 + f2
 
@@ -359,7 +359,7 @@ trait AnyValInstances {
   }
 
   implicit val floatInstance: Group[Float] with Enum[Float] with Show[Float] = new Group[Float] with Enum[Float] with Show[Float] {
-    def show(f: Float) = f.toString.toList
+    override def shows(f: Float) = f.toString
 
     def append(f1: Float, f2: => Float) = f1 + f2
 
@@ -389,7 +389,7 @@ trait AnyValInstances {
   }
 
   implicit val doubleInstance: Group[Double] with Enum[Double] with Show[Double] = new Group[Double] with Enum[Double] with Show[Double] {
-    def show(f: Double) = f.toString.toList
+    override def shows(f: Double) = f.toString
 
     def append(f1: Double, f2: => Double) = f1 + f2
 

@@ -11,9 +11,8 @@ trait HistoryInstances {
   }
 
   implicit def historyShow[S](implicit SL: Show[List[S]], S: Show[S]) = new Show[History[S]] {
-    def show(a: History[S]) = {
-      "History(".toList ::: S.show(a.current) ::: ",".toList ::: SL.show(a.undos) ::: ",".toList ::: SL.show(a.redos) ::: ")".toList
-    }
+    override def show(a: History[S]) =
+      Cord("History(", S.show(a.current), ",", SL.show(a.undos), ",", SL.show(a.redos), ")")
   }
 }
 

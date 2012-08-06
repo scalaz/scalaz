@@ -58,7 +58,10 @@ trait TraverseOps[F[_], A] extends Ops[F[A]] {
   final def zipWithR[B, C](fb: F[B])(f: (Option[A], B) => C): F[C] = F.zipWithR(self, fb)(f)
   final def zipL[B](fb: F[B]): F[(A, Option[B])] = F.zipL(self, fb)
   final def zipR[B](fb: F[B]): F[(Option[A], B)] = F.zipR(self, fb)
-
+  final def mapAccumL[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
+    F.mapAccumL(self, z)(f)
+  final def mapAccumR[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
+    F.mapAccumR(self, z)(f)
   ////
 }
 

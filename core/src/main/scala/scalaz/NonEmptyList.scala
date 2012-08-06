@@ -74,7 +74,7 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
-  def size: Int = 1 + list.size
+  def size: Int = 1 + tail.size
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
     nel((head, b.head), tail zip b.tail)
@@ -119,7 +119,7 @@ trait NonEmptyListInstances {
       def copoint[A](p: NonEmptyList[A]): A = p.head
 
       def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
-      
+
       def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
 
       def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
@@ -133,7 +133,7 @@ trait NonEmptyListInstances {
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = new Show[NonEmptyList[A]] {
     import std.list._
-    def show(fa: NonEmptyList[A]) = Show[List[A]].show(fa.list)
+    override def show(fa: NonEmptyList[A]) = Show[List[A]].show(fa.list)
   }
 
   implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])

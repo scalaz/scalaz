@@ -145,12 +145,12 @@ trait LazyEitherInstances {
     def point[A](a: => A): LazyEither[E, A] =
       LazyEither.lazyRight(a)
 
-    def cozip[A, B](a: LazyEither[E, Either[A, B]]) =
+    def cozip[A, B](a: LazyEither[E, A \/ B]) =
       a.fold(
-        e => Left(LazyEither.lazyLeft(e))
+        e => -\/(LazyEither.lazyLeft(e))
       , {
-          case Left(a) => Left(LazyEither.lazyRight(a))
-          case Right(b) => Right(LazyEither.lazyRight(b))
+          case -\/(a) => -\/(LazyEither.lazyRight(a))
+          case \/-(b) => \/-(LazyEither.lazyRight(b))
         }
       )
   }

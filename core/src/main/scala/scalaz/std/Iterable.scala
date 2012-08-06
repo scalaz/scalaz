@@ -4,19 +4,7 @@ package std
 trait IterableInstances {
 
   implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    def show(as: CC[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k += '['
-      while (i.hasNext) {
-        val n = i.next
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ']'
-      k.toList
-    }
+    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
   }
 
   /** Lexicographical ordering */

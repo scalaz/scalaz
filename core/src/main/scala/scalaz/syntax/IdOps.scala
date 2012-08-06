@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Reader}
+import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Reader, \/}
 
 import scalaz.Id._
 
@@ -17,11 +17,11 @@ trait IdOps[A] extends Ops[A] {
   final def squared: (A, A) =
     (self, self)
 
-  def left[B]: Either[A, B] =
-    Left(self)
+  def left[B]: (A \/ B) =
+    \/.left(self)
 
-  def right[B]: Either[B, A] =
-    Right(self)
+  def right[B]: (B \/ A) =
+    \/.right(self)
 
   final def wrapNel: NonEmptyList[A] =
     NonEmptyList(self)
