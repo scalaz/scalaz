@@ -1,7 +1,7 @@
 package scalaz
 
 import std.AllInstances._
-import std.option._
+import std.option.{some, none}
 import syntax.functor._
 
 class MonadPlusTest extends Spec {
