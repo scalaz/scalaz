@@ -29,7 +29,6 @@ trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with PointedSyntax[F] {
   implicit def ToApplicativeOps[A](v: F[A])(implicit F0: Applicative[F]): ApplicativeOps[F, A] = new ApplicativeOps[F,A] { def self = v; implicit def F: Applicative[F] = F0 }
 
   ////
-  implicit def lift2[A,B,C](f: (A,B) => C)(implicit F: Applicative[F]) = F.lift2(f)
-  implicit def lift3[A,B,C,D](f: (A,B,C) => D)(implicit F: Applicative[F]) = F.lift3(f)
+
   ////
 }

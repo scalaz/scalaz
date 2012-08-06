@@ -59,6 +59,33 @@ trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToApplyOps[A](v: F[A])(implicit F0: Apply[F]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
 
   ////
+  implicit def lift2[A,B,C](f: (A,B) => C)(implicit F: Apply[F]) = F.lift2(f)
+  implicit def lift3[A,B,C,D](f: (A,B,C) => D)(implicit F: Apply[F]) = F.lift3(f)
+
+  def ^[A,B,C](fa: => F[A], fb: => F[B])(
+               f: (A, B) => C)(
+               implicit F: Apply[F]): F[C] =
+    F.map2(fa, fb)(f)
+
+  def ^[A,B,C,D](fa: => F[A], fb: => F[B], fc: => F[C])(
+                 f: (A, B, C) => D)(
+                 implicit F: Apply[F]): F[D] =
+    F.map3(fa, fb, fc)(f)
+
+  def ^[A,B,C,D,E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(
+                   f: (A,B,C,D) => E)(
+                   implicit F: Apply[F]): F[E] =
+    F.map4(fa, fb, fc, fd)(f)
+
+  def ^[A,B,C,D,E,I](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(
+                     f: (A,B,C,D,E) => I)(
+                     implicit F: Apply[F]): F[I] =
+    F.map5(fa, fb, fc, fd, fe)(f)
+
+  def ^[A,B,C,D,E,I,J](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], fi: => F[I])(
+                       f: (A,B,C,D,E,I) => J)(
+                       implicit F: Apply[F]): F[J] =
+    F.map6(fa, fb, fc, fd, fe, fi)(f)
 
   ////
 }
