@@ -89,12 +89,12 @@ trait EitherInstances extends EitherInstances0 {
       case Right(a) => f(a, z)
     }
 
-    def cozip[A, B](a: Either[L, Either[A, B]]) =
+    def cozip[A, B](a: Either[L, A \/ B]) =
       a match {
-        case Left(l) => Left(Left(l))
+        case Left(l) => -\/(Left(l))
         case Right(e)=> e match {
-          case Left(a) => Left(Right(a))
-          case Right(b) => Right(Right(b))
+          case -\/(a) => -\/(Right(a))
+          case \/-(b) => \/-(Right(b))
         }
       }
   }

@@ -7,8 +7,8 @@ package scalaz
 ////
 trait Show[F]  { self =>
   ////
-  def show(f: F): List[Char] 
-  def shows(f: F): String = show(f).mkString
+  def show(f: F): Cord = Cord(shows(f))
+  def shows(f: F): String = show(f).toString
 
   def xmlText(f: F): scala.xml.Text = scala.xml.Text(shows(f))
 
@@ -23,23 +23,23 @@ object Show {
   ////
 
   def showFromToString[A]: Show[A] = new Show[A] {
-    def show(f: A): List[Char] = f.toString.toList
+    override def shows(f: A): String = f.toString
   }
 
   /** For compatibility with Scalaz 6 */
   def showA[A]: Show[A] = showFromToString[A]
 
-  def show[A](f: A => List[Char]): Show[A] = new Show[A] {
-    def show(a: A): List[Char] = f(a)
+  def show[A](f: A => Cord): Show[A] = new Show[A] {
+    override def show(a: A): Cord = f(a)
   }
 
   def shows[A](f: A => String): Show[A] = new Show[A] {
-    def show(a: A): List[Char] = f(a).toList
+    override def shows(a: A): String = f(a)
   }
 
   implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
     def contramap[A, B](r: Show[A])(f: (B) => A): Show[B] = new Show[B] {
-      def show(b: B): List[Char] = r.show(f(b))
+      override def show(b: B): Cord = r.show(f(b))
     }
   }
 

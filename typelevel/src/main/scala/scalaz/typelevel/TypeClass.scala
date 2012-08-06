@@ -57,8 +57,6 @@ object TypeClass {
 
       def equal(a1: HNil, a2: HNil) = true
 
-      def show(f: HNil) = shows(f).toList
-
       override def shows(f: HNil) = "HNil"
 
     }
@@ -119,7 +117,6 @@ object TypeClass {
     import formatters.string.Strings
 
     def product[F, T <: HList](FHead: Show[F], FTail: Show[T]) = new Show[F :: T] {
-      def show(f: F :: T) = shows(f).toList
       override def shows(f: F :: T) = (Strings.show[String] :: " :: " :: Strings.show[String] :: FNil) format (FHead.shows(f.head) :: FTail.shows(f.tail) :: HNil)
     }
 

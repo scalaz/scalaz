@@ -144,13 +144,13 @@ trait Contents {
 
 
   implicit val ContentShow: Show[Content] = new Show[Content] {
-    def show(c: Content) =
+    override def shows(c: Content) =
       ("Content{" + (c match {
         case Elem(e) => "Elem(" + Show[Element].shows(e) + ")"
         case Text(d) => "Text(" + Show[CData].shows(d) + ")"
         case CRef(s) => "CRef(" + s.mkString + ")"
         case Comment(s) => "Comment(" + s.mkString + ")"
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val ContentEqual: Equal[Content] = new Equal[Content] {

@@ -112,6 +112,15 @@ trait InsertionMapFunctions {
 trait InsertionMapInstances {
   import Scalaz._
 
+  implicit def insertionTraverse[K]: Traverse[({type λ[α]=InsertionMap[K, α]})#λ] =
+    new Traverse[({type λ[α]=InsertionMap[K, α]})#λ] {
+      def traverseImpl[F[_], A, B](m: InsertionMap[K, A])(f: A => F[B])(implicit F: Applicative[F]) = {
+        m.toList.foldLeft(F.point(InsertionMap.empty[K, B]))({
+          case (acc, (k, v)) => F.map2(acc, f(v))(_ ^+^ (k, _))
+        })
+      }
+    }
+
   implicit def insertionMap[K]: Functor[({type λ[α]=InsertionMap[K, α]})#λ] =
     new Functor[({type λ[α]=InsertionMap[K, α]})#λ] {
       def map[A, B](a: InsertionMap[K, A])(f: A => B) =
@@ -121,8 +130,9 @@ trait InsertionMapInstances {
   implicit def insertionMapEqual[K, V]: Equal[InsertionMap[K, V]] =
     Equal.equalA
 
+  import Cord._
+
   implicit def insertionMapShow[K: Show, V: Show]: Show[InsertionMap[K, V]] =
-    Show.show(q =>
-      "InsertionMap(" + (q.toList map (Show[(K, V)] shows _) mkString ", ") + ")" toList)
+    Show.show(q => Cord("InsertionMap(", Cord.mkCord(", ", q.toList.map(Show[(K, V)] show _):_*), ")"))
 
 }

@@ -4,7 +4,7 @@ package math
 
 trait BigInts {
   implicit val bigIntInstance: Group[BigInt] with Enum[BigInt] with Show[BigInt] = new Group[BigInt] with Enum[BigInt] with Show[BigInt] {
-    def show(f: BigInt): List[Char] = f.toString.toList
+    override def shows(f: BigInt) = f.toString
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
 
@@ -31,7 +31,7 @@ trait BigInts {
   import Tags.Multiplication
 
   implicit val bigIntMultiplication: Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] = new Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] {
-    def show(f: scalaz.@@[BigInt, Multiplication]) = f.toString.toList
+    override def shows(f: scalaz.@@[BigInt, Multiplication]) = f.toString
 
     def append(f1: BigInt @@ Multiplication, f2: => BigInt @@ Multiplication): BigInt @@ Multiplication = Multiplication(f1 * f2)
 

@@ -47,7 +47,7 @@ trait SetInstances {
       Order[Int].order(a1.size, a2.size) match {
         case EQ => Order.orderBy((s: Set[A]) => s.toSeq.sorted).order(a1, a2)
         case x => x
-      } 
+      }
     }
 
     override def equal(a1: Set[A], a2: Set[A]) = {
@@ -69,19 +69,7 @@ trait SetInstances {
   }
 
   implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
-    def show(as: Set[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k ++= "Set(".toList
-      while (i.hasNext) {
-        val n = i.next
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ')'
-      k.toList
-    }
+    override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
   }
 
 }

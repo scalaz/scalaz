@@ -72,15 +72,10 @@ sealed trait Heap[A] {
 
   def toUnsortedList: List[A] = toStream.toList
 
-  def toStream: Stream[A] = {
-    import std.stream._, std.list._
-    Monoid.unfold[Stream, Heap[A], A](this)(_.uncons)
-  }
+  def toStream: Stream[A] =
+    std.stream.unfold(this)(_.uncons)
 
-  def toList: List[A] = {
-    import std.list._
-    Monoid.unfold[List, Heap[A], A](this)(_.uncons)
-  }
+  def toList: List[A] = toStream.toList
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B) = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))

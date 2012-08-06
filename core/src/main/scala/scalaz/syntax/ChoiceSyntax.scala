@@ -5,7 +5,7 @@ package syntax
 trait ChoiceOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Choice[F]
   ////
-  final def |||[C](x: => F[C, B]): F[Either[A, C], B] =
+  final def |||[C](x: => F[C, B]): F[A \/ C, B] =
     F.choice(self, x)
   ////
 }

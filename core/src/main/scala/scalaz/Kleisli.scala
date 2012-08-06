@@ -154,6 +154,8 @@ trait KleisliFunctions {
 
   /**Pure Kleisli arrow */
   def ask[M[+_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
+
+  def local[M[+_] : Monad, A, R](f: (R) => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
 }
 
 object Kleisli extends KleisliFunctions with KleisliInstances {
@@ -251,10 +253,10 @@ private[scalaz] trait KleisliArrow[F[+_]]
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))
   }
 
-  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, Either[A, B], C] =
+  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
     Kleisli {
-      case Left(a) => f run a
-      case Right(b) => g run b
+      case -\/(a) => f run a
+      case \/-(b) => g run b
     }
 
   def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =

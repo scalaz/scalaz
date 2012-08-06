@@ -301,23 +301,23 @@ private[scalaz] trait LazyTuple4Equal[A1, A2, A3, A4] extends Equal[LazyTuple4[A
 private[scalaz] trait LazyTuple2Show[A1, A2] extends Show[LazyTuple2[A1, A2]] {
   implicit def _1 : Show[A1]
   implicit def _2 : Show[A2]
-  def show(f: LazyTuple2[A1, A2]) =
-    "(".toList ::: _1.show(f._1) ::: ",".toList ::: _2.show(f._2) ::: ")".toList
+  override def show(f: LazyTuple2[A1, A2]) =
+    Cord("(", _1.show(f._1), ",", _2.show(f._2), ")")
 }
 private[scalaz] trait LazyTuple3Show[A1, A2, A3] extends Show[LazyTuple3[A1, A2, A3]] {
   implicit def _1 : Show[A1]
   implicit def _2 : Show[A2]
   implicit def _3 : Show[A3]
-  def show(f: LazyTuple3[A1, A2, A3]) =
-    "(".toList ::: _1.show(f._1) ::: ",".toList ::: _2.show(f._2) ::: ",".toList ::: _3.show(f._3) ::: ")".toList
+  override def show(f: LazyTuple3[A1, A2, A3]) =
+    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ")")
 }
 private[scalaz] trait LazyTuple4Show[A1, A2, A3, A4] extends Show[LazyTuple4[A1, A2, A3, A4]] {
   implicit def _1 : Show[A1]
   implicit def _2 : Show[A2]
   implicit def _3 : Show[A3]
   implicit def _4 : Show[A4]
-  def show(f: LazyTuple4[A1, A2, A3, A4]) =
-    "(".toList ::: _1.show(f._1) ::: ",".toList ::: _2.show(f._2) ::: ",".toList ::: _3.show(f._3) ::: ",".toList ::: _4.show(f._4) ::: ")".toList
+  override def show(f: LazyTuple4[A1, A2, A3, A4]) =
+    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ")")
 }
 
 private[scalaz] trait LazyTuple2Order[A1, A2] extends Order[LazyTuple2[A1, A2]] with LazyTuple2Equal[A1, A2] {

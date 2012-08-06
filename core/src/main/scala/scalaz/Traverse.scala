@@ -28,22 +28,25 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     implicit def G = G0
   }
 
-  class Traversal[G[_]](implicit G: Applicative[G]) { 
+  class Traversal[G[_]](implicit G: Applicative[G]) {
     def run[A,B](fa: F[A])(f: A => G[B]): G[F[B]] = traverseImpl[G,A,B](fa)(f)
   }
 
   // reduce - given monoid
-  def traversal[G[_]:Applicative]: Traversal[G] = 
+  def traversal[G[_]:Applicative]: Traversal[G] =
     new Traversal[G]
-  def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] = 
+  def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] =
     new Traversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad)
 
-  def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] = 
+  def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] =
     traversal[G].run(fa)(f)
-  def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] = 
+  def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
     traversalS[S].run(fa)(f)
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (S, F[B]) =
     traverseS(fa)(f)(s)
+
+  def traverseS_[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,Unit] =
+    traversalS[S].run(fa)(f).map(_ => ())
 
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseSTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
@@ -60,16 +63,19 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   }
 
   // derived functions
-  def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] = 
+  def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] =
     traversal[G].run[G[A], A](fga)(ga => ga)
 
-  def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] = 
+  def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] =
     traversalS[S].run(fga)(a => a)
+
+  def sequenceS_[S,A](fga: F[State[S,A]]): State[S,Unit] =
+    traverseS_(fga)(x => x)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
 
-  def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (B, F[Unit]) = 
+  def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (B, F[Unit]) =
     runTraverseS(fa, z)(a => State.modify(f(_, a)))
 
   override def foldLeft[A,B](fa: F[A], z: B)(f: (B,A) => B): B = foldLShape(fa, z)(f)._1
@@ -79,15 +85,15 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
     foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
 
-  def reverse[A](fa: F[A]): F[A] = { 
-    val (as, shape) = foldLShape(fa, scala.List[A]())((t,h) => h :: t)
+  def reverse[A](fa: F[A]): F[A] = {
+    val (as, shape) = mapAccumL(fa, scala.List[A]())((t,h) => (h :: t,h))
     runTraverseS(shape, as)(_ => for {
       e <- State.get
       _ <- State.put(e.tail)
     } yield e.head)._2
   }
 
-  def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) = 
+  def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) =
     runTraverseS(fa, toList(fb))(a => for {
       bs <- State.get
       _ <- State.put(if (bs.isEmpty) bs else bs.tail)
@@ -99,7 +105,15 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def zipL[A,B](fa: F[A], fb: F[B]): F[(A, Option[B])] = zipWithL(fa, fb)((_,_))
   def zipR[A,B](fa: F[A], fb: F[B]): F[(Option[A], B)] = zipWithR(fa, fb)((_,_))
 
-  // mapAccumL, mapAccumR, map, filter?
+  def mapAccumL[S,A,B](fa: F[A], z: S)(f: (S,A) => (S,B)): (S, F[B]) =
+    runTraverseS(fa, z)(a => for {
+      s1 <- State.init[S]
+      val (s2,b) = f(s1,a)
+      _ <- State.put(s2)
+    } yield b)
+
+  def mapAccumR[S,A,B](fa: F[A], z: S)(f: (S,A) => (S,B)): (S, F[B]) =
+    mapAccumL(reverse(fa), z)(f) match { case (s, fb) => (s, reverse(fb)) }
 
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */

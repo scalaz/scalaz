@@ -52,7 +52,7 @@
  *  - [[scalaz.Arrow]] extends [[scalaz.Category]]
  *
  *  '''Data Structures Index'''
- *  - [[scalaz.Validation]] Represent computations that may success or fail, accumulating multiple errors.
+ *  - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
  *  - [[scalaz.NonEmptyList]] A list containing at least one element.
  *  - [[scalaz.DList]] A difference list, supporting efficient append and prepend.
  *  - [[scalaz.EphemeralStream]] A stream that holds weak references to its elements, and recomputes them if needed
@@ -70,7 +70,7 @@
  *  - [[scalaz.StateT]] Computations that modify state.
  *  - [[scalaz.WriterT]] Computations that log a value
  *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
- *  - [[scalaz.EitherT]] Represents computations of type `F[Either[A, B]]`
+ *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
   import Id._
@@ -152,8 +152,6 @@ package object scalaz {
    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
    */
   type ValidationNEL[+E, +X] = Validation[NonEmptyList[E], X]
-  
-  type ValidationTNEL[M[+_], +E, +X] = ValidationT[M, NonEmptyList[E], X]
 
   type FirstOption[A] = Option[A] @@ Tags.First
   type LastOption[A] = Option[A] @@ Tags.Last
