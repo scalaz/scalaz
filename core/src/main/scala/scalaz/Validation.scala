@@ -76,6 +76,7 @@ sealed trait Validation[+E, +A] {
   def unary_~ : Validation[A, E] =
     swap
 
+
   /** Flip the failure/success values in this validation. Alias for `unary_~` */
   def swap: Validation[A, E] =
     this match {
@@ -217,7 +218,7 @@ sealed trait Validation[+E, +A] {
     orElse(x)
 
   /** Return the first success or if they are both success, sum them and return that success. */
-  def ++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M: Semigroup[AA]): Validation[EE, AA] =
+  def +++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M: Semigroup[AA]): Validation[EE, AA] =
     this match {
       case Failure(_) => this
       case Success(b1) => x match {
@@ -345,7 +346,7 @@ trait ValidationInstances0 extends ValidationInstances1 {
   implicit def ValidationMonoid[E: Monoid, A: Semigroup]: Monoid[Validation[E, A]] =
     new Monoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
-        a1 ++ a2
+        a1 +++ a2
       def zero =
         Failure(Monoid[E].zero)
     }
@@ -358,41 +359,41 @@ trait ValidationInstances1 extends ValidationInstances2 {
           a1 === a2
       }
 
-    implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
-      Show.show(_.show)
+  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
+    Show.show(_.show)
 
-    implicit def ValidationSemigroup[E, A: Semigroup]: Semigroup[Validation[E, A]] =
-      new Semigroup[Validation[E, A]] {
-        def append(a1: Validation[E, A], a2: => Validation[E, A]) =
-          a1 ++ a2
-      }
+  implicit def ValidationSemigroup[E, A: Semigroup]: Semigroup[Validation[E, A]] =
+    new Semigroup[Validation[E, A]] {
+      def append(a1: Validation[E, A], a2: => Validation[E, A]) =
+        a1 +++ a2
+    }
 }
 
 trait ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] {
-
-      def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
-        fa.traverse(f)
-
-      override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
-        fa.foldRight(z)(f)
-
-      def cozip[A, B](x: Validation[L, A \/ B]) =
-        x match {
-          case Failure(l) => -\/(Failure(l))
-          case Success(e) => e match {
-            case -\/(a) => -\/(Success(a))
-            case \/-(b) => \/-(Success(b))
-          }
-        }
-    }
-
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+  implicit def ValidationInstances1[L]: Pointed[({type l[a] = Validation[L, a]})#l] with Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Pointed[({type l[a] = Validation[L, a]})#l] with Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
     def point[A](a: => A) =
       Success(a)
 
-    def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
-      fa ap f
+    override def map[A, B](fa: Validation[L, A])(f: A => B) =
+      fa map f
+
+    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
+      fa.traverse(f)
+
+    override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
+      fa.foldRight(z)(f)
+
+    def cozip[A, B](x: Validation[L, A \/ B]) =
+      x match {
+        case Failure(l) => -\/(Failure(l))
+        case Success(e) => e match {
+          case -\/(a) => -\/(Success(a))
+          case \/-(b) => \/-(Success(b))
+        }
+      }
+
+    def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
+      a orElse b
   }
 }
 
@@ -405,6 +406,15 @@ trait ValidationInstances3 {
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
+
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+    def point[A](a: => A) =
+      Success(a)
+
+    def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
+      fa ap f
+  }
+
 }
 
 trait ValidationFunctions {

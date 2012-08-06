@@ -9,20 +9,12 @@ class ValidationTest extends Spec {
   checkAll("Validation", order.laws[Validation[Int, Int]])
 
   type ValidationInt[A] = Validation[Int, A]
-  type FailureProjectionInt[A] = FailureProjection[Int, A]
 
   checkAll("Validation", semigroup.laws[ValidationInt[Int]])
   checkAll("Validation", plus.laws[ValidationInt])
   checkAll("Validation", applicative.laws[ValidationInt])
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
-
-  checkAll("FailureProjection", semigroup.laws[FailureProjectionInt[Int]])
-  checkAll("FailureProjection", plus.laws[FailureProjectionInt])
-  checkAll("FailureProjection", applicative.laws[FailureProjectionInt])
-  checkAll("FailureProjection", traverse.laws[FailureProjectionInt])
-
-  checkAll("FailureProjection", bifunctor.laws[FailureProjection])
 
   "fpoint and point" in {
 
@@ -42,6 +34,7 @@ class ValidationTest extends Spec {
       import syntax.functor._
       val voi2: Validation[String, Option[Int]] = vi.fpoint[Option]
       voi2 must be_===(success[String, Option[Int]](Some(0)))
+      println("hi")
     }
   }
 
@@ -51,14 +44,6 @@ class ValidationTest extends Spec {
     Validation.failure[String, Int]("fail").shows must be_===("Failure(fail)")
   }
 
-  "example" in {
-    import std.AllInstances._
-    import syntax.functor._
-    import std.string.stringSyntax._
-    val x = "0".parseBoolean.failure.fpair
-    ok
-  }
-  
   "ap2" should {
     "accumulate failures in order" in {
       import syntax.show._
@@ -84,7 +69,7 @@ class ValidationTest extends Spec {
     def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]
     def order[E: Order, A: Order] = Order[Validation[E, A]]
     def pointed[E] = Pointed[({type λ[α]=Validation[E, α]})#λ]
-    def semigroup[E: Semigroup, A] = Semigroup[Validation[E, A]]
+    def semigroup[E, A: Semigroup] = Semigroup[Validation[E, A]]
     def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
     def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
     def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
