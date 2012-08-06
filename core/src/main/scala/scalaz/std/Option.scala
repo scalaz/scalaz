@@ -30,12 +30,12 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
-    def cozip[A, B](a: Option[Either[A, B]]) =
+    def cozip[A, B](a: Option[A \/ B]) =
       a match {
-        case None => Left(None)
+        case None => -\/(None)
         case Some(e) => e match {
-          case Left(a) => Left(Some(a))
-          case Right(b) => Right(Some(b))
+          case -\/(a) => -\/(Some(a))
+          case \/-(b) => \/-(Some(b))
         }
       }
     def zip[A, B](a: => Option[A], b: => Option[B]) =

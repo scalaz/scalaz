@@ -110,7 +110,11 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
   def toList: List[Char] = toIndexedSeq.toList
   def toStream: Stream[Char] = toIndexedSeq.toStream
   def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq : IndexedSeq[Char])
-  override def toString: String = self.foldMap(x => x)
+  override def toString: String = {
+    val sb = new StringBuilder(self measure)
+    self foreach (sb ++= _)
+    sb.toString
+  }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
   def flatMap[B](f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))

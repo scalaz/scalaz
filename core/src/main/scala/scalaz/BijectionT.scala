@@ -40,8 +40,8 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
     bimap[C, Tuple2, D](g)
 
-  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[Either[A, C], Either[B, D]] =
-    bimap[C, Either, D](g)
+  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[A \/ C, B \/ D] =
+    bimap[C, \/, D](g)
 
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
@@ -86,12 +86,12 @@ trait BijectionTFunctions {
     bijection[Id, Id, (A, B) => C, A => B => C](_.curried, Function.uncurried(_))
 
   // Left is true, Right is false
-  def eitherB[A]: Bijection[Either[A, A], (Boolean, A)] =
-    bijection[Id, Id, Either[A, A], (Boolean, A)](_ match {
-      case Left(a) => (true, a)
-      case Right(a) => (false, a)
+  def eitherB[A]: Bijection[A \/ A, (Boolean, A)] =
+    bijection[Id, Id, A \/ A, (Boolean, A)](_ match {
+      case -\/(a) => (true, a)
+      case \/-(a) => (false, a)
     }, {
-      case (p, a) => if(p) Left(a) else Right(a)
+      case (p, a) => if(p) -\/(a) else \/-(a)
     })
 
   def zipB[X[_], A, B](implicit Z: Zip[X], U: Unzip[X]): Bijection[(X[A], X[B]), X[(A, B)]] =

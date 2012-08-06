@@ -68,6 +68,12 @@ trait Monoid[F] extends Semigroup[F] { self =>
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
+  /** Make an append and zero into an instance. */
+  def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {
+    def zero = z
+    def append(f1: A, f2: => A): A = f(f1, f2)
+  }
+
   ////
   import annotation.tailrec
 

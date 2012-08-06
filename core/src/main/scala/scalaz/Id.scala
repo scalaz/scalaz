@@ -27,7 +27,7 @@ trait IdInstances {
 
       def unzip[A, B](a: Id[(A, B)]): (A, B) = (a._1, a._2)
 
-      def cozip[A, B](a: Id[Either[A, B]]): Either[A, B] = a
+      def cozip[A, B](a: Id[A \/ B]): (A \/ B) = a
 
       def traverseImpl[G[_] : Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
 
