@@ -4,4 +4,4 @@ package std
 
 trait ToAllStdOps
   extends ToBooleanOps with ToOptionOps with ToOptionIdOps with ToListOps with ToStreamOps
-  with ToFunction2Ops with ToFunction1Ops with ToStringOps with ToTupleOps with ToMapOps
+  with ToFunction2Ops with ToFunction1Ops with ToStringOps with ToTupleOps with ToMapOps with ToEitherOps
