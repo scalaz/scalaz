@@ -33,6 +33,7 @@ object IoExceptionOr extends IoExceptionOrFunctions {
     } catch {
       case e: java.io.IOException => ioException(e)
     }
+  def unapply[A](ioExceptionOr: IoExceptionOr[A]) = ioExceptionOr.toOption
 }
 
 trait IoExceptionOrFunctions {

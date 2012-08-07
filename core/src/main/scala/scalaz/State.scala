@@ -12,6 +12,8 @@ trait StateFunctions {
 
   def get[S]: State[S, S] = init
 
+  def gets[S, T](f: S => T): State[S, T] = State(s => (s, f(s)))
+
   def put[S](s: S): State[S, Unit] = State(_ => (s, ()))
 
   def modify[S](f: S => S): State[S, Unit] = State(s => {

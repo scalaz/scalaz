@@ -2,7 +2,7 @@ package scalaz
 package typelevel
 
 object Typelevel
-  extends syntax.Syntax
+  extends Syntax
   with Nats
 
 // vim: expandtab:ts=2:sw=2

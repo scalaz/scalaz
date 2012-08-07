@@ -236,7 +236,7 @@ sealed trait Cursor {
   /// toTree
   def toTree: Content =
     root.current
-  
+
   /// toForest
   def toForest: List[Content] = {
     val r = root
@@ -447,8 +447,8 @@ trait Cursors {
   import std.AllInstances._
 
   implicit val CursorShow: Show[Cursor] = new Show[Cursor] {
-    def show(c: Cursor) =
-      ("Cursor{current=" + Show[Content].shows(c.current) + ",lefts=" + Show[List[Content]].shows(c.lefts) + ",rights=" + Show[List[Content]].shows(c.rights) + ",parents=" + Show[Path].shows(c.parents)).toList
+    override def show(c: Cursor) =
+      ("Cursor{current=" + Show[Content].shows(c.current) + ",lefts=" + Show[List[Content]].shows(c.lefts) + ",rights=" + Show[List[Content]].shows(c.rights) + ",parents=" + Show[Path].shows(c.parents))
   }
 
   implicit val CursorEqual: Equal[Cursor] =
@@ -459,18 +459,18 @@ trait Cursors {
 object Cursor extends Cursors {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val currentCursorL: Cursor @> Content =
-    lens(x => costate(x.current)(b => cursor(b, x.lefts, x.rights, x.parents)))
+    lens(x => store(x.current)(b => cursor(b, x.lefts, x.rights, x.parents)))
 
   val leftsCursorL: Cursor @> List[Content] =
-    lens(x => costate(x.lefts)(b => cursor(x.current, b, x.rights, x.parents)))
+    lens(x => store(x.lefts)(b => cursor(x.current, b, x.rights, x.parents)))
 
   val rightsCursorL: Cursor @> List[Content] =
-    lens(x => costate(x.rights)(b => cursor(x.current, x.lefts, b, x.parents)))
+    lens(x => store(x.rights)(b => cursor(x.current, x.lefts, b, x.parents)))
 
   val parentsCursorL: Cursor @> Path =
-    lens(x => costate(x.parents)(b => cursor(x.current, x.lefts, x.rights, b)))
+    lens(x => store(x.parents)(b => cursor(x.current, x.lefts, x.rights, b)))
 
 }

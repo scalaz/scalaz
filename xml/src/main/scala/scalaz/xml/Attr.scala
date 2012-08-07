@@ -41,8 +41,8 @@ trait Attrs {
     Order.orderBy[Attr, (QName, Str)](c => (c.key, c.value))
 
   implicit val AttrShow: Show[Attr] = new Show[Attr] {
-    def show(c: Attr) =
-      ("Attr{key=" + Show[QName].shows(c.key) + ",value=" + c.value.mkString + "}").toList
+    override def shows(c: Attr) =
+      ("Attr{key=" + Show[QName].shows(c.key) + ",value=" + c.value.mkString + "}")
   }
 
 }
@@ -50,12 +50,12 @@ trait Attrs {
 object Attr extends Attrs {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val keyAttrL: Attr @> QName =
-    lens(x => costate(x.key)(b => attr(b, x.value)))
+    lens(x => store(x.key)(b => attr(b, x.value)))
 
   val valueAttrL: Attr @> Str =
-    lens(x => costate(x.value)(b => attr(x.key, b)))
+    lens(x => store(x.value)(b => attr(x.key, b)))
 
 }

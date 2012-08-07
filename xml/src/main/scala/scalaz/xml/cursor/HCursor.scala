@@ -61,11 +61,11 @@ trait HCursors {
   import std.AllInstances._
 
   implicit val HCursorShow: Show[HCursor] = new Show[HCursor] {
-    def show(c: HCursor) =
+    override def show(c: HCursor) =
       ("HCursor{history=" + Show[History].shows(c.history) + (c.cursor match {
         case None => ""
         case Some(q) => ",cursor=" + Show[Cursor].shows(q)
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val HCursorEqual: Equal[HCursor] =
@@ -76,12 +76,12 @@ trait HCursors {
 object HCursor extends HCursors {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val historyHCursorL: HCursor @> History =
-    lens(x => costate(x.history)(b => hcursor(b, x.cursor)))
+    lens(x => store(x.history)(b => hcursor(b, x.cursor)))
 
   val cursorHCursorL: HCursor @> Option[Cursor] =
-    lens(x => costate(x.cursor)(b => hcursor(x.history, b)))
+    lens(x => store(x.cursor)(b => hcursor(x.history, b)))
 
 }

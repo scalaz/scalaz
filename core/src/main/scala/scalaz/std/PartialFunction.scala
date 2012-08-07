@@ -15,9 +15,9 @@ trait PartialFunctionInstances {
       case a => a
     }
     
-    def choice[A, B, C](f: => PartialFunction[A, C], g: => PartialFunction[B, C]): PartialFunction[Either[A,  B], C] = {
-      case Left(a) => f(a)
-      case Right(b) => g(b)
+    def choice[A, B, C](f: => PartialFunction[A, C], g: => PartialFunction[B, C]): PartialFunction[A \/ B, C] = {
+      case -\/(a) => f(a)
+      case \/-(b) => g(b)
     }
     
     def split[A, B, C, D](f: PartialFunction[A, B], g: PartialFunction[C, D]): PartialFunction[(A,  C), (B, D)] = {

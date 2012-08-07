@@ -802,7 +802,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   override def toString = {
     import syntax.show._
     def showA[A] = new Show[A] {
-      def show(a: A) = a.toString.toList
+      override def shows(a: A) = a.toString
     }
     implicit val v = showA[V]
     implicit val a = showA[A]
@@ -867,13 +867,15 @@ trait FingerTreeInstances {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
   }
 
-  implicit def fingerTreeShow[V: Show, A: Show]: Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
+  implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
     import syntax.show._
     import std.iterable._
-    def show(t: FingerTree[V,A]) = t.fold(
-      empty = v => (v + " []").toList,
-      single = (v, x) => v.show ++ (" [" + x.shows + "]").toList,
-      deep = (v, pf, m, sf) => v.show ++ (" [" + pf.toList.shows + ", ?, " + sf.toList.shows + "]").toList
+    val AS = Show[List[A]]
+    import Cord._
+    override def show(t: FingerTree[V,A]) = t.fold(
+      empty = v => Cord(V.show(v), " []"),
+      single = (v, x) => Cord(V.show(v), " [", A.show(x), "]"),
+      deep = (v, pf, m, sf) => Cord(V.show(v), " [", AS.show(pf.toList), ", ?, ", AS.show(sf.toList), "]")
     )
   }
 
@@ -1029,7 +1031,7 @@ trait FingerTreeFunctions {
         else
           rope(
             self.viewr.fold(
-              single(chunk),
+              single(chunk)(sizer),
               (_, last) =>
                 if (last.length + chunk.length <= baseChunkLength)
                   self :-| (last ++ chunk)
@@ -1045,7 +1047,7 @@ trait FingerTreeFunctions {
         else
           rope(
             self.viewl.fold(
-              single(chunk),
+              single(chunk)(sizer),
               (head, _) =>
                 if (chunk.length + head.length <= baseChunkLength)
                   (chunk ++ head) |-: self
@@ -1270,11 +1272,11 @@ object IndSeq {
  *
  * `insert` and `++` maintains the ordering.
  *
- * The measure is calculated with a `Monoid[Option[A] @@ First]`, whose `append`
+ * The measure is calculated with a `Monoid[Option[A] @@ Last]`, whose `append`
  * operation favours the first argument. Accordingly, the measuer of a node is the
  * item with the highest priority contained recursively below that node.
  */
-sealed trait OrdSeq[A] extends Ops[FingerTree[FirstOption[A], A]] {
+sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
   import syntax.arrow._
   import std.function._
   import syntax.order._
@@ -1286,7 +1288,8 @@ sealed trait OrdSeq[A] extends Ops[FingerTree[FirstOption[A], A]] {
    * @return (higher, lowerOrEqual) The sub-sequences that contain elements of higher and of lower-than-or-equal
    *                                priority than `a`, and of lower or equal priority respectively.
    */
-  def partition(a: A): (OrdSeq[A], OrdSeq[A]) = function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[FirstOption[A], A]))(self.split(_ gte Tags.First(some(a))))
+  def partition(a: A): (OrdSeq[A], OrdSeq[A]) =
+  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(_ gte Tags.Last(some(a))))
 
   /** Insert `a` at a the first point that all elements to the left are of higher priority */
   def insert(a: A): OrdSeq[A] = partition(a) match {
@@ -1298,17 +1301,17 @@ sealed trait OrdSeq[A] extends Ops[FingerTree[FirstOption[A], A]] {
 }
 
 object OrdSeq {
-  private def ordSeq[A: Order](t: FingerTree[FirstOption[A], A]): OrdSeq[A] = new OrdSeq[A] {
+  private def ordSeq[A: Order](t: FingerTree[LastOption[A], A]): OrdSeq[A] = new OrdSeq[A] {
     val self = t
     val ord = Order[A]
   }
 
-  implicit def unwrap[A](t: OrdSeq[A]): FingerTree[FirstOption[A], A] = t.self
+  implicit def unwrap[A](t: OrdSeq[A]): FingerTree[LastOption[A], A] = t.self
 
   def apply[A: Order](as: A*): OrdSeq[A] = {
     val z: OrdSeq[A] = {
-      val keyer: Reducer[A, FirstOption[A]] = UnitReducer((a: A) => Tags.First(some(a)))
-      ordSeq(empty[FirstOption[A], A](keyer))
+      val keyer: Reducer[A, LastOption[A]] = UnitReducer((a: A) => Tags.Last(some(a)))
+      ordSeq(empty[LastOption[A], A](keyer))
     }
     as.foldLeft(z)((x, y) => x insert y)
   }

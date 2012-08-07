@@ -4,19 +4,7 @@ package std
 trait IterableInstances {
 
   implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    def show(as: CC[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k += '['
-      while (i.hasNext) {
-        val n = i.next
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ']'
-      k.toList
-    }
+    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
   }
 
   /** Lexicographical ordering */
@@ -70,10 +58,12 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
+  implicit def iterableSubtypeTraverse[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
     def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldRight(fa, F.zero)((x,y) => Monoid[B].append(f(x), y))
 
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
+
+    override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
   }
 
 }

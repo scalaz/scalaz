@@ -223,7 +223,7 @@ trait Ops {
   import std.AllInstances._
 
   implicit val OpShow: Show[Op] = new Show[Op] {
-    def show(x: Op) =
+    override def shows(x: Op) =
       (x match {
         case ChoiceSucceed(h) => "choice-succeed" + Show[History].shows(h)
         case ChoiceSwitch(o, n) => Show[History].shows(o) + " >choice-switch< " + Show[History].shows(n)
@@ -257,7 +257,7 @@ trait Ops {
         case NthChild(n) => "nth-child{" + n() + "}"
         case Succeeding(_, d) => "succeeding{description=" + d + "}"
         case Generic(_, d) => "generic{description=" + d + "}"
-      }).toList
+      })
   }
 
   implicit val OpEqual: Equal[Op] = new Equal[Op] {
@@ -351,33 +351,33 @@ trait Ops {
 
 object Op extends Ops {
   import PLens._
-  import CostateT._
+  import StoreT._
 
   val choiceSucceedOpPL: Op @?> History =
-    plens(_.choiceSucceed map (e => costate(e)(choiceSucceedOp(_))))
+    plens(_.choiceSucceed map (e => store(e)(choiceSucceedOp(_))))
 
   val choiceSwitchOpPL: Op @?> (History, History) =
-    plens(_.choiceSwitch map (e => costate(e)(h => choiceSwitchOp(h._1, h._2))))
+    plens(_.choiceSwitch map (e => store(e)(h => choiceSwitchOp(h._1, h._2))))
 
   val findLeftOpPL: Op @?> CPredicate =
-    plens(_.findLeft map (e => costate(e)(findLeftOp(_))))
+    plens(_.findLeft map (e => store(e)(findLeftOp(_))))
 
   val findRightOpPL: Op @?> CPredicate =
-    plens(_.findRight map (e => costate(e)(findRightOp(_))))
+    plens(_.findRight map (e => store(e)(findRightOp(_))))
 
   val findChildOpPL: Op @?> CPredicate =
-    plens(_.findChild map (e => costate(e)(findChildOp(_))))
+    plens(_.findChild map (e => store(e)(findChildOp(_))))
 
   val findRecOpPL: Op @?> CPredicate =
-    plens(_.findRec map (e => costate(e)(findRecOp(_))))
+    plens(_.findRec map (e => store(e)(findRecOp(_))))
 
   val nthChildOpPL: Op @?> Int =
-    plens(_.nthChild map (e => costate(e)(nthChildOp(_))))
+    plens(_.nthChild map (e => store(e)(nthChildOp(_))))
 
   val succeedingOpPL: Op @?> (Cursor => Cursor, OpDescription) =
-    plens(_.succeeding map (e => costate(e)(x => succeedingOp(x._1, x._2))))
+    plens(_.succeeding map (e => store(e)(x => succeedingOp(x._1, x._2))))
 
   val genericOpPL: Op @?> (Cursor => Option[Cursor], OpDescription) =
-    plens(_.generic map (e => costate(e)(x => genericOp(x._1, x._2))))
+    plens(_.generic map (e => store(e)(x => genericOp(x._1, x._2))))
 
 }

@@ -128,7 +128,7 @@ sealed trait Element {
 
   def ?(n: QName): Boolean =
     (this ! n).isDefined
-  
+
   def findAttrOr(n: QName, s: => Str): Str =
     findAttr(n) getOrElse s
 
@@ -241,7 +241,7 @@ trait Elements {
   import std.AllInstances._
 
   implicit val ElementShow: Show[Element] = new Show[Element] {
-    def show(e: Element) =
+    override def shows(e: Element) =
       ("Element{name=" + Show[QName].shows(e.name) +
         ",attribs=" + Show[List[Attr]].shows(e.attribs) +
         ",content=" + Show[List[Content]].shows(e.content) +
@@ -249,7 +249,7 @@ trait Elements {
           case None => ""
           case Some(l) => ",line=" + l
         }) +
-        "}").toList
+        "}")
   }
 
   implicit val ElementEqual: Equal[Element] =
@@ -260,18 +260,18 @@ trait Elements {
 object Element extends Elements {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val nameElementL: Element @> QName =
-    lens(x => costate(x.name)(b => element(b, x.attribs, x.content, x.line)))
+    lens(x => store(x.name)(b => element(b, x.attribs, x.content, x.line)))
 
   val attribsElementL: Element @> List[Attr] =
-    lens(x => costate(x.attribs)(b => element(x.name, b, x.content, x.line)))
+    lens(x => store(x.attribs)(b => element(x.name, b, x.content, x.line)))
 
   val contentElementL: Element @> List[Content] =
-    lens(x => costate(x.content)(b => element(x.name, x.attribs, b, x.line)))
+    lens(x => store(x.content)(b => element(x.name, x.attribs, b, x.line)))
 
   val lineElementL: Element @> Option[Line] =
-    lens(x => costate(x.line)(b => element(x.name, x.attribs, x.content, b)))
+    lens(x => store(x.line)(b => element(x.name, x.attribs, x.content, b)))
 
 }

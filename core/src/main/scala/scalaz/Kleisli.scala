@@ -11,24 +11,23 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   import Kleisli._
 
-  def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
+  /** alias for `andThen` */
+  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k(_)))
+
+  def andThen[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >=> k
+
+  def >==>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >=> kleisli(k)
+
+  def andThenK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >==> k
 
   /** alias for `compose` */ 
   def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
-  def andThen[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] =
-    k >=> this
-
-  /** alias for `andThen` */
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = kleisli((a: A) => b.bind(this(a))(k(_)))
-
-  def composeK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >==>(k)
-
-  def >==>[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = >=>(kleisli(k))
-
-  def andThenK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = <==<(k)
+  def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
   def <==<[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = kleisli(k) >=> this
+
+  def composeK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = this <==< k
 
   def traverse[F[_], AA <: A, BB >: B](f: F[AA])(implicit M: Applicative[M], F: Traverse[F]): M[F[BB]] =
     F.traverse(f)(Kleisli.this(_))
@@ -155,6 +154,8 @@ trait KleisliFunctions {
 
   /**Pure Kleisli arrow */
   def ask[M[+_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
+
+  def local[M[+_] : Monad, A, R](f: (R) => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
 }
 
 object Kleisli extends KleisliFunctions with KleisliInstances {
@@ -252,10 +253,10 @@ private[scalaz] trait KleisliArrow[F[+_]]
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))
   }
 
-  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, Either[A, B], C] =
+  def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
     Kleisli {
-      case Left(a) => f run a
-      case Right(b) => g run b
+      case -\/(a) => f run a
+      case \/-(b) => g run b
     }
 
   def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =

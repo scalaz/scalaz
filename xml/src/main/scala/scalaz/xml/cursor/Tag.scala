@@ -42,11 +42,11 @@ trait Tags {
   import std.AllInstances._
 
   implicit val TagShow: Show[Tag] = new Show[Tag] {
-    def show(t: Tag) =
+    override def shows(t: Tag) =
       ("Tag{name=" + Show[QName].shows(t.name) + ",attribs=" + Show[List[Attr]].shows(t.attribs) + (t.line match {
         case None => ""
         case Some(l) => ",line=" + l
-      }) + "}").toList
+      }) + "}")
   }
 
   implicit val TagEqual: Equal[Tag] =
@@ -57,15 +57,15 @@ trait Tags {
 object Tag extends Tags {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val nameTagL: Tag @> QName =
-    lens(x => costate(x.name)(b => tag(b, x.attribs, x.line)))
+    lens(x => store(x.name)(b => tag(b, x.attribs, x.line)))
 
   val attribsTagL: Tag @> List[Attr] =
-    lens(x => costate(x.attribs)(b => tag(x.name, b, x.line)))
+    lens(x => store(x.attribs)(b => tag(x.name, b, x.line)))
 
   val lineTagL: Tag @> Option[Line] =
-    lens(x => costate(x.line)(b => tag(x.name, x.attribs, b)))
+    lens(x => store(x.line)(b => tag(x.name, x.attribs, b)))
 
 }

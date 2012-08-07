@@ -62,12 +62,12 @@ trait Txts {
 object Txt extends Txts {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   val is_txtTxtL: Txt @> Boolean =
-    lens(x => costate(x.isTxt)(b => if(b) txtBit(x.str) else crefBit(x.str)))
+    lens(x => store(x.isTxt)(b => if(b) txtBit(x.str) else crefBit(x.str)))
 
   val strTxtL: Txt @> Str =
-    lens(x => costate(x.str)(b => if(x.isTxt) txtBit(b) else crefBit(b)))
+    lens(x => store(x.str)(b => if(x.isTxt) txtBit(b) else crefBit(b)))
 
 }

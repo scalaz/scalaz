@@ -45,8 +45,7 @@ object TrampolineUsage extends App {
 
   import scalaz.concurrent._
   import annotation.unchecked.uncheckedVariance
-
-  type PromiseCov[+A] = Promise[A@uncheckedVariance]
+  type PromiseCov[+A] = Promise[A @uncheckedVariance]
 
   {
     // Run in parallel.

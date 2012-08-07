@@ -4,7 +4,7 @@ package std
 import annotation.tailrec
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] {
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
@@ -70,19 +70,7 @@ trait StreamInstances {
     def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
   }
   implicit def streamShow[A](implicit A0: Show[A]) = new Show[Stream[A]] {
-    def show(as: Stream[A]) = {
-      val i = as.iterator
-      val k = new collection.mutable.ListBuffer[Char]
-      k += '['
-      while (i.hasNext) {
-        val n = i.next()
-        k ++= Show[A].show(n)
-        if (i.hasNext)
-          k += ','
-      }
-      k += ']'
-      k.toList
-    }
+    override def show(as: Stream[A]) = stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _)
   }
 
 
@@ -149,6 +137,27 @@ trait StreamFunctions {
 
     mapM(as, unfoldTreeM)
   }
+
+  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
+  final def intersperse[A](as: Stream[A], a: A): Stream[A] = {
+    def loop(rest: Stream[A]): Stream[A] = rest match {
+      case Stream.Empty => Stream.empty
+      case h #:: t      => a #:: h #:: loop(t)
+    }
+    as match {
+      case Stream.Empty => Stream.empty
+      case h #:: t      => h #:: loop(t)
+    }
+  }
+
+  final def intercalate[A](as1: Stream[Stream[A]], as2: Stream[A]): Stream[A] =
+    intersperse(as1, as2).flatten
+
+  def unfold[A, B](seed: A)(f: A => Option[(B, A)]): Stream[B] =
+    f(seed) match {
+      case None         => Stream.empty
+      case Some((b, a)) => Stream.cons(b, unfold(a)(f))
+    }
 }
 
 object stream extends StreamInstances with StreamFunctions {

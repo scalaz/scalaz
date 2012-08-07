@@ -50,11 +50,11 @@ trait Predicates {
   import std.AllInstances._
 
   implicit def PredicateShow[A]: Show[Predicate[A]] = new Show[Predicate[A]] {
-    def show(p: Predicate[A]) =
+    override def shows(p: Predicate[A]) =
       ("Predicate{" + (p.name match {
         case None => "<no name>}"
         case Some(n) => "name=" + n.mkString + "}"
-      })).toList
+      }))
   }
 
   implicit def PreciateEqual[A]: Equal[Predicate[A]] =
@@ -64,12 +64,12 @@ trait Predicates {
 object Predicate extends Predicates {
 
   import Lens._
-  import CostateT._
+  import StoreT._
 
   def predPredicateL[A]: Predicate[A] @> (A => Boolean) =
-    lens(x => costate(x.pred)(b => predicate(b, x.name)))
+    lens(x => store(x.pred)(b => predicate(b, x.name)))
 
   def namePredicateL[A]: Predicate[A] @> Option[List[Char]] =
-    lens(x => costate(x.name)(b => predicate(x.pred, b)))
+    lens(x => store(x.name)(b => predicate(x.pred, b)))
 
 }

@@ -77,12 +77,5 @@ object HLists {
 
 }
 
-object HCons {
-
-  def apply[H, T <: HList](head: H, tail: T): HCons[H, T] = GenericCons[Id, H, T](head, tail)
-
-  def unapply[H, T <: HList](list: HCons[H, T]): Option[(H, T)] = Some(list.head, list.tail)
-
-}
 
 // vim: expandtab:ts=2:sw=2

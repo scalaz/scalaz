@@ -9,7 +9,7 @@ trait ListOps[A] extends Ops[List[A]] {
 
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
-  final def intercalate(other: List[A]): List[A] = l.intercalate(self, other)
+  final def intercalate[B](other: List[B])(implicit ev: List[A] =:= List[List[B]]): List[B] = l.intercalate(self, other)
 
   final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
 

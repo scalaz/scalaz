@@ -6,7 +6,7 @@ import Iteratee._
 
 /**The input to an iteratee. **/
 sealed trait Input[E] {
-  
+
   def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
 
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
@@ -33,7 +33,7 @@ sealed trait Input[E] {
   def flatMap[X](f: (=> E) => Input[X]): Input[X] =
     fold(emptyInput, e => f(e), eofInput)
 
-  def filter(f: (=> E) => Boolean): Input[E] = 
+  def filter(f: (=> E) => Boolean): Input[E] =
     fold(emptyInput, e => if (f(e)) this else emptyInput, eofInput)
 
   def foreach(f: (=> E) => Unit) =
@@ -136,11 +136,11 @@ trait InputInstances {
    }
 
    implicit def inputShow[A](implicit A: Show[A]) = new Show[Input[A]] {
-     def show(f: Input[A]): List[Char] = f.fold(
+     override def shows(f: Input[A]) = f.fold(
        empty = "empty-input"
        , el = a => "el-input(" + A.shows(a) + ")"
        , eof = "eof-input"
-     ).toList
+     )
    }
 }
 

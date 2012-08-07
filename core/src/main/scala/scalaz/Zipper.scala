@@ -79,7 +79,7 @@ sealed trait Zipper[+A] {
   }
 
   /**
-   * Possibly moves to previous element to the right of focus.
+   * Possibly moves to previous element to the left of focus.
    */
   def previousOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     previous getOrElse z
@@ -178,7 +178,7 @@ sealed trait Zipper[+A] {
 
   /**
    * Moves focus n elements in the zipper, or None if there is no such element.
-   * 
+   *
    * @param  n  number of elements to move (positive is forward, negative is backwards)
    */
   def move(n: Int): Option[Zipper[A]] = {
@@ -391,14 +391,14 @@ trait ZipperInstances {
       streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
   }
 
-  implicit def zipperShow[A: Show] = new Show[Zipper[A]]{
+  implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]]{
     import std.stream._
 
-    def show(f: Zipper[A]): List[Char] =
-      "Zipper(".toList :::
-        Show[Stream[A]].show(f.lefts) ::: ", ".toList :::
-        Show[A].show(f.focus) ::: ", ".toList :::
-        Show[Stream[A]].show(f.rights) ::: ")".toList
+    override def show(f: Zipper[A]) =
+      Cord("Zipper(",
+        Show[Stream[A]].show(f.lefts), ", ",
+        Show[A].show(f.focus), ", ",
+        Show[Stream[A]].show(f.rights), ")")
   }
 }
 
