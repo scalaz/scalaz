@@ -354,11 +354,9 @@ trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with
     Writer(fa.written, f(fa))
 }
 
-private[scalaz] trait WriterMonadWriter[F[+_], W] extends ListenableMonadWriter[({type f[+w, +a] = WriterT[F, w, a]})#f, W] with WriterTPointed[F, W] {
+private[scalaz] trait WriterMonadWriter[F[+_], W] extends ListenableMonadWriter[({type f[+w, +a] = WriterT[F, w, a]})#f, W] with WriterTMonad[F, W] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
-  
-  def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]): WriterT[F, W, B] = fa flatMap f
 
   def writer[A](v: (W, A)): WriterT[F, W, A] = WriterT.writerT(F.point(v))
 
