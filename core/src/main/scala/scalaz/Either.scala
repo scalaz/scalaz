@@ -372,4 +372,14 @@ trait DisjunctionFunctions {
   def right[A, B]: B => A \/ B =
     \/-(_)
 
+  /** Construct a disjunction value from a standard `scala.Either`. */
+  def fromEither[A, B](e: Either[A, B]): A \/ B =
+    e fold (left, right)
+
+  /** Evaluate the given value, which might throw an exception. */
+  def fromTryCatch[T](a: => T): Throwable \/ T = try {
+    right(a)
+  } catch {
+    case e => left(e)
+  }
 }
