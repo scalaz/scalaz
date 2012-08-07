@@ -48,14 +48,14 @@ sealed trait \/[+A, +B] {
   def loopl[AA >: A, BB >: B, X](left: AA => X \/ (AA \/ BB), right: BB => X): X =
     \/.loopLeft(this, left, right)
 
-  /** Flip the left/right values in this disjunction. Alias for `swap` */
+  /** Flip the left/right values in this disjunction. Alias for `unary_~` */
   def swap: (B \/ A) =
     this match {
       case -\/(a) => \/-(a)
       case \/-(b) => -\/(b)
     }
 
-  /** Flip the left/right values in this disjunction. Alias for `unary_~` */
+  /** Flip the left/right values in this disjunction. Alias for `swap` */
   def unary_~ : (B \/ A) =
     swap
 
