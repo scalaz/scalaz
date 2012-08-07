@@ -168,6 +168,16 @@ trait OptionFunctions {
     case None    => Success(b)
   }
 
+  final def toRight[A, E](oa: Option[A])(e: => E): E \/ A = oa match {
+    case Some(a) => \/-(a)
+    case None    => -\/(e)
+  }
+
+  final def toLeft[A, B](oa: Option[A])(b: => B): A \/ B = oa match {
+    case Some(a) => -\/(a)
+    case None    => \/-(b)
+  }
+
   /**
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.

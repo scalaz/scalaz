@@ -78,6 +78,10 @@ trait OptionOps[A] extends Ops[Option[A]] {
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
 
+  final def toRight[E](e: => E): E \/ A = o.toRight(self)(e)
+
+  final def toLeft[B](b: => B): A \/ B = o.toLeft(self)(b)
+
   final def first: Option[A] @@ First = Tag(self)
 
   final def last: Option[A] @@ Last = Tag(self)
