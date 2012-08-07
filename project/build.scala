@@ -4,6 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
+import com.typesafe.sbtosgi.OsgiPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -88,6 +89,8 @@ object build extends Build {
         }
         </developers>
       )
+  ) ++ osgiSettings ++ Seq[Sett](
+    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
   lazy val scalaz = Project(
@@ -105,7 +108,9 @@ object build extends Build {
       typeClasses := TypeClass.core,
       (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
-      }
+      },
+      osgiExport("scalaz"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
   )
 
@@ -114,7 +119,9 @@ object build extends Build {
     base = file("concurrent"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-concurrent",
-      typeClasses := TypeClass.concurrent
+      typeClasses := TypeClass.concurrent,
+      osgiExport("scalaz.concurrent"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
     dependencies = Seq(core, effect)
   )
@@ -124,7 +131,8 @@ object build extends Build {
     base = file("effect"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-effect",
-      typeClasses := TypeClass.effect
+      typeClasses := TypeClass.effect,
+      osgiExport("scalaz.effect", "scalaz.std.sffect", "scalaz.syntax.effect")
     ),
     dependencies = Seq(core)
   )
@@ -133,7 +141,8 @@ object build extends Build {
     id = "iteratee",
     base = file("iteratee"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iteratee"
+      name := "scalaz-iteratee",
+      osgiExport("scalaz.iteratee")
     ),
     dependencies = Seq(effect)
   )
@@ -142,7 +151,8 @@ object build extends Build {
     id = "iterv",
     base = file("iterv"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iterv"
+      name := "scalaz-iterv",
+      OsgiKeys.fragmentHost := Some("org.scalaz.core")
     ),
     dependencies = Seq(effect)
   )
@@ -151,7 +161,8 @@ object build extends Build {
     id = "typelevel",
     base = file("typelevel"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-typelevel"
+      name := "scalaz-typelevel",
+      osgiExport("scalaz.typelevel")
     ),
     dependencies = Seq(core)
   )
@@ -161,7 +172,8 @@ object build extends Build {
     base = file("xml"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-xml",
-      typeClasses := TypeClass.xml
+      typeClasses := TypeClass.xml,
+      osgiExport("scalaz.xml")
     ),
     dependencies = Seq(core)
   )
@@ -171,7 +183,8 @@ object build extends Build {
     base = file("example"),
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-example"
+      name := "scalaz-example",
+      osgiExport("scalaz.example")
     )
   )
 
@@ -181,7 +194,8 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full,
+      osgiExport("scalaz.scalacheck")
     )
   )
 
@@ -291,4 +305,5 @@ object build extends Build {
     writeFileScalazPackage("TupleOps.scala", source)
   }
 
+  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
