@@ -250,9 +250,17 @@ trait EitherTInstances extends EitherTInstances0 {
 }
 
 trait EitherTFunctions {
-   def eitherT[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
-     val run = a
-   }
+  def eitherT[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
+    val run = a
+  }
+
+  def monadWriter[F[+_, +_], W, A](implicit MW0: MonadWriter[F, W]) = new EitherTMonadWriter[F, W, A]{
+    def MW = MW0
+  }
+
+  def listenableMonadWriter[F[+_, +_], W, A](implicit MW0: ListenableMonadWriter[F, W]) = new EitherTListenableMonadWriter[F, W, A]{
+    def MW = MW0
+  }
 }
 
 
@@ -318,4 +326,34 @@ trait EitherTMonadTrans[A] extends MonadTrans[({type λ[α[+_], β] = EitherT[α
   def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
 
   implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
+}
+
+trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTMonadTrans[A] {
+  def MW: MonadWriter[F, W]
+
+  implicit def F = MW
+
+  implicit def W = MW.W
+
+  def writer[B](v: (W, B)): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
+    liftM[({type λ[+α] = F[W, α]})#λ, B](MW.writer(v)) 
+
+  def left[B](v: => A): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
+    EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
+
+  def right[B](v: => B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
+    EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
+} 
+
+trait EitherTListenableMonadWriter[F[+_, +_], W, A] extends ListenableMonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadWriter[F, W, A] {
+  implicit def MW: ListenableMonadWriter[F, W]
+
+  def listen[B](ma: EitherT[({type λ[+α] = F[W, α]})#λ, A, B]): EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)] = {
+    val tmp = MW.bind[(A \/ B, W), A \/ (B, W)](MW.listen(ma.run)){
+      case (-\/(a), _) => MW.point(-\/(a))
+      case (\/-(b), w) => MW.point(\/-((b, w))) 
+    }
+
+    EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)](tmp)
+  }
 }
