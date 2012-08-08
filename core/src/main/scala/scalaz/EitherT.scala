@@ -337,7 +337,6 @@ trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β
 
   def writer[B](v: (W, B)): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
     liftM[({type λ[+α] = F[W, α]})#λ, B](MW.writer(v)) 
-    //EitherT[({type λ[+α] = F[WW, α]})#λ, A, B](MW.map[B, A \/ B](MW.writer[B, WW](v))(\/-(_)))
 
   def left[B](v: => A): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
     EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
