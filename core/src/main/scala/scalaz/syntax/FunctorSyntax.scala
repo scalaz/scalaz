@@ -57,7 +57,7 @@ trait FunctorSyntax[F[_]]  {
   implicit def ToLiftV[A, B](v: A => B): LiftV[A, B] = new LiftV[A, B] {
     def self = v
   }
-  def ^[A, B](fa: => F[A])(f: A => B)(implicit F: Functor[F]) =
+  def on[A, B](fa: F[A])(f: A => B)(implicit F: Functor[F]) =
     F.map(fa)(f)
 
   trait LiftV[A,B] extends Ops[A => B] {

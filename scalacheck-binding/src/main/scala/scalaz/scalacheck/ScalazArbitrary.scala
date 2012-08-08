@@ -34,7 +34,7 @@ object ScalazArbitrary {
 
   implicit def BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
 
-  implicit def arbBigInt: Arbitrary[BigInt] = Apply[Arbitrary].map2[Int, Int, BigInt](arb[Int], arb[Int])(_ + _)
+  implicit def arbBigInt: Arbitrary[BigInt] = Apply[Arbitrary].apply[Int, Int, BigInt](arb[Int], arb[Int])(_ + _)
 
   implicit def arbBigInteger: Arbitrary[BigInteger] = Functor[Arbitrary].map(arb[BigInt])(_.bigInteger)
 
@@ -56,7 +56,7 @@ object ScalazArbitrary {
   implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
   import NonEmptyList._
-  implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].map2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
+  implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
 
   import scalaz.Ordering._
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
@@ -67,14 +67,14 @@ object ScalazArbitrary {
       case 0 => arbitrary[A] map (leaf(_))
       case _ => {
         val nextSize = n.abs / 2
-        Apply[Gen].map2(arbitrary[A], resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
+        Apply[Gen].apply(arbitrary[A], resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
       }
     }
     Gen.sized(tree _)
   }
 
   implicit def IterableArbitrary[A] (implicit a: Arbitrary[A]): Arbitrary[Iterable[A]] =
-      Apply[Arbitrary].map2[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
+      Apply[Arbitrary].apply[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
 
 
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
@@ -156,7 +156,7 @@ object ScalazArbitrary {
 
   import Zipper._
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
-    Apply[Arbitrary].map3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
+    Apply[Arbitrary].apply[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
   implicit def KleisliArbitrary[M[+_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
     Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
@@ -182,13 +182,13 @@ object ScalazArbitrary {
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
-    Applicative[Arbitrary].map2(A, B)(LazyTuple2(_, _))
+    Applicative[Arbitrary].apply(A, B)(LazyTuple2(_, _))
 
   implicit def lazyTuple3Arbitrary[A, B, C](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C]): Arbitrary[LazyTuple3[A, B, C]] =
-    Applicative[Arbitrary].map3(A, B, C)(LazyTuple3(_, _, _))
+    Applicative[Arbitrary].apply(A, B, C)(LazyTuple3(_, _, _))
 
   implicit def lazyTuple4Arbitrary[A, B, C, D](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C], D: Arbitrary[D]): Arbitrary[LazyTuple4[A, B, C, D]] =
-    Applicative[Arbitrary].map4(A, B, C, D)(LazyTuple4(_, _, _, _))
+    Applicative[Arbitrary].apply(A, B, C, D)(LazyTuple4(_, _, _, _))
 
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
     import std.list._
@@ -208,10 +208,10 @@ object ScalazArbitrary {
   implicit def listTArb[F[+_], A](implicit FA: Arbitrary[F[List[A]]], F: Pointed[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
   implicit def streamTArb[F[+_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Pointed[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
-  
+
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
 
-  implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] = 
+  implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] =
     Functor[Arbitrary].map(A0)(CaseInsensitive(_))
 }

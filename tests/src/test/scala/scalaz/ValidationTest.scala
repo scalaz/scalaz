@@ -50,7 +50,7 @@ class ValidationTest extends Spec {
       val fail1 = Failure("1").toValidationNEL
       val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
     }
   }
 
@@ -60,7 +60,7 @@ class ValidationTest extends Spec {
       val fail1 = Failure("1").toValidationNEL
       val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("Failure([1,2])")
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].apply(fail1, fail2)(f).shows must be_===("Failure([1,2])")
     }
   }
 

@@ -163,7 +163,7 @@ object KTypeClass {
       super[ProductFoldable].foldMap(fa)(f)
 
     def traverseImpl[G[_], A, B](fa: λ[A])(f: A => G[B])(implicit G: Applicative[G]) =
-      G.ap2(FHead.traverseImpl(fa.head)(f), FTail.traverseImpl(fa.tail)(f))(G.point(_ :: _))
+      G.ap(FHead.traverseImpl(fa.head)(f), FTail.traverseImpl(fa.tail)(f))(G.point(_ :: _))
 
   }
 

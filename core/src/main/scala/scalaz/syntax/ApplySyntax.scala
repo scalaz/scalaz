@@ -9,6 +9,9 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
   final def <*>[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
   final def tuple[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
 
+  @deprecated("Use `a tuple b` instead", "7")
+  final def pair[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
+
   /** Combine `self` and `fb` according to `Apply[F]` with a function that discards the `A`s */
   final def *>[B](fb: F[B]): F[B] = F(self,fb)((_,b) => b)
 
