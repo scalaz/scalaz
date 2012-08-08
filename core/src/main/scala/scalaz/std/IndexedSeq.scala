@@ -53,7 +53,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 
     def traverseImpl[F[_], A, B](v: IxSq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       DList.fromList(v.toList).foldr(F.point(empty[B])) {
-         (a, fbs) => F.map2(f(a), fbs)(_ +: _)
+         (a, fbs) => F(f(a), fbs)(_ +: _)
       }
     }
 

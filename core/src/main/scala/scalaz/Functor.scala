@@ -5,7 +5,7 @@ package scalaz
  * Functors, covariant by nature if not by Scala type.  Their key
  * operation is `map`, whose behavior is constrained only by type and
  * the functor laws.
- * 
+ *
  * Many useful functors also have natural [[scalaz.Apply]] or
  * [[scalaz.Bind]] operations.  Many also support
  * [[scalaz.Traverse]].
@@ -21,8 +21,11 @@ trait Functor[F[_]]  { self =>
 
   // derived functions
 
+  /** Alias for `map`. */
+  def apply[A, B](fa: F[A])(f: A => B): F[B] = map(fa)(f)
+
   /** Lift `f` into `F`. */
-  def apply[A, B](f: A => B): F[A] => F[B] = map(_)(f)
+  def lift1[A, B](f: A => B): F[A] => F[B] = map(_)(f)
 
   /** Inject `a` to the left of `B`s in `f`. */
   def strengthL[A, B](a: A, f: F[B]): F[(A, B)] = map(f)(b => (a, b))

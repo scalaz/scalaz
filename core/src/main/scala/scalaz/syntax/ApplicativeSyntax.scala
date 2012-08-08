@@ -5,8 +5,7 @@ package syntax
 trait ApplicativeOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Applicative[F]
   ////
-  final def map2[B,C](fb: F[B])(f: (A,B) => C): F[C] = F.map2(self,fb)(f)
-  final def pair[B](fb: F[B]): F[(A, B)] = F.map2(self, fb)((_,_))
+
   ////
 }
 

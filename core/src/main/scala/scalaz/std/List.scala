@@ -48,7 +48,7 @@ trait ListInstances extends ListInstances0 {
       // }
 
       DList.fromList(l).foldr(F.point(List[B]())) {
-         (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+         (a, fbs) => F(f(a), fbs)(_ :: _)
       }
     }
 
