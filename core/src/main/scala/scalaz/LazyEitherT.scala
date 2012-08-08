@@ -77,7 +77,7 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   def ap[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Applicative[F]): LazyEitherT[F, AA, C] = {
     // TODO check laziness
-    LazyEitherT[F, AA, C](F.map2(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
+    LazyEitherT[F, AA, C](F(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B]() {
@@ -163,7 +163,7 @@ trait LazyEitherTInstances1 extends LazyEitherTInstances2 {
   implicit def lazyEitherTLeftProjectionApplicative[F[+_], L](implicit F0: Applicative[F]) = new IsomorphismApplicative[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
     implicit def G = lazyEitherTApplicative[F, L]
     def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
-  }  
+  }
 }
 
 trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
@@ -223,7 +223,7 @@ trait LazyEitherTFunctions {
 
   def lazyRightT[F[+_], A, B](b: => B)(implicit p: Pointed[F]): LazyEitherT[F, A, B] =
     lazyEitherT(p.point(lazyRight(b)))
-  
+
   import Isomorphism.{IsoFunctorTemplate, IsoBifunctorTemplate}
 
   implicit def lazyEitherTLeftProjectionEIso2[F[+_], E] = new IsoFunctorTemplate[({type λ[α] = LazyEitherT.LeftProjectionT[F, E, α]})#λ, ({type λ[α] = LazyEitherT[F, E, α]})#λ] {

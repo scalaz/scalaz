@@ -207,7 +207,7 @@ sealed trait PLensT[F[+_], A, B] {
   def product[C, D](that: PLensT[F, C, D])(implicit FF: Apply[F]): PLensT[F, (A, C), (B, D)] =
     plensT {
       case (a, c) =>
-        FF.map2(run(a), that run c)((x, y) => for {
+        FF(run(a), that run c)((x, y) => for {
           q <- x
           r <- y
         } yield q *** r)
@@ -242,7 +242,7 @@ trait PLensTFunctions extends PLensTInstances {
     plensT(a => PF.point(r(a)))
 
   def plensgT[F[+_], A, B](set: A => F[Option[B => A]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensT[F, A, B] =
-    plensT(a => M.map2(set(a), get(a))((q, r) => for {
+    plensT(a => M(set(a), get(a))((q, r) => for {
       w <- q
       x <- r
     } yield Store(w, x)))

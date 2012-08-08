@@ -43,7 +43,7 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
 
   def ap[B, UU >: U](f: => UnwriterT[F, UU, A => B])(implicit F: Apply[F]): UnwriterT[F, UU, B] =
     unwriterT {
-      F.map2(f.run, run) {
+      F(f.run, run) {
         case ((w1, fab), (_, a)) => (w1, fab(a))
       }
     }
@@ -72,7 +72,7 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
 
   def bitraverse[G[_], C, D](f: (U) => G[C], g: (A) => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (U, A), (C, D)](run) {
-      case (a, b) => G.map2(f(a), g(b))((_, _))
+      case (a, b) => G(f(a), g(b))((_, _))
     })(unwriterT(_))
 
   def wpoint[G[+_]](implicit F: Functor[F], P: Pointed[G]): UnwriterT[F, G[U], A] =

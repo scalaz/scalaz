@@ -166,7 +166,7 @@ sealed trait LensT[F[+_], A, B] {
   /** Two disjoint lenses can be paired */
   def product[C, D](that: LensT[F, C, D])(implicit F: Apply[F]): LensT[F, (A, C), (B, D)] =
     lensT {
-      case (a, c) => F.map2(run(a), that run c)((x, y) => x *** y)
+      case (a, c) => F(run(a), that run c)((x, y) => x *** y)
     }
 
   /** alias for `product` */
@@ -215,7 +215,7 @@ trait LensTFunctions {
     lensT(a => F.point(r(a)))
 
   def lensgT[F[+_], A, B](set: A => F[B => A], get: A => F[B])(implicit M: Bind[F]): LensT[F, A, B] =
-    lensT(a => M.map2(set(a), get(a))(Store(_, _)))
+    lensT(a => M(set(a), get(a))(Store(_, _)))
 
   def lensg[A, B](set: A => B => A, get: A => B): Lens[A, B] =
     lensgT[Id, A, B](set, get)

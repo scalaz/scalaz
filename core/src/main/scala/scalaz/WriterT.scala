@@ -51,7 +51,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
     E.each(run)(wa => f(wa._2))
 
   def ap[B, WW >: W](f: => WriterT[F, WW, (A) => B])(implicit F: Apply[F], W: Semigroup[WW]): WriterT[F, WW, B] = writerT {
-    F.map2(f.run, run) {
+    F(f.run, run) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))
     }
   }
@@ -80,7 +80,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
 
   def bitraverse[G[_], C, D](f: (W) => G[C], g: (A) => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {
-      case (a, b) => G.map2(f(a), g(b))((_, _))
+      case (a, b) => G(f(a), g(b))((_, _))
     })(writerT(_))
 
   def rwst[R, S](implicit F: Functor[F]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
