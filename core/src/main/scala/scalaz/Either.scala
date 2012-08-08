@@ -48,14 +48,14 @@ sealed trait \/[+A, +B] {
   def loopl[AA >: A, BB >: B, X](left: AA => X \/ (AA \/ BB), right: BB => X): X =
     \/.loopLeft(this, left, right)
 
-  /** Flip the left/right values in this disjunction. Alias for `swap` */
+  /** Flip the left/right values in this disjunction. Alias for `unary_~` */
   def swap: (B \/ A) =
     this match {
       case -\/(a) => \/-(a)
       case \/-(b) => -\/(b)
     }
 
-  /** Flip the left/right values in this disjunction. Alias for `unary_~` */
+  /** Flip the left/right values in this disjunction. Alias for `swap` */
   def unary_~ : (B \/ A) =
     swap
 
@@ -372,4 +372,14 @@ trait DisjunctionFunctions {
   def right[A, B]: B => A \/ B =
     \/-(_)
 
+  /** Construct a disjunction value from a standard `scala.Either`. */
+  def fromEither[A, B](e: Either[A, B]): A \/ B =
+    e fold (left, right)
+
+  /** Evaluate the given value, which might throw an exception. */
+  def fromTryCatch[T](a: => T): Throwable \/ T = try {
+    right(a)
+  } catch {
+    case e => left(e)
+  }
 }

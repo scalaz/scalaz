@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 import syntax.apply._
-import std.option._
+import std.option.some
 import syntax.traverse._
 
 class ApplyTest extends Spec {

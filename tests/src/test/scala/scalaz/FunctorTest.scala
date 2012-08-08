@@ -1,7 +1,7 @@
 package scalaz
 
 import std.AllInstances._
-import std.option._
+import std.option.some
 import syntax.functor._
 
 class FunctorTest extends Spec {
