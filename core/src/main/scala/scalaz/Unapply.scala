@@ -243,17 +243,17 @@ trait Unapply21[TC[_[_, _], _], MAB]{
 }
 
 object Unapply21 {
-  implicit def unapply210MFABC[TC[_[_, _], _], F[_,_], M0[_[_], _, _], A0, B0, C](implicit TC0: TC[({type f[a, b] = M0[({type m[x] = F[a, x]})#m, C, b]})#f, A0]): Unapply21[TC, M0[({type f[x] = F[A0, x]})#f, C, B0]]{
-    type M[X, Y] = M0[({type f[a] = F[X, a]})#f, C, Y]
+  implicit def unapply210MFABC[TC[_[_, _], _], F[+_,+_], M0[_[+_], _, _], A0, B0, C](implicit TC0: TC[({type f[a, b] = M0[({type m[+x] = F[a, x]})#m, C, b]})#f, A0]): Unapply21[TC, M0[({type f[+x] = F[A0, x]})#f, C, B0]]{
+    type M[X, Y] = M0[({type f[+a] = F[X, a]})#f, C, Y]
     type A = A0
     type B = B0
-  } = new Unapply21[TC, M0[({type f[x] = F[A0, x]})#f, C, B0]]{
-    type M[X, Y] = M0[({type f[a] = F[X, a]})#f, C, Y]
+  } = new Unapply21[TC, M0[({type f[+x] = F[A0, x]})#f, C, B0]]{
+    type M[X, Y] = M0[({type f[+a] = F[X, a]})#f, C, Y]
     type A = A0
     type B = B0
 
     def TC = TC0
-    def apply(ma: M0[({type f[a] = F[A0, a]})#f, C, B0]) = ma
+    def apply(ma: M0[({type f[+a] = F[A0, a]})#f, C, B0]) = ma
   }
 }
 

@@ -1,6 +1,6 @@
 package scalaz
 
-trait ListenableMonadWriter[F[+_, +_], +W] extends MonadWriter[F, W] {
+trait ListenableMonadWriter[F[_, _], W] extends MonadWriter[F, W] {
   def listen[A](ma: F[W, A]): F[W, (A, W)]
 
   def pass[A](ma: F[W, (A, W => W)]): F[W, A] =
