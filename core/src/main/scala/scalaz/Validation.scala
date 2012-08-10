@@ -132,7 +132,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Bind through the success of this validation. */
-  def bind[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
+  def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
       case Failure(e) => Failure(e)
