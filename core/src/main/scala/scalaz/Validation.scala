@@ -346,12 +346,12 @@ trait ValidationInstances0 extends ValidationInstances1 {
       f1 compare f2
   }
 
-  implicit def ValidationMonoid[E: Monoid, A: Semigroup]: Monoid[Validation[E, A]] =
+  implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
     new Monoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2
       def zero =
-        Failure(Monoid[E].zero)
+        Success(Monoid[A].zero)
     }
 }
 
