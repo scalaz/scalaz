@@ -57,6 +57,8 @@ sealed trait IterV[E, A] {
         done = (x2, _) => Done(x2, str),
         cont = _(str)),
       cont = k => Cont(str2 => k(str2) flatMap f))
+
+  def map[B](f: A => B): IterV[E, B] = flatMap(a => Done(f(a), Empty[E]))
 }
 
 /** Monadic Iteratees */

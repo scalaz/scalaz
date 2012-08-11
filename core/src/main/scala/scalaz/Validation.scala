@@ -132,7 +132,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Bind through the success of this validation. */
-  def bind[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
+  def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
       case Failure(e) => Failure(e)
@@ -218,12 +218,15 @@ sealed trait Validation[+E, +A] {
     orElse(x)
 
   /** Return the first success or if they are both success, sum them and return that success. */
-  def +++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M: Semigroup[AA]): Validation[EE, AA] =
+  def +++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M1: Semigroup[AA], M2: Semigroup[EE]): Validation[EE, AA] =
     this match {
-      case Failure(_) => this
+      case Failure(a1) => x match {
+        case Failure(a2) => Failure(M2.append(a1, a2))
+        case Success(b2) => Failure(a1)
+      }
       case Success(b1) => x match {
         case Failure(a2) => Failure(a2)
-        case Success(b2) => Success(M.append(b1, b2))
+        case Success(b2) => Success(M1.append(b1, b2))
       }
     }
 
@@ -301,8 +304,8 @@ sealed trait Validation[+E, +A] {
 
 }
 
-private final case class Success[E, A](a: A) extends Validation[E, A]
-private final case class Failure[E, A](e: E) extends Validation[E, A]
+final case class Success[E, A](a: A) extends Validation[E, A]
+final case class Failure[E, A](e: E) extends Validation[E, A]
 
 object Validation extends ValidationFunctions with ValidationInstances {
 
@@ -343,12 +346,12 @@ trait ValidationInstances0 extends ValidationInstances1 {
       f1 compare f2
   }
 
-  implicit def ValidationMonoid[E: Monoid, A: Semigroup]: Monoid[Validation[E, A]] =
+  implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
     new Monoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2
       def zero =
-        Failure(Monoid[E].zero)
+        Success(Monoid[A].zero)
     }
 }
 
@@ -362,7 +365,7 @@ trait ValidationInstances1 extends ValidationInstances2 {
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
     Show.show(_.show)
 
-  implicit def ValidationSemigroup[E, A: Semigroup]: Semigroup[Validation[E, A]] =
+  implicit def ValidationSemigroup[E: Semigroup, A: Semigroup]: Semigroup[Validation[E, A]] =
     new Semigroup[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2

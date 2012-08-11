@@ -185,6 +185,17 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   /** Construct a right disjunction value. */
   def right[F[+_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(b)(\/.right(_)))
+
+  /** Construct a disjunction value from a standard `scala.Either`. */
+  def fromEither[F[+_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
+    apply(F.map(e)(_ fold (\/.left, \/.right)))
+
+  /** Evaluate the given value, which might throw an exception. */
+  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Functor[F] with Pointed[F]): EitherT[F, Throwable, A] = try {
+    right(a)
+  } catch {
+    case e => left(F.point(e))
+  }
 }
 
 trait EitherTInstances4 {
@@ -237,7 +248,7 @@ trait EitherTInstances extends EitherTInstances0 {
 
   implicit def eitherTEqual[F[+_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] = F0.contramap((_: EitherT[F, A, B]).run)
 }
-           
+
 trait EitherTFunctions {
    def eitherT[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
      val run = a
