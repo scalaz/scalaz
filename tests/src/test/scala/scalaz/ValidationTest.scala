@@ -11,6 +11,7 @@ class ValidationTest extends Spec {
   type ValidationInt[A] = Validation[Int, A]
 
   checkAll("Validation", semigroup.laws[ValidationInt[Int]])
+  checkAll("Validation", monoid.laws[ValidationInt[Int]])
   checkAll("Validation", plus.laws[ValidationInt])
   checkAll("Validation", applicative.laws[ValidationInt])
   checkAll("Validation", traverse.laws[ValidationInt])
