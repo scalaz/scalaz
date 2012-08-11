@@ -42,7 +42,7 @@ class ValidationTest extends Spec {
   "show" in {
     import syntax.show._
     Validation.success[String, Int](0).shows must be_===("Success(0)")
-    Validation.failure[String, Int]("fail").shows must be_===("Failure(fail)")
+    Validation.failure[String, Int]("fail").shows must be_===("Failure(\"fail\")")
   }
 
   "ap2" should {
@@ -51,7 +51,7 @@ class ValidationTest extends Spec {
       val fail1 = Failure("1").toValidationNEL
       val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("Failure([1,2])")
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("""Failure(["1","2"])""")
     }
   }
 
@@ -61,7 +61,7 @@ class ValidationTest extends Spec {
       val fail1 = Failure("1").toValidationNEL
       val fail2 = Failure("2").toValidationNEL
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("Failure([1,2])")
+      Apply[({type l[a] = ValidationNEL[String, a]})#l].map2(fail1, fail2)(f).shows must be_===("""Failure(["1","2"])""")
     }
   }
 
