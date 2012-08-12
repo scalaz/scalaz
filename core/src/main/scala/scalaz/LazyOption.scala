@@ -9,7 +9,7 @@ sealed trait LazyOption[+A] {
   def fold[X](some: (=> A) => X, none: => X): X =
     this match {
       case LazySome(z) => some(z())
-      case LazyNone()  => none
+      case LazyNone    => none
     }
 
   def ?[X](some: => X, none: => X): X =
@@ -99,7 +99,7 @@ sealed trait LazyOption[+A] {
 
 private case class LazySome[A](a: () => A) extends LazyOption[A]
 
-private case class LazyNone[A]() extends LazyOption[A]
+private case object LazyNone extends LazyOption[Nothing]
 
 object LazyOption extends LazyOptionFunctions with LazyOptionInstances
 
@@ -141,7 +141,7 @@ trait LazyOptionFunctions {
     LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =
-    LazyNone()
+    LazyNone
 
   def fromOption[A](oa: Option[A]): LazyOption[A] = oa match {
     case Some(x) => lazySome(x)
