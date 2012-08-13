@@ -139,8 +139,16 @@ sealed trait EitherT[F[+_], +A, +B] {
   def |||[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] =
     |||(x)
 
-  /** Return the first right or they are both right, sum them and return that right. */
-  def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M: Semigroup[BB], F: Apply[F]): EitherT[F, AA, BB] =
+  /**
+   * Sums up values inside disjunction, if both are left or right. Returns first left otherwise.
+   * {{{
+   * \/-(v1) +++ \/-(v2) → \/-(v1 + v2)
+   * \/-(v1) +++ -\/(v2) → -\/(v2)
+   * -\/(v1) +++ \/-(v2) → -\/(v1)
+   * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
+   * }}}
+   */
+  def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M1: Semigroup[BB], M2: Semigroup[AA], F: Apply[F]): EitherT[F, AA, BB] =
     EitherT(F.map2(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
