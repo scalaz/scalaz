@@ -32,7 +32,7 @@ sealed trait NSInfo {
     , uri = n.prefix match {
         case None => uri
         case Some(w) =>
-          prefixes find (_ == w) map (_._2)
+          prefixes.collectFirst{ case (`w`,x) => x }
       }
     , prefix = n.prefix
     )
