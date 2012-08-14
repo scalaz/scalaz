@@ -7,6 +7,7 @@ trait SemigroupOps[F] extends Ops[F] {
   ////
   final def |+|(other: => F): F = F.append(self, other)
   final def mappend(other: => F): F = F.append(self, other)
+  final def ⊹(other: => F): F = F.append(self, other)
   ////
 }
 
