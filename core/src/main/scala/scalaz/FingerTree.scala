@@ -879,6 +879,12 @@ trait FingerTreeInstances {
     )
   }
 
+  implicit def fingerTreeEqual[V, A : Equal]: Equal[FingerTree[V, A]] = new Equal[FingerTree[V, A]] {
+    import std.stream._
+    def equal(x: FingerTree[V, A], y: FingerTree[V, A]) =
+      Equal[Stream[A]].equal(x.toStream, y.toStream)
+  }
+
   import FingerTree.ftip2ft
   import Rope.Rope
 

@@ -111,8 +111,10 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
   def toStream: Stream[Char] = toIndexedSeq.toStream
   def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq : IndexedSeq[Char])
   override def toString: String = {
-    val sb = new StringBuilder(self measure)
+    val sb = new StringBuilder(self.measure + 2)
+    sb += '"'
     self foreach (sb ++= _)
+    sb += '"'
     sb.toString
   }
 
@@ -127,6 +129,8 @@ object Cord {
 
   implicit def stringToCord(s: String): Cord = cord(FingerTree.single[Int, String](s))
 
+  lazy val empty: Cord = apply()
+
   def apply(as: Cord*): Cord = as.foldLeft(cord(FingerTree.empty))(_ ++ _)
 
   def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String](sizer))((x, y) => x :+ y))
@@ -138,4 +142,13 @@ object Cord {
       as.tail.foldLeft(as.head)(_ ++ sep ++ _)
     else
       Cord()
+
+  implicit lazy val CordShow: Show[Cord] = Show.showFromToString
+  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+    def zero = empty
+    def append(x: Cord, y: => Cord) = x ++ y
+  }
+  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
+    def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
+  }
 }
