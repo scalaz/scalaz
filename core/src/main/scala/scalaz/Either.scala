@@ -189,13 +189,24 @@ sealed trait \/[+A, +B] {
   def |||[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
     orElse(x)
 
-  /** Return the first right or they are both right, sum them and return that right. */
-  def +++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M: Semigroup[BB]): AA \/ BB =
+  /**
+   * Sums up values inside disjunction, if both are left or right. Returns first left otherwise.
+   * {{{
+   * \/-(v1) +++ \/-(v2) → \/-(v1 + v2)
+   * \/-(v1) +++ -\/(v2) → -\/(v2)
+   * -\/(v1) +++ \/-(v2) → -\/(v1)
+   * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
+   * }}}
+   */
+  def +++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M1: Semigroup[BB], M2: Semigroup[AA]): AA \/ BB =
     this match {
-      case -\/(_) => this
+      case -\/(a1) => x match {
+        case -\/(a2) => -\/(M2.append(a1, a2))
+        case \/-(b2) => -\/(a1)
+      }
       case \/-(b1) => x match {
         case -\/(a2) => -\/(a2)
-        case \/-(b2) => \/-(M.append(b1, b2))
+        case \/-(b2) => \/-(M1.append(b1, b2))
       }
     }
 
@@ -297,12 +308,12 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
         a1 compare a2
     }
 
-  implicit def DisjunctionMonoid[A: Monoid, B: Semigroup]: Monoid[A \/ B] =
+  implicit def DisjunctionMonoid[A: Semigroup, B: Monoid]: Monoid[A \/ B] =
     new Monoid[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 +++ a2
       def zero =
-        -\/(Monoid[A].zero)
+        \/-(Monoid[B].zero)
     }
 }
 
@@ -316,7 +327,7 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionShow[A: Show, B: Show]: Show[A \/ B] =
     Show.show(_.show)
 
-  implicit def DisjunctionSemigroup[A, B: Semigroup]: Semigroup[A \/ B] =
+  implicit def DisjunctionSemigroup[A: Semigroup, B: Semigroup]: Semigroup[A \/ B] =
     new Semigroup[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 +++ a2

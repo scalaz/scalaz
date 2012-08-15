@@ -17,11 +17,16 @@ class StreamTTest extends Spec {
       ass.filter(_ => true) must be_===(ass)
   }
 
+  "isEmpty" ! check {
+    (s: Stream[Int]) =>
+      StreamT.fromStream(List(s)).isEmpty.forall(_ == s.isEmpty)
+  }
+
   "filter none" ! check {
     (ass: StreamT[Stream, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
-      !isEmpty.contains(true)
+      isEmpty.forall(_ == true)
   }
   
   "drop" ! check {

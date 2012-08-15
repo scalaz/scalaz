@@ -9,6 +9,8 @@ trait EqualOps[F] extends Ops[F] {
   final def ===(other: F): Boolean = F.equal(self, other)
   final def /==(other: F): Boolean = !F.equal(self, other)
   final def =/=(other: F): Boolean = /==(other)
+  final def ≟(other: F): Boolean = F.equal(self, other)
+  final def ≠(other: F): Boolean = !F.equal(self, other)
 
   /** Raises an exception unless self === other. */
   final def assert_===[B](other: B)(implicit S: Show[F], ev: B <:< F) =
