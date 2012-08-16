@@ -213,7 +213,7 @@ object GenTypeClass {
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
-    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
+    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] { def F = %s.this }".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent, typeClassName)
 
     val mainSource = """%s
 
@@ -266,9 +266,10 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F] %s {
-  implicit def To%sOps(v: F)(implicit F0: %s[F]): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
-
+trait %sSyntax[F] %s { self => 
+  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = self.F }
+  
+  def F: %s[F]
   ////
 
   ////
@@ -277,9 +278,12 @@ trait %sSyntax[F] %s {
 
       // implicits in ToXxxSyntax
       typeClassName, typeClassName, typeClassName, typeClassName,
-
+      
+      // trait MonadSyntax[F] extends ... { ... } 
       typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+      typeClassName, typeClassName, typeClassName, typeClassName,
+      
+      typeClassName
     )
     case Kind.*->* =>
       val ToVUnapply =
@@ -312,9 +316,10 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_]] %s {
-  implicit def To%sOps[A](v: F[A])(implicit F0: %s[F]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
+trait %sSyntax[F[_]] %s { self => 
+  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = self.F }
 
+  def F: %s[F]
   ////
 
   ////
@@ -327,7 +332,9 @@ trait %sSyntax[F[_]] %s {
           ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName,
+          
+          typeClassName
         )
       case Kind.*^*->* =>
 
@@ -364,9 +371,10 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_, _]] %s {
-  implicit def To%sOps[A, B](v: F[A, B])(implicit F0: %s[F]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = F0 }
+trait %sSyntax[F[_, _]] %s { self =>
+  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = self.F }
 
+  def F: %s[F]
   ////
 
   ////
@@ -377,7 +385,9 @@ trait %sSyntax[F[_, _]] %s {
           typeClassName, extendsToSyntaxListText,
           ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName,
+          
+          typeClassName
         )
     }
     val syntaxSourceFile = SourceFile(tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource)

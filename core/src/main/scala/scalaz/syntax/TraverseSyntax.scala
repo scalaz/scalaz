@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse` */
-trait TraverseOps[F[_], A] extends Ops[F[A]] {
+trait TraverseOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Traverse[F]
   ////
 
@@ -72,7 +72,7 @@ trait ToTraverseOps0 {
 }
 
 trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
-  implicit def ToTraverseOps[F[+_],A](v: F[A])(implicit F0: Traverse[F]) =
+  implicit def ToTraverseOps[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
 
   ////
@@ -80,9 +80,10 @@ trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps 
   ////
 }
 
-trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
-  implicit def ToTraverseOps[A](v: F[A])(implicit F0: Traverse[F]): TraverseOps[F, A] = new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
+trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] { self => 
+  implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = self.F }
 
+  def F: Traverse[F]
   ////
 
   ////

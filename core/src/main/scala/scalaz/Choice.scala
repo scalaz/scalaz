@@ -15,7 +15,7 @@ trait Choice[=>:[_, _]] extends Category[=>:] { self =>
   def codiagonal[A]: (A \/ A) =>: A = choice(id, id)
 
   ////
-  val choiceSyntax = new scalaz.syntax.ChoiceSyntax[=>:] {}
+  val choiceSyntax = new scalaz.syntax.ChoiceSyntax[=>:] { def F = Choice.this }
 }
 
 object Choice {

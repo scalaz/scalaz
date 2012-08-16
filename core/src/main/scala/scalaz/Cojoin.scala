@@ -13,7 +13,7 @@ trait Cojoin[F[_]]  { self =>
   // derived functions
 
   ////
-  val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] {}
+  val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] { def F = Cojoin.this }
 }
 
 object Cojoin {

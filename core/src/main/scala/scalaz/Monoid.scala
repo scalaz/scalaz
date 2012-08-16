@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 ////
 /**
  * Provides an identity element (`zero`) to the binary `append`
@@ -62,20 +60,20 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def monoidLaw = new MonoidLaw {}
 
   ////
-  val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] {}
+  val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
 
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
+  ////
+  import annotation.tailrec
+
   /** Make an append and zero into an instance. */
   def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {
     def zero = z
-    def append(f1: A, f2: => A): A = f(f1, f2)
+    def append(f1: A, f2: => A): A = f(f1,f2)
   }
-
-  ////
-  import annotation.tailrec
 
   trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Applicative[F]

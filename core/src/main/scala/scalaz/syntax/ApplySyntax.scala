@@ -68,42 +68,37 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
   ////
 }
 
-trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToApplyOps[A](v: F[A])(implicit F0: Apply[F]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
+trait ApplySyntax[F[_]] extends FunctorSyntax[F] { self => 
+  implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = self.F }
 
+  def F: Apply[F]
   ////
-  implicit def lift2[A,B,C](f: (A,B) => C)(implicit F: Apply[F]) = F.lift2(f)
-  implicit def lift3[A,B,C,D](f: (A,B,C) => D)(implicit F: Apply[F]) = F.lift3(f)
-  implicit def lift4[A,B,C,D,E](f: (A,B,C,D) => E)(implicit F: Apply[F]) = F.lift4(f)
+  implicit def lift2[A,B,C](f: (A,B) => C) = F.lift2(f)
+  implicit def lift3[A,B,C,D](f: (A,B,C) => D) = F.lift3(f)
+  implicit def lift4[A,B,C,D,E](f: (A,B,C,D) => E) = F.lift4(f)
 
   def on[A,B,C](fa: => F[A], fb: => F[B])(
-               f: (A, B) => C)(
-               implicit F: Apply[F]): F[C] =
+               f: (A, B) => C): F[C] =
     F(fa, fb)(f)
 
   def on[A,B,C,D](fa: => F[A], fb: => F[B], fc: => F[C])(
-                 f: (A, B, C) => D)(
-                 implicit F: Apply[F]): F[D] =
+                 f: (A, B, C) => D): F[D] =
     F(fa, fb, fc)(f)
 
   def on[A,B,C,D,E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(
-                   f: (A,B,C,D) => E)(
-                   implicit F: Apply[F]): F[E] =
+                   f: (A,B,C,D) => E): F[E] =
     F(fa, fb, fc, fd)(f)
 
   def on[A,B,C,D,E,I](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(
-                     f: (A,B,C,D,E) => I)(
-                     implicit F: Apply[F]): F[I] =
+                     f: (A,B,C,D,E) => I): F[I] =
     F(fa, fb, fc, fd, fe)(f)
 
   def on[A,B,C,D,E,I,J](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], fi: => F[I])(
-                       f: (A,B,C,D,E,I) => J)(
-                       implicit F: Apply[F]): F[J] =
+                       f: (A,B,C,D,E,I) => J): F[J] =
     F(fa, fb, fc, fd, fe, fi)(f)
 
   def on[A,B,C,D,E,I,J,K](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], fi: => F[I], fj: => F[J])(
-                         f: (A,B,C,D,E,I,J) => K)(
-                         implicit F: Apply[F]): F[K] =
+                         f: (A,B,C,D,E,I,J) => K): F[K] =
     F(fa, fb, fc, fd, fe, fi, fj)(f)
 
   ////

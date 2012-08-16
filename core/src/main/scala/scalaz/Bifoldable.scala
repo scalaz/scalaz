@@ -48,7 +48,7 @@ trait Bifoldable[F[_, _]]  { self =>
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
   ////
-  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] {}
+  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
 
 object Bifoldable {

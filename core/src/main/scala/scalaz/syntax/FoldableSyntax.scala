@@ -58,9 +58,10 @@ trait ToFoldableOps extends ToFoldableOps0 {
   ////
 }
 
-trait FoldableSyntax[F[_]]  {
-  implicit def ToFoldableOps[A](v: F[A])(implicit F0: Foldable[F]): FoldableOps[F, A] = new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = F0 }
+trait FoldableSyntax[F[_]]  { self => 
+  implicit def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] = new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = self.F }
 
+  def F: Foldable[F]
   ////
 
   ////

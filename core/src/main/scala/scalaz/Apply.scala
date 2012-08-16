@@ -120,7 +120,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply(_, _, _, _, _, _, _, _, _, _, _, _)(f)
 
   ////
-  val applySyntax = new scalaz.syntax.ApplySyntax[F] {}
+  val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }
 
 object Apply {

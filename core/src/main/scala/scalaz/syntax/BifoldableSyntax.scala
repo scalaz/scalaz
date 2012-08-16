@@ -26,9 +26,10 @@ trait ToBifoldableOps extends ToBifoldableOps0 {
   ////
 }
 
-trait BifoldableSyntax[F[_, _]]  {
-  implicit def ToBifoldableOps[A, B](v: F[A, B])(implicit F0: Bifoldable[F]): BifoldableOps[F, A, B] = new BifoldableOps[F, A, B] { def self = v; implicit def F: Bifoldable[F] = F0 }
+trait BifoldableSyntax[F[_, _]]  { self =>
+  implicit def ToBifoldableOps[A, B](v: F[A, B]): BifoldableOps[F, A, B] = new BifoldableOps[F, A, B] { def self = v; implicit def F: Bifoldable[F] = self.F }
 
+  def F: Bifoldable[F]
   ////
 
   ////

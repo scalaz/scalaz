@@ -204,7 +204,7 @@ trait Foldable[F[_]]  { self =>
   }
 
   ////
-  val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] {}
+  val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] { def F = Foldable.this }
 }
 
 object Foldable {

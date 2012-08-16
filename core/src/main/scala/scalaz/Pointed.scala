@@ -30,7 +30,7 @@ trait Pointed[F[_]] extends Functor[F] { self =>
   }
 
   ////
-  val pointedSyntax = new scalaz.syntax.PointedSyntax[F] {}
+  val pointedSyntax = new scalaz.syntax.PointedSyntax[F] { def F = Pointed.this }
 }
 
 object Pointed {

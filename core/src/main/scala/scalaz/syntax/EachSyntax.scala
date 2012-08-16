@@ -24,9 +24,10 @@ trait ToEachOps extends ToEachOps0 {
   ////
 }
 
-trait EachSyntax[F[_]]  {
-  implicit def ToEachOps[A](v: F[A])(implicit F0: Each[F]): EachOps[F, A] = new EachOps[F,A] { def self = v; implicit def F: Each[F] = F0 }
+trait EachSyntax[F[_]]  { self => 
+  implicit def ToEachOps[A](v: F[A]): EachOps[F, A] = new EachOps[F,A] { def self = v; implicit def F: Each[F] = self.F }
 
+  def F: Each[F]
   ////
 
   ////

@@ -24,9 +24,10 @@ trait ToCojoinOps extends ToCojoinOps0 {
   ////
 }
 
-trait CojoinSyntax[F[_]]  {
-  implicit def ToCojoinOps[A](v: F[A])(implicit F0: Cojoin[F]): CojoinOps[F, A] = new CojoinOps[F,A] { def self = v; implicit def F: Cojoin[F] = F0 }
+trait CojoinSyntax[F[_]]  { self => 
+  implicit def ToCojoinOps[A](v: F[A]): CojoinOps[F, A] = new CojoinOps[F,A] { def self = v; implicit def F: Cojoin[F] = self.F }
 
+  def F: Cojoin[F]
   ////
 
   ////

@@ -37,7 +37,7 @@ trait IdInstances {
 
       // Overrides for efficiency.
 
-      override def lift1[A, B](f: (A) => B): Id[A] => Id[B] = f
+      override def lift[A, B](f: (A) => B): Id[A] => Id[B] = f
 
       // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `ffa: A` is identical.
       override def join[A](ffa: A) = ffa

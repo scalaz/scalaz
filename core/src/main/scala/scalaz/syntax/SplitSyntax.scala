@@ -29,9 +29,10 @@ trait ToSplitOps extends ToSplitOps0 with ToCategoryOps {
   ////
 }
 
-trait SplitSyntax[F[_, _]] extends CategorySyntax[F] {
-  implicit def ToSplitOps[A, B](v: F[A, B])(implicit F0: Split[F]): SplitOps[F, A, B] = new SplitOps[F, A, B] { def self = v; implicit def F: Split[F] = F0 }
+trait SplitSyntax[F[_, _]] extends CategorySyntax[F] { self =>
+  implicit def ToSplitOps[A, B](v: F[A, B]): SplitOps[F, A, B] = new SplitOps[F, A, B] { def self = v; implicit def F: Split[F] = self.F }
 
+  def F: Split[F]
   ////
 
   ////

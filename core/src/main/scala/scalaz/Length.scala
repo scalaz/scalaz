@@ -11,7 +11,7 @@ trait Length[F[_]]  { self =>
   // derived functions
 
   ////
-  val lengthSyntax = new scalaz.syntax.LengthSyntax[F] {}
+  val lengthSyntax = new scalaz.syntax.LengthSyntax[F] { def F = Length.this }
 }
 
 object Length {

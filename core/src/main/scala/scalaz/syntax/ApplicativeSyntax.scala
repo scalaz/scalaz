@@ -24,9 +24,10 @@ trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps with ToPointedO
   ////
 }
 
-trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with PointedSyntax[F] {
-  implicit def ToApplicativeOps[A](v: F[A])(implicit F0: Applicative[F]): ApplicativeOps[F, A] = new ApplicativeOps[F,A] { def self = v; implicit def F: Applicative[F] = F0 }
+trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with PointedSyntax[F] { self => 
+  implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A] { def self = v; implicit def F: Applicative[F] = self.F }
 
+  def F: Applicative[F]
   ////
 
   ////

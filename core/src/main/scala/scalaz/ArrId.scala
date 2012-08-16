@@ -10,7 +10,7 @@ trait ArrId[=>:[_, _]]  { self =>
   def id[A]: A =>: A
 
   ////
-  val arrIdSyntax = new scalaz.syntax.ArrIdSyntax[=>:] {}
+  val arrIdSyntax = new scalaz.syntax.ArrIdSyntax[=>:] { def F = ArrId.this }
 }
 
 object ArrId {

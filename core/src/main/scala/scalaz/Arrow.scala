@@ -50,7 +50,7 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
   ////
-  val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] {}
+  val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
 
 object Arrow {

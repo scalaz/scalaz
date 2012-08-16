@@ -25,7 +25,7 @@ trait Functor[F[_]]  { self =>
   def apply[A, B](fa: F[A])(f: A => B): F[B] = map(fa)(f)
 
   /** Lift `f` into `F`. */
-  def lift1[A, B](f: A => B): F[A] => F[B] = map(_)(f)
+  def lift[A, B](f: A => B): F[A] => F[B] = map(_)(f)
 
   /** Inject `a` to the left of `B`s in `f`. */
   def strengthL[A, B](a: A, f: F[B]): F[(A, B)] = map(f)(b => (a, b))
@@ -77,7 +77,7 @@ trait Functor[F[_]]  { self =>
   }
   def functorLaw = new FunctorLaw {}
   ////
-  val functorSyntax = new scalaz.syntax.FunctorSyntax[F] {}
+  val functorSyntax = new scalaz.syntax.FunctorSyntax[F] { def F = Functor.this }
 }
 
 object Functor {

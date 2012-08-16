@@ -50,7 +50,7 @@ trait Zip[F[_]]  { self =>
     }
 
   ////
-  val zipSyntax = new scalaz.syntax.ZipSyntax[F] {}
+  val zipSyntax = new scalaz.syntax.ZipSyntax[F] { def F = Zip.this }
 }
 
 object Zip {

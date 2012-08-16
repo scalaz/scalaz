@@ -26,9 +26,10 @@ trait ToArrIdOps extends ToArrIdOps0 {
   ////
 }
 
-trait ArrIdSyntax[F[_, _]]  {
-  implicit def ToArrIdOps[A, B](v: F[A, B])(implicit F0: ArrId[F]): ArrIdOps[F, A, B] = new ArrIdOps[F, A, B] { def self = v; implicit def F: ArrId[F] = F0 }
+trait ArrIdSyntax[F[_, _]]  { self =>
+  implicit def ToArrIdOps[A, B](v: F[A, B]): ArrIdOps[F, A, B] = new ArrIdOps[F, A, B] { def self = v; implicit def F: ArrId[F] = self.F }
 
+  def F: ArrId[F]
   ////
 
   ////

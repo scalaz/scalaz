@@ -13,7 +13,7 @@ trait Cobind[F[_]] extends Functor[F] { self =>
   // derived functions
 
   ////
-  val cobindSyntax = new scalaz.syntax.CobindSyntax[F] {}
+  val cobindSyntax = new scalaz.syntax.CobindSyntax[F] { def F = Cobind.this }
 }
 
 object Cobind {

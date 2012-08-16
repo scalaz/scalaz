@@ -30,7 +30,7 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
   def categoryLaw = new CategoryLaw {}
 
   ////
-  val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] {}
+  val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] { def F = Category.this }
 }
 
 object Category {

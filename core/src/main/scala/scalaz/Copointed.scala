@@ -16,7 +16,7 @@ trait Copointed[F[_]] extends Functor[F] { self =>
   def copure[A](p: F[A]): A = copoint(p)
 
   ////
-  val copointedSyntax = new scalaz.syntax.CopointedSyntax[F] {}
+  val copointedSyntax = new scalaz.syntax.CopointedSyntax[F] { def F = Copointed.this }
 }
 
 object Copointed {

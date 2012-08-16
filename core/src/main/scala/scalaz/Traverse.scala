@@ -1,8 +1,8 @@
 package scalaz
 
-import Id._
-
 ////
+import scalaz.Id.Id
+
 /**
  * Idiomatic traversal of a structure, as described in
  * [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essense of the Iterator Pattern]].
@@ -160,7 +160,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseLaw = new TraverseLaw {}
 
   ////
-  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] {}
+  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
 }
 
 object Traverse {

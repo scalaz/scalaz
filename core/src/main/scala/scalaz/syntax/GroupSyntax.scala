@@ -20,9 +20,10 @@ trait ToGroupOps extends ToMonoidOps {
   ////
 }
 
-trait GroupSyntax[F] extends MonoidSyntax[F] {
-  implicit def ToGroupOps(v: F)(implicit F0: Group[F]): GroupOps[F] = new GroupOps[F] { def self = v; implicit def F: Group[F] = F0 }
-
+trait GroupSyntax[F] extends MonoidSyntax[F] { self => 
+  implicit def ToGroupOps(v: F): GroupOps[F] = new GroupOps[F] { def self = v; implicit def F: Group[F] = self.F }
+  
+  def F: Group[F]
   ////
 
   ////

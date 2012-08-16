@@ -1,8 +1,8 @@
 package scalaz
 
-import Id._
-
 ////
+import scalaz.Id.Id
+
 /**
  *
  */
@@ -83,7 +83,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) => (Endo.endo(g(b, _: C)))) apply z
 
   ////
-  val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] {}
+  val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }
 }
 
 object Bitraverse {

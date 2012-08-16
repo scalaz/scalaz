@@ -28,9 +28,10 @@ trait ToOrderOps extends ToEqualOps {
   ////
 }
 
-trait OrderSyntax[F] extends EqualSyntax[F] {
-  implicit def ToOrderOps(v: F)(implicit F0: Order[F]): OrderOps[F] = new OrderOps[F] { def self = v; implicit def F: Order[F] = F0 }
-
+trait OrderSyntax[F] extends EqualSyntax[F] { self => 
+  implicit def ToOrderOps(v: F): OrderOps[F] = new OrderOps[F] { def self = v; implicit def F: Order[F] = self.F }
+  
+  def F: Order[F]
   ////
 
   ////

@@ -31,7 +31,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
     bind(value)(x => if (x) ifTrue else ifFalse)
 
   ////
-  val bindSyntax = new scalaz.syntax.BindSyntax[F] {}
+  val bindSyntax = new scalaz.syntax.BindSyntax[F] { def F = Bind.this }
 }
 
 object Bind {

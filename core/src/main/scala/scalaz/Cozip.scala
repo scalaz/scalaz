@@ -1,9 +1,15 @@
 package scalaz
 
+////
+/**
+ *
+ */
+////
 trait Cozip[F[_]]  { self =>
   ////
   def cozip[A, B](x: F[A \/ B]): (F[A] \/ F[B])
 
+  // derived functions
   def cozip3[A, B, C](x: F[A \/ (B \/ C)]): (F[A] \/ (F[B] \/ F[C])) =
     cozip(x).map(cozip(_))
 
@@ -19,6 +25,8 @@ trait Cozip[F[_]]  { self =>
   def cozip7[A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) =
     cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map(cozip(_))))))
 
+  ////
+  val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
 }
 
 object Cozip {

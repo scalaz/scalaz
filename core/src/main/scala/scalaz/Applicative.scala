@@ -73,7 +73,7 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   def applicativeLaw = new ApplicativeLaw {}
 
   ////
-  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {}
+  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
 
 object Applicative {

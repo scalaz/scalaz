@@ -12,7 +12,7 @@ trait Split[=>:[_, _]] extends Category[=>:] { self =>
   // derived functions
 
   ////
-  val splitSyntax = new scalaz.syntax.SplitSyntax[=>:] {}
+  val splitSyntax = new scalaz.syntax.SplitSyntax[=>:] { def F = Split.this }
 }
 
 object Split {
