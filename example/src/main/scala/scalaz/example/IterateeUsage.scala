@@ -45,14 +45,14 @@ object IterateeUsage extends App {
   ((head[IoExceptionOr[Char], IO]  &= enumReader[IO](new StringReader(""))).map(_ flatMap (_.toOption)).run unsafePerformIO()) assert_=== None
 
   // As a monad
-  val m1 = head[Int, Id] flatMap (b => head[Int, Id] map (b2 => (b pair b2)))
+  val m1 = head[Int, Id] flatMap (b => head[Int, Id] map (b2 => (b tuple b2)))
   (m1 &= stream123).run assert_=== Some(1 -> 2)
 
   // As a monad using for comprehension (same as 'm1' example above)
   val m2 = for{
     b <- head[Int, Id]
     b2 <- head[Int, Id]
-  } yield b pair b2
+  } yield b tuple b2
   (m2 &= stream123).run assert_=== Some(1 -> 2)
 
   val colc = takeWhile[IoExceptionOr[Char], List](_.fold(_ => false, _ != ' ')).up[IO]

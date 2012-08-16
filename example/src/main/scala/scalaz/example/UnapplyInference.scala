@@ -40,7 +40,7 @@ object UnapplyInference extends App {
     val traverseOpt: Option[List[Int]] = ls.traverseU(a => some(a))
     val traverseState = ls.traverseU(a => State((x: Int) => (x + 1, a)))
 
-    val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).pair(State((x: Int) => (x + 2, x)))
+    val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).tuple(State((x: Int) => (x + 2, x)))
   }
 
   def kleisliCompose() {

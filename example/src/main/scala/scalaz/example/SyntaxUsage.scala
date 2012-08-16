@@ -59,7 +59,7 @@ object SyntaxUsage extends App {
     o2.join
     l2.join
 
-    o2.pair(o2)
+    o2.tuple(o2)
   }
 
 
@@ -103,7 +103,7 @@ object SyntaxUsage extends App {
 
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
     some(some(1)).join assert_=== some(1)
-    
+
     List(1, 2, 3).powerset.join
 
     import Kleisli._

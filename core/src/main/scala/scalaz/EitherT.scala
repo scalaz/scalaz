@@ -148,7 +148,7 @@ sealed trait EitherT[F[+_], +A, +B] {
    * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
    * }}}
    */
-  def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M: Semigroup[BB], F: Apply[F]): EitherT[F, AA, BB] =
+  def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M1: Semigroup[BB], M2: Semigroup[AA], F: Apply[F]): EitherT[F, AA, BB] =
     EitherT(F(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
