@@ -4,16 +4,22 @@ package std
 
 import scalaz.std.{boolean => b}
 import scalaz.std.anyVal._
-import scalaz.Tags.Conjunction
+import scalaz.Tags.{ Conjunction, Disjunction }
 
 
 trait BooleanOps extends Ops[Boolean] {
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
+  final def disjunction: Boolean @@ Disjunction = Disjunction(self)
+
   final def |∧| : Boolean @@ Conjunction = conjunction
 
   final def |/\| : Boolean @@ Conjunction = conjunction
+
+  final def |∨| : Boolean @@ Disjunction = disjunction
+
+  final def |\/| : Boolean @@ Disjunction = disjunction
 
   /**
    * Conjunction. (AND)

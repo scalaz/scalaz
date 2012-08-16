@@ -18,7 +18,7 @@ sealed class StreamT[M[+_], +A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   
   def ::[AA >: A](a: => AA)(implicit M: Pointed[M]): StreamT[M, AA] = StreamT[M, AA](M.point(Yield(a, this)))
     
-  def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(_.isDefined)
+  def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(!_.isDefined)
 
   def head(implicit M: Monad[M]): M[A] = M.map(uncons)(_.getOrElse(sys.error("head: empty StreamT"))._1)
     
