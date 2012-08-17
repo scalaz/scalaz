@@ -20,7 +20,7 @@ class WriterTTest extends Spec {
   checkAll(copointed.laws[({type λ[+α]=WriterT[NonEmptyList, Int, α]})#λ])
 
   implicit def writerArb[F[+_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
-    Applicative[Arbitrary].map2(W, A)((w, a) => Writer[W, A](w, a))
+    Applicative[Arbitrary].apply(W, A)((w, a) => Writer[W, A](w, a))
 
   checkAll(comonad.laws[({type λ[+α]=Writer[Int, α]})#λ])
 

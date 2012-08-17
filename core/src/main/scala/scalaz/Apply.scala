@@ -47,13 +47,15 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def ap[A,B,C,D,E,FF,G,H,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: F[(A,B,C,D,E,FF,G,H) => R]): F[R] =
     ap(fe, ff, fg, fh)(ap(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G, h: H) => f(a,b,c,d,e,ff,g,h)))))
 
-  @deprecated("given `F: Apply[F]` use `F(a,b)(f)` instead", "7")
+  @deprecated("given `F: Apply[F]` use `F(a,b)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b)(f)`", "7")
   def map2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     apply(fa,fb)(f)
-  @deprecated("given `F: Apply[F]` use `F(a,b,c)(f)` instead", "7")
+
+  @deprecated("given `F: Apply[F]` use `F(a,b,c)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b,c)(f)`", "7")
   def map3[A, B, C, D](fa: => F[A], fb: => F[B], fc: => F[C])(f: (A, B, C) => D): F[D] =
     apply(fa,fb,fc)(f)
-  @deprecated("given `F: Apply[F]` use `F(a,b,c,d)(f)` instead", "7")
+
+  @deprecated("given `F: Apply[F]` use `F(a,b,c,d)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b,c,d)(f)`", "7")
   def map4[A, B, C, D, E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: (A, B, C, D) => E): F[E] =
     apply(fa,fb,fc,fd)(f)
 
