@@ -53,8 +53,8 @@ trait ToEnumOps extends ToOrderOps {
   ////
 }
 
-trait EnumSyntax[F] extends OrderSyntax[F] { self => 
-  implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F] { def self = v; implicit def F: Enum[F] = self.F }
+trait EnumSyntax[F] extends OrderSyntax[F] {
+  implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F] { def self = v; implicit def F: Enum[F] = EnumSyntax.this.F }
   
   def F: Enum[F]
   ////

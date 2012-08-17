@@ -31,8 +31,8 @@ trait ToPointedOps extends ToPointedOps0 with ToFunctorOps {
   ////
 }
 
-trait PointedSyntax[F[_]] extends FunctorSyntax[F] { self => 
-  implicit def ToPointedOps[A](v: F[A]): PointedOps[F, A] = new PointedOps[F,A] { def self = v; implicit def F: Pointed[F] = self.F }
+trait PointedSyntax[F[_]] extends FunctorSyntax[F] { 
+  implicit def ToPointedOps[A](v: F[A]): PointedOps[F, A] = new PointedOps[F,A] { def self = v; implicit def F: Pointed[F] = PointedSyntax.this.F }
 
   def F: Pointed[F]
   ////

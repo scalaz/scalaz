@@ -37,8 +37,8 @@ trait ToUnzipOps extends ToUnzipOps0 {
   ////
 }
 
-trait UnzipSyntax[F[_]]  { self => 
-  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A] { def self = v; implicit def F: Unzip[F] = self.F }
+trait UnzipSyntax[F[_]]  { 
+  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A] { def self = v; implicit def F: Unzip[F] = UnzipSyntax.this.F }
 
   def F: Unzip[F]
   ////

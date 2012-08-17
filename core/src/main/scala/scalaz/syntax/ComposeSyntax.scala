@@ -39,8 +39,8 @@ trait ToComposeOps extends ToComposeOps0 {
   ////
 }
 
-trait ComposeSyntax[F[_, _]]  { self =>
-  implicit def ToComposeOps[A, B](v: F[A, B]): ComposeOps[F, A, B] = new ComposeOps[F, A, B] { def self = v; implicit def F: Compose[F] = self.F }
+trait ComposeSyntax[F[_, _]]  { 
+  implicit def ToComposeOps[A, B](v: F[A, B]): ComposeOps[F, A, B] = new ComposeOps[F, A, B] { def self = v; implicit def F: Compose[F] = ComposeSyntax.this.F }
 
   def F: Compose[F]
   ////

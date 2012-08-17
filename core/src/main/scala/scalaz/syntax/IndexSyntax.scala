@@ -25,8 +25,8 @@ trait ToIndexOps extends ToIndexOps0 {
   ////
 }
 
-trait IndexSyntax[F[_]]  { self => 
-  implicit def ToIndexOps[A](v: F[A]): IndexOps[F, A] = new IndexOps[F,A] { def self = v; implicit def F: Index[F] = self.F }
+trait IndexSyntax[F[_]]  { 
+  implicit def ToIndexOps[A](v: F[A]): IndexOps[F, A] = new IndexOps[F,A] { def self = v; implicit def F: Index[F] = IndexSyntax.this.F }
 
   def F: Index[F]
   ////

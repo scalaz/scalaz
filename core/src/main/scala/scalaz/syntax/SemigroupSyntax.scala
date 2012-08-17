@@ -19,8 +19,8 @@ trait ToSemigroupOps  {
   ////
 }
 
-trait SemigroupSyntax[F]  { self => 
-  implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = self.F }
+trait SemigroupSyntax[F]  {
+  implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = SemigroupSyntax.this.F }
   
   def F: Semigroup[F]
   ////

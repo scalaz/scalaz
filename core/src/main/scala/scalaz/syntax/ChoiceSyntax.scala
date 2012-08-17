@@ -29,8 +29,8 @@ trait ToChoiceOps extends ToChoiceOps0 with ToCategoryOps {
   ////
 }
 
-trait ChoiceSyntax[F[_, _]] extends CategorySyntax[F] { self =>
-  implicit def ToChoiceOps[A, B](v: F[A, B]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B] { def self = v; implicit def F: Choice[F] = self.F }
+trait ChoiceSyntax[F[_, _]] extends CategorySyntax[F] { 
+  implicit def ToChoiceOps[A, B](v: F[A, B]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B] { def self = v; implicit def F: Choice[F] = ChoiceSyntax.this.F }
 
   def F: Choice[F]
   ////

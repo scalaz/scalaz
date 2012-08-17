@@ -25,8 +25,8 @@ trait ToCopointedOps extends ToCopointedOps0 with ToFunctorOps {
   ////
 }
 
-trait CopointedSyntax[F[_]] extends FunctorSyntax[F] { self => 
-  implicit def ToCopointedOps[A](v: F[A]): CopointedOps[F, A] = new CopointedOps[F,A] { def self = v; implicit def F: Copointed[F] = self.F }
+trait CopointedSyntax[F[_]] extends FunctorSyntax[F] { 
+  implicit def ToCopointedOps[A](v: F[A]): CopointedOps[F, A] = new CopointedOps[F,A] { def self = v; implicit def F: Copointed[F] = CopointedSyntax.this.F }
 
   def F: Copointed[F]
   ////

@@ -266,8 +266,8 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F] %s { self => 
-  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = self.F }
+trait %sSyntax[F] %s {
+  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
   
   def F: %s[F]
   ////
@@ -281,7 +281,7 @@ trait %sSyntax[F] %s { self =>
       
       // trait MonadSyntax[F] extends ... { ... } 
       typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName, typeClassName,
+      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
       
       typeClassName
     )
@@ -316,8 +316,8 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_]] %s { self => 
-  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = self.F }
+trait %sSyntax[F[_]] %s { 
+  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
   def F: %s[F]
   ////
@@ -332,7 +332,7 @@ trait %sSyntax[F[_]] %s { self =>
           ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
           
           typeClassName
         )
@@ -371,8 +371,8 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_, _]] %s { self =>
-  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = self.F }
+trait %sSyntax[F[_, _]] %s { 
+  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
   def F: %s[F]
   ////
@@ -385,7 +385,7 @@ trait %sSyntax[F[_, _]] %s { self =>
           typeClassName, extendsToSyntaxListText,
           ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName,
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
           
           typeClassName
         )
