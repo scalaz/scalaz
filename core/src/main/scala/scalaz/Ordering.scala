@@ -5,9 +5,9 @@ sealed abstract class Ordering(val toInt: Int, val name: String) {
 }
 
 object Ordering extends OrderingFunctions with OrderingInstances {
-  case object LT extends Ordering(-1, "LT") { val complement = GT }
-  case object EQ extends Ordering(0,  "EQ") { val complement = EQ }
-  case object GT extends Ordering(1,  "GT") { val complement = LT }
+  case object LT extends Ordering(-1, "LT") { def complement = GT }
+  case object EQ extends Ordering(0,  "EQ") { def complement = EQ }
+  case object GT extends Ordering(1,  "GT") { def complement = LT }
 }
 
 trait OrderingInstances {
