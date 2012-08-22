@@ -62,7 +62,7 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit def tuple1Instance: Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Comonad[Tuple1] {
+  implicit def tuple1Instance: Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
@@ -539,6 +539,39 @@ private[scalaz] trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Functor[({ty
 private[scalaz] trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Functor[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, f(fa._8))
+}
+
+private[scalaz] trait Tuple1Cozip extends Cozip[Tuple1] {
+  override def cozip[A, B](x: Tuple1[A \/ B]) =
+    x._1.bimap(Tuple1(_), Tuple1(_))
+}
+private[scalaz] trait Tuple2Cozip[A1] extends Cozip[({type f[x] = (A1, x)})#f] {
+  override def cozip[A, B](x: (A1, A \/ B)) =
+    x._2.bimap((x._1, _), (x._1, _))
+}
+private[scalaz] trait Tuple3Cozip[A1, A2] extends Cozip[({type f[x] = (A1, A2, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A \/ B)) =
+    x._3.bimap((x._1, x._2, _), (x._1, x._2, _))
+}
+private[scalaz] trait Tuple4Cozip[A1, A2, A3] extends Cozip[({type f[x] = (A1, A2, A3, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A3, A \/ B)) =
+    x._4.bimap((x._1, x._2, x._3, _), (x._1, x._2, x._3, _))
+}
+private[scalaz] trait Tuple5Cozip[A1, A2, A3, A4] extends Cozip[({type f[x] = (A1, A2, A3, A4, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A3, A4, A \/ B)) =
+    x._5.bimap((x._1, x._2, x._3, x._4, _), (x._1, x._2, x._3, x._4, _))
+}
+private[scalaz] trait Tuple6Cozip[A1, A2, A3, A4, A5] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A3, A4, A5, A \/ B)) =
+    x._6.bimap((x._1, x._2, x._3, x._4, x._5, _), (x._1, x._2, x._3, x._4, x._5, _))
+}
+private[scalaz] trait Tuple7Cozip[A1, A2, A3, A4, A5, A6] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A \/ B)) =
+    x._7.bimap((x._1, x._2, x._3, x._4, x._5, x._6, _), (x._1, x._2, x._3, x._4, x._5, x._6, _))
+}
+private[scalaz] trait Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
+  override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A7, A \/ B)) =
+    x._8.bimap((x._1, x._2, x._3, x._4, x._5, x._6, x._7, _), (x._1, x._2, x._3, x._4, x._5, x._6, x._7, _))
 }
 
 private[scalaz] trait Tuple1Equal[A1] extends Equal[Tuple1[A1]] {
