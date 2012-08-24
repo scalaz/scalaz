@@ -50,6 +50,9 @@ trait MapInstances {
 }
 
 trait MapFunctions {
+  final def alter[K, A](m: Map[K, A], k: K)(f: (Option[A] => Option[A])): Map[K, A] =
+    f(m get k) map (m.updated(k, _)) getOrElse (m - k)
+
   final def intersectWithKey[K,A,B,C](m1: Map[K, A], m2: Map[K, B])(f: (K, A, B) => C): Map[K, C] = m1 collect {
     case (k, v) if m2 contains k => k -> f(k, v, m2(k))
   }
