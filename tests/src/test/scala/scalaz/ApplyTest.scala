@@ -11,6 +11,7 @@ class ApplyTest extends Spec {
     Apply[Option].apply(some("1"), some("2"), some("3"))(_ + _ + _) must be_===(some("123"))
     Apply[Option].apply(some("1"), some("2"), some("3"), some("4"))(_ + _ + _ + _) must be_===(some("1234"))
     Apply[Option].apply(some("1"), some("2"), some("3"), some("4"), some("5"))(_ + _ + _ + _ + _) must be_===(some("12345"))
+    Apply[Option].apply(some("1"), some("2"), some("3"), some("4"), some("5"), some("6"), some("7"), some("8"), some("9"), some("10"), some("11"), some("12"), some("13"), some("14"), some("15"), some("16"), some("17"), some("18"), some("19"), some("20"), some("21"), some("22"))(_ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _) must be_===(some("12345678910111213141516171819202122"))
 
     val A = Monoid[String].applicative
     def undefined = sys.error("")
