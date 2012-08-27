@@ -443,4 +443,8 @@ trait ValidationFunctions {
   } catch {
     case e => failure(e)
   }
+
+  /** Construct a `Validation` from an `Either`. */
+  def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
+    e.fold(failure, success)
 }
