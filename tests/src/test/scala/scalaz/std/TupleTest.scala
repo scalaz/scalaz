@@ -73,6 +73,7 @@ class TupleTest extends Spec {
       
       def monad = Monad[Tuple1]
       def comonad = Comonad[Tuple1]
+      def cozip = Cozip[Tuple1]
 
       // checking absence of ambiguity
       def equal[A: Order] = Equal[Tuple1[A]]
@@ -89,6 +90,7 @@ class TupleTest extends Spec {
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[({type λ[α] = (B, α)})#λ]
       def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
+      def cozip = Cozip[({type λ[α] = (A, α)})#λ]
 
       // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]

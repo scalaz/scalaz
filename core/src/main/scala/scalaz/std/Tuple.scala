@@ -295,6 +295,15 @@ trait TupleInstances1 extends TupleInstances0 {
     implicit def _8 = A8
   }
 
+  implicit def tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
+  implicit def tuple2Cozip[A1]: Cozip[({type f[x] = (A1, x)})#f] = new Tuple2Cozip[A1] {}
+  implicit def tuple3Cozip[A1, A2]: Cozip[({type f[x] = (A1, A2, x)})#f] = new Tuple3Cozip[A1, A2] {}
+  implicit def tuple4Cozip[A1, A2, A3]: Cozip[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Cozip[A1, A2, A3] {}
+  implicit def tuple5Cozip[A1, A2, A3, A4]: Cozip[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Cozip[A1, A2, A3, A4] {}
+  implicit def tuple6Cozip[A1, A2, A3, A4, A5]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Cozip[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
+
   implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[({type f[x] = (A1, x)})#f] = new Tuple2Monad[A1] {
     implicit def _1 = A1
   }
