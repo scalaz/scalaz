@@ -21,6 +21,10 @@ trait StateT[F[+_], S, +A] { self =>
   /** An alias for `apply` */
   def run(initial: S): F[(S, A)] = apply(initial)
 
+  /** Calls `run` using `Monoid[S].zero` as the initial state */
+  def runZero(implicit S: Monoid[S]): F[(S, A)] =
+    run(S.zero)
+
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(initial: S)(implicit F: Functor[F]): F[A] =
     F.map(apply(initial))(_._2)
