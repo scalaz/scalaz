@@ -100,6 +100,9 @@ sealed trait NonEmptyList[+A] {
 object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
+
+  def unapplySeq[A](v: NonEmptyList[A]): Option[(A, List[A])] =
+    Some((v.head, v.tail))
 }
 
 trait NonEmptyListInstances {
