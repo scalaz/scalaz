@@ -4,12 +4,16 @@ package std.java.math
 import java.math.BigInteger
 
 trait BigIntegerInstances {
-  implicit val bigIntegerInstance: Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
+  implicit val bigIntegerInstance: Ring[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Ring[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
     override def shows(f: BigInteger) = f.toString
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
 
+    def multiply(f1: BigInteger, f2: ⇒ BigInteger) = f1 multiply f2
+
     def zero = BigInteger.ZERO
+
+    def one = BigInteger.ONE
 
     def inverse(f: BigInteger) = f.negate()
 

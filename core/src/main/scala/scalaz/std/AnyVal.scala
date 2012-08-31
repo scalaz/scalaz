@@ -208,12 +208,16 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
+  implicit val shortInstance: Ring[Short] with Enum[Short] with Show[Short] = new Ring[Short] with Enum[Short] with Show[Short] {
     override def shows(f: Short) = f.toString
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
 
+    def multiply(f1: Short, f2: ⇒ Short) = (f1 * f2).toShort
+
     def zero: Short = 0
+
+    def one: Short = 1
 
     def inverse(f:Short) = (-f).toShort
 
@@ -256,12 +260,16 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
-  implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
+  implicit val intInstance: Ring[Int] with Enum[Int] with Show[Int] = new Ring[Int] with Enum[Int] with Show[Int] {
     override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
 
+    def multiply(f1: Int, f2: ⇒ Int) = f1 * f2
+
     def zero: Int = 0
+
+    def one: Int = 1
 
     def inverse(f:Int) = -f
 
@@ -310,12 +318,16 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
-  implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
+  implicit val longInstance: Ring[Long] with Enum[Long] with Show[Long] = new Ring[Long] with Enum[Long] with Show[Long] {
     override def shows(f: Long) = f.toString
 
     def append(f1: Long, f2: => Long) = f1 + f2
 
+    def multiply(f1: Long, f2: ⇒ Long) = f1 * f2
+
     def zero: Long = 0L
+
+    def one: Long = 1L
 
     def inverse(f: Long) = -f
 

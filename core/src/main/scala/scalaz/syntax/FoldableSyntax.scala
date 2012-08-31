@@ -18,6 +18,8 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def foldl1(f: (A, A) => A): Option[A] = F.foldl1(self)(f)
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
   final def suml(implicit A: Monoid[A]): A = F.foldLeft(self, A.zero)(A.append(_, _))
+  final def productr(implicit A: Ring[A]): A = F.foldRight(self, A.one)(A.multiply)
+  final def productl(implicit A: Ring[A]): A = F.foldLeft(self, A.one)(A.multiply(_, _))
   final def toList: List[A] = F.toList(self)
   final def toIndexedSeq: IndexedSeq[A] = F.toIndexedSeq(self)
   final def toSet: Set[A] = F.toSet(self)

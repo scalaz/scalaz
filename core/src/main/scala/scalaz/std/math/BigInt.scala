@@ -3,12 +3,16 @@ package std
 package math
 
 trait BigInts {
-  implicit val bigIntInstance: Group[BigInt] with Enum[BigInt] with Show[BigInt] = new Group[BigInt] with Enum[BigInt] with Show[BigInt] {
+  implicit val bigIntInstance: Ring[BigInt] with Enum[BigInt] with Show[BigInt] = new Ring[BigInt] with Enum[BigInt] with Show[BigInt] {
     override def shows(f: BigInt) = f.toString
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
 
+    def multiply(f1: BigInt, f2: ⇒ BigInt): BigInt = f1 * f2
+
     def zero: BigInt = 0L
+
+    def one: BigInt = 1L
 
     def inverse(f: BigInt): BigInt = -f
 
