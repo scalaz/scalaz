@@ -3,9 +3,12 @@ package syntax
 
 trait RingOps[F] extends Ops[F] {
   implicit def F: Ring[F]
+  ////
 
   final def |*|(other: ⇒ F)      = F.multiply(self, other)
   final def multiply(other: ⇒ F) = F.multiply(self, other)
+  ////
+
 }
 
 trait ToRingOps extends ToGroupOps {
@@ -13,6 +16,10 @@ trait ToRingOps extends ToGroupOps {
     new RingOps[F] {
       def self = v
       implicit def F: Ring[F] = F0
+      ////
+
+      ////
+
     }
 }
 
@@ -22,4 +29,8 @@ trait RingSyntax[F] extends GroupSyntax[F] {
     implicit def F: Ring[F] = RingSyntax.this.F
   }
   def F: Ring[F]
+  ////
+
+  ////
+
 }
