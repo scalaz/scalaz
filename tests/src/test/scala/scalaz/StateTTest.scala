@@ -11,7 +11,7 @@ class StateTTest extends Spec {
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
 
-  implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).run(0))
+  implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero)
   implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
   implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 

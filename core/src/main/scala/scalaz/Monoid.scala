@@ -63,9 +63,22 @@ trait Monoid[F] extends Semigroup[F] { self =>
   val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
 
-object Monoid {
+object Monoid extends MonoidInstances with MonoidFunctions {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
+}
 
+trait MonoidFunctions {
+  def ifEmpty[A, B](a: A)(t: => B)(f: => B)(implicit m: Monoid[A], eq: Equal[A]): B =
+    if (eq.equal(a, m.zero)) { t } else { f }
+
+  def onNotEmpty[A,B](a: A)(v: => B)(implicit m: Monoid[A], eq: Equal[A], mb: Monoid[B]): B =
+    ifEmpty(a)(mb.zero)(v)
+
+  def onEmpty[A,B](a: A)(v: => B)(implicit m: Monoid[A], eq: Equal[A], mb: Monoid[B]): B =
+    ifEmpty(a)(v)(mb.zero)
+}
+
+trait MonoidInstances {
   ////
   import annotation.tailrec
 
