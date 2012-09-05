@@ -69,7 +69,10 @@ object Monoid extends MonoidInstances with MonoidFunctions {
 
 trait MonoidFunctions {
   def ifEmpty[A, B](a: A)(t: => B)(f: => B)(implicit m: Monoid[A], eq: Equal[A]): B =
-    if (eq.equal(a, m.zero)) { t } else { f }
+    if (isMZero(a)) { t } else { f }
+
+  def isMZero[A](a: A)(implicit m: Monoid[A], eq: Equal[A]): Boolean =
+    eq.equal(a, m.zero)
 
   def onNotEmpty[A,B](a: A)(v: => B)(implicit m: Monoid[A], eq: Equal[A], mb: Monoid[B]): B =
     ifEmpty(a)(mb.zero)(v)
