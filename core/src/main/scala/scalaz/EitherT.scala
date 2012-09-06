@@ -30,6 +30,9 @@ sealed trait EitherT[F[+_], +A, +B] {
       def r = right
     }
 
+  def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
+    F.map(run)(_.fold(l, r))
+
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isLeft)
