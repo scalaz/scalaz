@@ -248,7 +248,7 @@ trait PLensTFunctions extends PLensTInstances {
     } yield Store(w, x)))
 
   def plensgO[F[+_], A, B](set: A => OptionT[F, B => A], get: A => OptionT[F, B])(implicit M: Bind[F]): PLensT[F, A, B] =
-    plensgT(a => set(a).run, a => get(a).run)
+    plensgT[F, A, B](a => set(a).run, a => get(a).run)
 
   def plensg[A, B](set: A => Option[B => A], get: A => Option[B]): PLens[A, B] =
     plensgT[Id, A, B](set, get)
