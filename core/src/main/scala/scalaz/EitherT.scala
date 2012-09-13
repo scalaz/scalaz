@@ -202,7 +202,7 @@ object EitherT extends EitherTFunctions with EitherTInstances {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Functor[F] with Pointed[F]): EitherT[F, Throwable, A] = try {
+  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Pointed[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
     case e => left(F.point(e))
