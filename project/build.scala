@@ -132,7 +132,7 @@ object build extends Build {
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-effect",
       typeClasses := TypeClass.effect,
-      osgiExport("scalaz.effect", "scalaz.std.sffect", "scalaz.syntax.effect")
+      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
     ),
     dependencies = Seq(core)
   )
