@@ -7,7 +7,7 @@ import std.AllInstances._
 
 class IterableTest extends Spec {
 
-  import std.iterable._
+  import std.genIterable._
 
   checkAll(order.laws[Iterable[Boolean]].withProp("benchmark", order.scalaOrdering[Iterable[Boolean]]))
 }

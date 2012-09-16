@@ -11,6 +11,6 @@ trait AllInstances
   with scalaz.std.java.math.BigIntegerInstances
   with scalaz.std.java.util.concurrent.CallableInstances
   with NodeSeqInstances
-  // Intentionally omitted: IterableInstances
+  // Intentionally omitted: GenIterableInstances
 
 object AllInstances extends AllInstances
