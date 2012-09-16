@@ -2,7 +2,7 @@ package scalaz
 package std
 import scala.collection.GenIterable
 
-trait genIterableInstances {
+trait GenIterableInstances {
 
   implicit def genIterableShow[CC[X] <: GenIterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
     override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toArray:_*) :+ "]"
@@ -69,4 +69,4 @@ trait genIterableInstances {
 
 }
 
-object genIterable extends genIterableInstances
+object genIterable extends GenIterableInstances
