@@ -33,4 +33,8 @@ class ApplyTest extends Spec {
     Apply[Option].ap(some("1"), some("2"), some("3"), some("4"))(some((_: String) + (_: String) + (_: String) + (_: String))) must be_===(some("1234"))
     Apply[Option].ap(some("1"), some("2"), some("3"), some("4"), some("5"))(some((_: String) + (_: String) + (_: String) + (_: String) + (_: String))) must be_===(some("12345"))
   }
+
+  "<*>" in {
+    some(9) <*> some({(_: Int) + 3}) must be_===(some(12))
+  }
 }
