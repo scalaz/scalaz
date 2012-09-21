@@ -26,6 +26,11 @@ class TraverseTest extends Spec {
       s must be_===(none[List[Int]])
     }
 
+    "traverse int function as monoidal applicative" in {
+      val s: Int = List(1, 2, 3) traverseU {_ + 1}
+      s must be_===(9)
+    }
+
     "not blow the stack" in {
       val s: Option[List[Int]] = List.range(0, 32 * 1024).traverseU(x => some(x))
       s.map(_.take(3)) must be_===(some(List(0, 1, 2)))

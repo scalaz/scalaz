@@ -62,7 +62,20 @@ trait Unapply[TC[_[_]], MA] {
   def apply(ma: MA): M[A]
 }
 
-trait Unapply_2 {
+trait Unapply_3 {
+  // /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
+  implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[({type λ[α] = A0})#λ]): Unapply[TC, A0] {
+    type M[X] = A0
+    type A = A0
+  } = new Unapply[TC, A0] {
+    type M[X] = A0
+    type A = A0
+    def TC = TC0
+    def apply(ma: M[A0]) = ma
+  }
+}
+
+trait Unapply_2 extends Unapply_3 {
   // Things get tricky with type State[S, A] = StateT[Id, S, A], both unapplyMAB2 and unapplyMFAB2 are applicable
   // Without characterizing this fully, I'm using the standard implicit prioritization to avoid this.
 
@@ -311,7 +324,20 @@ trait UnapplyCo[TC[_[_]], MA] {
   def apply(ma: MA): M[A]
 }
 
-trait UnapplyCo_2 {
+trait UnapplyCo_3 {
+  /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
+  implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[({type λ[α] = A0})#λ]): UnapplyCo[TC, A0] {
+    type M[+X] = A0
+    type A = A0
+  } = new UnapplyCo[TC, A0] {
+    type M[+X] = A0
+    type A = A0
+    def TC = TC0
+    def apply(ma: M[A0]) = ma
+  }
+}
+
+trait UnapplyCo_2 extends UnapplyCo_3 {
   /**Unpack a value of type `M0[F[+_], A0, B0]` into types `[a]M0[F, a, B0]` and `A0`, given an instance of `TC` */
   implicit def unapplyMFAB1[TC[_[_]], F[+_], M0[F[+_], +_, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, B0]})#λ]): UnapplyCo[TC, M0[F, A0, B0]] {
     type M[+X] = M0[F, X, B0]
