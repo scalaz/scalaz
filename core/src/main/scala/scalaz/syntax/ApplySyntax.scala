@@ -6,7 +6,7 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Apply[F]
   ////
 
-  final def <*>[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
+  final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
   final def tuple[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
 
   @deprecated("Use `a tuple b` instead", "7")
