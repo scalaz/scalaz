@@ -64,7 +64,7 @@ sealed trait \/[+A, +B] {
     k(swap).swap
 
   /** Run the given function on this swapped value. Alias for `swapped` */
-  def ~[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
+  def ~[AA, BB](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
     swapped(k)
 
   /** Binary functor map on this disjunction. */
@@ -257,11 +257,11 @@ sealed trait \/[+A, +B] {
     }
 
   /** Run a validation function and back to disjunction again. Alias for `@\?/` */
-  def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
+  def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
     k(validation).disjunction
 
   /** Run a validation function and back to disjunction again. Alias for `validationed` */
-  def @\?/[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
+  def @\?/[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
     validationed(k)
 
 

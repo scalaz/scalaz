@@ -54,7 +54,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     EitherT(F.map(run)(_ swapped k))
 
   /** Run the given function on this swapped value. Alias for `swapped` */
-  def ~[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
+  def ~[AA, BB](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
     swapped(k)
 
   /** Binary functor map on this disjunction. */
@@ -179,7 +179,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.map(run)(_.validation)
 
   /** Run a validation function and back to disjunction again. */
-  def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
+  def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ validationed k))
 
 }
