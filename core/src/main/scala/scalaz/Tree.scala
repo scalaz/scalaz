@@ -44,7 +44,7 @@ sealed trait Tree[A] {
       case t #:: ts     => "|" #:: shift("+- ", "|  ", t.draw) append drawSubTrees(ts)
     }
     def shift(first: String, other: String, s: Stream[String]): Stream[String] =
-      s.zip(first #:: Stream.continually(other)).map {
+      (first #:: Stream.continually(other)).zip(s).map {
         case (a, b) => a + b
       }
 
