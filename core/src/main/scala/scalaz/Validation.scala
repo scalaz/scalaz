@@ -85,7 +85,7 @@ sealed trait Validation[+E, +A] {
     }
 
   /** Run the given function on this swapped value. Alias for `~` */
-  def swapped[EE >: E, AA >: A](k: Validation[A, E] => Validation[AA, EE]): Validation[EE, AA] =
+  def swapped[EE, AA](k: Validation[A, E] => Validation[AA, EE]): Validation[EE, AA] =
     k(swap).swap
 
   /** Run the given function on this swapped value. Alias for `swapped` */

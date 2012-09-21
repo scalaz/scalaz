@@ -60,7 +60,7 @@ sealed trait \/[+A, +B] {
     swap
 
   /** Run the given function on this swapped value. Alias for `~` */
-  def swapped[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
+  def swapped[AA, BB](k: (B \/ A) => (BB \/ AA)): (AA \/ BB) =
     k(swap).swap
 
   /** Run the given function on this swapped value. Alias for `swapped` */
