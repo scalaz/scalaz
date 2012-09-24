@@ -64,11 +64,11 @@ trait STRefInstances {
 
 /**Mutable array in state thread S containing values of type A. */
 sealed trait STArray[S, A] {
-  val size: Int
-  val z: A
-  implicit val manifest: Manifest[A]
+  def size: Int
+  def z: A
+  implicit def manifest: Manifest[A]
 
-  private val value: Array[A] = Array.fill(size)(z)
+  private lazy val value: Array[A] = Array.fill(size)(z)
 
   import ST._
 
