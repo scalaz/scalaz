@@ -26,17 +26,17 @@ sealed trait LensT[F[+_], A, B] {
   import BijectionT._
   import WriterT._
 
-  def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
+  def xmapA[X](f: A => X)(g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
     lensT(x => F.map(run(g(x)))(_ map (f)))
 
   def xmapbA[X](b: Bijection[A, X])(implicit F: Functor[F]): LensT[F, X, B] =
-    xmapA(b to _, b from _)
+    xmapA(b to _)(b from _)
 
-  def xmapB[X](f: B => X, g: X => B)(implicit F: Functor[F]): LensT[F, A, X] =
-    lensT(a => F.map(run(a))(_ xmap (f, g)))
+  def xmapB[X](f: B => X)(g: X => B)(implicit F: Functor[F]): LensT[F, A, X] =
+    lensT(a => F.map(run(a))(_.xmap(f)(g)))
 
   def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): LensT[F, A, X] =
-    xmapB(b to _, b from _)
+    xmapB(b to _)(b from _)
 
   def get(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run(a))(_.pos)

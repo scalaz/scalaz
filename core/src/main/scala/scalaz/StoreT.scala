@@ -11,11 +11,11 @@ sealed trait StoreT[F[+_], A, +B] {
   import StoreT._
   import BijectionT._
 
-  def xmap[X](f: A => X, g: X => A)(implicit F: Functor[F]): StoreT[F, X, B] =
+  def xmap[X](f: A => X)(g: X => A)(implicit F: Functor[F]): StoreT[F, X, B] =
     storeT(F.map(set)(_ compose g), f(pos))
 
   def bmap[X](b: Bijection[A, X])(implicit F: Functor[F]): StoreT[F, X, B] =
-    xmap(b to _, b from _)
+    xmap(b to _)(b from _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
