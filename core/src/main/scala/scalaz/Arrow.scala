@@ -13,10 +13,12 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
 
   def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
 
-  def applyInstance[C]: Apply[({type λ[α] = (C =>: α)})#λ] =
-    new Apply[({type λ[α] = (C =>: α)})#λ] {
+  def covariantInstance[C]: Applicative[({type λ[α] = (C =>: α)})#λ] =
+    new Applicative[({type λ[α] = (C =>: α)})#λ] {
+      def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
-      def map[A, B](fa: (C =>: A))(f: (A) => B): (C =>: B) = <<<(arr(f), fa)
+      override def map[A, B](fa: (C =>: A))(f: (A) => B): (C =>: B) =
+	<<<(arr(f), fa)
     }
 
   def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
