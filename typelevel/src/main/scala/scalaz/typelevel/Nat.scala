@@ -17,6 +17,19 @@ sealed trait Nat {
 
   final def toInt = foldU(NFold.ToInt)
 
+
+  // pragmatic non-typelevel Nat operations
+
+  final def prev: Option[Nat] = this match {
+    case Zero => None
+    case Succ(nat) => Some(nat)
+  }
+
+  final def isZero: Boolean = this match {
+    case Zero => true
+    case Succ(_) => false
+  }
+
 }
 
 case object Zero extends Nat {
