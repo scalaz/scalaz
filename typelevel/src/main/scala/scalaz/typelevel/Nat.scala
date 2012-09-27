@@ -20,7 +20,7 @@ sealed trait Nat {
 
   // pragmatic non-typelevel Nat operations
 
-  final def prev: Option[Nat] = this match {
+  final def pred: Option[Nat] = this match {
     case Zero => None
     case Succ(nat) => Some(nat)
   }
