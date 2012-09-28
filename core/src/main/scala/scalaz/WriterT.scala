@@ -230,8 +230,8 @@ trait WriterTInstances extends WriterTInstances0 {
     implicit def W = W0
   }
 
-  implicit def writerTMonadTrans[W](implicit M0: Monoid[W]): MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] = new WriterTMonadTrans[W] {
-    implicit def MW = M0
+  implicit def writerTMonadTrans[W](implicit W0: Monoid[W]): MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] = new WriterTMonadTrans[W] {
+    implicit def W = W0
   }
 }
 
@@ -356,9 +356,9 @@ trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with
 
 trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] {
   def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): WriterT[M, W, B] =
-    WriterT(M.map(mb)((MW.zero, _)))
+    WriterT(M.map(mb)((W.zero, _)))
 
-  implicit def MW: Monoid[W]
+  implicit def W: Monoid[W]
 
   implicit def apply[M[+_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
 }
