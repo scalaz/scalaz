@@ -224,11 +224,15 @@ trait WriterTInstances0 extends WriterTInstances1 {
   }
 }
 
-trait WriterTInstances extends WriterTInstances0 {  
-  implicit def writerTListenableMonadWriter[F[+_], W](implicit F0: Monad[F], W0: Monoid[W]) = new WriterMonadWriter[F, W] {  
-    implicit def F = F0  
-    implicit def W = W0  
-  }  
+trait WriterTInstances extends WriterTInstances0 {
+  implicit def writerTListenableMonadWriter[F[+_], W](implicit F0: Monad[F], W0: Monoid[W]) = new WriterMonadWriter[F, W] {
+    implicit def F = F0
+    implicit def W = W0
+  }
+
+  implicit def writerTMonadTrans[W](implicit M0: Monoid[W]): MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] = new WriterTMonadTrans[W] {
+    implicit def MW = M0
+  }
 }
 
 trait WriterTFunctions {
@@ -348,6 +352,15 @@ trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with
 
   override def cobind[A, B](fa: Writer[W, A])(f: (Writer[W, A]) => B): Writer[W, B] =
     Writer(fa.written, f(fa))
+}
+
+trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] {
+  def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): WriterT[M, W, B] =
+    WriterT(M.map(mb)((MW.zero, _)))
+
+  implicit def MW: Monoid[W]
+
+  implicit def apply[M[+_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
 }
 
 private[scalaz] trait WriterMonadWriter[F[+_], W] extends ListenableMonadWriter[({type f[+w, +a] = WriterT[F, w, a]})#f, W] with WriterTMonad[F, W] {
