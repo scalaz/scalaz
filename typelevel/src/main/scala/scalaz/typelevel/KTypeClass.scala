@@ -56,151 +56,14 @@ trait KTypeClass[C[_[_]]] {
 
 }
 
-object KTypeClass {
-
-  @inline def apply[C[_[_]]](implicit C: KTypeClass[C]) = C
-
-  /** Wrapping the computation of a product. */
-  class WrappedProduct[C[_[_]], T <: TCList](val instance: C[T#Product], typeClass: KTypeClass[C]) {
-
-    def *:[F[_]](F: C[F]) = new WrappedProduct[C, TCCons[F, T]](typeClass.product(F, instance), typeClass)
-
-    def prodLeft[F[_]](F: C[F]) = F *: this
-
-  }
-
-  // The following classes are in place mostly to avoid repetition of methods
-  // of type classes which are inherited from some other ones.
-
-  private trait Product[+C[_[_]], F[_], T <: TCList] {
-    def FHead: C[F]
-    def FTail: C[T#Product]
-
-    type λ[α] = F[α] :: T#Product[α]
-  }
-
-  private trait ProductFunctor[F[_], T <: TCList]
-    extends Functor[TCCons[F, T]#Product]
-    with Product[Functor, F, T] {
-
-    def map[A, B](fa: λ[A])(f: A => B) =
-      FHead.map(fa.head)(f) :: FTail.map(fa.tail)(f)
-
-  }
-
-  private trait ProductPointed[F[_], T <: TCList]
-    extends ProductFunctor[F, T]
-    with Pointed[TCCons[F, T]#Product]
-    with Product[Pointed, F, T] {
-
-    def point[A](a: => A) =
-      FHead.point(a) :: FTail.point(a)
-
-  }
-
-  private trait ProductApply[F[_], T <: TCList]
-    extends ProductFunctor[F, T]
-    with Apply[TCCons[F, T]#Product]
-    with Product[Apply, F, T] {
-
-    def ap[A, B](fa: => λ[A])(f: => λ[A => B]) =
-      FHead.ap(fa.head)(f.head) :: FTail.ap(fa.tail)(f.tail)
-
-  }
-
-  private trait ProductApplicative[F[_], T <: TCList]
-    extends ProductPointed[F, T]
-    with ProductApply[F, T]
-    with Applicative[TCCons[F, T]#Product]
-    with Product[Applicative, F, T]
-
-  private trait ProductPlus[F[_], T <: TCList]
-    extends Plus[TCCons[F, T]#Product]
-    with Product[Plus, F, T] {
-
-    def plus[A](a: λ[A], b: => λ[A]) =
-      FHead.plus(a.head, b.head) :: FTail.plus(a.tail, b.tail)
-
-  }
-
-  private trait ProductPlusEmpty[F[_], T <: TCList]
-    extends ProductPlus[F, T]
-    with PlusEmpty[TCCons[F, T]#Product]
-    with Product[PlusEmpty, F, T] {
-
-    def empty[A] = FHead.empty[A] :: FTail.empty[A]
-
-  }
-
-  private trait ProductApplicativePlus[F[_], T <: TCList]
-    extends ProductPlusEmpty[F, T]
-    with ProductApplicative[F, T]
-    with ApplicativePlus[TCCons[F, T]#Product]
-    with Product[ApplicativePlus, F, T]
-
-  private trait ProductFoldable[F[_], T <: TCList]
-    extends Foldable[TCCons[F, T]#Product]
-    with Product[Foldable, F, T] {
-
-    def foldMap[A, B](fa: λ[A])(f: A => B)(implicit M: Monoid[B]) =
-      M.append(FHead.foldMap(fa.head)(f), FTail.foldMap(fa.tail)(f))
-
-    def foldRight[A, B](fa: λ[A], z: => B)(f: (A, => B) => B) =
-      FHead.foldRight(fa.head, z)((a, b) => FTail.foldRight(fa.tail, f(a, b))(f))
-
-    override def foldLeft[A, B](fa: λ[A], z: B)(f: (B, A) => B) =
-      FHead.foldLeft(fa.head, z)((b, a) => FTail.foldLeft(fa.tail, f(b, a))(f))
-
-  }
-
-  private trait ProductTraverse[F[_], T <: TCList]
-    extends ProductFunctor[F, T]
-    with ProductFoldable[F, T]
-    with Traverse[TCCons[F, T]#Product]
-    with Product[Traverse, F, T] {
-
-    override def foldMap[A, B](fa: λ[A])(f: A => B)(implicit M: Monoid[B]) =
-      super[ProductFoldable].foldMap(fa)(f)
-
-    def traverseImpl[G[_], A, B](fa: λ[A])(f: A => G[B])(implicit G: Applicative[G]) =
-      G.ap(FHead.traverseImpl(fa.head)(f), FTail.traverseImpl(fa.tail)(f))(G.point(_ :: _))
-
-  }
-
-  private trait ProductDistributive[F[_], T <: TCList]
-    extends ProductFunctor[F, T]
-    with Distributive[TCCons[F, T]#Product]
-    with Product[Distributive, F, T] {
-
-    def distributeImpl[G[_] : Functor, A, B](ga: G[A])(f: A => λ[B]): λ[G[B]] =
-      FHead.distribute(ga)(a => f(a).head) :: FTail.distribute(ga)(a => f(a).tail)
-
-  }
-
-  private trait ProductZip[F[_], T <: TCList]
-    extends Zip[TCCons[F, T]#Product]
-    with Product[Zip, F, T] {
-
-    def zip[A, B](a: => λ[A], b: => λ[B]) =
-      FHead.zip(a.head, b.head) :: FTail.zip(a.tail, b.tail)
-
-  }
-
-  private trait ProductUnzip[F[_], T <: TCList]
-    extends Unzip[TCCons[F, T]#Product]
-    with Product[Unzip, F, T] {
-
-    def unzip[A, B](x: λ[(A, B)]) = {
-      val (ha, hb) = FHead.unzip(x.head)
-      val (ta, tb) = FTail.unzip(x.tail)
-      (ha :: ta, hb :: tb)
-    }
-
+trait KTypeClassInstances4 extends KTypeClasssDefinitions {
+  implicit def FunctorI: KTypeClass[Functor] = new KTypeClass[Functor] with Empty {
+    def product[F[_], T <: TCList](FH: Functor[F], FT: Functor[T#Product]) =
+      new ProductFunctor[F, T] { def FHead = FH; def FTail = FT }
   }
 
   // Empty product
-
-  private trait Empty {
+  private[scalaz] trait Empty {
 
     protected def _emptyProduct = new ApplicativePlus[TCNil#Product]
       with Traverse[TCNil#Product]
@@ -233,14 +96,9 @@ object KTypeClass {
     }
 
   }
+}
 
-  // Instances
-
-  implicit def FunctorI: KTypeClass[Functor] = new KTypeClass[Functor] with Empty {
-    def product[F[_], T <: TCList](FH: Functor[F], FT: Functor[T#Product]) =
-      new ProductFunctor[F, T] { def FHead = FH; def FTail = FT }
-  }
-
+trait KTypeClassInstances3 extends KTypeClassInstances4 {
   implicit def PointedI: KTypeClass[Pointed] = new KTypeClass[Pointed] with Empty {
     def product[F[_], T <: TCList](FH: Pointed[F], FT: Pointed[T#Product]) =
       new ProductPointed[F, T] { def FHead = FH; def FTail = FT }
@@ -250,12 +108,16 @@ object KTypeClass {
     def product[F[_], T <: TCList](FH: Apply[F], FT: Apply[T#Product]) =
       new ProductApply[F, T] { def FHead = FH; def FTail = FT }
   }
+}
 
+trait KTypeClassInstances2 extends KTypeClassInstances3 {
   implicit def ApplicativeI: KTypeClass[Applicative] = new KTypeClass[Applicative] with Empty {
     def product[F[_], T <: TCList](FH: Applicative[F], FT: Applicative[T#Product]) =
       new ProductApplicative[F, T] { def FHead = FH; def FTail = FT }
   }
+}
 
+trait KTypeClassInstances1 extends KTypeClassInstances2 {
   implicit def PlusI: KTypeClass[Plus] = new KTypeClass[Plus] with Empty {
     def product[F[_], T <: TCList](FH: Plus[F], FT: Plus[T#Product]) =
       new ProductPlus[F, T] { def FHead = FH; def FTail = FT }
@@ -270,7 +132,9 @@ object KTypeClass {
     def product[F[_], T <: TCList](FH: ApplicativePlus[F], FT: ApplicativePlus[T#Product]) =
       new ProductApplicativePlus[F, T] { def FHead = FH; def FTail = FT }
   }
+}
 
+trait KTypeClassInstances0 extends KTypeClassInstances1 {
   implicit def FoldableI: KTypeClass[Foldable] = new KTypeClass[Foldable] with Empty {
     def product[F[_], T <: TCList](FH: Foldable[F], FT: Foldable[T#Product]) =
       new ProductFoldable[F, T] { def FHead = FH; def FTail = FT }
@@ -280,7 +144,9 @@ object KTypeClass {
     def product[F[_], T <: TCList](FH: Traverse[F], FT: Traverse[T#Product]) =
       new ProductTraverse[F, T] { def FHead = FH; def FTail = FT }
   }
+}
 
+trait KTypeClassInstances extends KTypeClassInstances0 {
   implicit def DistributiveI: KTypeClass[Distributive] = new KTypeClass[Distributive] with Empty {
     def product[F[_], T <: TCList](FH: Distributive[F], FT: Distributive[T#Product]) =
       new ProductDistributive[F, T] { def FHead = FH; def FTail = FT }
@@ -295,7 +161,148 @@ object KTypeClass {
     def product[F[_], T <: TCList](FH: Unzip[F], FT: Unzip[T#Product]) =
       new ProductUnzip[F, T] { def FHead = FH; def FTail = FT }
   }
+}
 
+trait KTypeClasssDefinitions {
+  private[scalaz] trait Product[+C[_[_]], F[_], T <: TCList] {
+    def FHead: C[F]
+    def FTail: C[T#Product]
+
+    type λ[α] = F[α] :: T#Product[α]
+  }
+
+  private[scalaz] trait ProductFunctor[F[_], T <: TCList]
+    extends Functor[TCCons[F, T]#Product]
+    with Product[Functor, F, T] {
+
+    def map[A, B](fa: λ[A])(f: A => B) =
+      FHead.map(fa.head)(f) :: FTail.map(fa.tail)(f)
+
+  }
+
+  private[scalaz] trait ProductPointed[F[_], T <: TCList]
+    extends ProductFunctor[F, T]
+    with Pointed[TCCons[F, T]#Product]
+    with Product[Pointed, F, T] {
+
+    def point[A](a: => A) =
+      FHead.point(a) :: FTail.point(a)
+
+  }
+
+  private[scalaz] trait ProductApply[F[_], T <: TCList]
+    extends ProductFunctor[F, T]
+    with Apply[TCCons[F, T]#Product]
+    with Product[Apply, F, T] {
+
+    def ap[A, B](fa: => λ[A])(f: => λ[A => B]) =
+      FHead.ap(fa.head)(f.head) :: FTail.ap(fa.tail)(f.tail)
+
+  }
+
+  private[scalaz] trait ProductApplicative[F[_], T <: TCList]
+    extends ProductPointed[F, T]
+    with ProductApply[F, T]
+    with Applicative[TCCons[F, T]#Product]
+    with Product[Applicative, F, T]
+
+  private[scalaz] trait ProductPlus[F[_], T <: TCList]
+    extends Plus[TCCons[F, T]#Product]
+    with Product[Plus, F, T] {
+
+    def plus[A](a: λ[A], b: => λ[A]) =
+      FHead.plus(a.head, b.head) :: FTail.plus(a.tail, b.tail)
+
+  }
+
+  private[scalaz] trait ProductPlusEmpty[F[_], T <: TCList]
+    extends ProductPlus[F, T]
+    with PlusEmpty[TCCons[F, T]#Product]
+    with Product[PlusEmpty, F, T] {
+
+    def empty[A] = FHead.empty[A] :: FTail.empty[A]
+
+  }
+
+  private[scalaz] trait ProductApplicativePlus[F[_], T <: TCList]
+    extends ProductPlusEmpty[F, T]
+    with ProductApplicative[F, T]
+    with ApplicativePlus[TCCons[F, T]#Product]
+    with Product[ApplicativePlus, F, T]
+
+  private[scalaz] trait ProductFoldable[F[_], T <: TCList]
+    extends Foldable[TCCons[F, T]#Product]
+    with Product[Foldable, F, T] {
+
+    def foldMap[A, B](fa: λ[A])(f: A => B)(implicit M: Monoid[B]) =
+      M.append(FHead.foldMap(fa.head)(f), FTail.foldMap(fa.tail)(f))
+
+    def foldRight[A, B](fa: λ[A], z: => B)(f: (A, => B) => B) =
+      FHead.foldRight(fa.head, z)((a, b) => FTail.foldRight(fa.tail, f(a, b))(f))
+
+    override def foldLeft[A, B](fa: λ[A], z: B)(f: (B, A) => B) =
+      FHead.foldLeft(fa.head, z)((b, a) => FTail.foldLeft(fa.tail, f(b, a))(f))
+
+  }
+
+  private[scalaz] trait ProductTraverse[F[_], T <: TCList]
+    extends ProductFunctor[F, T]
+    with ProductFoldable[F, T]
+    with Traverse[TCCons[F, T]#Product]
+    with Product[Traverse, F, T] {
+
+    override def foldMap[A, B](fa: λ[A])(f: A => B)(implicit M: Monoid[B]) =
+      super[ProductFoldable].foldMap(fa)(f)
+
+    def traverseImpl[G[_], A, B](fa: λ[A])(f: A => G[B])(implicit G: Applicative[G]) =
+      G.ap(FHead.traverseImpl(fa.head)(f), FTail.traverseImpl(fa.tail)(f))(G.point(_ :: _))
+
+  }
+
+  private[scalaz] trait ProductDistributive[F[_], T <: TCList]
+    extends ProductFunctor[F, T]
+    with Distributive[TCCons[F, T]#Product]
+    with Product[Distributive, F, T] {
+
+    def distributeImpl[G[_] : Functor, A, B](ga: G[A])(f: A => λ[B]): λ[G[B]] =
+      FHead.distribute(ga)(a => f(a).head) :: FTail.distribute(ga)(a => f(a).tail)
+
+  }
+
+  private[scalaz] trait ProductZip[F[_], T <: TCList]
+    extends Zip[TCCons[F, T]#Product]
+    with Product[Zip, F, T] {
+
+    def zip[A, B](a: => λ[A], b: => λ[B]) =
+      FHead.zip(a.head, b.head) :: FTail.zip(a.tail, b.tail)
+
+  }
+
+  private[scalaz] trait ProductUnzip[F[_], T <: TCList]
+    extends Unzip[TCCons[F, T]#Product]
+    with Product[Unzip, F, T] {
+
+    def unzip[A, B](x: λ[(A, B)]) = {
+      val (ha, hb) = FHead.unzip(x.head)
+      val (ta, tb) = FTail.unzip(x.tail)
+      (ha :: ta, hb :: tb)
+    }
+
+  }
+
+}
+
+object KTypeClass extends KTypeClassInstances {
+  @inline def apply[C[_[_]]](implicit C: KTypeClass[C]) = C
+
+  /** Wrapping the computation of a product. */
+  class WrappedProduct[C[_[_]], T <: TCList](val instance: C[T#Product], typeClass: KTypeClass[C]) {
+
+    def *:[F[_]](F: C[F]) = new WrappedProduct[C, TCCons[F, T]](typeClass.product(F, instance), typeClass)
+
+    def prodLeft[F[_]](F: C[F]) = F *: this
+
+  }
 }
 
 // vim: expandtab:ts=2:sw=2
