@@ -81,8 +81,23 @@ trait FuncFunctions {
     def runA(a: A) = f(a)
   }
   def functorfunc[M[_], A, B](f: A => M[B])(implicit F0: Functor[M]): Func[M, Functor, A, B] = func[M, Functor, A, B](f)  
+  def functorfuncU[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = new Func[F0.M, Functor, A, F0.A] {
+    def TC = KTypeClass[Functor]
+    def F = F0.TC
+    def runA(a: A) = F0(f(a))
+  }
   def pointedfunc[M[_], A, B](f: A => M[B])(implicit F0: Pointed[M]): Func[M, Pointed, A, B] = func[M, Pointed, A, B](f)
+  def pointedfuncU[A, R](f: A => R)(implicit F0: Unapply[Pointed, R]): Func[F0.M, Pointed, A, F0.A] = new Func[F0.M, Pointed, A, F0.A] {
+    def TC = KTypeClass[Pointed]
+    def F = F0.TC
+    def runA(a: A) = F0(f(a))
+  }
   def applyfunc[M[_], A, B](f: A => M[B])(implicit F0: Apply[M]): Func[M, Apply, A, B] = func[M, Apply, A, B](f)
+  def applyfuncU[A, R](f: A => R)(implicit F0: Unapply[Apply, R]): Func[F0.M, Apply, A, F0.A] = new Func[F0.M, Apply, A, F0.A] {
+    def TC = KTypeClass[Apply]
+    def F = F0.TC
+    def runA(a: A) = F0(f(a))
+  }
   def appfunc[M[_], A, B](f: A => M[B])(implicit F0: Applicative[M]): Func[M, Applicative, A, B] = func[M, Applicative, A, B](f)
   def appfuncU[A, R](f: A => R)(implicit F0: Unapply[Applicative, R]): Func[F0.M, Applicative, A, F0.A] = new Func[F0.M, Applicative, A, F0.A] {
     def TC = KTypeClass[Applicative]
@@ -93,6 +108,18 @@ trait FuncFunctions {
 
 object Func extends FuncFunctions with FuncInstances {
   def apply[M[_], TC[M[_]] <: Functor[M], A, B](f: A => M[B])(implicit TC0: KTypeClass[TC], F0: TC[M]): Func[M, TC, A, B] = func(f)
+}
+
+object FunctorFuncU {
+  def apply[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = Func.functorfuncU(f)
+}
+
+object PointedFuncU {
+  def apply[A, R](f: A => R)(implicit F0: Unapply[Pointed, R]): Func[F0.M, Pointed, A, F0.A] = Func.pointedfuncU(f)
+}
+
+object ApplyFuncU {
+  def apply[A, R](f: A => R)(implicit F0: Unapply[Apply, R]): Func[F0.M, Apply, A, F0.A] = Func.applyfuncU(f)
 }
 
 object AppFuncU {
