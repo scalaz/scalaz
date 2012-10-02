@@ -13,19 +13,19 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
   import syntax.HLists._
   import Leibniz.===
 
-  // /** alias for andThenA */
-  // def @>>>[G[_], C](g: Func[G, TC, B, C]) = andThenA(g)
-  // /** compose `A => F[B]` and `B => G[C]` into `A => F[G[C]]` */ 
-  // def andThenA[G[_], C](g: Func[G, TC, B, C]) = g.composeA(self)
+  /** alias for andThenA */
+  def @>>>[G[_], C](g: Func[G, TC, B, C]) = andThenA(g)
+  /** compose `A => F[B]` and `B => G[C]` into `A => F[G[C]]` */ 
+  def andThenA[G[_], C](g: Func[G, TC, B, C]) = g.composeA(self)
 
-  // /** alias for composeA */
-  // def <<<@[G[_], C](g: Func[G, TC, C, A]) = composeA(g)
-  // /** compose `A => F[B]` and `C => G[A]` into `C => G[F[B]]` */ 
-  // def composeA[G[_], C](g: Func[G, TC, C, A]): Func[({type λ[α] = G[F[α]]})#λ, TC, C, B] = new Func[({type λ[α] = G[F[α]]})#λ, TC, C, B] {
-  //   def runA(c: C): G[F[B]] = g.F.map(g.runA(c): G[A]) { a: A => self.runA(a) }
-  //   def TC = self.TC
-  //   // def F = g.F compose self.F
-  // }
+  /** alias for composeA */
+  def <<<@[G[_], C](g: Func[G, TC, C, A]) = composeA(g)
+  /** compose `A => F[B]` and `C => G[A]` into `C => G[F[B]]` */ 
+  def composeA[G[_], C](g: Func[G, TC, C, A]): Func[({type λ[α] = G[F[α]]})#λ, TC, C, B] = new Func[({type λ[α] = G[F[α]]})#λ, TC, C, B] {
+    def runA(c: C): G[F[B]] = g.F.map(g.runA(c): G[A]) { a: A => self.runA(a) }
+    def F = (g.F <<: self.F <<: TC.idCompose).instance
+    def TC = self.TC
+  }
 
   /** alias for productA  */
   def @&&&[G[_]](g: Func[G, TC, A, B]) = productA(g)

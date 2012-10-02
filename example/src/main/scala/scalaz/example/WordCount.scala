@@ -11,7 +11,8 @@ object WordCount {
   }
 
   def wordCount {
-    import scalaz.AppFuncU, scalaz.State._, scalaz.std.anyVal._, scalaz.std.list._,
+    import scalaz.typelevel.{AppFuncU, HList, HNil}, scalaz.typelevel.syntax.hlist._,
+      scalaz.State._, scalaz.std.anyVal._, scalaz.std.list._,
       scalaz.std.boolean.test, scalaz.syntax.equal._
 
     val text = "the cat in the hat\n sat on the mat\n".toList
@@ -35,7 +36,8 @@ object WordCount {
     val countAll = countWord @&&& countLine @&&& countChar
 
     // ... and execute them in a single traversal 
-    val ((wordCountState, lineCount), charCount) = countAll traverse text
+    val hnil = HNil
+    val (wordCountState :: lineCount :: `hnil`) :: charCount :: `hnil` = countAll traverse text
     val wordCount = wordCountState.eval(false)
 
     println("%d\t%d\t%d\t".format(lineCount, wordCount, charCount)) // 2	9	35
