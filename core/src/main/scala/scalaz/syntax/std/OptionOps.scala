@@ -82,6 +82,10 @@ trait OptionOps[A] extends Ops[Option[A]] {
 
   final def toLeftDisjunction[B](b: => B): A \/ B = o.toLeft(self)(b)
 
+  final def \/>[E](e: => E): E \/ A = o.toRight(self)(e)
+
+  final def <\/[B](b: => B): A \/ B = o.toLeft(self)(b)
+
   final def first: Option[A] @@ First = Tag(self)
 
   final def last: Option[A] @@ Last = Tag(self)
