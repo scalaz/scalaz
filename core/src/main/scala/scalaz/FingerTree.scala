@@ -1249,6 +1249,7 @@ sealed trait IndSeq[A] extends Ops[FingerTree[Int, A]] {
   def ++(xs: IndSeq[A]): IndSeq[A] = indSeq(self <++> xs.self)
   def :+(x: => A): IndSeq[A] = indSeq(self :+ x)
   def +:(x: => A): IndSeq[A] = indSeq(x +: self)
+  def length: Int = self.measure
   def tail: IndSeq[A] = indSeq(self.tail)
   def init: IndSeq[A] = indSeq(self.init)
   def drop(n: Int): IndSeq[A] = split(n)._2
