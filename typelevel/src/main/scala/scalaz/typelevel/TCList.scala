@@ -1,7 +1,7 @@
 package scalaz
 package typelevel
 
-import syntax.HLists._
+import syntax.hlist._
 
 /**
  * A structure storing a list of type constructors in the type, providing

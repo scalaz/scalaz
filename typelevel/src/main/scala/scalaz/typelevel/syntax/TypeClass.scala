@@ -36,6 +36,4 @@ trait TypeClasses extends TypeClasses0 {
 
 }
 
-object TypeClasses extends TypeClasses
-
 // vim: expandtab:ts=2:sw=2

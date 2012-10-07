@@ -28,7 +28,7 @@ object ScalaCheckBinding {
   }
 
   implicit val ArbitraryClass: TypeClass[Arbitrary] = new TypeClass[Arbitrary] {
-    import typelevel.syntax.HLists._
+    import typelevel.syntax.hlist._
 
     def emptyProduct = Arbitrary(value(HNil))
 
