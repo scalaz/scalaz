@@ -32,7 +32,7 @@ package object typelevel {
     def unapply[H, T <: HList](list: HCons[H, T]): Option[(H, T)] = Some(list.head, list.tail)
   }
 
-  def HNil: HNil = GenericNil[Id]()
+  lazy val HNil: HNil = GenericNil[Id]()
 
   import HLists._
 

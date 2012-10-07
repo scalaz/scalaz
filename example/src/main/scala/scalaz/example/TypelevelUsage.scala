@@ -19,7 +19,7 @@ object TypelevelUsage extends App {
     typed[String :: Int :: HNil](hlist2)
 
     hlist2 match {
-      case str :: n :: _ =>
+      case str :: n :: HNil =>
         typed[String](str)
         typed[Int](n)
     }
