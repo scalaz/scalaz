@@ -6,6 +6,7 @@ package typelevel
 
 trait Syntax
   extends syntax.HLists
+  with syntax.Nats
   with syntax.TypeClasses
 
 object Syntax extends Syntax
