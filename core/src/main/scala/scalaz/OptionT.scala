@@ -35,7 +35,7 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
   }
 
   def ap[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
-    OptionT(F(f.run, run) {
+    OptionT(F.apply2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
 

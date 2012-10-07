@@ -14,7 +14,7 @@ package scalaz
  *  - Any [[scalaz.Monoid]] can be treated as an Applicative (see [[scalaz.Monoid]]#applicative)
  *  - Zipping together corresponding elements of Naperian data structures (those of of a fixed, possibly infinite shape)
  *
- *  @see [[scalaz.Applicative.ApplicativeLaw]]
+ *  @see [[scalaz.Applicative.ApplicativeLaw]]                                                              IndeInde
  */
 ////
 trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
@@ -24,8 +24,8 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
     ap(fa)(point(f))
 
-  override def apply[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
-    ap(fa, fb)(point(f))
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
+    ap2(fa, fb)(point(f))
 
   // impls of sequence, traverse, etc
 

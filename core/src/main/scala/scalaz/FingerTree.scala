@@ -741,14 +741,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
          (v, pr, m, sf) => {
            //F.ap(traverseFinger(sf)(f))(F.ap(m.traverseTree(n => traverseNode(n)(f)))(F.map(traverseFinger(pr)(f))(pr => mkDeep(pr)_)))
            //the implementation below seems most efficient. The straightforward implementation using F.map3 leads to an explosion of traverseTree calls
-           val fmap2 = F(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b)_)
+           val fmap2 = F.apply2(traverseFinger(pr)(f), m.traverseTree(n => traverseNode(n)(f)))((a,b) => mkDeep(a)(b)_)
            F.ap(traverseFinger(sf)(f))(fmap2)
         })
   }
 
   private def traverseNode[F[_], V2, B](node: Node[V, A])(f: A => F[B])(implicit ms: Reducer[B, V2], F: Applicative[F]): F[Node[V2, B]] = {
     def mkNode(x: B)(y: B)(z: B): Node[V2, B] = node3(x, y, z)
-    node.fold((v, a, b) => F(f(a), f(b))((x, y) => node2(x, y)),
+    node.fold((v, a, b) => F.apply2(f(a), f(b))((x, y) => node2(x, y)),
         (v, a, b, c) =>  {
           F.ap(f(c))(F.ap(f(b))(F.map(f(a))(x => mkNode(x)_)))
         }

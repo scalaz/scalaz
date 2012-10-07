@@ -9,7 +9,7 @@ trait StreamInstances {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
-        (x, ys) => G(f(x), ys)((b, bs) => b #:: bs)
+        (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
       }
     }
 
@@ -127,7 +127,7 @@ trait StreamFunctions {
   final def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
     def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
       ts.foldRight[M[Stream[U]]](Monad[M].point(scala.Stream())) {
-        case (g, h) => Monad[M].apply(f(g), h)(_ #:: _)
+        case (g, h) => Monad[M].apply2(f(g), h)(_ #:: _)
       }
 
     def unfoldTreeM(v: A) =

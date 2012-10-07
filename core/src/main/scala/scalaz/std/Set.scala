@@ -14,7 +14,7 @@ trait SetInstances {
     // TODO duplication with ListInstances
     def traverseImpl[F[_], A, B](l: Set[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       DList.fromList(l.toList).foldr(F.point(Set[B]())) {
-        (a, fbs) => F(f(a), fbs)((a, b) => b + a)
+        (a, fbs) => F.apply2(f(a), fbs)((a, b) => b + a)
       }
     }
 
