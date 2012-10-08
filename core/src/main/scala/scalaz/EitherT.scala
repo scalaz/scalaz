@@ -79,7 +79,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Apply a function in the environment of the right of this disjunction. */
   def ap[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
-    EitherT(F(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
+    EitherT(F.apply2(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
 
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, C](f: B => EitherT[F, AA, C])(implicit F: Monad[F]): EitherT[F, AA, C] =
@@ -152,7 +152,7 @@ sealed trait EitherT[F[+_], +A, +B] {
    * }}}
    */
   def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M1: Semigroup[BB], M2: Semigroup[AA], F: Apply[F]): EitherT[F, AA, BB] =
-    EitherT(F(run, x.run)(_ +++ _))
+    EitherT(F.apply2(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
   def ensure[AA >: A](onLeft: => AA)(f: B => Boolean)(implicit F: Functor[F]): EitherT[F, AA, B] =
@@ -160,11 +160,11 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
-    F(run, x.run)(_ == _)
+    F.apply2(run, x.run)(_ == _)
 
   /** Compare two disjunction values for ordering. */
   def compare[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Order[AA], EB: Order[BB], F: Apply[F]): F[Ordering] =
-    F(run, x.run)(_ compare _)
+    F.apply2(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[Cord] =

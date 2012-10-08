@@ -21,10 +21,10 @@ object ScalaCheckBinding {
     override def ap[A, B](fa: => Gen[A])(f: => Gen[(A) => B]) = fa ap f
     def bind[A, B](fa: Gen[A])(f: (A) => Gen[B]) = fa flatMap f
     override def map[A, B](fa: Gen[A])(f: (A) => B) = fa map f
-    override def apply[A, B, C](fa: => Gen[A], fb: => Gen[B])(f: (A, B) => C) = fa.map2(fb)(f)
-    override def apply[A, B, C, D](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C])(f: (A, B, C) => D) = fa.map3(fb, fc)(f)
-    override def apply[A, B, C, D, E](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D])(f: (A, B, C, D) => E) = fa.map4(fb, fc, fd)(f)
-    override def apply[A, B, C, D, E, R](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D], fe: => Gen[E])(f: (A, B, C, D, E) => R) = fa.map5(fb, fc, fd, fe)(f)
+    override def apply2[A, B, C](fa: => Gen[A], fb: => Gen[B])(f: (A, B) => C) = fa.map2(fb)(f)
+    override def apply3[A, B, C, D](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C])(f: (A, B, C) => D) = fa.map3(fb, fc)(f)
+    override def apply4[A, B, C, D, E](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D])(f: (A, B, C, D) => E) = fa.map4(fb, fc, fd)(f)
+    override def apply5[A, B, C, D, E, R](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D], fe: => Gen[E])(f: (A, B, C, D, E) => R) = fa.map5(fb, fc, fd, fe)(f)
   }
 
   implicit val ArbitraryClass: TypeClass[Arbitrary] = new TypeClass[Arbitrary] {
@@ -33,7 +33,7 @@ object ScalaCheckBinding {
     def emptyProduct = Arbitrary(value(HNil))
 
     def product[F, T <: HList](FHead: Arbitrary[F], FTail: Arbitrary[T]): Arbitrary[F :: T] =
-      Applicative[Arbitrary].apply(FHead, FTail)(_ :: _)
+      Applicative[Arbitrary].apply2(FHead, FTail)(_ :: _)
   }
 
 }

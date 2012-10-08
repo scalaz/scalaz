@@ -536,6 +536,16 @@ trait BooleanFunctions {
   final def when(cond: Boolean)(f: => Unit) = if (cond) f
 
   /**
+   * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
+   */
+  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]) = if (!cond) f else M.point(())
+
+  /**
+   * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
+   */
+  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]) = if (cond) f else M.point(())
+
+  /**
    * @return `t` if `cond` is `true`, `f` otherwise
    */
   final def fold[A](cond: Boolean, t: => A, f: => A): A = if (cond) t else f

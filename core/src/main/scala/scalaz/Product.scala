@@ -66,7 +66,7 @@ private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α]
   implicit def G: Traverse[G]
 
   def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
-    Applicative[X].apply(F.traverse(a._1)(f), G.traverse(a._2)(f))((a, b) => (a, b))
+    Applicative[X].apply2(F.traverse(a._1)(f), G.traverse(a._2)(f))((a, b) => (a, b))
 }
 
 private[scalaz] trait ProductDistributive[F[_], G[_]] extends Distributive[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
@@ -130,5 +130,5 @@ private[scalaz] trait ProductBitraverse[F[_, _], G[_, _]]
   implicit def G: Bitraverse[G]
 
   def bitraverseImpl[X[_] : Applicative, A, B, C, D](x: (F[A, B], G[A, B]))(f: A => X[C], g: B => X[D]): X[(F[C, D], G[C, D])] =
-    Applicative[X].apply(F.bitraverse(x._1)(f)(g), G.bitraverse(x._2)(f)(g))((a, b) => (a, b))
+    Applicative[X].apply2(F.bitraverse(x._1)(f)(g), G.bitraverse(x._2)(f)(g))((a, b) => (a, b))
 }

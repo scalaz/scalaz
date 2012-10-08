@@ -189,6 +189,16 @@ trait BooleanOps extends Ops[Boolean] {
   final def when(f: => Unit) = b.when(self)(f)
 
   /**
+   * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
+   */
+  final def unlessM[M[_]: Pointed, A](f: => M[A]) = b.unlessM(self)(f)
+
+  /**
+   * Returns the given argument if `cond` is true`, otherwise, unit lifted into M.
+   */
+  final def whenM[M[_]: Pointed, A](f: => M[A]) = b.whenM(self)(f)
+
+  /**
    * @return `t` if true, `f` otherwise
    */
   final def fold[A](t: => A, f: => A): A = b.fold(self, t, f)

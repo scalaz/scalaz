@@ -116,7 +116,7 @@ trait InsertionMapInstances {
     new Traverse[({type λ[α]=InsertionMap[K, α]})#λ] {
       def traverseImpl[F[_], A, B](m: InsertionMap[K, A])(f: A => F[B])(implicit F: Applicative[F]) = {
         m.toList.foldLeft(F.point(InsertionMap.empty[K, B]))({
-          case (acc, (k, v)) => F(acc, f(v))(_ ^+^ (k, _))
+          case (acc, (k, v)) => F.apply2(acc, f(v))(_ ^+^ (k, _))
         })
       }
     }
