@@ -538,12 +538,12 @@ trait BooleanFunctions {
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
    */
-  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]) = if (!cond) f else M.point(())
+  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]): M[Unit] = if (cond) M.point(()) else M.void(f)
 
   /**
    * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
    */
-  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]) = if (cond) f else M.point(())
+  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Pointed[M]): M[Unit] = if (cond) M.void(f) else M.point(())
 
   /**
    * @return `t` if `cond` is `true`, `f` otherwise
