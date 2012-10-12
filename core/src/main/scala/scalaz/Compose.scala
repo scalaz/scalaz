@@ -9,14 +9,14 @@ trait Compose[=>:[_, _]]  { self =>
   ////
   def compose[A, B, C](f: B =>: C, g: A =>: B): (A =>: C)
 
-  private[scalaz] trait ComposePlus[A] extends Plus[({type λ[α]=(α =>: α)})#λ] {
+  private[scalaz] trait ComposePlus extends Plus[({type λ[α]=(α =>: α)})#λ] {
     def plus[A](f1: (A =>: A), f2: => (A =>: A)) = self.compose(f1, f2)
   }
   private[scalaz] trait ComposeSemigroup[A] extends Semigroup[A =>: A] {
     def append(f1: (A =>: A), f2: => (A =>: A)) = self.compose(f1, f2)
   }
 
-  def plus[A]: Plus[({type λ[α]=(α =>: α)})#λ] = new ComposePlus[A] {}
+  def plus: Plus[({type λ[α]=(α =>: α)})#λ] = new ComposePlus {}
   def semigroup[A]: Semigroup[A =>: A] = new ComposeSemigroup[A] {}
 
   trait ComposeLaw {
