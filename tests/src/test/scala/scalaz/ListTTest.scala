@@ -21,7 +21,7 @@ class ListTTest extends Spec {
     (ass: ListT[List, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
-      !isEmpty.contains(true)
+      isEmpty.toList.forall(identity)
   }
   
   "drop" ! check {
@@ -41,14 +41,9 @@ class ListTTest extends Spec {
   checkAll(monadPlus.laws[ListTOpt])
 
   object instances {
-    def semigroup[F[+_]: Functor, A] = Semigroup[ListT[F, A]]
-    def monoid[F[+_]: Pointed, A] = Monoid[ListT[F, A]]
-    def monad[F[+_]: Monad, A] = Monad[({type λ[α]=ListT[F, α]})#λ]
-    def functor[F[+_]: Functor, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
-
-    // checking absence of ambiguity
     def semigroup[F[+_]: Monad, A] = Semigroup[ListT[F, A]]
     def monoid[F[+_]: Monad, A] = Monoid[ListT[F, A]]
+    def monad[F[+_]: Monad, A] = Monad[({type λ[α]=ListT[F, α]})#λ]
     def functor[F[+_]: Monad, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
   }
 }
