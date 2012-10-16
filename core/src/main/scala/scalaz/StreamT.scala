@@ -111,21 +111,16 @@ object StreamT extends StreamTInstances {
 
   def fromStream[M[+_], A](mas: M[Stream[A]]): StreamT[M, A] = new StreamT[M, A](mas)
 
-  def unfoldM[M[+_], A, B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Monad[M]): StreamT[M,A] = {
-    def createStream(value: M[Option[(A, B)]]): M[Stream[A]] = {
-      M.bind(value){
-        case Some((a, b)) => M.map(createStream(f(b)))(a +: _)
-        case None => M.point(Stream.empty)
-      }
-    }
-
-    new StreamT(createStream(f(start)))
-  }
+  // TODO: Will investigate how to resolve this later.
+  /*
+  def unfoldM[M[+_], A, B](start: B)(f: B => M[Option[(A,B)]])(implicit M: Functor[M]): StreamT[M,A] =
+    StreamT[M,A](M.map(f(start)) {
+      case Some((a, b)) => Yield(a, unfoldM(b)(f))
+      case None => Done
+    })
 
   def unfold[A,B](b: B)(f: B => Option[(A,B)]): StreamT[Id,A] = unfoldM[Id,A,B](b)(f)
-
-  // TODO: Needs to be updated.
-  /*
+  
   def wrapEffect[M[+_]:Functor, A](m: M[StreamT[M, A]]): StreamT[M, A] = StreamT(Functor[M].map(m)(Skip(_)))
 
   def runStreamT[S,A](stream : StreamT[({type λ[+X] = State[S,X]})#λ,A], s0: S): StreamT[Id,A] =
@@ -136,7 +131,7 @@ object StreamT extends StreamTInstances {
          Done)
     })
 
-  */
+ */
 
   def fromIterable[A](s: Iterable[A]): StreamT[Id, A] = new StreamT(Pointed[Id].point(s.toStream))
 }
