@@ -433,7 +433,7 @@ trait ValidationFunctions {
   def success[E, A]: A => Validation[E, A] =
     Success(_)
 
-  /** Construct a success failure value. */
+  /** Construct a failure validation value. */
   def failure[E, A]: E => Validation[E, A] =
     Failure(_)
 
