@@ -74,6 +74,8 @@ trait OptionOps[A] extends Ops[Option[A]] {
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 
+  final def orZero(implicit z: Monoid[A]): A = self getOrElse z.zero
+
   final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
