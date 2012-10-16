@@ -38,20 +38,14 @@ class StreamTTest extends Spec {
     (ass: Option[Stream[Int]], x: Int) =>
       StreamT.fromStream(ass).take(x).toStream must be_===(ass.map(_.take(x)))
   }
-  
-  // Exists to ensure that fromStream and map don't stack overflow.
-  "large stream mapped" ! {
-    val stream = (0 to 400).toStream.map(_ => (0 to 400).toStream)
-    StreamT.fromStream(stream).map(_ * 2).toStream must be_===(stream.map(_.map(_ * 2)))
-  }
 
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monad.laws[StreamTOpt])
   
   object instances {
-    def semigroup[F[+_]: Monad, A] = Semigroup[StreamT[F, A]]
-    def monoid[F[+_]: Monad, A] = Monoid[StreamT[F, A]]
+    def semigroup[F[+_]: Functor, A] = Semigroup[StreamT[F, A]]
+    def monoid[F[+_]: Pointed, A] = Monoid[StreamT[F, A]]
     def functor[F[+_]: Functor, A] = Functor[({type λ[α]=StreamT[F, α]})#λ]
     def monad[F[+_]: Monad, A] = Monad[({type λ[α]=StreamT[F, α]})#λ]
   }
