@@ -310,6 +310,8 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
+  implicit val intMonoidApplicative = Applicative.monoidApplicative[Int]
+
   implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
     override def shows(f: Long) = f.toString
 
