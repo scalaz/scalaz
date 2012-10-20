@@ -3,6 +3,11 @@ package typelevel
 
 sealed trait Nat {
 
+  type Self <: Nat
+
+  def self: Self
+
+
   type Unapplied[Z, P[_ <: Nat]]
 
   def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P]
@@ -17,13 +22,13 @@ sealed trait Nat {
 
   final def toInt = foldU(NFold.ToInt)
 
+  final def succ: Succ[Self] = Succ(self)
 
-  // pragmatic non-typelevel Nat operations
+  final def pred: Unapplied[None.type, Some] = unapplied[None.type, Some](None, new HStream[Some] {
+    def apply[N <: Nat](n: N) = Some(n)
+  })
 
-  final def pred: Option[Nat] = this match {
-    case Zero => None
-    case Succ(nat) => Some(nat)
-  }
+  // could as well be implemented with the `Unapplied` machinery, but it's easier this way
 
   final def isZero: Boolean = this match {
     case Zero => true
@@ -33,6 +38,11 @@ sealed trait Nat {
 }
 
 case object Zero extends Nat {
+
+  type Self = Zero.type
+
+  def self = this
+
 
   override type Unapplied[Z, P[_ <: Nat]] = Z
 
@@ -46,6 +56,11 @@ case object Zero extends Nat {
 }
 
 case class Succ[N <: Nat](predecessor: N) extends Nat {
+
+  type Self = Succ[N]
+
+  def self = this
+
 
   override type Unapplied[Z, P[_ <: Nat]] = P[N]
 
