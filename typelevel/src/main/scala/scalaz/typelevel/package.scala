@@ -14,6 +14,11 @@ import Id._
  */
 package object typelevel {
 
+  /** Constraining a type constructor to a certain upper bound */
+  type UpperConstrained[T[_], U] = {
+    type Apply[X <: U] = T[X]
+  }
+
   /** A [[scalaz.typelevel.GenericList]] with the type constructor [[scalaz.Id]] */
   type HList = GenericList[Id]
 

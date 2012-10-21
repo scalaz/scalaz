@@ -24,9 +24,13 @@ sealed trait Nat {
 
   final def succ: Succ[Self] = Succ(self)
 
-  final def pred: Unapplied[Option[Nat], None.type, ({type λ[α <: Nat] = Some[α]})#λ] = unapplied[Option[Nat], None.type, ({type λ[α <: Nat] = Some[α]})#λ](None, new HStream[({type λ[α <: Nat] = Some[α]})#λ] {
+  final def succV: Nat = succ
+
+  final def pred: Unapplied[Option[Nat], None.type, UpperConstrained[Some, Nat]#Apply] = unapplied[Option[Nat], None.type, UpperConstrained[Some, Nat]#Apply](None, new HStream[UpperConstrained[Some, Nat]#Apply] {
     def apply[N <: Nat](n: N) = Some(n)
   })
+
+  final def predV: Option[Nat] = pred
 
   // could as well be implemented with the `Unapplied` machinery, but it's easier this way
 
