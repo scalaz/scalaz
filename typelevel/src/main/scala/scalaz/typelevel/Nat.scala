@@ -3,9 +3,14 @@ package typelevel
 
 sealed trait Nat {
 
-  type Unapplied[Z, P[_ <: Nat]]
+  type Self <: Nat
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P]
+  def self: Self
+
+
+  type Unapplied[U, Z <: U, P[_ <: Nat] <: U] <: U
+
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P]
 
 
   type Folded[U, F <: NFold[U]] <: U
@@ -17,13 +22,17 @@ sealed trait Nat {
 
   final def toInt = foldU(NFold.ToInt)
 
+  final def succ: Succ[Self] = Succ(self)
 
-  // pragmatic non-typelevel Nat operations
+  final def succV: Nat = succ
 
-  final def pred: Option[Nat] = this match {
-    case Zero => None
-    case Succ(nat) => Some(nat)
-  }
+  final def pred: Unapplied[Option[Nat], None.type, UpperConstrained[Some, Nat]#Apply] = unapplied[Option[Nat], None.type, UpperConstrained[Some, Nat]#Apply](None, new HStream[UpperConstrained[Some, Nat]#Apply] {
+    def apply[N <: Nat](n: N) = Some(n)
+  })
+
+  final def predV: Option[Nat] = pred
+
+  // could as well be implemented with the `Unapplied` machinery, but it's easier this way
 
   final def isZero: Boolean = this match {
     case Zero => true
@@ -34,9 +43,14 @@ sealed trait Nat {
 
 case object Zero extends Nat {
 
-  override type Unapplied[Z, P[_ <: Nat]] = Z
+  type Self = Zero.type
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifZero
+  def self = this
+
+
+  override type Unapplied[U, Z <: U, P[_ <: Nat] <: U] = Z
+
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P] = ifZero
 
 
   override type Folded[U, F <: NFold[U]] = F#Zero
@@ -47,9 +61,14 @@ case object Zero extends Nat {
 
 case class Succ[N <: Nat](predecessor: N) extends Nat {
 
-  override type Unapplied[Z, P[_ <: Nat]] = P[N]
+  type Self = Succ[N]
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifSucc(predecessor)
+  def self = this
+
+
+  override type Unapplied[U, Z <: U, P[_ <: Nat] <: U] = P[N]
+
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P] = ifSucc(predecessor)
 
 
   override type Folded[U, F <: NFold[U]] = F#Succ[predecessor.Folded[U, F]]
