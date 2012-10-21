@@ -56,7 +56,7 @@ trait HStream[T[_ <: Nat]] extends AbstractHStream { self =>
 
   // prepend
 
-  override type Prepended[A] = HStream[({ type λ[N <: Nat] = N#Unapplied[A, T] })#λ]
+  override type Prepended[A] = HStream[({ type λ[N <: Nat] = N#Unapplied[Any, A, T] })#λ]
 
   def prepend[A](a: A): Prepended[A] = new Prepended[A] {
     def apply[N <: Nat](n: N) = n.unapplied(a, self)

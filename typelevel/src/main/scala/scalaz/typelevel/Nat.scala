@@ -8,9 +8,9 @@ sealed trait Nat {
   def self: Self
 
 
-  type Unapplied[Z, P[_ <: Nat]]
+  type Unapplied[U, Z <: U, P[_ <: Nat] <: U] <: U
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P]
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P]
 
 
   type Folded[U, F <: NFold[U]] <: U
@@ -24,7 +24,7 @@ sealed trait Nat {
 
   final def succ: Succ[Self] = Succ(self)
 
-  final def pred: Unapplied[None.type, Some] = unapplied[None.type, Some](None, new HStream[Some] {
+  final def pred: Unapplied[Option[Nat], None.type, ({type λ[α <: Nat] = Some[α]})#λ] = unapplied[Option[Nat], None.type, ({type λ[α <: Nat] = Some[α]})#λ](None, new HStream[({type λ[α <: Nat] = Some[α]})#λ] {
     def apply[N <: Nat](n: N) = Some(n)
   })
 
@@ -44,9 +44,9 @@ case object Zero extends Nat {
   def self = this
 
 
-  override type Unapplied[Z, P[_ <: Nat]] = Z
+  override type Unapplied[U, Z <: U, P[_ <: Nat] <: U] = Z
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifZero
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P] = ifZero
 
 
   override type Folded[U, F <: NFold[U]] = F#Zero
@@ -62,9 +62,9 @@ case class Succ[N <: Nat](predecessor: N) extends Nat {
   def self = this
 
 
-  override type Unapplied[Z, P[_ <: Nat]] = P[N]
+  override type Unapplied[U, Z <: U, P[_ <: Nat] <: U] = P[N]
 
-  def unapplied[Z, P[_ <: Nat]](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[Z, P] = ifSucc(predecessor)
+  def unapplied[U, Z <: U, P[_ <: Nat] <: U](ifZero: => Z, ifSucc: => HStream[P]): Unapplied[U, Z, P] = ifSucc(predecessor)
 
 
   override type Folded[U, F <: NFold[U]] = F#Succ[predecessor.Folded[U, F]]
