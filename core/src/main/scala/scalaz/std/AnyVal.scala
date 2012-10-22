@@ -32,6 +32,25 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
+  implicit val nothingInstance: Semigroup[Nothing] with Show[Nothing] with Equal[Nothing] =
+    new Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] {
+      override def shows(f: Nothing) = f.toString
+      def append(f1: Nothing, f2: => Nothing) = f1
+      def order(x: Nothing, y: Nothing) = Ordering.EQ
+      def succ(n: Nothing) = n
+      def pred(n: Nothing) = n
+
+      override def succn(a: Int, b: Nothing) = b
+
+      override def predn(a: Int, b: Nothing) = b
+
+      override def min = None
+
+      override def max = None
+
+      override def equalIsNatural: Boolean = true
+    }
+
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
     override def shows(f: Boolean) = f.toString
 
@@ -618,3 +637,4 @@ object long extends LongFunctions
 object double extends DoubleFunctions
 
 object float extends FloatFunctions
+
