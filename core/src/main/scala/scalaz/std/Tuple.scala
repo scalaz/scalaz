@@ -6,7 +6,7 @@ trait TupleInstances0 {
     override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
       (f(fab._1), g(fab._2))
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
-      Applicative[G].apply(f(fab._1), g(fab._2))((_, _))
+      Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
   }
 
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]) = new Tuple1Semigroup[A1] {
@@ -62,25 +62,25 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit def tuple1Instance: Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+  implicit def tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
   /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Functor[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
+  implicit def tuple2Instance[A1]: Traverse[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
     def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
   }
 
-  implicit def tuple3Functor[A1, A2]: Functor[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
-  implicit def tuple4Functor[A1, A2, A3]: Functor[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
-  implicit def tuple5Functor[A1, A2, A3, A4]: Functor[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Functor[A1, A2, A3, A4] {}
-  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Functor[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Functor[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Functor[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
+  implicit def tuple3Functor[A1, A2]: Traverse[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
+  implicit def tuple4Functor[A1, A2, A3]: Traverse[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
+  implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Functor[A1, A2, A3, A4] {}
+  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
 
   implicit def tuple1Equal[A1](implicit A1: Equal[A1]) = new Tuple1Equal[A1] {
     implicit def _1 = A1
@@ -517,37 +517,53 @@ private[scalaz] trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Se
     _8.append(f1._8, f2._8)
     )
 }
-private[scalaz] trait Tuple1Functor extends Functor[Tuple1] {
+private[scalaz] trait Tuple1Functor extends Traverse[Tuple1] {
   override def map[A, B](fa: Tuple1[A])(f: (A) => B) =
     Tuple1(f(fa._1))
+  def traverseImpl[G[_], A, B](fa: Tuple1[A])(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._1))(Tuple1.apply)
 }
-private[scalaz] trait Tuple2Functor[A1] extends Functor[({type f[x] = (A1, x)})#f] {
+private[scalaz] trait Tuple2Functor[A1] extends Traverse[({type f[x] = (A1, x)})#f] {
   override def map[A, B](fa: (A1, A))(f: A => B) =
     (fa._1, f(fa._2))
+  def traverseImpl[G[_], A, B](fa: (A1, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._2))((fa._1, _))
 }
-private[scalaz] trait Tuple3Functor[A1, A2] extends Functor[({type f[x] = (A1, A2, x)})#f] {
+private[scalaz] trait Tuple3Functor[A1, A2] extends Traverse[({type f[x] = (A1, A2, x)})#f] {
   override def map[A, B](fa: (A1, A2, A))(f: A => B) =
     (fa._1, fa._2, f(fa._3))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._3))((fa._1, fa._2, _))
 }
-private[scalaz] trait Tuple4Functor[A1, A2, A3] extends Functor[({type f[x] = (A1, A2, A3, x)})#f] {
+private[scalaz] trait Tuple4Functor[A1, A2, A3] extends Traverse[({type f[x] = (A1, A2, A3, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A))(f: A => B) =
     (fa._1, fa._2, fa._3, f(fa._4))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._4))((fa._1, fa._2, fa._3, _))
 }
-private[scalaz] trait Tuple5Functor[A1, A2, A3, A4] extends Functor[({type f[x] = (A1, A2, A3, A4, x)})#f] {
+private[scalaz] trait Tuple5Functor[A1, A2, A3, A4] extends Traverse[({type f[x] = (A1, A2, A3, A4, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A4, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, f(fa._5))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._5))((fa._1, fa._2, fa._3, fa._4, _))
 }
-private[scalaz] trait Tuple6Functor[A1, A2, A3, A4, A5] extends Functor[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] {
+private[scalaz] trait Tuple6Functor[A1, A2, A3, A4, A5] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, f(fa._6))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._6))((fa._1, fa._2, fa._3, fa._4, fa._5, _))
 }
-private[scalaz] trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Functor[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] {
+private[scalaz] trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, f(fa._7))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._7))((fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, _))
 }
-private[scalaz] trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Functor[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
+private[scalaz] trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, f(fa._8))
+  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => G[B])(implicit G: Applicative[G]) =
+    G.map(f(fa._8))((fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, _))
 }
 
 private[scalaz] trait Tuple1Cozip extends Cozip[Tuple1] {

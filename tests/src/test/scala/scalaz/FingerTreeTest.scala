@@ -95,6 +95,29 @@ class FingerTreeTest extends Specification with ScalaCheck {
   "OrdSeq is ordered" in { check {
     forAll { xs: List[Int] => OrdSeq(xs:_*).toList == xs.sorted }
   }}
+  
+  "IndSeq" should {
+    "have a length" in { check {
+      forAll { xs: Array[Int] => IndSeq(xs: _*).length == xs.length }
+    }}
+    
+    "allow random access" in {
+      import org.scalacheck._
+      import Gen._
+      import Arbitrary.arbitrary
+      
+      case class TestInstance(arr: Array[Int], index: Int)
+      
+      implicit def myGen: Arbitrary[TestInstance] = Arbitrary(for {
+		  arr <- arbitrary[Array[Int]] if arr.nonEmpty
+		  m <- Gen.choose(0, arr.length-1)
+		} yield TestInstance(arr,m))
+      
+      check { forAll { ti: TestInstance => {
+        IndSeq(ti.arr: _*)(ti.index) == ti.arr(ti.index) }
+      }}
+    }
+  }
 
   // TODO reinstate
 //  "viewl works correctly" ! check {(tree: SequenceTree[Int]) =>

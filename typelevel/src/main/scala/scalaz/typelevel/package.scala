@@ -14,6 +14,11 @@ import Id._
  */
 package object typelevel {
 
+  /** Constraining a type constructor to a certain upper bound */
+  type UpperConstrained[T[_], U] = {
+    type Apply[X <: U] = T[X]
+  }
+
   /** A [[scalaz.typelevel.GenericList]] with the type constructor [[scalaz.Id]] */
   type HList = GenericList[Id]
 
@@ -32,7 +37,7 @@ package object typelevel {
     def unapply[H, T <: HList](list: HCons[H, T]): Option[(H, T)] = Some(list.head, list.tail)
   }
 
-  def HNil: HNil = GenericNil[Id]()
+  lazy val HNil: HNil = GenericNil[Id]()
 
   import HLists._
 

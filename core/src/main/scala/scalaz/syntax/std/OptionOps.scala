@@ -74,6 +74,8 @@ trait OptionOps[A] extends Ops[Option[A]] {
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 
+  final def orZero(implicit z: Monoid[A]): A = self getOrElse z.zero
+
   final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
@@ -81,6 +83,10 @@ trait OptionOps[A] extends Ops[Option[A]] {
   final def toRightDisjunction[E](e: => E): E \/ A = o.toRight(self)(e)
 
   final def toLeftDisjunction[B](b: => B): A \/ B = o.toLeft(self)(b)
+
+  final def \/>[E](e: => E): E \/ A = o.toRight(self)(e)
+
+  final def <\/[B](b: => B): A \/ B = o.toLeft(self)(b)
 
   final def first: Option[A] @@ First = Tag(self)
 

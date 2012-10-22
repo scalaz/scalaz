@@ -9,6 +9,4 @@ trait HLists {
 
 }
 
-object HLists extends HLists
-
 // vim: expandtab:ts=2:sw=2

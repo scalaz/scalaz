@@ -41,17 +41,17 @@ sealed trait PLensT[F[+_], A, B] {
   def mapC[C](f: Store[B, A] => Store[C, A])(implicit F: Functor[F]): PLensT[F, A, C] =
     plensT(a => F.map(run(a))(_ map f))
 
-  def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): PLensT[F, X, B] =
+  def xmapA[X](f: A => X)(g: X => A)(implicit F: Functor[F]): PLensT[F, X, B] =
     plensO(x => runO(g(x)) map (_ map (f)))
 
   def xmapbA[X](b: Bijection[A, X])(implicit F: Functor[F]): PLensT[F, X, B] =
-    xmapA(b to _, b from _)
+    xmapA(b to _)(b from _)
 
-  def xmapB[X](f: B => X, g: X => B)(implicit F: Functor[F]): PLensT[F, A, X] =
-    plensO(a => runO(a) map (_ xmap (f, g)))
+  def xmapB[X](f: B => X)(g: X => B)(implicit F: Functor[F]): PLensT[F, A, X] =
+    plensO(a => runO(a) map (_.xmap(f)(g)))
 
   def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): PLensT[F, A, X] =
-    xmapB(b to _, b from _)
+    xmapB(b to _)(b from _)
 
   def get(a: A)(implicit F: Functor[F]): F[Option[B]] =
     F.map(run(a))(_ map (_.pos))
@@ -207,7 +207,7 @@ sealed trait PLensT[F[+_], A, B] {
   def product[C, D](that: PLensT[F, C, D])(implicit FF: Apply[F]): PLensT[F, (A, C), (B, D)] =
     plensT {
       case (a, c) =>
-        FF(run(a), that run c)((x, y) => for {
+        FF.apply2(run(a), that run c)((x, y) => for {
           q <- x
           r <- y
         } yield q *** r)
@@ -242,7 +242,7 @@ trait PLensTFunctions extends PLensTInstances {
     plensT(a => PF.point(r(a)))
 
   def plensgT[F[+_], A, B](set: A => F[Option[B => A]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensT[F, A, B] =
-    plensT(a => M(set(a), get(a))((q, r) => for {
+    plensT(a => M.apply2(set(a), get(a))((q, r) => for {
       w <- q
       x <- r
     } yield Store(w, x)))

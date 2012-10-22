@@ -77,7 +77,7 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   def ap[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Applicative[F]): LazyEitherT[F, AA, C] = {
     // TODO check laziness
-    LazyEitherT[F, AA, C](F(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
+    LazyEitherT[F, AA, C](F.apply2(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
   }
 
   def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B]() {

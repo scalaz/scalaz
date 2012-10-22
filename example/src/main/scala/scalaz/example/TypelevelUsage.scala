@@ -10,7 +10,7 @@ object TypelevelUsage extends App {
 
   object HLists {
 
-    import typelevel.syntax.HLists._
+    import typelevel.syntax.hlist._
 
     val hlist1 = 3 :: HNil
     val hlist2 = "foo" :: hlist1
@@ -19,7 +19,7 @@ object TypelevelUsage extends App {
     typed[String :: Int :: HNil](hlist2)
 
     hlist2 match {
-      case str :: n :: _ =>
+      case str :: n :: HNil =>
         typed[String](str)
         typed[Int](n)
     }
@@ -120,7 +120,7 @@ object TypelevelUsage extends App {
 
   object Downed {
 
-    import typelevel.syntax.HLists._
+    import typelevel.syntax.hlist._
     import ALists._
 
     val downed = aplist.down
@@ -194,8 +194,7 @@ object TypelevelUsage extends App {
 
   object Classes {
 
-    import typelevel.syntax.TypeClasses._
-    import typelevel.syntax.HLists._
+    import typelevel.syntax.all._
 
     // with syntax
     val prod1 = Applicative[List] *: Applicative[Option]

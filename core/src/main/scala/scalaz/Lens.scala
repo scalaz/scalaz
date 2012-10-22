@@ -26,17 +26,17 @@ sealed trait LensT[F[+_], A, B] {
   import BijectionT._
   import WriterT._
 
-  def xmapA[X](f: A => X, g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
+  def xmapA[X](f: A => X)(g: X => A)(implicit F: Functor[F]): LensT[F, X, B] =
     lensT(x => F.map(run(g(x)))(_ map (f)))
 
   def xmapbA[X](b: Bijection[A, X])(implicit F: Functor[F]): LensT[F, X, B] =
-    xmapA(b to _, b from _)
+    xmapA(b to _)(b from _)
 
-  def xmapB[X](f: B => X, g: X => B)(implicit F: Functor[F]): LensT[F, A, X] =
-    lensT(a => F.map(run(a))(_ xmap (f, g)))
+  def xmapB[X](f: B => X)(g: X => B)(implicit F: Functor[F]): LensT[F, A, X] =
+    lensT(a => F.map(run(a))(_.xmap(f)(g)))
 
   def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): LensT[F, A, X] =
-    xmapB(b to _, b from _)
+    xmapB(b to _)(b from _)
 
   def get(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run(a))(_.pos)
@@ -166,7 +166,7 @@ sealed trait LensT[F[+_], A, B] {
   /** Two disjoint lenses can be paired */
   def product[C, D](that: LensT[F, C, D])(implicit F: Apply[F]): LensT[F, (A, C), (B, D)] =
     lensT {
-      case (a, c) => F(run(a), that run c)((x, y) => x *** y)
+      case (a, c) => F.apply2(run(a), that run c)((x, y) => x *** y)
     }
 
   /** alias for `product` */
@@ -215,7 +215,7 @@ trait LensTFunctions {
     lensT(a => F.point(r(a)))
 
   def lensgT[F[+_], A, B](set: A => F[B => A], get: A => F[B])(implicit M: Bind[F]): LensT[F, A, B] =
-    lensT(a => M(set(a), get(a))(Store(_, _)))
+    lensT(a => M.apply2(set(a), get(a))(Store(_, _)))
 
   def lensg[A, B](set: A => B => A, get: A => B): Lens[A, B] =
     lensgT[Id, A, B](set, get)

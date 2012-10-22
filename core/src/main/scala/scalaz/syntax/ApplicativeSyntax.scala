@@ -5,6 +5,8 @@ package syntax
 trait ApplicativeOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Applicative[F]
   ////
+  final def unlessM(cond: Boolean): F[Unit] = scalaz.std.boolean.unlessM(cond)(self)
+  final def whenM(cond: Boolean): F[Unit] = scalaz.std.boolean.whenM(cond)(self)
 
   ////
 }
