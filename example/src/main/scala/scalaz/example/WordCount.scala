@@ -11,7 +11,8 @@ object WordCount {
   }
 
   def wordCount {
-    import scalaz.typelevel.{AppFuncU, HList, HNil}, scalaz.typelevel.syntax.hlist._,
+    import scalaz.typelevel.{AppFunc, AppFuncU, HList, HNil},
+      scalaz.typelevel.syntax.hlist._,
       scalaz.State._, scalaz.std.anyVal._, scalaz.std.list._,
       scalaz.std.boolean.test, scalaz.syntax.equal._
 
@@ -33,10 +34,10 @@ object WordCount {
     } @>>> AppFuncU { (x: Int) => x }
 
     // Compose applicative functions in parallel
-    val countAll = countWord @&&& countLine @&&& countChar
-
-    // ... and execute them in a single traversal
-    val (wordCountState :: lineCount :: HNil) :: charCount :: HNil = countAll traverse text
+    val countAll = countChar :: countLine :: (countWord consA AppFunc.HNil)
+    
+    // ... and execute them in a single traversal 
+    val charCount :: lineCount ::  wordCountState :: HNil = countAll traverse text
     val wordCount = wordCountState.eval(false)
 
     println("%d\t%d\t%d\t".format(lineCount, wordCount, charCount)) // 2	9	35

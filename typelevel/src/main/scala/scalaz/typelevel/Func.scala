@@ -34,11 +34,14 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
   def @&&&[G[_]](g: Func[G, TC, A, B]) = productA(g)
 
   def &&&@[G[_]](g: Func[G, TC, A, B]) = g.productA(self)
+  
+  /** compose `A => F[B]` and `A => G[B]` into `A => F[B] :: G[B] :: HNil` */
+  def productA[G[_]](g: Func[G, TC, A, B]) = consA(g consA hnilfunc[TC, A, B])
 
-  /** compose `A => F[B]` and `A => G[B]` into `A => (F[B], G[B])` */
-  def productA[G[_]](g: Func[G, TC, A, B]): Func[TCCons[F, TCCons[G, TCNil]]#Product, TC, A, B] = new Func[TCCons[F, TCCons[G, TCNil]]#Product, TC, A, B] {
-    def runA(a: A) = self.runA(a) :: g.runA(a) :: HNil
-    def F = (self.F *: g.F *: TC.emptyProduct).instance
+  /** prepend `this` to HListFunc `tail` **/
+  def consA[T <: TCList](tail: HListFunc[T, TC, A, B]): HListFunc[TCCons[F, T], TC, A, B] = new HListFunc[TCCons[F, T], TC, A, B] {
+    def runA(a: A): TCCons[F, T]#Product[B] = self.runA(a) :: tail.runA(a)
+    def Product = self.F *: tail.Product
     def TC = self.TC
   }
 
@@ -47,6 +50,23 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
 
   def traverse[G[_]](value: G[A])(implicit G: Traverse[G], ev: TC[F] =:= Applicative[F]): F[G[B]] =
     G.traverse(value)(a => self.runA(a))(ev(F))
+}
+
+/**
+ * Represents a function `A => T#Product[B]` where `[T <: TCList]`.
+ *
+ * Example:
+ * {{{
+ * import scalaz._, std.AllInstances._, typelevel._, Func._
+ *
+ * val list = AppFuncU { (x: Int) => x + 1 } :: AppFuncU { (x: Int) => List(x + 5) } :: AppFunc.HNil
+ * list.traverse(List(1, 2, 3))
+ * }}}
+ */
+trait HListFunc[T <: TCList, TC[X[_]] <: Functor[X], A, B] extends Func[T#Product, TC, A, B] { self =>
+  def ::[G[_]](g: Func[G, TC, A, B]) = g consA self
+  private[scalaz] def Product: KTypeClass.WrappedProduct[TC, T]
+  final def F = Product.instance
 }
 
 //
@@ -107,22 +127,47 @@ trait FuncFunctions {
     def F = F0.TC
     def runA(a: A) = F0(f(a))
   }
+  def hnilfunc[TC[X[_]] <: Functor[X], A, B](implicit TC0: KTypeClass[TC]): HListFunc[TCNil, TC, A, B] = new HListFunc[TCNil, TC, A, B] {
+    def TC = TC0
+    def Product: KTypeClass.WrappedProduct[TC, TCNil] = TC0.emptyProduct
+    def runA(a: A) = HNil
+  }
 }
 
 object Func extends FuncFunctions with FuncInstances {
   def apply[M[_], TC[M[_]] <: Functor[M], A, B](f: A => M[B])(implicit TC0: KTypeClass[TC], F0: TC[M]): Func[M, TC, A, B] = func(f)
 }
 
+object FunctorFunc {
+  def apply[M[_], A, B](f: A => M[B])(implicit F0: Functor[M]): Func[M, Functor, A, B] = Func.functorfunc(f)
+  def HNil[A, B] = Func.hnilfunc[Functor, A, B]
+}
+
 object FunctorFuncU {
   def apply[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = Func.functorfuncU(f)
+}
+
+object PointedFunc {
+  def apply[M[_], A, B](f: A => M[B])(implicit F0: Pointed[M]): Func[M, Pointed, A, B] = Func.pointedfunc(f)
+  def HNil[A, B] = Func.hnilfunc[Pointed, A, B]
 }
 
 object PointedFuncU {
   def apply[A, R](f: A => R)(implicit F0: Unapply[Pointed, R]): Func[F0.M, Pointed, A, F0.A] = Func.pointedfuncU(f)
 }
 
+object ApplyFunc {
+  def apply[M[_], A, B](f: A => M[B])(implicit F0: Apply[M]): Func[M, Apply, A, B] = Func.applyfunc(f)
+  def HNil[A, B] = Func.hnilfunc[Apply, A, B]
+}
+
 object ApplyFuncU {
   def apply[A, R](f: A => R)(implicit F0: Unapply[Apply, R]): Func[F0.M, Apply, A, F0.A] = Func.applyfuncU(f)
+}
+
+object AppFunc {
+  def apply[M[_], A, B](f: A => M[B])(implicit F0: Applicative[M]): Func[M, Applicative, A, B] = Func.appfunc(f)
+  def HNil[A, B] = Func.hnilfunc[Applicative, A, B]
 }
 
 object AppFuncU {
