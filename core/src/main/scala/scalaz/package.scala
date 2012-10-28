@@ -1,4 +1,3 @@
-
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *
@@ -104,7 +103,7 @@ package object scalaz {
   type Reader[E, +A] = ReaderT[Id, E, A]
 
   type Writer[+W, +A] = WriterT[Id, W, A]
-  type Unwriter[W, A] = UnwriterT[Id, W, A]
+  type Unwriter[+W, +A] = UnwriterT[Id, W, A]
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
