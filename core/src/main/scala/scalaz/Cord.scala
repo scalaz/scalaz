@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.immutable.IndexedSeq
+
 import std.anyVal._
 import std.string._
 import std.indexedSeq.indexedSeqMonoid
@@ -109,7 +111,7 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
 
   def toList: List[Char] = toIndexedSeq.toList
   def toStream: Stream[Char] = toIndexedSeq.toStream
-  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq : IndexedSeq[Char])
+  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq)
   override def toString: String = {
     val sb = new StringBuilder(self.measure)
     self foreach (sb ++= _)

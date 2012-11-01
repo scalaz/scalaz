@@ -2,6 +2,7 @@ package scalaz
 package std
 
 import annotation.tailrec
+import collection.immutable.IndexedSeq
 import collection.IndexedSeqLike
 import collection.generic.{CanBuildFrom, GenericTraversableTemplate}
 
