@@ -2,6 +2,7 @@ package scalaz
 package syntax
 package std
 
+import collection.immutable.IndexedSeq
 import scalaz.std.{indexedSeq => v}
 
 trait IndexedSeqOps[A] extends Ops[IndexedSeq[A]] {
