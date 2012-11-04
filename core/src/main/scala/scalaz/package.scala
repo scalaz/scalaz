@@ -60,7 +60,7 @@
  *  - [[scalaz.Endo]] Represents functions from `A => A`.
  *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
  *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
- *  - [[scalaz.LensT]] Composable, functional alternative to getters and setters
+ *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
  *  - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
  *  - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
  *  - [[scalaz.Zipper]] A functional cursor over a List.
@@ -127,11 +127,18 @@ package object scalaz {
     }
   }
 
-  type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
   type StoreT[F[+_], A, +B] = IndexedStoreT[F, A, A, B]
+  type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
   type Store[A, +B] = StoreT[Id, A, B]
   // flipped
   type |-->[A, +B] = Store[B, A]
+  object StoreT extends StoreTFunctions with StoreTInstances {
+    def apply[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
+      storeT(r)
+  }
+  object IndexedStore {
+    def apply[I, A, B](f: A => B, i: I): IndexedStore[I, A, B] = IndexedStoreT.indexedStore(i)(f)
+  }
   object Store {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }

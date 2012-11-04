@@ -33,11 +33,23 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, X2, B1, B2] =
     lensFamilyT(x => F.map(run(g(x)))(_ map (f)))
 
+  def contramapA1[X1](g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, A2, B1, B2] =
+    xmapA(identity)(g)
+
+  def mapA2[X2](f: A2 => X2)(implicit F: Functor[F]): LensFamilyT[F, A1, X2, B1, B2] =
+    xmapA(f)(identity)
+
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X])(implicit F: Functor[F]): LensFamilyT[F, X, X, B1, B2] =
     xmapA(b to _)(b from _)
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X1, X2] =
     lensFamilyT(a => F.map(run(a))(_.xmap(f)(g)))
+
+  def mapB1[X1](f: B1 => X1)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X1, B2] =
+    xmapB(f)(identity)
+
+  def contramapB2[X2](g: X2 => B2)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, B1, X2] =
+    xmapB(identity)(g)
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X])(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X, X] =
     xmapB(b to _)(b from _)
@@ -79,7 +91,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def mods[A >: A2 <: A1, B >: B1 <: B2](f: B1 => B2)(implicit F: Functor[F]): StateT[F, A, B] =
     StateT(a =>
       F.map(run(a))(c => {
-        val b = f(c.pos)
+        val b: B = f(c.pos)
         (c put b, b)
       }))
 
@@ -157,7 +169,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
 
   /** Two lenses that view a value of the same type can be joined */
   def sum[C1, C2](that: => LensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] =
-    lensT{
+    lensFamilyT{
       case -\/(a) =>
         F.map(run(a))(_ map (-\/(_)))
       case \/-(c) =>
@@ -193,11 +205,121 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
 
   /** A homomorphism of lens categories */
   def partial(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, B1, B2] =
-    PLensT.plensT(a => F.map(run(a))(x => Some(x):Option[IndexedStore[B1, B2, A2]]))
+    PLensFamilyT.plensFamilyT(a => F.map(run(a))(x => Some(x):Option[IndexedStore[B1, B2, A2]]))
 
   /** alias for `partial` */
   def unary_~(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, B1, B2] =
     partial
+}
+
+trait LensFamilyTFunctions {
+  import IndexedStoreT._, StoreT._
+
+  def lensFamilyT[F[+_], A1, A2, B1, B2](r: A => F[Store[B, A]]): LensFamilyT[F, A1, A2, B1, B2]] = new LensFamilyT[F, A1, A2, B1, B2] {
+    def run(a: A): F[Store[B, A]] = r(a)
+  }
+
+  def lens[A, B](r: A => Store[B, A]): Lens[A, B] =
+    lensT[Id, A, B](r)
+
+  def lensp[F[+_], A, B](r: A => Store[B, A])(implicit F: Pointed[F]):LensFamilyT[F, A1, A2, B1, B2] =
+    lensT(a => F.point(r(a)))
+
+  def lensgT[F[+_], A, B](set: A => F[B => A], get: A => F[B])(implicit M: Bind[F]): LensFamilyT[F, A1, A2, B1, B2] =
+    lensT(a => M.apply2(set(a), get(a))(Store(_, _)))
+
+  def lensg[A, B](set: A => B => A, get: A => B): Lens[A, B] =
+    lensgT[Id, A, B](set, get)
+
+  def lensu[A, B](set: (A, B) => A, get: A => B): Lens[A, B] =
+    lensg(set.curried, get)
+
+  /** The identity lens for a given object */
+  def lensId[F[+_], A](implicit P: Pointed[F]): LensT[F, A, A] =
+    lensp(Store(identity, _))
+
+  /** The identity lens through the Id functor */
+  def self[A]: Lens[A, A] = lensId[Id, A]
+
+  /** The trivial lens that can retrieve Unit from anything */
+  def trivialLens[F[+_], A](implicit P: Pointed[F]): LensT[F, A, Unit] =
+    lensp[F, A, Unit](a => Store(_ => a, ()))
+
+  /** A lens that discards the choice of right or left from disjunction */
+  def codiagLens[F[+_]: Pointed, A]: LensT[F, A \/ A, A] =
+    lensId[F, A] ||| lensId[F, A]
+
+  /** Access the first field of a tuple */
+  def firstLens[A, B]: (A, B) @> A =
+    lens {
+      case (a, b) => Store(x => (x, b), a)
+    }
+
+  /** Access the second field of a tuple */
+  def secondLens[A, B]: (A, B) @> B =
+    lens {
+      case (a, b) => Store(x => (a, x), b)
+    }
+
+  /** Access the first field of a tuple */
+  def lazyFirstLens[A, B]: LazyTuple2[A, B] @> A =
+    lens(z => Store(x => LazyTuple2(x, z._2), z._1))
+
+  /** Access the second field of a tuple */
+  def lazySecondLens[A, B]: LazyTuple2[A, B] @> B =
+    lens(z => Store(x => LazyTuple2(z._1, x), z._2))
+
+  def nelHeadLens[A]: NonEmptyList[A] @> A =
+    lens(l => Store(NonEmptyList.nel(_, l.tail), l.head))
+
+  def nelTailLens[A]: NonEmptyList[A] @> List[A] =
+    lens(l => Store(NonEmptyList.nel(l.head, _), l.tail))
+
+  /** Access the value at a particular key of a Map **/
+  def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
+    lensg(m => ({
+      case None => m - k
+      case Some(v) => m.updated(k, v)
+    }: Option[V] => Map[K, V]), _ get k)
+
+  def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Store[A, B] @> B =
+    lens(q => {
+      lazy val x = q.pos
+      lazy val y = q put x
+      Store(b =>
+        Store(w => if(e equal (x, w)) b else y, x), y)
+    })
+
+  def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =
+    Lens(q => Store(_ match {
+      case -\/(l) => Store(_ => true, l)
+      case \/-(r) => Store(_ => false, r)
+    }, {
+      val x = q.pos
+      if(q put x) -\/(x) else \/-(x)
+    }))
+
+  def factorLens[A, B, C]: ((A, B) \/ (A, C)) @> (A, B \/ C) =
+    lens(e => Store({
+      case (a, -\/(b)) => -\/(a, b)
+      case (a, \/-(c)) => \/-(a, c)
+    }, e match {
+      case -\/((a, b)) => (a, -\/(b))
+      case \/-((a, c)) => (a, \/-(c))
+    }))
+
+  def distributeLens[A, B, C]: (A, B \/ C) @> ((A, B) \/ (A, C)) =
+    lens {
+      case (a, e) => Store({
+        case -\/((aa, bb)) => (aa, -\/(bb))
+        case \/-((aa, cc)) => (aa, \/-(cc))
+      }, e match {
+        case -\/(b) => -\/(a, b)
+        case \/-(c) => \/-(a, c)
+
+      })
+    }
+
 }
 
 trait LensTFunctions extends LensFamilyTFunctions {
