@@ -5,14 +5,17 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-sealed trait StoreT[F[+_], A, +B] {
-  def run: (F[A => B], A)
+sealed trait IndexedStoreT[F[+_] +I, -A, +B] {
+  def run: (F[A => B], I)
 
-  import StoreT._
+  import IndexedStoreT._, StoreT._
   import BijectionT._
 
-  def xmap[X](f: A => X)(g: X => A)(implicit F: Functor[F]): StoreT[F, X, B] =
-    storeT(F.map(set)(_ compose g), f(pos))
+  def xmap[X, Y](f: I => X)(g: Y => A)(implicit F: Functor[F]): IndexedStoreT[F, X, Y, B] =
+    indexedStoreT(F.map(set)(_ compose g), f(pos))
+
+  def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
+    indexedStoreT(identity)
 
   def bmap[X](b: Bijection[A, X])(implicit F: Functor[F]): StoreT[F, X, B] =
     xmap(b to _)(b from _)

@@ -127,9 +127,11 @@ package object scalaz {
     }
   }
 
-  type Store[A, B] = StoreT[Id, A, B]
+  type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
+  type StoreT[F[+_], A, +B] = IndexedStoreT[F, A, A, B]
+  type Store[A, +B] = StoreT[Id, A, B]
   // flipped
-  type |-->[A, B] = Store[B, A]
+  type |-->[A, +B] = Store[B, A]
   object Store {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }
@@ -160,9 +162,18 @@ package object scalaz {
   //
   // Lens type aliases
   //
+  type LensT[F[+_], A, B] = LensFamilyT[A, B]
+  type LensFamily[-A1, +A2, +B1, -B2] = LensFamilyT[A, B] 
   type Lens[A, B] = LensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object LensT extends LensTFunctions with LensTInstances {
+    def apply[F[+_], A, B](r: A => F[Store[B, A]]): LensT[F, A, B] =
+      lensT(r)
+  }
+  object LensFamily extends LensFamilyTFunctions with LensFamilyTInstances {
+    def apply[A1, A2, B1, B2](r: A => Indexd)
+  }
   object Lens extends LensTFunctions with LensTInstances {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
