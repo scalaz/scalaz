@@ -5,60 +5,60 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-sealed trait IndexedStoreT[F[+_] +I, -A, +B] {
+sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def run: (F[A => B], I)
 
   import IndexedStoreT._, StoreT._
   import BijectionT._
 
-  def xmap[X, Y](f: I => X)(g: Y => A)(implicit F: Functor[F]): IndexedStoreT[F, X, Y, B] =
-    indexedStoreT(F.map(set)(_ compose g), f(pos))
+  def xmap[X](f: I => X)(g: X => A)(implicit F: Functor[F]): StoreT[F, X, B] =
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
-    indexedStoreT(identity)
+    indexedStoreT(set, f(pos))
 
-  def bmap[X](b: Bijection[A, X])(implicit F: Functor[F]): StoreT[F, X, B] =
+  def contramap[X](g: X => A)(implicit F: Functor[F]) =
+    indexedStoreT(F.map(set)(_ compose g), pos)
+
+  def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStore[X, A, Y]
+  def bmap[X](b: Bijection[I, X])(implicit F: Functor[F], ev: A <:< X): StoreT[F, X, B] =
     xmap(b to _)(b from _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
 
-  def puts(f: A => A)(implicit F: Functor[F]): F[B] =
+  def puts(f: I => A)(implicit F: Functor[F]): F[B] =
     put(f(pos))
 
   def set: F[A => B] =
     run._1
 
-  def pos: A =
+  def pos: I =
     run._2
 
-  def copoint(implicit F: Copointed[F]): B =
+  def copoint(implicit F: Copointed[F], ev: A <:< I): B =
     F.copoint(run._1)(run._2)
 
-  def map[C](f: B => C)(implicit ftr: Functor[F]): StoreT[F, A, C] =
-    storeT(mapRunT(k => f compose k))
+  def map[C](f: B => C)(implicit ftr: Functor[F]): IndexedStoreT[F, I, A, C] =
+    indexedStoreT(mapRunT(k => f compose k))
 
-  def duplicate(implicit F: Comonad[F]): StoreT[F, A, StoreT[F, A, B]] =
-    storeT((F.cobind(run._1)(ff => (a: A) => storeT[F, A, B]((ff, a))), pos))
+  def duplicate[J](implicit F: Comonad[F]): IndexedStoreT[F, I, J, IndexedStoreT[F, J, A, B]] =
+   indexedStoreT((F.cobind(run._1)(ff => (a: J) => indexedStoreT[F, J, A, B]((ff, a))), pos))
 
-  def cobind[C](f: StoreT[F, A, B] => C)(implicit c: Cobind[F]): StoreT[F, A, C] =
-    storeT((Cobind[F].cobind(run._1)(ff => (a: A) => f(storeT[F, A, B]((ff, a)))), pos))
+  def cobind[K, C](f: IndexedStoreT[F, A, K, B] => C)(implicit c: Cobind[F]): IndexedStoreT[F, I, K, C] =
+    indexedStoreT((Cobind[F].cobind(run._1)(ff => (a: I) => f(indexedStoreT[F, I, K, B]((ff, a)))), pos))
 
   /** Two disjoint lenses can be paired */
-  def product[C, D](that: StoreT[F, C, D])(implicit M: Bind[F]): StoreT[F, (A, C), (B, D)] =
-    StoreT(M.bind(set) { s => M.map(that.set)(t => { (ac: (A, C)) => (s(ac._1), t(ac._2))})}, (pos, that.pos))
+  def product[J, C, D](that: IndexedStoreT[F, J, C, D])(implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] =
+    IndexedStoreT(M.bind(set) { s => M.map(that.set)(t => { (ac: (A, C)) => (s(ac._1), t(ac._2))})}, (pos, that.pos))
 
   /** alias for `product` */
-  def ***[C, D](that: StoreT[F, C, D])(implicit M: Bind[F]): StoreT[F, (A, C), (B, D)] = product(that)
+  def ***[J, C, D](that: StoreT[F, C, D])(implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] = product(that)
 
-  private def mapRunT[C](f: (A => B) => C)(implicit F: Functor[F]): (F[C], A) =
+  private def mapRunT[C](f: (A => B) => C)(implicit F: Functor[F]): (F[C], I) =
     (F.map(run._1)(f), run._2)
 }
 
-object StoreT extends StoreTFunctions with StoreTInstances {
-  def apply[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
-    storeT(r)
-}
+object IndexedStore extends 
 
 trait StoreTFunctions {
 
