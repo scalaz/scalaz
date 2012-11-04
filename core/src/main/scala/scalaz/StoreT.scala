@@ -12,6 +12,7 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   import BijectionT._
 
   def xmap[X](f: I => X)(g: X => A)(implicit F: Functor[F]): StoreT[F, X, B] =
+    storeT(F.map(set)(_ compose g), f(pos))
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     indexedStoreT(set, f(pos))
@@ -20,6 +21,7 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
     indexedStoreT(F.map(set)(_ compose g), pos)
 
   def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStore[X, A, Y]
+
   def bmap[X](b: Bijection[I, X])(implicit F: Functor[F], ev: A <:< X): StoreT[F, X, B] =
     xmap(b to _)(b from _)
 
