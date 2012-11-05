@@ -1,6 +1,6 @@
 package scalaz
 
-import StoreT._
+import IndexedStoreT._, StoreT._
 import Leibniz._
 import Id._
 
@@ -22,8 +22,8 @@ import Id._
  * @tparam A The type of the record
  * @tparam B The type of the optional field
  */
-sealed trait PLensT[F[+_], A, B] {
-  def run(a: A): F[Option[Store[B, A]]]
+sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
+  def run(a: A1): F[Option[IndexedStore[B1, B2, A2]]]
 
   def apply(a: A): F[Option[Store[B, A]]] =
     run(a)
@@ -32,7 +32,7 @@ sealed trait PLensT[F[+_], A, B] {
     OptionT(run(a))
 
   import StateT._
-  import PLensT._
+  import PLensFamilyT._
   import BijectionT._
 
   def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Store[B, A]] =

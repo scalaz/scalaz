@@ -169,8 +169,8 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  type LensT[F[+_], A, B] = LensFamilyT[A, B]
-  type LensFamily[-A1, +A2, +B1, -B2] = LensFamilyT[A, B] 
+  type LensT[F[+_], A, B] = LensFamilyT[F, A, A, B, B]
+  type LensFamily[-A1, +A2, +B1, -B2] = LensFamilyT[Id, A1, A2, B1, B2] 
   type Lens[A, B] = LensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
@@ -178,8 +178,9 @@ package object scalaz {
     def apply[F[+_], A, B](r: A => F[Store[B, A]]): LensT[F, A, B] =
       lensT(r)
   }
-  object LensFamily extends LensFamilyTFunctions with LensFamilyTInstances {
-    def apply[A1, A2, B1, B2](r: A => Indexd)
+  object LensFamily extends LensTFunctions with LensTInstances {
+    def apply[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] =
+      lensFamily(r)
   }
   object Lens extends LensTFunctions with LensTInstances {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
@@ -188,6 +189,8 @@ package object scalaz {
 
   type @>[A, B] = Lens[A, B]
 
+  type PLensT[F[+_], A, B] = PLensFamilyT[F, A, A, B, B]
+  type PLensFamily[-A1, +A2, +B1, -B2] = PLensFamilyT[Id, A1, A2, B1, B2]
   type PLens[A, B] = PLensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
