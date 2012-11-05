@@ -8,7 +8,7 @@ import Id._
 sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def run: (F[A => B], I)
 
-  import IndexedStoreT._, StoreT._
+  import StoreT._
   import BijectionT._
 
   def xmap[X1, X2](f: I => X1)(g: X2 => A)(implicit F: Functor[F]): IndexedStoreT[F, X1, X2, B] =

@@ -1,19 +1,20 @@
 package scalaz
 
-import IndexedStoreT._, StoreT._
+import StoreT._
 import Id._
 
 /**
- * A Lens family, offering a purely functional means to access and retrieve
+ * A Lens Family, offering a purely functional means to access and retrieve
  * a field transitioning from type `B1` to type `B21 in a record simultaneously
  * transitioning from type `A1` to type `A2`.  [[scalaz.Lens]] is a convenient
  * alias for when `A1 =:= A2` and `B1 =:= B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a lens
- * can address membership of a `Set`.
+ * family can address membership of a `Set`.
  *
  * @see [[scalaz.PLens]]
  *
+ * @tparam F Type constructor used to address the field
  * @tparam A1 The initial type of the record
  * @tparam A2 The final type of the record
  * @tparam B1 The initial type of the field
@@ -30,7 +31,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   import BijectionT._
   import WriterT._
 
-  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
+  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): LensFamilyT[F, A1, A2, C1, C2] =
     lensFamilyT(a => F.map(run(a))(f))
 
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, X2, B1, B2] =
@@ -130,7 +131,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
 
   /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
   def ->>-[C, A >: A2 <: A1](f: => StateT[F, A, C])(implicit F: Bind[F], ev: B1 <:< B2): StateT[F, A, C] =
-    mapB1(ev).>>-(_ => f)
+    xmapB(ev)(identity).>>-(_ => f)
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
   def liftsNT[A >: A2 <: A1, B >: B1 <: B2](implicit F: Bind[F]): ({type m[x] = StateT[F,B,x]})#m ~> ({type n[x] = StateT[F,A,x]})#n =
@@ -209,7 +210,7 @@ object LensFamilyT extends LensTFunctions with LensTInstances {
 }
 
 trait LensFamilyTFunctions {
-  import IndexedStoreT._, StoreT._
+  import StoreT._
 
   def lensFamilyT[F[+_], A1, A2, B1, B2](r: A1 => F[IndexedStore[B1, B2, A2]]): LensFamilyT[F, A1, A2, B1, B2] = new LensFamilyT[F, A1, A2, B1, B2] {
     def run(a: A1): F[IndexedStore[B1, B2, A2]] = r(a)
@@ -291,7 +292,7 @@ trait LensFamilyTFunctions {
 }
 
 trait LensTFunctions extends LensFamilyTFunctions {
-  import IndexedStoreT._, StoreT._
+  import StoreT._
 
   def lensT[F[+_], A, B](r: A => F[Store[B, A]]): LensT[F, A, B] = new LensT[F, A, B] {
     def run(a: A): F[Store[B, A]] = r(a)

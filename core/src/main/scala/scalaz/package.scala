@@ -188,12 +188,23 @@ package object scalaz {
   }
 
   type @>[A, B] = Lens[A, B]
-
+ 
+  //
+  // Partial Lens type aliases
+  //
   type PLensT[F[+_], A, B] = PLensFamilyT[F, A, A, B, B]
   type PLensFamily[-A1, +A2, +B1, -B2] = PLensFamilyT[Id, A1, A2, B1, B2]
   type PLens[A, B] = PLensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object PLensT extends PLensTFunctions with PLensTInstances {
+    def apply[F[+_], A, B](r: A => F[Option[Store[B, A]]]): PLensT[F, A, B] =
+      plensT(r)
+  }
+  object PLensFamily extends PLensTFunctions with PLensTInstances {
+    def apply[A1, A2, B1, B2](r: A1 => F[Option[IndexedStore[B1, B2, A2]]]): PLensFamily[A1, A2, B1, B2] =
+      plensFamily(r)
+  }
   object PLens extends PLensTFunctions with PLensTInstances {
     def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
