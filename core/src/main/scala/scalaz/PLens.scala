@@ -25,32 +25,36 @@ import Id._
 sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def run(a: A1): F[Option[IndexedStore[B1, B2, A2]]]
 
-  def apply(a: A): F[Option[Store[B, A]]] =
+  def apply(a: A1): F[Option[IndexedStore[B1, B2, A2]]] =
     run(a)
 
-  def runO(a: A): OptionT[F, Store[B, A]] =
+  def runO(a: A1): OptionT[F, IndexedStore[B1, B2, A2]] =
     OptionT(run(a))
 
   import StateT._
   import PLensFamilyT._
   import BijectionT._
 
-  def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Store[B, A]] =
-    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, Store[B, A]](runO(_))
+  def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, IndexedStore[B1, B2, A2]] =
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, IndexedStore[B1, B2, A2]](runO(_))
 
-  def mapC[C](f: Store[B, A] => Store[C, A])(implicit F: Functor[F]): PLensT[F, A, C] =
-    plensT(a => F.map(run(a))(_ map f))
+  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
+    plensFamilyT(a => F.map(run(a))(_ map f))
 
-  def xmapA[X](f: A => X)(g: X => A)(implicit F: Functor[F]): PLensT[F, X, B] =
-    plensO(x => runO(g(x)) map (_ map (f)))
+  def mapCO[C1, C2](f: Option[IndexedStore[B1, B2, A2]] => Option[IndexedStore[C1, C2, A2]])(implicit F: Functor[F]): PLensFamily[F, A1, A2, C1, C2]
+    plensFamilyT(a => F.map(run(a))(f))
 
-  def xmapbA[X](b: Bijection[A, X])(implicit F: Functor[F]): PLensT[F, X, B] =
+  def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): PLensFamilyT[F, X1, X2, B1, B2] =
+    plensFamilyO(x => runO(g(x)) map (_ map (f)))
+    
+
+  def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X])(implicit F: Functor[F]): PLensFamilyT[F, X, X, B1, B2] =
     xmapA(b to _)(b from _)
 
-  def xmapB[X](f: B => X)(g: X => B)(implicit F: Functor[F]): PLensT[F, A, X] =
-    plensO(a => runO(a) map (_.xmap(f)(g)))
+  def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2)(implicit F: Functor[F]): PLensFamilyT[F, A, X] =
+    plensFamilyO(a => runO(a) map (_.xmap(f)(g)))
 
-  def xmapbB[X](b: Bijection[B, X])(implicit F: Functor[F]): PLensT[F, A, X] =
+  def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, X, X] =
     xmapB(b to _)(b from _)
 
   def get(a: A)(implicit F: Functor[F]): F[Option[B]] =

@@ -30,26 +30,17 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   import BijectionT._
   import WriterT._
 
+  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
+    lensFamilyT(a => F.map(run(a))(f))
+
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, X2, B1, B2] =
     lensFamilyT(x => F.map(run(g(x)))(_ map (f)))
-
-  def contramapA1[X1](g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, A2, B1, B2] =
-    xmapA(identity)(g)
-
-  def mapA2[X2](f: A2 => X2)(implicit F: Functor[F]): LensFamilyT[F, A1, X2, B1, B2] =
-    xmapA(f)(identity)
 
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X])(implicit F: Functor[F]): LensFamilyT[F, X, X, B1, B2] =
     xmapA(b to _)(b from _)
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X1, X2] =
     lensFamilyT(a => F.map(run(a))(_.xmap(f)(g)))
-
-  def mapB1[X1](f: B1 => X1)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X1, B2] =
-    xmapB(f)(identity)
-
-  def contramapB2[X2](g: X2 => B2)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, B1, X2] =
-    xmapB(identity)(g)
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X])(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X, X] =
     xmapB(b to _)(b from _)
@@ -267,14 +258,6 @@ trait LensFamilyTFunctions {
   def lazySecondLensFamily[A, B1, B2]: LensFamily[LazyTuple2[A, B1], LazyTuple2[A, B2], B1, B2] =
     lensFamily(z => IndexedStore(x => LazyTuple2(z._1, x), z._2))
 
-  def applyLensFamily[A, B1, B2](k: B => A)(implicit e: Equal[A]): LensFamily[Store[A, B1], Store[A, B2], B1, B2] =
-    lensFamily(q => {
-      lazy val x = q.pos
-      lazy val y = q put x
-      IndexedStore(b =>
-        Store(w => if(e equal (x, w)) b else y, x), y)
-    })
-
   def predicateLensFamily[A1, A2]: LensFamily[Store[A1, Boolean], Store[A2, Boolean], (A1 \/ A1), (A2 \/ A2)] =
     LensFamily(q => IndexedStore(_ match {
       case -\/(l) => Store(_ => true, l)
@@ -418,7 +401,7 @@ trait LensTFunctions extends LensFamilyTFunctions {
 }
 
 trait LensTInstances0 {
-  implicit def lensTArrId[F[+_]](implicit F0: Pointed[F]): ArrId[({type λ[α, β] = LensFamilyT[F, α, β]})#λ] = new LensTArrId[F] {
+  implicit def lensTArrId[F[+_]](implicit F0: Pointed[F]): ArrId[({type λ[α, β] = LensT[F, α, β]})#λ] = new LensTArrId[F] {
     implicit def F = F0
   }
 }
@@ -454,7 +437,8 @@ trait LensTInstances extends LensTInstances0 {
     }
 
   type SetLens[S, K] = SetLens[S, S, K]
-  case class SetLens[-S1, +S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
+  val SetLens: SetLensFamily.type = SetLensFamily
+  case class SetLensFamily[-S1, +S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = LensFamilyT.lensFamilyg[S1, S2, Boolean, Boolean](
       s => b => lens.mod(m => if (b) m + key else m - key, s): Id[S2]
@@ -494,6 +478,7 @@ trait LensTInstances extends LensTInstances0 {
     SetLensFamily[S1, S2, K](lens)
 
   type MapLens[S, K, V] = MapLensFamily[S, S, K, V]
+  val MapLens: MapLensFamily.type = MapLensFamily
   /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */
   case class MapLensFamily[-S1, +S2, K, V](lens: LensFamily[S1, S2, Map[K, V], Map[K, V]]) {
     /** Allows both viewing and setting the value of a member of the map */
@@ -534,7 +519,7 @@ trait LensTInstances extends LensTInstances0 {
     MapLensFamily[S1, S2, K, V](lens)
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
-  case class SeqLikeLens[S1, A, Repr <: SeqLike[A, Repr]](lens: Lens[S, Repr]) {
+  case class SeqLikeLens[S, A, Repr <: SeqLike[A, Repr]](lens: Lens[S, Repr]) {
     def sortWith(lt: (A, A) => Boolean): State[S, Unit] =
       lens %== (_ sortWith lt)
 
@@ -552,7 +537,7 @@ trait LensTInstances extends LensTInstances0 {
     seqLikeLens[S, A, scala.collection.immutable.Seq[A]](lens)
 
   /** Provide an imperative-seeming API for stacks viewed through a lens */
-  case class StackLensFamily[S, A](lens: Lens[S, Stack[A]]) {
+  case class StackLens[S, A](lens: Lens[S, Stack[A]]) {
     def push(elem1: A, elem2: A, elems: A*): State[S, Unit] =
       lens %== (_ push elem1 push elem2 pushAll elems)
 
@@ -591,6 +576,7 @@ trait LensTInstances extends LensTInstances0 {
     QueueLens[S, A](lens)
 
   type ArrayLens[S, A] = ArrayLensFamily[S, S, A]
+  val ArrayLens: ArrayLensFamily.type = ArrayLensFamily
   /** Provide an imperative-seeming API for arrays viewed through a lens */
   case class ArrayLensFamily[-S1, +S2, A](lens: LensFamily[S1, S2, Array[A], Array[A]]) {
     def at(n: Int): (LensFamily[S1, S2, A, A]) =
