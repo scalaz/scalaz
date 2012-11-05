@@ -651,19 +651,19 @@ trait LensTInstances extends LensTInstances0 {
   (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C]) =
     LensFamilyTUnzip[F, S1, S2].unzip3(lens.xmapbB(tuple3B))
 
-  implicit def tuple4LensFamily[F[+_]: Functor, S1, S2, A, B, C, D](lens: LensFamilyT[F, S1, S2, (A, B, C, D)]):
+  implicit def tuple4LensFamily[F[+_]: Functor, S1, S2, A, B, C, D](lens: LensFamilyT[F, S1, S2, (A, B, C, D), (A, B, C, D)]):
   (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D]) =
     LensFamilyTUnzip[F, S1, S2].unzip4(lens.xmapbB(tuple4B))
 
-  implicit def tuple5LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E)]):
+  implicit def tuple5LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E), (A, B, C, D, E)]):
   (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E]) =
     LensFamilyTUnzip[F, S1, S2].unzip5(lens.xmapbB(tuple5B))
 
-  implicit def tuple6LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H)]):
+  implicit def tuple6LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H), (A, B, C, D, E, H)]):
   (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E], LensFamilyT[F, S1, S2, H, H]) =
     LensFamilyTUnzip[F, S1, S2].unzip6(lens.xmapbB(tuple6B))
 
-  implicit def tuple7LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H, I](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H, I)]):
+  implicit def tuple7LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H, I](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H, I), (A, B, C, D, E, H, I)]):
   (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E], LensFamilyT[F, S1, S2, H, H], LensFamilyT[F, S1, S2, I, I]) =
     LensFamilyTUnzip[F, S1, S2].unzip7(lens.xmapbB(tuple7B))
 }
