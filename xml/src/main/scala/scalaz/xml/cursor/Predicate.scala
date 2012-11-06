@@ -67,7 +67,7 @@ object Predicate extends Predicates {
   import StoreT._
 
   def predPredicateL[A1, A2]: LensFamily[Predicate[A1], Predicate[A2], A1 => Boolean, A2 => Boolean] =
-    lensFamily(x => store(x.pred)(b => predicate(b, x.name)))
+    lensFamily(x => indexedStore(x.pred)(b => predicate(b, x.name)))
 
   def namePredicateL[A]: Predicate[A] @> Option[List[Char]] =
     lens(x => store(x.name)(b => predicate(x.pred, b)))
