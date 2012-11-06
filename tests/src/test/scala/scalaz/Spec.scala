@@ -2,6 +2,7 @@ package scalaz
 
 import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder
+import org.specs2.data.NoTuplesToSeq
 import org.specs2.specification.{Example, Fragments, BaseSpecification, SpecificationStructure}
 import org.specs2.main.{ArgumentsShortcuts, ArgumentsArgs}
 import org.scalacheck.{Gen, Arbitrary, Prop, Properties}
@@ -11,7 +12,8 @@ trait Spec
   extends BaseSpecification with FragmentsBuilder with MustExpectations
   with MustThrownExpectations with ShouldThrownExpectations with ScalaCheckMatchers
   with MatchersImplicits with StandardMatchResults
-  with ArgumentsShortcuts with ArgumentsArgs {
+  with ArgumentsShortcuts with ArgumentsArgs
+  with NoTuplesToSeq {
 
   addArguments(fullStackTrace)
 
