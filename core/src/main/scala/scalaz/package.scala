@@ -131,7 +131,7 @@ package object scalaz {
   type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
   type Store[A, +B] = StoreT[Id, A, B]
   // flipped
-  type |-->[A, +B] = Store[B, A]
+  type |-->[+A, B] = Store[B, A]
   object StoreT extends StoreTFunctions with StoreTInstances {
     def apply[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
       storeT(r)
