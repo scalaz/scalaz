@@ -23,8 +23,8 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def bimap[X, Y](f: I => X, g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
     indexedStoreT((F.map(set)(g compose _), f(pos)))
 
-  def bmap[X](b: Bijection[I, X])(implicit F: Functor[F], ev: A <:< I): StoreT[F, X, B] =
-    xmap(ev compose (b to _))(b from _)
+  def bmap[X](b: Bijection[I, X])(implicit F: Functor[F], ev: I <:< A): StoreT[F, X, B] =
+    xmap(b to _)(b from _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
@@ -38,17 +38,17 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def pos: I =
     run._2
 
-  def copoint(implicit F: Copointed[F], ev: A <:< I): B =
+  def copoint(implicit F: Copointed[F], ev: I <:< A): B =
     F.copoint(run._1)(run._2)
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): IndexedStoreT[F, I, A, C] =
     indexedStoreT(mapRunT(k => f compose k))
 
   def duplicate[J](implicit F: Comonad[F]): IndexedStoreT[F, I, J, IndexedStoreT[F, J, A, B]] =
-   indexedStoreT((F.cobind(run._1)(ff => (a: J) => indexedStoreT[F, J, A, B]((ff, a))), pos))
+    indexedStoreT((F.cobind(run._1)(ff => (a: J) => indexedStoreT((ff, a))), pos))
 
-  def cobind[K, C](f: IndexedStoreT[F, A, K, B] => C)(implicit c: Cobind[F]): IndexedStoreT[F, I, K, C] =
-    indexedStoreT((Cobind[F].cobind(run._1)(ff => (a: I) => f(indexedStoreT[F, I, K, B]((ff, a)))), pos))
+  def cobind[K, C](f: IndexedStoreT[F, K, A, B] => C)(implicit F: Cobind[F]): IndexedStoreT[F, I, K, C] =
+    indexedStoreT((F.cobind(run._1)(ff => (a: K) => f(indexedStoreT((ff, a)))), pos))
 
   /** Two disjoint lenses can be paired */
   def product[J, C, D](that: IndexedStoreT[F, J, C, D])(implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] =

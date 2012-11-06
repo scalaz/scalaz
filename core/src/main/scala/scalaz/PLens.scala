@@ -290,26 +290,26 @@ trait PLensFamilyTFunctions extends PLensTInstances {
     plensFamilyp(_ => None)
 
   def somePLensFamily[A1, A2]: PLensFamily[Option[A1], Option[A2], A1, A2] =
-    plensFamily(_ map (z => Store(Some(_), z)))
+    plensFamily(_ map (z => IndexedStore(Some(_), z)))
 
   def leftPLensFamily[A1, A2, B]: PLensFamily[A1 \/ B, A2 \/ B, A1, A2] =
     plensFamily {
-      case -\/(a) => Some(Store(-\/(_), a))
+      case -\/(a) => Some(IndexedStore(-\/(_), a))
       case \/-(_) => None
     }
 
   def rightPLensFamily[A, B1, B2]: PLensFamily[A \/ B1, A \/ B2, B1, B2] =
     plensFamily {
-      case \/-(b) => Some(Store(\/-(_), b))
+      case \/-(b) => Some(IndexedStore(\/-(_), b))
       case -\/(_) => None
     }
 
   def tuple2PLensFamily[F[+_]: Functor, S1, S2, A, B](lens: PLensFamilyT[F, S1, S2, (A, B), (A, B)]):
-  (PLensFamilyT[F, S1, S2, A], PLensFamilyT[F, S1, S2, B]) =
+  (PLensFamilyT[F, S1, S2, A, A], PLensFamilyT[F, S1, S2, B, B]) =
     PLensFamilyTUnzip[F, S1, S2].unzip(lens)
 
   def tuple3PLensFamily[F[+_]: Functor, S1, S2, A, B, C](lens: PLensFamilyT[F, S1, S2, (A, B, C), (A, B, C)]):
-  (PLensFamilyT[F, S1, S2, A], PLensFamilyT[F, S1, S2, B], PLensFamilyT[F, S1, S2, C]) =
+  (PLensFamilyT[F, S1, S2, A, A], PLensFamilyT[F, S1, S2, B, B], PLensFamilyT[F, S1, S2, C, C]) =
     PLensFamilyTUnzip[F, S1, S2].unzip3(lens.xmapbB(tuple3B))
 
   def tuple4PLensFamily[F[+_]: Functor, S1, S2, A, B, C, D](lens: PLensFamilyT[F, S1, S2, (A, B, C, D), (A, B, C, D)]):
@@ -328,7 +328,7 @@ trait PLensFamilyTFunctions extends PLensTInstances {
   (PLensFamilyT[F, S1, S2, A, A], PLensFamilyT[F, S1, S2, B, B], PLensFamilyT[F, S1, S2, C, C], PLensFamilyT[F, S1, S2, D, D], PLensFamilyT[F, S1, S2, E, E], PLensFamilyT[F, S1, S2, H, H], PLensFamilyT[F, S1, S2, I, I]) =
     PLensFamilyTUnzip[F, S1, S2].unzip7(lens.xmapbB(tuple7B))
 
-  def eitherLensFamily[S1, S2, A1, A2, B1, B2](l: PLensFamily[S1, S2, A1 \/ B1, A2 \/ B2]): (PLensFamily[S1, S2, A1, A2], PLensFamily[S1, S2, B1, B2]) =
+  def eitherLensFamily[S1, S2, A, B](l: PLensFamily[S1, S2, A \/ B, A \/ B]): (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B]) =
     (
     leftPLensFamily compose l
     , rightPLensFamily compose l
@@ -426,27 +426,27 @@ trait PLensTFunctions extends PLensFamilyTFunctions with PLensTInstances {
 
   def tuple2PLens[F[+_]: Functor, S, A, B](lens: PLensT[F, S, (A, B)]):
   (PLensT[F, S, A], PLensT[F, S, B]) =
-    PLensTUnzip[F, S].unzip(lens)
+    PLensFamilyTUnzip[F, S, S].unzip(lens)
 
   def tuple3PLens[F[+_]: Functor, S, A, B, C](lens: PLensT[F, S, (A, B, C)]):
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C]) =
-    PLensTUnzip[F, S].unzip3(lens.xmapbB(tuple3B))
+    PLensFamilyTUnzip[F, S, S].unzip3(lens.xmapbB(tuple3B))
 
   def tuple4PLens[F[+_]: Functor, S, A, B, C, D](lens: PLensT[F, S, (A, B, C, D)]):
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C], PLensT[F, S, D]) =
-    PLensTUnzip[F, S].unzip4(lens.xmapbB(tuple4B))
+    PLensFamilyTUnzip[F, S, S].unzip4(lens.xmapbB(tuple4B))
 
   def tuple5PLens[F[+_]: Functor, S, A, B, C, D, E](lens: PLensT[F, S, (A, B, C, D, E)]):
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C], PLensT[F, S, D], PLensT[F, S, E]) =
-    PLensTUnzip[F, S].unzip5(lens.xmapbB(tuple5B))
+    PLensFamilyTUnzip[F, S, S].unzip5(lens.xmapbB(tuple5B))
 
   def tuple6PLens[F[+_]: Functor, S, A, B, C, D, E, H](lens: PLensT[F, S, (A, B, C, D, E, H)]):
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C], PLensT[F, S, D], PLensT[F, S, E], PLensT[F, S, H]) =
-    PLensTUnzip[F, S].unzip6(lens.xmapbB(tuple6B))
+    PLensFamilyTUnzip[F, S, S].unzip6(lens.xmapbB(tuple6B))
 
   def tuple7PLens[F[+_]: Functor, S, A, B, C, D, E, H, I](lens: PLensT[F, S, (A, B, C, D, E, H, I)]):
   (PLensT[F, S, A], PLensT[F, S, B], PLensT[F, S, C], PLensT[F, S, D], PLensT[F, S, E], PLensT[F, S, H], PLensT[F, S, I]) =
-    PLensTUnzip[F, S].unzip7(lens.xmapbB(tuple7B))
+    PLensFamilyTUnzip[F, S, S].unzip7(lens.xmapbB(tuple7B))
 
   def eitherLens[S, A, B](l: S @?> (A \/ B)): (S @?> A, S @?> B) =
     (
@@ -651,17 +651,17 @@ trait PLensTInstances extends PLensTInstance0 {
   implicit def PLensFamilyState[F[+_], A, B](plens: PLensFamilyT[F, A, _, B, _])(implicit F: Functor[F]): PStateT[F, A, B] =
     plens.st
 
-  implicit def PLensTFamilyUnzip[F[+_], S, R](implicit F: Functor[F]): Unzip[({type λ[α] = PLensFamilyT[F, S, R, α, α]})#λ] =
+  implicit def PLensFamilyTUnzip[F[+_], S, R](implicit F: Functor[F]): Unzip[({type λ[α] = PLensFamilyT[F, S, R, α, α]})#λ] =
     new Unzip[({type λ[α] = PLensFamilyT[F, S, R, α, α]})#λ] {
       def unzip[A, B](a: PLensFamilyT[F, S, R, (A, B), (A, B)]) =
         (
-          PLensT(x => F.map(a run x)(_ map (c => {
+          PLensFamilyT(x => F.map(a run x)(_ map (c => {
             val (p, q) = c.pos
-            Store(a => c.put((a, q)): R, p)
+            IndexedStore(a => c.put((a, q)): R, p)
           })))
-          , PLensT(x => F.map(a run x)(_ map (c => {
+          , PLensFamilyT(x => F.map(a run x)(_ map (c => {
           val (p, q) = c.pos
-          Store(a => c.put((p, a)): R, q)
+          IndexedStore(a => c.put((p, a)): R, q)
         })))
           )
     }

@@ -277,7 +277,7 @@ trait LensFamilyTFunctions {
       case \/-((a, c)) => (a, \/-(c))
     }))
 
-  def distributeLens[A1, A2, B1, B2, C1, C2]: LensFamily[(A1, B1 \/ C1), (A2, B2 \/ C2), ((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2))] =
+  def distributeLensFamily[A1, A2, B1, B2, C1, C2]: LensFamily[(A1, B1 \/ C1), (A2, B2 \/ C2), ((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2))] =
     lensFamily {
       case (a, e) => IndexedStore({
         case -\/((aa, bb)) => (aa, -\/(bb))
