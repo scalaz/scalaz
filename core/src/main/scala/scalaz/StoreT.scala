@@ -38,6 +38,21 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def pos: I =
     run._2
 
+  def peek(a: A)(implicit F: Copointed[F]): B =
+    F.copoint(set)(a)
+
+  def peeks(f: I => A)(implicit F: Copointed[F]): B =
+    F.copoint(set)(f(pos))
+
+  def seek[J](j: J): IndexedStoreT[F, J, A, B] =
+    indexedStoreT((set, j))
+
+  def seeks[J](f: I => J): IndexedStoreT[F, J, A, B] =
+    indexedStoreT((set, f(pos)))
+
+  def experiment[G[+_]](f: I => G[A])(implicit F: Copointed[F], G: Functor[G]): G[B] =
+    G.map(f(pos))(F.copoint(set))
+
   def copoint(implicit F: Copointed[F], ev: I <:< A): B =
     F.copoint(run._1)(run._2)
 
@@ -97,18 +112,23 @@ trait IndexedStoreTInstances extends IndexedStoreTInstances0 {
   implicit def indexedStoreTFunctor_A[F[+_], I, A](implicit F0: Functor[F]) =
     indexedStoreTBifunctor[F, A].rightFunctor[I]
 }
-trait StoreTInstances2 extends IndexedStoreTInstances {
+trait StoreTInstances3 extends IndexedStoreTInstances {
   implicit def storeTCopointed[F[+_], A](implicit F0: Copointed[F]) = new StoreTCopointed[F, A] {
     implicit def F: Copointed[F] = F0
   }
 }
-trait StoreTInstances1 extends StoreTInstances2 {
+trait StoreTInstances2 extends StoreTInstances3 {
   implicit def storeTCobind[F[+_], A](implicit F0: Cobind[F]) = new StoreTCobind[F, A] {
     implicit def F: Cobind[F] = F0
   }
 }
-trait StoreTInstances0 extends StoreTInstances1 {
+trait StoreTInstances1 extends StoreTInstances2 {
   implicit def storeTComonad[F[+_], A](implicit F0: Comonad[F]) = new StoreTComonad[F, A] {
+    implicit def F: Comonad[F] = F0
+  }
+}
+trait StoreTInstances0 extends StoreTInstances1 {
+  implicit def storeTComonadStore[F[+_], A](implicit F0: Comonad[F]) = new StoreTComonadStore[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
@@ -136,6 +156,26 @@ trait StoreTCobind[F[+_], A0] extends Cobind[({type λ[+α]=StoreT[F, A0, α]})#
 trait StoreTComonad[F[+_], A0] extends Comonad[({type λ[+α]=StoreT[F, A0, α]})#λ] with StoreTCobind[F, A0] with StoreTCopointed[F, A0]{
   implicit def F: Comonad[F]
   def cojoin[A](a: StoreT[F, A0, A]) = a.duplicate
+}
+
+trait StoreTComonadStore[F[+_], S] extends ComonadStore[({type λ[σ, +α]=StoreT[F, σ, α]})#λ, S] with StoreTComonad[F, S] {
+  def pos[A](w: StoreT[F, S, A]): S =
+    w.pos
+
+  def peek[A](s: S, w: StoreT[F, S, A]): A =
+    w peek s
+
+  override def peeks[A](s: S => S, w: StoreT[F, S, A]): A =
+    w peeks s
+
+  override def seek[A](s: S, w: StoreT[F, S, A]): StoreT[F, S, A] =
+    w seek s
+
+  override def seeks[A](s: S => S, w: StoreT[F, S, A]): StoreT[F, S, A] =
+    w seeks s
+
+  override def experiment[G[+_], A](s: S => G[S], w: StoreT[F, S, A])(implicit FG: Functor[G]): G[A] =
+    w experiment s
 }
 
 trait StoreTCohoist[S] extends Cohoist[({type f[g[+_], +a] = StoreT[g, S, a]})#f] {
