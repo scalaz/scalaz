@@ -137,7 +137,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def =>=[A >: A2 <: A1](f: B1 => B2)(implicit F: Functor[F]): A => F[A] =
     mod(f, _)
 
-  def st(implicit F: Functor[F]): PStateT[F, A1, B1] =
+  def st[A <: A1](implicit F: Functor[F]): PStateT[F, A, B1] =
     StateT(s => F.map(get(s))((s, _)))
 
   def %=[A >: A2 <: A1, B >: B1 <: B2](f: B1 => B)(implicit F: Functor[F]): PStateT[F, A, B] =
@@ -201,7 +201,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: PLensFamilyT[F, B1, B2, C1, C2])(implicit FF: Monad[F]): PLensFamilyT[F, A1, A2, C1, C2] = andThen(that)
 
   /** Two partial lenses that view a value of the same type can be joined */
-  def sum[C1, C2](that: => PLensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] =
+  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] =
     plensFamilyT{
       case -\/(a) =>
         F.map(run(a))(_ map (_ map (-\/(_))))
@@ -210,7 +210,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2](that: => PLensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
+  def |||[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
 
   /** Two disjoint partial lenses can be paired */
   def product[C1, C2, D1, D2](that: PLensFamilyT[F, C1, C2, D1, D2])(implicit FF: Apply[F]): PLensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
@@ -344,7 +344,7 @@ trait PLensFamilyTFunctions extends PLensTInstances {
   def factorPLensFamily[A1, A2, B1, B2, C1, C2]: PLensFamily[((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2)), (A1, B1 \/ C1), (A2, B2 \/ C2)] =
     ~LensFamilyT.factorLensFamily
 
-  def distributePLens[A1, A2, B1, B2, C1, C2]: PLensFamily[(A1, B1 \/ C1), (A2, B2 \/ C2), ((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2))] =
+  def distributePLensFamily[A1, A2, B1, B2, C1, C2]: PLensFamily[(A1, B1 \/ C1), (A2, B2 \/ C2), ((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2))] =
     ~LensFamilyT.distributeLensFamily
 }
 

@@ -212,7 +212,7 @@ package object scalaz {
 
   type @?>[A, B] = PLens[A, B]
 
-  type PStateT[F[+_], A, B] = StateT[F, A, Option[B]]
+  type PStateT[F[+_], A, +B] = StateT[F, A, Option[B]]
 
-  type PState[A, B] = StateT[Id, A, Option[B]]
+  type PState[A, +B] = StateT[Id, A, Option[B]]
 }

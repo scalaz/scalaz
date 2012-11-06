@@ -49,7 +49,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def set(a: A1, b: B2)(implicit F: Functor[F]): F[A2] =
     F.map(run(a))(_.put(b))
 
-  def st(implicit F: Functor[F]): StateT[F, A1, B1] =
+  def st[A <: A1](implicit F: Functor[F]): StateT[F, A, B1] =
     StateT(s => F.map(get(s))((s, _)))
 
   /** Modify the value viewed through the lens */
@@ -63,10 +63,10 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     mod(f, _)
 
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
-  def modf[X[_]](f: B1 => X[B2], a: A1)(implicit F: Functor[F], XF: Functor[X]): F[X[A2]] =
+  def modf[X[+_]](f: B1 => X[B2], a: A1)(implicit F: Functor[F], XF: Functor[X]): F[X[A2]] =
     F.map(run(a))(c => XF.map(f(c.pos))(c put _))
 
-  def =>>=[X[_]](f: B1 => X[B2])(implicit F: Functor[F], XF: Functor[X]): A1 => F[X[A2]] =
+  def =>>=[X[+_]](f: B1 => X[B2])(implicit F: Functor[F], XF: Functor[X]): A1 => F[X[A2]] =
     modf(f, _)
 
   /** Modify the value viewed through the lens, returning a `C` on the side.  */
@@ -157,7 +157,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: LensFamilyT[F, B1, B2, C1, C2])(implicit F: Bind[F]): LensFamilyT[F, A1, A2, C1, C2] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C1, C2](that: => LensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] =
+  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] =
     lensFamilyT{
       case -\/(a) =>
         F.map(run(a))(_ map (-\/(_)))
@@ -166,7 +166,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2](that: => LensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
+  def |||[C1, C2, A1m <: A1, A2m >: A2, B1m >: B1, B2m <: B2](that: => LensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C1, C2, D1, D2](that: LensFamilyT[F, C1, C2, D1, D2])(implicit F: Apply[F]): LensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
