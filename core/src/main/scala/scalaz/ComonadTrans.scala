@@ -11,3 +11,7 @@ object ComonadTrans {
 trait Cohoist[F[_[_], _]] extends ComonadTrans[F] {
   def cohoist[M[_], N[_]: Comonad](f: M ~> N): ({type f[x] = F[M, x]})#f ~> ({type f[x] = F[N, x]})#f
 }
+
+object Cohoist {
+  def apply[F[_[_], _]](implicit F: Cohoist[F]): Cohoist[F] = F
+}
