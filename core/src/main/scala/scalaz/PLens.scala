@@ -40,7 +40,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
     plensFamilyT(a => F.map(run(a))(_ map f))
 
-  def mapCO[C1, C2](f: Option[IndexedStore[B1, B2, A2]] => Option[IndexedStore[C1, C2, A2]])(implicit F: Functor[F]): PLensFamily[F, A1, A2, C1, C2]
+  def mapCO[C1, C2](f: Option[IndexedStore[B1, B2, A2]] => Option[IndexedStore[C1, C2, A2]])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
     plensFamilyT(a => F.map(run(a))(f))
 
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): PLensFamilyT[F, X1, X2, B1, B2] =
@@ -63,7 +63,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     OptionT(get(a))
 
   def getK(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, B1] =
-    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, B](getO(_))
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, B1](getO(_))
 
   /** If the Partial Lens is null, then return the given default value. */
   def getOr[B >: B1](a: A1, b: => B)(implicit F: Functor[F]): F[B] =
@@ -79,7 +79,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     OptionT(set(a, b))
 
   def setK(a: A1)(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, B2, A2] =
-    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, B, A](setO(a, _))
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, B2, A2](setO(a, _))
 
   def setOr[A >: A2](a: A1, b: B2, d: => A)(implicit F: Functor[F]): F[A] =
     F.map(set(a, b))(_ getOrElse d)
@@ -94,16 +94,16 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     OptionT(trySet(a))
 
   def trySetK(implicit F: Functor[F]): Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, B2 => A2] =
-    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A, B => A](trySetO(_))
+    Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, B2 => A2](trySetO(_))
 
   def trySetOr[A >: A2, B <: B2](a: A1, d: => B => A)(implicit F: Functor[F]): F[B => A] =
     F.map(trySet(a))(_ getOrElse d)
 
-  def trySetOrZ[A >: A2, B <: B2](a: A)(implicit M: Monoid[B => A], F: Functor[F]): F[B => A] =
+  def trySetOrZ[A >: A2, B <: B2](a: A1)(implicit M: Monoid[B => A], F: Functor[F]): F[B => A] =
     trySetOr(a, M.zero)
 
   /** If the Partial Lens is null, then return the target object, otherwise run the function on its projection. */
-  def as[A >: A1](f: B1 => A, a: A1)(implicit F: Functor[F]): F[A] =
+  def as[A <: A1](f: B1 => A, a: A)(implicit F: Functor[F]): F[A] =
     F.map(get(a))(_ match {
       case None => a
       case Some(w) => f(w)
@@ -121,17 +121,29 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def forall(p: B1 => Boolean, a: A1)(implicit F: Functor[F]): F[Boolean] =
     F.map(get(a))(_ forall p)
 
+  def modg(f: B1 => B2, a: A1)(implicit F: Functor[F]): F[Option[A2]] =
+    F.map(run(a))(_.map(_ puts f))
+
+  def =?>=(f: B1 => B2)(implicit F: Functor[F]): A1 => F[Option[A2]] =
+    modg(f, _)
+
+  def modgO(f: B1 => B2, a: A1)(implicit F: Functor[F]): OptionT[F, A2] =
+    OptionT(modg(f, a))
+
+  def =??>=(f: B1 => B2)(implicit F: Functor[F]): A1 => OptionT[F, A2] =
+    modgO(f, _)
+
   /** Modify the potential value viewed through the partial lens */
-  def mod(f: B1 => B2, a: A1)(implicit F: Functor[F]): F[A2] =
+  def mod[A >: A2 <: A1](f: B1 => B2, a: A)(implicit F: Functor[F]): F[A] =
     F.map(run(a)){
-      case None => a
-      case Some(w) => w puts f
+      case None => a: A
+      case Some(w) => (w puts f): A
     }
 
-  def =>=(f: B1 => B2)(implicit F: Functor[F]): A1 => F[A2] =
+  def =>=[A >: A2 <: A1](f: B1 => B2)(implicit F: Functor[F]): A => F[A] =
     mod(f, _)
 
-  def st(implicit F: Functor[F]): PStateT[F, A, B] =
+  def st(implicit F: Functor[F]): PStateT[F, A1, B1] =
     StateT(s => F.map(get(s))((s, _)))
 
   def %=[A >: A2 <: A1, B >: B1 <: B2](f: B1 => B)(implicit F: Functor[F]): PStateT[F, A, B] =
@@ -159,7 +171,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
       }
     }))
 
-  def >-[C, A >: A2 <: A1](f: B1 => C)(implicit F: Functor[F]): PStateT[F, A, C] =x
+  def >-[C, A >: A2 <: A1](f: B1 => C)(implicit F: Functor[F]): PStateT[F, A, C] =
     StateT(a => F.map(get(a))(x => (a, x map f)))
 
   def >>-[C, A >: A2 <: A1](f: B1 => StateT[F, A, C])(implicit F: Monad[F]): PStateT[F, A, C] =
@@ -195,7 +207,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: PLensFamilyT[F, B1, B2, C1, C2])(implicit FF: Monad[F]): PLensFamilyT[F, A1, A2, C1, C2] = andThen(that)
 
   /** Two partial lenses that view a value of the same type can be joined */
-  def sum[C1, C2](that: => PLensT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] =
+  def sum[C1, C2](that: => PLensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] =
     plensFamilyT{
       case -\/(a) =>
         F.map(run(a))(_ map (_ map (-\/(_))))
@@ -204,7 +216,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2](that: => PLensT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
+  def |||[C1, C2](that: => PLensFamilyT[F, C1, C2, B1, B2])(implicit F: Functor[F]): PLensFamilyT[F, A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
 
   /** Two disjoint partial lenses can be paired */
   def product[C1, C2, D1, D2](that: PLensFamilyT[F, C1, C2, D1, D2])(implicit FF: Apply[F]): PLensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
@@ -217,12 +229,13 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     }
 
   /** alias for `product` */
-  def ***[C, D](that: PLensT[F, C, D])(implicit FF: Apply[F]): PLensT[F, (A, C), (B, D)] = product(that)
+  def ***[C1, C2, D1, D2](that: PLensFamilyT[F, C1, C2, D1, D2])(implicit FF: Apply[F]): PLensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] = product(that)
 
 }
 
 object PLensFamilyT extends PLensTFunctions with PLensTInstances {
-  def apply[F[+_], A1, A2, B1, B2]()
+  def apply[F[+_], A1, A2, B1, B2](r: A1 => F[Option[IndexedStore[B1, B2, A2]]]): PLensFamilyT[F, A1, A2, B1, B2] =
+    plensFamilyT(r)
 }
 
 trait PLensFamilyTFunctions extends PLensTInstances {
@@ -231,14 +244,14 @@ trait PLensFamilyTFunctions extends PLensTInstances {
   import BijectionT._
 
   def plensFamilyT[F[+_], A1, A2, B1, B2](r: A1 => F[Option[IndexedStore[B1, B2, A2]]]): PLensFamilyT[F, A1, A2, B1, B2] = new PLensFamilyT[F, A1, A2, B1, B2] {
-    def run(a: A): F[Option[Store[B, A]]] = r(a)
+    def run(a: A1): F[Option[IndexedStore[B1, B2, A2]]] = r(a)
   }
 
   def plensFamilyO[F[+_], A1, A2, B1, B2](r: A1 => OptionT[F, IndexedStore[B1, B2, A2]]): PLensFamilyT[F, A1, A2, B1, B2] =
     plensFamilyT(a => r(a).run)
 
   def plensFamily[A1, A2, B1, B2](r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
-    plensFamilyT[Id, A, B](r)
+    plensFamilyT[Id, A1, A2, B1, B2](r)
 
   def plensFamilyf[A1, A2, B1, B2](r: PartialFunction[A1, IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
     plensFamily(r.lift)
@@ -249,31 +262,31 @@ trait PLensFamilyTFunctions extends PLensTInstances {
   def plensFamilypf[F[+_], A1, A2, B1, B2](r: PartialFunction[A1, IndexedStore[B1, B2, A2]])(implicit PF: Pointed[F]): PLensFamilyT[F, A1, A2, B1, B2] =
     plensFamilyp(r.lift)
 
-  def plensFamilygT[F[+_], A1, A2, B1, B2](set: A => F[Option[B => A]], get: A => F[Option[B]])(implicit M: Bind[F]): PLensFamilyT[F, A1, A2, B1, B2] =
+  def plensFamilygT[F[+_], A1, A2, B1, B2](set: A1 => F[Option[B2 => A2]], get: A1 => F[Option[B1]])(implicit M: Bind[F]): PLensFamilyT[F, A1, A2, B1, B2] =
     plensFamilyT(a => M.apply2(set(a), get(a))((q, r) => for {
       w <- q
       x <- r
     } yield IndexedStore(w, x)))
 
   def plensFamilygO[F[+_], A1, A2, B1, B2](set: A1 => OptionT[F, B2 => A2], get: A1 => OptionT[F, B1])(implicit M: Bind[F]): PLensFamilyT[F, A1, A2, B1, B2] =
-    plensFamilygT[F, A, B](a => set(a).run, a => get(a).run)
+    plensFamilygT[F, A1, A2, B1, B2](a => set(a).run, a => get(a).run)
 
   def plensFamilyg[A1, A2, B1, B2](set: A1 => Option[B2 => A2], get: A1 => Option[B1]): PLensFamily[A1, A2, B1, B2] =
-    plensFamilygT[Id, A, B](set, get)
+    plensFamilygT[Id, A1, A2, B1, B2](set, get)
 
   def plensFamilygf[A1, A2, B1, B2](set: PartialFunction[A1, B2 => A2], get: PartialFunction[A1, B1]): PLensFamily[A1, A2, B1, B2] =
     plensFamilyg(set.lift, get.lift)
 
   /** The identity partial lens family for a given pair of objects */
   def plensFamilyId[F[+_], A1, A2](implicit FF: Pointed[F]): PLensFamilyT[F, A1, A2, A1, A2] =
-    LensFamilyT.lensFamilyId[F, A].partial
+    LensFamilyT.lensFamilyId[F, A1, A2].partial
 
   /** A partial lens family that discards the choice of right or left from disjunction */
   def codiagPLensFamily[F[+_]: Pointed, A1, A2]: PLensFamilyT[F, A1 \/ A1, A2 \/ A2, A1, A2] =
     plensFamilyId[F, A1, A2] ||| plensFamilyId[F, A1, A2]
 
   /** The always-null partial lens family */
-  def nilFamily[F[+_]: Pointed, A1, A2, B1, B2]: PLensT[F, A1, A2, B1, B2] =
+  def nilFamily[F[+_]: Pointed, A1, A2, B1, B2]: PLensFamilyT[F, A1, A2, B1, B2] =
     plensFamilyp(_ => None)
 
   def somePLensFamily[A1, A2]: PLensFamily[Option[A1], Option[A2], A1, A2] =

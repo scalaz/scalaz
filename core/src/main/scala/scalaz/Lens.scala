@@ -131,7 +131,7 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
 
   /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
   def ->>-[C, A >: A2 <: A1](f: => StateT[F, A, C])(implicit F: Bind[F], ev: B1 <:< B2): StateT[F, A, C] =
-    xmapB(ev)(identity).>>-(_ => f)
+    xmapB(ev)(identity[B2]).>>-(_ => f)
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
   def liftsNT[A >: A2 <: A1, B >: B1 <: B2](implicit F: Bind[F]): ({type m[x] = StateT[F,B,x]})#m ~> ({type n[x] = StateT[F,A,x]})#n =
@@ -437,7 +437,7 @@ trait LensTInstances extends LensTInstances0 {
         )
     }
 
-  type SetLens[S, K] = SetLens[S, S, K]
+  type SetLens[S, K] = SetLensFamily[S, S, K]
   val SetLens: SetLensFamily.type = SetLensFamily
   case class SetLensFamily[-S1, +S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
@@ -487,12 +487,12 @@ trait LensTInstances extends LensTInstances0 {
       s => opt => lens.mod((m: Map[K, V]) => (opt match {
         case Some(v) => m + (k -> v)
         case None    => m - k
-      }): Map[K, V], s): Id[S]
+      }): Map[K, V], s): Id[S2]
       , s => lens.get(s).get(k))
 
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k: K): LensFamily[S1, S2, V, V] =
-      lensFamilyg[S, V](s => v => lens.mod(_ + (k -> v), s): Id[S], lens.get(_) apply k)
+      lensFamilyg[S1, S2, V, V](s => v => lens.mod(_ + (k -> v), s): Id[S2], lens.get(_) apply k)
 
     def +=[S >: S2 <: S1](elem1: (K, V), elem2: (K, V), elems: (K, V)*): State[S, Map[K, V]] =
       lens %= (_ + elem1 + elem2 ++ elems)
@@ -516,7 +516,7 @@ trait LensTInstances extends LensTInstances0 {
       lens %= (_ -- xs)
   }
 
-  implicit def mapLensFamily[S1, S2, K, V](lens: LensFamily[S1, S2, Map[K, V], Map[K, v]]) =
+  implicit def mapLensFamily[S1, S2, K, V](lens: LensFamily[S1, S2, Map[K, V], Map[K, V]]) =
     MapLensFamily[S1, S2, K, V](lens)
 
   /** Provide the appearance of a mutable-like API for sorting sequences through a lens */
@@ -549,7 +549,7 @@ trait LensTInstances extends LensTInstances0 {
       lens %== (_ pop)
 
     def pop2: State[S, A] =
-      lens %%= State(_.pop2.swap)
+      lens %%= State[Stack[A], A](_.pop2.swap)
 
     def top: State[S, A] =
       lens >- (_.top)
@@ -567,7 +567,7 @@ trait LensTInstances extends LensTInstances0 {
       lens %== (_ enqueue elem)
 
     def dequeue: State[S, A] =
-      lens %%= (State(_.dequeue.swap))
+      lens %%= State[Queue[A], A](_.dequeue.swap)
 
     def length: State[S, Int] =
       lens >- (_.length)
@@ -594,7 +594,7 @@ trait LensTInstances extends LensTInstances0 {
       lens >- (_.length)
   }
 
-  implicit def arrayLensFamily[S1, S2, A](lens: LensFamily[S1, S3, Array[A], Array[A]]) =
+  implicit def arrayLensFamily[S1, S2, A](lens: LensFamily[S1, S2, Array[A], Array[A]]) =
     ArrayLensFamily[S1, S2, A](lens)
 
   /** Allow the illusion of imperative updates to numbers viewed through a lens */

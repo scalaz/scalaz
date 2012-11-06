@@ -12,19 +12,19 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   import BijectionT._
 
   def xmap[X1, X2](f: I => X1)(g: X2 => A)(implicit F: Functor[F]): IndexedStoreT[F, X1, X2, B] =
-    indexedStoreT(F.map(set)(_ compose g), f(pos))
+    indexedStoreT((F.map(set)(_ compose g), f(pos)))
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
-    indexedStoreT(set, f(pos))
+    indexedStoreT((set, f(pos)))
 
   def contramap[X](g: X => A)(implicit F: Functor[F]) =
-    indexedStoreT(F.map(set)(_ compose g), pos)
+    indexedStoreT((F.map(set)(_ compose g), pos))
 
-  def bimap[X, Y](f: I => X, g: B => Y)(implicit F: Functor[F]): IndexedStore[X, A, Y] =
-    indexedStoreT(F.map(set)((_ compose g) compose (f compose _)), pos)
+  def bimap[X, Y](f: I => X, g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
+    indexedStoreT((F.map(set)(g compose _), f(pos)))
 
   def bmap[X](b: Bijection[I, X])(implicit F: Functor[F], ev: A <:< I): StoreT[F, X, B] =
-    xmap(b to _)(b from _)
+    xmap(ev compose (b to _))(b from _)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
@@ -62,7 +62,8 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
 }
 
 object IndexedStoreT extends StoreTFunctions with StoreTInstances {
-  def apply[F[+_], I, A, B]()
+  def apply[F[+_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] =
+    indexedStoreT(r)
 }
 
 trait IndexedStoreTFunctions {
@@ -83,38 +84,41 @@ trait StoreTFunctions extends IndexedStoreTFunctions {
   def store[A, B](a: A)(f: A => B): Store[A, B] =
     storeT[Id, A, B](f -> a)
 }
-
-trait IndexedStoreTInstances {
+trait IndexedStoreTInstances1 {
   implicit def indexedStoreTBifunctor[F[+_], A](implicit F0: Functor[F]) = new IndexedStoreTBifunctor[F, A] {
     implicit def F: Functor[F] = F0
   }
-
-  implicit def indexedStoreTFunctorI[F[+_], A, B](implicit F0: Functor[F]) =
+}
+trait IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
+  implicit def indexedStoreTFunctor_I[F[+_], A, B](implicit F0: Functor[F]) =
     indexedStoreTBifunctor[F, A].leftFunctor[B]
-
-  implicit def indexedStoreTFunctor[F[+_], I, A](implicit F0: Functor[F]) =
+}
+trait IndexedStoreTInstances extends IndexedStoreTInstances0 {
+  implicit def indexedStoreTFunctor_A[F[+_], I, A](implicit F0: Functor[F]) =
     indexedStoreTBifunctor[F, A].rightFunctor[I]
 }
-trait StoreTInstances1 extends IndexedStoreTInstances {
+trait StoreTInstances2 extends IndexedStoreTInstances {
   implicit def storeTCopointed[F[+_], A](implicit F0: Copointed[F]) = new StoreTCopointed[F, A] {
     implicit def F: Copointed[F] = F0
   }
 }
-trait StoreTInstances0 extends StoreTInstances1 {
+trait StoreTInstances1 extends StoreTInstances2 {
   implicit def storeTCobind[F[+_], A](implicit F0: Cobind[F]) = new StoreTCobind[F, A] {
     implicit def F: Cobind[F] = F0
   }
 }
-
-trait StoreTInstances extends StoreTInstances0 {
+trait StoreTInstances0 extends StoreTInstances1 {
   implicit def storeTComonad[F[+_], A](implicit F0: Comonad[F]) = new StoreTComonad[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
+trait StoreTInstances extends StoreTInstances0 {
+  implicit def storeTCohoist[S]: Cohoist[({type f[g[+_], +a] = StoreT[g, S, a]})#f] = new StoreTCohoist[S] {}
+}
 
 trait IndexedStoreTBifunctor[F[+_], A0] extends Bifunctor[({type λ[+α, +β]=IndexedStoreT[F, α, A0, β]})#λ]{
   implicit def F: Functor[F]
-  override def bimap[A, B, C, D](fab: StoreT[F, A, B])(f: A => C, g: B => D): F[C, D] = fa bimap (f, g)
+  override def bimap[A, B, C, D](fab: IndexedStoreT[F, A, A0, B])(f: A => C, g: B => D): IndexedStoreT[F, C, A0, D] = fab bimap (f, g)
 }
 
 trait StoreTCopointed[F[+_], A0] extends Copointed[({type λ[+α]=StoreT[F, A0, α]})#λ] {
@@ -134,15 +138,15 @@ trait StoreTComonad[F[+_], A0] extends Comonad[({type λ[+α]=StoreT[F, A0, α]}
   def cojoin[A](a: StoreT[F, A0, A]) = a.duplicate
 }
 
-trait IndexedStoreTCohoist[S, R] extends Cohoist[({type f[g[+_], +a] = IndexedStoreT[g, S, R, a]})#f] {
-  def lower[G[+_] : Cobind, A](a: IndexedStoreT[G, S, R, A]) =
+trait StoreTCohoist[S] extends Cohoist[({type f[g[+_], +a] = StoreT[g, S, a]})#f] {
+  def lower[G[+_] : Cobind, A](a: StoreT[G, S, A]) =
     Cobind[G].map(a.run._1)((z: S => A) => z(a.run._2))
 
   def cohoist[M[+_], N[+_]: Comonad](f: M ~> N) =
-    new (({type f[+x] = IndexedStoreT[M, S, R, x]})#f ~> ({type f[+x] = IndexedStoreT[N, S, R, x]})#f) {
-      def apply[A](c: IndexedStoreT[M, S, R, A]) = {
+    new (({type f[+x] = StoreT[M, S, x]})#f ~> ({type f[+x] = StoreT[N, S, x]})#f) {
+      def apply[A](c: StoreT[M, S, A]) = {
         val r = c.run
-        IndexedStoreT(f(r._1), r._2)
+        StoreT((f(r._1), r._2))
       }
     }
 }

@@ -202,7 +202,7 @@ package object scalaz {
       plensT(r)
   }
   object PLensFamily extends PLensTFunctions with PLensTInstances {
-    def apply[A1, A2, B1, B2](r: A1 => F[Option[IndexedStore[B1, B2, A2]]]): PLensFamily[A1, A2, B1, B2] =
+    def apply[A1, A2, B1, B2](r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
       plensFamily(r)
   }
   object PLens extends PLensTFunctions with PLensTInstances {
