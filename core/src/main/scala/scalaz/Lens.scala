@@ -31,9 +31,6 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   import BijectionT._
   import WriterT._
 
-  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): LensFamilyT[F, A1, A2, C1, C2] =
-    lensFamilyT(a => F.map(run(a))(f))
-
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, X2, B1, B2] =
     lensFamilyT(x => F.map(run(g(x)))(_ map (f)))
 

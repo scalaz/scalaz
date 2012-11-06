@@ -37,12 +37,6 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def kleisli: Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, IndexedStore[B1, B2, A2]] =
     Kleisli[({type λ[+α] = OptionT[F, α]})#λ, A1, IndexedStore[B1, B2, A2]](runO(_))
 
-  def mapC[C1, C2](f: IndexedStore[B1, B2, A2] => IndexedStore[C1, C2, A2])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
-    plensFamilyT(a => F.map(run(a))(_ map f))
-
-  def mapCO[C1, C2](f: Option[IndexedStore[B1, B2, A2]] => Option[IndexedStore[C1, C2, A2]])(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, C1, C2] =
-    plensFamilyT(a => F.map(run(a))(f))
-
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): PLensFamilyT[F, X1, X2, B1, B2] =
     plensFamilyO(x => runO(g(x)) map (_ map (f)))
     
