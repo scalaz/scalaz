@@ -254,14 +254,14 @@ trait WriterTFunctions {
   def putWith[F[+_], W, A](value: F[A])(w: A => W)(implicit F: Functor[F]): WriterT[F, W, A] =
     WriterT(F.map(value)(a => (w(a), a)))
 
-  def writerWL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, WriterT[F, W, A], W] =
-    LensT(x => MF.map(x.run) {
-      case (w, a) => Store((ww: W) => WriterT(MF.point(ww, a)), w)
+  def writerWL[F[+_], W1, W2, A](implicit MF: Pointed[F]): LensFamilyT[F, WriterT[F, W1, A], WriterT[F, W2, A], W1, W2] =
+    LensFamilyT(x => MF.map(x.run) {
+      case (w, a) => IndexedStore((ww: W) => WriterT(MF.point(ww, a)), w)
     })
 
-  def writerAL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, WriterT[F, W, A], A] =
-    LensT(x => MF.map(x.run) {
-      case (w, a) => Store((aa: A) => WriterT(MF.point(w, aa)), a)
+  def writerAL[F[+_], W, A1, A2](implicit MF: Pointed[F]): LensFamilyT[F, WriterT[F, W, A1], WriterT[F, W, A2], A1, A2] =
+    LensFamilyT(x => MF.map(x.run) {
+      case (w, a) => IndexedStore((aa: A) => WriterT(MF.point(w, aa)), a)
     })
 
 }
