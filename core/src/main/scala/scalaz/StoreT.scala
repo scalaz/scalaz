@@ -1,6 +1,7 @@
 package scalaz
 
 import Id._
+import Liskov._
 
 /**
  * @see [[scalaz.Lens]]
@@ -53,7 +54,7 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def experiment[G[+_]](f: I => G[A])(implicit F: Copointed[F], G: Functor[G]): G[B] =
     G.map(f(pos))(F.copoint(set))
 
-  def copoint(implicit F: Copointed[F], ev: I <:< A): B =
+  def copoint(implicit F: Copointed[F], ev: I <~< A): B =
     F.copoint(run._1)(run._2)
 
   def map[C](f: B => C)(implicit ftr: Functor[F]): IndexedStoreT[F, I, A, C] =

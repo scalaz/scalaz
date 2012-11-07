@@ -21,7 +21,7 @@ class LiskovTest extends Spec {
   import Liskov._
 
   "apply" in {
-    implicitly[String <:< AnyRef].apply(""): AnyRef
+    implicitly[String <~< AnyRef].apply(""): AnyRef
     ok
   }
 

@@ -7,6 +7,7 @@ package scalaz
  * @see [[http://en.wikipedia.org/wiki/Curry-Howard_correspondence]]
  */
 trait UnionTypes {
+  import Liskov.<~<
 
   type ![A] = A => Nothing
   type !![A] = ![![A]]
@@ -24,7 +25,7 @@ trait UnionTypes {
 
   type or[T <: Disj] = ![T#D]
 
-  type Contains[S, T <: Disj] = !![S] <:< or[T]
+  type Contains[S, T <: Disj] = !![S] <~< or[T]
   type ∈[S, T <: Disj] = Contains[S, T]
 
   sealed trait Union[T] {
