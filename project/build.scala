@@ -283,10 +283,9 @@ object build extends Build {
 
       val pimp = """|
           |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
-          |  import Liskov._
           |  val value = self
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
-          |  def toIndexedSeq[Z](implicit ev: value.type <~< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
+          |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
           |  def mapElements[%s](%s): (%s) = (%s)
           |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
         ztparams, params,

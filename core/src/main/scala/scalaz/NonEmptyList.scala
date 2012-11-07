@@ -79,9 +79,7 @@ sealed trait NonEmptyList[+A] {
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
     nel((head, b.head), tail zip b.tail)
 
-  import Liskov.<~<
-
-  def unzip[X, Y](implicit ev: A <~< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
+  def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
     val (a, b) = head: (X, Y)
     val (aa, bb) = tail.unzip: (List[X], List[Y])
     (nel(a, aa), nel(b, bb))

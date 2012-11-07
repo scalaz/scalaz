@@ -126,8 +126,6 @@ sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   /** Bind the function `f` over the value under the lens, as a state action. */
   def >>-[C, A >: A2 <: A1, B >: B1 <: B2](f: B1 => StateT[F, A, C])(implicit F: Bind[F]): StateT[F, A, C] = flatMap[C, A, B](f)
 
-  import Liskov._
-
   /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
   def ->>-[C, A >: A2 <: A1](f: => StateT[F, A, C])(implicit F: Bind[F], ev: B1 <:< B2): StateT[F, A, C] =
     xmapB(ev)(identity[B2]).>>-(_ => f)
