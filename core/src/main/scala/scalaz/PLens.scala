@@ -121,12 +121,6 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def =?>=(f: B1 => B2)(implicit F: Functor[F]): A1 => F[Option[A2]] =
     modg(f, _)
 
-  def modgF(f: B1 => F[B2], a: A1)(implicit F: Monad[F]): F[Option[A2]] =
-    F.bind(run(a)){
-      case None => F.point(None)
-      case Some(w) => (w puts)
-    }
-
   def modgO(f: B1 => B2, a: A1)(implicit F: Functor[F]): OptionT[F, A2] =
     OptionT(modg(f, a))
 
@@ -142,12 +136,6 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
 
   def =>=[A >: A2 <: A1](f: B1 => B2)(implicit F: Functor[F]): A => F[A] =
     mod(f, _)
-
-  def modF[A >: A2 <: A1](f: B1 => F[B2])(implicit F: Monad[F]): A => F[A] =
-    F.bind(run(a)){
-      case None => F.point(a: A)
-      case Some(w) => F.
-    }
 
   def st[A <: A1](implicit F: Functor[F]): PStateT[F, A, B1] =
     StateT(s => F.map(get(s))((s, _)))
