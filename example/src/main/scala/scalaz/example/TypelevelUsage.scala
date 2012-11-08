@@ -18,11 +18,11 @@ object TypelevelUsage extends App {
     typed[Int :: HNil](hlist1)
     typed[String :: Int :: HNil](hlist2)
 
-    hlist2 match {
+/*    hlist2 match {
       case str :: n :: HNil =>
         typed[String](str)
         typed[Int](n)
-    }
+    }*/
 
   }
 
@@ -31,12 +31,12 @@ object TypelevelUsage extends App {
     val klist1 = None :^: Option(3) :^: Some("foo") :^: KNil
     val klist2 = klist1.append(klist1)
 
-    klist1 match {
+/*    klist1 match {
       case optionInt1 :^: optionInt2 :^: someString :^: KNil =>
         typed[Option[Int]](optionInt1)
         typed[Option[Int]](optionInt2)
         typed[Some[String]](someString)
-    }
+    }*/
     
     val klist3 = klist1.fold[Option, GenericList[Option], HFold.Append[Option, klist1.type]](new HFold.Append[Option, klist1.type](klist1))
 

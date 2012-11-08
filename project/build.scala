@@ -12,13 +12,18 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-M5"),
+    crossScalaVersions := Seq("2.9.2", "2.10.0-RC2"),
     crossVersion := CrossVersion.full,
     resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
     },
+
+    // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
+    parallelExecution in Test := false,
+    testOptions in Test += Tests.Argument("sequential"),
+
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
@@ -206,7 +211,7 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.11" % "test" cross CrossVersion.full,
+        "org.specs2" %% "specs2" % "1.12.2" % "test" cross CrossVersion.full,
         "org.scalacheck" %% "scalacheck" % "1.10.0" % "test" cross CrossVersion.full
       )
     )
