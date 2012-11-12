@@ -139,7 +139,7 @@ object IO extends IOFunctions with IOInstances {
     io(rw => return_(rw -> a))
 }
 
-trait IOInstances0 {
+trait IOInstances1 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
       Monoid.liftSemigroup[IO, A](IO.ioMonad, A)
 
@@ -148,11 +148,15 @@ trait IOInstances0 {
   implicit val ioMonad: Monad[IO] = new IOMonad {}
 }
 
-trait IOInstances extends IOInstances0 {
+trait IOInstances0 extends IOInstances1 {
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
     Monoid.liftMonoid[IO, A](ioMonad, A)
   
   implicit val ioMonadIO: MonadIO[IO] = new MonadIO[IO] with IOLiftIO with IOMonad
+}
+
+trait IOInstances extends IOInstances0 {
+  implicit val ioMonadCatchIO: MonadCatchIO[IO] = new IOMonadCatchIO with IOLiftIO with IOMonad
 }
 
 private trait IOMonad extends Monad[IO] {
@@ -163,6 +167,10 @@ private trait IOMonad extends Monad[IO] {
 
 private trait IOLiftIO extends LiftIO[IO] {
   def liftIO[A](ioa: IO[A]) = ioa
+}
+
+private trait IOMonadCatchIO extends MonadCatchIO[IO] {
+  def except[A](io: IO[A])(h: Throwable ⇒ IO[A]): IO[A] = io.except(h)
 }
 
 /** IO Actions for writing to standard output and and reading from standard input */
