@@ -41,10 +41,10 @@ trait StringFunctions {
   // Parsing functions.
   import Validation.{success, failure}
 
-  def parseBoolean(s:String): Validation[NumberFormatException, Boolean] = try {
+  def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] = try {
     success(s.toBoolean)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: IllegalArgumentException => failure(e)
   }
 
   def parseByte(s:String): Validation[NumberFormatException, Byte] = try {
