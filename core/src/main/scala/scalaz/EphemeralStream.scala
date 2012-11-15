@@ -91,7 +91,7 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
 
 trait EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
+  implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
     def bind[A, B](fa: EphemeralStream[A])(f: (A) => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
