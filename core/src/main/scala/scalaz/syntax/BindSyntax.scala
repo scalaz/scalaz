@@ -17,7 +17,7 @@ trait BindOps[F[_],A] extends Ops[F[A]] {
 
   def μ[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
 
-  def >>[B](b: F[B]): F[B] = F.bind(self)(_ => b)
+  def >>[B](b: => F[B]): F[B] = F.bind(self)(_ => b)
 
   def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A <~< Boolean): F[B] = {
     val value: F[Boolean] = Liskov.co[F, A, Boolean](ev)(self)
