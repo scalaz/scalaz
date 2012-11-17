@@ -213,4 +213,6 @@ object ScalazArbitrary {
 
   implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] =
     Functor[Arbitrary].map(A0)(CaseInsensitive(_))
+
+  implicit def dievArbitrary[A](implicit A: Arbitrary[List[A]], E: Enum[A]): Arbitrary[Diev[A]] = Functor[Arbitrary].map(A)(_.foldLeft(Diev.empty[A])(_ + _))
 }

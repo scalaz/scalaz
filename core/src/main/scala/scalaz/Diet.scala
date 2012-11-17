@@ -14,6 +14,8 @@ sealed trait Diev[+A] {
 
   def -[B >: A](value: B)(implicit E: Enum[B]): Diev[B]
 
+  def intervals: Vector[(A, A)]
+
   def contains[B >: A](value: B)(implicit E: Enum[B]): Boolean
 
   def contains[B >: A](interval: (B, B))(implicit E: Enum[B]): Boolean
@@ -24,7 +26,7 @@ sealed trait Diev[+A] {
 }
 
 
-object Diev {
+object Diev extends DievInstances {
   def subtractInterval[B](minuend: (B, B), subtraend: (B, B))(implicit E: Enum[B]): Vector[(B, B)] = {
     val startOverlap = if(subtraend._1 > minuend._1) Vector((minuend._1, subtraend._1.pred)) else Vector()
     //println("startOverlap = " + startOverlap)
@@ -167,7 +169,13 @@ object Diev {
     }
 
     def toSet[B >: A](implicit E: Enum[B]): Set[B] = foldLeft[B, Set[B]](Set[B]())(_ + _)
+  }
+}
 
-    override def toString(): String = intervals.view.map(interval => "(%s -> %s)".format(interval._1, interval._2)).mkString(", ")
+trait DievInstances {
+  implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
+
+  implicit def dievShow[A: Show]: Show[Diev[A]] = new Show[Diev[A]] {
+    override def show(diev: Diev[A]) = Show[Vector[(A, A)]].show(diev.intervals)
   }
 }
