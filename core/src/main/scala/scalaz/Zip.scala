@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import PLens._
+import PLensFamily._
 
 
 /**
