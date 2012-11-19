@@ -31,6 +31,10 @@ class BKTreeTest extends Spec {
     (as: Set[String]) => BKTree[String](as.toSeq: _*).values.toSet == as
   }
 
+  "+ and -" ! check {
+    (a:String, as: Set[String]) => (BKTree[String](as.toSeq: _*) + a - a).values.toSet == as
+  }
+
   // TODO more tests
 
   checkAll(functor.laws[BKTree])
