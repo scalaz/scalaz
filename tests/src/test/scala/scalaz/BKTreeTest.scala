@@ -35,6 +35,10 @@ class BKTreeTest extends Spec {
     (a:String, as: Set[String]) => (BKTree[String](as.toSeq: _*) + a - a).values.toSet == as
   }
 
+  "isEmpty" ! check {
+    (as: Set[String]) => BKTree[String](as.toSeq: _*).isEmpty == as.isEmpty
+  }
+
   // TODO more tests
 
   checkAll(functor.laws[BKTree])
