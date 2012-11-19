@@ -11,6 +11,8 @@ trait MonoidOps[F] extends Ops[F] {
 
   final def ifEmpty[A](tv: => A)(fv: => A)(implicit e: Equal[F]): A = Monoid.ifEmpty(self)(tv)(fv)
 
+  final def isMZero(implicit e: Equal[F]): Boolean = Monoid.isMZero(self)
+
   final def onNotEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = Monoid.onNotEmpty(self)(v)
 
   final def onEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = Monoid.onEmpty(self)(v)
