@@ -17,21 +17,38 @@ class DievTest extends Spec {
     }
   }
 
-  /*
-  checkAll(equal.laws[ListTOpt[Int]])
-  checkAll(monoid.laws[ListTOpt[Int]])
-  checkAll(plusEmpty.laws[ListTOpt])
-  checkAll(monad.laws[ListTOpt])
-  checkAll(monadPlus.laws[ListTOpt])
-
-  object instances {
-    def semigroup[F[+_]: Monad, A] = Semigroup[ListT[F, A]]
-    def monoid[F[+_]: Monad, A] = Monoid[ListT[F, A]]
-    def monad[F[+_]: Monad, A] = Monad[({type λ[α]=ListT[F, α]})#λ]
-    def functor[F[+_]: Functor, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
-
-    // checking absence of ambiguity
-    def functor[F[+_]: Monad, A] = Functor[({type λ[α]=ListT[F, α]})#λ]  
+  "fixIntervalOrder" ! check {
+    (tuple: (Int, Int)) => {
+      val expectedResult = if (tuple._1 > tuple._2) tuple.swap else tuple
+      DievInterval.fixIntervalOrder(tuple) must be_===(expectedResult)
+    }
   }
-  */
+
+  // TODO: Use data table to test subtractInterval.
+  
+  "fromValuesSeq / toSet" ! check {
+    (set: Set[Int]) => Diev.fromValuesSeq(set.toSeq).toSet must be_===(set)
+  }
+
+  "fromValuesSeq / toList" ! check {
+    (list: List[Int]) => {
+      val sortedList = list.toSet.toList.sorted
+      Diev.fromValuesSeq(list).toList must be_===(sortedList)
+    }
+  }
+
+  "++ associativity" ! check {
+    (first: Diev[Int], second: Diev[Int]) => first ++ second must be_===(second ++ first)
+  }
+
+  "intervals / fromIntervalsSeq" ! check {
+    (original: Diev[Int]) => Diev.fromIntervalsSeq(original.intervals) must be_===(original)
+  }
+
+  "-- / ++" ! check {
+    (first: Diev[Int], second: Diev[Int]) => first -- second ++ second must be_===(first ++ second)
+  }
+
+  checkAll(equal.laws[Diev[Int]])
+  checkAll(monoid.laws[Diev[Int]])
 }
