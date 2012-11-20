@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait Codensity[F[+_], +A] { self =>
+trait Codensity[F[+_], +A] { self =>
   def apply[B](f: A => F[B]): F[B]
   def improve(implicit F: Pointed[F]): F[A] =
     apply(a => F.point(a))
