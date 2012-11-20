@@ -102,6 +102,31 @@ object ScalazProperties {
     }
   }
 
+  object ring {
+    def commutative[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.commutative _)
+    def multiplicationAssociative[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.multiplicationAssociative _)
+    def leftDistributive[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.leftDistributive _)
+    def rightDistributive[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.rightDistributive _)
+    def multiplicativeLeftIdentity[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.multiplicativeLeftIdentity _)
+    def multiplicativeRightIdentity[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) =
+      forAll(A.ringLaw.multiplicativeRightIdentity _)
+
+    def laws[A](implicit A: Ring[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("ring") {
+      include(group.laws[A])
+      property("addition commutative")          = commutative[A]
+      property("multiplication associative")    = multiplicationAssociative[A]
+      property("left distributive")             = leftDistributive[A]
+      property("right distributive")            = rightDistributive[A]
+      property("multiplicative left identity")  = multiplicativeLeftIdentity[A]
+      property("multiplicative right identity") = multiplicativeRightIdentity[A]
+    }
+  }
+
   object functor {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.functorLaw.identity[X] _)
