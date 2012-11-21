@@ -12,7 +12,7 @@ object WordCount {
 
   def wordCount {
     import scalaz.typelevel.{AppFunc, AppFuncU, HList, HNil},
-      scalaz.typelevel.syntax.hlist._,
+      scalaz.syntax.typelevel.hlist._,
       scalaz.State._, scalaz.std.anyVal._, scalaz.std.list._,
       scalaz.std.boolean.test, scalaz.syntax.equal._
 

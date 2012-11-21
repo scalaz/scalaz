@@ -1,6 +1,6 @@
 package scalaz
-package typelevel
 package syntax
+package typelevel
 
 trait AllSyntaxes extends HLists with TypeClasses
 

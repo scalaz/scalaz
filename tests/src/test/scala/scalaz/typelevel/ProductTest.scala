@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary
 
 class ProductTest extends Spec {
 
-  import typelevel.syntax.all._
+  import syntax.typelevel.all._
 
   implicit val nilArbitrary = TypeClass[Arbitrary].emptyProduct
   implicit val nilEqual = TypeClass[Equal].emptyProduct

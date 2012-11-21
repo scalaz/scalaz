@@ -12,7 +12,7 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
   implicit def F: TC[F]
 
   import Func._
-  import syntax.hlist._
+  import syntax.typelevel.hlist._
 
   /** alias for andThenA */
   def @>>>[G[_], C](g: Func[G, TC, B, C]) = andThenA(g)

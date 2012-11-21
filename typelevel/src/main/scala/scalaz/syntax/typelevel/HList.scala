@@ -1,6 +1,8 @@
 package scalaz
-package typelevel
 package syntax
+package typelevel
+
+import scalaz.typelevel.{HList, HCons}
 
 trait HLists {
 

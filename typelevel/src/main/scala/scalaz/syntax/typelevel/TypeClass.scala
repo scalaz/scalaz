@@ -1,6 +1,8 @@
 package scalaz
-package typelevel
 package syntax
+package typelevel
+
+import scalaz.typelevel._
 
 final class TCOps[C[_], T <: HList](typeClass: TypeClass[C], instance: C[T]) {
   def *:[F](F: C[F]): C[HCons[F, T]] = typeClass.product(F, instance)

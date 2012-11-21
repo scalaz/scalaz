@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary
 
 class CompositionTest extends Spec {
 
-  import typelevel.syntax.all._
+  import syntax.typelevel.all._
 
   checkAll("Identity composition", applicative.laws[TCNil#Composed])
   checkAll("Identity composition", traverse.laws[TCNil#Composed])

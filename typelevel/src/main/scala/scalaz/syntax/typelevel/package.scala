@@ -1,5 +1,5 @@
 package scalaz
-package typelevel
+package syntax
 
 /**
  * Implicits to provide a convenient syntax to work with type classes
@@ -7,4 +7,4 @@ package typelevel
  *
  * Non-trivial code should *not* be defined in this package; instead delegate.
  */
-package object syntax extends Syntaxes
+package object typelevel extends Syntaxes

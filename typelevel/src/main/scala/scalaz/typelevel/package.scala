@@ -24,7 +24,7 @@ package object typelevel {
 
   /**
    * @note `::` as type and extractor is available in
-   * [[scalaz.typelevel.syntax.HLists]]
+   * [[scalaz.syntax.typelevel.HLists]]
    */
   type HCons[H, T <: HList] = GenericCons[Id, H, T]
 
