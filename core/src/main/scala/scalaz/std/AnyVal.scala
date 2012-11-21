@@ -32,7 +32,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val nothingInstance: Semigroup[Nothing] with Show[Nothing] with Equal[Nothing] =
+  implicit val nothingInstance: Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] =
     new Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] {
       override def shows(f: Nothing) = f.toString
       def append(f1: Nothing, f2: => Nothing) = f1

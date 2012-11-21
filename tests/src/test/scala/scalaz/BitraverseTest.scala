@@ -1,5 +1,4 @@
 package scalaz
-package typelevel
 
 import scalaz.std.AllInstances.{tuple2Instance => _, _}
 import scalaz.scalacheck.ScalazProperties._
