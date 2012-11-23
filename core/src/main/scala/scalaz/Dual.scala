@@ -16,12 +16,12 @@ trait DualInstances {
   }
 }
 
-trait DualSemigroup[F] extends Semigroup[F @@ Tags.Dual] {
+private[scalaz] trait DualSemigroup[F] extends Semigroup[F @@ Tags.Dual] {
   implicit def F: Semigroup[F]
   def append(f1: F @@ Tags.Dual, f2: => F @@ Tags.Dual) = Tag(F.append(f2, f1))
 }
 
-trait DualMonoid[F] extends Monoid[F @@ Tags.Dual] with DualSemigroup[F] {
+private[scalaz] trait DualMonoid[F] extends Monoid[F @@ Tags.Dual] with DualSemigroup[F] {
   implicit def F: Monoid[F]
   def zero = Tag(F.zero)
 }

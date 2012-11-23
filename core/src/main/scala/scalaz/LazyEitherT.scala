@@ -240,37 +240,37 @@ trait LazyEitherTFunctions {
 // Type class implementation traits
 //
 
-trait LazyEitherTFunctor[F[+_], E] extends Functor[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
+private[scalaz] trait LazyEitherTFunctor[F[+_], E] extends Functor[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: LazyEitherT[F, E, A])(f: (A) => B): LazyEitherT[F, E, B] = fa map (a => f(a))
 }
 
-trait LazyEitherTPointed[F[+_], E] extends Pointed[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFunctor[F, E] {
+private[scalaz] trait LazyEitherTPointed[F[+_], E] extends Pointed[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFunctor[F, E] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): LazyEitherT[F, E, A] = LazyEitherT.lazyRightT(a)
 }
 
-trait LazyEitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTPointed[F, E] {
+private[scalaz] trait LazyEitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTPointed[F, E] {
   implicit def F: Applicative[F]
 
   override def ap[A, B](fa: => LazyEitherT[F, E, A])(f: => LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
 }
 
-trait LazyEitherTMonad[F[+_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApplicative[F, E] {
+private[scalaz] trait LazyEitherTMonad[F[+_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApplicative[F, E] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: LazyEitherT[F, E, A])(f: (A) => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] = fa flatMap (a => f(a))
 }
 
-trait LazyEitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
+private[scalaz] trait LazyEitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
   implicit def F: Foldable[F]
 
   def foldRight[A, B](fa: LazyEitherT[F, E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-trait LazyEitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFoldable[F, E] {
+private[scalaz] trait LazyEitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: LazyEitherT[F, E, A])(f: (A) => G[B]): G[LazyEitherT[F, E, B]] = fa traverse f
@@ -278,14 +278,14 @@ trait LazyEitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=LazyEitherT[F
   override def foldRight[A, B](fa: LazyEitherT[F, E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-trait LazyEitherTBifunctor[F[+_]] extends Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
+private[scalaz] trait LazyEitherTBifunctor[F[+_]] extends Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   def bimap[A, B, C, D](fab: LazyEitherT[F, A, B])(f: A => C, g: B => D) =
     fab.map(x => g(x)).left.map(x => f(x))
 }
 
-trait LazyEitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
+private[scalaz] trait LazyEitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = LazyEitherT[F, α, β]})#λ] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: (A) => G[C], g: (B) => G[D]): G[LazyEitherT[F, C, D]] =
