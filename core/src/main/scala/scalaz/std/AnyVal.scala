@@ -284,8 +284,6 @@ trait AnyValInstances {
 
     def inverse(f:Int) = -f
 
-    def distance(a: Int, b: Int): Int = b - a
-
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
     def succ(b: Int) = b + 1
