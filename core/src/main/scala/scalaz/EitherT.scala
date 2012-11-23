@@ -160,7 +160,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
-    F.apply2(run, x.run)(_ == _)
+    F.apply2(run, x.run)(_ === _)
 
   /** Compare two disjunction values for ordering. */
   def compare[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Order[AA], EB: Order[BB], F: Apply[F]): F[Ordering] =
