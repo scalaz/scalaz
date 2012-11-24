@@ -271,81 +271,81 @@ trait WriterTFunctions {
 //
 import WriterT.writerT
 
-trait WriterTFunctor[F[+_], W] extends Functor[({type λ[+α]=WriterT[F, W, α]})#λ] {
+private[scalaz] trait WriterTFunctor[F[+_], W] extends Functor[({type λ[+α]=WriterT[F, W, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: WriterT[F, W, A])(f: (A) => B) = fa map f
 }
 
-trait WriterTPointed[F[+_], W] extends Pointed[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
+private[scalaz] trait WriterTPointed[F[+_], W] extends Pointed[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
   implicit def F: Pointed[F]
   implicit def W: Monoid[W]
 
   def point[A](a: => A) = writerT(F.point((W.zero, a)))
 }
 
-trait WriterTApply[F[+_], W] extends Apply[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
+private[scalaz] trait WriterTApply[F[+_], W] extends Apply[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
   override def ap[A, B](fa: => WriterT[F, W, A])(f: => WriterT[F, W, (A) => B]) = fa ap f
 }
 
-trait WriterTApplicative[F[+_], W] extends Applicative[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] with WriterTPointed[F, W] {
+private[scalaz] trait WriterTApplicative[F[+_], W] extends Applicative[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] with WriterTPointed[F, W] {
   implicit def F: Applicative[F]
   implicit def W: Monoid[W]
 }
 
-trait WriterTEach[F[+_], W] extends Each[({type λ[+α]=WriterT[F, W, α]})#λ] {
+private[scalaz] trait WriterTEach[F[+_], W] extends Each[({type λ[+α]=WriterT[F, W, α]})#λ] {
   implicit def F: Each[F]
 
   def each[A](fa: WriterT[F, W, A])(f: (A) => Unit) = fa foreach f
 }
 
 // TODO does Index it make sense for F other than Id?
-trait WriterTIndex[W] extends Index[({type λ[+α]=WriterT[Id, W, α]})#λ] {
+private[scalaz] trait WriterTIndex[W] extends Index[({type λ[+α]=WriterT[Id, W, α]})#λ] {
   def index[A](fa: WriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.value) else None
 }
 
-trait WriterTMonad[F[+_], W] extends Monad[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] with WriterTPointed[F, W] {
+private[scalaz] trait WriterTMonad[F[+_], W] extends Monad[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] with WriterTPointed[F, W] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: WriterT[F, W, A])(f: (A) => WriterT[F, W, B]) = fa flatMap f
 }
 
-trait WriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({type λ[+α]=WriterT[F, W, α]})#λ] {
+private[scalaz] trait WriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({type λ[+α]=WriterT[F, W, α]})#λ] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: WriterT[F, W, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
 }
 
-trait WriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFoldable[F, W] {
+private[scalaz] trait WriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[+_]: Applicative, A, B](fa: WriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
 }
 
-trait WriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=WriterT[F, α, β]})#λ] {
+private[scalaz] trait WriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=WriterT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: WriterT[F, A, B])(f: (A) => C, g: (B) => D) =
     fab.bimap(f, g)
 }
 
-trait WriterTBitraverse[F[+_]] extends Bitraverse[({type λ[+α, +β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
+private[scalaz] trait WriterTBitraverse[F[+_]] extends Bitraverse[({type λ[+α, +β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
     fab.bitraverse(f, g)
 }
 
-trait WriterTCopointed[F[+_], W] extends Copointed[({type λ[+α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
+private[scalaz] trait WriterTCopointed[F[+_], W] extends Copointed[({type λ[+α] = WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
   implicit def F: Copointed[F]
 
   def copoint[A](p: WriterT[F, W, A]): A = F.copoint(p.value)
 }
 
-trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with WriterTCopointed[Id, W] {
+private[scalaz] trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with WriterTCopointed[Id, W] {
 
   override def cojoin[A](fa: Writer[W, A]): Writer[W, Writer[W, A]] =
     Writer(fa.written, fa)
@@ -354,7 +354,7 @@ trait WriterComonad[W] extends Comonad[({type λ[+α] = Writer[W, α]})#λ] with
     Writer(fa.written, f(fa))
 }
 
-trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] {
+private[scalaz] trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[+_], β] = WriterT[α, W, β]})#λ] {
   def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): WriterT[M, W, B] =
     WriterT(M.map(mb)((W.zero, _)))
 
