@@ -5,7 +5,7 @@ package scalaz
  */
 
 sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
-  def uncons(implicit M: Monad[M]): M[Option[(A, ListT[M, A])]] = {
+  def uncons(implicit M: Pointed[M]): M[Option[(A, ListT[M, A])]] = {
     M.map(underlying){list =>
       list match {
         case Nil => None
@@ -14,7 +14,7 @@ sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
     }
   }
 
-  def ::[AA >: A](a: AA)(implicit M: Monad[M]) : ListT[M, AA] = new ListT(M.map(underlying)(list => a :: list))
+  def ::[AA >: A](a: AA)(implicit M: Functor[M]) : ListT[M, AA] = new ListT(M.map(underlying)(list => a :: list))
 
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(underlying)(_.isEmpty)
 
@@ -22,7 +22,7 @@ sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
 
   def headOption(implicit M: Functor[M]) : M[Option[A]] = M.map(underlying)(_.headOption)
   
-  def tailM(implicit M: Monad[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
+  def tailM(implicit M: Pointed[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(underlying)(_.filter(p)))
   
@@ -70,8 +70,8 @@ trait ListTInstances2 {
     implicit def F: Functor[F] = F0
   }
 
-  implicit def listTSemigroup[F[+_], A](implicit F0: Monad[F]): Semigroup[ListT[F, A]] = new ListTSemigroup[F, A]{
-    implicit def F: Monad[F] = F0
+  implicit def listTSemigroup[F[+_], A](implicit F0: Bind[F]): Semigroup[ListT[F, A]] = new ListTSemigroup[F, A]{
+    implicit def F: Bind[F] = F0
   }
 }
 
@@ -111,7 +111,7 @@ private[scalaz] trait ListTFunctor[F[+_]] extends Functor[({type λ[α] = ListT[
 }
 
 private[scalaz] trait ListTSemigroup[F[+_], A] extends Semigroup[ListT[F, A]] {
- implicit def F: Monad[F]
+ implicit def F: Bind[F]
  def append(f1: ListT[F, A], f2: => ListT[F, A]): ListT[F, A] = f1 ++ f2
 }
 
