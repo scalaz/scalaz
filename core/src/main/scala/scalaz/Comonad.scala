@@ -16,8 +16,8 @@ trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
       F.equal(copoint(cobind(fa)(f)), f(fa))
     def cobindAssociative[A, B, C, D](fa: F[A], f: F[A] => B, g: F[B] => C, h: F[C] => D)(implicit F: Equal[D]): Boolean = {
       implicit val C = self
-      val d1 = (CoKleisli(f) =>= CoKleisli(g) =>= CoKleisli(h)) run fa
-      val d2 = (CoKleisli(f) =>= (CoKleisli(g) =>= CoKleisli(h))) run fa
+      val d1 = (Cokleisli(f) =>= Cokleisli(g) =>= Cokleisli(h)) run fa
+      val d2 = (Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h))) run fa
       F.equal(d1, d2)
     }
 
