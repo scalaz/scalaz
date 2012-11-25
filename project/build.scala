@@ -167,7 +167,7 @@ object build extends Build {
     base = file("typelevel"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-typelevel",
-      osgiExport("scalaz.typelevel")
+      osgiExport("scalaz.typelevel", "scalaz.syntax.typelevel")
     ),
     dependencies = Seq(core)
   )
