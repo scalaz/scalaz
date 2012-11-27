@@ -28,6 +28,8 @@ object Cojoin {
     self: Cobind[F] =>
 
     def cojoin[A](fa: F[A]): F[F[A]] = cobind(fa)(fa => fa)
+
+    override def extend[A, B](a: F[A])(f: F[A] => B): F[B] = cobind(a)(f)
   }
 
   ////
