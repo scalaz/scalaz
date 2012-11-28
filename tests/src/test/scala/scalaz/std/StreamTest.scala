@@ -40,25 +40,25 @@ class StreamTest extends Spec {
   }
 
 
-  "foldl1 is reduceLeft" ! check {(hd: List[Int], rngel: Stream[List[Int]]) =>
+  "foldl1 is reduceLeft" ! prop {(hd: List[Int], rngel: Stream[List[Int]]) =>
     val rnge = hd #:: rngel
     val F = Foldable[Stream]
     Some(rnge.reduceLeft(_++_)) must be_===(F.foldl1(rnge)(_++_))
   }
 
-  "foldl is foldLeft" ! check {(rnge: Stream[List[Int]]) =>
+  "foldl is foldLeft" ! prop {(rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldLeft(List[Int]())(_++_)
       must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
   }
 
-  "foldr1 is reduceRight" ! check {(hd: List[Int], rngel: Stream[List[Int]]) =>
+  "foldr1 is reduceRight" ! prop {(hd: List[Int], rngel: Stream[List[Int]]) =>
     val rnge = hd #:: rngel
     val F = Foldable[Stream]
     Some(rnge.reduceRight(_++_)) must be_===(F.foldr1(rnge)(_++_))
   }
 
-  "foldr is foldRight" ! check {(rnge: Stream[List[Int]]) =>
+  "foldr is foldRight" ! prop {(rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldRight(List[Int]())(_++_)
       must be_===(F.foldRight(rnge, List[Int]())(_++_)))
