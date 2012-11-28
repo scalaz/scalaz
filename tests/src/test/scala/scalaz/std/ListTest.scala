@@ -4,6 +4,7 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
+import syntax.std._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
@@ -38,7 +39,12 @@ class ListTest extends Spec {
 
   "groupByM[Id].flatten is identity" ! check {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupByM[Id]((a, b) => p(a, b)).flatten must be_===(a)
+      a.groupByM[Id](p).flatten must be_===(a)
+  }
+
+  "groupByWhen.flatten is identity" ! check {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupWhen(p).flatten must be_===(a)
   }
 
   "takeWhileM example" in {

@@ -37,6 +37,8 @@ trait IndexedSeqOps[A] extends Ops[IndexedSeq[A]] {
 
   final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[IndexedSeq[IndexedSeq[A]]] = v.groupByM(self)(p)
 
+  final def groupWhen(p: (A, A) => Boolean): IndexedSeq[IndexedSeq[A]] = v.groupWhen(self)(p)
+
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, IndexedSeq[B]) = v.mapAccumLeft(self)(c, f)
 
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, IndexedSeq[B]) = v.mapAccumRight(self)(c, f)

@@ -92,7 +92,7 @@ trait ListInstances extends ListInstances0 {
 
 }
 
-trait ListFunctions {
+trait ListFunctions extends IdInstances {
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec
@@ -185,6 +185,10 @@ trait ListFunctions {
       }
     }
   }
+
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+
 
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
