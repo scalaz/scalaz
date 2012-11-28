@@ -10,26 +10,26 @@ class HeapTest extends Spec {
 
   def pred(i: Int) = i % 2 == 0
 
-  "order maintained for toList" ! check {
+  "order maintained for toList" ! prop {
     (a: Heap[Int]) => a.toList must be_===(a.toList.sorted)
   }
 
-  "toList / toStream" ! check {
+  "toList / toStream" ! prop {
     (a: Heap[Int]) => a.toStream must be_===(a.toList.toStream)
   }
 
-  "filter" ! check {
+  "filter" ! prop {
     (a: Heap[Int]) => a.filter(pred).toStream must be_===(a.toStream.filter(pred))
   }
 
-  "partition" ! check {
+  "partition" ! prop {
     (a: Heap[Int]) =>
       val (ts, fs) = a.partition(pred)
       ts.forall(pred) must be_===(true)
       fs.exists(pred) must be_===(false)
   }
 
-  "split" ! check {
+  "split" ! prop {
     (a: Heap[Int], x: Int) =>
       val (lt, eq, gt) = a.split(x)
       lt.forall(_ < x) must be_===(true)

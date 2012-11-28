@@ -14,7 +14,7 @@ class StreamTest extends Spec {
 
   "intercalate empty stream is flatten" ! check((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must be_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! check {
+  "intersperse then remove odd items is identity" ! prop {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
