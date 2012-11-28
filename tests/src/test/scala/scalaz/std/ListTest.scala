@@ -4,6 +4,7 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
+import syntax.std._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
@@ -16,7 +17,7 @@ class ListTest extends Spec {
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! check {
+  "intersperse then remove odd items is identity" ! prop {
     (a: List[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
@@ -36,9 +37,14 @@ class ListTest extends Spec {
     (a: List[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
   }
 
-  "groupByM[Id].flatten is identity" ! check {
+  "groupByM[Id].flatten is identity" ! prop {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupByM[Id]((a, b) => p(a, b)).flatten must be_===(a)
+      a.groupByM[Id](p).flatten must be_===(a)
+  }
+
+  "groupByWhen.flatten is identity" ! prop {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupWhen(p).flatten must be_===(a)
   }
 
   "takeWhileM example" in {

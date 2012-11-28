@@ -37,6 +37,8 @@ trait ListOps[A] extends Ops[List[A]] {
 
   final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupByM(self)(p)
 
+  final def groupWhen(p: (A, A) => Boolean): List[List[A]] = l.groupWhen(self)(p)
+
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumLeft(self)(c, f)
 
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumRight(self)(c, f)

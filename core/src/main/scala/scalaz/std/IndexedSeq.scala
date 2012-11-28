@@ -97,7 +97,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 
 }
 
-trait IndexedSeqSubFunctions extends IndexedSeqSub {
+trait IndexedSeqSubFunctions extends IndexedSeqSub with IdInstances {
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
     @tailrec
@@ -169,6 +169,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         case (x, y) =>
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
+
+  final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     if (as.isEmpty) (c, empty) else {

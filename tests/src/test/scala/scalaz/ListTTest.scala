@@ -7,39 +7,39 @@ import scalaz.scalacheck.ScalazArbitrary._
 class ListTTest extends Spec {
   type ListTOpt[A] = ListT[Option, A]
 
-  "fromList / toList" ! check {
+  "fromList / toList" ! prop {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).toList must be_===(ass)
   }
 
-  "filter all" ! check {
+  "filter all" ! prop {
     (ass: ListT[List, Int]) =>
       ass.filter(_ => true) must be_===(ass)
   }
 
-  "filter none" ! check {
+  "filter none" ! prop {
     (ass: ListT[List, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
       isEmpty.toList.forall(identity)
   }
   
-  "drop" ! check {
+  "drop" ! prop {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).drop(x).toList must be_===(ass.map(_.drop(x)))
   }
   
-  "take" ! check {
+  "take" ! prop {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).take(x).toList must be_===(ass.map(_.take(x)))
   }
 
-  "map" ! check {
+  "map" ! prop {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).map(_ * 2).toList must be_===(ass.map(_.map(_ * 2)))
   }
 
-  "flatMap" ! check {
+  "flatMap" ! prop {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList must
       be_===(ass.map(_.flatMap(number => List(number.toFloat))))
