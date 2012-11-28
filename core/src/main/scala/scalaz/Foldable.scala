@@ -80,7 +80,7 @@ trait Foldable[F[_]]  { self =>
   /** Unbiased sum of monoidal values. */
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def foldr1[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, o) => o.map(f(a, _)) orElse Some(a))
-  def foldl1[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((o, a) => o.map(f(a, _)) orElse Some(a))
+  def foldl1[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((o, a) => o.map(f(_, a)) orElse Some(a))
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
