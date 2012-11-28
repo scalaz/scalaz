@@ -12,7 +12,7 @@ class NonEmptyListTest extends Spec {
   checkAll("NonEmptyList", traverse.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
-  "NonEmptyList size is corect" ! check { xs:NonEmptyList[Int] =>
+  "NonEmptyList size is corect" ! prop { xs:NonEmptyList[Int] =>
     xs.size must be_===(1 + xs.tail.size) 
   }
 }
