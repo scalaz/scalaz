@@ -3,6 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import syntax.std._
 
@@ -57,5 +58,29 @@ class ListTest extends Spec {
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
     actual must be_===("/abc/def/hij")
+  }
+
+  "foldl1 is reduceLeft" ! prop {(rngel: NonEmptyList[List[Int]]) =>
+    val rnge = rngel.list
+    val F = Foldable[List]
+    Some(rnge.reduceLeft(_++_)) must be_===(F.foldl1(rnge)(_++_))
+  }
+
+  "foldl is foldLeft" ! prop {(rnge: List[List[Int]]) =>
+    val F = Foldable[List]
+    (rnge.foldLeft(List[Int]())(_++_)
+      must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
+  }
+
+  "foldr1 is reduceRight" ! prop {(rngel: NonEmptyList[List[Int]]) =>
+    val rnge = rngel.list
+    val F = Foldable[List]
+    Some(rnge.reduceRight(_++_)) must be_===(F.foldr1(rnge)(_++_))
+  }
+
+  "foldr is foldRight" ! prop {(rnge: List[List[Int]]) =>
+    val F = Foldable[List]
+    (rnge.foldRight(List[Int]())(_++_)
+      must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 }
