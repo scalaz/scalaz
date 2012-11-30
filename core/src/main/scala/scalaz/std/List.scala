@@ -134,13 +134,8 @@ trait ListFunctions extends IdInstances {
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
-    case Nil    => Monad[M].point(Nil)
-    case h :: t => {
-      def g = filterM(t)(p)
-      Monad[M].bind(p(h))(b => if (b) Monad[M].map(g)(tt => h :: tt) else g)
-    }
-  }
+  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Monad[M].filterM(as)(p)
 
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil    => Monad[M].point(None: Option[A])

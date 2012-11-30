@@ -12,7 +12,7 @@ class ListTest extends Spec {
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
-  
+
   import std.list.listSyntax._
   import syntax.monad._
 
@@ -46,6 +46,10 @@ class ListTest extends Spec {
   "groupByWhen.flatten is identity" ! prop {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).flatten must be_===(a)
+  }
+
+  "filterM" ! prop {
+    (xs: List[Int]) => xs.filterM[Id](_ % 2 == 0) == xs.filter(_ % 2 == 0)
   }
 
   "takeWhileM example" in {
