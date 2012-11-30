@@ -42,6 +42,25 @@ class FunctionTest extends Spec {
 
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
 
+  // Likely could be made to cover all the FunctionN types.
+  "Function0 map eagerness" ! prop{(number: Int) =>
+    var modifiableNumber: Int = number
+    val methodCall: () => Int = () => modifiableNumber
+    val mappedCall: () => Int = Monad[Function0].map(methodCall)(_ + 3)
+    modifiableNumber += 1
+    mappedCall() must be_===(number + 4)
+  }
+
+  // Likely could be made to cover all the FunctionN types.
+  "Function0 bind eagerness" ! prop{(number: Int) =>
+    var modifiableNumber: Int = number
+    val methodCall: () => Int = () => modifiableNumber
+    val mappedCall = Monad[Function0].bind(methodCall)((value: Int) => () => value + 3)
+    modifiableNumber += 1
+    mappedCall() must be_===(number + 4)
+  }
+
+
   object instances {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]

@@ -22,7 +22,9 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def copoint[A](p: () => A) = p()
 
-    def bind[A, B](fa: () => A)(f: (A) => () => B) = f(fa())
+    def bind[A, B](fa: () => A)(f: (A) => () => B) = () => f(fa())()
+
+    override def map[A,B](fa: () => A)(f: A => B) = () => f(fa())
 
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
