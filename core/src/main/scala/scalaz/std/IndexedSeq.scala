@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
 import collection.immutable.IndexedSeq
 import collection.IndexedSeqLike
@@ -97,7 +98,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 
 }
 
-trait IndexedSeqSubFunctions extends IndexedSeqSub with IdInstances {
+trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
     @tailrec
