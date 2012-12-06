@@ -12,7 +12,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-RC3"),
+    crossScalaVersions := Seq("2.9.2", "2.10.0-RC5"),
     crossVersion := CrossVersion.full,
     resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
