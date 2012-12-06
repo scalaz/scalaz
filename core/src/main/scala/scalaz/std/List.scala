@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
 
 trait ListInstances0 {
@@ -92,7 +93,7 @@ trait ListInstances extends ListInstances0 {
 
 }
 
-trait ListFunctions extends IdInstances {
+trait ListFunctions {
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec
