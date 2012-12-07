@@ -22,8 +22,6 @@ class RopeTest extends Specification with ScalaCheck {
 
   override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 25))
 
-  def m[A](implicit man: ClassManifest[A]) = man
-
   "converting an array gives a rope of the same length" ! prop {(array: Array[Int]) =>
     Rope.fromArray(array).length === array.length
   }
@@ -60,11 +58,11 @@ class RopeTest extends Specification with ScalaCheck {
   }
 
   /*"a rope converted to a stream is the same sequence as the original rope" ! prop {(rope: Rope[Int]) =>
-     rope must beTheSameRopeSeq(m[Int])(rope.toStream)
+     rope must beTheSameRopeSeq(rope.toStream)
   }.set(minTestsOk -> 15)
   
   "appending ropes works correctly" ! prop {(rope1: Rope[Int], rope2: Rope[Int]) =>
-    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(m[Int])(rope1.toStream ++ rope2.toStream))
+    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(rope1.toStream ++ rope2.toStream))
   }.set(minTestsOk -> 15)*/
 
 //
