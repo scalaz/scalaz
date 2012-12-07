@@ -113,7 +113,7 @@ object ScalazProperties {
     def laws[F[_]](implicit F: Functor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("functor") {
       property("identity") = identity[F, Int]
-      property("associative") = associative[F, Int, Int, Int]
+      property("composite") = composite[F, Int, Int, Int]
     }
   }
 
