@@ -20,23 +20,23 @@ class FingerTreeTest extends Specification with ScalaCheck {
     case (t, x) => (t :+ x)
   }
 
-  "append one element works correctly" ! check {(tree: SequenceTree[Int], x: Int) =>
+  "append one element works correctly" ! prop {(tree: SequenceTree[Int], x: Int) =>
     (tree :+ x).toStream must be_===(tree.toStream :+ x)
   }
 
-  "prepending one element works correctly" ! check {(tree: SequenceTree[Int], x: Int) =>
+  "prepending one element works correctly" ! prop {(tree: SequenceTree[Int], x: Int) =>
     (x +: tree).toStream must be_===(x +: tree.toStream)
   }
 
-  "converting a stream to a finger-tree and back produces an equal stream" ! check {(stream: Stream[Int]) =>
+  "converting a stream to a finger-tree and back produces an equal stream" ! prop {(stream: Stream[Int]) =>
     streamToTree(stream).toStream must be_===(stream)
   }
 
-  "appending two trees works correctly" ! check {(tree1: SequenceTree[Int], tree2: SequenceTree[Int]) =>
+  "appending two trees works correctly" ! prop {(tree1: SequenceTree[Int], tree2: SequenceTree[Int]) =>
     (tree1 <++> tree2).toStream must be_===(tree1.toStream ++ tree2.toStream)
   }
 
-  "splitting a tree works the same as splitting a stream" ! check {(tree: SequenceTree[Int], index: Int) =>
+  "splitting a tree works the same as splitting a stream" ! prop {(tree: SequenceTree[Int], index: Int) =>
     val asStream = tree.toStream
     val splitTree = tree.split(_ > index)
     (splitTree._1.toStream, splitTree._2.toStream) must be_===(asStream.splitAt(index))
@@ -46,23 +46,23 @@ class FingerTreeTest extends Specification with ScalaCheck {
     tree.isEmpty || ((tree :-| x).toStream must be_===(tree.toStream.init :+ x))
   } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
 
-  "replacing first element works correctly" ! check {(tree: SequenceTree[Int], x: Int) =>
+  "replacing first element works correctly" ! prop {(tree: SequenceTree[Int], x: Int) =>
     tree.isEmpty || ((x |-: tree).toStream must be_=== (x +: tree.toStream.tail))
   }
 
-  "head and tail work correctly"  ! check {(tree: SequenceTree[Int]) =>
+  "head and tail work correctly"  ! prop {(tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
     tree.isEmpty || ((tree.head === tree.toStream.head) && (tree.tail.toStream === tree.toStream.tail))
   }
 
-  "last and init work correctly" ! check {(tree: SequenceTree[Int]) =>
+  "last and init work correctly" ! prop {(tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
     tree.isEmpty || ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
   }
 
-  "foldLeft snoc is identity" ! check {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream ?= tree.toStream}
+  "foldLeft snoc is identity" ! prop {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream ?= tree.toStream}
 
-  "foldLeft cons is reverse" ! check {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))((x, y) => y +: x).toStream ?= tree.toStream.reverse}
+  "foldLeft cons is reverse" ! prop {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))((x, y) => y +: x).toStream ?= tree.toStream.reverse}
 
   import std.option._
   import syntax.applicative._
@@ -120,7 +120,7 @@ class FingerTreeTest extends Specification with ScalaCheck {
   }
 
   // TODO reinstate
-//  "viewl works correctly" ! check {(tree: SequenceTree[Int]) =>
+//  "viewl works correctly" ! prop {(tree: SequenceTree[Int]) =>
 //    val asStream = tree.toStream
 //    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x === asStream.head) && (t.toStream === asStream.tail))
 //  }

@@ -106,14 +106,14 @@ object ScalazProperties {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.functorLaw.identity[X] _)
 
-    def associative[F[_], X, Y, Z](implicit F: Functor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
+    def composite[F[_], X, Y, Z](implicit F: Functor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
                                    ayz: Arbitrary[(Y => Z)], ef: Equal[F[Z]]) =
-      forAll(F.functorLaw.associative[X, Y, Z] _)
+      forAll(F.functorLaw.composite[X, Y, Z] _)
 
     def laws[F[_]](implicit F: Functor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("functor") {
       property("identity") = identity[F, Int]
-      property("associative") = associative[F, Int, Int, Int]
+      property("composite") = composite[F, Int, Int, Int]
     }
   }
 

@@ -97,7 +97,7 @@ class TraverseTest extends Spec {
       Traverse[List].reverse(List(1, 2, 3)) must be_===(List(3, 2, 1))
     }
 
-    "mapAccumL/R" ! check {
+    "mapAccumL/R" ! prop {
       val L = Traverse[List]; import L.traverseSyntax._
       (l: List[Int]) => {
         val (acc, l2) = l.mapAccumL(List[Int]())((acc,a) => (a :: acc, a))
@@ -106,7 +106,7 @@ class TraverseTest extends Spec {
       }
     }
 
-    "double reverse" ! check {
+    "double reverse" ! prop {
       (is: List[Int]) =>
         import syntax.monoid._
         Endo(Traverse[List].reverse[Int]).multiply(2).apply(is) must be_===(is)

@@ -14,7 +14,7 @@ class StreamTest extends Spec {
 
   "intercalate empty stream is flatten" ! check((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must be_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! check {
+  "intersperse then remove odd items is identity" ! prop {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
@@ -37,5 +37,30 @@ class StreamTest extends Spec {
       }
     }
     (a: Stream[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
+  }
+
+
+  "foldl1 is reduceLeft" ! prop {(hd: List[Int], rngel: Stream[List[Int]]) =>
+    val rnge = hd #:: rngel
+    val F = Foldable[Stream]
+    Some(rnge.reduceLeft(_++_)) must be_===(F.foldl1(rnge)(_++_))
+  }
+
+  "foldl is foldLeft" ! prop {(rnge: Stream[List[Int]]) =>
+    val F = Foldable[Stream]
+    (rnge.foldLeft(List[Int]())(_++_)
+      must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
+  }
+
+  "foldr1 is reduceRight" ! prop {(hd: List[Int], rngel: Stream[List[Int]]) =>
+    val rnge = hd #:: rngel
+    val F = Foldable[Stream]
+    Some(rnge.reduceRight(_++_)) must be_===(F.foldr1(rnge)(_++_))
+  }
+
+  "foldr is foldRight" ! prop {(rnge: Stream[List[Int]]) =>
+    val F = Foldable[Stream]
+    (rnge.foldRight(List[Int]())(_++_)
+      must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 }

@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
 import collection.immutable.IndexedSeq
 import collection.IndexedSeqLike
@@ -39,7 +40,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with ApplicativePlus[IxSq] with Zip[IxSq] with Unzip[IxSq] {
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] {
     def each[A](fa: IxSq[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
     def length[A](fa: IxSq[A]) = fa.length
@@ -169,6 +170,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         case (x, y) =>
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
+
+  final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     if (as.isEmpty) (c, empty) else {

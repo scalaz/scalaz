@@ -226,7 +226,7 @@ trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B] = iso.from(G.bind(iso.to(fa))(f.andThen(iso.to.apply)))
 }
 
-trait IsomorphismMonad[F[_], G[_]] extends IsomorphismApplicative[F, G] with IsomorphismBind[F, G] {
+trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G] {
   implicit def G: Monad[G]
 }
 

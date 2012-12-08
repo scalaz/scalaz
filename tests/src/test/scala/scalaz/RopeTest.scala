@@ -22,49 +22,47 @@ class RopeTest extends Specification with ScalaCheck {
 
   override implicit val defaultParameters = Parameters(defaultValues.updated(maxSize, 25))
 
-  def m[A](implicit man: ClassManifest[A]) = man
-
-  "converting an array gives a rope of the same length" ! check {(array: Array[Int]) =>
+  "converting an array gives a rope of the same length" ! prop {(array: Array[Int]) =>
     Rope.fromArray(array).length === array.length
   }
 
-  "indexing a rope converted from an array is the same as indexing this array" ! check {(array: Array[Int], i: Int) =>
+  "indexing a rope converted from an array is the same as indexing this array" ! prop {(array: Array[Int], i: Int) =>
     if (i >= 0 && i < array.length) (Rope.fromArray(array).apply(i) must (beEqualTo(array(i))))
     else (Rope.fromArray(array).apply(i) must throwA[RuntimeException])
   }
 
-  "length of a rope is the same as its length as a stream" ! check {(rope: Rope[Int]) =>
+  "length of a rope is the same as its length as a stream" ! prop {(rope: Rope[Int]) =>
     rope.length === rope.toStream.length
   }
 
-  "indexing a rope is the same as converting it to a stream and indexing that" ! check {(rope: Rope[Int], i: Int) =>
+  "indexing a rope is the same as converting it to a stream and indexing that" ! prop {(rope: Rope[Int], i: Int) =>
     if (i >= 0 && i < rope.length) (rope(i) must (beEqualTo(rope.toStream(i))))
     else (rope(i) must throwA[RuntimeException])
   }
 
-  "building a rope from chunks and converting it back is the same as filtering out empty chunks" ! check {(chunks: List[ImmutableArray[Int]]) =>
+  "building a rope from chunks and converting it back is the same as filtering out empty chunks" ! prop {(chunks: List[ImmutableArray[Int]]) =>
     Rope.fromChunks(chunks).chunks.toList must be_===(chunks.filterNot(_.isEmpty))
   }
 
-  "appending one element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+  "appending one element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     (tree :+ x).toStream === (tree.toStream :+ x)
   }
 
-  "prepending one element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+  "prepending one element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     (x +: tree).toStream === (x +: tree.toStream)
   }
 
-  "StringLike instance" ! check {(strings: List[String]) =>
+  "StringLike instance" ! prop {(strings: List[String]) =>
     val rope = Rope.fromChunks(strings.map(ImmutableArray.fromString))
     rope.asString must beEqualTo(strings.mkString)
   }
 
-  /*"a rope converted to a stream is the same sequence as the original rope" ! check {(rope: Rope[Int]) =>
-     rope must beTheSameRopeSeq(m[Int])(rope.toStream)
+  /*"a rope converted to a stream is the same sequence as the original rope" ! prop {(rope: Rope[Int]) =>
+     rope must beTheSameRopeSeq(rope.toStream)
   }.set(minTestsOk -> 15)
   
-  "appending ropes works correctly" ! check {(rope1: Rope[Int], rope2: Rope[Int]) =>
-    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(m[Int])(rope1.toStream ++ rope2.toStream))
+  "appending ropes works correctly" ! prop {(rope1: Rope[Int], rope2: Rope[Int]) =>
+    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(rope1.toStream ++ rope2.toStream))
   }.set(minTestsOk -> 15)*/
 
 //
@@ -72,29 +70,29 @@ class RopeTest extends Specification with ScalaCheck {
 //    streamToTree(stream).toStream ≟ stream
 //  }
 //
-//  "splitting a tree works the same as splitting a stream" ! check {(tree: Rope[Int], index: Int) =>
+//  "splitting a tree works the same as splitting a stream" ! prop {(tree: Rope[Int], index: Int) =>
 //    val asStream = tree.toStream
 //    val splitTree = tree.split(_ > index)
 //    (splitTree._1.toStream, splitTree._2.toStream) === asStream.splitAt(index)
 //  }
 //
-//  "replacing last element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+//  "replacing last element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
 //    tree.isEmpty || ((tree :-| x).toStream === (tree.toStream.init :+ x))
 //  } // can't use conditional property here, it would be better to write !tree.isEmpty ==> ...
 //
-//  "replacing first element works correctly" ! check {(tree: Rope[Int], x: Int) =>
+//  "replacing first element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
 //    tree.isEmpty || ((x |-: tree).toStream === (x +: tree.toStream.tail))
 //  }
-//  "last and init work correctly" ! check {(tree: Rope[Int]) =>
+//  "last and init work correctly" ! prop {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
 //    tree.isEmpty || ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
 //  }
-//  "viewl works correctly" ! check {(tree: Rope[Int]) =>
+//  "viewl works correctly" ! prop {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
 //    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x === asStream.head) && (t.toStream === asStream.tail))
 //  }
 //
-//  "viewr works correctly" ! check {(tree: Rope[Int]) =>
+//  "viewr works correctly" ! prop {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
 //    tree.viewr.fold[Boolean](true, (i: ({type λ[α]=FingerTree[Int, α]})#λ, x: Int) => (i.toStream === asStream.init) && (x === asStream.last))
 //  }

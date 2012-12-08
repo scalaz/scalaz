@@ -16,7 +16,7 @@ trait MapInstances {
     def append(m1: Map[K, V], m2: => Map[K, V]) = {
       // Eagerly consume m2 as the value is used more than once.
       val m2Instance: Map[K, V] = m2
-      // semigroups are not commutative, so order may matter. 
+      // semigroups are not commutative, so order may matter.
       val (from, to, semigroup) = {
         if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
         else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
@@ -28,11 +28,13 @@ trait MapInstances {
     }
   }
 
+  // this is totally fucking wrong
   implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] {
     def order(x: Map[K, V], y: Map[K, V]): Ordering = {
       import list._
       import tuple._
-      Order[List[(K, V)]].order(x.toList, y.toList)
+      implicit val ok = implicitly[Order[K]].toScalaOrdering
+      Order[List[(K, V)]].order(x.toList.sortBy(_._1), y.toList.sortBy(_._1))
     }
   }
 

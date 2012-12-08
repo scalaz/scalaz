@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
 
 trait ListInstances0 {
@@ -10,7 +11,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] with Zip[List] with Unzip[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -134,13 +135,8 @@ trait ListFunctions {
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
-    case Nil    => Monad[M].point(Nil)
-    case h :: t => {
-      def g = filterM(t)(p)
-      Monad[M].bind(p(h))(b => if (b) Monad[M].map(g)(tt => h :: tt) else g)
-    }
-  }
+  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Monad[M].filterM(as)(p)
 
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil    => Monad[M].point(None: Option[A])
@@ -185,6 +181,10 @@ trait ListFunctions {
       }
     }
   }
+
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+
 
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
