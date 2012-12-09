@@ -375,7 +375,7 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit val floatInstance: Group[Float] with Enum[Float] with Show[Float] = new Group[Float] with Enum[Float] with Show[Float] {
+  implicit val floatInstance: Group[Float] with Order[Float] with Show[Float] = new Group[Float] with Order[Float] with Show[Float] {
     override def shows(f: Float) = f.toString
 
     def append(f1: Float, f2: => Float) = f1 + f2
@@ -383,13 +383,6 @@ trait AnyValInstances {
     def zero: Float = 0f
 
     def inverse(f: Float) = -f
-
-    def succ(b: Float) = b + 1
-    def pred(b: Float) = b - 1
-    override def succn(a: Int, b: Float) = b + a
-    override def predn(a: Int, b: Float) = b - a
-    override def min = Some(Float.MinValue)
-    override def max = Some(Float.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -405,7 +398,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val doubleInstance: Group[Double] with Enum[Double] with Show[Double] = new Group[Double] with Enum[Double] with Show[Double] {
+  implicit val doubleInstance: Group[Double] with Order[Double] with Show[Double] = new Group[Double] with Order[Double] with Show[Double] {
     override def shows(f: Double) = f.toString
 
     def append(f1: Double, f2: => Double) = f1 + f2
@@ -414,16 +407,9 @@ trait AnyValInstances {
 
     def inverse(f: Double) = -f
 
-    def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-
-    def succ(b: Double) = b + 1
-    def pred(b: Double) = b - 1
-    override def succn(a: Int, b: Double) = b + a
-    override def predn(a: Int, b: Double) = b - a
-    override def min = Some(Double.MinValue)
-    override def max = Some(Double.MaxValue)
-
     override def equalIsNatural: Boolean = true
+
+    def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
   implicit val doubleMultiplicationNewType: Group[Double @@ Multiplication] = new Group[Double @@ Multiplication] {
