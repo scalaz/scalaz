@@ -255,7 +255,7 @@ trait EitherTInstances extends EitherTInstances0 {
     implicit def F = F0
   }
 
-  implicit def eitherTMonadTrans[A]: MonadTrans[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] = new EitherTMonadTrans[A] {}
+  implicit def eitherTHoist[A]: Hoist[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] = new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[+_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] = F0.contramap((_: EitherT[F, A, B]).run)
 }
@@ -329,7 +329,7 @@ private[scalaz] trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, 
     fab.bitraverse(f, g)
 }
 
-private[scalaz] trait EitherTMonadTrans[A] extends MonadTrans[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] {
+private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] {
   def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
     def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
   }
@@ -339,7 +339,7 @@ private[scalaz] trait EitherTMonadTrans[A] extends MonadTrans[({type λ[α[+_], 
   implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
 
-private[scalaz] trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTMonadTrans[A] {
+private[scalaz] trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
   def MW: MonadWriter[F, W]
 
   implicit def F = MW
