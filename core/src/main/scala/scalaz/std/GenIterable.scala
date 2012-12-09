@@ -1,15 +1,16 @@
 package scalaz
 package std
+import scala.collection.GenIterable
 
-trait IterableInstances {
+trait GenIterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
+  implicit def genIterableShow[CC[X] <: GenIterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
+    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toArray:_*) :+ "]"
   }
 
   /** Lexicographical ordering */
-  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] = new Order[Iterable[A]] {
-    def order(a1: Iterable[A], a2: Iterable[A]): Ordering = {
+  implicit def genIterableOrder[A](implicit A: Order[A]): Order[GenIterable[A]] = new Order[GenIterable[A]] {
+    def order(a1: GenIterable[A], a2: GenIterable[A]): Ordering = {
       import scalaz.Ordering._
       val i1 = a1.iterator
       val i2 = a2.iterator
@@ -27,8 +28,8 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
-    def length[A](a: Iterable[A]) = {
+  implicit def genIterableLength: Length[GenIterable] = new Length[GenIterable] {
+    def length[A](a: GenIterable[A]) = {
       var n = 0
       val i = a.iterator
       while (i.hasNext) {
@@ -39,7 +40,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+  implicit def genIterableEqual[CC[X] <: GenIterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     def equal(a1: CC[A], a2: CC[A]) = {
       val i1 = a1.iterator
       val i2 = a2.iterator
@@ -58,7 +59,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableSubtypeTraverse[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
+  implicit def genIterableSubtypeTraverse[I[X] <: GenIterable[X]]: Foldable[I] = new Foldable[I] {
     def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldRight(fa, F.zero)((x,y) => Monoid[B].append(f(x), y))
 
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
@@ -68,4 +69,4 @@ trait IterableInstances {
 
 }
 
-object iterable extends IterableInstances
+object genIterable extends GenIterableInstances

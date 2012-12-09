@@ -869,7 +869,7 @@ trait FingerTreeInstances {
 
   implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
     import syntax.show._
-    import std.iterable._
+    import std.list._
     val AS = Show[List[A]]
     import Cord._
     override def show(t: FingerTree[V,A]) = t.fold(
