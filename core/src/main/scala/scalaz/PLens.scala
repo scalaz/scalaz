@@ -160,6 +160,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
     StateT(a => F.map(run(a))(_ match {
       case None => (a, None)
       case Some(w) => {
+        val r = s.run(w.pos): (B2, C)
         (w put r._1, Some(r._2))
       }
     }))
@@ -614,6 +615,7 @@ trait PLensTFunctions extends PLensFamilyTFunctions with PLensTInstances {
 
   import util.parsing.json._
 
+  def scalaJSONObjectPLens: JSONType @?> Map[String, Any] =
     plens {
       case JSONObject(m) => Some(Store(JSONObject(_), m))
       case _             => None
