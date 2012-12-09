@@ -452,7 +452,7 @@ trait LensTInstances {
       lens %== (_ push elem)
 
     def pop: State[S, Unit] =
-      lens %== (_ pop)
+      lens %== (_.pop)
 
     def pop2: State[S, A] =
       lens %%= State(_.pop2.swap)

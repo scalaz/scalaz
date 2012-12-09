@@ -13,6 +13,8 @@ object SyntaxUsage extends App {
   stdSyntax()
   stdSyntaxUeber()
 
+  def typed[T](t: T) = ()
+
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
   def syntax1() {
@@ -24,8 +26,8 @@ object SyntaxUsage extends App {
     import std.option.optionInstance.monadSyntax._
     val x = 1.point
     val y = point(1)
-    x: Option[Int]
-    y: Option[Int]
+    typed[Option[Int]](x)
+    typed[Option[Int]](x)
 
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join

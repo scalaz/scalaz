@@ -37,8 +37,8 @@ object FibStateExample extends App {
 
   val (nextFib: State[(Int, Int), Int]) = for {
     s <- init:State[(Int, Int), (Int, Int)]
-    val (a,b) = s
-    val n = a + b
+    (a,b) = s
+    n = a + b
     _ <- put (b, n)
   } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
             // yield b instead to get (1,1,2,3...)
@@ -121,7 +121,7 @@ object LaunchburyInterpreter extends App {
   // e.g. freshen(Lambda("x", Var("x"))).eval(initialState) => Lambda("$1", Var("$1"))
   private def freshen(e: Expr): State[ReduceState, Expr] = {
     val getFreshVar = for { s <- init: State[ReduceState,ReduceState]
-                            val ReduceState(_, f #:: fs) = s
+                            ReduceState(_, f #:: fs) = s
                             _ <- modify((s:ReduceState) => s.copy(freshVars = fs))
                           } yield f
     // Lambda and Let define new bound variables, so we substitute fresh variables into them
@@ -134,11 +134,11 @@ object LaunchburyInterpreter extends App {
       case Var(_)        => pure(e)
       case Let(bs, e2)   => for { fs <- getFreshVar.replicateM(bs.size)
                                   // Seq[((originalVar, Expr), freshVar)]
-                                  val newBindings = bs.toSeq.zip(fs)
+                                  newBindings = bs.toSeq.zip(fs)
                                   // sub(Map(originalVar -> freshVar))
-                                  val subs = sub( newBindings.map(tpl => tpl.copy(_1 = tpl._1._1)).toMap ) _
+                                  subs = sub( newBindings.map(tpl => tpl.copy(_1 = tpl._1._1)).toMap ) _
                                   // List[freshVar, Expr] - change to map when dolio's done
-                                  val bs2 = newBindings.map(tpl => tpl.copy(_2 = tpl._1._2, _1 = tpl._2)).toList
+                                  bs2 = newBindings.map(tpl => tpl.copy(_2 = tpl._1._2, _1 = tpl._2)).toList
                                   e3 <- freshen( subs(e2) )
                                   freshendBs <- bs2.traverseS{case (x,e) => freshen( subs(e) ).map((x,_))}.map(_.toMap)
                                 } yield Let(freshendBs, e3)
@@ -159,7 +159,7 @@ object LaunchburyInterpreter extends App {
                                              case _ => sys.error("Ill-typed lambda term")
                                            }
       case Var(x)        => for { state <- init:State[ReduceState, ReduceState]
-                                  val e2 = state.heap(x)
+                                  e2 = state.heap(x)
                                   _ <- modify((s:ReduceState) => s.copy(heap = s.heap - x))
                                   e3 <- reduce(e2)
                                   _ <- modify((s:ReduceState) => s.copy(heap = s.heap + ((x, e3))))

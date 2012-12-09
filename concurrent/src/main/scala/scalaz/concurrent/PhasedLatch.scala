@@ -46,7 +46,7 @@ trait PhasedLatches {
      *  an integer that continually increases. The phase can wrap around past
      *  Int#MaxValue
      */
-    val sync = new AbstractQueuedSynchronizer {
+    class QueuedSynchronizer extends AbstractQueuedSynchronizer {
       def currentPhase = getState
   
       override def tryAcquireShared(waitingFor: Int) =
@@ -54,12 +54,14 @@ trait PhasedLatches {
         else -1
   
       @annotation.tailrec
-      override def tryReleaseShared(ignore: Int) = {
+      override final def tryReleaseShared(ignore: Int) = {
         val phase = currentPhase
         if (compareAndSetState(phase, phase + 1)) true
         else tryReleaseShared(ignore)
       }
     }
+
+    val sync = new QueuedSynchronizer
   
     /** Release the current phase. */
     def release = IO { sync releaseShared 1 }

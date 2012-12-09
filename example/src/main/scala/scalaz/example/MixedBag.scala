@@ -29,7 +29,7 @@ object MixedBag extends App {
     import std.list._
     import syntax.traverse._
 
-    //    val xs: Option[List[Int]] = (1 to 100000 toList).traverse(x => some(x * 2))
+    //    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
     //    println(xs map (_ take 10))
     ()
   }
@@ -39,8 +39,8 @@ object MixedBag extends App {
     import std.stream._
     import syntax.traverse._
 
-    (1 to 100000 toStream).traverse(x => none[Int])
-    //    (1 to 100000 toStream).traverse(x => some(x * 2))
+    (1 to 100000).toStream.traverse(x => none[Int])
+    //    (1 to 100000).toStream.traverse(x => some(x * 2))
     ()
   }
 

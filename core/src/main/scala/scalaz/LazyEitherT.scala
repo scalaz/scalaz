@@ -39,16 +39,16 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
   }
 
   def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, B] =
-    lazyOptionT(F.map(run)(_ toLazyOption))
+    lazyOptionT(F.map(run)(_.toLazyOption))
 
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
-    optionT(F.map(run)(_ toOption))
+    optionT(F.map(run)(_.toOption))
 
   def toList(implicit F: Functor[F]): F[List[B]] =
-    F.map(run)(_ toList)
+    F.map(run)(_.toList)
 
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
-    F.map(run)(_ toStream)
+    F.map(run)(_.toStream)
 
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
     lazyEitherT(F.map(run)(_ map f))
@@ -113,16 +113,16 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
     }
 
     def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, A] =
-      lazyOptionT(F.map(lazyEitherT.run)(_.left toLazyOption))
+      lazyOptionT(F.map(lazyEitherT.run)(_.left.toLazyOption))
 
     def toOption(implicit F: Functor[F]): OptionT[F, A] =
-      optionT(F.map(lazyEitherT.run)(_.left toOption))
+      optionT(F.map(lazyEitherT.run)(_.left.toOption))
 
     def toList(implicit F: Functor[F]): F[List[A]] =
-      F.map(lazyEitherT.run)(_.left toList)
+      F.map(lazyEitherT.run)(_.left.toList)
 
     def toStream(implicit F: Functor[F]): F[Stream[A]] =
-      F.map(lazyEitherT.run)(_.left toStream)
+      F.map(lazyEitherT.run)(_.left.toStream)
 
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
       LazyEitherT(F.map(lazyEitherT.run)(_.left map f))

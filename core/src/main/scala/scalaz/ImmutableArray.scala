@@ -174,7 +174,7 @@ trait ImmutableArrayFunctions {
 
     def ++[B >: Char](other: ImmutableArray[B]) =
       other match {
-        case other: StringArray => new StringArray(str + other.str)
+        case other: ImmutableArrayFunctions#StringArray => new StringArray(str + other.str)
         case _ => {
           val newArr = new Array[Char](length + other.length)
           this.copyToArray(newArr, 0, length)

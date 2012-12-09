@@ -155,7 +155,7 @@ sealed trait Element {
     withQname(_ setUri a)
 
   def setNoUri: Element =
-    withQname(_ setNoUri)
+    withQname(_.setNoUri)
 
   def withUri(a: Str => Str): Element =
     withQname(_ withUri a)
@@ -167,7 +167,7 @@ sealed trait Element {
     withQname(_ withPrefix a)
 
   def setNoPrefix: Element =
-    withQname(_ setNoPrefix)
+    withQname(_.setNoPrefix)
 
   def filterAttrsBy(p: Attr => Boolean): Element =
     withAttribs(_ filter p)

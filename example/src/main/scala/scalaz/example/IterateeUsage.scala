@@ -19,7 +19,7 @@ object IterateeUsage extends App {
   ((peek[Int, IO]   &= iter123).run unsafePerformIO()) assert_=== Some(1)
   ((head[Int, IO]   &= enumIterator[Int, IO](Iterator())).run unsafePerformIO()) assert_=== None
 
-  val stream1_10 = enumStream[Int, Id](1 to 10 toStream)
+  val stream1_10 = enumStream[Int, Id]((1 to 10).toStream)
 
   (take[Int, List](3) &= stream1_10).run assert_=== List(1, 2, 3)
   (takeWhile[Int, List](_ <= 5) &= stream1_10).run assert_=== (1 to 5).toList

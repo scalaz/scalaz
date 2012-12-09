@@ -28,7 +28,7 @@ object WordCount {
     val countWord = AppFuncU { (c: Char) =>
       for {
         x <- get[Boolean]
-        val y = c =/= ' '
+        y = c =/= ' '
         _ <- put(y)
       } yield test(y && !x)
     } @>>> AppFuncU { (x: Int) => x }

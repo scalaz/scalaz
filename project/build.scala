@@ -15,9 +15,19 @@ object build extends Build {
     crossScalaVersions := Seq("2.9.2", "2.10.0-RC5"),
     crossVersion := CrossVersion.full,
     resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
-    scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
-      bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+
+    scalacOptions <++= (scalaVersion) map { sv =>
+      val versionDepOpts =
+        if (sv.contains("2.10"))
+          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials")
+        else
+          Seq("-Ydependent-method-types", "-deprecation")
+
+      Seq("-unchecked") ++ versionDepOpts
+    },
+
+    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")) map { bd =>
+      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
@@ -312,3 +322,5 @@ object build extends Build {
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
+
+// vim: expandtab:ts=2:sw=2

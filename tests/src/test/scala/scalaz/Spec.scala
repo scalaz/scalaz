@@ -47,12 +47,14 @@ trait Spec
     )
   }
 
-  implicit def enrichProperties(props: Properties) = new {
+  class PropertyOps(props: Properties) {
     def withProp(propName: String, prop: Prop) = new Properties(props.name) {
       for {(name, p) <- props.properties} property(name) = p
       property(propName) = prop
     }
   }
+
+  implicit def enrichProperties(props: Properties) = new PropertyOps(props)
 
   /**
    * Most of our scalacheck tests use (Int => Int). This generator includes non-constant
