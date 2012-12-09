@@ -159,9 +159,9 @@ trait UnwriterTFunctions {
       case (w, a) => Store((ww: W) => UnwriterT(MF.point(ww, a)), w)
     })
 
-  def unwriterAL[F[+_], W, A](implicit MF: Pointed[F]): LensT[F, UnwriterT[F, W, A], A] =
-    LensT(x => MF.map(x.run) {
-      case (w, a) => Store((aa: A) => UnwriterT(MF.point(w, aa)), a)
+  def unwriterAL[F[+_], W, A1, A2](implicit MF: Pointed[F]): LensFamilyT[F, UnwriterT[F, W, A1], UnwriterT[F, W, A2], A1, A2] =
+    LensFamilyT(x => MF.map(x.run) {
+      case (w, a) => IndexedStore((aa: A2) => UnwriterT(MF.point((w, aa))), a)
     })
 
 }

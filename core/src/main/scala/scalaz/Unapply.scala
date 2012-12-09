@@ -62,7 +62,7 @@ trait Unapply[TC[_[_]], MA] {
   def apply(ma: MA): M[A]
 }
 
-trait Unapply_3 {
+trait Unapply_4 {
   // /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
   implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[({type λ[α] = A0})#λ]): Unapply[TC, A0] {
     type M[X] = A0
@@ -72,6 +72,30 @@ trait Unapply_3 {
     type A = A0
     def TC = TC0
     def apply(ma: M[A0]) = ma
+  }
+}
+
+trait Unapply_3 extends Unapply_4 {
+  /**Unpack a value of type `M0[F[_], A0, A0, B0]` into types `[a]M0[F, a, a, B0]` and `A0`, given an instance of `TC` */
+  implicit def unapplyMFABC1and2[TC[_[_]], F[_], M0[F[_], _, _, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, α, B0]})#λ]): Unapply[TC, M0[F, A0, A0, B0]] {
+    type M[X] = M0[F, X, X, B0]
+    type A = A0
+  } = new Unapply[TC, M0[F, A0, A0, B0]] {
+    type M[X] = M0[F, X, X, B0]
+    type A = A0
+    def TC = TC0
+    def apply(ma: M0[F, A0, A0, B0]) = ma
+  }
+
+  /**Unpack a value of type `M0[F[_], A0, B0, C0]` into types `[c]M0[F, A0, B0, c]` and `C0`, given an instance of `TC` */
+  implicit def unapplyMFABC3[TC[_[_]], F[_], M0[F[_], _, _, _], A0, B0, C0](implicit TC0: TC[({type λ[ɣ] = M0[F, A0, B0, ɣ]})#λ]): Unapply[TC, M0[F, A0, B0, C0]] {
+    type M[X] = M0[F, A0, B0, X]
+    type A = C0
+  } = new Unapply[TC, M0[F, A0, B0, C0]] {
+    type M[X] = M0[F, A0, B0, X]
+    type A = C0
+    def TC = TC0
+    def apply(ma: M0[F, A0, B0, C0]) = ma
   }
 }
 
