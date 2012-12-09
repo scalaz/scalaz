@@ -206,10 +206,10 @@ trait Enum[F] extends Order[F] { self =>
       equal(self.predn(n, x), Enum.predn(n, x)(self))
 
     def succorder(x: F): Boolean =
-      greaterThanOrEqual(succ(x), x)
+      max forall (m => equal(m, x) || greaterThanOrEqual(succ(x), x))
 
     def predorder(x: F): Boolean =
-      lessThanOrEqual(pred(x), x)
+      min forall (m => equal(m, x) || lessThanOrEqual(pred(x), x))
   }
 
   def enumLaw = new EnumLaw {}

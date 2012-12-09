@@ -70,6 +70,8 @@ object ScalazProperties {
       property("successor of the max is the min") = minmaxsucc[A]
       property("n-successor is n-times successor") = succn[A]
       property("n-predecessor is n-times predecessor") = predn[A]
+      property("successor is greater or equal") = succorder[A]
+      property("predecessor is less or equal") = predorder[A]
     }
   }
 
