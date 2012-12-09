@@ -41,7 +41,7 @@ object TypeClass {
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
   lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor))
-  lazy val cojoin = TypeClass("Cojoin", *->*)
+  lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
