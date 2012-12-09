@@ -140,7 +140,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
   def st[A <: A1](implicit F: Functor[F]): PStateT[F, A, B1] =
     StateT(s => F.map(get(s))((s, _)))
 
-  def %=[A >: A2 <: A1, B >: B1 <: B2](f: B1 => B)(implicit F: Functor[F]): PStateT[F, A, B] =
+  def %=[A >: A2 <: A1, B <: B2](f: B1 => B)(implicit F: Functor[F]): PStateT[F, A, B] =
     StateT(a => F.map(run(a))(_ match {
       case None => (a, None)
       case Some(w) => {
@@ -149,26 +149,25 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
       }
     }))
 
-  def :=[A >: A2 <: A1, B >: B1 <: B2](b: => B)(implicit F: Functor[F]): PStateT[F, A, B] =
+  def :=[A >: A2 <: A1, B <: B2](b: => B)(implicit F: Functor[F]): PStateT[F, A, B] =
     %=(_ => b)
 
-  def %==[A >: A2 <: A1, B >: B1 <: B2](f: B1 => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
+  def %==[A >: A2 <: A1, B <: B2](f: B1 => B)(implicit F: Functor[F]): StateT[F, A, Unit] =
     StateT(a =>
       F.map(mod(f, a))((_, ())))
 
-  def %%=[C, A >: A2 <: A1, B >: B1 <: B2](s: State[B, C])(implicit F: Functor[F]): PStateT[F, A, C] =
+  def %%=[A >: A2 <: A1, C](s: IndexedState[B1, B2, C])(implicit F: Functor[F]): PStateT[F, A, C] =
     StateT(a => F.map(run(a))(_ match {
       case None => (a, None)
       case Some(w) => {
-        val r = s.run(w.pos): (B, C)
         (w put r._1, Some(r._2))
       }
     }))
 
-  def >-[C, A >: A2 <: A1](f: B1 => C)(implicit F: Functor[F]): PStateT[F, A, C] =
+  def >-[A >: A2 <: A1, C](f: B1 => C)(implicit F: Functor[F]): PStateT[F, A, C] =
     StateT(a => F.map(get(a))(x => (a, x map f)))
 
-  def >>-[C, A >: A2 <: A1](f: B1 => StateT[F, A, C])(implicit F: Monad[F]): PStateT[F, A, C] =
+  def >>-[A >: A2 <: A1, C](f: B1 => StateT[F, A, C])(implicit F: Monad[F]): PStateT[F, A, C] =
     StateT(a => F.bind(get(a))(_ match {
       case None => F.point((a, None))
       case Some(w) =>
@@ -177,7 +176,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
         }
     }))
 
-  def ->>-[C, A >: A2 <: A1](f: => StateT[F, A, C])(implicit F: Monad[F]): PStateT[F, A, C] =
+  def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedStateT[F, X1, X2, C])(implicit F: Monad[F]): PIndexedStateT[F, X1, X2, C] =
     >>-(_ => f)
 
   /** Partial Lenses can be composed */
@@ -615,13 +614,12 @@ trait PLensTFunctions extends PLensFamilyTFunctions with PLensTInstances {
 
   import util.parsing.json._
 
-  def scalaJSONObjectPLens[A]: JSONType @?> Map[String, Any] =
     plens {
       case JSONObject(m) => Some(Store(JSONObject(_), m))
       case _             => None
     }
 
-  def scalaJSONArrayPLens[A]: JSONType @?> List[Any] =
+  def scalaJSONArrayPLens: JSONType @?> List[Any] =
     plens {
       case JSONArray(a) => Some(Store(JSONArray(_), a))
       case _            => None

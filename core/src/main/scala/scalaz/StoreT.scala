@@ -23,7 +23,7 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def contramap[X](g: X => A)(implicit F: Functor[F]) =
     indexedStoreT((F.map(set)(_ compose g), pos))
 
-  def bimap[X, Y](f: I => X, g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
+  def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
     indexedStoreT((F.map(set)(g compose _), f(pos)))
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
@@ -157,7 +157,7 @@ private[scalaz] trait IndexedStoreTContravariant[F[+_], I0, B0] extends Contrava
 
 private[scalaz] trait IndexedStoreTBifunctor[F[+_], A0] extends Bifunctor[({type λ[+α, +β]=IndexedStoreT[F, α, A0, β]})#λ] {
   implicit def F: Functor[F]
-  override def bimap[A, B, C, D](fab: IndexedStoreT[F, A, A0, B])(f: A => C, g: B => D): IndexedStoreT[F, C, A0, D] = fab bimap (f, g)
+  override def bimap[A, B, C, D](fab: IndexedStoreT[F, A, A0, B])(f: A => C, g: B => D): IndexedStoreT[F, C, A0, D] = (fab bimap f)(g)
 }
 
 private[scalaz] trait StoreTCopointed[F[+_], A0] extends Copointed[({type λ[+α]=StoreT[F, A0, α]})#λ] with IndexedStoreTFunctorRight[F, A0, A0] {

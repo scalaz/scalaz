@@ -118,10 +118,27 @@ package object scalaz {
     def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
+  /**
+   * StateT Monad Transformer
+   *
+   * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
+   */
+  type StateT[F[+_], S, +A] = IndexedStateT[F, S, S, A]
+  type IndexedState[-S1, +S2, +A] = IndexedStateT[Id, S1, S2, A]
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, +A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object StateT extends StateTFunctions with StateTInstances {
+    def apply[F[+_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
+      def apply(s: S) = f(s)
+    }
+  }
+  object IndexedState extends StateFunctions {
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = new IndexedState[S1, S2, A] {
+      def apply(s: S1) = f(s)
+    }
+  }
   object State extends StateFunctions {
     def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
       def apply(s: S) = f(s)
@@ -213,7 +230,9 @@ package object scalaz {
 
   type @?>[A, B] = PLens[A, B]
 
-  type PStateT[F[+_], A, +B] = StateT[F, A, Option[B]]
+  type PIndexedStateT[F[+_], -S1, +S2, +A] = IndexedStateT[F, S1, S2, Option[A]]
+  type PStateT[F[+_], S, +A] = PIndexedStateT[F, S, S, A]
 
-  type PState[A, +B] = StateT[Id, A, Option[B]]
+  type PIndexedState[-S1, +S2, +A] = PIndexedStateT[Id, S1, S2, A]
+  type PState[S, +A] = PStateT[Id, S, A]
 }
