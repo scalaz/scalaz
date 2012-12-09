@@ -19,7 +19,9 @@ object build extends Build {
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
         if (sv.contains("2.10"))
-          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials")
+          // does not contain -deprecation (because of ClassManifest)
+          // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
+          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
         else
           Seq("-Ydependent-method-types", "-deprecation")
 
