@@ -45,14 +45,18 @@ trait OrderingInstances {
       case Ordering.LT => Ordering.GT
     }
     override def succn(a: Int, b: Ordering) =
-      if(a % 3 == 0)
+      if(a < 0)
+        predn(-a, b)
+      else if(a % 3 == 0)
         b
       else if(a % 3 == 1)
         succ(b)
       else
         succ(succ(b))
     override def predn(a: Int, b: Ordering) =
-      if(a % 3 == 0)
+      if(a < 0)
+        succn(-a, b)
+      else if(a % 3 == 0)
         b
       else if(a % 3 == 1)
         pred(b)
