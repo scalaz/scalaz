@@ -17,7 +17,7 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
   def run(initial: S1): F[(S2, A)] = apply(initial)
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZero(implicit S: Monoid[S1]): F[(S2, A)] =
+  def runZero[S <: S1](implicit S: Monoid[S]): F[(S2, A)] =
     run(S.zero)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
@@ -25,7 +25,7 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
     F.map(apply(initial))(_._2)
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
-  def evalZero(implicit F: Functor[F], S: Monoid[S1]): F[A] =
+  def evalZero[S <: S1](implicit F: Functor[F], S: Monoid[S]): F[A] =
     eval(S.zero)
 
   /** Run, discard the final value, and return the final state in the context of `F` */
@@ -33,7 +33,7 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
     F.map(apply(initial))(_._1)
 
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
-  def execZero(implicit F: Functor[F], S: Monoid[S1]): F[S2] =
+  def execZero[S <: S1](implicit F: Functor[F], S: Monoid[S]): F[S2] =
     exec(S.zero)
 
   def map[B](f: A => B)(implicit F: Functor[F]): IndexedStateT[F, S1, S2, B] = IndexedStateT(s => F.map(apply(s)) {
@@ -68,11 +68,11 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
   }
 
   import Liskov._
-  def unlift[M[+_], FF[+_], AA >: A](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[({type λ[+α] = M[FF[α]]})#λ, S1, S2, AA]): IndexedStateT[FF, S1, S2, AA] = new IndexedStateT[FF, S1, S2, AA] {
-    def apply(initial: S1): FF[(S2, AA)] = Copointed[M].copoint(ev(self)(initial))
+  def unlift[M[+_], FF[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[({type λ[+α] = M[FF[α]]})#λ, S1m, S2m, AA]): IndexedStateT[FF, S1m, S2m, AA] = new IndexedStateT[FF, S1m, S2m, AA] {
+    def apply(initial: S1m): FF[(S2m, AA)] = Copointed[M].copoint(ev(self)(initial))
   }
 
-  def unliftId[M[+_], AA >: A](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[M, S1, S2, AA]): IndexedState[S1, S2, AA] = unlift[M, Id, AA]
+  def unliftId[M[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[M, S1m, S2m, AA]): IndexedState[S1m, S2m, AA] = unlift[M, Id, AA, S1m, S2m]
 
   def rwst[W, R, S >: S2 <: S1](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
     (r, s) => F.map(self(s)) {
@@ -191,9 +191,9 @@ private[scalaz] trait StateTMonadState[S, F[+_]] extends MonadState[({type f[s, 
 
   def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, ())))
 
-  def modify(f: S => S): StateT[F, S, Unit] = StateT(s => F.point((f(s), ())))
+  override def modify(f: S => S): StateT[F, S, Unit] = StateT(s => F.point((f(s), ())))
 
-  def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
+  override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
 }
 
 private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[+_], +a] = StateT[g, S, a]})#f] {

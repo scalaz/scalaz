@@ -177,7 +177,7 @@ sealed trait PLensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
         }
     }))
 
-  def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedStateT[F, X1, X2, C])(implicit F: Monad[F]): PIndexedStateT[F, X1, X2, C] =
+  def ->>-[A >: A2 <: A1, C](f: => StateT[F, A, C])(implicit F: Monad[F]): PStateT[F, A, C] =
     >>-(_ => f)
 
   /** Partial Lenses can be composed */
