@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 import org.specs2.ScalaCheck
 import org.scalacheck.Prop._
 import FingerTree._
-import scalacheck.ScalazArbitrary._
+import testlib.ScalazArbitrary._
 import std.anyVal._
 import syntax.equal._
 import std.stream._

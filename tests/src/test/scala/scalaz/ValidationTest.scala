@@ -1,9 +1,9 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class ValidationTest extends Spec {
+class ValidationTest extends testlib.Spec {
   import std.AllInstances._
 
   checkAll("Validation", order.laws[Validation[Int, Int]])

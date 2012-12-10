@@ -1,6 +1,6 @@
 package scalaz
 
-class LiskovTest extends Spec {
+class LiskovTest extends testlib.Spec {
 
   trait Co1[+ _]
 

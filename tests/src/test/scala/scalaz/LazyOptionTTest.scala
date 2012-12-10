@@ -1,10 +1,10 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
 
-class LazyOptionTTest extends Spec {
+class LazyOptionTTest extends testlib.Spec {
 
   type LazyOptionTList[A] = LazyOptionT[List, A]
 

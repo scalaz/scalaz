@@ -1,11 +1,11 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
-import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, _}
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary
+import scalaz.testlib.ScalazArbitrary.{stateTArb => _, _}
 import std.AllInstances._
 
-class LevenshteinTest extends Spec {
+class LevenshteinTest extends testlib.Spec {
   "string distance" in {
     MetricSpace[String].distance("kitten", "sitting") must be_===(3)
   }

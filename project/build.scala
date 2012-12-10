@@ -114,7 +114,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ Unidoc.settings,
-    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, testlib, typelevel, xml, tests)
   )
 
   lazy val core = Project(
@@ -205,23 +205,27 @@ object build extends Build {
     )
   )
 
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
+  lazy val testlib = Project(
+    id           = "testlib",
+    base         = file("testlib"),
     dependencies = Seq(core, concurrent, typelevel),
     settings     = standardSettings ++ Seq[Sett](
-      name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full,
-      osgiExport("scalaz.scalacheck")
+      name := "scalaz-testlib",
+      libraryDependencies ++= Seq(
+        "org.specs2" %% "specs2" % "1.12.3" cross CrossVersion.full,
+        "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full
+      ),
+      osgiExport("scalaz.testlib")
     )
   )
 
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
+    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, testlib % "test"),
+    settings = standardSettings ++ Seq[Sett](
       name := "scalaz-tests",
+      publishTo := None,
       libraryDependencies ++= Seq(
         "org.specs2" %% "specs2" % "1.12.3" % "test" cross CrossVersion.full,
         "org.scalacheck" %% "scalacheck" % "1.10.0" % "test" cross CrossVersion.full

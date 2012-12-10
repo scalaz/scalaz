@@ -1,10 +1,10 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class ListTTest extends Spec {
+class ListTTest extends testlib.Spec {
   type ListTOpt[A] = ListT[Option, A]
 
   "fromList / toList" ! prop {

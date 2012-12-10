@@ -1,11 +1,11 @@
 package scalaz
 package concurrent
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
 
-class PromiseTest extends Spec {
+class PromiseTest extends testlib.Spec {
   implicit def promiseEqual[A: Equal] = Equal[A].contramap((_: Promise[A]).get)
 
   checkAll(monad.laws[Promise])

@@ -6,10 +6,10 @@ import Zipper._
 import syntax.equal._
 import org.scalacheck._
 import org.scalacheck.Prop._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class ZipperTest extends Spec {
+class ZipperTest extends testlib.Spec {
   // TODO retronym Get this working again under Scala 2.10.0-M6+
   // val props = new Properties("Zipper") {
   //   property("Zipper From Stream") = forAll((xs: Stream[Int]) =>

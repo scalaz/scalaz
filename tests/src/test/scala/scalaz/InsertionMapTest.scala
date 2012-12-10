@@ -1,10 +1,10 @@
 package scalaz
 
-import scalacheck.ScalazArbitrary._
-import scalacheck.ScalazProperties._
+import testlib.ScalazArbitrary._
+import testlib.ScalazProperties._
 import std.AllInstances._
 
-class InsertionMapTest extends Spec {
+class InsertionMapTest extends testlib.Spec {
   checkAll(equal.laws[InsertionMap[Int, String]])
 
   "isEmpty == keys.isEmpty" ! prop {

@@ -1,10 +1,10 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class NeedTest extends Spec {
+class NeedTest extends testlib.Spec {
   // TODO check distributive laws
 
   checkAll("Value", monad.laws[Value])

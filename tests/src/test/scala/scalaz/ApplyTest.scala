@@ -5,7 +5,7 @@ import syntax.apply._
 import std.option.some
 import syntax.traverse._
 
-class ApplyTest extends Spec {
+class ApplyTest extends testlib.Spec {
   "mapN" in {
     Apply[Option].apply2(some("1"), some("2"))(_ + _) must be_===(some("12"))
     Apply[Option].apply3(some("1"), some("2"), some("3"))(_ + _ + _) must be_===(some("123"))

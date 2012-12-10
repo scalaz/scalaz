@@ -2,11 +2,11 @@ package scalaz
 package typelevel
 
 import scalaz.std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalaCheckBinding._
 import org.scalacheck.Arbitrary
 
-class ProductTest extends Spec {
+class ProductTest extends testlib.Spec {
 
   import syntax.typelevel.all._
 

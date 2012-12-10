@@ -1,11 +1,11 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import org.scalacheck.{Gen, Arbitrary}
 
-class PLensTTest extends Spec {
+class PLensTTest extends testlib.Spec {
   import PLensT._
 
   "list head" in {

@@ -1,14 +1,14 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
+import scalaz.testlib.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.Arbitrary
 import scalaz._
 import Id._
 
-class WriterTTest extends Spec {
+class WriterTTest extends testlib.Spec {
 
   type WriterTOpt[W, A] = WriterT[Option, W, A]
   type WriterTOptInt[A] = WriterTOpt[Int, A]

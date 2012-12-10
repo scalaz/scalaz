@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-class BooleanSyntaxTest extends Spec {
+class BooleanSyntaxTest extends testlib.Spec {
   "boolean syntax" in {
     import syntax.id._
     import syntax.std.boolean._

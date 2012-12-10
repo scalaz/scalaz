@@ -1,12 +1,12 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
-import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, _}
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary
+import scalaz.testlib.ScalazArbitrary.{stateTArb => _, _}
 import std.AllInstances._
 import Id._
 
-class StateTTest extends Spec {
+class StateTTest extends testlib.Spec {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]

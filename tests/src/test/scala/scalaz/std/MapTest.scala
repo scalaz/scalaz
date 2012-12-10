@@ -2,10 +2,10 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
+import scalaz.testlib.ScalazProperties._
 import scala.math.{Ordering => SOrdering}
 
-class MapTest extends Spec {
+class MapTest extends testlib.Spec {
   "map ordering" ! prop {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])

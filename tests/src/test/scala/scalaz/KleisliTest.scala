@@ -1,12 +1,12 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import org.scalacheck.{Gen, Arbitrary}
 import Id._
 
-class KleisliTest extends Spec {
+class KleisliTest extends testlib.Spec {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]

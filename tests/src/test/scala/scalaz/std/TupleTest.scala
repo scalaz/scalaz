@@ -2,10 +2,10 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class TupleTest extends Spec {
+class TupleTest extends testlib.Spec {
 
   type A = Int
   type B = Int

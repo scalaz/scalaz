@@ -1,14 +1,14 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.testlib.ScalazArbitrary._
+import scalaz.testlib.ScalaCheckBinding._
 import org.scalacheck.{Arbitrary, Gen}
 
 
-class BKTreeTest extends Spec {
+class BKTreeTest extends testlib.Spec {
   implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))
 
   "string distance" in {

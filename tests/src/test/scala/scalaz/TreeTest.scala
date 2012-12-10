@@ -1,11 +1,11 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Tree._
 
-class TreeTest extends Spec {
+class TreeTest extends testlib.Spec {
 
   checkAll("Tree", equal.laws[Tree[Int]])
 
