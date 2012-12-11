@@ -266,8 +266,8 @@ sealed trait \/[+A, +B] {
 
 
 }
-private case class -\/[+A](a: A) extends (A \/ Nothing)
-private case class \/-[+B](b: B) extends (Nothing \/ B)
+case class -\/[+A](a: A) extends (A \/ Nothing)
+case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
