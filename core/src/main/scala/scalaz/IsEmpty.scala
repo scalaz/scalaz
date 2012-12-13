@@ -16,7 +16,7 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
     def emptyIsEmpty[A]: Boolean = isEmpty(empty[A])
 
     def emptyPlusIdentity[A](f1: F[A], f2: F[A]): Boolean =
-      isEmpty(f1) && isEmpty(f2) == isEmpty(plus(f1, f2))
+      (isEmpty(f1) && isEmpty(f2)) == isEmpty(plus(f1, f2))
   }
 
   def isEmptyLaw = new IsEmptyLaw {}
