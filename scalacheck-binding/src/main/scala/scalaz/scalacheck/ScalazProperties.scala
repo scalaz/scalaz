@@ -48,9 +48,9 @@ object ScalazProperties {
 
     def predsucc[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predsucc _)
 
-    def minmaxpred[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxpred
+    def minmaxpred[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxpred
 
-    def minmaxsucc[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxsucc
+    def minmaxsucc[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxsucc
 
     def succn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succn1 _)
 
