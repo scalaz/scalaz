@@ -248,6 +248,20 @@ object ScalazProperties {
     }
   }
 
+  object isEmpty {
+    def emptyIsEmpty[F[_], X](implicit f: IsEmpty[F]):Prop =
+      f.isEmptyLaw.emptyIsEmpty[X]
+
+    def emptyPlusIdentity[F[_], X](implicit f: IsEmpty[F], afx: Arbitrary[F[X]]) =
+      forAll(f.isEmptyLaw.emptyPlusIdentity[X] _)
+
+    def laws[F[_]](implicit F: IsEmpty[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]) = new Properties("isEmpty") {
+      include(plusEmpty.laws[F])
+      property("empty is empty") = emptyIsEmpty[F, Int]
+      property("empty plus identity") =  emptyPlusIdentity[F, Int]
+    }
+  }
+
   object monadPlus {
     def emptyMap[F[_], X](implicit f: MonadPlus[F], afx: Arbitrary[X => X], ef: Equal[F[X]]) =
       forAll(f.monadPlusLaw.emptyMap[X] _)
