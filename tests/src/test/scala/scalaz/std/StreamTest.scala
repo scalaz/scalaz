@@ -9,6 +9,7 @@ class StreamTest extends Spec {
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
   checkAll(traverse.laws[Stream])
+  checkAll(isEmpty.laws[Stream])
 
   import std.stream.streamSyntax._
 
