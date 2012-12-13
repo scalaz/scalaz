@@ -6,7 +6,7 @@ package scalaz
  * Example:
  * {{{
  * val x: Option[String \/ Int] = Some(\/-(1))
- * EitherT(x).map(1+).run // Some(\/-(2)
+ * EitherT(x).map(1+).run // Some(\/-(2))
  * }}}
  * */
 sealed trait EitherT[F[+_], +A, +B] {
