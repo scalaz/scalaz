@@ -1,12 +1,12 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
-import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, _}
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary
+import scalaz.testlib.ScalazArbitrary.{stateTArb => _, _}
 import std.AllInstances._
 import org.scalacheck.{Gen, Arbitrary}
 
-class ReaderWriterStateTTest extends Spec {
+class ReaderWriterStateTTest extends testlib.Spec {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
   implicit val RWSOptIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int]](
     Gen.value(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),

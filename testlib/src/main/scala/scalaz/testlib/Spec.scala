@@ -1,4 +1,5 @@
 package scalaz
+package testlib
 
 import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder

@@ -2,13 +2,13 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
+import scalaz.testlib.ScalaCheckBinding._
 import Tags._
 import org.scalacheck.{Gen, Arbitrary}
 
-class AnyValTest extends Spec {
+class AnyValTest extends testlib.Spec {
 
   checkAll("Unit", order.laws[Unit])
   checkAll("Boolean", order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))

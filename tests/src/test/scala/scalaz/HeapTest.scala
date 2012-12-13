@@ -1,10 +1,10 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import scalaz.std.AllInstances._
 
-class HeapTest extends Spec {
+class HeapTest extends testlib.Spec {
   checkAll(equal.laws[Heap[Int]])
   checkAll(monoid.laws[Heap[Int]])
 

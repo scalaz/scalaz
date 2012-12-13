@@ -4,7 +4,7 @@ import std.AllInstances._
 import std.option.some
 import syntax.functor._
 
-class FunctorTest extends Spec {
+class FunctorTest extends testlib.Spec {
 
   "mapply" in {
     1.mapply(some((a: Int) => a)) must be_===(some(1))

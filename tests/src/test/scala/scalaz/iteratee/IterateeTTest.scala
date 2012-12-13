@@ -6,7 +6,7 @@ import Iteratee._
 import effect._
 import Id._
 
-class IterateeTTest extends Spec {
+class IterateeTTest extends testlib.Spec {
   "head" in {
     (head[Int, Id] &= enumStream(Stream(1, 2, 3))).run must be_===(Some(1))
   }

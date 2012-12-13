@@ -4,7 +4,7 @@ package effect
 import std.AllInstances._
 import ST._
 
-class STTest extends Spec {
+class STTest extends testlib.Spec {
   type ForallST[A] = Forall[({type λ[S] = ST[S, A]})#λ]
 
   "STRef" in {

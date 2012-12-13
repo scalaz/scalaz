@@ -2,11 +2,11 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Tags._
 
-class EitherTest extends Spec {
+class EitherTest extends testlib.Spec {
   checkAll("Either", order.laws[Either[Int, Int]])
   checkAll("Either.LeftProjection", order.laws[Either.LeftProjection[Int, Int]])
   checkAll("Either.LeftProjection @@ First", order.laws[Either.LeftProjection[Int, Int] @@ First])

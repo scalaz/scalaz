@@ -9,7 +9,7 @@ import Either3._
 import MonadPartialOrder._
 import Id._
 
-class Enumeratee2TTest extends Spec {
+class Enumeratee2TTest extends testlib.Spec {
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
   implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]

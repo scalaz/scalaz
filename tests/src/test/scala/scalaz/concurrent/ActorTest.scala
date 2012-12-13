@@ -1,10 +1,9 @@
 package scalaz
 package concurrent
 
-import scalaz.Spec
 import std.AllInstances._
 
-class ActorTest extends Spec {
+class ActorTest extends testlib.Spec {
   "code executes async" in {
     var called = false
     implicit val strategy = new Strategy {

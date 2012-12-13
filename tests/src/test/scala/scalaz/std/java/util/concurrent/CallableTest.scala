@@ -6,9 +6,9 @@ package concurrent
 
 import _root_.java.util.concurrent.Callable
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class CallableTest extends Spec {
+class CallableTest extends testlib.Spec {
   checkAll("Callable", equal.laws[Callable[Int]])
 }

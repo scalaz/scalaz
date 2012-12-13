@@ -1,11 +1,11 @@
 package scalaz
 package std
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
 
-class IterableTest extends Spec {
+class IterableTest extends testlib.Spec {
 
   import std.iterable._
 

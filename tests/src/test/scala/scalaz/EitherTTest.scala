@@ -1,10 +1,10 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
 
-class EitherTTest extends Spec {
+class EitherTTest extends testlib.Spec {
 
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]

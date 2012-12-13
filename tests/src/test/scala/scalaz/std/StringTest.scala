@@ -2,9 +2,9 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
+import scalaz.testlib.ScalazProperties._
 
-class StringTest extends Spec {
+class StringTest extends testlib.Spec {
   checkAll(monoid.laws[String])
 
   checkAll(order.laws[String].withProp("benchmark", order.scalaOrdering[String]))

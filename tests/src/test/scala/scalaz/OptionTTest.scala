@@ -1,10 +1,10 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import std.AllInstances._
 
-class OptionTTest extends Spec {
+class OptionTTest extends testlib.Spec {
 
   type OptionTList[A] = OptionT[List, A]
   type OptionTOption[A] = OptionT[Option, A]

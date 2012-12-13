@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-class MonoidTest extends Spec {
+class MonoidTest extends testlib.Spec {
   "endo multiply" in {
     import syntax.monoid._
 

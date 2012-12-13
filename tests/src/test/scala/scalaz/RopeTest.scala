@@ -1,6 +1,6 @@
 package scalaz
 
-import scalacheck.ScalazArbitrary._
+import testlib.ScalazArbitrary._
 import org.specs2.ScalaCheck
 import org.specs2.mutable.Specification
 import reflect.ClassManifest

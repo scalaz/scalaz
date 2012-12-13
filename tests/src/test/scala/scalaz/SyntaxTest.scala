@@ -1,6 +1,6 @@
 package scalaz
 
-class SyntaxTest extends Spec {
+class SyntaxTest extends testlib.Spec {
   val resultToProp = () // shodow pesky Specs implicit view
 
   "functor syntax" in {

@@ -1,5 +1,5 @@
 package scalaz
-package scalacheck
+package testlib
 
 import java.math.BigInteger
 import org.scalacheck.{Pretty, Gen, Arbitrary}

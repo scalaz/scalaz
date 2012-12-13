@@ -5,11 +5,11 @@ package math
 
 import _root_.java.math.BigInteger
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Tags._
 
-class BigIntegerTest extends Spec {
+class BigIntegerTest extends testlib.Spec {
   checkAll("BigInteger", order.laws[BigInteger])
   checkAll("BigInteger @@ Multiplication", order.laws[BigInteger @@ Multiplication])
   checkAll("BigInteger", group.laws[BigInteger])

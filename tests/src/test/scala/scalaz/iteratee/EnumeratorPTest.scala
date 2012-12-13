@@ -10,12 +10,12 @@ import org.scalacheck.{Pretty, Gen, Arbitrary}
 import Arbitrary._
 import Gen._
 import syntax.functor._
-import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Id._
 
-class EnumeratorPTest extends Spec {
+class EnumeratorPTest extends testlib.Spec {
   implicit val intO = Order[Int].order _
   "cogroupE" should {
     "work the same as directly using the nested iteratee " in {

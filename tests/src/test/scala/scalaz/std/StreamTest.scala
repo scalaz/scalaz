@@ -2,9 +2,9 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
+import scalaz.testlib.ScalazProperties._
 
-class StreamTest extends Spec {
+class StreamTest extends testlib.Spec {
   checkAll(equal.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])

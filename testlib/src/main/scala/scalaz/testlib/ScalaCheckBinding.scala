@@ -1,5 +1,5 @@
 package scalaz
-package scalacheck
+package testlib
 
 /**
  * Type class instances for types from <a href="https://github.com/rickynils/scalacheck">Scalacheck</a>

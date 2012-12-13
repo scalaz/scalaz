@@ -3,14 +3,14 @@ package std
 
 import std.nodeseq._
 import syntax.apply._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalaCheckBinding._
 import org.scalacheck.{ Gen, Arbitrary }
 import Id._
 
 import scala.xml.{ Node, NodeSeq, XML }
 
-class NodeSeqTest extends Spec {
+class NodeSeqTest extends testlib.Spec {
   {
     val validStr = """[a-zA-Z]+""".r
     val strFilter = (s: String) ⇒ validStr.pattern.matcher(s).matches

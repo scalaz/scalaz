@@ -3,11 +3,11 @@ package std
 package math
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Tags._
 
-class BigIntTest extends Spec {
+class BigIntTest extends testlib.Spec {
   checkAll("BigInt", order.laws[BigInt])
   checkAll("BigInt @@ Multiplication", order.laws[BigInt @@ Multiplication])
 

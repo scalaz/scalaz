@@ -9,12 +9,12 @@ import org.scalacheck.{Pretty, Gen, Arbitrary}
 import Arbitrary._
 import Gen._
 import syntax.functor._
-import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalaCheckBinding._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Id._
 
-class EnumeratorTTest extends Spec {
+class EnumeratorTTest extends testlib.Spec {
   implicit def enumeratorTArb[F[_], A](implicit FA: Arbitrary[List[A]], F: Monad[F]): Arbitrary[EnumeratorT[A, F]] = Functor[Arbitrary].map(FA)(l => EnumeratorT.enumStream[A, F](l.toStream))
 
   implicit def enumeratorEqual[A](implicit EQ: Equal[A]): Equal[Enumerator[A]] = new Equal[Enumerator[A]] {

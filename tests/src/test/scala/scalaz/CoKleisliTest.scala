@@ -1,6 +1,6 @@
 package scalaz
 
-class CokleisliTest extends Spec {
+class CokleisliTest extends testlib.Spec {
 
   // TODO enforce laws.
 

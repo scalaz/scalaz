@@ -1,10 +1,10 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class CaseInsensitiveTest extends Spec {
+class CaseInsensitiveTest extends testlib.Spec {
 
   "map identity" ! prop {
     (a: CaseInsensitive[String]) =>

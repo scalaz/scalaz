@@ -2,12 +2,12 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import syntax.std._
 
-class ListTest extends Spec {
+class ListTest extends testlib.Spec {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.strongLaws[List])

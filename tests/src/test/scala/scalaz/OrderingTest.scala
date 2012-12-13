@@ -1,8 +1,8 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class OrderingTest extends Spec {
+class OrderingTest extends testlib.Spec {
   checkAll("Ordering", enum.laws[Ordering])
 }

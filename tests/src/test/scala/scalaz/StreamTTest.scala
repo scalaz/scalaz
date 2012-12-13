@@ -1,10 +1,10 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 
-class StreamTTest extends Spec {
+class StreamTTest extends testlib.Spec {
   type StreamTOpt[A] = StreamT[Option, A]
 
   "fromStream / toStream" ! prop {

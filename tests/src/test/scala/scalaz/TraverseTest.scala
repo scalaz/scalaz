@@ -1,8 +1,8 @@
 package scalaz
 
-import scalacheck.ScalazProperties
+import testlib.ScalazProperties
 
-class TraverseTest extends Spec {
+class TraverseTest extends testlib.Spec {
 
   import scalaz._
   import scalaz.State._

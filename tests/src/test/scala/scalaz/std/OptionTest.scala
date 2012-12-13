@@ -2,12 +2,12 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.testlib.ScalazProperties._
+import scalaz.testlib.ScalazArbitrary._
 import Tags._
 import org.scalacheck.Prop._
 
-class OptionTest extends Spec {
+class OptionTest extends testlib.Spec {
 
   checkAll("Option", order.laws[Option[Int]])
   checkAll("Option @@ First", order.laws[Option[Int] @@ First])

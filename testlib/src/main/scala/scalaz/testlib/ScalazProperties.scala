@@ -1,5 +1,5 @@
 package scalaz
-package scalacheck
+package testlib
 
 import org.scalacheck.{Arbitrary, Prop, Properties}
 import Prop.forAll
