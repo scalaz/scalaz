@@ -2,13 +2,14 @@ package scalaz
 package std
 
 trait SetInstances {
-  implicit val setInstance = new Traverse[Set] with MonadPlus[Set] with Each[Set] with Length[Set] {
+  implicit val setInstance = new Traverse[Set] with MonadPlus[Set] with Each[Set] with Length[Set] with IsEmpty[Set] {
     def each[A](fa: Set[A])(f: (A) => Unit) = fa foreach f
     def length[A](fa: Set[A]) = fa.size
     def point[A](a: => A) = Set(a)
     def bind[A, B](fa: Set[A])(f: A => Set[B]) = fa flatMap f
     def empty[A] = Set()
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
+    def isEmpty[A](fa: Set[A]) = fa.isEmpty
     override def map[A, B](l: Set[A])(f: A => B) = l map f
 
     // TODO duplication with ListInstances

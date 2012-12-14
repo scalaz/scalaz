@@ -65,7 +65,6 @@ trait IterableInstances {
 
     override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
   }
-
 }
 
 object iterable extends IterableInstances
