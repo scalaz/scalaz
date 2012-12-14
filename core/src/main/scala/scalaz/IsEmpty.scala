@@ -6,7 +6,7 @@ package scalaz
  * is in fact empty.
  */
 ////
-trait IsEmpty[F[_]] extends PlusEmpty[F] { self => 
+trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
   ////
   def isEmpty[A](fa: F[A]): Boolean
 
