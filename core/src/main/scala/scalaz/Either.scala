@@ -245,8 +245,8 @@ sealed trait \/[+A, +B] {
   /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
     this match {
-      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a)// :- ')'
-      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b)// :- ')'
+      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a) :- ')'
+      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
     }
 
   /** Convert to a validation. */
