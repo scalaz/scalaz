@@ -9,4 +9,5 @@ class SetTest extends Spec {
   checkAll(equal.laws[Set[Int]])
   checkAll(monadPlus.strongLaws[Option])
   checkAll(traverse.laws[Option])
+  checkAll(isEmpty.laws[Set])
 }

@@ -40,7 +40,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] {
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
     def each[A](fa: IxSq[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
     def length[A](fa: IxSq[A]) = fa.length
@@ -48,6 +48,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
     def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f
     def empty[A] = self.empty[A]
     def plus[A](a: IxSq[A], b: => IxSq[A]) = a ++ b
+    def isEmpty[A](a: IxSq[A]) = a.isEmpty
     override def map[A, B](v: IxSq[A])(f: A => B) = v map f
 
     def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b

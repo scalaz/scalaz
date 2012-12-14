@@ -4,7 +4,11 @@ package std
 trait MapInstances {
   import syntax.std.function2._
 
-  implicit def mapInstance[K] = new Traverse[({type F[V] = Map[K,V]})#F] {
+  implicit def mapInstance[K] = new Traverse[({type F[V] = Map[K,V]})#F] with IsEmpty[({type F[V] = Map[K,V]})#F] {
+    def empty[V] = Map.empty[K, V]
+    def plus[V](a: Map[K, V], b: => Map[K, V]) = a ++ b
+    def isEmpty[V](fa: Map[K, V]) = fa.isEmpty
+
     def traverseImpl[G[_],A,B](m: Map[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[Map[K,B]] = {
       import G.functorSyntax._
       list.listInstance.traverseImpl(m.toList)({ case (k, v) => f(v) map (k -> _) }) map (_.toMap)

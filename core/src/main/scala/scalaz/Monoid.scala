@@ -114,6 +114,12 @@ trait MonoidInstances {
     implicit def M: Monoid[M] = M0
   }
 
+  def liftPlusEmpty[A](implicit M0: Monoid[A]): PlusEmpty[({ type λ[α] = A })#λ] = new PlusEmpty[({ type λ[α] = A })#λ] {
+    type A0[α] = A
+    def empty[A]: A0[A] = M0.zero
+    def plus[A](f1: A0[A], f2: => A0[A]): A0[A] = M0.append(f1, f2)
+  }
+
   ////
 }
 

@@ -12,6 +12,7 @@ class ListTest extends Spec {
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
+  checkAll(isEmpty.laws[List])
 
   import std.list.listSyntax._
   import syntax.monad._

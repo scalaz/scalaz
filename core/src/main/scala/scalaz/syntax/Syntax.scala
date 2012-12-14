@@ -25,6 +25,8 @@ trait Syntaxes {
 
   object metricSpace extends ToMetricSpaceOps
 
+  object isEmpty extends ToIsEmptyOps
+
   object plusEmpty extends ToPlusEmptyOps
 
   object each extends ToEachOps
