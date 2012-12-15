@@ -32,4 +32,5 @@ class EitherTest extends Spec {
   checkAll("Either", monad.laws[({type f[x] = Either[Int, x]})#f])
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[({type f[x] = Either[Int, x]})#f])
+  checkAll("Either", bitraverse.laws[Either])
 }

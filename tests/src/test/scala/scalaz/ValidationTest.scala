@@ -16,6 +16,7 @@ class ValidationTest extends Spec {
   checkAll("Validation", applicative.laws[ValidationInt])
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
+  checkAll("Validation", bitraverse.laws[Validation])
 
   "fpoint and point" in {
 

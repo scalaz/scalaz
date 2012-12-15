@@ -11,6 +11,8 @@ class LazyTupleTest extends Spec {
   type C = Int
   type D = Int
 
+  checkAll("LazyTuple2", bitraverse.laws[LazyTuple2])
+
   checkAll("LazyTuple2", order.laws[LazyTuple2[A, B]])
   checkAll("LazyTuple3", order.laws[LazyTuple3[A, B, C]])
   checkAll("LazyTuple4", order.laws[LazyTuple4[A, B, C, D]])

@@ -6,12 +6,14 @@ import std.AllInstances._
 
 class EitherTTest extends Spec {
 
+  type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
 
   checkAll(equal.laws[EitherTListInt[Int]])
   checkAll(monad.laws[EitherTListInt])
   checkAll(traverse.laws[EitherTListInt])
+  checkAll(bitraverse.laws[EitherTList])
 
   object instances {
     def functor[F[+_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
