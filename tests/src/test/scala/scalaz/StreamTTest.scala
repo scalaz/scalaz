@@ -41,7 +41,7 @@ class StreamTTest extends Spec {
 
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
-  checkAll(monad.laws[StreamTOpt])
+  checkAll(monadPlus.laws[StreamTOpt])
   
   object instances {
     def semigroup[F[+_]: Functor, A] = Semigroup[StreamT[F, A]]
