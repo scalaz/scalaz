@@ -10,14 +10,14 @@ import collection.generic.{CanBuildFrom, GenericTraversableTemplate}
 trait IndexedSeqSub {
   type IxSq[+A] <: IndexedSeq[A] with GenericTraversableTemplate[A, IxSq] with IndexedSeqLike[A, IxSq[A]]
   protected implicit def buildIxSq[A, B]: CanBuildFrom[IxSq[A], B, IxSq[B]]
-  protected def monad: Monad[IxSq]
+  protected def covariant: Traverse[IxSq] with Monad[IxSq]
   protected def empty[A]: IxSq[A]
 }
 
 trait IndexedSeqSubIndexedSeq extends IndexedSeqSub {
   type IxSq[+A] = IndexedSeq[A]
   protected final def buildIxSq[A, B] = implicitly
-  protected final def monad = indexedSeq.indexedSeqInstance
+  protected final def covariant = indexedSeq.indexedSeqInstance
   protected final def empty[A] = IndexedSeq()
 }
 
@@ -68,14 +68,13 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
         }))
 
     override def foldRight[A, B](fa: IxSq[A], z: => B)(f: (A, => B) => B) = {
-      import scala.collection.mutable.ArrayStack
-      val s = new ArrayStack[A]
-      fa.foreach(a => s += a)
+      var i = fa.length
       var r = z
-      while (!s.isEmpty) {
+      while (i > 0) {
+	i -= 1
         // force and copy the value of r to ensure correctness
         val w = r
-        r = f(s.pop, w)
+        r = f(fa(i), w)
       }
       r
     }
@@ -100,13 +99,15 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 }
 
 trait IndexedSeqSubFunctions extends IndexedSeqSub {
-  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
-  final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
-    @tailrec
-    def intersperse0(accum: IxSq[A], rest: IxSq[A]): IxSq[A] =
-      if (rest.isEmpty) accum else if (rest.tail.isEmpty) rest.head +: accum else intersperse0(a +: rest.head +: accum, rest.tail)
-    intersperse0(empty, as).reverse
+  private[this] def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B) = {
+    def rec(ix: Int): B =
+      if (ix >= as.length - 1) b else f(as(ix+1), rec(ix+1))
+    rec(-1)
   }
+
+  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
+  final def intersperse[A](as: IxSq[A], a: A): IxSq[A] =
+    if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
   final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
 
@@ -126,24 +127,25 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
 
   final def takeWhileM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
-    if (as.isEmpty) Monad[M].point(empty) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].map(takeWhileM(as.tail)(p))((tt: IxSq[A]) => as.head +: tt) else Monad[M].point(empty))
+    lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
+	else Monad[M].point(empty)))
 
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
   final def filterM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
-    if (as.isEmpty) Monad[M].point(empty) else {
-      def g = filterM(as.tail)(p)
-      Monad[M].bind(p(as.head))(b => if (b) Monad[M].map(g)(tt => as.head +: tt) else g)
-    }
+    lazyFoldRight(as, Monad[M].point(empty[A]))((a, g) =>
+      Monad[M].bind(p(a))(b => if (b) Monad[M].map(g)(tt => a +: tt) else g))
 
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
-    if (as.isEmpty) Monad[M].point(None: Option[A]) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].point(Some(as.head): Option[A]) else findM(as.tail)(p))
+    lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
+      Monad[M].bind(p(a))(b =>
+	if (b) Monad[M].point(Some(a): Option[A]) else g))
 
   final def powerset[A](as: IxSq[A]): IxSq[IxSq[A]] = {
-    implicit val indexedSeqInstance = monad
+    implicit val indexedSeqInstance = covariant
     val tf = empty[Boolean] :+ true :+ false
     filterM(as)(_ => tf)
   }

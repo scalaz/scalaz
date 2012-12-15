@@ -4,7 +4,7 @@ package std
 trait IndexedSeqSubVector extends IndexedSeqSub {
   type IxSq[+A] = Vector[A]
   protected final def buildIxSq[A, B] = implicitly
-  protected final def monad = vector.vectorInstance
+  protected final def covariant = vector.vectorInstance
   protected final def empty[A] = Vector()
 }
 
