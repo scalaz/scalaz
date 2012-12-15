@@ -12,6 +12,8 @@ class OptionTest extends Spec {
   checkAll("Option", order.laws[Option[Int]])
   checkAll("Option @@ First", order.laws[Option[Int] @@ First])
   checkAll("Option @@ Last", order.laws[Option[Int] @@ Last])
+  checkAll("Option @@ Min", order.laws[MinOption[Int]])
+  checkAll("Option @@ Max", order.laws[MaxOption[Int]])
 
   checkAll("Option", monoid.laws[Option[Int]])
   checkAll("Option", monadPlus.strongLaws[Option])
@@ -20,8 +22,10 @@ class OptionTest extends Spec {
   
   checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
-  checkAll("Option @@ First", monad.laws[({type f[x] = Option[x] @@ First})#f])
-  checkAll("Option @@ Last", monad.laws[({type f[x] = Option[x] @@ Last})#f])
+  checkAll("Option @@ First", monad.laws[FirstOption])
+  checkAll("Option @@ Last", monad.laws[LastOption])
+  checkAll("Option @@ Min", monad.laws[MinOption])
+  checkAll("Option @@ Max", monad.laws[MaxOption])
 
   "None is less than anything else" in {
     check { forAll { x: Option[Int] => Order[Option[Int]].greaterThanOrEqual(x, None) }}}

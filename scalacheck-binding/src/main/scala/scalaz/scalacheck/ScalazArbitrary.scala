@@ -53,6 +53,10 @@ object ScalazArbitrary {
 
   implicit def LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] = Tag.subst(arb[Long])
 
+  implicit def FloatMultiplicationArbitrary: Arbitrary[Float @@ Multiplication] = Tag.subst(arb[Float])
+
+  implicit def DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
+
   implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
   import NonEmptyList._
@@ -98,6 +102,10 @@ object ScalazArbitrary {
   implicit def FirstOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Option[A] @@ First] = Functor[Arbitrary].map(arb[Option[A]])(_.first)
 
   implicit def LastOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Option[A] @@ Last] = Functor[Arbitrary].map(arb[Option[A]])(_.last)
+
+  implicit def MinOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinOption[A]] = Tag.subst(arb[Option[A]])
+
+  implicit def MaxOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxOption[A]] = Tag.subst(arb[Option[A]])
 
   implicit def EitherLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.left)
 
