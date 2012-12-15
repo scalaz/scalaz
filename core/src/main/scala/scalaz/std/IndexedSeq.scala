@@ -99,7 +99,8 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 }
 
 trait IndexedSeqSubFunctions extends IndexedSeqSub {
-  private[this] def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B) = {
+  @inline private[this] final
+  def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B) = {
     def rec(ix: Int): B =
       if (ix >= as.length - 1) b else f(as(ix+1), rec(ix+1))
     rec(-1)
