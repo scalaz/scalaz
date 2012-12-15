@@ -71,7 +71,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
       var i = fa.length
       var r = z
       while (i > 0) {
-	i -= 1
+        i -= 1
         // force and copy the value of r to ensure correctness
         val w = r
         r = f(fa(i), w)
@@ -131,7 +131,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
       Monad[M].bind(p(a))(b =>
         if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
-	else Monad[M].point(empty)))
+        else Monad[M].point(empty)))
 
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
@@ -143,7 +143,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
     lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
-	if (b) Monad[M].point(Some(a): Option[A]) else g))
+        if (b) Monad[M].point(Some(a): Option[A]) else g))
 
   final def powerset[A](as: IxSq[A]): IxSq[IxSq[A]] = {
     implicit val indexedSeqInstance = covariant
