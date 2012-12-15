@@ -209,8 +209,7 @@ object ScalazProperties {
                                                F: Traverse[F], N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
       forAll(F.traverseLaw.parallelFusion[N, M, A, B] _)
 
-    def laws[F[_]](implicit fa: Arbitrary[F[Int]], amb: Arbitrary[Int => Option[Int]], anb: Arbitrary[Int => Stream[Int]],
-                   F: Traverse[F], EF: Equal[F[Int]], MN: Equal[(Option[F[Int]], Stream[F[Int]])]) =
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse[F], EF: Equal[F[Int]]) =
       new Properties("traverse") {
         property("identity traverse") = identityTraverse[F, Int, Int]
 
@@ -220,6 +219,16 @@ object ScalazProperties {
         property("purity.stream") = purity[F, Stream, Int]
 
         property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+      }
+  }
+
+  object bitraverse {
+    def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
+      new Properties("bitraverse") {
+        private implicit val left = F.leftTraverse[Int]
+        private implicit val right = F.rightTraverse[Int]
+        include(traverse.laws[({type f[a]=F[a, Int]})#f])
+        include(traverse.laws[({type f[a]=F[Int, a]})#f])
       }
   }
 

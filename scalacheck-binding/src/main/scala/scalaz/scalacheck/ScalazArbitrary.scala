@@ -171,6 +171,9 @@ object ScalazArbitrary {
   implicit def writerTArb[F[+_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
     Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
 
+  implicit def unwriterTArb[F[+_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
+    Functor[Arbitrary].map(A)(UnwriterT[F, U, A](_))
+
   implicit def optionTArb[F[+_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Functor[Arbitrary].map(A)(OptionT[F, A](_))
 
@@ -179,6 +182,15 @@ object ScalazArbitrary {
 
   implicit def lazyOptionTArb[F[+_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
     Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
+
+  implicit def lazyEitherArb[F[_], A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyEither[A, B]] =
+    Functor[Arbitrary].map(arb[Either[A, B]]) {
+      case Left(a)  => LazyEither.lazyLeft(a)
+      case Right(b) => LazyEither.lazyRight(b)
+    }
+
+  implicit def lazyEitherTArb[F[+_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
+    Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
   implicit def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[F, S, A]] =
     Functor[Arbitrary].map(A)(StateT[F, S, A](_))

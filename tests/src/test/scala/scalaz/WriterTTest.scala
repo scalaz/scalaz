@@ -18,6 +18,7 @@ class WriterTTest extends Spec {
   checkAll(traverse.laws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(copointed.laws[({type λ[+α]=WriterT[NonEmptyList, Int, α]})#λ])
+  checkAll(bitraverse.laws[WriterTOpt])
 
   implicit def writerArb[F[+_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
