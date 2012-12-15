@@ -186,17 +186,20 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     }
 
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
-    if (as.isEmpty) (c, empty) else {
-      val (i, j) = mapAccumRight(as.tail)(c, f)
-      val (k, v) = f(i, as.head)
-      (k, v +: j)
+    as.foldRight((c, empty[B])){(a, acc) => acc match {
+      case (c, v) => f(c, a) match {
+        case (c, b) => (c, b +: v)
+      }}
     }
 
   final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
-  final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] =
-    empty +: (if (as.isEmpty) empty else (initz(as.tail) map (as.head +: _)))
+  final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] = {
+    @tailrec def rec(acc: IxSq[IxSq[A]], as: IxSq[A]): IxSq[IxSq[A]] =
+      if (as.isEmpty) as +: acc else rec(as +: acc, as.init)
+    rec(empty, as)
+  }
 
   final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     tailz(as).tail flatMap (as zip _)
@@ -232,5 +235,4 @@ trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] 
         case x  => x
       }
     }
-
 }
