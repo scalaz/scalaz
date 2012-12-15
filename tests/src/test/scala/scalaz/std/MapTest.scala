@@ -8,6 +8,7 @@ import scala.math.{Ordering => SOrdering}
 class MapTest extends Spec {
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
+  checkAll(monoid.laws[Map[Int,String]])
 
   "map ordering" ! prop {
     val O = implicitly[Order[Map[String,Int]]]

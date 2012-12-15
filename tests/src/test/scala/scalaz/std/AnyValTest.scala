@@ -31,13 +31,12 @@ class AnyValTest extends Spec {
     checkAll("Boolean", monoid.laws[Boolean])
   }
 
-  checkAll("Short", monoid.laws[Short])
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
-  checkAll("Long", monoid.laws[Long])
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
 
+  checkAll("Unit", group.laws[Unit])
   checkAll("Int", group.laws[Int])
   checkAll("Short", group.laws[Short])
   checkAll("Long", group.laws[Long])

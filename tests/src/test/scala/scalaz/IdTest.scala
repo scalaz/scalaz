@@ -8,4 +8,5 @@ import Id._
 class IdTest extends Spec {
   checkAll(monad.laws[Id])
   checkAll(traverse.laws[Id])
+  checkAll(comonad.laws[Id])
 }
