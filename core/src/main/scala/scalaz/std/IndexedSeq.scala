@@ -179,10 +179,10 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
-    if (as.isEmpty) (c, empty) else {
-      val (i, j) = f(c, as.head)
-      val (k, v) = mapAccumLeft(as.tail)(i, f)
-      (k, j +: v)
+    as.foldLeft((c, empty[B])){(acc, a) => acc match {
+      case (c, v) => f(c, a) match {
+        case (c, b) => (c, v :+ b)
+      }}
     }
 
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
