@@ -52,7 +52,7 @@ trait UndoTInstances0 extends UndoTInstances1 {
 trait UndoTInstances extends UndoTInstances0 {
   implicit def undoTMonadTrans[S]: Hoist[({type G[x[+_], +a] = UndoT[x, S, a]})#G] = new UndoTHoist[S] {}
 
-  implicit def undoTMonadState[S, F[+_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[F, S, Y]})#HS, S] = new UndoTMonadState[S, F] {
+  implicit def undoTMonadState[S, F[+_]](implicit F0: Monad[F]): MonadState[({type HS[X, Y] = UndoT[F, X, Y]})#HS, S] = new UndoTMonadState[S, F] {
     implicit def F: Monad[F] = F0
 
     implicit def HMS: HStateTMonadState[F, S] = MonadState[({type f[s, +a] = StateT[F, s, a]})#f, History[S]]
@@ -128,7 +128,7 @@ private[scalaz] trait UndoTPointed[S, F[+_]]
 }
 
 private[scalaz] trait UndoTMonadState[S, F[+_]]
-  extends MonadState[({type HS[X, Y] = UndoT[F, S, Y]})#HS, S]
+  extends MonadState[({type HS[X, Y] = UndoT[F, X, Y]})#HS, S]
   with UndoTPointed[S, F] {
 
   implicit def F: Monad[F]
