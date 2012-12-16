@@ -55,4 +55,16 @@ class IndexedSeqTest extends Spec {
 	else (xs take (i+1), Some(xs(i)))
       }
   }
+
+  "mapAccumLeft" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      mapAccumLeft(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
+	(c :+ a, a)) must be_===(xs, xs)
+  }
+
+  "mapAccumRight" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      mapAccumRight(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
+	(c :+ a, a)) must be_===(xs.reverse, xs)
+  }
 }
