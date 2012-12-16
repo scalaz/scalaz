@@ -1,6 +1,10 @@
 package scalaz
 package std
 
+import collection.immutable.IndexedSeq
+
+import org.scalacheck.Arbitrary
+
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
@@ -8,15 +12,15 @@ import Id._
 import syntax.std._
 
 class IndexedSeqTest extends Spec {
-/*
-  {
-    import std.indexedSeq._
-    checkAll(equal.laws[IndexedSeq[Int]])
-    checkAll(monoid.laws[IndexedSeq[Int]])
-    checkAll(monadPlus.strongLaws[IndexedSeq])
-    checkAll(traverse.laws[IndexedSeq])
-    checkAll(isEmpty.laws[IndexedSeq])
-  }
+  implicit def indexedSeqArb[A: Arbitrary] =
+    Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toIndexedSeq))
+
+  import std.indexedSeq._
+  checkAll(equal.laws[IndexedSeq[Int]])
+  checkAll(monoid.laws[IndexedSeq[Int]])
+  checkAll(monadPlus.strongLaws[IndexedSeq])
+  checkAll(traverse.laws[IndexedSeq])
+  checkAll(isEmpty.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
 
@@ -27,23 +31,28 @@ class IndexedSeqTest extends Spec {
   }
 
   "initz" ! prop {
-    (xs: IndexedSeq[Int]) => initz(xs) must be_=== xs.inits.toIndexedSeq
+    (xs: IndexedSeq[Int]) =>
+      initz(xs) must be_===(xs.inits.toIndexedSeq.reverse)
   }
 
   "tailz" ! prop {
-    (xs: IndexedSeq[Int]) => tailz(xs) must be_=== xs.tails.toIndexedSeq
+    (xs: IndexedSeq[Int]) => tailz(xs) must be_===(xs.tails.toIndexedSeq)
   }
 
   "takeWhileM" ! prop {
     (xs: IndexedSeq[Int]) =>
-      takeWhileM[Int, Id](xs)(evenp) must be_=== xs.takeWhile(evenp)
+      takeWhileM[Int, Id](xs)(evenp) must be_===(xs takeWhile evenp)
   }
 
   "findM" ! prop {
     (xs: IndexedSeq[Int]) =>
-      val i = xs.findIndex(evenp)
-      type W[A] = Writer[Int, A]
-      findM[Int, W](xs)(x => put(evenp(x))(x))
+      val i = xs indexWhere evenp
+      type W[A] = Writer[IndexedSeq[Int], A]
+      val wxs = findM[Int, W](xs)(x =>
+	WriterT.writer(IndexedSeq(x) -> evenp(x)))
+      (wxs.written, wxs.value) must be_==={
+	if (i < 0) (xs, None)
+	else (xs take (i+1), Some(xs(i)))
+      }
   }
-*/
 }
