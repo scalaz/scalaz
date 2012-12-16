@@ -49,22 +49,22 @@ class IndexedSeqTest extends Spec {
       val i = xs indexWhere evenp
       type W[A] = Writer[IndexedSeq[Int], A]
       val wxs = findM[Int, W](xs)(x =>
-	WriterT.writer(IndexedSeq(x) -> evenp(x)))
+        WriterT.writer(IndexedSeq(x) -> evenp(x)))
       (wxs.written, wxs.value) must be_==={
-	if (i < 0) (xs, None)
-	else (xs take (i+1), Some(xs(i)))
+        if (i < 0) (xs, None)
+        else (xs take (i+1), Some(xs(i)))
       }
   }
 
   "mapAccumLeft" ! prop {
     (xs: IndexedSeq[Int]) =>
       mapAccumLeft(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
-	(c :+ a, a)) must be_===(xs, xs)
+        (c :+ a, a)) must be_===(xs, xs)
   }
 
   "mapAccumRight" ! prop {
     (xs: IndexedSeq[Int]) =>
       mapAccumRight(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
-	(c :+ a, a)) must be_===(xs.reverse, xs)
+        (c :+ a, a)) must be_===(xs.reverse, xs)
   }
 }
