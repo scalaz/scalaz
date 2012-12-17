@@ -168,9 +168,9 @@ trait Enum[F] extends Order[F] { self =>
   def fromToL(a: F, z: F): List[F] = {
     def fromToLT(a: F, z: F): Trampoline[List[F]] =
       if(equal(a, z))
-        Return(List(a))
+        return_(List(a))
       else
-        fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _)
+        suspend(fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
   }
 
@@ -202,9 +202,9 @@ trait Enum[F] extends Order[F] { self =>
          (_: F, _: F) => false
       val k = succn(n, a)
       if(cmp(k, z))
-        Return(List(a))
+        return_(List(a))
       else
-        fromStepToLT(n, k, z) map (a :: _)
+        suspend(fromStepToLT(n, k, z) map (a :: _))
     }
     fromStepToLT(n, a, z).run
   }
