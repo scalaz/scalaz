@@ -1,7 +1,22 @@
 package scalaz
 package std
 
-trait MapInstances {
+trait MapInstances0 {
+  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new Equal[Map[K, V]] {
+    def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
+      import set._
+      if (equalIsNatural) a1 == a2
+      else Equal[Set[K]].equal(a1.keySet, a1.keySet) && {
+        a1.forall {
+          case (k, v) => Equal[V].equal(v, a2(k))
+        }
+      }
+    }
+    override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
+  }
+}
+
+trait MapInstances extends MapInstances0 {
   import syntax.std.function2._
 
   implicit def mapInstance[K] = new Traverse[({type F[V] = Map[K,V]})#F] with IsEmpty[({type F[V] = Map[K,V]})#F] {
@@ -41,20 +56,6 @@ trait MapInstances {
       Order[List[(K, V)]].order(x.toList.sortBy(_._1), y.toList.sortBy(_._1))
     }
   }
-
-  // TODO: Make this a lower-priority instance
-  /*implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new Equal[Map[K, V]] {
-    def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
-      import set._
-      if (equalIsNatural) a1 == a2
-      else Equal[Set[K]].equal(a1.keySet, a1.keySet) && {
-        a1.forall {
-          case (k, v) => Equal[V].equal(v, a2(k))
-        }
-      }
-    }
-    override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
-  }*/
 }
 
 trait MapFunctions {
