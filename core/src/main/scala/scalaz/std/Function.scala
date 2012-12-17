@@ -17,17 +17,23 @@ trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] {
+  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] with Distributive[Function0] {
     def point[A](a: => A) = () => a
 
     def copoint[A](p: () => A) = p()
 
-    def bind[A, B](fa: () => A)(f: (A) => () => B) = f(fa())
+    def bind[A, B](fa: () => A)(f: (A) => () => B) = () => f(fa())()
+
+    override def map[A,B](fa: () => A)(f: A => B) = () => f(fa())
 
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
     override def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
+
+    def distributeImpl[G[_], A, B](fa: G[A])(f: A => () => B
+                                 )(implicit G: Functor[G]): () => G[B] =
+      () => G.map(fa)(a => f(a)())
   }
 
   implicit def function0Equal[R: Equal] = new Equal[() => R] {
