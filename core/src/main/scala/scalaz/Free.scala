@@ -16,7 +16,7 @@ object Free extends FreeFunctions with FreeInstances {
   case class Suspend[S[+_]: Functor, +A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  case class Gosub[S[+_]: Functor, A, +B](a: Free[S, A],
+  case class Gosub[S[+_]: Functor, A, +B](a: () => Free[S, A],
                                           f: A => Free[S, B]) extends Free[S, B]
 
   /** A computation that can be stepped through, suspended, and paused */
@@ -43,18 +43,18 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   /** Binds the given continuation to the result of this computation.
     * All left-associated binds are reassociated to the right. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] = this match {
-    case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(g(x), f))
-    case a           => Gosub(a, f)
+    case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(() => g(x), f))
+    case a           => Gosub(() => a, f)
   }
 
   /** Evaluates a single layer of the free monad. */
   @tailrec final def resume: (S[Free[S, A]] \/ A) = this match {
     case Return(a)  => \/.right(a)
     case Suspend(t) => \/.left(t)
-    case a Gosub f  => a match {
+    case a Gosub f  => a() match {
       case Return(a)  => f(a).resume
       case Suspend(t) => \/.left(S.map(t)(((_: Free[S, Any]) flatMap f)))
-      case b Gosub g  => b.flatMap((x: Any) => g(x) flatMap f).resume
+      case b Gosub g  => b().flatMap((x: Any) => g(x) flatMap f).resume
     }
   }
 
@@ -99,7 +99,7 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     @tailrec def foldRun2(t: Free[S, AA], z: B): (B, AA) = t.resume match {
       case -\/(s) => {
         val (b1, s1) = f(z, s)
-        foldRun2(s1, b1) 
+        foldRun2(s1, b1)
       }
       case \/-(r) => (z, r)
     }
