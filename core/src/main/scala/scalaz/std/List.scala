@@ -105,8 +105,6 @@ trait ListFunctions {
     intersperse0(Nil, as).reverse
   }
 
-  final def intercalate[A](as1: List[List[A]], as2: List[A]): List[A] = intersperse(as1, as2).flatten
-
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None
     case h :: t => Some(NonEmptyList.nel(h, t))
