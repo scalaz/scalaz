@@ -208,7 +208,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel),
+    dependencies = Seq(core, concurrent, typelevel, xml),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full,
@@ -219,7 +219,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
