@@ -108,6 +108,11 @@ trait Foldable[F[_]]  { self =>
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
   /** Whether `a` is an element of `fa`. */
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
+  /** Insert an `A` between every A, yielding the sum. */
+  def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
+    (foldMap1(fa)(identity)
+       (Semigroup instance ((l, r) => A.append(l, A.append(a, r))))
+     getOrElse A.zero)
 
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.

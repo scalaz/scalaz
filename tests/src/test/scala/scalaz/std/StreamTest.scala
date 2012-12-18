@@ -12,6 +12,7 @@ class StreamTest extends Spec {
   checkAll(isEmpty.laws[Stream])
 
   import std.stream.streamSyntax._
+  import syntax.foldable._
 
   "intercalate empty stream is flatten" ! check((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must be_===(a.flatten))
 

@@ -19,4 +19,16 @@ class MonoidTest extends Spec {
     }
     ss.toList must be_===(List("1", "2", "4", "8"))
   }
+
+  "intercalate empty" in (
+    Foldable[List].intercalate(List[String](), "oops")
+    must be_===("")
+  )
+
+  "intercalate" in {
+    val xs = List(Vector(Cord("this"), Cord("has")), Vector(),
+		  Vector(Cord("elements")), Vector(Cord("beneath")), Vector())
+    ((Foldable[List] compose Foldable[Vector]).intercalate(xs, Cord("!!")).toString
+     must be_===(Cord("this!!has!!elements!!beneath").toString))
+  }
 }

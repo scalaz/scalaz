@@ -38,6 +38,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def selectSplit(p: A => Boolean): List[List[A]] = F.selectSplit(self)(p)
   final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)
+  final def intercalate(a: A)(implicit A: Monoid[A]): A = F.intercalate(self, a)
   final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
 
   ////

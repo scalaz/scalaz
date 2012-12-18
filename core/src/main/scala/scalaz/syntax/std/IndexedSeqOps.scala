@@ -9,8 +9,6 @@ trait IndexedSeqOps[A] extends Ops[IndexedSeq[A]] {
 
   final def intersperse(a: A): IndexedSeq[A] = v.intersperse(self, a)
 
-  final def intercalate[B](other: IndexedSeq[B])(implicit ev: IndexedSeq[A] =:= IndexedSeq[IndexedSeq[B]]): IndexedSeq[B] = v.intercalate(self, other)
-
   final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
 
   final def toZipper: Option[Zipper[A]] = v.toZipper(self)
