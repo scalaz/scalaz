@@ -18,7 +18,7 @@ trait IdOps[A] extends Ops[A] {
    * Mostly for use with dodgy libraries that give you values that need additional initialization or 
    * mutation before they're valid to use.
    */
-  final def tap(f: A => Unit): A = { 
+  final def tap(f: A => Any): A = { 
     f(self); self 
   }
 
