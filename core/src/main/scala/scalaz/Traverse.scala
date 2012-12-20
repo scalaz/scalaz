@@ -52,7 +52,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseSTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
-    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline, G[F[B]]]
+    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline, G[F[B]], S, S]
   }
 
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */

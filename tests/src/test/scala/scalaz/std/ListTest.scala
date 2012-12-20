@@ -61,7 +61,7 @@ class ListTest extends Spec {
         val j = i + (if (f(a)) 0 else 1)
         val done = j >= n
         (j, !done)
-    }).evalZero
+    }).evalZero[Int]
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
     actual must be_===("/abc/def/hij")
