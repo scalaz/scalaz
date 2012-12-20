@@ -2,7 +2,7 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary
-import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, _}
+import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, indexedStateTArb => _, _}
 import std.AllInstances._
 import Id._
 
@@ -11,7 +11,7 @@ class StateTTest extends Spec {
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
 
-  implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero)
+  implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
   implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
   implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 

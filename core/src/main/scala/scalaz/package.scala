@@ -44,7 +44,8 @@
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *
  *  - [[scalaz.Bifunctor]]
- *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]]
+ *  - [[scalaz.Bifoldable]]
+ *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]] with [[scalaz.Bifoldable]]
  *  - [[scalaz.ArrId]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Category]] extends [[scalaz.ArrId]] with [[scalaz.Compose]]
@@ -60,7 +61,7 @@
  *  - [[scalaz.Endo]] Represents functions from `A => A`.
  *  - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
  *    various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
- *  - [[scalaz.LensT]] Composable, functional alternative to getters and setters
+ *  - [[scalaz.Lens]] Composable, functional alternative to getters and setters
  *  - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
  *  - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
  *  - [[scalaz.Zipper]] A functional cursor over a List.
@@ -117,19 +118,45 @@ package object scalaz {
     def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
+  /**
+   * StateT Monad Transformer
+   *
+   * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
+   */
+  type StateT[F[+_], S, +A] = IndexedStateT[F, S, S, A]
+  type IndexedState[-S1, +S2, +A] = IndexedStateT[Id, S1, S2, A]
   /** A state transition, representing a function `S => (A, S)`. */
   type State[S, +A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object StateT extends StateTFunctions with StateTInstances {
+    def apply[F[+_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
+      def apply(s: S) = f(s)
+    }
+  }
+  object IndexedState extends StateFunctions {
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = new IndexedState[S1, S2, A] {
+      def apply(s: S1) = f(s)
+    }
+  }
   object State extends StateFunctions {
     def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
       def apply(s: S) = f(s)
     }
   }
 
-  type Store[A, B] = StoreT[Id, A, B]
+  type StoreT[F[+_], A, +B] = IndexedStoreT[F, A, A, B]
+  type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
+  type Store[A, +B] = StoreT[Id, A, B]
   // flipped
-  type |-->[A, B] = Store[B, A]
+  type |-->[+A, B] = Store[B, A]
+  object StoreT extends StoreTFunctions with StoreTInstances {
+    def apply[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
+      storeT(r)
+  }
+  object IndexedStore {
+    def apply[I, A, B](f: A => B, i: I): IndexedStore[I, A, B] = IndexedStoreT.indexedStore(i)(f)
+  }
   object Store {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }
@@ -160,9 +187,19 @@ package object scalaz {
   //
   // Lens type aliases
   //
+  type LensT[F[+_], A, B] = LensFamilyT[F, A, A, B, B]
+  type LensFamily[-A1, +A2, +B1, -B2] = LensFamilyT[Id, A1, A2, B1, B2]
   type Lens[A, B] = LensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object LensT extends LensTFunctions with LensTInstances {
+    def apply[F[+_], A, B](r: A => F[Store[B, A]]): LensT[F, A, B] =
+      lensT(r)
+  }
+  object LensFamily extends LensTFunctions with LensTInstances {
+    def apply[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] =
+      lensFamily(r)
+  }
   object Lens extends LensTFunctions with LensTInstances {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
@@ -170,9 +207,22 @@ package object scalaz {
 
   type @>[A, B] = Lens[A, B]
 
+  //
+  // Partial Lens type aliases
+  //
+  type PLensT[F[+_], A, B] = PLensFamilyT[F, A, A, B, B]
+  type PLensFamily[-A1, +A2, +B1, -B2] = PLensFamilyT[Id, A1, A2, B1, B2]
   type PLens[A, B] = PLensT[Id, A, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  object PLensT extends PLensTFunctions with PLensTInstances {
+    def apply[F[+_], A, B](r: A => F[Option[Store[B, A]]]): PLensT[F, A, B] =
+      plensT(r)
+  }
+  object PLensFamily extends PLensTFunctions with PLensTInstances {
+    def apply[A1, A2, B1, B2](r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
+      plensFamily(r)
+  }
   object PLens extends PLensTFunctions with PLensTInstances {
     def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
@@ -180,7 +230,9 @@ package object scalaz {
 
   type @?>[A, B] = PLens[A, B]
 
-  type PStateT[F[+_], A, B] = StateT[F, A, Option[B]]
+  type PIndexedStateT[F[+_], -S1, +S2, +A] = IndexedStateT[F, S1, S2, Option[A]]
+  type PStateT[F[+_], S, +A] = PIndexedStateT[F, S, S, A]
 
-  type PState[A, B] = StateT[Id, A, Option[B]]
+  type PIndexedState[-S1, +S2, +A] = PIndexedStateT[Id, S1, S2, A]
+  type PState[S, +A] = PStateT[Id, S, A]
 }
