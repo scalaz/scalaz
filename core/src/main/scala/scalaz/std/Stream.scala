@@ -150,9 +150,6 @@ trait StreamFunctions {
     }
   }
 
-  final def intercalate[A](as1: Stream[Stream[A]], as2: Stream[A]): Stream[A] =
-    intersperse(as1, as2).flatten
-
   def unfold[A, B](seed: A)(f: A => Option[(B, A)]): Stream[B] =
     f(seed) match {
       case None         => Stream.empty

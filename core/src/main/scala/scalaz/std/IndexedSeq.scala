@@ -110,8 +110,6 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def intersperse[A](as: IxSq[A], a: A): IxSq[A] =
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
-  final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
-
   final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] =
     if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
 
