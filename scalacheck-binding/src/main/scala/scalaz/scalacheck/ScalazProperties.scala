@@ -1,7 +1,7 @@
 package scalaz
 package scalacheck
 
-import org.scalacheck.{Arbitrary, Prop, Properties}
+import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Prop.forAll
 import Scalaz._
 
@@ -52,9 +52,11 @@ object ScalazProperties {
 
     def minmaxsucc[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxsucc
 
-    def succn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succn1 _)
+    private val smallInt = Gen.choose(-100, 100)
 
-    def predn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predn1 _)
+    def succn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.succn(x, _)))
+
+    def predn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.predn(x, _)))
 
     def succorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succorder _)
 
@@ -66,10 +68,10 @@ object ScalazProperties {
       property("successor then predecessor is identity") = predsucc[A]
       property("predecessor of the min is the max") = minmaxpred[A]
       property("successor of the max is the min") = minmaxsucc[A]
-      property("n-successor once is successor") = succn1[A]
-      property("n-predecessor once is predecessor") = predn1[A]
-      property("successor is greater than or equal to") = succn1[A]
-      property("predecessor is less than or equal to") = predn1[A]
+      property("n-successor is n-times successor") = succn[A]
+      property("n-predecessor is n-times predecessor") = predn[A]
+      property("successor is greater or equal") = succorder[A]
+      property("predecessor is less or equal") = predorder[A]
     }
   }
 
