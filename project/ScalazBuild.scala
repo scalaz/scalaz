@@ -2,7 +2,6 @@ import sbt._
 import Keys._
 import sbt.Package._
 import java.util.jar.Attributes.Name._
-import com.jsuereth.pgp.sbtplugin.PgpPlugin._
 
 
 object ScalazBuild extends Build {
@@ -35,7 +34,7 @@ object ScalazBuild extends Build {
     base         = file("http"),
     dependencies = Seq(core),
     settings     = standardSettings ++ Seq(
-      libraryDependencies ++= Seq(Dependency.ServletApi)
+      libraryDependencies += Dependency.ServletApi
     )
   )
 
@@ -44,7 +43,7 @@ object ScalazBuild extends Build {
     base         = file("scalacheck-binding"),
     dependencies = Seq(core),
     settings     = standardSettings ++ Seq(
-      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
+      libraryDependencies <+= (scalaVersion)(Dependency.ScalaCheck)
     )
   )
 
@@ -53,7 +52,7 @@ object ScalazBuild extends Build {
     base         = file("geo-scalacheck"),
     dependencies = Seq(core, geo, scalacheckBinding),
     settings     = standardSettings ++ Seq(
-      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.ScalaCheck(dsv)))
+      libraryDependencies <+= (scalaVersion)(Dependency.ScalaCheck)
     )
   )
 
@@ -62,7 +61,7 @@ object ScalazBuild extends Build {
     base         = file("example"),
     dependencies = Seq(core, geo, http),
     settings     = standardSettings ++ Seq(
-      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv), Dependency.ServletApi))
+      libraryDependencies <++= (scalaVersion)(sv => Seq(Dependency.Specs(sv), Dependency.ServletApi))
     )
   )
 
@@ -71,7 +70,7 @@ object ScalazBuild extends Build {
     base         = file("tests"),
     dependencies = Seq(core, geo, scalacheckBinding, scalacheckGeo),
     settings     = standardSettings ++ Seq(
-      libraryDependencies <++= (dependencyScalaVersion)(dsv => Seq(Dependency.Specs(dsv)))
+      libraryDependencies <+= (scalaVersion)(Dependency.Specs)
     )
   )
 
@@ -144,46 +143,35 @@ object ScalazBuild extends Build {
   }
 
   object Dependency {
-    // SBT's built in '%%' is not flexible enough. When we build with a snapshot version of the compiler,
-    // we want to fetch dependencies from the last stable release (hopefully binary compatibility).
-    def dependencyScalaVersion(currentScalaVersion: String): String = currentScalaVersion match {
-      case "2.10.0-SNAPSHOT" | "2.10.0-M4" => "2.9.2"
-      case x => x
-    }
     val ServletApi = "javax.servlet" % "servlet-api" % "2.5"
 
     def ScalaCheck(scalaVersion: String) = {
       val version = scalaVersion match {
         case "2.8.1" => "1.8"
-        case _ => "1.9"
+        case "2.9.1" | "2.9.2" => "1.9"
+        case "2.10.0" => "1.10.0"
       }
-      "org.scalacheck" % "scalacheck_%s".format(scalaVersion) % version
+      "org.scalacheck" %% "scalacheck" % version cross CrossVersion.full
     }
     def Specs(scalaVersion: String) = {
       val version = scalaVersion match {
-        case "2.8.1" | "2.8.2" | "2.9.0-1" => "1.6.8"
-        case _ => "1.6.9"
+        case "2.8.1" => "1.6.8"
+        case "2.9.1" | "2.9.2" | "2.10.0" => "1.6.9"
       }
-      "org.scala-tools.testing" % "specs_%s".format(scalaVersion) % version % "test"
-    }
+      "org.scala-tools.testing" %% "specs" % version % "test"
+	}
   }
-
-  val dependencyScalaVersionTranslator = SettingKey[(String => String)]("dependency-scala-version-translator", "Function to translate the current scala version to the version used for dependency resolution")
-  val dependencyScalaVersion = SettingKey[String]("dependency-scala-version", "The version of scala appended to module id of dependencies")
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
     organization := "org.scalaz",
     version      := "6.0.5-SNAPSHOT",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.1", "2.9.0-1", "2.8.1", "2.10.0-M4"),
-    crossVersion := CrossVersion.full,
+    crossScalaVersions := Seq("2.9.2", "2.9.1", "2.8.1", "2.10.0"),
     resolvers    ++= Seq(
       "snapshotsResolver" at "http://oss.sonatype.org/content/repositories/snapshots",
       "releasesResolver"  at "http://oss.sonatype.org/content/repositories/releases"
     ),
 
-    dependencyScalaVersionTranslator := (Dependency.dependencyScalaVersion _),
-    dependencyScalaVersion           <<= (dependencyScalaVersionTranslator, scalaVersion)((t, sv) => t(sv)),
     publishSetting,
     scalacOptions in(Compile, doc) <++= (version, baseDirectory in LocalProject("scalaz")).map {
       (v, bd) =>
@@ -191,9 +179,6 @@ object ScalazBuild extends Build {
         val docSourceUrl = "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala"
         Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", docSourceUrl)
     },
-
-    // TODO remove after deprecating Scala 2.9.0.1
-    (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     credentialsSetting,
     scalacOptions  ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
@@ -203,8 +188,6 @@ object ScalazBuild extends Build {
       (IMPLEMENTATION_VENDOR, "The Scalaz Project"),
       (SEALED, "true"))
     ),
-    useGpg := true,
-    useGpgAgent := false,
     publishSetting,
     publishArtifact in Test := false,
     pomIncludeRepository := {
