@@ -12,8 +12,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-RC5"),
-    crossVersion := CrossVersion.full,
+    crossScalaVersions := Seq("2.9.2", "2.10.0"),
     resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
 
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -211,7 +210,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full,
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0",
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -223,8 +222,8 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.12.3" % "test" cross CrossVersion.full,
-        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test" cross CrossVersion.full
+        "org.specs2" %% "specs2" % "1.12.3" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
       )
     )
   )
