@@ -159,7 +159,7 @@ object ScalazBuild extends Build {
         case "2.9.1" | "2.9.2" | "2.10.0" => "1.6.9"
       }
       "org.scala-tools.testing" %% "specs" % version % "test"
-	}
+    }
   }
 
   lazy val standardSettings = Defaults.defaultSettings ++ Seq(
