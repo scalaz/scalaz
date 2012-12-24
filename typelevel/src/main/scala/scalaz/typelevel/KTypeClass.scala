@@ -12,9 +12,9 @@ import syntax.typelevel.hlist._
  *
  * Multiplication of instances is done via wrappers which are unpacked
  * automatically if the implicits of
- * [[scalaz.typelevel.syntax.TypeClasses]] are imported.
+ * [[scalaz.syntax.typelevel.TypeClasses]] are imported.
  *
- * @see [[scalaz.typelevel.syntax.TypeClasses]]
+ * @see [[scalaz.syntax.typelevel.TypeClasses]]
  * @see [[scalaz.typelevel.TCList]]
  */
 trait KTypeClass[C[_[_]]] {
@@ -66,7 +66,7 @@ trait KTypeClass[C[_[_]]] {
   /**
    * The empty composition.
    *
-   * @return an instance of [[scalaz.typelevel.TypeClass.WrappedComposition]]
+   * @return an instance of [[scalaz.typelevel.KTypeClass.WrappedComposition]]
    * representing an empty composition
    */
   final def idCompose = new WrappedComposition[C, TCNil](_idCompose, this)

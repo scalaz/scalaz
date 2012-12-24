@@ -17,12 +17,12 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * Returns the provided function `s` applied to item contained in the Option if it is defined,
    * otherwise, the provided value `n`.
    * <p/>
-   * This is a syntactic alternative to  { @link scalaz.OptionW # cata }
+   * This is a syntactic alternative to [[scalaz.syntax.std.OptionOps#cata]]
    * <p/>
    * Example:
-   * <code>
+   * {{{
    * o.some(_ * 2).none(0)
-   * </code>
+   * }}}
    */
   final def some[X](s: A => X): Fold[X] = new Fold[X] {
     def none(n: => X): X = cata(s, n)
@@ -36,9 +36,9 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * Ternary operator. Note that the arguments s and n are call-by-name.
    * <p/>
    * Example
-   * <code>
+   * {{{
    * option ? "defined" | "undefined"
-   * </code>
+   * }}}
    */
   final def ?[X](s: => X): Conditional[X] = new Conditional[X] {
     def |(n: => X): X = self match {
