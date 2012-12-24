@@ -7,7 +7,7 @@ import syntax.typelevel.hlist._
  * A type class abstracting over the `product` operation of type classes over
  * types of kind `*`.
  *
- * @see [[scalaz.typelevel.syntax.TypeClasses]]
+ * @see [[scalaz.syntax.typelevel.TypeClasses]]
  */
 trait TypeClass[C[_]] {
 
