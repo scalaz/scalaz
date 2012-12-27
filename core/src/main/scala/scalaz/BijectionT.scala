@@ -21,15 +21,15 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def fromK: Kleisli[G, B, A] =
     Kleisli(from(_))
 
-  def lens[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): LensT[H, A, B] =
-    LensT(a => FF.map(to(a))(x => Store(from(_), x)))
+  def lens(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Lens[A, B] =
+    Lens(a => Store(from(_), to(a)))
 
-  def partial[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): PLensT[H, A, B] =
-    lens[H].partial
+  def partial(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): PLens[A, B] =
+    lens.partial
 
   /** alias for `partial` */
-  def unary_~[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]) : PLensT[H, A, B] =
-    partial[H]
+  def unary_~(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]) : PLens[A, B] =
+    partial
 
   def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(

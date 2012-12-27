@@ -14,227 +14,214 @@ import Id._
  *
  * @see [[scalaz.PLens]]
  *
- * @tparam F Type constructor used to address the field
  * @tparam A1 The initial type of the record
  * @tparam A2 The final type of the record
  * @tparam B1 The initial type of the field
  * @tparam B2 The final type of the field
  */
-sealed trait LensFamilyT[F[+_], -A1, +A2, +B1, -B2] {
-  def run(a: A1): F[IndexedStore[B1, B2, A2]]
+sealed trait LensFamily[-A1, +A2, +B1, -B2] {
+  def run(a: A1): IndexedStore[B1, B2, A2]
 
-  def apply(a: A1): F[IndexedStore[B1, B2, A2]] =
+  def apply(a: A1): IndexedStore[B1, B2, A2] =
     run(a)
 
-  import StateT._
-  import LensFamilyT._
+  import LensFamily._
   import BijectionT._
-  import WriterT._
 
-  def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1)(implicit F: Functor[F]): LensFamilyT[F, X1, X2, B1, B2] =
-    lensFamilyT(x => F.map(run(g(x)))(_ map (f)))
+  def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): LensFamily[X1, X2, B1, B2] =
+    lensFamily(x => run(g(x)) map f)
 
-  def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X])(implicit F: Functor[F]): LensFamilyT[F, X, X, B1, B2] =
+  def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): LensFamily[X, X, B1, B2] =
     xmapA(b to _)(b from _)
 
-  def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2)(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X1, X2] =
-    lensFamilyT(a => F.map(run(a))(_.xmap(f)(g)))
+  def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): LensFamily[A1, A2, X1, X2] =
+    lensFamily(a => run(a).xmap(f)(g))
 
-  def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X])(implicit F: Functor[F]): LensFamilyT[F, A1, A2, X, X] =
+  def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): LensFamily[A1, A2, X, X] =
     xmapB(b to _)(b from _)
 
-  def get(a: A1)(implicit F: Functor[F]): F[B1] =
-    F.map(run(a))(_.pos)
+  def get(a: A1): B1 =
+    run(a).pos
 
-  def set(a: A1, b: B2)(implicit F: Functor[F]): F[A2] =
-    F.map(run(a))(_.put(b))
+  def set(a: A1, b: B2): A2 =
+    run(a).put(b)
 
-  def st[A <: A1](implicit F: Functor[F]): StateT[F, A, B1] =
-    StateT(s => F.map(get(s))((s, _)))
+  def st[A <: A1]: State[A, B1] =
+    State(s => (s, get(s)))
 
   /** Modify the value viewed through the lens */
-  def mod(f: B1 => B2, a: A1)(implicit F: Functor[F]): F[A2] =
-    F.map(run(a))(c => {
-      val (p, q) = c.run
-      p(f(q))
-    })
+  def mod(f: B1 => B2, a: A1): A2 = {
+    val (p, q) = run(a).run
+    p(f(q))
+  }
 
-  def =>=(f: B1 => B2)(implicit F: Functor[F]): A1 => F[A2] =
+  def =>=(f: B1 => B2): A1 => A2 =
     mod(f, _)
 
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
-  def modf[X[+_]](f: B1 => X[B2], a: A1)(implicit F: Functor[F], XF: Functor[X]): F[X[A2]] =
-    F.map(run(a))(c => XF.map(f(c.pos))(c put _))
+  def modf[X[+_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
+    val c = run(a)
+    XF.map(f(c.pos))(c put _)
+  }
 
-  def =>>=[X[+_]](f: B1 => X[B2])(implicit F: Functor[F], XF: Functor[X]): A1 => F[X[A2]] =
+  def =>>=[X[+_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
     modf(f, _)
 
   /** Modify the value viewed through the lens, returning a `C` on the side.  */
-  def modp[C](f: B1 => F[(B2, C)], a: A1)(implicit F: Bind[F]): F[(A2, C)] = F.bind(
-    get(a))(x => F.bind(
-    f(x)){
-      case (b, c) => F.map(set(a, b))((_, c))
+  def modp[C](f: B1 => (B2, C), a: A1): (A2, C) = {
+    val (b, c) = f(get(a))
+    (set(a, b), c)
+  }
+
+  /** Modify the portion of the state viewed through the lens and return its new value. */
+  def mods[B <: B2](f: B1 => B): IndexedState[A1, A2, B] =
+    IndexedState(a => {
+      val c = run(a)
+      val b = f(c.pos)
+      (c put b, b)
     })
 
   /** Modify the portion of the state viewed through the lens and return its new value. */
-  def mods[B <: B2](f: B1 => B)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, B] =
-    IndexedStateT(a =>
-      F.map(run(a))(c => {
-        val b = f(c.pos)
-        (c put b, b)
-      }))
-
-  /** Modify the portion of the state viewed through the lens and return its new value. */
-  def %=[B <: B2](f: B1 => B)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, B] =
+  def %=[B <: B2](f: B1 => B): IndexedState[A1, A2, B] =
     mods[B](f)
 
   /** Set the portion of the state viewed through the lens and return its new value. */
-  def assign[B <: B2](b: => B)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, B] =
+  def assign[B <: B2](b: => B): IndexedState[A1, A2, B] =
     mods[B](_ => b)
 
   /** Set the portion of the state viewed through the lens and return its new value. */
-  def :=[B <: B2](b: => B)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, B] =
+  def :=[B <: B2](b: => B): IndexedState[A1, A2, B] =
     assign[B](b)
 
   /** Modify the portion of the state viewed through the lens, but do not return its new value. */
-  def mods_(f: B1 => B2)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, Unit] =
-    IndexedStateT(a =>
-      F.map(mod(f, a))((_, ())))
+  def mods_(f: B1 => B2): IndexedState[A1, A2, Unit] =
+    IndexedState(a =>
+      (mod(f, a), ()))
 
   /** Modify the portion of the state viewed through the lens, but do not return its new value. */
-  def %==(f: B1 => B2)(implicit F: Functor[F]): IndexedStateT[F, A1, A2, Unit] =
+  def %==(f: B1 => B2): IndexedState[A1, A2, Unit] =
     mods_(f)
 
   /** Contravariantly map a state action through a lens. */
-  def lifts[C](s: IndexedStateT[F, B1, B2, C])(implicit M: Bind[F]): IndexedStateT[F, A1, A2, C] =
-    IndexedStateT(a => modp(s(_), a))
+  def lifts[C](s: IndexedState[B1, B2, C]): IndexedState[A1, A2, C] =
+    IndexedState(a => modp(s(_), a))
 
-  def %%=[C](s: IndexedStateT[F, B1, B2, C])(implicit M: Bind[F]): IndexedStateT[F, A1, A2, C] =
+  def %%=[C](s: IndexedState[B1, B2, C]): IndexedState[A1, A2, C] =
     lifts(s)
 
   /** Map the function `f` over the lens as a state action. */
-  def map[C, A <: A1](f: B1 => C)(implicit F: Functor[F]): StateT[F, A, C] =
-    StateT(a => F.map(get(a))(x => (a, f(x))))
+  def map[C, A <: A1](f: B1 => C): State[A, C] =
+    State(a => (a, f(get(a))))
 
   /** Map the function `f` over the value under the lens, as a state action. */
-  def >-[C, A <: A1](f: B1 => C)(implicit F: Functor[F]): StateT[F, A, C] = map(f)
+  def >-[C, A <: A1](f: B1 => C): State[A, C] = map(f)
 
   /** Bind the function `f` over the value under the lens, as a state action. */
-  def flatMap[C, X1 <: A1, X2 >: A2](f: B1 => IndexedStateT[F, X1, X2, C])(implicit F: Bind[F]): IndexedStateT[F, X1, X2, C] =
-    IndexedStateT(a => F.bind(get(a))(x => f(x)(a)))
+  def flatMap[C, X1 <: A1, X2 >: A2](f: B1 => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
+    IndexedState(a => f(get(a))(a))
 
   /** Bind the function `f` over the value under the lens, as a state action. */
-  def >>-[C, X1 <: A1, X2 >: A2](f: B1 => IndexedStateT[F, X1, X2, C])(implicit F: Bind[F]): IndexedStateT[F, X1, X2, C] = flatMap[C, X1, X2](f)
+  def >>-[C, X1 <: A1, X2 >: A2](f: B1 => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
+    flatMap[C, X1, X2](f)
 
   /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
-  def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedStateT[F, X1, X2, C])(implicit F: Bind[F]): IndexedStateT[F, X1, X2, C] =
+  def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
     flatMap(_ => f)
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
-  def liftsNT(implicit F: Bind[F]): ({type m[+x] = IndexedStateT[F,B1,B2,x]})#m ~> ({type n[+x] = IndexedStateT[F,A1,A2,x]})#n =
-    new (({type m[+x] = IndexedStateT[F,B1,B2,x]})#m ~> ({type n[+x] = IndexedStateT[F,A1,A2,x]})#n) {
-      def apply[C](s : IndexedStateT[F,B1,B2,C]): IndexedStateT[F,A1,A2,C] = IndexedStateT[F,A1,A2,C](a => modp(s(_), a))
+  def liftsNT: ({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n =
+    new (({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n) {
+      def apply[C](s : IndexedState[B1,B2,C]): IndexedState[A1,A2,C] = IndexedState[A1,A2,C](a => modp(s(_), a))
     }
 
   /** Lenses can be composed */
-  def compose[C1, C2](that: LensFamilyT[F, C1, C2, A1, A2])(implicit F: Bind[F]): LensFamilyT[F, C1, C2, B1, B2] =
-    lensFamilyT(c =>
-      F.bind(that run c)(x => {
-        val (ac, a) = x.run
-        F.map(run(a))(y => {
-          val (ba, b) = y.run
-          IndexedStore(ac compose ba, b)
-        })
-      }))
+  def compose[C1, C2](that: LensFamily[C1, C2, A1, A2]): LensFamily[C1, C2, B1, B2] =
+    lensFamily(c => {
+      val (ac, a) = that.run(c).run
+      val (ba, b) = run(a).run
+      IndexedStore(ac compose ba, b)
+    })
 
   /** alias for `compose` */
-  def <=<[C1, C2](that: LensFamilyT[F, C1, C2, A1, A2])(implicit F: Bind[F]): LensFamilyT[F, C1, C2, B1, B2] = compose(that)
+  def <=<[C1, C2](that: LensFamily[C1, C2, A1, A2]): LensFamily[C1, C2, B1, B2] = compose(that)
 
-  def andThen[C1, C2](that: LensFamilyT[F, B1, B2, C1, C2])(implicit F: Bind[F]): LensFamilyT[F, A1, A2, C1, C2] =
+  def andThen[C1, C2](that: LensFamily[B1, B2, C1, C2]): LensFamily[A1, A2, C1, C2] =
     that compose this
 
   /** alias for `andThen` */
-  def >=>[C1, C2](that: LensFamilyT[F, B1, B2, C1, C2])(implicit F: Bind[F]): LensFamilyT[F, A1, A2, C1, C2] = andThen(that)
+  def >=>[C1, C2](that: LensFamily[B1, B2, C1, C2]): LensFamily[A1, A2, C1, C2] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] =
-    lensFamilyT{
+  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
+    lensFamily{
       case -\/(a) =>
-        F.map(run(a))(_ map (-\/(_)))
+        run(a) map  (-\/(_))
       case \/-(c) =>
-        F.map(that run c)(_ map (\/-(_)))
+        that run c map (\/-(_))
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2, A1m <: A1, A2m >: A2, B1m >: B1, B2m <: B2](that: => LensFamilyT[F, C1, C2, B1m, B2m])(implicit F: Functor[F]): LensFamilyT[F, A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
+  def |||[C1, C2, A1m <: A1, A2m >: A2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
 
   /** Two disjoint lenses can be paired */
-  def product[C1, C2, D1, D2](that: LensFamilyT[F, C1, C2, D1, D2])(implicit F: Apply[F]): LensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
-    lensFamilyT {
-      case (a, c) => F.apply2(run(a), that run c)((x, y) => x *** y)
+  def product[C1, C2, D1, D2](that: LensFamily[C1, C2, D1, D2]): LensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
+    lensFamily {
+      case (a, c) => run(a) *** that.run(c)
     }
 
   /** alias for `product` */
-  def ***[C1, C2, D1, D2](that: LensFamilyT[F, C1, C2, D1, D2])(implicit F: Apply[F]): LensFamilyT[F, (A1, C1), (A2, C2), (B1, D1), (B2, D2)] = product(that)
+  def ***[C1, C2, D1, D2](that: LensFamily[ C1, C2, D1, D2]): LensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] = product(that)
 
   trait LensLaw {
-    def identity[A >: A2 <: A1, B >: B1 <: B2](a: A)(implicit A: Equal[A], ev: F[Store[B, A]] =:= Id[Store[B, A]]): Boolean = {
+    def identity[A >: A2 <: A1, B >: B1 <: B2](a: A)(implicit A: Equal[A]): Boolean = {
       val c = run(a)
-      A.equal(c.put(c.pos), a)
+      A.equal(c.put(c.pos: B), a)
     }
-    def retention[A >: A2 <: A1, B >: B1 <: B2](a: A, b: B)(implicit B: Equal[B], ev: F[Store[B, A]] =:= Id[Store[B, A]]): Boolean =
-      B.equal(run(run(a) put b).pos, b)
-    def doubleSet[A >: A2 <: A1, B >: B1 <: B2](a: A, b1: B, b2: B)(implicit A: Equal[A], ev: F[Store[B, A]] =:= Id[Store[B, A]]): Boolean = {
+    def retention[A >: A2 <: A1, B >: B1 <: B2](a: A, b: B)(implicit B: Equal[B]): Boolean =
+      B.equal(run(run(a).put(b): A).pos, b)
+    def doubleSet[A >: A2 <: A1, B >: B1 <: B2](a: A, b1: B, b2: B)(implicit A: Equal[A]): Boolean = {
       val r = run(a)
-      A.equal(run(r put b1) put b2, r put b2)
+      A.equal(run(r.put(b1): A) put b2, r put b2)
     }
   }
 
   def lensLaw = new LensLaw {}
 
   /** A homomorphism of lens categories */
-  def partial(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, B1, B2] =
-    PLensFamilyT.plensFamilyT(a => F.map(run(a))(x => Some(x):Option[IndexedStore[B1, B2, A2]]))
+  def partial: PLensFamily[A1, A2, B1, B2] =
+    PLensFamily.plensFamily(a => Some(run(a)):Option[IndexedStore[B1, B2, A2]])
 
   /** alias for `partial` */
-  def unary_~(implicit F: Functor[F]): PLensFamilyT[F, A1, A2, B1, B2] =
+  def unary_~ : PLensFamily[A1, A2, B1, B2] =
     partial
+
 }
 
-object LensFamilyT extends LensTFunctions with LensTInstances {
-  def apply[F[+_], A1, A2, B1, B2](r: A1 => F[IndexedStore[B1, B2, A2]]): LensFamilyT[F, A1, A2, B1, B2] =
-    lensFamilyT(r)
+object LensFamily extends LensFunctions with LensInstances {
+  def apply[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] =
+    lensFamily(r)
 }
 
-trait LensFamilyTFunctions {
+trait LensFamilyFunctions {
   import StoreT._
 
-  def lensFamilyT[F[+_], A1, A2, B1, B2](r: A1 => F[IndexedStore[B1, B2, A2]]): LensFamilyT[F, A1, A2, B1, B2] = new LensFamilyT[F, A1, A2, B1, B2] {
-    def run(a: A1): F[IndexedStore[B1, B2, A2]] = r(a)
+  def lensFamily[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] = new LensFamily[A1, A2, B1, B2] {
+    def run(a: A1): IndexedStore[B1, B2, A2] = r(a)
   }
 
-  def lensFamily[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] =
-    lensFamilyT[Id, A1, A2, B1, B2](r)
-
-  def lensFamilyp[F[+_], A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2])(implicit F: Pointed[F]): LensFamilyT[F, A1, A2, B1, B2] =
-    lensFamilyT(a => F.point(r(a)))
-
-  def lensFamilygT[F[+_], A1, A2, B1, B2](set: A1 => F[B2 => A2], get: A1 => F[B1])(implicit M: Bind[F]): LensFamilyT[F, A1, A2, B1, B2] =
-    lensFamilyT(a => M.apply2(set(a), get(a))(IndexedStore(_, _)))
-
   def lensFamilyg[A1, A2, B1, B2](set: A1 => B2 => A2, get: A1 => B1): LensFamily[A1, A2, B1, B2] =
-    lensFamilygT[Id, A1, A2, B1, B2](set, get)
+    lensFamily(a => IndexedStore(set(a), get(a)))
 
   def lensFamilyu[A1, A2, B1, B2](set: (A1, B2) => A2, get: A1 => B1): LensFamily[A1, A2, B1, B2] =
     lensFamilyg(set.curried, get)
 
   /** The identity lens family for a given pair of objects */
-  def lensFamilyId[F[+_], A1, A2](implicit P: Pointed[F]): LensFamilyT[F, A1, A2, A1, A2] =
-    lensFamilyp(IndexedStore(identity, _))
+  def lensFamilyId[A1, A2]: LensFamily[A1, A2, A1, A2] =
+    lensFamily(IndexedStore(identity, _))
 
   /** A lens family that discards the choice of right or left from disjunction */
-  def codiagLensFamily[F[+_]: Pointed, A1, A2]: LensFamilyT[F, A1 \/ A1, A2 \/ A2, A1, A2] =
-    lensFamilyId[F, A1, A2] ||| lensFamilyId[F, A1, A2]
+  def codiagLensFamily[A1, A2]: LensFamily[A1 \/ A1, A2 \/ A2, A1, A2] =
+    lensFamilyId[A1, A2] ||| lensFamilyId[A1, A2]
 
   /** Polymorphically access the first field of a tuple */
   def firstLensFamily[A1, A2, B]: LensFamily[(A1, B), (A2, B), A1, A2] =
@@ -257,7 +244,7 @@ trait LensFamilyTFunctions {
     lensFamily(z => IndexedStore(x => LazyTuple2(z._1, x), z._2))
 
   def predicateLensFamily[A1, A2]: LensFamily[Store[A1, Boolean], Store[A2, Boolean], (A1 \/ A1), (A2 \/ A2)] =
-    LensFamily(q => IndexedStore(_ match {
+    lensFamily(q => IndexedStore(_ match {
       case -\/(l) => Store(_ => true, l)
       case \/-(r) => Store(_ => false, r)
     }, {
@@ -288,42 +275,29 @@ trait LensFamilyTFunctions {
 
 }
 
-trait LensTFunctions extends LensFamilyTFunctions {
-  import StoreT._
+trait LensFunctions extends LensFamilyFunctions {
 
-  def lensT[F[+_], A, B](r: A => F[Store[B, A]]): LensT[F, A, B] = new LensT[F, A, B] {
-    def run(a: A): F[Store[B, A]] = r(a)
+  def lens[A, B](r: A => Store[B, A]): Lens[A, B] = new Lens[A, B] {
+    def run(a: A): Store[B, A] = r(a)
   }
 
-  def lens[A, B](r: A => Store[B, A]): Lens[A, B] =
-    lensT[Id, A, B](r)
-
-  def lensp[F[+_], A, B](r: A => Store[B, A])(implicit F: Pointed[F]): LensT[F, A, B] =
-    lensT(a => F.point(r(a)))
-
-  def lensgT[F[+_], A, B](set: A => F[B => A], get: A => F[B])(implicit M: Bind[F]): LensT[F, A, B] =
-    lensT(a => M.apply2(set(a), get(a))(Store(_, _)))
-
   def lensg[A, B](set: A => B => A, get: A => B): Lens[A, B] =
-    lensgT[Id, A, B](set, get)
+    lens(a => Store(set(a), get(a)))
 
   def lensu[A, B](set: (A, B) => A, get: A => B): Lens[A, B] =
     lensg(set.curried, get)
 
   /** The identity lens for a given object */
-  def lensId[F[+_], A](implicit P: Pointed[F]): LensT[F, A, A] =
-    lensp(Store(identity, _))
-
-  /** The identity lens through the Id functor */
-  def self[A]: Lens[A, A] = lensId[Id, A]
+  def lensId[A]: Lens[A, A] =
+    lens(Store(identity, _))
 
   /** The trivial lens that can retrieve Unit from anything */
-  def trivialLens[F[+_], A](implicit P: Pointed[F]): LensT[F, A, Unit] =
-    lensp[F, A, Unit](a => Store(_ => a, ()))
+  def trivialLens[A]: Lens[A, Unit] =
+    lens[A, Unit](a => Store(_ => a, ()))
 
   /** A lens that discards the choice of right or left from disjunction */
-  def codiagLens[F[+_]: Pointed, A]: LensT[F, A \/ A, A] =
-    lensId[F, A] ||| lensId[F, A]
+  def codiagLens[A]: Lens[A \/ A, A] =
+    lensId[A] ||| lensId[A]
 
   /** Access the first field of a tuple */
   def firstLens[A, B]: (A, B) @> A =
@@ -367,7 +341,7 @@ trait LensTFunctions extends LensFamilyTFunctions {
     })
 
   def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =
-    Lens(q => Store(_ match {
+    lens(q => Store(_ match {
       case -\/(l) => Store(_ => true, l)
       case \/-(r) => Store(_ => false, r)
     }, {
@@ -395,47 +369,47 @@ trait LensTFunctions extends LensFamilyTFunctions {
 
       })
     }
-
 }
 
-trait LensTInstances0 { this: LensTInstances =>
-  implicit def lensTArrId[F[+_]](implicit F0: Pointed[F]): ArrId[({type λ[α, β] = LensT[F, α, β]})#λ] = new LensTArrId[F] {
-    implicit def F = F0
+trait LensInstances0 { this: LensInstances =>
+  implicit def lensArrId: ArrId[({type λ[α, β] = Lens[α, β]})#λ] = new LensArrId {
   }
 
   import scala.collection.SeqLike
 
   implicit def seqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](lens: LensFamily[S1, S2, Repr, Repr]) =
     SeqLikeLens[S1, S2, A, Repr](lens)
+
 }
 
-trait LensTInstances extends LensTInstances0 {
-  import LensFamilyT._
-  import collection.immutable.Stack
-  import collection.SeqLike
-  import collection.immutable.Queue
+trait LensInstances extends LensInstances0 {
+  import LensFamily._
   import BijectionT._
+  import collection.SeqLike
+  import collection.immutable.Stack
+  import collection.immutable.Queue
 
-  implicit def lensTCategory[F[+_]](implicit F0: Monad[F]) = new LensTCategory[F] {
-    implicit def F = F0
+  implicit def lensCategory: LensCategory = new LensCategory {
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */
-  implicit def LensFamilyState[F[+_], A, B](lens: LensFamilyT[F, A, _, B, _])(implicit F: Functor[F]): StateT[F, A, B] =
+  implicit def LensFamilyState[A, B](lens: LensFamily[A, _, B, _]): State[A, B] =
     lens.st
 
-  implicit def LensFamilyTUnzip[F[+_], S, R](implicit F: Functor[F]): Unzip[({type λ[α] = LensFamilyT[F, S, R, α, α]})#λ] =
-    new Unzip[({type λ[α] = LensFamilyT[F, S, R, α, α]})#λ] {
-      def unzip[A, B](a: LensFamilyT[F, S, R, (A, B), (A, B)]) =
+  implicit def LensFamilyUnzip[S, R]: Unzip[({type λ[α] = LensFamily[S, R, α, α]})#λ] =
+    new Unzip[({type λ[α] = LensFamily[S, R, α, α]})#λ] {
+      def unzip[A, B](a: LensFamily[S, R, (A, B), (A, B)]) =
         (
-          LensFamilyT(x => F.map(a run x)(c => {
+          lensFamily(x => {
+            val c = a run x
             val (p, q) = c.pos
             IndexedStore(a => c.put((a, q)): R, p)
-          }))
-          , LensFamilyT(x => F.map(a run x)(c => {
+          })
+        , lensFamily(x => {
+          val c = a run x
           val (p, q) = c.pos
           IndexedStore(a => c.put((p, a)): R, q)
-        }))
+        })
         )
     }
 
@@ -443,7 +417,7 @@ trait LensTInstances extends LensTInstances0 {
   val SetLens: SetLensFamily.type = SetLensFamily
   case class SetLensFamily[-S1, +S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
-    def contains(key: K) = LensFamilyT.lensFamilyg[S1, S2, Boolean, Boolean](
+    def contains(key: K) = lensFamilyg[S1, S2, Boolean, Boolean](
       s => b => lens.mod(m => if (b) m + key else m - key, s): Id[S2]
     , s => lens.get(s).contains(key)
     )
@@ -641,57 +615,53 @@ trait LensTInstances extends LensTInstances0 {
   implicit def integralLensFamily[S1, S2, I: Integral](lens: LensFamily[S1, S2, I, I]) =
     IntegralLensFamily[S1, S2, I](lens, implicitly[Integral[I]])
 
-  implicit def tuple2LensFamily[F[+_]: Functor, S1, S2, A, B](lens: LensFamilyT[F, S1, S2, (A, B), (A, B)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B]) =
-    LensFamilyTUnzip[F, S1, S2].unzip(lens)
+  implicit def tuple2LensFamily[S1, S2, A, B](lens: LensFamily[S1, S2, (A, B), (A, B)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B]) =
+    LensFamilyUnzip[S1, S2].unzip(lens)
 
-  implicit def tuple3LensFamily[F[+_]: Functor, S1, S2, A, B, C](lens: LensFamilyT[F, S1, S2, (A, B, C), (A, B, C)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C]) =
-    LensFamilyTUnzip[F, S1, S2].unzip3(lens.xmapbB(tuple3B))
+  implicit def tuple3LensFamily[S1, S2, A, B, C](lens: LensFamily[S1, S2, (A, B, C), (A, B, C)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B], LensFamily[S1, S2, C, C]) =
+    LensFamilyUnzip[S1, S2].unzip3(lens.xmapbB(tuple3B))
 
-  implicit def tuple4LensFamily[F[+_]: Functor, S1, S2, A, B, C, D](lens: LensFamilyT[F, S1, S2, (A, B, C, D), (A, B, C, D)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D]) =
-    LensFamilyTUnzip[F, S1, S2].unzip4(lens.xmapbB(tuple4B))
+  implicit def tuple4LensFamily[S1, S2, A, B, C, D](lens: LensFamily[S1, S2, (A, B, C, D), (A, B, C, D)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B], LensFamily[S1, S2, C, C], LensFamily[S1, S2, D, D]) =
+    LensFamilyUnzip[S1, S2].unzip4(lens.xmapbB(tuple4B))
 
-  implicit def tuple5LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E), (A, B, C, D, E)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E]) =
-    LensFamilyTUnzip[F, S1, S2].unzip5(lens.xmapbB(tuple5B))
+  implicit def tuple5LensFamily[S1, S2, A, B, C, D, E](lens: LensFamily[S1, S2, (A, B, C, D, E), (A, B, C, D, E)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B], LensFamily[S1, S2, C, C], LensFamily[S1, S2, D, D], LensFamily[S1, S2, E, E]) =
+    LensFamilyUnzip[S1, S2].unzip5(lens.xmapbB(tuple5B))
 
-  implicit def tuple6LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H), (A, B, C, D, E, H)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E], LensFamilyT[F, S1, S2, H, H]) =
-    LensFamilyTUnzip[F, S1, S2].unzip6(lens.xmapbB(tuple6B))
+  implicit def tuple6LensFamily[S1, S2, A, B, C, D, E, H](lens: LensFamily[S1, S2, (A, B, C, D, E, H), (A, B, C, D, E, H)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B], LensFamily[S1, S2, C, C], LensFamily[S1, S2, D, D], LensFamily[S1, S2, E, E], LensFamily[S1, S2, H, H]) =
+    LensFamilyUnzip[S1, S2].unzip6(lens.xmapbB(tuple6B))
 
-  implicit def tuple7LensFamily[F[+_]: Functor, S1, S2, A, B, C, D, E, H, I](lens: LensFamilyT[F, S1, S2, (A, B, C, D, E, H, I), (A, B, C, D, E, H, I)]):
-  (LensFamilyT[F, S1, S2, A, A], LensFamilyT[F, S1, S2, B, B], LensFamilyT[F, S1, S2, C, C], LensFamilyT[F, S1, S2, D, D], LensFamilyT[F, S1, S2, E, E], LensFamilyT[F, S1, S2, H, H], LensFamilyT[F, S1, S2, I, I]) =
-    LensFamilyTUnzip[F, S1, S2].unzip7(lens.xmapbB(tuple7B))
+  implicit def tuple7LensFamily[S1, S2, A, B, C, D, E, H, I](lens: LensFamily[S1, S2, (A, B, C, D, E, H, I), (A, B, C, D, E, H, I)]):
+  (LensFamily[S1, S2, A, A], LensFamily[S1, S2, B, B], LensFamily[S1, S2, C, C], LensFamily[S1, S2, D, D], LensFamily[S1, S2, E, E], LensFamily[S1, S2, H, H], LensFamily[S1, S2, I, I]) =
+    LensFamilyUnzip[S1, S2].unzip7(lens.xmapbB(tuple7B))
 }
 
-private[scalaz] trait LensTArrId[F[+_]]
-  extends ArrId[({type λ[α, β] = LensT[F, α, β]})#λ]{
+private[scalaz] trait LensArrId
+  extends ArrId[Lens]{
 
-  implicit def F: Pointed[F]
-
-  def id[A] = LensT.lensId
+  def id[A] = LensFamily.lensId
 }
 
-private[scalaz] trait LensTCategory[F[+_]]
-  extends Choice[({type λ[α, β] = LensT[F, α, β]})#λ]
-  with Split[({type λ[α, β] = LensT[F, α, β]})#λ]
-  with LensTArrId[F] {
+private[scalaz] trait LensCategory
+  extends Choice[Lens]
+  with Split[Lens]
+  with LensArrId {
 
-  implicit def F: Monad[F]
+  def compose[A, B, C](bc: Lens[B, C], ab: Lens[A, B]): Lens[A, C] = ab >=> bc
 
-  def compose[A, B, C](bc: LensT[F, B, C], ab: LensT[F, A, B]): LensT[F, A, C] = ab >=> bc
-
-  def choice[A, B, C](f: => LensT[F, A, C], g: => LensT[F, B, C]): LensT[F, A \/ B, C] =
-    LensT.lensT {
+  def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[A \/ B, C] =
+    LensFamily.lens {
       case -\/(a) =>
-        F.map(f run a)(_ map (-\/(_)))
+        f run a map (-\/(_))
       case \/-(b) =>
-        F.map(g run b)(_ map (\/-(_)))
+        g run b map (\/-(_))
     }
 
-  def split[A, B, C, D](f: LensT[F, A, B], g: LensT[F, C, D]): LensT[F, (A,  C), (B, D)] =
+  def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
     f *** g
 
 }
