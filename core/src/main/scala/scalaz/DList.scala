@@ -25,12 +25,7 @@ trait DList[A] {
   def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
 
   /** Append a single element in constant time. */
-  def :+(a: A): DList[A] = mkDList(
-    as =>
-    suspend(
-      apply(
-        a :: as
-      )))
+  def :+(a: A): DList[A] = mkDList(as => suspend(apply( a :: as)))
 
   /** Append one list to another in constant time. */
   def ++(as: => DList[A]): DList[A] =
