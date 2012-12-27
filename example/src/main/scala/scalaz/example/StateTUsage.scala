@@ -9,11 +9,6 @@ object StateTUsage extends App {
     Functor[({type l[a] = StateT[M, Int, a]})#l]
   }
 
-  def p[M[+_]: Pointed] {
-    Functor[({type l[a] = StateT[M, Int, a]})#l]
-    Pointed[({type l[a] = StateT[M, Int, a]})#l]
-  }
-
   def m[M[+_]: Monad] {
     Applicative[({type l[a] = StateT[M, Int, a]})#l]
     Monad[({type l[a] = StateT[M, Int, a]})#l]

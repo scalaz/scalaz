@@ -17,10 +17,16 @@ trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] with Distributive[Function0] {
+  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Comonad[Function0] with Distributive[Function0] {
     def point[A](a: => A) = () => a
 
     def copoint[A](p: () => A) = p()
+
+    def cobind[A, B](fa: Function0[A])(f: Function0[A] => B) =
+      () => f(fa)
+
+    def cojoin[A](a: Function0[A]): Function0[Function0[A]] =
+      () => a
 
     def bind[A, B](fa: () => A)(f: (A) => () => B) = () => f(fa())()
 

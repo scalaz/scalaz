@@ -52,14 +52,20 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseSTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
-    traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline]).unliftId[Trampoline, G[F[B]], S, S]
+    State[S, G[F[B]]](s => {
+      val st = traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline])
+      st.run(s).run
+    })
   }
 
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseKTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
     implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
-    Kleisli(traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).unliftId[Trampoline, S, G[F[B]]] run _)
+    Kleisli[G, S, F[B]](s => {
+      val kl = traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
+      kl.run
+    })
   }
 
   // derived functions
@@ -137,7 +143,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
     /**
      * @param nat A natural transformation from `M` to `N` for which these properties hold:
-     *            `(a: A) => nat(Pointed[M].pure[A](a)) === Pointed[M].point[A](a)`
+     *            `(a: A) => nat(Applicative[M].pure[A](a)) === Applicative[M].point[A](a)`
      *            `(f: M[A => B], ma: M[A]) => nat(Applicative[M].ap(ma)(f)) === Applicative[N].ap(nat(ma))(nat(f))`
      */
     def naturality[N[_], M[_], A](nat: (M ~> N))

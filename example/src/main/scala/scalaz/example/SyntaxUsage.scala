@@ -64,17 +64,6 @@ object SyntaxUsage extends App {
     o2.tuple(o2)
   }
 
-
-  // Monad extends from Pointed, so we can use (std.Option.option: Monad[Option]) where Pointed[F] is called for.
-  def useParentTypeClass {
-    import scalaz._
-
-    def needPointed[F[_] : Pointed] = ()
-
-    import std.option._
-    needPointed[Option]
-  }
-
   def stdSyntax() {
     import scalaz.std.anyVal._
     import scalaz.std.stream.streamSyntax._

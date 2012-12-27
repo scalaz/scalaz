@@ -34,14 +34,14 @@ trait IdTInstances2 {
 }
 
 trait IdTInstances1 extends IdTInstances2 {
-  implicit def idTPointed[F[_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = IdT[F, α]})#λ] = new IdTPointed[F] {
-    implicit def F: Pointed[F] = F0
+  implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = IdT[F, α]})#λ] = new IdTApply[F] {
+    implicit def F: Apply[F] = F0
   }
 }
 
 trait IdTInstances0 extends IdTInstances1 {
-  implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = IdT[F, α]})#λ] = new IdTApply[F] {
-    implicit def F: Apply[F] = F0
+  implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = IdT[F, α]})#λ] = new IdTApplicative[F] {
+    implicit def F: Applicative[F] = F0
   }
 
   implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = IdT[F, α]})#λ] = new IdTFoldable[F] {
@@ -76,19 +76,19 @@ private[scalaz] trait IdTFunctor[F[_]] extends Functor[({type λ[α] = IdT[F, α
   override def map[A, B](fa: IdT[F, A])(f: A => B) = fa map f
 }
 
-private[scalaz] trait IdTPointed[F[_]] extends Pointed[({type λ[α] = IdT[F, α]})#λ] with IdTFunctor[F] {
-  implicit def F: Pointed[F]
+private[scalaz] trait IdTApply[F[_]] extends Apply[({type λ[α] = IdT[F, α]})#λ] with IdTFunctor[F] {
+  implicit def F: Apply[F]
+
+  override def ap[A, B](fa: => IdT[F, A])(f: => IdT[F, A => B]): IdT[F, B] = fa ap f
+}
+
+private[scalaz] trait IdTApplicative[F[_]] extends Applicative[({type λ[α] = IdT[F, α]})#λ] with IdTApply[F] {
+  implicit def F: Applicative[F]
 
   def point[A](a: => A) = new IdT[F, A](F.point(a))
 }
 
-private[scalaz] trait IdTApply[F[_]] extends Apply[({type λ[α] = IdT[F, α]})#λ] with IdTFunctor[F] {
-  implicit def F: Apply[F]
-
-  def ap[A, B](fa: => IdT[F, A])(f: => IdT[F, A => B]): IdT[F, B] = fa ap f
-}
-
-private[scalaz] trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#λ] with IdTPointed[F] {
+private[scalaz] trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#λ] with IdTApplicative[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f

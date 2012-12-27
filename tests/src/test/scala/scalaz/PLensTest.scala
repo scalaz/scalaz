@@ -14,7 +14,6 @@ class PLensTest extends Spec {
   }
 
   object instances {
-    def arrId = ArrId[PLens]
     def category = Category[PLens]
     def choice = Choice[PLens]
     def split = Split[PLens]

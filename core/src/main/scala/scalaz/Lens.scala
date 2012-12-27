@@ -372,9 +372,6 @@ trait LensFunctions extends LensFamilyFunctions {
 }
 
 trait LensInstances0 { this: LensInstances =>
-  implicit def lensArrId: ArrId[({type λ[α, β] = Lens[α, β]})#λ] = new LensArrId {
-  }
-
   import scala.collection.SeqLike
 
   implicit def seqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](lens: LensFamily[S1, S2, Repr, Repr]) =
@@ -640,18 +637,13 @@ trait LensInstances extends LensInstances0 {
     LensFamilyUnzip[S1, S2].unzip7(lens.xmapbB(tuple7B))
 }
 
-private[scalaz] trait LensArrId
-  extends ArrId[Lens]{
-
-  def id[A] = LensFamily.lensId
-}
-
 private[scalaz] trait LensCategory
   extends Choice[Lens]
-  with Split[Lens]
-  with LensArrId {
+  with Split[Lens] {
 
   def compose[A, B, C](bc: Lens[B, C], ab: Lens[A, B]): Lens[A, C] = ab >=> bc
+
+  def id[A] = LensFamily.lensId
 
   def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[A \/ B, C] =
     LensFamily.lens {

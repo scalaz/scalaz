@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Reader, \/}
+import scalaz.{Applicative, Monoid, NonEmptyList, Kleisli, Reader, \/}
 
 import scalaz.Id._
 
@@ -65,11 +65,11 @@ trait IdOps[A] extends Ops[A] {
 
   /**
    * If the provided partial function is defined for `self` run this,
-   * otherwise lift `self` into `F` with the provided [[scalaz.Pointed]].
+   * otherwise lift `self` into `F` with the provided [[scalaz.Applicative]].
    */
-  def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
+  def visit[F[_] : Applicative](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
-    else Pointed[F].point(self)
+    else Applicative[F].point(self)
 }
 
 trait ToIdOps {

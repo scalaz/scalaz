@@ -13,13 +13,11 @@ class LazyOptionTTest extends Spec {
 
   object instances {
     def functor[F[+_] : Functor] = Functor[({type λ[α] = LazyOptionT[F, α]})#λ]
-    def pointed[F[+_] : Pointed] = Pointed[({type λ[α] = LazyOptionT[F, α]})#λ]
     def apply[F[+_] : Apply] = Apply[({type λ[α] = LazyOptionT[F, α]})#λ]
     def monad[F[+_] : Monad] = Monad[({type λ[α] = LazyOptionT[F, α]})#λ]
 
     // checking absence of ambiguity
     def functor[F[+_] : Monad] = Functor[({type λ[α] = LazyOptionT[F, α]})#λ]
-    def pointed[F[+_] : Monad] = Pointed[({type λ[α] = LazyOptionT[F, α]})#λ]
     def apply[F[+_] : Monad] = Apply[({type λ[α] = LazyOptionT[F, α]})#λ]
   }
 }

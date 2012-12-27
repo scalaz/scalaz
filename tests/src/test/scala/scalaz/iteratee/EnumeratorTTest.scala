@@ -108,7 +108,6 @@ class EnumeratorTTest extends Spec {
 
   object instances {
     //def functor[F[_] : Functor] = Functor[({type λ[α] = EnumeratorT[α, F]})#λ]
-    //def pointed[F[_] : Pointed] = Pointed[({type λ[α] = EnumeratorT[α, F]})#λ]
     def monad[F[_] : Monad]     = Monad[({type λ[α] = EnumeratorT[α, F]})#λ]
     def semigroup[E, F[_]: Bind] = Semigroup[EnumeratorT[E, F]]
     def monoid[E, F[_]: Monad] = Monoid[EnumeratorT[E, F]]

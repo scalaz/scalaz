@@ -40,20 +40,17 @@ class KleisliTest extends Spec {
     def monoid[F[+_], A, B](implicit FB: Monoid[F[B]]) = Monoid[Kleisli[F, A, B]]
     def functor[F[+_] : Functor, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
     def apply[F[+_] : Apply, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
-    def pointed[F[+_] : Pointed, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[+_] : Plus, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[+_] : PlusEmpty, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def monadReader[F[+_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
 
-    def arrId[F[+_]: Pointed, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def category[F[+_]: Monad, A] = ArrId[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def category[F[+_]: Monad, A] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def arrow[F[+_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
     def semigroup[F[+_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def functor[F[+_] : Monad, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
     def apply[F[+_] : Monad, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
-    def pointed[F[+_] : Monad, A] = Pointed[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[+_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[+_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
 
@@ -61,10 +58,8 @@ class KleisliTest extends Spec {
       // F = Id
       def readerFunctor[A] = Functor[({type λ[α] = Reader[A, α]})#λ]
       def readerApply[A] = Apply[({type λ[α] = Reader[A, α]})#λ]
-      def readerPointed[A] = Pointed[({type λ[α] = Reader[A, α]})#λ]
       def readerMonadReader[A] = MonadReader[({type f[s, a] = Reader[s, a]})#f, A]
-      def readerArrId = ArrId[Reader]
-      def readerCategory = ArrId[Reader]
+      def readerCategory = Ca1tegory[Reader]
       def readerArrow = Arrow[Reader]
 
       // Sigh, more tests needed, see http://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
@@ -72,7 +67,6 @@ class KleisliTest extends Spec {
       type ReaderX[A] = Reader[X, A]
       def readerXFunctor = Functor[ReaderX]
       def readerXApply = Apply[ReaderX]
-      def readerXPointed = Pointed[ReaderX]
     }
   }
 }

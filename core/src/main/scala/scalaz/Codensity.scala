@@ -2,7 +2,7 @@ package scalaz
 
 trait Codensity[F[+_], +A] { self =>
   def apply[B](f: A => F[B]): F[B]
-  def improve(implicit F: Pointed[F]): F[A] =
+  def improve(implicit F: Applicative[F]): F[A] =
     apply(a => F.point(a))
   def flatMap[B](k: A => Codensity[F, B]): Codensity[F, B] = {
     new Codensity[F, B] {

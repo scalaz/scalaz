@@ -76,10 +76,10 @@ trait BijectionTFunctions {
   type Bijection[A, B] =
   BijectionT[Id, Id, A, B]
 
-  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, A, B] =
+  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
-  def bijectionId[F[+_], G[+_], A](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, A, A] =
+  def bijectionId[F[+_], G[+_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
     liftBijection(x => x, x => x)
 
   def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =

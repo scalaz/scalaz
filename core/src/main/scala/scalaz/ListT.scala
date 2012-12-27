@@ -5,7 +5,7 @@ package scalaz
  */
 
 sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
-  def uncons(implicit M: Pointed[M]): M[Option[(A, ListT[M, A])]] = {
+  def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
     M.map(underlying){list =>
       list match {
         case Nil => None
@@ -22,7 +22,7 @@ sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
 
   def headOption(implicit M: Functor[M]) : M[Option[A]] = M.map(underlying)(_.headOption)
   
-  def tailM(implicit M: Pointed[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
+  def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(underlying)(_.filter(p)))
   
@@ -76,9 +76,6 @@ trait ListTInstances2 {
 }
 
 trait ListTInstances1 extends ListTInstances2 {
-  implicit def listTPointedPlus[F[+_]](implicit F0: Monad[F]): Pointed[({type λ[α] = ListT[F, α]})#λ] with Plus[({type λ[α] = ListT[F, α]})#λ] = new ListTPointedPlusEmpty[F] {
-    implicit def F: Monad[F] = F0
-  }
 
   implicit def listTMonoid[F[+_], A](implicit F0: Monad[F]): Monoid[ListT[F, A]] = new ListTMonoid[F, A] {
     implicit def F: Monad[F] = F0
@@ -96,7 +93,7 @@ trait ListTInstances extends ListTInstances1 {
 }
 
 object ListT extends ListTInstances {
-  def empty[M[+_], A](implicit M: Pointed[M]): ListT[M, A] = new ListT[M, A](M.point(Nil))
+  def empty[M[+_], A](implicit M: Applicative[M]): ListT[M, A] = new ListT[M, A](M.point(Nil))
 
   def fromList[M[+_], A](mas: M[List[A]]): ListT[M, A] = new ListT(mas)
 }
@@ -121,20 +118,16 @@ private[scalaz] trait ListTMonoid[F[+_], A] extends Monoid[ListT[F, A]] with Lis
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
-private[scalaz] trait ListTPointedPlusEmpty[F[+_]] extends Pointed[({type λ[α] = ListT[F, α]})#λ] with PlusEmpty[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
+private[scalaz] trait ListTMonadPlus[F[+_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
   implicit def F: Monad[F]
+
+  def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
 
   def point[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
 
   def empty[A]: ListT[F, A] = ListT.empty[F, A]
 
   def plus[A](a: ListT[F, A], b: => ListT[F, A]): ListT[F, A] = a ++ b
-}
-
-private[scalaz] trait ListTMonadPlus[F[+_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTPointedPlusEmpty[F] {
-  implicit def F: Monad[F]
-
-  def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
 }
 
 private[scalaz] trait ListTHoist extends Hoist[ListT] {

@@ -128,16 +128,6 @@ object KTypeClass {
 
   }
 
-  private[scalaz] trait ProductPointed[F[_], T <: TCList]
-    extends ProductFunctor[F, T]
-    with Pointed[TCCons[F, T]#Product]
-    with Product[Pointed, F, T] {
-
-    def point[A](a: => A) =
-      FHead.point(a) :: FTail.point(a)
-
-  }
-
   private[scalaz] trait ProductApply[F[_], T <: TCList]
     extends ProductFunctor[F, T]
     with Apply[TCCons[F, T]#Product]
@@ -149,10 +139,14 @@ object KTypeClass {
   }
 
   private[scalaz] trait ProductApplicative[F[_], T <: TCList]
-    extends ProductPointed[F, T]
-    with ProductApply[F, T]
+    extends ProductApply[F, T]
     with Applicative[TCCons[F, T]#Product]
-    with Product[Applicative, F, T]
+    with Product[Applicative, F, T] {
+
+    def point[A](a: => A) =
+      FHead.point(a) :: FTail.point(a)
+
+  }
 
   private[scalaz] trait ProductPlus[F[_], T <: TCList]
     extends Plus[TCCons[F, T]#Product]
@@ -235,16 +229,6 @@ object KTypeClass {
 
   }
 
-  private[scalaz] trait ComposedPointed[F[_], T <: TCList]
-    extends ComposedFunctor[F, T]
-    with Pointed[TCCons[F, T]#Composed]
-    with Composed[Pointed, F, T] {
-
-    def point[A](a: => A) =
-      FOuter.point(FInner.point(a))
-
-  }
-
   private[scalaz] trait ComposedApply[F[_], T <: TCList]
     extends ComposedFunctor[F, T]
     with Apply[TCCons[F, T]#Composed]
@@ -256,10 +240,14 @@ object KTypeClass {
   }
 
   private[scalaz] trait ComposedApplicative[F[_], T <: TCList]
-    extends ComposedPointed[F, T]
-    with ComposedApply[F, T]
+    extends ComposedApply[F, T]
     with Applicative[TCCons[F, T]#Composed]
-    with Composed[Applicative, F, T]
+    with Composed[Applicative, F, T] {
+
+    def point[A](a: => A) =
+      FOuter.point(FInner.point(a))
+
+  }
 
   private[scalaz] trait ComposedFoldable[F[_], T <: TCList]
     extends Foldable[TCCons[F, T]#Composed]
@@ -348,13 +336,6 @@ object KTypeClass {
       new ProductFunctor[F, T] { def FHead = FH; def FTail = FT }
     def compose[F[_], T <: TCList](FO: Functor[F], FI: Functor[T#Composed]) =
       new ComposedFunctor[F, T] { def FOuter = FO; def FInner = FI }
-  }
-
-  implicit def PointedI: KTypeClass[Pointed] = new KTypeClass[Pointed] with Empty {
-    def product[F[_], T <: TCList](FH: Pointed[F], FT: Pointed[T#Product]) =
-      new ProductPointed[F, T] { def FHead = FH; def FTail = FT }
-    def compose[F[_], T <: TCList](FO: Pointed[F], FI: Pointed[T#Composed]) =
-      new ComposedPointed[F, T] { def FOuter = FO; def FInner = FI }
   }
 
   implicit def ApplyI: KTypeClass[Apply] = new KTypeClass[Apply] with Empty {

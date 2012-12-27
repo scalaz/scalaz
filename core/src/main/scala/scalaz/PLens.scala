@@ -568,13 +568,7 @@ trait PLensFunctions extends PLensFamilyFunctions with PLensInstances {
     }
 }
 
-trait PLensInstances0 {
-  implicit def plensArrI: PLensArrId = new PLensArrId {
-  }
-
-}
-
-trait PLensInstances extends PLensInstances0 {
+trait PLensInstances {
 
   import PLensFamily._
 
@@ -635,16 +629,12 @@ trait PLensInstances extends PLensInstances0 {
 
 }
 
-private[scalaz] trait PLensArrId extends ArrId[PLens] {
-  def id[A]: PLens[A, A] = PLensFamily.plensId
-}
-
 private[scalaz] trait PLensCategory
   extends Choice[PLens]
-  with Split[PLens]
-  with PLensArrId {
+  with Split[PLens] {
 
   def compose[A, B, C](bc: PLens[B, C], ab: PLens[A, B]): PLens[A, C] = ab >=> bc
+  def id[A]: PLens[A, A] = PLensFamily.plensId
 
   def choice[A, B, C](f: => PLens[A, C], g: => PLens[B, C]): PLens[A \/ B, C] =
     PLensFamily.plens[A \/ B, C] {

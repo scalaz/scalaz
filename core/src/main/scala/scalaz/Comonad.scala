@@ -5,10 +5,15 @@ package scalaz
  *
  */
 ////
-trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
+trait Comonad[F[_]] extends Cojoin[F] with Cobind[F] { self =>
+  /** Also known as `extract` / `copure` */
+  def copoint[A](p: F[A]): A
   ////
 
   // derived functions
+
+  /** alias for `copoint` */
+  def copure[A](p: F[A]): A = copoint(p)
   trait ComonadLaws {
     def cobindLeftIdentity[A](fa: F[A])(implicit F: Equal[F[A]]): Boolean =
       F.equal(cobind(fa)(copoint), fa)

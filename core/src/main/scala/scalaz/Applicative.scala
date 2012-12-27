@@ -17,8 +17,12 @@ package scalaz
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
  */
 ////
-trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
+trait Applicative[F[_]] extends Apply[F] { self =>
   ////
+  def point[A](a: => A): F[A]
+
+  // alias for point
+  def pure[A](a: => A): F[A] = point(a)
 
   // derived functions
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
@@ -80,11 +84,6 @@ object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   ////
-
-  def applicative[F[_]](p: Pointed[F], a: Apply[F]): Applicative[F] = new Applicative[F] {
-    def point[A](a: => A): F[A] = p.point(a)
-    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] = a.ap(fa)(f)
-  }
 
   implicit def monoidApplicative[M:Monoid]: Applicative[({type λ[α] = M})#λ] = Monoid[M].applicative
 

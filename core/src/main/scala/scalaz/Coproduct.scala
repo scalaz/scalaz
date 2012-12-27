@@ -22,7 +22,7 @@ sealed trait Coproduct[F[+_], G[+_], A] {
     , x => G.extend(x)(a => rightc(a)))
     )
 
-  def copoint(implicit F: Copointed[F], G: Copointed[G]): A =
+  def copoint(implicit F: Comonad[F], G: Comonad[G]): A =
     run.fold(F.copoint(_), G.copoint(_))
 
   def contramap[B](f: B => A)(implicit F: Contravariant[F], G: Contravariant[G]): Coproduct[F, G, B] =

@@ -77,10 +77,6 @@ trait FuncInstances3 {
 }
 
 trait FuncInstances2 extends FuncInstances3 {
-  implicit def FuncPointed[F[_], TC[F[_]] <: Pointed[F], R](implicit TC0: KTypeClass[TC], F0: TC[F]): Pointed[({type λ[α] = Func[F, TC, R, α]})#λ] = new FuncPointed[F, TC, R] {
-    implicit def TC: KTypeClass[TC] = TC0
-    implicit def F: TC[F] = F0
-  }
   implicit def FuncApply[F[_], TC[F[_]] <: Apply[F], R](implicit TC0: KTypeClass[TC], F0: TC[F]): Apply[({type λ[α] = Func[F, TC, R, α]})#λ] = new FuncApply[F, TC, R] {
     implicit def TC: KTypeClass[TC] = TC0
     implicit def F: TC[F] = F0
@@ -106,12 +102,6 @@ trait FuncFunctions {
   def functorfunc[M[_], A, B](f: A => M[B])(implicit F0: Functor[M]): Func[M, Functor, A, B] = func[M, Functor, A, B](f)  
   def functorfuncU[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = new Func[F0.M, Functor, A, F0.A] {
     def TC = KTypeClass[Functor]
-    def F = F0.TC
-    def runA(a: A) = F0(f(a))
-  }
-  def pointedfunc[M[_], A, B](f: A => M[B])(implicit F0: Pointed[M]): Func[M, Pointed, A, B] = func[M, Pointed, A, B](f)
-  def pointedfuncU[A, R](f: A => R)(implicit F0: Unapply[Pointed, R]): Func[F0.M, Pointed, A, F0.A] = new Func[F0.M, Pointed, A, F0.A] {
-    def TC = KTypeClass[Pointed]
     def F = F0.TC
     def runA(a: A) = F0(f(a))
   }
@@ -147,15 +137,6 @@ object FunctorFuncU {
   def apply[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = Func.functorfuncU(f)
 }
 
-object PointedFunc {
-  def apply[M[_], A, B](f: A => M[B])(implicit F0: Pointed[M]): Func[M, Pointed, A, B] = Func.pointedfunc(f)
-  def HNil[A, B] = Func.hnilfunc[Pointed, A, B]
-}
-
-object PointedFuncU {
-  def apply[A, R](f: A => R)(implicit F0: Unapply[Pointed, R]): Func[F0.M, Pointed, A, F0.A] = Func.pointedfuncU(f)
-}
-
 object ApplyFunc {
   def apply[M[_], A, B](f: A => M[B])(implicit F0: Apply[M]): Func[M, Apply, A, B] = Func.applyfunc(f)
   def HNil[A, B] = Func.hnilfunc[Apply, A, B]
@@ -184,19 +165,15 @@ private[scalaz] trait FuncFunctor[F[_], TC[F[_]] <: Functor[F], R] extends Funct
   override def map[A, B](fa: Func[F, TC, R, A])(f: A => B): Func[F, TC, R, B] = fa mapA f
 }
 
-private[scalaz] trait FuncPointed[F[_], TC[F[_]] <: Pointed[F], R] extends Pointed[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncFunctor[F, TC, R] {
-  implicit def TC: KTypeClass[TC]
-  implicit def F: TC[F]
-  def point[A](a: => A): Func[F, TC, R, A] = func((r: R) => F.point(a))
-}
-
 private[scalaz] trait FuncApply[F[_], TC[F[_]] <: Apply[F], R] extends Apply[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncFunctor[F, TC, R] {
   implicit def TC: KTypeClass[TC]
   implicit def F: TC[F]
   def ap[A, B](fa: => Func[F, TC, R, A])(f: => Func[F, TC, R, (A) => B]): Func[F, TC, R, B] = func(r => F.ap(fa.runA(r))(f.runA(r)))
 }
 
-private[scalaz] trait FuncApplicative[F[_], TC[F[_]] <: Applicative[F], R] extends Applicative[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncApply[F, TC, R] with FuncPointed[F, TC, R] {
+private[scalaz] trait FuncApplicative[F[_], TC[F[_]] <: Applicative[F], R] extends Applicative[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncApply[F, TC, R] {
   implicit def TC: KTypeClass[TC]
   implicit def F: TC[F]
+  def point[A](a: => A): Func[F, TC, R, A] = func((r: R) => F.point(a))
+
 }

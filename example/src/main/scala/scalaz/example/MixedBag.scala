@@ -69,7 +69,7 @@ object MixedBag extends App {
     val f = kleisli((i: Int) => some(i))
     f map (i => i * 2) map (x => println(x)) run 3
 
-    val K = Kleisli.kleisliArrId[Option] // or, Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
+    val K = Arrow[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 

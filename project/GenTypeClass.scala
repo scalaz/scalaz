@@ -29,9 +29,8 @@ object TypeClass {
   lazy val each = TypeClass("Each", *->*)
   lazy val index = TypeClass("Index", *->*)
   lazy val functor = TypeClass("Functor", *->*)
-  lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
@@ -40,10 +39,9 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor))
   lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(functor, cojoin, cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
   lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
@@ -86,9 +84,7 @@ object TypeClass {
     each,
     index,
     functor,
-    pointed,
     contravariant,
-    copointed,
     apply,
     applicative,
     zip,

@@ -164,14 +164,6 @@ object ScalazProperties {
     }
   }
 
-
-  object copointed {
-    def laws[M[_]](implicit a: Copointed[M], am: Arbitrary[M[Int]],
-                   af: Arbitrary[Int => Int], e: Equal[M[Int]]) = new Properties("copointed") {
-      include(functor.laws[M])
-    }
-  }
-
   object comonad {
     def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
       forAll(F.comonadLaw.cobindLeftIdentity[A] _)
@@ -185,7 +177,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
-      include(copointed.laws[F])
+      include(functor.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
       property("cobind right identity") = cobindRightIdentity[F, Int, Int]
       property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]

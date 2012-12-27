@@ -45,7 +45,7 @@ class StreamTTest extends Spec {
   
   object instances {
     def semigroup[F[+_]: Functor, A] = Semigroup[StreamT[F, A]]
-    def monoid[F[+_]: Pointed, A] = Monoid[StreamT[F, A]]
+    def monoid[F[+_]: Applicative, A] = Monoid[StreamT[F, A]]
     def functor[F[+_]: Functor, A] = Functor[({type λ[α]=StreamT[F, α]})#λ]
     def monad[F[+_]: Monad, A] = Monad[({type λ[α]=StreamT[F, α]})#λ]
   }

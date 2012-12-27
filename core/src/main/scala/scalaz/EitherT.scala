@@ -202,21 +202,15 @@ object EitherT extends EitherTFunctions with EitherTInstances {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Pointed[F]): EitherT[F, Throwable, A] = try {
+  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
     case e => left(F.point(e))
   }
 }
 
-trait EitherTInstances4 {
+trait EitherTInstances3 {
   implicit def eitherTFunctor[F[+_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
-    implicit def F = F0
-  }
-}
-
-trait EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTPointed[F[+_], L](implicit F0: Pointed[F]) = new EitherTPointed[F, L] {
     implicit def F = F0
   }
 }
@@ -281,20 +275,16 @@ private[scalaz] trait EitherTFunctor[F[+_], E] extends Functor[({type λ[α]=Eit
   override def map[A, B](fa: EitherT[F, E, A])(f: (A) => B): EitherT[F, E, B] = fa map f
 }
 
-private[scalaz] trait EitherTPointed[F[+_], E] extends Pointed[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
-  implicit def F: Pointed[F]
-
-  def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
-}
-
 private[scalaz] trait EitherTApply[F[+_], E] extends Apply[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
 }
 
-private[scalaz] trait EitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApply[F, E] with EitherTPointed[F, E] {
+private[scalaz] trait EitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApply[F, E] {
   implicit def F: Applicative[F]
+  def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
+
 }
 
 private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApplicative[F, E] {

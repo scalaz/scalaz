@@ -11,7 +11,7 @@ trait IterateeFunctions {
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */
-  def repeatBuild[E, A, F[_]](iter: Iteratee[E, A])(implicit mon: Monoid[F[A]], F: Pointed[F]): Iteratee[E, F[A]] = {
+  def repeatBuild[E, A, F[_]](iter: Iteratee[E, A])(implicit mon: Monoid[F[A]], F: Applicative[F]): Iteratee[E, F[A]] = {
     import Iteratee._
     def step(acc: F[A])(s: Input[E]): Iteratee[E, F[A]] =
       s(el = e => iter.foldT[Iteratee[E, F[A]]](
@@ -31,7 +31,7 @@ trait IterateeFunctions {
   /**
    * Iteratee that collects all inputs with the given monoid.
    */
-  def collect[A, F[_]](implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[A, F[A]] = {
+  def collect[A, F[_]](implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] = {
     fold[A, Id, F[A]](mon.zero)((acc, e) => mon.append(acc, pt.point(e)))
   }
 
@@ -47,7 +47,7 @@ trait IterateeFunctions {
   /**
    * Iteratee that collects the first n inputs.
    */
-  def take[A, F[_]](n: Int)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[A, F[A]] = {
+  def take[A, F[_]](n: Int)(implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] = {
     def loop(acc: F[A], n: Int)(s: Input[A]): Iteratee[A, F[A]] =
       s(el = e =>
         if (n <= 0) done[A, Id, F[A]](acc, s)
@@ -61,7 +61,7 @@ trait IterateeFunctions {
   /**
    * Iteratee that collects inputs with the given monoid until the input element fails a test.
    */
-  def takeWhile[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[A, F[A]] = {
+  def takeWhile[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] = {
     def loop(acc: F[A])(s: Input[A]): Iteratee[A, F[A]] =
       s(el = e =>
         if (p(e)) cont(loop(mon.append(acc, pt.point(e))))
@@ -75,13 +75,13 @@ trait IterateeFunctions {
   /**
    * Iteratee that collects inputs with the given monoid until the input element passes a test.
    */
-  def takeUntil[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Pointed[F]): Iteratee[A, F[A]] =
+  def takeUntil[A, F[_]](p: A => Boolean)(implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] =
     takeWhile(!p(_))
 
   /**
    * Produces chunked output split by the given predicate.
    */
-  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pointed[F]): Iteratee[A, F[A]] = {
+  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Applicative[F]): Iteratee[A, F[A]] = {
     Iteratee.peek[A, Id] flatMap {
       case None => done(Monoid[F[A]].zero, Input.Empty[A])
       case Some(h) => takeWhile(pred(_, h))

@@ -230,7 +230,7 @@ object IterV {
   /**
    * Takes while the given predicate holds, appending with the given monoid.
    */
-  def takeWhile[A, F[_]](pred: A => Boolean)(implicit mon: Monoid[F[A]], pr: Pointed[F]): IterV[A, F[A]] = {
+  def takeWhile[A, F[_]](pred: A => Boolean)(implicit mon: Monoid[F[A]], pr: Applicative[F]): IterV[A, F[A]] = {
     def peekStepDoneOr(z: F[A]) = peekDoneOr(z, step(z, _: A))
 
     def step(acc: F[A], a: A): IterV[A, F[A]] = {
@@ -245,7 +245,7 @@ object IterV {
   /**
    * Produces chunked output split by the given predicate.
    */
-  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Pointed[F]): IterV[A, F[A]] = {
+  def groupBy[A, F[_]](pred: (A, A) => Boolean)(implicit mon: Monoid[F[A]], pr: Applicative[F]): IterV[A, F[A]] = {
     IterV.peek flatMap {
       case None => Done(mzero[F[A]], Empty[A])
       case Some(h) => takeWhile(pred(_, h))
@@ -255,7 +255,7 @@ object IterV {
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */
-  def repeat[E, A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Pointed[F]): IterV[E, F[A]] = {
+  def repeat[E, A, F[_]](iter: IterV[E,A])(implicit mon: Monoid[F[A]], pr: Applicative[F]): IterV[E, F[A]] = {
     def step(acc: F[A])(s: Input[E]): IterV[E, F[A]] =
       s(el = e => iter.fold(
           (a, _) => Cont(step(acc |+| pr.point(a))),

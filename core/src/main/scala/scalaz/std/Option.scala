@@ -181,17 +181,17 @@ trait OptionFunctions {
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  final def orEmpty[A, M[_] : Pointed : PlusEmpty](oa: Option[A]): M[A] = oa match {
-    case Some(a) => Pointed[M].point(a)
+  final def orEmpty[A, M[_] : Applicative : PlusEmpty](oa: Option[A]): M[A] = oa match {
+    case Some(a) => Applicative[M].point(a)
     case None    => PlusEmpty[M].empty
   }
 
   /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
-  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
+  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Applicative[F]): B = oa match {
     case None    => b
-    case Some(a) => k(Pointed[F].point(a))
+    case Some(a) => k(Applicative[F].point(a))
   }
 
   /**

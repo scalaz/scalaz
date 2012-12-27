@@ -77,9 +77,6 @@ trait OptionTInstances2 {
 }
 
 trait OptionTInstances1 extends OptionTInstances2 {
-  implicit def optionTPointed[F[+_]](implicit F0: Pointed[F]): Pointed[({type λ[α] = OptionT[F, α]})#λ] = new OptionTPointed[F] {
-    implicit def F: Pointed[F] = F0
-  }
   implicit def optionTApply[F[+_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
@@ -88,6 +85,9 @@ trait OptionTInstances1 extends OptionTInstances2 {
 trait OptionTInstances0 extends OptionTInstances1 {
   implicit def optionTFoldable[F[+_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
+  }
+  implicit def optionTApplicative[F[+_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApplicative[F] {
+    implicit def F: Applicative[F] = F0
   }
 }
 
@@ -123,22 +123,23 @@ private[scalaz] trait OptionTFunctor[F[+_]] extends Functor[({type λ[α] = Opti
   override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] = fa map f
 }
 
-private[scalaz] trait OptionTPointed[F[+_]] extends Pointed[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
-  implicit def F: Pointed[F]
+private[scalaz] trait OptionTApply[F[+_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
+  implicit def F: Apply[F]
+
+  override def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
+}
+
+private[scalaz] trait OptionTApplicative[F[+_]] extends Applicative[({type λ[α] = OptionT[F, α]})#λ] with OptionTApply[F] {
+  implicit def F: Applicative[F]
 
   def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
-private[scalaz] trait OptionTApply[F[+_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
-  implicit def F: Apply[F]
-
-  def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
-}
-
-private[scalaz] trait OptionTMonad[F[+_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTPointed[F] {
+private[scalaz] trait OptionTMonad[F[+_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTApplicative[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
+
 }
 
 private[scalaz] trait OptionTFoldable[F[+_]] extends Foldable.FromFoldr[({type λ[α] = OptionT[F, α]})#λ] {

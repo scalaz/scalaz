@@ -5,6 +5,7 @@ package syntax
 trait ComonadOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Comonad[F]
   ////
+  def copoint: A = F.copoint(self)
 
   ////
 }
@@ -15,7 +16,7 @@ trait ToComonadOps0 {
 
 }
 
-trait ToComonadOps extends ToComonadOps0 with ToCopointedOps with ToCojoinOps with ToCobindOps {
+trait ToComonadOps extends ToComonadOps0 with ToCojoinOps with ToCobindOps {
   implicit def ToComonadOps[F[_],A](v: F[A])(implicit F0: Comonad[F]) =
     new ComonadOps[F,A] { def self = v; implicit def F: Comonad[F] = F0 }
 
@@ -24,7 +25,7 @@ trait ToComonadOps extends ToComonadOps0 with ToCopointedOps with ToCojoinOps wi
   ////
 }
 
-trait ComonadSyntax[F[_]] extends CopointedSyntax[F] with CojoinSyntax[F] with CobindSyntax[F] { 
+trait ComonadSyntax[F[_]] extends CojoinSyntax[F] with CobindSyntax[F] {
   implicit def ToComonadOps[A](v: F[A]): ComonadOps[F, A] = new ComonadOps[F,A] { def self = v; implicit def F: Comonad[F] = ComonadSyntax.this.F }
 
   def F: Comonad[F]

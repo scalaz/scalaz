@@ -40,7 +40,7 @@ sealed trait StepT[E, F[_], A] {
       , (_, _) => z
     )
 
-  def mapCont(k: (Input[E] => IterateeT[E, F, A]) => IterateeT[E, F, A])(implicit F: Pointed[F]): IterateeT[E, F, A] =
+  def mapCont(k: (Input[E] => IterateeT[E, F, A]) => IterateeT[E, F, A])(implicit F: Applicative[F]): IterateeT[E, F, A] =
     mapContOr[IterateeT[E, F, A]](k, pointI)
 
   def doneValue: LazyOption[A] =
@@ -76,7 +76,7 @@ sealed trait StepT[E, F[_], A] {
   def >-[Z](cont: => Z, done: => Z): Z =
     fold(_ => cont, (_, _) => done)
 
-  def pointI(implicit P: Pointed[F]): IterateeT[E, F, A] =
+  def pointI(implicit P: Applicative[F]): IterateeT[E, F, A] =
     iterateeT(P.point(this))
 }
 

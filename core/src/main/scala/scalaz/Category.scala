@@ -5,7 +5,9 @@ package scalaz
  *
  */
 ////
-trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
+trait Category[=>:[_, _]] extends Compose[=>:] { self =>
+  def id[A]: A =>: A
+
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 

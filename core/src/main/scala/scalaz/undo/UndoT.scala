@@ -36,16 +36,14 @@ final case class UndoT[F[+_], S, +A](hstate: StateT[F, History[S], A]) {
 //
 
 trait UndoTInstances1 {
-  // Prefer Pointed over Functor
   implicit def undoTFunctor[S, F[+_]](implicit F0: Functor[F]): Functor[({type G[+x] = UndoT[F, S, x]})#G] = new UndoTFunctor[S, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
 trait UndoTInstances0 extends UndoTInstances1 {
-  // Prefer Monad over Pointed
-  implicit def undoTPointed[S, F[+_]](implicit F0: Pointed[F]): Pointed[({type G[+x] = UndoT[F, S, x]})#G] = new UndoTPointed[S, F] {
-    implicit def F: Pointed[F] = F0
+  implicit def undoTMonad[S, F[+_]](implicit F0: Monad[F]): Monad[({type G[+x] = UndoT[F, S, x]})#G] = new UndoTMonad[S, F] {
+    implicit def F: Monad[F] = F0
   }
 }
 
@@ -118,24 +116,26 @@ private[scalaz] trait UndoTFunctor[S, F[+_]]
   override def map[A, B](fa: UndoT[F, S, A])(f: A => B) = fa.map(f)
 }
 
-private[scalaz] trait UndoTPointed[S, F[+_]]
-  extends Pointed[({type G[x] = UndoT[F, S, x]})#G]
+private[scalaz] trait UndoTMonad[S, F[+_]]
+  extends Monad[({type G[x] = UndoT[F, S, x]})#G]
   with UndoTFunctor[S, F] {
 
-  implicit def F: Pointed[F]
+  implicit def F: Monad[F]
 
   def point[A](a: => A) = UndoT[F, S, A](StateT(s => F.point(s, a)))
+
+  def bind[A, B](fa: UndoT[F, S, A])(f: A => UndoT[F, S, B]) = fa.flatMap(f)
 }
 
 private[scalaz] trait UndoTMonadState[S, F[+_]]
   extends MonadState[({type HS[X, Y] = UndoT[F, X, Y]})#HS, S]
-  with UndoTPointed[S, F] {
+  with UndoTMonad[S, F] {
 
   implicit def F: Monad[F]
 
   implicit def HMS: HStateTMonadState[F, S]
 
-  def bind[A, B](fa: UndoT[F, S, A])(f: A => UndoT[F, S, B]) = fa.flatMap(f)
+  override def bind[A, B](fa: UndoT[F, S, A])(f: A => UndoT[F, S, B]) = fa.flatMap(f)
 
   def init = UndoT[F, S, S](HMS.gets(s => s.current))
 

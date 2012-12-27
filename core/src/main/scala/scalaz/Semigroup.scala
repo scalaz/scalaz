@@ -79,10 +79,10 @@ object Semigroup {
     def append(f1: A, f2: => A): A = o.max(f1, f2)
   }
 
-  def repeat[F[_], A](a: A)(implicit F: Pointed[F], m: Semigroup[F[A]]): F[A] =
+  def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), repeat[F, A](a))
 
-  def iterate[F[_], A](a: A)(f: A => A)(implicit F: Pointed[F], m: Semigroup[F[A]]): F[A] =
+  def iterate[F[_], A](a: A)(f: A => A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), iterate[F, A](f(a))(f))
 
   ////

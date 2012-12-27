@@ -169,13 +169,9 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
 object Trampoline extends TrampolineInstances
 
 trait TrampolineInstances {
-  implicit val trampolineMonad: Monad[Trampoline] with Copointed[Trampoline] = new Monad[Trampoline] with Copointed[Trampoline] {
+  implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
     override def point[A](a: => A) = return_[Function0, A](a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
-    def copoint[A](p: Free.Trampoline[A]): A = {
-      import std.function.function0Instance
-      p.run
-    }
   }
 }
 
@@ -217,10 +213,10 @@ trait FreeFunctions {
   def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
 
   /** Suspend the given computation in a single step. */
-  def return_[S[+_], A](value: => A)(implicit S: Pointed[S]): Free[S, A] =
+  def return_[S[+_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(Return[S, A](value)))
 
-  def suspend[S[+_], A](value: => Free[S, A])(implicit S: Pointed[S]): Free[S, A] =
+  def suspend[S[+_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(value))
 
   /** A trampoline step that doesn't do anything. */

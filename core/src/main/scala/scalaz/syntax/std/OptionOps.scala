@@ -92,9 +92,9 @@ trait OptionOps[A] extends Ops[Option[A]] {
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_] : Pointed : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
+  final def orEmpty[M[_] : Applicative : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
 
-  final def foldLift[F[_] : Pointed, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
+  final def foldLift[F[_] : Applicative, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
 
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
 }

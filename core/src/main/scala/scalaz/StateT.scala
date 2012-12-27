@@ -63,16 +63,16 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
     case (s1, a) => f(a)(s1)
   })
 
-  def lift[M[+_]: Pointed]: IndexedStateT[({type λ[+α]=M[F[α]]})#λ, S1, S2, A] = new IndexedStateT[({type λ[+α]=M[F[α]]})#λ, S1, S2, A] {
-    def apply(initial: S1): M[F[(S2, A)]] = Pointed[M].point(self(initial))
+  def lift[M[+_]: Applicative]: IndexedStateT[({type λ[+α]=M[F[α]]})#λ, S1, S2, A] = new IndexedStateT[({type λ[+α]=M[F[α]]})#λ, S1, S2, A] {
+    def apply(initial: S1): M[F[(S2, A)]] = Applicative[M].point(self(initial))
   }
 
   import Liskov._
-  def unlift[M[+_], FF[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[({type λ[+α] = M[FF[α]]})#λ, S1m, S2m, AA]): IndexedStateT[FF, S1m, S2m, AA] = new IndexedStateT[FF, S1m, S2m, AA] {
-    def apply(initial: S1m): FF[(S2m, AA)] = Copointed[M].copoint(ev(self)(initial))
+  def unlift[M[+_], FF[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Comonad[M], ev: this.type <~< IndexedStateT[({type λ[+α] = M[FF[α]]})#λ, S1m, S2m, AA]): IndexedStateT[FF, S1m, S2m, AA] = new IndexedStateT[FF, S1m, S2m, AA] {
+    def apply(initial: S1m): FF[(S2m, AA)] = Comonad[M].copoint(ev(self)(initial))
   }
 
-  def unliftId[M[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Copointed[M], ev: this.type <~< IndexedStateT[M, S1m, S2m, AA]): IndexedState[S1m, S2m, AA] = unlift[M, Id, AA, S1m, S2m]
+  def unliftId[M[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Comonad[M], ev: this.type <~< IndexedStateT[M, S1m, S2m, AA]): IndexedState[S1m, S2m, AA] = unlift[M, Id, AA, S1m, S2m]
 
   def rwst[W, R, S >: S2 <: S1](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
     (r, s) => F.map(self(s)) {
@@ -113,13 +113,7 @@ trait IndexedStateTInstances extends IndexedStateTInstances0 {
   }
 }
 
-trait StateTInstances2 extends IndexedStateTInstances {
-  implicit def stateTPointed[S, F[+_]](implicit F0: Pointed[F]): Pointed[({type f[+a] = StateT[F, S, a]})#f] = new StateTPointed[S, F] {
-    implicit def F: Pointed[F] = F0
-  }
-}
-
-trait StateTInstances1 extends StateTInstances2 {
+trait StateTInstances1 extends IndexedStateTInstances {
   implicit def stateTMonadState[S, F[+_]](implicit F0: Monad[F]): MonadState[({type f[s, +a] = StateT[F, s, a]})#f, S] = new StateTMonadState[S, F] {
     implicit def F: Monad[F] = F0
   }
@@ -135,15 +129,15 @@ trait StateTInstances extends StateTInstances0 {
 }
 
 trait IndexedStateTFunctions {
-  def constantIndexedStateT[F[+_], S1, S2, A](a: A)(s: => S2)(implicit F: Pointed[F]): IndexedStateT[F, S1, S2, A] =
+  def constantIndexedStateT[F[+_], S1, S2, A](a: A)(s: => S2)(implicit F: Applicative[F]): IndexedStateT[F, S1, S2, A] =
     IndexedStateT((_: S1) => F.point((s, a)))
 }
 
 trait StateTFunctions extends IndexedStateTFunctions {
-  def constantStateT[F[+_], S, A](a: A)(s: => S)(implicit F: Pointed[F]): StateT[F, S, A] =
+  def constantStateT[F[+_], S, A](a: A)(s: => S)(implicit F: Applicative[F]): StateT[F, S, A] =
     StateT((_: S) => F.point((s, a)))
 
-  def stateT[F[+_], S, A](a: A)(implicit F: Pointed[F]): StateT[F, S, A] =
+  def stateT[F[+_], S, A](a: A)(implicit F: Applicative[F]): StateT[F, S, A] =
     StateT(s => F.point((s, a)))
 }
 
@@ -173,19 +167,15 @@ private[scalaz] trait IndexedStateTFunctorRight[S1, S2, F[+_]] extends Functor[(
   override def map[A, B](fa: IndexedStateT[F, S1, S2, A])(f: A => B): IndexedStateT[F, S1, S2, B] = fa.map(f)
 }
 
-private[scalaz] trait StateTPointed[S, F[+_]] extends Pointed[({type f[+a] = StateT[F, S, a]})#f] with IndexedStateTFunctorRight[S, S, F] {
-  implicit def F: Pointed[F]
+private[scalaz] trait StateTMonadState[S, F[+_]] extends MonadState[({type f[s, +a] = StateT[F, s, a]})#f, S] {
+  implicit def F: Monad[F]
+
+  def bind[A, B](fa: StateT[F, S, A])(f: A => StateT[F, S, B]): StateT[F, S, B] = fa.flatMap(f)
 
   def point[A](a: => A): StateT[F, S, A] = {
     lazy val aa = a
     StateT(s => F.point(s, aa))
   }
-}
-
-private[scalaz] trait StateTMonadState[S, F[+_]] extends MonadState[({type f[s, +a] = StateT[F, s, a]})#f, S] with StateTPointed[S, F] {
-  implicit def F: Monad[F]
-
-  def bind[A, B](fa: StateT[F, S, A])(f: A => StateT[F, S, B]): StateT[F, S, B] = fa.flatMap(f)
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
 

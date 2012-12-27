@@ -15,7 +15,7 @@ trait ToCategoryOps0 {
   
 }
 
-trait ToCategoryOps extends ToCategoryOps0 with ToArrIdOps with ToComposeOps {
+trait ToCategoryOps extends ToCategoryOps0 with ToComposeOps {
   
   implicit def ToCategoryOps[F[_, _],A, B](v: F[A, B])(implicit F0: Category[F]) =
       new CategoryOps[F,A, B] { def self = v; implicit def F: Category[F] = F0 }
@@ -28,7 +28,7 @@ trait ToCategoryOps extends ToCategoryOps0 with ToArrIdOps with ToComposeOps {
   ////
 }
 
-trait CategorySyntax[F[_, _]] extends ArrIdSyntax[F] with ComposeSyntax[F] { 
+trait CategorySyntax[F[_, _]] extends ComposeSyntax[F] {
   implicit def ToCategoryOps[A, B](v: F[A, B]): CategoryOps[F, A, B] = new CategoryOps[F, A, B] { def self = v; implicit def F: Category[F] = CategorySyntax.this.F }
 
   def F: Category[F]

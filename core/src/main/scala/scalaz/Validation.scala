@@ -381,9 +381,7 @@ trait ValidationInstances1 extends ValidationInstances2 {
 }
 
 trait ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Pointed[({type l[a] = Validation[L, a]})#l] with Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Pointed[({type l[a] = Validation[L, a]})#l] with Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
-    def point[A](a: => A) =
-      Success(a)
+  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
 
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f

@@ -20,7 +20,7 @@ class ValidationTest extends Spec {
 
   "fpoint and point" in {
 
-    import syntax.pointed._
+    import syntax.applicative._
     import std.AllInstances._
     import Validation._
 
@@ -70,7 +70,6 @@ class ValidationTest extends Spec {
     def show[E: Show, A: Show] = Show[Validation[E, A]]
     def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]
     def order[E: Order, A: Order] = Order[Validation[E, A]]
-    def pointed[E] = Pointed[({type λ[α]=Validation[E, α]})#λ]
     def semigroup[E: Semigroup, A: Semigroup] = Semigroup[Validation[E, A]]
     def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
     def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
@@ -79,6 +78,5 @@ class ValidationTest extends Spec {
 
     // checking absence of ambiguity
     def equal[E: Order, A: Order] = Equal[Validation[E, A]]
-    def pointed[E: Semigroup] = Pointed[({type λ[α] = Validation[E, α]})#λ]
   }
 }
