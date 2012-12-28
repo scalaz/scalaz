@@ -59,7 +59,7 @@ class KleisliTest extends Spec {
       def readerFunctor[A] = Functor[({type λ[α] = Reader[A, α]})#λ]
       def readerApply[A] = Apply[({type λ[α] = Reader[A, α]})#λ]
       def readerMonadReader[A] = MonadReader[({type f[s, a] = Reader[s, a]})#f, A]
-      def readerCategory = Ca1tegory[Reader]
+      def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 
       // Sigh, more tests needed, see http://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
