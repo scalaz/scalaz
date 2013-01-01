@@ -29,6 +29,9 @@ sealed trait InsertionMap[K, V] {
   def ^-^(k: K): InsertionMap[K, V] =
     @-(k)._2
 
+  def toMap: Map[K, V] =
+    assoc.map({ case (k, (v, _)) => (k, v) })
+
   /** Returns a list with keys in the order of their insertion. */
   def toList: List[(K, V)] =
     assoc.toList sortWith {
@@ -72,10 +75,10 @@ sealed trait InsertionMap[K, V] {
 
   override def equals(a: Any): Boolean =
     a.isInstanceOf[InsertionMap[_, _]] &&
-      assoc == a.asInstanceOf[InsertionMap[_, _]].assoc
+      toMap == a.asInstanceOf[InsertionMap[_, _]].toMap
 
   override def hashCode: Int =
-    assoc.hashCode
+    toMap.hashCode
 
   override def toString: String =
     "InsertionMap(" + (toList mkString ", ") + ")"

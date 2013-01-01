@@ -7,6 +7,12 @@ import std.AllInstances._
 class InsertionMapTest extends Spec {
   checkAll(equal.laws[InsertionMap[Int, String]])
 
+  "equality order independence" ! prop {
+    (k1: Int, v1: String, k2: Int, v2: String, a: InsertionMap[Int, String]) =>
+      (k1 != k2) ==>
+        ((a ^+^ (k1, v1) ^+^ (k2, v2)) == (a ^+^ (k2, v2) ^+^ (k1, v1)))
+  }
+
   "isEmpty == keys.isEmpty" ! prop {
     (a: InsertionMap[Int, String]) => a.isEmpty == a.keys.isEmpty
   }
