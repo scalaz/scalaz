@@ -4,7 +4,7 @@
 # Author: Paul Phillips <paulp@typesafe.com>
 
 # todo - make this dynamic
-declare -r sbt_release_version=0.12.1
+declare -r sbt_release_version=0.12.2-RC1
 declare -r sbt_snapshot_version=0.13.0-SNAPSHOT
 
 unset sbt_jar sbt_dir sbt_create sbt_snapshot sbt_launch_dir
@@ -114,7 +114,7 @@ declare -r sbt_opts_file=".sbtopts"
 declare -r jvm_opts_file=".jvmopts"
 declare -r latest_28="2.8.2"
 declare -r latest_29="2.9.2"
-declare -r latest_210="2.10.0-RC2"
+declare -r latest_210="2.10.0"
 
 declare -r script_path=$(get_script_path "$BASH_SOURCE")
 declare -r script_dir="$(dirname $script_path)"
@@ -272,6 +272,7 @@ Usage: $script_name [options]
   -210                      use $latest_210
   -scala-home <path>        use the scala build at the specified directory
   -scala-version <version>  use the specified version of scala
+  -binary-version <version> use the specified scala version when searching for dependencies
 
   # java version (default: java from PATH, currently $(java -version |& grep version))
   -java-home <path>         alternate JAVA_HOME
@@ -355,7 +356,8 @@ process_args ()
        -sbt-jar) require_arg path "$1" "$2" && sbt_jar="$2" && shift 2 ;;
    -sbt-version) require_arg version "$1" "$2" && sbt_explicit_version="$2" && shift 2 ;;
 -sbt-launch-dir) require_arg path "$1" "$2" && sbt_launch_dir="$2" && shift 2 ;;
- -scala-version) require_arg version "$1" "$2" && addSbt "set scalaVersion := \"$2\"" && addSbt "set every scalaBinaryVersion := \"$2\"" && shift 2 ;;
+ -scala-version) require_arg version "$1" "$2" && addSbt "set scalaVersion in ThisBuild := \"$2\"" && shift 2 ;;
+-binary-version) require_arg version "$1" "$2" && addSbt "set scalaBinaryVersion in ThisBuild := \"$2\"" && shift 2 ;;
     -scala-home) require_arg path "$1" "$2" && addSbt "set every scalaHome := Some(file(\"$2\"))" && shift 2 ;;
      -java-home) require_arg path "$1" "$2" && java_cmd="$2/bin/java" && shift 2 ;;
 
