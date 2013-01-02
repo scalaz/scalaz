@@ -62,4 +62,3 @@ object Zip {
       F.zip(t._1, t._2)
   ////
 }
-

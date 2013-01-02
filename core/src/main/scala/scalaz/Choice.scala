@@ -24,4 +24,3 @@ object Choice {
   ////
   ////
 }
-

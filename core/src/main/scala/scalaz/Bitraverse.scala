@@ -113,4 +113,3 @@ object Bitraverse {
 
   ////
 }
-

@@ -41,12 +41,13 @@ object TypeClass {
   lazy val contravariant = TypeClass("Contravariant", *->*)
   lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(functor, cojoin, cobind))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
   lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
@@ -54,9 +55,8 @@ object TypeClass {
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
-  lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
-  lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
+  lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val first = TypeClass("First", *^*->*)
@@ -81,6 +81,7 @@ object TypeClass {
     enum,
     metricSpace,
     plusEmpty,
+    isEmpty,
     each,
     index,
     functor,
@@ -103,7 +104,6 @@ object TypeClass {
     bifunctor,
     bifoldable,
     bitraverse,
-    arrId,
     compose,
     category,
     choice,
@@ -177,7 +177,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrId, arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
@@ -234,7 +234,6 @@ object %s {
 
   ////
 }
-
 """.format(tc.packageString0, typeClassName, classifiedType, extendsLikeList, syntaxMember,
       typeClassName,
       classifiedTypeF, typeClassName, typeClassName, typeClassName, classifiedTypeIdent, classifiedTypeIdent
@@ -312,7 +311,7 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_]] %s { 
+trait %sSyntax[F[_]] %s {
   implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
   def F: %s[F]
@@ -367,7 +366,7 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_, _]] %s { 
+trait %sSyntax[F[_, _]] %s {
   implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
   def F: %s[F]

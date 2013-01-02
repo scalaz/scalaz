@@ -6,10 +6,10 @@ package scalaz
  */
 ////
 trait Category[=>:[_, _]] extends Compose[=>:] { self =>
-  def id[A]: A =>: A
-
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
+
+  def id[A]: A =>: A
 
   def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
     def empty[A] = id
@@ -41,4 +41,3 @@ object Category {
   ////
   ////
 }
-

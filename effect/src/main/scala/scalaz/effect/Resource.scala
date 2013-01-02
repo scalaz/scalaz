@@ -54,4 +54,3 @@ object Resource {
     }*/
   ////
 }
-

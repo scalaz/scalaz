@@ -27,7 +27,7 @@ trait ToMonadControlIOOps extends ToMonadControlIOOps0 with ToLiftControlIOOps w
   ////
 }
 
-trait MonadControlIOSyntax[F[_]] extends LiftControlIOSyntax[F] with MonadSyntax[F] { 
+trait MonadControlIOSyntax[F[_]] extends LiftControlIOSyntax[F] with MonadSyntax[F] {
   implicit def ToMonadControlIOOps[A](v: F[A]): MonadControlIOOps[F, A] = new MonadControlIOOps[F,A] { def self = v; implicit def F: MonadControlIO[F] = MonadControlIOSyntax.this.F }
 
   def F: MonadControlIO[F]

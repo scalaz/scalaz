@@ -28,7 +28,7 @@ trait ToZipOps extends ToZipOps0 {
   ////
 }
 
-trait ZipSyntax[F[_]]  { 
+trait ZipSyntax[F[_]]  {
   implicit def ToZipOps[A](v: F[A]): ZipOps[F, A] = new ZipOps[F,A] { def self = v; implicit def F: Zip[F] = ZipSyntax.this.F }
 
   def F: Zip[F]

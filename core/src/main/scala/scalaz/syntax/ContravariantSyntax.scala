@@ -25,7 +25,7 @@ trait ToContravariantOps extends ToContravariantOps0 {
   ////
 }
 
-trait ContravariantSyntax[F[_]]  { 
+trait ContravariantSyntax[F[_]]  {
   implicit def ToContravariantOps[A](v: F[A]): ContravariantOps[F, A] = new ContravariantOps[F,A] { def self = v; implicit def F: Contravariant[F] = ContravariantSyntax.this.F }
 
   def F: Contravariant[F]

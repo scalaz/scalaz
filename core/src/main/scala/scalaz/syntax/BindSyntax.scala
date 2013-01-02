@@ -42,7 +42,7 @@ trait ToBindOps extends ToBindOps0 with ToApplyOps {
   ////
 }
 
-trait BindSyntax[F[_]] extends ApplySyntax[F] { 
+trait BindSyntax[F[_]] extends ApplySyntax[F] {
   implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A] { def self = v; implicit def F: Bind[F] = BindSyntax.this.F }
 
   def F: Bind[F]

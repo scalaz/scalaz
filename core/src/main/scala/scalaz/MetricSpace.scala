@@ -91,4 +91,3 @@ object MetricSpace {
   }
   ////
 }
-

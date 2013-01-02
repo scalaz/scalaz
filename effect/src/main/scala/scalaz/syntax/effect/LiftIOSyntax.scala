@@ -27,7 +27,7 @@ trait ToLiftIOOps extends ToLiftIOOps0 {
   ////
 }
 
-trait LiftIOSyntax[F[_]]  { 
+trait LiftIOSyntax[F[_]]  {
   implicit def ToLiftIOOps[A](v: F[A]): LiftIOOps[F, A] = new LiftIOOps[F,A] { def self = v; implicit def F: LiftIO[F] = LiftIOSyntax.this.F }
 
   def F: LiftIO[F]

@@ -52,7 +52,7 @@ trait ToFunctorOps extends ToFunctorOps0 {
   ////
 }
 
-trait FunctorSyntax[F[_]]  { 
+trait FunctorSyntax[F[_]]  {
   implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = FunctorSyntax.this.F }
 
   def F: Functor[F]

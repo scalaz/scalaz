@@ -41,4 +41,3 @@ object Cozip {
   def cofzip7[F[_], A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) = F.cozip7(x)
   ////
 }
-

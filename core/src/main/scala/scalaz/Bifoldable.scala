@@ -89,4 +89,3 @@ object Bifoldable {
 
   ////
 }
-

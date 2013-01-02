@@ -31,6 +31,18 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def multiply(value: F, n: Int): F =
     Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
 
+  def isMZero(a: F)(implicit eq: Equal[F]): Boolean =
+    eq.equal(a, zero)
+
+  final def ifEmpty[B](a: F)(t: => B)(f: => B)(implicit eq: Equal[F]): B =
+    if (isMZero(a)) { t } else { f }
+
+  final def onNotEmpty[B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
+    ifEmpty(a)(mb.zero)(v)
+
+  final def onEmpty[A,B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
+    ifEmpty(a)(v)(mb.zero)
+
   /** Every `Monoid` gives rise to a [[scalaz.Category]] */
   final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
     def id[A] = zero
@@ -63,25 +75,9 @@ trait Monoid[F] extends Semigroup[F] { self =>
   val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
 
-object Monoid extends MonoidInstances with MonoidFunctions {
+object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
-}
 
-trait MonoidFunctions {
-  def ifEmpty[A, B](a: A)(t: => B)(f: => B)(implicit m: Monoid[A], eq: Equal[A]): B =
-    if (isMZero(a)) { t } else { f }
-
-  def isMZero[A](a: A)(implicit m: Monoid[A], eq: Equal[A]): Boolean =
-    eq.equal(a, m.zero)
-
-  def onNotEmpty[A,B](a: A)(v: => B)(implicit m: Monoid[A], eq: Equal[A], mb: Monoid[B]): B =
-    ifEmpty(a)(mb.zero)(v)
-
-  def onEmpty[A,B](a: A)(v: => B)(implicit m: Monoid[A], eq: Equal[A], mb: Monoid[B]): B =
-    ifEmpty(a)(v)(mb.zero)
-}
-
-trait MonoidInstances {
   ////
   import annotation.tailrec
 
@@ -122,4 +118,3 @@ trait MonoidInstances {
 
   ////
 }
-
