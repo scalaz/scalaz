@@ -15,7 +15,7 @@ sealed class StreamT[M[_],A](stepper: => M[StreamT.Step[A, StreamT[M,A]]]) {
     }
   def ::(a: => A)(implicit M:Pure[M]): StreamT[M,A] = StreamT[M,A](M pure (Yield(a, this)))
 
-  def isEmpty(implicit M:Monad[M]) = uncons map { _.isDefined } 
+  def isEmpty(implicit M:Monad[M]) = uncons map { ! _.isDefined }
   def head(implicit M:Monad[M]) = uncons map { _.get._1 }
   def tailM(implicit M:Monad[M]): M[StreamT[M,A]] = uncons map { _.get._2 } 
 
