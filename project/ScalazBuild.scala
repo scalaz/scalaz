@@ -148,8 +148,7 @@ object ScalazBuild extends Build {
     def ScalaCheck(scalaVersion: String) = {
       val version = scalaVersion match {
         case "2.8.1" => "1.8"
-        case "2.9.1" | "2.9.2" => "1.9"
-        case "2.10.0" => "1.10.0"
+        case "2.9.1" | "2.9.2" | "2.10.0" => "1.10.0"
       }
       "org.scalacheck" %% "scalacheck" % version cross CrossVersion.full
     }
