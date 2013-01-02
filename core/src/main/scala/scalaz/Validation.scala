@@ -288,6 +288,16 @@ sealed trait Validation[+E, +A] {
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `append` */
   def +|+[EE >: E, AA >: A](x: Validation[EE, AA])(implicit es: Semigroup[EE], as: Semigroup[AA]): Validation[EE, AA] = append(x)
 
+  /** If `this` is a success, return it; otherwise, if `that` is a success, return it; otherwise, combine the failures with the specified semigroup. */
+  def findSuccess[EE >: E, AA >: A](that: => Validation[EE, AA])(implicit es: Semigroup[EE]): Validation[EE, AA] = this match {
+    case Failure(e) => that match {
+      case Failure(e0) => Failure(es.append(e, e0))
+      case success => success
+    }
+
+    case success => success
+  }
+
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
   def toValidationNEL[EE >: E, AA >: A]: ValidationNEL[EE, AA] =
     this match {
