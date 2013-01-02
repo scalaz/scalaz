@@ -1,4 +1,1 @@
-scalacOptions in Compile += "-deprecation"
-
-
-addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
+addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.7")

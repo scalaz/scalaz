@@ -2,6 +2,8 @@
 *.swp
 lib_managed
 project/boot
+project/.boot
+project/.ivy
 full/project/boot
 src_managed
 target
@@ -12,3 +14,6 @@ tags
 build.log
 .history
 .idea/inspectionProfiles/**
+.lib
+.idea
+.idea_modules
