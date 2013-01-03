@@ -6,9 +6,9 @@ package scalaz
  */
 ////
 trait Comonad[F[_]] extends Cojoin[F] with Cobind[F] { self =>
+  ////
   /** Also known as `extract` / `copure` */
   def copoint[A](p: F[A]): A
-  ////
 
   // derived functions
 
@@ -41,4 +41,3 @@ object Comonad {
 
   ////
 }
-

@@ -87,4 +87,3 @@ object Functor {
 
   ////
 }
-

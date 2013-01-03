@@ -24,7 +24,7 @@ trait ToCozipOps extends ToCozipOps0 {
   ////
 }
 
-trait CozipSyntax[F[_]]  { 
+trait CozipSyntax[F[_]]  {
   implicit def ToCozipOps[A](v: F[A]): CozipOps[F, A] = new CozipOps[F,A] { def self = v; implicit def F: Cozip[F] = CozipSyntax.this.F }
 
   def F: Cozip[F]

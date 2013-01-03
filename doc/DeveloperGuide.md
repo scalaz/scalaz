@@ -194,11 +194,11 @@ for instances over compositions and products, and for instances derived via an i
 
 ## Syntax
 
-The methods of a type class that should be copied to the corresponding `TypeClassV` object.
+The methods of a type class that should be copied to the corresponding `TypeClassOps` object.
 
 For example:
 
-    trait FunctorV[F[_],A] extends SyntaxV[F[A]] {
+    trait FunctorOps[F[_],A] extends Ops[F[A]] {
       implicit def F: Functor[F]
 
       final def map[B](f: A => B): F[B] = F.map(self)(f)
@@ -213,11 +213,11 @@ and delegate. A user should be able to opt-out of the syntax package without los
 The type class generation machinery maintains these files, again, just fill in the gaps. The generated implicit
 conversions use the `Unapply` and `Unapply2` types to maximize type inference, see this in action in
 `scalaz.example.UnapplyInference`. The same technique may be used in the methods in the syntax wrapper,
-see `TraverseV#sequence`.
+see `TraverseOps#sequence`.
 
-Standard library types, and Scalaz data structures, may also have a syntax defined. These files and implicit conversions
-are created by hand. For example, see `scalaz.syntax.TreeV` and `scalaz.syntax.std.OptionV`. Remember to add these to
-either `ToAllOtherV` or `ToAllStdV`, and to update `Syntaxes`.
+Standard library types, and Scalaz data structures may also have a syntax defined. These files and implicit conversions
+are created by hand. For example, see `scalaz.syntax.TreeOps` and `scalaz.syntax.std.OptionOps`. Remember to add these to
+either `ToDataOps` or `ToAllStdOps`, and to update `Syntaxes`.
 
 All the syntactic implicit conversions are eventually mixed into the object Scalaz. However, it is now possible, and
 recommended, to be more fine grained with imports.
@@ -297,12 +297,12 @@ the osgiExport method:
 ## How can I help?
 
  * Port some examples, or create new ones, to get a feel for the new organization.
- * Port/Write test cases (readd sub-project scalaz-tests)
- * Port a missing data structure (e.g. FingerTree)
+ * Port/Write test cases
+ * Port a missing data structure
  * Add type class instances (most `Show`, `Equal`, `Ordering` are missing).
  * Documentation
     * Class level documentation for each type class.
     * Brief method documentation welcome
     * `core/show-doc` in SBT will build and pop up the scaladoc.
  * Review code base for consistency problems
- * Review type class heirarchy
+ * Review type class hierarchy

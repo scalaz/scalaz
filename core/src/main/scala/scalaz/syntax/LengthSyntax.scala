@@ -24,7 +24,7 @@ trait ToLengthOps extends ToLengthOps0 {
   ////
 }
 
-trait LengthSyntax[F[_]]  { 
+trait LengthSyntax[F[_]]  {
   implicit def ToLengthOps[A](v: F[A]): LengthOps[F, A] = new LengthOps[F,A] { def self = v; implicit def F: Length[F] = LengthSyntax.this.F }
 
   def F: Length[F]

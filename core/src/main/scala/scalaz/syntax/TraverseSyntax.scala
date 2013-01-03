@@ -80,7 +80,7 @@ trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps 
   ////
 }
 
-trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] { 
+trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
   implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = TraverseSyntax.this.F }
 
   def F: Traverse[F]

@@ -254,4 +254,3 @@ object Foldable {
 
   ////
 }
-

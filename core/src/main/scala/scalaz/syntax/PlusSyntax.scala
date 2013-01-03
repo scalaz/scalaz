@@ -26,7 +26,7 @@ trait ToPlusOps extends ToPlusOps0 {
   ////
 }
 
-trait PlusSyntax[F[_]]  { 
+trait PlusSyntax[F[_]]  {
   implicit def ToPlusOps[A](v: F[A]): PlusOps[F, A] = new PlusOps[F,A] { def self = v; implicit def F: Plus[F] = PlusSyntax.this.F }
 
   def F: Plus[F]

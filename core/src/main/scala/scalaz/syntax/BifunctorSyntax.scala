@@ -32,7 +32,7 @@ trait ToBifunctorOps extends ToBifunctorOps0 {
   ////
 }
 
-trait BifunctorSyntax[F[_, _]]  { 
+trait BifunctorSyntax[F[_, _]]  {
   implicit def ToBifunctorOps[A, B](v: F[A, B]): BifunctorOps[F, A, B] = new BifunctorOps[F, A, B] { def self = v; implicit def F: Bifunctor[F] = BifunctorSyntax.this.F }
 
   def F: Bifunctor[F]

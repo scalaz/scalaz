@@ -94,7 +94,7 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
   ////
 }
 
-trait ApplySyntax[F[_]] extends FunctorSyntax[F] { 
+trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = ApplySyntax.this.F }
 
   def F: Apply[F]
