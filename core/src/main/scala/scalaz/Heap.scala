@@ -70,7 +70,7 @@ sealed trait Heap[A] {
 
   def toUnsortedStream: Stream[A] = fold(Stream(), (_, _, t) => t.flatten.map(_.value))
 
-  def toUnsortedList: List[A] = toStream.toList
+  def toUnsortedList: List[A] = toUnsortedStream.toList
 
   def toStream: Stream[A] =
     std.stream.unfold(this)(_.uncons)
