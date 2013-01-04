@@ -84,7 +84,7 @@ sealed trait Heap[A] {
 
   def exists(f: A => Boolean) = toStream.exists(f)
 
-  def foreach(f: A => Boolean) = toStream.foreach(f)
+  def foreach(f: A => Unit) = toStream.foreach(f)
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
