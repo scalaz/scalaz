@@ -67,22 +67,10 @@ class ListTest extends Spec {
     actual must be_===("/abc/def/hij")
   }
 
-  "foldl1 is reduceLeft" ! prop {(rngel: NonEmptyList[List[Int]]) =>
-    val rnge = rngel.list
-    val F = Foldable[List]
-    Some(rnge.reduceLeft(_++_)) must be_===(F.foldl1(rnge)(_++_))
-  }
-
   "foldl is foldLeft" ! prop {(rnge: List[List[Int]]) =>
     val F = Foldable[List]
     (rnge.foldLeft(List[Int]())(_++_)
       must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
-  }
-
-  "foldr1 is reduceRight" ! prop {(rngel: NonEmptyList[List[Int]]) =>
-    val rnge = rngel.list
-    val F = Foldable[List]
-    Some(rnge.reduceRight(_++_)) must be_===(F.foldr1(rnge)(_++_))
   }
 
   "foldr is foldRight" ! prop {(rnge: List[List[Int]]) =>
