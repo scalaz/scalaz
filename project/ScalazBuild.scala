@@ -148,14 +148,14 @@ object ScalazBuild extends Build {
     def ScalaCheck(scalaVersion: String) = {
       val version = scalaVersion match {
         case "2.8.1" => "1.8"
-        case "2.9.1" | "2.9.2" | "2.10.0" => "1.10.0"
+        case "2.9.1" | "2.9.2" | "2.9.3-RC1" | "2.10.0" => "1.10.0"
       }
       "org.scalacheck" %% "scalacheck" % version cross CrossVersion.full
     }
     def Specs(scalaVersion: String) = {
       val version = scalaVersion match {
         case "2.8.1" => "1.6.8"
-        case "2.9.1" | "2.9.2" | "2.10.0" => "1.6.9"
+        case "2.9.1" | "2.9.2" | "2.9.3-RC1" | "2.10.0" => "1.6.9"
       }
       "org.scala-tools.testing" %% "specs" % version % "test"
     }
@@ -165,7 +165,7 @@ object ScalazBuild extends Build {
     organization := "org.scalaz",
     version      := "6.0.5-SNAPSHOT",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.1", "2.8.1", "2.10.0"),
+    crossScalaVersions := Seq("2.9.3-RC1", "2.9.2", "2.9.1", "2.8.1", "2.10.0"),
     resolvers    ++= Seq(
       "snapshotsResolver" at "http://oss.sonatype.org/content/repositories/snapshots",
       "releasesResolver"  at "http://oss.sonatype.org/content/repositories/releases"
