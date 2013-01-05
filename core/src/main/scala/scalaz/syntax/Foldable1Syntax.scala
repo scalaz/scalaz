@@ -10,8 +10,8 @@ trait Foldable1Ops[F[_],A] extends Ops[F[A]] {
   final def foldMap1[B: Semigroup](f: A => B = (a: A) => a): B = F.foldMap1(self)(f)
   final def sumr1(implicit A: Semigroup[A]): A = F.foldRight1(self)(A.append)
   final def suml1(implicit A: Semigroup[A]): A = F.foldLeft1(self)(A.append(_, _))
-  final def maximum(implicit A: Order[A]): A = F.maximum(self)
-  final def minimum(implicit A: Order[A]): A = F.minimum(self)
+  final def maximum1(implicit A: Order[A]): A = F.maximum1(self)
+  final def minimum1(implicit A: Order[A]): A = F.minimum1(self)
   ////
 }
 

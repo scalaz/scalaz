@@ -89,19 +89,31 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
   /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+  import Ordering.{GT, LT}
+  import std.option.{some, none}
+  /** The greatest element of `fa`, or None if `fa` is empty. */
+  def maximum[A: Order](fa: F[A]): Option[A] =
+    foldLeft(fa, none[A]) {
+      case (None, y) => some(y)
+      case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
+    }
+  /** The smallest element of `fa`, or None if `fa` is empty. */
+  def minimum[A: Order](fa: F[A]): Option[A] =
+    foldLeft(fa, none[A]) {
+      case (None, y) => some(y)
+      case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
+    }
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
   /** Whether `a` is an element of `fa`. */
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
   /** Insert an `A` between every A, yielding the sum. */
-  def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A = {
-    import std.option._
+  def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
     (foldRight(fa, none[A]) {
       case (l, None) => some(l)
       case (l, Some(r)) => some(A.append(l, A.append(a, r)))
     }).getOrElse(A.zero)
-  }
 
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.

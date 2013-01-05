@@ -27,6 +27,8 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def any(p: A => Boolean): Boolean = F.any(self)(p)
   final def ∃(p: A => Boolean): Boolean = F.any(self)(p)
   final def count: Int = F.count(self)
+  final def maximum(implicit A: Order[A]): Option[A] = F.maximum(self)
+  final def minimum(implicit A: Order[A]): Option[A] = F.minimum(self)
   final def longDigits(implicit d: A <:< Digit): Long = F.longDigits(self)
   final def empty: Boolean = F.empty(self)
   final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)

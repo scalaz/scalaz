@@ -33,9 +33,9 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   import Ordering.{GT, LT}
   /** The greatest element of `fa`. */
-  def maximum[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
+  def maximum1[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
   /** The smallest element of `fa`. */
-  def minimum[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
+  def minimum1[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
 
   def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())
