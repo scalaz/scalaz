@@ -59,6 +59,8 @@ trait Syntaxes {
 
   object traverse extends ToTraverseOps
 
+  object traverse1 extends ToTraverse1Ops
+
   object zip extends ToZipOps
 
   object unzip extends ToUnzipOps
@@ -101,6 +103,8 @@ trait Syntaxes {
   object state extends ToStateOps
 
   object foldable extends ToFoldableOps
+
+  object foldable1 extends ToFoldable1Ops
 
   object validation extends ToValidationOps
 

@@ -43,13 +43,12 @@ sealed trait NonEmptyList[+A] {
     nel(bb.head, bb.tail)
   }
 
-  def traverse[G[_] : Applicative, B](f: A => G[B]): G[NonEmptyList[B]] = {
-    import std.list.listInstance
-
-    Applicative[G].map(Traverse[List].traverse(list)(f))(bs => NonEmptyList.nel(bs.head, bs.tail))
+  def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = tail match {
+    case Nil => F.map(f(head))(nel(_, Nil))
+    case b :: bs => F.apply2(f(head), nel(b, bs).traverse1(f)) {
+      case (h, t) => nel(h, t.head :: t.tail)
+    }
   }
-
-  def foldRight[B](z: => B)(f: (A, => B) => B): B = list.foldRight(z)((a, b) => f(a, b))
 
   def list: List[A] = head :: tail
 
@@ -107,11 +106,19 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
 
 trait NonEmptyListInstances {
   implicit val nonEmptyList =
-    new Traverse[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
-      def traverseImpl[G[_] : Applicative, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
-        fa traverse f
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
+      def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
+        fa traverse1 f
 
-      override def foldRight[A, B](fa: NonEmptyList[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+      override def foldRight1[A](fa: NonEmptyList[A])(f: (A, => A) => A): A = fa.tail match {
+        case Nil => fa.head
+        case h :: t => f(fa.head, foldRight1(NonEmptyList.nel(h, t))(f))
+      }
+
+      override def foldLeft1[A](fa: NonEmptyList[A])(f: (A, A) => A): A = fa.tail match {
+        case Nil => fa.head
+        case h :: t => foldLeft1(NonEmptyList.nel(f(fa.head, h), t))(f)
+      }
 
       def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
