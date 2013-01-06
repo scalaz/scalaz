@@ -36,7 +36,9 @@ object TypeClass {
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
+  lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
   lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
@@ -100,7 +102,9 @@ object TypeClass {
     applicativePlus,
     monadPlus,
     foldable,
+    foldable1,
     traverse,
+    traverse1,
     bifunctor,
     bifoldable,
     bitraverse,

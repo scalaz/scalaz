@@ -13,8 +13,8 @@ trait IdInstances {
   // TODO Review!
   type Identity[+X] = Need[X]
 
-  val id: Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
-    new Traverse[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+  val id: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+    new Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
@@ -29,11 +29,13 @@ trait IdInstances {
 
       def cozip[A, B](a: Id[A \/ B]): (A \/ B) = a
 
-      def traverseImpl[G[_] : Applicative, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
+      def traverse1Impl[G[_] : Apply, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
 
       def distributeImpl[G[_] : Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
 
       override def foldRight[A, B](fa: Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
+
+      override def foldRight1[A](fa: Id[A])(f: (A, => A) => A): A = fa
 
       // Overrides for efficiency.
 

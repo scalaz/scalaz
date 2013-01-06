@@ -45,13 +45,6 @@ trait Foldable[F[_]]  { self =>
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
   
-  /** Alias for `foldMap` where `F` is summed with `None` to form a
-    * Monoid. */
-  def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
-    import std.option._
-    foldMap(fa)(a => some(f(a)))
-  }
-
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
@@ -79,8 +72,6 @@ trait Foldable[F[_]]  { self =>
 
   /** Unbiased sum of monoidal values. */
   def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
-  def foldr1[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, o) => o.map(f(a, _)) orElse Some(a))
-  def foldl1[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((o, a) => o.map(f(_, a)) orElse Some(a))
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
@@ -99,10 +90,19 @@ trait Foldable[F[_]]  { self =>
   /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
   import Ordering.{GT, LT}
+  import std.option.{some, none}
   /** The greatest element of `fa`, or None if `fa` is empty. */
-  def maximum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == GT) x else y)
+  def maximum[A: Order](fa: F[A]): Option[A] =
+    foldLeft(fa, none[A]) {
+      case (None, y) => some(y)
+      case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
+    }
   /** The smallest element of `fa`, or None if `fa` is empty. */
-  def minimum[A: Order](fa: F[A]): Option[A] = foldl1(fa)((x, y) => if (Order[A].order(x, y) == LT) x else y)
+  def minimum[A: Order](fa: F[A]): Option[A] =
+    foldLeft(fa, none[A]) {
+      case (None, y) => some(y)
+      case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
+    }
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
@@ -110,9 +110,10 @@ trait Foldable[F[_]]  { self =>
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
   /** Insert an `A` between every A, yielding the sum. */
   def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
-    (foldMap1(fa)(identity)
-       (Semigroup instance ((l, r) => A.append(l, A.append(a, r))))
-     getOrElse A.zero)
+    (foldRight(fa, none[A]) {
+      case (l, None) => some(l)
+      case (l, Some(r)) => some(A.append(l, A.append(a, r)))
+    }).getOrElse(A.zero)
 
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
