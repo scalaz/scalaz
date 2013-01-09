@@ -25,9 +25,8 @@ trait Distributive[F[_]] extends Functor[F] { self =>
   def distribution[G[_]:Functor]: Distribution[G] =
     new Distribution[G]
 
-  def distribute[G[_],A,B](fa: G[A])(f: A => F[B])
-                                  (implicit G: Functor[G]): F[G[B]] =
-    distribution(G).run(fa)(f)
+  def distribute[G[_]:Functor,A,B](fa: G[A])(f: A => F[B]): F[G[B]] =
+    distribution[G].run(fa)(f)
 
   def cosequence[G[_]:Functor,A](fa: G[F[A]]): F[G[A]] =
     distributeImpl(fa)(x => x)
