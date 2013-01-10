@@ -1,8 +1,7 @@
 language: scala
 scala:
+  - 2.10.0
   - 2.9.2
 jdk:
   - oraclejdk7
-
-install: /bin/true
-script: ./sbt -J-Xss1M -J-Xms512M -J-Xmx1000M -J-XX:MaxPermSize=128M ++$TRAVIS_SCALA_VERSION ";clean;compile;test"
+  - openjdk7
