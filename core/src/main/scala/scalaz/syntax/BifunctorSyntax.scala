@@ -12,6 +12,8 @@ trait BifunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
   final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
   final def <:>[C](f: A => C)(implicit z: B <~< C): F[C, C] = F.bimap(self)(f, z)
   final def umap[C](f: A => C)(implicit ev: F[A, B] =:= F[A, A]): F[C, C] = F.umap(ev(self))(f)
+  final def rightMap[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
+  final def leftMap[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
   ////
 }
 
