@@ -13,6 +13,8 @@ object SyntaxUsage extends App {
   stdSyntax()
   stdSyntaxUeber()
 
+  def typed[T](t: T) = ()
+
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
   def syntax1() {
@@ -24,8 +26,8 @@ object SyntaxUsage extends App {
     import std.option.optionInstance.monadSyntax._
     val x = 1.point
     val y = point(1)
-    x: Option[Int]
-    y: Option[Int]
+    typed[Option[Int]](x)
+    typed[Option[Int]](x)
 
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
@@ -59,18 +61,7 @@ object SyntaxUsage extends App {
     o2.join
     l2.join
 
-    o2.pair(o2)
-  }
-
-
-  // Monad extends from Pointed, so we can use (std.Option.option: Monad[Option]) where Pointed[F] is called for.
-  def useParentTypeClass {
-    import scalaz._
-
-    def needPointed[F[_] : Pointed] = ()
-
-    import std.option._
-    needPointed[Option]
+    o2.tuple(o2)
   }
 
   def stdSyntax() {
@@ -103,7 +94,7 @@ object SyntaxUsage extends App {
 
     ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
     some(some(1)).join assert_=== some(1)
-    
+
     List(1, 2, 3).powerset.join
 
     import Kleisli._

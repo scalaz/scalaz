@@ -17,12 +17,12 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * Returns the provided function `s` applied to item contained in the Option if it is defined,
    * otherwise, the provided value `n`.
    * <p/>
-   * This is a syntactic alternative to  { @link scalaz.OptionW # cata }
+   * This is a syntactic alternative to [[scalaz.syntax.std.OptionOps#cata]]
    * <p/>
    * Example:
-   * <code>
+   * {{{
    * o.some(_ * 2).none(0)
-   * </code>
+   * }}}
    */
   final def some[X](s: A => X): Fold[X] = new Fold[X] {
     def none(n: => X): X = cata(s, n)
@@ -36,9 +36,9 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * Ternary operator. Note that the arguments s and n are call-by-name.
    * <p/>
    * Example
-   * <code>
+   * {{{
    * option ? "defined" | "undefined"
-   * </code>
+   * }}}
    */
   final def ?[X](s: => X): Conditional[X] = new Conditional[X] {
     def |(n: => X): X = self match {
@@ -74,17 +74,27 @@ trait OptionOps[A] extends Ops[Option[A]] {
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
 
+  final def orZero(implicit z: Monoid[A]): A = self getOrElse z.zero
+
   final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
+
+  final def toRightDisjunction[E](e: => E): E \/ A = o.toRight(self)(e)
+
+  final def toLeftDisjunction[B](b: => B): A \/ B = o.toLeft(self)(b)
+
+  final def \/>[E](e: => E): E \/ A = o.toRight(self)(e)
+
+  final def <\/[B](b: => B): A \/ B = o.toLeft(self)(b)
 
   final def first: Option[A] @@ First = Tag(self)
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_] : Pointed : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
+  final def orEmpty[M[_] : Applicative : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
 
-  final def foldLift[F[_] : Pointed, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
+  final def foldLift[F[_] : Applicative, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
 
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
 }

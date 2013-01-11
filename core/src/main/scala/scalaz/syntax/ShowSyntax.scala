@@ -22,8 +22,9 @@ trait ToShowOps  {
 }
 
 trait ShowSyntax[F]  {
-  implicit def ToShowOps(v: F)(implicit F0: Show[F]): ShowOps[F] = new ShowOps[F] { def self = v; implicit def F: Show[F] = F0 }
-
+  implicit def ToShowOps(v: F): ShowOps[F] = new ShowOps[F] { def self = v; implicit def F: Show[F] = ShowSyntax.this.F }
+  
+  def F: Show[F]
   ////
 
   ////

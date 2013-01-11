@@ -25,8 +25,9 @@ trait ToCobindOps extends ToCobindOps0 with ToFunctorOps {
 }
 
 trait CobindSyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToCobindOps[A](v: F[A])(implicit F0: Cobind[F]): CobindOps[F, A] = new CobindOps[F,A] { def self = v; implicit def F: Cobind[F] = F0 }
+  implicit def ToCobindOps[A](v: F[A]): CobindOps[F, A] = new CobindOps[F,A] { def self = v; implicit def F: Cobind[F] = CobindSyntax.this.F }
 
+  def F: Cobind[F]
   ////
 
   ////

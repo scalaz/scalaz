@@ -37,7 +37,7 @@ trait MetricSpace[F]  { self =>
   def metricSpaceLaw = new MetricSpaceLaw {}
 
   ////
-  val metricSpaceSyntax = new scalaz.syntax.MetricSpaceSyntax[F] {}
+  val metricSpaceSyntax = new scalaz.syntax.MetricSpaceSyntax[F] { def F = MetricSpace.this }
 }
 
 object MetricSpace {
@@ -91,4 +91,3 @@ object MetricSpace {
   }
   ////
 }
-

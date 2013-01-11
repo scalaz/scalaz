@@ -25,7 +25,7 @@ trait Group[F] extends Monoid[F] { self =>
   }
   def groupLaw = new GroupLaw {}
   ////
-  val groupSyntax = new scalaz.syntax.GroupSyntax[F] {}
+  val groupSyntax = new scalaz.syntax.GroupSyntax[F] { def F = Group.this }
 }
 
 object Group {
@@ -35,4 +35,3 @@ object Group {
 
   ////
 }
-

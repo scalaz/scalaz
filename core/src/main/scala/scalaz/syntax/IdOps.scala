@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Pointed, Monoid, NonEmptyList, Kleisli, Reader}
+import scalaz.{Applicative, Monoid, NonEmptyList, Kleisli, Reader, \/}
 
 import scalaz.Id._
 
@@ -10,24 +10,34 @@ trait IdOps[A] extends Ops[A] {
   final def ??(d: => A)(implicit ev: Null <:< A): A =
     if (self == null) d else self
 
-  /**Applies `self` to the provided function */
+  /**Applies `self` to the provided function. The Thrush combinator. */
   final def |>[B](f: A => B): B =
     f(self)
+
+  /**Applies `self` to the provide function for its side effect, and returns `self`. The Kestrel combinator. 
+   * Mostly for use with dodgy libraries that give you values that need additional initialization or 
+   * mutation before they're valid to use.
+   */
+  final def unsafeTap(f: A => Any): A = {
+    f(self); self 
+  }
+
+  /** Alias for `unsafeTap`. */
+  final def <|(f: A => Any): A = unsafeTap(f)
 
   final def squared: (A, A) =
     (self, self)
 
-  def left[B]: Either[A, B] =
-    Left(self)
+  def left[B]: (A \/ B) =
+    \/.left(self)
 
-  def right[B]: Either[B, A] =
-    Right(self)
+  def right[B]: (B \/ A) =
+    \/.right(self)
 
   final def wrapNel: NonEmptyList[A] =
     NonEmptyList(self)
 
   /**
-
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */
   def matchOrZero[B: Monoid](pf: PartialFunction[A, B]): B =
@@ -57,11 +67,11 @@ trait IdOps[A] extends Ops[A] {
 
   /**
    * If the provided partial function is defined for `self` run this,
-   * otherwise lift `self` into `F` with the provided [[scalaz.Pointed]].
+   * otherwise lift `self` into `F` with the provided [[scalaz.Applicative]].
    */
-  def visit[F[_] : Pointed](p: PartialFunction[A, F[A]]): F[A] =
+  def visit[F[_] : Applicative](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
-    else Pointed[F].point(self)
+    else Applicative[F].point(self)
 }
 
 trait ToIdOps {

@@ -1,7 +1,7 @@
 package scalaz
 package scalacheck
 
-import org.scalacheck.{Arbitrary, Prop, Properties}
+import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Prop.forAll
 import Scalaz._
 
@@ -48,13 +48,15 @@ object ScalazProperties {
 
     def predsucc[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predsucc _)
 
-    def minmaxpred[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxpred
+    def minmaxpred[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxpred
 
-    def minmaxsucc[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = A.enumLaw.minmaxsucc
+    def minmaxsucc[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxsucc
 
-    def succn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succn1 _)
+    private val smallInt = Gen.choose(-100, 100)
 
-    def predn1[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.predn1 _)
+    def succn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.succn(x, _)))
+
+    def predn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.predn(x, _)))
 
     def succorder[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll(A.enumLaw.succorder _)
 
@@ -66,10 +68,10 @@ object ScalazProperties {
       property("successor then predecessor is identity") = predsucc[A]
       property("predecessor of the min is the max") = minmaxpred[A]
       property("successor of the max is the min") = minmaxsucc[A]
-      property("n-successor once is successor") = succn1[A]
-      property("n-predecessor once is predecessor") = predn1[A]
-      property("successor is greater than or equal to") = succn1[A]
-      property("predecessor is less than or equal to") = predn1[A]
+      property("n-successor is n-times successor") = succn[A]
+      property("n-predecessor is n-times predecessor") = predn[A]
+      property("successor is greater or equal") = succorder[A]
+      property("predecessor is less or equal") = predorder[A]
     }
   }
 
@@ -106,14 +108,14 @@ object ScalazProperties {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.functorLaw.identity[X] _)
 
-    def associative[F[_], X, Y, Z](implicit F: Functor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
+    def composite[F[_], X, Y, Z](implicit F: Functor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
                                    ayz: Arbitrary[(Y => Z)], ef: Equal[F[Z]]) =
-      forAll(F.functorLaw.associative[X, Y, Z] _)
+      forAll(F.functorLaw.composite[X, Y, Z] _)
 
     def laws[F[_]](implicit F: Functor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("functor") {
       property("identity") = identity[F, Int]
-      property("associative") = associative[F, Int, Int, Int]
+      property("composite") = composite[F, Int, Int, Int]
     }
   }
 
@@ -162,14 +164,6 @@ object ScalazProperties {
     }
   }
 
-
-  object copointed {
-    def laws[M[_]](implicit a: Copointed[M], am: Arbitrary[M[Int]],
-                   af: Arbitrary[Int => Int], e: Equal[M[Int]]) = new Properties("copointed") {
-      include(functor.laws[M])
-    }
-  }
-
   object comonad {
     def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
       forAll(F.comonadLaw.cobindLeftIdentity[A] _)
@@ -183,7 +177,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
-      include(copointed.laws[F])
+      include(functor.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
       property("cobind right identity") = cobindRightIdentity[F, Int, Int]
       property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
@@ -209,8 +203,7 @@ object ScalazProperties {
                                                F: Traverse[F], N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
       forAll(F.traverseLaw.parallelFusion[N, M, A, B] _)
 
-    def laws[F[_]](implicit fa: Arbitrary[F[Int]], amb: Arbitrary[Int => Option[Int]], anb: Arbitrary[Int => Stream[Int]],
-                   F: Traverse[F], EF: Equal[F[Int]], MN: Equal[(Option[F[Int]], Stream[F[Int]])]) =
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse[F], EF: Equal[F[Int]]) =
       new Properties("traverse") {
         property("identity traverse") = identityTraverse[F, Int, Int]
 
@@ -220,6 +213,16 @@ object ScalazProperties {
         property("purity.stream") = purity[F, Stream, Int]
 
         property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+      }
+  }
+
+  object bitraverse {
+    def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
+      new Properties("bitraverse") {
+        private implicit val left = F.leftTraverse[Int]
+        private implicit val right = F.rightTraverse[Int]
+        include(traverse.laws[({type f[a]=F[a, Int]})#f])
+        include(traverse.laws[({type f[a]=F[Int, a]})#f])
       }
   }
 
@@ -245,6 +248,20 @@ object ScalazProperties {
       include(monoid.laws[F[Int]](F.monoid[Int], implicitly, implicitly))
       property("left plus identity") = leftPlusIdentity[F, Int]
       property("right plus identity") = rightPlusIdentity[F, Int]
+    }
+  }
+
+  object isEmpty {
+    def emptyIsEmpty[F[_], X](implicit f: IsEmpty[F]):Prop =
+      f.isEmptyLaw.emptyIsEmpty[X]
+
+    def emptyPlusIdentity[F[_], X](implicit f: IsEmpty[F], afx: Arbitrary[F[X]]) =
+      forAll(f.isEmptyLaw.emptyPlusIdentity[X] _)
+
+    def laws[F[_]](implicit F: IsEmpty[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]) = new Properties("isEmpty") {
+      include(plusEmpty.laws[F])
+      property("empty is empty") = emptyIsEmpty[F, Int]
+      property("empty plus identity") =  emptyPlusIdentity[F, Int]
     }
   }
 
@@ -305,7 +322,7 @@ object ScalazProperties {
   }
 
   object lens {
-    import LensT._
+    import Lens._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)

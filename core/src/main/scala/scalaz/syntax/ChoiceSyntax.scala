@@ -5,7 +5,7 @@ package syntax
 trait ChoiceOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Choice[F]
   ////
-  final def |||[C](x: => F[C, B]): F[Either[A, C], B] =
+  final def |||[C](x: => F[C, B]): F[A \/ C, B] =
     F.choice(self, x)
   ////
 }
@@ -30,8 +30,9 @@ trait ToChoiceOps extends ToChoiceOps0 with ToCategoryOps {
 }
 
 trait ChoiceSyntax[F[_, _]] extends CategorySyntax[F] {
-  implicit def ToChoiceOps[A, B](v: F[A, B])(implicit F0: Choice[F]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B] { def self = v; implicit def F: Choice[F] = F0 }
+  implicit def ToChoiceOps[A, B](v: F[A, B]): ChoiceOps[F, A, B] = new ChoiceOps[F, A, B] { def self = v; implicit def F: Choice[F] = ChoiceSyntax.this.F }
 
+  def F: Choice[F]
   ////
 
   ////

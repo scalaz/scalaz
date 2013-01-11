@@ -4,12 +4,12 @@ package std
 import annotation.tailrec
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] {
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
-        (x, ys) => G.map2(f(x), ys)((b, bs) => b #:: bs)
+        (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
       }
     }
 
@@ -36,10 +36,10 @@ trait StreamInstances {
     def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
+    def isEmpty[A](s: Stream[A]) = s.isEmpty
     def point[A](a: => A) = scala.Stream(a)
     def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
     def unzip[A, B](a: Stream[(A, B)]) = a.unzip
-
   }
 
   import Tags.Zip
@@ -50,7 +50,7 @@ trait StreamInstances {
    *
    * Example:
    * {{{
-   * streamZipApplicative.map2(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
+   * streamZipApplicative(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
    * }}}
    */
   implicit val streamZipApplicative: Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] = new Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
@@ -70,7 +70,7 @@ trait StreamInstances {
     def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
   }
   implicit def streamShow[A](implicit A0: Show[A]) = new Show[Stream[A]] {
-    override def show(as: Stream[A]) = stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _)
+    override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
   }
 
 
@@ -127,7 +127,7 @@ trait StreamFunctions {
   final def unfoldForestM[A, B, M[_] : Monad](as: Stream[A])(f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = {
     def mapM[T, U](ts: Stream[T], f: T => M[U]): M[Stream[U]] =
       ts.foldRight[M[Stream[U]]](Monad[M].point(scala.Stream())) {
-        case (g, h) => Monad[M].map2(f(g), h)(_ #:: _)
+        case (g, h) => Monad[M].apply2(f(g), h)(_ #:: _)
       }
 
     def unfoldTreeM(v: A) =
@@ -149,11 +149,6 @@ trait StreamFunctions {
       case h #:: t      => h #:: loop(t)
     }
   }
-
-  /** Intersperse the elements of `as2` between every adjacent `as1`
-    * pair. */
-  final def intercalate[A](as1: Stream[Stream[A]], as2: Stream[A]): Stream[A] =
-    intersperse(as1, as2).flatten
 
   def unfold[A, B](seed: A)(f: A => Option[(B, A)]): Stream[B] =
     f(seed) match {

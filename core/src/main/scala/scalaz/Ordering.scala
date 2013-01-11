@@ -5,9 +5,9 @@ sealed abstract class Ordering(val toInt: Int, val name: String) {
 }
 
 object Ordering extends OrderingFunctions with OrderingInstances {
-  case object LT extends Ordering(-1, "LT") { val complement = GT }
-  case object EQ extends Ordering(0,  "EQ") { val complement = EQ }
-  case object GT extends Ordering(1,  "GT") { val complement = LT }
+  case object LT extends Ordering(-1, "LT") { def complement = GT }
+  case object EQ extends Ordering(0,  "EQ") { def complement = EQ }
+  case object GT extends Ordering(1,  "GT") { def complement = LT }
 }
 
 trait OrderingInstances {
@@ -45,14 +45,18 @@ trait OrderingInstances {
       case Ordering.LT => Ordering.GT
     }
     override def succn(a: Int, b: Ordering) =
-      if(a % 3 == 0)
+      if(a < 0)
+        predn(-a, b)
+      else if(a % 3 == 0)
         b
       else if(a % 3 == 1)
         succ(b)
       else
         succ(succ(b))
     override def predn(a: Int, b: Ordering) =
-      if(a % 3 == 0)
+      if(a < 0)
+        succn(-a, b)
+      else if(a % 3 == 0)
         b
       else if(a % 3 == 1)
         pred(b)

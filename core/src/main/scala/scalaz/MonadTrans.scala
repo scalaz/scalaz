@@ -14,6 +14,10 @@ trait Hoist[F[_[_], _]] extends MonadTrans[F] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): ({type f[x] = F[M, x]})#f ~> ({type f[x] = F[N, x]})#f
 }
 
+object Hoist {
+  def apply[F[_[_], _]](implicit F: Hoist[F]): Hoist[F] = F
+}
+
 /**
  * This trait establishes a partial order among monads. A "bigger" monad
  * is one that does all of the effects of the "smaller" as part of its 

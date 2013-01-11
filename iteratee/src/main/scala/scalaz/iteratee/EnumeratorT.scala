@@ -48,7 +48,7 @@ trait EnumeratorT[E, F[_]] { self =>
   def zipWithIndex(implicit M: Monad[F]): EnumeratorT[(E, Long), F] =
     EnumerateeT.zipWithIndex[E, F] run self
 
-  def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Pointed[M]): F[M[E]] =
+  def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Applicative[M]): F[M[E]] =
     (IterateeT.consume[E, F, M] &= self).run
 
   def reduced[B](b: B)(f: (B, E) => B)(implicit M: Monad[F]): EnumeratorT[B, F] =
@@ -96,7 +96,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
 trait EnumeratorTFunctions {
   def enumerate[E](as: Stream[E]): Enumerator[E] = enumStream[E, Id](as)
 
-  def empty[E, F[_]: Pointed]: EnumeratorT[E, F] =
+  def empty[E, F[_]: Applicative]: EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = _.pointI
     }
@@ -104,7 +104,7 @@ trait EnumeratorTFunctions {
   /** 
    * An EnumeratorT that is at EOF
    */
-  def enumEofT[E, F[_] : Pointed]: EnumeratorT[E, F] =
+  def enumEofT[E, F[_] : Applicative]: EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = _.mapCont(_(eofInput))
     }
@@ -117,7 +117,7 @@ trait EnumeratorTFunctions {
       def apply[A] = s => iterateeT(Monad[F].bind(f) { _ => s.pointI.value })
     }
 
-  def enumOne[E, F[_]: Pointed](e: E): EnumeratorT[E, F] =
+  def enumOne[E, F[_]: Applicative](e: E): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] = _.mapCont(_(elInput(e)))
     }
@@ -238,10 +238,7 @@ private[scalaz] trait EnumeratorTFunctor[F[_]] extends Functor[({type λ[α]=Enu
   abstract override def map[A, B](fa: EnumeratorT[A, F])(f: A => B): EnumeratorT[B, F] = fa.map(f)
 }
 
-private[scalaz] trait EnumeratorTPointed[F[_]] extends Pointed[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTFunctor[F] {
-  def point[E](e: => E) = EnumeratorT.enumOne[E, F](e)
-}
-
-private [scalaz] trait EnumeratorTMonad[F[_]] extends Monad[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTPointed[F] {
+private [scalaz] trait EnumeratorTMonad[F[_]] extends Monad[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTFunctor[F] {
   def bind[A, B](fa: EnumeratorT[A, F])(f: A => EnumeratorT[B, F]) = fa.flatMap(f)
+  def point[E](e: => E) = EnumeratorT.enumOne[E, F](e)
 }

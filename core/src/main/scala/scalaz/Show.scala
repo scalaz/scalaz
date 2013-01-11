@@ -14,7 +14,7 @@ trait Show[F]  { self =>
 
   // derived functions
   ////
-  val showSyntax = new scalaz.syntax.ShowSyntax[F] {}
+  val showSyntax = new scalaz.syntax.ShowSyntax[F] { def F = Show.this }
 }
 
 object Show {
@@ -45,4 +45,3 @@ object Show {
 
   ////
 }
-

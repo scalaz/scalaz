@@ -29,26 +29,27 @@ object TypeClass {
   lazy val each = TypeClass("Each", *->*)
   lazy val index = TypeClass("Index", *->*)
   lazy val functor = TypeClass("Functor", *->*)
-  lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
+  lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val copointed = TypeClass("Copointed", *->*, extendsList = Seq(functor))
-  lazy val cojoin = TypeClass("Cojoin", *->*)
+  lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(copointed, cojoin, cobind))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
   lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
@@ -56,9 +57,8 @@ object TypeClass {
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
-  lazy val arrId = TypeClass("ArrId", *^*->*)
   lazy val compose = TypeClass("Compose", *^*->*)
-  lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(arrId, compose))
+  lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val first = TypeClass("First", *^*->*)
@@ -83,12 +83,11 @@ object TypeClass {
     enum,
     metricSpace,
     plusEmpty,
+    isEmpty,
     each,
     index,
     functor,
-    pointed,
     contravariant,
-    copointed,
     apply,
     applicative,
     zip,
@@ -103,11 +102,12 @@ object TypeClass {
     applicativePlus,
     monadPlus,
     foldable,
+    foldable1,
     traverse,
+    traverse1,
     bifunctor,
     bifoldable,
     bitraverse,
-    arrId,
     compose,
     category,
     choice,
@@ -181,7 +181,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrId, arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
@@ -213,7 +213,7 @@ object GenTypeClass {
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
-    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] {}".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent)
+    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] { def F = %s.this }".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent, typeClassName)
 
     val mainSource = """%s
 
@@ -238,7 +238,6 @@ object %s {
 
   ////
 }
-
 """.format(tc.packageString0, typeClassName, classifiedType, extendsLikeList, syntaxMember,
       typeClassName,
       classifiedTypeF, typeClassName, typeClassName, typeClassName, classifiedTypeIdent, classifiedTypeIdent
@@ -267,8 +266,9 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F] %s {
-  implicit def To%sOps(v: F)(implicit F0: %s[F]): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
-
+  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+  
+  def F: %s[F]
   ////
 
   ////
@@ -277,9 +277,12 @@ trait %sSyntax[F] %s {
 
       // implicits in ToXxxSyntax
       typeClassName, typeClassName, typeClassName, typeClassName,
-
+      
+      // trait MonadSyntax[F] extends ... { ... } 
       typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
+      
+      typeClassName
     )
     case Kind.*->* =>
       val ToVUnapply =
@@ -313,8 +316,9 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F[_]] %s {
-  implicit def To%sOps[A](v: F[A])(implicit F0: %s[F]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
+  def F: %s[F]
   ////
 
   ////
@@ -327,7 +331,9 @@ trait %sSyntax[F[_]] %s {
           ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
+          
+          typeClassName
         )
       case Kind.*^*->* =>
 
@@ -365,8 +371,9 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F[_, _]] %s {
-  implicit def To%sOps[A, B](v: F[A, B])(implicit F0: %s[F]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = F0 }
+  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
+  def F: %s[F]
   ////
 
   ////
@@ -377,7 +384,9 @@ trait %sSyntax[F[_, _]] %s {
           typeClassName, extendsToSyntaxListText,
           ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
+          
+          typeClassName
         )
     }
     val syntaxSourceFile = SourceFile(tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource)

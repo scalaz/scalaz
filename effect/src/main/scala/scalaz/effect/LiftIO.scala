@@ -14,7 +14,7 @@ trait LiftIO[F[_]]  { self =>
   // derived functions
 
   ////
-  val liftIOSyntax = new scalaz.syntax.effect.LiftIOSyntax[F] {}
+  val liftIOSyntax = new scalaz.syntax.effect.LiftIOSyntax[F] { def F = LiftIO.this }
 }
 
 object LiftIO {
@@ -24,4 +24,3 @@ object LiftIO {
   
   ////
 }
-

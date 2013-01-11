@@ -21,7 +21,7 @@ trait Index[F[_]]  { self =>
   // derived functions
 
   ////
-  val indexSyntax = new scalaz.syntax.IndexSyntax[F] {}
+  val indexSyntax = new scalaz.syntax.IndexSyntax[F] { def F = Index.this }
 }
 
 object Index {
@@ -31,4 +31,3 @@ object Index {
 
   ////
 }
-

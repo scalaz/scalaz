@@ -47,8 +47,9 @@ trait ToArrowOps extends ToArrowOps0 with ToCategoryOps {
 }
 
 trait ArrowSyntax[F[_, _]] extends CategorySyntax[F] {
-  implicit def ToArrowOps[A, B](v: F[A, B])(implicit F0: Arrow[F]): ArrowOps[F, A, B] = new ArrowOps[F, A, B] { def self = v; implicit def F: Arrow[F] = F0 }
+  implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] = new ArrowOps[F, A, B] { def self = v; implicit def F: Arrow[F] = ArrowSyntax.this.F }
 
+  def F: Arrow[F]
   ////
 
   ////

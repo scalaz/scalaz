@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 ////
 /**
  * Provides an identity element (`zero`) to the binary `append`
@@ -33,6 +31,18 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def multiply(value: F, n: Int): F =
     Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
 
+  def isMZero(a: F)(implicit eq: Equal[F]): Boolean =
+    eq.equal(a, zero)
+
+  final def ifEmpty[B](a: F)(t: => B)(f: => B)(implicit eq: Equal[F]): B =
+    if (isMZero(a)) { t } else { f }
+
+  final def onNotEmpty[B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
+    ifEmpty(a)(mb.zero)(v)
+
+  final def onEmpty[A,B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
+    ifEmpty(a)(v)(mb.zero)
+
   /** Every `Monoid` gives rise to a [[scalaz.Category]] */
   final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
     def id[A] = zero
@@ -62,20 +72,20 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def monoidLaw = new MonoidLaw {}
 
   ////
-  val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] {}
+  val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
 
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
+  ////
+  import annotation.tailrec
+
   /** Make an append and zero into an instance. */
   def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {
     def zero = z
-    def append(f1: A, f2: => A): A = f(f1, f2)
+    def append(f1: A, f2: => A): A = f(f1,f2)
   }
-
-  ////
-  import annotation.tailrec
 
   trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Applicative[F]
@@ -100,6 +110,11 @@ object Monoid {
     implicit def M: Monoid[M] = M0
   }
 
+  def liftPlusEmpty[A](implicit M0: Monoid[A]): PlusEmpty[({ type λ[α] = A })#λ] = new PlusEmpty[({ type λ[α] = A })#λ] {
+    type A0[α] = A
+    def empty[A]: A0[A] = M0.zero
+    def plus[A](f1: A0[A], f2: => A0[A]): A0[A] = M0.append(f1, f2)
+  }
+
   ////
 }
-

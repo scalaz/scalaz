@@ -1,4 +1,0 @@
-alias c=compile
-alias tc=test:compile
-alias cc=;iteratee/clean;compile
-alias gtc=gen-type-classes

@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import PLens._
+import PLensFamily._
 
 
 /**
@@ -50,7 +50,7 @@ trait Zip[F[_]]  { self =>
     }
 
   ////
-  val zipSyntax = new scalaz.syntax.ZipSyntax[F] {}
+  val zipSyntax = new scalaz.syntax.ZipSyntax[F] { def F = Zip.this }
 }
 
 object Zip {
@@ -62,4 +62,3 @@ object Zip {
       F.zip(t._1, t._2)
   ////
 }
-

@@ -12,7 +12,7 @@ trait Contravariant[F[_]]  { self =>
   // derived functions
 
   ////
-  val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] {}
+  val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] { def F = Contravariant.this }
 }
 
 object Contravariant {
@@ -22,4 +22,3 @@ object Contravariant {
 
   ////
 }
-

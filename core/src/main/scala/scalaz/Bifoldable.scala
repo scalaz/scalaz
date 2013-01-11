@@ -47,8 +47,24 @@ trait Bifoldable[F[_, _]]  { self =>
   final def bifoldL[A, B, C](fa: F[A, B], z: C)(f: C => A => C)(g: C => B => C): C =
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
+  def leftFoldable[X]: Foldable[({type λ[α] = F[α, X]})#λ] = new Foldable[({type λ[α] = F[α, X]})#λ] {
+    def foldMap[A,B](fa: F[A, X])(f: A => B)(implicit F: Monoid[B]): B =
+      bifoldMap(fa)(f)(Function const F.zero)
+
+    def foldRight[A, B](fa: F[A, X], z: => B)(f: (A, => B) => B): B =
+      bifoldRight(fa, z)(f)((_, b) => b)
+  }
+
+  def rightFoldable[X]: Foldable[({type λ[α] = F[X, α]})#λ] = new Foldable[({type λ[α] = F[X, α]})#λ] {
+    def foldMap[A,B](fa: F[X, A])(f: A => B)(implicit F: Monoid[B]): B =
+      bifoldMap(fa)(Function const F.zero)(f)
+
+    def foldRight[A, B](fa: F[X, A], z: => B)(f: (A, => B) => B): B =
+      bifoldRight(fa, z)((_, b) => b)(f)
+  }
+
   ////
-  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] {}
+  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
 
 object Bifoldable {
@@ -73,4 +89,3 @@ object Bifoldable {
 
   ////
 }
-

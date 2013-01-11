@@ -9,8 +9,6 @@ trait ListOps[A] extends Ops[List[A]] {
 
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
-  final def intercalate[B](other: List[B])(implicit ev: List[A] =:= List[List[B]]): List[B] = l.intercalate(self, other)
-
   final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
 
   final def toZipper: Option[Zipper[A]] = l.toZipper(self)
@@ -36,6 +34,8 @@ trait ListOps[A] extends Ops[List[A]] {
   final def breakM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.breakM(self)(p)
 
   final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupByM(self)(p)
+
+  final def groupWhen(p: (A, A) => Boolean): List[List[A]] = l.groupWhen(self)(p)
 
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumLeft(self)(c, f)
 

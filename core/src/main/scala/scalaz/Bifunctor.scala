@@ -39,7 +39,7 @@ trait Bifunctor[F[_, _]]  { self =>
   def umap[A, B](faa: F[A, A])(f: A => B): F[B, B] =
     bimap(faa)(f, f)
   ////
-  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] {}
+  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
 object Bifunctor {
@@ -49,4 +49,3 @@ object Bifunctor {
 
   ////
 }
-

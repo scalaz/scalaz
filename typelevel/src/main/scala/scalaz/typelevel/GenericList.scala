@@ -113,8 +113,8 @@ sealed trait GenericList[+M[_]] {
   /**
    * Version of `apply` which takes the bare function and wraps it into `N`.
    */
-  final def applyP[N[X] >: M[X] : Apply : Pointed, R](f: Function[R]): N[R] =
-    apply[N, R](Pointed[N].point(f))
+  final def applyP[N[X] >: M[X] : Applicative, R](f: Function[R]): N[R] =
+    apply[N, R](Applicative[N].point(f))
 
   /**
    * Upcasts the type constructor in this list. This operation is safe.

@@ -26,6 +26,11 @@ class TraverseTest extends Spec {
       s must be_===(none[List[Int]])
     }
 
+    "traverse int function as monoidal applicative" in {
+      val s: Int = List(1, 2, 3) traverseU {_ + 1}
+      s must be_===(9)
+    }
+
     "not blow the stack" in {
       val s: Option[List[Int]] = List.range(0, 32 * 1024).traverseU(x => some(x))
       s.map(_.take(3)) must be_===(some(List(0, 1, 2)))
@@ -66,7 +71,7 @@ class TraverseTest extends Spec {
       import scalaz.effect._
 
       val as = Stream.range(0, 100000)
-      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline(a => for {
+      val state: State[Int, IO[Stream[Int]]] = as.traverseSTrampoline[IO, Int, Int](a => for {
         s <- State.get[Int]
         _ <- State.put(a)
       } yield IO(a - s))
@@ -92,7 +97,7 @@ class TraverseTest extends Spec {
       Traverse[List].reverse(List(1, 2, 3)) must be_===(List(3, 2, 1))
     }
 
-    "mapAccumL/R" ! check {
+    "mapAccumL/R" ! prop {
       val L = Traverse[List]; import L.traverseSyntax._
       (l: List[Int]) => {
         val (acc, l2) = l.mapAccumL(List[Int]())((acc,a) => (a :: acc, a))
@@ -101,7 +106,7 @@ class TraverseTest extends Spec {
       }
     }
 
-    "double reverse" ! check {
+    "double reverse" ! prop {
       (is: List[Int]) =>
         import syntax.monoid._
         Endo(Traverse[List].reverse[Int]).multiply(2).apply(is) must be_===(is)

@@ -5,4 +5,4 @@ jdk:
   - oraclejdk7
 
 install: /bin/true
-script: ./sbt -J-Xss1M -J-Xms512M -J-Xmx700M -J-XX:MaxPermSize=128M ";clean;compile;test"
+script: ./sbt -J-Xss1M -J-Xms512M -J-Xmx1000M -J-XX:MaxPermSize=128M ++$TRAVIS_SCALA_VERSION ";clean;compile;test"

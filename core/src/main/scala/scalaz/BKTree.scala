@@ -60,6 +60,27 @@ sealed trait BKTree[A] {
     k
   }
 
+  def -(a: A)(implicit A: MetricSpace[A]): BKTree[A] =
+    this match {
+      case BKTreeEmpty()       => BKTreeEmpty()
+      case BKTreeNode(v, _, c) => {
+        val d = A.distance(v, a)
+        if(d == 0) BKTree(c.values.seq.flatMap(_.values).toSeq: _*)
+        else {
+          val subTree = updateMap(c, d, (t: BKTree[A]) => Some(t - a))
+          val size = subTree.values.map(_.size).sum + 1
+          BKTreeNode(v, size, subTree)
+        }
+      }
+    }
+
+  def --(t: BKTree[A])(implicit m: MetricSpace[A]): BKTree[A] = {
+    var k: BKTree[A] = this
+    for (v <- t.values)
+      k = k - v
+    k
+  }  
+
   def values: List[A] =
     this match {
       case BKTreeEmpty()       => Nil
@@ -141,6 +162,15 @@ sealed trait BKTree[A] {
     }
     (m1, m2)
   }
+
+  private def updateMap(m: M[BKTree[A]], k: Int, f: BKTree[A] => Option[BKTree[A]]) =
+    m get k match {
+      case None => m
+      case Some(v) => f(v) match {
+        case None => m - k
+        case Some(value) => m.updated(k, value)
+      }
+    }
 }
 
 private case class BKTreeNode[A](value: A, sz: Int, children: IntMap[BKTree[A]]) extends BKTree[A]

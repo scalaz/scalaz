@@ -31,13 +31,12 @@ class AnyValTest extends Spec {
     checkAll("Boolean", monoid.laws[Boolean])
   }
 
-  checkAll("Short", monoid.laws[Short])
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
-  checkAll("Long", monoid.laws[Long])
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
 
+  checkAll("Unit", group.laws[Unit])
   checkAll("Int", group.laws[Int])
   checkAll("Short", group.laws[Short])
   checkAll("Long", group.laws[Long])
@@ -47,4 +46,18 @@ class AnyValTest extends Spec {
 
     checkAll("Int", metricSpace.laws[Int])
   }
+
+  checkAll("Unit", enum.laws[Unit])
+  checkAll("Boolean", enum.laws[Boolean])
+  checkAll("Char", enum.laws[Char])
+  checkAll("Short", enum.laws[Short])
+  checkAll("Int", enum.laws[Int])
+  checkAll("Long", enum.laws[Long])
+  checkAll("Int @@ Multiplication", enum.laws[Int @@ Multiplication])
+  checkAll("Boolean @@ Conjunction", enum.laws[Boolean @@ Conjunction])
+  checkAll("Char @@ Multiplication", enum.laws[Char @@ Multiplication])
+  checkAll("Byte @@ Multiplication", enum.laws[Byte @@ Multiplication])
+  checkAll("Long @@ Multiplication", enum.laws[Long @@ Multiplication])
+  checkAll("Short @@ Multiplication", enum.laws[Short @@ Multiplication])
+
 }

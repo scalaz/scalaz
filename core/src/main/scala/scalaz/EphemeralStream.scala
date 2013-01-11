@@ -84,14 +84,14 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
     emptyEphemeralStream
 
   def apply[A](as: A*): EphemeralStream[A] =
-    unfold(0, (b: Int) =>
+    unfold(0)(b =>
       if (b < as.size) Some((as(b), b + 1))
       else None)
 }
 
 trait EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
+  implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
     def bind[A, B](fa: EphemeralStream[A])(f: (A) => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
@@ -119,17 +119,17 @@ trait EphemeralStreamFunctions {
     val tail = weakMemo(as)
   }
 
-  def unfold[A, B](b: => B, f: B => Option[(A, B)]): EphemeralStream[A] =
+  def unfold[A, B](b: => B)(f: B => Option[(A, B)]): EphemeralStream[A] =
     f(b) match {
       case None         => emptyEphemeralStream
-      case Some((a, r)) => cons(a, unfold(r, f))
+      case Some((a, r)) => cons(a, unfold(r)(f))
     }
 
   def iterate[A](start: A)(f: A => A): EphemeralStream[A] =
-    unfold(start, (a: A) => {
+    unfold(start){ a =>
       val fa = f(a)
       Some((fa, fa))
-    })
+    }
 
   def range(lower: Int, upper: Int): EphemeralStream[Int] =
     if (lower >= upper) emptyEphemeralStream else cons(lower, range(lower + 1, upper))

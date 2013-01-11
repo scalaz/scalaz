@@ -7,11 +7,13 @@ package scalaz
  * @see [[scalaz.Category.CategoryLaw]]
  */
 ////
-trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
+trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 
-  def empty[A]: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus[A] {
+  def id[A]: A =>: A
+
+  def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
     def empty[A] = id
   }
   def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
@@ -34,7 +36,7 @@ trait Category[=>:[_, _]] extends ArrId[=>:] with Compose[=>:] { self =>
   def categoryLaw = new CategoryLaw {}
 
   ////
-  val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] {}
+  val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] { def F = Category.this }
 }
 
 object Category {
@@ -43,4 +45,3 @@ object Category {
   ////
   ////
 }
-

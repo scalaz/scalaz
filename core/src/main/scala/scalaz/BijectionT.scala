@@ -21,15 +21,15 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def fromK: Kleisli[G, B, A] =
     Kleisli(from(_))
 
-  def lens[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): LensT[H, A, B] =
-    LensT(a => FF.map(to(a))(x => Store(from(_), x)))
+  def lens(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Lens[A, B] =
+    Lens(a => Store(from(_), to(a)))
 
-  def partial[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]): PLensT[H, A, B] =
-    lens[H].partial
+  def partial(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): PLens[A, B] =
+    lens.partial
 
   /** alias for `partial` */
-  def unary_~[H[+_]](implicit FF: Functor[H], evF: F[B] =:= H[B], evG: G[A] =:= Id[A]) : PLensT[H, A, B] =
-    partial[H]
+  def unary_~(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]) : PLens[A, B] =
+    partial
 
   def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(
@@ -40,8 +40,8 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
     bimap[C, Tuple2, D](g)
 
-  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[Either[A, C], Either[B, D]] =
-    bimap[C, Either, D](g)
+  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[A \/ C, B \/ D] =
+    bimap[C, \/, D](g)
 
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
@@ -76,22 +76,22 @@ trait BijectionTFunctions {
   type Bijection[A, B] =
   BijectionT[Id, Id, A, B]
 
-  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, A, B] =
+  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
-  def bijectionId[F[+_], G[+_], A](implicit PF: Pointed[F], PG: Pointed[G]): BijectionT[F, G, A, A] =
+  def bijectionId[F[+_], G[+_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
     liftBijection(x => x, x => x)
 
   def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =
     bijection[Id, Id, (A, B) => C, A => B => C](_.curried, Function.uncurried(_))
 
   // Left is true, Right is false
-  def eitherB[A]: Bijection[Either[A, A], (Boolean, A)] =
-    bijection[Id, Id, Either[A, A], (Boolean, A)](_ match {
-      case Left(a) => (true, a)
-      case Right(a) => (false, a)
+  def eitherB[A]: Bijection[A \/ A, (Boolean, A)] =
+    bijection[Id, Id, A \/ A, (Boolean, A)](_ match {
+      case -\/(a) => (true, a)
+      case \/-(a) => (false, a)
     }, {
-      case (p, a) => if(p) Left(a) else Right(a)
+      case (p, a) => if(p) -\/(a) else \/-(a)
     })
 
   def zipB[X[_], A, B](implicit Z: Zip[X], U: Unzip[X]): Bijection[(X[A], X[B]), X[(A, B)]] =

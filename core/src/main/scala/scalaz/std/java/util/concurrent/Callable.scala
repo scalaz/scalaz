@@ -9,11 +9,16 @@ trait CallableInstances {
     def order(f1: Callable[A], f2: Callable[A]) = Order[A].order(f1.call, f2.call)
   }
 
-  implicit def callablePointed: Pointed[Callable] = new Pointed[Callable] {
+  implicit def callableFunctor: Functor[Callable] = new Functor[Callable] {
     def map[A, B](fa: Callable[A])(f: (A) => B) = new Callable[B] {
       def call() = f(fa.call)
     }
+  }
 
+  implicit def callableMonad: Monad[Callable] = new Monad[Callable] {
+    def bind[A, B](fa: Callable[A])(f: (A) => Callable[B]) = new Callable[B] {
+      def call() = f(fa.call).call
+    }
     def point[A](a: => A) = new Callable[A] {
       def call() = a
     }

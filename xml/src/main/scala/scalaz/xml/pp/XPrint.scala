@@ -65,14 +65,14 @@ trait XPrints {
   /// tagStart
   private def tagStart(n: QName, a: List[Attr]): List[Char] = {
     def intercalate[A](as: List[A], v: List[A]): List[A] = {
-       val asr = as reverse
+       val asr = as.reverse
        @annotation.tailrec
        def intercalate0(accum: List[A], rest: List[A]): List[A] = rest match {
          case Nil => accum
          case x :: Nil => x :: accum
          case h :: t => intercalate0(asr ::: h :: accum, t)
        }
-       intercalate0(Nil, v) reverse
+       intercalate0(Nil, v).reverse
      }
 
     '<' :: XPrint.showQname(n) ::: (

@@ -4,6 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
+import com.typesafe.sbtosgi.OsgiPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -11,13 +12,29 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-M5"),
-    crossVersion := CrossVersion.full,
+    crossScalaVersions := Seq("2.9.2", "2.10.0"),
     resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
-    scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
-      bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+
+    scalacOptions <++= (scalaVersion) map { sv =>
+      val versionDepOpts =
+        if (sv.contains("2.10"))
+          // does not contain -deprecation (because of ClassManifest)
+          // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
+          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
+        else
+          Seq("-Ydependent-method-types", "-deprecation")
+
+      Seq("-unchecked") ++ versionDepOpts
     },
+
+    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")) map { bd =>
+      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+    },
+
+    // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
+    parallelExecution in Test := false,
+    testOptions in Test += Tests.Argument("sequential"),
+
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
@@ -88,6 +105,8 @@ object build extends Build {
         }
         </developers>
       )
+  ) ++ osgiSettings ++ Seq[Sett](
+    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
   lazy val scalaz = Project(
@@ -105,7 +124,9 @@ object build extends Build {
       typeClasses := TypeClass.core,
       (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
-      }
+      },
+      osgiExport("scalaz"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
   )
 
@@ -114,7 +135,9 @@ object build extends Build {
     base = file("concurrent"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-concurrent",
-      typeClasses := TypeClass.concurrent
+      typeClasses := TypeClass.concurrent,
+      osgiExport("scalaz.concurrent"),
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
     dependencies = Seq(core, effect)
   )
@@ -124,7 +147,8 @@ object build extends Build {
     base = file("effect"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-effect",
-      typeClasses := TypeClass.effect
+      typeClasses := TypeClass.effect,
+      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
     ),
     dependencies = Seq(core)
   )
@@ -133,7 +157,8 @@ object build extends Build {
     id = "iteratee",
     base = file("iteratee"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iteratee"
+      name := "scalaz-iteratee",
+      osgiExport("scalaz.iteratee")
     ),
     dependencies = Seq(effect)
   )
@@ -142,7 +167,8 @@ object build extends Build {
     id = "iterv",
     base = file("iterv"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iterv"
+      name := "scalaz-iterv",
+      OsgiKeys.fragmentHost := Some("org.scalaz.core")
     ),
     dependencies = Seq(effect)
   )
@@ -151,7 +177,8 @@ object build extends Build {
     id = "typelevel",
     base = file("typelevel"),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-typelevel"
+      name := "scalaz-typelevel",
+      osgiExport("scalaz.typelevel", "scalaz.syntax.typelevel")
     ),
     dependencies = Seq(core)
   )
@@ -161,7 +188,8 @@ object build extends Build {
     base = file("xml"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-xml",
-      typeClasses := TypeClass.xml
+      typeClasses := TypeClass.xml,
+      osgiExport("scalaz.xml")
     ),
     dependencies = Seq(core)
   )
@@ -171,29 +199,31 @@ object build extends Build {
     base = file("example"),
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-example"
+      name := "scalaz-example",
+      osgiExport("scalaz.example")
     )
   )
 
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel),
+    dependencies = Seq(core, concurrent, typelevel, xml),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0" cross CrossVersion.full
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0",
+      osgiExport("scalaz.scalacheck")
     )
   )
 
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.11" % "test" cross CrossVersion.full,
-        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test" cross CrossVersion.full
+        "org.specs2" %% "specs2" % "1.12.3" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
       )
     )
   )
@@ -291,4 +321,7 @@ object build extends Build {
     writeFileScalazPackage("TupleOps.scala", source)
   }
 
+  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
+
+// vim: expandtab:ts=2:sw=2

@@ -3,20 +3,25 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
+import syntax.std._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
-  
+  checkAll(isEmpty.laws[List])
+  checkAll(order.laws[List[Int]])
+
   import std.list.listSyntax._
+  import syntax.foldable._
   import syntax.monad._
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! check {
+  "intersperse then remove odd items is identity" ! prop {
     (a: List[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
@@ -36,9 +41,18 @@ class ListTest extends Spec {
     (a: List[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
   }
 
-  "groupByM[Id].flatten is identity" ! check {
+  "groupByM[Id].flatten is identity" ! prop {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupByM[Id]((a, b) => p(a, b)).flatten must be_===(a)
+      a.groupByM[Id](p).flatten must be_===(a)
+  }
+
+  "groupByWhen.flatten is identity" ! prop {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupWhen(p).flatten must be_===(a)
+  }
+
+  "filterM" ! prop {
+    (xs: List[Int]) => xs.filterM[Id](_ % 2 == 0) == xs.filter(_ % 2 == 0)
   }
 
   "takeWhileM example" in {
@@ -47,9 +61,21 @@ class ListTest extends Spec {
         val j = i + (if (f(a)) 0 else 1)
         val done = j >= n
         (j, !done)
-    }).evalZero
+    }).evalZero[Int]
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
     actual must be_===("/abc/def/hij")
+  }
+
+  "foldl is foldLeft" ! prop {(rnge: List[List[Int]]) =>
+    val F = Foldable[List]
+    (rnge.foldLeft(List[Int]())(_++_)
+      must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
+  }
+
+  "foldr is foldRight" ! prop {(rnge: List[List[Int]]) =>
+    val F = Foldable[List]
+    (rnge.foldRight(List[Int]())(_++_)
+      must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 }

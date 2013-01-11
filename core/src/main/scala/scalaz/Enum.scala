@@ -13,32 +13,9 @@ trait Enum[F] extends Order[F] { self =>
 
   // derived functions
 
-  def succn(n: Int, a: F): F = {
-    var w = n
-    var z = a
-    while(w < 0) {
-      z = pred(z)
-      w = w + 1
-    }
-    while(w > 0) {
-      z = succ(z)
-      w = w - 1
-    }
-    z
-  }
-  def predn(n: Int, a: F): F = {
-    var w = n
-    var z = a
-    while(w < 0) {
-      z = succ(z)
-      w = w + 1
-    }
-    while(w > 0) {
-      z = pred(z)
-      w = w - 1
-    }
-    z
-  }
+  def succn(n: Int, a: F): F = Enum.succn(n, a)(self)
+  def predn(n: Int, a: F): F = Enum.predn(n, a)(self)
+
   def min: Option[F] =
     None
   def max: Option[F] =
@@ -168,9 +145,9 @@ trait Enum[F] extends Order[F] { self =>
   def fromToL(a: F, z: F): List[F] = {
     def fromToLT(a: F, z: F): Trampoline[List[F]] =
       if(equal(a, z))
-        Return(List(a))
+        return_(List(a))
       else
-        fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _)
+        suspend(fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
   }
 
@@ -202,9 +179,9 @@ trait Enum[F] extends Order[F] { self =>
          (_: F, _: F) => false
       val k = succn(n, a)
       if(cmp(k, z))
-        Return(List(a))
+        return_(List(a))
       else
-        fromStepToLT(n, k, z) map (a :: _)
+        suspend(fromStepToLT(n, k, z) map (a :: _))
     }
     fromStepToLT(n, a, z).run
   }
@@ -222,30 +199,55 @@ trait Enum[F] extends Order[F] { self =>
     def minmaxsucc: Boolean =
       min forall (x => max forall (y => equal(succ(y), x)))
 
-    def succn1(x: F): Boolean =
-      equal(succn(1, x), succ(x))
+    def succn(x: F, n: Int): Boolean =
+      equal(self.succn(n, x), Enum.succn(n, x)(self))
 
-    def predn1(x: F): Boolean =
-      equal(predn(1, x), pred(x))
+    def predn(x: F, n: Int): Boolean =
+      equal(self.predn(n, x), Enum.predn(n, x)(self))
 
     def succorder(x: F): Boolean =
-      greaterThanOrEqual(succ(x), x)
+      (max exists (equal(_, x))) || greaterThanOrEqual(succ(x), x)
 
     def predorder(x: F): Boolean =
-      lessThanOrEqual(pred(x), x)
+      (min exists (equal(_, x))) || lessThanOrEqual(pred(x), x)
   }
 
   def enumLaw = new EnumLaw {}
 
   ////
-  val enumSyntax = new scalaz.syntax.EnumSyntax[F] {}
+  val enumSyntax = new scalaz.syntax.EnumSyntax[F] { def F = Enum.this }
 }
 
 object Enum {
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
   ////
+  def succn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
+    var w = n
+    var z = a
+    while(w < 0) {
+      z = F.pred(z)
+      w = w + 1
+    }
+    while(w > 0) {
+      z = F.succ(z)
+      w = w - 1
+    }
+    z
+  }
 
+  def predn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
+    var w = n
+    var z = a
+    while(w < 0) {
+      z = F.succ(z)
+      w = w + 1
+    }
+    while(w > 0) {
+      z = F.pred(z)
+      w = w - 1
+    }
+    z
+  }
   ////
 }
-

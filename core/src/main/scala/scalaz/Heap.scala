@@ -70,7 +70,7 @@ sealed trait Heap[A] {
 
   def toUnsortedStream: Stream[A] = fold(Stream(), (_, _, t) => t.flatten.map(_.value))
 
-  def toUnsortedList: List[A] = toStream.toList
+  def toUnsortedList: List[A] = toUnsortedStream.toList
 
   def toStream: Stream[A] =
     std.stream.unfold(this)(_.uncons)
@@ -84,7 +84,7 @@ sealed trait Heap[A] {
 
   def exists(f: A => Boolean) = toStream.exists(f)
 
-  def foreach(f: A => Boolean) = toStream.foreach(f)
+  def foreach(f: A => Unit) = toStream.foreach(f)
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
@@ -225,7 +225,7 @@ object Heap extends HeapFunctions with HeapInstances {
 
     def rootZ[A]: ForestZipper[A] => A = {
       case (_, x #:: _) => x.rootLabel.value
-      case _            => sys.error("Heap.rootZ: emptyEphemeralStream zipper")
+      case _            => sys.error("Heap.rootZ: empty zipper")
     }
 
     def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)

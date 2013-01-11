@@ -112,9 +112,9 @@ sealed trait IterateeT[E, F[_], A] {
     loop(this)
   }
 
-  def up[G[_]](implicit G: Pointed[G], F: Functor[F], FC: Copointed[F]): IterateeT[E, G, A] = {
+  def up[G[_]](implicit G: Applicative[G], F: Comonad[F]): IterateeT[E, G, A] = {
     mapI(new (F ~> G) {
-      def apply[A](a: F[A]) = G.point(FC.copoint(a))
+      def apply[A](a: F[A]) = G.point(F.copoint(a))
     })
   }
 
@@ -215,10 +215,10 @@ trait IterateeTFunctions {
     val value = s
   }
 
-  def cont[E, F[_] : Pointed, A](c: Input[E] => IterateeT[E, F, A]): IterateeT[E, F, A] =
+  def cont[E, F[_] : Applicative, A](c: Input[E] => IterateeT[E, F, A]): IterateeT[E, F, A] =
     StepT.scont(c).pointI
 
-  def done[E, F[_] : Pointed, A](d: => A, r: => Input[E]): IterateeT[E, F, A] =
+  def done[E, F[_] : Applicative, A](d: => A, r: => Input[E]): IterateeT[E, F, A] =
     StepT.sdone(d, r).pointI
     
   /**
@@ -230,24 +230,24 @@ trait IterateeTFunctions {
   }
 
   /**
-   * An iteratee that consumes all of the input into something that is PlusEmpty and Pointed.
+   * An iteratee that consumes all of the input into something that is PlusEmpty and Applicative.
    */
-  def consume[E, F[_]: Monad, A[_]: PlusEmpty : Pointed]: IterateeT[E, F, A[E]] = {
+  def consume[E, F[_]: Monad, A[_]: PlusEmpty : Applicative]: IterateeT[E, F, A[E]] = {
     import scalaz.syntax.plus._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
       e.fold(empty = cont(step)
-        , el = e => cont(step).map(a => Pointed[A].point(e) <+> a)
+        , el = e => cont(step).map(a => Applicative[A].point(e) <+> a)
         , eof = done(PlusEmpty[A].empty, eofInput[E])
       )   
 
     cont(step)
   }
 
-  def collectT[E, F[_], A[_]](implicit M: Monad[F], mae: Monoid[A[E]], pointed: Pointed[A]): IterateeT[E, F, A[E]] = {
+  def collectT[E, F[_], A[_]](implicit M: Monad[F], mae: Monoid[A[E]], pointed: Applicative[A]): IterateeT[E, F, A[E]] = {
     import scalaz.syntax.semigroup._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
       e.fold(empty = cont(step)
-        , el = e => cont(step).map(a => Pointed[A].point(e) |+| a)
+        , el = e => cont(step).map(a => Applicative[A].point(e) |+| a)
         , eof = done(Monoid[A[E]].zero, eofInput[E])
       )   
 
@@ -255,7 +255,7 @@ trait IterateeTFunctions {
   }
 
   /**An iteratee that consumes the head of the input **/
-  def head[E, F[_] : Pointed]: IterateeT[E, F, Option[E]] = {
+  def head[E, F[_] : Applicative]: IterateeT[E, F, Option[E]] = {
     def step(s: Input[E]): IterateeT[E, F, Option[E]] =
       s(empty = cont(step)
         , el = e => done(Some(e), emptyInput[E])
@@ -272,7 +272,7 @@ trait IterateeTFunctions {
   }
 
   /**An iteratee that returns the first element of the input **/
-  def peek[E, F[_] : Pointed]: IterateeT[E, F, Option[E]] = {
+  def peek[E, F[_] : Applicative]: IterateeT[E, F, Option[E]] = {
     def step(s: Input[E]): IterateeT[E, F, Option[E]]
     = s(el = e => done(Some(e), s),
       empty = cont(step),
@@ -288,7 +288,7 @@ trait IterateeTFunctions {
   }
 
   /**An iteratee that skips the first n elements of the input **/
-  def drop[E, F[_] : Pointed](n: Int): IterateeT[E, F, Unit] = {
+  def drop[E, F[_] : Applicative](n: Int): IterateeT[E, F, Unit] = {
     def step(s: Input[E]): IterateeT[E, F, Unit] =
       s(el = _ => drop(n - 1),
         empty = cont(step),
@@ -300,7 +300,7 @@ trait IterateeTFunctions {
   /**
    * An iteratee that skips elements while the predicate evaluates to true.
    */
-  def dropWhile[E, F[_] : Pointed](p: E => Boolean): IterateeT[E, F, Unit] = {
+  def dropWhile[E, F[_] : Applicative](p: E => Boolean): IterateeT[E, F, Unit] = {
     def step(s: Input[E]): IterateeT[E, F, Unit] =
       s(el = e => if (p(e)) dropWhile(p) else done((), s),
         empty = cont(step),
@@ -311,9 +311,9 @@ trait IterateeTFunctions {
   /**
    * An iteratee that skips elements until the predicate evaluates to true.
    */
-  def dropUntil[E, F[_] : Pointed](p: E => Boolean): IterateeT[E, F, Unit] = dropWhile(!p(_))
+  def dropUntil[E, F[_] : Applicative](p: E => Boolean): IterateeT[E, F, Unit] = dropWhile(!p(_))
 
-  def fold[E, F[_] : Pointed, A](init: A)(f: (A, E) => A): IterateeT[E, F, A] = {
+  def fold[E, F[_] : Applicative, A](init: A)(f: (A, E) => A): IterateeT[E, F, A] = {
     def step(acc: A): Input[E] => IterateeT[E, F, A] = s =>
       s(el = e => cont(step(f(acc, e))),
         empty = cont(step(acc)),
@@ -332,15 +332,15 @@ trait IterateeTFunctions {
   /**
    * An iteratee that counts and consumes the elements of the input
    */
-  def length[E, F[_] : Pointed]: IterateeT[E, F, Int] = fold(0)((a, _) => a + 1)
+  def length[E, F[_] : Applicative]: IterateeT[E, F, Int] = fold(0)((a, _) => a + 1)
 
   /**
    * An iteratee that checks if the input is EOF.
    */
-  def isEof[E, F[_] : Pointed]: IterateeT[E, F, Boolean] = cont(in => done(in.isEof, in))
+  def isEof[E, F[_] : Applicative]: IterateeT[E, F, Boolean] = cont(in => done(in.isEof, in))
 
   def sum[E: Monoid, F[_]: Monad]: IterateeT[E, F, E] =
-    foldM[E, F, E](Monoid[E].zero)((a, e) => Pointed[F].point(Monoid[E].append(a, e)))
+    foldM[E, F, E](Monoid[E].zero)((a, e) => Applicative[F].point(Monoid[E].append(a, e)))
 }
 
 //

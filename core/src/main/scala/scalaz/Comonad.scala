@@ -5,10 +5,15 @@ package scalaz
  *
  */
 ////
-trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
+trait Comonad[F[_]] extends Cojoin[F] with Cobind[F] { self =>
   ////
+  /** Also known as `extract` / `copure` */
+  def copoint[A](p: F[A]): A
 
   // derived functions
+
+  /** alias for `copoint` */
+  def copure[A](p: F[A]): A = copoint(p)
   trait ComonadLaws {
     def cobindLeftIdentity[A](fa: F[A])(implicit F: Equal[F[A]]): Boolean =
       F.equal(cobind(fa)(copoint), fa)
@@ -16,8 +21,8 @@ trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
       F.equal(copoint(cobind(fa)(f)), f(fa))
     def cobindAssociative[A, B, C, D](fa: F[A], f: F[A] => B, g: F[B] => C, h: F[C] => D)(implicit F: Equal[D]): Boolean = {
       implicit val C = self
-      val d1 = (CoKleisli(f) =>= CoKleisli(g) =>= CoKleisli(h)) run fa
-      val d2 = (CoKleisli(f) =>= (CoKleisli(g) =>= CoKleisli(h))) run fa
+      val d1 = (Cokleisli(f) =>= Cokleisli(g) =>= Cokleisli(h)) run fa
+      val d2 = (Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h))) run fa
       F.equal(d1, d2)
     }
 
@@ -26,7 +31,7 @@ trait Comonad[F[_]] extends Copointed[F] with Cojoin[F] with Cobind[F] { self =>
   def comonadLaw = new ComonadLaws {}
 
   ////
-  val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] {}
+  val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] { def F = Comonad.this }
 }
 
 object Comonad {
@@ -36,4 +41,3 @@ object Comonad {
 
   ////
 }
-

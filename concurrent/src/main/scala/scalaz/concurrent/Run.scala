@@ -13,7 +13,7 @@ trait Run[F]  { self =>
   // derived functions
   def contramap[B](f: B => F): Run[B] = new Run[B] {
     def run(a: B) = self.run(f(a))
-    def strategy: Strategy = strategy
+    def strategy: Strategy = self.strategy
   }
 }
 

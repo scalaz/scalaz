@@ -12,7 +12,7 @@ trait Each[F[_]]  { self =>
   // derived functions
 
   ////
-  val eachSyntax = new scalaz.syntax.EachSyntax[F] {}
+  val eachSyntax = new scalaz.syntax.EachSyntax[F] { def F = Each.this }
 }
 
 object Each {
@@ -22,4 +22,3 @@ object Each {
 
   ////
 }
-

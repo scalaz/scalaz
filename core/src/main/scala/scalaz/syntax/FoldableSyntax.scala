@@ -14,8 +14,6 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def foldl[B](z: B)(f: B => A => B): B = F.foldl(self, z)(f)
   final def foldrM[G[_], B](z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldrM(self, z)(f)
   final def foldlM[G[_], B](z: B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] = F.foldlM(self, z)(f)
-  final def foldr1(f: (A, => A) => A): Option[A] = F.foldr1(self)(f)
-  final def foldl1(f: (A, A) => A): Option[A] = F.foldl1(self)(f)
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
   final def suml(implicit A: Monoid[A]): A = F.foldLeft(self, A.zero)(A.append(_, _))
   final def toList: List[A] = F.toList(self)
@@ -23,9 +21,11 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
+  final def ∀(p: A => Boolean): Boolean = F.all(self)(p)
   final def allM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.allM(self)(p)
   final def anyM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.anyM(self)(p)
   final def any(p: A => Boolean): Boolean = F.any(self)(p)
+  final def ∃(p: A => Boolean): Boolean = F.any(self)(p)
   final def count: Int = F.count(self)
   final def maximum(implicit A: Order[A]): Option[A] = F.maximum(self)
   final def minimum(implicit A: Order[A]): Option[A] = F.minimum(self)
@@ -36,6 +36,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def selectSplit(p: A => Boolean): List[List[A]] = F.selectSplit(self)(p)
   final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)
+  final def intercalate(a: A)(implicit A: Monoid[A]): A = F.intercalate(self, a)
   final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
 
   ////
@@ -57,8 +58,9 @@ trait ToFoldableOps extends ToFoldableOps0 {
 }
 
 trait FoldableSyntax[F[_]]  {
-  implicit def ToFoldableOps[A](v: F[A])(implicit F0: Foldable[F]): FoldableOps[F, A] = new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = F0 }
+  implicit def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] = new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = FoldableSyntax.this.F }
 
+  def F: Foldable[F]
   ////
 
   ////

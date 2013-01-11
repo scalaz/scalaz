@@ -38,8 +38,9 @@ trait ToBitraverseOps extends ToBitraverseOps0 with ToBifunctorOps with ToBifold
 }
 
 trait BitraverseSyntax[F[_, _]] extends BifunctorSyntax[F] with BifoldableSyntax[F] {
-  implicit def ToBitraverseOps[A, B](v: F[A, B])(implicit F0: Bitraverse[F]): BitraverseOps[F, A, B] = new BitraverseOps[F, A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
+  implicit def ToBitraverseOps[A, B](v: F[A, B]): BitraverseOps[F, A, B] = new BitraverseOps[F, A, B] { def self = v; implicit def F: Bitraverse[F] = BitraverseSyntax.this.F }
 
+  def F: Bitraverse[F]
   ////
 
   ////

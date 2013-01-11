@@ -296,8 +296,8 @@ addDebugger () {
   addJava "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$1"
 }
 get_jvm_opts () {
-  # echo "${JAVA_OPTS:-$default_jvm_opts}"
-  # echo "${SBT_OPTS:-$default_sbt_opts}"
+  echo "${JAVA_OPTS:-$default_jvm_opts}"
+  echo "${SBT_OPTS:-$default_sbt_opts}"
 
   [[ -f "$jvm_opts_file" ]] && cat "$jvm_opts_file"
 }

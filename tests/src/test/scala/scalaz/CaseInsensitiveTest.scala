@@ -6,12 +6,12 @@ import scalaz.scalacheck.ScalazArbitrary._
 
 class CaseInsensitiveTest extends Spec {
 
-  "map identity" ! check {
+  "map identity" ! prop {
     (a: CaseInsensitive[String]) =>
       Equal[CaseInsensitive[String]].equal(a.map(x => x), a)
   }
   
-  "map associativity" ! check {
+  "map associativity" ! prop {
     (a: CaseInsensitive[String], f: String => String, g: String => String) =>
       Equal[CaseInsensitive[String]].equal(a.map(f).map(g), a.map(g compose f))
   }

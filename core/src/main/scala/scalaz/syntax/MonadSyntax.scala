@@ -33,8 +33,9 @@ trait ToMonadOps extends ToMonadOps0 with ToApplicativeOps with ToBindOps {
 }
 
 trait MonadSyntax[F[_]] extends ApplicativeSyntax[F] with BindSyntax[F] {
-  implicit def ToMonadOps[A](v: F[A])(implicit F0: Monad[F]): MonadOps[F, A] = new MonadOps[F,A] { def self = v; implicit def F: Monad[F] = F0 }
+  implicit def ToMonadOps[A](v: F[A]): MonadOps[F, A] = new MonadOps[F,A] { def self = v; implicit def F: Monad[F] = MonadSyntax.this.F }
 
+  def F: Monad[F]
   ////
 
   ////

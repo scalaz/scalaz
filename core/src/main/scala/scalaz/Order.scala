@@ -54,17 +54,14 @@ trait Order[F] extends Equal[F] { self =>
   def orderLaw = new OrderLaw {}
 
   ////
-  val orderSyntax = new scalaz.syntax.OrderSyntax[F] {}
+  val orderSyntax = new scalaz.syntax.OrderSyntax[F] { def F = Order.this }
 }
 
 object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
-  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = f(a1, a2)
-  }
-
   ////
+
   implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
     def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
   }
@@ -74,6 +71,10 @@ object Order {
   }
 
   def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
+
+  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
+    def order(a1: A, a2: A) = f(a1, a2)
+  }
 
   implicit def orderMonoid[A] = new Monoid[Order[A]] {
     def zero: Order[A] = new Order[A] {
@@ -86,4 +87,3 @@ object Order {
 
   ////
 }
-

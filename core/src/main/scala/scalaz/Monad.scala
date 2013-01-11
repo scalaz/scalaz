@@ -26,7 +26,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
     l match {
       case Nil => point(List())
-      case h :: t => bind(f(h))(b => filterM(if (b) h::t else t)(f))
+      case h :: t => bind(f(h))(b => map(filterM(t)(f))(t => if (b) h :: t else t))
     }
 
   trait MonadLaw extends ApplicativeLaw {
@@ -44,7 +44,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   }
   def monadLaw = new MonadLaw {}
   ////
-  val monadSyntax = new scalaz.syntax.MonadSyntax[F] {}
+  val monadSyntax = new scalaz.syntax.MonadSyntax[F] { def F = Monad.this }
 }
 
 object Monad {
@@ -54,4 +54,3 @@ object Monad {
 
   ////
 }
-

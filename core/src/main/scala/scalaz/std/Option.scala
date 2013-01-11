@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with ApplicativePlus[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -30,12 +30,12 @@ trait OptionInstances extends OptionInstances0 {
       case Some(a) => f(a, z)
       case None    => z
     }
-    def cozip[A, B](a: Option[Either[A, B]]) =
+    def cozip[A, B](a: Option[A \/ B]) =
       a match {
-        case None => Left(None)
+        case None => -\/(None)
         case Some(e) => e match {
-          case Left(a) => Left(Some(a))
-          case Right(b) => Right(Some(b))
+          case -\/(a) => -\/(Some(a))
+          case \/-(b) => \/-(Some(b))
         }
       }
     def zip[A, B](a: => Option[A], b: => Option[B]) =
@@ -49,6 +49,7 @@ trait OptionInstances extends OptionInstances0 {
         case Some((a, b)) => (Some(a), Some(b))
       }
 
+    def isEmpty[A](opt: Option[A]) = opt.isEmpty
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
@@ -73,71 +74,69 @@ trait OptionInstances extends OptionInstances0 {
     }
   }
 
-  import Tags.{First, Last, Min, Max}
+  implicit def optionFirst[A] = new Monoid[FirstOption[A]] {
+    def zero: FirstOption[A] = Tag(None)
 
-  implicit def optionFirst[A] = new Monoid[Option[A] @@ First] {
-    def zero: Option[A] @@ First = Tag(None)
-
-    def append(f1: Option[A] @@ First, f2: => Option[A] @@ First) = Tag(f1.orElse(f2))
+    def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(f1.orElse(f2))
   }
 
-  implicit def optionFirstShow[A: Show]: Show[Option[A] @@ First] = Tag.subst(Show[Option[A]])
+  implicit def optionFirstShow[A: Show]: Show[FirstOption[A]] = Tag.subst(Show[Option[A]])
 
-  implicit def optionFirstOrder[A: Order]: Order[Option[A] @@ First] = Tag.subst(Order[Option[A]])
+  implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionFirstMonad[A]: Monad[({type f[x] = Option[x] @@ First})#f] = new Monad[({type f[x] = Option[x] @@ First})#f] {
-    def point[A](a: => A): (Option[A] @@ Tags.First) = Tag(Some(a))
-    override def map[A, B](fa: Option[A] @@ First)(f: (A) => B) = Tag(fa map f)
-    def bind[A, B](fa: (Option[A] @@ Tags.First))(f: (A) => (Option[B] @@ Tags.First)): (Option[B] @@ Tags.First) = Tag(fa flatMap f)
+  implicit def optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
+    def point[A](a: => A): FirstOption[A] = Tag(Some(a))
+    override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
+    def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
   }
 
 
-  implicit def optionLast[A] = new Monoid[Option[A] @@ Last] {
-    def zero: Option[A] @@ Last = Tag(None)
+  implicit def optionLast[A] = new Monoid[LastOption[A]] {
+    def zero: LastOption[A] = Tag(None)
 
-    def append(f1: Option[A] @@ Last, f2: => Option[A] @@ Last) = Tag(f2.orElse(f1))
+    def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(f2.orElse(f1))
   }
 
-  implicit def optionLastShow[A: Show]: Show[Option[A] @@ Last] = Tag.subst(Show[Option[A]])
+  implicit def optionLastShow[A: Show]: Show[LastOption[A]] = Tag.subst(Show[Option[A]])
 
-  implicit def optionLastOrder[A: Order]: Order[Option[A] @@ Last] = Tag.subst(Order[Option[A]])
+  implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastMonad[A]: Monad[({type f[x] = Option[x] @@ Last})#f] = new Monad[({type f[x] = Option[x] @@ Last})#f] {
-    def point[A](a: => A): (Option[A] @@ Tags.Last) = Tag(Some(a))
-    override def map[A, B](fa: Option[A] @@ Last)(f: (A) => B) = Tag(fa map f)
-    def bind[A, B](fa: (Option[A] @@ Tags.Last))(f: (A) => (Option[B] @@ Tags.Last)): (Option[B] @@ Tags.Last) = Tag(fa flatMap f)
+  implicit def optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
+    def point[A](a: => A): LastOption[A] = Tag(Some(a))
+    override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
+    def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)
   }
 
-  implicit def optionMin[A](implicit o: Order[A]) = new Monoid[Option[A] @@ Min] {
-    def zero: Option[A] @@ Min = Tag(None)
+  implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
+    def zero: MinOption[A] = Tag(None)
 
-    def append(f1: Option[A] @@ Min, f2: => Option[A] @@ Min) = Tag(Order[Option[A]].min(f1, f2))
+    def append(f1: MinOption[A], f2: => MinOption[A]) = Tag(Order[Option[A]].min(f1, f2))
   }
 
-  implicit def optionMinShow[A: Show]: Show[Option[A] @@ Min] = Tag.subst(Show[Option[A]])
+  implicit def optionMinShow[A: Show]: Show[MinOption[A]] = Tag.subst(Show[Option[A]])
 
-  implicit def optionMinOrder[A: Order]: Order[Option[A] @@ Min] = Tag.subst(Order[Option[A]])
+  implicit def optionMinOrder[A: Order]: Order[MinOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionMinMonad[A]: Monad[({type f[x] = Option[x] @@ Min})#f] = new Monad[({type f[x] = Option[x] @@ Min})#f] {
-    def point[A](a: => A): (Option[A] @@ Tags.Min) = Tag(Some(a))
-    override def map[A, B](fa: Option[A] @@ Min)(f: (A) => B) = Tag(fa map f)
-    def bind[A, B](fa: (Option[A] @@ Tags.Min))(f: (A) => (Option[B] @@ Tags.Min)): (Option[B] @@ Tags.Min) = Tag(fa flatMap f)
+  implicit def optionMinMonad: Monad[MinOption] = new Monad[MinOption] {
+    def point[A](a: => A): MinOption[A] = Tag(Some(a))
+    override def map[A, B](fa: MinOption[A])(f: A => B) = Tag(fa map f)
+    def bind[A, B](fa: MinOption[A])(f: A => MinOption[B]): MinOption[B] = Tag(fa flatMap f)
   }
 
-  implicit def optionMax[A](implicit o: Order[A]) = new Monoid[Option[A] @@ Max] {
-    def zero: Option[A] @@ Max = Tag(None)
+  implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
+    def zero: MaxOption[A] = Tag(None)
 
-    def append(f1: Option[A] @@ Max, f2: => Option[A] @@ Max) = Tag(Order[Option[A]].max(f1, f2))
+    def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag(Order[Option[A]].max(f1, f2))
   }
 
-  implicit def optionMaxShow[A: Show]: Show[Option[A] @@ Max] = Tag.subst(Show[Option[A]])
+  implicit def optionMaxShow[A: Show]: Show[MaxOption[A]] = Tag.subst(Show[Option[A]])
 
-  implicit def optionMaxOrder[A: Order]: Order[Option[A] @@ Max] = Tag.subst(Order[Option[A]])
+  implicit def optionMaxOrder[A: Order]: Order[MaxOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionMaxMonad[A]: Monad[({type f[x] = Option[x] @@ Max})#f] = new Monad[({type f[x] = Option[x] @@ Max})#f] {
-    def point[A](a: => A): (Option[A] @@ Tags.Max) = Tag(Some(a))
-    override def map[A, B](fa: Option[A] @@ Max)(f: (A) => B) = Tag(fa map f)
-    def bind[A, B](fa: (Option[A] @@ Tags.Max))(f: (A) => (Option[B] @@ Tags.Max)): (Option[B] @@ Tags.Max) = Tag(fa flatMap f)
+  implicit def optionMaxMonad: Monad[MaxOption] = new Monad[MaxOption] {
+    def point[A](a: => A): MaxOption[A] = Tag(Some(a))
+    override def map[A, B](fa: MaxOption[A])(f: A => B) = Tag(fa map f)
+    def bind[A, B](fa: MaxOption[A])(f: A => MaxOption[B]): MaxOption[B] = Tag(fa flatMap f)
   }
 }
 
@@ -168,21 +167,31 @@ trait OptionFunctions {
     case None    => Success(b)
   }
 
+  final def toRight[A, E](oa: Option[A])(e: => E): E \/ A = oa match {
+    case Some(a) => \/-(a)
+    case None    => -\/(e)
+  }
+
+  final def toLeft[A, B](oa: Option[A])(b: => B): A \/ B = oa match {
+    case Some(a) => -\/(a)
+    case None    => \/-(b)
+  }
+
   /**
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
    */
-  final def orEmpty[A, M[_] : Pointed : PlusEmpty](oa: Option[A]): M[A] = oa match {
-    case Some(a) => Pointed[M].point(a)
+  final def orEmpty[A, M[_] : Applicative : PlusEmpty](oa: Option[A]): M[A] = oa match {
+    case Some(a) => Applicative[M].point(a)
     case None    => PlusEmpty[M].empty
   }
 
   /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
-  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Pointed[F]): B = oa match {
+  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Applicative[F]): B = oa match {
     case None    => b
-    case Some(a) => k(Pointed[F].point(a))
+    case Some(a) => k(Applicative[F].point(a))
   }
 
   /**

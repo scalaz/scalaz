@@ -29,7 +29,7 @@ object MixedBag extends App {
     import std.list._
     import syntax.traverse._
 
-    //    val xs: Option[List[Int]] = (1 to 100000 toList).traverse(x => some(x * 2))
+    //    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
     //    println(xs map (_ take 10))
     ()
   }
@@ -39,8 +39,8 @@ object MixedBag extends App {
     import std.stream._
     import syntax.traverse._
 
-    (1 to 100000 toStream).traverse(x => none[Int])
-    //    (1 to 100000 toStream).traverse(x => some(x * 2))
+    (1 to 100000).toStream.traverse(x => none[Int])
+    //    (1 to 100000).toStream.traverse(x => some(x * 2))
     ()
   }
 
@@ -69,7 +69,7 @@ object MixedBag extends App {
     val f = kleisli((i: Int) => some(i))
     f map (i => i * 2) map (x => println(x)) run 3
 
-    val K = Kleisli.kleisliArrId[Option] // or, Arr[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
+    val K = Arrow[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
@@ -93,8 +93,8 @@ object MixedBag extends App {
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
-        case Right(a)     => DList(a).tell
-        case Left((x, y)) => flatten(x) >> flatten(y)
+        case \/-(a)     => DList(a).tell
+        case -\/((x, y)) => flatten(x) >> flatten(y)
       }
       flatten(t).run._1
     }

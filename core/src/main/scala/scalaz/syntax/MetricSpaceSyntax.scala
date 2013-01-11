@@ -19,8 +19,9 @@ trait ToMetricSpaceOps  {
 }
 
 trait MetricSpaceSyntax[F]  {
-  implicit def ToMetricSpaceOps(v: F)(implicit F0: MetricSpace[F]): MetricSpaceOps[F] = new MetricSpaceOps[F] { def self = v; implicit def F: MetricSpace[F] = F0 }
-
+  implicit def ToMetricSpaceOps(v: F): MetricSpaceOps[F] = new MetricSpaceOps[F] { def self = v; implicit def F: MetricSpace[F] = MetricSpaceSyntax.this.F }
+  
+  def F: MetricSpace[F]
   ////
 
   ////

@@ -172,7 +172,7 @@ in Scala flows from left-to-right, can require fewer type annotations.
   every possible extension method. This should also help compiler performance,
   by reducing the implicit search space.
 * Syntax is layered in the same way as type classes. Importing the syntax for, say, `Applicative`
-  will also provide the syntax for `Pointed` and `Functor`.
+  will also provide the syntax for `Apply` and `Functor`.
 
 Syntax can be imported in two ways. Firstly, the syntax specialized for a particular instance
 of a type class can be imported directly from the instance itself.

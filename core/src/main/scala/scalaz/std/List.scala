@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
 
 trait ListInstances0 {
@@ -10,7 +11,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] with Zip[List] with Unzip[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -48,7 +49,7 @@ trait ListInstances extends ListInstances0 {
       // }
 
       DList.fromList(l).foldr(F.point(List[B]())) {
-         (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+         (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
       }
     }
 
@@ -75,6 +76,7 @@ trait ListInstances extends ListInstances0 {
       r
     }
 
+    def isEmpty[A](fa: List[A]) = fa.isEmpty
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
@@ -89,7 +91,6 @@ trait ListInstances extends ListInstances0 {
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
     implicit def A = A0
   }
-
 }
 
 trait ListFunctions {
@@ -103,10 +104,6 @@ trait ListFunctions {
     }
     intersperse0(Nil, as).reverse
   }
-
-  /** Intersperse the elements of `as2` between every adjacent `as1`
-    * pair. */
-  final def intercalate[A](as1: List[List[A]], as2: List[A]): List[A] = intersperse(as1, as2).flatten
 
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None
@@ -136,13 +133,8 @@ trait ListFunctions {
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
-    case Nil    => Monad[M].point(Nil)
-    case h :: t => {
-      def g = filterM(t)(p)
-      Monad[M].bind(p(h))(b => if (b) Monad[M].map(g)(tt => h :: tt) else g)
-    }
-  }
+  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Monad[M].filterM(as)(p)
 
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil    => Monad[M].point(None: Option[A])
@@ -192,8 +184,15 @@ trait ListFunctions {
     }
   }
 
+<<<<<<< HEAD
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
+=======
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+
+
+>>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {

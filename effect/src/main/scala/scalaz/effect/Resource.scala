@@ -17,7 +17,7 @@ trait Resource[F]  { self =>
   }
 
   ////
-  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] {}
+  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
 }
 
 object Resource {
@@ -54,4 +54,3 @@ object Resource {
     }*/
   ////
 }
-

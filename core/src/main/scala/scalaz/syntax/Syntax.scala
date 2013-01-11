@@ -25,6 +25,8 @@ trait Syntaxes {
 
   object metricSpace extends ToMetricSpaceOps
 
+  object isEmpty extends ToIsEmptyOps
+
   object plusEmpty extends ToPlusEmptyOps
 
   object each extends ToEachOps
@@ -33,11 +35,7 @@ trait Syntaxes {
 
   object functor extends ToFunctorOps
 
-  object pointed extends ToPointedOps
-
   object contravariant extends ToContravariantOps
-
-  object copointed extends ToCopointedOps
 
   object apply extends ToApplyOps
 
@@ -61,6 +59,8 @@ trait Syntaxes {
 
   object traverse extends ToTraverseOps
 
+  object traverse1 extends ToTraverse1Ops
+
   object zip extends ToZipOps
 
   object unzip extends ToUnzipOps
@@ -79,14 +79,15 @@ trait Syntaxes {
 
   object category extends ToCategoryOps
 
-  object arrId extends ToArrIdOps
-
   object arrow extends ToArrowOps
 
   object choice extends ToChoiceOps
 
   object split extends ToSplitOps
 
+  object monadWriter extends ToMonadWriterOps
+
+  object listenableMonadWriter extends ToListenableMonadWriterOps
   //
   // Data
   //
@@ -102,6 +103,8 @@ trait Syntaxes {
   object state extends ToStateOps
 
   object foldable extends ToFoldableOps
+
+  object foldable1 extends ToFoldable1Ops
 
   object validation extends ToValidationOps
 
@@ -120,9 +123,9 @@ trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidatio
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToGroupOps with ToEqualOps with ToLengthOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
-  with ToFunctorOps with ToPointedOps with ToContravariantOps with ToCopointedOps with ToApplyOps
+  with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
-  with ToBitraverseOps with ToArrIdOps with ToComposeOps with ToCategoryOps
-  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps
+  with ToBitraverseOps with ToComposeOps with ToCategoryOps
+  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadWriterOps with ToListenableMonadWriterOps

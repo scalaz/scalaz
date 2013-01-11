@@ -12,7 +12,7 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   // derived functions
 
   ////
-  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] {}
+  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] { def F = MonadIO.this }
 }
 
 object MonadIO {
@@ -28,4 +28,3 @@ object MonadIO {
     }
   ////
 }
-

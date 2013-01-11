@@ -105,7 +105,7 @@ sealed trait Zipper[+A] {
   def insertRight[AA >: A](y: AA): Zipper[AA] = zipper(focus #:: lefts, y, rights)
 
   /**
-   * An alias for deleteRight
+   * An alias for `deleteRight`
    */
   def delete: Option[Zipper[A]] = deleteRight
 
@@ -113,12 +113,12 @@ sealed trait Zipper[+A] {
    * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
    * focus is moved to the right.
    */
-  def deleteLeft: Option[Zipper[A]] = rights match {
-    case Stream.Empty => None
-    case r #:: rs     => Some(lefts match {
-      case Stream.Empty => zipper(Stream.Empty, r, rs)
-      case l #:: ls     => zipper(ls, l, rights)
-    })
+  def deleteLeft: Option[Zipper[A]] = lefts match {
+    case l #:: ls     => Some(zipper(ls, l, rights))
+    case Stream.Empty => rights match {
+      case r #:: rs     => Some(zipper(Stream.empty, r, rs))
+      case Stream.Empty => None
+    }
   }
 
   /**
@@ -133,11 +133,11 @@ sealed trait Zipper[+A] {
    * focus is moved to the left.
    */
   def deleteRight: Option[Zipper[A]] = rights match {
-    case Stream.Empty => None
-    case r #:: rs     => Some(lefts match {
-      case Stream.Empty => zipper(Stream.Empty, r, rs)
-      case l #:: ls     => zipper(ls, l, rights)
-    })
+    case r #:: rs     => Some(zipper(lefts, r, rs))
+    case Stream.Empty => lefts match {
+      case l #:: ls     => Some(zipper(ls, l, Stream.empty))
+      case Stream.Empty => None
+    }
   }
 
   /**
@@ -293,14 +293,12 @@ sealed trait Zipper[+A] {
    * Deletes the focused element and moves focus to the left. If the focus was on the first element,
    * focus is moved to the last element.
    */
-  def deleteLeftC: Option[Zipper[A]] = rights match {
-    case Stream.Empty => None
-    case _ #:: _ => Some(lefts match {
-      case l #:: ls     => zipper(ls, l, rights)
-      case Stream.Empty =>
-        val r = rights.reverse
-        zipper(r.tail, r.head, Stream.Empty)
-    })
+  def deleteLeftC: Option[Zipper[A]] = lefts match {
+    case l #:: ls     => Some(zipper(ls, l, rights))
+    case Stream.Empty => rights match {
+      case _ #:: _      => val rrev = rights.reverse; Some(zipper(rrev.tail, rrev.head, Stream.empty))
+      case Stream.Empty => None
+    }
   }
 
   /**
@@ -314,15 +312,18 @@ sealed trait Zipper[+A] {
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
    * focus is moved to the first element.
    */
-  def deleteRightC: Option[Zipper[A]] = lefts match {
-    case Stream.Empty => None
-    case _ #:: _      => Some(rights match {
-      case r #:: rs     => zipper(lefts, r, rs)
-      case Stream.Empty =>
-        val l = lefts.reverse
-        zipper(Stream.Empty, l.head, l.tail)
-    })
+  def deleteRightC: Option[Zipper[A]] = rights match {
+    case r #:: rs     => Some(zipper(lefts, r, rs))
+    case Stream.Empty => lefts match {
+      case _ #:: _      => val lrev = lefts.reverse; Some(zipper(Stream.empty, lrev.head, lrev.tail))
+      case Stream.Empty => None
+    }
   }
+
+  /**
+   * An alias for `deleteRightC`
+   */
+  def deleteC: Option[Zipper[A]] = deleteRightC
 
   /**
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
@@ -330,11 +331,6 @@ sealed trait Zipper[+A] {
    */
   def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteRightC getOrElse z
-
-  /**
-   * An alias for deleteRightC
-   */
-  def deleteC: Option[Zipper[A]] = deleteRightC
 
   def traverse[G[_] : Applicative, B](f: (A) => G[B]): G[Zipper[B]] = {
     val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried

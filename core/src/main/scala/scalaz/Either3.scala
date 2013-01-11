@@ -10,16 +10,16 @@ sealed trait Either3[+A, +B, +C] {
     case Right3(c)  => right(c)
   }
 
-  def eitherLeft:  Either[Either[A, B], C] = this match {
-    case Left3(a)   => Left(Left(a))
-    case Middle3(b) => Left(Right(b))
-    case Right3(c)  => Right(c)
+  def eitherLeft: (A \/ B) \/ C = this match {
+    case Left3(a)   => -\/(-\/(a))
+    case Middle3(b) => -\/(\/-(b))
+    case Right3(c)  => \/-(c)
   }
 
-  def eitherRight: Either[A, Either[B, C]] = this match {
-    case Left3(a)   => Left(a)
-    case Middle3(b) => Right(Left(b))
-    case Right3(c)  => Right(Right(c))
+  def eitherRight: A \/ (B \/ C) = this match {
+    case Left3(a)   => -\/(a)
+    case Middle3(b) => \/-(-\/(b))
+    case Right3(c)  => \/-(\/-(c))
   }
 
   def leftOr[Z](z: => Z)(f: A => Z)   = fold(f, _ => z, _ => z)

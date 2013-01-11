@@ -17,17 +17,29 @@ trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Copointed[Function0] {
+  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Comonad[Function0] with Distributive[Function0] {
     def point[A](a: => A) = () => a
 
     def copoint[A](p: () => A) = p()
 
-    def bind[A, B](fa: () => A)(f: (A) => () => B) = f(fa())
+    def cobind[A, B](fa: Function0[A])(f: Function0[A] => B) =
+      () => f(fa)
+
+    def cojoin[A](a: Function0[A]): Function0[Function0[A]] =
+      () => a
+
+    def bind[A, B](fa: () => A)(f: (A) => () => B) = () => f(fa())()
+
+    override def map[A,B](fa: () => A)(f: A => B) = () => f(fa())
 
     def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
     override def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
+
+    def distributeImpl[G[_], A, B](fa: G[A])(f: A => () => B
+                                 )(implicit G: Functor[G]): () => G[B] =
+      () => G.map(fa)(a => f(a)())
   }
 
   implicit def function0Equal[R: Equal] = new Equal[() => R] {
@@ -43,9 +55,9 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def id[A]: (A) => A = a => a
 
-    def choice[A, B, C](f: => A => C, g: => B => C): Either[A,  B] => C = {
-      case Left(a) => f(a)
-      case Right(b) => g(b)
+    def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
+      case -\/(a) => f(a)
+      case \/-(b) => g(b)
     }
     
     def split[A, B, C, D](f: A => B, g: C => D): ((A,  C)) => (B, D) = {

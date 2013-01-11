@@ -28,8 +28,9 @@ trait ToMonadIOOps extends ToMonadIOOps0 with ToLiftIOOps with ToMonadOps {
 }
 
 trait MonadIOSyntax[F[_]] extends LiftIOSyntax[F] with MonadSyntax[F] {
-  implicit def ToMonadIOOps[A](v: F[A])(implicit F0: MonadIO[F]): MonadIOOps[F, A] = new MonadIOOps[F,A] { def self = v; implicit def F: MonadIO[F] = F0 }
+  implicit def ToMonadIOOps[A](v: F[A]): MonadIOOps[F, A] = new MonadIOOps[F,A] { def self = v; implicit def F: MonadIO[F] = MonadIOSyntax.this.F }
 
+  def F: MonadIO[F]
   ////
 
   ////

@@ -38,18 +38,10 @@ trait ReaderWriterStateTFunctions {
 
 }
 
-trait ReaderWriterStateTInstances1 {
+trait ReaderWriterStateTInstances0 {
   implicit def rwstFunctor[F[+_], R, W, S](implicit F0: Functor[F]): Functor[({type λ[+α] = ReaderWriterStateT[F, R, W, S, α]})#λ] =
     new ReaderWriterStateTFunctor[F, R, W, S] {
       implicit def F = F0
-    }
-}
-
-trait ReaderWriterStateTInstances0 extends ReaderWriterStateTInstances1 {
-  implicit def rwstPointed[F[+_], R, W, S](implicit W0: Monoid[W], F0: Pointed[F]): Pointed[({type λ[+α] = ReaderWriterStateT[F, R, W, S, α]})#λ] =
-    new ReaderWriterStateTPointed[F, R, W, S] {
-      implicit def F = F0
-      implicit def W = W0
     }
 }
 
@@ -60,26 +52,29 @@ trait ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 {
       implicit def F = F0
       implicit def W = W0
     }
+
+  implicit def rwstMonadTrans[R, W, S](implicit W0: Monoid[W]): MonadTrans[({type λ[α[+_], β] = ReaderWriterStateT[α, R, W, S, β]})#λ] = 
+    new ReaderWriterStateTMonadTrans[R, W, S] {
+      implicit def W = W0
+    }
+
 }
 
-trait ReaderWriterStateTFunctor[F[+_], R, W, S] extends Functor[({type λ[+α]=ReaderWriterStateT[F, R, W, S, α]})#λ] {
+private[scalaz] trait ReaderWriterStateTFunctor[F[+_], R, W, S] extends Functor[({type λ[+α]=ReaderWriterStateT[F, R, W, S, α]})#λ] {
   implicit def F: Functor[F]
   override def map[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => B) = fa map f
 }
 
-trait ReaderWriterStateTPointed[F[+_], R, W, S] extends Pointed[({type λ[α]=ReaderWriterStateT[F, R, W, S, α]})#λ] with ReaderWriterStateTFunctor[F, R, W, S] {
-  implicit def F: Pointed[F]
-  implicit def W: Monoid[W]
-  def point[A](a: => A) = ReaderWriterStateT((r, s) => F.point((W.zero, a, s)))
-}
-
-trait ReaderWriterStateTMonadReader[F[+_], R, W, S]
+private[scalaz] trait ReaderWriterStateTMonadReader[F[+_], R, W, S]
   extends MonadReader[({type λ[r, α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R]
   with MonadState[({type f[s, a] = ReaderWriterStateT[F, R, W, s, a]})#f, S]
-  with ReaderWriterStateTPointed[F, R, W, S] {
+  with ReaderWriterStateTFunctor[F, R, W, S] {
   implicit def F: Monad[F]
+  implicit def W: Monoid[W]
 
   def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => ReaderWriterStateT[F, R, W, S, B]) = fa flatMap f
+  def point[A](a: => A) =
+    ReaderWriterStateT((r, s) => F.point((W.zero, a, s)))
   def ask: ReaderWriterStateT[F, R, W, S, R] =
     ReaderWriterStateT((r, s) => F.point((W.zero, r, s)))
   def local[A](f: (R) => R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
@@ -88,4 +83,17 @@ trait ReaderWriterStateTMonadReader[F[+_], R, W, S]
     ReaderWriterStateT((r, s) => F.point((W.zero, s, s)))
   def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
     ReaderWriterStateT((r, _) => F.point((W.zero, (), s)))
+}
+
+private[scalaz] trait ReaderWriterStateTMonadTrans[R, W, S] extends MonadTrans[({type λ[α[+_], β] = ReaderWriterStateT[α, R, W, S, β]})#λ] {
+  implicit def W: Monoid[W]
+  
+  def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = ReaderWriterStateT[M, R, W, S, α]})#λ ~> ({type λ[α] = ReaderWriterStateT[N, R, W, S, α]})#λ) {
+    def apply[A](ma: ReaderWriterStateT[M, R, W, S, A]): ReaderWriterStateT[N, R, W, S, A] = ReaderWriterStateT{ case (r,s) => f.apply(ma.run(r,s))}
+  }
+
+  def liftM[M[+_], A](ma: M[A])(implicit M: Monad[M]): ReaderWriterStateT[M, R, W, S, A] = {
+    ReaderWriterStateT( (r,s) => M.map(ma)((W.zero, _, s)))
+  }
+  implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = ReaderWriterStateT[M, R, W, S, α]})#λ] = ReaderWriterStateT.rwstMonad
 }

@@ -11,7 +11,11 @@ trait BindOps[F[_],A] extends Ops[F[A]] {
 
   def >>=[B](f: A => F[B]) = F.bind(self)(f)
 
+  def ∗[B](f: A => F[B]) = F.bind(self)(f)
+
   def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
+
+  def μ[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
 
   def >>[B](b: F[B]): F[B] = F.bind(self)(_ => b)
 
@@ -39,8 +43,9 @@ trait ToBindOps extends ToBindOps0 with ToApplyOps {
 }
 
 trait BindSyntax[F[_]] extends ApplySyntax[F] {
-  implicit def ToBindOps[A](v: F[A])(implicit F0: Bind[F]): BindOps[F, A] = new BindOps[F,A] { def self = v; implicit def F: Bind[F] = F0 }
+  implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A] { def self = v; implicit def F: Bind[F] = BindSyntax.this.F }
 
+  def F: Bind[F]
   ////
 
   ////

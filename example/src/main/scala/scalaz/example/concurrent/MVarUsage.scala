@@ -11,7 +11,7 @@ import std.anyVal._
 import syntax.equal._
 
 object MVarUsage extends App {
-  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f unsafePerformIO); () }
+  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO { s(f.unsafePerformIO); () }
 
   def out() {
     def calc(mvar: MVar[Int]): IO[Unit] = mvar.put(42)

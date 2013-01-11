@@ -7,6 +7,7 @@ trait SemigroupOps[F] extends Ops[F] {
   ////
   final def |+|(other: => F): F = F.append(self, other)
   final def mappend(other: => F): F = F.append(self, other)
+  final def ⊹(other: => F): F = F.append(self, other)
   ////
 }
 
@@ -19,8 +20,9 @@ trait ToSemigroupOps  {
 }
 
 trait SemigroupSyntax[F]  {
-  implicit def ToSemigroupOps(v: F)(implicit F0: Semigroup[F]): SemigroupOps[F] = new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = F0 }
-
+  implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = SemigroupSyntax.this.F }
+  
+  def F: Semigroup[F]
   ////
   def mappend(f1: F, f2: => F)(implicit F: Semigroup[F]): F = F.append(f1, f2)
 

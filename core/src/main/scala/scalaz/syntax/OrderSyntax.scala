@@ -11,6 +11,7 @@ trait OrderOps[F] extends Ops[F] {
   final def >=(other: F): Boolean = F.greaterThanOrEqual(self, other)
   final def max(other: F): F = F.max(self, other)
   final def min(other: F): F = F.min(self, other)
+  final def cmp(other: F): Ordering = F.order(self, other)
   final def ?|?(other: F): Ordering = F.order(self, other)
   final def lte(other: F): Boolean = F.lessThanOrEqual(self, other)
   final def gte(other: F): Boolean = F.greaterThanOrEqual(self, other)
@@ -29,8 +30,9 @@ trait ToOrderOps extends ToEqualOps {
 }
 
 trait OrderSyntax[F] extends EqualSyntax[F] {
-  implicit def ToOrderOps(v: F)(implicit F0: Order[F]): OrderOps[F] = new OrderOps[F] { def self = v; implicit def F: Order[F] = F0 }
-
+  implicit def ToOrderOps(v: F): OrderOps[F] = new OrderOps[F] { def self = v; implicit def F: Order[F] = OrderSyntax.this.F }
+  
+  def F: Order[F]
   ////
 
   ////

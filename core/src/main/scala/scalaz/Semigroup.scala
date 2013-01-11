@@ -49,18 +49,18 @@ trait Semigroup[F]  { self =>
 
 
   ////
-  val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] {}
+  val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] { def F = Semigroup.this }
 }
 
 object Semigroup {
   @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
-  /** Make an append function into an instance. */
+  ////
+  /** Make an associative binary function into an instance. */
   def instance[A](f: (A, => A) => A): Semigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = f(f1, f2)
+    def append(f1: A, f2: => A): A = f(f1,f2)
   }
 
-  ////
   /** A purely left-biased semigroup. */
   def firstSemigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = f1
@@ -79,12 +79,11 @@ object Semigroup {
     def append(f1: A, f2: => A): A = o.max(f1, f2)
   }
 
-  def repeat[F[_], A](a: A)(implicit F: Pointed[F], m: Semigroup[F[A]]): F[A] =
+  def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), repeat[F, A](a))
 
-  def iterate[F[_], A](a: A)(f: A => A)(implicit F: Pointed[F], m: Semigroup[F[A]]): F[A] =
+  def iterate[F[_], A](a: A)(f: A => A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), iterate[F, A](f(a))(f))
 
   ////
 }
-

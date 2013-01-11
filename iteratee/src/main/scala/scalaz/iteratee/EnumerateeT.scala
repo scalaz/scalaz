@@ -132,12 +132,12 @@ trait EnumerateeTFunctions {
       }
     }
 
-  def group[E, F[_], G[_]](n: Int)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G]): EnumerateeT[E, F[E], G] =
+  def group[E, F[_], G[_]](n: Int)(implicit F: Applicative[F], FE: Monoid[F[E]], G: Monad[G]): EnumerateeT[E, F[E], G] =
     new EnumerateeT[E, F[E], G] {
       def apply[A] = take[E, F](n).up[G].sequenceI.apply[A]
     }
 
-  def splitOn[E, F[_], G[_]](p: E => Boolean)(implicit F: Pointed[F], FE: Monoid[F[E]], G: Monad[G]): EnumerateeT[E, F[E], G] =
+  def splitOn[E, F[_], G[_]](p: E => Boolean)(implicit F: Applicative[F], FE: Monoid[F[E]], G: Monad[G]): EnumerateeT[E, F[E], G] =
     new EnumerateeT[E, F[E], G] {
       def apply[A] = {
         (takeWhile[E, F](p).up[G] flatMap (xs => drop[E, G](1).map(_ => xs))).sequenceI.apply[A]
@@ -166,7 +166,7 @@ trait EnumerateeTFunctions {
     }
     
 
-  def doneOr[O, I, F[_] : Pointed, A](f: (Input[I] => IterateeT[I, F, A]) => IterateeT[O, F, StepT[I, F, A]]): StepT[I, F, A] => IterateeT[O, F, StepT[I, F, A]] = {
+  def doneOr[O, I, F[_] : Applicative, A](f: (Input[I] => IterateeT[I, F, A]) => IterateeT[O, F, StepT[I, F, A]]): StepT[I, F, A] => IterateeT[O, F, StepT[I, F, A]] = {
     (s: StepT[I, F, A]) => s.mapContOr(k => f(k), done(s, emptyInput))
   }
 }

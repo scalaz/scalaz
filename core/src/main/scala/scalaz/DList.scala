@@ -9,7 +9,7 @@ import std.function._
  *
  * A difference list is a function that given a list, returns the
  * original contents of the difference list prepended at the given list.
- * 
+ *
  * This structure supports `O(1)` append and snoc operations on lists,
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
@@ -25,10 +25,10 @@ trait DList[A] {
   def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
 
   /** Append a single element in constant time. */
-  def :+(a: A): DList[A] = mkDList(as => suspend(apply(a :: as)))
+  def :+(a: A): DList[A] = mkDList(as => suspend(apply( a :: as)))
 
   /** Append one list to another in constant time. */
-  def ++(as: => DList[A]): DList[A] = 
+  def ++(as: => DList[A]): DList[A] =
     mkDList(xs => as(xs) >>= (ys => apply(ys)))
 
   /** List elimination of head and tail. */
@@ -69,7 +69,7 @@ trait DListInstances {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonad: Monad[DList] = new MonadPlus[DList] {
+  implicit val dlistMonadPlus: MonadPlus[DList] = new MonadPlus[DList] {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
@@ -82,7 +82,7 @@ trait DListInstances {
 }
 
 trait DListFunctions {
-  def mkDList[A](f: (=> List[A]) => Trampoline[List[A]]): DList[A] =
+  def mkDList[A](f: (List[A]) => Trampoline[List[A]]): DList[A] =
     new DList[A] {
       def apply(xs: => List[A]) = f(xs)
     }
@@ -93,7 +93,7 @@ trait DListFunctions {
     xs.foldRight(DList[A]())(_ ++ _)
   def replicate[A](n: Int, a: A): DList[A] =
     DL(xs => {
-      def go(m: Int): List[A] = if (m <= 0) xs else a :: go(m - 1)           
+      def go(m: Int): List[A] = if (m <= 0) xs else a :: go(m - 1)
       go(n)
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {

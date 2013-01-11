@@ -9,12 +9,14 @@ class StreamTest extends Spec {
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
   checkAll(traverse.laws[Stream])
+  checkAll(isEmpty.laws[Stream])
 
   import std.stream.streamSyntax._
+  import syntax.foldable._
 
   "intercalate empty stream is flatten" ! check((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must be_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! check {
+  "intersperse then remove odd items is identity" ! prop {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
@@ -37,5 +39,18 @@ class StreamTest extends Spec {
       }
     }
     (a: Stream[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
+  }
+
+
+  "foldl is foldLeft" ! prop {(rnge: Stream[List[Int]]) =>
+    val F = Foldable[Stream]
+    (rnge.foldLeft(List[Int]())(_++_)
+      must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
+  }
+
+  "foldr is foldRight" ! prop {(rnge: Stream[List[Int]]) =>
+    val F = Foldable[Stream]
+    (rnge.foldRight(List[Int]())(_++_)
+      must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 }

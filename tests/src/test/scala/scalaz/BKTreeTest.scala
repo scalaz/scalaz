@@ -15,20 +15,28 @@ class BKTreeTest extends Spec {
     BKTree[String]("kitten").containsApproximate("sitting", 3)
   }
 
-  "empty" ! check {
+  "empty" ! prop {
     (a: String) => !BKTree[String]().contains(a)
   }
 
-  "singleton" ! check {
+  "singleton" ! prop {
     (a: String) => BKTree[String](a).contains(a)
   }
 
-  "contains" ! check {
+  "contains" ! prop {
     (a: String, as: Set[String]) => BKTree[String](as.toSeq: _*).contains(a) == as.contains(a)
   }
 
-  "values" ! check {
+  "values" ! prop {
     (as: Set[String]) => BKTree[String](as.toSeq: _*).values.toSet == as
+  }
+
+  "+ and -" ! prop {
+    (a:String, as: Set[String]) => (BKTree[String](as.toSeq: _*) + a - a).values.toSet == as
+  }
+
+  "isEmpty" ! prop {
+    (as: Set[String]) => BKTree[String](as.toSeq: _*).isEmpty == as.isEmpty
   }
 
   // TODO more tests

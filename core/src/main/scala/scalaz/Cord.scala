@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.immutable.IndexedSeq
+
 import std.anyVal._
 import std.string._
 import std.indexedSeq.indexedSeqMonoid
@@ -109,8 +111,12 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
 
   def toList: List[Char] = toIndexedSeq.toList
   def toStream: Stream[Char] = toIndexedSeq.toStream
-  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq : IndexedSeq[Char])
-  override def toString: String = self.foldMap(x => x)
+  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq)
+  override def toString: String = {
+    val sb = new StringBuilder(self.measure)
+    self foreach (sb ++= _)
+    sb.toString
+  }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
   def flatMap[B](f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
@@ -123,6 +129,8 @@ object Cord {
 
   implicit def stringToCord(s: String): Cord = cord(FingerTree.single[Int, String](s))
 
+  lazy val empty: Cord = apply()
+
   def apply(as: Cord*): Cord = as.foldLeft(cord(FingerTree.empty))(_ ++ _)
 
   def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String](sizer))((x, y) => x :+ y))
@@ -134,4 +142,16 @@ object Cord {
       as.tail.foldLeft(as.head)(_ ++ sep ++ _)
     else
       Cord()
+
+  implicit lazy val CordShow: Show[Cord] = new Show[Cord] {
+    override def show(x: Cord) = x
+    override def shows(x: Cord) = x.toString
+  }
+  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+    def zero = empty
+    def append(x: Cord, y: => Cord) = x ++ y
+  }
+  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
+    def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
+  }
 }

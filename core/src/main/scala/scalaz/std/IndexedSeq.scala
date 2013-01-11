@@ -1,21 +1,23 @@
 package scalaz
 package std
 
+import scalaz.Id._
 import annotation.tailrec
+import collection.immutable.IndexedSeq
 import collection.IndexedSeqLike
 import collection.generic.{CanBuildFrom, GenericTraversableTemplate}
 
 trait IndexedSeqSub {
   type IxSq[+A] <: IndexedSeq[A] with GenericTraversableTemplate[A, IxSq] with IndexedSeqLike[A, IxSq[A]]
   protected implicit def buildIxSq[A, B]: CanBuildFrom[IxSq[A], B, IxSq[B]]
-  protected def monad: Monad[IxSq]
+  protected def covariant: Traverse[IxSq] with Monad[IxSq]
   protected def empty[A]: IxSq[A]
 }
 
 trait IndexedSeqSubIndexedSeq extends IndexedSeqSub {
   type IxSq[+A] = IndexedSeq[A]
   protected final def buildIxSq[A, B] = implicitly
-  protected final def monad = indexedSeq.indexedSeqInstance
+  protected final def covariant = indexedSeq.indexedSeqInstance
   protected final def empty[A] = IndexedSeq()
 }
 
@@ -38,7 +40,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with ApplicativePlus[IxSq] with Zip[IxSq] with Unzip[IxSq] {
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
     def each[A](fa: IxSq[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
     def length[A](fa: IxSq[A]) = fa.length
@@ -46,6 +48,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
     def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f
     def empty[A] = self.empty[A]
     def plus[A](a: IxSq[A], b: => IxSq[A]) = a ++ b
+    def isEmpty[A](a: IxSq[A]) = a.isEmpty
     override def map[A, B](v: IxSq[A])(f: A => B) = v map f
 
     def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b
@@ -53,7 +56,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 
     def traverseImpl[F[_], A, B](v: IxSq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       DList.fromList(v.toList).foldr(F.point(empty[B])) {
-         (a, fbs) => F.map2(f(a), fbs)(_ +: _)
+         (a, fbs) => F.apply2(f(a), fbs)(_ +: _)
       }
     }
 
@@ -65,14 +68,13 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
         }))
 
     override def foldRight[A, B](fa: IxSq[A], z: => B)(f: (A, => B) => B) = {
-      import scala.collection.mutable.ArrayStack
-      val s = new ArrayStack[A]
-      fa.foreach(a => s += a)
+      var i = fa.length
       var r = z
-      while (!s.isEmpty) {
+      while (i > 0) {
+        i -= 1
         // force and copy the value of r to ensure correctness
         val w = r
-        r = f(s.pop, w)
+        r = f(fa(i), w)
       }
       r
     }
@@ -97,17 +99,16 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 }
 
 trait IndexedSeqSubFunctions extends IndexedSeqSub {
-  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
-  final def intersperse[A](as: IxSq[A], a: A): IxSq[A] = {
-    @tailrec
-    def intersperse0(accum: IxSq[A], rest: IxSq[A]): IxSq[A] =
-      if (rest.isEmpty) accum else if (rest.tail.isEmpty) rest.head +: accum else intersperse0(a +: rest.head +: accum, rest.tail)
-    intersperse0(empty, as).reverse
+  @inline private[this] final
+  def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B) = {
+    def rec(ix: Int): B =
+      if (ix >= as.length - 1) b else f(as(ix+1), rec(ix+1))
+    rec(-1)
   }
 
-  /** Intersperse the elements of `as2` between every adjacent `as1`
-    * pair. */
-  final def intercalate[A](as1: IxSq[IxSq[A]], as2: IxSq[A]): IxSq[A] = intersperse(as1, as2).flatten
+  /** Intersperse the element `a` between each adjacent pair of elements in `as` */
+  final def intersperse[A](as: IxSq[A], a: A): IxSq[A] =
+    if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
   final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] =
     if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
@@ -125,44 +126,45 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
 
   final def takeWhileM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
-    if (as.isEmpty) Monad[M].point(empty) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].map(takeWhileM(as.tail)(p))((tt: IxSq[A]) => as.head +: tt) else Monad[M].point(empty))
+    lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
+        else Monad[M].point(empty)))
 
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
   final def filterM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
-    if (as.isEmpty) Monad[M].point(empty) else {
-      def g = filterM(as.tail)(p)
-      Monad[M].bind(p(as.head))(b => if (b) Monad[M].map(g)(tt => as.head +: tt) else g)
-    }
+    lazyFoldRight(as, Monad[M].point(empty[A]))((a, g) =>
+      Monad[M].bind(p(a))(b => if (b) Monad[M].map(g)(tt => a +: tt) else g))
 
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
-    if (as.isEmpty) Monad[M].point(None: Option[A]) else Monad[M].bind(p(as.head))(b =>
-      if (b) Monad[M].point(Some(as.head): Option[A]) else findM(as.tail)(p))
+    lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].point(Some(a): Option[A]) else g))
 
   final def powerset[A](as: IxSq[A]): IxSq[IxSq[A]] = {
-    implicit val indexedSeqInstance = monad
+    implicit val indexedSeqInstance = covariant
     val tf = empty[Boolean] :+ true :+ false
     filterM(as)(_ => tf)
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    if (as.isEmpty) Monad[M].point(empty[A], empty[A]) else
+    lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
       Monad[M].bind(p(as.head))(b =>
-        Monad[M].map(partitionM(as.tail)(p)) {
-          case (x, y) => if (b) (as.head +: x, y) else (x, as.head +: y)
+        Monad[M].map(g) {
+          case (x, y) => if (b) (a +: x, y) else (x, a +: y)
         }
-      )
+      ))
 
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    if (as.isEmpty) Monad[M].point(empty, empty) else
-      Monad[M].bind(p(as.head))(b =>
-        if (b) Monad[M].map(spanM(as.tail)(p))((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
-        else Monad[M].point(empty, as))
+    lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].map(g)((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
+        else Monad[M].point(empty, as)))
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
@@ -175,31 +177,45 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
+<<<<<<< HEAD
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
+=======
+  final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
+    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+
+>>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
-    if (as.isEmpty) (c, empty) else {
-      val (i, j) = f(c, as.head)
-      val (k, v) = mapAccumLeft(as.tail)(i, f)
-      (k, j +: v)
+    as.foldLeft((c, empty[B])){(acc, a) => acc match {
+      case (c, v) => f(c, a) match {
+        case (c, b) => (c, v :+ b)
+      }}
     }
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
-    if (as.isEmpty) (c, empty) else {
-      val (i, j) = mapAccumRight(as.tail)(c, f)
-      val (k, v) = f(i, as.head)
-      (k, v +: j)
+    as.foldRight((c, empty[B])){(a, acc) => acc match {
+      case (c, v) => f(c, a) match {
+        case (c, b) => (c, b +: v)
+      }}
     }
 
   /** `[as, as.tail, as.tail.tail, ..., `empty IxSq`]` */
   final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
+<<<<<<< HEAD
   /** `[`empty IxSq`, as take 1, as take 2, ..., as]` */
   final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     empty +: (if (as.isEmpty) empty else (initz(as.tail) map (as.head +: _)))
+=======
+  final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] = {
+    @tailrec def rec(acc: IxSq[IxSq[A]], as: IxSq[A]): IxSq[IxSq[A]] =
+      if (as.isEmpty) as +: acc else rec(as +: acc, as.init)
+    rec(empty, as)
+  }
+>>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
 
   /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
@@ -237,5 +253,4 @@ trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] 
         case x  => x
       }
     }
-
 }

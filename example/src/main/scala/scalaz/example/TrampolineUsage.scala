@@ -4,7 +4,7 @@ object TrampolineUsage extends App {
 
   import scalaz._, Scalaz._, Free._
 
-  def quickSort[F[+ _] : Pointed, T: Order](xs: List[T]): Free[F, List[T]] = {
+  def quickSort[F[+ _] : Applicative, T: Order](xs: List[T]): Free[F, List[T]] = {
     xs match {
       case Nil =>
         return_ {
@@ -21,8 +21,8 @@ object TrampolineUsage extends App {
     }
   }
 
-  def runQuickSort[F[+ _] : Pointed : Copointed, T: Order](xs: List[T]): List[T] =
-    quickSort[F, T](xs).go(f => Copointed[F].copoint(f))
+  def runQuickSort[F[+ _] : Applicative : Comonad, T: Order](xs: List[T]): List[T] =
+    quickSort[F, T](xs).go(f => Comonad[F].copoint(f))
 
   val xs = List.fill(32)(util.Random.nextInt())
 
@@ -55,7 +55,7 @@ object TrampolineUsage extends App {
 
 
   /**Run using `F1` as a binding for lists longer than `threshold`, and `F2` otherwise. */
-  def quickSort2[F[+ _] : Pointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): Free[F, List[T]] = {
+  def quickSort2[F[+ _] : Applicative, F2[+ _] : Applicative, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): Free[F, List[T]] = {
     def qs(as: List[T]): Free[F, List[T]] =
       if (as.lengthCompare(threshold) < 0) {
         val free: Free[F2, List[T]] = quickSort2[F2, F2, T](as, NaturalTransformation.refl[F2], threshold)
@@ -78,8 +78,8 @@ object TrampolineUsage extends App {
     }
   }
 
-  def runQuickSort2[F[+ _] : Pointed : Copointed, F2[+ _] : Pointed, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
-    quickSort2[F, F2, T](xs, nat, threshold).go(f => Copointed[F].copoint(f))
+  def runQuickSort2[F[+ _] : Applicative : Comonad, F2[+ _] : Applicative, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
+    quickSort2[F, F2, T](xs, nat, threshold).go(f => Comonad[F].copoint(f))
 
 
   {

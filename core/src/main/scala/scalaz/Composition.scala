@@ -5,15 +5,7 @@ private[scalaz] trait CompositionFunctor[F[_], G[_]] extends Functor[({type λ[�
 
   implicit def G: Functor[G]
 
-  override def map[A, B](fga: F[G[A]])(f: (A) => B): F[G[B]] = F.map(fga)(ga => G.map(ga)(f))
-}
-
-private[scalaz] trait CompositionPointed[F[_], G[_]] extends Pointed[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
-  implicit def F: Pointed[F]
-
-  implicit def G: Pointed[G]
-
-  def point[A](a: => A): F[G[A]] = F.point(G.point(a))
+  override def map[A, B](fga: F[G[A]])(f: (A) => B): F[G[B]] = F(fga)(ga => G(ga)(f))
 }
 
 private[scalaz] trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
@@ -22,26 +14,25 @@ private[scalaz] trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] =
   implicit def G: Apply[G]
 
   def ap[A, B](fa: => F[G[A]])(f: => F[G[A => B]]): F[G[B]] =
-    F.map2(f, fa)((ff, ga) => G.ap(ga)(ff))
+    F.apply2(f, fa)((ff, ga) => G.ap(ga)(ff))
 }
 
-private[scalaz] trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[α] = F[G[α]]})#λ] with CompositionPointed[F, G] with CompositionFunctor[F, G] {
+private[scalaz] trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[α] = F[G[α]]})#λ] with CompositionApply[F, G] {
   implicit def F: Applicative[F]
 
   implicit def G: Applicative[G]
 
-  def ap[A, B](fa: => F[G[A]])(f: => F[G[A => B]]): F[G[B]] =
-    F.map2(f, fa)((ff, ga) => G.ap(ga)(ff))
+  def point[A](a: => A): F[G[A]] = F.point(G.point(a))
 }
 
-private[scalaz] trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[({type λ[α] = F[G[α]]})#λ] with CompositionPointed[F, G] with CompositionFunctor[F, G] with CompositionApplicative[F, G] {
+private[scalaz] trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[({type λ[α] = F[G[α]]})#λ] with CompositionApplicative[F, G] {
   implicit def F: ApplicativePlus[F]
 
   implicit def G: ApplicativePlus[G]
 
   def empty[A]: F[G[A]] = F.empty[G[A]]
   def plus[A](a: F[G[A]], b: => F[G[A]]): F[G[A]] =
-    F.map2(a, b)(G.plus(_, _))
+    F.apply2(a, b)(G.plus(_, _))
 }
 
 private[scalaz] trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ[α] = F[G[α]]})#λ]  {
@@ -76,8 +67,7 @@ private[scalaz] trait CompositionDistributive[F[_], G[_]] extends Distributive[(
   implicit def G: Distributive[G]
 
   def distributeImpl[X[_]:Functor, A, B](a: X[A])(f: A => F[G[B]]): F[G[X[B]]] =
-    F.map(F.distribute(a)(f))(G.cosequence(_))
-
+    F(F.distribute(a)(f))(G.cosequence(_))
 }
 
 private[scalaz] trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G[α]]})#λ] {

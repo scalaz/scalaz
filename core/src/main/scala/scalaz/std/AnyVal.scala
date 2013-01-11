@@ -32,6 +32,25 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
+  implicit val nothingInstance: Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] =
+    new Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] {
+      override def shows(f: Nothing) = f.toString
+      def append(f1: Nothing, f2: => Nothing) = f1
+      def order(x: Nothing, y: Nothing) = Ordering.EQ
+      def succ(n: Nothing) = n
+      def pred(n: Nothing) = n
+
+      override def succn(a: Int, b: Nothing) = b
+
+      override def predn(a: Int, b: Nothing) = b
+
+      override def min = None
+
+      override def max = None
+
+      override def equalIsNatural: Boolean = true
+    }
+
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
     override def shows(f: Boolean) = f.toString
 
@@ -265,8 +284,6 @@ trait AnyValInstances {
 
     def inverse(f:Int) = -f
 
-    def distance(a: Int, b: Int): Int = b - a
-
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
     def succ(b: Int) = b + 1
@@ -358,7 +375,7 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit val floatInstance: Group[Float] with Enum[Float] with Show[Float] = new Group[Float] with Enum[Float] with Show[Float] {
+  implicit val floatInstance: Group[Float] with Order[Float] with Show[Float] = new Group[Float] with Order[Float] with Show[Float] {
     override def shows(f: Float) = f.toString
 
     def append(f1: Float, f2: => Float) = f1 + f2
@@ -366,13 +383,6 @@ trait AnyValInstances {
     def zero: Float = 0f
 
     def inverse(f: Float) = -f
-
-    def succ(b: Float) = b + 1
-    def pred(b: Float) = b - 1
-    override def succn(a: Int, b: Float) = b + a
-    override def predn(a: Int, b: Float) = b - a
-    override def min = Some(Float.MinValue)
-    override def max = Some(Float.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
@@ -388,7 +398,7 @@ trait AnyValInstances {
 
   }
 
-  implicit val doubleInstance: Group[Double] with Enum[Double] with Show[Double] = new Group[Double] with Enum[Double] with Show[Double] {
+  implicit val doubleInstance: Group[Double] with Order[Double] with Show[Double] = new Group[Double] with Order[Double] with Show[Double] {
     override def shows(f: Double) = f.toString
 
     def append(f1: Double, f2: => Double) = f1 + f2
@@ -397,16 +407,9 @@ trait AnyValInstances {
 
     def inverse(f: Double) = -f
 
-    def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-
-    def succ(b: Double) = b + 1
-    def pred(b: Double) = b - 1
-    override def succn(a: Int, b: Double) = b + a
-    override def predn(a: Int, b: Double) = b - a
-    override def min = Some(Double.MinValue)
-    override def max = Some(Double.MaxValue)
-
     override def equalIsNatural: Boolean = true
+
+    def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
   implicit val doubleMultiplicationNewType: Group[Double @@ Multiplication] = new Group[Double @@ Multiplication] {
@@ -536,6 +539,16 @@ trait BooleanFunctions {
   final def when(cond: Boolean)(f: => Unit) = if (cond) f
 
   /**
+   * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
+   */
+  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = if (cond) M.point(()) else M.void(f)
+
+  /**
+   * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
+   */
+  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = if (cond) M.void(f) else M.point(())
+
+  /**
    * @return `t` if `cond` is `true`, `f` otherwise
    */
   final def fold[A](cond: Boolean, t: => A, f: => A): A = if (cond) t else f
@@ -564,22 +577,22 @@ trait BooleanFunctions {
    * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
    * for `M`.
    */
-  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
+  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (cond) M.point(a) else M0.empty
 
   /**
    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
    * for `M`.
    */
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A] =
+  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
     }
 
-  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Pointed[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
     }
@@ -618,3 +631,4 @@ object long extends LongFunctions
 object double extends DoubleFunctions
 
 object float extends FloatFunctions
+

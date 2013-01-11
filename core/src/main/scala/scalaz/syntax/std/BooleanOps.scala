@@ -4,16 +4,22 @@ package std
 
 import scalaz.std.{boolean => b}
 import scalaz.std.anyVal._
-import scalaz.Tags.Conjunction
+import scalaz.Tags.{ Conjunction, Disjunction }
 
 
 trait BooleanOps extends Ops[Boolean] {
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
+  final def disjunction: Boolean @@ Disjunction = Disjunction(self)
+
   final def |∧| : Boolean @@ Conjunction = conjunction
 
   final def |/\| : Boolean @@ Conjunction = conjunction
+
+  final def |∨| : Boolean @@ Disjunction = disjunction
+
+  final def |\/| : Boolean @@ Disjunction = disjunction
 
   /**
    * Conjunction. (AND)
@@ -183,6 +189,16 @@ trait BooleanOps extends Ops[Boolean] {
   final def when(f: => Unit) = b.when(self)(f)
 
   /**
+   * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
+   */
+  final def unlessM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.unlessM(self)(f)
+
+  /**
+   * Returns the given argument if `cond` is true`, otherwise, unit lifted into M.
+   */
+  final def whenM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.whenM(self)(f)
+
+  /**
    * @return `t` if true, `f` otherwise
    */
   final def fold[A](t: => A, f: => A): A = b.fold(self, t, f)
@@ -199,26 +215,26 @@ trait BooleanOps extends Ops[Boolean] {
   }
 
   /**
-   * Returns the given argument in `Some` if this is `lazySome`, `lazySome` otherwise.
+   * Returns the given argument in `Some` if this is `true`, `None` otherwise.
    */
   final def option[A](a: => A): Option[A] = b.option(self, a)
 
   /**
-   * Returns the given argument in `lazySome` if this is `Left`, `Left` otherwise.
+   * Returns the given argument in `LazySome` if this is `true`, `LazyNone` otherwise.
    */
   final def lazyOption[A](a: => A): LazyOption[A] = LazyOption.condLazyOption(self, a)
 
   trait ConditionalEither[A] {
-    def or[B](b: => B): Either[A, B]
+    def or[B](b: => B): A \/ B
   }
 
   /**
-   * Returns the first argument in `Left` if this is `Right`, otherwise the second argument in
+   * Returns the first argument in `Left` if this is `true`, otherwise the second argument in
    * `Right`.
    */
   final def either[A, B](a: => A) = new ConditionalEither[A] {
     def or[B](b: => B) =
-      if (self) Left(a) else Right(b)
+      if (self) -\/(a) else \/-(b)
   }
 
   /**
@@ -234,15 +250,15 @@ trait BooleanOps extends Ops[Boolean] {
   final def !?[A](a: => A)(implicit z: Monoid[A]): A = b.zeroOrValue(self)(a)
 
   trait GuardPrevent[M[_]] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]): M[A]
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A]
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = b.pointOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Pointed[M], M0: PlusEmpty[M]) = b.emptyOrPure[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.emptyOrPure[M, A](self)(a)
   }
 }
 

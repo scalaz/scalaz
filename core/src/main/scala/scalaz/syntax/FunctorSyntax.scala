@@ -16,9 +16,9 @@ trait FunctorOps[F[_],A] extends Ops[F[A]] {
   final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
   final def fpair: F[(A, A)] = F.fpair(self)
   final def void: F[Unit] = F.void(self)
-  final def fpoint[G[_]: Pointed]: F[G[A]] = F.map(self)(a => Pointed[G].point(a))
-  final def >|[B](b: B): F[B] = F.map(self)(_ => b)
-  final def as[B](b: B): F[B] = F.map(self)(_ => b)
+  final def fpoint[G[_]: Applicative]: F[G[A]] = F.map(self)(a => Applicative[G].point(a))
+  final def >|[B](b: => B): F[B] = F.map(self)(_ => b)
+  final def as[B](b: => B): F[B] = F.map(self)(_ => b)
   ////
 }
 
@@ -38,8 +38,10 @@ trait ToFunctorOps extends ToFunctorOps0 {
 
   // TODO Duplication
   trait LiftV[F[_], A, B] extends Ops[A => B] {
-    def lift(implicit F: Functor[F]) = F(self)
+    def lift(implicit F: Functor[F]) = F.lift(self)
   }
+
+  def ^[F[_],A,B](fa: F[A])(f: A => B)(implicit F: Functor[F]) = F(fa)(f)
 
   implicit def ToFunctorIdV[A](v: A) = new FunctorIdV[A] { def self = v }
 
@@ -51,15 +53,17 @@ trait ToFunctorOps extends ToFunctorOps0 {
 }
 
 trait FunctorSyntax[F[_]]  {
-  implicit def ToFunctorOps[A](v: F[A])(implicit F0: Functor[F]): FunctorOps[F, A] = new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = F0 }
+  implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = FunctorSyntax.this.F }
 
+  def F: Functor[F]
   ////
   implicit def ToLiftV[A, B](v: A => B): LiftV[A, B] = new LiftV[A, B] {
     def self = v
   }
+  def ^[A, B](fa: F[A])(f: A => B) = F(fa)(f)
 
   trait LiftV[A,B] extends Ops[A => B] {
-    def lift(implicit F: Functor[F]) = F(self)
+    def lift = F.lift(self)
   }
   ////
 }

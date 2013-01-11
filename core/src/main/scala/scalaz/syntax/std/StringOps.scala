@@ -30,7 +30,7 @@ trait StringOps extends Ops[String]{
 
   // Parsing functions.
 
-  def parseBoolean: Validation[NumberFormatException, Boolean] = s.parseBoolean(self)
+  def parseBoolean: Validation[IllegalArgumentException, Boolean] = s.parseBoolean(self)
 
   def parseByte: Validation[NumberFormatException, Byte] = s.parseByte(self)
 

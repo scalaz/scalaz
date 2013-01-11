@@ -17,14 +17,18 @@ package scalaz
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
  */
 ////
-trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
+trait Applicative[F[_]] extends Apply[F] { self =>
   ////
+  def point[A](a: => A): F[A]
+
+  // alias for point
+  def pure[A](a: => A): F[A] = point(a)
 
   // derived functions
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
     ap(fa)(point(f))
 
-  override def map2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     ap2(fa, fb)(point(f))
 
   // impls of sequence, traverse, etc
@@ -73,7 +77,7 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
   def applicativeLaw = new ApplicativeLaw {}
 
   ////
-  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {}
+  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
 
 object Applicative {
@@ -81,13 +85,7 @@ object Applicative {
 
   ////
 
-  def applicative[F[_]](p: Pointed[F], a: Apply[F]): Applicative[F] = new Applicative[F] {
-    def point[A](a: => A): F[A] = p.point(a)
-    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] = a.ap(fa)(f)
-  }
-
   implicit def monoidApplicative[M:Monoid]: Applicative[({type λ[α] = M})#λ] = Monoid[M].applicative
 
   ////
 }
-

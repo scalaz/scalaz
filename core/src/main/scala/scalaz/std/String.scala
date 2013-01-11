@@ -2,13 +2,17 @@ package scalaz
 package std
 
 trait StringInstances {
-  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] {
+  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[({ type λ[α] = String })#λ] {
+    type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
-    override def show(f: String) = f
+    override def show(f: String) = '"' + f + '"'
     def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
     override def equal(x: String, y: String) = x == y
     override def equalIsNatural: Boolean = true
+    def empty[A] = zero
+    def plus[A](f1: SA[A], f2: => SA[A]) = f1 + f2
+    def isEmpty[A](s: SA[A]) = s == ""
   }
 }
 
@@ -41,10 +45,10 @@ trait StringFunctions {
   // Parsing functions.
   import Validation.{success, failure}
 
-  def parseBoolean(s:String): Validation[NumberFormatException, Boolean] = try {
+  def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] = try {
     success(s.toBoolean)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: IllegalArgumentException => failure(e)
   }
 
   def parseByte(s:String): Validation[NumberFormatException, Byte] = try {

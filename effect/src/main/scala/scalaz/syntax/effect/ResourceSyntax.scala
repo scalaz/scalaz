@@ -24,8 +24,9 @@ trait ToResourceOps  {
 }
 
 trait ResourceSyntax[F]  {
-  implicit def ToResourceOps(v: F)(implicit F0: Resource[F]): ResourceOps[F] = new ResourceOps[F] { def self = v; implicit def F: Resource[F] = F0 }
-
+  implicit def ToResourceOps(v: F): ResourceOps[F] = new ResourceOps[F] { def self = v; implicit def F: Resource[F] = ResourceSyntax.this.F }
+  
+  def F: Resource[F]
   ////
 
   ////
