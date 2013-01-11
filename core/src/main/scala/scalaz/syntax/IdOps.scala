@@ -18,9 +18,12 @@ trait IdOps[A] extends Ops[A] {
    * Mostly for use with dodgy libraries that give you values that need additional initialization or 
    * mutation before they're valid to use.
    */
-  final def tap(f: A => Any): A = { 
+  final def unsafeTap(f: A => Any): A = {
     f(self); self 
   }
+
+  /** Alias for `unsafeTap`. */
+  final def <|(f: A => Any): A = unsafeTap(f)
 
   final def squared: (A, A) =
     (self, self)
@@ -35,7 +38,6 @@ trait IdOps[A] extends Ops[A] {
     NonEmptyList(self)
 
   /**
-
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */
   def matchOrZero[B: Monoid](pf: PartialFunction[A, B]): B =
