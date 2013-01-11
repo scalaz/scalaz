@@ -225,7 +225,7 @@ object Heap extends HeapFunctions with HeapInstances {
 
     def rootZ[A]: ForestZipper[A] => A = {
       case (_, x #:: _) => x.rootLabel.value
-      case _            => sys.error("Heap.rootZ: emptyEphemeralStream zipper")
+      case _            => sys.error("Heap.rootZ: empty zipper")
     }
 
     def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)
