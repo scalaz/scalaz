@@ -9,6 +9,7 @@ class NonEmptyListTest extends Spec {
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
   checkAll("NonEmptyList", semigroup.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])
+  checkAll("NonEmptyList", order.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", traverse.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
