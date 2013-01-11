@@ -324,13 +324,17 @@ trait LensFunctions extends LensFamilyFunctions {
 
   def nelTailLens[A]: NonEmptyList[A] @> List[A] =
     lens(l => Store(NonEmptyList.nel(l.head, _), l.tail))
-
+    
   /** Access the value at a particular key of a Map **/
   def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
     lensg(m => ({
       case None => m - k
       case Some(v) => m.updated(k, v)
     }: Option[V] => Map[K, V]), _ get k)
+    
+  /** Access the Nth value of a list **/
+  def listNthLens[A](i: Int): List[A] @> A = 
+    lensg(l => a => l.updated(i,a), l => l.apply(i))
 
   def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Store[A, B] @> B =
     lens(q => {
