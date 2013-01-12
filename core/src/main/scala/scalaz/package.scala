@@ -94,7 +94,9 @@ package object scalaz {
    */
   type @@[T, Tag] = T with Tagged[Tag]
 
+  /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
+  /** A [[scalaz.NaturalTransformation]][G, F]. */
   type <~[+F[_], -G[_]] = NaturalTransformation[G, F]
   type ~~>[-F[_,_], +G[_,_]] = BiNaturalTransformation[F, G]
 
@@ -191,6 +193,7 @@ package object scalaz {
   //
   // Lens type aliases
   //
+  /** A lens that doesn't transform the type the record. */
   type Lens[A, B] = LensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
@@ -204,6 +207,7 @@ package object scalaz {
   //
   // Partial Lens type aliases
   //
+  /** A partial lens that doesn't transform the type of the record. */
   type PLens[A, B] = PLensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug

@@ -4,7 +4,7 @@ package scalaz
 import scala.math.{Ordering => SOrdering}
 
 /**
- *
+ * Safer version of [[scala.math.Ordering]].
  */
 ////
 trait Order[F] extends Equal[F] { self =>
@@ -32,6 +32,7 @@ trait Order[F] extends Equal[F] { self =>
     def order(b1: B, b2: B): Ordering = self.order(f(b1), f(b2))
   }
 
+  /** @note `Order.fromScalaOrdering(toScalaOrdering)` = `this` */
   def toScalaOrdering: SOrdering[F] = SOrdering.fromLessThan[F](lessThan)
 
   final def reverseOrder = new Order[F] {
@@ -41,6 +42,7 @@ trait Order[F] extends Equal[F] { self =>
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional
 
+    /** `order` yields a total order, in the mathematical sense. */
     def transitiveOrder(f1: F, f2: F, f3: F): Boolean = {
       val f1f2: Ordering = order(f1, f2)
       conditional(Set(f1f2, Ordering.EQ)(order(f2, f3)), order(f1, f3) == f1f2)
@@ -70,8 +72,10 @@ object Order {
     def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
   }
 
+  /** Alias for `Order[B] contramap f`, with inferred `B`. */
   def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
 
+  /** Derive from an `order` function. */
   def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
     def order(a1: A, a2: A) = f(a1, a2)
   }

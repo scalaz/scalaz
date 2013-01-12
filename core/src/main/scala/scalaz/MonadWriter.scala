@@ -1,5 +1,8 @@
 package scalaz
 
+/** The class of monads supporting the operations of
+  * [[scalaz.Writer]].
+  */
 trait MonadWriter[F[_, _], W] extends Monad[({type f[+x] = F[W, x]})#f] {
   implicit def W: Monoid[W]
   

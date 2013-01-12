@@ -1,5 +1,6 @@
 package scalaz
 
+/** A monad transformer stack yielding `(R, S) => F[(W, A, S)]`. */
 sealed trait ReaderWriterStateT[F[+_], -R, +W, S, +A] {
   self =>
   def run(r: R, s: S): F[(W, A, S)]
