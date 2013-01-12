@@ -1,5 +1,10 @@
 package scalaz
 
+/** Dual of [[scalaz.Traverse]].  To transform `F[G[B]]` to `G[F[B]]`,
+  * you may use `Traverse[F]` and `Applicative[G]`, but alternatively
+  * `Functor[F]` and `Distributive[G]`, which permits greater sharing
+  * and nonstrictness.
+  */
 trait Distributive[F[_]] extends Functor[F] { self =>
   def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => F[B]): F[G[B]]
 

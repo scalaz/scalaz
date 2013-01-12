@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * An [[scalaz.Order]]able with discrete values.
  */
 ////
 trait Enum[F] extends Order[F] { self =>

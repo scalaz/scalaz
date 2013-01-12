@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * [[scalaz.Applicative]] without `point`.
  */
 ////
 trait Apply[F[_]] extends Functor[F] { self =>
@@ -31,7 +31,10 @@ trait Apply[F[_]] extends Functor[F] { self =>
     implicit def G = G0
   }
 
+  /** Flipped variant of `ap`. */
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
+
+  /** [[scalaz.Zip]] derived from `tuple2`. */
   def zip: Zip[F] =
     new Zip[F] {
       def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =

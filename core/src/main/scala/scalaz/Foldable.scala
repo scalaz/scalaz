@@ -2,7 +2,8 @@ package scalaz
 
 ////
 /**
- *
+ * A type parameter implying the ability to extract zero or more
+ * values of that type.
  */
 ////
 trait Foldable[F[_]]  { self =>

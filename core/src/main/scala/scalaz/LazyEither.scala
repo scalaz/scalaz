@@ -1,5 +1,6 @@
 package scalaz
 
+/** [[scala.Either]], but with a value by name. */
 sealed trait LazyEither[+A, +B] {
 
   import LazyOption._
@@ -11,6 +12,7 @@ sealed trait LazyEither[+A, +B] {
       case LazyRight(b) => right(b())
     }
 
+  /** Catamorphism of the constructor chosen. */
   def ?[X](left: => X, right: => X): X =
     fold(_ => left, _ => right)
 
