@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- * A category supporting all ordinary functions, as well as combining
- * arrows product-wise.  Every Arrow forms a [[scalaz.Contravariant]]
- * in one type parameter, and a [[scalaz.Functor]] in the other, just
- * as with ordinary functions.
+ * A [[scalaz.Category]] supporting all ordinary functions, as well as
+ * combining arrows product-wise.  Every Arrow forms a
+ * [[scalaz.Contravariant]] in one type parameter, and a
+ * [[scalaz.Functor]] in the other, just as with ordinary functions.
  */
 ////
 trait Arrow[=>:[_, _]] extends Category[=>:] { self =>

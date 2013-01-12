@@ -2,8 +2,8 @@ package scalaz
 
 ////
 /**
- * @see [[scalaz.ArrId]]
- * @see [[scalaz.Compose]]
+ * [[scalaz.Compose]] with identity.
+ *
  * @see [[scalaz.Category.CategoryLaw]]
  */
 ////

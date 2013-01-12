@@ -184,15 +184,11 @@ trait ListFunctions {
     }
   }
 
-<<<<<<< HEAD
-  /** All of the `B`s, in order, and the final `C` acquired by a
-    * stateful left fold over `as`. */
-=======
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
-
->>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {

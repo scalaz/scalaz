@@ -177,14 +177,11 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
-<<<<<<< HEAD
-  /** All of the `B`s, in order, and the final `C` acquired by a
-    * stateful left fold over `as`. */
-=======
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
->>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     as.foldLeft((c, empty[B])){(acc, a) => acc match {
       case (c, v) => f(c, a) match {
@@ -205,17 +202,12 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
-<<<<<<< HEAD
   /** `[`empty IxSq`, as take 1, as take 2, ..., as]` */
-  final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] =
-    empty +: (if (as.isEmpty) empty else (initz(as.tail) map (as.head +: _)))
-=======
   final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] = {
     @tailrec def rec(acc: IxSq[IxSq[A]], as: IxSq[A]): IxSq[IxSq[A]] =
       if (as.isEmpty) as +: acc else rec(as +: acc, as.init)
     rec(empty, as)
   }
->>>>>>> dadbe0b75a11bbdaad0dc79f8bc3ca23f23008f0
 
   /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
