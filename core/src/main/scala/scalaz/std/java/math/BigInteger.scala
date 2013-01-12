@@ -4,14 +4,12 @@ package std.java.math
 import java.math.BigInteger
 
 trait BigIntegerInstances {
-  implicit val bigIntegerInstance: Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Group[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
+  implicit val bigIntegerInstance: Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
     override def shows(f: BigInteger) = f.toString
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
 
     def zero = BigInteger.ZERO
-
-    def inverse(f: BigInteger) = f.negate()
 
     def succ(b: BigInteger) = b add BigInteger.ONE
     def pred(b: BigInteger) = b subtract BigInteger.ONE

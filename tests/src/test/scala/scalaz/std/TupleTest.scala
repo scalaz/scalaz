@@ -28,14 +28,14 @@ class TupleTest extends Spec {
   checkAll("Tuple7", order.laws[(A, B, C, D, E, F, G)])
   checkAll("Tuple8", order.laws[(A, B, C, D, E, F, G, H)])
 
-  checkAll("Tuple1", group.laws[(A)])
-  checkAll("Tuple2", group.laws[(A, B)])
-  checkAll("Tuple3", group.laws[(A, B, C)])
-  checkAll("Tuple4", group.laws[(A, B, C, D)])
-  checkAll("Tuple5", group.laws[(A, B, C, D, E)])
-  checkAll("Tuple6", group.laws[(A, B, C, D, E, F)])
-  checkAll("Tuple7", group.laws[(A, B, C, D, E, F, G)])
-  checkAll("Tuple8", group.laws[(A, B, C, D, E, F, G, H)])
+  checkAll("Tuple1", monoid.laws[(A)])
+  checkAll("Tuple2", monoid.laws[(A, B)])
+  checkAll("Tuple3", monoid.laws[(A, B, C)])
+  checkAll("Tuple4", monoid.laws[(A, B, C, D)])
+  checkAll("Tuple5", monoid.laws[(A, B, C, D, E)])
+  checkAll("Tuple6", monoid.laws[(A, B, C, D, E, F)])
+  checkAll("Tuple7", monoid.laws[(A, B, C, D, E, F, G)])
+  checkAll("Tuple8", monoid.laws[(A, B, C, D, E, F, G, H)])
 
   checkAll("Tuple1", monad.laws[Tuple1])
   checkAll("Tuple2", monad.laws[({type λ[α] = (B, α)})#λ])
@@ -85,7 +85,6 @@ class TupleTest extends Spec {
       def order[A: Order, B: Order] = Order[(A, B)]
       def semigroup[A: Semigroup, B: Semigroup] = Semigroup[(A, B)]
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
-      def group[A: Group, B: Group] = Group[(A, B)]
       
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[({type λ[α] = (B, α)})#λ]
@@ -94,8 +93,7 @@ class TupleTest extends Spec {
 
       // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]
-      def semigroup[A: Group, B: Group] = Semigroup[(A, B)]
-      def monoid[A: Group, B: Group] = Monoid[(A, B)]
+      def semigroup[A: Monoid, B: Monoid] = Semigroup[(A, B)]
       def functor[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
     }
     object tuple3 {
@@ -104,7 +102,6 @@ class TupleTest extends Spec {
       def order[A: Order, B: Order, C: Order] = Order[(A, B, C)]
       def semigroup[A: Semigroup, B: Semigroup, C: Semigroup] = Semigroup[(A, B, C)]
       def monoid[A: Monoid, B: Monoid, C: Monoid] = Monoid[(A, B, C)]
-      def group[A: Group, B: Group, C: Group] = Group[(A, B, C)]
     }
   }
 }

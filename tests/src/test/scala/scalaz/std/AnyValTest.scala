@@ -36,10 +36,10 @@ class AnyValTest extends Spec {
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
 
-  checkAll("Unit", group.laws[Unit])
-  checkAll("Int", group.laws[Int])
-  checkAll("Short", group.laws[Short])
-  checkAll("Long", group.laws[Long])
+  checkAll("Unit", monoid.laws[Unit])
+  checkAll("Int", monoid.laws[Int])
+  checkAll("Short", monoid.laws[Short])
+  checkAll("Long", monoid.laws[Long])
 
   {
     implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))

@@ -27,7 +27,7 @@ class FunctionTest extends Spec {
   implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
   implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
 
-  checkAll("Function0", group.laws[Int => Int])
+  checkAll("Function0", monoid.laws[Int => Int])
 
   checkAll("Function0", monad.laws[Function0])
   checkAll("Function1", monad.laws[({type λ[α] = (B) => α})#λ])
@@ -65,11 +65,9 @@ class FunctionTest extends Spec {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]
     def monoid[A, R: Monoid] = Monoid[A => R]
-    def group[A, R: Group] = Group[A => R]
     def comonad[A: Monoid, R] = Comonad[({type λ[α]=A => α})#λ]
 
     // checking absence of ambiguity
-    def semigroup[A, R: Group] = Semigroup[A => R]
-    def monoid[A, R: Group] = Semigroup[A => R]
+    def semigroup[A, R: Monoid] = Semigroup[A => R]
   }
 }

@@ -11,8 +11,6 @@ trait Syntaxes {
 
   object monoid extends ToMonoidOps
 
-  object group extends ToGroupOps
-
   object equal extends ToEqualOps
 
   object length extends ToLengthOps
@@ -121,7 +119,7 @@ trait Syntaxes {
 trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
 
 trait ToTypeClassOps
-  extends ToSemigroupOps with ToMonoidOps with ToGroupOps with ToEqualOps with ToLengthOps with ToShowOps
+  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps

@@ -6,14 +6,12 @@ import Id._
 
 trait AnyValInstances {
 
-  implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] {
+  implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] {
     override def shows(f: Unit) = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
 
     def zero = ()
-
-    def inverse(f:Unit) = ()
 
     def order(x: Unit, y: Unit) = Ordering.EQ
 
@@ -227,14 +225,12 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
+  implicit val shortInstance: Monoid[Short] with Enum[Short] with Show[Short] = new Monoid[Short] with Enum[Short] with Show[Short] {
     override def shows(f: Short) = f.toString
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
 
     def zero: Short = 0
-
-    def inverse(f:Short) = (-f).toShort
 
     def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -275,14 +271,12 @@ trait AnyValInstances {
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
   }
 
-  implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
+  implicit val intInstance: Monoid[Int] with Enum[Int] with Show[Int] = new Monoid[Int] with Enum[Int] with Show[Int] {
     override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
 
     def zero: Int = 0
-
-    def inverse(f:Int) = -f
 
     def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -327,14 +321,12 @@ trait AnyValInstances {
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
   }
 
-  implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
+  implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
     override def shows(f: Long) = f.toString
 
     def append(f1: Long, f2: => Long) = f1 + f2
 
     def zero: Long = 0L
-
-    def inverse(f: Long) = -f
 
     def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -375,49 +367,41 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit val floatInstance: Group[Float] with Order[Float] with Show[Float] = new Group[Float] with Order[Float] with Show[Float] {
+  implicit val floatInstance: Monoid[Float] with Order[Float] with Show[Float] = new Monoid[Float] with Order[Float] with Show[Float] {
     override def shows(f: Float) = f.toString
 
     def append(f1: Float, f2: => Float) = f1 + f2
 
     def zero: Float = 0f
 
-    def inverse(f: Float) = -f
-
     override def equalIsNatural: Boolean = true
 
     def order(x: Float, y: Float) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit val floatMultiplicationNewType: Group[Float @@ Multiplication] = new Group[Float @@ Multiplication] {
+  implicit val floatMultiplicationNewType: Semigroup[Float @@ Multiplication] = new Semigroup[Float @@ Multiplication] {
     def append(f1: Float @@ Multiplication, f2: => Float @@ Multiplication) = Multiplication(f1 * f2)
 
     def zero: Float @@ Multiplication = Multiplication(1.0f)
 
-    def inverse(f: Float @@ Multiplication) = Multiplication(1.0f/f)
-
   }
 
-  implicit val doubleInstance: Group[Double] with Order[Double] with Show[Double] = new Group[Double] with Order[Double] with Show[Double] {
+  implicit val doubleInstance: Monoid[Double] with Order[Double] with Show[Double] = new Monoid[Double] with Order[Double] with Show[Double] {
     override def shows(f: Double) = f.toString
 
     def append(f1: Double, f2: => Double) = f1 + f2
 
     def zero: Double = 0d
 
-    def inverse(f: Double) = -f
-
     override def equalIsNatural: Boolean = true
 
     def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit val doubleMultiplicationNewType: Group[Double @@ Multiplication] = new Group[Double @@ Multiplication] {
+  implicit val doubleMultiplicationNewType: Semigroup[Double @@ Multiplication] = new Semigroup[Double @@ Multiplication] {
     def append(f1: Double @@ Multiplication, f2: => Double @@ Multiplication) = Multiplication(f1 * f2)
 
     def zero: Double @@ Multiplication = Multiplication(1.0d)
-
-    def inverse(f: Double @@ Multiplication) = Multiplication(1.0d/f)
   }
 }
 

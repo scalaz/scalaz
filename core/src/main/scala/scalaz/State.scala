@@ -32,13 +32,4 @@ trait StateFunctions extends IndexedStateFunctions {
     val r = f(s);
     (r, ())
   })
-
-  /**
-   * Computes the difference between the current and previous values of `a`
-   */
-  def delta[A](a: A)(implicit A: Group[A]): State[A, A] = State{
-    (prevA) =>
-      val diff = A.minus(a, prevA)
-      (diff, a)
-  }
 }

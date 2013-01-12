@@ -130,14 +130,6 @@ trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G] 
   def zero: F = iso.from(G.zero)
 }
 
-trait IsomorphismGroup[F, G] extends Group[F] with IsomorphismMonoid[F, G] {
-  implicit def G: Group[G]
-
-  def iso: F <=> G
-
-  def inverse(f: F): F = iso.from(G.inverse(iso.to(f)))
-}
-
 trait IsomorphismEqual[F, G] extends Equal[F] {
   implicit def G: Equal[G]
 
