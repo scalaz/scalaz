@@ -11,7 +11,7 @@ import scalaz.Id.Id
  */
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
-  ////
+  /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
