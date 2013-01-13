@@ -4,11 +4,11 @@ package scalaz
 import scalaz.Id.Id
 
 /**
- *
+ * A type giving rise to two unrelated [[scalaz.Traverse]]s.
  */
 ////
 trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
-  ////
+  /** Collect `G`s while applying `f` and `g` in some order. */
   def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: F[A, B])(f: A => G[C], g: B => G[D]): G[F[C, D]]
 
   // derived functions
@@ -27,6 +27,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     implicit def G = G0
   }
 
+  /** Flipped `bitraverse`. */
   def bitraverseF[G[_] : Applicative, A, B, C, D](f: A => G[C], g: B => G[D]): F[A, B] => G[F[C, D]] =
     bitraverseImpl(_)(f, g)
 
@@ -34,11 +35,13 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     bitraverseImpl[Id, A, B, C, D](fab)(f, g)
   }
 
+  /** Extract the Traverse on the first param. */
   def leftTraverse[X]: Traverse[({type λ[α] = F[α, X]})#λ] = new Traverse[({type λ[α] = F[α, X]})#λ] {
     def traverseImpl[G[_]:Applicative,A,B](fa: F[A, X])(f: A => G[B]): G[F[B, X]] =
       bitraverseImpl(fa)(f, x => Applicative[G] point x)
   }
 
+  /** Extract the Traverse on the second param. */
   def rightTraverse[X]: Traverse[({type λ[α] = F[X, α]})#λ] = new Traverse[({type λ[α] = F[X, α]})#λ] {
     def traverseImpl[G[_]:Applicative,A,B](fa: F[X, A])(f: A => G[B]): G[F[X, B]] =
       bitraverseImpl(fa)(x => Applicative[G] point x, f)

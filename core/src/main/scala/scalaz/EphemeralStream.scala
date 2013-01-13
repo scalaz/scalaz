@@ -2,6 +2,11 @@ package scalaz
 
 import java.lang.ref.WeakReference
 
+/** Like [[scala.collection.immutable.Stream]], but doesn't save
+  * computed values.  As such, it can be used to represent similar
+  * things, but without the space leak problem frequently encountered
+  * using that type.
+  */
 sealed trait EphemeralStream[A] {
 
   import EphemeralStream._

@@ -125,12 +125,18 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def <^>[A, B: Monoid](as: IxSq[A])(f: NonEmptyList[A] => B): B =
     if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
 
+  /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
+    * any `p`s after the first false.
+    */
   final def takeWhileM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
       Monad[M].bind(p(a))(b =>
         if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
         else Monad[M].point(empty)))
 
+  /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
+    * any `p`s after the first true.
+    */
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
@@ -138,6 +144,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, g) =>
       Monad[M].bind(p(a))(b => if (b) Monad[M].map(g)(tt => a +: tt) else g))
 
+  /** Run `p(a)`s left-to-right until it yields a true value,
+    * answering `Some(that)`, or `None` if nothing matched `p`.
+    */
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
     lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
@@ -149,6 +158,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     filterM(as)(_ => tf)
   }
 
+  /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
       Monad[M].bind(p(as.head))(b =>
@@ -157,15 +167,19 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         }
       ))
 
+  /** A pair of the longest prefix of passing `as` against `p`, and
+    * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
         if (b) Monad[M].map(g)((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
         else Monad[M].point(empty, as)))
 
+  /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
     if (as.isEmpty) Monad[M].point(empty) else
       Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
@@ -173,9 +187,12 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
+  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     as.foldLeft((c, empty[B])){(acc, a) => acc match {
       case (c, v) => f(c, a) match {
@@ -183,6 +200,8 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       }}
     }
 
+  /** All of the `B`s, in order `as`-wise, and the final `C` acquired
+    * by a stateful right fold over `as`. */
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     as.foldRight((c, empty[B])){(a, acc) => acc match {
       case (c, v) => f(c, a) match {
@@ -190,18 +209,22 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       }}
     }
 
+  /** `[as, as.tail, as.tail.tail, ..., `empty IxSq`]` */
   final def tailz[A](as: IxSq[A]): IxSq[IxSq[A]] =
     if (as.isEmpty) empty[A] +: empty else as +: tailz(as.tail)
 
+  /** `[`empty IxSq`, as take 1, as take 2, ..., as]` */
   final def initz[A](as: IxSq[A]): IxSq[IxSq[A]] = {
     @tailrec def rec(acc: IxSq[IxSq[A]], as: IxSq[A]): IxSq[IxSq[A]] =
       if (as.isEmpty) as +: acc else rec(as +: acc, as.init)
     rec(empty, as)
   }
 
+  /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     tailz(as).tail flatMap (as zip _)
 
+  /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: IxSq[A]): IxSq[(A, A)] =
     if (as.isEmpty) empty else as zip as.tail
 }

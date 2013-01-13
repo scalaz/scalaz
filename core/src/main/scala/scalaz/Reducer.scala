@@ -20,8 +20,10 @@ sealed trait Reducer[C, M] {
 
   def unit(c: C): M
 
+  /** Faster `append(m, unit(c))`. */
   def snoc(m: M, c: C): M
 
+  /** Faster `append(unit(c), m)`. */
   def cons(c: C, m: M): M
 
   def zero: M =
@@ -30,6 +32,7 @@ sealed trait Reducer[C, M] {
   def append(a1: M, a2: => M): M =
     monoid.append(a1, a2)
 
+  /** Distribute `C`s to `M` and `N`. */
   def compose[N](r: Reducer[C, N]): Reducer[C, (M, N)] = {
     implicit val m = Reducer.this.monoid
     implicit val n = r.monoid
@@ -57,6 +60,7 @@ sealed trait UnitReducer[C, M] extends Reducer[C, M] {
 }
 
 object UnitReducer {
+  /** Minimal `Reducer` derived from a monoid and `unit`. */
   def apply[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] = new UnitReducer[C, M] {
     val monoid = mm
     def unit(c: C) = u(c)
@@ -64,6 +68,9 @@ object UnitReducer {
 }
 
 object Reducer extends ReducerFunctions with ReducerInstances {
+  /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
+    * sharing than `UnitReducer.apply`.
+    */
   def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
 }
@@ -71,26 +78,31 @@ object Reducer extends ReducerFunctions with ReducerInstances {
 trait ReducerInstances {
   import Reducer._
 
+  /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
     unitConsReducer(List(_), c => c :: _)
   }
 
+  /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._
     unitConsReducer(Stream(_), c => c #:: _)
   }
 
+  /** Ignore `C`s. */
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
     import std.anyVal._
     unitReducer((_: C) => ())
   }
 
+  /** Collect `C`s into a vector, in order. */
   implicit def VectorReducer[C]: Reducer[C, Vector[C]] = {
     import std.vector._
     unitReducer(c => Vector(c))
   }
 
+  /** The "or" monoid. */
   implicit def AnyReducer: Reducer[Boolean, Boolean] = {
     implicit val B = std.anyVal.booleanInstance.disjunction
     unitReducer(x => x)
@@ -98,8 +110,10 @@ trait ReducerInstances {
 
   import std.anyVal._
 
+  /** The "and" monoid. */
   implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
 
+  /** Accumulate endomorphisms. */
   implicit def EndoReducer[A]: Reducer[A => A, Endo[A]] = unitReducer(Endo(_))
 
   implicit def DualReducer[A: Monoid]: Reducer[A, A @@ Tags.Dual] = unitReducer(Tags.Dual(_: A))(Dual.dualMonoid[A])
@@ -135,6 +149,7 @@ trait ReducerInstances {
 
 trait ReducerFunctions {
 
+  /** Alias for [[scalaz.Reducer]]`.apply`. */
   def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     new Reducer[C, M] {
       val monoid = mm
@@ -149,7 +164,7 @@ trait ReducerFunctions {
   def foldReduce[F[_], A, B](a: F[A])(implicit f: Foldable[F], r: Reducer[A, B]): B =
     f.foldMap(a)(r.unit(_))(r.monoid)
 
-  /**Construct a Reducer with the given unit function and monoid **/
+  /** Alias for [[scalaz.UnitReducer]]`.apply`. */
   def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     new UnitReducer[C, M] {
       val monoid = mm
@@ -166,5 +181,8 @@ trait ReducerFunctions {
     def cons(c: C, m: M): M = cs(c)(m)
   }
 
+  /** The reducer derived from any monoid.  Not implicit because it is
+    * suboptimal for most reducer applications.
+    */
   def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(x => x)
 }

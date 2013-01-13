@@ -124,18 +124,27 @@ trait ListFunctions {
     case h :: t => f(NonEmptyList.nel(h, t))
   }
 
+  /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
+    * any `p`s after the first false.
+    */
   final def takeWhileM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => Monad[M].bind(p(h))(b =>
       if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt) else Monad[M].point(Nil))
   }
 
+  /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
+    * any `p`s after the first true.
+    */
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
   final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     Monad[M].filterM(as)(p)
 
+  /** Run `p(a)`s left-to-right until it yields a true value,
+    * answering `Some(that)`, or `None` if nothing matched `p`.
+    */
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil    => Monad[M].point(None: Option[A])
     case h :: t => Monad[M].bind(p(h))(b =>
@@ -148,6 +157,7 @@ trait ListFunctions {
     filterM(as)(_ => scala.List(true, false))
   }
 
+  /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil    => Monad[M].point(Nil: List[A], Nil: List[A])
     case h :: t =>
@@ -158,6 +168,8 @@ trait ListFunctions {
       )
   }
 
+  /** A pair of the longest prefix of passing `as` against `p`, and
+    * the remainder. */
   final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
     case Nil    => Monad[M].point(Nil, Nil)
     case h :: t =>
@@ -167,9 +179,11 @@ trait ListFunctions {
 
   }
 
+  /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => {
@@ -180,10 +194,12 @@ trait ListFunctions {
     }
   }
 
+  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
-
+  /** All of the `B`s, in order, and the final `C` acquired by a
+    * stateful left fold over `as`. */
   final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {
@@ -193,6 +209,8 @@ trait ListFunctions {
     }
   }
 
+  /** All of the `B`s, in order `as`-wise, and the final `C` acquired
+    * by a stateful right fold over `as`. */
   final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
     case Nil    => (c, Nil)
     case h :: t => {
@@ -202,19 +220,23 @@ trait ListFunctions {
     }
   }
 
+  /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {
     case Nil           => scala.List(Nil)
     case xxs@(_ :: xs) => xxs :: tailz(xs)
   }
 
+  /** `[Nil, as take 1, as take 2, ..., as]` */
   final def initz[A](as: List[A]): List[List[A]] = as match {
     case Nil           => scala.List(Nil)
     case xxs@(x :: xs) => Nil :: (initz(xs) map (x :: _))
   }
 
+  /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: List[A]): List[(A, A)] =
     tailz(as).tail flatMap (as zip _)
 
+  /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: List[A]): List[(A, A)] = as match {
     case Nil      => Nil
     case (_ :: t) => as zip t

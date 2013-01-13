@@ -1,13 +1,19 @@
 package scalaz
 
-/** Representable functors */
+/** Representable functors, that is to say, those with isomorphisms to
+  * and from `[a](X => a)`.  As such, all typeclasses and operations on
+  * `[a](X => a)`, that is, fixed in `X`, can be trivially derived for
+  * `F`.
+  */
 abstract class Representable[F[_], X](implicit val F: Functor[F]) {
   def rep[A](f: X => A): F[A]
   def unrep[A](f: F[A]): X => A
 
   trait RepresentableLaw {
+    /** `rep compose unrep` is vacuous. */
     def repUnrep[A](f: F[A])(implicit E: Equal[F[A]]) =
       E.equal(rep(unrep(f)), f)
+    /** `unrep compose rep` is vacuous. */
     def unrepRep[A](f: X => A, x: X)(implicit E: Equal[A]) =
       E.equal(unrep(rep(f))(x), f(x))
   }
@@ -18,6 +24,7 @@ abstract class Representable[F[_], X](implicit val F: Functor[F]) {
 trait RepresentableInstances {
   import scalaz.std.function._
 
+  /** The identity representable. */
   implicit def readerRepresentable[E]: Representable[({type λ[α] = E => α})#λ, E] =
     new Representable[({type λ[α] = E => α})#λ, E] {
       def rep[A](f: E => A) = f

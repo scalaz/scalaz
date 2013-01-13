@@ -2,27 +2,37 @@ package scalaz
 
 ////
 /**
+ * [[scalaz.Compose]] with identity.
  *
+ * @see [[scalaz.Category.CategoryLaw]]
  */
 ////
 trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   ////
   // TODO GeneralizedCategory, GeneralizedFunctor, et al, from Scalaz6 ?
 
+  /** The left and right identity over `compose`. */
   def id[A]: A =>: A
 
+  /** `monoid`, but universally quantified. */
   def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
     def empty[A] = id
   }
+
+  /** The endomorphism monoid, where `zero`=`id` and
+    * `append`=`compose`.
+    */
   def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
     def zero = id
   }
 
   trait CategoryLaw extends ComposeLaw {
+    /** `_ <<< id` is vacuous. */
     def leftIdentity[A, B](ab: (A =>: B))(implicit E: Equal[A =>: B]): Boolean = {
       val ab1 = compose(ab, id[A])
       E.equal(ab, ab1)
     }
+    /** `id <<< _` is vacuous. */
     def rightIdentity[A, B](ab: (A =>: B))(implicit E: Equal[A =>: B]): Boolean = {
       val ab1 = compose(id[B], ab)
       E.equal(ab, ab1)
