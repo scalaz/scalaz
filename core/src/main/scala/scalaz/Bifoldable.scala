@@ -2,18 +2,23 @@ package scalaz
 
 ////
 /**
- *
+ * A type giving rise to two unrelated [[scalaz.Foldable]]s.
  */
 ////
 trait Bifoldable[F[_, _]]  { self =>
   ////
 
+  /** Accumulate `A`s and `B`s in some unspecified order. */
   def bifoldMap[A,B,M](fa: F[A, B])(f: A => M)(g: B => M)(implicit F: Monoid[M]): M
 
+  /** Accumulate to `C` starting at the "right".  `f` and `g` may be
+    * interleaved.
+    */
   def bifoldRight[A,B,C](fa: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C
 
   // derived functions
 
+  /** `bifoldRight`, but defined to run in the opposite direction. */
   def bifoldLeft[A,B,C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C = {
     import Dual._, Endo._, syntax.std.all._
     bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) => Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]]) apply z
@@ -47,6 +52,7 @@ trait Bifoldable[F[_, _]]  { self =>
   final def bifoldL[A, B, C](fa: F[A, B], z: C)(f: C => A => C)(g: C => B => C): C =
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
+  /** Extract the Foldable on the first parameter. */
   def leftFoldable[X]: Foldable[({type λ[α] = F[α, X]})#λ] = new Foldable[({type λ[α] = F[α, X]})#λ] {
     def foldMap[A,B](fa: F[A, X])(f: A => B)(implicit F: Monoid[B]): B =
       bifoldMap(fa)(f)(Function const F.zero)
@@ -55,6 +61,7 @@ trait Bifoldable[F[_, _]]  { self =>
       bifoldRight(fa, z)(f)((_, b) => b)
   }
 
+  /** Extract the Foldable on the second parameter. */
   def rightFoldable[X]: Foldable[({type λ[α] = F[X, α]})#λ] = new Foldable[({type λ[α] = F[X, α]})#λ] {
     def foldMap[A,B](fa: F[X, A])(f: A => B)(implicit F: Monoid[B]): B =
       bifoldMap(fa)(Function const F.zero)(f)

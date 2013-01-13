@@ -1,5 +1,6 @@
 package scalaz
 
+/** [[scala.Option]], but with a value by name. */
 sealed trait LazyOption[+A] {
 
   import LazyOption._

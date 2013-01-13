@@ -31,6 +31,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
   def multiply(value: F, n: Int): F =
     Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
 
+  /** Whether `a` == `zero`. */
   def isMZero(a: F)(implicit eq: Equal[F]): Boolean =
     eq.equal(a, zero)
 
@@ -43,7 +44,11 @@ trait Monoid[F] extends Semigroup[F] { self =>
   final def onEmpty[A,B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
     ifEmpty(a)(v)(mb.zero)
 
-  /** Every `Monoid` gives rise to a [[scalaz.Category]] */
+  /** Every `Monoid` gives rise to a [[scalaz.Category]], for which
+    * the type parameters are phantoms.
+    *
+    * @note `category.monoid` = `this`
+    */
   final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
     def id[A] = zero
   }

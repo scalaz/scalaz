@@ -97,11 +97,13 @@ trait StreamFunctions {
       Some(Zipper.zipper(x.tail, x.head, empty))
   }
 
+  /** `[as take 1, as take 2, ..., as]` */
   final def heads[A](as: Stream[A]): Stream[Stream[A]] = as match {
     case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
     case _       => empty
   }
 
+  /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
   final def tails[A](as: Stream[A]): Stream[Stream[A]] = as match {
     case h #:: t => as #:: tails(t)
     case _       => empty

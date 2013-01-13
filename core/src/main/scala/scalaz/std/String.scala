@@ -26,6 +26,7 @@ trait StringFunctions {
   if((s endsWith "y") && (List("ay", "ey","iy", "oy", "uy") forall (!s.endsWith(_)))) s.take(s.length - 1) + "ies"
   else s + "s"
 
+  /** Encode `s` according to a Java character set identifier. */
   def encode(s:String)(implicit c: CharSet): Array[Byte] = s getBytes c.value
 
   /**

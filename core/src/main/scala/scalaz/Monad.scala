@@ -23,6 +23,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
     listInstance.sequence_(List.fill(n)(fa))(this)
 
+  /** Filter `l` according to a monadic predicate. */
   def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
     l match {
       case Nil => point(List())

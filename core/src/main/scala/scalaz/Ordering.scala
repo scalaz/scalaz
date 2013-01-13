@@ -1,5 +1,11 @@
 package scalaz
 
+/** A ternary marker of how two values relate in an ordering.
+  *
+  * @note scalaz calls its version of [[scala.math.Ordering]],
+  *       [[scalaz.Order]].  This `Ordering` is analogous to the
+  *       `Int`s returned by [[scala.math.Ordering]].
+  */
 sealed abstract class Ordering(val toInt: Int, val name: String) {
   def complement: Ordering
 }

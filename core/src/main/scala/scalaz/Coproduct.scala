@@ -1,6 +1,8 @@
 package scalaz
 
+/** `F` on the left, and `G` on the right, of [[scalaz.\/]]. */
 sealed trait Coproduct[F[+_], G[+_], A] {
+  /** The underlying [[scalaz.\/]]. */
   val run: F[A] \/ G[A]
 
   import Coproduct._

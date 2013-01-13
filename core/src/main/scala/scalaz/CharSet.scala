@@ -1,5 +1,6 @@
 package scalaz
 
+/** Newtype for strings representing character sets. */
 sealed trait CharSet {
   val value: String
 }
