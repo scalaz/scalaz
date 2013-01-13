@@ -193,7 +193,7 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  /** A lens that doesn't transform the type the record. */
+  /** A lens that doesn't transform the type of the record. */
   type Lens[A, B] = LensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
