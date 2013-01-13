@@ -34,7 +34,7 @@ trait ToTraverse1Ops extends ToTraverse1Ops0 with ToTraverseOps with ToFoldable1
   ////
 }
 
-trait Traverse1Syntax[F[_]] extends TraverseSyntax[F] with Foldable1Syntax[F] { 
+trait Traverse1Syntax[F[_]] extends TraverseSyntax[F] with Foldable1Syntax[F] {
   implicit def ToTraverse1Ops[A](v: F[A]): Traverse1Ops[F, A] = new Traverse1Ops[F,A] { def self = v; implicit def F: Traverse1[F] = Traverse1Syntax.this.F }
 
   def F: Traverse1[F]
