@@ -22,12 +22,6 @@ class CompositionTest extends Spec {
   checkAll("Double composition", applicative.laws[TCCons[Option, TCCons[List, TCNil]]#Composed])
   checkAll("Double composition", traverse.laws[TCCons[Option, TCCons[List, TCNil]]#Composed])
 
-  implicit val nestedNestedApplicative = (Applicative[List] <<: Applicative[Option] <<: Applicative[List] <<: KTypeClass[Applicative].idCompose).instance
-  implicit val nestedNestedTraverse = (Traverse[List] <<: Traverse[Option] <<: Traverse[List] <<: KTypeClass[Traverse].idCompose).instance
-
-  checkAll("Triple composition", applicative.laws[TCCons[List, TCCons[Option, TCCons[List, TCNil]]]#Composed])
-  checkAll("Triple composition", traverse.laws[TCCons[List, TCCons[Option, TCCons[List, TCNil]]]#Composed])
-
 }
 
 // vim: expandtab:ts=2:sw=2
