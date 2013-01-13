@@ -16,7 +16,7 @@ sealed trait LazyOption[+A] {
     fold(_ => some, none)
 
   def isDefined =
-    fold(_ => false, true)
+    fold(_ => true, false)
 
   def isEmpty =
     !isDefined
