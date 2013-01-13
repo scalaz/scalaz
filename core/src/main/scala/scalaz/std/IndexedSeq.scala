@@ -125,12 +125,18 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def <^>[A, B: Monoid](as: IxSq[A])(f: NonEmptyList[A] => B): B =
     if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
 
+  /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
+    * any `p`s after the first false.
+    */
   final def takeWhileM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
       Monad[M].bind(p(a))(b =>
         if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
         else Monad[M].point(empty)))
 
+  /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
+    * any `p`s after the first true.
+    */
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
@@ -138,6 +144,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, g) =>
       Monad[M].bind(p(a))(b => if (b) Monad[M].map(g)(tt => a +: tt) else g))
 
+  /** Run `p(a)`s left-to-right until it yields a true value,
+    * answering `Some(that)`, or `None` if nothing matched `p`.
+    */
   final def findM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
     lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
@@ -170,6 +179,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
     if (as.isEmpty) Monad[M].point(empty) else
       Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
@@ -177,6 +187,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
           Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
+  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 

@@ -124,18 +124,27 @@ trait ListFunctions {
     case h :: t => f(NonEmptyList.nel(h, t))
   }
 
+  /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
+    * any `p`s after the first false.
+    */
   final def takeWhileM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => Monad[M].bind(p(h))(b =>
       if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt) else Monad[M].point(Nil))
   }
 
+  /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
+    * any `p`s after the first true.
+    */
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
   final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     Monad[M].filterM(as)(p)
 
+  /** Run `p(a)`s left-to-right until it yields a true value,
+    * answering `Some(that)`, or `None` if nothing matched `p`.
+    */
   final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
     case Nil    => Monad[M].point(None: Option[A])
     case h :: t => Monad[M].bind(p(h))(b =>
@@ -174,6 +183,7 @@ trait ListFunctions {
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => {
@@ -184,6 +194,7 @@ trait ListFunctions {
     }
   }
 
+  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
     groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
