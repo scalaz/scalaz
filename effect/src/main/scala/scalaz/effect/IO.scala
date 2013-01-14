@@ -9,6 +9,7 @@ import ST._
 import Kleisli._
 import Free._
 import std.function._
+import syntax.bifunctor._
 
 sealed trait IO[+A] {
   private[effect] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
@@ -81,22 +82,15 @@ sealed trait IO[+A] {
     })
 
   /**
-   * Returns an Either result which is Right if no exception was raised, or Left if an
+   * Returns a disjunction result which is right if no exception was raised, or left if an
    * exception was raised.
    */
-  def catchLeft: IO[Either[Throwable, A]] = map(Right(_): Either[Throwable, A]) except (t => IO(Left(t): Either[Throwable, A]))
+  def catchLeft: IO[Throwable \/ A] =
+    map(\/.right) except (t => IO(\/.left(t)))
 
   /**Like "catchLeft" but takes a predicate to select which exceptions are caught. */
-  def catchSomeLeft[B](p: Throwable => Option[B]): IO[Either[B, A]] = for {
-    r <- this.catchLeft
-    x <- r match {
-      case Right(v) => IO(Right(v): Either[B, A])
-      case Left(e)  => p(e) match {
-        case Some(b) => IO(Left(b): Either[B, A])
-        case None    => throw e
-      }
-    }
-  } yield x
+  def catchSomeLeft[B](p: Throwable => Option[B]): IO[B \/ A] =
+    catchLeft map (_.leftMap(e => p(e).getOrElse(throw e)))
 
   /**Like "finally", but only performs the final action if there was an exception. */
   def onException[B](action: IO[B]): IO[A] = this except (e => for {
