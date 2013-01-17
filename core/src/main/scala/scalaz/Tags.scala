@@ -37,8 +37,11 @@ object Tags {
    *
    *  Example:
    *  {{{
-   *  import std.string._
-   *  Monoid[Dual[String]].append("World!", "Hello, ") // "Hello, World!"
+   *  import scalaz.{@@, Tag, Tags, Dual}
+   *  import scalaz.std.string._
+   *  import scalaz.syntax.monoid._
+   *  import scalaz.Dual._
+   *  Dual("World!") |+| Dual("Hello, ") // "Hello, World!"
    *  }}}
    */
   sealed trait Dual
