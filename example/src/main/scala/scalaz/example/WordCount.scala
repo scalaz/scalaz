@@ -34,7 +34,7 @@ object WordCount {
     } @>>> AppFuncU { (x: Int) => x }
 
     // Compose applicative functions in parallel
-    val countAll = countChar :: countLine :: (countWord consA AppFunc.HNil)
+    val countAll = countChar :: countLine :: (countWord consA AppFunc.HNil[Char, Int])
     
     // ... and execute them in a single traversal 
     val charCount :: lineCount ::  wordCountState :: HNil = countAll traverse text
