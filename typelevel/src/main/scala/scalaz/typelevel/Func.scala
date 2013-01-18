@@ -67,9 +67,9 @@ object HListFunc {
  * list.traverse(List(1, 2, 3))
  * }}}
  */
-trait HListFunc[TC[X[_]] <: Functor[X], A, B]  { self =>
+trait HListFunc[TC[X[_]] <: Functor[X], A, B]  {
   type L <: TCList
-  def ::[G[_]](g: Func[G, TC, A, B]): HConsFunc[G, TC, A, B, self.type]
+  def ::[G[_]](g: Func[G, TC, A, B]) = HConsFunc[G, TC, A, B, this.type](g, this)
   private[scalaz] def Product: KTypeClass.WrappedProduct[TC, L]
   final def F = Product.instance
   def runA(a: A): L#Product[B]
@@ -80,7 +80,6 @@ case class HConsFunc[F[_], TC[F[_]] <: Functor[F], A, B, +T <: HListFunc[TC, A, 
   tail: T
 ) extends HListFunc[TC, A, B] {
   override type L = TCCons[F, tail.L]
-  def ::[G[_]](g: Func[G, TC, A, B]) = g consA this
   def runA(a: A) = head.runA(a) :: tail.runA(a)
   def Product = head.F *: tail.Product
   def TC = head.TC
@@ -90,7 +89,6 @@ case class HNilFunc[TC[F[_]] <: Functor[F], A, B](
   TC0: KTypeClass[TC]
 ) extends HListFunc[TC, A, B] {
   override type L = TCNil
-  def ::[G[_]](g: Func[G, TC, A, B]) = g consA this
   def TC = TC0
   def Product: KTypeClass.WrappedProduct[TC, TCNil] = TC0.emptyProduct
   def runA(a: A) = HNil  
