@@ -39,12 +39,7 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
   def productA[G[_]](g: Func[G, TC, A, B]) = consA(g consA hnilfunc[TC, A, B])
 
   /** prepend `this` to HListFunc `tail` **/
-  def consA(tail: HListFunc[TC, A, B]): HListFunc[TC, A, B] = new HListFunc[TC, A, B] {
-    type L = TCCons[F, tail.L] 
-    def runA(a: A) = self.runA(a) :: tail.runA(a)
-    def Product = self.F *: tail.Product
-    def TC = self.TC
-  }
+  def consA[T <: HListFunc[TC, A, B]](tail: T) = HConsFunc[F, TC, A, B, T](self, tail)
 
   def mapA[C](f: B => C): Func[F, TC, A, C] =
     func(a => F.map(self.runA(a))(f))
@@ -74,10 +69,31 @@ object HListFunc {
  */
 trait HListFunc[TC[X[_]] <: Functor[X], A, B]  { self =>
   type L <: TCList
-  def ::[G[_]](g: Func[G, TC, A, B]) = g consA self
+  def ::[G[_]](g: Func[G, TC, A, B]): HConsFunc[G, TC, A, B, self.type]
   private[scalaz] def Product: KTypeClass.WrappedProduct[TC, L]
   final def F = Product.instance
   def runA(a: A): L#Product[B]
+}
+
+case class HConsFunc[F[_], TC[F[_]] <: Functor[F], A, B, +T <: HListFunc[TC, A, B]](
+  head: Func[F, TC, A, B],
+  tail: T
+) extends HListFunc[TC, A, B] {
+  override type L = TCCons[F, tail.L]
+  def ::[G[_]](g: Func[G, TC, A, B]) = g consA this
+  def runA(a: A) = head.runA(a) :: tail.runA(a)
+  def Product = head.F *: tail.Product
+  def TC = head.TC
+}
+
+case class HNilFunc[TC[F[_]] <: Functor[F], A, B](
+  TC0: KTypeClass[TC]
+) extends HListFunc[TC, A, B] {
+  override type L = TCNil
+  def ::[G[_]](g: Func[G, TC, A, B]) = g consA this
+  def TC = TC0
+  def Product: KTypeClass.WrappedProduct[TC, TCNil] = TC0.emptyProduct
+  def runA(a: A) = HNil  
 }
 
 //
@@ -128,12 +144,7 @@ trait FuncFunctions {
     def F = F0.TC
     def runA(a: A) = F0(f(a))
   }
-  def hnilfunc[TC[X[_]] <: Functor[X], A, B](implicit TC0: KTypeClass[TC]): HListFunc[TC, A, B] = new HListFunc[TC, A, B] {
-    type L = TCNil
-    def TC = TC0
-    def Product: KTypeClass.WrappedProduct[TC, TCNil] = TC0.emptyProduct
-    def runA(a: A) = HNil
-  }
+  def hnilfunc[TC[X[_]] <: Functor[X], A, B](implicit TC0: KTypeClass[TC]) = HNilFunc[TC, A, B](TC0)
 }
 
 object Func extends FuncFunctions with FuncInstances {
