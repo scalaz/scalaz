@@ -77,9 +77,12 @@ sealed trait EitherT[F[+_], +A, +B] {
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
     F.each(run)(_ foreach f)
 
-  /** Apply a function in the environment of the right of this disjunction. */
+  /** Apply a function in the environment of the right of this
+    * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
+    * it is not consistent with `flatMap`.
+    */
   def ap[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
-    EitherT(F.apply2(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
+    EitherT(F.apply2(f.run, run)((a, b) => b ap a))
 
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, C](f: B => EitherT[F, AA, C])(implicit F: Monad[F]): EitherT[F, AA, C] =
@@ -181,7 +184,6 @@ sealed trait EitherT[F[+_], +A, +B] {
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ validationed k))
-
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
@@ -209,20 +211,8 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   }
 }
 
-trait EitherTInstances3 {
+trait EitherTInstances1 {
   implicit def eitherTFunctor[F[+_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
-    implicit def F = F0
-  }
-}
-
-trait EitherTInstances2 extends EitherTInstances3 {
-  implicit def eitherTApply[F[+_], L](implicit F0: Apply[F]) = new EitherTApply[F, L] {
-    implicit def F = F0
-  }
-}
-
-trait EitherTInstances1 extends EitherTInstances2 {
-  implicit def eitherTApplicative[F[+_], L](implicit F0: Applicative[F]) = new EitherTApplicative[F, L] {
     implicit def F = F0
   }
 }
@@ -275,20 +265,10 @@ private[scalaz] trait EitherTFunctor[F[+_], E] extends Functor[({type λ[α]=Eit
   override def map[A, B](fa: EitherT[F, E, A])(f: (A) => B): EitherT[F, E, B] = fa map f
 }
 
-private[scalaz] trait EitherTApply[F[+_], E] extends Apply[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
-  implicit def F: Apply[F]
-
-  override def ap[A, B](fa: => EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
-}
-
-private[scalaz] trait EitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApply[F, E] {
-  implicit def F: Applicative[F]
-  def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
-
-}
-
-private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApplicative[F, E] {
+private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
   implicit def F: Monad[F]
+
+  def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
 
   def bind[A, B](fa: EitherT[F, E, A])(f: (A) => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
