@@ -77,6 +77,10 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     /** `point` is a left and right identity, F-wise. */
     def interchange[A, B](f: F[A => B], a: A)(implicit FB: Equal[F[B]]): Boolean =
       FB.equal(ap(point(a))(f), ap(f)(point((f: A => B) => f(a))))
+
+    /** `map` is like the one derived from `point` and `ap`. */
+    def mapLikeDerived[A, B](f: A => B, fa: F[A])(implicit FB: Equal[F[B]]): Boolean =
+      FB.equal(map(fa)(f), ap(fa)(point(f)))
   }
   def applicativeLaw = new ApplicativeLaw {}
 

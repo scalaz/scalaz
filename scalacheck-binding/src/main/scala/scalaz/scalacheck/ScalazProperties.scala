@@ -132,6 +132,9 @@ object ScalazProperties {
     def interchange[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], afx: Arbitrary[F[X => Y]], e: Equal[F[Y]]) =
       forAll(ap.applicativeLaw.interchange[X, Y] _)
 
+    def mapApConsistency[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[F[X]], afx: Arbitrary[X => Y], e: Equal[F[Y]]) =
+      forAll(ap.applicativeLaw.mapLikeDerived[X, Y] _)
+
     def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("applicative") {
       include(functor.laws[F])
@@ -139,6 +142,7 @@ object ScalazProperties {
       property("composition") = applicative.composition[F, Int, Int, Int]
       property("homomorphism") = applicative.homomorphism[F, Int, Int]
       property("interchange") = applicative.interchange[F, Int, Int]
+      property("map consistent with ap") = applicative.mapApConsistency[F, Int, Int]
     }
   }
 
