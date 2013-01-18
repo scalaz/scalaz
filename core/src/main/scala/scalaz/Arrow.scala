@@ -9,7 +9,7 @@ package scalaz
  * functions.
  */
 ////
-trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] { self =>
   ////
 
   /** Lift an ordinary function. */
@@ -49,9 +49,13 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
     >>>(<<<(first[A, B, C](f), swap), swap)
   }
 
-  /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
+  /** Alias for `split`. */
   def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
-      >>>(first[A, B, C](fab), second[C, D, B](fcd))
+    split(fab, fcd)
+
+  /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
+  def split[A, B, C, D](f: A =>: B, g: C =>: D): ((A,  C) =>: (B, D)) =
+    >>>(first[A, B, C](f), second[C, D, B](g))
 
   /** Run two `fab`s alongside each other. */
   def product[A, B](fab: (A =>: B)): ((A, A) =>: (B, B)) =
