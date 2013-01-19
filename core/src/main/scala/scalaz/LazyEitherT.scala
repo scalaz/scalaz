@@ -77,9 +77,9 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
-    * it is not consistent with `flatMap`.
+    * it is not consistent with `ap`.
     */
-  def ap[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Apply[F]): LazyEitherT[F, AA, C] = {
+  def app[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Apply[F]): LazyEitherT[F, AA, C] = {
     // TODO check laziness
     LazyEitherT[F, AA, C](F.apply2(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
   }

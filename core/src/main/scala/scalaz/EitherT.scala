@@ -79,9 +79,9 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
-    * it is not consistent with `flatMap`.
+    * it is not consistent with `ap`.
     */
-  def ap[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
+  def app[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
     EitherT(F.apply2(f.run, run)((a, b) => b ap a))
 
   /** Bind through the right of this disjunction. */
