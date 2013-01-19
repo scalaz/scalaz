@@ -51,6 +51,12 @@ trait MapInstances extends MapInstances0 {
     }
   }
 
+  implicit def mapShow[K, V](implicit K: Show[K], V: Show[V]): Show[Map[K, V]] =
+    Show.show(m => "Map[" +:
+                Cord.mkCord(", ", m.toSeq.view.map{
+                  case (k, v) => Cord(K show k, "->", V show v)
+                }: _*) :+ "]")
+
   implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] {
     def order(x: Map[K, V], y: Map[K, V]): Ordering = {
       import list._
