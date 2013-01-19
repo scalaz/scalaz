@@ -10,5 +10,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class CallableTest extends Spec {
-  checkAll("Callable", equal.laws[Callable[Int]])
+  checkAll("Callable", order.laws[Callable[Int]])
+  checkAll("Callable", monad.laws[Callable])
 }

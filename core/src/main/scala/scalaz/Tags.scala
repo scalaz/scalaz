@@ -6,22 +6,42 @@ package scalaz
  * @see [[scalaz.Tag]] and, `@@` in the package object [[scalaz]] .
  */
 object Tags {
-  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the first operand to append */
+  /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the first operand to append. */
+  sealed trait FirstVal
+
+  def FirstVal[A](a: A): A @@ FirstVal = Tag[A, FirstVal](a)
+
+  /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the last operand to append. */
+  sealed trait LastVal
+
+  def LastVal[A](a: A): A @@ LastVal = Tag[A, LastVal](a)
+
+  /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the lesser of two operands. */
+  sealed trait MinVal
+
+  def MinVal[A](a: A): A @@ MinVal = Tag[A, MinVal](a)
+
+  /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the greater of two operands. */
+  sealed trait MaxVal
+
+  def MaxVal[A](a: A): A @@ MaxVal = Tag[A, MaxVal](a)
+
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the first non-`zero` operand to append. */
   sealed trait First
 
   def First[A](a: A): A @@ First = Tag[A, First](a)
 
-  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the last operand to append */
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the last non-`zero` operand to append. */
   sealed trait Last
 
   def Last[A](a: A): A @@ Last = Tag[A, Last](a)
 
-  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the lesser of two operands */
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the lesser of two operands, ignoring `zero`. */
   sealed trait Min
 
   def Min[A](a: A): A @@ Min = Tag[A, Min](a)
 
-  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the greater of two operands */
+  /** Type tag to choose a [[scalaz.Monoid]] instance that selects the greater of two operands, ignoring `zero`. */
   sealed trait Max
 
   def Max[A](a: A): A @@ Max = Tag[A, Max](a)
