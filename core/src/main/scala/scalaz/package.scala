@@ -185,6 +185,11 @@ package object scalaz {
    */
   type ValidationNEL[+E, +X] = Validation[NonEmptyList[E], X]
 
+  type FirstOf[A] = A @@ Tags.FirstVal
+  type LastOf[A] = A @@ Tags.LastVal
+  type MinOf[A] = A @@ Tags.MinVal
+  type MaxOf[A] = A @@ Tags.MaxVal
+
   type FirstOption[A] = Option[A] @@ Tags.First
   type LastOption[A] = Option[A] @@ Tags.Last
   type MinOption[A] = Option[A] @@ Tags.Min
