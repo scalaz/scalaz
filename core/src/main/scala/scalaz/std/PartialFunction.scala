@@ -16,12 +16,12 @@ trait PartialFunctionInstances {
     }
     
     def choice[A, B, C](f: => PartialFunction[A, C], g: => PartialFunction[B, C]): PartialFunction[A \/ B, C] = {
-      case -\/(a) => f(a)
-      case \/-(b) => g(b)
+      case -\/(a) if f isDefinedAt a => f(a)
+      case \/-(b) if g isDefinedAt b => g(b)
     }
     
     def split[A, B, C, D](f: PartialFunction[A, B], g: PartialFunction[C, D]): PartialFunction[(A,  C), (B, D)] = {
-      case (a, c) => (f(a), g(c))
+      case (a, c) if f.isDefinedAt(a) && g.isDefinedAt(c) => (f(a), g(c))
     }
                     
     def first[A, B, C](f: PartialFunction[A, B]): PartialFunction[(A, C), (B, C)] = {
