@@ -62,7 +62,7 @@ object TypeClass {
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val first = TypeClass("First", *^*->*)
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category, split))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))

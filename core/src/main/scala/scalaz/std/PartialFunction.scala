@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait PartialFunctionInstances {
-  implicit val partialFunctionInstance = new Arrow[PartialFunction] with Category[PartialFunction] with Choice[PartialFunction] with Split[PartialFunction] {
+  implicit val partialFunctionInstance = new Arrow[PartialFunction] with Category[PartialFunction] with Choice[PartialFunction] {
     def arr[A, B](f: (A) => B) = {
       case a => f(a)
     }
@@ -20,7 +20,7 @@ trait PartialFunctionInstances {
       case \/-(b) if g isDefinedAt b => g(b)
     }
     
-    def split[A, B, C, D](f: PartialFunction[A, B], g: PartialFunction[C, D]): PartialFunction[(A,  C), (B, D)] = {
+    override def split[A, B, C, D](f: PartialFunction[A, B], g: PartialFunction[C, D]): PartialFunction[(A,  C), (B, D)] = {
       case (a, c) if f.isDefinedAt(a) && g.isDefinedAt(c) => (f(a), g(c))
     }
                     

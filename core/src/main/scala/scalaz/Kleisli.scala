@@ -235,7 +235,6 @@ private[scalaz] trait KleisliMonadPlus[F[+_], R] extends MonadPlus[({type λ[α]
 
 private[scalaz] trait KleisliArrow[F[+_]]
   extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ]
-  with Split[({type λ[α, β] = Kleisli[F, α, β]})#λ]
   with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
 
   implicit def F: Monad[F]
@@ -256,7 +255,7 @@ private[scalaz] trait KleisliArrow[F[+_]]
       case \/-(b) => g run b
     }
 
-  def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
+  override def split[A, B, C, D](f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
     Kleisli {
       case (a, c) =>
         F.bind(f run a)(b => F.map(g run c)(d => (b, d)))

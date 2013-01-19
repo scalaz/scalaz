@@ -9,7 +9,7 @@ package scalaz
  * functions.
  */
 ////
-trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] { self =>
   ////
 
   /** Lift an ordinary function. */
@@ -24,6 +24,12 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
       override def map[A, B](fa: (C =>: A))(f: (A) => B): (C =>: B) =
 	<<<(arr(f), fa)
+    }
+
+  def contravariantInstance[C]: Contravariant[({type λ[α] = (α =>: C)})#λ] =
+    new Contravariant[({type λ[α] = (α =>: C)})#λ] {
+      def contramap[A, B](fa: A =>: C)(f: B => A): (B =>: C) =
+        <<<(fa, arr(f))
     }
 
   /** Alias for `compose`. */
@@ -43,9 +49,13 @@ trait Arrow[=>:[_, _]] extends Category[=>:] { self =>
     >>>(<<<(first[A, B, C](f), swap), swap)
   }
 
-  /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
+  /** Alias for `split`. */
   def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
-      >>>(first[A, B, C](fab), second[C, D, B](fcd))
+    split(fab, fcd)
+
+  /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
+  def split[A, B, C, D](f: A =>: B, g: C =>: D): ((A,  C) =>: (B, D)) =
+    >>>(first[A, B, C](f), second[C, D, B](g))
 
   /** Run two `fab`s alongside each other. */
   def product[A, B](fab: (A =>: B)): ((A, A) =>: (B, B)) =
