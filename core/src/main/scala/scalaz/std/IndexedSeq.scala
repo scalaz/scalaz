@@ -246,14 +246,14 @@ trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] 
 
   import Ordering._
 
-  def order(a1: Coll, a2: Coll): Ordering =
-    (a1, a2) match {
-      case (IndexedSeq(), IndexedSeq()) => EQ
-      case (IndexedSeq(), y)        => LT
-      case (x, IndexedSeq())        => GT
-      case (as, bs) => Order[A].order(as.head, bs.head) match {
-        case EQ => order(as.tail, bs.tail)
-        case x  => x
+  def order(a1: Coll, a2: Coll): Ordering = {
+    val a1s = a1.length
+    @tailrec def receqs(ix: Int): Ordering =
+      if (ix >= a1s) EQ else A.order(a1(ix), a2(ix)) match {
+        case EQ => receqs(ix + 1)
+        case o => o
       }
-    }
+    Semigroup[Ordering].append(Order[Int].order(a1s, a2.length),
+                               receqs(0))
+  }
 }
