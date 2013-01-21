@@ -77,18 +77,26 @@ object Semigroup {
     def append(f1: A, f2: => A): A = f1
   }
 
+  @inline implicit def firstTaggedSemigroup[A] = firstSemigroup[A @@ Tags.FirstVal]
+
   /** A purely right-biased semigroup. */
   def lastSemigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = f2
   }
 
+  @inline implicit def lastTaggedSemigroup[A] = firstSemigroup[A @@ Tags.LastVal]
+
   def minSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = o.min(f1, f2)
   }
 
+  @inline implicit def minTaggedSemigroup[A] = firstSemigroup[A @@ Tags.MinVal]
+
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
     def append(f1: A, f2: => A): A = o.max(f1, f2)
   }
+
+  @inline implicit def maxTaggedSemigroup[A] = firstSemigroup[A @@ Tags.MaxVal]
 
   /** `point(a) append (point(a) append (point(a)...` */
   def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
