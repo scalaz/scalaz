@@ -139,8 +139,8 @@ trait ListFunctions {
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
-    Monad[M].filterM(as)(p)
+  final def filterM[A, M[_] : Applicative](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Applicative[M].filterM(as)(p)
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.

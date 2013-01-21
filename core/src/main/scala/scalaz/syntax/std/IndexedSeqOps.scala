@@ -21,7 +21,7 @@ trait IndexedSeqOps[A] extends Ops[IndexedSeq[A]] {
 
   final def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[IndexedSeq[A]] = v.takeUntilM(self)(p)
 
-  final def filterM[M[_] : Monad](p: A => M[Boolean]): M[IndexedSeq[A]] = v.filterM(self)(p)
+  final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[IndexedSeq[A]] = v.filterM(self)(p)
 
   final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = v.findM(self)(p)
 
