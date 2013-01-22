@@ -132,6 +132,9 @@ object ScalazProperties {
     def interchange[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], afx: Arbitrary[F[X => Y]], e: Equal[F[Y]]) =
       forAll(ap.applicativeLaw.interchange[X, Y] _)
 
+    def mapApConsistency[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[F[X]], afx: Arbitrary[X => Y], e: Equal[F[Y]]) =
+      forAll(ap.applicativeLaw.mapLikeDerived[X, Y] _)
+
     def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("applicative") {
       include(functor.laws[F])
@@ -139,6 +142,7 @@ object ScalazProperties {
       property("composition") = applicative.composition[F, Int, Int, Int]
       property("homomorphism") = applicative.homomorphism[F, Int, Int]
       property("interchange") = applicative.interchange[F, Int, Int]
+      property("map consistent with ap") = applicative.mapApConsistency[F, Int, Int]
     }
   }
 
@@ -153,6 +157,10 @@ object ScalazProperties {
                                      ag: Arbitrary[(Y => M[Z])], emz: Equal[M[Z]]) =
       forAll(M.monadLaw.associativeBind[X, Y, Z] _)
 
+    def bindApConsistency[M[_], X, Y](implicit M: Monad[M], amx: Arbitrary[M[X]],
+                                      af: Arbitrary[M[X => Y]], emy: Equal[M[Y]]) =
+      forAll(M.monadLaw.apLikeDerived[X, Y] _)
+
     def laws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]],
                    af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("monad") {
       include(applicative.laws[M])
@@ -160,6 +168,7 @@ object ScalazProperties {
       property("right identity") = monad.rightIdentity[M, Int]
       property("left identity") = monad.leftIdentity[M, Int, Int]
       property("associativity") = monad.associativity[M, Int, Int, Int]
+      property("ap consistent with bind") = monad.bindApConsistency[M, Int, Int]
 
     }
   }

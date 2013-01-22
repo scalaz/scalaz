@@ -17,8 +17,6 @@ class EitherTTest extends Spec {
 
   object instances {
     def functor[F[+_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def apply[F[+_] : Apply, A] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
-    def applicative[F[+_] : Applicative, A] = Applicative[({type λ[α] = EitherT[F, A, α]})#λ]
     def monad[F[+_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
     def foldable[F[+_] : Foldable, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
     def traverse[F[+_] : Traverse, A] = Traverse[({type λ[α] = EitherT[F, A, α]})#λ]
