@@ -104,7 +104,11 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
     Some((v.head, v.tail))
 }
 
-trait NonEmptyListInstances {
+trait NonEmptyListInstances0 {
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
+}
+
+trait NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
@@ -119,6 +123,10 @@ trait NonEmptyListInstances {
         case Nil => fa.head
         case h :: t => foldLeft1(NonEmptyList.nel(f(fa.head, h), t))(f)
       }
+
+      // would otherwise use traverse1Impl
+      override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B, A) => B): B =
+        fa.tail.foldLeft(f(z, fa.head))(f)
 
       def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
@@ -148,7 +156,8 @@ trait NonEmptyListInstances {
     override def show(fa: NonEmptyList[A]) = Show[List[A]].show(fa.list)
   }
 
-  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
+  implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
+    Order.orderBy[NonEmptyList[A], List[A]](_.list)(std.list.listOrder[A])
 }
 
 trait NonEmptyListFunctions {

@@ -66,6 +66,24 @@ class ValidationTest extends Spec {
     }
   }
 
+  "findSuccess" should {
+    import syntax.show._
+    "accumulate failures in order" in {
+      val fail1 = Validation.failure[String, Int]("1").toValidationNEL
+      val fail2 = Validation.failure[String, Int]("2").toValidationNEL
+
+      (fail1 findSuccess fail2).shows must be_===("""Failure(["1","2"])""")
+    }
+
+    "return first success" in {
+      val succ = Validation.success[String, Int](1).toValidationNEL
+      val fail = Validation.failure[String, Int]("2").toValidationNEL
+    
+      (succ findSuccess fail).shows must be_===(succ.shows)
+      (fail findSuccess succ).shows must be_===(succ.shows)
+    }
+  }
+
   object instances {
     def show[E: Show, A: Show] = Show[Validation[E, A]]
     def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]

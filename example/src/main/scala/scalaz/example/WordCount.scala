@@ -1,7 +1,7 @@
 package scalaz.example
 
 /**
- * Character/Line/Word Count from "The Essense of the Iterator Pattern".
+ * Character/Line/Word Count from "The Essence of the Iterator Pattern".
  *
  * @see [[http://www.comlab.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf]]
  */
@@ -34,7 +34,7 @@ object WordCount {
     } @>>> AppFuncU { (x: Int) => x }
 
     // Compose applicative functions in parallel
-    val countAll = countChar :: countLine :: (countWord consA AppFunc.HNil)
+    val countAll = countChar :: countLine :: (countWord consA AppFunc.HNil[Char, Int])
     
     // ... and execute them in a single traversal 
     val charCount :: lineCount ::  wordCountState :: HNil = countAll traverse text

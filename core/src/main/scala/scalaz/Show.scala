@@ -2,7 +2,8 @@ package scalaz
 
 ////
 /**
- *
+ * A typeclass for conversion to textual representation, done via
+ * [[scalaz.Cord]] for efficiency.
  */
 ////
 trait Show[F]  { self =>

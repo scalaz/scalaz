@@ -63,6 +63,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: Option[A] = None
   }
 
+  /** Add `None` as an element less than all `A`s. */
   implicit def optionOrder[A](implicit A0: Order[A]): Order[Option[A]] = new OptionOrder[A] {
     implicit def A = A0
   }
@@ -141,8 +142,10 @@ trait OptionInstances extends OptionInstances0 {
 }
 
 trait OptionFunctions {
+  /** [[scala.Some.apply]] with a sometimes more convenient type. */
   final def some[A](a: A): Option[A] = Some(a)
 
+  /** [[scala.None]] with a sometimes more convenient type. */
   final def none[A]: Option[A] = None
 
   /**

@@ -1,8 +1,11 @@
 package scalaz
 
+/** Class of monad transformers. */
 trait MonadTrans[F[_[_], _]] {
+  /** A component of `Applicative.point` for the transformer stack. */
   def liftM[G[_] : Monad, A](a: G[A]): F[G, A]
 
+  /** The [[scalaz.Monad]] implied by this transformer. */
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = F[G, α]})#λ]
 }
 

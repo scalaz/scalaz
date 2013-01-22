@@ -1,5 +1,8 @@
 package scalaz
 
+/** The class of monads supporting the operations of
+  * [[scalaz.State]].
+  */
 trait MonadState[F[_,_],S] extends Monad[({type f[x]=F[S,x]})#f] {
   def init: F[S,S]
   def put(s: S): F[S,Unit]

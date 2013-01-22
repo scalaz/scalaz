@@ -1,6 +1,6 @@
 package scalaz
 
-// Returns a list in order of key insertion.
+/** Returns a list in order of key insertion. */
 sealed trait InsertionMap[K, V] {
   private[scalaz] val assoc: Map[K, (V, Long)]
   private[scalaz] val next: Long

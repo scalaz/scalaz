@@ -14,6 +14,9 @@ trait DualInstances {
   implicit def dualMonoid[F](implicit F0: Monoid[F]) = new DualMonoid[F] {
     implicit def F = F0
   }
+
+  implicit def dualOrder[F](implicit F0: Order[F]): Order[F @@ Tags.Dual] =
+    Tag subst F0.reverseOrder
 }
 
 private[scalaz] trait DualSemigroup[F] extends Semigroup[F @@ Tags.Dual] {

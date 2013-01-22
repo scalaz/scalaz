@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * A [[scalaz.Category]] permitting products.
  */
 ////
 trait Split[=>:[_, _]] extends Category[=>:] { self =>

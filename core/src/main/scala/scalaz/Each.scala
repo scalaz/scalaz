@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- *
+ * Run a side effect once for each `A` in the `F`.
  */
 ////
 trait Each[F[_]]  { self =>

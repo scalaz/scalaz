@@ -1,5 +1,6 @@
 package scalaz
 
+/** [[scala.Option]], but with a value by name. */
 sealed trait LazyOption[+A] {
 
   import LazyOption._
@@ -16,7 +17,7 @@ sealed trait LazyOption[+A] {
     fold(_ => some, none)
 
   def isDefined =
-    fold(_ => false, true)
+    fold(_ => true, false)
 
   def isEmpty =
     !isDefined

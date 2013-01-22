@@ -5,13 +5,15 @@ import scalaz.Id.Id
 
 /**
  * Idiomatic traversal of a structure, as described in
- * [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essense of the Iterator Pattern]].
+ * [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence of the Iterator Pattern]].
  *
  * @see [[scalaz.Traverse.TraverseLaw]]
  */
 ////
 trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
+
+  /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */

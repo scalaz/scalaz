@@ -2,7 +2,8 @@ package scalaz
 
 ////
 /**
- *
+ * A [[scalaz.Foldable]] where `foldMap` is total over semigroups.
+ * That is, `toList` cannot return an empty list.
  */
 ////
 trait Foldable1[F[_]] extends Foldable[F] { self =>
@@ -26,7 +27,9 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     }.getOrElse(sys.error("foldLeft1"))
   }
 
+  /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
+  /** Curried `foldLeft1`. */
   final def foldl1[A](fa: F[A])(f: A => A => A): A = foldLeft1(fa)((b, a) => f(b)(a))
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
@@ -54,4 +57,3 @@ object Foldable1 {
 
   ////
 }
-

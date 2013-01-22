@@ -4,11 +4,14 @@ package scalaz
 import scalaz.Id.Id
 
 /**
- *
+ * A [[scalaz.Traverse]] where `traverse` is total over
+ * [[scalaz.Apply]]s.  That is, `toList` cannot return an empty list.
  */
 ////
 trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   ////
+
+  /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverse1Impl[G[_]:Apply,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
   // derived functions
@@ -35,4 +38,3 @@ object Traverse1 {
 
   ////
 }
-
