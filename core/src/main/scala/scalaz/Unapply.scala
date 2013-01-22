@@ -184,6 +184,19 @@ trait Unapply_1 extends Unapply_2 {
 }
 
 trait Unapply_0 extends Unapply_1 {
+  /** Unpack a value of type `M0[F0, A0]` where `F0: * -> *` into
+    * types `[a]M0[F0, a]` and `A`, given an instance of `TC`
+    */
+  implicit def unapplyMFA[TC[_[_]], M0[_[_], _], F0[_], A0](implicit TC0: TC[({type λ[α] = M0[F0, α]})#λ]): Unapply[TC, M0[F0, A0]] {
+    type M[X] = M0[F0, X]
+    type A = A0
+  } = new Unapply[TC, M0[F0, A0]] {
+    type M[X] = M0[F0, X]
+    type A = A0
+    def TC = TC0
+    def apply(ma: M0[F0, A0]) = ma
+  }
+
   /**Unpack a value of type `M0[A0, B0]` into types `[a]M0[a, B0]` and `A`, given an instance of `TC` */
   implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[α, B0]})#λ]): Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
