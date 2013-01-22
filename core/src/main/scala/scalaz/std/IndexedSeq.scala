@@ -158,10 +158,10 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       ))
 
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
-      Monad[M].bind(p(a))(b =>
-        if (b) Monad[M].map(g)((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
-        else Monad[M].point(empty, as)))
+    if (as.isEmpty) Monad[M].point(empty, empty) else
+          Monad[M].bind(p(as.head))(b =>
+            if (b) Monad[M].map(spanM(as.tail)(p))((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
+            else Monad[M].point(empty, as))
 
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
