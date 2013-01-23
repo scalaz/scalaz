@@ -27,7 +27,7 @@ trait IndexedSeqOps[A] extends Ops[IndexedSeq[A]] {
 
   final def powerset: IndexedSeq[IndexedSeq[A]] = v.powerset(self)
 
-  final def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] = v.partitionM(self)(p)
+  final def partitionM[M[_] : Applicative](p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] = v.partitionM(self)(p)
 
   final def spanM[M[_] : Monad](p: A => M[Boolean]): M[(IndexedSeq[A], IndexedSeq[A])] = v.spanM(self)(p)
 

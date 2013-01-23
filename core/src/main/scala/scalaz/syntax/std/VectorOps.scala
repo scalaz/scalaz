@@ -26,7 +26,7 @@ trait VectorOps[A] extends Ops[Vector[A]] {
 
   final def powerset: Vector[Vector[A]] = v.powerset(self)
 
-  final def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(Vector[A], Vector[A])] = v.partitionM(self)(p)
+  final def partitionM[M[_] : Applicative](p: A => M[Boolean]): M[(Vector[A], Vector[A])] = v.partitionM(self)(p)
 
   final def spanM[M[_] : Monad](p: A => M[Boolean]): M[(Vector[A], Vector[A])] = v.spanM(self)(p)
 
