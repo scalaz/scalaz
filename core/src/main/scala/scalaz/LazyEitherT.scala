@@ -75,7 +75,11 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
     F.foldr[LazyEither[A, B], Z](run, z)(a => b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
   }
 
-  def ap[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Apply[F]): LazyEitherT[F, AA, C] = {
+  /** Apply a function in the environment of the right of this
+    * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
+    * it is not consistent with `ap`.
+    */
+  def app[AA >: A, C](f: => LazyEitherT[F, AA, B => C])(implicit F: Apply[F]): LazyEitherT[F, AA, C] = {
     // TODO check laziness
     LazyEitherT[F, AA, C](F.apply2(f.run, run)((ff: LazyEither[AA, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[AA].ap(aa)(ff)))
   }
@@ -136,32 +140,12 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
 }
 
-trait LazyEitherTInstances3 {
+trait LazyEitherTInstances1 {
   implicit def lazyEitherTFunctor[F[+_], L](implicit F0: Functor[F]) = new LazyEitherTFunctor[F, L] {
     implicit def F = F0
   }
   implicit def lazyEitherTLeftProjectionFunctor[F[+_], L](implicit F0: Functor[F]) = new IsomorphismFunctor[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
     implicit def G = lazyEitherTFunctor[F, L]
-    def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
-  }
-}
-
-trait LazyEitherTInstances2 extends LazyEitherTInstances3 {
-  implicit def lazyEitherTApply[F[+_], L](implicit F0: Apply[F]) = new LazyEitherTApply[F, L] {
-    implicit def F = F0
-  }
-  implicit def lazyEitherTLeftProjectionApply[F[+_], L](implicit F0: Apply[F]) = new IsomorphismApply[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
-    implicit def G = lazyEitherTApply[F, L]
-    def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
-  }
-}
-
-trait LazyEitherTInstances1 extends LazyEitherTInstances2 {
-  implicit def lazyEitherTApplicative[F[+_], L](implicit F0: Applicative[F]) = new LazyEitherTApplicative[F, L] {
-    implicit def F = F0
-  }
-  implicit def lazyEitherTLeftProjectionApplicative[F[+_], L](implicit F0: Applicative[F]) = new IsomorphismApplicative[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
-    implicit def G = lazyEitherTApplicative[F, L]
     def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
   }
 }
@@ -246,22 +230,10 @@ private[scalaz] trait LazyEitherTFunctor[F[+_], E] extends Functor[({type λ[α]
   override def map[A, B](fa: LazyEitherT[F, E, A])(f: (A) => B): LazyEitherT[F, E, B] = fa map (a => f(a))
 }
 
-private[scalaz] trait LazyEitherTApply[F[+_], E] extends Apply[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFunctor[F, E] {
-  implicit def F: Apply[F]
-
-  override def ap[A, B](fa: => LazyEitherT[F, E, A])(f: => LazyEitherT[F, E, (A) => B]): LazyEitherT[F, E, B] = fa ap f
-
-}
-
-private[scalaz] trait LazyEitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApply[F, E] {
-  implicit def F: Applicative[F]
+private[scalaz] trait LazyEitherTMonad[F[+_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTFunctor[F, E] {
+  implicit def F: Monad[F]
 
   def point[A](a: => A): LazyEitherT[F, E, A] = LazyEitherT.lazyRightT(a)
-
-}
-
-private[scalaz] trait LazyEitherTMonad[F[+_], E] extends Monad[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTApplicative[F, E] {
-  implicit def F: Monad[F]
 
   def bind[A, B](fa: LazyEitherT[F, E, A])(f: (A) => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] = fa flatMap (a => f(a))
 }
