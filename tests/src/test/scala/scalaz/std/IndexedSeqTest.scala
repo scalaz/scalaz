@@ -57,6 +57,14 @@ class IndexedSeqTest extends Spec {
                    .map(_.toIndexedSeq).toIndexedSeq))
   }
 
+  "partitionM" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      val (evens, odds) = xs.partitionM[Id](evenp)
+      (evens.toSet & odds.toSet) must be_===(Set[Int]())
+      (evens.filter(evenp) ++
+       odds.filter(i => !evenp(i))).toSet must be_===(xs.toSet)
+  }
+
   "findM" ! prop {
     (xs: IndexedSeq[Int]) =>
       val i = xs indexWhere evenp

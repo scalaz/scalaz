@@ -161,7 +161,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
-      Monad[M].bind(p(as.head))(b =>
+      Monad[M].bind(p(a))(b =>
         Monad[M].map(g) {
           case (x, y) => if (b) (a +: x, y) else (x, a +: y)
         }
