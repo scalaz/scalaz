@@ -161,7 +161,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
-      Monad[M].bind(p(as.head))(b =>
+      Monad[M].bind(p(a))(b =>
         Monad[M].map(g) {
           case (x, y) => if (b) (a +: x, y) else (x, a +: y)
         }
@@ -170,10 +170,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    if (as.isEmpty) Monad[M].point(empty, empty) else
-          Monad[M].bind(p(as.head))(b =>
-            if (b) Monad[M].map(spanM(as.tail)(p))((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
-            else Monad[M].point(empty, as))
+    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as drop (ys.length)))
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
