@@ -88,4 +88,10 @@ class IndexedSeqTest extends Spec {
       mapAccumRight(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
         (c :+ a, a)) must be_===(xs.reverse, xs)
   }
+
+  "Issue #266" in {
+    import syntax.std.list._
+    List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
+    List(1, 2, 4).toIndexedSeq.groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
+  }
 }
