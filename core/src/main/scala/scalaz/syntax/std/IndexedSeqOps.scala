@@ -4,7 +4,7 @@ package std
 
 import collection.immutable.IndexedSeq
 
-trait IndexedSeqOps[IS[_], A] extends Ops[IS[A]] {
+trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
 
   protected def v: scalaz.std.IndexedSeqSubFunctions {
     type IxSq[+X] = IS[X]
