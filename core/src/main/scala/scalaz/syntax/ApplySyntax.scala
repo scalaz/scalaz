@@ -19,7 +19,7 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
   final def <*[B](fb: F[B]): F[A] = F.apply2(self,fb)((a,_) => a)
 
   /** Combine `self` and `fb` according to `Apply[F]` with a function that constructs a `Tuple2[A, B]` */
-  @deprecated("Use `a <*> b` instead", "7")
+  @deprecated("Use `a tuple b` instead", "7")
   final def <|*|>[B](fb: F[B]): F[(A, B)] = F.tuple2(self,fb)
 
   @deprecated("Use `^(f1,f2..fN)((a,b,c) => ..)` instead", "7")

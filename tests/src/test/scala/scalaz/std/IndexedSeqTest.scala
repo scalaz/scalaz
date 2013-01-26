@@ -39,9 +39,30 @@ class IndexedSeqTest extends Spec {
     (xs: IndexedSeq[Int]) => tailz(xs) must be_===(xs.tails.toIndexedSeq)
   }
 
+  "spanM" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      (xs.spanM[Id](evenp)
+       must be_===(xs.takeWhile(evenp) -> xs.dropWhile(evenp)))
+  }
+
   "takeWhileM" ! prop {
     (xs: IndexedSeq[Int]) =>
       takeWhileM[Int, Id](xs)(evenp) must be_===(xs takeWhile evenp)
+  }
+
+  "groupWhen" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      (xs.groupWhen(_ < _)
+       must be_===(list.groupWhen(xs.toList)(_ < _)
+                   .map(_.toIndexedSeq).toIndexedSeq))
+  }
+
+  "partitionM" ! prop {
+    (xs: IndexedSeq[Int]) =>
+      val (evens, odds) = xs.partitionM[Id](evenp)
+      (evens.toSet & odds.toSet) must be_===(Set[Int]())
+      (evens.filter(evenp) ++
+       odds.filter(i => !evenp(i))).toSet must be_===(xs.toSet)
   }
 
   "findM" ! prop {
@@ -66,5 +87,11 @@ class IndexedSeqTest extends Spec {
     (xs: IndexedSeq[Int]) =>
       mapAccumRight(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
         (c :+ a, a)) must be_===(xs.reverse, xs)
+  }
+
+  "Issue #266" in {
+    import syntax.std.list._
+    List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
+    List(1, 2, 4).toIndexedSeq.groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
   }
 }
