@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-import RealWorld._
+import IvoryTower._
 import STRef._
 import STArray._
 import ST._
@@ -16,13 +16,13 @@ sealed trait STRef[S, A] {
   def read: ST[S, A] = returnST(value)
 
   /**Modifies the value at this reference with the given function. */
-  def mod[B](f: A => A): ST[S, STRef[S, A]] = st((s: World[S]) => {
+  def mod[B](f: A => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
     value = f(value);
     (s, this)
   })
 
   /**Associates this reference with the given value. */
-  def write(a: => A): ST[S, STRef[S, A]] = st((s: World[S]) => {
+  def write(a: => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
     value = a;
     (s, this)
   })
@@ -117,7 +117,7 @@ trait STArrayFunctions {
  * Based on JL and SPJ's paper "Lazy Functional State Threads"
  */
 sealed trait ST[S, A] {
-  private[effect] def apply(s: World[S]): (World[S], A)
+  private[effect] def apply(s: Tower[S]): (Tower[S], A)
 
   import ST._
 
@@ -138,12 +138,12 @@ object ST extends STFunctions with STInstances {
 }
 
 trait STFunctions {
-  def st[S, A](f: World[S] => (World[S], A)): ST[S, A] = new ST[S, A] {
-    private[effect] def apply(s: World[S]) = f(s)
+  def st[S, A](f: Tower[S] => (Tower[S], A)): ST[S, A] = new ST[S, A] {
+    private[effect] def apply(s: Tower[S]) = f(s)
   }
 
   // Implicit conversions between IO and ST
-  implicit def STToIO[A](st: ST[RealWorld, A]): IO[A] =
+  implicit def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
     IO.io(rw => Free.return_(st(rw)))
 
   /**Put a value in a state thread */
@@ -152,7 +152,7 @@ trait STFunctions {
 
   /**Run a state thread */
   def runST[A](f: Forall[({type λ[S] = ST[S, A]})#λ]): A =
-    f.apply.apply(realWorld)._2
+    f.apply.apply(ivoryTower)._2
 
   /**Allocates a fresh mutable reference. */
   def newVar[S]: (Id ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) = new (Id ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) {
@@ -165,7 +165,7 @@ trait STFunctions {
 
   /**Allows the result of a state transformer computation to be used lazily inside the computation. */
   def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = st(s => {
-    lazy val ans: (World[S], A) = k(r)(s)
+    lazy val ans: (Tower[S], A) = k(r)(s)
     lazy val (_, r) = ans
     ans
   })
