@@ -1,12 +1,12 @@
 package scalaz
 package effect
 
-private[effect] case class World[A]()
+private[effect] case class Tower[A]()
 
-sealed trait RealWorld
+sealed trait IvoryTower
 
-object RealWorld extends RealWorlds
+object IvoryTower extends IvoryTowers
 
-trait RealWorlds {
-  private[effect] val realWorld = World[RealWorld]()
+trait IvoryTowers {
+  private[effect] val ivoryTower = Tower[IvoryTower]()
 }
