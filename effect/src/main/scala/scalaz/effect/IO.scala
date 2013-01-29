@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-import RealWorld._
+import IvoryTower._
 import RegionT._
 import RefCountedFinalizer._
 import FinalizerHandle._
@@ -12,7 +12,7 @@ import std.function._
 import syntax.bifunctor._
 
 sealed trait IO[+A] {
-  private[effect] def apply(rw: World[RealWorld]): Trampoline[(World[RealWorld], A)]
+  private[effect] def apply(rw: Tower[IvoryTower]): Trampoline[(Tower[IvoryTower], A)]
 
   import IO._
 
@@ -20,14 +20,14 @@ sealed trait IO[+A] {
    * Runs I/O and performs side-effects. An unsafe operation.
    * Do not call until the end of the universe.
    */
-  def unsafePerformIO(): A = apply(realWorld).run._2
+  def unsafePerformIO(): A = apply(ivoryTower).run._2
 
   /**
    * Constructs an IO action whose steps may be interleaved with another.
    * An unsafe operation, since it exposes a trampoline that allows one to
    * step through the components of the IO action.
    */
-  def unsafeInterleaveIO(): IO[Trampoline[A]] = IO(apply(realWorld).map(_._2))
+  def unsafeInterleaveIO(): IO[Trampoline[A]] = IO(apply(ivoryTower).map(_._2))
 
   /**
    * Interleaves the steps of this IO action with the steps of another,
@@ -207,8 +207,8 @@ trait IOFunctions extends IOStd {
   Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
 
   /** Construct an IO action from a world-transition function. */
-  def io[A](f: World[RealWorld] => Trampoline[(World[RealWorld], A)]): IO[A] = new IO[A] {
-    private[effect] def apply(rw: World[RealWorld]) = f(rw)
+  def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] = new IO[A] {
+    private[effect] def apply(rw: Tower[IvoryTower]) = f(rw)
   }
 
   // Mutable variables in the IO monad
@@ -260,7 +260,7 @@ trait IOFunctions extends IOStd {
   }
 
   /** An IO action is an ST action. */
-  implicit def IOToST[A](io: IO[A]): ST[RealWorld, A] =
+  implicit def IOToST[A](io: IO[A]): ST[IvoryTower, A] =
     st(io(_).run)
 
   /** An IO action that does nothing. */

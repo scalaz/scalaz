@@ -8,7 +8,7 @@ import ST._
  * such a reference out of the monad, but any operations on a leaked reference are still monadic.
  */
 sealed trait IORef[A] {
-  val value: STRef[RealWorld, A]
+  val value: STRef[IvoryTower, A]
 
   def read: IO[A] = STToIO(value.read)
 
@@ -20,7 +20,7 @@ sealed trait IORef[A] {
 object IORef extends IORefs
 
 trait IORefs {
-  private[effect] def ioRef[A](v: STRef[RealWorld, A]): IORef[A] = new IORef[A] {
+  private[effect] def ioRef[A](v: STRef[IvoryTower, A]): IORef[A] = new IORef[A] {
     val value = v
   }
 }
