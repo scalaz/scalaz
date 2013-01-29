@@ -3,7 +3,6 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.{Arbitrary, Gen}
 
