@@ -1,5 +1,10 @@
 package scalaz
 
+import org.scalacheck.Arbitrary
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalaCheckBinding._
+import Cord._
+
 class CordTest extends Spec {
   "split() must result in two cords whose summary length is equal to the length of original cord " in {
     val x = Cord("Once upon a midnight dreary")
@@ -24,4 +29,9 @@ class CordTest extends Spec {
     x.tail.tail.toString must_== "c"
     x.tail.tail.tail.toString must_== ""
   }
+
+  implicit def ArbitraryCord: Arbitrary[Cord] = Functor[Arbitrary].map(implicitly[Arbitrary[String]])(Cord.stringToCord)
+
+  checkAll(monoid.laws[Cord])
+  checkAll(equal.laws[Cord])
 }
