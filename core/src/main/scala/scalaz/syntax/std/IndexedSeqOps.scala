@@ -23,13 +23,13 @@ trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
 
   final def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[IS[A]] = v.takeUntilM(self)(p)
 
-  final def filterM[M[_] : Monad](p: A => M[Boolean]): M[IS[A]] = v.filterM(self)(p)
+  final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[IS[A]] = v.filterM(self)(p)
 
   final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = v.findM(self)(p)
 
   final def powerset: IS[IS[A]] = v.powerset(self)
 
-  final def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(IS[A], IS[A])] = v.partitionM(self)(p)
+  final def partitionM[M[_] : Applicative](p: A => M[Boolean]): M[(IS[A], IS[A])] = v.partitionM(self)(p)
 
   final def spanM[M[_] : Monad](p: A => M[Boolean]): M[(IS[A], IS[A])] = v.spanM(self)(p)
 

@@ -39,6 +39,23 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
     traverse(as)(a => a)
 
+  import std.list._
+
+  /** Performs the action `n` times, returning the list of results. */
+  def replicateM[A](n: Int, fa: F[A]): F[List[A]] =
+    listInstance.sequence(List.fill(n)(fa))(this)
+
+  /** Performs the action `n` times, returning nothing. */
+  def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
+    listInstance.sequence_(List.fill(n)(fa))(this)
+
+  /** Filter `l` according to an applicative predicate. */
+  def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
+    l match {
+      case Nil => point(List())
+      case h :: t => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
+    }
+
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
     implicit def F = self
