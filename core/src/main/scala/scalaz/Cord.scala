@@ -32,9 +32,9 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
    * Time complexity: O(log N)
    */
   def split(i: Int): (Cord, Cord) = {
-    val (l, r) = self.split(_ > i)
-    val (l1, r1) = r.viewl.headOption.map(_.splitAt(i - l.measure)).getOrElse(rangeError(i))
-    (cord(l :+ l1), cord(r1 +: r))
+    val (l, mid, r) = self.split1(_ > i)
+    val (midl, midr) = mid.splitAt(i - l.measure)
+    (cord(l :+ midl), cord(midr +: r))
   }
 
   /**
