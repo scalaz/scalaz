@@ -139,8 +139,8 @@ trait ListFunctions {
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
-    Monad[M].filterM(as)(p)
+  final def filterM[A, M[_] : Applicative](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Applicative[M].filterM(as)(p)
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
@@ -158,14 +158,12 @@ trait ListFunctions {
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
-  final def partitionM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
-    case Nil    => Monad[M].point(Nil: List[A], Nil: List[A])
+  final def partitionM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(List[A], List[A])] = as match {
+    case Nil    => F.point(Nil: List[A], Nil: List[A])
     case h :: t =>
-      Monad[M].bind(p(h))(b =>
-        Monad[M].map(partitionM(t)(p)) {
+      F.ap(partitionM(t)(p))(F.map(p(h))(b => {
           case (x, y) => if (b) (h :: x, y) else (x, h :: y)
-        }
-      )
+      }))
   }
 
   /** A pair of the longest prefix of passing `as` against `p`, and

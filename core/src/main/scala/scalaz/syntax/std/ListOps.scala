@@ -21,13 +21,13 @@ trait ListOps[A] extends Ops[List[A]] {
 
   final def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.takeUntilM(self)(p)
 
-  final def filterM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.filterM(self)(p)
+  final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[List[A]] = l.filterM(self)(p)
 
   final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = l.findM(self)(p)
 
   final def powerset: List[List[A]] = l.powerset(self)
 
-  final def partitionM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.partitionM(self)(p)
+  final def partitionM[M[_] : Applicative](p: A => M[Boolean]): M[(List[A], List[A])] = l.partitionM(self)(p)
 
   final def spanM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.spanM(self)(p)
 

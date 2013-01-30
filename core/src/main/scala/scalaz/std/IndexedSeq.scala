@@ -140,9 +140,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
-  final def filterM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
-    lazyFoldRight(as, Monad[M].point(empty[A]))((a, g) =>
-      Monad[M].bind(p(a))(b => if (b) Monad[M].map(g)(tt => a +: tt) else g))
+  final def filterM[A, M[_]](as: IxSq[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[IxSq[A]] =
+    lazyFoldRight(as, F.point(empty[A]))((a, g) =>
+      F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
@@ -159,21 +159,16 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
-  final def partitionM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
-      Monad[M].bind(p(as.head))(b =>
-        Monad[M].map(g) {
-          case (x, y) => if (b) (a +: x, y) else (x, a +: y)
-        }
-      ))
+  final def partitionM[A, M[_]](as: IxSq[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(IxSq[A], IxSq[A])] =
+    lazyFoldRight(as, F.point(empty[A], empty[A]))((a, g) =>
+      F.ap(g)(F.map(p(a))(b => {
+        case (x, y) => if (b) (a +: x, y) else (x, a +: y)
+      })))
 
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
-    lazyFoldRight(as, Monad[M].point(empty[A], empty[A]))((a, g) =>
-      Monad[M].bind(p(a))(b =>
-        if (b) Monad[M].map(g)((k: (IxSq[A], IxSq[A])) => (as.head +: k._1, k._2))
-        else Monad[M].point(empty, as)))
+    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as drop (ys.length)))
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
