@@ -64,7 +64,7 @@ class FunctionTest extends Spec {
   object instances {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]
-    def monoid[A, R: Monoid] = Semigroup[A => R]
+    def monoid[A, R: Monoid] = Monoid[A => R]
     def group[A, R: Group] = Group[A => R]
     def comonad[A: Monoid, R] = Comonad[({type λ[α]=A => α})#λ]
 
