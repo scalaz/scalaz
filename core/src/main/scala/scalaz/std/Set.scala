@@ -2,24 +2,14 @@ package scalaz
 package std
 
 trait SetInstances {
-  implicit val setInstance = new Traverse[Set] with MonadPlus[Set] with Each[Set] with Length[Set] with IsEmpty[Set] {
+  implicit val setInstance: Foldable[Set] with IsEmpty[Set] with Length[Set] = new Foldable[Set] with IsEmpty[Set] with Length[Set] with Foldable.FromFoldr[Set] {
     def each[A](fa: Set[A])(f: A => Unit) = fa foreach f
     def length[A](fa: Set[A]) = fa.size
-    def point[A](a: => A) = Set(a)
-    def bind[A, B](fa: Set[A])(f: A => Set[B]) = fa flatMap f
     def empty[A] = Set()
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
     def isEmpty[A](fa: Set[A]) = fa.isEmpty
-    override def map[A, B](l: Set[A])(f: A => B) = l map f
 
-    // TODO duplication with ListInstances
-    def traverseImpl[F[_], A, B](l: Set[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      DList.fromList(l.toList).foldr(F.point(Set[B]())) {
-        (a, fbs) => F.apply2(f(a), fbs)((a, b) => b + a)
-      }
-    }
-
-    override def foldRight[A, B](fa: Set[A], z: => B)(f: (A, => B) => B) = {
+    def foldRight[A, B](fa: Set[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
       fa.foreach(a => s += a)
