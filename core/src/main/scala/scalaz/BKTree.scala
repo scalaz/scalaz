@@ -187,7 +187,7 @@ trait BKTreeFunctions {
 
 trait BKTreeInstances {
   implicit def bKTreeInstance: Functor[BKTree] with Length[BKTree] = new Functor[BKTree] with Length[BKTree] {
-    def map[A, B](fa: BKTree[A])(f: (A) => B): BKTree[B] = fa map f
+    def map[A, B](fa: BKTree[A])(f: A => B): BKTree[B] = fa map f
     def length[A](fa: BKTree[A]): Int = fa.size
   }
   implicit def bKTreeMonoid[A: MetricSpace]: Monoid[BKTree[A]] = new Monoid[BKTree[A]] {

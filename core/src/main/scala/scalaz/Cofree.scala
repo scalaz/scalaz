@@ -88,7 +88,7 @@ private[scalaz] trait CofreeComonad[S[+_]] extends Comonad[({type f[x] = Cofree[
 
   def cojoin[A](a: Cofree[S, A]) = a.duplicate
 
-  def map[A, B](fa: Cofree[S, A])(f: (A) => B) = fa map f
+  def map[A, B](fa: Cofree[S, A])(f: A => B) = fa map f
 
   def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa extend f
 }

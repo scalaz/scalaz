@@ -64,7 +64,7 @@ sealed trait LazyEither[+A, +B] {
   def flatMap[AA >: A, C](f: (=> B) => LazyEither[AA, C]): LazyEither[AA, C] =
     fold(lazyLeft(_), f)
 
-  def traverse[G[_]: Applicative, AA >: A, C](f: (B) => G[C]): G[LazyEither[AA, C]] =
+  def traverse[G[_]: Applicative, AA >: A, C](f: B => G[C]): G[LazyEither[AA, C]] =
     fold(
       left = x => Applicative[G].point(LazyEither.lazyLeft[C](x)),
       right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
@@ -132,16 +132,16 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 // TODO more instances
 trait LazyEitherInstances {
   implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] {
-    def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: (A) => G[B]): G[LazyEither[E, B]] =
+    def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
     override def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
 
-    def bind[A, B](fa: LazyEither[E, A])(f: (A) => LazyEither[E, B]): LazyEither[E, B] =
+    def bind[A, B](fa: LazyEither[E, A])(f: A => LazyEither[E, B]): LazyEither[E, B] =
       fa flatMap (a => f(a))
 
-    override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, (A) => B]): LazyEither[E, B] =
+    override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, A => B]): LazyEither[E, B] =
       fa ap f
 
     def point[A](a: => A): LazyEither[E, A] =
@@ -162,7 +162,7 @@ trait LazyEitherInstances {
       fab.map(x => g(x)).left.map(x => f(x))
 
     def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: LazyEither[A, B])
-                                                  (f: (A) => G[C], g: (B) => G[D]): G[LazyEither[C, D]] =
+                                                  (f: A => G[C], g: B => G[D]): G[LazyEither[C, D]] =
       fab.fold(
         a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
         b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))

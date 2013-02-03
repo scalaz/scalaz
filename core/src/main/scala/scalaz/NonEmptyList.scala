@@ -128,7 +128,7 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
       override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B, A) => B): B =
         fa.tail.foldLeft(f(z, fa.head))(f)
 
-      def bind[A, B](fa: NonEmptyList[A])(f: (A) => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
+      def bind[A, B](fa: NonEmptyList[A])(f: A => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
 
       def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
 

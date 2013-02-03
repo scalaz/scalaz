@@ -31,7 +31,7 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
     F.foldRight[Option[A], Z](run, z)((a, b) => Foldable[Option].foldRight[A, Z](a, b)(f))
   }
 
-  def traverse[G[_], B](f: (A) => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[OptionT[F, B]] = {
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[OptionT[F, B]] = {
     import std.option._
     G.map(F.traverse(run)(o => Traverse[Option].traverse(o)(f)))(OptionT(_))
   }
@@ -151,7 +151,7 @@ private[scalaz] trait OptionTFoldable[F[+_]] extends Foldable.FromFoldr[({type �
 private[scalaz] trait OptionTTraverse[F[+_]] extends Traverse[({type λ[α] = OptionT[F, α]})#λ] with OptionTFoldable[F] with OptionTFunctor[F]{
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: (A) => G[B]): G[OptionT[F, B]] = fa traverse f
+  def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: A => G[B]): G[OptionT[F, B]] = fa traverse f
 }
 
 private[scalaz] trait OptionTHoist extends Hoist[OptionT] {

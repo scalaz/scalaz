@@ -23,7 +23,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
   private val suspended = new AtomicBoolean(true)
   private val mbox = new ConcurrentLinkedQueue[A]
 
-  val toEffect: Run[A] = Run[A]((a) => this ! a)
+  val toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
   def !(a: A) {
@@ -66,7 +66,7 @@ object Actor extends ActorFunctions with ActorInstances
 
 trait ActorInstances {
   implicit def actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
-    def contramap[A, B](r: Actor[A])(f: (B) => A): Actor[B] = r contramap f
+    def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
   }
 }
 

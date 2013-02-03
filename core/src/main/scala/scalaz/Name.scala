@@ -20,7 +20,7 @@ object Name {
   implicit val name = new Monad[Name] with Comonad[Name] with Cobind.FromCojoin[Name] with Distributive[Name] {
     def point[A](a: => A) = Name(a)
 
-    override def map[A, B](fa: Name[A])(f: (A) => B) = Name(f(fa.value))
+    override def map[A, B](fa: Name[A])(f: A => B) = Name(f(fa.value))
     override def ap[A, B](fa: => Name[A])(f: => Name[A => B]) =
       Name(f.value apply fa.value)
     def bind[A,B](v: Name[A])(f: A => Name[B]): Name[B] = Name(f(v.value).value)

@@ -189,7 +189,7 @@ private[scalaz] trait FuncFunctor[F[_], TC[F[_]] <: Functor[F], R] extends Funct
 private[scalaz] trait FuncApply[F[_], TC[F[_]] <: Apply[F], R] extends Apply[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncFunctor[F, TC, R] {
   implicit def TC: KTypeClass[TC]
   implicit def F: TC[F]
-  def ap[A, B](fa: => Func[F, TC, R, A])(f: => Func[F, TC, R, (A) => B]): Func[F, TC, R, B] = func(r => F.ap(fa.runA(r))(f.runA(r)))
+  def ap[A, B](fa: => Func[F, TC, R, A])(f: => Func[F, TC, R, A => B]): Func[F, TC, R, B] = func(r => F.ap(fa.runA(r))(f.runA(r)))
 }
 
 private[scalaz] trait FuncApplicative[F[_], TC[F[_]] <: Applicative[F], R] extends Applicative[({type λ[α] = Func[F, TC, R, α]})#λ] with FuncApply[F, TC, R] {

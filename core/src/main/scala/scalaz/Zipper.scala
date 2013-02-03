@@ -332,7 +332,7 @@ sealed trait Zipper[+A] {
   def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteRightC getOrElse z
 
-  def traverse[G[_] : Applicative, B](f: (A) => G[B]): G[Zipper[B]] = {
+  def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
     val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried
     val G = Applicative[G]
     import std.stream.streamInstance
@@ -367,7 +367,7 @@ trait ZipperInstances {
       a.positions
     def copoint[A](p: Zipper[A]): A =
       p.focus
-    def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: (A) => G[B]): G[Zipper[B]] =
+    def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
       za traverse f
     override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
@@ -377,7 +377,7 @@ trait ZipperInstances {
       zipper(Stream.continually(a), a, Stream.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
       fa ap f
-    override def map[A, B](fa: Zipper[A])(f: (A) => B): Zipper[B] =
+    override def map[A, B](fa: Zipper[A])(f: A => B): Zipper[B] =
       fa map f
   }
 

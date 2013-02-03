@@ -5,7 +5,7 @@ import annotation.tailrec
 
 trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] {
-    def traverseImpl[G[_], A, B](fa: Stream[A])(f: (A) => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
+    def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
@@ -13,7 +13,7 @@ trait StreamInstances {
       }
     }
 
-    def each[A](fa: Stream[A])(f: (A) => Unit) = fa foreach f
+    def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f
     def length[A](fa: Stream[A]) = fa.length
     def index[A](fa: Stream[A], i: Int) = {
       var n = 0
@@ -33,7 +33,7 @@ trait StreamInstances {
     else
       f(fa.head, foldRight(fa.tail, z)(f))
 
-    def bind[A, B](fa: Stream[A])(f: (A) => Stream[B]) = fa flatMap f
+    def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
     def isEmpty[A](s: Stream[A]) = s.isEmpty

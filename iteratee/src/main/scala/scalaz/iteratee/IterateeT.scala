@@ -351,7 +351,7 @@ private[scalaz] trait IterateeTMonad[E, F[_]] extends Monad[({type λ[α] = Iter
   implicit def F: Monad[F]
 
   def point[A](a: => A) = StepT.sdone(a, emptyInput).pointI
-  override def map[A, B](fa: IterateeT[E, F, A])(f: (A) => B): IterateeT[E, F, B] = fa map f
+  override def map[A, B](fa: IterateeT[E, F, A])(f: A => B): IterateeT[E, F, B] = fa map f
   def bind[A, B](fa: IterateeT[E, F, A])(f: A => IterateeT[E, F, B]): IterateeT[E, F, B] = fa flatMap f
 }
 

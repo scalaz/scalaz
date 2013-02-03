@@ -33,7 +33,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bitraverseF[G[_] : Applicative, A, B, C, D](f: A => G[C], g: B => G[D]): F[A, B] => G[F[C, D]] =
     bitraverseImpl(_)(f, g)
 
-  def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] = {
+  def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D] = {
     bitraverseImpl[Id, A, B, C, D](fab)(f, g)
   }
 

@@ -45,7 +45,7 @@ object MetricSpace {
 
   ////
   val metricSpaceInstance = new Contravariant[MetricSpace] {
-    def contramap[A, B](r: MetricSpace[A])(f: (B) => A): MetricSpace[B] = r contramap f
+    def contramap[A, B](r: MetricSpace[A])(f: B => A): MetricSpace[B] = r contramap f
   }
 
   def metricSpace[A](f: (A, A) => Int): MetricSpace[A] = new MetricSpace[A] {

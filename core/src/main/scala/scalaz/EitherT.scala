@@ -62,7 +62,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     EitherT(F.map(run)(_.bimap(f, g)))
 
   /** Binary functor traverse on this disjunction. */
-  def bitraverse[G[_], C, D](f: (A) => G[C], g: (B) => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
+  def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
     Applicative[G].map(F.traverse(run)(Bitraverse[\/].bitraverseF(f, g)))(EitherT(_: F[C \/ D]))
 
   /** Map on the right of this disjunction. */
@@ -70,7 +70,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     EitherT(F.map(run)(_.map(f)))
 
   /** Traverse on the right of this disjunction. */
-  def traverse[G[_], AA >: A, C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
+  def traverse[G[_], AA >: A, C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (AA \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
   /** Run the side-effect on the right of this disjunction. */
@@ -262,7 +262,7 @@ trait EitherTFunctions {
 private[scalaz] trait EitherTFunctor[F[+_], E] extends Functor[({type λ[α]=EitherT[F, E, α]})#λ] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: EitherT[F, E, A])(f: (A) => B): EitherT[F, E, B] = fa map f
+  override def map[A, B](fa: EitherT[F, E, A])(f: A => B): EitherT[F, E, B] = fa map f
 }
 
 private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
@@ -270,7 +270,7 @@ private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT
 
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
 
-  def bind[A, B](fa: EitherT[F, E, A])(f: (A) => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
+  def bind[A, B](fa: EitherT[F, E, A])(f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
 
 private[scalaz] trait EitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
@@ -282,20 +282,20 @@ private[scalaz] trait EitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({typ
 private[scalaz] trait EitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: (A) => G[B]): G[EitherT[F, E, B]] = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: A => G[B]): G[EitherT[F, E, B]] = fa traverse f
 }
 
 private[scalaz] trait EitherTBifunctor[F[+_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
-  override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: (A) => C, g: (B) => D): EitherT[F, C, D] = fab.bimap(f, g)
+  override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: A => C, g: B => D): EitherT[F, C, D] = fab.bimap(f, g)
 }
 
 private[scalaz] trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
-                                                (f: (A) => G[C], g: (B) => G[D]): G[EitherT[F, C, D]] =
+                                                (f: A => G[C], g: B => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
 }
 

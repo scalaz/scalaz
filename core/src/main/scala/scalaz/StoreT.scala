@@ -137,12 +137,12 @@ trait StoreTInstances extends StoreTInstances0 {
 }
 
 private[scalaz] trait IndexedStoreTFunctorLeft[F[+_], A0, B0] extends Functor[({type λ[+α]=IndexedStoreT[F, α, A0, B0]})#λ]{
-  override def map[A, B](fa: IndexedStoreT[F, A, A0, B0])(f: (A) => B): IndexedStoreT[F, B, A0, B0] = fa imap f
+  override def map[A, B](fa: IndexedStoreT[F, A, A0, B0])(f: A => B): IndexedStoreT[F, B, A0, B0] = fa imap f
 }
 
 private[scalaz] trait IndexedStoreTFunctorRight[F[+_], I0, A0] extends Functor[({type λ[+α]=IndexedStoreT[F, I0, A0, α]})#λ]{
   implicit def F: Functor[F]
-  override def map[A, B](fa: IndexedStoreT[F, I0, A0, A])(f: (A) => B): IndexedStoreT[F, I0, A0, B] = fa map f
+  override def map[A, B](fa: IndexedStoreT[F, I0, A0, A])(f: A => B): IndexedStoreT[F, I0, A0, B] = fa map f
 }
 
 private[scalaz] trait IndexedStoreTContravariant[F[+_], I0, B0] extends Contravariant[({type λ[-α]=IndexedStoreT[F, I0, α, B0]})#λ] {

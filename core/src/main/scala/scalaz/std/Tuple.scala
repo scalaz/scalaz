@@ -3,9 +3,9 @@ package std
 
 trait TupleInstances0 {
   implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
-    override def bimap[A, B, C, D](fab: (A, B))(f: (A) => C, g: (B) => D) =
+    override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
-    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: (A) => G[C], g: (B) => G[D]) =
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: A => G[C], g: B => G[D]) =
       Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
   }
 
@@ -518,7 +518,7 @@ private[scalaz] trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Se
     )
 }
 private[scalaz] trait Tuple1Functor extends Traverse[Tuple1] {
-  override def map[A, B](fa: Tuple1[A])(f: (A) => B) =
+  override def map[A, B](fa: Tuple1[A])(f: A => B) =
     Tuple1(f(fa._1))
   def traverseImpl[G[_], A, B](fa: Tuple1[A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._1))(Tuple1.apply)

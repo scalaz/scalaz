@@ -197,6 +197,6 @@ trait STInstances extends STInstance0 {
 
   implicit def stMonad[S]: Monad[({type λ[α] = ST[S, α]})#λ] = new Monad[({type λ[α] = ST[S, α]})#λ] {
     def point[A](a: => A): ST[S, A] = returnST(a)
-    def bind[A, B](fa: ST[S, A])(f: (A) => ST[S, B]): ST[S, B] = fa flatMap f
+    def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f
   }
 }

@@ -32,7 +32,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
     override def map[A,B](fa: () => A)(f: A => B) = () => f(fa())
 
-    def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: (A) => G[B]) =
+    def traverseImpl[G[_]: Applicative, A, B](fa: () => A)(f: A => G[B]) =
       Applicative[G].map(f(fa()))((b: B) => () => b)
 
     override def foldRight[A, B](fa: () => A, z: => B)(f: (A, => B) => B) = f(fa(), z)
@@ -51,9 +51,9 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
     
-    def compose[A, B, C](f: (B) => C, g: (A) => B) = f compose g
+    def compose[A, B, C](f: B => C, g: A => B) = f compose g
 
-    def id[A]: (A) => A = a => a
+    def id[A]: A => A = a => a
 
     def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
       case -\/(a) => f(a)
@@ -83,7 +83,7 @@ trait FunctionInstances extends FunctionInstances0 {
   }
 
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
-    def contramap[A, B](r: (A) => R)(f: (B) => A) = r compose f
+    def contramap[A, B](r: A => R)(f: B => A) = r compose f
   }
 
   implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
@@ -152,10 +152,10 @@ trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R]
 
 trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] {
   implicit def M: Monoid[M]
-  def cojoin[A](a: (M) => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
-  def copoint[A](p: (M) => A) = p(M.zero)
-  def cobind[A, B](fa: (M) => A)(f: ((M) => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
-  def map[A, B](fa: (M) => A)(f: (A) => B) = fa andThen f
+  def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
+  def copoint[A](p: M => A) = p(M.zero)
+  def cobind[A, B](fa: M => A)(f: (M => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
+  def map[A, B](fa: M => A)(f: A => B) = fa andThen f
 }
 
 trait Function1Group[A, R] extends Group[A => R] with Function1Monoid[A, R] {

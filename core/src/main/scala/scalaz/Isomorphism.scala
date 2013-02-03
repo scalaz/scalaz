@@ -167,7 +167,7 @@ trait IsomorphismEach[F[_], G[_]] extends Each[F] {
 
   def iso: F <~> G
 
-  def each[A](fa: F[A])(f: (A) => Unit) = G.each(iso.to(fa))(f)
+  def each[A](fa: F[A])(f: A => Unit) = G.each(iso.to(fa))(f)
 }
 
 trait IsomorphismIndex[F[_], G[_]] extends Index[F] {
@@ -197,7 +197,7 @@ trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
 trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] {
   implicit def G: Apply[G]
 
-  override def ap[A, B](fa: => F[A])(f: => F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
 }
 
 trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] {
@@ -205,7 +205,7 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
 
   def point[A](a: => A): F[A] = iso.from(G.point(a))
 
-  override def ap[A, B](fa: => F[A])(f: => F[(A) => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
 }
 
 trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
@@ -259,7 +259,7 @@ trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
 
   def iso: F <~> G
 
-  override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) = G.foldMap(iso.to(fa))(f)
+  override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) = G.foldMap(iso.to(fa))(f)
 
   override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldLeft(iso.to(fa), z)(f)
 
@@ -269,7 +269,7 @@ trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldable[F, G] with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
 
-  def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: (A) => H[B]): H[F[B]] =
+  def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
 }
 
@@ -278,13 +278,13 @@ trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
 
   implicit def G: Bifunctor[G]
 
-  override def bimap[A, B, C, D](fab: F[A, B])(f: (A) => C, g: (B) => D): F[C, D] =
+  override def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D] =
     iso.from(G.bimap(iso.to(fab))(f, g))
 }
 
 trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] {
   implicit def G: Bitraverse[G]
 
-  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: (A) => H[C], g: (B) => H[D]): H[F[C, D]] =
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

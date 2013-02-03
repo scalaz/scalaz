@@ -47,7 +47,7 @@ trait RegionTMonad[S, M[+_]] extends Monad[({type λ[α] = RegionT[S, M, α]})#�
   implicit def M: Monad[M]
 
   def point[A](a: => A): RegionT[S, M, A] = RegionT(kleisli(s => M.point(a)))
-  def bind[A, B](fa: RegionT[S, M, A])(f: (A) => RegionT[S, M, B]): RegionT[S, M, B] =
+  def bind[A, B](fa: RegionT[S, M, A])(f: A => RegionT[S, M, B]): RegionT[S, M, B] =
     RegionT(kleisli(s => M.bind(fa.value.run(s))((a: A) => f(a).value.run(s))))
 }
 
