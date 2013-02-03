@@ -11,7 +11,7 @@ trait Parsers {
     type Parser[A] = parser.Parser[A]
     def instance: Monad[Parser] = new Monad[Parser] {
       def point[A](a: => A): Parser[A] = parser.success(a)
-      def bind[A, B](fa: Parser[A])(f: (A) => Parser[B]): Parser[B] = fa flatMap f
+      def bind[A, B](fa: Parser[A])(f: A => Parser[B]): Parser[B] = fa flatMap f
     }
   }
 
@@ -29,7 +29,7 @@ trait Parsers {
       object dummyParser extends combinator.Parsers
       def instance: Monad[Parser] = new Monad[Parser] {
         def pure[A](a: => A): Parser[A] = dummyParser.success(a).asInstanceOf[Parser[A]] // please look the other way!
-        def bind[A, B](fa: Parser[A])(f: (A) => Parser[B]): Parser[B] = fa flatMap f
+        def bind[A, B](fa: Parser[A])(f: A => Parser[B]): Parser[B] = fa flatMap f
       }
     }
 

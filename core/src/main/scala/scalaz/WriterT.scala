@@ -50,7 +50,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
   def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
     E.each(run)(wa => f(wa._2))
 
-  def ap[B, WW >: W](f: => WriterT[F, WW, (A) => B])(implicit F: Apply[F], W: Semigroup[WW]): WriterT[F, WW, B] = writerT {
+  def ap[B, WW >: W](f: => WriterT[F, WW, A => B])(implicit F: Apply[F], W: Semigroup[WW]): WriterT[F, WW, B] = writerT {
     F.apply2(f.run, run) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))
     }
@@ -73,12 +73,12 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
       f(a._2, b)
     }
 
-  def bimap[C, D](f: (W) => C, g: (A) => D)(implicit F: Functor[F]) =
+  def bimap[C, D](f: W => C, g: A => D)(implicit F: Functor[F]) =
     writerT[F, C, D](F.map(run)({
       case (a, b) => (f(a), g(b))
     }))
 
-  def bitraverse[G[_], C, D](f: (W) => G[C], g: (A) => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
+  def bitraverse[G[_], C, D](f: W => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {
       case (a, b) => G.apply2(f(a), g(b))((_, _))
     })(writerT(_))
@@ -245,14 +245,14 @@ import WriterT.writerT
 private[scalaz] trait WriterTFunctor[F[+_], W] extends Functor[({type λ[+α]=WriterT[F, W, α]})#λ] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: WriterT[F, W, A])(f: (A) => B) = fa map f
+  override def map[A, B](fa: WriterT[F, W, A])(f: A => B) = fa map f
 }
 
 private[scalaz] trait WriterTApply[F[+_], W] extends Apply[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFunctor[F, W] {
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
-  override def ap[A, B](fa: => WriterT[F, W, A])(f: => WriterT[F, W, (A) => B]) = fa ap f
+  override def ap[A, B](fa: => WriterT[F, W, A])(f: => WriterT[F, W, A => B]) = fa ap f
 }
 
 private[scalaz] trait WriterTApplicative[F[+_], W] extends Applicative[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApply[F, W] {
@@ -264,7 +264,7 @@ private[scalaz] trait WriterTApplicative[F[+_], W] extends Applicative[({type λ
 private[scalaz] trait WriterTEach[F[+_], W] extends Each[({type λ[+α]=WriterT[F, W, α]})#λ] {
   implicit def F: Each[F]
 
-  def each[A](fa: WriterT[F, W, A])(f: (A) => Unit) = fa foreach f
+  def each[A](fa: WriterT[F, W, A])(f: A => Unit) = fa foreach f
 }
 
 // TODO does Index it make sense for F other than Id?
@@ -275,7 +275,7 @@ private[scalaz] trait WriterTIndex[W] extends Index[({type λ[+α]=WriterT[Id, W
 private[scalaz] trait WriterTMonad[F[+_], W] extends Monad[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] {
   implicit def F: Monad[F]
 
-  def bind[A, B](fa: WriterT[F, W, A])(f: (A) => WriterT[F, W, B]) = fa flatMap f
+  def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]) = fa flatMap f
 }
 
 private[scalaz] trait WriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({type λ[+α]=WriterT[F, W, α]})#λ] {
@@ -287,20 +287,20 @@ private[scalaz] trait WriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({typ
 private[scalaz] trait WriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[+_]: Applicative, A, B](fa: WriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
+  def traverseImpl[G[+_]: Applicative, A, B](fa: WriterT[F, W, A])(f: A => G[B]) = fa traverse f
 }
 
 private[scalaz] trait WriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=WriterT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
-  override def bimap[A, B, C, D](fab: WriterT[F, A, B])(f: (A) => C, g: (B) => D) =
+  override def bimap[A, B, C, D](fab: WriterT[F, A, B])(f: A => C, g: B => D) =
     fab.bimap(f, g)
 }
 
 private[scalaz] trait WriterTBitraverse[F[+_]] extends Bitraverse[({type λ[+α, +β]=WriterT[F, α, β]})#λ] with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(f: A => G[C], g: B => G[D]) =
     fab.bitraverse(f, g)
 }
 

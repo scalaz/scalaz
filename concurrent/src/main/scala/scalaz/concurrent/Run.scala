@@ -26,7 +26,7 @@ object Run {
   implicit def RunFrom[A](e: Run[A]): A => Unit = e.run _
 
   implicit val runContravariant = new Contravariant[Run] {
-    def contramap[A, B](r: Run[A])(f: (B) => A): Run[B] = new Run[B] {
+    def contramap[A, B](r: Run[A])(f: B => A): Run[B] = new Run[B] {
 
       def strategy: Strategy = r.strategy
 

@@ -65,7 +65,7 @@ object Order {
   ////
 
   implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
-    def contramap[A, B](r: Order[A])(f: (B) => A): Order[B] = r.contramap(f)
+    def contramap[A, B](r: Order[A])(f: B => A): Order[B] = r.contramap(f)
   }
 
   implicit def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {

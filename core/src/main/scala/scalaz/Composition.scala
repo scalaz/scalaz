@@ -5,7 +5,7 @@ private[scalaz] trait CompositionFunctor[F[_], G[_]] extends Functor[({type λ[�
 
   implicit def G: Functor[G]
 
-  override def map[A, B](fga: F[G[A]])(f: (A) => B): F[G[B]] = F(fga)(ga => G(ga)(f))
+  override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] = F(fga)(ga => G(ga)(f))
 }
 
 private[scalaz] trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {

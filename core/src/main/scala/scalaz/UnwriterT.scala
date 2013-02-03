@@ -65,12 +65,12 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
       f(a._2, b)
     }
 
-  def bimap[C, D](f: (U) => C, g: (A) => D)(implicit F: Functor[F]) =
+  def bimap[C, D](f: U => C, g: A => D)(implicit F: Functor[F]) =
     unwriterT[F, C, D](F.map(run)({
       case (a, b) => (f(a), g(b))
     }))
 
-  def bitraverse[G[_], C, D](f: (U) => G[C], g: (A) => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
+  def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (U, A), (C, D)](run) {
       case (a, b) => G.apply2(f(a), g(b))((_, _))
     })(unwriterT(_))
@@ -160,19 +160,19 @@ trait UnwriterTFunctions {
 private[scalaz] trait UnwriterTFunctor[F[+_], W] extends Functor[({type λ[+α]=UnwriterT[F, W, α]})#λ] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: UnwriterT[F, W, A])(f: (A) => B) = fa map f
+  override def map[A, B](fa: UnwriterT[F, W, A])(f: A => B) = fa map f
 }
 
 private[scalaz] trait UnwriterTApply[F[+_], W] extends Apply[({type λ[+α]=UnwriterT[F, W, α]})#λ] with UnwriterTFunctor[F, W] {
   implicit def F: Apply[F]
 
-  override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, (A) => B]) = fa ap f
+  override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa ap f
 }
 
 private[scalaz] trait UnwriterTEach[F[+_], W] extends Each[({type λ[+α]=UnwriterT[F, W, α]})#λ] {
   implicit def F: Each[F]
 
-  def each[A](fa: UnwriterT[F, W, A])(f: (A) => Unit) = fa foreach f
+  def each[A](fa: UnwriterT[F, W, A])(f: A => Unit) = fa foreach f
 }
 
 // TODO does Index it make sense for F other than Id?
@@ -183,7 +183,7 @@ private[scalaz] trait UnwriterTIndex[W] extends Index[({type λ[+α]=UnwriterT[I
 private[scalaz] trait UnwriterTBind[F[+_], W] extends Bind[({type λ[+α]=UnwriterT[F, W, α]})#λ] with UnwriterTApply[F, W] {
   implicit def F: Bind[F]
 
-  def bind[A, B](fa: UnwriterT[F, W, A])(f: (A) => UnwriterT[F, W, B]) = fa flatMap f
+  def bind[A, B](fa: UnwriterT[F, W, A])(f: A => UnwriterT[F, W, B]) = fa flatMap f
 }
 
 private[scalaz] trait UnwriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({type λ[+α]=UnwriterT[F, W, α]})#λ] {
@@ -195,20 +195,20 @@ private[scalaz] trait UnwriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({t
 private[scalaz] trait UnwriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=UnwriterT[F, W, α]})#λ] with UnwriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[+_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: (A) => G[B]) = fa traverse f
+  def traverseImpl[G[+_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa traverse f
 }
 
 private[scalaz] trait UnwriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=UnwriterT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
-  override def bimap[A, B, C, D](fab: UnwriterT[F, A, B])(f: (A) => C, g: (B) => D) =
+  override def bimap[A, B, C, D](fab: UnwriterT[F, A, B])(f: A => C, g: B => D) =
     fab.bimap(f, g)
 }
 
 private[scalaz] trait UnwriterTBitraverse[F[+_]] extends Bitraverse[({type λ[+α, +β]=UnwriterT[F, α, β]})#λ] with UnwriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
-  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: UnwriterT[F, A, B])(f: (A) => G[C], g: (B) => G[D]) =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: UnwriterT[F, A, B])(f: A => G[C], g: B => G[D]) =
     fab.bitraverse(f, g)
 }
 

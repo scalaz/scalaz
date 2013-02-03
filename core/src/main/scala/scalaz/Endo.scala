@@ -60,12 +60,12 @@ trait EndoFunctions {
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 
   implicit def IsoEndo[A] = new IsoSet[Endo[A], A => A] {
-    def to: (Endo[A]) => (A) => A = _.run
-    def from: ((A) => A) => Endo[A] = endo
+    def to: (Endo[A]) => A => A = _.run
+    def from: (A => A) => Endo[A] = endo
   }
 
   implicit def IsoFunctorEndo = new IsoFunctorTemplate[Endo, ({type λ[α]=(α => α)})#λ] {
-    def to[A](fa: Endo[A]): (A) => A = fa.run
-    def from[A](ga: (A) => A): Endo[A] = endo(ga)
+    def to[A](fa: Endo[A]): A => A = fa.run
+    def from[A](ga: A => A): Endo[A] = endo(ga)
   }
 }

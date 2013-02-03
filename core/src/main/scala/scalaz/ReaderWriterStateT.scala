@@ -78,7 +78,7 @@ private[scalaz] trait ReaderWriterStateTMonadReader[F[+_], R, W, S]
     ReaderWriterStateT((r, s) => F.point((W.zero, a, s)))
   def ask: ReaderWriterStateT[F, R, W, S, R] =
     ReaderWriterStateT((r, s) => F.point((W.zero, r, s)))
-  def local[A](f: (R) => R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
+  def local[A](f: R => R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((r, s) => fa.run(f(r), s))
   def init: ReaderWriterStateT[F, R, W, S, S] =
     ReaderWriterStateT((r, s) => F.point((W.zero, s, s)))

@@ -29,9 +29,9 @@ trait IdInstances {
 
       def cozip[A, B](a: Id[A \/ B]): (A \/ B) = a
 
-      def traverse1Impl[G[_] : Apply, A, B](fa: Id[A])(f: (A) => G[B]): G[Id[B]] = f(fa)
+      def traverse1Impl[G[_] : Apply, A, B](fa: Id[A])(f: A => G[B]): G[Id[B]] = f(fa)
 
-      def distributeImpl[G[_] : Functor, A, B](fa: G[A])(f: (A) => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
+      def distributeImpl[G[_] : Functor, A, B](fa: G[A])(f: A => Id[B]): Id[G[B]] = Functor[G].map(fa)(f)
 
       override def foldRight[A, B](fa: Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
@@ -39,7 +39,7 @@ trait IdInstances {
 
       // Overrides for efficiency.
 
-      override def lift[A, B](f: (A) => B): Id[A] => Id[B] = f
+      override def lift[A, B](f: A => B): Id[A] => Id[B] = f
 
       // `ffa: Id[Id[A]]`, gives, "cyclic aliasing or subtyping involving type Id", but `ffa: A` is identical.
       override def join[A](ffa: A) = ffa
@@ -50,7 +50,7 @@ trait IdInstances {
 
       override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
-      def each[A](fa: Id[A])(f: (A) => Unit) {
+      def each[A](fa: Id[A])(f: A => Unit) {
         f(fa)
       }
 

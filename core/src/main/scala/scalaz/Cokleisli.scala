@@ -61,9 +61,9 @@ trait CokleisliFunctions {
 }
 
 private[scalaz] trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]})#λ] {
-  override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, (A) => B]) = f flatMap (fa map _)
+  override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
-  def bind[A, B](fa: Cokleisli[F, R, A])(f: (A) => Cokleisli[F, R, B]) = fa flatMap f
+  def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) = fa flatMap f
 }
 
 private[scalaz] trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
@@ -79,7 +79,7 @@ private[scalaz] trait CokleisliArrow[F[_]]
 
   implicit def F: Comonad[F]
 
-  def arr[A, B](f: (A) => B) = Cokleisli(a => f(F.copoint(a)))
+  def arr[A, B](f: A => B) = Cokleisli(a => f(F.copoint(a)))
   def id[A] = Cokleisli(F.copoint)
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =

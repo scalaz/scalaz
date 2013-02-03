@@ -39,7 +39,7 @@ object Show {
   }
 
   implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
-    def contramap[A, B](r: Show[A])(f: (B) => A): Show[B] = new Show[B] {
+    def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
       override def show(b: B): Cord = r.show(f(b))
     }
   }

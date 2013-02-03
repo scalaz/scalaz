@@ -3,7 +3,7 @@ package std
 
 trait SetInstances {
   implicit val setInstance = new Traverse[Set] with MonadPlus[Set] with Each[Set] with Length[Set] with IsEmpty[Set] {
-    def each[A](fa: Set[A])(f: (A) => Unit) = fa foreach f
+    def each[A](fa: Set[A])(f: A => Unit) = fa foreach f
     def length[A](fa: Set[A]) = fa.size
     def point[A](a: => A) = Set(a)
     def bind[A, B](fa: Set[A])(f: A => Set[B]) = fa flatMap f

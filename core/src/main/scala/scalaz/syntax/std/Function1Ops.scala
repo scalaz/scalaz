@@ -14,7 +14,7 @@ trait Function1Ops[T, R] extends Ops[T => R] {
   def kleisli[Z[+_]](implicit z: Applicative[Z]): Kleisli[Z, T, R] =
     Kleisli.kleisli((t: T) => z.point(self(t)))
 
-  def unary_!(implicit m: Memo[T, R]): (T) => R = m(self)
+  def unary_!(implicit m: Memo[T, R]): T => R = m(self)
 
   def toValidation[E](e: => E)(implicit ev: R =:= Boolean): T => Validation[NonEmptyList[E], T] =
     (t: T) => (if (self(t): Boolean) success(t) else failure(nel(e, Nil)))

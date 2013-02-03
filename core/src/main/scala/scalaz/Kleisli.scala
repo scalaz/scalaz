@@ -162,7 +162,7 @@ trait KleisliFunctions {
   /**Pure Kleisli arrow */
   def ask[M[+_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
 
-  def local[M[+_] : Monad, A, R](f: (R) => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
+  def local[M[+_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
 }
 
 object Kleisli extends KleisliFunctions with KleisliInstances {
@@ -187,7 +187,7 @@ private[scalaz] trait KleisliFunctor[F[+_], R] extends Functor[({type λ[α] = K
 
 private[scalaz] trait KleisliApply[F[+_], R] extends Apply[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliFunctor[F, R] {
   implicit def F: Apply[F]
-  override def ap[A, B](fa: => Kleisli[F, R, A])(f: => Kleisli[F, R, (A) => B]): Kleisli[F, R, B] = Kleisli[F, R, B](r => F.ap(fa(r))(f(r)))
+  override def ap[A, B](fa: => Kleisli[F, R, A])(f: => Kleisli[F, R, A => B]): Kleisli[F, R, B] = Kleisli[F, R, B](r => F.ap(fa(r))(f(r)))
 }
 
 private[scalaz] trait KleisliDistributive[F[+_], R] extends Distributive[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliFunctor[F, R] {
@@ -211,7 +211,7 @@ private[scalaz] trait KleisliMonadReader[F[+_], R] extends MonadReader[({type f[
   implicit def F: Monad[F]
 
   def ask: Kleisli[F, R, R] = Kleisli[F, R, R](r => F.point(r))
-  def local[A](f: (R) => R)(fa: Kleisli[F, R, A]): Kleisli[F, R, A] = Kleisli[F, R, A](r => fa.run(f(r)))
+  def local[A](f: R => R)(fa: Kleisli[F, R, A]): Kleisli[F, R, A] = Kleisli[F, R, A](r => fa.run(f(r)))
 }
 
 private[scalaz] trait KleisliHoist[R] extends Hoist[({type λ[α[+_], β] = Kleisli[α, R, β]})#λ] {
@@ -243,7 +243,7 @@ private[scalaz] trait KleisliArrow[F[+_]]
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
 
-  def arr[A, B](f: (A) => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
+  def arr[A, B](f: A => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
 
   def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
     case (a, c) => F.map(f.run(a))((b: B) => (b, c))

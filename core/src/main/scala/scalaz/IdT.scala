@@ -17,7 +17,7 @@ final case class IdT[F[_], A](run: F[A]) {
     F.foldRight[A, Z](run, z)(f)
   }
 
-  def traverse[G[_], B](f: (A) => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] = {
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] = {
     import std.option._
     G.map(F.traverse(run)(f))(IdT(_))
   }
@@ -103,7 +103,7 @@ private[scalaz] trait IdTFoldable[F[_]] extends Foldable.FromFoldr[({type λ[α]
 private[scalaz] trait IdTTraverse[F[_]] extends Traverse[({type λ[α] = IdT[F, α]})#λ] with IdTFoldable[F] with IdTFunctor[F]{
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_] : Applicative, A, B](fa: IdT[F, A])(f: (A) => G[B]): G[IdT[F, B]] = fa traverse f
+  def traverseImpl[G[_] : Applicative, A, B](fa: IdT[F, A])(f: A => G[B]): G[IdT[F, B]] = fa traverse f
 }
 
 private[scalaz] object IdTHoist extends Hoist[IdT] {
