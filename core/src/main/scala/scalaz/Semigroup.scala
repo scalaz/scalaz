@@ -84,19 +84,19 @@ object Semigroup {
     def append(f1: A, f2: => A): A = f2
   }
 
-  @inline implicit def lastTaggedSemigroup[A] = firstSemigroup[A @@ Tags.LastVal]
+  @inline implicit def lastTaggedSemigroup[A] = lastSemigroup[A @@ Tags.LastVal]
 
-  def minSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = o.min(f1, f2)
+  def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] = new Semigroup[A @@ Tags.MinVal] {
+    def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(f1, f2))
   }
 
-  @inline implicit def minTaggedSemigroup[A] = firstSemigroup[A @@ Tags.MinVal]
+  @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
 
-  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = o.max(f1, f2)
+  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] = new Semigroup[A @@ Tags.MaxVal] {
+    def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(f1, f2))
   }
 
-  @inline implicit def maxTaggedSemigroup[A] = firstSemigroup[A @@ Tags.MaxVal]
+  @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
 
   /** `point(a) append (point(a) append (point(a)...` */
   def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
