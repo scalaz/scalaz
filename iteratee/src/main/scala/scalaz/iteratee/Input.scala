@@ -89,7 +89,7 @@ trait InputInstances {
        , eof = 0
      )
      def point[A](a: => A): Input[A] = elInput(a)
-     def traverseImpl[G[_]: Applicative, A, B](fa: Input[A])(f: (A) => G[B]): G[Input[B]] = fa.fold(
+     def traverseImpl[G[_]: Applicative, A, B](fa: Input[A])(f: A => G[B]): G[Input[B]] = fa.fold(
        empty = Applicative[G].point(emptyInput[B])
        , el = x => Applicative[G].map(f(x))(b => elInput(b))
        , eof = Applicative[G].point(eofInput[B])
@@ -99,13 +99,13 @@ trait InputInstances {
        , el = a => f(a, z)
        , eof = z
      )
-     def each[A](fa: Input[A])(f: (A) => Unit) = fa foreach (a => f(a))
+     def each[A](fa: Input[A])(f: A => Unit) = fa foreach (a => f(a))
      def plus[A](a: Input[A], b: => Input[A]): Input[A] = a.fold(
        empty = b
        , el = _ => a
        , eof = b
      )
-     def bind[A, B](fa: Input[A])(f: (A) => Input[B]): Input[B] = fa flatMap (a => f(a))
+     def bind[A, B](fa: Input[A])(f: A => Input[B]): Input[B] = fa flatMap (a => f(a))
      def empty[A]: Input[A] = emptyInput
    }
 

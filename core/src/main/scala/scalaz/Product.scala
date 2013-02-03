@@ -6,7 +6,7 @@ private[scalaz] trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] =
 
   implicit def G: Functor[G]
 
-  override def map[A, B](fa: (F[A], G[A]))(f: (A) => B): (F[B], G[B]) = (F.map(fa._1)(f), G.map(fa._2)(f))
+  override def map[A, B](fa: (F[A], G[A]))(f: A => B): (F[B], G[B]) = (F.map(fa._1)(f), G.map(fa._2)(f))
 }
 
 private[scalaz] trait ProductApply[F[_], G[_]] extends Apply[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {

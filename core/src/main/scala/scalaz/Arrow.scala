@@ -22,7 +22,7 @@ trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] { self =>
     new Applicative[({type λ[α] = (C =>: α)})#λ] {
       def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
-      override def map[A, B](fa: (C =>: A))(f: (A) => B): (C =>: B) =
+      override def map[A, B](fa: (C =>: A))(f: A => B): (C =>: B) =
 	<<<(arr(f), fa)
     }
 

@@ -120,9 +120,9 @@ trait TreeInstances {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
     def copoint[A](p: Tree[A]): A = p.rootLabel
-    override def map[A, B](fa: Tree[A])(f: (A) => B) = fa map f
-    def bind[A, B](fa: Tree[A])(f: (A) => Tree[B]): Tree[B] = fa flatMap f
-    def traverse1Impl[G[_]: Apply, A, B](fa: Tree[A])(f: (A) => G[B]): G[Tree[B]] = fa traverse1 f
+    override def map[A, B](fa: Tree[A])(f: A => B) = fa map f
+    def bind[A, B](fa: Tree[A])(f: A => Tree[B]): Tree[B] = fa flatMap f
+    def traverse1Impl[G[_]: Apply, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] = fa traverse1 f
     override def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def foldRight1[A](fa: Tree[A])(f: (A, => A) => A): A = fa.subForest.foldRight(fa.rootLabel)((t, a) => treeInstance.foldRight(t, a)(f))
     override def foldLeft[A, B](fa: Tree[A], z: B)(f: (B, A) => B): B =
@@ -130,7 +130,7 @@ trait TreeInstances {
     override def foldLeft1[A](fa: Tree[A])(f: (A, A) => A): A = fa.flatten match {
       case h #:: t => t.foldLeft(h)(f)
     }
-    override def foldMap[A, B](fa: Tree[A])(f: (A) => B)(implicit F: Monoid[B]): B = fa foldMap f
+    override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
 
   implicit def treeEqual[A](implicit A: Equal[A]): Equal[Tree[A]] = new Equal[Tree[A]] {

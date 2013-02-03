@@ -155,8 +155,8 @@ trait IOInstances extends IOInstances0 {
 
 private trait IOMonad extends Monad[IO] {
   def point[A](a: => A): IO[A] = IO(a)
-  override def map[A, B](fa: IO[A])(f: (A) => B) = fa map f
-  def bind[A, B](fa: IO[A])(f: (A) => IO[B]): IO[B] = fa flatMap f
+  override def map[A, B](fa: IO[A])(f: A => B) = fa map f
+  def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f
 }
 
 private trait IOLiftIO extends LiftIO[IO] {

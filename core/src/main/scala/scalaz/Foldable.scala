@@ -224,7 +224,7 @@ object Foldable {
    * Example:
    * {{{
    * new Foldable[Option] with Foldable.FromFoldMap[Option] {
-   *   def foldMap[A, B](fa: Option[A])(f: (A) => B)(implicit F: Monoid[B]) = fa match {
+   *   def foldMap[A, B](fa: Option[A])(f: A => B)(implicit F: Monoid[B]) = fa match {
    *     case Some(a) => f(a)
    *     case None    => F.zero
    *   }
@@ -250,7 +250,7 @@ object Foldable {
    * }}}
    */
   trait FromFoldr[F[_]] extends Foldable[F] {
-    override def foldMap[A, B](fa: F[A])(f: (A) => B)(implicit F: Monoid[B]) =
+    override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) =
         foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
   }
 
