@@ -56,7 +56,7 @@ sealed trait Coproduct[F[+_], G[+_], A] {
 
 }
 
-object Coproduct extends CoproductFunctions with CoproductInstances {
+object Coproduct extends CoproductFunctions with CoproductInstances0 {
   def apply[F[+_], G[+_], A](x: F[A] \/ G[A]): Coproduct[F, G, A] =
     new Coproduct[F, G, A] {
       val run = x
