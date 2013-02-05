@@ -96,13 +96,22 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
 
 trait EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] {
+  implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
     def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
     def empty[A] = EphemeralStream()
     def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
     def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
+
+    def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
+      val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
+
+      foldRight(fa, seed) {
+        (x, ys) => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
+      }
+    }
+
   }
 }
 
