@@ -105,9 +105,9 @@ package object scalaz {
 
   type |>=|[G[_], F[_]] = MonadPartialOrder[G, F]
 
-  type ReaderT[F[+_], E, +A] = Kleisli[F, E, A]
-  type =?>[E, A] = Kleisli[Option, E, A]
-  type Reader[E, +A] = ReaderT[Id, E, A]
+  type ReaderT[F[+_], -E, +A] = Kleisli[F, E, A]
+  type =?>[-E, +A] = Kleisli[Option, E, A]
+  type Reader[-E, +A] = ReaderT[Id, E, A]
 
   type Writer[+W, +A] = WriterT[Id, W, A]
   type Unwriter[+W, +A] = UnwriterT[Id, W, A]
@@ -168,13 +168,26 @@ package object scalaz {
   }
 
 
-  type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Identity, R, W, S, A]
-
+  type ReaderWriterStateT[F[+_], -R, +W, S, +A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
+  object ReaderWriterStateT extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+    def apply[F[+_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+  }
+  type IndexedReaderWriterState[-R, +W, -S1, +S2, +A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
+  object IndexedReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+    def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) => f(r, s) }
+  }
+  type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Id, R, W, S, A]
+  object ReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+    def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+  }
+  type IRWST[F[+_], -R, +W, -S1, +S2, +A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
+  val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
+  type IRWS[-R, +W, -S1, +S2, +A] = IndexedReaderWriterState[R, W, S1, S2, A]
+  val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
   type RWST[F[+_], -R, +W, S, +A] = ReaderWriterStateT[F, R, W, S, A]
-
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
-
   type RWS[-R, +W, S, +A] = ReaderWriterState[R, W, S, A]
+  val RWS: ReaderWriterState.type = ReaderWriterState
 
   type Alternative[F[_]] = ApplicativePlus[F]
 

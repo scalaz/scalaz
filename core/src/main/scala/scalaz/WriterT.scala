@@ -17,7 +17,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
   def mapValue[X, B](f: ((W, A)) => (X, B))(implicit F: Functor[F]): WriterT[F, X, B] =
     writerT(F.map(run)(f))
 
-  def mapWritten[X](f: W => X)(implicit ftr: Functor[F]): WriterT[F, X, A] =
+  def mapWritten[X](f: W => X)(implicit F: Functor[F]): WriterT[F, X, A] =
     mapValue(wa => (f(wa._1), wa._2))
 
   def written(implicit F: Functor[F]): F[W] =
@@ -93,6 +93,8 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
     writerT(F.map(self.run) {
       case (w, a) => (P.point(w), a)
     })
+
+  def colocal[X](f: W => X)(implicit F: Functor[F]): WriterT[F, X, A] = mapWritten(f)
 }
 
 object WriterT extends WriterTFunctions with WriterTInstances {

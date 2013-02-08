@@ -74,11 +74,17 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
 
   def unliftId[M[+_], AA >: A, S1m <: S1, S2m >: S2](implicit M: Comonad[M], ev: this.type <~< IndexedStateT[M, S1m, S2m, AA]): IndexedState[S1m, S2m, AA] = unlift[M, Id, AA, S1m, S2m]
 
-  def rwst[W, R, S >: S2 <: S1](implicit F: Functor[F], W: Monoid[W]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
+  def rwst[W, R](implicit F: Functor[F], W: Monoid[W]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] = IndexedReaderWriterStateT(
     (r, s) => F.map(self(s)) {
       case (s, a) => (W.zero, a, s)
     }
   )
+
+  def zoom[S0, S3](l: LensFamily[S0, S3, S1, S2])(implicit F: Functor[F]): IndexedStateT[F, S0, S3, A] = new IndexedStateT[F, S0, S3, A] {
+    def apply(s0: S0) = F.map(self(l get s0)) {
+      case (s2, a) => (l.set(s0, s2), a)
+    }
+  }
 }
 
 object IndexedStateT extends StateTFunctions with StateTInstances {
