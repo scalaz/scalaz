@@ -69,6 +69,8 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   def liftMK[T[_[_], _]](implicit T: MonadTrans[T], M: Monad[M]): Kleisli[({type l[+a] = T[M, a]})#l, A, B] =
     mapK[({type l[+a] = T[M, a]})#l, B](ma => T.liftM(ma))
+
+  def local[AA](f: AA => A): Kleisli[M, AA, B] = kleisli(f andThen run)
 }
 
 //

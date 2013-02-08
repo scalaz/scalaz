@@ -23,7 +23,7 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
   def mapValue[X, B](f: ((U, A)) => (X, B))(implicit F: Functor[F]): UnwriterT[F, X, B] =
     unwriterT(F.map(run)(f))
 
-  def mapUnwritten[X](f: U => X)(implicit ftr: Functor[F]): UnwriterT[F, X, A] =
+  def mapUnwritten[X](f: U => X)(implicit F: Functor[F]): UnwriterT[F, X, A] =
     mapValue(wa => (f(wa._1), wa._2))
 
   def unwritten(implicit F: Functor[F]): F[U] =
@@ -79,6 +79,8 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
     unwriterT(F.map(self.run) {
       case (u, a) => (P.point(u), a)
     })
+
+  def colocal[X](f: U => X)(implicit F: Functor[F]): UnwriterT[F, X, A] = mapUnwritten(f)
 }
 
 object UnwriterT extends UnwriterTFunctions with UnwriterTInstances {
