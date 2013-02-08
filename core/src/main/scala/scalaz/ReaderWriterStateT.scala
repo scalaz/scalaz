@@ -65,7 +65,7 @@ trait ReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances {
 private[scalaz] trait IndexedReaderWriterStateTFunctor[F[+_], R, W, S1, S2] extends Functor[({type λ[+α]=IndexedReaderWriterStateT[F, R, W, S1, S2, α]})#λ] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, A] = fa map f
+  override def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
 }
 
 private[scalaz] trait ReaderWriterStateTMonad[F[+_], R, W, S]
@@ -83,10 +83,10 @@ private[scalaz] trait ReaderWriterStateTMonad[F[+_], R, W, S]
     ReaderWriterStateT((r, s) => F.point((W.zero, r, s)))
   def local[A](f: R => R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((r, s) => fa.run(f(r), s))
-  override def scope[A](k: S)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
+  override def scope[A](k: R)(fa: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((_, s) => fa.run(k, s))
-  override def asks[A](f: S => A): ReaderWriterStateT[F, R, W, S, A] =
-    ReaderWriterStateT((r, s) => F.point((W.zero, r, f(s))))
+  override def asks[A](f: R => A): ReaderWriterStateT[F, R, W, S, A] =
+    ReaderWriterStateT((r, s) => F.point((W.zero, f(r), s)))
   def init: ReaderWriterStateT[F, R, W, S, S] =
     ReaderWriterStateT((_, s) => F.point((W.zero, s, s)))
   def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
