@@ -73,7 +73,7 @@ trait MemoFunctions {
   def mutableHashMapMemo[K, V]: Memo[K, V] = 
     mutableMapMemo(new collection.mutable.HashMap[K, V])
 
-/** As with `mutableHashMapMemo`, but forget elements according to
+  /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
   def weakHashMapMemo[K, V]: Memo[K, V] = 
