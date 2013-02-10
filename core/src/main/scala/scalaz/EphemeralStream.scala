@@ -82,6 +82,14 @@ sealed trait EphemeralStream[A] {
     foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
       (cons(q._1, r._1), cons(q._2, r._2)))
 
+  def interleave(q: EphemeralStream[A]): EphemeralStream[A] =
+    if(isEmpty)
+      q
+    else if (q.isEmpty)
+      this
+    else
+      cons(head(), cons(q.head(), tail() interleave q.tail()))
+
 }
 
 object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInstances {
