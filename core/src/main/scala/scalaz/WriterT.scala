@@ -78,6 +78,9 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
       case (a, b) => (f(a), g(b))
     }))
 
+  def leftMap[C](f: W => C)(implicit F: Functor[F]): WriterT[F, C, A] =
+    bimap(f, identity)
+
   def bitraverse[G[_], C, D](f: W => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {
       case (a, b) => G.apply2(f(a), g(b))((_, _))

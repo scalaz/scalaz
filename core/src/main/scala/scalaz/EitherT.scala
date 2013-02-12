@@ -61,6 +61,10 @@ sealed trait EitherT[F[+_], +A, +B] {
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): EitherT[F, C, D] =
     EitherT(F.map(run)(_.bimap(f, g)))
 
+  /** Run the given function on the left value. */
+  def leftMap[C](f: A => C)(implicit F: Functor[F]): EitherT[F, C, B] =
+    bimap(f, identity)
+
   /** Binary functor traverse on this disjunction. */
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
     Applicative[G].map(F.traverse(run)(Bitraverse[\/].bitraverseF(f, g)))(EitherT(_: F[C \/ D]))

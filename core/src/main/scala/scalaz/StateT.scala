@@ -59,6 +59,9 @@ trait IndexedStateT[F[+_], -S1, +S2, +A] { self =>
     case (s1, a) => (f(s1), g(a))
   })
 
+  def leftMap[X](f: S2 => X)(implicit F: Functor[F]): IndexedStateT[F, S1, X, A] =
+    imap(f)
+
   def flatMap[S3, B](f: A => IndexedStateT[F, S2, S3, B])(implicit F: Bind[F]): IndexedStateT[F, S1, S3, B] = IndexedStateT(s => F.bind(apply(s)) {
     case (s1, a) => f(a)(s1)
   })

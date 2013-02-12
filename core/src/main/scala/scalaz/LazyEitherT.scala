@@ -62,6 +62,10 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
   def bimap[C, D](f: (=> A) => C, g: (=> B) => D)(implicit F: Functor[F]): LazyEitherT[F, C, D] =
     map(g).left.map(f)
 
+  /** Run the given function on the left value. */
+  def leftMap[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
+    left.map(f)
+
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[LazyEitherT[F, C, D]] = {
     import std.either.eitherInstance
     Applicative[G].map(F.traverse(run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT(_: F[LazyEither[C, D]]))
