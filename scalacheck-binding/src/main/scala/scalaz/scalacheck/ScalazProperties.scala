@@ -95,15 +95,6 @@ object ScalazProperties {
     }
   }
 
-  object group {
-    def inverseExists[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = forAll(A.groupLaw.inverseExists _)
-
-    def laws[A](implicit A: Group[A], eqa: Equal[A], arb: Arbitrary[A]) = new Properties("group") {
-      include(monoid.laws[A])
-      property("inverse exists") = inverseExists[A]
-    }
-  }
-
   object functor {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.functorLaw.identity[X] _)

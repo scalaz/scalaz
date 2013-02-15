@@ -81,7 +81,7 @@ trait LazyTupleFunctions {
   }
 }
 
-trait LazyTuple2Instances1 {
+trait LazyTuple2Instances0 {
   implicit def lazyTuple2Instance[A1, A2] = new Bitraverse[LazyTuple2] {
     override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(f: A => C, g: B => D): LazyTuple2[C, D] = LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] = {
@@ -96,7 +96,8 @@ trait LazyTuple2Instances1 {
 
   implicit def lazyTuple2Functor[A1]: Functor[({type f[x] = LazyTuple2[A1, x]})#f] = new LazyTuple2Functor[A1] {}
 }
-trait LazyTuple2Instances0 extends LazyTuple2Instances1 {
+
+trait LazyTuple2Instances extends LazyTuple2Instances0 {
 
   implicit def lazyTuple2Show[A1, A2](implicit A1: Show[A1], A2: Show[A2]) = new LazyTuple2Show[A1, A2] {
     implicit def _1 = A1
@@ -118,14 +119,7 @@ trait LazyTuple2Instances0 extends LazyTuple2Instances1 {
   }
 }
 
-trait LazyTuple2Instances extends LazyTuple2Instances0 {
-  implicit def lazyTuple2Group[A1, A2](implicit A1: Group[A1], A2: Group[A2]) = new LazyTuple2Group[A1, A2] {
-      implicit def _1 = A1
-      implicit def _2 = A2
-    }
-}
-
-trait LazyTuple3Instances1 {
+trait LazyTuple3Instances0 {
   implicit def lazyTuple3Semigroup[A1, A2, A3](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3]) = new LazyTuple3Semigroup[A1, A2, A3] {
     implicit def _1 = A1
     implicit def _2 = A2
@@ -140,7 +134,7 @@ trait LazyTuple3Instances1 {
     implicit def _3 = A3
   }
 }
-trait LazyTuple3Instances0 extends LazyTuple3Instances1 {
+trait LazyTuple3Instances extends LazyTuple3Instances0 {
 
   implicit def lazyTuple3Show[A1, A2, A3](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]) = new LazyTuple3Show[A1, A2, A3] {
     implicit def _1 = A1
@@ -166,15 +160,7 @@ trait LazyTuple3Instances0 extends LazyTuple3Instances1 {
   }
 }
 
-trait LazyTuple3Instances extends LazyTuple3Instances0 {
-  implicit def lazyTuple3Group[A1, A2, A3](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3]) = new LazyTuple3Group[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-}
-
-trait LazyTuple4Instances1 {
+trait LazyTuple4Instances0 {
   implicit def lazyTuple4Semigroup[A1, A2, A3, A4](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3], A4: Semigroup[A4]) = new LazyTuple4Semigroup[A1, A2, A3, A4] {
     implicit def _1 = A1
     implicit def _2 = A2
@@ -191,7 +177,7 @@ trait LazyTuple4Instances1 {
     implicit def _4 = A4
   }
 }
-trait LazyTuple4Instances0 extends LazyTuple4Instances1 {
+trait LazyTuple4Instances extends LazyTuple4Instances0 {
 
   implicit def lazyTuple4Show[A1, A2, A3, A4](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4]) = new LazyTuple4Show[A1, A2, A3, A4] {
     implicit def _1 = A1
@@ -218,15 +204,6 @@ trait LazyTuple4Instances0 extends LazyTuple4Instances1 {
     implicit def _1 = A1
     implicit def _2 = A2
     implicit def _3 = A3
-  }
-}
-
-trait LazyTuple4Instances extends LazyTuple4Instances0 {
-  implicit def lazyTuple4Group[A1, A2, A3, A4](implicit A1: Group[A1], A2: Group[A2], A3: Group[A3], A4: Group[A4]) = new LazyTuple4Group[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
   }
 }
 
@@ -378,26 +355,6 @@ private[scalaz] trait LazyTuple4Monoid[A1, A2, A3, A4] extends Monoid[LazyTuple4
   implicit def _4 : Monoid[A4]
   def zero: LazyTuple4[A1, A2, A3, A4] = LazyTuple4(_1.zero, _2.zero, _3.zero, _4.zero)
 }
-
-private[scalaz] trait LazyTuple2Group[A1, A2] extends Group[LazyTuple2[A1, A2]] with LazyTuple2Monoid[A1, A2] {
-  implicit def _1 : Group[A1]
-  implicit def _2 : Group[A2]
-  def inverse(f: LazyTuple2[A1, A2]) = LazyTuple2(_1.inverse(f._1), _2.inverse(f._2))
-}
-private[scalaz] trait LazyTuple3Group[A1, A2, A3] extends Group[LazyTuple3[A1, A2, A3]] with LazyTuple3Monoid[A1, A2, A3] {
-  implicit def _1 : Group[A1]
-  implicit def _2 : Group[A2]
-  implicit def _3 : Group[A3]
-  def inverse(f: LazyTuple3[A1, A2, A3]) = LazyTuple3(_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3))
-}
-private[scalaz] trait LazyTuple4Group[A1, A2, A3, A4] extends Group[LazyTuple4[A1, A2, A3, A4]] with LazyTuple4Monoid[A1, A2, A3, A4] {
-  implicit def _1 : Group[A1]
-  implicit def _2 : Group[A2]
-  implicit def _3 : Group[A3]
-  implicit def _4 : Group[A4]
-  def inverse(f: LazyTuple4[A1, A2, A3, A4]) = lazyTuple4(_1.inverse(f._1), _2.inverse(f._2), _3.inverse(f._3), _4.inverse(f._4))
-}
-
 
 // LazyTupleN forms a Monad if the element types other than the last are Monoids.
 

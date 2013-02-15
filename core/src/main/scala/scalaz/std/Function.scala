@@ -85,10 +85,6 @@ trait FunctionInstances extends FunctionInstances0 {
   implicit def function1Contravariant[R] = new Contravariant[({type l[a] = (a => R)})#l] {
     def contramap[A, B](r: A => R)(f: B => A) = r compose f
   }
-
-  implicit def function1Group[A, R](implicit R0: Group[R]) = new Function1Group[A, R] {
-    implicit def R: Group[R] = R0
-  }
   
   implicit def function2Instance[T1, T2] = new Monad[({type l[a] = ((T1, T2) => a)})#l] {
     def point[A](a: => A) = (t1, t2) => a
@@ -156,9 +152,4 @@ trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] {
   def copoint[A](p: M => A) = p(M.zero)
   def cobind[A, B](fa: M => A)(f: (M => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
   def map[A, B](fa: M => A)(f: A => B) = fa andThen f
-}
-
-trait Function1Group[A, R] extends Group[A => R] with Function1Monoid[A, R] {
-  implicit def R: Group[R]
-  def inverse(f: A=>R) = a => R.inverse(f(a))
 }

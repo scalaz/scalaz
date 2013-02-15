@@ -12,5 +12,5 @@ class BigIntTest extends Spec {
   checkAll("BigInt @@ Multiplication", order.laws[BigInt @@ Multiplication])
 
   checkAll("BigInt @@ Multiplication", monoid.laws[BigInt @@ Multiplication])
-  checkAll("BigInt", group.laws[BigInt])
+  checkAll("BigInt", monoid.laws[BigInt])
 }

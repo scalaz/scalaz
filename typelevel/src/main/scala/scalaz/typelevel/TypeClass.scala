@@ -47,13 +47,11 @@ object TypeClass {
   private trait Empty {
 
     def emptyProduct = new Equal[HNil]
-      with Show[HNil] with Group[HNil] {
+      with Show[HNil] with Monoid[HNil] {
 
       def zero = HNil
 
       def append(f1: HNil, f2: => HNil) = HNil
-
-      def inverse(f: HNil) = HNil
 
       def equal(a1: HNil, a2: HNil) = true
 
@@ -91,16 +89,6 @@ object TypeClass {
 
   }
 
-  private trait ProductGroup[F, T <: HList]
-    extends ProductMonoid[F, T]
-    with Group[F :: T]
-    with Product[Group, F, T] {
-
-    def inverse(f: λ) =
-      FHead.inverse(f.head) :: FTail.inverse(f.tail)
-
-  }
-
   // Instances
 
   implicit def EqualI: TypeClass[Equal] = new TypeClass[Equal] with Empty {
@@ -130,11 +118,6 @@ object TypeClass {
   implicit def MonoidI: TypeClass[Monoid] = new TypeClass[Monoid] with Empty {
     def product[F, T <: HList](FH: Monoid[F], FT: Monoid[T]): Monoid[F :: T] =
       new ProductMonoid[F, T] { def FHead = FH; def FTail = FT }
-  }
-
-  implicit def GroupI: TypeClass[Group] = new TypeClass[Group] with Empty {
-    def product[F, T <: HList](FH: Group[F], FT: Group[T]): Group[F :: T] =
-      new ProductGroup[F, T] { def FHead = FH; def FTail = FT }
   }
 
 }

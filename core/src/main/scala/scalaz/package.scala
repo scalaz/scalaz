@@ -16,7 +16,6 @@
  *
  *  - [[scalaz.Semigroup]]
  *  - [[scalaz.Monoid]] extends [[scalaz.Semigroup]]
- *  - [[scalaz.Group]] extends [[scalaz.Monoid]]
  *  - [[scalaz.Equal]]
  *  - [[scalaz.Length]]
  *  - [[scalaz.Show]]
