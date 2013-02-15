@@ -3,14 +3,12 @@ package std
 package math
 
 trait BigInts {
-  implicit val bigIntInstance: Group[BigInt] with Enum[BigInt] with Show[BigInt] = new Group[BigInt] with Enum[BigInt] with Show[BigInt] {
+  implicit val bigIntInstance: Monoid[BigInt] with Enum[BigInt] with Show[BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
     override def shows(f: BigInt) = f.toString
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
 
     def zero: BigInt = 0L
-
-    def inverse(f: BigInt): BigInt = -f
 
     def order(x: BigInt, y: BigInt): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 

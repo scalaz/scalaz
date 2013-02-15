@@ -12,6 +12,6 @@ import Tags._
 class BigIntegerTest extends Spec {
   checkAll("BigInteger", enum.laws[BigInteger])
   checkAll("BigInteger @@ Multiplication", order.laws[BigInteger @@ Multiplication])
-  checkAll("BigInteger", group.laws[BigInteger])
+  checkAll("BigInteger", monoid.laws[BigInteger])
   checkAll("BigInteger @@ Multiplication", monoid.laws[BigInteger @@ Multiplication])
 }
