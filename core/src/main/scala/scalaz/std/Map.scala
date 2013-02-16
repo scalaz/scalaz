@@ -2,8 +2,11 @@ package scalaz
 package std
 
 trait MapInstances0 {
-  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new Equal[Map[K, V]] {
-    def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
+  private[std] trait MapEqual[K, V] extends Equal[Map[K, V]] {
+    implicit def OK: Order[K]
+    implicit def OV: Equal[V]
+
+    override def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
       else Equal[Set[K]].equal(a1.keySet, a1.keySet) && {
@@ -13,6 +16,11 @@ trait MapInstances0 {
       }
     }
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
+  }
+
+  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new MapEqual[K, V] {
+    def OK = Order[K]
+    def OV = Equal[V]
   }
 }
 
@@ -57,12 +65,19 @@ trait MapInstances extends MapInstances0 {
                   case (k, v) => Cord(K show k, "->", V show v)
                 }: _*) :+ "]")
 
-  implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] {
+  implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] with MapEqual[K, V] {
+    def OK = Order[K]
+    def OV = Equal[V]
     def order(x: Map[K, V], y: Map[K, V]): Ordering = {
-      import list._
+      import collection.immutable.IndexedSeq
+      import indexedSeq._
       import tuple._
-      implicit val ok = implicitly[Order[K]].toScalaOrdering
-      Order[List[(K, V)]].order(x.toList.sortBy(_._1), y.toList.sortBy(_._1))
+      implicit val ok = Order[K].toScalaOrdering
+      Semigroup[Ordering]
+       .append(Order[Int].order(x.size, y.size),
+               Order[IndexedSeq[(K, V)]]
+                .order(x.toIndexedSeq.sortBy((_:(K,V))._1),
+                       y.toIndexedSeq.sortBy((_:(K,V))._1)))
     }
   }
 }
