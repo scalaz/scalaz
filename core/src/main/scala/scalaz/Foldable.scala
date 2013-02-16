@@ -28,10 +28,6 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
-  //  /**Right-associative fold of a structure. */
-//  def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
-//    foldMap(fa)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z
-
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
     import Dual._, Endo._, syntax.std.all._
