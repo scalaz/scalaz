@@ -18,7 +18,9 @@ class MapTest extends Spec {
       val (m1, m2) = (kvs.toMap, kvs2.toMap)
       ((m1.size == kvs.size) && (m2.size == kvs2.size)) ==> {
         val l: Boolean = O.lessThan(m1, m2)
-        val r: Boolean = O2.lt(kvs.sortBy(_._1), kvs2.sortBy(_._1))
+        val r: Boolean = (if (m1.size < m2.size) true
+                          else if (m1.size > m2.size) false
+                          else O2.lt(kvs.sortBy(_._1), kvs2.sortBy(_._1)))
         l == r
       }
     }
