@@ -70,6 +70,9 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
       case (a, b) => (f(a), g(b))
     }))
 
+  def leftMap[C](f: U => C)(implicit F: Functor[F]): UnwriterT[F, C, A] =
+    bimap(f, identity)
+
   def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (U, A), (C, D)](run) {
       case (a, b) => G.apply2(f(a), g(b))((_, _))

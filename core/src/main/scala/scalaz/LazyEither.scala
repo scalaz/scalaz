@@ -58,6 +58,10 @@ sealed trait LazyEither[+A, +B] {
   def bimap[C, D](f: (=> A) => C, g: (=> B) => D): LazyEither[C, D] =
     fold(a => lazyLeft(f(a)), b => lazyRight(g(b)))
 
+  /** Run the given function on the left value. */
+  def leftMap[C](f: (=> A) => C): LazyEither[C, B] =
+    fold(a => lazyLeft(f(a)), lazyRight(_))
+
   def foreach(f: (=> B) => Unit): Unit =
     fold(_ => (), f)
 

@@ -74,6 +74,10 @@ sealed trait \/[+A, +B] {
       case \/-(b) => \/-(g(b))
     }
 
+  /** Run the given function on the left value. */
+  def leftMap[C](f: A => C): (C \/ B) =
+    bimap(f, identity)
+
   /** Binary functor traverse on this disjunction. */
   def bitraverse[F[+_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
     this match {
