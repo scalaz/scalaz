@@ -63,40 +63,22 @@ trait MemoFunctions {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
+  private def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
+    memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
+
   /** Cache results in a [[scala.collection.mutable.HashMap]].
     * Nonsensical if `K` lacks a meaningful `hashCode` and
     * `java.lang.Object.equals`.
     */
-  def mutableHashMapMemo[K, V]: Memo[K, V] = {
-    val a = new collection.mutable.HashMap[K, V]
-
-    memo[K, V](f =>
-      k =>
-        a get k getOrElse {
-          val v = f(k)
-          a update (k, v)
-          v
-        })
-  }
+  def mutableHashMapMemo[K, V]: Memo[K, V] =
+    mutableMapMemo(new collection.mutable.HashMap[K, V])
 
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
-  def weakHashMapMemo[K, V]: Memo[K, V] = {
-    val a = new java.util.WeakHashMap[K, V]
+  def weakHashMapMemo[K, V]: Memo[K, V] =
+    mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
 
-    memo[K, V](f =>
-      k => {
-        val v = a get k
-        if (v == null) {
-          val nv = f(k)
-          a put (k, nv)
-          nv
-        } else {
-          v
-        }
-      })
-  }
 
   private def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
     var a = m
