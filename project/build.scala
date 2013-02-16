@@ -168,7 +168,8 @@ object build extends Build {
     base = file("iterv"),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-iterv",
-      OsgiKeys.fragmentHost := Some("org.scalaz.core")
+      OsgiKeys.fragmentHost := Some("org.scalaz.core"),
+      OsgiKeys.exportPackage := Seq("scalaz;version=${Bundle-Version};-split-package:=first")
     ),
     dependencies = Seq(effect)
   )
