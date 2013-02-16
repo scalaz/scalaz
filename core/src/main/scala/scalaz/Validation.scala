@@ -99,6 +99,10 @@ sealed trait Validation[+E, +A] {
       case Success(b) => Success(g(b))
     }
 
+  /** Run the given function on the left value. */
+  def leftMap[C](f: E => C): Validation[C, A] =
+    bimap(f, identity)
+
   /** Binary functor traverse on this validation. */
   def bitraverse[G[+_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
     case Failure(a) => Functor[G].map(f(a))(Failure(_))

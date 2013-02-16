@@ -26,6 +26,9 @@ sealed trait IndexedStoreT[F[+_], +I, -A, +B] {
   def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
     indexedStoreT((F.map(set)(g compose _), f(pos)))
 
+  def leftMap[X](f: I => X): IndexedStoreT[F, X, A, B] =
+    imap(f)
+
   def put(a: A)(implicit F: Functor[F]): F[B] =
     F.map(run._1)(_(a))
 
