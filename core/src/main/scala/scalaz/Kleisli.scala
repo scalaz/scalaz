@@ -69,6 +69,8 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   def liftMK[T[_[_], _]](implicit T: MonadTrans[T], M: Monad[M]): Kleisli[({type l[+a] = T[M, a]})#l, A, B] =
     mapK[({type l[+a] = T[M, a]})#l, B](ma => T.liftM(ma))
+
+  def local[AA](f: AA => A): Kleisli[M, AA, B] = kleisli(f andThen run)
 }
 
 //
@@ -162,7 +164,7 @@ trait KleisliFunctions {
   /**Pure Kleisli arrow */
   def ask[M[+_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
 
-  def local[M[+_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = kleisli[M, R, A](r => fa.run(f(r)))
+  def local[M[+_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = fa local f
 }
 
 object Kleisli extends KleisliFunctions with KleisliInstances {
