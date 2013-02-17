@@ -38,6 +38,8 @@ class FunctionTest extends Spec {
 
   checkAll("Function0", traverse.laws[Function0])
 
+  checkAll("Function1", contravariant.laws[({type λ[α] = (α) => B})#λ])
+
   checkAll("Function1", category.laws[Function1])
 
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
