@@ -141,6 +141,8 @@ trait KleisliInstances extends KleisliInstances0 {
     implicit def F: Monad[F] = F0
   }
 
+  implicit def kleisliContravariant[F[+_], A] = new KleisliContravariant[F, A] {}
+
   implicit def kleisliIdMonadReader[R] = kleisliMonadReader[Id, R]
 
   implicit def kleisliMonoid[F[+_], A, B](implicit FB0: Monoid[F[B]]) = new KleisliMonoid[F, A, B] {
@@ -229,6 +231,10 @@ private[scalaz] trait KleisliHoist[R] extends Hoist[({type λ[α[+_], β] = Klei
 
 private[scalaz] trait KleisliMonadPlus[F[+_], R] extends MonadPlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPlusEmpty[F, R] with KleisliMonad[F, R] {
   implicit def F: MonadPlus[F]
+}
+
+private[scalaz] trait KleisliContravariant[F[+_], X] extends Contravariant[({type λ[α] = Kleisli[F, α, X]})#λ] {
+  def contramap[A, B](fa: Kleisli[F, A, X])(f: B => A) = fa local f
 }
 
 //
