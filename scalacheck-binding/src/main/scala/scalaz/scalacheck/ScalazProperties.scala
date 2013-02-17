@@ -287,6 +287,21 @@ object ScalazProperties {
     }
   }
 
+  object contravariant {
+    def identity[F[_], X](implicit F: Contravariant[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(F.contravariantLaw.identity[X] _)
+
+    def composite[F[_], X, Y, Z](implicit F: Contravariant[F], af: Arbitrary[F[Z]], axy: Arbitrary[(X => Y)],
+                                   ayz: Arbitrary[(Y => Z)], ef: Equal[F[X]]) =
+      forAll(F.contravariantLaw.composite[Z, Y, X] _)
+
+    def laws[F[_]](implicit F: Contravariant[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
+                   ef: Equal[F[Int]]) = new Properties("contravariant") {
+      property("identity") = identity[F, Int]
+      property("composite") = composite[F, Int, Int, Int]
+    }
+  }
+
   object compose {
     def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
