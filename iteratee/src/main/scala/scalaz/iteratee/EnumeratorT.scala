@@ -110,7 +110,7 @@ trait EnumeratorTFunctions {
     }
 
   /**
-   * An enumerator that forces the evaulation of an effect in the F monad when it is consumed.
+   * An enumerator that forces the evaluation of an effect in the F monad when it is consumed.
    */
   def perform[E, F[_]: Monad, B](f: F[B]): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
