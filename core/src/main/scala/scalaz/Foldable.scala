@@ -49,6 +49,10 @@ trait Foldable[F[_]]  { self =>
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
 
+  /** `traverse_` specialized to `State` **/
+  def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
+    traverse_[({type λ[α]=State[S, α]})#λ, A, B](fa)(f)
+
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A, B](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
