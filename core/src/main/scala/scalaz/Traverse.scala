@@ -74,9 +74,6 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] =
     traversalS[S].run(fga)(a => a)
 
-  def sequenceS_[S,A](fga: F[State[S,A]]): State[S,Unit] =
-    traverseS_(fga)(x => x)
-
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
 

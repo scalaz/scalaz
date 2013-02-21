@@ -57,6 +57,10 @@ trait Foldable[F[_]]  { self =>
   def sequence_[M[_], A, B](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
 
+  /** `sequence_` specialized to `State` **/
+  def sequenceS_[S, A](fga: F[State[S, A]]): State[S, Unit] =
+    traverseS_(fga)(x => x)
+
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
 
