@@ -38,6 +38,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)
   final def intercalate(a: A)(implicit A: Monoid[A]): A = F.intercalate(self, a)
   final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
+  final def traverseS_[S, B](f: A => State[S, B]): State[S, Unit] = F.traverseS_(self)(f)
 
   ////
 }
