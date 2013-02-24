@@ -147,7 +147,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
   def |||[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] =
-    |||(x)
+    orElse(x)
 
   /**
    * Sums up values inside disjunction, if both are left or right. Returns first left otherwise.
