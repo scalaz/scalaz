@@ -26,16 +26,6 @@ object ScalaCheckBinding {
     override def apply4[A, B, C, D, E](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D])(f: (A, B, C, D) => E) = fa.map4(fb, fc, fd)(f)
     override def apply5[A, B, C, D, E, R](fa: => Gen[A], fb: => Gen[B], fc: => Gen[C], fd: => Gen[D], fe: => Gen[E])(f: (A, B, C, D, E) => R) = fa.map5(fb, fc, fd, fe)(f)
   }
-
-  implicit val ArbitraryClass: TypeClass[Arbitrary] = new TypeClass[Arbitrary] {
-    import syntax.typelevel.hlist._
-
-    def emptyProduct = Arbitrary(value(HNil))
-
-    def product[F, T <: HList](FHead: Arbitrary[F], FTail: Arbitrary[T]): Arbitrary[F :: T] =
-      Applicative[Arbitrary].apply2(FHead, FTail)(_ :: _)
-  }
-
 }
 
 // vim: expandtab:ts=2:sw=2
