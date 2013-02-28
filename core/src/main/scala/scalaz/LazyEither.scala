@@ -28,6 +28,9 @@ sealed trait LazyEither[+A, +B] {
   def toEither: Either[A, B] =
     fold(Left(_), Right(_))
 
+  def disjunction: (A \/ B) =
+    fold(-\/(_), \/-(_))
+
   def getOrElse[BB >: B](default: => BB): BB =
     fold(_ => default, z => z)
 

@@ -6,19 +6,19 @@ object TypeCheckerWithExplicitTypes_Monadic {
 
   import TypeCheckerWithExplicitTypesAST._
   import scalaz.syntax.monad._
-  import scalaz.std.either._
+  import scalaz.{\/, \/-, -\/}
 
-  def success(t: Type) = Right(t)
-  def typeError(msg: String) = Left(msg)
+  def success(t: Type): String \/ Type = \/-(t)
+  def typeError(msg: String): String \/ Type = -\/(msg)
 
-  def find(s: String, env: TypeEnv): Either[String, Type] =
+  def find(s: String, env: TypeEnv): String \/ Type =
     env.find(_._1 == s).map(p => success(p._2)).getOrElse(typeError("not found: " + s))
 
-  def compare(t1: Type, t2: Type, resultType: Type, errorMsg: String): Either[String, Type] =
+  def compare(t1: Type, t2: Type, resultType: Type, errorMsg: String): String \/ Type =
     if (t1 == t2) success(resultType) else typeError(errorMsg)
 
   // the real type check function, which works with the type environment.
-  def typeCheck(expr: Exp, env: TypeEnv = predef): Either[String, Type] = expr match {
+  def typeCheck(expr: Exp, env: TypeEnv = predef): String \/ Type = expr match {
     case Lit(v) => success(litToTy(v))
     case Id(x) => find(x, env)
     // make sure the first branch is a boolean and then
