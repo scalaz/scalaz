@@ -59,10 +59,8 @@ object UnapplyInference extends App {
 
     val e: String \/ Int = \/-(1)
 
-    // type T = (scalaz.Unapply[scalaz.Functor,Either[String,Int]]{type M[X] = Either[String,X]; type A = Int})#M[Int]
-    // implicitly[Unapply[Functor, T]]
-
     ToFunctorOps[({type λ[α] = String \/ α})#λ, Int](e.map(1 +)).map(1 +)
+    ToFunctorOpsUnapply(e.map(1 +)).map(1 +)
 
     e.map(1 +).map(1 +)
 
