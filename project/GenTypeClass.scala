@@ -57,6 +57,7 @@ object TypeClass {
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
+  lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
@@ -107,6 +108,7 @@ object TypeClass {
     bifoldable,
     bitraverse,
     compose,
+    catchable,
     category,
     choice,
     split,
