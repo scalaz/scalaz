@@ -62,6 +62,7 @@ trait ListInstances extends ListInstances0 {
       })
     }
 
+    override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
     override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
