@@ -49,7 +49,7 @@ trait IndexedReaderWriterStateTInstances {
 
 trait ReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances {
   implicit def rwstMonad[F[+_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]):
-  MonadReader[({type λ[-r, +α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R] with MonadState[({type f[s, +α] = ReaderWriterStateT[F, R, W, s, α]})#f, S] with ListenableMonadWriter[({type f[+w, +α] = ReaderWriterStateT[F, R, w, S, α]})#f, W] =
+  MonadReader[({type λ[-r, +α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R] with MonadState[({type f[s, +α] = ReaderWriterStateT[F, R, W, s, α]})#f, S] with MonadListen[({type f[+w, +α] = ReaderWriterStateT[F, R, w, S, α]})#f, W] =
     new ReaderWriterStateTMonad[F, R, W, S] {
       implicit def F = F0
       implicit def W = W0
@@ -71,7 +71,7 @@ private[scalaz] trait IndexedReaderWriterStateTFunctor[F[+_], R, W, S1, S2] exte
 private[scalaz] trait ReaderWriterStateTMonad[F[+_], R, W, S]
   extends MonadReader[({type λ[-r, +α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R]
   with MonadState[({type f[s, +α] = ReaderWriterStateT[F, R, W, s, α]})#f, S]
-  with ListenableMonadWriter[({type f[+w, +α] = ReaderWriterStateT[F, R, w, S, α]})#f, W]
+  with MonadListen[({type f[+w, +α] = ReaderWriterStateT[F, R, w, S, α]})#f, W]
   with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
@@ -95,8 +95,8 @@ private[scalaz] trait ReaderWriterStateTMonad[F[+_], R, W, S]
     ReaderWriterStateT((r, s) => F.point((W.zero, (), f(s))))
   override def gets[A](f: S => A): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((_, s) => F.point((W.zero, f(s), s)))
-  def writer[A](v: (W, A)): ReaderWriterStateT[F, R, W, S, A] =
-    ReaderWriterStateT((_, s) => F.point((v._1, v._2, s)))
+  def writer[A](w: W, v: A): ReaderWriterStateT[F, R, W, S, A] =
+    ReaderWriterStateT((_, s) => F.point((w, v, s)))
   override def tell(w: W): ReaderWriterStateT[F, R, W, S, Unit] =
     ReaderWriterStateT((_, s) => F.point((w, (), s)))
   def listen[A](ma: ReaderWriterStateT[F, R, W, S, A]): ReaderWriterStateT[F, R, W, S, (A, W)] =

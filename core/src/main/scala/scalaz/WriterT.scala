@@ -211,7 +211,7 @@ trait WriterTInstances0 extends WriterTInstances1 {
 }
 
 trait WriterTInstances extends WriterTInstances0 {
-  implicit def writerTListenableMonadWriter[F[+_], W](implicit F0: Monad[F], W0: Monoid[W]) = new WriterMonadWriter[F, W] {
+  implicit def writerTMonadListen[F[+_], W](implicit F0: Monad[F], W0: Monoid[W]) = new WriterMonadListen[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
@@ -328,11 +328,11 @@ private[scalaz] trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[+_], 
   implicit def apply[M[+_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
 }
 
-private[scalaz] trait WriterMonadWriter[F[+_], W] extends ListenableMonadWriter[({type f[+w, +a] = WriterT[F, w, a]})#f, W] with WriterTMonad[F, W] {
+private[scalaz] trait WriterMonadListen[F[+_], W] extends MonadListen[({type λ[+α, +β] = WriterT[F, α, β]})#λ, W] with WriterTMonad[F, W] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 
-  def writer[A](v: (W, A)): WriterT[F, W, A] = WriterT.writerT(F.point(v))
+  def writer[A](w: W, v: A): WriterT[F, W, A] = WriterT.writerT(F.point((w, v)))
 
   def listen[A](fa: WriterT[F, W, A]): WriterT[F, W, (A, W)] =
     WriterT(F.bind(fa.run){ case (w, a) => F.point((w, (a, w))) })
