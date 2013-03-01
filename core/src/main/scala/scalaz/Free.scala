@@ -166,7 +166,17 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   }
 }
 
-object Trampoline extends TrampolineInstances
+object Trampoline extends TrampolineInstances {
+
+  def done[A](a: A): Trampoline[A] = 
+    Free.Return[Function0,A](a)
+
+  def delay[A](a: => A): Trampoline[A] = 
+    suspend(done(a))
+
+  def suspend[A](a: => Trampoline[A]): Trampoline[A] =
+    Free.Suspend[Function0, A](() => a)
+}
 
 trait TrampolineInstances {
   implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
