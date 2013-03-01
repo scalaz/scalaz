@@ -2,9 +2,12 @@ package scalaz
 
 ////
 /**
- * Dual to [[scalaz.Functor]].  For example, functions provide a
+ * Contravariant functors.  For example, functions provide a
  * [[scalaz.Functor]] in their result type, but a
  * [[scalaz.Contravariant]] for each argument type.
+ *
+ * Note that the dual of a [[scalaz.Functor]] is just a [[scalaz.Functor]]
+ * itself.
  *
  * Providing an instance of this is a useful alternative to marking a
  * type parameter with `-` in Scala.
