@@ -7,20 +7,20 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
   import TypeCheckerWithExplicitTypesAST._
   import scalaz.ReaderT
   import scalaz.Kleisli._
-  import scalaz.std.either._
+  import scalaz.{\/, -\/, \/-}
 
-  def success(t: Type)       = Right(t)
-  def typeError(msg: String) = Left(msg)
+  def success(t: Type): String \/ Type       = \/-(t)
+  def typeError(msg: String): String \/ Type = -\/(msg)
 
-  def find(s: String, env: TypeEnv): Either[String, Type] =
+  def find(s: String, env: TypeEnv): String \/ Type =
     env.find(_._1 == s).map(p => success(p._2)).getOrElse(typeError("not found: " + s))
 
-  def compare(t1: Type, t2: Type, resultType: Type, errorMsg: String) =
+  def compare(t1: Type, t2: Type, resultType: Type, errorMsg: String): String \/ Type =
     if (t1 == t2) success(resultType) else typeError(errorMsg)
 
-  type V[+T] = Either[String, T]
+  type V[+T] = String \/ T
 
-  def liftK[T, U](e: Either[String, U]): ReaderT[V, T, U] = kleisli[V, T, U]((env: T) => e)
+  def liftK[T, U](e: String \/ U): ReaderT[V, T, U] = kleisli[V, T, U]((env: T) => e)
 
   def typeCheck(expr: Exp): ReaderT[V, TypeEnv, Type] = expr match {
     case Lit(v) => liftK(success(litToTy(v)))

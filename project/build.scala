@@ -112,7 +112,10 @@ object build extends Build {
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
-    settings = standardSettings ++ Unidoc.settings,
+    settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
+      // <https://github.com/scalaz/scalaz/issues/261>
+      Unidoc.unidocExclude += "typelevel"
+    ),
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 

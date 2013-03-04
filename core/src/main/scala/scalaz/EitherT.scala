@@ -253,12 +253,12 @@ trait EitherTFunctions {
     val run = a
   }
 
-  def monadWriter[F[+_, +_], W, A](implicit MW0: MonadWriter[F, W]) = new EitherTMonadWriter[F, W, A]{
-    def MW = MW0
+  def monadTell[F[+_, +_], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
+    def MT = MT0
   }
 
-  def listenableMonadWriter[F[+_, +_], W, A](implicit MW0: ListenableMonadWriter[F, W]) = new EitherTListenableMonadWriter[F, W, A]{
-    def MW = MW0
+  def monadListen[F[+_, +_], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
+    def MT = ML0
   }
 }
 
@@ -313,30 +313,28 @@ private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[+_], β] = Eith
   implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
 
-private[scalaz] trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
-  def MW: MonadWriter[F, W]
+private[scalaz] trait EitherTMonadTell[F[+_, +_], W, A] extends MonadTell[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
+  def MT: MonadTell[F, W]
 
-  implicit def F = MW
+  implicit def F = MT
 
-  implicit def W = MW.W
-
-  def writer[B](v: (W, B)): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    liftM[({type λ[+α] = F[W, α]})#λ, B](MW.writer(v))
+  def writer[B](w: W, v: B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
+    liftM[({type λ[+α] = F[W, α]})#λ, B](MT.writer(w, v))
 
   def left[B](v: => A): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
+    EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MT.point(v))
 
   def right[B](v: => B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
+    EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MT.point(v))
 }
 
-private[scalaz] trait EitherTListenableMonadWriter[F[+_, +_], W, A] extends ListenableMonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadWriter[F, W, A] {
-  implicit def MW: ListenableMonadWriter[F, W]
+private[scalaz] trait EitherTMonadListen[F[+_, +_], W, A] extends MonadListen[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
+  implicit def MT: MonadListen[F, W]
 
   def listen[B](ma: EitherT[({type λ[+α] = F[W, α]})#λ, A, B]): EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)] = {
-    val tmp = MW.bind[(A \/ B, W), A \/ (B, W)](MW.listen(ma.run)){
-      case (-\/(a), _) => MW.point(-\/(a))
-      case (\/-(b), w) => MW.point(\/-((b, w)))
+    val tmp = MT.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
+      case (-\/(a), _) => MT.point(-\/(a))
+      case (\/-(b), w) => MT.point(\/-((b, w)))
     }
 
     EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)](tmp)
