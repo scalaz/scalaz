@@ -16,7 +16,7 @@ trait Future[+A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
-    case Now(a) => f(a)
+    case Now(a) => Suspend(() => f(a))
     case Suspend(thunk) => BindSuspend(thunk, f)
     case Async(listen) => BindAsync(listen, f)
     case BindSuspend(thunk, g) => 
