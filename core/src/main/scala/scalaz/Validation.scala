@@ -161,7 +161,7 @@ sealed trait Validation[+E, +A] {
     case Failure(_) => false
   }
 
-  /** Return `true` if this validation is a success value or the failure value satisfies the given predicate. */
+  /** Return `true` if this validation is a failure value or the success value satisfies the given predicate. */
   def forall(f: A => Boolean): Boolean = this match {
     case Success(a) => f(a)
     case Failure(_) => true
