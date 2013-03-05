@@ -2,7 +2,7 @@ package scalaz.concurrent
 
 import java.util.concurrent.ExecutorService
 
-import scalaz.Monad
+import scalaz.{Monad, Nondeterminism}
 import scalaz.Free.Trampoline
 import scalaz.Free
 import scalaz.Trampoline
@@ -74,10 +74,64 @@ object Future {
   // NB: considered implementing Traverse and Comonad, but these would have
   // to run the Future; leaving out for now
 
-  implicit val futureInstance = new Monad[Future] {
+  implicit val futureInstance = new Nondeterminism[Future] {
     def bind[A,B](fa: Future[A])(f: A => Future[B]): Future[B] =   
       fa flatMap f
     def point[A](a: => A): Future[A] = now(a)
+
+    def chooseAny[A](fs: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+      // The details of this implementation are a bit tricky, but general
+      // idea is to run all `fs` in parallel, with each decrementing
+      // a central CountDownLatch; we then return a Future that awaits on 
+      // this latch, then returns whichever result became available first
+      // 
+      // To account for the fact that the losing computations are still 
+      // running, the residual futures for the losers 
+      import java.util.concurrent.CountDownLatch
+      import java.util.concurrent.atomic.{AtomicReference, AtomicBoolean}
+
+      @volatile var result: Option[(A, Int)] = None
+      val latch = new CountDownLatch(1)
+      // we keep a separate latch and atomic reference for purposes of 
+      // computing a residual Future should each Future lose
+      val fs2: IndexedSeq[(Future[A], CountDownLatch, AtomicReference[A])] = 
+        fs.toIndexedSeq.map { 
+          (f: Future[A]) => (f, new CountDownLatch(1), new AtomicReference[A])
+        }
+      Async { (cb: Tuple2[A,Seq[Future[A]]] => Trampoline[Unit]) => 
+        fs2.zipWithIndex.foreach { case ((f,flatch,ref), ind) => f.runAsync { a =>
+          ref.set(a)
+          flatch.countDown 
+          latch.countDown
+          // actually ok if two threads clobber each other here
+          if (!result.isDefined) result = Some((a, ind))
+        }}
+        latch.await // wait for any one of the threads to finish
+        val Some((a, ind)) = result // extract the winner
+        // for all the losing futures, we compute a 'residual', which includes the
+        // 'rest' of the current, partially completed computation, followed by a 
+        // repetition of the original computation
+        val residuals = fs2.zipWithIndex collect { case ((f, latch, ref), i) if i != ind => 
+          val used = new AtomicBoolean(false)
+          Async { (cb: A => Trampoline[Unit]) => 
+            if (used.get) f.listen(cb) 
+            else {
+              // A bit of trickiness here, since two threads may listen to this
+              // Async simultaneously, and we only want one to receive the value
+              // inside `ref`. To ensure this, we race to set the `used` flag.
+              // Whichever one wins gets the value inside `ref`, the other just
+              // delegates to `f`.
+              latch.await
+              if (used.compareAndSet(false, true)) 
+                cb(ref.get).run
+              else
+                f.listen(cb)
+            }
+          }
+        }
+        cb((a, residuals))
+      }
+    }
   }
 
   def now[A](a: A): Future[A] = Now(a)
