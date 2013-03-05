@@ -3,6 +3,9 @@ package scalaz
 trait Cokleisli[F[_], A, B] { self =>
   def run(fa: F[A]): B
 
+  def apply(fa: F[A]): B =
+    run(fa)
+
   def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C,  B] = new Cokleisli[F, C, B] {
     def run(fc: F[C]): B = self.run(f(fc))
   }
