@@ -80,7 +80,6 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
 //    (splitTree._1.toStream, splitTree._2.toStream) === asStream.splitAt(index)
 //  }
 
-/*
   "init works correctly" ! prop {(tree: Rope[Int]) =>
     !tree.isEmpty ==> (tree.init.toStream must be_===(tree.toStream.init))
   }
@@ -96,7 +95,6 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
   "replacing first element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     !tree.isEmpty ==> ((x +: tree.tail).toStream must be_===(x +: tree.toStream.tail))
   }
-*/
 
 //  "last and init work correctly" ! prop {(tree: Rope[Int]) =>
 //    val asStream = tree.toStream
