@@ -11,8 +11,8 @@ import Id._
  * `Applicative[[a]Validation[E, a]]` that accumulate failures through a [[scalaz.Semigroup]]`[E]`.
  *
  * [[scalaz.NonEmptyList]] is commonly chosen as a type constructor for the type `E`. As a convenience,
- * an alias `scalaz.ValidationNEL[E]` is provided as a shorthand for `scalaz.Validation[NonEmptyList[E]]`,
- * and a method `Validation#toValidationNel` converts `Validation[E]` to `ValidationNEL[E]`.
+ * an alias `scalaz.ValidationNel[E]` is provided as a shorthand for `scalaz.Validation[NonEmptyList[E]]`,
+ * and a method `Validation#toValidationNel` converts `Validation[E]` to `ValidationNel[E]`.
  *
  * Example:
  * {{{
@@ -22,7 +22,7 @@ import Id._
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
  * val V = Validation.validationNelApplicative[String]
  *
- * val x: ValidationNEL[String, Int] =
+ * val x: ValidationNel[String, Int] =
  *   V.map2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
  *   // Failure(NonEmptyList(For input string: "1..0", For input string: "1.x"))
  * }}}
@@ -303,7 +303,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
-  def toValidationNEL[EE >: E, AA >: A]: ValidationNEL[EE, AA] =
+  def toValidationNel[EE >: E, AA >: A]: ValidationNel[EE, AA] =
     this match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(NonEmptyList(e))
