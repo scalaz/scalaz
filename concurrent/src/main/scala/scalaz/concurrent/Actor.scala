@@ -1,13 +1,16 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
+import annotation.tailrec
 
 /**
  * Processes messages of type `A` sequentially. Messages are submitted to
  * the actor with the method `!`. Processing is typically performed asynchronously,
  * this is controlled by the provided `strategy`.
+ *
+ * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
+ * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
  *
  * @see scalaz.concurrent.Promise
  *
@@ -20,15 +23,17 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
                          (implicit val strategy: Strategy) {
   self =>
 
-  private val suspended = new AtomicBoolean(true)
-  private val mbox = new ConcurrentLinkedQueue[A]
+  private val tail = new AtomicReference(new Node[A]())
+  private val suspended = new AtomicInteger(1)
+  private val head = new AtomicReference(tail.get)
 
   val toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
   def !(a: A) {
-    mbox offer a
-    work
+    val n = new Node(a)
+    head.getAndSet(n).lazySet(n)
+    trySchedule()
   }
 
   /** Pass the message `a` to the mailbox of this actor */
@@ -39,28 +44,41 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
   def contramap[B](f: B => A): Actor[B] =
     Actor[B]((b: B) => (this ! f(b)), onError)(strategy)
 
-  private def work {
-    if (!mbox.isEmpty && suspended.compareAndSet(true, false))
-      strategy(act)
+  private def trySchedule() {
+    if (suspended.compareAndSet(1, 0)) schedule()
   }
 
-  private def act {
-    var i = 0
-    val batchSize = 1000
-    while (i < batchSize) {
-      val m = mbox.poll
-      if (m != null) try {
-        handler(m)
-        i = i + 1
-      } catch {
-        case ex => onError(ex)
-      }
-      else i = batchSize
+  private def schedule() {
+    strategy(act())
+  }
+
+  private def act() {
+    val t = tail.get
+    val n = batchHandle(t, 1024)
+    if (n ne t) {
+      tail.lazySet(n)
+      schedule()
+    } else {
+      suspended.set(1)
+      if (n.get ne null) trySchedule()
     }
-    suspended.set(true)
-    work
+  }
+
+  @tailrec
+  private def batchHandle(t: Node[A], i: Int): Node[A] = {
+    val n = t.get
+    if (n ne null) {
+      try {
+        handler(n.a)
+      } catch {
+        case ex: Throwable => onError(ex)
+      }
+      if (i > 0) batchHandle(n, i - 1) else n
+    } else t
   }
 }
+
+private class Node[A](val a: A = null.asInstanceOf[A]) extends AtomicReference[Node[A]]
 
 object Actor extends ActorFunctions with ActorInstances
 
