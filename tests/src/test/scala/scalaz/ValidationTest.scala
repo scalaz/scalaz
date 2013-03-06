@@ -49,35 +49,35 @@ class ValidationTest extends Spec {
   "ap2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNEL
-      val fail2 = Failure("2").toValidationNEL
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("""Failure(["1","2"])""")
+      Apply[({type l[a] = ValidationNel[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must be_===("""Failure(["1","2"])""")
     }
   }
 
   "map2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNEL
-      val fail2 = Failure("2").toValidationNEL
+      val fail1 = Failure("1").toValidationNel
+      val fail2 = Failure("2").toValidationNel
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNEL[String, a]})#l].apply2(fail1, fail2)(f).shows must be_===("""Failure(["1","2"])""")
+      Apply[({type l[a] = ValidationNel[String, a]})#l].apply2(fail1, fail2)(f).shows must be_===("""Failure(["1","2"])""")
     }
   }
 
   "findSuccess" should {
     import syntax.show._
     "accumulate failures in order" in {
-      val fail1 = Validation.failure[String, Int]("1").toValidationNEL
-      val fail2 = Validation.failure[String, Int]("2").toValidationNEL
+      val fail1 = Validation.failure[String, Int]("1").toValidationNel
+      val fail2 = Validation.failure[String, Int]("2").toValidationNel
 
       (fail1 findSuccess fail2).shows must be_===("""Failure(["1","2"])""")
     }
 
     "return first success" in {
-      val succ = Validation.success[String, Int](1).toValidationNEL
-      val fail = Validation.failure[String, Int]("2").toValidationNEL
+      val succ = Validation.success[String, Int](1).toValidationNel
+      val fail = Validation.failure[String, Int]("2").toValidationNel
     
       (succ findSuccess fail).shows must be_===(succ.shows)
       (fail findSuccess succ).shows must be_===(succ.shows)
