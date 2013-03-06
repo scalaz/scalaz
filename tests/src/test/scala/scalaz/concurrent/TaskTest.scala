@@ -26,8 +26,12 @@ class TaskTest extends Spec {
     combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).run == correct }
   }
 
-  "parallel map == sequential map" ! prop { (xs: List[Int]) => 
+  "traverse-based map == sequential map" ! prop { (xs: List[Int]) => 
     xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).run 
+  }
+
+  "gather-based map == sequential map" ! prop { (xs: List[Int]) => 
+    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).run
   }
 
   case object FailWhale extends RuntimeException {
@@ -38,4 +42,11 @@ class TaskTest extends Spec {
     Task.fork { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun == 
     Left(FailWhale)
   }
+
+  "catches exceptions in antichain" ! prop { (x: Int, y: Int) => 
+    val t1 = Task { Thread.sleep(1); throw FailWhale; 42 } 
+    val t2 = Task { 43 } 
+    Nondeterminism[Task].both(t1, t2).attemptRun == Left(FailWhale)
+  }
+
 }

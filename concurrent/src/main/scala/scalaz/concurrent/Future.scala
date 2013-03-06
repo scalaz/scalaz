@@ -1,6 +1,9 @@
 package scalaz.concurrent
 
-import java.util.concurrent.ExecutorService
+import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Executors, ExecutorService}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
+
+import collection.JavaConversions._
 
 import scalaz.{Monad, Nondeterminism}
 import scalaz.Free.Trampoline
@@ -36,12 +39,33 @@ trait Future[+A] {
         onFinish(x => Trampoline.delay(g(x)) map (_ listen cb))
     }
 
+  def listenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit = 
+    this.stepInterruptibly(cancel) match {
+      case Now(a) if !cancel.get => cb(a) 
+      case Async(onFinish) if !cancel.get => onFinish(cb)
+      case BindAsync(onFinish, g) if !cancel.get => 
+        onFinish(x => 
+          if (!cancel.get) Trampoline.delay(g(x)) map (_ listenInterruptibly (cb, cancel))
+          else Trampoline.done(()))
+      case _ if cancel.get => ()
+    }
+
+
   @annotation.tailrec
   final def step: Future[A] = this match {
     case Suspend(thunk) => thunk().step
     case BindSuspend(thunk, f) => (thunk() flatMap f).step 
     case _ => this
   }
+
+  @annotation.tailrec
+  final def stepInterruptibly(cancel: AtomicBoolean): Future[A] = 
+    if (!cancel.get) this match {
+      case Suspend(thunk) => thunk().stepInterruptibly(cancel)
+      case BindSuspend(thunk, f) => (thunk() flatMap f).stepInterruptibly(cancel)
+      case _ => this
+    }
+    else this
 
   def start: Future[A] = {
     val latch = new java.util.concurrent.CountDownLatch(1)
@@ -52,6 +76,9 @@ trait Future[+A] {
 
   def runAsync(cb: A => Unit): Unit = 
     listen(a => Trampoline.done(cb(a)))
+
+  def runAsyncInterruptibly(cb: A => Unit, cancel: AtomicBoolean): Unit = 
+    listenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
   def run: A = {
     val latch = new java.util.concurrent.CountDownLatch(1) 
@@ -79,26 +106,27 @@ object Future {
       fa flatMap f
     def point[A](a: => A): Future[A] = now(a)
 
-    def chooseAny[A](fs: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+    def chooseAny[A](h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
       // The details of this implementation are a bit tricky, but general
       // idea is to run all `fs` in parallel, with each decrementing
       // a central CountDownLatch; we then return a Future that awaits on 
       // this latch, then returns whichever result became available first
       // 
       // To account for the fact that the losing computations are still 
-      // running, the residual futures for the losers 
-      import java.util.concurrent.CountDownLatch
-      import java.util.concurrent.atomic.{AtomicReference, AtomicBoolean}
+      // running, we construct special 'residual' Futures for the losers,
+      // that will first return from the already running computation, 
+      // then revert back to running the original Future
 
-      @volatile var result: Option[(A, Int)] = None
-      val latch = new CountDownLatch(1)
-      // we keep a separate latch and atomic reference for purposes of 
-      // computing a residual Future should each Future lose
-      val fs2: IndexedSeq[(Future[A], CountDownLatch, AtomicReference[A])] = 
-        fs.toIndexedSeq.map { 
-          (f: Future[A]) => (f, new CountDownLatch(1), new AtomicReference[A])
-        }
       Async { (cb: Tuple2[A,Seq[Future[A]]] => Trampoline[Unit]) => 
+        @volatile var result: Option[(A, Int)] = None
+        val latch = new CountDownLatch(1)
+        val fs = h +: t
+        // we keep a separate latch and atomic reference for purposes of 
+        // computing a residual Future should each Future lose
+        val fs2: IndexedSeq[(Future[A], CountDownLatch, AtomicReference[A])] = 
+          fs.toIndexedSeq.map { 
+            (f: Future[A]) => (f, new CountDownLatch(1), new AtomicReference[A])
+          }
         fs2.zipWithIndex.foreach { case ((f,flatch,ref), ind) => f.runAsync { a =>
           ref.set(a)
           flatch.countDown 
@@ -129,24 +157,34 @@ object Future {
             }
           }
         }
-        cb((a, residuals))
+        cb((a, residuals)).run
       }
     }
+
+    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
+      Async { cb => 
+        val latch = new CountDownLatch(fs.length)
+        val results = new ConcurrentLinkedQueue[A] 
+        fs.foreach(_ runAsync { a => 
+          results.add(a)
+          latch.countDown
+        })
+        latch.await
+        cb(results.toList).run
+      }
   }
 
   def now[A](a: A): Future[A] = Now(a)
 
   def delay[A](a: => A): Future[A] = Suspend(() => Now(a))
 
-  def fork[A](a: => Future[A]): Future[A] = Future(a) flatMap (a => a)
+  def fork[A](a: => Future[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Future[A] = Future(a) flatMap (a => a)
 
   def suspend[A](f: => Future[A]): Future[A] = Suspend(() => f)
 
   def async[A](listen: (A => Unit) => Unit): Future[A] = 
     Async((cb: A => Trampoline[Unit]) => listen { a => cb(a).run })
   
-  import java.util.concurrent.{Callable, Executors, ThreadFactory}
-
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Future[A] = Async { cb => 
     pool.submit { new Callable[Unit] { def call = cb(a).run }}
   }

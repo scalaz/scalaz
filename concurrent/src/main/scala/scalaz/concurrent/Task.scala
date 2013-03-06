@@ -1,6 +1,9 @@
 package scalaz.concurrent
 
-import scalaz.Monad
+import scalaz.Nondeterminism
+import scalaz.Traverse
+import scalaz.std.list._
+import scalaz.std.either._
 
 /* 
  * `Task[A]` is a `Future[Either[Throwable,A]]`, with some convenience 
@@ -56,10 +59,20 @@ class Task[+A](val get: Future[Either[Throwable,A]]) {
 
 object Task {
   
-  implicit val taskInstance = new Monad[Task] { 
+  implicit val taskInstance = new Nondeterminism[Task] { 
+    val F = Nondeterminism[Future]
     def point[A](a: => A) = new Task(Future.now(Try(a))) 
     def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] = 
       a flatMap f 
+    def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
+      new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) => 
+        a.right.map((_, residuals.map(new Task(_))))
+      })
+    override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
+      new Task (F.map(F.gatherUnordered(fs.map(_ get)))(eithers => 
+        Traverse[List].sequenceU(eithers) 
+      ))
+    }
   }
 
   def fail(e: Throwable): Task[Nothing] = new Task(Future.now(Left(e))) 
