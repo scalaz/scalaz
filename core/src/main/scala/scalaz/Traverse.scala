@@ -16,6 +16,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverseImpl[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
+  // derived functions
+
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
   def compose[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = F[G[α]]})#λ] = new CompositionTraverse[F, G] {
     implicit def F = self
@@ -42,8 +44,16 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] =
     traversal[G].run(fa)(f)
+
+  /** A version of `traverse` that infers the type constructor `G`. */
+  final def traverseU[A,GB](self: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
+    G.TC.traverse(self)(a => G(f(a)))(this)
+  }
+
+  /** Traverse with `State`. */
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
     traversalS[S].run(fa)(f)
+
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (S, F[B]) =
     traverseS(fa)(f)(s)
 
@@ -67,12 +77,18 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     })
   }
 
-  // derived functions
+  /** Traverse with the identity function. */
   def sequence[G[_]:Applicative,A](fga: F[G[A]]): G[F[A]] =
     traversal[G].run[G[A], A](fga)(ga => ga)
 
+  /** Traverse with `State`. */
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] =
     traversalS[S].run(fga)(a => a)
+
+  /** A version of `sequence` that infers the nested type constructor. */
+  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
+    G.TC.traverse(self)(x => G.apply(x))(this)
+  }
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
