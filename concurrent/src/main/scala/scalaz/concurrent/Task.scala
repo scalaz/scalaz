@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scalaz.{Catchable, Nondeterminism, Traverse}
+import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.std.either._
 
@@ -179,19 +180,4 @@ object Task {
   def Try[A](a: => A): Either[Throwable,A] = 
     try Right(a) catch { case e: Exception => Left(e) }
 
-  // we place the various syntax pimps here in the companion object where
-  // they will be found by implicit search without explicit imports
-
-  import scalaz.syntax.{ApplyOps, ApplicativeOps, BindOps, FunctorOps, MonadOps}
-
-  implicit def toMonadOps[A](f: Task[A]): MonadOps[Task,A] = 
-    taskInstance.monadSyntax.ToMonadOps(f)
-  implicit def toBindOps[A](f: Task[A]): BindOps[Task,A] = 
-    taskInstance.bindSyntax.ToBindOps(f)
-  implicit def toApplicativeOps[A](f: Task[A]): ApplicativeOps[Task,A] = 
-    taskInstance.applicativeSyntax.ToApplicativeOps(f)
-  implicit def toApplyOps[A](f: Task[A]): ApplyOps[Task,A] = 
-    taskInstance.applySyntax.ToApplyOps(f)
-  implicit def toFunctorOps[A](f: Task[A]): FunctorOps[Task,A] =
-    taskInstance.functorSyntax.ToFunctorOps(f)
 }

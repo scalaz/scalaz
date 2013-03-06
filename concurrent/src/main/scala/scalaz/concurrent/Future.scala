@@ -9,6 +9,7 @@ import scalaz.{Monad, Nondeterminism}
 import scalaz.Free.Trampoline
 import scalaz.Free
 import scalaz.Trampoline
+import scalaz.syntax.monad._
 import scalaz.std.function._
 
 /** 
@@ -284,19 +285,4 @@ object Future {
     pool.submit { new Callable[Unit] { def call = cb(a).run }}
   }
 
-  // we place the various syntax pimps here in the companion object where
-  // they will be found by implicit search without explicit imports
-
-  import scalaz.syntax.{ApplyOps, ApplicativeOps, BindOps, FunctorOps, MonadOps}
-
-  implicit def toMonadOps[A](f: Future[A]): MonadOps[Future,A] = 
-    futureInstance.monadSyntax.ToMonadOps(f)
-  implicit def toBindOps[A](f: Future[A]): BindOps[Future,A] = 
-    futureInstance.bindSyntax.ToBindOps(f)
-  implicit def toApplicativeOps[A](f: Future[A]): ApplicativeOps[Future,A] = 
-    futureInstance.applicativeSyntax.ToApplicativeOps(f)
-  implicit def toApplyOps[A](f: Future[A]): ApplyOps[Future,A] = 
-    futureInstance.applySyntax.ToApplyOps(f)
-  implicit def toFunctorOps[A](f: Future[A]): FunctorOps[Future,A] =
-    futureInstance.functorSyntax.ToFunctorOps(f)
 }
