@@ -19,7 +19,7 @@ class TaskTest extends Spec {
                           cur: (=> Int) => Task[Int]): Task[Int] = 
     (0 to N).map(cur(_)).foldLeft(seed(0))(Task.taskInstance.lift2(_ + _))
 
-  val options = List[(=> Int) => Task[Int]](n => Task.now(n), Task.delay _ , Task.fork _)
+  val options = List[(=> Int) => Task[Int]](n => Task.now(n), Task.delay _ , Task.apply _)
   val combinations = (options tuple options)
 
   "left associated binds" ! check {
@@ -39,12 +39,12 @@ class TaskTest extends Spec {
   }
 
   "catches exceptions" ! check {
-    Task.fork { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun == 
+    Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun == 
     Left(FailWhale)
   }
 
-  "catches exceptions in antichain" ! prop { (x: Int, y: Int) => 
-    val t1 = Task { Thread.sleep(1); throw FailWhale; 42 } 
+  "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) => 
+    val t1 = Task { Thread.sleep(10); throw FailWhale; 42 } 
     val t2 = Task { 43 } 
     Nondeterminism[Task].both(t1, t2).attemptRun == Left(FailWhale)
   }
