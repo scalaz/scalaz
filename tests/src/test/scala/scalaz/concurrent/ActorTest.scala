@@ -46,13 +46,11 @@ class ActorTest extends Spec {
   "actor handles messages in order of sending by each thread" in {
     val latch = new CountDownLatch(NumOfMessages)
     val actor = countingDownActor(latch)
-    val phaser = new Phaser(1)
-    for (j <- 1 to NumOfThreads) fork(phaser) {
+    for (j <- 1 to NumOfThreads) fork {
       for (i <- 1 to NumOfMessagesPerThread) {
         actor ! (j, i)
       }
     }
-    phaser.arriveAndDeregister() // synchronize start of threads to maximize contention
     assertCountDown(latch, "Should process " + NumOfMessages + " messages")
   }
 
@@ -72,11 +70,9 @@ class ActorTest extends Spec {
     else Failure("Failed to count down within " + Timeout + " millis: " + hint)
   }
 
-  def fork(phases: Phaser)(f: => Unit) {
-    phases.register()
+  def fork(f: => Unit) {
     new Thread {
       override def run() {
-        phases.arriveAndAwaitAdvance()
         f
       }
     }.start()
