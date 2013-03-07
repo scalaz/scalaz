@@ -124,7 +124,6 @@ object ScalazArbitrary {
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
 
   import FingerTree._
-  import Rope._
 
   implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
     arbitrary[A].map(one(_): Finger[V, A]),
@@ -150,9 +149,8 @@ object ScalazArbitrary {
     Gen.sized(fingerTree[A] _)
   }
 
-  import FingerTree.ft2ftip
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
-    Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(rope[A](_))
+    Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
   import java.util.concurrent.Callable
 

@@ -64,11 +64,20 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
   /*"a rope converted to a stream is the same sequence as the original rope" ! prop {(rope: Rope[Int]) =>
      rope must beTheSameRopeSeq(rope.toStream)
   }.set(minTestsOk -> 15)
-  
-  "appending ropes works correctly" ! prop {(rope1: Rope[Int], rope2: Rope[Int]) =>
-    (rope1 ++ rope2) must (haveClass[Rope[_]] and beTheSameRopeSeq(rope1.toStream ++ rope2.toStream))
-  }.set(minTestsOk -> 15)*/
+  */
 
+  "concatenating ropes work correctly" ! prop {(t1: Rope[Int], t2: Rope[Int]) ⇒
+    (!t1.isEmpty && !t2.isEmpty) ==>
+      ((t1 ++ t2).toStream must be_===(t1.toStream ++ t2.toStream))
+  }
+
+  "chunk append works correctly" ! prop {(tree: Rope[Int], arr: ImmutableArray[Int]) ⇒
+    (tree ::+ arr).toStream must be_===(tree.toStream ++ arr.toStream)
+  }
+
+  "chunk prepend works correctly" ! prop {(tree: Rope[Int], arr: ImmutableArray[Int]) ⇒
+    (arr +:: tree).toStream must be_===(arr.toStream ++ tree.toStream)
+  }
 
   "converting a stream to a finger-tree and back produces an equal stream" ! prop {(stream: Stream[Int]) =>
     streamToTree(stream).toStream must be_===(stream)
@@ -80,7 +89,14 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
 //    (splitTree._1.toStream, splitTree._2.toStream) === asStream.splitAt(index)
 //  }
 
-/*
+  "head works correctly" ! prop {(tree: Rope[Int]) ⇒
+    !tree.isEmpty ==> (tree.head must be_===(tree.toStream.head))
+  }
+
+  "last works correctly" ! prop {(tree: Rope[Int]) ⇒
+    !tree.isEmpty ==> (tree.last must be_===(tree.toStream.last))
+  }
+
   "init works correctly" ! prop {(tree: Rope[Int]) =>
     !tree.isEmpty ==> (tree.init.toStream must be_===(tree.toStream.init))
   }
@@ -89,27 +105,12 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
     !tree.isEmpty ==> (tree.tail.toStream must be_===(tree.toStream.tail))
   }
 
-  "replacing last element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
+   "replacing last element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     !tree.isEmpty ==> ((tree.init :+ x).toStream must be_===(tree.toStream.init :+ x))
   }
 
   "replacing first element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     !tree.isEmpty ==> ((x +: tree.tail).toStream must be_===(x +: tree.toStream.tail))
   }
-*/
 
-//  "last and init work correctly" ! prop {(tree: Rope[Int]) =>
-//    val asStream = tree.toStream
-//    tree.isEmpty || ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
-//  }
-//
-//  "viewl works correctly" ! prop {(tree: Rope[Int]) =>
-//    val asStream = tree.toStream
-//    tree.viewl.fold[Boolean](true, (x: Int, t: ({type λ[α]=FingerTree[Int, α]})#λ) => (x === asStream.head) && (t.toStream === asStream.tail))
-//  }
-//
-//  "viewr works correctly" ! prop {(tree: Rope[Int]) =>
-//    val asStream = tree.toStream
-//    tree.viewr.fold[Boolean](true, (i: ({type λ[α]=FingerTree[Int, α]})#λ, x: Int) => (i.toStream === asStream.init) && (x === asStream.last))
-//  }
 }
