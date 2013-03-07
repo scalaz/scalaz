@@ -1,7 +1,6 @@
 package scalaz.concurrent
 
-import scalaz.Nondeterminism
-import scalaz.Traverse
+import scalaz.{Catchable, Nondeterminism, Traverse}
 import scalaz.std.list._
 import scalaz.std.either._
 
@@ -59,7 +58,7 @@ class Task[+A](val get: Future[Either[Throwable,A]]) {
 
 object Task {
   
-  implicit val taskInstance = new Nondeterminism[Task] { 
+  implicit val taskInstance = new Nondeterminism[Task] with Catchable[Task] { 
     val F = Nondeterminism[Future]
     def point[A](a: => A) = new Task(Future.now(Try(a))) 
     def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] = 
@@ -73,6 +72,8 @@ object Task {
         Traverse[List].sequenceU(eithers) 
       ))
     }
+    def fail[A](e: Throwable): Task[A] = new Task(Future.now(Left(e))) 
+    def attempt[A](a: Task[A]): Task[Either[Throwable,A]] = a.attempt
   }
 
   def fail(e: Throwable): Task[Nothing] = new Task(Future.now(Left(e))) 
