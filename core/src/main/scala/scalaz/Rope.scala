@@ -29,8 +29,8 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
   def length: Int = self.measure
 
   def apply(i: Int): A = {
-    val split = self.split(_ > i)
-    split._2.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))(i - split._1.measure)
+    val (right, left) = self.split(_ > i)
+    left.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))(i - right.measure)
   }
 
   /**Concatenates two Ropes. `(O lg min(r1, r2))` where `r1` and `r2` are their sizes. */
@@ -76,10 +76,24 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
   def +:(x: A): Rope[A] = IA.fromArray(Array(x)) +:: this
 
   /**tail of the Rope*/
-  def tail = Rope(self.tail)
+  @annotation.tailrec
+  final def tail: Rope[A] = {
+    val head = self.head
+    if(head.length > 1)
+      Rope(head.tail +: self.tail)
+    else if(head.length == 1) Rope(self.tail)
+    else Rope(self.tail).tail
+  }
 
   /**first element of the rope*/
-  def init = Rope(self.init)
+  @annotation.tailrec
+  final def init: Rope[A] = {
+    val last = self.last
+    if(last.length > 1)
+      Rope(self.init :+ last.init)
+    else if(last.length == 1) Rope(self.init)
+    else Rope(self.init).init
+  }
 //      def map[B](f: A => B) = Rope(value map f) TODO
 //      def flatMap[B](f: A => Rope[B]) =
 //        Rope(value.foldl(empty[Int, B])((ys, x) => ys <++> f(x).value))
@@ -92,8 +106,6 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
   // TODO override def reverse
 
   def chunks: Stream[ImmutableArray[A]] = self.toStream
-
-  // protected[this] override def newBuilder: Builder[A, Rope[A]] = new RopeBuilder[A]
 }
     
 sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
@@ -204,17 +216,28 @@ final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
 
 object Rope {
   type FingerTreeIntPlus[A] = FingerTree[Int, A]
+
   implicit def wrapRope[A : ClassManifest](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
   implicit def unwrapRope[A : ClassManifest](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.self
   implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
-  val baseChunkLength = 16
   implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
+
+  implicit def ropeLength: Length[Rope] = new Length[Rope] {
+    def length[A](a: Rope[A]) = a.self.measure
+  }
+
+  val baseChunkLength = 16
+
   def apply[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)
+
   def empty[A : ClassManifest] = Rope(FingerTree.empty[Int, ImmutableArray[A]])
+
   def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
     if (a.isEmpty) empty[A] else Rope(single(IA.fromArray(a)))
+
   def fromString(str: String): Rope[Char] =
     if (str.isEmpty) empty[Char] else Rope(single(IA.fromString(str)))
+
   def fromChunks[A : ClassManifest](chunks: Seq[ImmutableArray[A]]): Rope[A] =
     Rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
 //      def apply[A](as: A*) = fromSeq(as)

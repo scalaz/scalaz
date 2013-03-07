@@ -878,10 +878,6 @@ trait FingerTreeInstances {
     def equal(x: FingerTree[V, A], y: FingerTree[V, A]) =
       Equal[Stream[A]].equal(x.toStream, y.toStream)
   }
-
-  implicit def ropeLength: Length[Rope] = new Length[Rope] {
-    def length[A](a: Rope[A]) = a.self.measure
-  }
 }
 
 trait FingerTreeFunctions {
