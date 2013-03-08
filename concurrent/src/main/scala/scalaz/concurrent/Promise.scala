@@ -14,14 +14,19 @@ sealed trait Promise[A] {
   private val waiting = new ConcurrentLinkedQueue[A => Unit]
   @volatile private var state: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
-  lazy private[concurrent] val e = actor[Signal[A]](_.eval)
+  lazy private[concurrent] val e = actor[Signal[A]](_.eval, onError)
 
   def get = {
     latch.await()
     state.get
   }
 
-  def to(k: A => Unit): Unit = e ! new Cont(k, this)
+  def to(k: A => Unit, err: Throwable => Unit = e.onError): Unit = e ! new Cont(k, err, this)
+
+  private def onError(e: Throwable): Unit = {
+    state = new Thrown(e)
+    latch.countDown()
+  }
 
   def fulfill(a: => A): Unit = e ! new Done(a, this)
 
@@ -44,7 +49,7 @@ sealed trait Promise[A] {
     val r = new Promise[B] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => f(a) to Run[B](b => r fulfill b))
+    to(a => f(a).to(Run[B](b => r fulfill b), r.onError), r.onError)
     r
   }
 
@@ -52,7 +57,7 @@ sealed trait Promise[A] {
     val r = new Promise[A] {
       implicit val strategy = Promise.this.strategy
     }
-    to(a => promise(p(a)) to Run[Boolean](b => if (b) r fulfill a))
+    to(a => promise(p(a)).to(Run[Boolean](b => if (b) r fulfill a else r.break), r.onError), r.onError)
     r
   }
 
@@ -83,7 +88,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
     def break(promise: Promise[_]): Unit
   }
 
-  protected class Thrown(e: Throwable) extends State[Nothing] {
+  protected case class Thrown(e: Throwable) extends State[Nothing] {
     def get: Nothing = throw e
 
     def fulfill[B](a: => B, promise: Promise[B]) {
@@ -98,7 +103,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
     def break(promise: Promise[_]) {}
   }
 
-  protected class Fulfilled[A](val get: A) extends State[A] {
+  protected case class Fulfilled[A](val get: A) extends State[A] {
     def fulfill[B >: A](a: => B, promise: Promise[B]) {}
 
     val fulfilled = true
@@ -107,7 +112,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
     def break(promise: Promise[_]) {}
   }
 
-  protected object Unfulfilled extends State[Nothing] {
+  protected case object Unfulfilled extends State[Nothing] {
     // the only way get gets here is if the promise is broken
     def get: Nothing = throw new BrokenException
 
@@ -120,9 +125,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
           while (!as.isEmpty) as.remove()(a)
         } catch {
           case e: Throwable => {
-            promise.state = new Thrown(e)
-            promise.latch.countDown()
-            promise.waiting.clear() // kill teh hordes
+            promise.onError(e)
           }
         }
       }
@@ -148,10 +151,13 @@ object Promise extends PromiseFunctions with PromiseInstances {
     }
   }
 
-  protected[concurrent] class Cont[A](k: A => Unit, promise: Promise[A]) extends Signal[A] {
+  protected[concurrent] class Cont[A](k: A => Unit, err: Throwable => Unit, promise: Promise[A]) extends Signal[A] {
     def eval {
-      if (promise.state.fulfilled) k(promise.state.get)
-      else promise.waiting.offer(k)
+      promise.state match {
+        case Fulfilled(a) => k(a)
+        case Unfulfilled => promise.waiting.offer(k)
+        case Thrown(e) => err(e)
+      }
     }
   }
 
