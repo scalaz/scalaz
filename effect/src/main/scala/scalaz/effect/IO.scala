@@ -176,30 +176,37 @@ trait IOStd {
 
   /** Writes a character to standard output. */
   def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
-    print(c);
+    print(c)
     ()
   }))
 
   /** Writes a string to standard output. */
   def putStr(s: String): IO[Unit] = io(rw => return_(rw -> {
-    print(s);
+    print(s)
     ()
   }))
 
   /** Writes a string to standard output, followed by a newline.*/
   def putStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
-    println(s);
+    println(s)
     ()
   }))
 
   /** Reads a line of standard input. */
   def readLn: IO[String] = IO(readLine())
 
-  /** Write the given value to standard output. */
-  def putOut[A](a: A): IO[Unit] = io(rw => return_(rw -> {
-    print(a);
-    ()
-  }))
+  def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
+    io(rw => return_(rw -> {
+      print(S shows a)
+      ()
+    }))
+
+  def putLn[A](a: A)(implicit S: Show[A]): IO[Unit] =
+    io(rw => return_(rw -> {
+      println(S shows a)
+      ()
+    }))
+
 }
 
 trait IOFunctions extends IOStd {
