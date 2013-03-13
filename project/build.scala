@@ -43,7 +43,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.0"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
