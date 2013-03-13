@@ -22,6 +22,7 @@ import sbtbuildinfo.Plugin._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import com.typesafe.tools.mima.plugin.MimaKeys.binaryIssueFilters
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -46,7 +47,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.0"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -157,6 +158,14 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
+    binaryIssueFilters ++= {
+      import com.typesafe.tools.mima.core._
+      import com.typesafe.tools.mima.core.ProblemFilters._
+      Seq(
+        exclude[MissingMethodProblem]("scalaz.EitherT.withFilter")
+      )
+    }
+  ) ++ Seq[Sett](
     previousArtifact <<= (organization, name, scalaBinaryVersion) { (o, n, sbv) => Some(o % (n + "_" + sbv) % "7.0.0") }
   )
 
