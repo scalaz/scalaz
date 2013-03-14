@@ -14,6 +14,7 @@ package object std {
   object option extends ToOptionOps with ToOptionIdOps
   object either extends ToEitherOps
   object map extends ToMapOps
+  object seq extends ToSeqOps
 
   object all extends ToAllStdOps
 }

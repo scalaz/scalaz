@@ -23,6 +23,9 @@ object ScalazArbitrary {
 
   implicit def arbList[T](implicit a: Arbitrary[T]): Arbitrary[List[T]] = Arbitrary(containerOf[List,T](arbitrary[T]))
 
+  implicit def arbSeq[T](implicit a: Arbitrary[T]): Arbitrary[Seq[T]] =
+    Arbitrary(containerOf[List, T](arbitrary[T]).map(_.toSeq))
+
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arbArray[A])(ImmutableArray.fromArray[A](_))
 
