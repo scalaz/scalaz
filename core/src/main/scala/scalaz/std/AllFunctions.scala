@@ -3,6 +3,7 @@ package std
 
 trait AllFunctions
   extends ListFunctions
+  with SeqFunctions
   with OptionFunctions
   with StreamFunctions
   with math.OrderingFunctions
