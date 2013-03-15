@@ -188,6 +188,8 @@ private[scalaz] trait StateTMonadState[S, F[+_]] extends MonadState[({type f[s, 
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
 
+  def get = init
+
   def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, ())))
 
   override def modify(f: S => S): StateT[F, S, Unit] = StateT(s => F.point((f(s), ())))

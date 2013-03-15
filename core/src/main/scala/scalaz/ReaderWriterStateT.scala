@@ -89,6 +89,7 @@ private[scalaz] trait ReaderWriterStateTMonad[F[+_], R, W, S]
     ReaderWriterStateT((r, s) => F.point((W.zero, f(r), s)))
   def init: ReaderWriterStateT[F, R, W, S, S] =
     ReaderWriterStateT((_, s) => F.point((W.zero, s, s)))
+  def get = init
   def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
     ReaderWriterStateT((r, _) => F.point((W.zero, (), s)))
   override def modify(f: S => S): ReaderWriterStateT[F, R, W, S, Unit] =
