@@ -71,6 +71,13 @@ trait KTypeClass[C[_[_]]] {
    */
   final def idCompose = new WrappedComposition[C, TCNil](_idCompose, this)
 
+  /**The unwrapped composition of two instances. */
+  final def compose2[F[_], G[_]](implicit F: C[F], G: C[G]): C[TCCons[F, TCCons[G, TCNil]]#Composed] =
+    (idCompose composeInto G composeInto F).instance
+
+  /**The unwrapped composition of three instances. */
+  final def compose3[F[_], G[_], H[_]](implicit F: C[F], G: C[G], H: C[H]): C[TCCons[F, TCCons[G, TCCons[H, TCNil]]]#Composed] =
+    (idCompose composeInto H composeInto G composeInto F).instance
 
 
   // Implementation
