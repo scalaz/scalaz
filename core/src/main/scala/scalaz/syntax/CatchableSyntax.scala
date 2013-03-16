@@ -5,7 +5,7 @@ package syntax
 trait CatchableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Catchable[F]
   ////
-  def attempt: F[Either[Throwable,A]] = F.attempt(self)
+  def attempt: F[Throwable \/ A] = F.attempt(self)
   ////
 }
 
