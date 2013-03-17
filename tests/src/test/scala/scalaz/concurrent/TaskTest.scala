@@ -39,14 +39,14 @@ class TaskTest extends Spec {
   }
 
   "catches exceptions" ! check {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun == 
-    Left(FailWhale)
+    Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun ==
+    -\/(FailWhale)
   }
 
   "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) => 
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 } 
     val t2 = Task { 43 } 
-    Nondeterminism[Task].both(t1, t2).attemptRun == Left(FailWhale)
+    Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
   }
 
 }

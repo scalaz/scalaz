@@ -47,7 +47,7 @@ import scalaz.std.function._
  * design their own error handling strategy. See 
  * `scalaz.concurrent.Task` for a type that extends `Future` with 
  * proper error handling -- it is merely a wrapper for 
- * `Future[Either[Throwable,A]]` with a number of additional 
+ * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
 trait Future[+A] {
