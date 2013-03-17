@@ -196,10 +196,10 @@ object Future {
           }
         fs2.zipWithIndex.foreach { case ((f,flatch,ref), ind) => f.runAsync { a =>
           ref.set(a)
-          flatch.countDown 
-          latch.countDown
           // actually ok if two threads clobber each other here
           if (!result.isDefined) result = Some((a, ind))
+          flatch.countDown 
+          latch.countDown
         }}
         latch.await // wait for any one of the threads to finish
         val Some((a, ind)) = result // extract the winner
