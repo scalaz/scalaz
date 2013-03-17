@@ -12,14 +12,14 @@ package scalaz
  * 
  * We can state the requirement that `attempt` catch all ambient exceptions
  * by stipulating that for all total functions of the form 
- * `g: forall A . F[Either[Throwable,A]] => B`, `g compose attempt` is also
+ * `g: forall A . F[Throwable \/ A] => B`, `g compose attempt` is also
  * total.
  */
 ////
 trait Catchable[F[_]]  { self =>
   ////
   
-  def attempt[A](f: F[A]): F[Either[Throwable,A]]
+  def attempt[A](f: F[A]): F[Throwable \/ A]
   def fail[A](err: Throwable): F[A]
   // derived functions
 
