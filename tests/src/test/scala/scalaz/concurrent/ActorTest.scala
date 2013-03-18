@@ -5,9 +5,9 @@ import scalaz.Spec
 import org.specs2.execute.{Failure, Result, Success}
 import collection.mutable
 import java.util.concurrent._
+import ConcurrentTest._
 
 class ActorTest extends Spec {
-  val Timeout = 1000 // in millis
   val NumOfMessages = 1000
   val NumOfThreads = 4
   val NumOfMessagesPerThread = NumOfMessages / NumOfThreads
@@ -63,18 +63,5 @@ class ActorTest extends Spec {
         ms.put(j, i)
         latch.countDown()
       }
-  }
-
-  def assertCountDown(latch: CountDownLatch, hint: String) : Result = {
-    if (latch.await(Timeout, TimeUnit.MILLISECONDS)) Success()
-    else Failure("Failed to count down within " + Timeout + " millis: " + hint)
-  }
-
-  def fork(f: => Unit) {
-    new Thread {
-      override def run() {
-        f
-      }
-    }.start()
   }
 }
