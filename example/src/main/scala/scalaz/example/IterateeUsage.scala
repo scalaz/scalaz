@@ -12,7 +12,7 @@ object IterateeUsage extends App {
   ((peek[Int, Id]   &= stream123).run) assert_=== Some(1)
   ((head[Int, Id]   &= enumStream(Stream())).run) assert_=== None
 
-  val iter123 = enumIterator[Int, IO](Iterator(1, 2, 3))
+  def iter123 = enumIterator[Int, IO](Iterator(1, 2, 3))
 
   ((head[Int, IO]   &= iter123).run unsafePerformIO()) assert_=== Some(1)
   ((length[Int, IO] &= iter123).run unsafePerformIO()) assert_=== 3

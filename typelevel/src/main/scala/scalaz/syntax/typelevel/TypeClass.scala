@@ -4,23 +4,7 @@ package typelevel
 
 import scalaz.typelevel._
 
-final class TCOps[C[_], T <: HList](typeClass: TypeClass[C], instance: C[T]) {
-  def *:[F](F: C[F]): C[HCons[F, T]] = typeClass.product(F, instance)
-}
-
-trait TypeClasses0 {
-
-  implicit def ToTCOps[C[_], F](F: C[F])(implicit C: TypeClass[C]): TCOps[C, HCons[F, HNil]] =
-    new TCOps[C, HCons[F, HNil]](C, C.product(F, C.emptyProduct))
-
-}
-
-trait TypeClasses extends TypeClasses0 {
-
-  // Kind *
-
-  implicit def ToTCOpsCons[C[_] : TypeClass, F, T <: HList](instance: C[T]): TCOps[C, T] =
-    new TCOps[C, T](TypeClass[C], instance)
+trait TypeClasses {
 
   // Kind * -> *
 

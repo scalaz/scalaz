@@ -1,13 +1,41 @@
-import collection.immutable.IndexedSeq
-import java.awt.Desktop
 import sbt._
-import Keys._
-import GenTypeClass._
 import Project.Setting
+import Keys._
+
+import GenTypeClass._
+
+import java.awt.Desktop
+
+import scala.collection.immutable.IndexedSeq
+
+import sbtrelease._
+import sbtrelease.ReleasePlugin._
+import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.Utilities._
+
+import com.typesafe.sbt.pgp.PgpKeys._
+
 import com.typesafe.sbtosgi.OsgiPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
+
+  lazy val publishSignedArtifacts = ReleaseStep(
+    action = st => {
+      val extracted = st.extract
+      val ref = extracted.get(thisProjectRef)
+      extracted.runAggregated(publishSigned in Global in ref, st)
+    },
+    check = st => {
+      // getPublishTo fails if no publish repository is set up.
+      val ex = st.extract
+      val ref = ex.get(thisProjectRef)
+      Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
+      st
+    },
+    enableCrossBuild = true
+  )
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -60,11 +88,26 @@ object build extends Build {
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
+
     credentialsSetting,
-    // useGpg := false,
-    // useGpgAgent := false,
     publishSetting,
     publishArtifact in Test := false,
+
+    // adapted from sbt-release defaults
+    // (performs `publish-signed` instead of `publish`)
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishSignedArtifacts,
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    ),
+
     pomIncludeRepository := {
       x => false
     },

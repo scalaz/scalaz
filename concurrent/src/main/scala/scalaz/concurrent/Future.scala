@@ -9,6 +9,7 @@ import scalaz.{Monad, Nondeterminism}
 import scalaz.Free.Trampoline
 import scalaz.Free
 import scalaz.Trampoline
+import scalaz.syntax.monad._
 import scalaz.std.function._
 
 /** 
@@ -46,7 +47,7 @@ import scalaz.std.function._
  * design their own error handling strategy. See 
  * `scalaz.concurrent.Task` for a type that extends `Future` with 
  * proper error handling -- it is merely a wrapper for 
- * `Future[Either[Throwable,A]]` with a number of additional 
+ * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
 trait Future[+A] {
@@ -195,10 +196,10 @@ object Future {
           }
         fs2.zipWithIndex.foreach { case ((f,flatch,ref), ind) => f.runAsync { a =>
           ref.set(a)
-          flatch.countDown 
-          latch.countDown
           // actually ok if two threads clobber each other here
           if (!result.isDefined) result = Some((a, ind))
+          flatch.countDown 
+          latch.countDown
         }}
         latch.await // wait for any one of the threads to finish
         val Some((a, ind)) = result // extract the winner
@@ -284,19 +285,4 @@ object Future {
     pool.submit { new Callable[Unit] { def call = cb(a).run }}
   }
 
-  // we place the various syntax pimps here in the companion object where
-  // they will be found by implicit search without explicit imports
-
-  import scalaz.syntax.{ApplyOps, ApplicativeOps, BindOps, FunctorOps, MonadOps}
-
-  implicit def toMonadOps[A](f: Future[A]): MonadOps[Future,A] = 
-    futureInstance.monadSyntax.ToMonadOps(f)
-  implicit def toBindOps[A](f: Future[A]): BindOps[Future,A] = 
-    futureInstance.bindSyntax.ToBindOps(f)
-  implicit def toApplicativeOps[A](f: Future[A]): ApplicativeOps[Future,A] = 
-    futureInstance.applicativeSyntax.ToApplicativeOps(f)
-  implicit def toApplyOps[A](f: Future[A]): ApplyOps[Future,A] = 
-    futureInstance.applySyntax.ToApplyOps(f)
-  implicit def toFunctorOps[A](f: Future[A]): FunctorOps[Future,A] =
-    futureInstance.functorSyntax.ToFunctorOps(f)
 }

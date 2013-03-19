@@ -126,6 +126,10 @@ sealed trait IO[+A] {
 
   def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadControlIO[M]): M[B] =
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
+
+  /** An automatic resource management. */
+  def using[B >: A, C](f: B => IO[C])(implicit resource: Resource[B]) =
+    bracket(resource.close)(f)
 }
 
 object IO extends IOFunctions with IOInstances {
