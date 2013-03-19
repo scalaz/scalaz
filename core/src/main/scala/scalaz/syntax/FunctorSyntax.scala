@@ -15,7 +15,7 @@ trait FunctorOps[F[_],A] extends Ops[F[A]] {
   final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)
   final def strengthR[B](b: B): F[(A, B)] = F.strengthR(self, b)
   final def fpair: F[(A, A)] = F.fpair(self)
-  final def fproduce[B](f: A => B): F[(A, B)] = F.fproduce(self)(f)
+  final def fproduct[B](f: A => B): F[(A, B)] = F.fproduct(self)(f)
   final def void: F[Unit] = F.void(self)
   final def fpoint[G[_]: Applicative]: F[G[A]] = F.map(self)(a => Applicative[G].point(a))
   final def >|[B](b: => B): F[B] = F.map(self)(_ => b)

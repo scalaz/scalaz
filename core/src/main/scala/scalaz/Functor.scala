@@ -40,7 +40,7 @@ trait Functor[F[_]]  { self =>
   def fpair[A](fa: F[A]): F[(A, A)] = map(fa)(a => (a, a))
 
   /** Pair all `A`s in `fa` with the result of function application. */
-  def fproduce[A, B](fa: F[A])(f: A => B): F[(A, B)] = map(fa)(a => (a, f(a)))
+  def fproduct[A, B](fa: F[A])(f: A => B): F[(A, B)] = map(fa)(a => (a, f(a)))
 
   /**
    * Empty `fa` of meaningful pure values, preserving its
