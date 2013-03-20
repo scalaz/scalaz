@@ -11,7 +11,7 @@ sealed trait Promise[A] {
 
   implicit val strategy: Strategy
   private val latch = new CountDownLatch(1)
-  private val waiting = new ConcurrentLinkedQueue[A => Unit]
+  private val waiting = new ConcurrentLinkedQueue[Waiting[A]]
   @volatile private var state: Promise.State[A] = Promise.Unfulfilled
   @volatile private var borked: Boolean = false
   lazy private[concurrent] val e = actor[Signal[A]](_.eval, onError)
@@ -26,6 +26,7 @@ sealed trait Promise[A] {
   private def onError(e: Throwable): Unit = {
     state = new Thrown(e)
     latch.countDown()
+    while (!waiting.isEmpty) waiting.remove().err(e)
   }
 
   def fulfill(a: => A): Unit = e ! new Done(a, this)
@@ -74,6 +75,8 @@ sealed trait Promise[A] {
 }
 
 object Promise extends PromiseFunctions with PromiseInstances {
+  private case class Waiting[A](ok: A => Unit, err: Throwable => Unit)
+
   def apply[A](a: => A)(implicit s: Strategy): Promise[A] =
     promise(a)
 
@@ -122,7 +125,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
           promise.state = new Fulfilled(a)
           promise.latch.countDown()
           val as = promise.waiting
-          while (!as.isEmpty) as.remove()(a)
+          while (!as.isEmpty) as.remove().ok(a)
         } catch {
           case e: Throwable => {
             promise.onError(e)
@@ -155,7 +158,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
     def eval {
       promise.state match {
         case Fulfilled(a) => k(a)
-        case Unfulfilled => promise.waiting.offer(k)
+        case Unfulfilled => promise.waiting.offer(Waiting(k, err))
         case Thrown(e) => err(e)
       }
     }
