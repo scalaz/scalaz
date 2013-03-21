@@ -5,6 +5,8 @@ package syntax
 trait Foldable1Ops[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable1[F]
   ////
+  final def foldRight1(f: (A, => A) => A): A = F.foldRight1(self)(f)
+  final def foldLeft1(f: (A, A) => A): A = F.foldLeft1(self)(f)
   final def foldr1(f: A => (=> A) => A): A = F.foldr1(self)(f)
   final def foldl1(f: A => A => A): A = F.foldl1(self)(f)
   final def foldMap1[B: Semigroup](f: A => B = (a: A) => a): B = F.foldMap1(self)(f)
