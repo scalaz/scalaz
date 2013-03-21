@@ -39,18 +39,19 @@ object build extends Build {
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
+
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0"),
-    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.0"),
+    resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
-        if (sv.contains("2.10"))
+        if (sv startsWith "2.9")
+          Seq("-Ydependent-method-types", "-deprecation")
+        else
           // does not contain -deprecation (because of ClassManifest)
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
-        else
-          Seq("-Ydependent-method-types", "-deprecation")
 
       Seq("-unchecked") ++ versionDepOpts
     },
@@ -157,7 +158,8 @@ object build extends Build {
     base = file("."),
     settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
-      Unidoc.unidocExclude += "typelevel"
+      Unidoc.unidocExclude += "typelevel",
+      publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
@@ -247,7 +249,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
-      osgiExport("scalaz.example")
+      publishArtifact := false
     )
   )
 
@@ -268,12 +270,21 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
-      libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2" % "1.12.3" % "test",
+      publishArtifact := false,
+      libraryDependencies <++= (scalaVersion) { sv => Seq(
+        "org.specs2" %% "specs2" % Dependencies.specs2(sv) % "test",
         "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
-      )
+      ) }
     )
   )
+
+  object Dependencies {
+    def specs2(scalaVersion: String) =
+      if (scalaVersion startsWith "2.9")
+        "1.12.4.1"
+      else
+        "1.12.3"
+  }
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>

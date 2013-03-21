@@ -22,20 +22,18 @@ class ValidationTest extends Spec {
 
     import syntax.applicative._
     import std.AllInstances._
-    import Validation._
 
-
-    val vi = success[String, Int](0)
+    val vi = Validation.success[String, Int](0)
 
     val voi: Validation[String, Option[Int]] = vi map (Some(_))
     val ovi: Option[Validation[String, Int]] = vi.point[Option]
-    voi must be_===(success[String, Option[Int]](Some(0)))
+    voi must be_===(Validation.success[String, Option[Int]](Some(0)))
     ovi must be_===(Some(vi))
 
     {
       import syntax.functor._
       val voi2: Validation[String, Option[Int]] = vi.fpoint[Option]
-      voi2 must be_===(success[String, Option[Int]](Some(0)))
+      voi2 must be_===(Validation.success[String, Option[Int]](Some(0)))
       println("hi")
     }
   }
