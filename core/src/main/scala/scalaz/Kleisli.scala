@@ -20,7 +20,7 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   def andThenK[C](k: B => M[C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >==> k
 
-  /** alias for `compose` */ 
+  /** alias for `compose` */
   def <=<[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
 
   def compose[C](k: Kleisli[M, C, A])(implicit b: Bind[M]): Kleisli[M, C, B] = k >=> this
@@ -36,8 +36,8 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
 
   def map[C](f: B => C)(implicit M: Functor[M]): Kleisli[M, A, C] =
     kleisli(a => M.map(run(a))(f))
-    
-  def mapK[N[+_], C](f: M[B] => N[C]): Kleisli[N, A, C] = 
+
+  def mapK[N[+_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
     kleisli(a => f(run(a)))
 
   def flatMapK[C](f: B => M[C])(implicit M: Bind[M]): Kleisli[M, A, C] =
@@ -49,7 +49,7 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
   def lift[L[+_]: Applicative]: Kleisli[({type λ[+α]=L[M[α]]})#λ, A, B] = new Kleisli[({type λ[+α]=L[M[α]]})#λ, A, B] {
     def run(a: A) = Applicative[L].point(self(a))
   }
-        
+
   import Liskov._
   def unlift[N[+_], FF[+_], AA <: A, BB >: B](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[+α] = N[FF[α]]})#λ, AA, BB]): Kleisli[FF, AA, BB] = new Kleisli[FF, AA, BB] {
     def run(a: AA) = Comonad[N].copoint(ev(self) run a)
@@ -225,7 +225,7 @@ private[scalaz] trait KleisliHoist[R] extends Hoist[({type λ[α[+_], β] = Klei
     }
 
   def liftM[G[+_] : Monad, A](a: G[A]): Kleisli[G, R, A] = Kleisli(_ => a)
-  
+
   implicit def apply[G[+_] : Monad]: Monad[({type λ[α] = Kleisli[G, R, α]})#λ] = Kleisli.kleisliMonadReader
 }
 

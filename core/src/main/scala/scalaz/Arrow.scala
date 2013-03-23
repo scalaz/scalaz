@@ -9,7 +9,7 @@ package scalaz
  * functions.
  */
 ////
-trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] with Profunctor[=>:] { self =>
   ////
 
   /** Lift an ordinary function. */
@@ -72,6 +72,7 @@ trait Arrow[=>:[_, _]] extends Category[=>:] with Split[=>:] { self =>
   /** Functor map on `B`. */
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
+
   ////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
