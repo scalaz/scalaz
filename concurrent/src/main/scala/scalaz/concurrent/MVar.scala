@@ -76,7 +76,7 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
       
   def write(a: => A, read: => IO[Option[A]]): IO[Unit] = writeLatch.currentPhase flatMap { p =>
     read flatMap(v => v match {
-      case Some(a) => 
+      case Some(_) => 
         for {
           _ <- writeLatch awaitPhase p // if there is a value, wait until someone takes it
           _ <- write(a, read)           // someone has taken the value, try and write it again
