@@ -12,6 +12,7 @@ class MVarTest extends Spec {
   def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] =
     IO { s(f.unsafePerformIO); () }
 
+  /** NOTE: This test replicates #314 approx 1 in every 2 attempts. */
   "MVar" should {
     "have deterministic sequential take/put behaviour" in {
       def run = for {
