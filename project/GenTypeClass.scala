@@ -62,8 +62,9 @@ object TypeClass {
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
+  lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
   lazy val first = TypeClass("First", *^*->*)
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(category, split))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -114,6 +115,7 @@ object TypeClass {
     category,
     choice,
     split,
+    profunctor,
     arrow
   )
   lazy val concurrent = Seq[TypeClass]()
@@ -183,7 +185,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, codiagonal)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, profunctor, codiagonal)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
