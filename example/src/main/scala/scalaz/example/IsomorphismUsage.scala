@@ -8,11 +8,11 @@ import syntax.equal._
 import syntax.traverse._
 
 object IsomorphismUsage extends App {
-  def isoSet[A, <=>[Seq[A], List[A]]] = new IsoSet[Seq[A], List[A]] {
+  def isoSet[A] = new IsoSet[Seq[A], List[A]] {
     def to: Seq[A] ⇒ List[A] = _.toList
     def from: List[A] ⇒ Seq[A] = _.toSeq
   }
-  def isoFunctor[<~>[Seq, List]] = new IsoFunctorTemplate[Seq, List] {
+  def isoFunctor = new IsoFunctorTemplate[Seq, List] {
     def to[A](sa: Seq[A]): List[A] = sa.toList
     def from[A](la: List[A]): Seq[A] = la.toSeq
   }
