@@ -20,12 +20,6 @@ trait ArrowOps[F[_, _],A, B] extends Ops[F[A, B]] {
   final def product: F[(A, A), (B, B)] =
     F.product(self)
 
-  final def ^>>[C](f: C => A): F[C, B] =
-    F.mapfst(self)(f)
-
-  final def >>^[C](f: B => C): F[A, C] =
-    F.mapsnd(self)(f)
-
   ////
 }
 
@@ -35,7 +29,7 @@ trait ToArrowOps0 {
   
 }
 
-trait ToArrowOps extends ToArrowOps0 with ToCategoryOps with ToSplitOps {
+trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps {
   
   implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
       new ArrowOps[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
@@ -46,7 +40,7 @@ trait ToArrowOps extends ToArrowOps0 with ToCategoryOps with ToSplitOps {
   ////
 }
 
-trait ArrowSyntax[F[_, _]] extends CategorySyntax[F] with SplitSyntax[F] {
+trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with ProfunctorSyntax[F] {
   implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] = new ArrowOps[F, A, B] { def self = v; implicit def F: Arrow[F] = ArrowSyntax.this.F }
 
   def F: Arrow[F]
