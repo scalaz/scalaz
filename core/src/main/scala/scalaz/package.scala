@@ -91,7 +91,7 @@ package object scalaz {
    *
    * Credit to Miles Sabin for the idea.
    */
-  type @@[T, Tag] = T with Tagged[Tag]
+  type @@[+T, Tag] = T with Tagged[Tag]
 
   /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
