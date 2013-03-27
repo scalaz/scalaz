@@ -189,12 +189,13 @@ trait PromiseInstances {
 }
 
 trait PromiseFunctions {
-
-
-  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
-    val p = new Promise[A] {
+  def emptyPromise[A](implicit s: Strategy): Promise[A] =
+    new Promise[A] {
       implicit val strategy = s
     }
+
+  def promise[A](a: => A)(implicit s: Strategy): Promise[A] = {
+    val p = emptyPromise[A]
     p.e ! new Promise.Done(a, p)
     p
   }
