@@ -23,24 +23,24 @@ class FutureTest extends Spec {
       }
     }
     "have a run method that returns" in {
-      "when constructed from Future.now" in {
-        Future.now(100).run must_== 100
+      "when constructed from Future.now" in check{(n: Int) =>
+        Future.now(n).run must_== n
       }
-      "when constructed from Future.delay" in {
-        Future.delay(100).run must_== 100
+      "when constructed from Future.delay" in check{(n: Int) =>
+        Future.delay(n).run must_== n
       }
-      "when constructed from Future.fork" in {
-        Future.fork(Future.now(100)).run must_== 100
+      "when constructed from Future.fork" in check{(n: Int) =>
+        Future.fork(Future.now(n)).run must_== n
       }
-      "when constructed from Future.suspend" in {
-        Future.suspend(Future.now(100)).run must_== 100
+      "when constructed from Future.suspend" in check{(n: Int) =>
+        Future.suspend(Future.now(n)).run must_== n
       }
-      "when constructed from Future.async" in {
-        def callback(call: Int => Unit): Unit = call(100)
-        Future.async(callback).run must_== 100
+      "when constructed from Future.async" in check{(n: Int) =>
+        def callback(call: Int => Unit): Unit = call(n)
+        Future.async(callback).run must_== n
       }
-      "when constructed from Future.apply" in {
-        Future.apply(100).run must_== 100
+      "when constructed from Future.apply" in check{(n: Int) =>
+        Future.apply(n).run must_== n
       }
     }
   }
