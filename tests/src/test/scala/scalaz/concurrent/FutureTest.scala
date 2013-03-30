@@ -22,6 +22,27 @@ class FutureTest extends Spec {
         deadlocks(3).run.length must_== 4
       }
     }
+    "have a run method that returns" in {
+      "when constructed from Future.now" in {
+        Future.now(100).run must_== 100
+      }
+      "when constructed from Future.delay" in {
+        Future.delay(100).run must_== 100
+      }
+      "when constructed from Future.fork" in {
+        Future.fork(Future.now(100)).run must_== 100
+      }
+      "when constructed from Future.suspend" in {
+        Future.suspend(Future.now(100)).run must_== 100
+      }
+      "when constructed from Future.async" in {
+        def callback(call: Int => Unit): Unit = call(100)
+        Future.async(callback).run must_== 100
+      }
+      "when constructed from Future.apply" in {
+        Future.apply(100).run must_== 100
+      }
+    }
   }
 
   /*
