@@ -26,7 +26,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
         lastNow = alignTimeResolution(System.currentTimeMillis)
         // Deal with stuff to expire.
         futures.headOption match {
-          case Some((time, _)) if (time < lastNow) => {
+          case Some((time, _)) if (time <= lastNow) => {
             val expiredFutures: SortedMap[Long, List[() => Unit]] = withWrite{
               val (past, future) = futures.span(pair => pair._1 < lastNow)
               futures = future
