@@ -12,19 +12,19 @@ object Timeout extends Timeout
 
 case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
   import Timer._
-  val safeTickMs = if (timeoutTickMs > 0) timeoutTickMs else 1
+  val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]
   @volatile private[this] var continueRunning: Boolean = true
-  @volatile private[this] var lastNow: Long = System.currentTimeMillis
+  @volatile private[this] var lastNow: Long = alignTimeResolution(System.currentTimeMillis)
   private[this] val lock = new ReentrantReadWriteLock()
   private[this] var futures: SortedMap[Long, List[() => Unit]] = SortedMap()
   private[this] val workerRunnable = new Runnable() {
     def run() {
       @tailrec
       def innerRun() {
+        lastNow = alignTimeResolution(System.currentTimeMillis)
         // Deal with stuff to expire.
-        lastNow = System.currentTimeMillis
         futures.headOption match {
           case Some((time, _)) if (time < lastNow) => {
             val expiredFutures: SortedMap[Long, List[() => Unit]] = withWrite{
@@ -51,7 +51,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   private[this] def expireFutures(futures: SortedMap[Long, List[() => Unit]]) {
     futures.foreach(vector => vector._2.foreach(call => call()))
   }
-
+  
   def stop(expireImmediately: Boolean = false) {
     withWrite{
       continueRunning = false
@@ -79,12 +79,14 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
       lock.readLock().unlock()
     }
   }
+
+  private[this] def alignTimeResolution(time: Long): Long = time / timeoutTickMs * timeoutTickMs
   
   def valueWait[T](value: T, waitMs: Long): Future[T] = {
     withRead{
       if (continueRunning) {
         val listen: (T => Unit) => Unit = callback => withWrite{
-          val waitTime = lastNow + (if (waitMs < 0) 0 else waitMs / timeoutTickMs * timeoutTickMs)
+          val waitTime = alignTimeResolution(lastNow + (if (waitMs < 0) 0 else waitMs))
           val timedCallback = () => callback(value)
           // Lazy implementation for now.
           futures = futures + futures.get(waitTime).map(current => (waitTime, timedCallback :: current)).getOrElse((waitTime, List(timedCallback)))
