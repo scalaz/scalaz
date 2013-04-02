@@ -18,6 +18,8 @@ import com.typesafe.sbt.pgp.PgpKeys._
 
 import com.typesafe.sbtosgi.OsgiPlugin._
 
+import sbtbuildinfo.Plugin._
+
 object build extends Build {
   type Sett = Project.Setting[_]
 
@@ -167,12 +169,15 @@ object build extends Build {
   lazy val core = Project(
     id = "core",
     base = file("core"),
-    settings = standardSettings ++ Seq[Sett](
+    settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
       name := "scalaz-core",
       typeClasses := TypeClass.core,
-      (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
+      sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
       },
+      sourceGenerators in Compile <+= buildInfo,
+      buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+      buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
