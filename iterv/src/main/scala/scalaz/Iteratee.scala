@@ -3,6 +3,7 @@ package scalaz
 import Scalaz._
 
 /** The input to an iteratee. */
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 sealed trait Input[E] {
   def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
   def map[D](f: E => D): Input[D] =
@@ -10,6 +11,7 @@ sealed trait Input[E] {
 }
 
 /** A pure iteratee computation which is either done or needs more input */
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 sealed trait IterV[E, A] {
   import IterV._
 
@@ -62,11 +64,13 @@ sealed trait IterV[E, A] {
 }
 
 /** Monadic Iteratees */
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 sealed trait IterVM[M[+_], E, A] {
   import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 case class Iteratee[M[+_], E, A](value: M[IterVM[M, E, A]]) {
   import IterV._
 
@@ -112,11 +116,12 @@ case class Iteratee[M[+_], E, A](value: M[IterVM[M, E, A]]) {
 }
 
 /** An Enumerator[F] feeds data from an F to an iteratee */
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 trait Enumerator[F[_]] {
   def apply[E, A](f: F[E], i: IterV[E, A]): IterV[E, A]
 }
 
-
+@deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 object IterV {
 
   case class OptionSyntax[A](value: Option[A]) {
