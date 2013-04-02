@@ -20,6 +20,9 @@ import com.typesafe.sbtosgi.OsgiPlugin._
 
 import sbtbuildinfo.Plugin._
 
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+
 object build extends Build {
   type Sett = Project.Setting[_]
 
@@ -153,6 +156,8 @@ object build extends Build {
       )
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
+  ) ++ mimaDefaultSettings ++ Seq[Sett](
+    previousArtifact <<= (organization, name, scalaBinaryVersion) { (o, n, sbv) => Some(o % (n + "_" + sbv) % "7.0.0-RC1") }
   )
 
   lazy val scalaz = Project(
@@ -161,6 +166,7 @@ object build extends Build {
     settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
       Unidoc.unidocExclude += "typelevel",
+      previousArtifact := None,
       publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
@@ -254,6 +260,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
+      previousArtifact := None,
       publishArtifact := false
     )
   )
@@ -276,6 +283,7 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
+      previousArtifact := None,
       libraryDependencies <++= (scalaVersion) { sv => Seq(
         "org.specs2" %% "specs2" % Dependencies.specs2(sv) % "test",
         "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
