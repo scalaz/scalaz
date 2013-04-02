@@ -19,8 +19,6 @@ trait Spec
 
   def is = fragments
 
-  addArguments(fullStackTrace)
-
   def be_===[T: Show : Equal](expected: T): Matcher[T] = new Matcher[T] {
     def apply[S <: T](actual: Expectable[S]): MatchResult[S] = {
       val actualT = actual.value.asInstanceOf[T]
