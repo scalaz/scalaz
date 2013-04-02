@@ -109,6 +109,14 @@ trait OptionTFunctions {
   def optionT[M[+_]] = new (({type λ[α] = M[Option[α]]})#λ ~> ({type λ[α] = OptionT[M, α]})#λ) {
     def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
   }
+
+  def monadTell[F[+_, +_], W, A](implicit MT0: MonadTell[F, W]) = new OptionTMonadTell[F, W] {
+    def MT = MT0
+  }
+
+  def monadListen[F[+_, +_], W, A](implicit ML0: MonadListen[F, W]) = new OptionTMonadListen[F, W] {
+    def MT = ML0
+  }
 }
 
 object OptionT extends OptionTFunctions with OptionTInstances
@@ -170,4 +178,32 @@ private[scalaz] trait OptionTMonadPlus[F[+_]] extends MonadPlus[({type λ[α] = 
 
   def empty[A]: OptionT[F, A] = OptionT(F point none[A])
   def plus[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
+}
+
+private[scalaz] trait OptionTMonadTell[F[+_, +_], W] extends MonadTell[({ type λ[+α, +β] = OptionT[({ type f[+x] = F[α, x] })#f, β] })#λ, W] with OptionTMonad[({ type λ[+α] = F[W, α] })#λ] with OptionTHoist {
+  def MT: MonadTell[F, W]
+
+  implicit def F = MT
+
+  def writer[A](w: W, v: A): OptionT[({ type λ[+α] = F[W, α] })#λ, A] =
+    liftM[({ type λ[+α] = F[W, α] })#λ, A](MT.writer(w, v))
+
+  def some[A](v: => A): OptionT[({ type λ[+α] = F[W, α] })#λ, A] =
+    OptionT.optionT[({ type λ[+α] = F[W, α] })#λ].apply[A](MT.point(Some(v)))
+
+  def none[A]: OptionT[({ type λ[+α] = F[W, α] })#λ, A] =
+    OptionT.optionT[({ type λ[+α] = F[W, α] })#λ].apply[A](MT.point(None))
+}
+
+private[scalaz] trait OptionTMonadListen[F[+_, +_], W] extends MonadListen[({ type λ[+α, +β] = OptionT[({ type f[+x] = F[α, x] })#f, β] })#λ, W] with OptionTMonadTell[F, W] {
+  def MT: MonadListen[F, W]
+
+  def listen[A](ma: OptionT[({ type λ[+α] = F[W, α] })#λ, A]): OptionT[({ type λ[+α] = F[W, α] })#λ, (A, W)] = {
+    val tmp = MT.bind[(Option[A], W), Option[(A, W)]](MT.listen(ma.run)) {
+      case (None, _) => MT.point(None)
+      case (Some(a), w) => MT.point(Some(a, w))
+    }
+
+    OptionT.optionT[({ type λ[+α] = F[W, α] })#λ].apply[(A, W)](tmp)
+  }
 }
