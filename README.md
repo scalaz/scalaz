@@ -6,7 +6,7 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
-[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=scalaz-seven)](http://travis-ci.org/scalaz/scalaz)
+[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.0.x)](http://travis-ci.org/scalaz/scalaz)
 
 ## Quick Start
 
