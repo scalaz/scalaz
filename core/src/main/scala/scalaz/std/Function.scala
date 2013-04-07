@@ -17,7 +17,7 @@ trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit def function0Instance[T] = new Traverse[Function0] with Monad[Function0] with Comonad[Function0] with Distributive[Function0] {
+  implicit val function0Instance = new Traverse[Function0] with Monad[Function0] with Comonad[Function0] with Distributive[Function0] {
     def point[A](a: => A) = () => a
 
     def copoint[A](p: () => A) = p()
@@ -46,7 +46,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-  implicit def function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
+  implicit val function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
     def arr[A, B](f: A => B) = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
