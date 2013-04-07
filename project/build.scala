@@ -162,8 +162,12 @@ object build extends Build {
       import com.typesafe.tools.mima.core._
       import com.typesafe.tools.mima.core.ProblemFilters._
       Seq(
-        exclude[MissingMethodProblem]("scalaz.EitherT.withFilter")
-      )
+        "scalaz.EitherT.withFilter",
+        "scalaz.LensFamily.modo",
+        "scalaz.LensFamily.<%=",
+        "scalaz.LensFamily.assigno",
+        "scalaz.LensFamily.<:="
+      ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
     previousArtifact <<= (organization, name, scalaBinaryVersion) { (o, n, sbv) => Some(o % (n + "_" + sbv) % "7.0.0") }
