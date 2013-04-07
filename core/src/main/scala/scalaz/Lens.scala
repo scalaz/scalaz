@@ -85,6 +85,18 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def %=[B <: B2](f: B1 => B): IndexedState[A1, A2, B] =
     mods[B](f)
 
+  /** Modify the portion of the state viewed through the lens and return its old value. */
+  def modo(f: B1 => B2): IndexedState[A1, A2, B1] =
+    IndexedState(a => {
+      val c = run(a)
+      val o = c.pos
+      (c put f(o), o)
+    })
+
+  /** Modify the portion of the state viewed through the lens and return its old value. */
+  def <%=(f: B1 => B2): IndexedState[A1, A2, B1] =
+    modo(f)
+
   /** Set the portion of the state viewed through the lens and return its new value. */
   def assign[B <: B2](b: => B): IndexedState[A1, A2, B] =
     mods[B](_ => b)
@@ -92,6 +104,14 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   /** Set the portion of the state viewed through the lens and return its new value. */
   def :=[B <: B2](b: => B): IndexedState[A1, A2, B] =
     assign[B](b)
+
+  /** Set the portion of the state viewed through the lens and return its old value. */
+  def assigno(b: => B2): IndexedState[A1, A2, B1] =
+    modo(_ => b)
+
+  /** Set the portion of the state viewed through the lens and return its old value. */
+  def <:=(b: => B2): IndexedState[A1, A2, B1] =
+    assigno(b)
 
   /** Modify the portion of the state viewed through the lens, but do not return its new value. */
   def mods_(f: B1 => B2): IndexedState[A1, A2, Unit] =
