@@ -147,12 +147,15 @@ trait Future[+A] {
     listenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
   /** Run this `Future` and block awaiting its result. */
-  def run: A = {
-    val latch = new java.util.concurrent.CountDownLatch(1) 
-    @volatile var result: Option[A] = None
-    runAsync { a => result = Some(a); latch.countDown }
-    latch.await
-    result.get
+  def run: A = this match {
+    case Now(a) => a
+    case _ => {
+      val latch = new java.util.concurrent.CountDownLatch(1) 
+      @volatile var result: Option[A] = None
+      runAsync { a => result = Some(a); latch.countDown }
+      latch.await
+      result.get
+    }
   }
 }
 
