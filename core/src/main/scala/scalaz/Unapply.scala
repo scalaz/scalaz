@@ -23,6 +23,11 @@ import Leibniz.{===, refl}
  *   G.TC.traverse(self)(a => G(f(a)))
  * }
  *
+ * // Deforested version of traverseI
+ * def traverseI2[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
+ *   G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))
+ * }
+ *
  * // Old usage
  * def stateTraverse1 {
  *   import scalaz._, Scalaz._
