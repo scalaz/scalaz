@@ -22,6 +22,27 @@ class FutureTest extends Spec {
         deadlocks(3).run.length must_== 4
       }
     }
+    "have a run method that returns" in {
+      "when constructed from Future.now" in prop{(n: Int) =>
+        Future.now(n).run must_== n
+      }
+      "when constructed from Future.delay" in prop{(n: Int) =>
+        Future.delay(n).run must_== n
+      }
+      "when constructed from Future.fork" in prop{(n: Int) =>
+        Future.fork(Future.now(n)).run must_== n
+      }
+      "when constructed from Future.suspend" in prop{(n: Int) =>
+        Future.suspend(Future.now(n)).run must_== n
+      }
+      "when constructed from Future.async" in prop{(n: Int) =>
+        def callback(call: Int => Unit): Unit = call(n)
+        Future.async(callback).run must_== n
+      }
+      "when constructed from Future.apply" in prop{(n: Int) =>
+        Future.apply(n).run must_== n
+      }
+    }
   }
 
   /*
