@@ -11,5 +11,5 @@ trait MonadTell[F[_, _], W] extends Monad[({type λ[+α] = F[W, α]})#λ] {
 }
 
 object MonadTell {
-  def apply[F[+_, +_], W](implicit F: MonadTell[F, W]) = F
+  def apply[F[_, _], W](implicit F: MonadTell[F, W]) = F
 }

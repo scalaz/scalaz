@@ -59,12 +59,12 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     mod(f, _)
 
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
-  def modf[X[+_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
+  def modf[X[_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
     val c = run(a)
     XF.map(f(c.pos))(c put _)
   }
 
-  def =>>=[X[+_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
+  def =>>=[X[_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
     modf(f, _)
 
   /** Modify the value viewed through the lens, returning a `C` on the side.  */
