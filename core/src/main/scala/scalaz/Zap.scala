@@ -42,7 +42,7 @@ trait ZapInstances {
       }
 
   /** A free monad and a cofree comonad annihilate each other */
-  implicit def monadComonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]):
+  implicit def monadComonadZap[F[+_], G[+_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]):
     Zap[({type λ[α] = Free[F, α]})#λ, ({type λ[α] = Cofree[G, α]})#λ] =
       new Zap[({type λ[α] = Free[F, α]})#λ, ({type λ[α] = Cofree[G, α]})#λ] {
         def zapWith[A, B, C](ma: Free[F, A], wb: Cofree[G, B])(f: (A, B) => C): C =
@@ -53,7 +53,7 @@ trait ZapInstances {
       }
 
   /** A cofree comonad and a free monad annihilate each other */
-  implicit def comonadMonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]):
+  implicit def comonadMonadZap[F[+_], G[+_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]):
     Zap[({type λ[α] = Cofree[F, α]})#λ, ({type λ[α] = Free[G, α]})#λ] =
       new Zap[({type λ[α] = Cofree[F, α]})#λ, ({type λ[α] = Free[G, α]})#λ] {
         def zapWith[A, B, C](wa: Cofree[F, A], mb: Free[G, B])(f: (A, B) => C): C =
