@@ -27,19 +27,19 @@ final case class IdT[F[_], A](run: F[A]) {
   )
 }
 
-trait IdTInstances2 {
+trait IdTInstances3 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = IdT[F, α]})#λ] = new IdTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait IdTInstances1 extends IdTInstances2 {
+trait IdTInstances2 extends IdTInstances3 {
   implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = IdT[F, α]})#λ] = new IdTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
-trait IdTInstances0 extends IdTInstances1 {
+trait IdTInstances1 extends IdTInstances2 {
   implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = IdT[F, α]})#λ] = new IdTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }
@@ -49,12 +49,14 @@ trait IdTInstances0 extends IdTInstances1 {
   }
 }
 
-trait IdTInstances extends IdTInstances0 {
-  implicit def idTHoist: Hoist[IdT] = IdTHoist
-
+trait IdTInstances0 extends IdTInstances1 {
   implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IdT[F, α]})#λ] = new IdTMonad[F] {
     implicit def F: Monad[F] = F0
   }
+}
+
+trait IdTInstances extends IdTInstances0 {
+  implicit def idTHoist: Hoist[IdT] = IdTHoist
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = IdT[F, α]})#λ] = new IdTTraverse[F] {
     implicit def F: Traverse[F] = F0

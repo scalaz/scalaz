@@ -22,6 +22,7 @@ class OptionTTest extends Spec {
 
     // checking absence of ambiguity
     def functor[F[+_] : Monad] = Functor[({type λ[α] = OptionT[F, α]})#λ]
+    def functor[F[+_] : Monad : Traverse] = Functor[({type λ[α] = OptionT[F, α]})#λ]
     def apply[F[+_] : Monad] = Apply[({type λ[α] = OptionT[F, α]})#λ]
     def foldable[F[+_] : Traverse] = Foldable[({type λ[α] = OptionT[F, α]})#λ]
   }
