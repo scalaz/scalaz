@@ -47,7 +47,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** A version of `traverse` that infers the type constructor `G`. */
   final def traverseU[A,GB](self: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
-    G.TC.traverse(self)(a => G(f(a)))(this)
+    G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(this)
   }
 
   /** Traverse with `State`. */
