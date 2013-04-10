@@ -116,7 +116,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Traverse on the success of this validation. */
-  def traverse[G[+_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
+  def traverse[G[_] : Applicative, EE >: E, B](f: A => G[B]): G[Validation[EE, B]] = this match {
     case Success(a) => Applicative[G].map(f(a))(Success(_))
     case Failure(e) => Applicative[G].point(Failure(e))
   }
@@ -400,7 +400,7 @@ trait ValidationInstances2 extends ValidationInstances3 {
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f
 
-    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
+    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
       fa.traverse(f)
 
     override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
