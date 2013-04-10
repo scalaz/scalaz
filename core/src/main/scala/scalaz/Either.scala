@@ -79,7 +79,7 @@ sealed trait \/[+A, +B] {
     bimap(f, identity)
 
   /** Binary functor traverse on this disjunction. */
-  def bitraverse[F[+_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
+  def bitraverse[F[_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
     this match {
       case -\/(a) => Functor[F].map(f(a))(-\/(_))
       case \/-(b) => Functor[F].map(g(b))(\/-(_))
@@ -372,7 +372,7 @@ trait DisjunctionInstances3 {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: A \/ B)
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
