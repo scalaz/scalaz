@@ -101,10 +101,10 @@ The implicit members within the `Instances` class should be named:
 `classifiedTypeInstance` // the primary instance, e.g. `implicit object optionInstance extends MonadPlus[Option] with Traverse[Option]`.
 `classifiedTypeTypeClassName` // additional instances, e.g. `implicit def optionSemigroup[A]`
 
-### Scala and Java standard libary
+### Scala and Java standard library
 
 Instances are organized under `scalaz.std` according to the package of the classified type. The package prefix `scala`
-is ommited. Where a type is aliased under the package `scala`, the shorter path to the alias determines the location
+is omitted. Where a type is aliased under the package `scala`, the shorter path to the alias determines the location
 of the type class.
 
 `scala.Option` => `scalaz.std.option._`
@@ -138,9 +138,9 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
 
     trait TupleInstances0 {
       // defined in a supertype of TupleInstances as a tie-breaker in case of ambiguity.
-      // pass the type class instances into the type class implemetatation trait as members.
+      // pass the type class instances into the type class implementation trait as members.
       // We need to choose different names for the parameters and the members to avoid shadowing.
-      // Usually we suffix the parameter name with '0', in this case '_' is used for better readibility.
+      // Usually we suffix the parameter name with '0', in this case '_' is used for better readability.
       implicit def tuple2Semigroup[A1, A2](implicit A1_ : Semigroup[A1], A2_ : Semigroup[A2]): Semigroup[(A1, A2)] = new Tuple2Semigroup[A1, A2] {
         // WARNING: It's really easy to write `def A1 = A1` here!!
         implicit def A1 = A1_
