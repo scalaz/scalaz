@@ -73,7 +73,7 @@ employ the implicit scope.
 ### At a glance
 
 * `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
-* Refined and expanded the type class heirarchy.
+* Refined and expanded the type class hierarchy.
 * Type class instances are no longer defined in the companion objects of the type class.
   Instances for standard library types are defined under `scalaz.std`, and instances for
   Scalaz data types are defined in the companion object for those types. An instance definition
@@ -205,7 +205,7 @@ val oi: Option[Option[Int]] = Some(Some(1))
 oi.join
 ```
 
-For some degree of backwards compability with Scalaz 6, the über-import of `import scalaz.Scalaz._`
+For some degree of backwards compatibility with Scalaz 6, the über-import of `import scalaz.Scalaz._`
 will import *all* implicit conversions that provide syntax (as well as type class instances and other
 functions). However, we recommend to review usage of this and replace with more focussed imports.
 
