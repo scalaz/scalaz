@@ -44,7 +44,6 @@ object TypeClass {
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
-  lazy val codiagonal = TypeClass("Codiagonal", *^*->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
@@ -63,7 +62,6 @@ object TypeClass {
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
   lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
-  lazy val first = TypeClass("First", *^*->*)
   lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
@@ -185,7 +183,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, profunctor, codiagonal)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, profunctor)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
