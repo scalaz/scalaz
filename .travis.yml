@@ -6,3 +6,8 @@ scala:
 jdk:
   - oraclejdk7
   - openjdk6
+notifications:
+  irc:
+    channels: "irc.freenode.net#scalaz"
+    on_success: change
+    on_failure: change
