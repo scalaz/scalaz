@@ -29,7 +29,7 @@ class TimerTest extends Spec {
     "valueWait produces a value after the specified timeout" in {
       withTimer{timer =>
         val start = System.currentTimeMillis
-        withTimeout(500){
+        withTimeout(5000){
           val future = timer.valueWait("Test", 100)
           future.run must_== "Test"
           (System.currentTimeMillis - start) >= 100
@@ -39,7 +39,7 @@ class TimerTest extends Spec {
     "withTimeout(Future...) produces a Timeout if the timeout is exceeded" in {
       withTimer{timer =>
         val future = timer.withTimeout(Future{Thread.sleep(500); "Test"}, 100)
-        withTimeout(1000){
+        withTimeout(5000){
           future.run must_== Timeout.left
         }
       }
@@ -47,7 +47,7 @@ class TimerTest extends Spec {
     "produces the result of the Future if the timeout is not exceeded" in {
       withTimer{timer =>
         val future = timer.withTimeout(Future{Thread.sleep(50); "Test"}, 200)
-        withTimeout(1000){
+        withTimeout(5000){
           future.run must_== "Test".right
         }
       }
