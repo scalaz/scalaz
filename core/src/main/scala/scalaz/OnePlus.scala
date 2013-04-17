@@ -100,11 +100,11 @@ trait OnePlusInstances0 extends OnePlusInstances1 {
       def OA = A
       def OFA = FA
     }
-  // TODO 1 + traverse, equal
+  // TODO 1 + traverse
 }
 
 trait OnePlusInstances extends OnePlusInstances0 {
-  // TODO 1 + traverse1, show
+  // TODO 1 + traverse1
 
   implicit def onePlusShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OnePlus[F, A]] =
     new Show[OnePlus[F, A]] {
@@ -119,6 +119,33 @@ trait OnePlusInstances extends OnePlusInstances0 {
       def order(a1: OnePlus[F, A], a2: OnePlus[F, A]) =
         Monoid[Ordering].append(A.order(a1.head, a2.head),
                                 FA.order(a1.tail, a2.tail))
+    }
+
+  implicit def onePlusEach[F[_]: Each]: Each[({type λ[α] = OnePlus[F, α]})#λ] =
+    new Each[({type λ[α] = OnePlus[F, α]})#λ] {
+      def each[A](fa: OnePlus[F, A])(f: A => Unit) = {
+        f(fa.head)
+        Each[F].each(fa.tail)(f)
+      }
+    }
+
+  implicit def onePlusLength[F[_]: Length, A]: Length[({type λ[α] = OnePlus[F, α]})#λ] =
+    new Length[({type λ[α] = OnePlus[F, α]})#λ] {
+      def length[A](fa: OnePlus[F, A]) = 1 + Length[F].length(fa.tail)
+    }
+
+  implicit def onePlusZip[F[_]: Zip]: Zip[({type λ[α] = OnePlus[F, α]})#λ] =
+    new Zip[({type λ[α] = OnePlus[F, α]})#λ] {
+      def zip[A, B](a: => OnePlus[F, A], b: => OnePlus[F, B]) =
+        OnePlus((a.head, b.head), Zip[F].zip(a.tail, b.tail))
+    }
+
+  implicit def onePlusUnzip[F[_]: Unzip]: Unzip[({type λ[α] = OnePlus[F, α]})#λ] =
+    new Unzip[({type λ[α] = OnePlus[F, α]})#λ] {
+      def unzip[A, B](a: OnePlus[F, (A, B)]) = {
+        val (fa, fb) = Unzip[F].unzip(a.tail)
+        (OnePlus(a.head._1, fa), OnePlus(a.head._2, fb))
+      }
     }
 }
 
