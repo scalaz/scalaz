@@ -59,7 +59,7 @@ private[scalaz] sealed trait OnePlusTraverse[F[_]]
 }
 
 private[scalaz] sealed trait OnePlusTraverse1[F[_]]
-    extends OnePlusTraverse[F] {
+    extends OnePlusTraverse[F] with OnePlusFoldable1 {
    def F: Traverse1[F]
 */
 
