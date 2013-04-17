@@ -109,7 +109,7 @@ trait OnePlusInstances extends OnePlusInstances0 {
   implicit def onePlusShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OnePlus[F, A]] =
     new Show[OnePlus[F, A]] {
       override def show(f: OnePlus[F, A]) =
-        Cord("OnePlus(", A.show(f.head), ",", FA.show(f.tail))
+        Cord("OnePlus(", A.show(f.head), ",", FA.show(f.tail), ")")
     }
 
   implicit def onePlusOrder[F[_], A](implicit A: Order[A], FA: Order[F[A]]): Order[OnePlus[F, A]] =
