@@ -130,6 +130,19 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def lift12[A, B, C, D, E, FF, G, H, I, J, K, L, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L]) => F[R] =
     apply12(_, _, _, _, _, _, _, _, _, _, _, _)(f)
 
+  /** Add a unit to any Apply to form an Applicative. */
+  def applyApplicative: Applicative[({type λ[α] = F[α] \/ α})#λ] =
+    new Applicative[({type λ[α] = F[α] \/ α})#λ] {
+      // transliterated from semigroupoids 3.0.2, thanks edwardk
+      def point[A](a: => A) = \/-(a)
+      def ap[A, B](a: => F[A] \/ A)(f: => F[A => B] \/ (A => B)) = (f, a) match {
+        case (\/-(f), \/-(a)) => \/-(f(a))
+        case (\/-(f), -\/(a)) => -\/(self.map(a)(f))
+        case (-\/(f), \/-(a)) => -\/(self.map(f)(_(a)))
+        case (-\/(f), -\/(a)) => -\/(self.ap(a)(f))
+      }
+    }
+
   ////
   val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }
