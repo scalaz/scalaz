@@ -47,20 +47,28 @@ private[scalaz] sealed trait OnePlusFoldable1[F[_]] extends OnePlusFoldable[F] {
     f(fa.head, F.foldRight1(fa.tail)(f))
 }
 
-/*
 private[scalaz] sealed trait OnePlusTraverse[F[_]]
     extends Traverse1[({type λ[α] = OnePlus[F, α]})#λ]
     with OnePlusFunctor[F] with OnePlusFoldable[F] {
   def F: Traverse[F]
 
   def traverse1Impl[G[_],A,B](fa: OnePlus[F, A])(f: A => G[B])(implicit G: Apply[G]) =
-    lift Apply to Applicative, &c
+    (F.traverseImpl[({type λ[α] = G[α] \/ α})#λ, A, B
+                   ](fa.tail)(a => -\/(f(a)))(G.applyApplicative)
+       fold (ftl => G.apply2(f(fa.head), ftl)(OnePlus.apply),
+             tl => G.map(f(fa.head))(OnePlus(_, tl))))
+
+  override def traverseImpl[G[_],A,B](fa: OnePlus[F, A])(f: A => G[B])(implicit G: Applicative[G]) =
+    G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OnePlus.apply)
 }
 
 private[scalaz] sealed trait OnePlusTraverse1[F[_]]
-    extends OnePlusTraverse[F] with OnePlusFoldable1 {
-   def F: Traverse1[F]
-*/
+    extends OnePlusTraverse[F] with OnePlusFoldable1[F] {
+  def F: Traverse1[F]
+
+  override def traverse1Impl[G[_],A,B](fa: OnePlus[F, A])(f: A => G[B])(implicit G: Apply[G]) =
+    G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(G))(OnePlus.apply)
+}
 
 trait OnePlusInstances1 {
   implicit def onePlusFunctor[F[_]: Functor]: Functor[({type λ[α] = OnePlus[F, α]})#λ] =
@@ -99,11 +107,18 @@ trait OnePlusInstances0 extends OnePlusInstances1 {
       def OA = A
       def OFA = FA
     }
-  // TODO 1 + traverse
+
+  implicit def onePlusTraverse[F[_]: Traverse]: Traverse1[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusTraverse[F] {
+      def F = implicitly
+    }
 }
 
 trait OnePlusInstances extends OnePlusInstances0 {
-  // TODO 1 + traverse1
+  implicit def onePlusTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusTraverse1[F] {
+      def F = implicitly
+    }
 
   implicit def onePlusShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OnePlus[F, A]] =
     new Show[OnePlus[F, A]] {
