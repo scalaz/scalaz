@@ -17,12 +17,11 @@ private[scalaz] sealed trait OnePlusFoldable[F[_]]
     extends Foldable1[({type λ[α] = OnePlus[F, α]})#λ] {
   def F: Foldable[F]
 
-  override def foldMap1[A, B](fa: OnePlus[F, A])(f: A => B)(implicit S: Semigroup[B]) =
-    (F.foldMap(fa.tail)(a => some(f(a)))(Monoid[Option[B]])
-       map (S.append(f(fa.head), _)) getOrElse f(fa.head))
+  override def foldMap1[A, B: Semigroup](fa: OnePlus[F, A])(f: A => B) =
+    foldMap(fa)(a => some(f(a))) getOrElse f(fa.head)
 
   override def foldRight1[A](fa: OnePlus[F, A])(f: (A, => A) => A) =
-    (F.foldRight(fa.tail, none[A])((a, oa) => some(oa map (f(a, _)) getOrElse a))
+    (F.foldRight(fa.tail, none[A])((a, oa) => oa map (f(a, _)) orElse some(a))
        map (f(fa.head, _)) getOrElse fa.head)
 
   override def foldLeft1[A](fa: OnePlus[F, A])(f: (A, A) => A) =
