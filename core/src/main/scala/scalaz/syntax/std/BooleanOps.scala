@@ -75,20 +75,7 @@ trait BooleanOps extends Ops[Boolean] {
   final def \/(q: => Boolean): Boolean = ∨(q)
 
   /**
-   * Negation of Conjunction. (NOR)
-   *
-   * {{{
-   * p q  p !&& q
-   * 0 0  1
-   * 0 1  1
-   * 1 0  1
-   * 1 1  0
-   * }}}
-   */
-  final def !&&(q: => Boolean) = b.nor(self, q)
-
-  /**
-   * Negation of Disjunction. (NAND)
+   * Negation of Disjunction. (NOR)
    *
    * {{{
    * p q  p !|| q
@@ -98,7 +85,21 @@ trait BooleanOps extends Ops[Boolean] {
    * 1 1  0
    * }}}
    */
-  final def !||(q: => Boolean) = b.nand(self, q)
+  final def !||(q: => Boolean) = b.nor(self, q)
+
+
+  /**
+   * Negation of Conjunction. (NAND)
+   *
+   * {{{
+   * p q  p !&& q
+   * 0 0  1
+   * 0 1  1
+   * 1 0  1
+   * 1 1  0
+   * }}}
+   */
+  final def !&&(q: => Boolean) = b.nand(self, q)
 
   /**
    * Conditional.
