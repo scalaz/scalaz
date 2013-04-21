@@ -415,20 +415,7 @@ trait BooleanFunctions {
   final def disjunction(p: Boolean, q: => Boolean) = p || q
 
   /**
-   * Negation of Conjunction. (NOR)
-   *
-   * {{{
-   * p q  p !&& q
-   * 0 0  1
-   * 0 1  1
-   * 1 0  1
-   * 1 1  0
-   * }}}
-   */
-  final def nor(p: Boolean, q: => Boolean) = !p || !q
-
-  /**
-   * Negation of Disjunction. (NAND)
+   * Negation of Disjunction. (NOR)
    *
    * {{{
    * p q  p !|| q
@@ -438,7 +425,20 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def nand(p: Boolean, q: => Boolean) = !p && !q
+  final def nor(p: Boolean, q: => Boolean) = !(p || q)
+
+  /**
+   * Negation of Conjunction. (NAND)
+   *
+   * {{{
+   * p q  p !&& q
+   * 0 0  1
+   * 0 1  1
+   * 1 0  1
+   * 1 1  0
+   * }}}
+   */
+  final def nand(p: Boolean, q: => Boolean) = !(p && q)
 
   /**
    * Conditional.

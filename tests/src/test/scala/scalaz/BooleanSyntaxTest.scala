@@ -7,6 +7,38 @@ class BooleanSyntaxTest extends Spec {
     import syntax.id._
     import syntax.std.boolean._
 
+    "and" ! prop { (p:Boolean, q:Boolean) =>
+      p /\ q == (p && q)
+    }
+
+    "or" ! prop { (p:Boolean, q:Boolean) =>
+      p \/ q == (p || q)
+    }
+
+    "nand" ! prop { (p:Boolean, q:Boolean) =>
+      p !&& q == !(p && q)
+    }
+
+    "nor" ! prop { (p:Boolean, q:Boolean) =>
+      p !|| q == !(p || q)
+    }
+
+    "conditional" ! prop { (p:Boolean, q:Boolean) =>
+      p --> q == (!p || q)
+    }
+
+    "inverse conditional" ! prop { (p:Boolean, q:Boolean) =>
+      p <-- q == (p || !q)
+    }
+
+    "negate conditional" ! prop { (p:Boolean, q:Boolean) =>
+      p -/> q == (p && !q)
+    }
+
+    "negate inverse conditional" ! prop { (p:Boolean, q:Boolean) =>
+      p <\- q == (!p && q)
+    }
+
     "true.option" ! prop { (i: Int) =>
       true.option(i).exists(_ == i)
     }
