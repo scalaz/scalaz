@@ -124,6 +124,10 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
         case h :: t => foldLeft1(NonEmptyList.nel(f(fa.head, h), t))(f)
       }
 
+      override def foldMap1[A, B](fa: NonEmptyList[A])(f: A => B)(implicit F: Semigroup[B]): B = {
+        fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
+      }
+
       // would otherwise use traverse1Impl
       override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B, A) => B): B =
         fa.tail.foldLeft(f(z, fa.head))(f)
