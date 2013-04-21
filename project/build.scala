@@ -163,7 +163,7 @@ object build extends Build {
       Unidoc.unidocExclude += "typelevel",
       publishArtifact := false
     ),
-    aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   lazy val core = Project(
@@ -212,17 +212,6 @@ object build extends Build {
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee")
-    ),
-    dependencies = Seq(effect)
-  )
-
-  lazy val iterv = Project(
-    id = "iterv",
-    base = file("iterv"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iterv",
-      OsgiKeys.fragmentHost := Some("org.scalaz.core"),
-      OsgiKeys.exportPackage := Seq("scalaz;version=${Bundle-Version};-split-package:=first")
     ),
     dependencies = Seq(effect)
   )
