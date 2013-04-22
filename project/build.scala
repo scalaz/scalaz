@@ -42,7 +42,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.0",
     crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.0"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
