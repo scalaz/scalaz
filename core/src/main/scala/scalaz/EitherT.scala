@@ -100,6 +100,10 @@ sealed trait EitherT[F[+_], +A, +B] {
   def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
     EitherT(F.map(run)(_.filter[AA](p)))
 
+  /** Alias for `filter`. */
+  def withFilter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
+    filter[AA](p)(M, F)
+
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_ exists f)
