@@ -9,7 +9,7 @@ class MapTest extends Spec {
   "Map functions" should {
     "satisfy monoid laws" ! monoid.laws[Map[Int, String]]
     "satisfy order laws" ! order.laws[Map[Int, String]]
-    "satisfy traverse laws" ! order.laws[Map[Int, String]]
+    "satisfy traverse laws" ! traverse.laws[({type λ[α]=Map[Int, α]})#λ]
     "satisfy equals laws" ! equal.laws[Map[Int, String]]
     "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
   }
