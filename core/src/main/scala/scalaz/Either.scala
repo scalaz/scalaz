@@ -79,7 +79,7 @@ sealed trait \/[+A, +B] {
     bimap(f, identity)
 
   /** Binary functor traverse on this disjunction. */
-  def bitraverse[F[+_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
+  def bitraverse[F[_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
     this match {
       case -\/(a) => Functor[F].map(f(a))(-\/(_))
       case \/-(b) => Functor[F].map(g(b))(\/-(_))
@@ -90,7 +90,7 @@ sealed trait \/[+A, +B] {
     bimap(identity, g)
 
   /** Traverse on the right of this disjunction. */
-  def traverse[F[+_]: Applicative, D](g: B => F[D]): F[A \/ D] =
+  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
     this match {
       case -\/(a) => Applicative[F].point(-\/(a))
       case \/-(b) => Functor[F].map(g(b))(\/-(_))
@@ -346,7 +346,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
     def point[A](a: => A) =
       \/-(a)
 
-    def traverseImpl[G[+_] : Applicative, A, B](fa: L \/ A)(f: A => G[B]) =
+    def traverseImpl[G[_] : Applicative, A, B](fa: L \/ A)(f: A => G[B]) =
       fa.traverse(f)
 
     override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
@@ -372,7 +372,7 @@ trait DisjunctionInstances3 {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: A \/ B)
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }

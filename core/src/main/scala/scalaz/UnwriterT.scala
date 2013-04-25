@@ -54,7 +54,7 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
       F.map(z)(wb => (wa._1, wb._2))
     })
 
-  def traverse[G[+_] , B](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F]): G[UnwriterT[F, U, B]] = {
+  def traverse[G[_] , UU >: U, B](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F]): G[UnwriterT[F, UU, B]] = {
     G.map(F.traverse(run){
       case (w, a) => G.map(f(a))(b => (w, b))
     })(UnwriterT(_))
@@ -200,7 +200,7 @@ private[scalaz] trait UnwriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({t
 private[scalaz] trait UnwriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=UnwriterT[F, W, α]})#λ] with UnwriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[+_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa traverse f
 }
 
 private[scalaz] trait UnwriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=UnwriterT[F, α, β]})#λ] {

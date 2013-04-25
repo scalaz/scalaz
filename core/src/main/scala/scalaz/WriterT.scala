@@ -62,7 +62,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
       F.map(z)(wb => (s.append(wa._1, wb._1), wb._2))
     })
 
-  def traverse[G[+_] , B](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F]): G[WriterT[F, W, B]] = {
+  def traverse[G[_] , WW >: W, B](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F]): G[WriterT[F, WW, B]] = {
     G.map(F.traverse(run){
       case (w, a) => G.map(f(a))(b => (w, b))
     })(WriterT(_))
@@ -292,7 +292,7 @@ private[scalaz] trait WriterTFoldable[F[+_], W] extends Foldable.FromFoldr[({typ
 private[scalaz] trait WriterTTraverse[F[+_], W] extends Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[+_]: Applicative, A, B](fa: WriterT[F, W, A])(f: A => G[B]) = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[F, W, A])(f: A => G[B]) = fa traverse f
 }
 
 private[scalaz] trait WriterTBifunctor[F[+_]] extends Bifunctor[({type λ[+α, +β]=WriterT[F, α, β]})#λ] {
