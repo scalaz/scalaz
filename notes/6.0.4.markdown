@@ -1,6 +1,0 @@
-* Propagate exceptions from flatMapped `Promise` to the calling thread
-* Resolve ambiguous implicit conversion to MA / MAB [#39](https://github.com/scalaz/scalaz/issues/39)
-* Solve serious race condition in `Actor`.
-* Added methods to `Zipper`: `modify`, `update`, `start`, `end` and `copy`.
-* Added `Free`, a means to structure computations to avoid stack overflow. (http://apocalisp.wordpress.com/2011/10/)
-  This is used in the `IO` monad.
