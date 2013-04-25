@@ -266,7 +266,7 @@ parameter (or, equivalently, a context bound), to the implicit method.
 Type class instances for 'transformers', such as `OptionT`, present a more subtle challenge. `OptionT[F, A]`
 is a wrapper for a value of type `F[Option[A]]`. It allows us to write:
 
-```
+```scala
 val ot = OptionT(List(Some(1), None))
 ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 ```
