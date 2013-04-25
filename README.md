@@ -121,9 +121,9 @@ Scalaz has been been modularised.
   type class with an instance of a more specific type class:
 
 ```scala
-def bar[M: Functor] = ()
+def bar[M[_]: Functor] = ()
 
-def foo[M: Monad] = bar // Monad[M] is a subtype of Functor[M]
+def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 ```
 
 * The hierarchy itself is largely the same as in Scalaz 6. However, there have been a few
@@ -266,7 +266,7 @@ parameter (or, equivalently, a context bound), to the implicit method.
 Type class instances for 'transformers', such as `OptionT`, present a more subtle challenge. `OptionT[F, A]`
 is a wrapper for a value of type `F[Option[A]]`. It allows us to write:
 
-```
+```scala
 val ot = OptionT(List(Some(1), None))
 ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 ```
