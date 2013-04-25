@@ -36,7 +36,7 @@ sealed trait Coproduct[F[+_], G[+_], A] {
   def foldMap[B](f: A => B)(implicit F: Foldable[F], G: Foldable[G], M: Monoid[B]): B =
     run.fold(F.foldMap(_)(f), G.foldMap(_)(f))
 
-  def traverse[X[+_], B](g: A => X[B])(implicit F: Traverse[F], G: Traverse[G], A: Applicative[X]): X[Coproduct[F, G, B]] =
+  def traverse[X[_], B](g: A => X[B])(implicit F: Traverse[F], G: Traverse[G], A: Applicative[X]): X[Coproduct[F, G, B]] =
     run.fold(
       x => A.map(F.traverse(x)(g))(leftc(_))
     , x => A.map(G.traverse(x)(g))(rightc(_))
