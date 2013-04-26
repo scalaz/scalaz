@@ -109,7 +109,6 @@ Scalaz has been been modularised.
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
-* **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 * **scalaz-typelevel**: Type-level data structures, type-safe printf
 * **scalaz-xml**: Error-correcting XML parser
