@@ -100,6 +100,10 @@ sealed trait EitherT[F[+_], +A, +B] {
   def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
     EitherT(F.map(run)(_.filter[AA](p)))
 
+  /** Alias for `filter`. */
+  def withFilter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
+    filter[AA](p)(M, F)
+
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_ exists f)
@@ -253,11 +257,11 @@ trait EitherTFunctions {
     val run = a
   }
 
-  def monadTell[F[+_, +_], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
+  def monadTell[F[_, +_], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
     def MT = MT0
   }
 
-  def monadListen[F[+_, +_], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
+  def monadListen[F[_, +_], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
     def MT = ML0
   }
 }
@@ -313,7 +317,7 @@ private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[+_], β] = Eith
   implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
 
-private[scalaz] trait EitherTMonadTell[F[+_, +_], W, A] extends MonadTell[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
+private[scalaz] trait EitherTMonadTell[F[_, +_], W, A] extends MonadTell[({type λ[α, β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
   implicit def F = MT
@@ -328,7 +332,7 @@ private[scalaz] trait EitherTMonadTell[F[+_, +_], W, A] extends MonadTell[({type
     EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MT.point(v))
 }
 
-private[scalaz] trait EitherTMonadListen[F[+_, +_], W, A] extends MonadListen[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
+private[scalaz] trait EitherTMonadListen[F[_, +_], W, A] extends MonadListen[({type λ[α, β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
   implicit def MT: MonadListen[F, W]
 
   def listen[B](ma: EitherT[({type λ[+α] = F[W, α]})#λ, A, B]): EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)] = {

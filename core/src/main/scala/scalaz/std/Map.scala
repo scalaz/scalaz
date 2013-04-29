@@ -9,9 +9,9 @@ trait MapInstances0 {
     override def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
-      else Equal[Set[K]].equal(a1.keySet, a1.keySet) && {
+      else Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
         a1.forall {
-          case (k, v) => Equal[V].equal(v, a2(k))
+          case (k, v) => a2.get(k).exists(v2 => Equal[V].equal(v, v2))
         }
       }
     }
@@ -130,4 +130,3 @@ trait MapFunctions {
 }
 
 object map extends MapInstances with MapFunctions
-

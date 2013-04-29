@@ -8,60 +8,73 @@ a large number of data structures.
 
 [![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=scalaz-seven)](http://travis-ci.org/scalaz/scalaz)
 
+## Getting Scalaz
+
+The current stable version is 7.0.0, which is cross-built against Scala 2.9.2, 2.9.3 and 2.10.x.
+
+If you're using SBT, add the following lines to your build file:
+
+```scala
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.0"
+```
+
+For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.0.0%22).
+(This search will also list all available modules of scalaz.)
+
+To get sample configurations, click on the version of the module you are interested in.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.0.0.jar`.
+
+Note: In some cases, Maven will warn about "multiple versions of scala libraries", e.g.
+
+```
+[WARNING]  Expected all dependencies to require Scala version: 2.10.1
+[WARNING]  org.scalaz:scalaz-core_2.10:7.0.0 requires scala version: 2.10.0
+```
+
+You can safely ignore this warning, as the Scala 2.10.x versions are compatible.
+
 ## Quick Start
 
 ```scala
-scala> import scalaz._
 import scalaz._
+import std.option._, std.list._ // functions and type class instances for Option and List
 
-scala> import std.option._, std.list._ // functions and type class instances for Option and List
-import std.option._
-import std.list._
-
-scala> Apply[Option].map2(some(1), some(2))((a, b) => a + b)
-res3: Option[Int] = Some(3)
+scala> Apply[Option].apply2(some(1), some(2))((a, b) => a + b)
+res0: Option[Int] = Some(3)
 
 scala> Traverse[List].traverse(List(1, 2, 3))(i => some(i))
-res4: Option[List[Int]] = Some(List(1, 2, 3))
+res1: Option[List[Int]] = Some(List(1, 2, 3))
 ```
 
 Use of the `Ops` classes, defined under `scalaz.syntax`.
 
 ```scala
-scala> import scalaz._
 import scalaz._
-
-scala> import std.list._ // type class instances for List
-import std.list._
-
-scala> import syntax.bind._ // syntax for the Bind type class (and its parents)
-import syntax.bind._
+import std.list._ // type class instances for List
+import syntax.bind._ // syntax for the Bind type class (and its parents)
 
 scala> List(List(1)).join
-res3: List[Int] = List(1)
+res0: List[Int] = List(1)
 
 scala> List(true, false).ifM(List(0, 1), List(2, 3))
-res4: List[Int] = List(0, 1, 2, 3)
-
+res1: List[Int] = List(0, 1, 2, 3)
 ```
 
 We've gone to great lengths to give you an *a-la-carte* importing experience, but if you prefer an all-you-can-eat
 buffet, you're in luck:
 
 ```scala
-scala> import scalaz._, Scalaz._
 import scalaz._
 import Scalaz._
 
 scala> NonEmptyList(1, 2, 3).cojoin
-res6: scalaz.NonEmptyList[scalaz.NonEmptyList[Int]] = NonEmptyList(NonEmptyList(1, 2, 3), NonEmptyList(2, 3), NonEmptyList(3))
+res0: scalaz.NonEmptyList[scalaz.NonEmptyList[Int]] = NonEmptyList(NonEmptyList(1, 2, 3), NonEmptyList(2, 3), NonEmptyList(3))
 
 scala> 1.node(2.leaf, 3.node(4.leaf))
-res7: scalaz.Tree[Int] = <tree>
+res1: scalaz.Tree[Int] = <tree>
 
 scala> List(some(1), none).suml
-res10: Option[Int] = Some(1)
-
+res2: Option[Int] = Some(1)
 ```
 
 ## Changes in Version 7
@@ -96,7 +109,6 @@ Scalaz has been been modularised.
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
-* **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 * **scalaz-typelevel**: Type-level data structures, type-safe printf
 * **scalaz-xml**: Error-correcting XML parser
@@ -108,9 +120,9 @@ Scalaz has been been modularised.
   type class with an instance of a more specific type class:
 
 ```scala
-def bar[M: Functor] = ()
+def bar[M[_]: Functor] = ()
 
-def foo[M: Monad] = bar // Monad[M] is a subtype of Functor[M]
+def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 ```
 
 * The hierarchy itself is largely the same as in Scalaz 6. However, there have been a few
@@ -253,7 +265,7 @@ parameter (or, equivalently, a context bound), to the implicit method.
 Type class instances for 'transformers', such as `OptionT`, present a more subtle challenge. `OptionT[F, A]`
 is a wrapper for a value of type `F[Option[A]]`. It allows us to write:
 
-```
+```scala
 val ot = OptionT(List(Some(1), None))
 ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 ```
@@ -288,19 +300,6 @@ a type alias for `StateT[Id, A, B]`.
 ```scala
 type Id[A] = A
 ```
-
-### Type Class Derivation
-
-Type classes can be derived based on an isomorphism. For example, the functor type class instance
-for Validation could be derived from the instance for Either.
-
-https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Isomorphism.scala
-
-Type classes can also be derived based on the composition and product of data types:
-
-https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Composition.scala
-
-https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/Product.scala
 
 ## Contributing
 
