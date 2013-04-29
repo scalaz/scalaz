@@ -46,6 +46,17 @@ class OnePlusTest extends Spec {
     Foldable1[OnePlusNel].foldRight1(llst)(_ ++ _) must be_===(lst)
   }
 
+  "traverse1 on traverse" ! prop {(ints: OnePlus[List, Int], f: Int => List[Int]) =>
+    (Traverse1[OnePlusList].traverse1(ints)(f)
+       must be_===(Traverse[OnePlusList].traverse(ints)(f)))
+  }
+
+  "traverse1 on traverse1" ! prop {(ints: OnePlus[NonEmptyList, Int],
+                                    f: Int => NonEmptyList[Int]) =>
+    (Traverse1[OnePlusNel].traverse1(ints)(f)
+       must be_===(Traverse[OnePlusNel].traverse(ints)(f)))
+  }
+
   "inequality exists" ! prop {(a: OnePlus[List, Int]) =>
     exists {(b: OnePlus[List, Int]) =>
       propBoolean(!Equal[OnePlusList[Int]].equal(a, b))
