@@ -32,6 +32,20 @@ class OnePlusTest extends Spec {
     Foldable1[OnePlusNel].foldMap1(ints)(_ + 1) must be_===(lst.size + lst.sum)
   }
 
+  "right fold1 on fold" ! prop {(ints: OnePlus[List, Int]) =>
+    val lst = ints.head :: ints.tail
+    val llst = Functor[OnePlusList].map(ints)(List(_))
+    Foldable[OnePlusList].foldRight(ints, List.empty[Int])(_ :: _) must be_===(lst)
+    Foldable1[OnePlusList].foldRight1(llst)(_ ++ _) must be_===(lst)
+  }
+
+  "right fold1 on fold1" ! prop {(ints: OnePlus[NonEmptyList, Int]) =>
+    val lst = ints.head :: ints.tail.list
+    val llst = Functor[OnePlusNel].map(ints)(List(_))
+    Foldable[OnePlusNel].foldRight(ints, List.empty[Int])(_ :: _) must be_===(lst)
+    Foldable1[OnePlusNel].foldRight1(llst)(_ ++ _) must be_===(lst)
+  }
+
   "inequality exists" ! prop {(a: OnePlus[List, Int]) =>
     exists {(b: OnePlus[List, Int]) =>
       propBoolean(!Equal[OnePlusList[Int]].equal(a, b))
