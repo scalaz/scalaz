@@ -1,5 +1,6 @@
 package scalaz
 
+import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
 import scalaz.std.option.{optionMonoid, none, some}
 import scalaz.Ordering.orderingInstance
 
@@ -167,4 +168,10 @@ object OnePlus extends OnePlusFunctions with OnePlusInstances
 
 trait OnePlusFunctions {
   def oneAnd[F[_], A](hd: A, tl: F[A]): OnePlus[F, A] = OnePlus(hd, tl)
+
+  val onePlusNelIso: NonEmptyList <~> ({type λ[α] = OnePlus[List, α]})#λ =
+    new IsoFunctorTemplate[NonEmptyList, ({type λ[α] = OnePlus[List, α]})#λ] {
+      def to[A](fa: NonEmptyList[A]) = OnePlus(fa.head, fa.tail)
+      def from[A](ga: OnePlus[List, A]) = NonEmptyList.nel(ga.head, ga.tail)
+    }
 }

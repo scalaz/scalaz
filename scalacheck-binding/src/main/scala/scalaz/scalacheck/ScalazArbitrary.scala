@@ -62,6 +62,10 @@ object ScalazArbitrary {
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
 
+  implicit def OnePlusArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]
+                                        ): Arbitrary[OnePlus[F, A]] =
+    Apply[Arbitrary].apply2(arb[A], arb[F[A]])(OnePlus.apply)
+
   import scalaz.Ordering._
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
