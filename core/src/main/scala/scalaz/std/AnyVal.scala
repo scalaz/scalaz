@@ -343,41 +343,20 @@ trait AnyValInstances {
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
   }
 
-  implicit val floatInstance: Monoid[Float] with Order[Float] with Show[Float] = new Monoid[Float] with Order[Float] with Show[Float] {
+  implicit val floatInstance: Order[Float] with Show[Float] = new Order[Float] with Show[Float] {
     override def shows(f: Float) = f.toString
-
-    def append(f1: Float, f2: => Float) = f1 + f2
-
-    def zero: Float = 0f
 
     override def equalIsNatural: Boolean = true
 
     def order(x: Float, y: Float) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
-  implicit val floatMultiplicationNewType: Semigroup[Float @@ Multiplication] = new Semigroup[Float @@ Multiplication] {
-    def append(f1: Float @@ Multiplication, f2: => Float @@ Multiplication) = Multiplication(f1 * f2)
-
-    def zero: Float @@ Multiplication = Multiplication(1.0f)
-
-  }
-
-  implicit val doubleInstance: Monoid[Double] with Order[Double] with Show[Double] = new Monoid[Double] with Order[Double] with Show[Double] {
+  implicit val doubleInstance: Order[Double] with Show[Double] = new Order[Double] with Show[Double] {
     override def shows(f: Double) = f.toString
-
-    def append(f1: Double, f2: => Double) = f1 + f2
-
-    def zero: Double = 0d
 
     override def equalIsNatural: Boolean = true
 
     def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-  }
-
-  implicit val doubleMultiplicationNewType: Semigroup[Double @@ Multiplication] = new Semigroup[Double @@ Multiplication] {
-    def append(f1: Double @@ Multiplication, f2: => Double @@ Multiplication) = Multiplication(f1 * f2)
-
-    def zero: Double @@ Multiplication = Multiplication(1.0d)
   }
 }
 
