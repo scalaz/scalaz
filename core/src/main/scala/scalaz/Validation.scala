@@ -303,7 +303,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
-  def toValidationNel[EE >: E, AA >: A]: ValidationNel[EE, AA] =
+  def toValidationNel: ValidationNel[E, A] =
     this match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(NonEmptyList(e))
