@@ -56,7 +56,7 @@ trait OptionInstances extends OptionInstances0 {
     def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
       case (Some(a1), None)     => f1
-      case (None, Some(a2))     => f2
+      case (None, Some(a2))     => Some(a2)
       case (None, None)         => None
     }
 
