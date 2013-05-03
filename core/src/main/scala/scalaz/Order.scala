@@ -95,5 +95,10 @@ object Order {
     }
   }
 
+  import Tags._  
+  implicit def orderMaxValSemigroup[A: Order]: Semigroup[A @@ MaxVal] = Semigroup.instance((a1, a2) => MaxVal(Order[A].max(a1, a2)))
+  implicit def orderMinValSemigroup[A: Order]: Semigroup[A @@ MinVal] = Semigroup.instance((a1, a2) => MinVal(Order[A].min(a1, a2)))
+
+
   ////
 }
