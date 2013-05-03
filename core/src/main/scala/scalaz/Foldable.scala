@@ -102,12 +102,40 @@ trait Foldable[F[_]]  { self =>
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
     }
+  /** The greatest element of `f(fa)`, or None if `fa` is empty. */
+  def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
+    foldLeft(fa, none[B]) {
+      case (None, a) => some(f(a))
+      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) b else bb)
+    }
+
+  /** The element of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
+  def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
+    foldLeft(fa, none[(A, B)]) {
+      case (None, a) => some(a -> f(a))
+      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
+    } map (_._1)
   /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
     }
+
+  /** The smallest element of `f(fa)`, or None if `fa` is empty. */
+  def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
+    foldLeft(fa, none[B]) {
+      case (None, a) => some(f(a))
+      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) b else bb)
+    }
+
+  /** The element of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
+  def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
+    foldLeft(fa, none[(A, B)]) {
+      case (None, a) => some(a -> f(a))
+      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
+    } map (_._1)
+
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)

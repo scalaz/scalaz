@@ -13,7 +13,11 @@ trait Foldable1Ops[F[_],A] extends Ops[F[A]] {
   final def sumr1(implicit A: Semigroup[A]): A = F.foldRight1(self)(A.append)
   final def suml1(implicit A: Semigroup[A]): A = F.foldLeft1(self)(A.append(_, _))
   final def maximum1(implicit A: Order[A]): A = F.maximum1(self)
+  final def maximumOf1[B: Order](f: A => B): B = F.maximumOf1(self)(f)
+  final def maximumBy1[B: Order](f: A => B): A = F.maximumBy1(self)(f)
   final def minimum1(implicit A: Order[A]): A = F.minimum1(self)
+  final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
+  final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
   ////
 }
 

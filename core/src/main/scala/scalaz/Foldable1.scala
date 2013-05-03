@@ -37,8 +37,31 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   import Ordering.{GT, LT}
   /** The greatest element of `fa`. */
   def maximum1[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
+
+  /** The greatest element of `f(fa)`. */
+  def maximumOf1[A, B: Order](fa: F[A])(f: A => B): B = {
+	import Tags._
+	implicit val MaxSemigroup: Semigroup[B @@ MaxVal] = Semigroup.instance((b1, b2) => MaxVal(Order[B].max(b1, b2)))
+	foldMap1(fa)(f andThen MaxVal)(MaxSemigroup)
+  }
+  /** The element of `fa` which yield the greatest value of `f(fa)`. */
+  def maximumBy1[A, B: Order](fa: F[A])(f: A => B): A = {
+	(maximumOf1(fa)(a => (a, f(a)))(Order.orderBy[(A, B), B](_._2)))._1
+  }
+
   /** The smallest element of `fa`. */
   def minimum1[A: Order](fa: F[A]): A = foldl1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
+
+  /** The smallest element of `f(fa)`. */
+  def minimumOf1[A, B: Order](fa: F[A])(f: A => B): B = {
+	import Tags._
+	implicit val MinSemigroup: Semigroup[B @@ MinVal] = Semigroup.instance((b1, b2) => MinVal(Order[B].min(b1, b2)))
+	foldMap1(fa)(f andThen MinVal)(MinSemigroup)
+  }
+  /** The element of `fa` which yield the smallest value of `f(fa)`. */
+  def minimumBy1[A, B: Order](fa: F[A])(f: A => B): A = {
+	(minimumOf1(fa)(a => (a, f(a)))(Order.orderBy[(A, B), B](_._2)))._1
+  }
 
   def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())
