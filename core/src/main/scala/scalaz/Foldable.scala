@@ -94,27 +94,31 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
   /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+
   import Ordering.{GT, LT}
   import std.option.{some, none}
+
   /** The greatest element of `fa`, or None if `fa` is empty. */
   def maximum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
     }
-  /** The greatest element of `f(fa)`, or None if `fa` is empty. */
+
+  /** The greatest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
   def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
     foldLeft(fa, none[B]) {
       case (None, a) => some(f(a))
       case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) b else bb)
     }
 
-  /** The element of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
+  /** The element `a` of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
   def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
     foldLeft(fa, none[(A, B)]) {
       case (None, a) => some(a -> f(a))
       case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
     } map (_._1)
+
   /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
@@ -122,14 +126,14 @@ trait Foldable[F[_]]  { self =>
       case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
     }
 
-  /** The smallest element of `f(fa)`, or None if `fa` is empty. */
+  /** The smallest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
   def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
     foldLeft(fa, none[B]) {
       case (None, a) => some(f(a))
       case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) b else bb)
     }
 
-  /** The element of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
+  /** The element `a` of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
   def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
     foldLeft(fa, none[(A, B)]) {
       case (None, a) => some(a -> f(a))
