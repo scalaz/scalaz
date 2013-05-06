@@ -18,6 +18,7 @@ class ListTest extends Spec {
   import std.list.listSyntax._
   import syntax.foldable._
   import syntax.monad._
+  import syntax.index._
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 
@@ -77,5 +78,9 @@ class ListTest extends Spec {
     val F = Foldable[List]
     (rnge.foldRight(List[Int]())(_++_)
       must be_===(F.foldRight(rnge, List[Int]())(_++_)))
+  }
+
+  "index" ! prop { (xs: List[Int], n: Int) =>
+    (xs index n) must be_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 }

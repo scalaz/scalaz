@@ -42,7 +42,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
   val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
     def each[A](fa: IxSq[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
+    def index[A](fa: IxSq[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: IxSq[A]) = fa.length
     def point[A](a: => A) = empty :+ a
     def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f

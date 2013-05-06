@@ -13,18 +13,7 @@ trait ListInstances0 {
 trait ListInstances extends ListInstances0 {
   implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: List[A], i: Int) = {
-      var n = 0
-      var k: Option[A] = None
-      val it = fa.iterator
-      while (it.hasNext && k.isEmpty) {
-        val z = it.next()
-        if (n == i) k = Some(z)
-        n = n + 1
-      }
-
-      k
-    }
+    def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: List[A]) = fa.length
     def point[A](a: => A) = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
