@@ -95,6 +95,9 @@ trait ListFunctions {
     intersperse0(Nil, as).reverse
   }
 
+  /** [[scala.Nil]] with a sometimes more convenient type */
+  final def nil[A]: List[A] = Nil
+
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None
     case h :: t => Some(NonEmptyList.nel(h, t))
