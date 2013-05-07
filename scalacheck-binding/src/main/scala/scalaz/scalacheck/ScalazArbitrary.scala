@@ -227,6 +227,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
   }
 
+  @deprecated("BKTree is deprecated", "7.0.1")
   implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
     Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
 

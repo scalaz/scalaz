@@ -21,6 +21,7 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
+  @deprecated("MetricSpace is deprecated", "7.0.1")
   object metricSpace extends ToMetricSpaceOps
 
   object isEmpty extends ToIsEmptyOps
