@@ -243,10 +243,8 @@ sealed trait Validation[+E, +A] {
     }
 
   /** Ensures that the success value of this validation satisfies the given predicate, or fails with the given value. */
-  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
-    case Success(a) => if (f(a)) this else Failure(onFailure)
-    case Failure(_) => this
-  }
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] =
+    excepting({ case a if !f(a) => onFailure})
 
   /** Compare two validations values for equality. */
   def ===[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =

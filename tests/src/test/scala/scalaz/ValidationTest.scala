@@ -96,6 +96,13 @@ class ValidationTest extends Spec {
       (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsgA(i) })) must be_===(List(1.success[Any], errmsgA(-2).fail[Int], 3.success[Any]))
       
     }
+    
+    "ensure" in {
+      import syntax.std.string._
+      import syntax.validation._
+        List("1", "2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must be_===(List(1.success[String], 2.success[String]))
+        List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must be_===(List(1.success[String], "Fail".fail[Int]))
+    }
   }
 
   object instances {
