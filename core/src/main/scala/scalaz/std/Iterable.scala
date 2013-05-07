@@ -27,18 +27,6 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
-    def length[A](a: Iterable[A]) = {
-      var n = 0
-      val i = a.iterator
-      while (i.hasNext) {
-        n = n + 1
-        i.next
-      }
-      n
-    }
-  }
-
   implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     def equal(a1: CC[A], a2: CC[A]) = {
       val i1 = a1.iterator
@@ -64,6 +52,16 @@ trait IterableInstances {
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
 
     override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+    override def length[A](a: I[A]) = {
+      var n = 0
+      val i = a.iterator
+      while (i.hasNext) {
+        n = n + 1
+        i.next
+      }
+      n
+    }
   }
 }
 

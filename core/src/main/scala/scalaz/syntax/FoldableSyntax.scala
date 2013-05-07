@@ -14,6 +14,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def foldl[B](z: B)(f: B => A => B): B = F.foldl(self, z)(f)
   final def foldrM[G[_], B](z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldrM(self, z)(f)
   final def foldlM[G[_], B](z: B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] = F.foldlM(self, z)(f)
+  final def length: Int = F.length(self)
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
   final def suml(implicit A: Monoid[A]): A = F.foldLeft(self, A.zero)(A.append(_, _))
   final def toList: List[A] = F.toList(self)

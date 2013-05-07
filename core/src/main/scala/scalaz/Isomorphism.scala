@@ -154,14 +154,6 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
-trait IsomorphismEach[F[_], G[_]] extends Each[F] {
-  implicit def G: Each[G]
-
-  def iso: F <~> G
-
-  def each[A](fa: F[A])(f: A => Unit) = G.each(iso.to(fa))(f)
-}
-
 trait IsomorphismIndex[F[_], G[_]] extends Index[F] {
   implicit def G: Index[G]
 

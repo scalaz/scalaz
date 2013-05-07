@@ -47,9 +47,6 @@ sealed trait LazyOptionT[F[+_], +A] {
   def map[B](f: (=> A) => B)(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_ map f))
 
-  def foreach(f: (=> A) => Unit)(implicit e: Each[F]): Unit =
-    e.each(run)(_ foreach f)
-
   def filter(f: (=> A) => Boolean)(implicit F: Functor[F]): LazyOptionT[F, A] =
     lazyOptionT(F.map(run)(_.filter(f)))
 
