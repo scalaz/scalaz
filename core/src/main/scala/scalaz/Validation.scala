@@ -323,6 +323,22 @@ sealed trait Validation[+E, +A] {
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     disjunctioned(k)
+    
+  /** 
+   * Return a Validation formed by the application of a partial function across the
+   * success of this value:
+   * {{{
+   *   strings map (_.parseInt excepting { case i if i < 0 => new Exception(s"Int must be positive: $i") })
+   * }}}
+   */
+  def excepting[EE >: E](pf: PartialFunction[A, EE]): Validation[EE, A] = {
+    import syntax.std.option._
+    def exceptOpt(f: A => Option[EE]): Validation[EE, A] = this match {
+      case Success(s) => f(s).toFailure(s)
+      case _          => this
+    }
+    exceptOpt(pf.lift)
+  }
 
 }
 
