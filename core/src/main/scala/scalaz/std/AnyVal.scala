@@ -278,6 +278,7 @@ trait AnyValInstances {
   }
 
   /** Warning: the triangle inequality will not hold if `b - a` overflows. */
+  @deprecated("MetricSpace is deprecated", "7.0.1")
   implicit val intMetricSpace: MetricSpace[Int] = new MetricSpace[Int] {
     def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
   }

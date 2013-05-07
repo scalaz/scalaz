@@ -349,6 +349,7 @@ object ScalazProperties {
     }
   }
 
+  @deprecated("MetricSpace is deprecated", "7.0.1")
   object metricSpace {
     def nonNegativity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.nonNegativity _)
     def identity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.identity _)

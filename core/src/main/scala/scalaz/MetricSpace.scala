@@ -13,6 +13,7 @@ package scalaz
  * @see [[scalaz.BKTree]]
  */
 ////
+@deprecated("Redundant to spire's `MetricSpace`", "7.0.1")
 trait MetricSpace[F]  { self =>
   ////
   def distance(a: F, b: F): Int
