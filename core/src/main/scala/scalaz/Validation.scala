@@ -243,10 +243,8 @@ sealed trait Validation[+E, +A] {
     }
 
   /** Ensures that the success value of this validation satisfies the given predicate, or fails with the given value. */
-  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
-    case Success(a) => if (f(a)) this else Failure(onFailure)
-    case Failure(_) => this
-  }
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] =
+    excepting({ case a if !f(a) => onFailure})
 
   /** Compare two validations values for equality. */
   def ===[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
@@ -323,6 +321,22 @@ sealed trait Validation[+E, +A] {
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     disjunctioned(k)
+    
+  /** 
+   * Return a Validation formed by the application of a partial function across the
+   * success of this value:
+   * {{{
+   *   strings map (_.parseInt excepting { case i if i < 0 => new Exception(s"Int must be positive: $i") })
+   * }}}
+   */
+  def excepting[EE >: E](pf: PartialFunction[A, EE]): Validation[EE, A] = {
+    import syntax.std.option._
+    def exceptOpt(f: A => Option[EE]): Validation[EE, A] = this match {
+      case Success(s) => f(s).toFailure(s)
+      case _          => this
+    }
+    exceptOpt(pf.lift)
+  }
 
 }
 
