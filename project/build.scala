@@ -166,7 +166,8 @@ object build extends Build {
         "scalaz.LensFamily.modo",
         "scalaz.LensFamily.<%=",
         "scalaz.LensFamily.assigno",
-        "scalaz.LensFamily.<:="
+        "scalaz.LensFamily.<:=",
+        "scalaz.Validation.excepting"
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
