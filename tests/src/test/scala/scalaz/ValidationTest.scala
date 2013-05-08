@@ -84,7 +84,7 @@ class ValidationTest extends Spec {
     "excepting" in {
       import syntax.std.string._
       import syntax.validation._
-      def errmsg(i: Int) = s"Int must be positive: $i"
+      def errmsg(i: Int) = "Int must be positive: " + i
       (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must be_===(List(1.success[String], 2.success[String], 3.success[String]))
       
       (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must be_===(List(1.success[String], errmsg(-2).fail[Int], 3.success[String]))
