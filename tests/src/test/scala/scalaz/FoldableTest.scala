@@ -54,4 +54,52 @@ class FoldableTest extends Spec with OptionMatchers {
       else
         (xs minimumBy f) must beSome((xs zip (xs map f)).minBy(_._2)._1)
   }
+  
+  "foldLeft1Opt" ! prop {
+      (xs: List[Int]) =>
+      val F = Foldable1[NonEmptyList]
+      val gt = (i : Int, j : Int) => if (i > j ) i else j
+      import syntax.foldable._
+      import syntax.std.list._
+      xs.toNel match {
+        case None      => (xs foldLeft1Opt gt) must be_===(None: Option[Int])
+        case Some(nel) => (xs foldLeft1Opt gt) must be_===(Some(F.foldLeft1(nel)(gt)): Option[Int])
+      }
+
+  }
+  "foldRight1Opt" ! prop {
+      (xxs: Stream[Int]) =>
+      val F = Foldable[Stream]
+      val gt: (Int, => Int) => Int = (i, j) => if (i > 0) i else j
+      import syntax.foldable._
+      import syntax.std.stream._
+      xxs match {
+        case Stream.Empty => (xxs foldRight1Opt gt) must be_===(None: Option[Int])
+        case _            => (xxs foldRight1Opt gt) must be_===(Some(F.foldRight(xxs.init, xxs.last)(gt)): Option[Int])
+      }
+  }
+  
+  "foldr1Opt" ! prop {
+      (xxs: Stream[Int]) =>
+      val F = Foldable[Stream]
+      val gt = (i: Int, j: Int) => if (i > j ) i else j
+      import syntax.foldable._
+      xxs match {
+        case Stream.Empty => (xxs foldr1Opt (i => (j => gt(i, j)))) must be_===(None: Option[Int])
+        case _            => (xxs foldr1Opt (i => (j => gt(i, j)))) must be_===(Some(F.foldr(xxs.init, xxs.last)((i => (j => gt(i, j))))): Option[Int])
+      }
+  }
+  "foldl1Opt" ! prop {
+      (xs: List[Int]) =>
+      val F = Foldable1[NonEmptyList]
+      val gt = (i: Int) => (j: Int) => if (i > j ) i else j
+      import syntax.foldable._
+      import syntax.std.list._
+      xs.toNel match {
+        case None      => (xs foldl1Opt gt) must be_===(None: Option[Int])
+        case Some(nel) => (xs foldl1Opt gt) must be_===(Some(F.foldl1(nel)(gt)): Option[Int])
+      }
+
+  }
+  
 }
