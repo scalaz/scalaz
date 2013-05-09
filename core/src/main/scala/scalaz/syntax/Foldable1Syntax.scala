@@ -18,6 +18,11 @@ trait Foldable1Ops[F[_],A] extends Ops[F[A]] {
   final def minimum1(implicit A: Order[A]): A = F.minimum1(self)
   final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
   final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
+  final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
+  final def foldRight1Opt(f: (A, => A) => A): Option[A] = F.foldRight1Opt(self)(f)
+  final def foldLeft1Opt(f: (A, A) => A): Option[A] = F.foldLeft1Opt(self)(f)
+  final def foldr1Opt(f: A => (=> A) => A): Option[A] = F.foldr1Opt(self)(f)
+  final def foldl1Opt(f: A => A => A): Option[A] = F.foldl1Opt(self)(f)
   ////
 }
 
