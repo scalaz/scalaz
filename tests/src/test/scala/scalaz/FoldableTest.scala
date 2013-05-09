@@ -99,7 +99,17 @@ class FoldableTest extends Spec with OptionMatchers {
         case None      => (xs foldl1Opt gt) must be_===(None: Option[Int])
         case Some(nel) => (xs foldl1Opt gt) must be_===(Some(F.foldl1(nel)(gt)): Option[Int])
       }
-
   }
   
+  "foldMap1Opt" ! prop {
+      (xs: List[String]) =>
+      val F = Foldable1[NonEmptyList]
+      val strlen = (_ : String).length
+      import syntax.foldable._
+      import syntax.std.list._
+      xs.toNel match {
+        case None      => (xs foldMap1Opt strlen) must be_===(None: Option[Int])
+        case Some(nel) => (xs foldMap1Opt strlen) must be_===(Some(F.foldMap1(nel)(strlen)): Option[Int])
+      }
+  }
 }

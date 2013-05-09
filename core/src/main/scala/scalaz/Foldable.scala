@@ -10,6 +10,14 @@ trait Foldable[F[_]]  { self =>
   ////
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
+  /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
+  def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
+      import std.option._
+      import syntax.std.option._
+      import syntax.semigroup._
+      val g: A => Option[B] = f andThen some
+      foldMap(fa)(g)(Monoid.instance[Option[B]](_ |+| _, none[B]))
+  }
 
   /**Right-associative fold of a structure. */
   def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B
@@ -63,9 +71,13 @@ trait Foldable[F[_]]  { self =>
 
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
+  final def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, optA) => optA map (aa => f(a, aa)) orElse Some(a))
+  final def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = foldr(fa, None: Option[A])(a => optA => optA map (aa => f(a)(aa)) orElse Some(a))
 
   /**Curred version of `foldLeft` */
   final def foldl[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+  final def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa, a)) orElse Some(a))
+  final def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldl(fa, None: Option[A])(optA => a => optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */
   final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
