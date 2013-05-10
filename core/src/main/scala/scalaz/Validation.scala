@@ -331,11 +331,10 @@ sealed trait Validation[+E, +A] {
    */
   def excepting[EE >: E](pf: PartialFunction[A, EE]): Validation[EE, A] = {
     import syntax.std.option._
-    def exceptOpt(f: A => Option[EE]): Validation[EE, A] = this match {
-      case Success(s) => f(s).toFailure(s)
+    this match {
+      case Success(s) => pf.lift(s) toFailure s
       case _          => this
     }
-    exceptOpt(pf.lift)
   }
 
 }
