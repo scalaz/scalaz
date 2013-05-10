@@ -23,6 +23,7 @@ class IndexedSeqTest extends Spec {
   checkAll(isEmpty.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
+  import syntax.index._
 
   private def evenp(x: Int): Boolean = x % 2 == 0
 
@@ -93,5 +94,9 @@ class IndexedSeqTest extends Spec {
     import syntax.std.list._
     List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
     List(1, 2, 4).toIndexedSeq.groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
+  }
+
+  "index" ! prop { (xs: IndexedSeq[Int], n: Int) =>
+    (xs index n) must be_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 }

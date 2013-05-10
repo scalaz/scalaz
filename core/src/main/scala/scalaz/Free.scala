@@ -94,13 +94,20 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     go2(this)
   }
 
+  final def runM[M[_]:Monad, AA >: A](f: S[Free[S, AA]] => M[Free[S, AA]]): M[AA] = {
+    def runM2(t: Free[S, AA]): M[AA] = t.resume match {
+      case -\/(s) => Monad[M].bind(f(s))(runM2)
+      case \/-(r) => Monad[M].pure(r)
+    }
+    runM2(this)
+  }
+
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
   final def foldRun[B, AA >: A](b: B)(f: (B, S[Free[S, AA]]) => (B, Free[S, AA])): (B, AA) = {
     @tailrec def foldRun2(t: Free[S, AA], z: B): (B, AA) = t.resume match {
-      case -\/(s) => {
+      case -\/(s) =>
         val (b1, s1) = f(z, s)
         foldRun2(s1, b1)
-      }
       case \/-(r) => (z, r)
     }
     foldRun2(this, b)
@@ -168,10 +175,10 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
 
 object Trampoline extends TrampolineInstances {
 
-  def done[A](a: A): Trampoline[A] = 
+  def done[A](a: A): Trampoline[A] =
     Free.Return[Function0,A](a)
 
-  def delay[A](a: => A): Trampoline[A] = 
+  def delay[A](a: => A): Trampoline[A] =
     suspend(done(a))
 
   def suspend[A](a: => Trampoline[A]): Trampoline[A] =
