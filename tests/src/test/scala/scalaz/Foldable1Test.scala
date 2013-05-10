@@ -12,12 +12,12 @@ class Foldable1Test extends Spec {
   }
   "maximumOf1" ! prop {
     (xs: NonEmptyList[Int]) =>
-	    val f: Int => Double = 1D + _
+      val f: Int => Double = 1D + _
       (xs maximumOf1 f) must be_===((xs.list.iterator map f).max)
   }
   "maximumBy1" ! prop {
     (xs: NonEmptyList[Int]) =>
-	    val f: Int => String = _.toString
+      val f: Int => String = _.toString
       (xs maximumBy1 f) must be_===((xs.list zip (xs.list map f)).maxBy(_._2)._1)
   }
   "minimum1" ! prop {
@@ -26,12 +26,12 @@ class Foldable1Test extends Spec {
   }
   "minimumOf1" ! prop {
     (xs: NonEmptyList[Int]) =>
-	    val f: Int => Double = 1D + _
+      val f: Int => Double = 1D + _
       (xs minimumOf1 f) must be_===((xs.list.iterator map f).min)
   }
   "minimumBy1" ! prop {
     (xs: NonEmptyList[Int]) =>
-	    val f: Int => String = _.toString
+      val f: Int => String = _.toString
       (xs minimumBy1 f) must be_===((xs.list zip (xs.list map f)).minBy(_._2)._1)
   }
 }
