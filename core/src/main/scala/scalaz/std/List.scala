@@ -174,20 +174,28 @@ trait ListFunctions {
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  @deprecated(since = "7.1", message="use groupWhenM")
+  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = groupWhenM(as)(p)
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
-  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
+  final def groupWhenM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => {
       Monad[M].bind(spanM(t)(p(h, _))) {
         case (x, y) =>
-          Monad[M].map(groupByM(y)(p))((g: List[List[A]]) => (h :: x) :: g)
+          Monad[M].map(groupWhenM(y)(p))((g: List[List[A]]) => (h :: x) :: g)
       }
     }
   }
+  
+  /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */   
+  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
+    val b = f(a)
+    nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
+  } mapValues (_.reverse) 
 
-  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
-    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+    groupWhenM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */

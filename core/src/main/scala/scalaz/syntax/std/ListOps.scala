@@ -33,7 +33,11 @@ trait ListOps[A] extends Ops[List[A]] {
 
   final def breakM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.breakM(self)(p)
 
-  final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupByM(self)(p)
+  @deprecated(since = "7.1", message="use groupWhenM")
+  final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupWhenM(self)(p)
+  final def groupWhenM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupWhenM(self)(p)
+  
+  final def groupBy1[B](f: A => B): Map[B, NonEmptyList[A]] = l.groupBy1(self)(f)
 
   final def groupWhen(p: (A, A) => Boolean): List[List[A]] = l.groupWhen(self)(p)
 

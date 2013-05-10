@@ -42,12 +42,18 @@ class ListTest extends Spec {
     (a: List[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
   }
 
-  "groupByM[Id].flatten is identity" ! prop {
+  "groupWhenM[Id].flatten is identity" ! prop {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupByM[Id](p).flatten must be_===(a)
+      a.groupWhenM[Id](p).flatten must be_===(a)
   }
 
-  "groupByWhen.flatten is identity" ! prop {
+  "groupBy1" ! prop {
+      (a: List[String]) =>
+      val strlen = (_ : String).length
+      (a groupBy strlen) must be_===((a groupBy1 strlen) mapValues (_.list))
+  }
+  
+  "groupWhen.flatten is identity" ! prop {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).flatten must be_===(a)
   }
