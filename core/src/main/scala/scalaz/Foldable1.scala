@@ -10,6 +10,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   ////
   /** Map each element of the structure to a [[scalaz.Semigroup]], and combine the results. */
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B
+  override def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))
 
   /**Right-associative fold of a structure. */
   def foldRight1[A](fa: F[A])(f: (A, => A) => A): A
@@ -29,8 +30,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
+  override def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] = Some(foldRight1(fa)(f))
+  override def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = Some(foldr1(fa)(f))
   /** Curried `foldLeft1`. */
   final def foldl1[A](fa: F[A])(f: A => A => A): A = foldLeft1(fa)((b, a) => f(b)(a))
+  override def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] = Some(foldLeft1(fa)(f))
+  override def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
 

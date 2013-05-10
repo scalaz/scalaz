@@ -6,12 +6,17 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
   ////
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
+  final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
   final def foldRight[B](z: => B)(f: (A, => B) => B): B = F.foldRight(self, z)(f)
+  final def foldRight1Opt(f: (A, => A) => A): Option[A] = F.foldRight1Opt(self)(f)
   final def foldLeft[B](z: B)(f: (B, A) => B): B = F.foldLeft(self, z)(f)
+  final def foldLeft1Opt(f: (A, A) => A): Option[A] = F.foldLeft1Opt(self)(f)
   final def foldRightM[G[_], B](z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldRightM(self, z)(f)
   final def foldLeftM[G[_], B](z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] = F.foldLeftM(self, z)(f)
   final def foldr[B](z: => B)(f: A => (=> B) => B): B = F.foldr(self, z)(f)
+  final def foldr1Opt(f: A => (=> A) => A): Option[A] = F.foldr1Opt(self)(f)
   final def foldl[B](z: B)(f: B => A => B): B = F.foldl(self, z)(f)
+  final def foldl1Opt(f: A => A => A): Option[A] = F.foldl1Opt(self)(f)
   final def foldrM[G[_], B](z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldrM(self, z)(f)
   final def foldlM[G[_], B](z: B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] = F.foldlM(self, z)(f)
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
