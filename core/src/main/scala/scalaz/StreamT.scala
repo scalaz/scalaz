@@ -85,6 +85,13 @@ sealed class StreamT[M[+_], +A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      )
   }
       
+  def mapM[B](f: A => M[B])(implicit m: Monad[M]): StreamT[M, B] = stepBind {
+    _( yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) }
+     , skip = s => m.point(Skip(s mapM f))
+     , done = m.point(Done)
+     )
+  }
+
   /**Don't use iteratively! */
   def tail(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, s) => Skip(s)
@@ -120,6 +127,8 @@ sealed class StreamT[M[+_], +A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   }
   
   private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
+
+  private def stepBind[B](f: Step[A, StreamT[M, A]] => M[Step[B, StreamT[M, B]]])(implicit M: Monad[M]): StreamT[M, B] = StreamT(M.bind(step)(f))
 
   private def rev(implicit M: Monad[M]): M[Stream[A]] = {
     def loop(xs: StreamT[M, A], ys: Stream[A]): M[Stream[A]] =
