@@ -32,7 +32,7 @@ private[scalaz] trait CompositionApplicativePlus[F[_], G[_]] extends Applicative
 
   def empty[A]: F[G[A]] = F.empty[G[A]]
   def plus[A](a: F[G[A]], b: => F[G[A]]): F[G[A]] =
-    F.apply2(a, b)(G.plus(_, _))
+    F.plus(a, b)
 }
 
 private[scalaz] trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ[α] = F[G[α]]})#λ]  {
