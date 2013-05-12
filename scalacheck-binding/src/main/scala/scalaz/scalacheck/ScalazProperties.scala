@@ -349,4 +349,18 @@ object ScalazProperties {
     }
   }
 
+  object invariantFunctor {
+    def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(F.invariantFunctorLaw.identity[X] _)
+
+    def composite[F[_], X, Y, Z](implicit F: InvariantFunctor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
+                                   ayz: Arbitrary[(Y => Z)], ayx: Arbitrary[(Y => X)], azy: Arbitrary[(Z => Y)], ef: Equal[F[Z]]) =
+      forAll(F.invariantFunctorLaw.composite[X, Y, Z] _)
+
+    def laws[F[_]](implicit F: InvariantFunctor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
+                   ef: Equal[F[Int]]) = new Properties("invariantFunctor") {
+      property("identity") = identity[F, Int]
+      property("composite") = composite[F, Int, Int, Int]
+    }
+  }
 }
