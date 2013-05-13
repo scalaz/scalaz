@@ -47,9 +47,6 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): WriterT[F, W, B] =
     writerT(F.map(run)(wa => (wa._1, f(wa._2))))
 
-  def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
-    E.each(run)(wa => f(wa._2))
-
   def ap[B, WW >: W](f: => WriterT[F, WW, A => B])(implicit F: Apply[F], W: Semigroup[WW]): WriterT[F, WW, B] = writerT {
     F.apply2(f.run, run) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))
@@ -191,9 +188,6 @@ trait WriterTInstances1 extends WriterTInstances2 {
   implicit def writerTraverse[W]: WriterTTraverse[Id, W] = new WriterTTraverse[Id, W] {
     implicit def F = idInstance
   }
-  implicit def writerEach[W]: WriterTEach[Id, W] = new WriterTEach[Id, W] {
-    implicit def F = idInstance
-  }
 }
 
 trait WriterTInstances0 extends WriterTInstances1 {
@@ -204,9 +198,6 @@ trait WriterTInstances0 extends WriterTInstances1 {
     implicit def F = F0
   }
   implicit def writerTIndex[W] = new WriterTIndex[W] {
-  }
-  implicit def writerEach[F[+_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
-    implicit def F = F0
   }
 }
 
@@ -264,12 +255,6 @@ private[scalaz] trait WriterTApplicative[F[+_], W] extends Applicative[({type λ
   implicit def F: Applicative[F]
   implicit def W: Monoid[W]
   def point[A](a: => A) = writerT(F.point((W.zero, a)))
-}
-
-private[scalaz] trait WriterTEach[F[+_], W] extends Each[({type λ[+α]=WriterT[F, W, α]})#λ] {
-  implicit def F: Each[F]
-
-  def each[A](fa: WriterT[F, W, A])(f: A => Unit) = fa foreach f
 }
 
 // TODO does Index it make sense for F other than Id?

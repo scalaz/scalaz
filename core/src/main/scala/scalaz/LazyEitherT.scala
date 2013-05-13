@@ -53,9 +53,6 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
     lazyEitherT(F.map(run)(_ map f))
 
-  def foreach(f: (=> B) => Unit)(implicit e: Each[F]): Unit =
-    e.each(run)(_ foreach f)
-
   def flatMap[AA >: A, C](f: (=> B) => LazyEitherT[F, AA, C])(implicit M: Monad[F]): LazyEitherT[F, AA, C] =
     lazyEitherT(M.bind(run)(_.fold(a => M.point(lazyLeft[C](a)), b => f(b).run)))
 
@@ -134,9 +131,6 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
       LazyEitherT(F.map(lazyEitherT.run)(_.left map f))
-
-    def foreach(f: (=> A) => Unit)(implicit F: Each[F]): Unit =
-      F.each(lazyEitherT.run)(_.left foreach f)
 
     def flatMap[BB >: B, C](f: (=> A) => LazyEitherT[F, C, BB])(implicit M: Monad[F]): LazyEitherT[F, C, BB] =
       LazyEitherT(M.bind(lazyEitherT.run)(_.fold(a => f(a).run, b => M.point(LazyEither.lazyRight[C](b)))))

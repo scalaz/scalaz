@@ -38,9 +38,6 @@ sealed trait UnwriterT[F[+_], +U, +A] { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): UnwriterT[F, U, B] =
     unwriterT(F.map(run)(wa => (wa._1, f(wa._2))))
 
-  def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
-    E.each(run)(wa => f(wa._2))
-
   def ap[B, UU >: U](f: => UnwriterT[F, UU, A => B])(implicit F: Apply[F]): UnwriterT[F, UU, B] =
     unwriterT {
       F.apply2(f.run, run) {
@@ -128,9 +125,6 @@ trait UnwriterTInstances extends UnwriterTInstances0 {
   }
   implicit def unwriterTIndex[W] = new UnwriterTIndex[W] {
   }
-  implicit def unwriterTEach[F[+_], W](implicit F0: Each[F]) = new UnwriterTEach[F, W] {
-    implicit def F = F0
-  }
   implicit def unwriterEqual[W, A](implicit W: Equal[W], A: Equal[A]) = {
     import std.tuple._
     Equal[(W, A)].contramap((_: Unwriter[W, A]).run)
@@ -172,12 +166,6 @@ private[scalaz] trait UnwriterTApply[F[+_], W] extends Apply[({type λ[+α]=Unwr
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa ap f
-}
-
-private[scalaz] trait UnwriterTEach[F[+_], W] extends Each[({type λ[+α]=UnwriterT[F, W, α]})#λ] {
-  implicit def F: Each[F]
-
-  def each[A](fa: UnwriterT[F, W, A])(f: A => Unit) = fa foreach f
 }
 
 // TODO does Index it make sense for F other than Id?

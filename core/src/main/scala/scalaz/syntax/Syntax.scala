@@ -13,8 +13,6 @@ trait Syntaxes {
 
   object equal extends ToEqualOps
 
-  object length extends ToLengthOps
-
   object show extends ToShowOps
 
   object order extends ToOrderOps
@@ -24,8 +22,6 @@ trait Syntaxes {
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
-
-  object each extends ToEachOps
 
   object index extends ToIndexOps
 
@@ -117,8 +113,8 @@ trait Syntaxes {
 trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
 
 trait ToTypeClassOps
-  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
-  with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
+  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
+  with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
@@ -126,4 +122,3 @@ trait ToTypeClassOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps
   with ToFoldable1Ops with ToTraverse1Ops
-

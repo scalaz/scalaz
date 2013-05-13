@@ -77,10 +77,6 @@ sealed trait EitherT[F[+_], +A, +B] {
   def traverse[G[_], AA >: A, C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (AA \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
-  /** Run the side-effect on the right of this disjunction. */
-  def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
-    F.each(run)(_ foreach f)
-
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
     * it is not consistent with `ap`.

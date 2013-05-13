@@ -10,8 +10,6 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](mapO(_ map f))
 
-  def foreach(f: A => Unit)(implicit E: Each[F]): Unit = E.each(run)(_ foreach f)
-
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
     F.bind(self.run) {
       case None    => F.point(None: Option[B])

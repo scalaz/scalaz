@@ -219,12 +219,6 @@ object Diev extends DievInstances with DievFunctions {
 trait DievInstances extends DievImplementation {
   implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
 
-  implicit val dievInstance: Each[Diev] with Length[Diev] = new Each[Diev] with Length[Diev]{
-    def each[A](fa: Diev[A])(f: A => Unit): Unit = fa foreach f
-
-    def length[A](fa: Diev[A]): Int = fa.foldLeft(0)((x, _) => x + 1)
-  }
-
   implicit def dievMonoid[A: Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
     def append(f1: Diev[A], f2: => Diev[A]) = f1 ++ f2
 
