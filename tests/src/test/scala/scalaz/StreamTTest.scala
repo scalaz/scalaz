@@ -39,6 +39,16 @@ class StreamTTest extends Spec {
       StreamT.fromStream(ass).take(x).toStream must be_===(ass.map(_.take(x)))
   }
 
+  "mapM" ! prop {
+    (s: Stream[Int], l: List[Int]) => 
+      val s0 = s map (_ + 1)
+      StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must be_===(
+        Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: 
+        Traverse[Stream].traverse(s0)(i => l.map(_ + i))
+      )
+
+  }
+
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
