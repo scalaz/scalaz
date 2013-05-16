@@ -19,6 +19,10 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
     G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))
   }
 
+  /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
+  final def traverseM[G[_], B](f: A => G[F[B]])(implicit G: Applicative[G], FM: Monad[F]): G[F[B]] =
+    G.map(G.traverse(self)(f))(FM.join)
+
   /** Traverse with the identity function */
   final def sequence[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
     val fgb: F[G[B]] = ev.subst[F](self)
