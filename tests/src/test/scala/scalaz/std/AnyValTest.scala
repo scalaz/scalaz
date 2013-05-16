@@ -41,6 +41,12 @@ class AnyValTest extends Spec {
   checkAll("Short", monoid.laws[Short])
   checkAll("Long", monoid.laws[Long])
 
+  {
+    implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))
+
+    checkAll("Int", metricSpace.laws[Int])
+  }
+
   checkAll("Unit", enum.laws[Unit])
   checkAll("Boolean", enum.laws[Boolean])
   checkAll("Char", enum.laws[Char])

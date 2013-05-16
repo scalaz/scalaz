@@ -277,6 +277,11 @@ trait AnyValInstances {
     }
   }
 
+  /** Warning: the triangle inequality will not hold if `b - a` overflows. */
+  implicit val intMetricSpace: MetricSpace[Int] = new MetricSpace[Int] {
+    def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
+  }
+
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) = Multiplication(f1 * f2)
 

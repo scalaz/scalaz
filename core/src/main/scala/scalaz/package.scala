@@ -22,6 +22,7 @@
  *  - [[scalaz.Order]] extends [[scalaz.Equal]]
  *  - [[scalaz.Enum]] extends [[scalaz.Order]]
  *
+ *  - [[scalaz.MetricSpace]]
  *  - [[scalaz.Plus]]
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
  *  - [[scalaz.IsEmpty]] extends [[scalaz.PlusEmpty]]

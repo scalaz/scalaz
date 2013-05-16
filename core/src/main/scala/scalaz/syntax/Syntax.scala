@@ -21,6 +21,8 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
+  object metricSpace extends ToMetricSpaceOps
+
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
@@ -118,7 +120,7 @@ trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidatio
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
-  with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
+  with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
