@@ -6,3 +6,7 @@ scala:
 jdk:
   - oraclejdk7
   - openjdk6
+matrix:
+  allow_failures:
+    - scala: 2.9.3
+      jdk: openjdk6
