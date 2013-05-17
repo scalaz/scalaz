@@ -18,12 +18,12 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
   /**
    * DSL for constructing Applicative expressions.
    *
-   * `(f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)` is an alternative to `Apply[F].mapN(f1, f2, ..., fn)((v1, v2, ... vn) => ...)`
+   * `(f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)` is an alternative to `Apply[F].applyN(f1, f2, ..., fn)((v1, v2, ... vn) => ...)`
    *
-   * `(f1 |@| f2 |@| ... |@| fn).tupled` is an alternative to `Apply[F].mapN(f1, f2, ..., fn)(TupleN.apply _)`
+   * `(f1 |@| f2 |@| ... |@| fn).tupled` is an alternative to `Apply[F].applyN(f1, f2, ..., fn)(TupleN.apply _)`
    *
    * Warning: each call to `|@|` leads to an allocation of wrapper object. For performance sensitive code, consider using
-   *          [[scalaz.Apply]]`#mapN` directly.
+   *          [[scalaz.Apply]]`#applyN` directly.
    */
   final def |@|[B](fb: F[B]) = new ApplicativeBuilder[F, A, B] {
     val a: F[A] = self
