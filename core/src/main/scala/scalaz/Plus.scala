@@ -8,6 +8,20 @@ package scalaz
 trait Plus[F[_]]  { self =>
   ////
 
+  /**The composition of Plus `F` and `G`, `[x]F[G[x]]`, is a Plus */
+  def compose[G[_]](implicit G0: Plus[G]): Plus[({type λ[α] = F[G[α]]})#λ] = new CompositionPlus[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
+  /**The product of Plus `F` and `G`, `[x](F[x], G[x]])`, is a Plus */
+  def product[G[_]](implicit G0: Plus[G]): Plus[({type λ[α] = (F[α], G[α])})#λ] = new ProductPlus[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def plus[A](a: F[A], b: => F[A]): F[A]
 
   def semigroup[A]: Semigroup[F[A]] = new Semigroup[F[A]] {
