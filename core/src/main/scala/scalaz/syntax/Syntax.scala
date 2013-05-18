@@ -2,10 +2,10 @@ package scalaz
 package syntax
 
 trait Syntaxes {
+
   //
   // Type classes over * -> *
   //
-
 
   object semigroup extends ToSemigroupOps
 
@@ -56,6 +56,10 @@ trait Syntaxes {
 
   object monadPlus extends ToMonadPlusOps
 
+  object foldable extends ToFoldableOps
+
+  object foldable1 extends ToFoldable1Ops
+
   object traverse extends ToTraverseOps
 
   object traverse1 extends ToTraverse1Ops
@@ -87,6 +91,7 @@ trait Syntaxes {
   object monadTell extends ToMonadTellOps
 
   object monadListen extends ToMonadListenOps
+
   //
   // Data
   //
@@ -101,13 +106,13 @@ trait Syntaxes {
 
   object state extends ToStateOps
 
-  object foldable extends ToFoldableOps
-
-  object foldable1 extends ToFoldable1Ops
-
   object validation extends ToValidationOps
 
   object kleisli extends ToKleisliOps
+
+  object either extends ToEitherOps
+
+  object nel extends ToNelOps
 
   //
   // Mixed
@@ -117,7 +122,18 @@ trait Syntaxes {
 
 }
 
-trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
+trait ToDataOps
+  extends ToIdOps
+  with ToTreeOps
+  with ToReducerOps
+  with ToWriterOps
+  with ToStateOps
+  with ToValidationOps
+  with ToKleisliOps
+  // TODO those are not yet included because of ambiguities when importing all syntax
+  // can be included again when the @deprecated methods are being removed
+  // with ToEitherOps
+  // with ToNelOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps

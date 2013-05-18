@@ -1,11 +1,12 @@
 package scalaz
 package concurrent
 
-import scalaz._
-import Scalaz._
 import scala.annotation.tailrec
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import scala.collection.immutable.SortedMap
+
+import java.util.concurrent.locks.ReentrantReadWriteLock
+
+import scalaz.syntax.either._
 
 trait Timeout
 object Timeout extends Timeout
