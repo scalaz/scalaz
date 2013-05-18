@@ -42,7 +42,7 @@ class StreamTTest extends Spec {
   "mapM" ! prop {
     (s: Stream[Int], l: List[Int]) => 
       val s0 = s map (_ + 1)
-      StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must be_===(
+      StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must_==(
         Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: 
         Traverse[Stream].traverse(s0)(i => l.map(_ + i))
       )
