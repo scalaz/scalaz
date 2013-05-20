@@ -57,6 +57,10 @@ trait IndexedContsTFunctions {
     def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[W, N, R, O, A] = IndexedContsT { wk => f(fa.run(W.map(wk) { k => { x => g(k(x)) } })) }
   }
 
+  def contracohoist[W[+_], V[+_], M[+_], R, O](f: V ~> W): (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[V, M, R, O, x]})#f) = new (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[V, M, R, O, x]})#f) {
+    def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[V, M, R, O, A] = IndexedContsT { k => fa.run(f(k)) }
+  }
+
   def shift[W[+_], M[+_], I, R, J, O, A](f: (A => IndexedContsT[W, M, I, I, O]) => IndexedContsT[W, M, R, J, J])(implicit W: Comonad[W], WA: Applicative[W], M: Monad[M]): IndexedContsT[W, M, R, O, A] =
     IndexedContsT { k0 =>
       (f { a =>
