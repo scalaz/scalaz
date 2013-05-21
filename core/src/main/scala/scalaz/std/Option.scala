@@ -160,6 +160,12 @@ trait OptionFunctions {
   /**Alias for `cata` */
   final def fold[A, X](oa: Option[A])(some: A => X, none: => X): X = cata(oa)(some, none)
 
+  final def coflatten[A](oa: Option[A]): Option[Option[A]] =
+    oa map (Some(_))
+
+  final def coflatMap[A, B](oa: Option[A], f: Option[A] => B): Option[B] =
+    oa map (a => f(Some(a)))
+
   final def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
     case Some(a) => Success(a)
     case None    => Failure(e)
