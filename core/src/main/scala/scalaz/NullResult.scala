@@ -84,13 +84,19 @@ sealed trait NullResult[A, B] {
   def or(a: A, b: => B): B =
     apply(a) getOrElse b
 
+  def carry: A =>? (A, B) =
+    NullResult(a => apply(a) map (b => (a, b)))
+
+  def cancel: A =>? A =
+    carry map (_._1)
+
   def kleisli: Kleisli[Option, A, B] =
     Kleisli(apply(_))
 
   import std.option._
 
   def state: StateT[Option, A, B] =
-    kleisli.state
+    StateT(carry apply _)
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
     T.traverse(a)(apply(_))
