@@ -30,6 +30,9 @@ trait NullArgument[A, B] {
       case Some((a, c)) => (apply(Some(a)), x(Some(c)))
     }
 
+  def +++[C, D](x: C ?=> D): (A \/ C) ?=> (B \/ D) =
+    left compose x.right
+
   def left[C]: (A \/ C) ?=> (B \/ C) =
     NullArgument {
       case None => -\/(apply(None))
@@ -68,6 +71,9 @@ trait NullArgument[A, B] {
   def zero(implicit M: Monoid[A]): B =
     lower(M.zero)
 
+  def pair: (A => B, B) =
+    (a => apply(Some(a)), apply(None))
+
 }
 
 object NullArgument extends NullArgumentFunctions
@@ -78,4 +84,10 @@ trait NullArgumentFunctions {
     new (A ?=> B) {
       def apply(a: Option[A]) = f(a)
     }
+
+  def pair[A, B](f: A => B, b: => B): A ?=> B =
+    apply((_: Option[A]) match {
+      case None => b
+      case Some(a) => f(a)
+    })
 }

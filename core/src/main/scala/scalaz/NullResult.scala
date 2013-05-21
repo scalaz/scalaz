@@ -74,6 +74,12 @@ sealed trait NullResult[A, B] {
 
   def =>>[C](f: B ?=> C): A =>? C =
     NullResult(apply(_) map (b => f(Some(b))))
+
+  def isDefinedAt(a: A): Boolean =
+    apply(a).isDefined
+
+  def isEmptyAt(a: A): Boolean =
+    apply(a).isEmpty
 }
 
 object NullResult extends NullResultFunctions
