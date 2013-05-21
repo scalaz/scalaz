@@ -81,10 +81,16 @@ sealed trait NullResult[A, B] {
   def isEmptyAt(a: A): Boolean =
     apply(a).isEmpty
 
+  def or(a: A, b: => B): B =
+    apply(a) getOrElse b
+
   def kleisli: Kleisli[Option, A, B] =
     Kleisli(apply(_))
 
   import std.option._
+
+  def state: StateT[Option, A, B] =
+    kleisli.state
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
     T.traverse(a)(apply(_))

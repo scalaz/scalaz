@@ -91,6 +91,9 @@ trait NullArgumentFunctions {
       def apply(a: Option[A]) = f(a)
     }
 
+  def always[A, B](b: => B): A ?=> B =
+    apply(_ => b)
+
   def pair[A, B](f: A => B, b: => B): A ?=> B =
     apply((_: Option[A]) match {
       case None => b
