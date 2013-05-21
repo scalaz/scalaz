@@ -62,6 +62,12 @@ trait NullArgument[A, B] {
       b2 <- x
     } yield S.append(b1, b2)
 
+  def cokleisli: Cokleisli[Option, A, B] =
+    Cokleisli(apply(_))
+
+  def on[F[+_]](o: OptionT[F, A])(implicit F: Functor[F]): F[B] =
+    F.map(o.run)(apply(_))
+
   def lower: A => B =
     a => apply(Some(a))
 
@@ -90,4 +96,7 @@ trait NullArgumentFunctions {
       case None => b
       case Some(a) => f(a)
     })
+
+  def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
+    apply(c apply _)
 }

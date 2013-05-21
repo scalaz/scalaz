@@ -80,6 +80,17 @@ sealed trait NullResult[A, B] {
 
   def isEmptyAt(a: A): Boolean =
     apply(a).isEmpty
+
+  def kleisli: Kleisli[Option, A, B] =
+    Kleisli(apply(_))
+
+  import std.option._
+
+  def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
+    T.traverse(a)(apply(_))
+
+  def on[F[+_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
+    OptionT(F.map(a)(apply(_)))
 }
 
 object NullResult extends NullResultFunctions
@@ -90,6 +101,9 @@ trait NullResultFunctions {
     new (A =>? B) {
       def apply(a: A) = f(a)
     }
+
+  def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
+    apply(k apply _)
 
   def lift[A, B](f: A => B): A =>? B =
     apply(a => Some(f(a)))
