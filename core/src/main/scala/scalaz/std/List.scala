@@ -84,6 +84,20 @@ trait ListInstances extends ListInstances0 {
 }
 
 trait ListFunctions {
+  /** Return all non-empty tails. */
+  final def coflatten[A](as: List[A]): List[List[A]] =
+    as match {
+      case Nil => Nil
+      case _ :: t => as :: coflatten(t)
+    }
+
+  /** Map on all non-empty tails. */
+  final def coflatMap[A, B](as: List[A], f: List[A] => B): List[B] =
+    as match {
+      case Nil => Nil
+      case _ :: t => f(as) :: coflatMap(t, f)
+    }
+
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec
