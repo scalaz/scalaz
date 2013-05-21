@@ -395,6 +395,6 @@ trait DisjunctionFunctions {
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     right(a)
   } catch {
-    case e => left(e)
+    case e: Throwable => left(e)
   }
 }
