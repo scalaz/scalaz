@@ -4,6 +4,7 @@ sealed trait NullResult[A, B] {
   def apply(a: A): Option[B]
 
   import NullResult._
+  import NullArgument._
 
   def map[C](f: B => C): A =>? C =
     NullResult(apply(_) map f)
@@ -70,6 +71,9 @@ sealed trait NullResult[A, B] {
       b1 <- this
       b2 <- x
     } yield S.append(b1, b2)
+
+  def =>>[C](f: B ?=> C): A =>? C =
+    NullResult(apply(_) map (b => f(Some(b))))
 }
 
 object NullResult extends NullResultFunctions
