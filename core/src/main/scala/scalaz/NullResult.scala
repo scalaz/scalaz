@@ -28,6 +28,12 @@ sealed trait NullResult[A, B] {
       case (a, c) => apply(a) flatMap (b => x(c) map (d => (b, d)))
     }
 
+  def +++[C, D](x: C =>? D): (A \/ C) =>? (B \/ D) =
+    NullResult {
+      case -\/(a) => apply(a) map (-\/(_))
+      case \/-(c) => x(c) map (\/-(_))
+    }
+
   def first[C]: (A, C) =>? (B, C) =
     NullResult {
       case (a, c) => apply(a) map (b => (b, c))
@@ -58,6 +64,12 @@ sealed trait NullResult[A, B] {
 
   def andThen[C](g: B =>? C): A =>? C =
     g compose this
+
+  def |+|(x: A =>? B)(implicit S: Semigroup[B]): A =>? B =
+    for {
+      b1 <- this
+      b2 <- x
+    } yield S.append(b1, b2)
 }
 
 object NullResult extends NullResultFunctions
@@ -77,4 +89,7 @@ trait NullResultFunctions {
 
   def never[A, B]: A =>? B =
     apply(_ => None)
+
+  def zero[A, B](implicit M: Monoid[B]): A =>? B =
+    always(M.zero)
 }
