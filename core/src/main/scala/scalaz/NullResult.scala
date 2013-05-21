@@ -128,4 +128,15 @@ trait NullResultFunctions {
 
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
+
+  object list {
+    def head[A]: List[A] =>? A =
+      apply(_.headOption)
+
+    def tail[A]: List[A] =>? List[A] =
+      apply {
+        case Nil => None
+        case _::t => Some(t)
+      }
+  }
 }
