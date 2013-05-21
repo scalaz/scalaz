@@ -11,7 +11,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] with Cojoin[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: List[A]) = fa.length
@@ -67,6 +67,19 @@ trait ListInstances extends ListInstances0 {
     }
 
     def isEmpty[A](fa: List[A]) = fa.isEmpty
+
+    def cobind[A, B](fa: List[A])(f: List[A] => B) =
+      fa match {
+        case Nil => Nil
+        case _::t => f(fa) :: cobind(t)(f)
+      }
+
+    def cojoin[A](a: List[A]) =
+      a match {
+        case Nil => Nil
+        case _::t => a :: cojoin(t)
+      }
+
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
