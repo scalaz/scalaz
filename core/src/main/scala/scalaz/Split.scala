@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- * A [[scalaz.Category]] permitting products.
+ * A [[scalaz.Compose]] permitting products.
  */
 ////
-trait Split[=>:[_, _]] extends Category[=>:] { self =>
+trait Split[=>:[_, _]] extends Compose[=>:] { self =>
   ////
   def split[A, B, C, D](f: A =>: B, g: C =>: D): (A,  C) =>: (B, D)
 

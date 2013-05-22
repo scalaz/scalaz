@@ -9,6 +9,9 @@ trait NullArgument[A, B] {
   def map[C](f: B => C): A ?=> C =
     NullArgument(a => f(apply(a)))
 
+  def contramap[C](f: C => A): C ?=> B =
+    ???
+
   def flatMap[C](f: B => A ?=> C): A ?=> C =
     NullArgument(a => f(apply(a))(a))
 
@@ -82,7 +85,7 @@ trait NullArgument[A, B] {
 
 }
 
-object NullArgument extends NullArgumentFunctions
+object NullArgument extends NullArgumentFunctions // with NullArgumentInstances
 
 trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
@@ -94,6 +97,9 @@ trait NullArgumentFunctions {
   def always[A, B](b: => B): A ?=> B =
     apply(_ => b)
 
+  def zero[A, B](implicit M: Monoid[B]): A ?=> B =
+    always(M.zero)
+
   def pair[A, B](f: A => B, b: => B): A ?=> B =
     apply((_: Option[A]) match {
       case None => b
@@ -103,3 +109,106 @@ trait NullArgumentFunctions {
   def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
     apply(c apply _)
 }
+                                                                    /*
+trait NullArgumentInstances {
+  implicit def NullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
+    new NullArgumentSemigroup[A, B] {
+      implicit val M = M0
+    }
+
+  implicit def NullArgumentFunctor[X]: Functor[({type λ[α] = NullArgument[X, α]})#λ] =
+    new NullArgumentFunctor[X] {
+    }
+
+  implicit def NullArgumentCompose: Compose[NullArgument] =
+    new NullArgumentCompose {
+    }
+
+  implicit def NullArgumentProfunctor: Profunctor[NullArgument] =
+    new NullArgumentProfunctor {
+    }
+}
+
+trait NullArgumentInstances0 extends NullArgumentInstances {
+  implicit def NullArgumentMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullArgument[A, B]] =
+    new NullArgumentMonoid[A, B] {
+      implicit val M = M0
+    }
+
+  implicit def NullArgumentApply[X]: Apply[({type λ[α] = NullArgument[X, α]})#λ] =
+    new NullArgumentApply[X] {
+    }
+}
+
+trait NullArgumentInstances1 extends NullArgumentInstances0 {
+  implicit def NullArgumentApplicative[X]: Applicative[({type λ[α] = NullArgument[X, α]})#λ] =
+    new NullArgumentApplicative[X] {
+    }
+
+  implicit def NullArgumentSplit: Split[NullArgument] =
+    new NullArgumentSplit {
+    }
+}
+
+trait NullArgumentInstances2 extends NullArgumentInstances1 {
+  implicit def NullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] =
+    new NullArgumentMonad[X] {
+    }
+}
+
+private[scalaz] trait NullArgumentSemigroup[A, B] extends Semigroup[NullArgument[A, B]] {
+  implicit val M: Semigroup[B]
+
+  override def append(a1: NullArgument[A, B], a2: => NullArgument[A, B]) =
+    a1 |+| a2
+}
+
+private[scalaz] trait NullArgumentMonoid[A, B] extends Monoid[NullArgument[A, B]] with NullArgumentSemigroup[A, B] {
+  implicit val M: Monoid[B]
+
+  override def zero =
+    NullArgument.zero
+}
+
+private[scalaz] trait NullArgumentFunctor[X] extends Functor[({type λ[α] = NullArgument[X, α]})#λ] {
+  override def map[A, B](a: NullArgument[X, A])(f: A => B) =
+    a map f
+}
+
+private[scalaz] trait NullArgumentApply[X] extends Apply[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentFunctor[X] {
+  override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
+    a ap f
+}
+
+private[scalaz] trait NullArgumentApplicative[X] extends Applicative[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentApply[X] {
+  override def map[A, B](a: NullArgument[X, A])(f: A => B) =
+    a map f
+  override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
+    a ap f
+  override def point[A](a: => A): NullArgument[X, A] =
+    NullArgument.always(a)
+}
+
+private[scalaz] trait NullArgumentMonad[X] extends Monad[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentApplicative[X] {
+  override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
+    a flatMap f
+}
+
+private[scalaz] trait NullArgumentCompose extends Compose[NullArgument] {
+  override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
+    f compose g
+}
+
+private[scalaz] trait NullArgumentSplit extends Split[NullArgument] {
+  override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
+    f *** g
+}
+
+private[scalaz] trait NullArgumentProfunctor extends Profunctor[NullArgument] {
+  override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
+    r contramap f
+  override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
+    r map f
+}
+
+                                                                      */
