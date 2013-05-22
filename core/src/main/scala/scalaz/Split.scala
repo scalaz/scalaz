@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- * A [[scalaz.Compose]] permitting products.
+ * A [[scalaz.Compose]] (semigroupoid) permitting products.
  */
 ////
 trait Split[=>:[_, _]] extends Compose[=>:] { self =>
