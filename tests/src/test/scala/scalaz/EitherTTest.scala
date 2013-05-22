@@ -30,7 +30,7 @@ class EitherTTest extends Spec {
   // compilation test
   // https://gist.github.com/vmarquez/5106252/
   {
-    import scalaz.syntax.id._
+    import scalaz.syntax.either._
 
     case class ABC(s:String)
 

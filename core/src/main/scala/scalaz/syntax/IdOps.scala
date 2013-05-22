@@ -1,9 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Applicative, Monoid, NonEmptyList, Kleisli, Reader, \/}
-
-import scalaz.Id._
+import scalaz.{Applicative, Monoid, NonEmptyList, \/}
 
 trait IdOps[A] extends Ops[A] {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
@@ -28,12 +26,15 @@ trait IdOps[A] extends Ops[A] {
   final def squared: (A, A) =
     (self, self)
 
+  @deprecated("use scalaz.syntax.either._", "7.1")
   def left[B]: (A \/ B) =
     \/.left(self)
 
+  @deprecated("use scalaz.syntax.either._", "7.1")
   def right[B]: (B \/ A) =
     \/.right(self)
 
+  @deprecated("use scalaz.syntax.nel._", "7.1")
   final def wrapNel: NonEmptyList[A] =
     NonEmptyList(self)
 

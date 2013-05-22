@@ -3,8 +3,6 @@ package syntax
 package std
 
 trait Function1Ops[T, R] extends Ops[T => R] {
-  import NonEmptyList._
-  import Validation._
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 
@@ -17,7 +15,7 @@ trait Function1Ops[T, R] extends Ops[T => R] {
   def unary_!(implicit m: Memo[T, R]): T => R = m(self)
 
   def toValidation[E](e: => E)(implicit ev: R =:= Boolean): T => Validation[NonEmptyList[E], T] =
-    (t: T) => (if (self(t): Boolean) success(t) else failure(nel(e, Nil)))
+    (t: T) => (if (self(t): Boolean) Success(t) else Failure(NonEmptyList(e)))
 
   def byName: (=> T) => R = t => self(t)
 
