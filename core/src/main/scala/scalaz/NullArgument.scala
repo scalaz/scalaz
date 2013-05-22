@@ -85,7 +85,7 @@ trait NullArgument[A, B] {
 
 }
 
-object NullArgument extends NullArgumentFunctions // with NullArgumentInstances
+object NullArgument extends NullArgumentFunctions with NullArgumentInstances
 
 trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
@@ -109,7 +109,7 @@ trait NullArgumentFunctions {
   def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
     apply(c apply _)
 }
-                                                                    /*
+
 trait NullArgumentInstances {
   implicit def NullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
     new NullArgumentSemigroup[A, B] {
@@ -118,6 +118,10 @@ trait NullArgumentInstances {
 
   implicit def NullArgumentFunctor[X]: Functor[({type λ[α] = NullArgument[X, α]})#λ] =
     new NullArgumentFunctor[X] {
+    }
+
+  implicit def NullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] =
+    new NullArgumentContravariant[X] {
     }
 
   implicit def NullArgumentCompose: Compose[NullArgument] =
@@ -175,6 +179,11 @@ private[scalaz] trait NullArgumentFunctor[X] extends Functor[({type λ[α] = Nul
     a map f
 }
 
+private[scalaz] trait NullArgumentContravariant[X] extends Contravariant[({type λ[α] = NullArgument[α, X]})#λ] {
+  override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
+    a contramap f
+}
+
 private[scalaz] trait NullArgumentApply[X] extends Apply[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentFunctor[X] {
   override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
     a ap f
@@ -199,7 +208,7 @@ private[scalaz] trait NullArgumentCompose extends Compose[NullArgument] {
     f compose g
 }
 
-private[scalaz] trait NullArgumentSplit extends Split[NullArgument] {
+private[scalaz] trait NullArgumentSplit extends Split[NullArgument] with NullArgumentCompose {
   override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
     f *** g
 }
@@ -210,5 +219,3 @@ private[scalaz] trait NullArgumentProfunctor extends Profunctor[NullArgument] {
   override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
     r map f
 }
-
-                                                                      */

@@ -218,6 +218,11 @@ private[scalaz] trait NullResultFunctor[X] extends Functor[({type λ[α] = NullR
     a map f
 }
 
+private[scalaz] trait NullResultContravariant[X] extends Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
+  override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
+    a contramap f
+}
+
 private[scalaz] trait NullResultApply[X] extends Apply[({type λ[α] = NullResult[X, α]})#λ] with NullResultFunctor[X] {
   override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
     a ap f
@@ -247,7 +252,7 @@ private[scalaz] trait NullResultCategory extends Category[NullResult] with NullR
     NullResult.lift(identity)
 }
 
-private[scalaz] trait NullResultSplit extends Split[NullResult] with NullResultCategory {
+private[scalaz] trait NullResultSplit extends Split[NullResult] with NullResultCompose {
   override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
     f *** g
 }
