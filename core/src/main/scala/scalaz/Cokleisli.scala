@@ -83,7 +83,7 @@ private[scalaz] trait CokleisliArrow[F[_]]
   implicit def F: Comonad[F]
 
   def arr[A, B](f: A => B) = Cokleisli(a => f(F.copoint(a)))
-  def id[A] = Cokleisli(F.copoint)
+  def id[A] = Cokleisli[F, A, A](F.copoint)
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
       Cokleisli[F, (A, C), (B, C)](w => (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
