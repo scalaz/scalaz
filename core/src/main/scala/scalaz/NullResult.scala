@@ -264,7 +264,7 @@ private[scalaz] trait NullResultProfunctor extends Profunctor[NullResult] {
     r map f
 }
 
-private[scalaz] trait NullResultArrow extends Arrow[NullResult] with NullResultSplit with NullResultProfunctor {
+private[scalaz] trait NullResultArrow extends Arrow[NullResult] with NullResultSplit with NullResultProfunctor with NullResultCategory {
   override def arr[A, B](f: A => B) =
     NullResult.lift(f)
   override def first[A, B, C](r: NullResult[A, B]) =
