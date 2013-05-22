@@ -22,7 +22,7 @@ class BitraverseTest extends Spec {
 
 
   "left/right bias" in {
-    import scalaz.syntax.id._
+    import scalaz.syntax.either._
 
     Bitraverse[\/].rightTraverse.traverse(42.left[Int])(x => Vector(x + 3)) must be_===(Vector(-\/(42)))
     Bitraverse[\/].leftTraverse.traverse(42.left[Int])(x => Vector(x + 3))  must be_===(Vector(-\/(45)))

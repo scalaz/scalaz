@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.specs2.execute.{Failure, Result}
 import ConcurrentTest._
-import scalaz._,Scalaz._
+import scalaz.syntax.either._
 
 class TimerTest extends Spec {
   def withTimer[T](expression: Timer => T): T = {
