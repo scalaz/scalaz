@@ -51,7 +51,15 @@ object IndexedContsT extends IndexedContsTFunctions with IndexedContsTInstances 
 trait IndexedContsTFunctions {
   def point[W[+_], M[+_], R, A](a: => A)(implicit W: Comonad[W]): ContsT[W, M, R, A] = ContsT { k => W.copoint(k)(a) }
 
-  def liftM[W[+_], M[+_], R, O, A](a: => M[A])(implicit W: Comonad[W], M: Bind[M]): ContsT[W, M, R, A] = ContsT { k => M.bind(a)(W.copoint(k)) }
+  def liftM[W[+_], M[+_], R, A](a: => M[A])(implicit W: Comonad[W], M: Bind[M]): ContsT[W, M, R, A] = ContsT { k => M.bind(a)(W.copoint(k)) }
+
+  def xhoist[W[+_], M[+_], N[+_], R, O](f: M ~> N, g: N ~> M)(implicit W: Functor[W]): (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[W, N, R, O, x]})#f) = new (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[W, N, R, O, x]})#f) {
+    def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[W, N, R, O, A] = IndexedContsT { wk => f(fa.run(W.map(wk) { k => { x => g(k(x)) } })) }
+  }
+
+  def contracohoist[W[+_], V[+_], M[+_], R, O](f: V ~> W): (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[V, M, R, O, x]})#f) = new (({type f[+x]=IndexedContsT[W, M, R, O, x]})#f ~> ({type f[+x]=IndexedContsT[V, M, R, O, x]})#f) {
+    def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[V, M, R, O, A] = IndexedContsT { k => fa.run(f(k)) }
+  }
 
   def shift[W[+_], M[+_], I, R, J, O, A](f: (A => IndexedContsT[W, M, I, I, O]) => IndexedContsT[W, M, R, J, J])(implicit W: Comonad[W], WA: Applicative[W], M: Monad[M]): IndexedContsT[W, M, R, O, A] =
     IndexedContsT { k0 =>
@@ -70,7 +78,7 @@ trait IndexedContsTFunctions {
   def callCC[W[+_], M[+_], R, O, A](f: (A => IndexedContsT[W, M, Any, O, Nothing]) => IndexedContsT[W, M, R, O, A])(implicit W: Comonad[W]): IndexedContsT[W, M, R, O, A] =
     IndexedContsT { k =>
       (f { a =>
-        IndexedContsT { u =>
+        IndexedContsT { _ =>
           W.copoint(k)(a)
         }
       }).run(k)
