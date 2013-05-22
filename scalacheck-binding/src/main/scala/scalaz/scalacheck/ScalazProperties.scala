@@ -305,6 +305,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse1[F], EF: Equal[F[Int]]) =
       new Properties("traverse1") {
+        include(traverse.laws[F])
         property("identity traverse1") = identityTraverse1[F, Int, Int]
 
         import std.list._, std.option._, std.stream._, std.anyVal._
