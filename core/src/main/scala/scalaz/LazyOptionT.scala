@@ -35,11 +35,11 @@ sealed trait LazyOptionT[F[+_], +A] {
   def toLazyLeft[X](right: => X)(implicit F: Functor[F]): LazyEitherT[F, A, X] =
     lazyEitherT(F.map(run)(_.toLazyLeft(right)))
 
-  def toRight[X](left: => X)(implicit F: Functor[F]): EitherT[F, X, A] =
-    eitherT(F.map(run)(_.fold(z => \/-(z), -\/(left))))
+  def toRight[AA >: A, X](left: => X)(implicit F: Functor[F]): EitherT[F, X, AA] =
+    eitherT(F.map(run)(_.fold[X \/ AA](z => \/-(z), -\/(left))))
 
-  def toLeft[X](right: => X)(implicit F: Functor[F]): EitherT[F, A, X] =
-    eitherT(F.map(run)(_.fold(z => -\/(z), \/-(right))))
+  def toLeft[AA >: A, X](right: => X)(implicit F: Functor[F]): EitherT[F, AA, X] =
+    eitherT(F.map(run)(_.fold[AA \/ X](z => -\/(z), \/-(right))))
 
   def orElse[AA >: A](a: => LazyOption[AA])(implicit F: Functor[F]): LazyOptionT[F, AA] =
     lazyOptionT(F.map(LazyOptionT.this.run)(_.orElse(a)))
