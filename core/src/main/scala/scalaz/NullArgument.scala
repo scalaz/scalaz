@@ -1,6 +1,6 @@
 package scalaz
 
-trait NullArgument[A, B] {
+sealed trait NullArgument[A, B] {
   def apply(a: Option[A]): B
 
   import NullResult._
@@ -10,7 +10,7 @@ trait NullArgument[A, B] {
     NullArgument(a => f(apply(a)))
 
   def contramap[C](f: C => A): C ?=> B =
-    ???
+    NullArgument(c => apply(c.map(f)))
 
   def flatMap[C](f: B => A ?=> C): A ?=> C =
     NullArgument(a => f(apply(a))(a))
@@ -110,54 +110,49 @@ trait NullArgumentFunctions {
     apply(c apply _)
 }
 
-trait NullArgumentInstances {
-  implicit def NullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
+trait NullArgumentInstances0 {
+
+  implicit def nullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
     new NullArgumentSemigroup[A, B] {
       implicit val M = M0
     }
 
-  implicit def NullArgumentFunctor[X]: Functor[({type λ[α] = NullArgument[X, α]})#λ] =
-    new NullArgumentFunctor[X] {
-    }
-
-  implicit def NullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] =
-    new NullArgumentContravariant[X] {
-    }
-
-  implicit def NullArgumentCompose: Compose[NullArgument] =
-    new NullArgumentCompose {
-    }
-
-  implicit def NullArgumentProfunctor: Profunctor[NullArgument] =
-    new NullArgumentProfunctor {
-    }
 }
 
-trait NullArgumentInstances0 extends NullArgumentInstances {
-  implicit def NullArgumentMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullArgument[A, B]] =
+trait NullArgumentInstances extends NullArgumentInstances0 {
+
+  implicit def nullArgumentMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullArgument[A, B]] =
     new NullArgumentMonoid[A, B] {
       implicit val M = M0
     }
 
-  implicit def NullArgumentApply[X]: Apply[({type λ[α] = NullArgument[X, α]})#λ] =
-    new NullArgumentApply[X] {
-    }
-}
+  implicit def nullArgumentCategory: Split[NullArgument] with Profunctor[NullArgument] = new Split[NullArgument] with Profunctor[NullArgument] {
+    override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
+      f compose g
+    override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
+      f *** g
+    override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
+      r contramap f
+    override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
+      r map f
+  }
 
-trait NullArgumentInstances1 extends NullArgumentInstances0 {
-  implicit def NullArgumentApplicative[X]: Applicative[({type λ[α] = NullArgument[X, α]})#λ] =
-    new NullArgumentApplicative[X] {
-    }
+  implicit def nullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] = new Monad[({type λ[α] = NullArgument[X, α]})#λ] {
+    override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
+      a ap f
+    override def map[A, B](a: NullArgument[X, A])(f: A => B) =
+      a map f
+    override def point[A](a: => A): NullArgument[X, A] =
+      NullArgument.always(a)
+    override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
+      a flatMap f
+  }
 
-  implicit def NullArgumentSplit: Split[NullArgument] =
-    new NullArgumentSplit {
-    }
-}
+  implicit def nullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] = new Contravariant[({type λ[α] = NullArgument[α, X]})#λ] {
+    override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
+      a contramap f
+  }
 
-trait NullArgumentInstances2 extends NullArgumentInstances1 {
-  implicit def NullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] =
-    new NullArgumentMonad[X] {
-    }
 }
 
 private[scalaz] trait NullArgumentSemigroup[A, B] extends Semigroup[NullArgument[A, B]] {
@@ -174,48 +169,4 @@ private[scalaz] trait NullArgumentMonoid[A, B] extends Monoid[NullArgument[A, B]
     NullArgument.zero
 }
 
-private[scalaz] trait NullArgumentFunctor[X] extends Functor[({type λ[α] = NullArgument[X, α]})#λ] {
-  override def map[A, B](a: NullArgument[X, A])(f: A => B) =
-    a map f
-}
-
-private[scalaz] trait NullArgumentContravariant[X] extends Contravariant[({type λ[α] = NullArgument[α, X]})#λ] {
-  override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
-    a contramap f
-}
-
-private[scalaz] trait NullArgumentApply[X] extends Apply[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentFunctor[X] {
-  override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
-    a ap f
-}
-
-private[scalaz] trait NullArgumentApplicative[X] extends Applicative[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentApply[X] {
-  override def map[A, B](a: NullArgument[X, A])(f: A => B) =
-    a map f
-  override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
-    a ap f
-  override def point[A](a: => A): NullArgument[X, A] =
-    NullArgument.always(a)
-}
-
-private[scalaz] trait NullArgumentMonad[X] extends Monad[({type λ[α] = NullArgument[X, α]})#λ] with NullArgumentApplicative[X] {
-  override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
-    a flatMap f
-}
-
-private[scalaz] trait NullArgumentCompose extends Compose[NullArgument] {
-  override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
-    f compose g
-}
-
-private[scalaz] trait NullArgumentSplit extends Split[NullArgument] with NullArgumentCompose {
-  override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
-    f *** g
-}
-
-private[scalaz] trait NullArgumentProfunctor extends Profunctor[NullArgument] {
-  override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
-    r contramap f
-  override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
-    r map f
-}
+// vim: expandtab:ts=2:sw=2
