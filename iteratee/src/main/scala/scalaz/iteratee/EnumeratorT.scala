@@ -166,10 +166,7 @@ trait EnumeratorTFunctions {
         )
     }
 
-  /**
-   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
-   */
-  def enumArray[E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
+  def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       private val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
@@ -180,10 +177,15 @@ trait EnumeratorTFunctions {
                    else             s.pointI
             )   
         }
-
         loop(min)
       }
     }
+
+  /**
+   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+   */
+  def enumArray[E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
+    enumIndexedSeq(a, min, max)
 
   def repeat[E, F[_] : Monad](e: E): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
