@@ -60,9 +60,9 @@ object TypeClass {
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
-  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
+  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(compose))
   lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -80,7 +80,7 @@ object TypeClass {
     show,
     order,
     enum,
-    metricSpace,
+    //metricSpace,
     plusEmpty,
     isEmpty,
     each,
