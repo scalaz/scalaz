@@ -18,9 +18,6 @@ trait Cokleisli[F[_], A, B] { self =>
     def run(fa: F[A]) = f(self.run(fa)).run(fa)
   }
 
-//  def redaer(implicit i: Identity[A] =:= W[A]): A => B =
-//    a => run(id(a))
-
   def <<=(a: F[A])(implicit F: Functor[F], FC: Cojoin[F]): F[B] =
     F.map(FC.cojoin(a))(run)
 
@@ -54,14 +51,7 @@ trait CokleisliInstances extends CokleisliInstances0 {
   }
 }
 
-trait CokleisliFunctions {
-  // TODO
-//  type RedaerT[A, F[_], B] = Cokleisli[F, A, B]
-//  type Redaer[A, B] = Cokleisli[Need, A, B]
-
-//  def redaer[A, B](r: A => B): Redaer[A, B] =
-//    Cokleisli[A, Identity, B](a => r(a.value))
-}
+trait CokleisliFunctions
 
 private[scalaz] trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]})#λ] {
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)

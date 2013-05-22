@@ -16,9 +16,6 @@ object ScalazArbitrary {
   import Gen._
   import ScalaCheckBinding._
 
-  // todo report and/or work around compilation error: "scalaz is not an enclosing class"
-  // implicit def ShowPretty[A: Show](a: A): Pretty = Pretty { _ => a.show }
-
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
