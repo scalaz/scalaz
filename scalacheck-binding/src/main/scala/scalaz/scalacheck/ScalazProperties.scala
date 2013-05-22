@@ -287,6 +287,32 @@ object ScalazProperties {
     }
   }
 
+  object traverse1 {
+    def identityTraverse1[F[_], X, Y](implicit f: Traverse1[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
+      forAll(f.traverse1Law.identityTraverse1[X, Y] _)
+
+    def sequentialFusion1[F[_], N[_], M[_], A, B, C](implicit fa: Arbitrary[F[A]], amb: Arbitrary[A => M[B]], bnc: Arbitrary[B => N[C]],
+                                                      F: Traverse1[F], N: Apply[N], M: Apply[M], MN: Equal[M[N[F[C]]]]): Prop =
+      forAll(F.traverse1Law.sequentialFusion1[N, M, A, B, C] _)
+
+    def naturality1[F[_], N[_], M[_], A](nat: (M ~> N))
+                                       (implicit fma: Arbitrary[F[M[A]]], F: Traverse1[F], N: Apply[N], M: Apply[M], NFA: Equal[N[F[A]]]): Prop =
+      forAll(F.traverse1Law.naturality1[N, M, A](nat) _)
+
+    def parallelFusion1[F[_], N[_], M[_], A, B](implicit fa: Arbitrary[F[A]], amb: Arbitrary[A => M[B]], anb: Arbitrary[A => N[B]],
+                                               F: Traverse1[F], N: Apply[N], M: Apply[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
+      forAll(F.traverse1Law.parallelFusion1[N, M, A, B] _)
+
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse1[F], EF: Equal[F[Int]]) =
+      new Properties("traverse1") {
+        property("identity traverse1") = identityTraverse1[F, Int, Int]
+
+        import std.list._, std.option._, std.stream._, std.anyVal._
+
+        property("sequential fusion (1)") = sequentialFusion1[F, Option, List, Int, Int, Int]
+      }
+  }
+
   object contravariant {
     def identity[F[_], X](implicit F: Contravariant[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.contravariantLaw.identity[X] _)

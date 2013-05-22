@@ -34,6 +34,47 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   def sequence1[G[_]:Apply,A](fga: F[G[A]]): G[F[A]] =
     traverse1Impl[G, G[A], A](fga)(identity)
 
+  trait Traverse1Law extends TraverseLaw {
+    /** Traversal through the [[scalaz.Id]] effect is equivalent to
+      * `Functor#map`.
+      */
+    def identityTraverse1[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
+      FB.equal(traverse1[Id, A, B](fa)(f), map(fa)(f))
+    }
+
+    /** Two sequentially dependent effects can be fused into one,
+      * their composition.
+      */
+    def sequentialFusion1[N[_], M[_], A, B, C](fa: F[A], amb: A => M[B], bnc: B => N[C])
+                                               (implicit N: Apply[N], M: Apply[M], MN: Equal[M[N[F[C]]]]): Boolean = {
+      type MN[A] = M[N[A]]
+      val t1: MN[F[C]] = M.map(traverse1[M, A, B](fa)(amb))(fb => traverse1[N, B, C](fb)(bnc))
+      val t2: MN[F[C]] = traverse1[MN, A, C](fa)(a => M.map(amb(a))(b => bnc(b)))(M compose N)
+      MN.equal(t1, t2)
+    }
+
+    /**
+     * `naturality` specialized to `sequence1`.
+     */
+    def naturality1[N[_], M[_], A](nat: (M ~> N))
+                                 (fma: F[M[A]])
+                                 (implicit N: Apply[N], M: Apply[M], NFA: Equal[N[F[A]]]): Boolean = {
+      val n1: N[F[A]] = nat[F[A]](sequence1[M, A](fma))
+      val n2: N[F[A]] = sequence1[N, A](map(fma)(ma => nat(ma)))
+      NFA.equal(n1, n2)
+    }
+
+    /** Two independent effects can be fused into a single effect, their product. */
+    def parallelFusion1[N[_], M[_], A, B](fa: F[A], amb: A => M[B], anb: A => N[B])
+                                        (implicit N: Apply[N], M: Apply[M], MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {
+      type MN[A] = (M[A], N[A])
+      val t1: MN[F[B]] = (traverse1[M, A, B](fa)(amb), traverse1[N, A, B](fa)(anb))
+      val t2: MN[F[B]] = traverse1[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
+      MN.equal(t1, t2)
+    }
+  }
+  def traverse1Law = new Traverse1Law {}
+
   ////
   val traverse1Syntax = new scalaz.syntax.Traverse1Syntax[F] { def F = Traverse1.this }
 }
