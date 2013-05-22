@@ -40,7 +40,7 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
   def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_.toLazyOption))
 
-  def toOption(implicit F: Functor[F]): OptionT[F, B] =
+  def toOption[BB >: B](implicit F: Functor[F]): OptionT[F, BB] =
     optionT(F.map(run)(_.toOption))
 
   def toList(implicit F: Functor[F]): F[List[B]] =
@@ -121,7 +121,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
     def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, A] =
       lazyOptionT(F.map(lazyEitherT.run)(_.left.toLazyOption))
 
-    def toOption(implicit F: Functor[F]): OptionT[F, A] =
+    def toOption[AA >: A](implicit F: Functor[F]): OptionT[F, AA] =
       optionT(F.map(lazyEitherT.run)(_.left.toOption))
 
     def toList(implicit F: Functor[F]): F[List[A]] =

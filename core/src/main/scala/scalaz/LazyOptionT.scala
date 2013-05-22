@@ -26,7 +26,7 @@ sealed trait LazyOptionT[F[+_], +A] {
   def forall(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.forall(f))
 
-  def toOption(implicit F: Functor[F]): OptionT[F, A] =
+  def toOption[AA >: A](implicit F: Functor[F]): OptionT[F, AA] =
     OptionT.optionT(F.map(run)(_.toOption))
 
   def toLazyRight[X](left: => X)(implicit F: Functor[F]): LazyEitherT[F, X, A] =

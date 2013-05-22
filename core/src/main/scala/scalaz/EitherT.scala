@@ -121,7 +121,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.map(run)((_: (A \/ B)).fold(_ => Stream(), Stream(_)))
 
   /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
-  def toOption(implicit F: Functor[F]): OptionT[F, B] =
+  def toOption[BB >: B](implicit F: Functor[F]): OptionT[F, BB] =
     optionT[F](F.map(run)((_: (A \/ B)).toOption))
 
   /** Convert to a core `scala.Either` at your own peril. */
