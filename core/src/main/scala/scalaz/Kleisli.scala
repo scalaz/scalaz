@@ -57,7 +57,7 @@ sealed trait Kleisli[M[+_], -A, +B] { self =>
   def unliftId[N[+_], AA <: A, BB >: B](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[+α] = N[α]})#λ, AA, BB]): Reader[AA, BB] =
     unlift[N, Id, AA, BB]
 
-  def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, B] = ReaderWriterStateT(
+  def rwst[BB >: B, W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, BB] = ReaderWriterStateT(
     (r, s) => M.map(self(r)) {
       b => (W.zero, b, s)
     }

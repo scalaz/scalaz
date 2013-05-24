@@ -114,8 +114,8 @@ package object scalaz {
   type =?>[-E, +A] = Kleisli[Option, E, A]
   type Reader[-E, +A] = ReaderT[Id, E, A]
 
-  type Writer[+W, +A] = WriterT[Id, W, A]
-  type Unwriter[+W, +A] = UnwriterT[Id, W, A]
+  type Writer[W, A] = WriterT[Id, W, A]
+  type Unwriter[W, A] = UnwriterT[Id, W, A]
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
@@ -129,19 +129,14 @@ package object scalaz {
     def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
-  /**
-   * StateT Monad Transformer
-   *
-   * [[http://www.youtube.com/watch?feature=player_detailpage&v=XVmhK8WbRLY#t=585s An introduction to the State Monad]]
-   */
-  type StateT[F[+_], S, +A] = IndexedStateT[F, S, S, A]
-  type IndexedState[-S1, +S2, +A] = IndexedStateT[Id, S1, S2, A]
+  type StateT[F[_], S, A] = IndexedStateT[F, S, S, A]
+  type IndexedState[-S1, S2, A] = IndexedStateT[Id, S1, S2, A]
   /** A state transition, representing a function `S => (A, S)`. */
-  type State[S, +A] = StateT[Id, S, A]
+  type State[S, A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
   object StateT extends StateTFunctions with StateTInstances {
-    def apply[F[+_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
+    def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
       def apply(s: S) = f(s)
     }
   }
@@ -156,13 +151,13 @@ package object scalaz {
     }
   }
 
-  type StoreT[F[+_], A, +B] = IndexedStoreT[F, A, A, B]
-  type IndexedStore[+I, -A, +B] = IndexedStoreT[Id, I, A, B]
-  type Store[A, +B] = StoreT[Id, A, B]
+  type StoreT[F[_], A, B] = IndexedStoreT[F, A, A, B]
+  type IndexedStore[I, A, B] = IndexedStoreT[Id, I, A, B]
+  type Store[A, B] = StoreT[Id, A, B]
   // flipped
-  type |-->[+A, B] = Store[B, A]
+  type |-->[A, B] = Store[B, A]
   object StoreT extends StoreTFunctions with StoreTInstances {
-    def apply[F[+_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
+    def apply[F[_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
       storeT(r)
   }
   object IndexedStore {
@@ -173,25 +168,25 @@ package object scalaz {
   }
 
 
-  type ReaderWriterStateT[F[+_], -R, +W, S, +A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
+  type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
   object ReaderWriterStateT extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
-    def apply[F[+_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+    def apply[F[_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
   }
-  type IndexedReaderWriterState[-R, +W, -S1, +S2, +A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
+  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
   object IndexedReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
     def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) => f(r, s) }
   }
-  type ReaderWriterState[-R, +W, S, +A] = ReaderWriterStateT[Id, R, W, S, A]
+  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[Id, R, W, S, A]
   object ReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
     def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
   }
-  type IRWST[F[+_], -R, +W, -S1, +S2, +A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
+  type IRWST[F[_], -R, W, -S1, S2, A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
   val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
-  type IRWS[-R, +W, -S1, +S2, +A] = IndexedReaderWriterState[R, W, S1, S2, A]
+  type IRWS[-R, W, -S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
   val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
-  type RWST[F[+_], -R, +W, S, +A] = ReaderWriterStateT[F, R, W, S, A]
+  type RWST[F[_], -R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
-  type RWS[-R, +W, S, +A] = ReaderWriterState[R, W, S, A]
+  type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
 
   type Alternative[F[_]] = ApplicativePlus[F]
@@ -241,11 +236,11 @@ package object scalaz {
 
   type @?>[A, B] = PLens[A, B]
 
-  type PIndexedStateT[F[+_], -S1, +S2, +A] = IndexedStateT[F, S1, S2, Option[A]]
-  type PStateT[F[+_], S, +A] = PIndexedStateT[F, S, S, A]
+  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[F, S1, S2, Option[A]]
+  type PStateT[F[_], S, A] = PIndexedStateT[F, S, S, A]
 
-  type PIndexedState[-S1, +S2, +A] = PIndexedStateT[Id, S1, S2, A]
-  type PState[S, +A] = PStateT[Id, S, A]
+  type PIndexedState[-S1, S2, A] = PIndexedStateT[Id, S1, S2, A]
+  type PState[S, A] = PStateT[Id, S, A]
 
   type IndexedConts[W[_], R, O, A] = IndexedContsT[W, Id, R, O, A]
   object IndexedConts extends IndexedContsTFunctions with IndexedContsTInstances {
