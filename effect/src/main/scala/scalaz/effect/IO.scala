@@ -10,7 +10,7 @@ import Kleisli._
 import Free._
 import std.function._
 
-sealed trait IO[+A] {
+sealed trait IO[A] {
   private[effect] def apply(rw: Tower[IvoryTower]): Trampoline[(Tower[IvoryTower], A)]
 
   import IO._
@@ -63,18 +63,18 @@ sealed trait IO[+A] {
     })
 
   /** Lift this action to a given IO-like monad. */
-  def liftIO[M[+_]](implicit m: MonadIO[M]): M[A] =
+  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
     m.liftIO(this)
 
   /** Executes the handler if an exception is raised. */
-  def except[B >: A](handler: Throwable => IO[B]): IO[B] = 
+  def except(handler: Throwable => IO[A]): IO[A] =
     io(rw => try { Return(this(rw).run) } catch { case e: Throwable => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
    * Other exceptions are rethrown.
    */
-  def catchSome[B,C >: A](p: Throwable => Option[B], handler: B => IO[C]): IO[C] =
+  def catchSome[B](p: Throwable => Option[B], handler: B => IO[A]): IO[A] =
     except(e => p(e) match {
       case Some(z) => handler(z)
       case None => throw e
@@ -85,7 +85,7 @@ sealed trait IO[+A] {
    * exception was raised.
    */
   def catchLeft: IO[Throwable \/ A] =
-    map(\/.right) except (t => IO(\/.left(t)))
+    map(\/.right[Throwable, A]) except (t => IO(\/.left(t)))
 
   /**Like "catchLeft" but takes a predicate to select which exceptions are caught. */
   def catchSomeLeft[B](p: Throwable => Option[B]): IO[B \/ A] =
@@ -127,7 +127,7 @@ sealed trait IO[+A] {
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 
   /** An automatic resource management. */
-  def using[B >: A, C](f: B => IO[C])(implicit resource: Resource[B]) =
+  def using[C](f: A => IO[C])(implicit resource: Resource[A]) =
     bracket(resource.close)(f)
 }
 
