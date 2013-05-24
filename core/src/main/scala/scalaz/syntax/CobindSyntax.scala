@@ -6,6 +6,7 @@ trait CobindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Cobind[F]
   ////
   def cobind[B](f: F[A] => B) = F.cobind(self)(f)
+  def coflatMap[B](f: F[A] => B) = F.cobind(self)(f)
   ////
 }
 

@@ -76,10 +76,6 @@ trait OptionOps[A] extends Ops[Option[A]] {
 
   final def orZero(implicit z: Monoid[A]): A = self getOrElse z.zero
 
-  final def coflatten: Option[Option[A]] = o.coflatten(self)
-
-  final def coflatMap[B](f: Option[A] => B): Option[B] = o.coflatMap(self, f )
-
   final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
