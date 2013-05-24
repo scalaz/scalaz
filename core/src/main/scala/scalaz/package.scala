@@ -110,9 +110,9 @@ package object scalaz {
 
   type |>=|[G[_], F[_]] = MonadPartialOrder[G, F]
 
-  type ReaderT[F[+_], -E, +A] = Kleisli[F, E, A]
-  type =?>[-E, +A] = Kleisli[Option, E, A]
-  type Reader[-E, +A] = ReaderT[Id, E, A]
+  type ReaderT[F[_], E, A] = Kleisli[F, E, A]
+  type =?>[E, A] = Kleisli[Option, E, A]
+  type Reader[E, A] = ReaderT[Id, E, A]
 
   type Writer[W, A] = WriterT[Id, W, A]
   type Unwriter[W, A] = UnwriterT[Id, W, A]
