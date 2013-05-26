@@ -11,6 +11,9 @@ class MonadTransTest extends Spec {
   }
 
   "liftMU" in {
-    IndexedStateT.StateMonadTrans[Int].liftMU(10.right[String]).run(1) must be_===((1, 10).right[String])
+    val mt = IndexedStateT.StateMonadTrans[Int]
+    // Inference of M fails when using liftM with a higher kinded type
+    mt.liftM[({type λ[α] = String \/ α})#λ, Int](10.right[String]).run(1) must be_===((1, 10).right[String])
+    mt.liftMU(10.right[String]).run(1) must be_===((1, 10).right[String])
   }
 }
