@@ -26,4 +26,8 @@ class NonEmptyListTest extends Spec {
     val F = Foldable1[NonEmptyList]
     rnge.list.reduceRight(_++_) must be_===(F.foldr1(rnge)(a => b => a ++ b))
   }
+
+  "NonEmptyList.init size is correct" ! prop { xs:NonEmptyList[Int] =>
+    xs.init.size must be_===(xs.tail.size)
+  }
 }

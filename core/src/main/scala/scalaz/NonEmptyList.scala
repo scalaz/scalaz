@@ -64,6 +64,10 @@ sealed trait NonEmptyList[+A] {
     }
   }
 
+  def init: List[A] = if(tail.isEmpty) Nil else (head :: tail.init)
+
+  def last: A = if(tail.isEmpty) head else tail.last
+
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
     case Nil    => Nil
     case h :: t => nel(h, t).tails.list
