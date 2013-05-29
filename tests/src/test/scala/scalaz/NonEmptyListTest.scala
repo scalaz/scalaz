@@ -27,6 +27,9 @@ class NonEmptyListTest extends Spec {
     rnge.list.reduceRight(_++_) must be_===(F.foldr1(rnge)(a => b => a ++ b))
   }
 
+  "NonEmptyList.last is correct" ! prop { xs:NonEmptyList[Int] =>
+    xs.reverse.head must be_===(xs.last)
+  }
   "NonEmptyList.init size is correct" ! prop { xs:NonEmptyList[Int] =>
     xs.init.size must be_===(xs.tail.size)
   }
