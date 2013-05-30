@@ -19,7 +19,7 @@ trait IdOps[A] extends Ops[A] {
 }
 
 trait ToIdOps {
-  implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps[A] {
+  implicit def ToEffectIdOps[A](a: A): IdOps[A] = new IdOps[A] {
     def self: A = a
   }
 }
