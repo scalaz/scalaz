@@ -4,7 +4,7 @@ package scalaz
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is
  * simultaneously transitioning from type `A1` to type `A2`.  [[scalaz.PLens]] is a
- * convenient alias for when `F =:= Id`, `A1 =:= A2`, and `B1 =:= B2`.
+ * convenient alias for when `A1 =:= A2`, and `B1 =:= B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a partial lens
  * family can address the nth element of a `List`.
