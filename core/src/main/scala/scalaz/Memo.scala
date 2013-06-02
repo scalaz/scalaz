@@ -63,7 +63,7 @@ trait MemoFunctions {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
-  private def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
+  def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
     memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
   /** Cache results in a [[scala.collection.mutable.HashMap]].
@@ -80,7 +80,7 @@ trait MemoFunctions {
     mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
 
 
-  private def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
+  def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
     var a = m
 
     memo[K, V](f =>
