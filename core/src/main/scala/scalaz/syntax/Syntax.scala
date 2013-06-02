@@ -34,6 +34,8 @@ trait Syntaxes {
 
   object functor extends ToFunctorOps
 
+  object invariantFunctor extends ToInvariantFunctorOps
+
   object contravariant extends ToContravariantOps
 
   object apply extends ToApplyOps

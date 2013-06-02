@@ -13,13 +13,16 @@ package scalaz
  * @see [[scalaz.Functor.FunctorLaw]]
  */
 ////
-trait Functor[F[_]]  { self =>
+trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   ////
 
   /** Lift `f` into `F` and apply to `F[A]`. */
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
   // derived functions
+
+  def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
+    map(fa)(f)
 
   /** Alias for `map`. */
   def apply[A, B](fa: F[A])(f: A => B): F[B] = map(fa)(f)
@@ -68,7 +71,7 @@ trait Functor[F[_]]  { self =>
     implicit def G = G0
   }
 
-  trait FunctorLaw {
+  trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
     def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
 
