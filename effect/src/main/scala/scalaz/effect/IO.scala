@@ -69,7 +69,7 @@ sealed trait IO[+A] {
 
   /** Executes the handler if an exception is raised. */
   def except[B >: A](handler: Throwable => IO[B]): IO[B] = 
-    io(rw => try { Return(this(rw).run) } catch { case e => handler(e)(rw) })
+    io(rw => try { Return(this(rw).run) } catch { case e: Throwable => handler(e)(rw) })
 
   /**
    * Executes the handler for exceptions that are raised and match the given predicate.
