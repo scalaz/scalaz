@@ -59,7 +59,7 @@ trait Foldable[F[_]]  { self =>
     traverse_[({type λ[α]=State[S, α]})#λ, A, B](fa)(f)
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
-  def sequence_[M[_], A, B](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
+  def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
 
   /** `sequence_` specialized to `State` **/

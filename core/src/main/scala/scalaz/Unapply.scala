@@ -18,7 +18,7 @@ import Leibniz.{===, refl}
  *   G.traverse(self)(f)
  *
  * // Indirect lookup of the Applicative instance
- * // Requires -Ydep-method-types or Scala trunk circa Oct 2011
+ * // Requires the -Ydep-method-types flag to scalac with scala 2.9.x (not required with 2.10)
  * def traverseI[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
  *   G.TC.traverse(self)(a => G(f(a)))
  * }
