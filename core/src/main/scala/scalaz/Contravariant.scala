@@ -29,7 +29,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
     contramap(fa)(g)
 
-  trait ContravariantLaw {
+  trait ContravariantLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
     def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(contramap(fa)(x => x), fa)
 

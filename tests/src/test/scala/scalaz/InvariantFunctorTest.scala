@@ -10,9 +10,6 @@ import scalaz.scalacheck.ScalazProperties._
 
 class InvariantFunctorTest extends Spec {
 
-  checkAll(invariantFunctor.laws[Id])
-  checkAll(invariantFunctor.laws[Option])
-
   "xmap" in {
     some(1).xmap[Int](_ + 1, _ - 1) must be_===(some(2))
   }

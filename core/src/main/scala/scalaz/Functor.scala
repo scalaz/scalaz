@@ -71,7 +71,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
     implicit def G = G0
   }
 
-  trait FunctorLaw {
+  trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
     def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
 
