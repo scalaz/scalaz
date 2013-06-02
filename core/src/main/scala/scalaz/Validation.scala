@@ -466,7 +466,7 @@ trait ValidationFunctions {
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
-    case e => failure(e)
+    case e: Throwable => failure(e)
   }
 
   /** Construct a `Validation` from an `Either`. */
