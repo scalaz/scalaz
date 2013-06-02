@@ -15,13 +15,12 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
     G.traverse(self)(f)
 
   /** A version of `traverse` that infers the type constructor `G` */
-  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
-    G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))
-  }
+  final def traverseU[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ =
+    F.traverseU[A, GB](self)(f)(G)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
   final def traverseM[G[_], B](f: A => G[F[B]])(implicit G: Applicative[G], FM: Monad[F]): G[F[B]] =
-    G.map(G.traverse(self)(f))(FM.join)
+    F.traverseM[A, G, B](self)(f)(G, FM)
 
   /** Traverse with the identity function */
   final def sequence[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
