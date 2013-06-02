@@ -13,6 +13,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def foldLeft1Opt(f: (A, A) => A): Option[A] = F.foldLeft1Opt(self)(f)
   final def foldRightM[G[_], B](z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldRightM(self, z)(f)
   final def foldLeftM[G[_], B](z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] = F.foldLeftM(self, z)(f)
+  final def fold(implicit A: Monoid[A]): A = F.fold(self)(A)
   final def foldr[B](z: => B)(f: A => (=> B) => B): B = F.foldr(self, z)(f)
   final def foldr1Opt(f: A => (=> A) => A): Option[A] = F.foldr1Opt(self)(f)
   final def foldl[B](z: B)(f: B => A => B): B = F.foldl(self, z)(f)
