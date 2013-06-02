@@ -15,7 +15,7 @@ package scalaz
  * @see [[scalaz.Contravariant.ContravariantLaw]]
  */
 ////
-trait Contravariant[F[_]]  { self =>
+trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   ////
 
   /** Transform `A`.
@@ -25,6 +25,9 @@ trait Contravariant[F[_]]  { self =>
   def contramap[A, B](r: F[A])(f: B => A): F[B]
 
   // derived functions
+
+  def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
+    contramap(fa)(g)
 
   trait ContravariantLaw {
     /** The identity function, lifted, is a no-op. */

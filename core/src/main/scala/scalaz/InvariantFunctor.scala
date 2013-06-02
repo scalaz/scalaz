@@ -15,8 +15,12 @@ import Isomorphism.<=>
  *
  * @see http://hackage.haskell.org/packages/archive/invariant/latest/doc/html/Data-Functor-Invariant.html
  * @see http://comonad.com/reader/2008/rotten-bananas/
+ *
+ * @see [[scalaz.InvariantFunctor.InvariantFunctorLaw]]
  */
+////
 trait InvariantFunctor[F[_]] {
+  ////
 
   /** Converts `ma` to a value of type `F[B]` using the provided functions `f` and `g`. */
   def xmap[A, B](ma: F[A], f: A => B, g: B => A): F[B]
@@ -37,6 +41,7 @@ trait InvariantFunctor[F[_]] {
   }
 
   def invariantFunctorLaw = new InvariantFunctorLaw {}
+  ////
 
   val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }
 }
@@ -44,10 +49,7 @@ trait InvariantFunctor[F[_]] {
 object InvariantFunctor {
   @inline def apply[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
 
-  /** Every functor is an invariant functor, where `B => A` is ignored. */
-  implicit def liftFunctorToInvariantFunctor[F[_]](implicit F: Functor[F]): InvariantFunctor[F] = new InvariantFunctor[F] {
-    def xmap[A, B](ma: F[A], f: A => B, g: B => A): F[B] = F.map(ma)(f)
-  }
+  ////
 
   /** Semigroup is an invariant functor. */
   implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {
@@ -63,4 +65,5 @@ object InvariantFunctor {
       def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
     }
   }
+  ////
 }
