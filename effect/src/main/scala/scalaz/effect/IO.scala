@@ -240,7 +240,7 @@ trait IOFunctions extends IOStd {
    * Register a finalizer in the current region. When the region terminates,
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
-  def onExit[S, P[+_] : MonadIO](finalizer: IO[Unit]):
+  def onExit[S, P[_] : MonadIO](finalizer: IO[Unit]):
   RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)
@@ -256,7 +256,7 @@ trait IOFunctions extends IOStd {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegionT[P[+_] : MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
+  def runRegionT[P[_] : MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
     def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {
