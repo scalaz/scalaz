@@ -67,7 +67,7 @@ sealed trait NullArgument[A, B] {
   def cokleisli: Cokleisli[Option, A, B] =
     Cokleisli(apply(_))
 
-  def on[F[+_]](o: OptionT[F, A])(implicit F: Functor[F]): F[B] =
+  def on[F[_]](o: OptionT[F, A])(implicit F: Functor[F]): F[B] =
     F.map(o.run)(apply(_))
 
   def lower: A => B =

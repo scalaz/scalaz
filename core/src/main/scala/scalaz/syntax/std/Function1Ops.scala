@@ -9,7 +9,7 @@ trait Function1Ops[T, R] extends Ops[T => R] {
   def arrow[A[_, _]](implicit a: Arrow[A]): A[T, R] =
     a.arr(self)
 
-  def kleisli[Z[+_]](implicit z: Applicative[Z]): Kleisli[Z, T, R] =
+  def kleisli[Z[_]](implicit z: Applicative[Z]): Kleisli[Z, T, R] =
     Kleisli.kleisli((t: T) => z.point(self(t)))
 
   def unary_!(implicit m: Memo[T, R]): T => R = m(self)

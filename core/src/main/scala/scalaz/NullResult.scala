@@ -104,7 +104,7 @@ sealed trait NullResult[A, B] {
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
     T.traverse(a)(apply(_))
 
-  def on[F[+_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
+  def on[F[_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
     OptionT(F.map(a)(apply(_)))
 }
 
