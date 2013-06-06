@@ -35,6 +35,8 @@ trait StreamInstances {
     else
       f(fa.head, foldRight(fa.tail, z)(f))
 
+    override def toStream[A](fa: Stream[A]) = fa
+
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b

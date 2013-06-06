@@ -67,6 +67,8 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
           (bs._1, acc._2 :+ bs._2)
         }))
 
+    override def toIndexedSeq[A](fa: IxSq[A]) = fa
+
     override def foldRight[A, B](fa: IxSq[A], z: => B)(f: (A, => B) => B) = {
       var i = fa.length
       var r = z
