@@ -148,7 +148,7 @@ trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R]
 
 trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] {
   implicit def M: Monoid[M]
-  def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m1))
+  def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m2))
   def copoint[A](p: M => A) = p(M.zero)
   def cobind[A, B](fa: M => A)(f: (M => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
   def map[A, B](fa: M => A)(f: A => B) = fa andThen f
