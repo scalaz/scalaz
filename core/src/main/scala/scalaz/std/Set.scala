@@ -9,6 +9,8 @@ trait SetInstances {
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
     def isEmpty[A](fa: Set[A]) = fa.isEmpty
 
+    override def toSet[A](fa: Set[A]) = fa
+
     def foldRight[A, B](fa: Set[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]

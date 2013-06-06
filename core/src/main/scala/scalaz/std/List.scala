@@ -66,6 +66,8 @@ trait ListInstances extends ListInstances0 {
       r
     }
 
+    override def toList[A](fa: List[A]) = fa
+
     def isEmpty[A](fa: List[A]) = fa.isEmpty
   }
 
