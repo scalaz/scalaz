@@ -7,5 +7,6 @@ import std.AllInstances._
 class LazyOptionTest extends Spec {
   checkAll(equal.laws[LazyOption[Int]])
   checkAll(monadPlus.laws[LazyOption])
+  checkAll(cojoin.laws[LazyOption])
   checkAll(traverse.laws[LazyOption])
 }
