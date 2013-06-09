@@ -857,8 +857,9 @@ trait FingerTreeInstances {
     override def foldRight[A, B](t: FingerTree[V, A], z: => B)(f: (A, => B) => B) = t.foldRight(z)(f)
   }
 
-  implicit def fingerTreeSemigroup[V, A](implicit m: Reducer[A, V]): Semigroup[FingerTree[V, A]]= new Semigroup[FingerTree[V, A]] {
+  implicit def fingerTreeMonoid[V, A](implicit m: Reducer[A, V]): Monoid[FingerTree[V, A]]= new Monoid[FingerTree[V, A]] {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
+    def zero = empty
   }
 
   implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {

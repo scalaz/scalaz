@@ -3,6 +3,7 @@ package scalaz
 import org.scalacheck.Prop._
 import FingerTree._
 import scalacheck.ScalazArbitrary._
+import scalacheck.ScalazProperties._
 import std.anyVal._
 import std.stream._
 import std.string._
@@ -15,6 +16,8 @@ import WriterT._
 class FingerTreeTest extends Spec {
   type SequenceTree[A] = FingerTree[Int, A]
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
+
+  checkAll(monoid.laws[SequenceTree[String]])
 
   val intStream = Stream.from(1)
 
