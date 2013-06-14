@@ -233,7 +233,7 @@ object ScalazProperties {
       new Properties("traverse") {
         property("identity traverse") = identityTraverse[F, Int, Int]
 
-        import std.list._, std.option._, std.stream._, std.anyVal._
+        import std.list._, std.option._, std.stream._
 
         property("purity.option") = purity[F, Option, Int]
         property("purity.stream") = purity[F, Stream, Int]
@@ -364,7 +364,6 @@ object ScalazProperties {
   }
 
   object lens {
-    import Lens._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)

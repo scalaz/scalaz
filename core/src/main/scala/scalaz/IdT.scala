@@ -18,7 +18,6 @@ final case class IdT[F[_], A](run: F[A]) {
   }
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] = {
-    import std.option._
     G.map(F.traverse(run)(f))(IdT(_))
   }
 

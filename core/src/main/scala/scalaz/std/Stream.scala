@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import annotation.tailrec
 
 trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cojoin[Stream] with Cobind.FromCojoin[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cojoin[Stream] with Cobind.FromCojoin[Stream]{

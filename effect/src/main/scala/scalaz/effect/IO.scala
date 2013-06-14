@@ -9,7 +9,6 @@ import ST._
 import Kleisli._
 import Free._
 import std.function._
-import syntax.bifunctor._
 
 sealed trait IO[+A] {
   private[effect] def apply(rw: Tower[IvoryTower]): Trampoline[(Tower[IvoryTower], A)]

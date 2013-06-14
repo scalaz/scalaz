@@ -2,7 +2,6 @@ package scalaz
 
 import collection.IndexedSeqLike
 import collection.immutable.IndexedSeq
-import collection.mutable.Builder
 import collection.generic.CanBuildFrom
 
 import syntax.Ops

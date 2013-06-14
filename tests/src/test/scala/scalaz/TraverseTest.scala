@@ -1,6 +1,5 @@
 package scalaz
 
-import scalacheck.ScalazProperties
 
 class TraverseTest extends Spec {
 

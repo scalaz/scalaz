@@ -5,7 +5,6 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   import LazyEither._
   import LazyEitherT._
-  import EitherT._
   import OptionT._
   import LazyOptionT._
 
@@ -67,7 +66,6 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
     left.map(f)
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[LazyEitherT[F, C, D]] = {
-    import std.either.eitherInstance
     Applicative[G].map(F.traverse(run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT(_: F[LazyEither[C, D]]))
   }
 

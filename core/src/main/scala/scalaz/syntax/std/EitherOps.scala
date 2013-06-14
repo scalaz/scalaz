@@ -2,8 +2,6 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.{either => e}
-
 trait EitherOps[A, B] extends Ops[Either[A, B]] {
 
   final def disjunction: A \/ B = \/ fromEither self

@@ -2,7 +2,6 @@ package scalaz
 
 import std.AllInstances._
 import syntax.foldable1._
-import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class Foldable1Test extends Spec {

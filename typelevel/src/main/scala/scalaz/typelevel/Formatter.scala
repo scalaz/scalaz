@@ -8,7 +8,6 @@ import UnionTypes._
 
 trait Formatter[Params <: HList, R] extends (Params => R) { self =>
 
-  import Formatter._
 
   implicit val semigroup: Semigroup[R]
 

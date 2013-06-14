@@ -226,7 +226,6 @@ trait WriterTFunctions {
     val run = v
   }
 
-  import StoreT._
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)

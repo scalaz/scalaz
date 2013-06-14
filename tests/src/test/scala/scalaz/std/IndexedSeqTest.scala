@@ -7,7 +7,6 @@ import org.scalacheck.Arbitrary
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import syntax.std._
 

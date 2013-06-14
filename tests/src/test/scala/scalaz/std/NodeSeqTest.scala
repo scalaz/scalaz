@@ -6,7 +6,6 @@ import syntax.apply._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.{ Gen, Arbitrary }
-import Id._
 
 import scala.xml.{ Node, NodeSeq, XML }
 

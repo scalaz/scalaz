@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import scala.xml.{ Node, NodeSeq, PrettyPrinter }
+import scala.xml.{ NodeSeq, PrettyPrinter }
 
 trait NodeSeqInstances {
   implicit val nodeSeqInstance: Monoid[NodeSeq] with Show[NodeSeq] with Equal[NodeSeq] = new Monoid[NodeSeq] with Show[NodeSeq] with Equal[NodeSeq] {
