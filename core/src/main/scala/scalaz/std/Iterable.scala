@@ -27,6 +27,7 @@ trait IterableInstances {
     }
   }
 
+  @deprecated("Length is deprecated, use Foldable#length instead", "7.1")
   implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
     def length[A](a: Iterable[A]) = {
       var n = 0
@@ -64,6 +65,16 @@ trait IterableInstances {
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
 
     override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+    override def length[A](a: I[A]) = {
+      var n = 0
+      val i = a.iterator
+      while (i.hasNext) {
+        n = n + 1
+        i.next
+      }
+      n
+    }
   }
 }
 

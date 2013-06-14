@@ -5,6 +5,7 @@ package syntax
 trait LengthOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Length[F]
   ////
+  @deprecated("Length#length is deprecated, use Foldable#length instead", "7.1")
   final def length: Int = F.length(self)
   ////
 }

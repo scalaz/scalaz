@@ -13,6 +13,7 @@ trait Syntaxes {
 
   object equal extends ToEqualOps
 
+  @deprecated("length is deprecated, use foldable instead", "7.1")
   object length extends ToLengthOps
 
   object show extends ToShowOps
@@ -21,13 +22,14 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
-  @deprecated("MetricSpace is deprecated", "7.0.1")
+  @deprecated("metricSpace is deprecated", "7.0.1")
   object metricSpace extends ToMetricSpaceOps
 
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
 
+  @deprecated("each is deprecated", "7.1")
   object each extends ToEachOps
 
   object index extends ToIndexOps
@@ -147,4 +149,3 @@ trait ToTypeClassOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps
   with ToFoldable1Ops with ToTraverse1Ops
-

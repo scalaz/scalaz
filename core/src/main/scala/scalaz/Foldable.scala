@@ -84,6 +84,11 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
+  def length[A](fa: F[A]): Int = {
+    import scalaz.std.anyVal._
+    foldMap(fa)(_ => 1)
+  }
+
   /** Unbiased sum of monoidal values. */
   @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
   def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)

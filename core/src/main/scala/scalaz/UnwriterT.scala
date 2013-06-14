@@ -38,6 +38,7 @@ sealed trait UnwriterT[F[_], U, A] { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): UnwriterT[F, U, B] =
     unwriterT(F.map(run)(wa => (wa._1, f(wa._2))))
 
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
     E.each(run)(wa => f(wa._2))
 
@@ -128,6 +129,7 @@ trait UnwriterTInstances extends UnwriterTInstances0 {
   }
   implicit def unwriterTIndex[W] = new UnwriterTIndex[W] {
   }
+  @deprecated("Each/foreach is deprecated", "7.1")
   implicit def unwriterTEach[F[_], W](implicit F0: Each[F]) = new UnwriterTEach[F, W] {
     implicit def F = F0
   }

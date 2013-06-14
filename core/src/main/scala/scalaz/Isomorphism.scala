@@ -154,6 +154,7 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
+@deprecated("Each is deprecated", "7.1")
 trait IsomorphismEach[F[_], G[_]] extends Each[F] {
   implicit def G: Each[G]
 
