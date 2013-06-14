@@ -89,6 +89,21 @@ trait Foldable[F[_]]  { self =>
     foldMap(fa)(_ => 1)
   }
 
+  /**
+   * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
+   */
+  def index[A](fa: F[A], i: Int): Option[A] =
+    foldLeft[A, (Int, Option[A])](fa, (0, None)) {
+      case ((idx, elem), curr) =>
+        (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
+    }._2
+
+  /**
+   * @return the element at index `i`, or `default` if the given index falls outside of the range
+   */
+  def indexOr[A](fa: F[A], default: => A, i: Int): A =
+    index(fa, i) getOrElse default
+
   /** Unbiased sum of monoidal values. */
   @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
   def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)

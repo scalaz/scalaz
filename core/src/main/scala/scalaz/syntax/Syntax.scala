@@ -32,6 +32,7 @@ trait Syntaxes {
   @deprecated("each is deprecated", "7.1")
   object each extends ToEachOps
 
+  @deprecated("index is deprecated", "7.1")
   object index extends ToIndexOps
 
   object functor extends ToFunctorOps

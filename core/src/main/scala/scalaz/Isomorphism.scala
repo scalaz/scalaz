@@ -163,6 +163,7 @@ trait IsomorphismEach[F[_], G[_]] extends Each[F] {
   def each[A](fa: F[A])(f: A => Unit) = G.each(iso.to(fa))(f)
 }
 
+@deprecated("Index is deprecated, use Foldable instead", "7.1")
 trait IsomorphismIndex[F[_], G[_]] extends Index[F] {
   implicit def G: Index[G]
 

@@ -205,6 +205,7 @@ trait WriterTInstances0 extends WriterTInstances1 {
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {
     implicit def F = F0
   }
+  @deprecated("Index is deprecated, use Foldable instead", "7.1")
   implicit def writerTIndex[W] = new WriterTIndex[W] {
   }
   @deprecated("Each/foreach is deprecated", "7.1")

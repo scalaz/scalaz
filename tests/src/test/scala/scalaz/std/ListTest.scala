@@ -16,7 +16,6 @@ class ListTest extends Spec {
 
   import std.list.listSyntax._
   import syntax.foldable._
-  import syntax.index._
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 

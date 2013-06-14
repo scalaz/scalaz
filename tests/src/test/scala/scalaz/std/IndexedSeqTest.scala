@@ -22,7 +22,7 @@ class IndexedSeqTest extends Spec {
   checkAll(isEmpty.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
-  import syntax.index._
+  import syntax.foldable._
 
   private def evenp(x: Int): Boolean = x % 2 == 0
 

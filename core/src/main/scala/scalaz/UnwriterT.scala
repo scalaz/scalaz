@@ -127,6 +127,7 @@ trait UnwriterTInstances extends UnwriterTInstances0 {
   implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]) = new UnwriterTTraverse[F, W] {
     implicit def F = F0
   }
+  @deprecated("Index is deprecated, use Foldable instead", "7.1")
   implicit def unwriterTIndex[W] = new UnwriterTIndex[W] {
   }
   @deprecated("Each/foreach is deprecated", "7.1")
