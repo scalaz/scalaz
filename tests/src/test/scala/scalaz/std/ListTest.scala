@@ -3,9 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
-import syntax.std._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
@@ -18,7 +16,6 @@ class ListTest extends Spec {
 
   import std.list.listSyntax._
   import syntax.foldable._
-  import syntax.monad._
   import syntax.index._
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))

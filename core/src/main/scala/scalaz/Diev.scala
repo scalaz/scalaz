@@ -2,8 +2,6 @@ package scalaz
 
 import scala.annotation.tailrec
 import Scalaz._
-import Free._
-import scala.math
 import scala.collection.mutable.ListBuffer
 
 /**

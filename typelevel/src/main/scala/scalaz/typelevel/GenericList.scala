@@ -1,7 +1,7 @@
 package scalaz
 package typelevel
 
-import scalaz.{Apply, Kleisli}
+import scalaz.Apply
 
 import scalaz.Id._
 

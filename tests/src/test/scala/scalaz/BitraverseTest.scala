@@ -2,7 +2,6 @@ package scalaz
 
 import scalaz.std.AllInstances.{tuple2Instance => _, _}
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class BitraverseTest extends Spec {

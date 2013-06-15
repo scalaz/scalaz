@@ -1,7 +1,6 @@
 package scalaz
 
 import org.scalacheck.Prop._
-import FingerTree._
 import scalacheck.ScalazArbitrary._
 import scalacheck.ScalazProperties._
 import std.anyVal._
@@ -97,7 +96,6 @@ class FingerTreeTest extends Spec {
   
   "IndSeq" should {
     import org.scalacheck._
-    import Gen._
     import Arbitrary.arbitrary
 
     case class TestInstance(arr: Array[Int], index: Int)

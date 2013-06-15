@@ -7,7 +7,6 @@ package scalacheck
 object ScalaCheckBinding {
   import org.scalacheck.{Gen, Arbitrary}
   import Gen.{sized, value}
-  import typelevel._
 
   implicit val ArbitraryMonad: Monad[Arbitrary] = new Monad[Arbitrary] {
     def bind[A, B](fa: Arbitrary[A])(f: A => Arbitrary[B]) = Arbitrary(fa.arbitrary.flatMap(f(_).arbitrary))

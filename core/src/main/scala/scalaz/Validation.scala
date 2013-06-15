@@ -1,6 +1,5 @@
 package scalaz
 
-import Id._
 
 /**
  * Represents either:
@@ -32,7 +31,6 @@ import Id._
  */
 sealed trait Validation[+E, +A] {
 
-  import Validation._
 
   sealed trait SwitchingValidation[X] {
     def s: X

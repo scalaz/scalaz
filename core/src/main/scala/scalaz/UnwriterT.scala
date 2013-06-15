@@ -142,7 +142,6 @@ trait UnwriterTFunctions {
     val run = v
   }
 
-  import StoreT._
 
   def unwriter[W, A](v: (W, A)): Unwriter[W, A] =
     unwriterT[Id, W, A](v)

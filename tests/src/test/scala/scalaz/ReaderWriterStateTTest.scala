@@ -1,7 +1,6 @@
 package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
 import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, indexedStateTArb => _, _}
 import std.AllInstances._
 import org.scalacheck.{Gen, Arbitrary}

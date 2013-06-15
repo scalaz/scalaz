@@ -1,6 +1,5 @@
 package scalaz
 
-import StoreT._
 import Id._
 
 /**
@@ -223,7 +222,6 @@ object LensFamily extends LensFunctions with LensInstances {
 }
 
 trait LensFamilyFunctions {
-  import StoreT._
 
   def lensFamily[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] = new LensFamily[A1, A2, B1, B2] {
     def run(a: A1): IndexedStore[B1, B2, A2] = r(a)

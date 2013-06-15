@@ -3,7 +3,6 @@ package scalaz
 sealed trait NullArgument[A, B] {
   def apply(a: Option[A]): B
 
-  import NullResult._
   import NullArgument._
 
   def map[C](f: B => C): A ?=> C =

@@ -12,7 +12,6 @@ trait Timeout
 object Timeout extends Timeout
 
 case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
-  import Timer._
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]

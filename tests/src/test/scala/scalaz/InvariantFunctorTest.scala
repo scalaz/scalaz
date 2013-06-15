@@ -6,7 +6,6 @@ import Isomorphism.{<=>, IsoSet}
 import std.AllInstances._
 import std.option.some
 import syntax.invariantFunctor._
-import scalaz.scalacheck.ScalazProperties._
 
 class InvariantFunctorTest extends Spec {
 

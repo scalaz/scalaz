@@ -84,7 +84,6 @@ object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
   ////
-  import annotation.tailrec
 
   /** Make an append and zero into an instance. */
   def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {

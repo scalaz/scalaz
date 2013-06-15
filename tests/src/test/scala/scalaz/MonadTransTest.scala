@@ -1,7 +1,7 @@
 package scalaz
 
 import std.AllInstances._
-import std.option.{some, none}
+import std.option.some
 import syntax.either._
 
 class MonadTransTest extends Spec {

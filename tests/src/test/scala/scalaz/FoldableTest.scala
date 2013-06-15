@@ -2,8 +2,6 @@ package scalaz
 
 import std.AllInstances._
 import syntax.foldable._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
 import org.specs2.matcher._
 
