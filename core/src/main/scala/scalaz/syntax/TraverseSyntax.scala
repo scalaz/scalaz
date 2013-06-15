@@ -48,7 +48,7 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
    * A version of `traverse` specialized for `Kleisli[G, S, B]` that internally uses a `Trampoline`
    * to avoid stack-overflow.
    */
-  final def traverseKTrampoline[G[+_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
+  final def traverseKTrampoline[G[_]: Applicative, S, B](f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
     F.traverseKTrampoline[S, G, A, B](self)(f)
 
   final def runTraverseS[S, B](s: S)(f: A => State[S, B]): (S, F[B]) =

@@ -16,15 +16,15 @@ class EitherTTest extends Spec {
   checkAll(bitraverse.laws[EitherTList])
 
   object instances {
-    def functor[F[+_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def monad[F[+_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
-    def foldable[F[+_] : Foldable, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
-    def traverse[F[+_] : Traverse, A] = Traverse[({type λ[α] = EitherT[F, A, α]})#λ]
+    def functor[F[_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
+    def monad[F[_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
+    def foldable[F[_] : Foldable, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
+    def traverse[F[_] : Traverse, A] = Traverse[({type λ[α] = EitherT[F, A, α]})#λ]
 
     // checking absence of ambiguity
-    def functor[F[+_] : Monad, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def apply[F[+_] : Monad, A] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
-    def foldable[F[+_] : Traverse, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
+    def functor[F[_] : Monad, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
+    def apply[F[_] : Monad, A] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
+    def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
   }
 
   // compilation test

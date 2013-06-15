@@ -220,7 +220,7 @@ trait LiskovFunctions {
   }
 
 
-  def unco[F[+_] : Injective, Z, A](
+  def unco[F[_] : Injective, Z, A](
     a: F[A] <~< F[Z]
   ): (A <~< Z) = force[A, Z]
 
