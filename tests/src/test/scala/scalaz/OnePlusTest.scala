@@ -48,13 +48,13 @@ class OnePlusTest extends Spec {
 
   "traverse1 on traverse" ! prop {(ints: OnePlus[List, Int], f: Int => List[Int]) =>
     (Traverse1[OnePlusList].traverse1(ints)(f)
-       must be_===(Traverse[OnePlusList].traverse(ints)(f)))
+       must_==(Traverse[OnePlusList].traverse(ints)(f)))
   }
 
   "traverse1 on traverse1" ! prop {(ints: OnePlus[NonEmptyList, Int],
                                     f: Int => NonEmptyList[Int]) =>
     (Traverse1[OnePlusNel].traverse1(ints)(f)
-       must be_===(Traverse[OnePlusNel].traverse(ints)(f)))
+       must_==(Traverse[OnePlusNel].traverse(ints)(f)))
   }
 
   "inequality exists" ! prop {(a: OnePlus[List, Int]) =>
