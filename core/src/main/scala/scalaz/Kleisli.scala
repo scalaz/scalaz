@@ -1,7 +1,6 @@
 package scalaz
 
 import Id._
-import annotation.unchecked.uncheckedVariance
 
 /**
  * Represents a function `A => M[B]`.

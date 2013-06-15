@@ -5,7 +5,6 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.Arbitrary
-import scalaz._
 import Id._
 
 class WriterTTest extends Spec {

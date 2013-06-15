@@ -1,18 +1,16 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Executors, ExecutorService}
+import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
 
-import scalaz.{Monad, Nondeterminism}
+import scalaz.Nondeterminism
 import scalaz.Free.Trampoline
-import scalaz.Free
 import scalaz.Trampoline
 import scalaz.syntax.monad._
-import scalaz.std.function._
 
-/** 
+/**
  * `Future` is a trampolined computation producing an `A` that may 
  * include asynchronous steps. Like `Trampoline`, arbitrary 
  * monadic expressions involving `map` and `flatMap` are guaranteed

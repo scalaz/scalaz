@@ -3,7 +3,6 @@ package syntax
 package std
 
 import scalaz.std.{boolean => b}
-import scalaz.std.anyVal._
 import scalaz.Tags.{ Conjunction, Disjunction }
 
 

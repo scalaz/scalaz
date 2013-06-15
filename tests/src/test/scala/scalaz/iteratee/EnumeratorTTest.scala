@@ -5,13 +5,8 @@ import std.AllInstances._
 import Iteratee._
 import effect._
 
-import org.scalacheck.{Pretty, Gen, Arbitrary}
-import Arbitrary._
-import Gen._
-import syntax.functor._
+import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import Id._
 
 class EnumeratorTTest extends Spec {

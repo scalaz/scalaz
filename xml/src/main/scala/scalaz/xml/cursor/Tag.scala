@@ -9,7 +9,6 @@ sealed trait Tag {
   val attribs: List[Attr]
   val line: Option[Line]
 
-  import Tag._
   import Element._
 
   /// setTag

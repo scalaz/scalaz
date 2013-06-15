@@ -3,7 +3,6 @@ package std
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import std.AllInstances._
 
 class IterableTest extends Spec {
 

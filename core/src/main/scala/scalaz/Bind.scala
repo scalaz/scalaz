@@ -20,7 +20,6 @@ trait Bind[F[_]] extends Apply[F] { self =>
   def join[A](ffa: F[F[A]]) = bind(ffa)(a => a)
 
   // derived functions
-  import Liskov._
 
   /**
    * `if` lifted into a binding.  Unlike `lift3((t,c,a)=>if(t)c else

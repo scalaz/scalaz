@@ -1,8 +1,6 @@
 package scalaz
 package concurrent
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
 import org.scalacheck.Prop._
 

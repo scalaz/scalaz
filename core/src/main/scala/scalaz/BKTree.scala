@@ -3,7 +3,6 @@ package scalaz
 import collection.immutable.IntMap
 import annotation.tailrec
 
-import BKTree._
 
 /**
  * Burkhard-Keller trees provide an implementation of sets which apart
