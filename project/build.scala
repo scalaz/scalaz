@@ -16,12 +16,13 @@ import sbtrelease.Utilities._
 
 import com.typesafe.sbt.pgp.PgpKeys._
 
-import com.typesafe.sbtosgi.OsgiPlugin._
+import com.typesafe.sbt.osgi.OsgiKeys
+import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.Plugin._
 
 object build extends Build {
-  type Sett = Project.Setting[_]
+  type Sett = Def.Setting[_]
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
