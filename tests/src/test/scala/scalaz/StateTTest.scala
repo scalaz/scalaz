@@ -17,14 +17,14 @@ class StateTTest extends Spec {
   checkAll(monad.laws[StateTListInt])
 
   object instances {
-    def functor[S, F[+_] : Functor] = Functor[({type λ[+α] = StateT[F, S, α]})#λ]
-    def monadState[S, F[+_] : Monad] = MonadState[({type λ[α, +β]=StateT[F, α, β]})#λ, S]
+    def functor[S, F[_] : Functor] = Functor[({type λ[α] = StateT[F, S, α]})#λ]
+    def monadState[S, F[_] : Monad] = MonadState[({type λ[α, β]=StateT[F, α, β]})#λ, S]
 
     // F = Id
     def functor[S] = Functor[({type λ[α] = State[S, α]})#λ]
     def monadState[S] = MonadState[({type λ[α, β]=State[α, β]})#λ, S]
 
     // checking absence of ambiguity
-    def functor[S, F[+_] : Monad] = Functor[({type λ[+α] = StateT[F, S, α]})#λ]
+    def functor[S, F[_] : Monad] = Functor[({type λ[α] = StateT[F, S, α]})#λ]
   }
 }
