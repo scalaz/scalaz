@@ -47,6 +47,13 @@ class ListTest extends Spec {
       a.groupWhen(p).flatten must be_===(a)
   }
 
+  "groupByWhen splits a list at each point where `p(as(n), as(n+1))` yields false" ! prop {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      forall(a.groupWhen(p)) { group: List[Int] =>
+        forall(0 until group.size - 1) { i: Int => p(group(i), group(i+1)) ==== true }
+      }
+  }
+
   "takeWhileM example" in {
     def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[({type λ[α] = State[Int, α]})#λ](a => State {
       i =>
