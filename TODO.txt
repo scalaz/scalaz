@@ -1,7 +1,6 @@
 
 - implicitNotFound("Could not find instance of type class Monoid[${T}]") (?)
 - review order of supertypes in type class inheritance
-- ReaderWriterStateT
 = INSTANCES =
 - TailRec / ControlContext
 
