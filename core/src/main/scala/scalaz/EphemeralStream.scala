@@ -121,6 +121,10 @@ trait EphemeralStreamInstances {
     }
 
   }
+
+  import std.list._
+
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
 }
 
 trait EphemeralStreamFunctions {
