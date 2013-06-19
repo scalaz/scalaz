@@ -145,6 +145,10 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
       if (xs.isEmpty) None
       else Some((xs.head(), xs.tail()))
   }
+
+  import std.list._
+
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
 }
 
 trait EphemeralStreamInstances {
