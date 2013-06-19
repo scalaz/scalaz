@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.<~<
+
 /**
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
@@ -268,6 +270,12 @@ sealed trait \/[+A, +B] {
   def @\?/[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
     validationed(k)
 
+  /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
+  def merge[AA >: A](implicit ev: B <~< AA): AA =
+    this match {
+      case -\/(a) => a
+      case \/-(b) => ev(b)
+    }
 
 }
 case class -\/[+A](a: A) extends (A \/ Nothing)
