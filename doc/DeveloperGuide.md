@@ -19,7 +19,7 @@ Type class extension is encoded with inheritance. For example, `Monoid` extends 
 
 ### Hierarchy
 
-The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gtc`
+The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gen-type-classes`
 will recreate all type classes, preserving chunks of code delimited by pairs of `////` comments.
 
 Do not add code, comments, or imports outside of these delimiters.
