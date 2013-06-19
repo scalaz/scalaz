@@ -115,12 +115,16 @@ trait EphemeralStreamInstances {
     def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
       val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
-      foldRight(fa, seed) {
-        (x, ys) => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
+      fa.foldRight(seed) {
+        x => ys => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
       }
     }
 
   }
+
+  import std.list._
+
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
 }
 
 trait EphemeralStreamFunctions {
