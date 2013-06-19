@@ -279,7 +279,7 @@ Similarly, use these as defaults for parameters:
 ### OSGi Support
 
 All JARs contain OSGi metadata and are usable in an OSGi container without modification.  The metadata is generated automatically
-by [sbtosgi](https://github.com/typesafehub/sbtosgi), which delegates the heavy lifting to [bnd](http://www.aqute.biz/Code/Bnd).
+by [sbt-osgi](https://github.com/sbt/sbt-osgi), which delegates the heavy lifting to [bnd](http://www.aqute.biz/Code/Bnd).
 
 All packages of each JAR are exported with the package version set to the version of Scalaz.  All bundles import all used packages, with
 some exceptions for optional imports (unsatisfied optional imports will result in ClassNotFoundExceptions at runtime if dependent code
