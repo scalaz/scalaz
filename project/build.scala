@@ -22,7 +22,6 @@ import sbtbuildinfo.Plugin._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
-import com.typesafe.tools.mima.plugin.MimaKeys.binaryIssueFilters
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -158,16 +157,6 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    binaryIssueFilters ++= {
-      import com.typesafe.tools.mima.core._
-      import com.typesafe.tools.mima.core.ProblemFilters._
-      Seq(
-        exclude[MissingMethodProblem]("scalaz.syntax.effect.ToIdOps.ToIdOps"),
-        exclude[MissingMethodProblem]("scalaz.syntax.effect.ToIdOps.ToEffectIdOps"),
-        exclude[MissingMethodProblem]("scalaz.effect.Effect.ToIdOps")
-      )
-    }
-  ) ++ Seq[Sett](
     previousArtifact <<= (organization, name, scalaBinaryVersion) { (o, n, sbv) => Some(o % (n + "_" + sbv) % "7.0.0") }
   )
 
