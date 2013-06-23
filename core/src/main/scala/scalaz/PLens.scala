@@ -597,7 +597,7 @@ trait PLensInstances {
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
   case class NumericPLens[S, N: Numeric](lens: S @?> N, num: Numeric[N]) {
     def +=(that: N): PState[S, N] =
-      lens %= (num.minus(_, that))
+      lens %= (num.plus(_, that))
 
     def -=(that: N): PState[S, N] =
       lens %= (num.minus(_, that))
