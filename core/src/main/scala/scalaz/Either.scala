@@ -92,7 +92,7 @@ sealed trait \/[+A, +B] {
   /** Traverse on the right of this disjunction. */
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
     this match {
-      case -\/(a) => Applicative[F].point(-\/(a))
+      case a @ -\/(_) => Applicative[F].point(a)
       case \/-(b) => Functor[F].map(g(b))(\/-(_))
     }
 
@@ -107,7 +107,7 @@ sealed trait \/[+A, +B] {
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
     this match {
-      case -\/(a) => -\/(a)
+      case a @ -\/(_) => a
       case \/-(b) => g(b)
     }
 
@@ -121,8 +121,8 @@ sealed trait \/[+A, +B] {
   /** Filter on the right of this disjunction. */
   def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA]): (AA \/ B) =
     this match {
-      case -\/(a) => -\/(a)
-      case \/-(b) => if(p(b)) \/-(b) else -\/(M.zero)
+      case -\/(_) => this
+      case \/-(b) => if(p(b)) this else -\/(M.zero)
     }
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
@@ -206,10 +206,10 @@ sealed trait \/[+A, +B] {
     this match {
       case -\/(a1) => x match {
         case -\/(a2) => -\/(M2.append(a1, a2))
-        case \/-(b2) => -\/(a1)
+        case \/-(_) => this
       }
       case \/-(b1) => x match {
-        case -\/(a2) => -\/(a2)
+        case -\/(_) => x
         case \/-(b2) => \/-(M1.append(b1, b2))
       }
     }
@@ -354,10 +354,10 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 
     def cozip[A, B](x: L \/ (A \/ B)) =
       x match {
-        case -\/(l) => -\/(-\/(l))
+        case l @ -\/(_) => -\/(l)
         case \/-(e) => e match {
           case -\/(a) => -\/(\/-(a))
-          case \/-(b) => \/-(\/-(b))
+          case b @ \/-(_) => \/-(b)
         }
       }
 

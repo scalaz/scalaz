@@ -149,8 +149,8 @@ sealed trait Validation[+E, +A] {
   /** Filter on the success of this validation. */
   def filter[EE >: E](p: A => Boolean)(implicit M: Monoid[EE]): Validation[EE, A] =
     this match {
-      case Failure(a) => Failure(a)
-      case Success(e) => if(p(e)) Success(e) else Failure(M.zero)
+      case Failure(_) => this
+      case Success(e) => if(p(e)) this else Failure(M.zero)
     }
 
   /** Return `true` if this validation is a success value satisfying the given predicate. */
@@ -232,10 +232,10 @@ sealed trait Validation[+E, +A] {
     this match {
       case Failure(a1) => x match {
         case Failure(a2) => Failure(M2.append(a1, a2))
-        case Success(b2) => Failure(a1)
+        case Success(b2) => this
       }
       case Success(b1) => x match {
-        case Failure(a2) => Failure(a2)
+        case Failure(_) => x
         case Success(b2) => Success(M1.append(b1, b2))
       }
     }
