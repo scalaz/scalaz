@@ -86,8 +86,8 @@ trait ListTInstances extends ListTInstances1 {
   implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
     implicit def F: Monad[F] = F0
   }
-  implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
-  implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
+  implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
+  implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
   implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
 }
