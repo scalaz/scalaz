@@ -14,7 +14,7 @@ import Id._
  *
  * @tparam E The type of the input data (mnemonic: '''E'''lement type)
  * @tparam F The type constructor representing an effect.
- *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Iteratee]].
+ *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.iteratee.Iteratee]].
  * @tparam A The type of the calculated result
  */
 sealed trait IterateeT[E, F[_], A] {
