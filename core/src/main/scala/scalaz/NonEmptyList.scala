@@ -77,6 +77,18 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
+  def sortBy[B](f: A => B)(implicit o: scala.Ordering[B]): NonEmptyList[A] = (list.sortBy(f): @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
+  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = (list.sortWith(lt): @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
+  def sorted[B >: A](implicit o: scala.Ordering[B]): NonEmptyList[A] = (list.sorted(o): @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
   def size: Int = 1 + tail.size
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
