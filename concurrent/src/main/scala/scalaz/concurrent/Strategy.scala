@@ -1,7 +1,7 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.{ExecutorService, ThreadFactory, Executors}
+import java.util.concurrent.{Executor, ExecutorService}
 
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
@@ -22,16 +22,7 @@ trait Strategys extends StrategysLow {
    * The default executor service is a fixed thread pool with N daemon threads,
    * where N is equal to the number of available processors.
    */
-  val DefaultExecutorService: ExecutorService = {
-    import Executors._
-    newFixedThreadPool(Runtime.getRuntime.availableProcessors, new ThreadFactory {
-      def newThread(r: Runnable) = {
-        val t = defaultThreadFactory.newThread(r)
-        t.setDaemon(true)
-        t
-      }
-    })
-  }
+  val DefaultExecutorService: ExecutorService = new FixedThreadPoolExecutor()
 
   /**
    * A strategy that executes its arguments on `DefaultExecutorService`
@@ -51,8 +42,6 @@ trait StrategysLow {
     }
   }
 
-  import java.util.concurrent.ExecutorService
-
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
    */
@@ -65,6 +54,18 @@ trait StrategysLow {
         def call = a
       })
       () => fut.get
+    }
+  }
+
+  /**
+   * A strategy that evaluates its arguments using an implicit Executor without returning of result.
+   */
+  implicit def ActorExecutor(implicit e: Executor) = new Strategy {
+    def apply[A](a: => A) = {
+      e.execute(new Runnable() {
+        def run(): Unit = a
+      })
+      () => null.asInstanceOf[A]
     }
   }
 

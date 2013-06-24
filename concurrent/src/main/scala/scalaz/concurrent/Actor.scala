@@ -9,8 +9,9 @@ import annotation.tailrec
  * the actor with the method `!`. Processing is typically performed asynchronously,
  * this is controlled by the provided `strategy`.
  *
- * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
- * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
+ * <p>Implementation based on
+ * <a href="http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue">non-intrusive MPSC node-based queue</a>,
+ * described by Dmitriy Vyukov.
  *
  * @see scalaz.concurrent.Promise
  *
