@@ -166,6 +166,20 @@ trait EnumeratorTFunctions {
         )
     }
 
+  def enumInputStream[F[_]](in: => java.io.InputStream)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Byte], F] =
+    new EnumeratorT[IoExceptionOr[Byte], F] {
+      import MO._
+      lazy val inputStream = in
+      def apply[A] = (s: StepT[IoExceptionOr[Byte], F, A]) =>
+        s.mapCont(
+          k => {
+            val i = IoExceptionOr(inputStream.read)
+            if (i exists (_ != -1)) k(elInput(i.map(_.toByte))) >>== apply[A]
+            else s.pointI
+          }
+        )
+    }
+
   def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       private val limit = max.map(_ min (a.length)).getOrElse(a.length)
