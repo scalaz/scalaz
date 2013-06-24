@@ -152,33 +152,32 @@ trait EnumeratorTFunctions {
         )
     }
 
-  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] =
-    new EnumeratorT[IoExceptionOr[Char], F] {
+  def enumIoSource[T, E, F[_]](get : () => IoExceptionOr[T], gotdata : IoExceptionOr[T] => Boolean, render : T => E)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[E], F] =
+    new EnumeratorT[IoExceptionOr[E], F] {
       import MO._
-      lazy val reader = r
-      def apply[A] = (s: StepT[IoExceptionOr[Char], F, A]) =>
+      def apply[A] = (s: StepT[IoExceptionOr[E], F, A]) =>
         s.mapCont(
           k => {
-            val i = IoExceptionOr(reader.read)
-            if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== apply[A]
+            val i = get()
+            if (gotdata(i)) k(elInput(i.map(render))) >>== apply[A]
             else s.pointI
           }
         )
     }
 
-  def enumInputStream[F[_]](in: => java.io.InputStream)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Byte], F] =
-    new EnumeratorT[IoExceptionOr[Byte], F] {
-      import MO._
-      lazy val inputStream = in
-      def apply[A] = (s: StepT[IoExceptionOr[Byte], F, A]) =>
-        s.mapCont(
-          k => {
-            val i = IoExceptionOr(inputStream.read)
-            if (i exists (_ != -1)) k(elInput(i.map(_.toByte))) >>== apply[A]
-            else s.pointI
-          }
-        )
-    }
+  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] = {
+    lazy val src = r
+    enumIoSource(get = () => IoExceptionOr(src.read),
+                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 render = ((n: Int) => n.toChar))
+  }
+
+  def enumInputStream[F[_]](is: => java.io.InputStream)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Byte], F] = {
+    lazy val src = is
+    enumIoSource(get = () => IoExceptionOr(src.read),
+                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 render = ((n:Int) => n.toByte))
+  }
 
   def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
