@@ -146,7 +146,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait StreamTInstances2 {
+trait StreamTInstances0 {
   implicit def StreamTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = StreamT[F, α]})#λ] = new StreamTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
@@ -156,22 +156,12 @@ trait StreamTInstances2 {
   }
 }
 
-trait StreamTInstances1 extends StreamTInstances2 {
-
+trait StreamTInstances extends StreamTInstances0 {
   implicit def StreamTMonoid[F[_], A](implicit F0: Applicative[F]): Monoid[StreamT[F, A]] = new StreamTMonoid[F, A] {
     implicit def F: Applicative[F] = F0
   }
-}
-
-trait StreamTInstances0 extends StreamTInstances1 {
-  implicit def StreamTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = StreamT[F, α]})#λ] = new StreamTMonad[F] {
-    implicit def F: Monad[F] = F0
-  }
-}
-
-trait StreamTInstances extends StreamTInstances0 {
-  implicit def StreamTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = StreamT[F, α]})#λ] = new StreamTMonadPlus[F] {
-    implicit def F: Monad[F] = F0
+  implicit def StreamTMonadPlus[F[_]](implicit F0: Applicative[F]): MonadPlus[({type λ[α] = StreamT[F, α]})#λ] = new StreamTMonadPlus[F] {
+    implicit def F: Applicative[F] = F0
   }
   implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
   implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
@@ -263,26 +253,22 @@ private[scalaz] trait StreamTMonoid[F[_], A] extends Monoid[StreamT[F, A]] with 
   def zero: StreamT[F, A] = StreamT.empty[F, A]
 }
 
-private[scalaz] trait StreamTMonad[F[_]] extends Monad[({type λ[α] = StreamT[F, α]})#λ] with StreamTFunctor[F] {
-  implicit def F: Monad[F]
+private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTFunctor[F] {
+  implicit def F: Applicative[F]
 
   def point[A](a: => A): StreamT[F, A] = a :: StreamT.empty[F, A]
-
-  def bind[A, B](fa: StreamT[F, A])(f: A => StreamT[F, B]): StreamT[F, B] = fa flatMap f
-}
-
-private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTMonad[F] {
-  implicit def F: Monad[F]
 
   def empty[A]: StreamT[F, A] = StreamT.empty
 
   def plus[A](a: StreamT[F, A], b: => StreamT[F, A]): StreamT[F, A] = a ++ b
+
+  def bind[A, B](fa: StreamT[F, A])(f: A => StreamT[F, B]): StreamT[F, B] = fa flatMap f
 }
 
 private[scalaz] trait StreamTHoist extends Hoist[StreamT] {
   import StreamT._
   
-  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StreamT[G, α]})#λ] = StreamTMonad[G]
+  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StreamT[G, α]})#λ] = StreamTMonadPlus[G]
   
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
   
