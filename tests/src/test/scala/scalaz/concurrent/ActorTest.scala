@@ -19,7 +19,7 @@ class ActorTest extends Spec {
     assertCountDown(latch, "Should process a message")
   }
 
-  "code errors are catched and can be handled" in {
+  "code errors are caught and can be handled" in {
     val latch = new CountDownLatch(1)
     val actor = Actor[Int]((i: Int) => 100 / i, (ex: Throwable) => latch.countDown())
     actor ! 0
