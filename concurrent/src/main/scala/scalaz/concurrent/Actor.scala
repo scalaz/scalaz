@@ -1,16 +1,18 @@
-package scalaz
-package concurrent
+package scalaz.concurrent
 
+import scalaz.Contravariant
 import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
-import annotation.tailrec
 
 /**
  * Processes messages of type `A` sequentially. Messages are submitted to
  * the actor with the method `!`. Processing is typically performed asynchronously,
  * this is controlled by the provided `strategy`.
  *
- * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
- * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
+ * An implementation of message queue based on structure of
+ * <a href="http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue">non-intrusive MPSC node-based queue</a>,
+ * described by Dmitriy Vyukov.
+ *
+ * Cooked at kitchen of <a href="https://github.com/plokhotnyuk/actors">actor benchmarks</a>.
  *
  * @see scalaz.concurrent.Promise
  *
@@ -65,7 +67,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
     }
   }
 
-  @tailrec
+  @annotation.tailrec
   private def batchHandle(t: Node[A], i: Int): Node[A] = {
     val n = t.get
     if (n ne null) {
