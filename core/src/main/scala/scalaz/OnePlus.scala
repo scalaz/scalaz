@@ -14,6 +14,37 @@ private[scalaz] sealed trait OnePlusFunctor[F[_]]
     OnePlus(f(fa.head), F.map(fa.tail)(f))
 }
 
+private[scalaz] sealed trait OnePlusBind[F[_]] extends OnePlusFunctor[F] with Bind[({type λ[α] = OnePlus[F, α]})#λ] {
+  def F: Monad[F]
+  def G: Plus[F]
+
+  def bind[A, B](fa: OnePlus[F, A])(f: A => OnePlus[F, B]): OnePlus[F, B] = OnePlus(
+    f(fa.head).head,
+    G.plus(
+      f(fa.head).tail,
+      F.bind(fa.tail){ a =>
+        val x = f(a)
+        G.plus(F.point(x.head), x.tail)
+      }
+    )
+  )
+}
+
+private[scalaz] sealed trait OnePlusPlus[F[_]] extends Plus[({type λ[α] = OnePlus[F, α]})#λ] {
+  def F: Applicative[F]
+  def G: Plus[F]
+
+  def plus[A](a: OnePlus[F, A], b: => OnePlus[F, A]): OnePlus[F, A] =
+    OnePlus(a.head, G.plus(G.plus(a.tail, F.point(b.head)), b.tail))
+}
+
+private[scalaz] sealed trait OnePlusMonad[F[_]] extends OnePlusBind[F] with Monad[({type λ[α] = OnePlus[F, α]})#λ] {
+  def F: MonadPlus[F]
+  def G = F
+
+  def point[A](a: => A): OnePlus[F, A] = OnePlus(a, F.empty)
+}
+
 private[scalaz] sealed trait OnePlusFoldable[F[_]]
     extends Foldable1[({type λ[α] = OnePlus[F, α]})#λ] {
   def F: Foldable[F]
@@ -71,12 +102,14 @@ private[scalaz] sealed trait OnePlusTraverse1[F[_]]
     G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(G))(OnePlus.apply)
 }
 
-trait OnePlusInstances1 {
+trait OnePlusInstances2 {
   implicit def onePlusFunctor[F[_]: Functor]: Functor[({type λ[α] = OnePlus[F, α]})#λ] =
     new OnePlusFunctor[F] {
       def F = implicitly
     }
+}
 
+trait OnePlusInstances1 extends OnePlusInstances2 {
   implicit def onePlusFoldable[F[_]: Foldable]: Foldable1[({type λ[α] = OnePlus[F, α]})#λ] =
     new OnePlusFoldable[F] {
       def F = implicitly
@@ -95,6 +128,13 @@ sealed trait OnePlusEqual[F[_], A] extends Equal[OnePlus[F, A]] {
 }
 
 trait OnePlusInstances0 extends OnePlusInstances1 {
+
+  implicit def onePlusBind[F[_]: Monad: Plus]: Bind[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusBind[F] {
+      def F = implicitly
+      def G = implicitly
+    }
+
   /** If you have `Foldable1[F]`, `foldMap1` and `foldRight1` are
     * nonstrict and significantly more efficient.
     */
@@ -116,6 +156,17 @@ trait OnePlusInstances0 extends OnePlusInstances1 {
 }
 
 trait OnePlusInstances extends OnePlusInstances0 {
+  implicit def onePlusPlus[F[_]: Applicative: Plus]: Plus[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusPlus[F] {
+      def F = implicitly
+      def G = implicitly
+    }
+
+  implicit def onePlusMonad[F[_]: MonadPlus]: Monad[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusMonad[F] {
+      def F = implicitly
+    }
+
   implicit def onePlusTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OnePlus[F, α]})#λ] =
     new OnePlusTraverse1[F] {
       def F = implicitly

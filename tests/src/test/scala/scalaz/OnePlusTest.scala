@@ -13,6 +13,9 @@ class OnePlusTest extends Spec {
 
   checkAll("OnePlus", equal.laws[OnePlus[List, Int]])
   checkAll("OnePlus", order.laws[OnePlus[List, Int]])
+  checkAll("OnePlus List", monad.laws[OnePlusList])
+  checkAll("OnePlus List", plus.laws[OnePlusList])
+  checkAll("OnePlus Nel", plus.laws[OnePlusNel])
   checkAll("OnePlus List", traverse.laws[OnePlusList])
   checkAll("OnePlus Nel", traverse.laws[OnePlusNel])
 
@@ -65,6 +68,9 @@ class OnePlusTest extends Spec {
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OnePlus[F, α]})#λ]
+    def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OnePlus[F, α]})#λ]
+    def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OnePlus[F, α]})#λ]
+    def plus[F[_]: Applicative: Plus, A] = Plus[({type λ[α] = OnePlus[F, α]})#λ]
     def foldable[F[_]: Foldable, A] = Foldable1[({type λ[α] = OnePlus[F, α]})#λ]
     def foldable1[F[_]: Foldable1, A] = Foldable1[({type λ[α] = OnePlus[F, α]})#λ]
     def traverse[F[_]: Traverse, A] = Traverse1[({type λ[α] = OnePlus[F, α]})#λ]
