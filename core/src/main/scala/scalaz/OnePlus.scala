@@ -14,7 +14,21 @@ private[scalaz] sealed trait OnePlusFunctor[F[_]]
     OnePlus(f(fa.head), F.map(fa.tail)(f))
 }
 
-private[scalaz] sealed trait OnePlusBind[F[_]] extends OnePlusFunctor[F] with Bind[({type λ[α] = OnePlus[F, α]})#λ] {
+private[scalaz] sealed trait OnePlusApply[F[_]] extends OnePlusFunctor[F] with Apply[({type λ[α] = OnePlus[F, α]})#λ] {
+  def F: Apply[F]
+
+  def ap[A, B](fa: => OnePlus[F, A])(f: => OnePlus[F, A => B]): OnePlus[F, B] = OnePlus(
+    f.head(fa.head), F.apply2(f.tail, fa.tail)(_.apply(_))
+  )
+}
+
+private[scalaz] sealed trait OnePlusApplicative[F[_]] extends OnePlusApply[F] with Applicative[({type λ[α] = OnePlus[F, α]})#λ] {
+  def F: ApplicativePlus[F]
+
+  def point[A](a: => A): OnePlus[F, A] = OnePlus(a, F.empty)
+}
+
+private[scalaz] sealed trait OnePlusBind[F[_]] extends OnePlusApply[F] with Bind[({type λ[α] = OnePlus[F, α]})#λ] {
   def F: Monad[F]
   def G: Plus[F]
 
@@ -38,11 +52,9 @@ private[scalaz] sealed trait OnePlusPlus[F[_]] extends Plus[({type λ[α] = OneP
     OnePlus(a.head, G.plus(G.plus(a.tail, F.point(b.head)), b.tail))
 }
 
-private[scalaz] sealed trait OnePlusMonad[F[_]] extends OnePlusBind[F] with Monad[({type λ[α] = OnePlus[F, α]})#λ] {
+private[scalaz] sealed trait OnePlusMonad[F[_]] extends OnePlusBind[F] with OnePlusApplicative[F] with Monad[({type λ[α] = OnePlus[F, α]})#λ] {
   def F: MonadPlus[F]
   def G = F
-
-  def point[A](a: => A): OnePlus[F, A] = OnePlus(a, F.empty)
 }
 
 private[scalaz] sealed trait OnePlusFoldable[F[_]]
@@ -114,6 +126,11 @@ trait OnePlusInstances1 extends OnePlusInstances2 {
     new OnePlusFoldable[F] {
       def F = implicitly
     }
+
+  implicit def onePlusApply[F[_]: Apply]: Apply[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusApply[F] {
+      def F = implicitly
+    }
 }
 
 private[scalaz]
@@ -133,6 +150,11 @@ trait OnePlusInstances0 extends OnePlusInstances1 {
     new OnePlusBind[F] {
       def F = implicitly
       def G = implicitly
+    }
+
+  implicit def onePlusApplicative[F[_]: ApplicativePlus]: Applicative[({type λ[α] = OnePlus[F, α]})#λ] =
+    new OnePlusApplicative[F] {
+      def F = implicitly
     }
 
   /** If you have `Foldable1[F]`, `foldMap1` and `foldRight1` are

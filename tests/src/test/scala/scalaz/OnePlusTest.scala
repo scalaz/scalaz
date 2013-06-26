@@ -68,6 +68,8 @@ class OnePlusTest extends Spec {
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OnePlus[F, α]})#λ]
+    def apply[F[_]: Apply, A] = Apply[({type λ[α] = OnePlus[F, α]})#λ]
+    def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OnePlus[F, α]})#λ]
     def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OnePlus[F, α]})#λ]
     def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OnePlus[F, α]})#λ]
     def plus[F[_]: Applicative: Plus, A] = Plus[({type λ[α] = OnePlus[F, α]})#λ]
