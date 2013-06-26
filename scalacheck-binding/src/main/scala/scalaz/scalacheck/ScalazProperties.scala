@@ -128,7 +128,7 @@ object ScalazProperties {
 
   object applicative {
     def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.applicativeLaw.identity[X] _)
+      forAll(f.applicativeLaw.identityAp[X] _)
 
     def composition[F[_], X, Y, Z](implicit ap: Applicative[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
                                    av: Arbitrary[F[X => Y]], e: Equal[F[Z]]) = forAll(ap.applicativeLaw.composition[X, Y, Z] _)
