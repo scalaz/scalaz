@@ -77,7 +77,7 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
-  def sortBy[B](f: A => B)(implicit o: scala.Ordering[B]): NonEmptyList[A] = (list.sortBy(f): @unchecked) match {
+  def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
     case x :: xs => nel(x, xs)
   }
 
@@ -85,7 +85,7 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
-  def sorted[B >: A](implicit o: scala.Ordering[B]): NonEmptyList[A] = (list.sorted(o): @unchecked) match {
+  def sorted[B >: A](implicit o: Order[B]): NonEmptyList[A] = (list.sorted(o.toScalaOrdering): @unchecked) match {
     case x :: xs => nel(x, xs)
   }
 
