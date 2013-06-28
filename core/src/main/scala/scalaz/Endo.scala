@@ -8,9 +8,6 @@ sealed trait Endo[A] {
 
   final def apply(a: A): A = run(a)
 
-  /** `run(run(run(...` */
-  final def fix: A = apply(fix)
-
   /** Do `other`, than call myself with its result. */
   final def compose(other: Endo[A]): Endo[A] = Endo.endo(run compose other.run)
 

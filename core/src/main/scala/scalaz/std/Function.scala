@@ -132,7 +132,15 @@ trait FunctionInstances extends FunctionInstances0 {
   }
 }
 
-object function extends FunctionInstances
+trait FunctionFunctions {
+  /** `f(f(f(...` for referentially transparent `f`. */
+  final def fix[A](f: (=> A) => A): A = {
+    lazy val a: A = f(a)
+    a
+  }
+}
+
+object function extends FunctionFunctions with FunctionInstances
 
 //
 // Type class implementation traits
