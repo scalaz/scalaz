@@ -2,6 +2,7 @@ package scalaz
 package std
 
 import std.AllInstances._
+import std.AllFunctions.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
@@ -62,6 +63,11 @@ class FunctionTest extends Spec {
     mappedCall() must be_===(number + 4)
   }
 
+  "fix" ! prop{(n: Int) =>
+    fix[Int](_ => n) must be_===(n)
+    (fix[Stream[Int]](ns => n #:: (2*n) #:: ns).take(4).toList
+      must be_===(List(n, 2*n, n, 2*n)))
+  }
 
   object instances {
     def equal[A, R: Equal] = Equal[() => R]
