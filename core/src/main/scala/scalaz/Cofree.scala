@@ -64,7 +64,7 @@ case class Cofree[S[+_], +A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor
     zapWith(fs)((a, f) => f(a))
 }
 
-object Cofree extends CofreeFunctions
+object Cofree extends CofreeFunctions with CofreeInstances
 
 
 trait CofreeFunctions {
