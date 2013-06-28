@@ -29,7 +29,7 @@ case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S
   }
 
   /** Redecorates the structure with values representing entire substructures. */
-  final def duplicate: Cofree[S, Cofree[S, A]] = 
+  final def duplicate: Cofree[S, Cofree[S, A]] =
     applyTail(this, _.duplicate)
 
   /** Returns the components of this structure in a tuple. */
@@ -64,7 +64,7 @@ case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S
     zapWith(fs)((a, f) => f(a))
 }
 
-object Cofree extends CofreeFunctions
+object Cofree extends CofreeFunctions with CofreeInstances
 
 
 trait CofreeFunctions {
@@ -76,14 +76,10 @@ trait CofreeFunctions {
 }
 
 trait CofreeInstances {
-  implicit def cofreeComonad[S[_]](implicit S0: Functor[S]): Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {
-    implicit def S = S0
-  }
+  implicit def cofreeComonad[S[_]]: Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {}
 }
 
 private[scalaz] trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
-  implicit def S: Functor[S]
-
   def copoint[A](p: Cofree[S, A]) = p.head
 
   def cojoin[A](a: Cofree[S, A]) = a.duplicate
