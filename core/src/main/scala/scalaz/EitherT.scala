@@ -78,6 +78,7 @@ sealed trait EitherT[F[_], A, B] {
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (A \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
   /** Run the side-effect on the right of this disjunction. */
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
     F.each(run)(_ foreach f)
 
