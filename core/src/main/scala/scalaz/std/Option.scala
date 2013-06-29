@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Cojoin[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Cojoin[Option] with Optional[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -49,7 +49,7 @@ trait OptionInstances extends OptionInstances0 {
         case Some((a, b)) => (Some(a), Some(b))
       }
 
-    def isEmpty[A](opt: Option[A]) = opt.isEmpty
+    override def isEmpty[A](opt: Option[A]) = opt.isEmpty
 
     def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
       fa map (a => f(Some(a)))
@@ -57,6 +57,10 @@ trait OptionInstances extends OptionInstances0 {
     def cojoin[A](a: Option[A]) =
       a map (Some(_))
 
+    def getOrElse[A](fa: Option[A])(default: => A): A = fa.getOrElse(default)
+    def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
+    def orElse[A](fa: Option[A])(alternative: => Option[A]): Option[A] = fa.orElse(alternative)
+    def toOption[A](fa: Option[A]): Option[A] = fa
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {

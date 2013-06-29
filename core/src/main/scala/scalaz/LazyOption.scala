@@ -107,7 +107,7 @@ object LazyOption extends LazyOptionFunctions with LazyOptionInstances
 trait LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Cojoin[LazyOption] with Cobind.FromCojoin[LazyOption]{
+  implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Cojoin[LazyOption] with Cobind.FromCojoin[LazyOption] with Optional[LazyOption] {
     def cojoin[A](a: LazyOption[A]) = a match {
       case LazyNone => LazyNone
       case o @ LazySome(_) => LazySome(() => o)
@@ -126,6 +126,10 @@ trait LazyOptionInstances {
       }, -\/(lazyNone))
     def zip[A, B](a: => LazyOption[A], b: => LazyOption[B]) = a zip b
     def unzip[A, B](a: LazyOption[(A, B)]) = a.unzip
+    def getOrElse[A](fa: LazyOption[A])(default: => A): A = fa.getOrElse(default)
+    def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
+    def orElse[A](fa: LazyOption[A])(alternative: => LazyOption[A]): LazyOption[A] = fa.orElse(alternative)
+    def toOption[A](fa: LazyOption[A]): Option[A] = fa.toOption
   }
 
   implicit def lazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = {
