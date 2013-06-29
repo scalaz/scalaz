@@ -47,6 +47,7 @@ sealed trait LazyOptionT[F[_], A] {
   def map[B](f: (=> A) => B)(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_ map f))
 
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: (=> A) => Unit)(implicit e: Each[F]): Unit =
     e.each(run)(_ foreach f)
 

@@ -47,6 +47,7 @@ sealed trait WriterT[F[_], W, A] { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): WriterT[F, W, B] =
     writerT(F.map(run)(wa => (wa._1, f(wa._2))))
 
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
     E.each(run)(wa => f(wa._2))
 
@@ -191,6 +192,7 @@ trait WriterTInstances1 extends WriterTInstances2 {
   implicit def writerTraverse[W]: WriterTTraverse[Id, W] = new WriterTTraverse[Id, W] {
     implicit def F = idInstance
   }
+  @deprecated("Each/foreach is deprecated", "7.1")
   implicit def writerEach[W]: WriterTEach[Id, W] = new WriterTEach[Id, W] {
     implicit def F = idInstance
   }
@@ -203,8 +205,10 @@ trait WriterTInstances0 extends WriterTInstances1 {
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {
     implicit def F = F0
   }
+  @deprecated("Index is deprecated, use Foldable instead", "7.1")
   implicit def writerTIndex[W] = new WriterTIndex[W] {
   }
+  @deprecated("Each/foreach is deprecated", "7.1")
   implicit def writerEach[F[_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
     implicit def F = F0
   }

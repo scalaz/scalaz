@@ -164,7 +164,7 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
-      def length[A](a: NonEmptyList[A]): Int = a.size
+      override def length[A](a: NonEmptyList[A]): Int = a.size
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {

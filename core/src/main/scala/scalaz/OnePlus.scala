@@ -136,6 +136,7 @@ trait OnePlusInstances extends OnePlusInstances0 {
                                 FA.order(a1.tail, a2.tail))
     }
 
+  @deprecated("Each is deprecated", "7.1")
   implicit def onePlusEach[F[_]: Each]: Each[({type λ[α] = OnePlus[F, α]})#λ] =
     new Each[({type λ[α] = OnePlus[F, α]})#λ] {
       def each[A](fa: OnePlus[F, A])(f: A => Unit) = {
@@ -144,6 +145,7 @@ trait OnePlusInstances extends OnePlusInstances0 {
       }
     }
 
+  @deprecated("Length is deprecated", "7.1")
   implicit def onePlusLength[F[_]: Length, A]: Length[({type λ[α] = OnePlus[F, α]})#λ] =
     new Length[({type λ[α] = OnePlus[F, α]})#λ] {
       def length[A](fa: OnePlus[F, A]) = 1 + Length[F].length(fa.tail)

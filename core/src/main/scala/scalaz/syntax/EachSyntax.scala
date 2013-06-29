@@ -5,6 +5,7 @@ package syntax
 trait EachOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Each[F]
   ////
+  @deprecated("Each/foreach is deprecated", "7.1")
   final def foreach(f: A => Unit): Unit = F.each(self)(f)
   ////
 }
