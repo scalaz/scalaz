@@ -19,6 +19,9 @@ trait Optional[F[_]]  { self =>
 
   // derived functions
 
+  /** Returns `true` if a value is defined within the context. This is an alias for `isDefined`. */
+  def nonEmpty[A](fa: F[A]): Boolean = isDefined(fa)
+
   /** Returns `true` if no value is defined within the context. */
   def isEmpty[A](fa: F[A]): Boolean = ! isDefined(fa)
 

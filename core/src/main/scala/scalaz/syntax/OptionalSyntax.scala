@@ -15,6 +15,9 @@ trait OptionalOps[F[_],A] extends Ops[F[A]] {
   /** Returns `this` context if defined or else the value of the `alternative`. */
   def orElse(alternative: => F[A]): F[A] = F.orElse(self)(alternative)
 
+  /** Returns `true` if a value is defined within the context. */
+  def nonEmpty: Boolean = F.nonEmpty(self)
+
   /** Returns `true` if no value is defined within the context. */
   def isEmpty: Boolean = F.isEmpty(self)
 
