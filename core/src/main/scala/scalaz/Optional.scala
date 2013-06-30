@@ -1,12 +1,15 @@
 package scalaz
 
+////
 /** Abstraction over a container/context which may or may not provide a value.
   *
   * @tparam F the container/context type
   *
   * @see [[syntax.OptionalOps]]
   */
-trait Optional[F[_]] {
+////
+trait Optional[F[_]]  { self =>
+  ////
 
   /** Returns the value within the context if defined or else the value of `default`. */
   def getOrElse[A](fa: F[A])(default: => A): A
@@ -31,4 +34,14 @@ trait Optional[F[_]] {
   /** Returns this context converted to the `Option` context. */
   def toOption[A](fa: F[A]): Option[A]
 
+  ////
+  val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }
+}
+
+object Optional {
+  @inline def apply[F[_]](implicit F: Optional[F]): Optional[F] = F
+
+  ////
+
+  ////
 }
