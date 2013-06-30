@@ -61,7 +61,6 @@ trait OptionInstances extends OptionInstances0 {
 
     def getOrElse[A](fa: Option[A])(default: => A): A = fa.getOrElse(default)
     def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
-    def orElse[A](fa: Option[A])(alternative: => Option[A]): Option[A] = fa.orElse(alternative)
     def toOption[A](fa: Option[A]): Option[A] = fa
   }
 

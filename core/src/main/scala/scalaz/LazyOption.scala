@@ -128,7 +128,6 @@ trait LazyOptionInstances {
     def unzip[A, B](a: LazyOption[(A, B)]) = a.unzip
     def getOrElse[A](fa: LazyOption[A])(default: => A): A = fa.getOrElse(default)
     def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
-    def orElse[A](fa: LazyOption[A])(alternative: => LazyOption[A]): LazyOption[A] = fa.orElse(alternative)
     def toOption[A](fa: LazyOption[A]): Option[A] = fa.toOption
   }
 
