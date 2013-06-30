@@ -52,6 +52,7 @@ sealed trait LazyEitherT[F[_], A, B] {
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
     lazyEitherT(F.map(run)(_ map f))
 
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: (=> B) => Unit)(implicit e: Each[F]): Unit =
     e.each(run)(_ foreach f)
 
@@ -133,6 +134,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
       LazyEitherT(F.map(lazyEitherT.run)(_.left map f))
 
+    @deprecated("Each/foreach is deprecated", "7.1")
     def foreach(f: (=> A) => Unit)(implicit F: Each[F]): Unit =
       F.each(lazyEitherT.run)(_.left foreach f)
 

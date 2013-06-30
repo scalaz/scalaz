@@ -14,8 +14,8 @@ trait StreamInstances {
     }
 
     def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f
-    def length[A](fa: Stream[A]) = fa.length
-    def index[A](fa: Stream[A], i: Int) = {
+    override def length[A](fa: Stream[A]) = fa.length
+    override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
       val it = fa.iterator
@@ -27,6 +27,8 @@ trait StreamInstances {
 
       k
     }
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: Stream[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 

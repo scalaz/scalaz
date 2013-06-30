@@ -24,9 +24,6 @@ object TypeClass {
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
-  lazy val length = TypeClass("Length", *->*)
-  lazy val each = TypeClass("Each", *->*)
-  lazy val index = TypeClass("Index", *->*)
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
@@ -77,15 +74,11 @@ object TypeClass {
   def core: List[TypeClass] = List(semigroup,
     monoid,
     equal,
-    length,
     show,
     order,
     enum,
-    //metricSpace,
     plusEmpty,
     isEmpty,
-    each,
-    index,
     functor,
     contravariant,
     apply,
