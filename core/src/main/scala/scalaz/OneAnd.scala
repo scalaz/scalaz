@@ -14,21 +14,21 @@ private[scalaz] sealed trait OneAndFunctor[F[_]]
     OneAnd(f(fa.head), F.map(fa.tail)(f))
 }
 
-private[scalaz] sealed trait OneAndApply[F[_]] extends OneAndFunctor[F] with Apply[({type λ[α] = OneAnd[F, α]})#λ] {
+private[scalaz] sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = OneAnd[F, α]})#λ] with OneAndFunctor[F] {
   def F: Apply[F]
 
-  def ap[A, B](fa: => OneAnd[F, A])(f: => OneAnd[F, A => B]): OneAnd[F, B] = OneAnd(
+  override def ap[A, B](fa: => OneAnd[F, A])(f: => OneAnd[F, A => B]): OneAnd[F, B] = OneAnd(
     f.head(fa.head), F.apply2(f.tail, fa.tail)(_.apply(_))
   )
 }
 
-private[scalaz] sealed trait OneAndApplicative[F[_]] extends OneAndApply[F] with Applicative[({type λ[α] = OneAnd[F, α]})#λ] {
+private[scalaz] sealed trait OneAndApplicative[F[_]] extends Applicative[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
   def F: ApplicativePlus[F]
 
   def point[A](a: => A): OneAnd[F, A] = OneAnd(a, F.empty)
 }
 
-private[scalaz] sealed trait OneAndBind[F[_]] extends OneAndApply[F] with Bind[({type λ[α] = OneAnd[F, α]})#λ] {
+private[scalaz] sealed trait OneAndBind[F[_]] extends Bind[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
   def F: Monad[F]
   def G: Plus[F]
 
@@ -52,7 +52,7 @@ private[scalaz] sealed trait OneAndPlus[F[_]] extends Plus[({type λ[α] = OneAn
     OneAnd(a.head, G.plus(G.plus(a.tail, F.point(b.head)), b.tail))
 }
 
-private[scalaz] sealed trait OneAndMonad[F[_]] extends OneAndBind[F] with OneAndApplicative[F] with Monad[({type λ[α] = OneAnd[F, α]})#λ] {
+private[scalaz] sealed trait OneAndMonad[F[_]] extends Monad[({type λ[α] = OneAnd[F, α]})#λ] with OneAndBind[F] with OneAndApplicative[F] {
   def F: MonadPlus[F]
   def G = F
 }
