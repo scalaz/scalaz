@@ -70,7 +70,7 @@ class OneAndTest extends Spec {
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
-    def apply[F[_]: Apply, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Applicative: Plus, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
     def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
     def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
     def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OneAnd[F, α]})#λ]

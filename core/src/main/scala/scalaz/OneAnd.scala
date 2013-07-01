@@ -15,11 +15,15 @@ private[scalaz] sealed trait OneAndFunctor[F[_]]
 }
 
 private[scalaz] sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = OneAnd[F, α]})#λ] with OneAndFunctor[F] {
-  def F: Apply[F]
+  def F: Applicative[F]
+  def G: Plus[F]
 
-  override def ap[A, B](fa: => OneAnd[F, A])(f: => OneAnd[F, A => B]): OneAnd[F, B] = OneAnd(
-    f.head(fa.head), F.apply2(f.tail, fa.tail)(_.apply(_))
-  )
+  override def ap[A, B](fa: => OneAnd[F, A])(f: => OneAnd[F, A => B]): OneAnd[F, B] = {
+    val OneAnd(hf, tf) = f
+    val OneAnd(ha, ta) = fa
+    OneAnd(hf(ha), G.plus(F.map(ta)(hf),
+                          F.ap(G.plus(F.point(ha), ta))(tf)))
+  }
 }
 
 private[scalaz] sealed trait OneAndApplicative[F[_]] extends Applicative[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
@@ -122,9 +126,10 @@ trait OneAndInstances5 {
 }
 
 trait OneAndInstances4 extends OneAndInstances5 {
-  implicit def oneAndApply[F[_]: Apply]: Apply[({type λ[α] = OneAnd[F, α]})#λ] =
+  implicit def oneAndApply[F[_]: Applicative: Plus]: Apply[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndApply[F] {
       def F = implicitly
+      def G = implicitly
     }
 }
 
@@ -132,6 +137,7 @@ trait OneAndInstances3 extends OneAndInstances4 {
   implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndApplicative[F] {
       def F = implicitly
+      def G = implicitly
     }
 }
 
