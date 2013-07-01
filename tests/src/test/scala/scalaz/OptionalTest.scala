@@ -24,6 +24,16 @@ class OptionalTest extends Spec {
     O.toOption(context)            must be_===(Option.empty[A])
   }
 
+  """\/ instance tests""" in {
+    type EitherInt[A] = Int \/ A
+
+    def right(a: Int): EitherInt[Int] = \/.right(a)
+    def left(a: Int): EitherInt[Int] = \/.left(a)
+
+    definedTests(right(1), 1, 0, right(0))
+    undefinedTests(left(0), 0, right(0))
+  }
+
   // LazyOption[Show[_]] is currently unavailable
 //  "LazyOption instance tests" in {
 //    definedTests(LazyOption.lazySome(1), 1, 0, LazyOption.lazySome(0))

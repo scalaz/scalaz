@@ -339,7 +339,7 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
 }
 
 trait DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] {
+  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
@@ -363,6 +363,15 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 
     def plus[A](a: L \/ A, b: => L \/ A) =
       a orElse b
+
+    def getOrElse[A](fa: L \/ A)(default: => A): A =
+      fa.getOrElse(default)
+
+    def isDefined[A](fa: L \/ A): Boolean =
+      fa.isRight
+
+    def toOption[A](fa: L \/ A): Option[A] =
+      fa.toOption
   }
 
 }
