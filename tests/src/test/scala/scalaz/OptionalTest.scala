@@ -34,7 +34,16 @@ class OptionalTest extends Spec {
     undefinedTests(left(0), 0, right(0))
   }
 
-  // LazyOption[Show[_]] is currently unavailable
+  // currently there are no Equal[LazyEither], Show[LazyEither]
+//  """LazyEither instance tests""" in {
+//    type LEInt[A] = LazyEither[Int,A]
+//    def right(a: Int): LEInt[Int] = LazyEither.lazyRight(a)
+//    def left(a: Int): LEInt[Int] = LazyEither.lazyLeft(a)
+//    definedTests(right(1), 1, 0, right(0))
+//    undefinedTests(left(0), 0, right(0))
+//  }
+
+  // currently there is no Show[LazyOption]
 //  "LazyOption instance tests" in {
 //    definedTests(LazyOption.lazySome(1), 1, 0, LazyOption.lazySome(0))
 //    undefinedTests(LazyOption.lazyNone[Int], 0, LazyOption.lazySome(0))
