@@ -114,21 +114,43 @@ private[scalaz] sealed trait OneAndTraverse1[F[_]]
     G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(G))(OneAnd.apply)
 }
 
-trait OneAndInstances2 {
+trait OneAndInstances5 {
   implicit def oneAndFunctor[F[_]: Functor]: Functor[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndFunctor[F] {
       def F = implicitly
     }
 }
 
+trait OneAndInstances4 extends OneAndInstances5 {
+  implicit def oneAndApply[F[_]: Apply]: Apply[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndApply[F] {
+      def F = implicitly
+    }
+}
+
+trait OneAndInstances3 extends OneAndInstances4 {
+  implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndApplicative[F] {
+      def F = implicitly
+    }
+}
+
+trait OneAndInstances2 extends OneAndInstances3 {
+  implicit def oneAndBind[F[_]: Monad: Plus]: Bind[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndBind[F] {
+      def F = implicitly
+      def G = implicitly
+    }
+}
+
 trait OneAndInstances1 extends OneAndInstances2 {
-  implicit def oneAndFoldable[F[_]: Foldable]: Foldable1[({type λ[α] = OneAnd[F, α]})#λ] =
-    new OneAndFoldable[F] {
+  implicit def oneAndMonad[F[_]: MonadPlus]: Monad[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndMonad[F] {
       def F = implicitly
     }
 
-  implicit def oneAndApply[F[_]: Apply]: Apply[({type λ[α] = OneAnd[F, α]})#λ] =
-    new OneAndApply[F] {
+  implicit def oneAndFoldable[F[_]: Foldable]: Foldable1[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndFoldable[F] {
       def F = implicitly
     }
 }
@@ -145,18 +167,6 @@ sealed trait OneAndEqual[F[_], A] extends Equal[OneAnd[F, A]] {
 }
 
 trait OneAndInstances0 extends OneAndInstances1 {
-
-  implicit def oneAndBind[F[_]: Monad: Plus]: Bind[({type λ[α] = OneAnd[F, α]})#λ] =
-    new OneAndBind[F] {
-      def F = implicitly
-      def G = implicitly
-    }
-
-  implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[({type λ[α] = OneAnd[F, α]})#λ] =
-    new OneAndApplicative[F] {
-      def F = implicitly
-    }
-
   /** If you have `Foldable1[F]`, `foldMap1` and `foldRight1` are
     * nonstrict and significantly more efficient.
     */
@@ -182,11 +192,6 @@ trait OneAndInstances extends OneAndInstances0 {
     new OneAndPlus[F] {
       def F = implicitly
       def G = implicitly
-    }
-
-  implicit def oneAndMonad[F[_]: MonadPlus]: Monad[({type λ[α] = OneAnd[F, α]})#λ] =
-    new OneAndMonad[F] {
-      def F = implicitly
     }
 
   implicit def oneAndTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OneAnd[F, α]})#λ] =

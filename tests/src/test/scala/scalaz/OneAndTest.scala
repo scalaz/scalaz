@@ -8,13 +8,14 @@ import std.AllInstances._
 import OneAnd.oneAndNelIso
 
 class OneAndTest extends Spec {
+  type OneAndOption[A] = OneAnd[Option, A]
   type OneAndList[A] = OneAnd[List, A]
   type OneAndNel[A] = OneAnd[NonEmptyList, A]
 
   checkAll("OneAnd", equal.laws[OneAnd[List, Int]])
   checkAll("OneAnd", order.laws[OneAnd[List, Int]])
   checkAll("OneAnd List", monad.laws[OneAndList])
-  checkAll("OneAnd List", plus.laws[OneAndList])
+  checkAll("OneAnd Option", monad.laws[OneAndOption])
   checkAll("OneAnd Nel", plus.laws[OneAndNel])
   checkAll("OneAnd List", traverse.laws[OneAndList])
   checkAll("OneAnd Nel", traverse.laws[OneAndNel])
@@ -68,6 +69,7 @@ class OneAndTest extends Spec {
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def apply[F[_]: Apply, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
     def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
     def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
