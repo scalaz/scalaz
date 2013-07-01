@@ -13,6 +13,9 @@ class OneAndTest extends Spec {
 
   checkAll("OneAnd", equal.laws[OneAnd[List, Int]])
   checkAll("OneAnd", order.laws[OneAnd[List, Int]])
+  checkAll("OneAnd List", monad.laws[OneAndList])
+  checkAll("OneAnd List", plus.laws[OneAndList])
+  checkAll("OneAnd Nel", plus.laws[OneAndNel])
   checkAll("OneAnd List", traverse.laws[OneAndList])
   checkAll("OneAnd Nel", traverse.laws[OneAndNel])
 
@@ -65,6 +68,11 @@ class OneAndTest extends Spec {
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Apply, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
+    def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
+    def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: Applicative: Plus, A] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
     def foldable[F[_]: Foldable, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
     def foldable1[F[_]: Foldable1, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse[F[_]: Traverse, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
