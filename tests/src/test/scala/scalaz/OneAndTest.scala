@@ -19,6 +19,9 @@ class OneAndTest extends Spec {
   checkAll("OneAnd Nel", plus.laws[OneAndNel])
   checkAll("OneAnd List", traverse.laws[OneAndList])
   checkAll("OneAnd Nel", traverse.laws[OneAndNel])
+  checkAll("OneAnd List", semigroup.laws[OneAnd[List, Int]])
+  checkAll("OneAnd Nel", semigroup.laws[OneAnd[NonEmptyList, Int]])
+  checkAll("OneAnd Option", semigroup.laws[OneAnd[Option, Int]])
 
   "oneAndNelIso is iso" ! prop {(nel: NonEmptyList[Int]) =>
     oneAndNelIso.from(oneAndNelIso.to(nel)) must be_===(nel)
@@ -80,5 +83,6 @@ class OneAndTest extends Spec {
     def traverse[F[_]: Traverse, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse1[F[_]: Traverse1, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def each[F[_]: Each, A] = Each[({type λ[α] = OneAnd[F, α]})#λ]
+    def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }

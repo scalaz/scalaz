@@ -220,6 +220,9 @@ trait OneAndInstances extends OneAndInstances0 {
                                 FA.order(a1.tail, a2.tail))
     }
 
+  implicit def oneAndSemigroup[F[_]: Applicative: Plus, A]: Semigroup[OneAnd[F, A]] =
+    oneAndPlus[F].semigroup
+
   @deprecated("Each is deprecated", "7.1")
   implicit def oneAndEach[F[_]: Each]: Each[({type λ[α] = OneAnd[F, α]})#λ] =
     new Each[({type λ[α] = OneAnd[F, α]})#λ] {
