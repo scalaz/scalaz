@@ -133,10 +133,10 @@ trait LazyOptionInstances {
     Equal.equalBy(_.toOption)
   }
 
-  /* TODO
-implicit def LazyOptionShow[A: Show]: Show[LazyOption[A]] =
-  Show[A].shows(_ map (Show[A].shows(_)) fold ("~Some(" + _ + ")", "~None"))
+  implicit def lazyOptionShow[A: Show]: Show[LazyOption[A]] =
+    Show.shows(_.fold(a ⇒ "LazySome(%s)".format(a.shows), "LazyNone"))
 
+  /* TODO
 implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
   Order.orderBy(_.toOption)*/
 }
