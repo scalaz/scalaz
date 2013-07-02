@@ -133,8 +133,8 @@ trait LazyOptionInstances {
     Equal.equalBy(_.toOption)
   }
 
-  implicit def lazyOptionShow[A: Show]: Show[LazyOption[A]] =
-    Show.shows(_.fold(a ⇒ "LazySome(%s)".format(a.shows), "LazyNone"))
+  implicit def lazyOptionShow[A](implicit S: Show[A]): Show[LazyOption[A]] =
+    Show.shows(_.fold(a ⇒ "LazySome(%s)".format(S.shows(a)), "LazyNone"))
 
   /* TODO
 implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
