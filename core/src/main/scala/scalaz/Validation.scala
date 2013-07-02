@@ -406,7 +406,7 @@ trait ValidationInstances1 extends ValidationInstances2 {
 }
 
 trait ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
+  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] {
 
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f
@@ -428,6 +428,15 @@ trait ValidationInstances2 extends ValidationInstances3 {
 
     def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
       a orElse b
+
+    def getOrElse[A](fa: Validation[L,A])(default: => A): A =
+      fa.getOrElse(default)
+
+    def isDefined[A](fa: Validation[L,A]): Boolean =
+      fa.isSuccess
+
+    def toOption[A](fa: Validation[L,A]): Option[A] =
+      fa.toOption
   }
 }
 

@@ -54,6 +54,16 @@ class OptionalTest extends Spec {
     undefinedTests(Option.empty[Int], 0, Option(0))
   }
 
+  """Validation instance tests""" in {
+    type VString[A] = Validation[String,A]
+
+    def success(a: Int): VString[Int] = Validation.success(a)
+    def failure(s: String): VString[Int] = Validation.failure(s)
+
+    definedTests(success(1), 1, 0, success(0))
+    undefinedTests(failure("oO"), 0, success(0))
+  }
+
   "syntax test" in {
     import syntax.optional._
 
