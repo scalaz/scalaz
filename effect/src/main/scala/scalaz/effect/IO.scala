@@ -68,7 +68,7 @@ sealed trait IO[+A] {
     m.liftIO(this)
 
   /** Executes the handler if an exception is raised. */
-  def except[B >: A](handler: Throwable => IO[B]): IO[B] = 
+  def except[B >: A](handler: Throwable => IO[B]): IO[B] =
     io(rw => try { Return(this(rw).run) } catch { case e => handler(e)(rw) })
 
   /**
@@ -149,7 +149,7 @@ trait IOInstances1 {
 trait IOInstances0 extends IOInstances1 {
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
     Monoid.liftMonoid[IO, A](ioMonad, A)
-  
+
   implicit val ioMonadIO: MonadIO[IO] = new MonadIO[IO] with IOLiftIO with IOMonad
 }
 
@@ -219,7 +219,7 @@ trait IOFunctions extends IOStd {
 
   /** Construct an IO action from a world-transition function. */
   def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] = new IO[A] {
-    private[effect] def apply(rw: Tower[IvoryTower]) = f(rw)
+    private[effect] def apply(rw: Tower[IvoryTower]) = Suspend(() => f(rw))
   }
 
   // Mutable variables in the IO monad
