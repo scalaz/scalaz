@@ -219,7 +219,7 @@ trait IOFunctions extends IOStd {
 
   /** Construct an IO action from a world-transition function. */
   def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] = new IO[A] {
-    private[effect] def apply(rw: Tower[IvoryTower]) = f(rw)
+    private[effect] def apply(rw: Tower[IvoryTower]) = Suspend(() => f(rw))
   }
 
   // Mutable variables in the IO monad
