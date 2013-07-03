@@ -4,7 +4,7 @@ package scalaz
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is
  * simultaneously transitioning from type `A1` to type `A2`.  [[scalaz.PLens]] is a
- * convenient alias for when `F =:= Id`, `A1 =:= A2`, and `B1 =:= B2`.
+ * convenient alias for when `A1 =:= A2`, and `B1 =:= B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a partial lens
  * family can address the nth element of a `List`.
@@ -16,18 +16,12 @@ package scalaz
  * @tparam B1 The initial type of the optional field
  * @tparam B2 The final type of the optional field
  */
-sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
+sealed trait PLensFamily[A1, A2, B1, B2] {
   def run(a: A1): Option[IndexedStore[B1, B2, A2]]
 
   def apply(a: A1): Option[IndexedStore[B1, B2, A2]] =
     run(a)
 
-  /*
-
-  import StateT._
-
-
-   */
   import BijectionT._
   import PLensFamily._
 
@@ -53,10 +47,10 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
     Kleisli[Option, A1, B1](get(_))
 
   /** If the Partial Lens is null, then return the given default value. */
-  def getOr[B >: B1](a: A1, b: => B): B =
+  def getOr(a: A1, b: => B1): B1 =
     get(a) getOrElse b
 
-  def getOrZ[B >: B1](a: A1)(implicit M: Monoid[B]): B =
+  def getOrZ(a: A1)(implicit M: Monoid[B1]): B1 =
     getOr(a, M.zero)
 
   def set(a: A1, b: B2): Option[A2] =
@@ -65,10 +59,10 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
   def setK(a: A1): Kleisli[Option, B2, A2] =
     Kleisli[Option, B2, A2](set(a, _))
 
-  def setOr[A >: A2](a: A1, b: B2, d: => A): A =
+  def setOr(a: A1, b: B2, d: => A2): A2 =
     set(a, b) getOrElse d
 
-  def setOrZ[A >: A2](a: A1, b: B2)(implicit M: Monoid[A]): A =
+  def setOrZ(a: A1, b: B2)(implicit M: Monoid[A2]): A2 =
     setOr(a, b, M.zero)
 
   def trySet(a: A1): Option[B2 => A2] =
@@ -77,14 +71,14 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
   def trySetK: Kleisli[Option, A1, B2 => A2] =
     Kleisli[Option, A1, B2 => A2](trySet(_))
 
-  def trySetOr[A >: A2, B <: B2](a: A1, d: => B => A): B => A =
+  def trySetOr(a: A1, d: => B2 => A2): B2 => A2 =
     trySet(a) getOrElse d
 
-  def trySetOrZ[A >: A2, B <: B2](a: A1)(implicit M: Monoid[B => A]): B => A =
-    trySetOr(a, M.zero)
+  def trySetOrZ(a: A1)(implicit M: Monoid[A2]): B2 => A2 =
+    trySetOr(a, _ => M.zero)
 
   /** If the Partial Lens is null, then return the target object, otherwise run the function on its projection. */
-  def as[A <: A1](f: B1 => A, a: A): A =
+  def as(f: B1 => A1, a: A1): A1 =
     get(a) match {
       case None => a
       case Some(w) => f(w)
@@ -118,10 +112,10 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
   def =>=[A >: A2 <: A1](f: B1 => B2): A => A =
     mod(f, _)
 
-  def st[A <: A1]: PState[A, B1] =
+  def st: PState[A1, B1] =
     State(s => (s, get(s)))
 
-  def %=[A >: A2 <: A1, B <: B2](f: B1 => B): PState[A, B] =
+  def %=[A >: A2 <: A1](f: B1 => B2): PState[A, B2] =
     State(a => run(a) match {
       case None => (a, None)
       case Some(w) => {
@@ -130,10 +124,10 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
       }
     })
 
-  def :=[A >: A2 <: A1, B <: B2](b: => B): PState[A, B] =
+  def :=[A >: A2 <: A1](b: => B2): PState[A, B2] =
     %=(_ => b)
 
-  def %==[A >: A2 <: A1, B <: B2](f: B1 => B): State[A, Unit] =
+  def %==[A >: A2 <: A1](f: B1 => B2): State[A, Unit] =
     State(a =>
   (mod(f, a), ()))
 
@@ -182,7 +176,7 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: PLensFamily[B1, B2, C1, C2]): PLensFamily[A1, A2, C1, C2] = andThen(that)
 
   /** Two partial lenses that view a value of the same type can be joined */
-  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamily[C1, C2, B1m, B2m]): PLensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
+  def sum[C1, C2](that: => PLensFamily[C1, C2, B1, B2]): PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
     plensFamily {
       case -\/(a) =>
         run(a) map (_ map (-\/(_)))
@@ -191,7 +185,7 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamily[C1, C2, B1m, B2m]): PLensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
+  def |||[C1, C2](that: => PLensFamily[C1, C2, B1, B2]): PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
 
   /** Two disjoint partial lenses can be paired */
   def product[C1, C2, D1, D2](that: PLensFamily[C1, C2, D1, D2]): PLensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
@@ -597,7 +591,7 @@ trait PLensInstances {
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
   case class NumericPLens[S, N: Numeric](lens: S @?> N, num: Numeric[N]) {
     def +=(that: N): PState[S, N] =
-      lens %= (num.minus(_, that))
+      lens %= (num.plus(_, that))
 
     def -=(that: N): PState[S, N] =
       lens %= (num.minus(_, that))

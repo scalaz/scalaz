@@ -10,8 +10,8 @@ trait AllInstances
   with scalaz.std.util.parsing.combinator.Parsers
   with scalaz.std.java.util.MapInstances
   with scalaz.std.java.math.BigIntegerInstances
+  with scalaz.std.java.EnumInstances
   with scalaz.std.java.util.concurrent.CallableInstances
   with NodeSeqInstances
-  // Intentionally omitted: IterableInstances
 
 object AllInstances extends AllInstances

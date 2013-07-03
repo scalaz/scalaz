@@ -24,10 +24,8 @@ object TypeClass {
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
-  lazy val length = TypeClass("Length", *->*)
-  lazy val each = TypeClass("Each", *->*)
-  lazy val index = TypeClass("Index", *->*)
-  lazy val functor = TypeClass("Functor", *->*)
+  lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
+  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)
@@ -39,7 +37,7 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
-  lazy val contravariant = TypeClass("Contravariant", *->*)
+  lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
@@ -60,9 +58,9 @@ object TypeClass {
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
-  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
+  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(compose))
   lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -76,15 +74,11 @@ object TypeClass {
   def core: List[TypeClass] = List(semigroup,
     monoid,
     equal,
-    length,
     show,
     order,
     enum,
-    metricSpace,
     plusEmpty,
     isEmpty,
-    each,
-    index,
     functor,
     contravariant,
     apply,

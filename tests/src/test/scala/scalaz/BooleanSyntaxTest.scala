@@ -4,7 +4,6 @@ import std.AllInstances._
 
 class BooleanSyntaxTest extends Spec {
   "boolean syntax" in {
-    import syntax.id._
     import syntax.std.boolean._
 
     "and" ! prop { (p:Boolean, q:Boolean) =>

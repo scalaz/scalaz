@@ -1,6 +1,5 @@
 package scalaz
 
-import std.AllInstances._
 
 class BooleanTest extends Spec {
   "boolean functions" in {

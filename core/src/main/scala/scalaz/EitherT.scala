@@ -9,7 +9,7 @@ package scalaz
  * EitherT(x).map(1+).run // Some(\/-(2))
  * }}}
  * */
-sealed trait EitherT[F[+_], +A, +B] {
+sealed trait EitherT[F[_], A, B] {
   val run: F[A \/ B]
 
   import OptionT._
@@ -74,10 +74,11 @@ sealed trait EitherT[F[+_], +A, +B] {
     EitherT(F.map(run)(_.map(f)))
 
   /** Traverse on the right of this disjunction. */
-  def traverse[G[_], AA >: A, C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
-    G.map(F.traverse(run)(o => Traverse[({type λ[α] = (AA \/ α)})#λ].traverse(o)(f)))(EitherT(_))
+  def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
+    G.map(F.traverse(run)(o => Traverse[({type λ[α] = (A \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
   /** Run the side-effect on the right of this disjunction. */
+  @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
     F.each(run)(_ foreach f)
 
@@ -85,20 +86,24 @@ sealed trait EitherT[F[+_], +A, +B] {
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
     * it is not consistent with `ap`.
     */
-  def app[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
+  def app[C](f: => EitherT[F, A, B => C])(implicit F: Apply[F]): EitherT[F, A, C] =
     EitherT(F.apply2(f.run, run)((a, b) => b ap a))
 
   /** Bind through the right of this disjunction. */
-  def flatMap[AA >: A, C](f: B => EitherT[F, AA, C])(implicit F: Monad[F]): EitherT[F, AA, C] =
-    EitherT(F.bind(run)(_.fold(a => F.point(-\/(a): (AA \/ C)), b => f(b).run)))
+  def flatMap[C](f: B => EitherT[F, A, C])(implicit F: Monad[F]): EitherT[F, A, C] =
+    EitherT(F.bind(run)(_.fold(a => F.point(-\/(a): (A \/ C)), b => f(b).run)))
 
   /** Fold on the right of this disjunction. */
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
 
   /** Filter on the right of this disjunction. */
-  def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
-    EitherT(F.map(run)(_.filter[AA](p)))
+  def filter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
+    EitherT(F.map(run)(_.filter[A](p)))
+
+  /** Alias for `filter`. */
+  def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
+    filter(p)(M, F)
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
@@ -125,19 +130,19 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.map(run)(_.toEither)
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
-  def getOrElse[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
+  def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
     F.map(run)(_ getOrElse default)
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
-  def |[BB >: B](default: => BB)(implicit F: Functor[F]): F[BB] =
+  def |(default: => B)(implicit F: Functor[F]): F[B] =
     getOrElse(default)
 
   /** Return the right value of this disjunction or run the given function on the left. */
-  def valueOr[BB >: B](x: A => BB)(implicit F: Functor[F]): F[BB] =
+  def valueOr(x: A => B)(implicit F: Functor[F]): F[B] =
     F.map(run)(_ valueOr x)
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] = {
+  def orElse(x: => EitherT[F, A, B])(implicit F: Bind[F]): EitherT[F, A, B] = {
     val g = run
     EitherT(F.bind(g) {
       case -\/(_) => x.run
@@ -146,7 +151,7 @@ sealed trait EitherT[F[+_], +A, +B] {
   }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit F: Bind[F]): EitherT[F, AA, BB] =
+  def |||(x: => EitherT[F, A, B])(implicit F: Bind[F]): EitherT[F, A, B] =
     orElse(x)
 
   /**
@@ -158,24 +163,24 @@ sealed trait EitherT[F[+_], +A, +B] {
    * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
    * }}}
    */
-  def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M1: Semigroup[BB], M2: Semigroup[AA], F: Apply[F]): EitherT[F, AA, BB] =
+  def +++(x: => EitherT[F, A, B])(implicit M1: Semigroup[B], M2: Semigroup[A], F: Apply[F]): EitherT[F, A, B] =
     EitherT(F.apply2(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
-  def ensure[AA >: A](onLeft: => AA)(f: B => Boolean)(implicit F: Functor[F]): EitherT[F, AA, B] =
+  def ensure(onLeft: => A)(f: B => Boolean)(implicit F: Functor[F]): EitherT[F, A, B] =
     EitherT(F.map(run)(_.ensure(onLeft)(f)))
 
   /** Compare two disjunction values for equality. */
-  def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
+  def ===(x: EitherT[F, A, B])(implicit EA: Equal[A], EB: Equal[B], F: Apply[F]): F[Boolean] =
     F.apply2(run, x.run)(_ === _)
 
   /** Compare two disjunction values for ordering. */
-  def compare[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Order[AA], EB: Order[BB], F: Apply[F]): F[Ordering] =
+  def compare(x: EitherT[F, A, B])(implicit EA: Order[A], EB: Order[B], F: Apply[F]): F[Ordering] =
     F.apply2(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[Cord] =
-    F.map(run)(_.show[AA, BB])
+  def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord] =
+    F.map(run)(_.show[A, B])
 
   /** Cozip this disjunction on its functor. */
   def cozip(implicit Z: Cozip[F]): (F[A] \/ F[B]) =
@@ -192,84 +197,84 @@ sealed trait EitherT[F[+_], +A, +B] {
 
 object EitherT extends EitherTFunctions with EitherTInstances {
   /** Construct a disjunction value. */
-  def apply[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] =
+  def apply[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] =
     eitherT[F, A, B](a)
 
   /** Construct a left disjunction value. */
-  def left[F[+_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
+  def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left(_)))
 
   /** Construct a right disjunction value. */
-  def right[F[+_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
+  def right[F[_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(b)(\/.right(_)))
 
   /** Construct a disjunction value from a standard `scala.Either`. */
-  def fromEither[F[+_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
+  def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
+  def fromTryCatch[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
-    case e => left(F.point(e))
+    case e: Throwable => left(F.point(e))
   }
 }
 
 trait EitherTInstances1 {
-  implicit def eitherTFunctor[F[+_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
+  implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
     implicit def F = F0
   }
 }
 
 trait EitherTInstances0 extends EitherTInstances1 {
-  implicit def eitherTBifunctor[F[+_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
+  implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
     implicit def F = F0
   }
 
-  implicit def eitherTMonad[F[+_], L](implicit F0: Monad[F]) = new EitherTMonad[F, L] {
+  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]) = new EitherTMonad[F, L] {
     implicit def F = F0
   }
-  implicit def eitherTFoldable[F[+_], L](implicit F0: Foldable[F]) = new EitherTFoldable[F, L] {
+  implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]) = new EitherTFoldable[F, L] {
     implicit def F = F0
   }
 }
 
 trait EitherTInstances extends EitherTInstances0 {
-  implicit def eitherTBitraverse[F[+_]](implicit F0: Traverse[F]) = new EitherTBitraverse[F] {
+  implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBitraverse[F] {
     implicit def F = F0
   }
 
-  implicit def eitherTTraverse[F[+_], L](implicit F0: Traverse[F]) = new EitherTTraverse[F, L] {
+  implicit def eitherTTraverse[F[_], L](implicit F0: Traverse[F]) = new EitherTTraverse[F, L] {
     implicit def F = F0
   }
 
-  implicit def eitherTHoist[A]: Hoist[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] = new EitherTHoist[A] {}
+  implicit def eitherTHoist[A]: Hoist[({type λ[α[_], β] = EitherT[α, A, β]})#λ] = new EitherTHoist[A] {}
 
-  implicit def eitherTEqual[F[+_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] = F0.contramap((_: EitherT[F, A, B]).run)
+  implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] = F0.contramap((_: EitherT[F, A, B]).run)
 }
 
 trait EitherTFunctions {
-  def eitherT[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
+  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
     val run = a
   }
 
-  def monadTell[F[+_, +_], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
+  def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
     def MT = MT0
   }
 
-  def monadListen[F[+_, +_], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
+  def monadListen[F[_, _], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
     def MT = ML0
   }
 }
 
 
-private[scalaz] trait EitherTFunctor[F[+_], E] extends Functor[({type λ[α]=EitherT[F, E, α]})#λ] {
+private[scalaz] trait EitherTFunctor[F[_], E] extends Functor[({type λ[α]=EitherT[F, E, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: EitherT[F, E, A])(f: A => B): EitherT[F, E, B] = fa map f
 }
 
-private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
+private[scalaz] trait EitherTMonad[F[_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
   implicit def F: Monad[F]
 
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
@@ -277,25 +282,25 @@ private[scalaz] trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT
   def bind[A, B](fa: EitherT[F, E, A])(f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
 
-private[scalaz] trait EitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
+private[scalaz] trait EitherTFoldable[F[_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: EitherT[F, E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-private[scalaz] trait EitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFoldable[F, E] {
+private[scalaz] trait EitherTTraverse[F[_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: A => G[B]): G[EitherT[F, E, B]] = fa traverse f
 }
 
-private[scalaz] trait EitherTBifunctor[F[+_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
+private[scalaz] trait EitherTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: A => C, g: B => D): EitherT[F, C, D] = fab.bimap(f, g)
 }
 
-private[scalaz] trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
+private[scalaz] trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
@@ -303,40 +308,40 @@ private[scalaz] trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, 
     fab.bitraverse(f, g)
 }
 
-private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] {
-  def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
+private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[_], β] = EitherT[α, A, β]})#λ] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
     def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
   }
 
-  def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
+  def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
 
-  implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
+  implicit def apply[M[_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
 
-private[scalaz] trait EitherTMonadTell[F[+_, +_], W, A] extends MonadTell[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[+α] = F[W, α]})#λ, A] with EitherTHoist[A] {
+private[scalaz] trait EitherTMonadTell[F[_, _], W, A] extends MonadTell[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[α] = F[W, α]})#λ, A] with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
   implicit def F = MT
 
-  def writer[B](w: W, v: B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    liftM[({type λ[+α] = F[W, α]})#λ, B](MT.writer(w, v))
+  def writer[B](w: W, v: B): EitherT[({type λ[α] = F[W, α]})#λ, A, B] =
+    liftM[({type λ[α] = F[W, α]})#λ, B](MT.writer(w, v))
 
-  def left[B](v: => A): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MT.point(v))
+  def left[B](v: => A): EitherT[({type λ[α] = F[W, α]})#λ, A, B] =
+    EitherT.left[({type λ[α] = F[W, α]})#λ, A, B](MT.point(v))
 
-  def right[B](v: => B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MT.point(v))
+  def right[B](v: => B): EitherT[({type λ[α] = F[W, α]})#λ, A, B] =
+    EitherT.right[({type λ[α] = F[W, α]})#λ, A, B](MT.point(v))
 }
 
-private[scalaz] trait EitherTMonadListen[F[+_, +_], W, A] extends MonadListen[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
+private[scalaz] trait EitherTMonadListen[F[_, _], W, A] extends MonadListen[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
   implicit def MT: MonadListen[F, W]
 
-  def listen[B](ma: EitherT[({type λ[+α] = F[W, α]})#λ, A, B]): EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)] = {
+  def listen[B](ma: EitherT[({type λ[α] = F[W, α]})#λ, A, B]): EitherT[({type λ[α] = F[W, α]})#λ, A, (B, W)] = {
     val tmp = MT.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
       case (-\/(a), _) => MT.point(-\/(a))
       case (\/-(b), w) => MT.point(\/-((b, w)))
     }
 
-    EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)](tmp)
+    EitherT[({type λ[α] = F[W, α]})#λ, A, (B, W)](tmp)
   }
 }

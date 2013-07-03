@@ -4,7 +4,6 @@ package concurrent
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.specs2.execute.{Failure, Result}
 import java.util.concurrent._
 import ConcurrentTest._
 

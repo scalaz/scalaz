@@ -152,24 +152,34 @@ trait EnumeratorTFunctions {
         )
     }
 
-  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] =
-    new EnumeratorT[IoExceptionOr[Char], F] {
+  def enumIoSource[T, E, F[_]](get : () => IoExceptionOr[T], gotdata : IoExceptionOr[T] => Boolean, render : T => E)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[E], F] =
+    new EnumeratorT[IoExceptionOr[E], F] {
       import MO._
-      lazy val reader = r
-      def apply[A] = (s: StepT[IoExceptionOr[Char], F, A]) =>
+      def apply[A] = (s: StepT[IoExceptionOr[E], F, A]) =>
         s.mapCont(
           k => {
-            val i = IoExceptionOr(reader.read)
-            if (i exists (_ != -1)) k(elInput(i.map(_.toChar))) >>== apply[A]
+            val i = get()
+            if (gotdata(i)) k(elInput(i.map(render))) >>== apply[A]
             else s.pointI
           }
         )
     }
 
-  /**
-   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
-   */
-  def enumArray[E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
+  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] = {
+    lazy val src = r
+    enumIoSource(get = () => IoExceptionOr(src.read),
+                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 render = ((n: Int) => n.toChar))
+  }
+
+  def enumInputStream[F[_]](is: => java.io.InputStream)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Byte], F] = {
+    lazy val src = is
+    enumIoSource(get = () => IoExceptionOr(src.read),
+                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 render = ((n:Int) => n.toByte))
+  }
+
+  def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       private val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
@@ -180,10 +190,15 @@ trait EnumeratorTFunctions {
                    else             s.pointI
             )   
         }
-
         loop(min)
       }
     }
+
+  /**
+   * An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+   */
+  def enumArray[E, F[_]: Monad](a : Array[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
+    enumIndexedSeq(a, min, max)
 
   def repeat[E, F[_] : Monad](e: E): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {

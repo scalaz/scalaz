@@ -56,20 +56,8 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def ap8[A,B,C,D,E,FF,G,H,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: F[(A,B,C,D,E,FF,G,H) => R]): F[R] =
     ap4(fe, ff, fg, fh)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G, h: H) => f(a,b,c,d,e,ff,g,h)))))
 
-  @deprecated("given `F: Apply[F]` use `F(a,b)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b)(f)`", "7")
-  def map2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
-    apply2(fa,fb)(f)
-
-  @deprecated("given `F: Apply[F]` use `F(a,b,c)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b,c)(f)`", "7")
-  def map3[A, B, C, D](fa: => F[A], fb: => F[B], fc: => F[C])(f: (A, B, C) => D): F[D] =
-    apply3(fa,fb,fc)(f)
-
-  @deprecated("given `F: Apply[F]` use `F(a,b,c,d)(f)` instead, or given `implicitly[Apply[F]]`, use `^(a,b,c,d)(f)`", "7")
-  def map4[A, B, C, D, E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: (A, B, C, D) => E): F[E] =
-    apply4(fa,fb,fc,fd)(f)
-
-  def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = ap(fb)(map(fa)(f.curried))
-
+  def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
+    ap(fb)(map(fa)(f.curried))
   def apply3[A, B, C, D](fa: => F[A], fb: => F[B], fc: => F[C])(f: (A, B, C) => D): F[D] =
     apply2(apply2(fa, fb)((_, _)), fc)((ab, c) => f(ab._1, ab._2, c))
   def apply4[A, B, C, D, E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: (A, B, C, D) => E): F[E] =
@@ -129,6 +117,19 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply11(_, _, _, _, _, _, _, _, _, _, _)(f)
   def lift12[A, B, C, D, E, FF, G, H, I, J, K, L, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L]) => F[R] =
     apply12(_, _, _, _, _, _, _, _, _, _, _, _)(f)
+
+  /** Add a unit to any Apply to form an Applicative. */
+  def applyApplicative: Applicative[({type λ[α] = F[α] \/ α})#λ] =
+    new Applicative[({type λ[α] = F[α] \/ α})#λ] {
+      // transliterated from semigroupoids 3.0.2, thanks edwardk
+      def point[A](a: => A) = \/-(a)
+      def ap[A, B](a: => F[A] \/ A)(f: => F[A => B] \/ (A => B)) = (f, a) match {
+        case (\/-(f), \/-(a)) => \/-(f(a))
+        case (\/-(f), -\/(a)) => -\/(self.map(a)(f))
+        case (-\/(f), \/-(a)) => -\/(self.map(f)(_(a)))
+        case (-\/(f), -\/(a)) => -\/(self.ap(a)(f))
+      }
+    }
 
   ////
   val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }

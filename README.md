@@ -10,13 +10,28 @@ a large number of data structures.
 
 ## Getting Scalaz
 
+The current stable version is 7.0.1, which is cross-built against Scala 2.9.2, 2.9.3 and 2.10.x.
+
 If you're using SBT, add the following lines to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.0"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.1"
 ```
 
-The current stable version is 7.0.0, which is cross-built against Scala 2.9.2, 2.9.3 and 2.10.x.
+For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.0.1%22).
+(This search will also list all available modules of scalaz.)
+
+To get sample configurations, click on the version of the module you are interested in.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.0.1.jar`.
+
+Note: In some cases, Maven will warn about "multiple versions of scala libraries", e.g.
+
+```
+[WARNING]  Expected all dependencies to require Scala version: 2.10.1
+[WARNING]  org.scalaz:scalaz-core_2.10:7.0.1 requires scala version: 2.10.0
+```
+
+You can safely ignore this warning, as the Scala 2.10.x versions are compatible.
 
 ## Quick Start
 
@@ -94,7 +109,6 @@ Scalaz has been been modularised.
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
-* **scalaz-iterv**: Scalaz 6 compatible Iteratees (stable)
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 * **scalaz-typelevel**: Type-level data structures, type-safe printf
 * **scalaz-xml**: Error-correcting XML parser
@@ -106,9 +120,9 @@ Scalaz has been been modularised.
   type class with an instance of a more specific type class:
 
 ```scala
-def bar[M: Functor] = ()
+def bar[M[_]: Functor] = ()
 
-def foo[M: Monad] = bar // Monad[M] is a subtype of Functor[M]
+def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 ```
 
 * The hierarchy itself is largely the same as in Scalaz 6. However, there have been a few
@@ -251,7 +265,7 @@ parameter (or, equivalently, a context bound), to the implicit method.
 Type class instances for 'transformers', such as `OptionT`, present a more subtle challenge. `OptionT[F, A]`
 is a wrapper for a value of type `F[Option[A]]`. It allows us to write:
 
-```
+```scala
 val ot = OptionT(List(Some(1), None))
 ot.map((a: Int) => a * 2) // OptionT(List(Some(2), None))
 ```

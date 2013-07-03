@@ -29,7 +29,7 @@ trait ToArrowOps0 {
   
 }
 
-trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps {
+trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps with ToCategoryOps {
   
   implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
       new ArrowOps[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
@@ -40,7 +40,7 @@ trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps {
   ////
 }
 
-trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with ProfunctorSyntax[F] {
+trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with ProfunctorSyntax[F] with CategorySyntax[F] {
   implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] = new ArrowOps[F, A, B] { def self = v; implicit def F: Arrow[F] = ArrowSyntax.this.F }
 
   def F: Arrow[F]

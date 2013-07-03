@@ -2,10 +2,10 @@ package scalaz
 package syntax
 
 trait Syntaxes {
+
   //
   // Type classes over * -> *
   //
-
 
   object semigroup extends ToSemigroupOps
 
@@ -13,6 +13,7 @@ trait Syntaxes {
 
   object equal extends ToEqualOps
 
+  @deprecated("length is deprecated, use foldable instead", "7.1")
   object length extends ToLengthOps
 
   object show extends ToShowOps
@@ -21,17 +22,22 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
+  @deprecated("metricSpace is deprecated", "7.0.1")
   object metricSpace extends ToMetricSpaceOps
 
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
 
+  @deprecated("each is deprecated", "7.1")
   object each extends ToEachOps
 
+  @deprecated("index is deprecated", "7.1")
   object index extends ToIndexOps
 
   object functor extends ToFunctorOps
+
+  object invariantFunctor extends ToInvariantFunctorOps
 
   object contravariant extends ToContravariantOps
 
@@ -54,6 +60,10 @@ trait Syntaxes {
   object applicativePlus extends ToApplicativePlusOps
 
   object monadPlus extends ToMonadPlusOps
+
+  object foldable extends ToFoldableOps
+
+  object foldable1 extends ToFoldable1Ops
 
   object traverse extends ToTraverseOps
 
@@ -86,6 +96,7 @@ trait Syntaxes {
   object monadTell extends ToMonadTellOps
 
   object monadListen extends ToMonadListenOps
+
   //
   // Data
   //
@@ -100,13 +111,13 @@ trait Syntaxes {
 
   object state extends ToStateOps
 
-  object foldable extends ToFoldableOps
-
-  object foldable1 extends ToFoldable1Ops
-
   object validation extends ToValidationOps
 
   object kleisli extends ToKleisliOps
+
+  object either extends ToEitherOps
+
+  object nel extends ToNelOps
 
   //
   // Mixed
@@ -116,7 +127,18 @@ trait Syntaxes {
 
 }
 
-trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
+trait ToDataOps
+  extends ToIdOps
+  with ToTreeOps
+  with ToReducerOps
+  with ToWriterOps
+  with ToStateOps
+  with ToValidationOps
+  with ToKleisliOps
+  // TODO those are not yet included because of ambiguities when importing all syntax
+  // can be included again when the @deprecated methods are being removed
+  // with ToEitherOps
+  // with ToNelOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
@@ -128,4 +150,3 @@ trait ToTypeClassOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps
   with ToFoldable1Ops with ToTraverse1Ops
-

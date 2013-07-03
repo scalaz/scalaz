@@ -1,17 +1,17 @@
 package scalaz
 package concurrent
 
-import scalaz._
-import Scalaz._
 import scala.annotation.tailrec
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import scala.collection.immutable.SortedMap
+
+import java.util.concurrent.locks.ReentrantReadWriteLock
+
+import scalaz.syntax.either._
 
 trait Timeout
 object Timeout extends Timeout
 
 case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
-  import Timer._
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]

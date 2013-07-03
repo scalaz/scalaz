@@ -1,6 +1,5 @@
 package scalaz
 
-import Id._
 
 /**
  * Represents either:
@@ -32,7 +31,6 @@ import Id._
  */
 sealed trait Validation[+E, +A] {
 
-  import Validation._
 
   sealed trait SwitchingValidation[X] {
     def s: X
@@ -104,7 +102,7 @@ sealed trait Validation[+E, +A] {
     bimap(f, identity)
 
   /** Binary functor traverse on this validation. */
-  def bitraverse[G[+_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
+  def bitraverse[G[_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
     case Failure(a) => Functor[G].map(f(a))(Failure(_))
     case Success(b) => Functor[G].map(g(b))(Success(_))
   }
@@ -116,7 +114,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Traverse on the success of this validation. */
-  def traverse[G[+_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
+  def traverse[G[_] : Applicative, EE >: E, B](f: A => G[B]): G[Validation[EE, B]] = this match {
     case Success(a) => Applicative[G].map(f(a))(Success(_))
     case Failure(e) => Applicative[G].point(Failure(e))
   }
@@ -151,8 +149,8 @@ sealed trait Validation[+E, +A] {
   /** Filter on the success of this validation. */
   def filter[EE >: E](p: A => Boolean)(implicit M: Monoid[EE]): Validation[EE, A] =
     this match {
-      case Failure(a) => Failure(a)
-      case Success(e) => if(p(e)) Success(e) else Failure(M.zero)
+      case Failure(_) => this
+      case Success(e) => if(p(e)) this else Failure(M.zero)
     }
 
   /** Return `true` if this validation is a success value satisfying the given predicate. */
@@ -234,19 +232,17 @@ sealed trait Validation[+E, +A] {
     this match {
       case Failure(a1) => x match {
         case Failure(a2) => Failure(M2.append(a1, a2))
-        case Success(b2) => Failure(a1)
+        case Success(b2) => this
       }
       case Success(b1) => x match {
-        case Failure(a2) => Failure(a2)
+        case Failure(_) => x
         case Success(b2) => Success(M1.append(b1, b2))
       }
     }
 
   /** Ensures that the success value of this validation satisfies the given predicate, or fails with the given value. */
-  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] = this match {
-    case Success(a) => if (f(a)) this else Failure(onFailure)
-    case Failure(_) => this
-  }
+  def ensure[EE >: E](onFailure: => EE)(f: A => Boolean): Validation[EE, A] =
+    excepting({ case a if !f(a) => onFailure})
 
   /** Compare two validations values for equality. */
   def ===[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
@@ -303,7 +299,7 @@ sealed trait Validation[+E, +A] {
   }
 
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
-  def toValidationNel[EE >: E, AA >: A]: ValidationNel[EE, AA] =
+  def toValidationNel: ValidationNel[E, A] =
     this match {
       case Success(a) => Success(a)
       case Failure(e) => Failure(NonEmptyList(e))
@@ -323,6 +319,21 @@ sealed trait Validation[+E, +A] {
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     disjunctioned(k)
+    
+  /** 
+   * Return a Validation formed by the application of a partial function across the
+   * success of this value:
+   * {{{
+   *   strings map (_.parseInt excepting { case i if i < 0 => new Exception(s"Int must be positive: $i") })
+   * }}}
+   */
+  def excepting[EE >: E](pf: PartialFunction[A, EE]): Validation[EE, A] = {
+    import syntax.std.option._
+    this match {
+      case Success(s) => pf.lift(s) toFailure s
+      case _          => this
+    }
+  }
 
 }
 
@@ -400,7 +411,7 @@ trait ValidationInstances2 extends ValidationInstances3 {
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f
 
-    def traverseImpl[G[+_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
+    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
       fa.traverse(f)
 
     override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
@@ -425,7 +436,7 @@ trait ValidationInstances3 {
     override def bimap[A, B, C, D](fab: Validation[A, B])
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[+_] : Applicative, A, B, C, D](fab: Validation[A, B])
+    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
@@ -453,7 +464,7 @@ trait ValidationFunctions {
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
-    case e => failure(e)
+    case e: Throwable => failure(e)
   }
 
   /** Construct a `Validation` from an `Either`. */

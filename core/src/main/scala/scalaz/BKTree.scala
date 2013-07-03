@@ -3,7 +3,6 @@ package scalaz
 import collection.immutable.IntMap
 import annotation.tailrec
 
-import BKTree._
 
 /**
  * Burkhard-Keller trees provide an implementation of sets which apart
@@ -22,6 +21,7 @@ import BKTree._
  *
  * This implementation is a port of Haskell's [[http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html Data.Set.BKTree]]
  */
+@deprecated("This class depends on `MetricSpace` which is deprecated, too.", "7.0.1")
 sealed trait BKTree[A] {
   def isEmpty: Boolean =
     this match {

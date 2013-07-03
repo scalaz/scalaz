@@ -9,6 +9,20 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
   ////
   def empty[A]: F[A]
 
+  /**The composition of PlusEmpty `F` and `G`, `[x]F[G[x]]`, is a PlusEmpty */
+  def compose[G[_]](implicit G0: PlusEmpty[G]): PlusEmpty[({type λ[α] = F[G[α]]})#λ] = new CompositionPlusEmpty[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
+  /**The product of PlusEmpty `F` and `G`, `[x](F[x], G[x]])`, is a PlusEmpty */
+  def product[G[_]](implicit G0: PlusEmpty[G]): PlusEmpty[({type λ[α] = (F[α], G[α])})#λ] = new ProductPlusEmpty[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   // derived functions
 
   def monoid[A]: Monoid[F[A]] = new Monoid[F[A]] {

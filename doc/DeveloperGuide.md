@@ -19,7 +19,7 @@ Type class extension is encoded with inheritance. For example, `Monoid` extends 
 
 ### Hierarchy
 
-The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gtc`
+The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gen-type-classes`
 will recreate all type classes, preserving chunks of code delimited by pairs of `////` comments.
 
 Do not add code, comments, or imports outside of these delimiters.
@@ -248,8 +248,8 @@ from the applied types.
 
     ({type λ[α]=F[X, α]})#λ
     ({type λ[α, β]=F[X, α, β]})#λ
-    ({type l[a]=F[X, a})#l
-    ({type l[a b]=F[X, a, b})#l
+    ({type l[a]=F[X, a]})#l
+    ({type l[a, b]=F[X, a, b]})#l
 
 ### Parameters
 
@@ -279,7 +279,7 @@ Similarly, use these as defaults for parameters:
 ### OSGi Support
 
 All JARs contain OSGi metadata and are usable in an OSGi container without modification.  The metadata is generated automatically
-by [sbtosgi](https://github.com/typesafehub/sbtosgi), which delegates the heavy lifting to [bnd](http://www.aqute.biz/Code/Bnd).
+by [sbt-osgi](https://github.com/sbt/sbt-osgi), which delegates the heavy lifting to [bnd](http://www.aqute.biz/Code/Bnd).
 
 All packages of each JAR are exported with the package version set to the version of Scalaz.  All bundles import all used packages, with
 some exceptions for optional imports (unsatisfied optional imports will result in ClassNotFoundExceptions at runtime if dependent code

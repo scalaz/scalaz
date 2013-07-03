@@ -786,11 +786,6 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     (_, x) => Iterator.single(x),
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
 
-
-
-  import scala.collection.immutable.Stream
-  import scala.collection.immutable.Stream._
-
   /** Convert the leaves of the tree to a `scala.Stream` */
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
 
@@ -857,12 +852,12 @@ trait FingerTreeInstances {
     override def foldRight[A, B](t: FingerTree[V, A], z: => B)(f: (A, => B) => B) = t.foldRight(z)(f)
   }
 
-  implicit def fingerTreeSemigroup[V, A](implicit m: Reducer[A, V]): Semigroup[FingerTree[V, A]]= new Semigroup[FingerTree[V, A]] {
+  implicit def fingerTreeMonoid[V, A](implicit m: Reducer[A, V]): Monoid[FingerTree[V, A]]= new Monoid[FingerTree[V, A]] {
     def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
+    def zero = empty
   }
 
   implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
-    import syntax.show._
     import std.iterable._
     val AS = Show[List[A]]
     import Cord._
@@ -1040,7 +1035,6 @@ object IndSeq {
  * item with the highest priority contained recursively below that node.
  */
 sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
-  import syntax.arrow._
   import std.function._
   import syntax.order._
   import std.option._

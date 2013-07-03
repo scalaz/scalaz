@@ -14,7 +14,7 @@ import Id._
  *
  * @tparam E The type of the input data (mnemonic: '''E'''lement type)
  * @tparam F The type constructor representing an effect.
- *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.Iteratee]].
+ *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.iteratee.Iteratee]].
  * @tparam A The type of the calculated result
  */
 sealed trait IterateeT[E, F[_], A] {
@@ -72,12 +72,10 @@ sealed trait IterateeT[E, F[_], A] {
    * F and G will have the same monad.
    */
   def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA])(implicit MO: G |>=| F): IterateeT[EE, G, AA] = {
-    import MO._
     iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
   }
 
   def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]])(implicit MO: G |>=| F): G[StepT[EE, F, AA]] = {
-    import MO._
     MO.MG.bind(MO.promote(value))(s => f(s))
   }
 

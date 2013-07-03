@@ -1,6 +1,6 @@
 package scalaz
 
-trait Codensity[F[+_], +A] { self =>
+trait Codensity[F[_], A] { self =>
   def apply[B](f: A => F[B]): F[B]
   def improve(implicit F: Applicative[F]): F[A] =
     apply(a => F.point(a))
@@ -15,12 +15,11 @@ trait Codensity[F[+_], +A] { self =>
 }
 
 object Codensity {
-  def rep[F[+_], A](f: F[A])(implicit F: Monad[F]): Codensity[F, A] =
+  def rep[F[_], A](f: F[A])(implicit F: Monad[F]): Codensity[F, A] =
     new Codensity[F, A] {
       def apply[B](k: A => F[B]) = F.bind(f)(k)
     }
-  def pureCodensity[F[+_], A](a: => A): Codensity[F, A] = new Codensity[F, A] {
+  def pureCodensity[F[_], A](a: => A): Codensity[F, A] = new Codensity[F, A] {
     def apply[B](f: A => F[B]): F[B] = f(a)
   }
 }
-

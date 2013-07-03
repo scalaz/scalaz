@@ -10,7 +10,7 @@ trait DualInstances0 {
   }
 }
 
-trait DualInstances {
+trait DualInstances extends DualInstances0 {
   implicit def dualMonoid[F](implicit F0: Monoid[F]) = new DualMonoid[F] {
     implicit def F = F0
   }

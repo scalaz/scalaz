@@ -11,21 +11,12 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] with Cojoin[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: List[A], i: Int) = {
-      var n = 0
-      var k: Option[A] = None
-      val it = fa.iterator
-      while (it.hasNext && k.isEmpty) {
-        val z = it.next()
-        if (n == i) k = Some(z)
-        n = n + 1
-      }
-
-      k
-    }
-    def length[A](fa: List[A]) = fa.length
+    override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: List[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
+    override def length[A](fa: List[A]) = fa.length
     def point[A](a: => A) = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()
@@ -77,7 +68,22 @@ trait ListInstances extends ListInstances0 {
       r
     }
 
+    override def toList[A](fa: List[A]) = fa
+
     def isEmpty[A](fa: List[A]) = fa.isEmpty
+
+    def cobind[A, B](fa: List[A])(f: List[A] => B) =
+      fa match {
+        case Nil => Nil
+        case _::t => f(fa) :: cobind(t)(f)
+      }
+
+    def cojoin[A](a: List[A]) =
+      a match {
+        case Nil => Nil
+        case _::t => a :: cojoin(t)
+      }
+
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
@@ -105,6 +111,9 @@ trait ListFunctions {
     }
     intersperse0(Nil, as).reverse
   }
+
+  /** [[scala.Nil]] with a sometimes more convenient type */
+  final def nil[A]: List[A] = Nil
 
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None
@@ -182,20 +191,28 @@ trait ListFunctions {
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
+  @deprecated("use groupWhenM", "7.1")
+  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = groupWhenM(as)(p)
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
-  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
+  final def groupWhenM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t => {
       Monad[M].bind(spanM(t)(p(h, _))) {
         case (x, y) =>
-          Monad[M].map(groupByM(y)(p))((g: List[List[A]]) => (h :: x) :: g)
+          Monad[M].map(groupWhenM(y)(p))((g: List[List[A]]) => (h :: x) :: g)
       }
     }
   }
+  
+  /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */   
+  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
+    val b = f(a)
+    nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
+  } mapValues (_.reverse) 
 
-  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
-    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+    groupWhenM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */

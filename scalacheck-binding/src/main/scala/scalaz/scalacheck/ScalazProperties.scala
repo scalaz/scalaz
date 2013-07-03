@@ -95,6 +95,21 @@ object ScalazProperties {
     }
   }
 
+  object invariantFunctor {
+    def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(F.invariantFunctorLaw.invariantIdentity[X] _)
+
+    def composite[F[_], X, Y, Z](implicit F: InvariantFunctor[F], af: Arbitrary[F[X]], axy: Arbitrary[(X => Y)],
+                                   ayz: Arbitrary[(Y => Z)], ayx: Arbitrary[(Y => X)], azy: Arbitrary[(Z => Y)], ef: Equal[F[Z]]) =
+      forAll(F.invariantFunctorLaw.invariantComposite[X, Y, Z] _)
+
+    def laws[F[_]](implicit F: InvariantFunctor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
+                   ef: Equal[F[Int]]) = new Properties("invariantFunctor") {
+      property("identity") = identity[F, Int]
+      property("composite") = composite[F, Int, Int, Int]
+    }
+  }
+
   object functor {
     def identity[F[_], X](implicit F: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.functorLaw.identity[X] _)
@@ -105,6 +120,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit F: Functor[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("functor") {
+      include(invariantFunctor.laws[F])
       property("identity") = identity[F, Int]
       property("composite") = composite[F, Int, Int, Int]
     }
@@ -112,7 +128,7 @@ object ScalazProperties {
 
   object applicative {
     def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
-      forAll(f.applicativeLaw.identity[X] _)
+      forAll(f.applicativeLaw.identityAp[X] _)
 
     def composition[F[_], X, Y, Z](implicit ap: Applicative[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
                                    av: Arbitrary[F[X => Y]], e: Equal[F[Z]]) = forAll(ap.applicativeLaw.composition[X, Y, Z] _)
@@ -164,6 +180,17 @@ object ScalazProperties {
     }
   }
 
+  object cojoin {
+    def cobindAssociative[F[_], A, B, C, D](implicit F: Cojoin[F], D: Equal[D], fa: Arbitrary[F[A]],
+                                            f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
+      forAll(F.cojoinLaw.cobindAssociative[A, B, C, D] _)
+
+    def laws[F[_]](implicit a: Cojoin[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("cojoin") {
+      include(functor.laws[F])
+      property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
+    }
+  }
+
   object comonad {
     def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
       forAll(F.comonadLaw.cobindLeftIdentity[A] _)
@@ -177,10 +204,9 @@ object ScalazProperties {
 
     def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
-      include(functor.laws[F])
+      include(cojoin.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
       property("cobind right identity") = cobindRightIdentity[F, Int, Int]
-      property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
     }
   }
 
@@ -207,7 +233,7 @@ object ScalazProperties {
       new Properties("traverse") {
         property("identity traverse") = identityTraverse[F, Int, Int]
 
-        import std.list._, std.option._, std.stream._, std.anyVal._
+        import std.list._, std.option._, std.stream._
 
         property("purity.option") = purity[F, Option, Int]
         property("purity.stream") = purity[F, Stream, Int]
@@ -297,6 +323,7 @@ object ScalazProperties {
 
     def laws[F[_]](implicit F: Contravariant[F], af: Arbitrary[F[Int]], axy: Arbitrary[(Int => Int)],
                    ef: Equal[F[Int]]) = new Properties("contravariant") {
+      include(invariantFunctor.laws[F])
       property("identity") = identity[F, Int]
       property("composite") = composite[F, Int, Int, Int]
     }
@@ -337,7 +364,6 @@ object ScalazProperties {
   }
 
   object lens {
-    import Lens._
     def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]) = forAll(l.lensLaw.identity _)
     def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]) = forAll(l.lensLaw.retention _)
     def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]) = forAll(l.lensLaw.doubleSet _)
@@ -349,6 +375,7 @@ object ScalazProperties {
     }
   }
 
+  @deprecated("MetricSpace is deprecated", "7.0.1")
   object metricSpace {
     def nonNegativity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.nonNegativity _)
     def identity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.identity _)

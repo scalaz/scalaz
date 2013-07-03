@@ -1,13 +1,12 @@
 package scalaz
 
-import StoreT._
 import Id._
 
 /**
  * A Lens Family, offering a purely functional means to access and retrieve
  * a field transitioning from type `B1` to type `B2` in a record simultaneously
  * transitioning from type `A1` to type `A2`.  [[scalaz.Lens]] is a convenient
- * alias for when `F =:= Id`, `A1 =:= A2`, and `B1 =:= B2`.
+ * alias for when `A1 =:= A2`, and `B1 =:= B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a lens
  * family can address membership of a `Set`.
@@ -19,7 +18,7 @@ import Id._
  * @tparam B1 The initial type of the field
  * @tparam B2 The final type of the field
  */
-sealed trait LensFamily[-A1, +A2, +B1, -B2] {
+sealed trait LensFamily[A1, A2, B1, B2] {
   def run(a: A1): IndexedStore[B1, B2, A2]
 
   def apply(a: A1): IndexedStore[B1, B2, A2] =
@@ -46,7 +45,7 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def set(a: A1, b: B2): A2 =
     run(a).put(b)
 
-  def st[A <: A1]: State[A, B1] =
+  def st: State[A1, B1] =
     State(s => (s, get(s)))
 
   /** Modify the value viewed through the lens */
@@ -59,12 +58,12 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     mod(f, _)
 
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
-  def modf[X[+_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
+  def modf[X[_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
     val c = run(a)
     XF.map(f(c.pos))(c put _)
   }
 
-  def =>>=[X[+_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
+  def =>>=[X[_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
     modf(f, _)
 
   /** Modify the value viewed through the lens, returning a `C` on the side.  */
@@ -74,7 +73,7 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   }
 
   /** Modify the portion of the state viewed through the lens and return its new value. */
-  def mods[B <: B2](f: B1 => B): IndexedState[A1, A2, B] =
+  def mods(f: B1 => B2): IndexedState[A1, A2, B2] =
     IndexedState(a => {
       val c = run(a)
       val b = f(c.pos)
@@ -82,8 +81,8 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     })
 
   /** Modify the portion of the state viewed through the lens and return its new value. */
-  def %=[B <: B2](f: B1 => B): IndexedState[A1, A2, B] =
-    mods[B](f)
+  def %=(f: B1 => B2): IndexedState[A1, A2, B2] =
+    mods(f)
 
   /** Modify the portion of the state viewed through the lens and return its old value. */
   def modo(f: B1 => B2): IndexedState[A1, A2, B1] =
@@ -98,12 +97,12 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     modo(f)
 
   /** Set the portion of the state viewed through the lens and return its new value. */
-  def assign[B <: B2](b: => B): IndexedState[A1, A2, B] =
-    mods[B](_ => b)
+  def assign(b: => B2): IndexedState[A1, A2, B2] =
+    mods(_ => b)
 
   /** Set the portion of the state viewed through the lens and return its new value. */
-  def :=[B <: B2](b: => B): IndexedState[A1, A2, B] =
-    assign[B](b)
+  def :=(b: => B2): IndexedState[A1, A2, B2] =
+    assign(b)
 
   /** Set the portion of the state viewed through the lens and return its old value. */
   def assigno(b: => B2): IndexedState[A1, A2, B1] =
@@ -130,27 +129,27 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     lifts(s)
 
   /** Map the function `f` over the lens as a state action. */
-  def map[C, A <: A1](f: B1 => C): State[A, C] =
+  def map[C](f: B1 => C): State[A1, C] =
     State(a => (a, f(get(a))))
 
   /** Map the function `f` over the value under the lens, as a state action. */
-  def >-[C, A <: A1](f: B1 => C): State[A, C] = map(f)
+  def >-[C](f: B1 => C): State[A1, C] = map(f)
 
   /** Bind the function `f` over the value under the lens, as a state action. */
-  def flatMap[C, X1 <: A1, X2 >: A2](f: B1 => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
+  def flatMap[C](f: B1 => IndexedState[A1, A2, C]): IndexedState[A1, A2, C] =
     IndexedState(a => f(get(a))(a))
 
   /** Bind the function `f` over the value under the lens, as a state action. */
-  def >>-[C, X1 <: A1, X2 >: A2](f: B1 => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
-    flatMap[C, X1, X2](f)
+  def >>-[C](f: B1 => IndexedState[A1, A2, C]): IndexedState[A1, A2, C] =
+    flatMap[C](f)
 
   /** Sequence the monadic action of looking through the lens to occur before the state action `f`. */
-  def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
+  def ->>-[C](f: => IndexedState[A1, A2, C]): IndexedState[A1, A2, C] =
     flatMap(_ => f)
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
-  def liftsNT: ({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n =
-    new (({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n) {
+  def liftsNT: ({type m[x] = IndexedState[B1,B2,x]})#m ~> ({type n[x] = IndexedState[A1,A2,x]})#n =
+    new (({type m[x] = IndexedState[B1,B2,x]})#m ~> ({type n[x] = IndexedState[A1,A2,x]})#n) {
       def apply[C](s : IndexedState[B1,B2,C]): IndexedState[A1,A2,C] = IndexedState[A1,A2,C](a => modp(s(_), a))
     }
 
@@ -172,7 +171,7 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: LensFamily[B1, B2, C1, C2]): LensFamily[A1, A2, C1, C2] = andThen(that)
 
   /** Two lenses that view a value of the same type can be joined */
-  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
+  def sum[C1, C2](that: => LensFamily[C1, C2, B1, B2]): LensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
     lensFamily{
       case -\/(a) =>
         run(a) map  (-\/(_))
@@ -181,7 +180,7 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2, A1m <: A1, A2m >: A2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
+  def |||[C1, C2](that: => LensFamily[C1, C2, B1, B2]): LensFamily[A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
 
   /** Two disjoint lenses can be paired */
   def product[C1, C2, D1, D2](that: LensFamily[C1, C2, D1, D2]): LensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
@@ -223,7 +222,6 @@ object LensFamily extends LensFunctions with LensInstances {
 }
 
 trait LensFamilyFunctions {
-  import StoreT._
 
   def lensFamily[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] = new LensFamily[A1, A2, B1, B2] {
     def run(a: A1): IndexedStore[B1, B2, A2] = r(a)
@@ -432,7 +430,7 @@ trait LensInstances extends LensInstances0 {
 
   type SetLens[S, K] = SetLensFamily[S, S, K]
   val SetLens: SetLensFamily.type = SetLensFamily
-  case class SetLensFamily[-S1, +S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
+  case class SetLensFamily[S1, S2, K](lens: LensFamily[S1, S2, Set[K], Set[K]]) {
     /** Setting the value of this lens will change whether or not it is present in the set */
     def contains(key: K) = lensFamilyg[S1, S2, Boolean, Boolean](
       s => b => lens.mod(m => if (b) m + key else m - key, s): Id[S2]
@@ -474,7 +472,7 @@ trait LensInstances extends LensInstances0 {
   type MapLens[S, K, V] = MapLensFamily[S, S, K, V]
   val MapLens: MapLensFamily.type = MapLensFamily
   /** A lens that views an immutable Map type can provide a mutable.Map-like API via State */
-  case class MapLensFamily[-S1, +S2, K, V](lens: LensFamily[S1, S2, Map[K, V], Map[K, V]]) {
+  case class MapLensFamily[S1, S2, K, V](lens: LensFamily[S1, S2, Map[K, V], Map[K, V]]) {
     /** Allows both viewing and setting the value of a member of the map */
     def member(k: K): LensFamily[S1, S2, Option[V], Option[V]] = lensFamilyg[S1, S2, Option[V], Option[V]](
       s => opt => lens.mod((m: Map[K, V]) => (opt match {

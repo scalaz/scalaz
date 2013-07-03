@@ -39,14 +39,25 @@ class StreamTTest extends Spec {
       StreamT.fromStream(ass).take(x).toStream must be_===(ass.map(_.take(x)))
   }
 
+  "mapM" ! prop {
+    (s: Stream[Int], l: List[Int]) => 
+      val s0 = s map (_ + 1)
+      StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must_==(
+        Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: 
+        Traverse[Stream].traverse(s0)(i => l.map(_ + i))
+      )
+
+  }
+
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
   
   object instances {
-    def semigroup[F[+_]: Functor, A] = Semigroup[StreamT[F, A]]
-    def monoid[F[+_]: Applicative, A] = Monoid[StreamT[F, A]]
-    def functor[F[+_]: Functor, A] = Functor[({type λ[α]=StreamT[F, α]})#λ]
-    def monad[F[+_]: Monad, A] = Monad[({type λ[α]=StreamT[F, α]})#λ]
+    def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
+    def monoid[F[_]: Applicative, A] = Monoid[StreamT[F, A]]
+    def functor[F[_]: Functor, A] = Functor[({type λ[α]=StreamT[F, α]})#λ]
+    def monad[F[_]: Applicative, A] = Monad[({type λ[α]=StreamT[F, α]})#λ]
+    def monadPlus[F[_]: Applicative, A] = MonadPlus[({type λ[α]=StreamT[F, α]})#λ]
   }
 }

@@ -10,6 +10,11 @@ trait Foldable[F[_]]  { self =>
   ////
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
+  /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
+  def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
+    import syntax.std.option._, std.option._
+    foldMap(fa)(x => some(f(x)))
+  }
 
   /**Right-associative fold of a structure. */
   def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B
@@ -54,7 +59,7 @@ trait Foldable[F[_]]  { self =>
     traverse_[({type λ[α]=State[S, α]})#λ, A, B](fa)(f)
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
-  def sequence_[M[_], A, B](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
+  def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
 
   /** `sequence_` specialized to `State` **/
@@ -63,9 +68,13 @@ trait Foldable[F[_]]  { self =>
 
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
+  def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] = foldRight(fa, None: Option[A])((a, optA) => optA map (aa => f(a, aa)) orElse Some(a))
+  def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = foldr(fa, None: Option[A])(a => optA => optA map (aa => f(a)(aa)) orElse Some(a))
 
-  /**Curred version of `foldLeft` */
+  /**Curried version of `foldLeft` */
   final def foldl[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+  def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa, a)) orElse Some(a))
+  def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldl(fa, None: Option[A])(optA => a => optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */
   final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
@@ -75,8 +84,29 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
+  def length[A](fa: F[A]): Int = {
+    import scalaz.std.anyVal._
+    foldMap(fa)(_ => 1)
+  }
+
+  /**
+   * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
+   */
+  def index[A](fa: F[A], i: Int): Option[A] =
+    foldLeft[A, (Int, Option[A])](fa, (0, None)) {
+      case ((idx, elem), curr) =>
+        (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
+    }._2
+
+  /**
+   * @return the element at index `i`, or `default` if the given index falls outside of the range
+   */
+  def indexOr[A](fa: F[A], default: => A, i: Int): A =
+    index(fa, i) getOrElse default
+
   /** Unbiased sum of monoidal values. */
-  def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
+  @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
+  def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
@@ -94,20 +124,52 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
   /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+
   import Ordering.{GT, LT}
   import std.option.{some, none}
+
   /** The greatest element of `fa`, or None if `fa` is empty. */
   def maximum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
     }
+
+  /** The greatest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
+  def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
+    foldLeft(fa, none[B]) {
+      case (None, a) => some(f(a))
+      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) b else bb)
+    }
+
+  /** The element `a` of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
+  def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
+    foldLeft(fa, none[(A, B)]) {
+      case (None, a) => some(a -> f(a))
+      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
+    } map (_._1)
+
   /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
     }
+
+  /** The smallest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
+  def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
+    foldLeft(fa, none[B]) {
+      case (None, a) => some(f(a))
+      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) b else bb)
+    }
+
+  /** The element `a` of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
+  def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
+    foldLeft(fa, none[(A, B)]) {
+      case (None, a) => some(a -> f(a))
+      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
+    } map (_._1)
+
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)

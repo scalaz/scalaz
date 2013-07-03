@@ -2,7 +2,6 @@ package scalaz
 
 import collection.IndexedSeqLike
 import collection.immutable.IndexedSeq
-import collection.mutable.Builder
 import collection.generic.CanBuildFrom
 
 import syntax.Ops
@@ -222,6 +221,7 @@ object Rope {
   implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
 
+  @deprecated("Length is deprecated", "7.1")
   implicit def ropeLength: Length[Rope] = new Length[Rope] {
     def length[A](a: Rope[A]) = a.self.measure
   }

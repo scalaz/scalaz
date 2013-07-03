@@ -42,8 +42,10 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
   val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
     def each[A](fa: IxSq[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: IxSq[A], i: Int) = if (fa.size > i) Some(fa(i)) else None
-    def length[A](fa: IxSq[A]) = fa.length
+    override def index[A](fa: IxSq[A], i: Int) = fa.lift.apply(i)
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: IxSq[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
+    override def length[A](fa: IxSq[A]) = fa.length
     def point[A](a: => A) = empty :+ a
     def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f
     def empty[A] = self.empty[A]
@@ -66,6 +68,8 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
         }))
+
+    override def toIndexedSeq[A](fa: IxSq[A]) = fa
 
     override def foldRight[A, B](fa: IxSq[A], z: => B)(f: (A, => B) => B) = {
       var i = fa.length
@@ -174,17 +178,23 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
-  /** Split at each point where `p(as(n), as(n+1))` yields false. */
+  @deprecated("use groupWhenM", "7.1")
   final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
-    if (as.isEmpty) Monad[M].point(empty) else
+    groupWhenM(as)(p)
+
+  /** Split at each point where `p(as(n), as(n+1))` yields false. */
+  final def groupWhenM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
+    if (as.isEmpty)
+      Monad[M].point(empty)
+    else
       Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
         case (x, y) =>
-          Monad[M].map(groupByM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
+          Monad[M].map(groupWhenM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
 
-  /** `groupByM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
-    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+    groupWhenM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */

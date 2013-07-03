@@ -155,30 +155,6 @@ object KTypeClass {
 
   }
 
-  private[scalaz] trait ProductPlus[F[_], T <: TCList]
-    extends Plus[TCCons[F, T]#Product]
-    with Product[Plus, F, T] {
-
-    def plus[A](a: λ[A], b: => λ[A]) =
-      FHead.plus(a.head, b.head) :: FTail.plus(a.tail, b.tail)
-
-  }
-
-  private[scalaz] trait ProductPlusEmpty[F[_], T <: TCList]
-    extends ProductPlus[F, T]
-    with PlusEmpty[TCCons[F, T]#Product]
-    with Product[PlusEmpty, F, T] {
-
-    def empty[A] = FHead.empty[A] :: FTail.empty[A]
-
-  }
-
-  private[scalaz] trait ProductApplicativePlus[F[_], T <: TCList]
-    extends ProductPlusEmpty[F, T]
-    with ProductApplicative[F, T]
-    with ApplicativePlus[TCCons[F, T]#Product]
-    with Product[ApplicativePlus, F, T]
-
   private[scalaz] trait ProductFoldable[F[_], T <: TCList]
     extends Foldable[TCCons[F, T]#Product]
     with Product[Foldable, F, T] {

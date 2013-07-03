@@ -11,6 +11,13 @@ import scalaz.Id.Id
 trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   ////
 
+  /**The product of Traverse1 `F` and `G`, `[x](F[x], G[x]])`, is a Traverse1 */
+  def product[G[_]](implicit G0: Traverse1[G]): Traverse1[({type λ[α] = (F[α], G[α])})#λ] = new ProductTraverse1[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverse1Impl[G[_]:Apply,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 

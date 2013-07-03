@@ -2,8 +2,7 @@ package scalaz
 package scalacheck
 
 import java.math.BigInteger
-import org.scalacheck.{Pretty, Gen, Arbitrary}
-import java.io._
+import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
 
 /**
@@ -16,12 +15,10 @@ object ScalazArbitrary {
   import Gen._
   import ScalaCheckBinding._
 
-  // todo report and/or work around compilation error: "scalaz is not an enclosing class"
-  // implicit def ShowPretty[A: Show](a: A): Pretty = Pretty { _ => a.show }
-
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
-  implicit def arbList[T](implicit a: Arbitrary[T]): Arbitrary[List[T]] = Arbitrary(containerOf[List,T](arbitrary[T]))
+  implicit def EphemeralStreamArbitrary[A : Arbitrary] =
+    Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arbArray[A])(ImmutableArray.fromArray[A](_))
@@ -64,6 +61,10 @@ object ScalazArbitrary {
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
 
+  implicit def OnePlusArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]
+                                        ): Arbitrary[OnePlus[F, A]] =
+    Apply[Arbitrary].apply2(arb[A], arb[F[A]])(OnePlus.apply)
+
   import scalaz.Ordering._
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
@@ -85,7 +86,6 @@ object ScalazArbitrary {
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
     Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
 
-  import Validation._
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => \/.left(a)
@@ -157,7 +157,6 @@ object ScalazArbitrary {
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Promise
-  import scalaz.concurrent.Promise._
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
@@ -218,15 +217,14 @@ object ScalazArbitrary {
     Applicative[Arbitrary].apply4(A, B, C, D)(LazyTuple4(_, _, _, _))
 
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
   implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
   }
 
+  @deprecated("BKTree is deprecated", "7.0.1")
   implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
     Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
 

@@ -46,9 +46,12 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traversal[G].run(fa)(f)
 
   /** A version of `traverse` that infers the type constructor `G`. */
-  final def traverseU[A,GB](self: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ = {
-    G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(this)
-  }
+  final def traverseU[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ =
+    G.TC.traverse(fa)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(this)
+
+  /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
+  final def traverseM[A, G[_], B](fa: F[A])(f: A => G[F[B]])(implicit G: Applicative[G], F: Monad[F]): G[F[B]] =
+    G.map(G.traverse(fa)(f)(this))(F.join)
 
   /** Traverse with `State`. */
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
@@ -58,7 +61,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traverseS(fa)(f)(s)
 
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
-  def traverseSTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
+  def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](s => {
@@ -68,7 +71,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   }
 
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
-  def traverseKTrampoline[S, G[+_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
+  def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
     implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](s => {
@@ -155,7 +158,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
     /**
      * @param nat A natural transformation from `M` to `N` for which these properties hold:
-     *            `(a: A) => nat(Applicative[M].pure[A](a)) === Applicative[M].point[A](a)`
+     *            `(a: A) => nat(Applicative[M].point[A](a)) === Applicative[N].point[A](a)`
      *            `(f: M[A => B], ma: M[A]) => nat(Applicative[M].ap(ma)(f)) === Applicative[N].ap(nat(ma))(nat(f))`
      */
     def naturality[N[_], M[_], A](nat: (M ~> N))

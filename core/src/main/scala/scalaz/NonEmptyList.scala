@@ -64,12 +64,28 @@ sealed trait NonEmptyList[+A] {
     }
   }
 
+  def init: List[A] = if(tail.isEmpty) Nil else (head :: tail.init)
+
+  def last: A = if(tail.isEmpty) head else tail.last
+
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
     case Nil    => Nil
     case h :: t => nel(h, t).tails.list
   })
 
   def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
+  def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
+  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = (list.sortWith(lt): @unchecked) match {
+    case x :: xs => nel(x, xs)
+  }
+
+  def sorted[B >: A](implicit o: Order[B]): NonEmptyList[A] = (list.sorted(o.toScalaOrdering): @unchecked) match {
     case x :: xs => nel(x, xs)
   }
 
@@ -148,7 +164,7 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
-      def length[A](a: NonEmptyList[A]): Int = a.size
+      override def length[A](a: NonEmptyList[A]): Int = a.size
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {

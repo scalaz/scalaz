@@ -15,6 +15,17 @@ trait Cojoin[F[_]] extends Functor[F] { self =>
   def extend[A, B](a: F[A])(f: F[A] => B): F[B] =
     map(cojoin(a))(f)
 
+  trait CojoinLaws {
+    def cobindAssociative[A, B, C, D](fa: F[A], f: F[A] => B, g: F[B] => C, h: F[C] => D)(implicit F: Equal[D]): Boolean = {
+      implicit val C = self
+      val d1 = ((Cokleisli(f) =>= Cokleisli(g)) =>= Cokleisli(h)) run fa
+      val d2 = (Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h))) run fa
+      F.equal(d1, d2)
+    }
+  }
+
+  def cojoinLaw = new CojoinLaws {}
+
   ////
   val cojoinSyntax = new scalaz.syntax.CojoinSyntax[F] { def F = Cojoin.this }
 }

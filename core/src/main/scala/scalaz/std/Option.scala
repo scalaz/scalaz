@@ -8,11 +8,13 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Cojoin[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
-    def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
+    override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: Option[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
+    override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
     override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
       case Some(f) => fa match {
         case Some(x) => Some(f(x))
@@ -50,13 +52,20 @@ trait OptionInstances extends OptionInstances0 {
       }
 
     def isEmpty[A](opt: Option[A]) = opt.isEmpty
+
+    def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
+      fa map (a => f(Some(a)))
+
+    def cojoin[A](a: Option[A]) =
+      a map (Some(_))
+
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
       case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
       case (Some(a1), None)     => f1
-      case (None, Some(a2))     => f2
+      case (None, sa2 @ Some(a2)) => sa2
       case (None, None)         => None
     }
 
