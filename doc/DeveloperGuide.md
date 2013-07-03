@@ -248,8 +248,8 @@ from the applied types.
 
     ({type λ[α]=F[X, α]})#λ
     ({type λ[α, β]=F[X, α, β]})#λ
-    ({type l[a]=F[X, a})#l
-    ({type l[a b]=F[X, a, b})#l
+    ({type l[a]=F[X, a]})#l
+    ({type l[a, b]=F[X, a, b]})#l
 
 ### Parameters
 
